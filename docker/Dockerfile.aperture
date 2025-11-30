@@ -1,0 +1,43 @@
+# =============================================================================
+# Aperture - L402 Lightning Payment Gateway
+# =============================================================================
+# Build from source since no official Docker image is published
+# =============================================================================
+
+FROM golang:1.24-alpine AS builder
+
+# Install build dependencies
+RUN apk add --no-cache git make
+
+# Clone and build Aperture
+WORKDIR /src
+RUN git clone --depth 1 https://github.com/lightninglabs/aperture.git . && \
+    make install
+
+# =============================================================================
+# Runtime stage
+# =============================================================================
+FROM alpine:3.19
+
+# Install runtime dependencies
+RUN apk add --no-cache ca-certificates tzdata
+
+# Create non-root user
+RUN addgroup -g 1000 aperture && \
+    adduser -D -u 1000 -G aperture aperture
+
+# Copy binary from builder
+COPY --from=builder /go/bin/aperture /usr/local/bin/aperture
+
+# Create config directory
+RUN mkdir -p /home/aperture/.aperture && \
+    chown -R aperture:aperture /home/aperture
+
+USER aperture
+WORKDIR /home/aperture
+
+# Expose default port
+EXPOSE 8081
+
+ENTRYPOINT ["aperture"]
+

@@ -1,0 +1,65 @@
+# =============================================================================
+# SatGate Aperture - systemd Service File (Linux)
+# =============================================================================
+# 
+# Installation:
+#   1. Copy this file to /etc/systemd/system/aperture.service
+#   2. Edit the Environment variables below with your LNC credentials
+#   3. sudo systemctl daemon-reload
+#   4. sudo systemctl enable aperture
+#   5. sudo systemctl start aperture
+#
+# =============================================================================
+
+[Unit]
+Description=SatGate Aperture L402 Gateway
+Documentation=https://github.com/lightninglabs/aperture
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=satgate
+Group=satgate
+
+# Working directory
+WorkingDirectory=/opt/satgate
+
+# Environment variables for LNC
+Environment="LNC_PASSPHRASE=YOUR_LNC_PASSPHRASE_HERE"
+Environment="LNC_MAILBOX=mailbox.terminal.lightning.today:443"
+Environment="LNC_NETWORK=mainnet"
+
+# Aperture command
+ExecStart=/usr/local/bin/aperture \
+    --configfile=/opt/satgate/aperture.yaml \
+    --authenticator.network=${LNC_NETWORK} \
+    --authenticator.passphrase=${LNC_PASSPHRASE} \
+    --authenticator.mailboxaddress=${LNC_MAILBOX}
+
+# Restart policy - restart on failure and every 12 hours
+Restart=always
+RestartSec=10
+
+# Watchdog - restart if unresponsive for 60 seconds
+WatchdogSec=60
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/satgate/.aperture
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=aperture
+
+[Install]
+WantedBy=multi-user.target
+

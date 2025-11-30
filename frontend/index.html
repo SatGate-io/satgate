@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SatGate - Protect & monetize your API with Lightning. Instant. Permissionless.">
+<title>SatGate - Lightning API Gateway</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --accent-hover: #79c0ff;
+    --ok: #3fb950;
+    --warn: #d29922;
+    --bad: #f85149;
+    --radius: 12px;
+  }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    min-height: 100vh;
+  }
+  
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+  
+  header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  
+  header h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  
+  header p {
+    color: var(--muted);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  
+  .card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .card h3 .step {
+    background: var(--accent);
+    color: var(--bg);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  
+  .card p {
+    color: var(--muted);
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
+  
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  
+  .btn {
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--accent);
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .btn:hover:not(:disabled) {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+  }
+  
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .btn.secondary {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text);
+  }
+  
+  .btn.secondary:hover:not(:disabled) {
+    background: var(--border);
+  }
+  
+  .btn.success {
+    background: var(--ok);
+  }
+  
+  .btn .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  code {
+    background: #0d1117;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    border: 1px solid var(--border);
+  }
+  
+  .output {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+    font-size: 12px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 12px;
+  }
+  
+  .output:empty {
+    display: none;
+  }
+  
+  .output.error {
+    border-color: var(--bad);
+    color: var(--bad);
+  }
+  
+  .output.success {
+    border-color: var(--ok);
+  }
+  
+  .status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+  
+  .status-badge.success { background: var(--ok); color: #000; }
+  .status-badge.error { background: var(--bad); color: #fff; }
+  .status-badge.pending { background: var(--warn); color: #000; }
+  
+  input {
+    width: 100%;
+    padding: 10px 12px;
+    background: #0d1117;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.15s;
+  }
+  
+  input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  
+  input::placeholder {
+    color: var(--muted);
+  }
+  
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--muted);
+  }
+  
+  .qr-container {
+    display: none;
+    margin-top: 16px;
+    padding: 16px;
+    background: #fff;
+    border-radius: 12px;
+    text-align: center;
+  }
+  
+  .qr-container.visible {
+    display: inline-block;
+  }
+  
+  .qr-container canvas {
+    display: block;
+    margin: 0 auto;
+  }
+  
+  .invoice-text {
+    margin-top: 12px;
+    padding: 8px;
+    background: var(--bg);
+    border-radius: 6px;
+    font-size: 10px;
+    color: var(--muted);
+    word-break: break-all;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  
+  .invoice-text:hover {
+    background: var(--panel);
+  }
+  
+  .token-info {
+    background: linear-gradient(135deg, #1a3a1a 0%, #0d1117 100%);
+    border: 1px solid var(--ok);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 12px;
+    font-size: 12px;
+  }
+  
+  .token-info .label {
+    color: var(--ok);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  
+  .docs-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .docs-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  
+  .docs-list li:last-child {
+    border-bottom: none;
+  }
+  
+  footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  
+  footer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  
+  @media (max-width: 600px) {
+    .container { padding: 16px 12px; }
+    header h1 { font-size: 1.4rem; }
+    .btn-row { flex-direction: column; }
+    .btn { width: 100%; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>⚡ SatGate</h1>
+      <p>Protect & monetize your API with Lightning. Instant. Permissionless.</p>
+    </header>
+
+    <!-- Step 1: Request Protected Resource -->
+    <div class="card">
+      <h3><span class="step">1</span> Request Protected Resource</h3>
+      <p>Select a tier and endpoint. Without a valid L402 token, you'll receive a <strong>402 Payment Required</strong> response with a Lightning invoice.</p>
+      
+      <div style="margin-bottom: 12px;">
+        <label style="color: var(--muted); font-size: 12px; display: block; margin-bottom: 6px;">Select Endpoint:</label>
+        <select id="endpointSelect" style="background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-size: 14px; width: 100%; max-width: 400px;">
+          <optgroup label="⭐ Premium (1000 sats)">
+            <option value="/api/premium/insights">AI Insights - /api/premium/insights</option>
+            <option value="/api/premium/export">Data Export - /api/premium/export</option>
+          </optgroup>
+          <optgroup label="📊 Standard (100 sats)">
+            <option value="/api/standard/analytics" selected>Analytics - /api/standard/analytics</option>
+            <option value="/api/standard/metrics">Metrics - /api/standard/metrics</option>
+          </optgroup>
+          <optgroup label="🔹 Basic (10 sats)">
+            <option value="/api/basic/status">Status - /api/basic/status</option>
+            <option value="/api/basic/quote">Quote - /api/basic/quote</option>
+          </optgroup>
+        </select>
+      </div>
+      
+      <div class="btn-row">
+        <button class="btn" id="btnRequest">
+          <span id="btnRequestText">Request Endpoint</span>
+        </button>
+        <button class="btn secondary" id="btnPing">Test Free Endpoint</button>
+      </div>
+      <div id="tokenInfo" class="token-info" style="display:none">
+        <div class="label">✓ Valid L402 Token Available</div>
+        <div id="tokenDetails"></div>
+      </div>
+      <pre id="output1" class="output"></pre>
+    </div>
+
+    <!-- Step 2: Pay Invoice -->
+    <div class="card">
+      <h3><span class="step">2</span> Pay the Invoice</h3>
+      <p>Use WebLN (Alby, etc.) for one-click payment, or scan the QR code with any Lightning wallet.</p>
+      
+      <div id="invoiceAmount" style="display:none; background: linear-gradient(135deg, #1a2a3a 0%, #0d1117 100%); border: 1px solid var(--accent); border-radius: 8px; padding: 16px; margin-bottom: 16px; text-align: center;">
+        <div style="color: var(--muted); font-size: 12px; margin-bottom: 4px;">Invoice Amount</div>
+        <div id="invoiceAmountValue" style="font-size: 28px; font-weight: 700; color: var(--accent);">-- sats</div>
+      </div>
+      
+      <div class="btn-row">
+        <button class="btn" id="btnWebLN" disabled>
+          <span>⚡</span>
+          <span id="btnWebLNText">Pay with WebLN</span>
+        </button>
+        <button class="btn secondary" id="btnShowQR" disabled>Show QR Code</button>
+        <button class="btn secondary" id="btnCopyInvoice" disabled>Copy Invoice</button>
+      </div>
+      
+      <div id="qrContainer" class="qr-container">
+        <div id="qrCode"></div>
+        <div id="invoiceText" class="invoice-text" title="Click to copy"></div>
+      </div>
+      
+      <!-- Preimage Entry Section - Shows after QR is displayed -->
+      <div id="preimageSection" class="preimage-section" style="display:none; margin-top: 20px; padding: 16px; background: linear-gradient(135deg, #2a2a1a 0%, #0d1117 100%); border: 1px solid var(--warn); border-radius: 8px;">
+        <h4 style="color: var(--warn); margin-bottom: 8px; font-size: 14px;">📋 Paid via External Wallet?</h4>
+        <p style="color: var(--muted); font-size: 13px; margin-bottom: 12px; line-height: 1.5;">
+          After paying, your wallet shows a <strong style="color: var(--text);">preimage</strong> (also called "payment proof" or "secret"). 
+          It's a 64-character hex string. Copy it and paste below.
+        </p>
+        <div style="background: #1a1a2e; border: 1px solid var(--bad); border-radius: 6px; padding: 10px; margin-bottom: 12px;">
+          <p style="color: var(--bad); font-size: 12px; margin: 0 0 8px 0; font-weight: 600;">
+            ⚠️ Important: Copy the PREIMAGE, not the Payment Hash!
+          </p>
+          <p style="color: var(--muted); font-size: 11px; margin: 0;">
+            • <strong>Preimage</strong> = 64 hex chars (what you need) ✓<br>
+            • <strong>Payment Hash</strong> = different 64 hex chars (won't work) ✗
+          </p>
+        </div>
+        <p style="color: var(--muted); font-size: 12px; margin-bottom: 12px;">
+          <strong>Where to find the PREIMAGE:</strong><br>
+          • <strong>Wallet of Satoshi:</strong> Tap payment → "Payment Details" → look for "Preimage" (not Payment Hash)<br>
+          • <strong>Phoenix:</strong> Tap payment → scroll down → "Preimage" (starts with different chars than hash)<br>
+          • <strong>Zeus:</strong> Transaction details → "Payment Preimage" (64 chars)<br>
+          • <strong>Alby:</strong> Click payment → expand details → "Preimage"<br>
+          • <strong>Muun:</strong> Settings → Lightning invoices → tap payment → "Preimage"
+        </p>
+        <label for="preimage" style="color: var(--warn); font-weight: 600;">Preimage (64 hex characters)</label>
+        <input id="preimage" placeholder="e.g. 0a1b2c3d4e5f... (paste your payment preimage here)" style="margin-top: 6px; border-color: var(--warn);">
+        <div id="preimageStatus" style="margin-top: 8px; font-size: 12px; color: var(--muted);"></div>
+        <button class="btn" id="btnConfirmPayment" style="margin-top: 12px; background: var(--warn); width: 100%;">
+          ✓ I've Paid - Verify Preimage
+        </button>
+      </div>
+      
+      <!-- Success Message -->
+      <div id="paymentSuccess" style="display:none; margin-top: 16px; padding: 16px; background: linear-gradient(135deg, #1a3a1a 0%, #0d1117 100%); border: 1px solid var(--ok); border-radius: 8px; text-align: center;">
+        <div style="font-size: 32px; margin-bottom: 8px;">✅</div>
+        <div style="color: var(--ok); font-weight: 600; font-size: 16px;">Payment Confirmed!</div>
+        <div style="color: var(--muted); font-size: 13px; margin-top: 4px;">Preimage validated. Click "Retry with L402 Token" below.</div>
+      </div>
+    </div>
+
+    <!-- Step 3: Access Resource -->
+    <div class="card">
+      <h3><span class="step">3</span> Access Protected Resource</h3>
+      <p>After payment, retry with your L402 token to access the protected data.</p>
+      <div class="btn-row">
+        <button class="btn success" id="btnRetry" disabled>
+          <span id="btnRetryText">Retry with L402 Token</span>
+        </button>
+        <button class="btn secondary" id="btnClearToken">Clear Saved Token</button>
+      </div>
+      <pre id="output2" class="output"></pre>
+    </div>
+
+    <!-- Documentation -->
+    <div class="card">
+      <h3>📚 What is L402?</h3>
+      <p style="margin-bottom: 16px; line-height: 1.6;">
+        <strong>L402</strong> is an open protocol that enables <em>native internet payments</em> using Bitcoin's Lightning Network. 
+        It leverages HTTP status code <strong>402 Payment Required</strong> — reserved since 1999 for "future use" — to create 
+        a standard way for APIs to request payment before granting access. No accounts, no API keys, no credit cards — 
+        just instant micropayments that work globally, 24/7.
+      </p>
+      <p style="margin-bottom: 16px; line-height: 1.6; color: #8b949e;">
+        L402 combines <strong>macaroons</strong> (flexible bearer credentials) with <strong>Lightning invoices</strong> (instant Bitcoin payments) 
+        to create tokens that prove you paid. This makes it perfect for AI agents, bots, and applications that need 
+        programmatic, metered access to APIs without human intervention.
+      </p>
+      <h4 style="margin: 20px 0 12px 0; font-size: 14px; color: #c9d1d9;">The Flow</h4>
+      <ul class="docs-list">
+        <li><strong>1. Request:</strong> Client requests a protected resource without credentials</li>
+        <li><strong>2. Challenge:</strong> Server returns <code>402</code> with <code>WWW-Authenticate: L402 macaroon="...", invoice="..."</code></li>
+        <li><strong>3. Pay:</strong> Client pays the Lightning invoice → receives preimage (cryptographic proof of payment)</li>
+        <li><strong>4. Access:</strong> Client retries with <code>Authorization: L402 &lt;macaroon&gt;:&lt;preimage&gt;</code></li>
+        <li><strong>5. Reuse:</strong> Token can be cached and reused for <strong>1 hour</strong> — no need to pay again</li>
+      </ul>
+    </div>
+
+    <footer>
+      <strong>SatGate</strong> — Built with <a href="https://github.com/lightninglabs/aperture">Aperture</a> • 
+      <a href="https://lightning.engineering/posts/2020-03-30-lsat/">L402 Protocol</a>
+    </footer>
+  </div>
+
+<script>
+// =============================================================================
+// CONFIGURATION
+// =============================================================================
+const CONFIG = {
+  apertureBase: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://127.0.0.1:8081'
+    : window.location.origin, // In production, Aperture would be on the same domain
+  storageKey: 'l402_token',
+  endpoints: {
+    // Tiered pricing endpoints
+    premium: {
+      insights: '/api/premium/insights',
+      export: '/api/premium/export'
+    },
+    standard: {
+      analytics: '/api/standard/analytics',
+      metrics: '/api/standard/metrics'
+    },
+    basic: {
+      status: '/api/basic/status',
+      quote: '/api/basic/quote'
+    },
+    free: {
+      ping: '/api/free/ping'
+    }
+  }
+};
+
+// =============================================================================
+// STATE
+// =============================================================================
+let state = {
+  macaroon: null,
+  invoice: null,
+  preimage: null,
+  loading: false
+};
+
+// =============================================================================
+// DOM ELEMENTS
+// =============================================================================
+const $ = (id) => document.getElementById(id);
+const btnRequest = $('btnRequest');
+const btnRequestText = $('btnRequestText');
+const btnPing = $('btnPing');
+const btnWebLN = $('btnWebLN');
+const btnWebLNText = $('btnWebLNText');
+const btnShowQR = $('btnShowQR');
+const btnCopyInvoice = $('btnCopyInvoice');
+const btnRetry = $('btnRetry');
+const btnRetryText = $('btnRetryText');
+const btnClearToken = $('btnClearToken');
+const output1 = $('output1');
+const output2 = $('output2');
+const preimageInput = $('preimage');
+const qrContainer = $('qrContainer');
+const qrCode = $('qrCode');
+const invoiceText = $('invoiceText');
+const tokenInfo = $('tokenInfo');
+const tokenDetails = $('tokenDetails');
+const invoiceAmount = $('invoiceAmount');
+const invoiceAmountValue = $('invoiceAmountValue');
+const preimageSection = $('preimageSection');
+const preimageStatus = $('preimageStatus');
+const paymentSuccess = $('paymentSuccess');
+const btnConfirmPayment = $('btnConfirmPayment');
+
+// =============================================================================
+// UTILITIES
+// =============================================================================
+
+function log(element, data, isError = false, isSuccess = false) {
+  element.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+  element.classList.toggle('error', isError);
+  element.classList.toggle('success', isSuccess);
+}
+
+function setLoading(button, textEl, loading, loadingText = 'Loading...') {
+  const originalText = textEl.dataset.original || textEl.textContent;
+  if (!textEl.dataset.original) textEl.dataset.original = originalText;
+  
+  if (loading) {
+    textEl.innerHTML = `<span class="spinner"></span> ${loadingText}`;
+    button.disabled = true;
+  } else {
+    textEl.textContent = originalText;
+    button.disabled = false;
+  }
+}
+
+function parseWwwAuthenticate(header) {
+  if (!header) return null;
+  const match = /(L402|LSAT)\s+macaroon="([^"]+)"\s*,\s*invoice="([^"]+)"/i.exec(header);
+  if (!match) return null;
+  return { scheme: match[1], macaroon: match[2], invoice: match[3] };
+}
+
+function decodeInvoice(invoice) {
+  // Simple extraction of amount from BOLT11 invoice
+  const amountMatch = invoice.match(/lnbc(\d+)([munp]?)/i);
+  if (!amountMatch) return null;
+  
+  let amount = parseInt(amountMatch[1]);
+  const multiplier = amountMatch[2];
+  
+  switch(multiplier) {
+    case 'm': amount *= 100000; break; // milli-bitcoin
+    case 'u': amount *= 100; break;     // micro-bitcoin  
+    case 'n': amount *= 0.1; break;     // nano-bitcoin
+    case 'p': amount *= 0.0001; break;  // pico-bitcoin
+    default: amount *= 100000000;       // bitcoin
+  }
+  
+  return { sats: Math.round(amount) };
+}
+
+// =============================================================================
+// TOKEN PERSISTENCE
+// =============================================================================
+
+function saveToken() {
+  if (state.macaroon && state.preimage) {
+    const token = {
+      macaroon: state.macaroon,
+      preimage: state.preimage,
+      savedAt: Date.now()
+    };
+    localStorage.setItem(CONFIG.storageKey, JSON.stringify(token));
+    updateTokenDisplay();
+  }
+}
+
+function loadToken() {
+  try {
+    const stored = localStorage.getItem(CONFIG.storageKey);
+    if (stored) {
+      const token = JSON.parse(stored);
+      // Check if token is less than 24 hours old (macaroons typically have expiry)
+      if (Date.now() - token.savedAt < 24 * 60 * 60 * 1000) {
+        state.macaroon = token.macaroon;
+        state.preimage = token.preimage;
+        preimageInput.value = token.preimage;
+        updateTokenDisplay();
+        enableRetryButton();
+        return true;
+      } else {
+        localStorage.removeItem(CONFIG.storageKey);
+      }
+    }
+  } catch (e) {
+    console.error('Failed to load token:', e);
+  }
+  return false;
+}
+
+function clearToken() {
+  localStorage.removeItem(CONFIG.storageKey);
+  state.macaroon = null;
+  state.preimage = null;
+  preimageInput.value = '';
+  tokenInfo.style.display = 'none';
+  btnRetry.disabled = true;
+  log(output2, '');
+}
+
+function updateTokenDisplay() {
+  if (state.macaroon && state.preimage) {
+    tokenInfo.style.display = 'block';
+    tokenDetails.textContent = `Macaroon: ${state.macaroon.substring(0, 20)}...\nPreimage: ${state.preimage.substring(0, 16)}...`;
+  } else {
+    tokenInfo.style.display = 'none';
+  }
+}
+
+function enablePaymentButtons() {
+  btnWebLN.disabled = false;
+  btnShowQR.disabled = false;
+  btnCopyInvoice.disabled = false;
+  btnRetry.disabled = !state.preimage;
+  
+  // Show invoice amount and identifier
+  if (state.invoice) {
+    const info = decodeInvoice(state.invoice);
+    if (info) {
+      // Show amount and last 8 chars of invoice as identifier
+      const invoiceId = state.invoice.slice(-8).toUpperCase();
+      invoiceAmountValue.innerHTML = `${info.sats} sats <span style="font-size: 12px; color: var(--muted); display: block; margin-top: 4px;">Invoice ID: ...${invoiceId}</span>`;
+      invoiceAmount.style.display = 'block';
+    }
+  }
+}
+
+function enableRetryButton() {
+  btnRetry.disabled = !(state.macaroon && state.preimage);
+}
+
+// =============================================================================
+// API FUNCTIONS
+// =============================================================================
+
+async function requestAnalytics() {
+  const endpointSelect = document.getElementById('endpointSelect');
+  const selectedEndpoint = endpointSelect.value;
+  
+  // Warn if there's already an unpaid invoice
+  if (state.invoice && !state.preimage) {
+    const confirmed = confirm(
+      '⚠️ You already have an unpaid invoice!\n\n' +
+      'If you request a new endpoint, you\'ll get a NEW invoice.\n' +
+      'Any payment you already made won\'t work with the new invoice.\n\n' +
+      'Click OK to get a new invoice, or Cancel to keep the current one.'
+    );
+    if (!confirmed) return;
+  }
+  
+  setLoading(btnRequest, btnRequestText, true, 'Requesting...');
+  output1.textContent = '';
+  
+  // Reset payment UI state for new request
+  qrContainer.classList.remove('visible');
+  preimageSection.style.display = 'none';
+  paymentSuccess.style.display = 'none';
+  invoiceAmount.style.display = 'none';
+  preimageStatus.textContent = '';
+  state.invoice = null; // Clear old invoice
+  state.macaroon = null; // Clear old macaroon
+  
+  try {
+    // If we have a valid token, use it
+    const headers = {};
+    if (state.macaroon && state.preimage) {
+      headers['Authorization'] = `L402 ${state.macaroon}:${state.preimage}`;
+    }
+    
+    const response = await fetch(CONFIG.apertureBase + selectedEndpoint, {
+      method: 'GET',
+      headers
+    });
+    
+    const text = await response.text();
+    const authHeader = response.headers.get('WWW-Authenticate');
+    
+    if (response.status === 402 && authHeader) {
+      const challenge = parseWwwAuthenticate(authHeader);
+      if (challenge) {
+        state.macaroon = challenge.macaroon;
+        state.invoice = challenge.invoice;
+        
+        const invoiceInfo = decodeInvoice(challenge.invoice);
+        
+        log(output1, {
+          status: 402,
+          message: 'Payment Required',
+          invoice: challenge.invoice,
+          amount: invoiceInfo ? `${invoiceInfo.sats} sats` : 'unknown',
+          scheme: challenge.scheme
+        });
+        
+        enablePaymentButtons();
+      }
+    } else if (response.ok) {
+      try {
+        const json = JSON.parse(text);
+        log(output1, { status: response.status, data: json }, false, true);
+      } catch {
+        log(output1, { status: response.status, body: text }, false, true);
+      }
+    } else {
+      log(output1, { status: response.status, error: text }, true);
+    }
+  } catch (error) {
+    log(output1, `Error: ${error.message}`, true);
+  } finally {
+    setLoading(btnRequest, btnRequestText, false);
+  }
+}
+
+async function pingEndpoint() {
+  try {
+    const response = await fetch(CONFIG.apertureBase + CONFIG.endpoints.free.ping);
+    const data = await response.json();
+    log(output1, { status: response.status, data }, false, response.ok);
+  } catch (error) {
+    log(output1, `Error: ${error.message}`, true);
+  }
+}
+
+async function payWithWebLN() {
+  if (!state.invoice) {
+    alert('No invoice available. Request the endpoint first.');
+    return;
+  }
+  
+  if (!state.macaroon) {
+    alert('No macaroon available. Request the endpoint first.');
+    return;
+  }
+  
+  // Store the macaroon we're paying for - critical for matching!
+  const payingForMacaroon = state.macaroon;
+  const payingForInvoice = state.invoice;
+  
+  setLoading(btnWebLN, btnWebLNText, true, 'Connecting...');
+  
+  try {
+    if (!window.webln) {
+      throw new Error('No WebLN provider found. Install Alby or another WebLN wallet.');
+    }
+    
+    await window.webln.enable();
+    setLoading(btnWebLN, btnWebLNText, true, 'Paying...');
+    
+    console.log('WebLN: Paying invoice:', payingForInvoice.slice(-12));
+    
+    const result = await window.webln.sendPayment(payingForInvoice);
+    
+    if (result && result.preimage) {
+      console.log('WebLN: Payment success! Preimage:', result.preimage.substring(0, 16) + '...');
+      
+      // CRITICAL: Use the macaroon we were paying for, not current state
+      // (in case user clicked elsewhere during payment)
+      state.macaroon = payingForMacaroon;
+      state.invoice = payingForInvoice;
+      state.preimage = result.preimage;
+      preimageInput.value = result.preimage;
+      saveToken();
+      enableRetryButton();
+      
+      console.log('WebLN: Token saved. Macaroon (first 30):', state.macaroon.substring(0, 30));
+      
+      // Show success state
+      preimageSection.style.display = 'none';
+      paymentSuccess.style.display = 'block';
+      
+      // Scroll to step 3
+      document.getElementById('btnRetry').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  } catch (error) {
+    console.error('WebLN Error:', error);
+    alert(`WebLN Error: ${error.message}`);
+  } finally {
+    setLoading(btnWebLN, btnWebLNText, false);
+  }
+}
+
+function showQRCode() {
+  if (!state.invoice) return;
+  
+  qrCode.innerHTML = '';
+  qrContainer.classList.add('visible');
+  
+  new QRCode(qrCode, {
+    text: state.invoice.toUpperCase(),
+    width: 220,
+    height: 220,
+    colorDark: '#000000',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.L
+  });
+  
+  invoiceText.textContent = state.invoice;
+  invoiceText.onclick = copyInvoice;
+  
+  // Show preimage entry section for external wallet payments
+  preimageSection.style.display = 'block';
+  paymentSuccess.style.display = 'none';
+}
+
+function validatePreimageFormat(preimage) {
+  // Preimage should be 64 hex characters
+  return /^[a-fA-F0-9]{64}$/.test(preimage);
+}
+
+function confirmPayment() {
+  const preimage = preimageInput.value.trim();
+  
+  if (!preimage) {
+    preimageStatus.textContent = '⚠️ Please enter the preimage from your wallet';
+    preimageStatus.style.color = 'var(--warn)';
+    return;
+  }
+  
+  if (!validatePreimageFormat(preimage)) {
+    preimageStatus.textContent = '❌ Invalid format. Preimage must be exactly 64 hexadecimal characters (0-9, a-f)';
+    preimageStatus.style.color = 'var(--bad)';
+    return;
+  }
+  
+  // Valid preimage format
+  state.preimage = preimage;
+  saveToken();
+  enableRetryButton();
+  
+  // Show success state
+  preimageSection.style.display = 'none';
+  paymentSuccess.style.display = 'block';
+  
+  // Scroll to step 3
+  document.getElementById('btnRetry').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function copyInvoice() {
+  if (!state.invoice) return;
+  
+  navigator.clipboard.writeText(state.invoice).then(() => {
+    const original = invoiceText.textContent;
+    invoiceText.textContent = '✓ Copied to clipboard!';
+    invoiceText.style.color = '#3fb950';
+    setTimeout(() => {
+      invoiceText.textContent = original;
+      invoiceText.style.color = '';
+    }, 2000);
+  });
+}
+
+async function retryWithL402() {
+  const endpointSelect = document.getElementById('endpointSelect');
+  const selectedEndpoint = endpointSelect.value;
+  const preimage = preimageInput.value.trim();
+  
+  if (!state.macaroon) {
+    alert('No macaroon available. Click "Request Endpoint" first to get an invoice.');
+    return;
+  }
+  
+  if (!preimage) {
+    alert('Please enter the preimage from your payment.\n\nFind it in your wallet\'s payment details after paying the invoice.');
+    return;
+  }
+  
+  if (!validatePreimageFormat(preimage)) {
+    alert('Invalid preimage format.\n\nPreimage must be exactly 64 hexadecimal characters (0-9, a-f).\n\nYou entered: ' + preimage.length + ' characters');
+    return;
+  }
+  
+  state.preimage = preimage;
+  saveToken();
+  
+  setLoading(btnRetry, btnRetryText, true, 'Authorizing...');
+  output2.textContent = '';
+  
+  // Log what we're sending for debugging
+  const invoiceId = state.invoice ? state.invoice.slice(-8).toUpperCase() : 'unknown';
+  console.log('L402 Authorization attempt:', {
+    endpoint: selectedEndpoint,
+    macaroon: state.macaroon.substring(0, 30) + '...',
+    preimage: preimage.substring(0, 16) + '...',
+    preimageLength: preimage.length,
+    invoiceId: invoiceId
+  });
+  
+  try {
+    const response = await fetch(CONFIG.apertureBase + selectedEndpoint, {
+      headers: {
+        'Authorization': `L402 ${state.macaroon}:${preimage}`
+      }
+    });
+    
+    const text = await response.text();
+    
+    if (response.ok) {
+      try {
+        const json = JSON.parse(text);
+        log(output2, { 
+          status: response.status, 
+          message: '✅ Access Granted!',
+          data: json 
+        }, false, true);
+        
+        // Show success feedback
+        paymentSuccess.style.display = 'block';
+        preimageSection.style.display = 'none';
+      } catch {
+        log(output2, { status: response.status, body: text }, false, true);
+      }
+    } else if (response.status === 402) {
+      // Got another 402 - preimage might be wrong or for different invoice
+      const invoiceId = state.invoice ? state.invoice.slice(-8).toUpperCase() : 'unknown';
+      log(output2, { 
+        status: 402, 
+        error: '❌ Payment verification failed',
+        hint: 'The preimage doesn\'t match the invoice. This usually means:\n' +
+              '1. You made a NEW request after paying (getting a different invoice)\n' +
+              '2. The preimage is from a different payment\n\n' +
+              'Solution: Click "Request Endpoint" again, pay the NEW invoice, then retry immediately.',
+        invoiceId: invoiceId,
+        preimageUsed: preimage.substring(0, 16) + '...'
+      }, true);
+      // Don't clear token yet - let user try again with correct preimage
+    } else {
+      log(output2, { 
+        status: response.status, 
+        error: 'Authorization failed. Token may be invalid or expired.',
+        hint: 'Try requesting a new invoice and paying again.',
+        body: text 
+      }, true);
+      // Clear invalid token
+      clearToken();
+    }
+  } catch (error) {
+    log(output2, {
+      error: `Network error: ${error.message}`,
+      hint: 'Check that Aperture is running on port 8081'
+    }, true);
+  } finally {
+    setLoading(btnRetry, btnRetryText, false);
+    // Scroll to show the result
+    output2.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+// =============================================================================
+// EVENT LISTENERS
+// =============================================================================
+
+btnRequest.addEventListener('click', requestAnalytics);
+btnPing.addEventListener('click', pingEndpoint);
+btnWebLN.addEventListener('click', payWithWebLN);
+btnShowQR.addEventListener('click', showQRCode);
+btnCopyInvoice.addEventListener('click', copyInvoice);
+btnRetry.addEventListener('click', retryWithL402);
+btnClearToken.addEventListener('click', clearToken);
+btnConfirmPayment.addEventListener('click', confirmPayment);
+
+preimageInput.addEventListener('input', () => {
+  const val = preimageInput.value.trim();
+  state.preimage = val;
+  enableRetryButton();
+  
+  // Live validation feedback
+  if (val.length === 0) {
+    preimageStatus.textContent = '';
+  } else if (val.length < 64) {
+    preimageStatus.textContent = `${val.length}/64 characters`;
+    preimageStatus.style.color = 'var(--muted)';
+  } else if (val.length === 64 && validatePreimageFormat(val)) {
+    preimageStatus.textContent = '✓ Valid preimage format';
+    preimageStatus.style.color = 'var(--ok)';
+  } else {
+    preimageStatus.textContent = '❌ Invalid characters or length';
+    preimageStatus.style.color = 'var(--bad)';
+  }
+});
+
+// =============================================================================
+// INITIALIZATION
+// =============================================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Load any saved token
+  if (loadToken()) {
+    console.log('Loaded saved L402 token');
+  }
+  
+  // Check for WebLN availability
+  if (window.webln) {
+    console.log('WebLN provider detected');
+  }
+});
+</script>
+</body>
+</html>

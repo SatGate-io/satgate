@@ -1,0 +1,54 @@
+# =============================================================================
+# SatGate - Lightning API Gateway - Docker Compose Configuration
+# =============================================================================
+# 
+# Usage:
+#   Development:  docker-compose up
+#   Production:   docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# Note: Aperture must be run separately with LNC credentials
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # ---------------------------------------------------------------------------
+  # Backend API Server
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: satgate-backend
+    restart: unless-stopped
+    ports:
+      - "8083:8083"
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - BACKEND_PORT=8083
+      - CORS_ORIGINS=http://127.0.0.1:8081,http://localhost:8081
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8083/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - satgate-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  satgate-network:
+    driver: bridge
+
+# =============================================================================
+# Volume for persistent data (if needed in future)
+# =============================================================================
+# volumes:
+#   l402-data:
+
+

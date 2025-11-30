@@ -1,0 +1,21 @@
+{
+  "name": "@satgate/client",
+  "version": "0.1.0",
+  "description": "Client SDK for SatGate L402 Gateways. Auto-handles payment loops.",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "satgate",
+    "l402",
+    "lightning",
+    "bitcoin",
+    "client"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}
+

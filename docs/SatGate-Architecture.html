@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SatGate - Architecture & Value Proposition</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap');
+    
+    :root {
+      --bg: #ffffff;
+      --text: #1a1a2e;
+      --text-muted: #6b7280;
+      --accent: #f7931a;
+      --accent-light: #fff3e0;
+      --border: #e5e7eb;
+      --code-bg: #f3f4f6;
+      --table-header: #f9fafb;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.7;
+      color: var(--text);
+      background: var(--bg);
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 60px 40px;
+      font-size: 15px;
+    }
+    
+    h1 {
+      font-size: 42px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    
+    h1 .emoji { font-size: 36px; }
+    
+    h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 48px 0 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--accent);
+      color: var(--text);
+    }
+    
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 32px 0 16px;
+      color: var(--text);
+    }
+    
+    h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 24px 0 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    p {
+      margin-bottom: 16px;
+    }
+    
+    .tagline {
+      font-size: 20px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    
+    .subtitle {
+      font-size: 14px;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-bottom: 40px;
+    }
+    
+    .summary-box {
+      background: var(--accent-light);
+      border-left: 4px solid var(--accent);
+      padding: 20px 24px;
+      margin: 24px 0;
+      border-radius: 0 8px 8px 0;
+    }
+    
+    .summary-box p {
+      margin: 0;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    
+    th, td {
+      text-align: left;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+    }
+    
+    th {
+      background: var(--table-header);
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+    
+    tr:nth-child(even) {
+      background: #fafafa;
+    }
+    
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      background: var(--code-bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    pre {
+      background: #1a1a2e;
+      color: #e5e7eb;
+      padding: 20px 24px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 20px 0;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+    
+    ul, ol {
+      margin: 16px 0;
+      padding-left: 24px;
+    }
+    
+    li {
+      margin-bottom: 8px;
+    }
+    
+    .diagram {
+      background: #1a1a2e;
+      color: #a5b4fc;
+      padding: 24px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      line-height: 1.4;
+      overflow-x: auto;
+      white-space: pre;
+      margin: 24px 0;
+    }
+    
+    .highlight {
+      background: var(--accent-light);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    .center {
+      text-align: center;
+    }
+    
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 48px 0;
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 60px;
+      padding-top: 40px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    
+    .footer strong {
+      color: var(--text);
+      font-size: 18px;
+      display: block;
+      margin-bottom: 8px;
+    }
+    
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    
+    a:hover {
+      text-decoration: underline;
+    }
+    
+    @media print {
+      body {
+        padding: 40px;
+        font-size: 12px;
+      }
+      h1 { font-size: 32px; }
+      h2 { font-size: 20px; margin-top: 32px; }
+      pre, .diagram { font-size: 10px; }
+      table { font-size: 11px; }
+    }
+    
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    
+    @media (max-width: 700px) {
+      .two-col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<h1><span class="emoji">⚡</span> SatGate</h1>
+<p class="tagline">Protect & Monetize Your API with Lightning</p>
+<p class="subtitle">INSTANT • PERMISSIONLESS • GLOBAL</p>
+
+<h2>Executive Summary</h2>
+
+<div class="summary-box">
+  <p><strong>SatGate</strong> is a production-ready API monetization gateway built on the L402 protocol. It uses Bitcoin's Lightning Network for instant API payments — no accounts, no API keys, no minimums. Lightning-native by default, with optional card payments as a bridge for enterprise adoption.</p>
+</div>
+
+<h2>What is L402?</h2>
+
+<p><strong>L402</strong> is an open protocol that enables <em>native internet payments</em> using Bitcoin's Lightning Network. It leverages HTTP status code <code>402 Payment Required</code> — reserved since 1999 for "future use" — to create a standard way for APIs to request payment before granting access. No accounts, no API keys, no minimums — just instant micropayments that work globally, 24/7. While Lightning is the native payment rail, L402 tokens work regardless of payment method (enabling card/stablecoin bridges).</p>
+
+<p>L402 combines <strong>macaroons</strong> (flexible bearer credentials) with <strong>Lightning invoices</strong> (instant Bitcoin payments) to create tokens that prove you paid. This makes it perfect for AI agents, bots, and applications that need programmatic, metered access to APIs without human intervention.</p>
+
+<div class="summary-box">
+  <p><strong>Key Insight:</strong> HTTP 402 was reserved for "future use" in 1999, waiting for a native internet payment system. 25 years later, Bitcoin's Lightning Network finally makes it possible — and L402 is the protocol that brings it to life.</p>
+</div>
+
+<h2>The Problem</h2>
+
+<div class="two-col">
+  <div>
+    <h4>For API Providers</h4>
+    <table>
+      <tr><th>Challenge</th><th>Impact</th></tr>
+      <tr><td>Bot abuse & scraping</td><td>Inflated costs, degraded service</td></tr>
+      <tr><td>Payment friction</td><td>Lost customers during signup</td></tr>
+      <tr><td>Chargebacks & fraud</td><td>Revenue loss, overhead</td></tr>
+      <tr><td>Global access barriers</td><td>Users without cards excluded</td></tr>
+      <tr><td>Micropayment economics</td><td>Can't charge &lt;$1 profitably</td></tr>
+    </table>
+  </div>
+  <div>
+    <h4>For API Consumers</h4>
+    <table>
+      <tr><th>Challenge</th><th>Impact</th></tr>
+      <tr><td>Account fatigue</td><td>Yet another login to manage</td></tr>
+      <tr><td>Minimum commitments</td><td>Prepay for unused capacity</td></tr>
+      <tr><td>Privacy concerns</td><td>PII required for API access</td></tr>
+      <tr><td>Geographic restrictions</td><td>Banking limits access</td></tr>
+    </table>
+  </div>
+</div>
+
+<h2>The Solution</h2>
+
+<h3>SatGate: Lightning-Native API Access Control</h3>
+
+<div class="diagram">┌──────────────┐                      ┌──────────────┐
+│              │   1. Request API     │              │
+│    Client    │─────────────────────▶│   SatGate    │
+│              │                      │  (Aperture)  │
+│              │◀─────────────────────│              │
+│              │   2. 402 + Invoice   │              │
+│              │                      │              │
+│              │   3. Pay Lightning   │              │
+│              │─ ─ ─ ─ ─ ─ ─ ⚡ ─ ─ ▶│              │
+│              │                      │              │
+│              │   4. Retry + Token   │              │
+│              │─────────────────────▶│              │
+│              │                      │              │
+│              │◀─────────────────────│              │
+│              │   5. API Response    │              │
+└──────────────┘                      └──────────────┘</div>
+
+<h4>How It Works</h4>
+
+<table>
+  <tr><th>Step</th><th>Action</th><th>Technical Detail</th></tr>
+  <tr><td><strong>1</strong></td><td>Client requests protected resource</td><td><code>GET /api/analytics</code></td></tr>
+  <tr><td><strong>2</strong></td><td>Server returns payment challenge</td><td><code>402</code> + <code>WWW-Authenticate: L402 macaroon="...", invoice="..."</code></td></tr>
+  <tr><td><strong>3</strong></td><td>Client pays Lightning invoice</td><td>Receives cryptographic preimage as proof</td></tr>
+  <tr><td><strong>4</strong></td><td>Client retries with token</td><td><code>Authorization: L402 &lt;macaroon&gt;:&lt;preimage&gt;</code></td></tr>
+  <tr><td><strong>5</strong></td><td>Server validates & responds</td><td>Token valid per-request or configurable duration</td></tr>
+</table>
+
+<h2>Architecture</h2>
+
+<div class="diagram">┌─────────────────────────────────────────────────────────────────────────┐
+│                              INTERNET                                    │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         NGINX (Production)                               │
+│                    TLS termination • Rate limiting • Caching             │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        APERTURE (L402 Gateway)                           │
+│                                                                          │
+│   ┌────────────────┐   ┌────────────────┐   ┌────────────────────────┐  │
+│   │ Request Router │   │    Invoice     │   │    Token Validator     │  │
+│   │ • Path matching│   │   Generator    │   │  • Signature check     │  │
+│   │ • Price lookup │   │  (LNC → LND)   │   │  • Expiry validation   │  │
+│   └────────────────┘   └────────────────┘   └────────────────────────┘  │
+│                                                                          │
+│                        ┌────────────────┐                                │
+│                        │ SQLite Database│                                │
+│                        └────────────────┘                                │
+└─────────────────────────────────────────────────────────────────────────┘
+           │                                              │
+           │ LNC (Lightning Node Connect)                 │ HTTP Proxy
+           ▼                                              ▼
+┌─────────────────────────┐                ┌──────────────────────────────┐
+│      VOLTAGE LND        │                │     BACKEND (Node.js)        │
+│    (Lightning Node)     │                │   • /api/analytics (paid)    │
+│  • Invoice generation   │                │   • /api/free/ping (free)    │
+│  • Payment receipt      │                │   • /health, /ready          │
+└─────────────────────────┘                └──────────────────────────────┘
+                                                          │
+                                                          ▼
+                                           ┌──────────────────────────────┐
+                                           │    FRONTEND (HTML/JS)        │
+                                           │  • WebLN integration         │
+                                           │  • QR code generation        │
+                                           │  • Token persistence         │
+                                           └──────────────────────────────┘</div>
+
+<h2>Technology Stack</h2>
+
+<table>
+  <tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+  <tr><td>Gateway</td><td>Aperture (Go)</td><td>L402 protocol, invoice generation, token validation</td></tr>
+  <tr><td>Backend</td><td>Node.js + Express</td><td>Business logic, API endpoints, health checks</td></tr>
+  <tr><td>Lightning</td><td>Voltage LND + LNC</td><td>Payment infrastructure, hosted node</td></tr>
+  <tr><td>Frontend</td><td>Vanilla HTML/CSS/JS</td><td>Demo UI, WebLN, QR codes</td></tr>
+  <tr><td>Database</td><td>SQLite</td><td>Token storage, payment tracking</td></tr>
+  <tr><td>Reverse Proxy</td><td>Nginx</td><td>TLS, rate limiting, caching</td></tr>
+  <tr><td>Container</td><td>Docker + Compose</td><td>Deployment, orchestration</td></tr>
+</table>
+
+<h2>Value Proposition</h2>
+
+<h3>Traditional vs SatGate</h3>
+
+<table>
+  <tr><th>Aspect</th><th>Traditional API Monetization</th><th>SatGate (L402)</th></tr>
+  <tr><td><strong>Onboarding</strong></td><td>Create account, verify email, add payment</td><td>Just pay</td></tr>
+  <tr><td><strong>Payment method</strong></td><td>Credit card required</td><td>Lightning native (card bridge optional)*</td></tr>
+  <tr><td><strong>Time to access</strong></td><td>Minutes to days</td><td>&lt; 1 second</td></tr>
+  <tr><td><strong>Minimum charge</strong></td><td>$5-50 (processing fees)</td><td>1 sat (~$0.001) Lightning / $0.50 card</td></tr>
+  <tr><td><strong>Chargebacks</strong></td><td>Possible, costly</td><td>Impossible (Lightning) / L402 token still single-use (card)</td></tr>
+  <tr><td><strong>Global access</strong></td><td>Banking required</td><td>Permissionless</td></tr>
+  <tr><td><strong>Privacy</strong></td><td>PII required</td><td>Pseudonymous (Lightning) / Standard (card)</td></tr>
+  <tr><td><strong>Bot protection</strong></td><td>CAPTCHAs, heuristics</td><td>Economic barrier</td></tr>
+</table>
+<p style="font-size: 12px; color: #666; margin-top: 8px;">*Card Bridge: Accept cards as an onramp to Lightning. Users start familiar → experience L402 benefits → discover Lightning is 10x cheaper → migrate naturally.</p>
+
+<h3>ROI for API Providers</h3>
+
+<table>
+  <tr><th>Benefit</th><th>Impact</th></tr>
+  <tr><td>Eliminate bot abuse</td><td>Reduce infrastructure costs 50-90%</td></tr>
+  <tr><td>Zero payment fraud</td><td>No chargebacks, no disputes</td></tr>
+  <tr><td>Global market access</td><td>Reach unbanked users (2B+ people)</td></tr>
+  <tr><td>Micropayment revenue</td><td>Monetize previously free endpoints</td></tr>
+  <tr><td>Reduced ops overhead</td><td>No account management, no billing disputes</td></tr>
+  <tr><td><strong>Abuse becomes revenue</strong></td><td><strong>Scrapers/bots pay you to abuse</strong></td></tr>
+</table>
+
+<div class="summary-box">
+  <p><strong>Key Insight:</strong> SatGate turns application-layer abuse into a revenue stream. The more they scrape, the more they pay you. Traditional bot protection costs you money — SatGate makes abusers pay instead.</p>
+</div>
+
+<div class="callout" style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 16px; margin: 20px 0;">
+  <p style="margin: 0;"><strong>⚠️ Important:</strong> L402 protects against <strong>application-layer (Layer 7)</strong> abuse — bots, scrapers, and API abuse. For network-layer DDoS attacks (volumetric, UDP floods, etc.), deploy SatGate <strong>behind a CDN/WAF</strong> like Cloudflare or AWS Shield.</p>
+</div>
+
+<h2>Abuse Protection & Cost Analysis</h2>
+
+<p>With per-request pricing, SatGate creates <strong>economic friction</strong> that makes large-scale application-layer abuse financially impractical. Every API request costs real Bitcoin — making bot abuse and scraping economically irrational.</p>
+
+<h3>Abuse Cost Analysis</h3>
+
+<p>At 100 sats (~$0.10) per request:</p>
+
+<table>
+  <tr><th>Abuse Scale</th><th>Requests</th><th>Cost to Abuser</th></tr>
+  <tr><td>Small probe</td><td>100</td><td>$0.10</td></tr>
+  <tr><td>Moderate abuse</td><td>10,000</td><td>$10</td></tr>
+  <tr><td>Serious abuse</td><td>100,000</td><td>$100</td></tr>
+  <tr><td>Major scraping campaign</td><td>1,000,000</td><td><strong>$1,000</strong></td></tr>
+  <tr><td>Sustained bot abuse</td><td>10,000,000</td><td><strong>$10,000</strong></td></tr>
+  <tr><td>Enterprise-scale</td><td>100,000,000</td><td><strong>$100,000</strong></td></tr>
+</table>
+
+<p><em>At $10,000+ for sustained abuse, most bad actors will look for easier targets — or you'll profit from their attempt.</em></p>
+
+<h3>SatGate vs Traditional Bot/Abuse Protection</h3>
+
+<table>
+  <tr><th>Solution</th><th>Protection Type</th><th>Monthly Cost</th><th>Economic Model</th></tr>
+  <tr><td>Cloudflare Bot Management</td><td>L7 (heuristics)</td><td>$20-5,000+</td><td>You pay to block</td></tr>
+  <tr><td>AWS WAF</td><td>L7 (rules)</td><td>Usage-based</td><td>You pay to block</td></tr>
+  <tr><td>DataDome</td><td>L7 (ML)</td><td>$3,000+</td><td>You pay to block</td></tr>
+  <tr><td>PerimeterX</td><td>L7 (ML)</td><td>$5,000+</td><td>You pay to block</td></tr>
+  <tr style="background: var(--accent-light);"><td><strong>SatGate (L402)</strong></td><td><strong>L7 (economic)</strong></td><td><strong>$0</strong></td><td><strong>Abusers pay you</strong></td></tr>
+</table>
+
+<p><em>Note: For volumetric/network-layer DDoS, use SatGate in combination with Cloudflare, AWS Shield, or similar.</em></p>
+
+<h3>Tiered Pricing (Implemented)</h3>
+
+<p>SatGate uses tiered per-request pricing to maximize protection while enabling different access levels:</p>
+
+<table>
+  <tr><th>Tier</th><th>Price</th><th>Use Case</th><th>Endpoint Pattern</th></tr>
+  <tr><td><strong>Premium</strong></td><td>1,000 sats ($1.00)</td><td>AI inference, premium insights</td><td><code>/api/premium/*</code></td></tr>
+  <tr><td><strong>Standard</strong></td><td>100 sats ($0.10)</td><td>Analytics, metrics, data queries</td><td><code>/api/standard/*</code></td></tr>
+  <tr><td><strong>Basic</strong></td><td>10 sats ($0.01)</td><td>Status checks, high-volume access</td><td><code>/api/basic/*</code></td></tr>
+  <tr><td><strong>Free</strong></td><td>0 sats</td><td>Health checks, demo only</td><td><code>/health</code>, <code>/api/free/*</code></td></tr>
+</table>
+
+<p><em>All paid tiers use single-use tokens (L402 standard) — each payment authorizes one request. Tokens are valid for 1 hour after payment.</em></p>
+
+<h2>Roadmap: Card Bridge to Lightning</h2>
+
+<p>While SatGate is Lightning-native, we recognize enterprise adoption requires familiar payment methods. Our <strong>Card Bridge</strong> strategy accepts cards as an onramp, not a destination.</p>
+
+<div class="summary-box">
+  <p><strong>Strategy:</strong> Cards bridge legacy users to Lightning. Start familiar → experience L402 benefits → discover Lightning is 10x cheaper → migrate naturally.</p>
+</div>
+
+<h4>The Migration Flywheel</h4>
+
+<table>
+  <tr><th>Stage</th><th>User Action</th><th>Outcome</th></tr>
+  <tr><td>1. Onboard</td><td>Pay with card (familiar)</td><td>Gets L402 token instantly</td></tr>
+  <tr><td>2. Experience</td><td>Uses API with no account</td><td>Loves the UX, pays 2.9% card fee</td></tr>
+  <tr><td>3. Discover</td><td>Sees "Lightning: 0% fee" option</td><td>Curious about savings</td></tr>
+  <tr><td>4. Migrate</td><td>Tries Lightning payment</td><td>Faster AND cheaper</td></tr>
+  <tr><td>5. Convert</td><td>Becomes Lightning-native</td><td>Advocates to others</td></tr>
+</table>
+
+<h4>Payment Rail Comparison</h4>
+
+<table>
+  <tr><th>Rail</th><th>Fee</th><th>Settlement</th><th>Role</th></tr>
+  <tr><td><strong>Lightning</strong></td><td>~0%</td><td>~1 second</td><td>Destination (native)</td></tr>
+  <tr><td>Stablecoin</td><td>~0.1-1%</td><td>~15 seconds</td><td>Intermediate</td></tr>
+  <tr><td>Card (Stripe)</td><td>2.9% + $0.30</td><td>~2 seconds</td><td>Onramp (bridge)</td></tr>
+</table>
+
+<p><em>Note: Card Bridge is on our 2027+ roadmap. Current implementation is Lightning-only.</em></p>
+
+<h2>Configuration</h2>
+
+<h4>Tiered Pricing (Production Settings)</h4>
+
+<table>
+  <tr><th>Tier</th><th>Price</th><th>Token Validity</th><th>Endpoints</th></tr>
+  <tr><td>Premium</td><td>1,000 sats</td><td>Per-request</td><td><code>/api/premium/insights</code>, <code>/api/premium/export</code></td></tr>
+  <tr><td>Standard</td><td>100 sats</td><td>Per-request</td><td><code>/api/standard/analytics</code>, <code>/api/standard/metrics</code></td></tr>
+  <tr><td>Basic</td><td>10 sats</td><td>Per-request</td><td><code>/api/basic/status</code>, <code>/api/basic/quote</code></td></tr>
+  <tr><td>Free</td><td>0 sats</td><td>N/A</td><td><code>/health</code>, <code>/ready</code>, <code>/api/free/ping</code></td></tr>
+</table>
+
+<h4>Rate Limiting</h4>
+
+<table>
+  <tr><th>Layer</th><th>Limit</th></tr>
+  <tr><td>Application (per IP)</td><td>100 requests / 15 minutes</td></tr>
+  <tr><td>Nginx (burst protection)</td><td>10 requests / second</td></tr>
+</table>
+
+<h2>API Endpoints</h2>
+
+<h4>Premium Tier (1,000 sats)</h4>
+<table>
+  <tr><th>Endpoint</th><th>Description</th></tr>
+  <tr><td><code>GET /api/premium/insights</code></td><td>AI-powered predictions, recommendations, growth metrics</td></tr>
+  <tr><td><code>GET /api/premium/export</code></td><td>Full data export with download links</td></tr>
+</table>
+
+<h4>Standard Tier (100 sats)</h4>
+<table>
+  <tr><th>Endpoint</th><th>Description</th></tr>
+  <tr><td><code>GET /api/standard/analytics</code></td><td>User stats, revenue data, top endpoints</td></tr>
+  <tr><td><code>GET /api/standard/metrics</code></td><td>Performance metrics, uptime, throughput</td></tr>
+</table>
+
+<h4>Basic Tier (10 sats)</h4>
+<table>
+  <tr><th>Endpoint</th><th>Description</th></tr>
+  <tr><td><code>GET /api/basic/status</code></td><td>Service status for all systems</td></tr>
+  <tr><td><code>GET /api/basic/quote</code></td><td>Random Bitcoin/crypto quote</td></tr>
+</table>
+
+<h4>Free Tier</h4>
+<table>
+  <tr><th>Endpoint</th><th>Description</th></tr>
+  <tr><td><code>GET /health</code></td><td>Health check for load balancers</td></tr>
+  <tr><td><code>GET /ready</code></td><td>Readiness probe</td></tr>
+  <tr><td><code>GET /api/free/ping</code></td><td>Simple ping/pong test</td></tr>
+</table>
+
+<h2>Resources</h2>
+
+<ul>
+  <li><strong>L402 Protocol Specification:</strong> <a href="https://lightning.engineering/posts/2020-03-30-lsat/">lightning.engineering/posts/2020-03-30-lsat</a></li>
+  <li><strong>Aperture Documentation:</strong> <a href="https://github.com/lightninglabs/aperture">github.com/lightninglabs/aperture</a></li>
+  <li><strong>Lightning Network:</strong> <a href="https://lightning.network">lightning.network</a></li>
+  <li><strong>Voltage (Hosted LND):</strong> <a href="https://voltage.cloud">voltage.cloud</a></li>
+  <li><strong>WebLN Specification:</strong> <a href="https://www.webln.guide/">webln.guide</a></li>
+</ul>
+
+<hr class="divider">
+
+<div class="footer">
+  <strong>⚡ SatGate</strong>
+  <em>Protect & monetize your API with Lightning. Instant. Permissionless.</em>
+  <p style="margin-top: 20px;">Document Version 1.0 • November 2025</p>
+</div>
+
+</body>
+</html>

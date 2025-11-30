@@ -1,0 +1,63 @@
+# =============================================================================
+# SatGate Aperture Configuration (Docker)
+# =============================================================================
+# This config is used when running inside Docker containers.
+# The backend address uses the Docker service name instead of localhost.
+# =============================================================================
+
+listenaddr: "0.0.0.0:8081"
+dbbackend: "sqlite"
+insecure: true
+debuglevel: "debug"
+
+services:
+  # ---------------------------------------------------------------------------
+  # PREMIUM TIER - 1000 sats per request
+  # ---------------------------------------------------------------------------
+  - name: premium
+    hostregexp: ".*"
+    pathregexp: '^/api/premium($|/.*)$'
+    address: "backend:8083"
+    protocol: http
+    price: 1000
+    timeout: 3600
+
+  # ---------------------------------------------------------------------------
+  # STANDARD TIER - 100 sats per request
+  # ---------------------------------------------------------------------------
+  - name: standard
+    hostregexp: ".*"
+    pathregexp: '^/api/standard($|/.*)$'
+    address: "backend:8083"
+    protocol: http
+    price: 100
+    timeout: 3600
+
+  # ---------------------------------------------------------------------------
+  # BASIC TIER - 10 sats per request
+  # ---------------------------------------------------------------------------
+  - name: basic
+    hostregexp: ".*"
+    pathregexp: '^/api/basic($|/.*)$'
+    address: "backend:8083"
+    protocol: http
+    price: 10
+    timeout: 3600
+
+  # ---------------------------------------------------------------------------
+  # FREE TIER - Public endpoints
+  # ---------------------------------------------------------------------------
+  - name: public
+    hostregexp: ".*"
+    pathregexp: '^/.*$'
+    address: "backend:8083"
+    protocol: http
+    price: 0
+    authwhitelistpaths:
+      - '^/health$'
+      - '^/ready$'
+      - '^/api/free/.*$'
+      - '^/$'
+      - '^/index.html$'
+      - '^/.*\.(css|js|png|jpg|ico|svg|woff|woff2)$'
+

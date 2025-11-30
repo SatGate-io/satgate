@@ -1,0 +1,29 @@
+# =============================================================================
+# SatGate - Production Docker Compose Override
+# =============================================================================
+#
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# =============================================================================
+
+version: '3.8'
+
+services:
+  backend:
+    environment:
+      - NODE_ENV=production
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+

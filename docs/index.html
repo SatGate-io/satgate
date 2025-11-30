@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SatGate API Playground</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --border: #1e1e2e;
+            --accent: #8b5cf6;
+            --accent-glow: rgba(139, 92, 246, 0.3);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+        body { font-family: 'Space Grotesk', sans-serif; }
+        code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
+        .glow-border { box-shadow: 0 0 20px var(--accent-glow), inset 0 0 20px rgba(139, 92, 246, 0.05); }
+        .success-glow { box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); border-color: var(--success) !important; }
+        .code-block { 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 1px solid #2d2d44;
+        }
+        .slide-down {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .slide-down.open {
+            max-height: 500px;
+        }
+    </style>
+</head>
+<body class="bg-[#0a0a0f] text-gray-100 min-h-screen">
+
+    <div class="max-w-3xl mx-auto px-4 py-12">
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <h1 class="text-5xl font-bold mb-3">
+                <span class="bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">SatGate</span>
+            </h1>
+            <p class="text-gray-400 text-lg">The L402 Gateway for AI Agents</p>
+            <p class="text-gray-500 text-sm mt-2">Pay-per-request API access via Lightning Network</p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="bg-[#12121a] rounded-2xl border border-[#1e1e2e] glow-border overflow-hidden">
+            
+            <!-- Endpoint Header -->
+            <div class="p-6 border-b border-[#1e1e2e] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-lg border border-emerald-500/30">GET</span>
+                    <select id="endpointSelect" class="bg-[#1a1a2e] text-gray-300 border border-[#2d2d44] rounded-lg px-3 py-2 text-sm mono focus:outline-none focus:border-violet-500">
+                        <option value="/api/basic/quote" data-price="10">/api/basic/quote (10 sats)</option>
+                        <option value="/api/standard/analytics" data-price="100" selected>/api/standard/analytics (100 sats)</option>
+                        <option value="/api/premium/insights" data-price="1000">/api/premium/insights (1000 sats)</option>
+                    </select>
+                </div>
+                <button id="fetchBtn" class="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white px-6 py-2.5 rounded-xl font-semibold transition-all flex items-center gap-2 shadow-lg shadow-violet-500/20">
+                    <span>⚡</span>
+                    <span id="fetchBtnText">Fetch Data</span>
+                </button>
+            </div>
+
+            <!-- Console Output -->
+            <div class="p-6 bg-black/40 h-[400px] overflow-y-auto mono text-sm" id="console">
+                <div class="text-gray-600">// Ready. Click "Fetch Data" to start the L402 flow.</div>
+                <div class="text-gray-600">// Your wallet will prompt you to pay the Lightning invoice.</div>
+            </div>
+
+            <!-- View Client Code Toggle -->
+            <div class="border-t border-[#1e1e2e]">
+                <button id="toggleCode" class="w-full p-4 text-left text-gray-400 hover:text-gray-200 flex items-center justify-between transition-colors">
+                    <span class="flex items-center gap-2">
+                        <span>🤖</span>
+                        <span>View Client Code for AI Agents</span>
+                    </span>
+                    <span id="toggleIcon" class="transition-transform">▼</span>
+                </button>
+                <div id="codePanel" class="slide-down">
+                    <div class="p-4 pt-0">
+                        <div class="code-block rounded-xl p-4 overflow-x-auto">
+                            <pre class="text-sm text-gray-300"><code><span class="text-violet-400">import</span> { SatGateClient } <span class="text-violet-400">from</span> <span class="text-emerald-400">'@satgate/client'</span>;
+
+<span class="text-gray-500">// Initialize with your wallet</span>
+<span class="text-violet-400">const</span> client = <span class="text-violet-400">new</span> <span class="text-yellow-400">SatGateClient</span>({
+  wallet: myLndWallet, <span class="text-gray-500">// or 'alby' for browser</span>
+});
+
+<span class="text-gray-500">// Make authenticated request - payment handled automatically</span>
+<span class="text-violet-400">const</span> response = <span class="text-violet-400">await</span> client.<span class="text-yellow-400">get</span>(<span class="text-emerald-400" id="codeEndpoint">'https://api.satgate.io/api/standard/analytics'</span>);
+<span class="text-violet-400">const</span> data = <span class="text-violet-400">await</span> response.<span class="text-yellow-400">json</span>();
+
+<span class="text-gray-500">// That's it! The client:</span>
+<span class="text-gray-500">// 1. Detects 402 Payment Required</span>
+<span class="text-gray-500">// 2. Pays the Lightning invoice</span>
+<span class="text-gray-500">// 3. Retries with L402 token</span></code></pre>
+                        </div>
+                        <p class="text-gray-500 text-xs mt-3">
+                            Install: <code class="bg-[#1a1a2e] px-2 py-1 rounded">npm install @satgate/client</code>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Steps -->
+        <div class="mt-6 grid grid-cols-3 gap-3 text-center text-sm">
+            <div id="status-402" class="p-4 rounded-xl border border-[#1e1e2e] bg-[#12121a] text-gray-500 transition-all">
+                <div class="text-2xl mb-1">🔒</div>
+                <div>402 Blocked</div>
+            </div>
+            <div id="status-pay" class="p-4 rounded-xl border border-[#1e1e2e] bg-[#12121a] text-gray-500 transition-all">
+                <div class="text-2xl mb-1">⚡</div>
+                <div>Pay Invoice</div>
+            </div>
+            <div id="status-200" class="p-4 rounded-xl border border-[#1e1e2e] bg-[#12121a] text-gray-500 transition-all">
+                <div class="text-2xl mb-1">✅</div>
+                <div>200 OK</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-gray-600 text-sm">
+            <p>Built with <a href="https://github.com/lightninglabs/aperture" class="text-violet-400 hover:underline">Aperture</a> • <a href="https://lightning.engineering/posts/2020-03-30-lsat/" class="text-violet-400 hover:underline">L402 Protocol</a></p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { SatGateClient } from '../sdk/js/src/index.js'; 
+
+        const consoleDiv = document.getElementById('console');
+        const btn = document.getElementById('fetchBtn');
+        const btnText = document.getElementById('fetchBtnText');
+        const endpointSelect = document.getElementById('endpointSelect');
+        const toggleCode = document.getElementById('toggleCode');
+        const codePanel = document.getElementById('codePanel');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const codeEndpoint = document.getElementById('codeEndpoint');
+        
+        // Update code snippet when endpoint changes
+        endpointSelect.addEventListener('change', () => {
+            const endpoint = endpointSelect.value;
+            codeEndpoint.textContent = `'https://api.satgate.io${endpoint}'`;
+        });
+
+        // Toggle code panel
+        toggleCode.addEventListener('click', () => {
+            codePanel.classList.toggle('open');
+            toggleIcon.style.transform = codePanel.classList.contains('open') ? 'rotate(180deg)' : '';
+        });
+        
+        const log = (msg, type = 'info') => {
+            const colors = { 
+                info: 'text-gray-400', 
+                error: 'text-red-400', 
+                success: 'text-emerald-400', 
+                warn: 'text-amber-400',
+                hash: 'text-violet-400',
+                dim: 'text-gray-600'
+            };
+            const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
+            const el = document.createElement('div');
+            el.className = `${colors[type]} mb-1`;
+            el.innerHTML = `<span class="text-gray-600">[${timestamp}]</span> ${msg}`;
+            consoleDiv.appendChild(el);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        };
+
+        const truncateHash = (hash, startLen = 8, endLen = 8) => {
+            if (hash.length <= startLen + endLen + 3) return hash;
+            return `${hash.slice(0, startLen)}...${hash.slice(-endLen)}`;
+        };
+
+        const highlightStep = (stepId) => {
+            ['status-402', 'status-pay', 'status-200'].forEach(id => {
+                const el = document.getElementById(id);
+                el.className = "p-4 rounded-xl border border-[#1e1e2e] bg-[#12121a] text-gray-500 transition-all";
+            });
+            if(stepId) {
+                const el = document.getElementById(stepId);
+                el.className = "p-4 rounded-xl border-2 border-emerald-500 bg-emerald-500/10 text-emerald-400 transition-all success-glow scale-105";
+            }
+        };
+
+        btn.addEventListener('click', async () => {
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            btnText.textContent = 'Processing...';
+            consoleDiv.innerHTML = '';
+            
+            const endpoint = endpointSelect.value;
+            const price = endpointSelect.selectedOptions[0].dataset.price;
+            const targetUrl = `http://localhost:8081${endpoint}`;
+            
+            try {
+                const client = new SatGateClient({
+                   onChallenge: (challenge) => {
+                       highlightStep('status-402');
+                       log(`🔒 <span class="text-white">402 Payment Required</span>`, 'warn');
+                       log(`   Price: <span class="text-white">${price} sats</span>`, 'dim');
+                       log(`   Invoice: <span class="text-violet-400 mono">${truncateHash(challenge.invoice, 12, 12)}</span>`, 'hash');
+                       log(`   Macaroon: <span class="text-violet-400 mono">${truncateHash(challenge.macaroon, 12, 8)}</span>`, 'hash');
+                   },
+                   onPaymentStart: () => {
+                       // Small delay so user can see the 402 step first
+                       setTimeout(() => {
+                           highlightStep('status-pay');
+                           log(`⚡ <span class="text-white">Awaiting Payment...</span>`, 'warn');
+                           log(`   Wallet popup opened. Confirm payment to continue.`, 'dim');
+                       }, 300);
+                   },
+                   onPayment: (details) => {
+                       log(`✅ <span class="text-white">Payment Confirmed!</span>`, 'success');
+                       log(`   Preimage: <span class="text-emerald-400 mono">${details.preimage}</span>`, 'hash');
+                   }
+                });
+
+                log(`🚀 Initiating L402 request to <span class="text-white mono">${endpoint}</span>`, 'info');
+                log(`   Target: <span class="text-gray-500">${targetUrl}</span>`, 'dim');
+
+                const response = await client.get(targetUrl); 
+                
+                let data;
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    data = { message: text, status: response.status };
+                }
+
+                if (!response.ok) {
+                     if (response.status === 402) {
+                         throw new Error(`Token rejected by server`);
+                     }
+                     throw new Error(`Request failed: ${response.status}`);
+                }
+
+                highlightStep('status-200');
+                log(`✅ <span class="text-white">200 OK - Access Granted!</span>`, 'success');
+                log(`   Tier: <span class="text-white">${data.tier}</span> | Resource: <span class="text-white">${data.resource}</span>`, 'dim');
+                
+                const pre = document.createElement('pre');
+                pre.className = 'text-emerald-300/80 mt-3 p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl text-xs overflow-x-auto';
+                pre.innerText = JSON.stringify(data, null, 2);
+                consoleDiv.appendChild(pre);
+                consoleDiv.scrollTop = consoleDiv.scrollHeight;
+
+            } catch (error) {
+                // Reset step indicators on error
+                highlightStep(null);
+                
+                // Friendly error messages
+                let errorMsg = error.message;
+                if (error.message.includes('User rejected') || error.message.includes('cancelled')) {
+                    log(`🚫 <span class="text-white">Payment Cancelled</span>`, 'warn');
+                    log(`   No worries! Click "Fetch Data" to try again.`, 'dim');
+                } else if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
+                    log(`❌ <span class="text-white">Network Error</span>`, 'error');
+                    log(`   ${errorMsg}`, 'dim');
+                } else {
+                    log(`❌ <span class="text-white">Error:</span> ${errorMsg}`, 'error');
+                }
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnText.textContent = 'Fetch Data';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+# ============================================
+# PRIVATE BUSINESS DOCUMENTS - NEVER COMMIT
+# ============================================
+*-Pitch-Deck*
+*-Sales-Deck*
+*-GTM-Strategy*
+*-Invention-Disclosure*
+*-Patent-*
+*-Legal-*
+*-Deloitte-*
+*-Cyber-Practice-*
+docs/private/
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables (contain secrets)
+.env
+.env.local
+.env.*.local
+
+# Aperture data directory (contains macaroons/secrets)
+.aperture/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Build outputs
+dist/
+build/
+
+# Next.js
+satgate-landing/.next/
+satgate-landing/out/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Test coverage
+coverage/
+
+# Docker volumes
+data/
+

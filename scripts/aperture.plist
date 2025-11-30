@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>io.satgate.aperture</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/waynewonder/go/bin/aperture</string>
+        <string>--configfile=/Users/waynewonder/.aperture/aperture.yaml</string>
+        <string>--authenticator.network=mainnet</string>
+        <string>--authenticator.passphrase=YOUR_LNC_PASSPHRASE_HERE</string>
+        <string>--authenticator.mailboxaddress=mailbox.terminal.lightning.today:443</string>
+    </array>
+    
+    <key>RunAtLoad</key>
+    <true/>
+    
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+        <key>Crashed</key>
+        <true/>
+    </dict>
+    
+    <key>StandardOutPath</key>
+    <string>/tmp/aperture.log</string>
+    
+    <key>StandardErrorPath</key>
+    <string>/tmp/aperture.error.log</string>
+    
+    <key>WorkingDirectory</key>
+    <string>/Users/waynewonder/l402-aperture-kit</string>
+    
+    <!-- Restart every 12 hours to refresh macaroon keys -->
+    <key>StartInterval</key>
+    <integer>43200</integer>
+</dict>
+</plist>
+

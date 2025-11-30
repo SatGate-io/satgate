@@ -1,0 +1,88 @@
+listenaddr: "0.0.0.0:8081"
+dbbackend: "sqlite"
+insecure: true
+debuglevel: "trace"
+
+# =============================================================================
+# TIERED PRICING CONFIGURATION
+# =============================================================================
+# SatGate uses tiered pricing to create an economic firewall against DDoS attacks.
+# Each tier has per-request tokens (timeout: 1) to maximize protection.
+
+services:
+  # ---------------------------------------------------------------------------
+  # PREMIUM TIER - 1000 sats ($1.00) per request
+  # ---------------------------------------------------------------------------
+  # High-value endpoints: AI inference, premium data, critical operations
+  - name: premium
+    hostregexp: ".*"
+    pathregexp: '^/api/premium($|/.*)$'
+    address: "127.0.0.1:8083"
+    protocol: http
+    price: 1000
+    timeout: 86400  # Token valid for 24 hours (prevents stale macaroon issues)
+
+  # ---------------------------------------------------------------------------
+  # STANDARD TIER - 100 sats ($0.10) per request
+  # ---------------------------------------------------------------------------
+  # Standard paid endpoints: analytics, data queries
+  - name: standard
+    hostregexp: ".*"
+    pathregexp: '^/api/standard($|/.*)$'
+    address: "127.0.0.1:8083"
+    protocol: http
+    price: 100
+    timeout: 86400  # Token valid for 24 hours
+
+  # ---------------------------------------------------------------------------
+  # BASIC TIER - 10 sats ($0.01) per request
+  # ---------------------------------------------------------------------------
+  # Low-cost endpoints: still stops bots, accessible for high-volume use
+  - name: basic
+    hostregexp: ".*"
+    pathregexp: '^/api/basic($|/.*)$'
+    address: "127.0.0.1:8083"
+    protocol: http
+    price: 10
+    timeout: 86400  # Token valid for 24 hours
+
+  # ---------------------------------------------------------------------------
+  # MICRO TIER - 1 sat ($0.001) per request
+  # ---------------------------------------------------------------------------
+  # True micropayments: the absolute minimum viable price
+  - name: micro
+    hostregexp: ".*"
+    pathregexp: '^/api/micro($|/.*)$'
+    address: "127.0.0.1:8083"
+    protocol: http
+    price: 1
+    timeout: 86400  # Token valid for 24 hours
+
+  # ---------------------------------------------------------------------------
+  # FREE TIER - Health checks and demo endpoints only
+  # ---------------------------------------------------------------------------
+  - name: public
+    hostregexp: ".*"
+    pathregexp: '^/.*$'
+    address: "127.0.0.1:8083"
+    protocol: http
+    price: 0
+    authwhitelistpaths:
+      - '^/health$'
+      - '^/ready$'
+      - '^/api/free/.*$'
+      - '^/api/admin/.*$'
+      - '^/$'
+      - '^/index.html$'
+      - '^/.*\.(css|js|png|jpg|ico|svg|woff|woff2)$'
+
+# =============================================================================
+# LNC (Lightning Node Connect) Settings
+# =============================================================================
+# NOTE: Authenticator settings must be passed via command line:
+#
+# aperture \
+#   --configfile=$HOME/.aperture/aperture.yaml \
+#   --authenticator.network=mainnet \
+#   --authenticator.passphrase="your pairing phrase" \
+#   --authenticator.mailboxaddress="mailbox.terminal.lightning.today:443"
