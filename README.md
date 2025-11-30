@@ -46,6 +46,8 @@ On SatGate: $0.50 total                          ← Just the value
 
 **We solve for the 99% of agent traffic that Stripe physically cannot touch.**
 
+**Bonus:** Every request costs money, so bots and scrapers can't abuse your API. Don't block them—monetize them. *(Economic DDoS Protection)*
+
 ---
 
 ## 🐍 Python SDK

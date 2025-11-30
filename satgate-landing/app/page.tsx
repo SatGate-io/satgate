@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check } from 'lucide-react';
+import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield } from 'lucide-react';
 import Link from 'next/link';
 
 const LandingPage = () => {
@@ -99,7 +99,7 @@ const LandingPage = () => {
       {/* Feature Grid */}
       <section id="features" className="py-20 bg-gray-900/50 border-y border-gray-800">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             
             <FeatureCard 
               icon={<Cpu className="text-cyan-400" />}
@@ -115,6 +115,11 @@ const LandingPage = () => {
               icon={<Code className="text-pink-400" />}
               title="Micropayments"
               desc="Monetize per-request. Charge $0.001 per API call. Impossible with Stripe, trivial with SatGate."
+            />
+            <FeatureCard 
+              icon={<Shield className="text-green-400" />}
+              title="Economic DDoS Protection"
+              desc="Don't block bots—monetize them. Every request costs money, making spam economically unviable."
             />
           </div>
         </div>
