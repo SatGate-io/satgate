@@ -26,12 +26,13 @@
 
 ---
 
-<!-- TODO: Replace with your hero video/GIF -->
-<!-- 
 <p align="center">
-  <img src="docs/hero-demo.gif" alt="AI Agent paying for API access" width="600" />
+  <img src="docs/screenshots/satgate-hero-demo.gif" alt="AI Agent paying 1 satoshi for API access" width="700" />
+  <br>
+  <em>An AI agent pays $0.001 for API access — in real-time</em>
 </p>
--->
+
+---
 
 ## The Problem
 
@@ -211,6 +212,12 @@ satgate/
 ---
 
 ## 🎬 Demo
+
+<p align="center">
+  <a href="docs/screenshots/satgate-hero-demo.mp4">
+    <img src="docs/screenshots/satgate-hero-demo.gif" alt="SatGate Demo" width="600" />
+  </a>
+</p>
 
 ```bash
 python examples/hero_demo.py
