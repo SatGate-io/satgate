@@ -231,6 +231,47 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* How L402 Works Section */}
+      <section className="py-16 px-6 border-b border-gray-800">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-center mb-3">How L402 Works</h2>
+          <p className="text-gray-500 text-center mb-10">Three steps. No accounts. Instant access.</p>
+          
+          {/* 3-Step Flow */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-2 mb-10">
+            <div className="flex-1 max-w-[200px] p-5 rounded-xl bg-gray-900 border border-gray-800 text-center">
+              <div className="text-2xl font-bold text-purple-400 mb-2">1</div>
+              <div className="font-semibold text-white mb-1">Request API</div>
+              <div className="text-xs text-gray-500">Client hits protected endpoint</div>
+            </div>
+            <div className="text-gray-600 text-2xl hidden md:block">→</div>
+            <div className="text-gray-600 text-xl md:hidden">↓</div>
+            <div className="flex-1 max-w-[200px] p-5 rounded-xl bg-gray-900 border border-gray-800 text-center">
+              <div className="text-2xl font-bold text-yellow-400 mb-2">2</div>
+              <div className="font-semibold text-white mb-1">402 + Invoice</div>
+              <div className="text-xs text-gray-500">Gateway returns Lightning invoice</div>
+            </div>
+            <div className="text-gray-600 text-2xl hidden md:block">→</div>
+            <div className="text-gray-600 text-xl md:hidden">↓</div>
+            <div className="flex-1 max-w-[200px] p-5 rounded-xl bg-gray-900 border border-gray-800 text-center">
+              <div className="text-2xl font-bold text-cyan-400 mb-2">3</div>
+              <div className="font-semibold text-white mb-1">Pay → Access</div>
+              <div className="text-xs text-gray-500">Pay invoice, get L402 token</div>
+            </div>
+          </div>
+
+          {/* Token explanation */}
+          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 text-center">
+            <p className="text-gray-400 text-sm mb-2">
+              <span className="text-white font-semibold">L402 Token</span> = Macaroon + Preimage
+            </p>
+            <p className="text-gray-500 text-xs">
+              A bearer credential with embedded permissions (caveats) that proves payment. No database lookup required.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Code Integration Section */}
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto">
