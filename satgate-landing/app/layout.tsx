@@ -14,7 +14,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "SatGate - Stripe for AI Agents",
-  description: "API monetization via Lightning micropayments. $0.001 per request. No accounts. No bank required. Patent Pending.",
+  description: "API monetization via Lightning micropayments. Meter in sats per request. No accounts. No bank required.",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({

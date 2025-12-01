@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/⚡-SatGate-orange?style=for-the-badge&labelColor=black" alt="SatGate" />
+  <img src="docs/screenshots/logo.png" alt="SatGate Logo" width="80" />
 </p>
 
-<h1 align="center">⚡ SatGate</h1>
+<h1 align="center">SatGate</h1>
 
 <p align="center">
   <strong>Stripe for AI Agents • EZ-Pass for the API Economy</strong><br>

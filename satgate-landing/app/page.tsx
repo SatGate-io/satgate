@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock, DollarSign, Bot } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const LandingPage = () => {
   const [copied, setCopied] = useState(false);
@@ -18,9 +19,10 @@ const LandingPage = () => {
       {/* Navigation */}
       <nav className="border-b border-gray-800 backdrop-blur-md fixed w-full z-50 bg-black/50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
-            ⚡ SatGate
-          </div>
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/logo.png" alt="SatGate" width={32} height={32} className="w-8 h-8" />
+            <span className="text-xl font-bold text-white">SatGate</span>
+          </Link>
           <div className="flex gap-6 text-sm font-medium text-gray-400">
             <Link href="#features" className="hover:text-white transition">Features</Link>
             <Link href="/playground" className="hover:text-white transition">Playground</Link>
@@ -269,7 +271,10 @@ agent.run(<span className="text-green-400">"Buy the latest stock report from Alp
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 py-12 border-t border-gray-800">
             <div>
-              <h4 className="font-bold text-white mb-4">⚡ SatGate</h4>
+              <div className="flex items-center gap-2 mb-4">
+                <Image src="/logo.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
+                <h4 className="font-bold text-white">SatGate</h4>
+              </div>
               <p className="text-gray-500 text-sm">Stripe for AI Agents.<br/>EZ-Pass for the API Economy.</p>
               <p className="text-gray-600 text-xs mt-3">Non-custodial. We never hold your keys.</p>
             </div>
