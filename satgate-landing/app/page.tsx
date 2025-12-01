@@ -286,7 +286,7 @@ const LandingPage = () => {
               <span className="text-white font-semibold">L402 Token</span> = Macaroon + Preimage
             </p>
             <p className="text-gray-500 text-xs">
-              A bearer credential with embedded permissions (caveats) that proves payment. No database lookup required.
+              A bearer credential with embedded permissions (caveats) that proves payment. No centralized identity lookup required.
             </p>
           </div>
         </div>

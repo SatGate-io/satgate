@@ -485,26 +485,25 @@ services:
 git clone https://github.com/SatGate-io/satgate.git && cd satgate
 npm install
 
-# 2. Set environment variables (never paste secrets in CLI flags!)
-export LNC_PASSPHRASE="your-10-word-lnc-phrase"
-export LNC_MAILBOX_ADDRESS="mailbox.terminal.lightning.today:443"
-export BITCOIN_NETWORK="mainnet"
+# 2. Configure Aperture (edit proxy/aperture.yaml)
+#    Add your LNC credentials to the authenticator section:
+#    authenticator:
+#      passphrase: "your-10-word-lnc-phrase"
+#      mailboxaddress: "mailbox.terminal.lightning.today:443"
+#      network: "mainnet"
 
 # 3. Start backend
 node proxy/server.js
 
 # 4. Start Aperture (in another terminal)
-aperture --configfile=proxy/aperture.yaml \
-  --authenticator.network=${BITCOIN_NETWORK} \
-  --authenticator.passphrase="${LNC_PASSPHRASE}" \
-  --authenticator.mailboxaddress="${LNC_MAILBOX_ADDRESS}"
+aperture --configfile=proxy/aperture.yaml
 
 # 5. Test it
 curl http://localhost:8081/api/free/ping     # ✅ Free
 curl http://localhost:8081/api/micro/ping    # ⚡ 402 → Pay 1 sat
 ```
 
-> ⚠️ **Security:** Always use environment variables for secrets. Never paste passphrases directly in CLI flags (they leak via shell history and process lists).
+> ⚠️ **Security:** Keep secrets in config files (with proper permissions), not CLI flags. CLI args leak via process listings (`ps aux`). Ensure `aperture.yaml` is not committed to version control.
 
 ### Production Deployment
 
