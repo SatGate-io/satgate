@@ -108,6 +108,47 @@ const data = await client.get('/api/premium');
 
 ---
 
+## Why Lightning? (Not Stablecoins or Stripe)
+
+A common question: *"Why Bitcoin/Lightning instead of USDC or traditional payment rails?"*
+
+### The Short Answer
+
+Agents can't KYC. Stripe requires identity. Stablecoins require wallets that can be frozen. Lightning is the only payment rail where **code can pay code** without permission.
+
+### The Long Answer
+
+| Requirement | Stripe | Stablecoins (USDC) | Lightning |
+|-------------|--------|-------------------|-----------|
+| Sub-cent transactions ($0.001) | ❌ $0.30 minimum | ⚠️ Gas fees vary | ✅ <$0.01 fees |
+| No KYC/Identity | ❌ Required | ⚠️ Wallet can be frozen | ✅ Permissionless |
+| Instant finality | ❌ Chargebacks | ⚠️ Block confirmations | ✅ Milliseconds |
+| Censorship-resistant | ❌ Account freezes | ❌ OFAC blacklists | ✅ No central authority |
+| Agent-native | ❌ Needs human | ⚠️ Needs signing keys | ✅ Bearer tokens |
+
+### Why Not Stablecoins?
+
+1. **Freezable**: Circle (USDC) and Tether can blacklist addresses. An agent's wallet could be frozen without recourse.
+2. **Gas volatility**: Ethereum L1 fees spike unpredictably. Even L2s have variable costs.
+3. **Not truly permissionless**: Most stablecoin on-ramps require KYC.
+
+### Why Not Stripe?
+
+1. **Minimum fees**: $0.30 + 2.9% makes micropayments impossible.
+2. **Identity required**: Agents can't pass KYC or hold bank accounts.
+3. **Chargebacks**: Payments can be reversed, breaking the trust model.
+
+### Lightning's Unique Properties
+
+- **Bearer instrument**: The L402 token IS the proof of payment. No database lookup needed.
+- **Atomic**: Payment either completes or fails. No partial states.
+- **Instant**: Settlement in milliseconds, not days.
+- **Programmable**: Macaroons enable caveats (expiry, usage limits) baked into the token.
+
+This isn't ideological—it's practical. Lightning is currently the **only** payment rail that meets all requirements for autonomous agent commerce.
+
+---
+
 ## Architecture
 
 ```
