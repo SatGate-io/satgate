@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock } from 'lucide-react';
+import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock, DollarSign, Bot } from 'lucide-react';
 import Link from 'next/link';
 
 const LandingPage = () => {
@@ -95,6 +95,39 @@ const LandingPage = () => {
           </div>
         </div>
       </header>
+
+      {/* Two Products Section */}
+      <section className="py-16 px-6 border-b border-gray-800">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-center mb-3">Two Products in One</h2>
+          <p className="text-gray-500 text-center mb-10">Use SatGate for either—or both.</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-6 rounded-xl bg-gradient-to-br from-purple-950/30 to-purple-900/10 border border-purple-800/30 hover:border-purple-600/50 transition">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 bg-purple-900/50 rounded-lg">
+                  <DollarSign className="text-purple-400" size={22} />
+                </div>
+                <h3 className="font-bold text-lg">Monetize APIs per request</h3>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Sub-cent pricing that's impossible on card rails. Charge 1 sat per call. No minimums, no chargebacks, instant settlement.
+              </p>
+            </div>
+            <div className="p-6 rounded-xl bg-gradient-to-br from-cyan-950/30 to-cyan-900/10 border border-cyan-800/30 hover:border-cyan-600/50 transition">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 bg-cyan-900/50 rounded-lg">
+                  <Bot className="text-cyan-400" size={22} />
+                </div>
+                <h3 className="font-bold text-lg">Secure agent traffic</h3>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                L402 tokens replace accounts and API keys. No PII, no credential stuffing. Paid capabilities for autonomous agents.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Feature Grid */}
       <section id="features" className="py-20 bg-gray-900/50 border-y border-gray-800">
