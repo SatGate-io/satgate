@@ -324,5 +324,6 @@ MIT License — See [LICENSE](LICENSE)
 
 <p align="center">
   <strong>© 2025 SatGate. Patent Pending.</strong><br>
-  <em>Stripe for AI Agents • EZ-Pass for the API Economy</em>
+  <em>Stripe for AI Agents • EZ-Pass for the API Economy</em><br>
+  <a href="https://satgate.io">satgate.io</a>
 </p>

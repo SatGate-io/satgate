@@ -165,9 +165,12 @@ const LandingPage = () => {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Internet-Native Access Control</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
+            <p className="text-gray-400 max-w-2xl mx-auto mb-4">
               SatGate implements L402 to turn payment into a <span className="text-purple-400 font-semibold">capability token</span> for APIs—ideal for stateless AI agents and zero-PII integrations.
             </p>
+            <Link href="/security" className="text-sm text-purple-400 hover:text-purple-300 transition underline underline-offset-4">
+              Deep dive: Security architecture →
+            </Link>
           </div>
           
           {/* Identity vs Capability comparison */}
