@@ -94,6 +94,9 @@ const LandingPage = () => {
                 ⚡ Metered in sats
               </div>
             </div>
+            <p className="text-center text-sm text-gray-500 mt-4">
+              Watch an AI agent autonomously pay for API access in real-time.
+            </p>
           </div>
         </div>
       </header>
