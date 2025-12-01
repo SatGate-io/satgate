@@ -240,9 +240,9 @@ const LandingPage = () => {
             <div className="flex items-start gap-4">
               <Shield className="text-cyan-400 flex-shrink-0 mt-1" size={20} />
               <div>
-                <h4 className="font-semibold text-white mb-2">Zero Trust–Aligned Access Control</h4>
+                <h4 className="font-semibold text-white mb-2">Zero Trust Access Control (PEP)</h4>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  SatGate enforces per-request authorization at the edge using cryptographically verifiable capability tokens (L402/macaroons)—not network location, long-lived API keys, or centralized sessions. 
+                  Enforces per-request authorization at the edge using cryptographically verifiable, least-privilege capability tokens—no network trust assumptions. 
                   Use alongside your existing WAF/CDN for volumetric protection.
                 </p>
               </div>
