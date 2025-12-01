@@ -92,6 +92,47 @@ export default function SecurityPage() {
             </p>
           </section>
 
+          {/* Zero Trust Section */}
+          <section className="bg-gradient-to-r from-cyan-900/20 to-purple-900/20 border border-cyan-800/30 rounded-xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Shield className="text-cyan-400" size={24} />
+              <h2 className="text-xl font-bold text-white m-0">Zero Trust Alignment</h2>
+            </div>
+            <p className="text-gray-400 leading-relaxed mb-4">
+              SatGate is a <strong>Zero Trust–aligned Policy Enforcement Point (PEP)</strong> for paid and capability-based API access. 
+              It implements "never trust, always verify" at the API boundary by requiring a valid, scoped token for every protected request.
+            </p>
+            
+            <h3 className="text-sm font-semibold text-gray-300 mb-3 mt-6">How SatGate maps to Zero Trust concepts</h3>
+            <ul className="text-gray-500 text-sm space-y-3">
+              <li>
+                <strong className="text-gray-300">Policy Enforcement Point (PEP):</strong>{' '}
+                The gateway sits in front of services and enforces access decisions on every request (deny-by-default for protected routes).
+              </li>
+              <li>
+                <strong className="text-gray-300">Continuous Authorization:</strong>{' '}
+                Rather than trusting a network zone or long-lived credential, SatGate validates an L402 token on each request before proxying.
+              </li>
+              <li>
+                <strong className="text-gray-300">Least Privilege:</strong>{' '}
+                Macaroon caveats enable fine-grained restriction (route, method, TTL, budget), reducing blast radius and enabling safe delegation.
+              </li>
+              <li>
+                <strong className="text-gray-300">Reduced Trust Dependencies:</strong>{' '}
+                Authorization is cryptographic, not reliant on a centralized user database. Optional state can be used for metering/quotas without requiring PII.
+              </li>
+            </ul>
+
+            <div className="mt-6 pt-4 border-t border-gray-800">
+              <h3 className="text-sm font-semibold text-gray-300 mb-3">What SatGate is (and isn't)</h3>
+              <ul className="text-gray-500 text-sm space-y-1">
+                <li className="text-green-400">✓ Zero Trust–aligned API access control primitive (PEP + request-level verification + least privilege)</li>
+                <li className="text-green-400">✓ Complements existing security stack (WAF/CDN, rate limiting, SIEM)</li>
+                <li className="text-yellow-400">⚠ Not a full enterprise Zero Trust program (identity governance, device posture, microsegmentation)</li>
+              </ul>
+            </div>
+          </section>
+
           <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
               <Eye className="text-cyan-400" size={24} />

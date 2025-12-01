@@ -231,6 +231,20 @@ const LandingPage = () => {
               <p className="text-gray-500 text-sm">Spam becomes expensive and self-limiting. High-volume callers must continuously pay.</p>
             </div>
           </div>
+
+          {/* Zero Trust Blurb */}
+          <div className="mt-8 p-5 rounded-xl bg-gradient-to-r from-cyan-900/20 to-purple-900/20 border border-cyan-800/30">
+            <div className="flex items-start gap-4">
+              <Shield className="text-cyan-400 flex-shrink-0 mt-1" size={20} />
+              <div>
+                <h4 className="font-semibold text-white mb-2">Zero Trust–Aligned Access Control</h4>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  SatGate enforces per-request authorization at the edge using cryptographically verifiable capability tokens (L402/macaroons)—not network location, long-lived API keys, or centralized sessions. 
+                  Use alongside your existing WAF/CDN for volumetric protection.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
