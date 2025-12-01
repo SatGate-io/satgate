@@ -2,7 +2,7 @@
 
 ## Stripe for AI Agents • EZ-Pass for the API Economy
 
-**$0.001 per request. No accounts. No bank required.**
+**Meter in sats per request. No accounts. No bank required.**
 
 ---
 
@@ -10,9 +10,16 @@
 
 **SatGate** is a production-ready API monetization gateway that uses Bitcoin's Lightning Network to charge for API access. No accounts, no API keys, no credit cards — just instant micropayments that work globally, 24/7.
 
-> **Think of SatGate as Stripe for AI Agents** — but with one critical difference. Stripe can't process transactions under 30 cents, and they require a bank account. Our agents pay $0.001 per request, instantly, with no bank account required. **We unlock the economy that Stripe is too expensive to serve.**
+> **Think of SatGate as Stripe for AI Agents** — but with one critical difference. Card rails can't economically process sub-cent transactions. Our agents pay 1 sat per request, instantly, with no bank account required. **We unlock the economy that card rails are too expensive to serve.**
 
 Built on the **L402 protocol** (formerly LSAT), SatGate leverages HTTP status code `402 Payment Required` — reserved since 1999 for "future use" — to create a native internet payment layer for APIs.
+
+### Two Products in One
+
+| Use Case | What SatGate Does |
+|----------|-------------------|
+| **Monetize APIs per request** | Sub-cent pricing that's impossible on card rails. Charge 1 sat per call. |
+| **Secure agent traffic with paid capabilities** | L402 tokens replace accounts/API keys. No PII, no credential stuffing. |
 
 ### The EZ-Pass Analogy
 
@@ -20,8 +27,8 @@ Built on the **L402 protocol** (formerly LSAT), SatGate leverages HTTP status co
 |---|---|---|
 | **Flow** | Stop → Talk to attendant → Hand over card → Wait | Drive through at full speed |
 | **Speed** | Slow, human-centric | Instant, machine-native |
-| **Auth** | Payment separate from authentication | Payment *is* authentication (L402) |
-| **Minimum** | $0.30 per transaction | $0.0001 per transaction |
+| **Auth** | Payment separate from authorization | Payment-gated authorization (L402) |
+| **Minimum** | ~$0.30 per transaction | 1 sat per transaction |
 
 ### The Stripe Parallel
 
@@ -237,7 +244,7 @@ SatGate provides production-ready SDKs that handle the complete L402 payment flo
 For web applications with WebLN wallet support (Alby, etc.):
 
 ```javascript
-import { SatGateClient } from '@satgate/client';
+import { SatGateClient } from 'satgate-sdk';
 
 const client = new SatGateClient({
   baseUrl: 'https://api.yoursite.com',
@@ -256,7 +263,7 @@ const data = await client.get('/api/premium/analytics');
 
 **Installation:**
 ```bash
-npm install @satgate/client
+npm install satgate-sdk
 ```
 
 ### Python SDK (Agents / Backend)
@@ -280,7 +287,7 @@ data = response.json()
 
 **Installation:**
 ```bash
-pip install satgate-sdk
+pip install satgate
 ```
 
 ### LangChain Integration (AI Agents)
@@ -288,7 +295,7 @@ pip install satgate-sdk
 Give your AI agents a "credit card" to access paid APIs:
 
 ```python
-from satgate.langchain_integrations import SatGateTool
+from satgate.langchain import SatGateTool
 from langchain.agents import initialize_agent
 
 # The agent can now autonomously pay for API access
@@ -310,15 +317,17 @@ agent.run("Fetch the premium market analysis from SatGate")
 
 ### Security & Protection
 
-- **Economic Firewall** — Every request costs real money, stopping bots and abuse
+- **Capability-Based Access** — L402 tokens encode permissions; no identity database required
+- **Economic Friction for L7 Abuse** — Every request costs real money, making scraping/bots expensive and self-limiting (use alongside WAF/CDN for volumetric protection)
+- **Zero Trust–Aligned** — Per-request verification at the edge; no implicit trust based on network location
 - **Rate Limiting** — Configurable limits at nginx and application layers
 - **Security Headers** — Helmet.js, CORS, CSP policies
 - **TLS Encryption** — Let's Encrypt or custom certificates
-- **No Stored Credentials** — Tokens are self-validating macaroons
+- **No Stored Credentials** — Tokens are self-validating macaroons with caveats (scope, time, budget)
 
 ### Payment Flexibility
 
-- **Micropayments** — Charge as little as 1 satoshi (~$0.001)
+- **Micropayments** — Charge as little as 1 satoshi (sats-first pricing)
 - **Instant Settlement** — Payments confirm in milliseconds
 - **Global Access** — Works anywhere Lightning reaches
 - **No Chargebacks** — Payments are cryptographically final
@@ -331,6 +340,45 @@ agent.run("Fetch the premium market analysis from SatGate")
 - **QR Codes** — Mobile wallet compatibility
 - **Token Caching** — Pay once, reuse for 1 hour
 - **Health Endpoints** — Production monitoring ready
+
+---
+
+## Capability-Based Security
+
+Traditional APIs use **identity-based** access: "Prove *who you are*, then we decide what you can do."
+
+SatGate uses **capability-based** access: "Present a token that *already encodes* what you can do."
+
+### Why This Matters
+
+| | Identity-Based (OAuth/API Keys) | Capability-Based (L402) |
+|---|---|---|
+| **Model** | Who you are | What you hold |
+| **Requires** | User databases, PII | Cryptographic tokens |
+| **Risk** | Credential stuffing, breaches | Token theft (mitigated by short-lived caveats) |
+| **For Agents** | ❌ Can't sign up | ✅ Just present token |
+
+### Security Features
+
+- **No Accounts Required** — Access via L402 bearer tokens (macaroons + proof-of-payment), not usernames or API keys
+- **Edge Verification** — Tokens verified cryptographically at the gateway; no centralized identity store needed (usage accounting/quotas can be tracked without storing PII)
+- **Least Privilege** — Add caveats to constrain scope, time, audience, and budget (e.g., `"valid_until": 5min`, `"max_calls": 10`)
+- **Delegatable** — Attenuate tokens before passing to sub-agents; permissions only shrink, never grow
+
+> **The security primitive:** L402 creates *paid capabilities* — cryptographic tokens where payment gates issuance and the token itself encodes permissions.
+
+### Zero Trust Alignment
+
+SatGate is a **Zero Trust–aligned Policy Enforcement Point (PEP)** for API access:
+
+- **Per-request verification** — Every protected call requires a valid L402 token; no implicit trust based on network location
+- **Continuous authorization** — Token validated on each request, not just at session start
+- **Least privilege by design** — Macaroon caveats constrain scope, time, and budget
+- **Reduced trust dependencies** — Cryptographic verification without centralized user databases
+
+> ✅ Zero Trust–aligned API access control primitive  
+> ✅ Complements existing security stack (WAF/CDN, rate limiting, SIEM)  
+> ⚠️ Not a full enterprise Zero Trust program (identity governance, device posture, microsegmentation)
 
 ---
 
@@ -434,21 +482,29 @@ services:
 
 ```bash
 # 1. Clone and install
-git clone <repo> satgate && cd satgate
+git clone https://github.com/SatGate-io/satgate.git && cd satgate
 npm install
 
-# 2. Start backend
-npm start
+# 2. Set environment variables (never paste secrets in CLI flags!)
+export LNC_PASSPHRASE="your-10-word-lnc-phrase"
+export LNC_MAILBOX_ADDRESS="mailbox.terminal.lightning.today:443"
+export BITCOIN_NETWORK="mainnet"
 
-# 3. Start Aperture with your Lightning credentials
-aperture \
-  --configfile=$HOME/.aperture/aperture.yaml \
-  --authenticator.network=mainnet \
-  --authenticator.passphrase="your LNC pairing phrase" \
-  --authenticator.mailboxaddress="mailbox.terminal.lightning.today:443"
+# 3. Start backend
+node proxy/server.js
 
-# 4. Open http://127.0.0.1:8083
+# 4. Start Aperture (in another terminal)
+aperture --configfile=proxy/aperture.yaml \
+  --authenticator.network=${BITCOIN_NETWORK} \
+  --authenticator.passphrase="${LNC_PASSPHRASE}" \
+  --authenticator.mailboxaddress="${LNC_MAILBOX_ADDRESS}"
+
+# 5. Test it
+curl http://localhost:8081/api/free/ping     # ✅ Free
+curl http://localhost:8081/api/micro/ping    # ⚡ 402 → Pay 1 sat
 ```
+
+> ⚠️ **Security:** Always use environment variables for secrets. Never paste passphrases directly in CLI flags (they leak via shell history and process lists).
 
 ### Production Deployment
 
