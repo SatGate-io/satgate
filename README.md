@@ -235,6 +235,19 @@ SatGate uses **capability-based** access: "Present a token that *already encodes
 
 > **The security primitive:** L402 creates *paid capabilities* — cryptographic tokens where payment gates issuance and the token itself encodes permissions.
 
+### Zero Trust Alignment
+
+SatGate is a **Zero Trust–aligned Policy Enforcement Point (PEP)** for API access:
+
+- **Per-request verification** — Every protected call requires a valid L402 token; no implicit trust based on network location
+- **Continuous authorization** — Token validated on each request, not just at session start
+- **Least privilege by design** — Macaroon caveats constrain scope, time, and budget
+- **Reduced trust dependencies** — Cryptographic verification without centralized user databases
+
+> ✅ Zero Trust–aligned API access control primitive  
+> ✅ Complements existing security stack (WAF/CDN, rate limiting, SIEM)  
+> ⚠️ Not a full enterprise Zero Trust program (identity governance, device posture, microsegmentation)
+
 ---
 
 ## 📁 Repository Structure
