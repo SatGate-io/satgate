@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield } from 'lucide-react';
+import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock } from 'lucide-react';
 import Link from 'next/link';
 
 const LandingPage = () => {
@@ -121,6 +121,77 @@ const LandingPage = () => {
               title="Economic Rate Limiting"
               desc="Don't block bots—monetize them. Per-request costs stop L7 abuse & scraping. Use with your existing WAF/CDN."
             />
+          </div>
+        </div>
+      </section>
+
+      {/* Capability-Based Security Section */}
+      <section className="py-20 px-6 bg-gradient-to-b from-black to-gray-900/50">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Internet-Native Access Control</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              SatGate implements L402 to turn payment into a <span className="text-purple-400 font-semibold">capability token</span> for APIs—ideal for stateless AI agents and zero-PII integrations.
+            </p>
+          </div>
+          
+          {/* Identity vs Capability comparison */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            <div className="p-6 rounded-xl bg-red-950/20 border border-red-900/30">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-red-900/30 rounded-lg">
+                  <Lock className="text-red-400" size={20} />
+                </div>
+                <h3 className="font-bold text-red-300">Identity-Based (Traditional)</h3>
+              </div>
+              <p className="text-gray-400 text-sm mb-4">"Prove <em>who you are</em>, then we decide what you can do."</p>
+              <ul className="space-y-2 text-sm text-gray-500">
+                <li>• Requires user databases & PII</li>
+                <li>• OAuth flows, API keys, sessions</li>
+                <li>• Credential stuffing risks</li>
+                <li>• Agents can't sign up</li>
+              </ul>
+            </div>
+            <div className="p-6 rounded-xl bg-green-950/20 border border-green-900/30">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-green-900/30 rounded-lg">
+                  <Key className="text-green-400" size={20} />
+                </div>
+                <h3 className="font-bold text-green-300">Capability-Based (L402)</h3>
+              </div>
+              <p className="text-gray-400 text-sm mb-4">"Present a token that <em>already encodes</em> what you can do."</p>
+              <ul className="space-y-2 text-sm text-gray-500">
+                <li className="text-green-400">✓ No accounts required</li>
+                <li className="text-green-400">✓ Payment = Authorization</li>
+                <li className="text-green-400">✓ Zero PII, no credentials to steal</li>
+                <li className="text-green-400">✓ Perfect for autonomous agents</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Security Features */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-5 rounded-xl bg-gray-900 border border-gray-800">
+              <div className="flex items-center gap-3 mb-3">
+                <Shield className="text-cyan-400" size={18} />
+                <h4 className="font-semibold">Edge Verification</h4>
+              </div>
+              <p className="text-gray-500 text-sm">Tokens verified cryptographically at the gateway. No centralized identity store needed.</p>
+            </div>
+            <div className="p-5 rounded-xl bg-gray-900 border border-gray-800">
+              <div className="flex items-center gap-3 mb-3">
+                <Clock className="text-purple-400" size={18} />
+                <h4 className="font-semibold">Least Privilege</h4>
+              </div>
+              <p className="text-gray-500 text-sm">Add caveats to constrain scope, time, and budget (e.g., "valid 5 mins", "max 10 calls").</p>
+            </div>
+            <div className="p-5 rounded-xl bg-gray-900 border border-gray-800">
+              <div className="flex items-center gap-3 mb-3">
+                <Zap className="text-yellow-400" size={18} />
+                <h4 className="font-semibold">Economic Friction</h4>
+              </div>
+              <p className="text-gray-500 text-sm">Spam becomes expensive and self-limiting. High-volume callers must continuously pay.</p>
+            </div>
           </div>
         </div>
       </section>

@@ -190,6 +190,33 @@ services:
 
 ---
 
+## 🔐 Capability-Based Security
+
+Traditional APIs use **identity-based** access: "Prove *who you are*, then we decide what you can do."
+
+SatGate uses **capability-based** access: "Present a token that *already encodes* what you can do."
+
+### Why This Matters
+
+| | Identity-Based (OAuth/API Keys) | Capability-Based (L402) |
+|---|---|---|
+| **Model** | Who you are | What you hold |
+| **Requires** | User databases, PII | Cryptographic tokens |
+| **Risk** | Credential stuffing, breaches | Token theft (mitigated by short-lived caveats) |
+| **For Agents** | ❌ Can't sign up | ✅ Just present token |
+
+### Security Features
+
+- **No Accounts Required** — Access via L402 bearer tokens (macaroons + proof-of-payment), not usernames or API keys
+- **Edge Verification** — Tokens verified cryptographically at the gateway; no centralized identity store needed
+- **Least Privilege** — Add caveats to constrain scope, time, audience, and budget (e.g., `"valid_until": 5min`, `"max_calls": 10`)
+- **Economic Abuse Friction** — Spam becomes expensive and self-limiting; high-volume callers must continuously pay
+- **Privacy-Forward** — Zero PII collection; reduced credential-stuffing exposure with short-lived scoped tokens
+
+> **The security primitive:** L402 creates *paid capabilities* — cryptographic tokens where payment gates issuance and the token itself encodes permissions.
+
+---
+
 ## 📁 Repository Structure
 
 ```
