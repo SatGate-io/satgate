@@ -46,6 +46,13 @@ On SatGate:     $0.50 total                          ← Just the value
 
 **Captures the high-frequency agent traffic that is economically unviable on card rails.**
 
+### Two Products in One
+
+| Use Case | What SatGate Does |
+|----------|-------------------|
+| **Monetize APIs per request** | Sub-cent pricing that's impossible on card rails. Charge 1 sat per call. |
+| **Secure agent traffic with paid capabilities** | L402 tokens replace accounts/API keys. No PII, no credential stuffing. |
+
 **Bonus:** High-volume scraping becomes expensive and self-limiting. *(Economic friction for L7 abuse — use alongside your WAF/CDN for volumetric protection)*
 
 ---
@@ -70,7 +77,7 @@ print(response.json())
 ### LangChain Integration
 
 ```python
-from satgate import SatGateTool
+from satgate.langchain import SatGateTool
 from langchain.agents import initialize_agent
 
 # Give your AI agent a wallet
@@ -123,19 +130,26 @@ cd satgate
 # 2. Install
 npm install
 
-# 3. Start the backend
+# 3. Set environment variables (never paste secrets in CLI flags!)
+export LNC_PASSPHRASE="your-10-word-lnc-phrase"
+export LNC_MAILBOX_ADDRESS="mailbox.terminal.lightning.today:443"
+export BITCOIN_NETWORK="mainnet"
+
+# 4. Start the backend
 node proxy/server.js
 
-# 4. Start Aperture (in another terminal)
+# 5. Start Aperture (in another terminal)
 aperture --configfile=proxy/aperture.yaml \
-  --authenticator.network=mainnet \
-  --authenticator.passphrase="your-10-word-lnc-phrase" \
-  --authenticator.mailboxaddress="mailbox.terminal.lightning.today:443"
+  --authenticator.network=${BITCOIN_NETWORK} \
+  --authenticator.passphrase="${LNC_PASSPHRASE}" \
+  --authenticator.mailboxaddress="${LNC_MAILBOX_ADDRESS}"
 
-# 5. Test it
+# 6. Test it
 curl http://localhost:8081/api/free/ping     # ✅ Free
 curl http://localhost:8081/api/micro/ping    # ⚡ 402 → Pay 1 sat
 ```
+
+> ⚠️ **Security:** Always use environment variables for secrets. Never paste passphrases directly in CLI flags (they leak via shell history and process lists).
 
 ---
 
