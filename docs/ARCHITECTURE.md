@@ -319,7 +319,7 @@ agent.run("Fetch the premium market analysis from SatGate")
 
 - **Capability-Based Access** — L402 tokens encode permissions; no identity database required
 - **Economic Friction for L7 Abuse** — Every request costs real money, making scraping/bots expensive and self-limiting (use alongside WAF/CDN for volumetric protection)
-- **Zero Trust–Aligned** — Per-request verification at the edge; no implicit trust based on network location
+- **Zero Trust PEP** — Per-request verification at the edge; no network trust assumptions
 - **Rate Limiting** — Configurable limits at nginx and application layers
 - **Security Headers** — Helmet.js, CORS, CSP policies
 - **TLS Encryption** — Let's Encrypt or custom certificates
@@ -367,18 +367,18 @@ SatGate uses **capability-based** access: "Present a token that *already encodes
 
 > **The security primitive:** L402 creates *paid capabilities* — cryptographic tokens where payment gates issuance and the token itself encodes permissions.
 
-### Zero Trust Alignment
+### Zero Trust Access Control (PEP)
 
-SatGate is a **Zero Trust–aligned Policy Enforcement Point (PEP)** for API access:
+SatGate is a **Zero Trust Policy Enforcement Point** — the gateway that verifies every protected request and enforces scoped access via L402/macaroons.
 
-- **Per-request verification** — Every protected call requires a valid L402 token; no implicit trust based on network location
+- **Per-request verification** — Every protected call requires a valid L402 token; no network trust assumptions
 - **Continuous authorization** — Token validated on each request, not just at session start
 - **Least privilege by design** — Macaroon caveats constrain scope, time, and budget
 - **Reduced trust dependencies** — Cryptographic verification without centralized user databases
 
-> ✅ Zero Trust–aligned API access control primitive  
+> ✅ Zero Trust PEP for API access  
 > ✅ Complements existing security stack (WAF/CDN, rate limiting, SIEM)  
-> ⚠️ Not a full enterprise Zero Trust program (identity governance, device posture, microsegmentation)
+> ⚠️ Not a full Zero Trust program (identity governance, device posture, microsegmentation)
 
 ---
 
