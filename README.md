@@ -36,15 +36,21 @@
 
 ## The Problem
 
+**Card rails aren't built for per-request payments.** Fixed minimums make micropayments uneconomic.
+
 ```
+Illustrative example:
 An AI agent needs 50 API calls to research a topic.
-Each call costs $0.01.
 
-On Card Rails:  $15.00 in fees (50 × $0.30 minimum)  ← 3,000% overhead
-On SatGate:     $0.50 total                          ← Just the value
+Card rails:  ~$15 in minimum fees (50 × ~$0.30)
+Value:       $0.50 total
+
+That's 3,000% overhead — broken unit economics.
 ```
 
-**Captures the high-frequency agent traffic that is economically unviable on card rails.**
+Agents can't "create accounts and enter card details" per tool call — so developers fall back to API keys, subscriptions, and rate limits.
+
+**SatGate solves this with sats-native per-request pricing (L402).** Agents pay and authenticate without accounts.
 
 ### Two Products in One
 
