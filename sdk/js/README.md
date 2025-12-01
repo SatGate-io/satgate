@@ -1,11 +1,13 @@
-# SatGate Client SDK
+# satgate-sdk
 
-The official JavaScript client for building AI Agents and Apps that pay for API usage via the L402 protocol.
+The official JavaScript SDK for SatGate — **Stripe for AI Agents**.
+
+Build AI agents and apps that pay for API access via the L402 protocol (Lightning Network micropayments).
 
 ## Installation
 
 ```bash
-npm install @satgate/client
+npm install satgate-sdk
 ```
 
 ## Usage
@@ -15,7 +17,7 @@ npm install @satgate/client
 The client automatically detects `window.webln` (Alby, standard WebLN providers).
 
 ```javascript
-import { SatGateClient } from '@satgate/client';
+import { SatGateClient } from 'satgate-sdk';
 
 const client = new SatGateClient();
 
@@ -32,7 +34,7 @@ const data = await response.json();
 For autonomous agents, you can inject a custom wallet provider (e.g., wrapping LND or LNBits).
 
 ```javascript
-import { SatGateClient } from '@satgate/client';
+import { SatGateClient } from 'satgate-sdk';
 
 const myAgentWallet = {
   async payInvoice(invoice) {

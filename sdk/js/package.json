@@ -1,21 +1,48 @@
 {
-  "name": "@satgate/client",
+  "name": "satgate-sdk",
   "version": "0.1.0",
-  "description": "Client SDK for SatGate L402 Gateways. Auto-handles payment loops.",
+  "description": "JavaScript SDK for SatGate - Stripe for AI Agents. Auto-handles L402 payment loops.",
   "main": "src/index.js",
+  "module": "src/index.js",
   "type": "module",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "types": "./src/index.d.ts"
+    }
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "satgate",
     "l402",
+    "lsat",
     "lightning",
     "bitcoin",
-    "client"
+    "micropayments",
+    "api",
+    "ai-agents",
+    "langchain",
+    "webln",
+    "payments"
   ],
-  "author": "",
+  "author": "SatGate <contact@satgate.io>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SatGate-io/satgate.git",
+    "directory": "sdk/js"
+  },
+  "bugs": {
+    "url": "https://github.com/SatGate-io/satgate/issues"
+  },
+  "homepage": "https://satgate.io",
   "dependencies": {}
 }
 

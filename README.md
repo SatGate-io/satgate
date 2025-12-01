@@ -86,11 +86,11 @@ agent.run("Fetch the premium market report from AlphaVantage")
 ## 📦 JavaScript SDK
 
 ```bash
-npm install @satgate/sdk
+npm install satgate-sdk
 ```
 
 ```javascript
-import { SatGateClient } from '@satgate/sdk';
+import { SatGateClient } from 'satgate-sdk';
 
 const client = new SatGateClient();
 
