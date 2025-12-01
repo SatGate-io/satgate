@@ -7,6 +7,7 @@ import Image from 'next/image';
 
 const LandingPage = () => {
   const [copied, setCopied] = useState(false);
+  const [activeTab, setActiveTab] = useState<'python' | 'nodejs' | 'curl'>('python');
 
   const copyToClipboard = async () => {
     await navigator.clipboard.writeText('pip install satgate');
@@ -299,11 +300,27 @@ const LandingPage = () => {
           
           <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
             <div className="flex border-b border-gray-800">
-              <button className="px-6 py-3 bg-gray-800 text-white font-mono text-sm border-r border-gray-700">Python (Agents)</button>
-              <button className="px-6 py-3 text-gray-500 hover:text-white font-mono text-sm transition">Node.js</button>
-              <button className="px-6 py-3 text-gray-500 hover:text-white font-mono text-sm transition">cURL</button>
+              <button 
+                onClick={() => setActiveTab('python')}
+                className={`px-6 py-3 font-mono text-sm border-r border-gray-700 transition ${activeTab === 'python' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-white'}`}
+              >
+                Python (Agents)
+              </button>
+              <button 
+                onClick={() => setActiveTab('nodejs')}
+                className={`px-6 py-3 font-mono text-sm border-r border-gray-700 transition ${activeTab === 'nodejs' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-white'}`}
+              >
+                Node.js
+              </button>
+              <button 
+                onClick={() => setActiveTab('curl')}
+                className={`px-6 py-3 font-mono text-sm transition ${activeTab === 'curl' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-white'}`}
+              >
+                cURL
+              </button>
             </div>
             <div className="p-8 overflow-x-auto">
+              {activeTab === 'python' && (
 <pre className="text-sm font-mono text-gray-300 leading-relaxed">
 <span className="text-purple-400">from</span> satgate.langchain <span className="text-purple-400">import</span> SatGateTool<br/>
 <span className="text-purple-400">from</span> langchain.agents <span className="text-purple-400">import</span> initialize_agent<br/>
@@ -315,6 +332,32 @@ tools = [SatGateTool(wallet=my_lnd_node)]<br/>
 agent = initialize_agent(tools, llm, agent=<span className="text-green-400">"openai-functions"</span>)<br/>
 agent.run(<span className="text-green-400">"Buy the latest stock report from AlphaVantage"</span>)
 </pre>
+              )}
+              {activeTab === 'nodejs' && (
+<pre className="text-sm font-mono text-gray-300 leading-relaxed">
+<span className="text-purple-400">import</span> {'{ SatGateClient }'} <span className="text-purple-400">from</span> <span className="text-green-400">'satgate-sdk'</span>;<br/>
+<br/>
+<span className="text-gray-500">// Initialize client (uses WebLN in browser)</span><br/>
+<span className="text-purple-400">const</span> client = <span className="text-purple-400">new</span> SatGateClient();<br/>
+<br/>
+<span className="text-gray-500">// Automatic: 402 → Pay → Retry → Response</span><br/>
+<span className="text-purple-400">const</span> data = <span className="text-purple-400">await</span> client.get(<span className="text-green-400">'https://api.example.com/premium'</span>);<br/>
+console.log(data);
+</pre>
+              )}
+              {activeTab === 'curl' && (
+<pre className="text-sm font-mono text-gray-300 leading-relaxed">
+<span className="text-gray-500"># 1. Request protected endpoint → get 402 + invoice</span><br/>
+curl -i https://api.example.com/api/premium<br/>
+<br/>
+<span className="text-gray-500"># 2. Pay the Lightning invoice (via your wallet)</span><br/>
+<span className="text-gray-500"># Returns preimage as proof of payment</span><br/>
+<br/>
+<span className="text-gray-500"># 3. Retry with L402 token</span><br/>
+curl -H <span className="text-green-400">"Authorization: L402 &lt;macaroon&gt;:&lt;preimage&gt;"</span> \<br/>
+&nbsp;&nbsp;https://api.example.com/api/premium
+</pre>
+              )}
             </div>
           </div>
         </div>
