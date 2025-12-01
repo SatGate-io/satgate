@@ -174,8 +174,8 @@ export default function SecurityPage() {
             </p>
             <p className="text-gray-400 leading-relaxed m-0">
               Email:{' '}
-              <a href="mailto:security@satgate.io" className="text-yellow-400 hover:text-yellow-300 font-mono">
-                security@satgate.io
+              <a href="mailto:contact@satgate.io" className="text-yellow-400 hover:text-yellow-300 font-mono">
+                contact@satgate.io
               </a>
             </p>
           </section>
