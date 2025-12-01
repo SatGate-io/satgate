@@ -89,7 +89,7 @@ const LandingPage = () => {
                 <img src="/satgate-hero-demo.gif" alt="SatGate Demo" className="w-full" />
               </video>
               <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-gray-300 font-mono">
-                ⚡ ~1 sat ≈ $0.001
+                ⚡ Metered in sats
               </div>
             </div>
           </div>
@@ -114,12 +114,12 @@ const LandingPage = () => {
             <FeatureCard 
               icon={<Code className="text-pink-400" />}
               title="Micropayments"
-              desc="Monetize per-request. Charge ~$0.001 per API call. Uneconomical on card rails, trivial with SatGate."
+              desc="Meter in sats per call. Sub-cent pricing that's uneconomical on card rails, trivial with SatGate."
             />
             <FeatureCard 
               icon={<Shield className="text-green-400" />}
-              title="Economic Rate Limiting"
-              desc="Don't block bots—monetize them. Per-request costs stop L7 abuse & scraping. Use with your existing WAF/CDN."
+              title="Economic Friction for L7 Abuse"
+              desc="High-volume scraping becomes expensive. Use alongside your WAF/CDN for volumetric protection."
             />
           </div>
         </div>
@@ -162,7 +162,7 @@ const LandingPage = () => {
               <p className="text-gray-400 text-sm mb-4">"Present a token that <em>already encodes</em> what you can do."</p>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li className="text-green-400">✓ No accounts required</li>
-                <li className="text-green-400">✓ Payment = Authorization</li>
+                <li className="text-green-400">✓ Payment-gated authorization</li>
                 <li className="text-green-400">✓ Zero PII, no credentials to steal</li>
                 <li className="text-green-400">✓ Perfect for autonomous agents</li>
               </ul>
@@ -176,7 +176,7 @@ const LandingPage = () => {
                 <Shield className="text-cyan-400" size={18} />
                 <h4 className="font-semibold">Edge Verification</h4>
               </div>
-              <p className="text-gray-500 text-sm">Tokens verified cryptographically at the gateway. No centralized identity store needed.</p>
+              <p className="text-gray-500 text-sm">Tokens verified cryptographically at the gateway. No centralized identity store needed. Usage accounting/quotas can be tracked without storing PII.</p>
             </div>
             <div className="p-5 rounded-xl bg-gray-900 border border-gray-800">
               <div className="flex items-center gap-3 mb-3">

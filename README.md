@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>Stripe for AI Agents • EZ-Pass for the API Economy</strong><br>
-  <em>~$0.001 per request. No accounts. No bank required.</em>
+  <em>Meter in sats per request. No accounts. No bank required.</em>
 </p>
 
 <p align="center">
@@ -29,7 +29,7 @@
 <p align="center">
   <img src="docs/screenshots/satgate-hero-demo.gif" alt="AI Agent paying 1 satoshi for API access" width="700" />
   <br>
-  <em>An AI agent pays ~$0.001 for API access — in real-time</em>
+  <em>An AI agent pays 1 sat for API access — in real-time</em>
 </p>
 
 ---
@@ -46,7 +46,7 @@ On SatGate:     $0.50 total                          ← Just the value
 
 **Captures the high-frequency agent traffic that is economically unviable on card rails.**
 
-**Bonus:** Every request costs money, so bots and scrapers can't abuse your API. Don't block them—monetize them. *(Economic Rate Limiting — complements your WAF/CDN)*
+**Bonus:** High-volume scraping becomes expensive and self-limiting. *(Economic friction for L7 abuse — use alongside your WAF/CDN for volumetric protection)*
 
 ---
 
@@ -141,15 +141,15 @@ curl http://localhost:8081/api/micro/ping    # ⚡ 402 → Pay 1 sat
 
 ## 💰 Pricing Tiers
 
-| Endpoint | Price | ~USD* | Use Case |
-|----------|-------|-------|----------|
-| `/api/micro/*` | 1 sat | ~$0.001 | True micropayments |
-| `/api/basic/*` | 10 sats | ~$0.01 | High-volume |
-| `/api/standard/*` | 100 sats | ~$0.10 | Analytics |
-| `/api/premium/*` | 1000 sats | ~$1.00 | AI inference |
-| `/api/free/*` | Free | — | Health checks |
+| Endpoint | Price | Use Case |
+|----------|-------|----------|
+| `/api/micro/*` | 1 sat | True micropayments |
+| `/api/basic/*` | 10 sats | High-volume |
+| `/api/standard/*` | 100 sats | Analytics |
+| `/api/premium/*` | 1000 sats | AI inference |
+| `/api/free/*` | Free | Health checks |
 
-*USD values approximate; varies with BTC price.
+> **Sats-first pricing.** We quote and settle in satoshis. Display an optional real-time fiat estimate in your UI if needed.
 
 Configure in `proxy/aperture.yaml`:
 
@@ -157,7 +157,7 @@ Configure in `proxy/aperture.yaml`:
 services:
   - name: micro
     pathregexp: '^/api/micro($|/.*)$'
-    price: 1      # 1 satoshi ≈ $0.001
+    price: 1      # 1 satoshi
     timeout: 86400
 ```
 
@@ -208,9 +208,9 @@ SatGate uses **capability-based** access: "Present a token that *already encodes
 ### Security Features
 
 - **No Accounts Required** — Access via L402 bearer tokens (macaroons + proof-of-payment), not usernames or API keys
-- **Edge Verification** — Tokens verified cryptographically at the gateway; no centralized identity store needed
+- **Edge Verification** — Tokens verified cryptographically at the gateway; no centralized identity store needed (usage accounting/quotas can be tracked without storing PII)
 - **Least Privilege** — Add caveats to constrain scope, time, audience, and budget (e.g., `"valid_until": 5min`, `"max_calls": 10`)
-- **Economic Abuse Friction** — Spam becomes expensive and self-limiting; high-volume callers must continuously pay
+- **Economic Friction for L7 Abuse** — High-volume scraping becomes expensive and self-limiting; use alongside WAF/CDN for volumetric protection
 - **Privacy-Forward** — Zero PII collection; reduced credential-stuffing exposure with short-lived scoped tokens
 
 > **The security primitive:** L402 creates *paid capabilities* — cryptographic tokens where payment gates issuance and the token itself encodes permissions.
