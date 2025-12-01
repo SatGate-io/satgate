@@ -21,7 +21,7 @@ const LandingPage = () => {
       <nav className="border-b border-gray-800 backdrop-blur-md fixed w-full z-50 bg-black/50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="SatGate" width={32} height={32} className="w-8 h-8" />
+            <Image src="/logo_transparent.png" alt="SatGate" width={32} height={32} className="w-8 h-8" />
             <span className="text-xl font-bold text-white">SatGate</span>
           </Link>
           <div className="flex gap-6 text-sm font-medium text-gray-400">
@@ -376,7 +376,7 @@ curl -H <span className="text-green-400">"Authorization: L402 &lt;macaroon&gt;:&
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 py-12 border-t border-gray-800">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Image src="/logo.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
+                <Image src="/logo_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
               <p className="text-gray-500 text-sm">Stripe for AI Agents.<br/>EZ-Pass for the API Economy.</p>
