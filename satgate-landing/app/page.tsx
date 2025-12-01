@@ -43,7 +43,7 @@ const LandingPage = () => {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
                 Autonomous Agents
               </span>
-            </h1>
+          </h1>
             <p className="text-xl text-gray-400 mb-8 max-w-lg leading-relaxed">
               Agents can't pass KYC. They can't hold bank accounts. 
               SatGate gives them a <b>Lightning Wallet</b> and an <b>L402 Gateway</b> to buy data, API calls, and compute instantly.
@@ -89,7 +89,7 @@ const LandingPage = () => {
                 <img src="/satgate-hero-demo.gif" alt="SatGate Demo" className="w-full" />
               </video>
               <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-gray-300 font-mono">
-                ⚡ 1 sat = $0.001
+                ⚡ ~1 sat ≈ $0.001
               </div>
             </div>
           </div>
@@ -114,12 +114,12 @@ const LandingPage = () => {
             <FeatureCard 
               icon={<Code className="text-pink-400" />}
               title="Micropayments"
-              desc="Monetize per-request. Charge $0.001 per API call. Impossible with Stripe, trivial with SatGate."
+              desc="Monetize per-request. Charge ~$0.001 per API call. Uneconomical on card rails, trivial with SatGate."
             />
             <FeatureCard 
               icon={<Shield className="text-green-400" />}
-              title="Economic DDoS Protection"
-              desc="Don't block bots—monetize them. Every request costs money, making spam economically unviable."
+              title="Economic Rate Limiting"
+              desc="Don't block bots—monetize them. Per-request costs stop L7 abuse & scraping. Use with your existing WAF/CDN."
             />
           </div>
         </div>
@@ -163,10 +163,11 @@ agent.run(<span className="text-green-400">"Buy the latest stock report from Alp
             </a>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-12 border-t border-gray-800">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 py-12 border-t border-gray-800">
             <div>
               <h4 className="font-bold text-white mb-4">⚡ SatGate</h4>
               <p className="text-gray-500 text-sm">Stripe for AI Agents.<br/>EZ-Pass for the API Economy.</p>
+              <p className="text-gray-600 text-xs mt-3">Non-custodial. We never hold your keys.</p>
             </div>
             <div>
               <h4 className="font-bold text-white mb-4">Resources</h4>
@@ -177,10 +178,19 @@ agent.run(<span className="text-green-400">"Buy the latest stock report from Alp
               </ul>
             </div>
             <div>
+              <h4 className="font-bold text-white mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm text-gray-500">
+                <li><Link href="/terms" className="hover:text-white transition">Terms of Service</Link></li>
+                <li><Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link></li>
+                <li><Link href="/security" className="hover:text-white transition">Security</Link></li>
+              </ul>
+            </div>
+            <div>
               <h4 className="font-bold text-white mb-4">Contact</h4>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><a href="mailto:contact@satgate.io" className="hover:text-white transition">contact@satgate.io</a></li>
                 <li><a href="https://twitter.com/SatGate_io" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Twitter/X</a></li>
+                <li><a href="mailto:security@satgate.io" className="hover:text-white transition">security@satgate.io</a></li>
               </ul>
             </div>
           </div>

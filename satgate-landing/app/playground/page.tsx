@@ -6,10 +6,10 @@ import Link from 'next/link';
 
 // --- ENDPOINT OPTIONS ---
 const ENDPOINTS = [
-  { path: '/api/micro/ping', price: 1, label: '/api/micro/ping (1 sat = $0.001)' },
-  { path: '/api/basic/quote', price: 10, label: '/api/basic/quote (10 sats = $0.01)' },
-  { path: '/api/standard/analytics', price: 100, label: '/api/standard/analytics (100 sats = $0.10)' },
-  { path: '/api/premium/insights', price: 1000, label: '/api/premium/insights (1000 sats = $1.00)' },
+  { path: '/api/micro/ping', price: 1, label: '/api/micro/ping (1 sat ≈ $0.001)' },
+  { path: '/api/basic/quote', price: 10, label: '/api/basic/quote (10 sats ≈ $0.01)' },
+  { path: '/api/standard/analytics', price: 100, label: '/api/standard/analytics (100 sats ≈ $0.10)' },
+  { path: '/api/premium/insights', price: 1000, label: '/api/premium/insights (1000 sats ≈ $1.00)' },
 ];
 
 // --- 1. MOCK CLIENT (Simulation) ---

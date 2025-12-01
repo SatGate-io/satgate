@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>Stripe for AI Agents • EZ-Pass for the API Economy</strong><br>
-  <em>$0.001 per request. No accounts. No bank required.</em>
+  <em>~$0.001 per request. No accounts. No bank required.</em>
 </p>
 
 <p align="center">
@@ -29,7 +29,7 @@
 <p align="center">
   <img src="docs/screenshots/satgate-hero-demo.gif" alt="AI Agent paying 1 satoshi for API access" width="700" />
   <br>
-  <em>An AI agent pays $0.001 for API access — in real-time</em>
+  <em>An AI agent pays ~$0.001 for API access — in real-time</em>
 </p>
 
 ---
@@ -40,13 +40,13 @@
 An AI agent needs 50 API calls to research a topic.
 Each call costs $0.01.
 
-On Stripe:  $15.00 in fees (50 × $0.30 minimum)  ← 3,000% overhead
-On SatGate: $0.50 total                          ← Just the value
+On Card Rails:  $15.00 in fees (50 × $0.30 minimum)  ← 3,000% overhead
+On SatGate:     $0.50 total                          ← Just the value
 ```
 
-**We solve for the 99% of agent traffic that Stripe physically cannot touch.**
+**Captures the high-frequency agent traffic that is economically unviable on card rails.**
 
-**Bonus:** Every request costs money, so bots and scrapers can't abuse your API. Don't block them—monetize them. *(Economic DDoS Protection)*
+**Bonus:** Every request costs money, so bots and scrapers can't abuse your API. Don't block them—monetize them. *(Economic Rate Limiting — complements your WAF/CDN)*
 
 ---
 
@@ -141,13 +141,15 @@ curl http://localhost:8081/api/micro/ping    # ⚡ 402 → Pay 1 sat
 
 ## 💰 Pricing Tiers
 
-| Endpoint | Price | USD | Use Case |
-|----------|-------|-----|----------|
-| `/api/micro/*` | 1 sat | **$0.001** | True micropayments |
-| `/api/basic/*` | 10 sats | $0.01 | High-volume |
-| `/api/standard/*` | 100 sats | $0.10 | Analytics |
-| `/api/premium/*` | 1000 sats | $1.00 | AI inference |
+| Endpoint | Price | ~USD* | Use Case |
+|----------|-------|-------|----------|
+| `/api/micro/*` | 1 sat | ~$0.001 | True micropayments |
+| `/api/basic/*` | 10 sats | ~$0.01 | High-volume |
+| `/api/standard/*` | 100 sats | ~$0.10 | Analytics |
+| `/api/premium/*` | 1000 sats | ~$1.00 | AI inference |
 | `/api/free/*` | Free | — | Health checks |
+
+*USD values approximate; varies with BTC price.
 
 Configure in `proxy/aperture.yaml`:
 
@@ -155,7 +157,7 @@ Configure in `proxy/aperture.yaml`:
 services:
   - name: micro
     pathregexp: '^/api/micro($|/.*)$'
-    price: 1      # 1 satoshi = $0.001
+    price: 1      # 1 satoshi ≈ $0.001
     timeout: 86400
 ```
 
@@ -173,6 +175,18 @@ services:
        └────────────────────────────────────┘
                  Lightning Network
 ```
+
+### How L402 Works (3 Steps)
+
+1. **402 Response** — Client requests protected endpoint, gateway returns `HTTP 402` with a Lightning invoice
+2. **Pay Invoice** — Client pays invoice via Lightning, receives cryptographic preimage
+3. **L402 Token** — Client combines macaroon + preimage into an `Authorization: L402` header for access
+
+**L402 Token = Macaroon + Preimage** — A bearer credential with embedded permissions (caveats) that proves payment.
+
+### Non-Custodial by Design
+
+> **SatGate never holds your funds.** We help generate invoices, but payments settle directly to your Lightning node (or your partner custodian). We never hold your keys.
 
 ---
 
