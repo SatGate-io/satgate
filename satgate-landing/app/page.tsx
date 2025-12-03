@@ -117,7 +117,7 @@ const LandingPage = () => {
                 <h3 className="font-bold text-lg">Monetize APIs per request</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Sub-cent pricing that's impossible on card rails. Charge 1 sat per call. No minimums, no chargebacks, instant settlement.
+                Charge 1 sat per call—sub-cent pricing that's impossible on card rails. No minimums, no chargebacks, instant settlement.
               </p>
             </div>
             <div className="p-6 rounded-xl bg-gradient-to-br from-cyan-950/30 to-cyan-900/10 border border-cyan-800/30 hover:border-cyan-600/50 transition">
@@ -194,7 +194,7 @@ const LandingPage = () => {
             <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
               <div className="flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-lg text-sm">
                 <Activity size={16} className="text-cyan-400" />
-                <span className="text-gray-300">Get quotes</span>
+                <span className="text-gray-300">Get quotes <span className="text-gray-500">(price, p95, uptime)</span></span>
               </div>
               <span className="text-gray-600 text-xl hidden md:block">→</span>
               <span className="text-gray-600 md:hidden">↓</span>
