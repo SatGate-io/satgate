@@ -220,6 +220,16 @@ const LandingPage = () => {
             </p>
           </div>
           
+          <div className="text-center mt-8">
+            <a 
+              href="https://github.com/SatGate-io/satgate#-agent-routing-failover-example" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-sm text-cyan-400 hover:text-cyan-300 transition underline underline-offset-4"
+            >
+              See the Failover Example →
+            </a>
+          </div>
         </div>
       </section>
 

@@ -249,6 +249,77 @@ SatGate is a **Zero Trust Policy Enforcement Point** — the gateway that verifi
 
 ---
 
+## 🔀 Agent Routing (Failover Example)
+
+In the agent era, switching APIs isn't a two-week integration project. Agents can evaluate providers *per request* and route based on price, latency, and availability.
+
+**This enables an API marketplace where providers compete per request.**
+
+### Simple Failover Pattern
+
+```python
+from satgate import SatGateSession
+import time
+
+# Define providers (each running SatGate)
+PROVIDERS = [
+    {"name": "Provider A", "url": "https://api-a.example.com/data", "price_sats": 5},
+    {"name": "Provider B", "url": "https://api-b.example.com/data", "price_sats": 8},
+    {"name": "Provider C", "url": "https://api-c.example.com/data", "price_sats": 3},
+]
+
+def fetch_with_failover(session, providers, timeout=5):
+    """Try providers in order; failover on error/timeout."""
+    
+    # Sort by price (or add latency, reputation, etc.)
+    sorted_providers = sorted(providers, key=lambda p: p["price_sats"])
+    
+    for provider in sorted_providers:
+        try:
+            print(f"Trying {provider['name']} ({provider['price_sats']} sats)...")
+            start = time.time()
+            
+            # SatGate handles 402 → pay → retry automatically
+            response = session.get(provider["url"], timeout=timeout)
+            
+            if response.ok:
+                latency = time.time() - start
+                print(f"✓ Success via {provider['name']} ({latency:.2f}s)")
+                return response.json()
+                
+        except Exception as e:
+            print(f"✗ {provider['name']} failed: {e}")
+            continue  # Try next provider
+    
+    raise Exception("All providers failed")
+
+# Usage
+session = SatGateSession(wallet=my_wallet)
+data = fetch_with_failover(session, PROVIDERS)
+```
+
+### What's Happening
+
+1. **Agent sorts providers** by price (cheapest first)
+2. **Tries Provider C** (3 sats) — if down, moves to next
+3. **Tries Provider A** (5 sats) — SatGate handles 402 → pay → access
+4. **If timeout/error** → automatically tries Provider B (8 sats)
+
+The agent switches providers *on the next call* — no human intervention, no config changes.
+
+### Why SatGate Makes This Work
+
+| Without SatGate | With SatGate |
+|-----------------|--------------|
+| Each provider needs separate API key | One wallet works everywhere |
+| Signup/onboarding per provider | Pay-to-authorize instantly |
+| Days to add a new provider | Seconds to failover |
+| Static pricing (contracts) | Dynamic per-request pricing |
+
+> **The primitive:** SatGate's L402 tokens are *provider-agnostic*. Any provider running SatGate accepts the same pay → token → call pattern.
+
+---
+
 ## 📁 Repository Structure
 
 ```
