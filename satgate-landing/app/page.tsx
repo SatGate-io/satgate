@@ -194,7 +194,7 @@ const LandingPage = () => {
             <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
               <div className="flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-lg text-sm">
                 <Activity size={16} className="text-cyan-400" />
-                <span className="text-gray-300">Get quotes <span className="text-gray-500">(price, p95, uptime)</span></span>
+                <span className="text-gray-300">Get quotes <span className="text-gray-500">(price, latency, uptime)</span></span>
               </div>
               <span className="text-gray-600 text-xl hidden md:block">→</span>
               <span className="text-gray-600 md:hidden">↓</span>
