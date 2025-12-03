@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock, DollarSign, Bot } from 'lucide-react';
+import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock, DollarSign, Bot, GitBranch, Activity, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -49,7 +49,7 @@ const LandingPage = () => {
           </h1>
             <p className="text-xl text-gray-400 mb-8 max-w-lg leading-relaxed">
               Agents can't pass KYC. They can't hold bank accounts. 
-              SatGate gives them a <b>Lightning Wallet</b> and an <b>L402 Gateway</b> to buy data, API calls, and compute instantly.
+              SatGate gives them a <b>Lightning Wallet</b> and an <b>L402 Gateway</b> to buy data, API calls, and compute instantly—and route to the best provider based on price, latency, and availability.
             </p>
             <div className="flex gap-4">
               <Link href="/playground" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center gap-2">
@@ -131,6 +131,90 @@ const LandingPage = () => {
                 L402 tokens replace accounts and API keys. No PII, no credential stuffing. Paid capabilities for autonomous agents.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Agent Routing Section */}
+      <section className="py-20 px-6 bg-gradient-to-b from-gray-900/30 to-black border-b border-gray-800">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-900/30 border border-cyan-500/30 text-cyan-300 text-xs font-mono mb-6">
+              <GitBranch size={12} /> The Agent Era
+            </div>
+            <h2 className="text-3xl font-bold mb-4">Agents Route in Real Time. Humans Can't.</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              In the agent era, switching APIs isn't a two-week integration project. With MCP/tooling, an agent evaluates providers <em>per request</em> and routes based on price, latency, and availability—then pays instantly with L402.
+            </p>
+          </div>
+
+          {/* 3 Key Benefits */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-cyan-800/50 transition">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 bg-cyan-900/30 rounded-lg">
+                  <DollarSign className="text-cyan-400" size={20} />
+                </div>
+                <h3 className="font-bold">Dynamic Pricing</h3>
+              </div>
+              <p className="text-gray-500 text-sm leading-relaxed">
+                Providers compete per call. Agents optimize spend automatically based on budget policies.
+              </p>
+            </div>
+            <div className="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-cyan-800/50 transition">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 bg-purple-900/30 rounded-lg">
+                  <RefreshCw className="text-purple-400" size={20} />
+                </div>
+                <h3 className="font-bold">Instant Failover</h3>
+              </div>
+              <p className="text-gray-500 text-sm leading-relaxed">
+                If one API is degraded, the agent switches on the next call. No human intervention, no downtime.
+              </p>
+            </div>
+            <div className="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-cyan-800/50 transition">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 bg-green-900/30 rounded-lg">
+                  <Zap className="text-green-400" size={20} />
+                </div>
+                <h3 className="font-bold">No Onboarding Drag</h3>
+              </div>
+              <p className="text-gray-500 text-sm leading-relaxed">
+                Pay-to-authorize replaces accounts and API keys for machine clients. Instant access, any provider.
+              </p>
+            </div>
+          </div>
+
+          {/* Agent Decision Flow Diagram */}
+          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
+            <h4 className="text-center text-sm font-semibold text-gray-400 mb-6">AGENT DECISION LOOP</h4>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-lg text-sm">
+                <Activity size={16} className="text-cyan-400" />
+                <span className="text-gray-300">Get quotes</span>
+              </div>
+              <span className="text-gray-600 text-xl hidden md:block">→</span>
+              <span className="text-gray-600 md:hidden">↓</span>
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-lg text-sm">
+                <GitBranch size={16} className="text-purple-400" />
+                <span className="text-gray-300">Select best provider</span>
+              </div>
+              <span className="text-gray-600 text-xl hidden md:block">→</span>
+              <span className="text-gray-600 md:hidden">↓</span>
+              <div className="flex items-center gap-2 px-4 py-2 bg-purple-900/30 border border-purple-700/50 rounded-lg text-sm">
+                <Zap size={16} className="text-yellow-400" />
+                <span className="text-gray-300">Pay → L402 token</span>
+              </div>
+              <span className="text-gray-600 text-xl hidden md:block">→</span>
+              <span className="text-gray-600 md:hidden">↓</span>
+              <div className="flex items-center gap-2 px-4 py-2 bg-green-900/30 border border-green-700/50 rounded-lg text-sm">
+                <CheckCircle size={16} className="text-green-400" />
+                <span className="text-gray-300">Call API</span>
+              </div>
+            </div>
+            <p className="text-center text-gray-600 text-xs mt-6">
+              If timeout/error → agent automatically retries with next provider. SatGate is the primitive that makes this possible.
+            </p>
           </div>
         </div>
       </section>
