@@ -227,7 +227,7 @@ const LandingPage = () => {
               rel="noopener noreferrer"
               className="text-sm text-cyan-400 hover:text-cyan-300 transition underline underline-offset-4"
             >
-              See the Failover Example →
+              See the Agent Routing Example →
             </a>
           </div>
         </div>
