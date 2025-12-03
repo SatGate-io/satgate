@@ -143,8 +143,11 @@ const LandingPage = () => {
               <GitBranch size={12} /> The Agent Era
             </div>
             <h2 className="text-3xl font-bold mb-4">Agents Route in Real Time. Humans Can't.</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
-              In the agent era, switching APIs isn't a two-week integration project. With MCP/tooling, an agent evaluates providers <em>per request</em> and routes based on price, latency, and availability—then pays instantly with L402.
+            <p className="text-gray-400 max-w-2xl mx-auto mb-4">
+              In the agent era, switching APIs isn't a two-week integration project. With <span className="text-gray-300" title="Model Context Protocol">MCP</span> and agent tooling, providers publish price and health signals—agents route by policy, pay instantly, and get an L402 capability token.
+            </p>
+            <p className="text-cyan-400 font-medium">
+              This enables an API marketplace where providers compete per request.
             </p>
           </div>
 
@@ -215,6 +218,18 @@ const LandingPage = () => {
             <p className="text-center text-gray-600 text-xs mt-6">
               If timeout/error → agent automatically retries with next provider. SatGate is the primitive that makes this possible.
             </p>
+          </div>
+          
+          {/* CTA Link */}
+          <div className="text-center mt-8">
+            <a 
+              href="https://github.com/SatGate-io/satgate#-agent-routing" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-sm text-cyan-400 hover:text-cyan-300 transition underline underline-offset-4"
+            >
+              See the Router Example →
+            </a>
           </div>
         </div>
       </section>
