@@ -83,6 +83,7 @@ Lightning Network now—others pluggable.
 - Playground: https://satgate.io/playground
 - Security: https://satgate.io/security
 - GitHub: https://github.com/SatGate-io/satgate
+- L402 Response Schema: https://github.com/SatGate-io/satgate/blob/main/docs/L402-RESPONSE-SCHEMA.md
 - Python SDK: https://pypi.org/project/satgate/
 - Node.js SDK: https://www.npmjs.com/package/satgate-sdk
 

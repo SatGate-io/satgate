@@ -386,6 +386,8 @@ Watch an AI agent autonomously pay for API access in real-time.
 
 ## 📚 Resources
 
+- [L402 Response Schema](docs/L402-RESPONSE-SCHEMA.md) — Machine-friendly 402 response format
+- [llms.txt](https://satgate.io/llms.txt) — Machine-readable spec for AI assistants
 - [L402 Protocol Spec](https://lightning.engineering/posts/2020-03-30-lsat/)
 - [Aperture Docs](https://github.com/lightninglabs/aperture)
 - [WebLN Guide](https://www.webln.guide/)

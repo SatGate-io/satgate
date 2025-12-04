@@ -95,9 +95,17 @@ const LandingPage = () => {
                 ⚡ Metered in sats
               </div>
             </div>
-            <p className="text-center text-sm text-gray-500 mt-4">
-              Watch an AI agent autonomously pay for API access in real-time.
-            </p>
+            <div className="text-center mt-4">
+              <p className="text-sm text-gray-500 mb-3">
+                Watch an AI agent autonomously pay for API access in real-time.
+              </p>
+              <Link 
+                href="/playground" 
+                className="inline-flex items-center gap-2 text-sm font-medium text-purple-400 hover:text-purple-300 transition"
+              >
+                Try it live in 15 seconds <ArrowRight size={14} />
+              </Link>
+            </div>
           </div>
         </div>
       </header>
