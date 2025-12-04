@@ -135,6 +135,41 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Where It Fits Section */}
+      <section className="py-16 px-6 border-b border-gray-800">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-center mb-3">Where It Fits</h2>
+          <p className="text-gray-500 text-center mb-10">Drop-in deployment. Minimal code changes.</p>
+          
+          {/* Architecture Diagram */}
+          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
+              <div className="px-5 py-3 rounded-lg bg-gray-800 border border-gray-700 text-center min-w-[140px]">
+                <span className="text-gray-300 font-medium">Client / Agent</span>
+              </div>
+              <span className="text-gray-600 text-xl hidden md:block">→</span>
+              <span className="text-gray-600 md:hidden">↓</span>
+              <div className="px-5 py-3 rounded-lg bg-cyan-900/30 border border-cyan-700/50 text-center min-w-[140px]">
+                <span className="text-cyan-400 font-medium">CDN / WAF</span>
+              </div>
+              <span className="text-gray-600 text-xl hidden md:block">→</span>
+              <span className="text-gray-600 md:hidden">↓</span>
+              <div className="px-5 py-3 rounded-lg bg-purple-900/40 border-2 border-purple-500/60 text-center min-w-[140px]">
+                <span className="text-purple-300 font-bold">SatGate PEP</span>
+              </div>
+              <span className="text-gray-600 text-xl hidden md:block">→</span>
+              <span className="text-gray-600 md:hidden">↓</span>
+              <div className="px-5 py-3 rounded-lg bg-green-900/30 border border-green-700/50 text-center min-w-[140px]">
+                <span className="text-green-400 font-medium">Your API</span>
+              </div>
+            </div>
+            <p className="text-center text-gray-500 text-sm mt-6">
+              SatGate sits <span className="text-white">behind</span> your CDN/WAF (volumetric protection) and <span className="text-white">in front of</span> your API origin.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Agent Routing Section */}
       <section className="py-20 px-6 bg-gradient-to-b from-gray-900/30 to-black border-b border-gray-800">
         <div className="max-w-5xl mx-auto">
