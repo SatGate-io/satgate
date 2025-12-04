@@ -71,7 +71,7 @@ const LandingPage = () => {
 
           {/* Right: Hero Demo Video */}
           <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+            <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 pointer-events-none"></div>
             <div className="relative bg-gray-900 rounded-xl border border-gray-800 overflow-hidden shadow-2xl">
               <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-800 bg-gray-900/80">
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
