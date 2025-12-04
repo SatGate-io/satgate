@@ -206,7 +206,7 @@ const LandingPage = () => {
               <span className="text-gray-600 md:hidden">↓</span>
               <div className="flex items-center gap-2 px-4 py-2 bg-purple-900/30 border border-purple-700/50 rounded-lg text-sm">
                 <Zap size={16} className="text-yellow-400" />
-                <span className="text-gray-300">Pay → L402 token</span>
+                <span className="text-gray-300">Pay → receive L402 token</span>
               </div>
               <span className="text-gray-600 text-xl hidden md:block">→</span>
               <span className="text-gray-600 md:hidden">↓</span>
