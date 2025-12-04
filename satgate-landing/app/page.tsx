@@ -132,6 +132,10 @@ const LandingPage = () => {
               </p>
             </div>
           </div>
+          
+          <p className="text-center text-gray-600 text-xs mt-8">
+            L402 is the access-control primitive; settlement rails can vary. Lightning now—others pluggable.
+          </p>
         </div>
       </section>
 
@@ -196,7 +200,7 @@ const LandingPage = () => {
                 <h3 className="font-bold">Dynamic Pricing</h3>
               </div>
               <p className="text-gray-500 text-sm leading-relaxed">
-                Providers compete per call. Agents optimize spend automatically based on budget policies.
+                Providers compete per call. If p95 latency spikes, degraded providers drop price to stay competitive. Agents optimize automatically.
               </p>
             </div>
             <div className="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-cyan-800/50 transition">

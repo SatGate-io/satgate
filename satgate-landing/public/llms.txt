@@ -1,0 +1,92 @@
+# SatGate — L402 Access Control for APIs
+> Monetize and secure APIs with pay-per-request capability tokens.
+> Zero Trust PEP. No accounts. No chargebacks. AI-agent ready.
+
+## What is SatGate?
+SatGate is a Policy Enforcement Point (PEP) that implements the L402 protocol.
+It sits between your CDN/WAF and your API origin, enforcing per-request
+authorization using cryptographically verifiable capability tokens.
+
+## L402 Flow (4 steps)
+1. Client requests protected endpoint
+2. Server returns `402 Payment Required` + Lightning invoice + macaroon
+3. Client pays invoice, receives preimage (proof of payment)
+4. Client retries with `Authorization: L402 <macaroon>:<preimage>`
+
+## Token Format
+L402 Token = Macaroon + Preimage
+- Macaroon: encodes permissions via caveats (scope, TTL, budget)
+- Preimage: cryptographic proof that payment was made
+
+## Caveats (Least Privilege)
+Macaroons support caveats to constrain capabilities:
+- `scope=/api/premium/*` — limit to specific routes
+- `exp<=1735689600` — expiration timestamp
+- `budget<=1000` — max sats spendable
+- `calls<=10` — max number of API calls
+
+## Quick Start
+
+### Python (Agents)
+```python
+pip install satgate
+
+from satgate.langchain import SatGateTool
+from langchain.agents import initialize_agent
+
+tools = [SatGateTool(wallet=my_lnd_node)]
+agent = initialize_agent(tools, llm, agent="openai-functions")
+agent.run("Buy the latest stock report")
+```
+
+### Node.js
+```javascript
+npm install satgate-sdk
+
+import { SatGateClient } from 'satgate-sdk';
+const client = new SatGateClient();
+const data = await client.get('https://api.example.com/premium');
+```
+
+### cURL
+```bash
+# 1. Request → get 402 + invoice
+curl -i https://api.example.com/api/premium
+
+# 2. Pay Lightning invoice (returns preimage)
+
+# 3. Retry with L402 token
+curl -H "Authorization: L402 <macaroon>:<preimage>" \
+  https://api.example.com/api/premium
+```
+
+## Architecture
+```
+Client/Agent → CDN/WAF → SatGate PEP → Your API
+```
+SatGate sits behind your CDN/WAF (for volumetric protection) and
+in front of your API origin. Drop-in deployment.
+
+## Key Concepts
+- **Zero Trust PEP**: Per-request verification at the edge
+- **Capability-based**: Tokens encode what you can do, not who you are
+- **No accounts**: Payment is authentication
+- **Economic friction**: Abuse becomes expensive (attackers pay you)
+- **Agent-native**: Agents can't KYC—L402 gives them access credentials
+
+## Settlement Rails
+L402 is the access-control primitive; settlement rails can vary.
+Lightning Network now—others pluggable.
+
+## Links
+- Website: https://satgate.io
+- Playground: https://satgate.io/playground
+- Security: https://satgate.io/security
+- GitHub: https://github.com/SatGate-io/satgate
+- Python SDK: https://pypi.org/project/satgate/
+- Node.js SDK: https://www.npmjs.com/package/satgate-sdk
+
+## Contact
+- Email: contact@satgate.io
+- Twitter/X: @SatGateIO
+
