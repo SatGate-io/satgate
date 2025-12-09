@@ -241,7 +241,7 @@ export default function PlaygroundPage() {
           <ArrowLeft size={18} /> Back to Home
         </Link>
         <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
-          ⚡ SatGate Playground
+          ⚡ SatGate™ Playground
         </h1>
       </div>
 

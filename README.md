@@ -2,7 +2,7 @@
   <img src="docs/screenshots/logo.png" alt="SatGate Logo" width="80" />
 </p>
 
-<h1 align="center">SatGate</h1>
+<h1 align="center">SatGate™</h1>
 
 <p align="center">
   <strong>Stripe for AI Agents • EZ-Pass for the API Economy</strong><br>

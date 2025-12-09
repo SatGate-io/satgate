@@ -1,4 +1,4 @@
-# SatGate — L402 Access Control for APIs
+# SatGate™ — L402 Access Control for APIs
 > Monetize and secure APIs with pay-per-request capability tokens.
 > Zero Trust PEP. No accounts. No chargebacks. AI-agent ready.
 

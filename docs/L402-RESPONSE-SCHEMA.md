@@ -224,3 +224,5 @@ Agents can implement "pay and continue" without custom parsing—the schema prov
 - [SatGate Documentation](https://github.com/SatGate-io/satgate)
 - [llms.txt](https://satgate.io/llms.txt) - Machine-readable spec for AI assistants
 
+
+

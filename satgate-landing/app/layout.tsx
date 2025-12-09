@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SatGate - Stripe for AI Agents",
+  title: "SatGate™ - Stripe for AI Agents",
   description: "API monetization via Lightning micropayments. Meter in sats per request. No accounts. No bank required.",
   icons: {
     icon: "/logo.png",

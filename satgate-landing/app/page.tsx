@@ -22,7 +22,7 @@ const LandingPage = () => {
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <Image src="/logo_white_transparent.png" alt="SatGate" width={32} height={32} className="w-8 h-8" />
-            <span className="text-xl font-bold text-white">SatGate</span>
+            <span className="text-xl font-bold text-white">SatGate<sup className="text-xs font-normal">™</sup></span>
           </Link>
           <div className="flex gap-6 text-sm font-medium text-gray-400">
             <Link href="#features" className="hover:text-white transition">Features</Link>
@@ -553,7 +553,7 @@ curl -H <span className="text-green-400">"Authorization: L402 &lt;macaroon&gt;:&
           </div>
           
           <div className="pt-8 border-t border-gray-800 text-center text-gray-600 text-sm">
-            © 2025 SatGate. Patent Pending. • Built for the machine economy.
+            © 2025 SatGate Inc. All rights reserved. SatGate™ is a trademark of SatGate Inc. Patent Pending.
           </div>
         </div>
       </footer>

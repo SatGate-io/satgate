@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, Shield, Lock, Eye, AlertTriangle, Key, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'Security - SatGate',
+  title: 'Security - SatGate™',
 };
 
 export default function SecurityPage() {
