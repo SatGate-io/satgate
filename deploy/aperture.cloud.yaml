@@ -47,6 +47,15 @@ services:
     price: 1000
     timeout: 86400
 
+  # CAPABILITY-ONLY TIER - Requires macaroon, no payment (Phase 1 test)
+  - name: capability
+    hostregexp: ".*"
+    pathregexp: '^/api/capability($|/.*)$'
+    address: "127.0.0.1:8083"
+    protocol: http
+    price: 0
+    # No authwhitelistpaths = should require macaroon validation?
+
   # FREE TIER - Health checks and public endpoints
   - name: public
     hostregexp: ".*"

@@ -460,6 +460,28 @@ app.get('/api/basic/quote', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// CAPABILITY TIER - Macaroon required, no payment (Phase 1 Test)
+// ---------------------------------------------------------------------------
+// Tests whether Aperture validates macaroons without requiring payment
+
+app.get('/api/capability/ping', (req, res) => {
+  const auth = req.get('authorization') || '';
+  res.json({
+    ok: true,
+    tier: 'capability',
+    price: '0 sats (capability-only)',
+    time: new Date().toISOString(),
+    resource: 'capability-ping',
+    accessType: auth ? 'Bearer Token' : 'No Auth',
+    authHeader: auth ? `${auth.substring(0, 30)}...` : null,
+    data: {
+      message: 'Phase 1: Capability-only access - no payment required',
+      note: 'If you see this, the macaroon was validated without Lightning payment'
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
 // MICRO TIER - 1 sat ($0.001) per request
 // ---------------------------------------------------------------------------
 // True micropayments - the absolute minimum viable price
