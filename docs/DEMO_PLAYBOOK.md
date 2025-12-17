@@ -274,13 +274,36 @@ curl -X POST https://satgate-production.up.railway.app/api/capability/mint
 
 ## The "Maturity Model" Reference
 
-| Phase | Pitch Term | What You Showed | Crypto Required | Value Prop |
-|-------|------------|-----------------|-----------------|------------|
-| **Phase 1** | **Crawl** | Scenes 1-4 (Capability tokens) | ❌ NO | Stateless Access & Speed |
-| **Phase 2** | **Walk** | Quota tracking (future) | ❌ NO | Governance & Cost Control |
-| **Phase 3** | **Run** | Scenes 5-8 (L402 payments) | ✅ YES | Revenue Generation |
+### The Guardrails Framework
 
-> 💡 **Note:** This demo covers **Crawl → Run** (Phase 1 → Phase 3). Phase 2 (Walk/Governance) uses the same architecture but adds quota tracking—available when the client needs cost controls.
+| Category | Phase | Question | Mechanism | Guardrail |
+|----------|-------|----------|-----------|-----------|
+| 🛡️ **Safety** | **Crawl** | "What are you allowed to do?" | Scopes & Attenuation | **Least Privilege** |
+| 🛡️ **Safety** | **Walk** | "How much are you allowed to do?" | Rate Limits & Quotas | **Budget Control** |
+| 🚀 **Growth** | **Run** | "How do we monetize this?" | L402 Payments | **Revenue Generation** |
+
+### Demo Coverage
+
+| Phase | Pitch Term | What You Showed | Crypto Required |
+|-------|------------|-----------------|-----------------|
+| **Phase 1** | **Crawl** | Scenes 1-4 (Capability tokens) | ❌ NO |
+| **Phase 2** | **Walk** | Quota tracking (future) | ❌ NO |
+| **Phase 3** | **Run** | Scenes 5-8 (L402 payments) | ✅ YES |
+
+> 💡 **Note:** This demo covers **Crawl → Run**. Phase 2 (Walk) uses the same architecture but adds quota tracking—available when the client needs cost controls.
+
+### The "Guardrails" Talk Track
+
+> "Think of Crawl and Walk as establishing your **Guardrails**.
+> 
+> - **Crawl** locks down the *Permission* (so the agent can't hack you).
+> - **Walk** locks down the *Volume* (so the agent can't bankrupt you).
+> 
+> Only once those two safety layers are proven do we look at **Run** to turn that traffic into revenue."
+
+**Why this wins with CISOs:**
+- Crawl stops the "Super-Admin Service Account" problem (every bot has root access)
+- Walk prevents the "Runaway AI" nightmare (a loop costs $50k in API fees overnight)
 
 ---
 
@@ -299,7 +322,10 @@ curl -X POST https://satgate-production.up.railway.app/api/capability/mint
 > "Stripe charges 2.9% + 30¢. That makes a 1-cent API call cost 31 cents. Lightning lets us charge 1 sat ($0.001) with near-zero fees. It's the only rail that makes micropayments viable."
 
 **"Our clients won't use Bitcoin."**
-> "That's exactly why we built Phase 1. Start with governance—no crypto required. When they're ready for monetization, the payment rail is already in place."
+> "That's exactly why we built Crawl and Walk. Start with the guardrails—no crypto required. When they're ready for monetization, the payment rail is already in place."
+
+**"This seems risky for a conservative enterprise."**
+> "We're not asking you to jump to payments. Crawl and Walk are the guardrails—permission control and budget control. We build the entire containment system before we ever turn on the fuel. Run is optional."
 
 ---
 
