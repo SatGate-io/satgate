@@ -495,7 +495,7 @@ app.use('/api/capability', (req, res, next) => {
   try {
     // Decode and import the macaroon
     const tokenBytes = Buffer.from(tokenBase64, 'base64');
-    const m = macaroon.importMacaroons(tokenBytes)[0];
+    const m = macaroon.importMacaroon(tokenBytes);
     
     // Verify signature with root key
     const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
@@ -503,20 +503,35 @@ app.use('/api/capability', (req, res, next) => {
     // Build verifier with caveat checkers
     const now = Date.now();
     
-    // Verify the macaroon (signature check)
-    macaroon.dischargeMacaroon(m, () => null, keyBytes, (err) => {
-      if (err) {
-        throw new Error('Invalid signature: ' + err.message);
-      }
-    });
-    
-    // Check caveats manually
+    // Check caveats manually (extract from macaroon)
     const caveats = [];
-    m.caveats.forEach(c => {
-      if (c.identifier) {
-        caveats.push(c.identifier.toString('utf8'));
-      }
-    });
+    if (m._caveats) {
+      m._caveats.forEach(c => {
+        if (c._identifier) {
+          caveats.push(c._identifier.toString('utf8'));
+        }
+      });
+    }
+    
+    // Verify signature
+    try {
+      m.verify(keyBytes, (caveat) => {
+        // Caveat verifier - return true if caveat is satisfied
+        if (caveat.startsWith('expires = ')) {
+          const expiry = parseInt(caveat.split(' = ')[1], 10);
+          return now <= expiry;
+        }
+        if (caveat.startsWith('scope = ')) {
+          return true; // Accept any scope for now
+        }
+        if (caveat.startsWith('delegated_by = ')) {
+          return true; // Accept delegation marker
+        }
+        return false;
+      });
+    } catch (verifyErr) {
+      throw new Error('Signature verification failed: ' + verifyErr.message);
+    }
     
     // Validate each caveat
     for (const caveat of caveats) {
@@ -577,13 +592,13 @@ app.post('/api/capability/mint', express.json(), (req, res) => {
       rootKey: keyBytes
     });
     
-    // Add caveats
+    // Add caveats (method on macaroon object)
     const expiresAt = Date.now() + (expiresIn * 1000);
-    m = macaroon.addFirstPartyCaveat(m, Buffer.from(`expires = ${expiresAt}`, 'utf8'));
-    m = macaroon.addFirstPartyCaveat(m, Buffer.from(`scope = ${scope}`, 'utf8'));
+    m.addFirstPartyCaveat(Buffer.from(`expires = ${expiresAt}`, 'utf8'));
+    m.addFirstPartyCaveat(Buffer.from(`scope = ${scope}`, 'utf8'));
     
     // Export as base64
-    const tokenBytes = macaroon.exportMacaroons([m]);
+    const tokenBytes = m.exportBinary();
     const tokenBase64 = Buffer.from(tokenBytes).toString('base64');
     
     console.log(`[CAPABILITY] Minted token: scope=${scope}, expires=${new Date(expiresAt).toISOString()}`);

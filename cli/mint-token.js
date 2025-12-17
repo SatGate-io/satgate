@@ -86,13 +86,13 @@ function mintToken(options) {
       rootKey: keyBytes
     });
     
-    // Add caveats
+    // Add caveats (method on macaroon object)
     const expiresAt = Date.now() + (expires * 1000);
-    m = macaroon.addFirstPartyCaveat(m, Buffer.from(`expires = ${expiresAt}`, 'utf8'));
-    m = macaroon.addFirstPartyCaveat(m, Buffer.from(`scope = ${scope}`, 'utf8'));
+    m.addFirstPartyCaveat(Buffer.from(`expires = ${expiresAt}`, 'utf8'));
+    m.addFirstPartyCaveat(Buffer.from(`scope = ${scope}`, 'utf8'));
     
     // Export as base64
-    const tokenBytes = macaroon.exportMacaroons([m]);
+    const tokenBytes = m.exportBinary();
     const tokenBase64 = Buffer.from(tokenBytes).toString('base64');
     
     console.log('✅ Token minted successfully!\n');

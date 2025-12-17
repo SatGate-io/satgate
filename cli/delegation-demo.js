@@ -55,16 +55,10 @@ async function runDemo() {
   
   // Parent: broad scope, 1 hour expiry
   const parentExpiry = Date.now() + (60 * 60 * 1000);
-  parentMacaroon = macaroon.addFirstPartyCaveat(
-    parentMacaroon, 
-    Buffer.from(`expires = ${parentExpiry}`, 'utf8')
-  );
-  parentMacaroon = macaroon.addFirstPartyCaveat(
-    parentMacaroon, 
-    Buffer.from(`scope = api:capability:*`, 'utf8')
-  );
+  parentMacaroon.addFirstPartyCaveat(Buffer.from(`expires = ${parentExpiry}`, 'utf8'));
+  parentMacaroon.addFirstPartyCaveat(Buffer.from(`scope = api:capability:*`, 'utf8'));
   
-  const parentToken = Buffer.from(macaroon.exportMacaroons([parentMacaroon])).toString('base64');
+  const parentToken = Buffer.from(parentMacaroon.exportBinary()).toString('base64');
   
   console.log('✅ Parent Token Created');
   console.log(`   Scope: api:capability:* (full access)`);
@@ -105,24 +99,15 @@ async function runDemo() {
   
   // Re-import parent and add more restrictive caveats
   const parentBytes = Buffer.from(parentToken, 'base64');
-  let childMacaroon = macaroon.importMacaroons(parentBytes)[0];
+  let childMacaroon = macaroon.importMacaroon(parentBytes);
   
   // Child: narrower scope, 5 minute expiry (MORE restrictive)
   const childExpiry = Date.now() + (5 * 60 * 1000);
-  childMacaroon = macaroon.addFirstPartyCaveat(
-    childMacaroon, 
-    Buffer.from(`expires = ${childExpiry}`, 'utf8')  // Shorter than parent
-  );
-  childMacaroon = macaroon.addFirstPartyCaveat(
-    childMacaroon, 
-    Buffer.from(`scope = api:capability:ping`, 'utf8')  // Narrower than parent
-  );
-  childMacaroon = macaroon.addFirstPartyCaveat(
-    childMacaroon, 
-    Buffer.from(`delegated_by = agent-001`, 'utf8')  // Audit trail
-  );
+  childMacaroon.addFirstPartyCaveat(Buffer.from(`expires = ${childExpiry}`, 'utf8'));  // Shorter than parent
+  childMacaroon.addFirstPartyCaveat(Buffer.from(`scope = api:capability:ping`, 'utf8'));  // Narrower than parent
+  childMacaroon.addFirstPartyCaveat(Buffer.from(`delegated_by = agent-001`, 'utf8'));  // Audit trail
   
-  const childToken = Buffer.from(macaroon.exportMacaroons([childMacaroon])).toString('base64');
+  const childToken = Buffer.from(childMacaroon.exportBinary()).toString('base64');
   
   console.log('✅ Child Token Created (Attenuated)\n');
   
