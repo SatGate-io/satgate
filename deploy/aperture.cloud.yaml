@@ -1,0 +1,64 @@
+# SatGate Cloud - Aperture Configuration
+# This config is for cloud deployment (Railway, etc.)
+
+listenaddr: "0.0.0.0:8081"
+dbbackend: "sqlite"
+insecure: false  # Use TLS in production (Railway provides this)
+debuglevel: "info"
+
+# Database location
+sqlite:
+  dbfile: "/app/data/aperture.db"
+
+services:
+  # MICRO TIER - 1 sat per request (Demo default)
+  - name: micro
+    hostregexp: ".*"
+    pathregexp: '^/api/micro($|/.*)$'
+    address: "127.0.0.1:8083"
+    protocol: http
+    price: 1
+    timeout: 86400
+
+  # BASIC TIER - 10 sats per request
+  - name: basic
+    hostregexp: ".*"
+    pathregexp: '^/api/basic($|/.*)$'
+    address: "127.0.0.1:8083"
+    protocol: http
+    price: 10
+    timeout: 86400
+
+  # STANDARD TIER - 100 sats per request
+  - name: standard
+    hostregexp: ".*"
+    pathregexp: '^/api/standard($|/.*)$'
+    address: "127.0.0.1:8083"
+    protocol: http
+    price: 100
+    timeout: 86400
+
+  # PREMIUM TIER - 1000 sats per request
+  - name: premium
+    hostregexp: ".*"
+    pathregexp: '^/api/premium($|/.*)$'
+    address: "127.0.0.1:8083"
+    protocol: http
+    price: 1000
+    timeout: 86400
+
+  # FREE TIER - Health checks and public endpoints
+  - name: public
+    hostregexp: ".*"
+    pathregexp: '^/.*$'
+    address: "127.0.0.1:8083"
+    protocol: http
+    price: 0
+    authwhitelistpaths:
+      - '^/health$'
+      - '^/ready$'
+      - '^/api/free/.*$'
+      - '^/$'
+
+# LNC settings are passed via command line from environment variables
+
