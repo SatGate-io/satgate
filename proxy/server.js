@@ -499,13 +499,11 @@ app.use('/api/capability', (req, res, next) => {
     
     // Verify signature with root key
     const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
-    
-    // Build verifier with caveat checkers
     const now = Date.now();
     
-    // Check caveats manually (extract from macaroon)
+    // Extract caveats from macaroon
     const caveats = [];
-    if (m._caveats) {
+    if (m._caveats && Array.isArray(m._caveats)) {
       m._caveats.forEach(c => {
         if (c._identifier) {
           caveats.push(c._identifier.toString('utf8'));
@@ -513,55 +511,45 @@ app.use('/api/capability', (req, res, next) => {
       });
     }
     
-    // Verify signature
-    try {
-      m.verify(keyBytes, (caveat) => {
-        // Caveat verifier - return true if caveat is satisfied
-        if (caveat.startsWith('expires = ')) {
-          const expiry = parseInt(caveat.split(' = ')[1], 10);
-          return now <= expiry;
-        }
-        if (caveat.startsWith('scope = ')) {
-          return true; // Accept any scope for now
-        }
-        if (caveat.startsWith('delegated_by = ')) {
-          return true; // Accept delegation marker
-        }
-        return false;
-      });
-    } catch (verifyErr) {
-      throw new Error('Signature verification failed: ' + verifyErr.message);
-    }
-    
-    // Validate each caveat
-    for (const caveat of caveats) {
-      // Time-based expiry: "expires = <timestamp>"
-      if (caveat.startsWith('expires = ')) {
-        const expiry = parseInt(caveat.split(' = ')[1], 10);
+    // Verify HMAC signature (check function validates first-party caveats)
+    // The check function receives each caveat string and must return null if OK
+    // or an error string if the caveat is not satisfied
+    const checkCaveat = (caveat) => {
+      const caveatStr = typeof caveat === 'string' ? caveat : caveat.toString('utf8');
+      
+      // Time-based expiry
+      if (caveatStr.startsWith('expires = ')) {
+        const expiry = parseInt(caveatStr.split(' = ')[1], 10);
         if (now > expiry) {
-          return res.status(403).json({
-            error: 'Token Expired',
-            expired: new Date(expiry).toISOString(),
-            now: new Date(now).toISOString()
-          });
+          return 'token expired';
         }
+        return null; // OK
       }
-      // Scope check: "scope = <prefix>"
-      if (caveat.startsWith('scope = ')) {
-        const allowedScope = caveat.split(' = ')[1];
-        const requestedPath = req.path;
-        // Simple prefix match (e.g., scope = /ping allows /ping but not /admin)
-        if (!requestedPath.startsWith('/' + allowedScope.replace('api:capability:', ''))) {
-          // More flexible: just log the scope for demo
-          console.log(`[CAPABILITY] Scope caveat: ${allowedScope}, path: ${requestedPath}`);
-        }
+      
+      // Scope - accept for demo
+      if (caveatStr.startsWith('scope = ')) {
+        return null; // OK
       }
-    }
+      
+      // Delegation marker - accept
+      if (caveatStr.startsWith('delegated_by = ')) {
+        return null; // OK
+      }
+      
+      // Unknown caveat - reject
+      return 'unknown caveat: ' + caveatStr;
+    };
+    
+    // Verify signature and caveats
+    m.verify(keyBytes, checkCaveat);
+    
+    // Extract identifier
+    const identifier = m._identifier ? m._identifier.toString('utf8') : 'unknown';
     
     // Attach parsed info to request for endpoints
     req.capability = {
       caveats,
-      identifier: m.identifier.toString('utf8'),
+      identifier,
       validatedAt: new Date().toISOString()
     };
     
