@@ -1,6 +1,8 @@
-# 🚀 SatGate Phase 1 Demo: The "No Crypto" Walkthrough
+# SatGate Phase 1: Capability-Only Access Walkthrough
 
-**Goal:** Prove to the Partner that we can solve IAM scale problems *today* without Bitcoin, while future-proofing for payments.
+**A step-by-step demo script for presenting Zero Trust access control without cryptocurrency.**
+
+This document provides the commands, talk tracks, and objection handlers for demonstrating SatGate's Phase 1 (Capability-Only) mode to enterprise clients and partners.
 
 ---
 
@@ -59,6 +61,56 @@ node cli/delegation-demo.js
 **Talk Track (While script runs):**
 
 > "Watch the '[NETWORK]' line. Zero requests. The agent is minting a restricted credential offline. It just cut a spare key for the janitor that only opens the basement and expires in 5 minutes. This is the Google-grade capability competitors can't touch."
+
+---
+
+### **Scene 3b: The "Security Proof" (Least Privilege)**
+
+*Narrative:* "But here's the key question: Can the child token escalate privileges? Let's test it."
+
+**Command 1: The BLOCKED Action (Negative Test)**
+```bash
+# Copy the CHILD token from delegation-demo.js output
+# Try to mint a NEW token with it (should FAIL)
+curl -X POST -H "Authorization: Bearer <PASTE_CHILD_TOKEN>" \
+  https://satgate-production.up.railway.app/api/capability/mint
+```
+
+**Expected Output:**
+```json
+{
+  "error": "Access Denied",
+  "reason": "Scope violation: token has 'api:capability:ping', need 'api:capability:admin'",
+  "hint": "Token scope does not permit this action"
+}
+```
+
+**Talk Track:**
+
+> "403 Forbidden. The child token tried to escalate privileges—to mint a new token. The Gateway rejected it. Not because we looked it up in a database, but because the **token itself** said 'I can only access /ping'. The math enforced least privilege."
+
+---
+
+**Command 2: The ALLOWED Action (Positive Test)**
+```bash
+# Same child token, but for its intended purpose
+curl -H "Authorization: Bearer <PASTE_CHILD_TOKEN>" \
+  https://satgate-production.up.railway.app/api/capability/ping
+```
+
+**Expected Output:**
+```json
+{
+  "ok": true,
+  "tier": "capability",
+  "mode": "Phase 1: Capability-Only",
+  "message": "✓ Authenticated with capability token..."
+}
+```
+
+**Talk Track:**
+
+> "200 OK. Same token, correct endpoint. The janitor's key opens the basement—nothing more, nothing less. This is Zero Trust at the token level."
 
 ---
 
