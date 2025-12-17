@@ -474,6 +474,11 @@ const CAPABILITY_IDENTIFIER = 'satgate-capability-v1';
 
 // Middleware: Validate macaroon for /api/capability/* routes
 app.use('/api/capability', (req, res, next) => {
+  // Allow unauthenticated access to mint endpoint (so users can get tokens)
+  if (req.path === '/mint') {
+    return next();
+  }
+  
   const authHeader = req.get('authorization') || '';
   
   // Check for Bearer token
