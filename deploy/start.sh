@@ -1,5 +1,5 @@
-#!/bin/bash
-set -e
+#!/bin/sh
+set -eu
 
 echo "=== SatGate Cloud Starting ==="
 echo "Time: $(date)"
@@ -16,10 +16,6 @@ echo "Backend PID: $BACKEND_PID"
 # Wait for backend to be ready
 echo "Waiting for backend to start..."
 sleep 3
-
-# Test backend health
-echo "Testing backend health..."
-curl -s http://127.0.0.1:${BACKEND_PORT:-8083}/health || echo "Backend health check failed"
 
 # Start Aperture in foreground so we see all output
 echo ""
