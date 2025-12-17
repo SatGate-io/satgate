@@ -51,6 +51,16 @@ curl -H "Authorization: Bearer <PASTE_TOKEN_HERE>" \
   https://satgate-production.up.railway.app/api/capability/ping
 ```
 
+> 💡 **Pro-Tip: Smoother Demo Flow**
+> Store the token in a variable to avoid copy-paste friction:
+> ```bash
+> # After minting, store the token:
+> TOKEN=$(curl -s -X POST https://satgate-production.up.railway.app/api/capability/mint | jq -r '.token')
+> 
+> # Now use it cleanly:
+> curl -H "Authorization: Bearer $TOKEN" https://satgate-production.up.railway.app/api/capability/ping
+> ```
+
 **Talk Track:**
 
 > "Authenticated instantly. The Gateway validated the signature mathematically. No LDAP lookup. No bottleneck."
@@ -91,6 +101,16 @@ curl -X POST https://satgate-production.up.railway.app/api/capability/demo/deleg
 
 > 💡 **Note:** Both Option A and Option B from Scene 3 output a CHILD TOKEN at the end. Copy that token for the tests below.
 
+> 💡 **Pro-Tip: Store Child Token in Variable**
+> ```bash
+> # After running the delegation demo, store the child token:
+> CHILD_TOKEN="<paste the child token here>"
+> 
+> # Now use it for both tests:
+> curl -X POST -H "Authorization: Bearer $CHILD_TOKEN" .../api/capability/mint  # BLOCKED
+> curl -H "Authorization: Bearer $CHILD_TOKEN" .../api/capability/ping          # ALLOWED
+> ```
+
 **Command 1: The BLOCKED Action (Negative Test)**
 ```bash
 # Copy the CHILD token from Scene 3 output
@@ -103,7 +123,7 @@ curl -X POST -H "Authorization: Bearer <PASTE_CHILD_TOKEN>" \
 ```json
 {
   "error": "Access Denied",
-  "reason": "Scope violation: token has 'api:capability:ping', need 'api:capability:admin'",
+  "reason": "caveat check failed (scope = api:capability:ping): Scope violation: token has 'api:capability:ping', need 'api:capability:admin'",
   "hint": "Token scope does not permit this action"
 }
 ```
