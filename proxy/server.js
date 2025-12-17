@@ -473,13 +473,22 @@ const CAPABILITY_LOCATION = 'https://satgate.io';
 const CAPABILITY_IDENTIFIER = 'satgate-capability-v1';
 
 // Middleware: Validate macaroon for /api/capability/* routes
+// Implements DYNAMIC SCOPE ENFORCEMENT based on requested path
 app.use('/api/capability', (req, res, next) => {
-  // Allow unauthenticated access to mint endpoint (so users can get tokens)
+  const authHeader = req.get('authorization') || '';
+  
+  // Determine required scope for this path
+  let requiredScope = 'api:capability:read'; // Default for /ping, /data
   if (req.path === '/mint') {
-    return next();
+    requiredScope = 'api:capability:admin'; // Minting requires admin scope
   }
   
-  const authHeader = req.get('authorization') || '';
+  // Allow unauthenticated access to /mint for bootstrapping (demo only)
+  // In production, remove this block and require admin token
+  if (req.path === '/mint' && !authHeader) {
+    console.log(`[PEP] Allowing unauthenticated mint (demo mode)`);
+    return next();
+  }
   
   // Check for Bearer token
   if (!authHeader.startsWith('Bearer ')) {
@@ -501,7 +510,7 @@ app.use('/api/capability', (req, res, next) => {
     const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
     const now = Date.now();
     
-    // Extract caveats from macaroon
+    // Extract caveats from macaroon for logging
     const caveats = [];
     if (m._caveats && Array.isArray(m._caveats)) {
       m._caveats.forEach(c => {
@@ -511,9 +520,14 @@ app.use('/api/capability', (req, res, next) => {
       });
     }
     
-    // Verify HMAC signature (check function validates first-party caveats)
-    // The check function receives each caveat string and must return null if OK
-    // or an error string if the caveat is not satisfied
+    console.log(`[PEP] Path: ${req.path} | Required Scope: ${requiredScope}`);
+    console.log(`[PEP] Token caveats: ${JSON.stringify(caveats)}`);
+    
+    // Track if scope was validated
+    let scopeValidated = false;
+    let scopeError = null;
+    
+    // Verify HMAC signature with dynamic scope checking
     const checkCaveat = (caveat) => {
       const caveatStr = typeof caveat === 'string' ? caveat : caveat.toString('utf8');
       
@@ -526,22 +540,68 @@ app.use('/api/capability', (req, res, next) => {
         return null; // OK
       }
       
-      // Scope - accept for demo
+      // DYNAMIC SCOPE CHECK
       if (caveatStr.startsWith('scope = ')) {
+        const tokenScope = caveatStr.split(' = ')[1].trim();
+        
+        // Check if token scope covers the required scope
+        // Wildcard: "api:capability:*" covers everything
+        // Specific: "api:capability:ping" only covers /ping
+        // Admin: "api:capability:admin" covers admin actions
+        
+        let isAllowed = false;
+        
+        // Wildcard scope covers everything
+        if (tokenScope === 'api:capability:*') {
+          isAllowed = true;
+        }
+        // Exact match
+        else if (tokenScope === requiredScope) {
+          isAllowed = true;
+        }
+        // "read" scope covers read operations (ping, data)
+        else if (tokenScope === 'api:capability:read' && 
+                 (requiredScope === 'api:capability:read' || 
+                  requiredScope === 'api:capability:ping' ||
+                  requiredScope === 'api:capability:data')) {
+          isAllowed = true;
+        }
+        // Specific endpoint scope
+        else if (tokenScope === 'api:capability:ping' && req.path === '/ping') {
+          isAllowed = true;
+        }
+        else if (tokenScope === 'api:capability:data' && req.path === '/data') {
+          isAllowed = true;
+        }
+        
+        if (!isAllowed) {
+          scopeError = `Scope violation: token has '${tokenScope}', need '${requiredScope}'`;
+          console.log(`[PEP] ⛔ ${scopeError}`);
+          return scopeError;
+        }
+        
+        scopeValidated = true;
+        console.log(`[PEP] ✓ Scope OK: '${tokenScope}' covers '${requiredScope}'`);
         return null; // OK
       }
       
-      // Delegation marker - accept
+      // Delegation marker - accept (informational only)
       if (caveatStr.startsWith('delegated_by = ')) {
         return null; // OK
       }
       
-      // Unknown caveat - reject
+      // Unknown caveat - reject for security
       return 'unknown caveat: ' + caveatStr;
     };
     
     // Verify signature and caveats
     m.verify(keyBytes, checkCaveat);
+    
+    // If we get here but scope wasn't validated, reject
+    // (This handles tokens without any scope caveat)
+    if (!scopeValidated) {
+      throw new Error('Token has no scope caveat');
+    }
     
     // Extract identifier
     const identifier = m._identifier ? m._identifier.toString('utf8') : 'unknown';
@@ -550,17 +610,20 @@ app.use('/api/capability', (req, res, next) => {
     req.capability = {
       caveats,
       identifier,
+      requiredScope,
       validatedAt: new Date().toISOString()
     };
     
-    console.log(`[CAPABILITY] ✓ Valid token, caveats: ${JSON.stringify(caveats)}`);
+    console.log(`[CAPABILITY] ✓ Valid token with scope for ${req.path}`);
     next();
     
   } catch (e) {
-    console.error(`[CAPABILITY] ✗ Invalid token: ${e.message}`);
+    console.error(`[CAPABILITY] ✗ Access denied: ${e.message}`);
+    const isScopeError = e.message.includes('Scope violation') || e.message.includes('scope');
     return res.status(403).json({
-      error: 'Invalid Capability Token',
-      reason: e.message
+      error: 'Access Denied',
+      reason: e.message,
+      hint: isScopeError ? 'Token scope does not permit this action' : undefined
     });
   }
 });
