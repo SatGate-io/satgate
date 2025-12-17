@@ -18,9 +18,11 @@ This document provides commands, talk tracks, and objection handlers for demonst
 
 ---
 
-# 🔐 Phase 1: Capability-Only Access (No Crypto)
+# 🔐 Phase 1: Stateless Access (Crawl)
 
 **Goal:** Prove we solve IAM scale problems *today* without Bitcoin.
+
+> This is **Crawl** in the maturity model: Zero Trust security via capability tokens. No quotas, no payments—just fast, stateless access control.
 
 ---
 
@@ -157,21 +159,23 @@ curl -H "Authorization: Bearer <PASTE_CHILD_TOKEN>" \
 
 ---
 
-### **Scene 4: The Phase 1 Close**
+### **Scene 4: The Crawl Close**
 
 *Narrative:* "Everything you just saw happened without a single satoshi of Bitcoin."
 
 **Closing Line:**
 
-> "Phase 1 is live. Phase 3 (Payments) is just a config change away."
+> "Crawl is live. Run (Payments) is just a config change away. And if you need Walk (Quotas) in between, same architecture—we just enable the governance layer."
 
 ---
 
-# 💰 Phase 3: The "Revenue Switch" (Optional Closer)
+# 💰 Phase 3: Economic Access (Run)
 
 **Goal:** Prove that monetization is a config change, not a re-platform.
 
-> 💡 **When to show this:** Only if the partner is interested in the monetization story. Phase 1 alone is often enough for governance-focused clients.
+> This is **Run** in the maturity model: Pay-per-request access via L402. Same architecture as Crawl, plus proof-of-payment.
+
+> 💡 **When to show this:** Only if the partner is interested in the monetization story. Phase 1 (Crawl) alone is often enough for security-focused clients.
 
 ---
 
@@ -240,11 +244,11 @@ WWW-Authenticate: L402 macaroon="...", invoice="lnbc..."
 
 ---
 
-### **Scene 8: The Phase 3 Close**
+### **Scene 8: The Run Close**
 
 **Closing Line:**
 
-> "Phase 1 gives you governance. Phase 3 gives you revenue. Same architecture. Same day deployment. Different config file."
+> "Crawl gives you security. Walk gives you governance. Run gives you revenue. Same architecture. Same day deployment. Different config file."
 
 ---
 
@@ -270,11 +274,13 @@ curl -X POST https://satgate-production.up.railway.app/api/capability/mint
 
 ## The "Maturity Model" Reference
 
-| Phase | What You Showed | Crypto Required | Value Prop |
-|-------|-----------------|-----------------|------------|
-| **Phase 1** | Scenes 1-4 (Capability tokens) | ❌ NO | Governance & Speed |
-| **Phase 2** | Quota tracking (future) | ❌ NO | Cost Control |
-| **Phase 3** | Scenes 5-8 (L402 payments) | ✅ YES | Revenue Generation |
+| Phase | Pitch Term | What You Showed | Crypto Required | Value Prop |
+|-------|------------|-----------------|-----------------|------------|
+| **Phase 1** | **Crawl** | Scenes 1-4 (Capability tokens) | ❌ NO | Stateless Access & Speed |
+| **Phase 2** | **Walk** | Quota tracking (future) | ❌ NO | Governance & Cost Control |
+| **Phase 3** | **Run** | Scenes 5-8 (L402 payments) | ✅ YES | Revenue Generation |
+
+> 💡 **Note:** This demo covers **Crawl → Run** (Phase 1 → Phase 3). Phase 2 (Walk/Governance) uses the same architecture but adds quota tracking—available when the client needs cost controls.
 
 ---
 
