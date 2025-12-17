@@ -10,8 +10,10 @@ This document provides the commands, talk tracks, and objection handlers for dem
 
 - [ ] Terminal open with clean screen
 - [ ] Railway deployment healthy (`curl https://satgate-production.up.railway.app/health`)
-- [ ] `cli/delegation-demo.js` tested locally
+- [ ] Test delegation works: `node cli/delegation-demo.js` (local) OR `curl -X POST .../api/capability/demo/delegate` (server)
 - [ ] Backup tokens pre-minted (in case of network issues)
+
+> ✅ **Any-Device Ready:** All demo commands work via curl. No laptop required.
 
 ---
 
@@ -66,9 +68,13 @@ curl -X POST https://satgate-production.up.railway.app/api/capability/demo/deleg
 
 > 💡 **"Two is one, one is none"** — Option B works from any device with curl (iPad, borrowed laptop, phone terminal app).
 
-**Talk Track (While script runs):**
+**Talk Track (Option A - Local):**
 
 > "Watch the '[NETWORK]' line. Zero requests. The agent is minting a restricted credential offline. It just cut a spare key for the janitor that only opens the basement and expires in 5 minutes. This is the Google-grade capability competitors can't touch."
+
+**Talk Track (Option B - Server Backup):**
+
+> "I'm triggering this remotely to show you the logic. Even though this ran on my server just now for the demo, in production this entire logic happens inside the Agent's own code—client-side. That means zero latency and zero dependency on our uptime to create these sub-credentials. The agent doesn't phone home to delegate."
 
 ---
 
@@ -76,9 +82,11 @@ curl -X POST https://satgate-production.up.railway.app/api/capability/demo/deleg
 
 *Narrative:* "But here's the key question: Can the child token escalate privileges? Let's test it."
 
+> 💡 **Note:** Both Option A and Option B from Scene 3 output a CHILD TOKEN at the end. Copy that token for the tests below.
+
 **Command 1: The BLOCKED Action (Negative Test)**
 ```bash
-# Copy the CHILD token from delegation-demo.js output
+# Copy the CHILD token from Scene 3 output
 # Try to mint a NEW token with it (should FAIL)
 curl -X POST -H "Authorization: Bearer <PASTE_CHILD_TOKEN>" \
   https://satgate-production.up.railway.app/api/capability/mint
