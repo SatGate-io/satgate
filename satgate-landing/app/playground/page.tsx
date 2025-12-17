@@ -69,7 +69,7 @@ export default function PlaygroundPage() {
     setLogs([]);
     setStatus('idle');
     
-    const BASE_URL = 'http://localhost:8081';
+    const BASE_URL = 'https://satgate-production.up.railway.app';
     const TARGET_URL = `${BASE_URL}${selectedEndpoint.path}`;
 
     try {
@@ -211,16 +211,12 @@ export default function PlaygroundPage() {
         addLog(`💡 After installing, refresh this page and try again.`, 'info');
         addLog(`💡 Or use SIMULATION MODE to test without a wallet.`, 'info');
       } else if (errMsg === 'Load failed' || errMsg.includes('Failed to fetch')) {
-        // Network error - localhost not reachable for external users
+        // Network error
         addLog(`❌ Network Error: Could not reach the server`, 'error');
         addLog(``, 'info');
-        addLog(`⚠️  Real Network mode requires a local SatGate server.`, 'warn');
+        addLog(`⚠️  The cloud server may be temporarily unavailable.`, 'warn');
         addLog(``, 'info');
-        addLog(`To run locally:`, 'info');
-        addLog(`   1. git clone https://github.com/SatGate-io/satgate`, 'info');
-        addLog(`   2. Follow the README to start Aperture`, 'info');
-        addLog(``, 'info');
-        addLog(`💡 Or use SIMULATION MODE to see the full payment flow demo.`, 'warn');
+        addLog(`Try again in a moment, or use SIMULATION MODE.`, 'info');
       } else if (errMsg.includes('User rejected') || errMsg.includes('cancelled')) {
         addLog('⚠️ Payment Cancelled by User.', 'warn');
         setStatus('idle');
@@ -274,7 +270,7 @@ export default function PlaygroundPage() {
                   {useRealNetwork ? "REAL NETWORK" : "SIMULATION"}
               </button>
               {useRealNetwork && (
-                <span className="text-[10px] text-yellow-500/70">⚠️ Requires local server</span>
+                <span className="text-[10px] text-green-500/70">✓ Live Cloud Server</span>
               )}
             </div>
 
@@ -314,7 +310,7 @@ export default function PlaygroundPage() {
             {logs.length === 0 && (
                 <div className="text-gray-600 italic">
                     {useRealNetwork 
-                        ? "⚠️ REAL MODE: Ensure Aperture is running on localhost:8081 and Alby is installed." 
+                        ? "🌐 LIVE MODE: Connected to cloud server. Install Alby to pay real Lightning invoices." 
                         : "Ready to simulate... Click 'Run Request' to start."}
                 </div>
             )}

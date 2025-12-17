@@ -1,10 +1,10 @@
 # SatGate Cloud - Aperture Configuration
 # This config is for cloud deployment (Railway, etc.)
 
-listenaddr: "0.0.0.0:8081"
+listenaddr: "0.0.0.0:8080"
 dbbackend: "sqlite"
-insecure: false  # Use TLS in production (Railway provides this)
-debuglevel: "info"
+insecure: true  # Railway handles TLS at edge; Aperture listens on plain HTTP
+debuglevel: "trace"
 
 # Database location
 sqlite:
