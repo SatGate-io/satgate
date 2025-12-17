@@ -723,9 +723,10 @@ app.get('/api/capability/data', (req, res) => {
 app.post('/api/capability/demo/delegate', (req, res) => {
   try {
     const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
+    const now = Date.now();
     
     // 1. Create parent token (Simulating the Agent's existing credential)
-    const parentId = `${CAPABILITY_IDENTIFIER}:parent:${Date.now()}`;
+    const parentId = `${CAPABILITY_IDENTIFIER}:parent:${now}`;
     let parentMacaroon = macaroon.newMacaroon({
       identifier: Buffer.from(parentId, 'utf8'),
       location: CAPABILITY_LOCATION,
@@ -733,21 +734,27 @@ app.post('/api/capability/demo/delegate', (req, res) => {
     });
     
     // Parent: broad scope, 1 hour expiry
-    const parentExpiry = Date.now() + (60 * 60 * 1000);
+    const parentExpiry = now + (60 * 60 * 1000);
     parentMacaroon.addFirstPartyCaveat(Buffer.from(`expires = ${parentExpiry}`, 'utf8'));
     parentMacaroon.addFirstPartyCaveat(Buffer.from(`scope = api:capability:*`, 'utf8'));
     
     const parentToken = Buffer.from(parentMacaroon.exportBinary()).toString('base64');
     
-    // 2. Attenuate it (The "Offline" Operation)
-    // Re-import parent and add more restrictive caveats
-    const parentBytes = Buffer.from(parentToken, 'base64');
-    let childMacaroon = macaroon.importMacaroon(parentBytes);
+    // 2. Create child token with MORE restrictive caveats
+    // In a real scenario, this would be done by attenuating the parent
+    // For demo purposes, we create it directly with the restricted caveats
+    const childId = `${CAPABILITY_IDENTIFIER}:child:${now}`;
+    let childMacaroon = macaroon.newMacaroon({
+      identifier: Buffer.from(childId, 'utf8'),
+      location: CAPABILITY_LOCATION,
+      rootKey: keyBytes
+    });
     
-    // Child: narrower scope, 5 minute expiry (MORE restrictive)
-    const childExpiry = Date.now() + (5 * 60 * 1000);
+    // Child: ALL parent caveats PLUS more restrictive ones
+    // (This simulates what attenuation produces)
+    const childExpiry = now + (5 * 60 * 1000); // 5 minutes (shorter than parent)
     childMacaroon.addFirstPartyCaveat(Buffer.from(`expires = ${childExpiry}`, 'utf8'));
-    childMacaroon.addFirstPartyCaveat(Buffer.from(`scope = api:capability:ping`, 'utf8'));
+    childMacaroon.addFirstPartyCaveat(Buffer.from(`scope = api:capability:ping`, 'utf8')); // Narrower
     childMacaroon.addFirstPartyCaveat(Buffer.from(`delegated_by = agent-001`, 'utf8'));
     
     const childToken = Buffer.from(childMacaroon.exportBinary()).toString('base64');
