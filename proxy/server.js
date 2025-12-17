@@ -490,6 +490,12 @@ app.use('/api/capability', (req, res, next) => {
     return next();
   }
   
+  // Allow unauthenticated access to /demo/* for backup demo purposes
+  if (req.path.startsWith('/demo/')) {
+    console.log(`[PEP] Allowing demo endpoint: ${req.path}`);
+    return next();
+  }
+  
   // Check for Bearer token
   if (!authHeader.startsWith('Bearer ')) {
     return res.status(401).json({
@@ -705,6 +711,134 @@ app.get('/api/capability/data', (req, res) => {
       timestamp: Date.now()
     }
   });
+});
+
+// ===========================================================================
+// DEMO BACKUP - Server-side Delegation Simulation
+// ===========================================================================
+// This endpoint simulates the "offline" agent behavior for demo purposes
+// when you don't have access to your local Node.js environment.
+// "Two is one, and one is none" - always have a backup for critical demos.
+
+app.post('/api/capability/demo/delegate', (req, res) => {
+  try {
+    const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
+    
+    // 1. Create parent token (Simulating the Agent's existing credential)
+    const parentId = `${CAPABILITY_IDENTIFIER}:parent:${Date.now()}`;
+    let parentMacaroon = macaroon.newMacaroon({
+      identifier: Buffer.from(parentId, 'utf8'),
+      location: CAPABILITY_LOCATION,
+      rootKey: keyBytes
+    });
+    
+    // Parent: broad scope, 1 hour expiry
+    const parentExpiry = Date.now() + (60 * 60 * 1000);
+    parentMacaroon.addFirstPartyCaveat(Buffer.from(`expires = ${parentExpiry}`, 'utf8'));
+    parentMacaroon.addFirstPartyCaveat(Buffer.from(`scope = api:capability:*`, 'utf8'));
+    
+    const parentToken = Buffer.from(parentMacaroon.exportBinary()).toString('base64');
+    
+    // 2. Attenuate it (The "Offline" Operation)
+    // Re-import parent and add more restrictive caveats
+    const parentBytes = Buffer.from(parentToken, 'base64');
+    let childMacaroon = macaroon.importMacaroon(parentBytes);
+    
+    // Child: narrower scope, 5 minute expiry (MORE restrictive)
+    const childExpiry = Date.now() + (5 * 60 * 1000);
+    childMacaroon.addFirstPartyCaveat(Buffer.from(`expires = ${childExpiry}`, 'utf8'));
+    childMacaroon.addFirstPartyCaveat(Buffer.from(`scope = api:capability:ping`, 'utf8'));
+    childMacaroon.addFirstPartyCaveat(Buffer.from(`delegated_by = agent-001`, 'utf8'));
+    
+    const childToken = Buffer.from(childMacaroon.exportBinary()).toString('base64');
+    
+    // 3. Format the output to match the CLI demo script exactly
+    const output = `
+═══════════════════════════════════════════════════════════════
+  SatGate Phase 1: DELEGATION DEMO (Server-Side Backup)
+  "The Google-Grade Superpower"
+═══════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────┐
+│ SCENE 1: Parent Token Created                              │
+└─────────────────────────────────────────────────────────────┘
+
+[CISO] Capability issued for the Data Agent.
+[CISO] Scope: api:capability:* (full access)
+[CISO] Expires: ${new Date(parentExpiry).toISOString()}
+
+Parent Token: ${parentToken.substring(0, 50)}...
+
+┌─────────────────────────────────────────────────────────────┐
+│ SCENE 2: Agent Delegates to Worker                         │
+└─────────────────────────────────────────────────────────────┘
+
+[AGENT] I need to delegate a read-only task to a Worker.
+[AGENT] The Worker should only access /ping for 5 minutes.
+
+[SYSTEM] Generating restricted sub-token...
+[NETWORK] Requests sent: 0  ← OFFLINE OPERATION
+[CRYPTO] Attenuating parent macaroon...
+
+┌─────────────────────────────────────────────────────────────┐
+│ SCENE 3: Comparison                                        │
+└─────────────────────────────────────────────────────────────┘
+
+┌────────────────────┬──────────────────┬────────────────────┐
+│ Property           │ Parent Token     │ Child Token        │
+├────────────────────┼──────────────────┼────────────────────┤
+│ Scope              │ api:capability:* │ api:capability:ping│
+│ Expires            │ 1 hour           │ 5 minutes          │
+│ Network calls      │ 0                │ 0                  │
+│ Admin approval     │ NO               │ NO                 │
+└────────────────────┴──────────────────┴────────────────────┘
+
+[CRYPTO] Sub-token signature: VALID
+[CRYPTO] Caveat chain: ATTENUATED (more restrictive)
+
+✅ Child Token Created (Attenuated)
+
+═══════════════════════════════════════════════════════════════
+CHILD TOKEN (copy this for testing):
+═══════════════════════════════════════════════════════════════
+${childToken}
+═══════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────┐
+│ TEST COMMANDS                                              │
+└─────────────────────────────────────────────────────────────┘
+
+# ✅ ALLOWED: Child token can access /ping
+curl -H "Authorization: Bearer ${childToken.substring(0, 40)}..." \\
+  https://satgate-production.up.railway.app/api/capability/ping
+
+# ❌ BLOCKED: Child token CANNOT mint new tokens
+curl -X POST -H "Authorization: Bearer ${childToken.substring(0, 40)}..." \\
+  https://satgate-production.up.railway.app/api/capability/mint
+
+┌─────────────────────────────────────────────────────────────┐
+│ THE KEY INSIGHT                                            │
+└─────────────────────────────────────────────────────────────┘
+
+  "The agent just cut a spare key for the janitor —
+   one that only opens the basement, and expires in 5 minutes.
+   It didn't need to call the locksmith."
+
+  ✓ ZERO network calls
+  ✓ ZERO admin tickets
+  ✓ INSTANT delegation
+  ✓ SELF-EXPIRING credentials
+  ✓ MATHEMATICALLY restricted scope
+
+`;
+
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.send(output);
+    
+  } catch (e) {
+    console.error(`[DEMO] Delegation simulation error: ${e.message}`);
+    res.status(500).send(`Error: ${e.message}`);
+  }
 });
 
 // ---------------------------------------------------------------------------

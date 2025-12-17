@@ -52,11 +52,19 @@ curl -H "Authorization: Bearer <PASTE_TOKEN_HERE>" \
 
 *Narrative:* "Now the Agent needs to delegate a task to a sub-worker. In the old world, this is a ticket. In our world, it's math."
 
-**Command:**
+**Command (Option A - Local):**
 ```bash
-# Run the delegation simulation
+# Run the delegation simulation locally
 node cli/delegation-demo.js
 ```
+
+**Command (Option B - Server Backup):**
+```bash
+# If laptop unavailable, run from ANY terminal:
+curl -X POST https://satgate-production.up.railway.app/api/capability/demo/delegate
+```
+
+> 💡 **"Two is one, one is none"** — Option B works from any device with curl (iPad, borrowed laptop, phone terminal app).
 
 **Talk Track (While script runs):**
 

@@ -57,6 +57,7 @@ services:
     price: 0
     authwhitelistpaths:
       - '^/api/capability/.*$'
+      - '^/api/capability/demo/.*$'
 
   # FREE TIER - Health checks and public endpoints
   - name: public
