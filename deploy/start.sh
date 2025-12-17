@@ -9,7 +9,7 @@ echo "BACKEND_PORT: ${BACKEND_PORT:-8083}"
 # Start backend in background
 echo "Starting backend on port ${BACKEND_PORT:-8083}..."
 cd /app/backend
-BACKEND_PORT="${BACKEND_PORT:-8083}" node server.js &
+BACKEND_PORT="${BACKEND_PORT:-8083}" NODE_ENV="${NODE_ENV:-production}" node server.js &
 BACKEND_PID=$!
 echo "Backend PID: $BACKEND_PID"
 

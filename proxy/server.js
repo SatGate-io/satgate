@@ -19,6 +19,10 @@ const config = {
   rateLimitMax: 100, // requests per window
 };
 
+// Optional shared-secret for “control plane” endpoints in production.
+// Set `PRICING_ADMIN_TOKEN` in the Railway service if you need to mutate pricing.
+const PRICING_ADMIN_TOKEN = process.env.PRICING_ADMIN_TOKEN || '';
+
 // =============================================================================
 // MIDDLEWARE
 // =============================================================================
@@ -184,8 +188,25 @@ app.get('/api/free/pricing', (req, res) => {
   });
 });
 
+function requirePricingAdmin(req, res, next) {
+  // For the public demo we allow reads, but disallow writes in production unless
+  // an explicit shared secret is configured.
+  if (config.env !== 'production') return next();
+  if (!PRICING_ADMIN_TOKEN) {
+    return res.status(403).json({ error: 'Pricing updates disabled in production' });
+  }
+  const token =
+    req.get('x-admin-token') ||
+    req.get('x-satgate-admin-token') ||
+    '';
+  if (token !== PRICING_ADMIN_TOKEN) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+  return next();
+}
+
 // Update pricing (would need auth in production)
-app.post('/api/free/pricing', (req, res) => {
+app.post('/api/free/pricing', requirePricingAdmin, (req, res) => {
   const { tier, price, updatedBy } = req.body;
   
   if (!tier || !pricingStore.tiers[tier]) {
@@ -217,7 +238,7 @@ app.post('/api/free/pricing', (req, res) => {
 });
 
 // Bulk update pricing
-app.put('/api/free/pricing', (req, res) => {
+app.put('/api/free/pricing', requirePricingAdmin, (req, res) => {
   const { tiers, updatedBy } = req.body;
   
   if (!tiers || typeof tiers !== 'object') {
@@ -478,23 +499,29 @@ app.get('/api/micro/data', (req, res) => {
   });
 });
 
-// =============================================================================
-// STATIC FILE SERVING
-// =============================================================================
-
-app.use('/', express.static(path.join(__dirname, '..', 'frontend'), {
-  maxAge: config.env === 'production' ? '1d' : 0,
-  etag: true
-}));
-
-// Fallback for SPA routing (if needed)
-app.get('*', (req, res, next) => {
-  if (req.accepts('html')) {
-    res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
-  } else {
-    next();
-  }
+// -----------------------------------------------------------------------------
+// Root (API-only) landing
+// -----------------------------------------------------------------------------
+app.get('/', (req, res) => {
+  res.json({
+    ok: true,
+    name: 'SatGate Cloud API',
+    endpoints: {
+      health: '/health',
+      freePing: '/api/free/ping',
+      pricing: '/api/free/pricing',
+      l402Example: '/api/micro/ping'
+    },
+    playground: 'https://satgate.io/playground'
+  });
 });
+
+// =============================================================================
+// STATIC FILE SERVING (disabled in cloud container)
+// =============================================================================
+
+// Note: The Railway deployment runs as an API-only container (front-end is on satgate.io).
+// If you later bundle a static frontend into the container, re-enable express.static here.
 
 // =============================================================================
 // ERROR HANDLING

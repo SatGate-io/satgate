@@ -143,8 +143,9 @@ export default function PlaygroundPage() {
         // @ts-ignore
         const payment = await window.webln.sendPayment(invoice);
         preimage = payment.preimage;
-        
-        addLog(`✅ Payment Sent! Preimage: ${preimage.substring(0,10)}...`, 'success');
+
+        // Don't display preimages in UI logs (sensitive proof-of-payment material).
+        addLog(`✅ Payment Sent! Preimage received.`, 'success');
       } else {
         addLog(`💸 Paying Invoice (${selectedEndpoint.price} sats)...`, 'info');
         await new Promise(r => setTimeout(r, 1500)); 

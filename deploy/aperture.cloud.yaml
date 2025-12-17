@@ -4,7 +4,7 @@
 listenaddr: "0.0.0.0:8080"
 dbbackend: "sqlite"
 insecure: true  # Railway handles TLS at edge; Aperture listens on plain HTTP
-debuglevel: "trace"
+debuglevel: "info"
 
 # Database location
 sqlite:
