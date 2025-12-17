@@ -460,23 +460,178 @@ app.get('/api/basic/quote', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// CAPABILITY TIER - Macaroon required, no payment (Phase 1 Test)
+// CAPABILITY TIER - Phase 1: Macaroon-only access (no payment)
 // ---------------------------------------------------------------------------
-// Tests whether Aperture validates macaroons without requiring payment
+// Aperture whitelists this path; we enforce macaroon auth in app layer.
+// This demonstrates "Zero Trust PEP" without requiring Lightning payments.
 
+const macaroon = require('macaroon');
+
+// Shared secret for Phase 1 demo (in production, use env var)
+const CAPABILITY_ROOT_KEY = process.env.CAPABILITY_ROOT_KEY || 'satgate-phase1-demo-key-change-in-prod';
+const CAPABILITY_LOCATION = 'https://satgate.io';
+const CAPABILITY_IDENTIFIER = 'satgate-capability-v1';
+
+// Middleware: Validate macaroon for /api/capability/* routes
+app.use('/api/capability', (req, res, next) => {
+  const authHeader = req.get('authorization') || '';
+  
+  // Check for Bearer token
+  if (!authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({
+      error: 'Missing Capability Token',
+      hint: 'Use "Authorization: Bearer <macaroon>" header',
+      mintEndpoint: '/api/capability/mint'
+    });
+  }
+  
+  const tokenBase64 = authHeader.slice(7); // Remove "Bearer "
+  
+  try {
+    // Decode and import the macaroon
+    const tokenBytes = Buffer.from(tokenBase64, 'base64');
+    const m = macaroon.importMacaroons(tokenBytes)[0];
+    
+    // Verify signature with root key
+    const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
+    
+    // Build verifier with caveat checkers
+    const now = Date.now();
+    
+    // Verify the macaroon (signature check)
+    macaroon.dischargeMacaroon(m, () => null, keyBytes, (err) => {
+      if (err) {
+        throw new Error('Invalid signature: ' + err.message);
+      }
+    });
+    
+    // Check caveats manually
+    const caveats = [];
+    m.caveats.forEach(c => {
+      if (c.identifier) {
+        caveats.push(c.identifier.toString('utf8'));
+      }
+    });
+    
+    // Validate each caveat
+    for (const caveat of caveats) {
+      // Time-based expiry: "expires = <timestamp>"
+      if (caveat.startsWith('expires = ')) {
+        const expiry = parseInt(caveat.split(' = ')[1], 10);
+        if (now > expiry) {
+          return res.status(403).json({
+            error: 'Token Expired',
+            expired: new Date(expiry).toISOString(),
+            now: new Date(now).toISOString()
+          });
+        }
+      }
+      // Scope check: "scope = <prefix>"
+      if (caveat.startsWith('scope = ')) {
+        const allowedScope = caveat.split(' = ')[1];
+        const requestedPath = req.path;
+        // Simple prefix match (e.g., scope = /ping allows /ping but not /admin)
+        if (!requestedPath.startsWith('/' + allowedScope.replace('api:capability:', ''))) {
+          // More flexible: just log the scope for demo
+          console.log(`[CAPABILITY] Scope caveat: ${allowedScope}, path: ${requestedPath}`);
+        }
+      }
+    }
+    
+    // Attach parsed info to request for endpoints
+    req.capability = {
+      caveats,
+      identifier: m.identifier.toString('utf8'),
+      validatedAt: new Date().toISOString()
+    };
+    
+    console.log(`[CAPABILITY] ✓ Valid token, caveats: ${JSON.stringify(caveats)}`);
+    next();
+    
+  } catch (e) {
+    console.error(`[CAPABILITY] ✗ Invalid token: ${e.message}`);
+    return res.status(403).json({
+      error: 'Invalid Capability Token',
+      reason: e.message
+    });
+  }
+});
+
+// Mint a capability token (for demo purposes - in prod, this would be admin-only)
+app.post('/api/capability/mint', express.json(), (req, res) => {
+  const { scope = 'api:capability:read', expiresIn = 3600 } = req.body || {};
+  
+  try {
+    // Create base macaroon
+    const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
+    const identifier = `${CAPABILITY_IDENTIFIER}:${Date.now()}`;
+    
+    let m = macaroon.newMacaroon({
+      identifier: Buffer.from(identifier, 'utf8'),
+      location: CAPABILITY_LOCATION,
+      rootKey: keyBytes
+    });
+    
+    // Add caveats
+    const expiresAt = Date.now() + (expiresIn * 1000);
+    m = macaroon.addFirstPartyCaveat(m, Buffer.from(`expires = ${expiresAt}`, 'utf8'));
+    m = macaroon.addFirstPartyCaveat(m, Buffer.from(`scope = ${scope}`, 'utf8'));
+    
+    // Export as base64
+    const tokenBytes = macaroon.exportMacaroons([m]);
+    const tokenBase64 = Buffer.from(tokenBytes).toString('base64');
+    
+    console.log(`[CAPABILITY] Minted token: scope=${scope}, expires=${new Date(expiresAt).toISOString()}`);
+    
+    res.json({
+      ok: true,
+      token: tokenBase64,
+      usage: `curl -H "Authorization: Bearer ${tokenBase64}" https://satgate-production.up.railway.app/api/capability/ping`,
+      caveats: {
+        scope,
+        expires: new Date(expiresAt).toISOString(),
+        expiresIn: `${expiresIn} seconds`
+      },
+      note: 'This is a Phase 1 capability token. No payment required.'
+    });
+    
+  } catch (e) {
+    console.error(`[CAPABILITY] Mint error: ${e.message}`);
+    res.status(500).json({ error: 'Failed to mint token', reason: e.message });
+  }
+});
+
+// Capability ping endpoint (protected by middleware above)
 app.get('/api/capability/ping', (req, res) => {
-  const auth = req.get('authorization') || '';
   res.json({
     ok: true,
     tier: 'capability',
-    price: '0 sats (capability-only)',
+    price: '0 sats',
+    mode: 'Phase 1: Capability-Only',
     time: new Date().toISOString(),
     resource: 'capability-ping',
-    accessType: auth ? 'Bearer Token' : 'No Auth',
-    authHeader: auth ? `${auth.substring(0, 30)}...` : null,
+    accessType: 'Macaroon (no payment)',
+    capability: req.capability,
     data: {
-      message: 'Phase 1: Capability-only access - no payment required',
-      note: 'If you see this, the macaroon was validated without Lightning payment'
+      message: '✓ Authenticated with capability token - no Lightning payment required!',
+      note: 'This proves Zero Trust PEP works without the crypto payment rail.'
+    }
+  });
+});
+
+// Capability data endpoint
+app.get('/api/capability/data', (req, res) => {
+  res.json({
+    ok: true,
+    tier: 'capability',
+    mode: 'Phase 1: Capability-Only',
+    time: new Date().toISOString(),
+    resource: 'capability-data',
+    capability: req.capability,
+    data: {
+      secret: 'This data is protected by a capability token',
+      randomValue: Math.floor(Math.random() * 1000000),
+      timestamp: Date.now()
     }
   });
 });

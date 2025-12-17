@@ -47,14 +47,16 @@ services:
     price: 1000
     timeout: 86400
 
-  # CAPABILITY-ONLY TIER - Requires macaroon, no payment (Phase 1 test)
+  # CAPABILITY-ONLY TIER - Pass-through to app layer (Phase 1)
+  # Aperture whitelists this path; server.js enforces macaroon auth
   - name: capability
     hostregexp: ".*"
     pathregexp: '^/api/capability($|/.*)$'
     address: "127.0.0.1:8083"
     protocol: http
     price: 0
-    # No authwhitelistpaths = should require macaroon validation?
+    authwhitelistpaths:
+      - '^/api/capability/.*$'
 
   # FREE TIER - Health checks and public endpoints
   - name: public
