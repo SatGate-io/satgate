@@ -69,6 +69,37 @@ curl -H "Authorization: Bearer <PASTE_TOKEN_HERE>" \
 
 ---
 
+### Delegation Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant CISO
+    participant Agent
+    participant Worker
+    participant Gateway
+
+    Note over CISO, Agent: Scene 1: Initial Issuance
+    CISO->>Gateway: Request Master Token (Scope: read)
+    Gateway-->>CISO: Issue Parent Token
+    CISO->>Agent: Give Parent Token
+
+    Note over Agent, Worker: Scene 3: The "Superpower" (Offline)
+    Agent->>Agent: Cryptographically Attenuate Token
+    Note right of Agent: ⚡ No Network Call<br/>Scope: read → /ping<br/>TTL: 1hr → 5min
+    Agent->>Worker: Issue Child Token
+
+    Note over Worker, Gateway: Scene 3b: Usage & Enforcement
+    Worker->>Gateway: Request /ping (with Child Token)
+    Gateway->>Gateway: Validate Signature & Constraints
+    Gateway-->>Worker: 200 OK (Access Granted)
+    
+    Worker->>Gateway: Request /mint (with Child Token)
+    Gateway->>Gateway: Scope Check Failed
+    Gateway-->>Worker: 403 Forbidden (Scope Violation)
+```
+
+---
+
 ### **Scene 3: The "Superpower" (Offline Delegation)**
 
 *Narrative:* "Now the Agent needs to delegate a task to a sub-worker. In the old world, this is a ticket. In our world, it's math."
@@ -212,6 +243,31 @@ curl -H "Authorization: Bearer <PASTE_CHILD_TOKEN>" \
 > This is **Run** in the maturity model: Pay-per-request access via L402. Same architecture as Crawl, plus proof-of-payment.
 
 > 💡 **When to show this:** Only if the partner is interested in the monetization story. Phase 1 (Crawl) alone is often enough for security-focused clients.
+
+---
+
+### L402 Payment Flow Diagram
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Agent
+    participant Gateway
+    participant Lightning
+
+    Note over Agent, Gateway: Scene 6: The Challenge
+    Agent->>Gateway: GET /api/micro/ping
+    Gateway-->>Agent: 402 Payment Required<br/>(Invoice + Macaroon)
+
+    Note over Agent, Lightning: Scene 7: Payment
+    Agent->>Lightning: Pay Invoice (1 sat)
+    Lightning-->>Agent: Return Preimage (Proof of Payment)
+
+    Note over Agent, Gateway: Success
+    Agent->>Gateway: GET /api/micro/ping<br/>(Auth: Macaroon + Preimage)
+    Gateway->>Gateway: Verify Preimage Hash
+    Gateway-->>Agent: 200 OK (Resource)
+```
 
 ---
 
