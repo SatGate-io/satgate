@@ -6,6 +6,89 @@ This document provides commands, talk tracks, and objection handlers for demonst
 
 ---
 
+# 🎯 Mission Control: What You Can Demo
+
+## Live Infrastructure
+
+| Component | URL | Status |
+|-----------|-----|--------|
+| **Landing Page** | https://satgate.io | ✅ Cloudflare |
+| **Playground** | https://satgate.io/playground | ✅ Live L402 Demo |
+| **Gateway (Aperture)** | https://satgate-production.up.railway.app | ✅ Railway |
+| **Health Check** | `.../health` | ✅ Always available |
+
+---
+
+## 🔐 Crawl (Capability-Only) — No Crypto Required
+
+| Scene | Command | What It Proves |
+|-------|---------|----------------|
+| **Token Minting** | `curl -X POST .../api/capability/mint` | Stateless credential issuance (no database) |
+| **Token Usage** | `curl -H "Authorization: Bearer $TOKEN" .../api/capability/ping` | Instant cryptographic validation |
+| **Offline Delegation** | `curl -X POST .../api/capability/demo/delegate` | Agent mints restricted sub-token with ZERO network calls |
+| **Scope Enforcement** | Child token → `/mint` = 403 Forbidden | Least privilege enforced mathematically |
+| **CISO Authority** | Default tokens are read-only | Humans retain control; agents can't escalate |
+
+**Key Talking Points:**
+- ⚡ **No Bitcoin required** — pure Zero Trust architecture
+- 🔒 **Google-grade macaroons** — same tech from 2014 research paper
+- 🚀 **Instant delegation** — no tickets, no waiting, no admin approval
+- 📉 **Eliminates "Identity Tax"** — $150/account × 50K agents = $7.5M saved
+
+---
+
+## 💰 Run (L402 Payments) — Monetization Mode
+
+| Scene | Command | What It Proves |
+|-------|---------|----------------|
+| **402 Challenge** | `curl -i .../api/micro/ping` | Standard HTTP payment required |
+| **Lightning Invoice** | See `WWW-Authenticate: L402` header | Machine-readable payment request |
+| **Playground Payment** | https://satgate.io/playground + Alby | Full pay-and-access flow in browser |
+| **Config Diff** | `price: 0` → `price: 100` | Monetization is a config change, not a replatform |
+
+**Key Talking Points:**
+- 💸 **Sub-cent pricing** — 1 sat ≈ $0.001 (impossible on Stripe)
+- ⚡ **Instant settlement** — no net-30, no chargebacks
+- 🤖 **AI-agent ready** — agents can pay autonomously
+- 🔄 **Same architecture** — Crawl → Run is a config toggle
+
+---
+
+## 🎯 Demo Scenarios by Audience
+
+| Audience | Show | Skip |
+|----------|------|------|
+| **CISO / Security** | Crawl (delegation, scope enforcement) | Run (payments) |
+| **CTO / Architect** | Full Crawl + Architecture diagrams | — |
+| **Product / Revenue** | Crawl → Run config toggle, Playground | Deep delegation |
+| **Developer** | CLI tools, curl commands, code | Business slides |
+
+---
+
+## 📂 Quick Reference
+
+| Resource | Location |
+|----------|----------|
+| **Delegation Script** | `cli/delegation-demo.js` |
+| **Token Minter** | `cli/mint-token.js` |
+| **Server-Side Backup** | `POST /api/capability/demo/delegate` |
+| **Architecture Doc** | `docs/ARCHITECTURE.md` |
+
+---
+
+## ✅ Any-Device Ready
+
+All demos work from **any terminal with curl** — iPad, borrowed laptop, phone SSH client.
+
+No local Aperture required. The Railway deployment handles everything.
+
+```bash
+# Base URL for all commands:
+https://satgate-production.up.railway.app
+```
+
+---
+
 ## Pre-Demo Checklist
 
 - [ ] Terminal open with clean screen
