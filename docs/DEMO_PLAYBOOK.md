@@ -136,6 +136,42 @@ curl -X POST -H "Authorization: Bearer <PASTE_CHILD_TOKEN>" \
 
 ---
 
+### **Scene 3c: The "CISO Retains Authority" (Bonus Point)**
+
+*Narrative:* "Even the tokens we mint are read-only by default. The CISO controls who gets admin power."
+
+**Show the default token scope:**
+```bash
+# Mint a token (no special permissions)
+curl -X POST https://satgate-production.up.railway.app/api/capability/mint
+# Notice: scope = "api:capability:read" (read-only by default)
+
+# Try to use it to mint another token
+curl -X POST -H "Authorization: Bearer <TOKEN>" \
+  https://satgate-production.up.railway.app/api/capability/mint
+# Result: 403 - Scope violation
+```
+
+**Talk Track:**
+
+> "Notice the default scope is 'read'. Even tokens minted by the system can't create more tokens. To get admin privileges, the CISO must explicitly grant them. No agent can escalate itself—the authority stays with the humans."
+
+**Optional: Show explicit admin grant:**
+```bash
+# Only explicit admin scope can mint new tokens
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"scope":"api:capability:admin"}' \
+  https://satgate-production.up.railway.app/api/capability/mint
+```
+
+| Token Type | Default Scope | Can Mint? |
+|------------|---------------|-----------|
+| Regular mint | `api:capability:read` | ❌ No |
+| Explicit admin | `api:capability:admin` | ✅ Yes |
+| Delegated child | Inherited (restricted) | ❌ No |
+
+---
+
 **Command 2: The ALLOWED Action (Positive Test)**
 ```bash
 # Same child token, but for its intended purpose
@@ -304,6 +340,7 @@ curl -X POST https://satgate-production.up.railway.app/api/capability/mint
 **Why this wins with CISOs:**
 - Crawl stops the "Super-Admin Service Account" problem (every bot has root access)
 - Walk prevents the "Runaway AI" nightmare (a loop costs $50k in API fees overnight)
+- **CISO retains authority:** Tokens are read-only by default; admin scope requires explicit grant
 
 ---
 
