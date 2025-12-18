@@ -18,6 +18,56 @@ This document provides commands, talk tracks, and objection handlers for demonst
 
 ---
 
+## Architecture: Crawl vs Run
+
+Both modes use **Aperture** as the single entry point. The difference is *who* validates the token.
+
+```mermaid
+flowchart LR
+    subgraph "Crawl (Capability-Only)"
+        C1[Client] --> A1[Aperture<br/>Proxy Mode]
+        A1 -->|whitelist pass-through| B1[Node.js Backend<br/>Validates Macaroon]
+        B1 --> API1[Protected API]
+    end
+```
+
+```mermaid
+flowchart LR
+    subgraph "Run (L402 Payments)"
+        C2[Client] --> A2[Aperture<br/>L402 Mode]
+        A2 -->|402 Challenge| C2
+        C2 -->|Pay Invoice| LN[Lightning Network]
+        LN -->|Preimage| C2
+        C2 -->|Macaroon + Preimage| A2
+        A2 -->|Validated| B2[Node.js Backend]
+        B2 --> API2[Protected API]
+    end
+```
+
+| Feature | Crawl (Capability-Only) | Run (L402 Payments) |
+|---------|-------------------------|---------------------|
+| **Aperture Role** | Reverse proxy (pass-through) | L402 gateway (challenge-response) |
+| **Validator** | Application Middleware (Node.js) | Gateway Edge (Aperture) |
+| **Token Type** | Bearer Capability (Macaroon) | L402 (Macaroon + Preimage) |
+| **Network Path** | Whitelisted pass-through | Intercept & challenge |
+| **Payment** | ❌ None | ✅ Lightning |
+
+> 💡 **Same infrastructure, different auth mode.** Crawl routes are whitelisted in Aperture config; Run routes have a `price` set.
+
+**The Config That Controls This:**
+```yaml
+# aperture.yaml
+authwhitelistpaths:
+  - "^/api/capability/.*"   # Crawl: Pass-through to backend
+
+services:
+  - name: micro
+    pathregexp: "^/api/micro/.*"
+    price: 100               # Run: Aperture handles L402
+```
+
+---
+
 # 🔐 Phase 1: Stateless Access (Crawl)
 
 **Goal:** Prove we solve IAM scale problems *today* without Bitcoin.
