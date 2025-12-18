@@ -2,7 +2,7 @@
 
 **The complete demo script for presenting Zero Trust access control and API monetization.**
 
-This document provides commands, talk tracks, and objection handlers for demonstrating SatGate's full capability—from governance (Phase 1) to monetization (Phase 3).
+This document provides commands, talk tracks, and objection handlers for demonstrating SatGate's full capability—from security (Crawl) to monetization (Run).
 
 ---
 
@@ -280,10 +280,10 @@ sequenceDiagram
 ```yaml
 services:
   - name: "my-service"
-    # Phase 1: Governance Only (No payment)
+    # Crawl: Security Only (No payment)
     # price: 0
     
-    # Phase 3: Monetized (Uncomment to enable)
+    # Run: Monetized (Uncomment to enable)
     price: 1  # sats per request
 ```
 
@@ -352,10 +352,10 @@ WWW-Authenticate: L402 macaroon="...", invoice="lnbc..."
 # Health check
 curl https://satgate-production.up.railway.app/health
 
-# Test L402 (Phase 3) - should return 402
+# Test L402 (Run) - should return 402
 curl -i https://satgate-production.up.railway.app/api/micro/ping
 
-# Test Capability (Phase 1) - should return 401
+# Test Capability (Crawl) - should return 401
 curl https://satgate-production.up.railway.app/api/capability/ping
 
 # Mint a fresh token
