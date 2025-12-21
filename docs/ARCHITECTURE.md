@@ -158,6 +158,8 @@ This isn't ideological—it's practical. Lightning is currently the **only** pay
 
 ## Architecture
 
+### Standard Deployment (Full Gateway)
+
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                              INTERNET                                    │
@@ -217,6 +219,59 @@ This isn't ideological—it's practical. Lightning is currently the **only** pay
                                            │                              │
                                            └──────────────────────────────┘
 ```
+
+### Enterprise "Sidecar" Deployment
+
+**For enterprises with existing API Gateways (Kong, Apigee, AWS API Gateway):**
+
+SatGate can be deployed as a **Sidecar** rather than a full gateway replacement. This lowers adoption risk by keeping existing infrastructure intact.
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                              INTERNET                                    │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     EXISTING GATEWAY (Kong/Apigee/AWS)                   │
+│                           Legacy Auth • Routing • Logging                │
+└─────────────────────────────────────────────────────────────────────────┘
+                    │                                    │
+                    │ /api/legacy/*                      │ /api/agents/*
+                    │ (Existing Traffic)                 │ (AI Agent Traffic)
+                    ▼                                    ▼
+    ┌───────────────────────────┐         ┌───────────────────────────────┐
+    │                           │         │                               │
+    │    LEGACY API BACKEND     │         │   SATGATE (Sidecar Mode)      │
+    │                           │         │                               │
+    │  • Existing auth          │         │   ┌─────────────────────────┐ │
+    │  • Existing business logic│         │   │ Capability Validation   │ │
+    │                           │         │   │ (Crawl/Walk)            │ │
+    │                           │         │   ├─────────────────────────┤ │
+    │                           │         │   │ Economic Firewall       │ │
+    │                           │         │   │ (Run - L402 Payments)   │ │
+    │                           │         │   └─────────────────────────┘ │
+    │                           │         │             │                 │
+    └───────────────────────────┘         │             ▼                 │
+                                          │   ┌─────────────────────────┐ │
+                                          │   │ Agent API Backend       │ │
+                                          │   └─────────────────────────┘ │
+                                          │                               │
+                                          └───────────────────────────────┘
+```
+
+**Why Sidecar?**
+
+| Objection | Gateway Replacement | Sidecar Deployment |
+|-----------|--------------------|--------------------|
+| "We've invested millions in Kong" | ❌ Rip & replace | ✅ Keep existing gateway |
+| "Our team doesn't know SatGate" | ❌ Full migration | ✅ Only route agent traffic |
+| "Too risky for production" | ❌ All-or-nothing | ✅ Incremental adoption |
+| "Need approval from 5 teams" | ❌ Enterprise blocker | ✅ Just route `/agents/*` |
+
+**The Pitch:**
+
+> "Keep your existing Gateway for routing and legacy auth. Drop SatGate in specifically to handle the Agent Economy traffic. We're an addon, not a replacement."
 
 ---
 
@@ -620,6 +675,14 @@ cd satgate-landing && npm run dev
 *Document Version: 2.0 | Last Updated: November 2025*
 
 ## Changelog
+
+### v2.1 (December 2025)
+- Added "Sidecar" deployment model for enterprise adoption
+- Added Economic Firewall positioning (security-first framing)
+- Added Governance Inspector CLI (`cli/inspect.js`)
+- Added Telemetry module for dashboard data stream
+- Added Strategic Roadmap (`docs/STRATEGIC_ROADMAP.md`)
+- Enhanced Demo Playbook with Mission Control summary
 
 ### v2.0 (November 2025)
 - Added JavaScript SDK with WebLN support

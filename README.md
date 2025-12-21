@@ -371,16 +371,14 @@ python examples/hero_demo.py
 
 Watch an AI agent autonomously pay for API access in real-time.
 
-### 📋 Demo Playbook (Sales Engineer Kit)
+### 📋 Demo Commands
 
-For live demos and customer presentations, see the **[Demo Playbook](docs/DEMO_PLAYBOOK.md)**:
+For live demos, see the **[Demo Commands](docs/DEMO_COMMANDS.md)**:
 
-- ✅ Pre-flight checklist
-- 🎯 Audience-specific scenarios (CISO, CTO, Product, Developer)
-- 🔐 **Crawl** — Capability-only demo (no crypto required)
+- 🔐 **Crawl** — Capability token commands (no crypto required)
 - 💰 **Run** — L402 payment demo
-- 💬 Talk tracks and objection handlers
 - 🛠️ Any-device curl commands (works from borrowed laptops)
+- 🔍 Token inspection and governance tools
 
 ---
 
@@ -397,7 +395,7 @@ For live demos and customer presentations, see the **[Demo Playbook](docs/DEMO_P
 
 ## 📚 Resources
 
-- [Demo Playbook](docs/DEMO_PLAYBOOK.md) — Complete sales engineer kit with talk tracks
+- [Demo Commands](docs/DEMO_COMMANDS.md) — Quick reference for live demos
 - [Architecture](docs/ARCHITECTURE.md) — Technical deep dive
 - [L402 Response Schema](docs/L402-RESPONSE-SCHEMA.md) — Machine-friendly 402 response format
 - [llms.txt](https://satgate.io/llms.txt) — Machine-readable spec for AI assistants
