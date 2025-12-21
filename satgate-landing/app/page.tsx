@@ -27,6 +27,7 @@ const LandingPage = () => {
           <div className="flex gap-6 text-sm font-medium text-gray-400">
             <Link href="#features" className="hover:text-white transition">Features</Link>
             <Link href="/playground" className="hover:text-white transition">Playground</Link>
+            <Link href="/dashboard" className="hover:text-white transition">Dashboard</Link>
             <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a>
           </div>
         </div>
@@ -147,6 +148,54 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Economic Firewall Section */}
+      <section className="py-16 px-6 border-b border-gray-800 bg-gradient-to-b from-red-950/10 to-black">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-900/30 border border-red-500/30 text-red-300 text-xs font-mono mb-6">
+              <Shield size={12} /> Active Defense
+            </div>
+            <h2 className="text-2xl font-bold mb-3">The Economic Firewall</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Most attacks rely on <span className="text-white font-medium">zero marginal cost</span>. DDoS, credential stuffing, scraping—all free for attackers. 
+              SatGate flips this by attaching a cryptographic cost to every request.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="p-5 rounded-xl bg-gray-900 border border-gray-800">
+              <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
+                <span className="text-red-400">⛔</span> DDoS
+              </h4>
+              <p className="text-gray-500 text-sm mb-3">Without SatGate: <span className="text-red-400">You pay AWS</span> to reject their traffic.</p>
+              <p className="text-gray-400 text-sm">With SatGate: <span className="text-green-400">They pay</span> to annoy you.</p>
+            </div>
+            <div className="p-5 rounded-xl bg-gray-900 border border-gray-800">
+              <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
+                <span className="text-red-400">🤖</span> Scraping
+              </h4>
+              <p className="text-gray-500 text-sm mb-3">Without SatGate: Free data theft, rotating IPs bypass rate limits.</p>
+              <p className="text-gray-400 text-sm">With SatGate: <span className="text-green-400">Massive bill</span> for mass scrapers.</p>
+            </div>
+            <div className="p-5 rounded-xl bg-gray-900 border border-gray-800">
+              <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
+                <span className="text-red-400">🔑</span> Credential Stuffing
+              </h4>
+              <p className="text-gray-500 text-sm mb-3">Without SatGate: Free brute force, 1M guesses cost $0.</p>
+              <p className="text-gray-400 text-sm">With SatGate: 1M guesses = <span className="text-green-400">$50,000</span>.</p>
+            </div>
+          </div>
+          
+          <div className="bg-gradient-to-r from-red-900/20 to-orange-900/20 border border-red-800/30 rounded-xl p-6 text-center">
+            <p className="text-gray-300 text-sm">
+              <span className="text-white font-semibold">"We don't just block the adversary—we bankrupt them."</span>
+              <br/>
+              <span className="text-gray-500 text-xs mt-2 block">Economic friction eliminates the ROI of automated attacks.</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Where It Fits Section */}
       <section className="py-16 px-6 border-b border-gray-800">
         <div className="max-w-4xl mx-auto">
@@ -154,7 +203,8 @@ const LandingPage = () => {
           <p className="text-gray-500 text-center mb-10">Drop-in deployment. Minimal code changes.</p>
           
           {/* Architecture Diagram */}
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
+          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8 mb-8">
+            <h4 className="text-center text-sm font-semibold text-gray-400 mb-6">STANDARD DEPLOYMENT</h4>
             <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
               <div className="px-5 py-3 rounded-lg bg-gray-800 border border-gray-700 text-center min-w-[140px]">
                 <span className="text-gray-300 font-medium">Client / Agent</span>
@@ -177,6 +227,43 @@ const LandingPage = () => {
             </div>
             <p className="text-center text-gray-500 text-sm mt-6">
               SatGate sits <span className="text-white">behind</span> your CDN/WAF (volumetric protection) and <span className="text-white">in front of</span> your API origin.
+            </p>
+          </div>
+
+          {/* Sidecar Deployment */}
+          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
+            <h4 className="text-center text-sm font-semibold text-gray-400 mb-6">ENTERPRISE "SIDECAR" MODE</h4>
+            <p className="text-center text-gray-500 text-sm mb-6">
+              Already have Kong, Apigee, or AWS API Gateway? Deploy SatGate as a <span className="text-white">sidecar</span>—no rip-and-replace.
+            </p>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
+              <div className="px-5 py-3 rounded-lg bg-gray-800 border border-gray-700 text-center min-w-[140px]">
+                <span className="text-gray-300 font-medium">Existing Gateway</span>
+                <span className="text-gray-600 text-xs block">Kong / Apigee</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-600 text-sm hidden md:block">→</span>
+                  <div className="px-4 py-2 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-xs">
+                    <span className="text-gray-400">/api/legacy/*</span>
+                  </div>
+                  <span className="text-gray-600 text-sm hidden md:block">→</span>
+                  <span className="text-gray-500 text-xs">Legacy API</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-600 text-sm hidden md:block">→</span>
+                  <div className="px-4 py-2 rounded-lg bg-purple-900/40 border border-purple-500/60 text-center text-xs">
+                    <span className="text-purple-300">/api/agents/*</span>
+                  </div>
+                  <span className="text-gray-600 text-sm hidden md:block">→</span>
+                  <span className="text-purple-400 text-xs font-medium">SatGate</span>
+                  <span className="text-gray-600 text-sm hidden md:block">→</span>
+                  <span className="text-green-400 text-xs">Agent API</span>
+                </div>
+              </div>
+            </div>
+            <p className="text-center text-gray-600 text-xs mt-6">
+              Route only agent traffic through SatGate. Keep existing infrastructure for legacy clients.
             </p>
           </div>
         </div>
