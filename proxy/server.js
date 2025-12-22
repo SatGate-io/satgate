@@ -371,6 +371,31 @@ app.get('/ready', (req, res) => {
   res.json({ ready: true });
 });
 
+// Lightning provider status
+app.get('/lightning/status', async (req, res) => {
+  try {
+    const { getProvider, isApertureMode } = require('./lightning');
+    const provider = getProvider();
+    const status = await provider.getStatus();
+    
+    res.json({
+      mode: isApertureMode() ? 'aperture' : 'native',
+      provider: provider.name,
+      ...status
+    });
+  } catch (error) {
+    res.json({
+      mode: 'aperture',
+      provider: 'aperture',
+      ok: true,
+      info: {
+        note: 'Lightning handled by Aperture (LNC)',
+        error: error.message
+      }
+    });
+  }
+});
+
 // =============================================================================
 // DYNAMIC PRICING CONTROL PLANE
 // =============================================================================
