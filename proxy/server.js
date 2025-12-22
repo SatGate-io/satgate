@@ -1264,11 +1264,13 @@ app.get('/', (req, res) => {
 // STATIC FILE SERVING (Governance Dashboard)
 // =============================================================================
 
-// Serve the governance dashboard at /dashboard
-app.use('/dashboard', express.static(path.join(__dirname, 'public')));
+// Serve dashboard index.html at /dashboard
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
+// Serve static assets from /dashboard/assets/*
+app.use('/dashboard/assets', express.static(path.join(__dirname, 'public', 'assets')));
 
 // =============================================================================
 // ERROR HANDLING
