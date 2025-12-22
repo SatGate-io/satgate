@@ -676,12 +676,20 @@ cd satgate-landing && npm run dev
 
 ## Changelog
 
+### v2.2 (December 2025)
+- Added **Governance Dashboard** with real-time WebSocket updates
+- Added **Cytoscape.js** force-directed graph visualization
+- Added **Kill Switch** for instant token revocation
+- Added **Redis persistence** for banned tokens and stats
+- Published **Python SDK v0.3.0** with LangChain integration
+- Published **JavaScript SDK** to npm (`@satgate/sdk`)
+- Added **Go SDK** with LNBits, Alby, LND wallet support
+
 ### v2.1 (December 2025)
 - Added "Sidecar" deployment model for enterprise adoption
 - Added Economic Firewall positioning (security-first framing)
 - Added Governance Inspector CLI (`cli/inspect.js`)
 - Added Telemetry module for dashboard data stream
-- Added Strategic Roadmap (`docs/STRATEGIC_ROADMAP.md`)
 - Enhanced Demo Playbook with Mission Control summary
 
 ### v2.0 (November 2025)

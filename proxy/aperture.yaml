@@ -59,7 +59,7 @@ services:
     timeout: 86400  # Token valid for 24 hours
 
   # ---------------------------------------------------------------------------
-  # FREE TIER - Health checks and demo endpoints only
+  # FREE TIER - Health checks, demos, governance, and dashboard
   # ---------------------------------------------------------------------------
   - name: public
     hostregexp: ".*"
@@ -68,13 +68,22 @@ services:
     protocol: http
     price: 0
     authwhitelistpaths:
+      # Health & Status
       - '^/health$'
       - '^/ready$'
+      # Free API endpoints
       - '^/api/free/.*$'
       - '^/api/admin/.*$'
+      # Capability tokens (Phase 1 - no payment required)
+      - '^/api/capability/.*$'
+      # Governance dashboard & API
+      - '^/api/governance/.*$'
+      - '^/dashboard.*$'
+      - '^/ws/governance$'
+      # Static assets
       - '^/$'
       - '^/index.html$'
-      - '^/.*\.(css|js|png|jpg|ico|svg|woff|woff2)$'
+      - '^/.*\.(css|js|png|jpg|ico|svg|woff|woff2|html)$'
 
 # =============================================================================
 # LNC (Lightning Node Connect) Settings

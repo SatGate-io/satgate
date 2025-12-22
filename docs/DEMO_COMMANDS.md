@@ -10,8 +10,10 @@ Quick reference for demonstrating SatGate capabilities.
 |-----------|-----|
 | **Landing Page** | https://satgate.io |
 | **Playground** | https://satgate.io/playground |
+| **Dashboard (Live)** | https://satgate-production.up.railway.app/dashboard |
 | **Gateway** | https://satgate-production.up.railway.app |
 | **Health Check** | https://satgate-production.up.railway.app/health |
+| **Governance API** | https://satgate-production.up.railway.app/api/governance/graph |
 
 ---
 
@@ -71,7 +73,7 @@ curl -X POST -H "Authorization: Bearer $CHILD" \
 
 ---
 
-## 💰 Phase 3: L402 Payments
+## 💰 Phase 3: L402 Payments (Economic Firewall)
 
 ### Trigger 402 Challenge
 ```bash
@@ -80,6 +82,48 @@ curl -i https://satgate-production.up.railway.app/api/micro/ping
 
 ### Interactive Playground
 Open https://satgate.io/playground with an Alby wallet to complete the full payment flow.
+
+---
+
+## 🛡️ Governance & Kill Switch
+
+### View Live Dashboard
+Open https://satgate-production.up.railway.app/dashboard in a browser.
+
+The dashboard shows:
+- **Active Tokens** — Observed agents in last 10 minutes
+- **Economic Firewall** — Blocked unpaid requests (scrapers, bots)
+- **Kill Switch Hits** — Revoked tokens that attempted access
+
+### Get Governance Data (API)
+```bash
+curl https://satgate-production.up.railway.app/api/governance/graph
+```
+
+### Get Stats Summary
+```bash
+curl https://satgate-production.up.railway.app/api/governance/stats
+```
+
+### Kill Switch: Ban a Token
+```bash
+# Get a token signature first (from inspect tool or dashboard)
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"tokenSignature":"<TOKEN_SIGNATURE>","reason":"Compromised"}' \
+  https://satgate-production.up.railway.app/api/governance/ban
+```
+
+### Kill Switch: Unban a Token
+```bash
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"tokenSignature":"<TOKEN_SIGNATURE>"}' \
+  https://satgate-production.up.railway.app/api/governance/unban
+```
+
+### List Banned Tokens
+```bash
+curl https://satgate-production.up.railway.app/api/governance/banned
+```
 
 ---
 

@@ -70,28 +70,35 @@ pip install satgate
 ```
 
 ```python
-from satgate import SatGateSession
+from satgate import SatGateClient, LNBitsWallet
 
 # Create a session with your Lightning wallet
-session = SatGateSession(wallet=my_wallet)
+wallet = LNBitsWallet(url="https://legend.lnbits.com", admin_key="...")
+client = SatGateClient(wallet)
 
 # That's it. 402s are handled automatically.
-response = session.get("https://api.example.com/premium/data")
+response = client.get("https://api.example.com/premium/data")
 print(response.json())
 ```
 
 ### LangChain Integration
 
+```bash
+pip install satgate[langchain]
+```
+
 ```python
-from satgate.langchain import SatGateTool
-from langchain.agents import initialize_agent
+from satgate import SatGateTool, LNBitsWallet
+from langchain.agents import initialize_agent, AgentType
+from langchain_openai import ChatOpenAI
 
 # Give your AI agent a wallet
-tools = [SatGateTool(wallet=my_wallet)]
-agent = initialize_agent(tools, llm, agent="openai-functions")
+wallet = LNBitsWallet(url="...", admin_key="...")
+tools = [SatGateTool(wallet=wallet)]
+agent = initialize_agent(tools, ChatOpenAI(), agent=AgentType.OPENAI_FUNCTIONS)
 
 # Let it roam the paid API economy
-agent.run("Fetch the premium market report from AlphaVantage")
+agent.run("Fetch the premium market report")
 ```
 
 ---
@@ -99,17 +106,35 @@ agent.run("Fetch the premium market report from AlphaVantage")
 ## 📦 JavaScript SDK
 
 ```bash
-npm install satgate-sdk
+npm install @satgate/sdk
 ```
 
 ```javascript
-import { SatGateClient } from 'satgate-sdk';
+import { SatGateClient } from '@satgate/sdk';
 
-const client = new SatGateClient();
+const client = new SatGateClient({ wallet: 'webln' });
 
 // Automatic payment handling via WebLN (Alby)
-const data = await client.get('https://api.example.com/premium');
-console.log(data);
+const response = await client.get('https://api.example.com/premium');
+console.log(await response.json());
+```
+
+---
+
+## 🦫 Go SDK
+
+```bash
+go get github.com/SatGate-io/satgate-go/sdk/go
+```
+
+```go
+import satgate "github.com/SatGate-io/satgate-go/sdk/go"
+
+wallet := satgate.NewLNBitsWallet("https://legend.lnbits.com", "admin-key")
+client := satgate.NewClient(wallet)
+
+// 402 → Pay → Retry happens automatically
+resp, _ := client.Get("https://api.example.com/premium")
 ```
 
 ---
