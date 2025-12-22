@@ -1,4 +1,4 @@
-module github.com/SatGate-io/satgate-go
+module github.com/SatGate-io/satgate/sdk/go
 
 go 1.21
 

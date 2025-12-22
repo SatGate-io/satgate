@@ -7,7 +7,7 @@ Automatic L402 payment handling — the "Stripe Moment" for Go microservices.
 ## Installation
 
 ```bash
-go get github.com/SatGate-io/satgate-go
+go get github.com/SatGate-io/satgate/sdk/go
 ```
 
 ## Quick Start
@@ -19,7 +19,7 @@ import (
     "fmt"
     "io"
     
-    satgate "github.com/SatGate-io/satgate-go"
+    satgate "github.com/SatGate-io/satgate/sdk/go"
 )
 
 func main() {
