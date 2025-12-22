@@ -1,4 +1,6 @@
 #!/bin/sh
+# SatGate Cloud Startup Script
+# Updated: 2024-12-22
 set -eu
 
 echo "=== SatGate Cloud Starting ==="
