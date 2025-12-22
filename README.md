@@ -124,11 +124,11 @@ console.log(await response.json());
 ## 🦫 Go SDK
 
 ```bash
-go get github.com/SatGate-io/satgate-go/sdk/go
+go get github.com/SatGate-io/satgate/sdk/go
 ```
 
 ```go
-import satgate "github.com/SatGate-io/satgate-go/sdk/go"
+import satgate "github.com/SatGate-io/satgate/sdk/go"
 
 wallet := satgate.NewLNBitsWallet("https://legend.lnbits.com", "admin-key")
 client := satgate.NewClient(wallet)
