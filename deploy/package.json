@@ -1,6 +1,6 @@
 {
   "name": "satgate-demo-backend",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "SatGate Demo API - sits behind Aperture for L402 authentication",
   "main": "server.js",
   "scripts": {

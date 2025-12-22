@@ -1264,22 +1264,116 @@ app.get('/', (req, res) => {
 // STATIC FILE SERVING (Governance Dashboard)
 // =============================================================================
 
-// Serve dashboard index.html at /dashboard
+// Serve dashboard at /dashboard
+// Try file first, fall back to inline minimal version
 app.get('/dashboard', (req, res) => {
   const dashboardPath = path.join(__dirname, 'public', 'index.html');
-  console.log(`[DASHBOARD] Serving from: ${dashboardPath}`);
   
   res.sendFile(dashboardPath, (err) => {
     if (err) {
-      console.error(`[DASHBOARD] Error serving file:`, err.message);
-      res.status(404).json({
-        error: 'Dashboard not found',
-        path: dashboardPath,
-        hint: 'The public folder may not be deployed. Check Docker build.'
-      });
+      // Serve inline minimal dashboard as fallback
+      console.log(`[DASHBOARD] Serving inline fallback (file not found: ${dashboardPath})`);
+      res.setHeader('Content-Type', 'text/html');
+      res.send(getInlineDashboard());
     }
   });
 });
+
+// Minimal inline dashboard for Railway deployment fallback
+function getInlineDashboard() {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SatGate // Governance</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0a0e14; --bg2: #151b24; --border: #2d3748; --text: #e2e8f0; --green: #00ff9d; --red: #ff4757; --cyan: #00d4ff; }
+    body { font-family: 'SF Mono', monospace; background: var(--bg); color: var(--text); height: 100vh; display: grid; grid-template-rows: 60px 1fr; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 0 24px; background: var(--bg2); border-bottom: 1px solid var(--border); }
+    .logo { font-size: 18px; font-weight: 600; letter-spacing: 1px; }
+    .logo span { color: var(--green); }
+    .status { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+    main { display: grid; grid-template-columns: 280px 1fr; }
+    aside { background: var(--bg2); padding: 20px; border-right: 1px solid var(--border); }
+    .card { background: var(--bg); border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); }
+    .card h3 { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 6px; }
+    .card .val { font-size: 28px; font-weight: 700; }
+    .card.active .val { color: var(--green); }
+    .card.blocked .val { color: var(--red); }
+    .graph { position: relative; background: var(--bg); background-image: radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0); background-size: 40px 40px; }
+    #cy { width: 100%; height: 100%; }
+    .legend { position: absolute; top: 20px; left: 20px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 11px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .ldot { width: 10px; height: 10px; border-radius: 50%; }
+    .ldot.root { background: var(--green); }
+    .ldot.child { background: var(--cyan); }
+    .empty { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #666; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">SAT<span>GATE</span> // Governance</div>
+    <div class="status"><div class="dot"></div><span id="status">Connecting...</span></div>
+  </header>
+  <main>
+    <aside>
+      <div class="card active"><h3>Active Agents</h3><div class="val" id="active">0</div></div>
+      <div class="card blocked"><h3>Economic Firewall</h3><div class="val" id="blocked">0</div></div>
+      <div class="card"><h3>Kill Switch</h3><div class="val" id="banned">0</div></div>
+      <div class="card"><h3>Revocation Hits</h3><div class="val" id="hits">0</div></div>
+    </aside>
+    <div class="graph">
+      <div id="cy"></div>
+      <div class="legend">
+        <div class="legend-item"><div class="ldot root"></div>Root</div>
+        <div class="legend-item"><div class="ldot child"></div>Delegated</div>
+      </div>
+      <div class="empty" id="empty">📡 Awaiting Traffic</div>
+    </div>
+  </main>
+  <script>
+    const cy = cytoscape({
+      container: document.getElementById('cy'),
+      style: [
+        { selector: 'node', style: { 'background-color': '#00d4ff', 'label': 'data(label)', 'color': '#e2e8f0', 'font-size': '10px', 'text-valign': 'bottom', 'text-margin-y': 8, 'width': 30, 'height': 30 }},
+        { selector: 'node[depth=0]', style: { 'background-color': '#00ff9d', 'width': 45, 'height': 45 }},
+        { selector: 'edge', style: { 'width': 2, 'line-color': '#2d3748', 'target-arrow-color': '#2d3748', 'target-arrow-shape': 'triangle', 'curve-style': 'bezier' }}
+      ],
+      layout: { name: 'preset' }
+    });
+    function runLayout() {
+      if (cy.nodes().length === 0) return;
+      cy.layout({ name: 'cose', animate: true, padding: 50, nodeRepulsion: () => 8000 }).run();
+    }
+    async function fetchData() {
+      try {
+        const r = await fetch('/api/governance/graph');
+        const d = await r.json();
+        document.getElementById('status').textContent = 'Polling (2s)';
+        document.getElementById('active').textContent = d.stats.active || 0;
+        document.getElementById('blocked').textContent = d.stats.blocked || 0;
+        document.getElementById('banned').textContent = d.stats.banned || 0;
+        document.getElementById('hits').textContent = d.stats.bannedHits || 0;
+        document.getElementById('empty').style.display = d.nodes.length ? 'none' : 'block';
+        if (d.nodes.length && cy.nodes().length !== d.nodes.length) {
+          cy.elements().remove();
+          d.nodes.forEach(n => cy.add({ group: 'nodes', data: { id: n.data.id, label: n.data.label, depth: n.data.depth || 0 }}));
+          d.edges.forEach(e => cy.add({ group: 'edges', data: { id: e.data.id, source: e.data.source, target: e.data.target }}));
+          runLayout();
+        }
+      } catch(e) { document.getElementById('status').textContent = 'Error'; }
+    }
+    fetchData();
+    setInterval(fetchData, 2000);
+  </script>
+</body>
+</html>`;
+}
 
 // Serve static assets from /dashboard/assets/*
 app.use('/dashboard/assets', express.static(path.join(__dirname, 'public', 'assets')));
