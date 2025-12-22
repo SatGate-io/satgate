@@ -1,7 +1,7 @@
 {
-  "name": "satgate-sdk",
-  "version": "0.1.0",
-  "description": "JavaScript SDK for SatGate - Stripe for AI Agents. Auto-handles L402 payment loops.",
+  "name": "@satgate/sdk",
+  "version": "0.2.0",
+  "description": "JavaScript SDK for SatGate - Automatic L402 payments for AI Agents. The Stripe Moment.",
   "main": "src/index.js",
   "module": "src/index.js",
   "type": "module",
@@ -17,7 +17,7 @@
     "README.md"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test/manual-test.js"
   },
   "keywords": [
     "satgate",
@@ -30,7 +30,9 @@
     "ai-agents",
     "langchain",
     "webln",
-    "payments"
+    "payments",
+    "stripe",
+    "autonomous-agents"
   ],
   "author": "SatGate <contact@satgate.io>",
   "license": "MIT",
@@ -43,6 +45,8 @@
     "url": "https://github.com/SatGate-io/satgate/issues"
   },
   "homepage": "https://satgate.io",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {}
 }
-
