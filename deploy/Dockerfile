@@ -7,6 +7,7 @@ WORKDIR /app/backend
 COPY deploy/package.json ./
 RUN npm install --production
 COPY proxy/server.js ./
+COPY proxy/public ./public
 
 # -------------------------------------------
 FROM ubuntu:22.04
