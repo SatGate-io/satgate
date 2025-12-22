@@ -35,6 +35,9 @@ RUN npm install --omit=dev --no-audit --no-fund
 # Copy backend source
 COPY proxy/server.js /app/backend/server.js
 
+# Copy dashboard UI
+COPY proxy/public /app/backend/public
+
 # Copy configs
 WORKDIR /app
 COPY deploy/aperture.cloud.yaml /app/aperture.yaml
