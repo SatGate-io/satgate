@@ -439,41 +439,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// Simple in-memory rate limiter (use Redis in production cluster)
-const rateLimitStore = new Map();
-app.use((req, res, next) => {
-  const ip = req.ip || req.connection.remoteAddress;
-  const now = Date.now();
-  const windowStart = now - config.rateLimitWindow;
-  
-  let record = rateLimitStore.get(ip);
-  if (!record || record.windowStart < windowStart) {
-    record = { windowStart: now, count: 0 };
-  }
-  record.count++;
-  rateLimitStore.set(ip, record);
-  
-  res.setHeader('X-RateLimit-Limit', config.rateLimitMax);
-  res.setHeader('X-RateLimit-Remaining', Math.max(0, config.rateLimitMax - record.count));
-  
-  if (record.count > config.rateLimitMax) {
-    return res.status(429).json({ 
-      error: 'Too many requests', 
-      retryAfter: Math.ceil((record.windowStart + config.rateLimitWindow - now) / 1000)
-    });
-  }
-  next();
-});
-
-// Cleanup old rate limit entries every 5 minutes
-setInterval(() => {
-  const cutoff = Date.now() - config.rateLimitWindow;
-  for (const [ip, record] of rateLimitStore) {
-    if (record.windowStart < cutoff) {
-      rateLimitStore.delete(ip);
-    }
-  }
-}, 5 * 60 * 1000);
+// Note: Rate limiting is now handled by the rateLimit() middleware defined at the top of this file.
+// Admin endpoints use adminRateLimit (30/min), API endpoints use apiRateLimit (300/min).
 
 // =============================================================================
 // HEALTH & MONITORING ENDPOINTS
