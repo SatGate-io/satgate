@@ -1266,7 +1266,19 @@ app.get('/', (req, res) => {
 
 // Serve dashboard index.html at /dashboard
 app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  const dashboardPath = path.join(__dirname, 'public', 'index.html');
+  console.log(`[DASHBOARD] Serving from: ${dashboardPath}`);
+  
+  res.sendFile(dashboardPath, (err) => {
+    if (err) {
+      console.error(`[DASHBOARD] Error serving file:`, err.message);
+      res.status(404).json({
+        error: 'Dashboard not found',
+        path: dashboardPath,
+        hint: 'The public folder may not be deployed. Check Docker build.'
+      });
+    }
+  });
 });
 
 // Serve static assets from /dashboard/assets/*
