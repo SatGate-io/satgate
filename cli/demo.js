@@ -24,7 +24,7 @@ const crypto = require('crypto');
 const readline = require('readline');
 
 // Configuration
-const DEFAULT_API_URL = process.env.SATGATE_API_URL || 'https://l402-aperture-kit-production.up.railway.app';
+const DEFAULT_API_URL = process.env.SATGATE_API_URL || 'https://satgate-production.up.railway.app';
 const ADMIN_TOKEN = process.env.SATGATE_ADMIN_TOKEN || '';
 
 // ANSI colors
