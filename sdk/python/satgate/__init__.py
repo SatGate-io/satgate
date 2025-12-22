@@ -47,7 +47,7 @@ from .client import (
     L402ParseError,
 )
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 # Optional LangChain integration (only if langchain is installed)
 try:
