@@ -754,12 +754,22 @@ const isL402Auth = (req) => {
   return auth.toLowerCase().startsWith('l402') || auth.toLowerCase().startsWith('lsat');
 };
 
+// Middleware to track L402 paid requests
+// Call this on paid tier endpoints to record revenue
+const trackPaidRequest = (tier, priceSats) => (req, res, next) => {
+  if (isL402Auth(req)) {
+    telemetry.recordPaidRequest(tier, priceSats);
+    console.log(`[L402] Paid request: ${tier} tier, ${priceSats} sats`);
+  }
+  next();
+};
+
 // ---------------------------------------------------------------------------
 // PREMIUM TIER - 1000 sats ($1.00) per request
 // ---------------------------------------------------------------------------
 
-// Premium AI insights endpoint
-app.get('/api/premium/insights', (req, res) => {
+// Premium AI insights endpoint (1000 sats)
+app.get('/api/premium/insights', trackPaidRequest('premium', 1000), (req, res) => {
   res.json({
     ok: true,
     tier: 'premium',
@@ -784,8 +794,8 @@ app.get('/api/premium/insights', (req, res) => {
   });
 });
 
-// Premium data export endpoint
-app.get('/api/premium/export', (req, res) => {
+// Premium data export endpoint (1000 sats)
+app.get('/api/premium/export', trackPaidRequest('premium', 1000), (req, res) => {
   res.json({
     ok: true,
     tier: 'premium',
@@ -808,8 +818,8 @@ app.get('/api/premium/export', (req, res) => {
 // STANDARD TIER - 100 sats ($0.10) per request
 // ---------------------------------------------------------------------------
 
-// Standard analytics endpoint
-app.get('/api/standard/analytics', (req, res) => {
+// Standard analytics endpoint (100 sats)
+app.get('/api/standard/analytics', trackPaidRequest('standard', 100), (req, res) => {
   res.json({
     ok: true,
     tier: 'standard',
@@ -841,8 +851,8 @@ app.get('/api/standard/analytics', (req, res) => {
   });
 });
 
-// Standard metrics endpoint
-app.get('/api/standard/metrics', (req, res) => {
+// Standard metrics endpoint (100 sats)
+app.get('/api/standard/metrics', trackPaidRequest('standard', 100), (req, res) => {
   res.json({
     ok: true,
     tier: 'standard',
@@ -873,8 +883,8 @@ app.get('/api/standard/metrics', (req, res) => {
 // BASIC TIER - 10 sats ($0.01) per request
 // ---------------------------------------------------------------------------
 
-// Basic status endpoint
-app.get('/api/basic/status', (req, res) => {
+// Basic status endpoint (10 sats)
+app.get('/api/basic/status', trackPaidRequest('basic', 10), (req, res) => {
   res.json({
     ok: true,
     tier: 'basic',
@@ -894,8 +904,8 @@ app.get('/api/basic/status', (req, res) => {
   });
 });
 
-// Basic quote endpoint
-app.get('/api/basic/quote', (req, res) => {
+// Basic quote endpoint (10 sats)
+app.get('/api/basic/quote', trackPaidRequest('basic', 10), (req, res) => {
   const quotes = [
     { text: "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks", author: "Satoshi Nakamoto" },
     { text: "Bitcoin is a technological tour de force.", author: "Bill Gates" },
@@ -1326,8 +1336,8 @@ curl -X POST -H "Authorization: Bearer ${childToken.substring(0, 40)}..." \\
 // ---------------------------------------------------------------------------
 // True micropayments - the absolute minimum viable price
 
-// Micro ping endpoint
-app.get('/api/micro/ping', (req, res) => {
+// Micro ping endpoint (1 sat)
+app.get('/api/micro/ping', trackPaidRequest('micro', 1), (req, res) => {
   res.json({
     ok: true,
     tier: 'micro',
@@ -1343,8 +1353,8 @@ app.get('/api/micro/ping', (req, res) => {
   });
 });
 
-// Micro data endpoint
-app.get('/api/micro/data', (req, res) => {
+// Micro data endpoint (1 sat)
+app.get('/api/micro/data', trackPaidRequest('micro', 1), (req, res) => {
   res.json({
     ok: true,
     tier: 'micro',
