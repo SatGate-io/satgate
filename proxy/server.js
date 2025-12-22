@@ -1,6 +1,35 @@
 /* backend/server.js
  * SatGate - Lightning-powered API access control
  * Production backend that sits behind Aperture for L402 authentication
+ * 
+ * SECURITY MODEL:
+ * ===============
+ * PUBLIC endpoints (no auth required):
+ *   - /health, /ready              - Health checks
+ *   - /api/free/*                  - Free tier APIs
+ *   - /api/governance/graph        - Public telemetry (read-only)
+ *   - /api/governance/stats        - Public stats (read-only)
+ *   - /dashboard                   - Governance dashboard (optionally protected)
+ * 
+ * ADMIN endpoints (require X-Admin-Token header):
+ *   - POST /api/governance/ban     - Ban a token (kill switch)
+ *   - POST /api/governance/unban   - Unban a token
+ *   - GET /api/governance/banned   - List all banned tokens
+ *   - POST /api/free/pricing       - Update pricing
+ * 
+ * L402 PROTECTED endpoints (require Lightning payment):
+ *   - /api/micro/*                 - 1 sat per request
+ *   - /api/basic/*                 - 10 sats per request
+ *   - /api/standard/*              - 100 sats per request
+ *   - /api/premium/*               - 1000 sats per request
+ * 
+ * CAPABILITY endpoints (require valid macaroon):
+ *   - /api/capability/*            - Macaroon-authenticated
+ * 
+ * Environment Variables:
+ *   PRICING_ADMIN_TOKEN    - Secret for admin endpoints (required in production)
+ *   DASHBOARD_PUBLIC       - Set to 'true' to allow public dashboard access
+ *   ADMIN_RATE_LIMIT       - Requests per minute for admin endpoints (default: 30)
  */
 const express = require('express');
 const os = require('os');
@@ -8,6 +37,100 @@ const path = require('path');
 const http = require('http');
 
 const app = express();
+
+// =============================================================================
+// RATE LIMITING (Simple in-memory, use Redis in production at scale)
+// =============================================================================
+
+const rateLimitStore = new Map();
+
+function rateLimit(options = {}) {
+  const { 
+    windowMs = 60000,           // 1 minute window
+    max = 30,                   // 30 requests per window
+    keyGenerator = (req) => req.ip || req.connection.remoteAddress,
+    message = 'Too many requests, please try again later'
+  } = options;
+
+  return (req, res, next) => {
+    const key = `ratelimit:${keyGenerator(req)}`;
+    const now = Date.now();
+    
+    let record = rateLimitStore.get(key);
+    if (!record || now - record.windowStart > windowMs) {
+      record = { count: 0, windowStart: now };
+    }
+    
+    record.count++;
+    rateLimitStore.set(key, record);
+    
+    // Cleanup old entries periodically
+    if (Math.random() < 0.01) {
+      for (const [k, v] of rateLimitStore) {
+        if (now - v.windowStart > windowMs * 2) rateLimitStore.delete(k);
+      }
+    }
+    
+    // Set rate limit headers
+    res.setHeader('X-RateLimit-Limit', max);
+    res.setHeader('X-RateLimit-Remaining', Math.max(0, max - record.count));
+    res.setHeader('X-RateLimit-Reset', Math.ceil((record.windowStart + windowMs) / 1000));
+    
+    if (record.count > max) {
+      return res.status(429).json({ 
+        error: message,
+        retryAfter: Math.ceil((record.windowStart + windowMs - now) / 1000)
+      });
+    }
+    
+    next();
+  };
+}
+
+// Admin endpoint rate limiter (stricter)
+const adminRateLimit = rateLimit({
+  windowMs: 60000,
+  max: parseInt(process.env.ADMIN_RATE_LIMIT || '30'),
+  keyGenerator: (req) => `admin:${req.ip}`,
+  message: 'Admin rate limit exceeded'
+});
+
+// General API rate limiter (more permissive)
+const apiRateLimit = rateLimit({
+  windowMs: 60000,
+  max: 300,
+  message: 'API rate limit exceeded'
+});
+
+// =============================================================================
+// AUDIT LOGGING
+// =============================================================================
+
+const auditLog = [];
+const MAX_AUDIT_LOG = 1000;
+
+function logAdminAction(action, details, req) {
+  const entry = {
+    timestamp: new Date().toISOString(),
+    action,
+    details,
+    ip: req.ip || req.connection.remoteAddress,
+    userAgent: req.get('user-agent'),
+  };
+  
+  auditLog.unshift(entry);
+  if (auditLog.length > MAX_AUDIT_LOG) auditLog.pop();
+  
+  console.log(`[AUDIT] ${action}:`, JSON.stringify(details));
+  
+  // Persist to Redis if available
+  if (redis) {
+    redis.lpush('satgate:audit', JSON.stringify(entry)).catch(() => {});
+    redis.ltrim('satgate:audit', 0, MAX_AUDIT_LOG - 1).catch(() => {});
+  }
+}
+
+// Note: Audit endpoint defined after requirePricingAdmin middleware at /api/governance/audit
 
 // =============================================================================
 // REDIS + WEBSOCKET SETUP (Optional - falls back to in-memory)
@@ -1187,20 +1310,31 @@ app.get('/api/governance/stats', async (req, res) => {
 });
 
 // KILL SWITCH: Ban a token (The "Panic Button")
-app.post('/api/governance/ban', requirePricingAdmin, async (req, res) => {
+// Protected by: admin auth + rate limiting + audit logging
+app.post('/api/governance/ban', adminRateLimit, requirePricingAdmin, async (req, res) => {
   const { tokenSignature, reason } = req.body;
   
+  // Input validation
   if (!tokenSignature) {
+    logAdminAction('BAN_FAILED', { error: 'Missing tokenSignature' }, req);
     return res.status(400).json({ 
       error: 'Missing tokenSignature',
       hint: 'Provide the token signature (hex) to ban'
     });
   }
   
-  // Normalize: accept both full signature and short form
+  // Validate signature format (should be hex)
   const sig = tokenSignature.replace('...', '');
+  if (!/^[a-fA-F0-9]+$/.test(sig)) {
+    logAdminAction('BAN_FAILED', { error: 'Invalid signature format', provided: sig.substring(0, 20) }, req);
+    return res.status(400).json({
+      error: 'Invalid tokenSignature format',
+      hint: 'Token signature must be a hex string'
+    });
+  }
   
   if (await bannedTokens.has(sig)) {
+    logAdminAction('BAN_DUPLICATE', { tokenSignature: sig.substring(0, 16) }, req);
     return res.json({
       ok: true,
       message: 'Token was already banned',
@@ -1209,6 +1343,10 @@ app.post('/api/governance/ban', requirePricingAdmin, async (req, res) => {
   }
   
   await bannedTokens.add(sig);
+  logAdminAction('BAN_SUCCESS', { 
+    tokenSignature: sig.substring(0, 16), 
+    reason: reason || 'Not specified' 
+  }, req);
   console.log(`[KILL SWITCH] 🚨 Token banned: ${sig.substring(0, 16)}... Reason: ${reason || 'Not specified'}`);
   
   const totalBanned = await bannedTokens.size();
@@ -1223,16 +1361,19 @@ app.post('/api/governance/ban', requirePricingAdmin, async (req, res) => {
 });
 
 // KILL SWITCH: Unban a token
-app.post('/api/governance/unban', requirePricingAdmin, async (req, res) => {
+// Protected by: admin auth + rate limiting + audit logging
+app.post('/api/governance/unban', adminRateLimit, requirePricingAdmin, async (req, res) => {
   const { tokenSignature } = req.body;
   
   if (!tokenSignature) {
+    logAdminAction('UNBAN_FAILED', { error: 'Missing tokenSignature' }, req);
     return res.status(400).json({ error: 'Missing tokenSignature' });
   }
   
   const sig = tokenSignature.replace('...', '');
   
   if (!(await bannedTokens.has(sig))) {
+    logAdminAction('UNBAN_NOT_FOUND', { tokenSignature: sig.substring(0, 16) }, req);
     return res.json({
       ok: true,
       message: 'Token was not banned',
@@ -1241,6 +1382,7 @@ app.post('/api/governance/unban', requirePricingAdmin, async (req, res) => {
   }
   
   await bannedTokens.delete(sig);
+  logAdminAction('UNBAN_SUCCESS', { tokenSignature: sig.substring(0, 16) }, req);
   console.log(`[KILL SWITCH] ✅ Token unbanned: ${sig.substring(0, 16)}...`);
   
   const totalBanned = await bannedTokens.size();
@@ -1253,7 +1395,10 @@ app.post('/api/governance/unban', requirePricingAdmin, async (req, res) => {
 });
 
 // List all banned tokens (admin only)
-app.get('/api/governance/banned', requirePricingAdmin, async (req, res) => {
+// Protected by: admin auth + rate limiting
+app.get('/api/governance/banned', adminRateLimit, requirePricingAdmin, async (req, res) => {
+  logAdminAction('LIST_BANNED', { count: await bannedTokens.size() }, req);
+  
   const allBanned = await bannedTokens.all();
   const banned = allBanned.map(sig => ({
     signature: sig.substring(0, 16) + '...',
@@ -1265,6 +1410,28 @@ app.get('/api/governance/banned', requirePricingAdmin, async (req, res) => {
     count: banned.length,
     bannedTokens: banned
   });
+});
+
+// Get admin audit log
+// Protected by: admin auth + rate limiting
+app.get('/api/governance/audit', adminRateLimit, requirePricingAdmin, async (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 100, MAX_AUDIT_LOG);
+  
+  let logs = auditLog.slice(0, limit);
+  
+  // Try to get from Redis for persistence
+  if (redis) {
+    try {
+      const redisLogs = await redis.lrange('satgate:audit', 0, limit - 1);
+      if (redisLogs.length > 0) {
+        logs = redisLogs.map(l => JSON.parse(l));
+      }
+    } catch (e) {
+      // Fall back to in-memory
+    }
+  }
+  
+  res.json({ ok: true, count: logs.length, logs });
 });
 
 // -----------------------------------------------------------------------------
