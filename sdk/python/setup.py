@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="satgate",
-    version="0.2.0",
+    version="0.3.0",
     description="Python SDK for SatGate - Automatic L402 payments for AI Agents. The Stripe Moment.",
     long_description=open("README.md").read() if __import__("os").path.exists("README.md") else "",
     long_description_content_type="text/markdown",
@@ -19,7 +19,16 @@ setup(
         "requests>=2.25.0",
     ],
     extras_require={
-        "langchain": ["langchain>=0.1.0", "pydantic>=2.0.0"],
+        "langchain": [
+            "langchain>=0.1.0",
+            "langchain-core>=0.1.0",
+            "pydantic>=2.0.0",
+        ],
+        "openai": [
+            "langchain>=0.1.0",
+            "langchain-openai>=0.0.5",
+            "pydantic>=2.0.0",
+        ],
         "dev": ["pytest", "responses", "flask"],
     },
     python_requires=">=3.8",
@@ -35,7 +44,8 @@ setup(
         "Programming Language :: Python :: 3.12",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Software Development :: Libraries :: Python Modules",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
-    keywords="l402 lightning bitcoin micropayments api ai agents langchain",
+    keywords="l402 lightning bitcoin micropayments api ai agents langchain openai gpt",
 )
 

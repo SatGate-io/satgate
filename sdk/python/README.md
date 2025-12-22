@@ -128,16 +128,71 @@ client = SatGateClient(wallet, verbose=False)
 
 ## LangChain Integration
 
+SatGate includes a ready-to-use LangChain tool for AI agents.
+
+### Installation
+
+```bash
+pip install satgate langchain langchain-openai
+```
+
+### Basic Usage
+
 ```python
-from satgate.langchain_integrations import SatGateTool
-from langchain.agents import initialize_agent
+from satgate import SatGateTool, LNBitsWallet
+from langchain.agents import initialize_agent, AgentType
+from langchain_openai import ChatOpenAI
 
-# Give your agent a wallet
-tools = [SatGateTool(wallet=my_wallet)]
-agent = initialize_agent(tools, llm, agent="openai-functions")
+# 1. Configure wallet
+wallet = LNBitsWallet(
+    url="https://legend.lnbits.com",
+    admin_key="your-admin-key"
+)
 
-# Let it roam the paid API economy
-agent.run("Fetch the premium market report from AlphaVantage")
+# 2. Create the tool
+satgate_tool = SatGateTool(wallet=wallet)
+
+# 3. Build agent
+llm = ChatOpenAI(model="gpt-4", temperature=0)
+agent = initialize_agent(
+    tools=[satgate_tool],
+    llm=llm,
+    agent=AgentType.OPENAI_FUNCTIONS,
+    verbose=True
+)
+
+# 4. Let it pay for premium data
+result = agent.run("Fetch the premium market analysis from the paid API at https://api.example.com/premium/report")
+```
+
+### How It Works
+
+The `SatGateTool` gives your AI agent the ability to:
+1. Access any L402-protected API
+2. Automatically pay Lightning invoices
+3. Cache tokens for repeated access
+4. Handle the entire 402 → Pay → Retry flow
+
+### Tool Description (for the LLM)
+
+```
+Tool: satgate_api_browser
+Description: Useful for fetching data from paid/premium APIs that require 
+Lightning Network payments. Use this tool when you need to access high-value 
+data, reports, or analytics that are behind a paywall. The tool handles 
+payment automatically.
+
+Input: The full URL of the premium API endpoint to fetch data from.
+```
+
+### Example Agent Prompt
+
+```python
+agent.run("""
+You are a financial analyst assistant. 
+Use the satgate_api_browser tool to fetch premium market data.
+Then summarize the key insights.
+""")
 ```
 
 ## Error Handling
