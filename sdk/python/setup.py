@@ -2,8 +2,8 @@ from setuptools import setup, find_packages
 
 setup(
     name="satgate",
-    version="0.1.0",
-    description="Python SDK for SatGate - Stripe for AI Agents. L402 micropayments for APIs.",
+    version="0.2.0",
+    description="Python SDK for SatGate - Automatic L402 payments for AI Agents. The Stripe Moment.",
     long_description=open("README.md").read() if __import__("os").path.exists("README.md") else "",
     long_description_content_type="text/markdown",
     author="SatGate Team",

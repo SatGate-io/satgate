@@ -9,6 +9,101 @@ const path = require('path');
 const app = express();
 
 // =============================================================================
+// GOVERNANCE: Kill Switch & Telemetry
+// =============================================================================
+// The "Negative Cache" - we don't track valid tokens (stateless),
+// but we DO track banned tokens (small stateful blocklist).
+// This answers the CISO question: "How do I revoke a compromised token?"
+
+const bannedTokens = new Set();  // Token signatures/IDs that are revoked
+
+// Telemetry: Track active tokens observed in traffic (for dashboard)
+const telemetry = {
+  activeTokens: new Map(),  // signature -> { lastSeen, ip, depth, constraints }
+  blockedCount: 0,          // 402/403 blocks (Economic Firewall metric)
+  bannedHits: 0,            // Requests blocked by Kill Switch
+  
+  recordBlock: function() {
+    this.blockedCount++;
+  },
+  
+  recordBannedHit: function() {
+    this.bannedHits++;
+  },
+  
+  recordUsage: function(tokenSignature, caveats, ip) {
+    const now = Date.now();
+    const depth = caveats.length;  // Heuristic: more caveats = deeper delegation
+    
+    this.activeTokens.set(tokenSignature, {
+      id: tokenSignature.substring(0, 12) + '...',
+      fullSignature: tokenSignature,
+      lastSeen: now,
+      ip: ip,
+      depth: depth,
+      constraints: caveats,
+      status: bannedTokens.has(tokenSignature) ? 'BANNED' : 'ACTIVE'
+    });
+    
+    // Cleanup: remove tokens not seen in 10 minutes
+    const cutoff = now - (10 * 60 * 1000);
+    for (const [sig, data] of this.activeTokens) {
+      if (data.lastSeen < cutoff) {
+        this.activeTokens.delete(sig);
+      }
+    }
+  },
+  
+  getGraphData: function() {
+    const nodes = [];
+    const edges = [];
+    
+    const sortedTokens = Array.from(this.activeTokens.values())
+      .sort((a, b) => a.depth - b.depth);
+    
+    sortedTokens.forEach((token, index) => {
+      nodes.push({
+        group: 'nodes',
+        data: {
+          id: token.fullSignature,
+          label: `Token (Depth ${token.depth})`,
+          constraints: token.constraints,
+          lastSeen: new Date(token.lastSeen).toLocaleTimeString(),
+          depth: token.depth,
+          status: token.status
+        }
+      });
+      
+      // Heuristic linking: connect deeper tokens to shallower ones
+      if (token.depth > 0) {
+        const possibleParent = sortedTokens.find(t => t.depth === token.depth - 1);
+        if (possibleParent) {
+          edges.push({
+            group: 'edges',
+            data: {
+              id: `e-${token.fullSignature}`,
+              source: possibleParent.fullSignature,
+              target: token.fullSignature
+            }
+          });
+        }
+      }
+    });
+    
+    return {
+      nodes,
+      edges,
+      stats: {
+        active: this.activeTokens.size,
+        blocked: this.blockedCount,
+        banned: bannedTokens.size,
+        bannedHits: this.bannedHits
+      }
+    };
+  }
+};
+
+// =============================================================================
 // CONFIGURATION
 // =============================================================================
 const config = {
@@ -512,6 +607,18 @@ app.use('/api/capability', (req, res, next) => {
     const tokenBytes = Buffer.from(tokenBase64, 'base64');
     const m = macaroon.importMacaroon(tokenBytes);
     
+    // KILL SWITCH: Check if token is banned
+    const tokenSignature = Buffer.from(m._signature).toString('hex');
+    if (bannedTokens.has(tokenSignature)) {
+      console.log(`[KILL SWITCH] 🛑 Blocked banned token: ${tokenSignature.substring(0, 16)}...`);
+      telemetry.recordBannedHit();
+      return res.status(403).json({
+        error: 'Token Revoked',
+        reason: 'This token has been banned by an administrator',
+        code: 'TOKEN_BANNED'
+      });
+    }
+    
     // Verify signature with root key
     const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
     const now = Date.now();
@@ -617,8 +724,13 @@ app.use('/api/capability', (req, res, next) => {
       caveats,
       identifier,
       requiredScope,
-      validatedAt: new Date().toISOString()
+      validatedAt: new Date().toISOString(),
+      tokenSignature: tokenSignature
     };
+    
+    // TELEMETRY: Record this token usage for governance dashboard
+    const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
+    telemetry.recordUsage(tokenSignature, caveats, clientIp);
     
     console.log(`[CAPABILITY] ✓ Valid token with scope for ${req.path}`);
     next();
@@ -888,6 +1000,104 @@ app.get('/api/micro/data', (req, res) => {
   });
 });
 
+// =============================================================================
+// GOVERNANCE ENDPOINTS - Kill Switch & Dashboard API
+// =============================================================================
+
+// Get governance graph data (for dashboard visualization)
+app.get('/api/governance/graph', (req, res) => {
+  const graphData = telemetry.getGraphData();
+  res.json(graphData);
+});
+
+// Get governance stats (quick summary)
+app.get('/api/governance/stats', (req, res) => {
+  const data = telemetry.getGraphData();
+  res.json({
+    ok: true,
+    stats: data.stats,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// KILL SWITCH: Ban a token (The "Panic Button")
+app.post('/api/governance/ban', requirePricingAdmin, (req, res) => {
+  const { tokenSignature, reason } = req.body;
+  
+  if (!tokenSignature) {
+    return res.status(400).json({ 
+      error: 'Missing tokenSignature',
+      hint: 'Provide the token signature (hex) to ban'
+    });
+  }
+  
+  // Normalize: accept both full signature and short form
+  const sig = tokenSignature.replace('...', '');
+  
+  if (bannedTokens.has(sig)) {
+    return res.json({
+      ok: true,
+      message: 'Token was already banned',
+      tokenSignature: sig.substring(0, 16) + '...'
+    });
+  }
+  
+  bannedTokens.add(sig);
+  console.log(`[KILL SWITCH] 🚨 Token banned: ${sig.substring(0, 16)}... Reason: ${reason || 'Not specified'}`);
+  
+  res.json({
+    ok: true,
+    message: 'Token banned successfully',
+    tokenSignature: sig.substring(0, 16) + '...',
+    reason: reason || 'Not specified',
+    totalBanned: bannedTokens.size,
+    note: 'Token will be rejected on next use. Active sessions using this token will fail.'
+  });
+});
+
+// KILL SWITCH: Unban a token
+app.post('/api/governance/unban', requirePricingAdmin, (req, res) => {
+  const { tokenSignature } = req.body;
+  
+  if (!tokenSignature) {
+    return res.status(400).json({ error: 'Missing tokenSignature' });
+  }
+  
+  const sig = tokenSignature.replace('...', '');
+  
+  if (!bannedTokens.has(sig)) {
+    return res.json({
+      ok: true,
+      message: 'Token was not banned',
+      tokenSignature: sig.substring(0, 16) + '...'
+    });
+  }
+  
+  bannedTokens.delete(sig);
+  console.log(`[KILL SWITCH] ✅ Token unbanned: ${sig.substring(0, 16)}...`);
+  
+  res.json({
+    ok: true,
+    message: 'Token unbanned successfully',
+    tokenSignature: sig.substring(0, 16) + '...',
+    totalBanned: bannedTokens.size
+  });
+});
+
+// List all banned tokens (admin only)
+app.get('/api/governance/banned', requirePricingAdmin, (req, res) => {
+  const banned = Array.from(bannedTokens).map(sig => ({
+    signature: sig.substring(0, 16) + '...',
+    fullSignature: sig
+  }));
+  
+  res.json({
+    ok: true,
+    count: banned.length,
+    bannedTokens: banned
+  });
+});
+
 // -----------------------------------------------------------------------------
 // Root (API-only) landing
 // -----------------------------------------------------------------------------
@@ -899,7 +1109,8 @@ app.get('/', (req, res) => {
       health: '/health',
       freePing: '/api/free/ping',
       pricing: '/api/free/pricing',
-      l402Example: '/api/micro/ping'
+      l402Example: '/api/micro/ping',
+      governance: '/api/governance/graph'
     },
     playground: 'https://satgate.io/playground'
   });

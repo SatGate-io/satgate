@@ -1,9 +1,8 @@
 # SatGate Python SDK
 
-**Stripe for AI Agents** — L402 micropayments for APIs.
+**Give your AI agents a Lightning wallet in 2 lines of code.**
 
-[![PyPI version](https://badge.fury.io/py/satgate.svg)](https://pypi.org/project/satgate/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+Automatic L402 payment handling — the "Stripe Moment" for autonomous agents.
 
 ## Installation
 
@@ -11,69 +10,176 @@
 pip install satgate
 ```
 
-For LangChain integration:
-
-```bash
-pip install satgate[langchain]
-```
-
 ## Quick Start
 
 ```python
-from satgate import SatGateSession, LightningWallet
+from satgate import SatGateClient, LNBitsWallet
 
-# Implement your wallet (or use a library like lndgrpc, pyln-client)
+# 1. Connect your wallet
+wallet = LNBitsWallet(
+    url="https://legend.lnbits.com",
+    admin_key="your-admin-key"
+)
+
+# 2. Create client
+client = SatGateClient(wallet)
+
+# 3. That's it. 402 → Pay → Retry happens automatically.
+response = client.get("https://api.example.com/premium/data")
+print(response.json())
+```
+
+## What Happens Under the Hood
+
+```
+1. GET /premium/data
+   ↓
+2. Server returns 402 + Lightning Invoice
+   ↓
+3. SDK automatically pays invoice
+   ↓
+4. SDK retries with L402 token
+   ↓
+5. You get the response ✓
+```
+
+## Wallet Options
+
+### LNBits
+
+```python
+from satgate import LNBitsWallet
+
+wallet = LNBitsWallet(
+    url="https://legend.lnbits.com",  # or your own instance
+    admin_key="your-admin-key"
+)
+```
+
+### Alby
+
+```python
+from satgate import AlbyWallet
+
+wallet = AlbyWallet(access_token="your-alby-token")
+```
+
+### Custom Wallet
+
+Implement the `LightningWallet` interface:
+
+```python
+from satgate import LightningWallet
+
 class MyWallet(LightningWallet):
     def pay_invoice(self, invoice: str) -> str:
-        # Pay the invoice and return the preimage
-        return your_lightning_node.pay(invoice)
+        # Connect to your LND, CLN, etc.
+        preimage = my_node.pay(invoice)
+        return preimage  # hex string
+```
 
-# Create a session that auto-pays 402 responses
-session = SatGateSession(wallet=MyWallet())
+## Features
 
-# Use like requests - payments happen automatically!
-response = session.get("https://api.example.com/premium/data")
-print(response.json())
+### Token Caching
+
+Tokens are cached by default to avoid paying twice:
+
+```python
+client = SatGateClient(wallet, cache_tokens=True, cache_ttl=3600)
+
+# First call: pays invoice
+client.get("/premium")
+
+# Second call: uses cached token (no payment)
+client.get("/premium")
+```
+
+### Payment Callbacks
+
+Track payments in real-time:
+
+```python
+def on_payment(info):
+    print(f"Paid {info.amount_sats} sats for {info.endpoint}")
+    # Log to your analytics, update UI, etc.
+
+client = SatGateClient(wallet, on_payment=on_payment)
+```
+
+### Session Tracking
+
+```python
+client = SatGateClient(wallet)
+
+# Make some requests...
+client.get("/endpoint1")
+client.get("/endpoint2")
+
+print(f"Total spent: {client.total_paid_sats} sats")
+```
+
+### Quiet Mode
+
+Disable console output:
+
+```python
+client = SatGateClient(wallet, verbose=False)
 ```
 
 ## LangChain Integration
 
 ```python
-from satgate import SatGateTool
+from satgate.langchain_integrations import SatGateTool
+from langchain.agents import initialize_agent
 
-# Create a tool your AI agent can use
-tool = SatGateTool(wallet=MyWallet())
+# Give your agent a wallet
+tools = [SatGateTool(wallet=my_wallet)]
+agent = initialize_agent(tools, llm, agent="openai-functions")
 
-# Add to your LangChain agent
-agent = initialize_agent(
-    tools=[tool],
-    llm=ChatOpenAI(),
-    agent=AgentType.OPENAI_FUNCTIONS
-)
-
-# The agent can now access paid APIs automatically!
-agent.run("Fetch premium market data from https://api.example.com/insights")
+# Let it roam the paid API economy
+agent.run("Fetch the premium market report from AlphaVantage")
 ```
 
-## How It Works
+## Error Handling
 
-1. Your code makes a request to a paid API
-2. The API returns `402 Payment Required` with a Lightning invoice
-3. SatGate automatically pays the invoice via your wallet
-4. The request is retried with the L402 token
-5. You get your data ✨
+```python
+from satgate import PaymentError, L402ParseError
 
-## Links
+try:
+    response = client.get("/premium")
+except PaymentError as e:
+    print(f"Payment failed: {e}")
+except L402ParseError as e:
+    print(f"Invalid L402 response: {e}")
+```
 
-- 🌐 Website: [satgate.io](https://satgate.io)
-- 📖 Playground: [satgate.io/playground](https://satgate.io/playground)
-- 💻 GitHub: [github.com/SatGate-io/satgate](https://github.com/SatGate-io/satgate)
-- 📧 Contact: contact@satgate.io
+## API Reference
+
+### SatGateClient / SatGateSession
+
+```python
+SatGateClient(
+    wallet: LightningWallet,      # Required: wallet for payments
+    cache_tokens: bool = True,    # Cache L402 tokens
+    cache_ttl: int = 3600,        # Cache TTL in seconds
+    on_payment: Callable = None,  # Payment callback
+    verbose: bool = True          # Print progress
+)
+```
+
+### PaymentInfo
+
+```python
+@dataclass
+class PaymentInfo:
+    invoice: str           # BOLT11 invoice
+    preimage: str          # Payment proof
+    macaroon: str          # L402 macaroon
+    amount_sats: int       # Amount paid
+    endpoint: str          # URL accessed
+    timestamp: float       # Unix timestamp
+```
 
 ## License
 
-MIT License - © 2025 SatGate. Patent Pending.
-
-
-
-
+MIT
