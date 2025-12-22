@@ -749,7 +749,7 @@ app.use('/api/capability', (req, res, next) => {
     const m = macaroon.importMacaroon(tokenBytes);
     
     // KILL SWITCH: Check if token is banned (uses sync in-memory check for speed)
-    const tokenSignature = Buffer.from(m._signature).toString('hex');
+    const tokenSignature = Buffer.from(m.signature).toString('hex');
     if (bannedTokens.hasSync(tokenSignature)) {
       console.log(`[KILL SWITCH] 🛑 Blocked banned token: ${tokenSignature.substring(0, 16)}...`);
       telemetry.recordBannedHit();
