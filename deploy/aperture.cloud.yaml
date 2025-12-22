@@ -59,7 +59,17 @@ services:
       - '^/api/capability/.*$'
       - '^/api/capability/demo/.*$'
 
-  # FREE TIER - Health checks and public endpoints
+  # GOVERNANCE - Dashboard and API (free for visibility)
+  - name: governance
+    hostregexp: ".*"
+    pathregexp: '^/api/governance($|/.*)$'
+    address: "127.0.0.1:8083"
+    protocol: http
+    price: 0
+    authwhitelistpaths:
+      - '^/api/governance/.*$'
+
+  # FREE TIER - Health checks, dashboard, and public endpoints
   - name: public
     hostregexp: ".*"
     pathregexp: '^/.*$'
@@ -67,10 +77,17 @@ services:
     protocol: http
     price: 0
     authwhitelistpaths:
+      # Health & Status
       - '^/health$'
       - '^/ready$'
+      # Free API endpoints
       - '^/api/free/.*$'
+      # Governance dashboard UI
+      - '^/dashboard.*$'
+      - '^/ws/governance$'
+      # Static assets
       - '^/$'
+      - '^/.*\.(css|js|png|jpg|ico|svg|woff|woff2|html)$'
 
 # LNC settings are passed via command line from environment variables
 
