@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SatGate // Governance Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    :root {
+      --bg-primary: #0a0e14;
+      --bg-secondary: #151b24;
+      --bg-tertiary: #1c2430;
+      --border: #2d3748;
+      --text-primary: #e2e8f0;
+      --text-secondary: #a0aec0;
+      --accent-green: #00ff9d;
+      --accent-red: #ff4757;
+      --accent-yellow: #ffc107;
+      --accent-cyan: #00d4ff;
+      --accent-purple: #b388ff;
+    }
+    
+    body {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-cyan) 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: var(--bg-primary);
+    }
+    
+    .logo-text {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    
+    .logo-text span {
+      color: var(--accent-green);
+    }
+    
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    .status-dot.connected {
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
+    }
+    
+    .status-dot.polling {
+      background: var(--accent-yellow);
+      box-shadow: 0 0 8px var(--accent-yellow);
+    }
+    
+    .status-dot.disconnected {
+      background: var(--accent-red);
+      animation: none;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* Main Layout */
+    .main {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      height: calc(100vh - 65px);
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      padding: 20px;
+      overflow-y: auto;
+    }
+    
+    .stats-grid {
+      display: grid;
+      gap: 16px;
+    }
+    
+    .stat-card {
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid var(--border);
+    }
+    
+    .stat-card h3 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    
+    .stat-card.active .stat-value {
+      color: var(--accent-green);
+    }
+    
+    .stat-card.blocked .stat-value {
+      color: var(--accent-red);
+    }
+    
+    .stat-card.banned .stat-value {
+      color: var(--accent-yellow);
+    }
+    
+    .stat-card.hits .stat-value {
+      color: var(--accent-purple);
+    }
+    
+    .stat-subtitle {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    
+    /* Token List */
+    .token-section {
+      margin-top: 24px;
+    }
+    
+    .token-section h3 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .token-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .token-item {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .token-item:hover {
+      border-color: var(--accent-cyan);
+      background: var(--bg-tertiary);
+    }
+    
+    .token-item.selected {
+      border-color: var(--accent-green);
+      box-shadow: 0 0 0 1px var(--accent-green);
+    }
+    
+    .token-id {
+      font-family: monospace;
+      color: var(--accent-cyan);
+    }
+    
+    .token-meta {
+      display: flex;
+      gap: 12px;
+      margin-top: 6px;
+      color: var(--text-secondary);
+    }
+    
+    /* Graph Container */
+    .graph-container {
+      position: relative;
+      background: var(--bg-primary);
+      background-image: 
+        radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0);
+      background-size: 40px 40px;
+    }
+    
+    #cy {
+      width: 100%;
+      height: 100%;
+    }
+    
+    /* Controls */
+    .graph-controls {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      gap: 8px;
+    }
+    
+    .control-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all 0.2s;
+    }
+    
+    .control-btn:hover {
+      background: var(--bg-tertiary);
+      border-color: var(--accent-cyan);
+    }
+    
+    /* Legend */
+    .graph-legend {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+    }
+    
+    .legend-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    
+    .legend-items {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+    }
+    
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    
+    .legend-dot.root { background: var(--accent-green); }
+    .legend-dot.child { background: var(--accent-cyan); }
+    .legend-dot.deep { background: var(--accent-purple); }
+    .legend-dot.banned { background: var(--accent-red); }
+    
+    /* Node Details Panel */
+    .node-details {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 280px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: none;
+    }
+    
+    .node-details.visible {
+      display: block;
+    }
+    
+    .node-details h4 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+    
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+    
+    .detail-label {
+      color: var(--text-secondary);
+    }
+    
+    .detail-value {
+      font-family: monospace;
+      color: var(--accent-cyan);
+    }
+    
+    /* Empty State */
+    .empty-state {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: var(--text-secondary);
+    }
+    
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    .empty-state-title {
+      font-size: 18px;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+    
+    .empty-state-desc {
+      font-size: 13px;
+      max-width: 300px;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">SAT<span>GATE</span> // Governance</div>
+    </div>
+    <div class="connection-status">
+      <div class="status-dot disconnected" id="statusDot"></div>
+      <span id="statusText">Connecting...</span>
+    </div>
+  </header>
+  
+  <main class="main">
+    <aside class="sidebar">
+      <div class="stats-grid">
+        <div class="stat-card active">
+          <h3>Active Agents</h3>
+          <div class="stat-value" id="activeCount">0</div>
+          <div class="stat-subtitle">Observed tokens in last 10m</div>
+        </div>
+        
+        <div class="stat-card blocked">
+          <h3>Economic Firewall</h3>
+          <div class="stat-value" id="blockedCount">0</div>
+          <div class="stat-subtitle">Unpaid requests blocked</div>
+        </div>
+        
+        <div class="stat-card banned">
+          <h3>Kill Switch</h3>
+          <div class="stat-value" id="bannedCount">0</div>
+          <div class="stat-subtitle">Tokens revoked</div>
+        </div>
+        
+        <div class="stat-card hits">
+          <h3>Revocation Hits</h3>
+          <div class="stat-value" id="bannedHitsCount">0</div>
+          <div class="stat-subtitle">Blocked by Kill Switch</div>
+        </div>
+      </div>
+      
+      <div class="token-section">
+        <h3>🔗 Active Tokens</h3>
+        <div class="token-list" id="tokenList">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </aside>
+    
+    <div class="graph-container">
+      <div id="cy"></div>
+      
+      <div class="graph-legend">
+        <div class="legend-title">Token Depth</div>
+        <div class="legend-items">
+          <div class="legend-item">
+            <div class="legend-dot root"></div>
+            <span>Root (Depth 0)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot child"></div>
+            <span>Delegated (Depth 1-2)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot deep"></div>
+            <span>Deep (Depth 3+)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot banned"></div>
+            <span>Banned</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="graph-controls">
+        <button class="control-btn" onclick="cy.fit()" title="Fit to view">⊞</button>
+        <button class="control-btn" onclick="runLayout()" title="Re-layout">↻</button>
+        <button class="control-btn" onclick="cy.zoom(cy.zoom() * 1.2)" title="Zoom in">+</button>
+        <button class="control-btn" onclick="cy.zoom(cy.zoom() / 1.2)" title="Zoom out">−</button>
+      </div>
+      
+      <div class="node-details" id="nodeDetails">
+        <h4>Token Details</h4>
+        <div id="nodeDetailsContent"></div>
+      </div>
+      
+      <div class="empty-state" id="emptyState">
+        <div class="empty-state-icon">📡</div>
+        <div class="empty-state-title">Awaiting Traffic</div>
+        <div class="empty-state-desc">
+          The governance graph will populate as tokens are observed in API traffic.
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ==========================================================================
+    // CYTOSCAPE INITIALIZATION (Force-Directed Layout)
+    // ==========================================================================
+    
+    const cy = cytoscape({
+      container: document.getElementById('cy'),
+      style: [
+        {
+          selector: 'node',
+          style: {
+            'background-color': '#00d4ff',
+            'border-width': 2,
+            'border-color': '#00d4ff',
+            'label': 'data(label)',
+            'color': '#e2e8f0',
+            'font-size': '10px',
+            'text-valign': 'bottom',
+            'text-margin-y': 8,
+            'width': 30,
+            'height': 30,
+            'text-background-color': '#0a0e14',
+            'text-background-opacity': 0.8,
+            'text-background-padding': '2px'
+          }
+        },
+        {
+          selector: 'node[depth = 0]',
+          style: {
+            'background-color': '#00ff9d',
+            'border-color': '#00ff9d',
+            'width': 45,
+            'height': 45,
+            'font-weight': 'bold',
+            'box-shadow': '0 0 15px #00ff9d'
+          }
+        },
+        {
+          selector: 'node[depth >= 1][depth <= 2]',
+          style: {
+            'background-color': '#00d4ff',
+            'border-color': '#00d4ff',
+            'width': 35,
+            'height': 35
+          }
+        },
+        {
+          selector: 'node[depth >= 3]',
+          style: {
+            'background-color': '#b388ff',
+            'border-color': '#b388ff',
+            'width': 28,
+            'height': 28
+          }
+        },
+        {
+          selector: 'node[status = "BANNED"]',
+          style: {
+            'background-color': '#ff4757',
+            'border-color': '#ff4757',
+            'border-width': 3
+          }
+        },
+        {
+          selector: 'edge',
+          style: {
+            'width': 2,
+            'line-color': '#2d3748',
+            'target-arrow-color': '#2d3748',
+            'target-arrow-shape': 'triangle',
+            'curve-style': 'bezier',
+            'arrow-scale': 0.8
+          }
+        },
+        {
+          selector: 'edge:selected',
+          style: {
+            'line-color': '#00ff9d',
+            'target-arrow-color': '#00ff9d'
+          }
+        },
+        {
+          selector: 'node:selected',
+          style: {
+            'border-color': '#ffc107',
+            'border-width': 4
+          }
+        }
+      ],
+      layout: { name: 'preset' },
+      minZoom: 0.3,
+      maxZoom: 3,
+      wheelSensitivity: 0.3
+    });
+    
+    // Node click handler - show details
+    cy.on('tap', 'node', function(evt) {
+      const node = evt.target;
+      const data = node.data();
+      showNodeDetails(data);
+    });
+    
+    cy.on('tap', function(evt) {
+      if (evt.target === cy) {
+        hideNodeDetails();
+      }
+    });
+    
+    // ==========================================================================
+    // FORCE-DIRECTED LAYOUT
+    // ==========================================================================
+    
+    function runLayout() {
+      if (cy.nodes().length === 0) return;
+      
+      cy.layout({
+        name: 'cose',
+        animate: true,
+        animationDuration: 500,
+        fit: true,
+        padding: 50,
+        nodeRepulsion: function(node) { return 8000; },
+        idealEdgeLength: function(edge) { return 100; },
+        edgeElasticity: function(edge) { return 100; },
+        nestingFactor: 0.1,
+        gravity: 0.25,
+        numIter: 100,
+        coolingFactor: 0.95,
+        minTemp: 1.0
+      }).run();
+    }
+    
+    // ==========================================================================
+    // DATA FETCHING & WEBSOCKET
+    // ==========================================================================
+    
+    let ws = null;
+    let pollingInterval = null;
+    let isWebSocketConnected = false;
+    
+    function updateConnectionStatus(status) {
+      const dot = document.getElementById('statusDot');
+      const text = document.getElementById('statusText');
+      
+      dot.className = 'status-dot ' + status;
+      
+      switch(status) {
+        case 'connected':
+          text.textContent = 'WebSocket Live';
+          break;
+        case 'polling':
+          text.textContent = 'Polling (2s)';
+          break;
+        case 'disconnected':
+          text.textContent = 'Disconnected';
+          break;
+      }
+    }
+    
+    function connectWebSocket() {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${protocol}//${window.location.host}/ws/governance`;
+      
+      try {
+        ws = new WebSocket(wsUrl);
+        
+        ws.onopen = function() {
+          console.log('[WS] Connected');
+          isWebSocketConnected = true;
+          updateConnectionStatus('connected');
+          
+          // Stop polling if it was running
+          if (pollingInterval) {
+            clearInterval(pollingInterval);
+            pollingInterval = null;
+          }
+        };
+        
+        ws.onmessage = function(event) {
+          const data = JSON.parse(event.data);
+          handleMessage(data);
+        };
+        
+        ws.onclose = function() {
+          console.log('[WS] Disconnected, falling back to polling');
+          isWebSocketConnected = false;
+          startPolling();
+        };
+        
+        ws.onerror = function(err) {
+          console.log('[WS] Error, falling back to polling');
+          isWebSocketConnected = false;
+          ws.close();
+        };
+      } catch (e) {
+        console.log('[WS] Not available, using polling');
+        startPolling();
+      }
+    }
+    
+    function startPolling() {
+      if (pollingInterval) return;
+      
+      updateConnectionStatus('polling');
+      
+      fetchData();
+      pollingInterval = setInterval(fetchData, 2000);
+    }
+    
+    async function fetchData() {
+      try {
+        const response = await fetch('/api/governance/graph');
+        const data = await response.json();
+        handleMessage({ type: 'init', ...data });
+      } catch (err) {
+        console.error('[Polling] Error:', err);
+        updateConnectionStatus('disconnected');
+      }
+    }
+    
+    function handleMessage(data) {
+      switch(data.type) {
+        case 'init':
+          updateGraph(data);
+          break;
+        case 'token':
+          addOrUpdateToken(data.data);
+          break;
+        case 'block':
+          updateStats({ blocked: data.total });
+          break;
+        case 'bannedHit':
+          updateStats({ bannedHits: data.total });
+          break;
+        case 'ban':
+        case 'unban':
+          fetchData(); // Refresh full state
+          break;
+      }
+    }
+    
+    // ==========================================================================
+    // GRAPH UPDATES
+    // ==========================================================================
+    
+    function updateGraph(data) {
+      const { nodes, edges, stats } = data;
+      
+      // Update stats
+      document.getElementById('activeCount').textContent = stats.active || 0;
+      document.getElementById('blockedCount').textContent = stats.blocked || 0;
+      document.getElementById('bannedCount').textContent = stats.banned || 0;
+      document.getElementById('bannedHitsCount').textContent = stats.bannedHits || 0;
+      
+      // Update token list
+      updateTokenList(nodes);
+      
+      // Toggle empty state
+      const emptyState = document.getElementById('emptyState');
+      emptyState.style.display = nodes.length === 0 ? 'block' : 'none';
+      
+      if (nodes.length === 0) return;
+      
+      // Build elements array for Cytoscape
+      const elements = [];
+      
+      nodes.forEach(n => {
+        elements.push({
+          group: 'nodes',
+          data: {
+            id: n.data.id,
+            label: n.data.label,
+            depth: n.data.depth || 0,
+            status: n.data.status || 'ACTIVE',
+            constraints: n.data.constraints || [],
+            lastSeen: n.data.lastSeen
+          }
+        });
+      });
+      
+      edges.forEach(e => {
+        elements.push({
+          group: 'edges',
+          data: {
+            id: e.data.id,
+            source: e.data.source,
+            target: e.data.target
+          }
+        });
+      });
+      
+      // Check if graph structure changed
+      const currentNodeIds = cy.nodes().map(n => n.id()).sort().join(',');
+      const newNodeIds = nodes.map(n => n.data.id).sort().join(',');
+      
+      if (currentNodeIds !== newNodeIds) {
+        // Structure changed - rebuild graph
+        cy.elements().remove();
+        cy.add(elements);
+        runLayout();
+      } else {
+        // Just update data
+        nodes.forEach(n => {
+          const node = cy.getElementById(n.data.id);
+          if (node.length) {
+            node.data(n.data);
+          }
+        });
+      }
+    }
+    
+    function addOrUpdateToken(tokenData) {
+      const existingNode = cy.getElementById(tokenData.fullSignature);
+      
+      if (existingNode.length) {
+        // Update existing node
+        existingNode.data({
+          label: `Token (Depth ${tokenData.depth})`,
+          depth: tokenData.depth,
+          status: tokenData.status,
+          lastSeen: new Date(tokenData.lastSeen).toLocaleTimeString()
+        });
+      } else {
+        // Add new node
+        cy.add({
+          group: 'nodes',
+          data: {
+            id: tokenData.fullSignature,
+            label: `Token (Depth ${tokenData.depth})`,
+            depth: tokenData.depth,
+            status: tokenData.status,
+            lastSeen: new Date(tokenData.lastSeen).toLocaleTimeString()
+          }
+        });
+        
+        // Re-run layout to position new node
+        runLayout();
+      }
+      
+      // Update empty state
+      document.getElementById('emptyState').style.display = 'none';
+      
+      // Update token list
+      fetchData(); // Simple approach - refresh full state
+    }
+    
+    function updateStats(partial) {
+      if (partial.blocked !== undefined) {
+        document.getElementById('blockedCount').textContent = partial.blocked;
+      }
+      if (partial.bannedHits !== undefined) {
+        document.getElementById('bannedHitsCount').textContent = partial.bannedHits;
+      }
+    }
+    
+    // ==========================================================================
+    // TOKEN LIST
+    // ==========================================================================
+    
+    function updateTokenList(nodes) {
+      const list = document.getElementById('tokenList');
+      
+      if (nodes.length === 0) {
+        list.innerHTML = '<div style="color: var(--text-secondary); font-size: 12px; padding: 12px;">No active tokens</div>';
+        return;
+      }
+      
+      list.innerHTML = nodes.map(n => {
+        const depth = n.data.depth || 0;
+        const status = n.data.status || 'ACTIVE';
+        const shortId = n.data.id.substring(0, 16) + '...';
+        
+        return `
+          <div class="token-item" onclick="focusNode('${n.data.id}')">
+            <div class="token-id">${shortId}</div>
+            <div class="token-meta">
+              <span>Depth: ${depth}</span>
+              <span>${status}</span>
+              <span>${n.data.lastSeen || ''}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function focusNode(id) {
+      const node = cy.getElementById(id);
+      if (node.length) {
+        cy.animate({
+          center: { eles: node },
+          zoom: 1.5
+        }, { duration: 300 });
+        
+        cy.nodes().unselect();
+        node.select();
+        showNodeDetails(node.data());
+      }
+    }
+    
+    // ==========================================================================
+    // NODE DETAILS PANEL
+    // ==========================================================================
+    
+    function showNodeDetails(data) {
+      const panel = document.getElementById('nodeDetails');
+      const content = document.getElementById('nodeDetailsContent');
+      
+      const shortId = data.id.substring(0, 24) + '...';
+      const constraints = data.constraints || [];
+      
+      content.innerHTML = `
+        <div class="detail-row">
+          <span class="detail-label">Signature</span>
+          <span class="detail-value">${shortId}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Depth</span>
+          <span class="detail-value">${data.depth}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Status</span>
+          <span class="detail-value" style="color: ${data.status === 'BANNED' ? 'var(--accent-red)' : 'var(--accent-green)'}">${data.status}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Last Seen</span>
+          <span class="detail-value">${data.lastSeen || 'Unknown'}</span>
+        </div>
+        <div class="detail-row" style="flex-direction: column; gap: 6px;">
+          <span class="detail-label">Caveats (${constraints.length})</span>
+          <div style="font-size: 10px; color: var(--text-secondary); max-height: 100px; overflow-y: auto;">
+            ${constraints.length > 0 
+              ? constraints.map(c => `<div style="padding: 2px 0; border-bottom: 1px solid var(--border);">${c}</div>`).join('') 
+              : '<div>No caveats</div>'
+            }
+          </div>
+        </div>
+      `;
+      
+      panel.classList.add('visible');
+    }
+    
+    function hideNodeDetails() {
+      document.getElementById('nodeDetails').classList.remove('visible');
+    }
+    
+    // ==========================================================================
+    // INITIALIZATION
+    // ==========================================================================
+    
+    connectWebSocket();
+    
+    // Fallback: start polling after 3 seconds if WebSocket hasn't connected
+    setTimeout(() => {
+      if (!isWebSocketConnected) {
+        startPolling();
+      }
+    }, 3000);
+  </script>
+</body>
+</html>
+

@@ -5,8 +5,51 @@
 const express = require('express');
 const os = require('os');
 const path = require('path');
+const http = require('http');
 
 const app = express();
+
+// =============================================================================
+// REDIS + WEBSOCKET SETUP (Optional - falls back to in-memory)
+// =============================================================================
+
+let redis = null;
+let wsServer = null;
+const wsClients = new Set();
+
+// Try to connect to Redis if REDIS_URL is set
+const REDIS_URL = process.env.REDIS_URL || process.env.REDIS_PRIVATE_URL;
+if (REDIS_URL) {
+  try {
+    const Redis = require('ioredis');
+    redis = new Redis(REDIS_URL, {
+      maxRetriesPerRequest: 3,
+      retryDelayOnFailover: 100,
+      lazyConnect: true
+    });
+    redis.on('connect', () => console.log('[Redis] Connected'));
+    redis.on('error', (err) => console.error('[Redis] Error:', err.message));
+    redis.connect().catch(err => {
+      console.log('[Redis] Connection failed, using in-memory storage');
+      redis = null;
+    });
+  } catch (e) {
+    console.log('[Redis] Module not available, using in-memory storage');
+    redis = null;
+  }
+} else {
+  console.log('[Storage] No REDIS_URL set, using in-memory storage');
+}
+
+// Broadcast to all WebSocket clients
+function wsBroadcast(data) {
+  const message = JSON.stringify(data);
+  wsClients.forEach(client => {
+    if (client.readyState === 1) { // WebSocket.OPEN
+      client.send(message);
+    }
+  });
+}
 
 // =============================================================================
 // GOVERNANCE: Kill Switch & Telemetry
@@ -15,7 +58,81 @@ const app = express();
 // but we DO track banned tokens (small stateful blocklist).
 // This answers the CISO question: "How do I revoke a compromised token?"
 
-const bannedTokens = new Set();  // Token signatures/IDs that are revoked
+const bannedTokensMemory = new Set();  // In-memory fallback
+
+// Redis-backed or in-memory banned tokens
+const bannedTokens = {
+  async has(sig) {
+    if (redis) {
+      try {
+        return await redis.sismember('satgate:banned', sig) === 1;
+      } catch (e) {
+        return bannedTokensMemory.has(sig);
+      }
+    }
+    return bannedTokensMemory.has(sig);
+  },
+  
+  async add(sig) {
+    bannedTokensMemory.add(sig);
+    if (redis) {
+      try {
+        await redis.sadd('satgate:banned', sig);
+      } catch (e) { /* ignore */ }
+    }
+    wsBroadcast({ type: 'ban', tokenSignature: sig });
+  },
+  
+  async delete(sig) {
+    bannedTokensMemory.delete(sig);
+    if (redis) {
+      try {
+        await redis.srem('satgate:banned', sig);
+      } catch (e) { /* ignore */ }
+    }
+    wsBroadcast({ type: 'unban', tokenSignature: sig });
+  },
+  
+  async size() {
+    if (redis) {
+      try {
+        return await redis.scard('satgate:banned');
+      } catch (e) {
+        return bannedTokensMemory.size;
+      }
+    }
+    return bannedTokensMemory.size;
+  },
+  
+  async all() {
+    if (redis) {
+      try {
+        return await redis.smembers('satgate:banned');
+      } catch (e) {
+        return Array.from(bannedTokensMemory);
+      }
+    }
+    return Array.from(bannedTokensMemory);
+  },
+  
+  // Sync check for middleware (uses memory cache)
+  hasSync(sig) {
+    return bannedTokensMemory.has(sig);
+  }
+};
+
+// Load banned tokens from Redis on startup
+async function loadBannedTokensFromRedis() {
+  if (redis) {
+    try {
+      const tokens = await redis.smembers('satgate:banned');
+      tokens.forEach(t => bannedTokensMemory.add(t));
+      console.log(`[Redis] Loaded ${tokens.length} banned tokens`);
+    } catch (e) {
+      console.error('[Redis] Failed to load banned tokens:', e.message);
+    }
+  }
+}
 
 // Telemetry: Track active tokens observed in traffic (for dashboard)
 const telemetry = {
@@ -23,27 +140,46 @@ const telemetry = {
   blockedCount: 0,          // 402/403 blocks (Economic Firewall metric)
   bannedHits: 0,            // Requests blocked by Kill Switch
   
+  async init() {
+    // Load persisted stats from Redis
+    if (redis) {
+      try {
+        const blocked = await redis.get('satgate:stats:blocked');
+        const banned = await redis.get('satgate:stats:bannedHits');
+        if (blocked) this.blockedCount = parseInt(blocked);
+        if (banned) this.bannedHits = parseInt(banned);
+        console.log(`[Redis] Loaded stats: blocked=${this.blockedCount}, bannedHits=${this.bannedHits}`);
+      } catch (e) { /* ignore */ }
+    }
+  },
+  
   recordBlock: function() {
     this.blockedCount++;
+    if (redis) redis.incr('satgate:stats:blocked').catch(() => {});
+    wsBroadcast({ type: 'block', total: this.blockedCount });
   },
   
   recordBannedHit: function() {
     this.bannedHits++;
+    if (redis) redis.incr('satgate:stats:bannedHits').catch(() => {});
+    wsBroadcast({ type: 'bannedHit', total: this.bannedHits });
   },
   
   recordUsage: function(tokenSignature, caveats, ip) {
     const now = Date.now();
     const depth = caveats.length;  // Heuristic: more caveats = deeper delegation
     
-    this.activeTokens.set(tokenSignature, {
+    const tokenData = {
       id: tokenSignature.substring(0, 12) + '...',
       fullSignature: tokenSignature,
       lastSeen: now,
       ip: ip,
       depth: depth,
       constraints: caveats,
-      status: bannedTokens.has(tokenSignature) ? 'BANNED' : 'ACTIVE'
-    });
+      status: bannedTokensMemory.has(tokenSignature) ? 'BANNED' : 'ACTIVE'
+    };
+    
+    this.activeTokens.set(tokenSignature, tokenData);
     
     // Cleanup: remove tokens not seen in 10 minutes
     const cutoff = now - (10 * 60 * 1000);
@@ -52,9 +188,12 @@ const telemetry = {
         this.activeTokens.delete(sig);
       }
     }
+    
+    // Broadcast token update to dashboard
+    wsBroadcast({ type: 'token', data: tokenData });
   },
   
-  getGraphData: function() {
+  async getGraphData() {
     const nodes = [];
     const edges = [];
     
@@ -90,13 +229,15 @@ const telemetry = {
       }
     });
     
+    const bannedSize = await bannedTokens.size();
+    
     return {
       nodes,
       edges,
       stats: {
         active: this.activeTokens.size,
         blocked: this.blockedCount,
-        banned: bannedTokens.size,
+        banned: bannedSize,
         bannedHits: this.bannedHits
       }
     };
@@ -607,9 +748,9 @@ app.use('/api/capability', (req, res, next) => {
     const tokenBytes = Buffer.from(tokenBase64, 'base64');
     const m = macaroon.importMacaroon(tokenBytes);
     
-    // KILL SWITCH: Check if token is banned
+    // KILL SWITCH: Check if token is banned (uses sync in-memory check for speed)
     const tokenSignature = Buffer.from(m._signature).toString('hex');
-    if (bannedTokens.has(tokenSignature)) {
+    if (bannedTokens.hasSync(tokenSignature)) {
       console.log(`[KILL SWITCH] 🛑 Blocked banned token: ${tokenSignature.substring(0, 16)}...`);
       telemetry.recordBannedHit();
       return res.status(403).json({
@@ -1005,14 +1146,14 @@ app.get('/api/micro/data', (req, res) => {
 // =============================================================================
 
 // Get governance graph data (for dashboard visualization)
-app.get('/api/governance/graph', (req, res) => {
-  const graphData = telemetry.getGraphData();
+app.get('/api/governance/graph', async (req, res) => {
+  const graphData = await telemetry.getGraphData();
   res.json(graphData);
 });
 
 // Get governance stats (quick summary)
-app.get('/api/governance/stats', (req, res) => {
-  const data = telemetry.getGraphData();
+app.get('/api/governance/stats', async (req, res) => {
+  const data = await telemetry.getGraphData();
   res.json({
     ok: true,
     stats: data.stats,
@@ -1021,7 +1162,7 @@ app.get('/api/governance/stats', (req, res) => {
 });
 
 // KILL SWITCH: Ban a token (The "Panic Button")
-app.post('/api/governance/ban', requirePricingAdmin, (req, res) => {
+app.post('/api/governance/ban', requirePricingAdmin, async (req, res) => {
   const { tokenSignature, reason } = req.body;
   
   if (!tokenSignature) {
@@ -1034,7 +1175,7 @@ app.post('/api/governance/ban', requirePricingAdmin, (req, res) => {
   // Normalize: accept both full signature and short form
   const sig = tokenSignature.replace('...', '');
   
-  if (bannedTokens.has(sig)) {
+  if (await bannedTokens.has(sig)) {
     return res.json({
       ok: true,
       message: 'Token was already banned',
@@ -1042,21 +1183,22 @@ app.post('/api/governance/ban', requirePricingAdmin, (req, res) => {
     });
   }
   
-  bannedTokens.add(sig);
+  await bannedTokens.add(sig);
   console.log(`[KILL SWITCH] 🚨 Token banned: ${sig.substring(0, 16)}... Reason: ${reason || 'Not specified'}`);
   
+  const totalBanned = await bannedTokens.size();
   res.json({
     ok: true,
     message: 'Token banned successfully',
     tokenSignature: sig.substring(0, 16) + '...',
     reason: reason || 'Not specified',
-    totalBanned: bannedTokens.size,
+    totalBanned,
     note: 'Token will be rejected on next use. Active sessions using this token will fail.'
   });
 });
 
 // KILL SWITCH: Unban a token
-app.post('/api/governance/unban', requirePricingAdmin, (req, res) => {
+app.post('/api/governance/unban', requirePricingAdmin, async (req, res) => {
   const { tokenSignature } = req.body;
   
   if (!tokenSignature) {
@@ -1065,7 +1207,7 @@ app.post('/api/governance/unban', requirePricingAdmin, (req, res) => {
   
   const sig = tokenSignature.replace('...', '');
   
-  if (!bannedTokens.has(sig)) {
+  if (!(await bannedTokens.has(sig))) {
     return res.json({
       ok: true,
       message: 'Token was not banned',
@@ -1073,20 +1215,22 @@ app.post('/api/governance/unban', requirePricingAdmin, (req, res) => {
     });
   }
   
-  bannedTokens.delete(sig);
+  await bannedTokens.delete(sig);
   console.log(`[KILL SWITCH] ✅ Token unbanned: ${sig.substring(0, 16)}...`);
   
+  const totalBanned = await bannedTokens.size();
   res.json({
     ok: true,
     message: 'Token unbanned successfully',
     tokenSignature: sig.substring(0, 16) + '...',
-    totalBanned: bannedTokens.size
+    totalBanned
   });
 });
 
 // List all banned tokens (admin only)
-app.get('/api/governance/banned', requirePricingAdmin, (req, res) => {
-  const banned = Array.from(bannedTokens).map(sig => ({
+app.get('/api/governance/banned', requirePricingAdmin, async (req, res) => {
+  const allBanned = await bannedTokens.all();
+  const banned = allBanned.map(sig => ({
     signature: sig.substring(0, 16) + '...',
     fullSignature: sig
   }));
@@ -1117,11 +1261,14 @@ app.get('/', (req, res) => {
 });
 
 // =============================================================================
-// STATIC FILE SERVING (disabled in cloud container)
+// STATIC FILE SERVING (Governance Dashboard)
 // =============================================================================
 
-// Note: The Railway deployment runs as an API-only container (front-end is on satgate.io).
-// If you later bundle a static frontend into the container, re-enable express.static here.
+// Serve the governance dashboard at /dashboard
+app.use('/dashboard', express.static(path.join(__dirname, 'public')));
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // =============================================================================
 // ERROR HANDLING
@@ -1150,34 +1297,90 @@ app.use((err, req, res, next) => {
 // SERVER STARTUP & GRACEFUL SHUTDOWN
 // =============================================================================
 
-const server = app.listen(config.port, () => {
-  console.log(`[${new Date().toISOString()}] Backend started`);
-  console.log(`  Environment: ${config.env}`);
-  console.log(`  Listening: http://127.0.0.1:${config.port}`);
-  console.log(`  CORS origins: ${config.corsOrigins.join(', ')}`);
-});
-
-// Graceful shutdown
-const shutdown = (signal) => {
-  console.log(`\n[${new Date().toISOString()}] Received ${signal}, shutting down gracefully...`);
+async function startServer() {
+  // Initialize data from Redis
+  await loadBannedTokensFromRedis();
+  await telemetry.init();
   
-  server.close((err) => {
-    if (err) {
-      console.error('Error during shutdown:', err);
-      process.exit(1);
-    }
-    console.log('Server closed');
-    process.exit(0);
+  // Create HTTP server
+  const server = http.createServer(app);
+  
+  // Setup WebSocket server for real-time dashboard updates
+  try {
+    const WebSocket = require('ws');
+    wsServer = new WebSocket.Server({ server, path: '/ws/governance' });
+    
+    wsServer.on('connection', (ws, req) => {
+      console.log('[WebSocket] Dashboard client connected');
+      wsClients.add(ws);
+      
+      // Send initial state
+      telemetry.getGraphData().then(data => {
+        ws.send(JSON.stringify({ type: 'init', ...data }));
+      });
+      
+      ws.on('close', () => {
+        wsClients.delete(ws);
+        console.log('[WebSocket] Dashboard client disconnected');
+      });
+      
+      ws.on('error', (err) => {
+        console.error('[WebSocket] Error:', err.message);
+        wsClients.delete(ws);
+      });
+    });
+    
+    console.log('[WebSocket] Server ready at /ws/governance');
+  } catch (e) {
+    console.log('[WebSocket] Module not available, using polling fallback');
+  }
+  
+  server.listen(config.port, () => {
+    console.log(`[${new Date().toISOString()}] Backend started`);
+    console.log(`  Environment: ${config.env}`);
+    console.log(`  Listening: http://127.0.0.1:${config.port}`);
+    console.log(`  CORS origins: ${config.corsOrigins.join(', ')}`);
+    console.log(`  Redis: ${redis ? 'Connected' : 'In-memory fallback'}`);
+    console.log(`  WebSocket: ${wsServer ? 'Enabled' : 'Disabled'}`);
   });
-  
-  // Force exit after 10 seconds
-  setTimeout(() => {
-    console.error('Forced shutdown after timeout');
-    process.exit(1);
-  }, 10000);
-};
 
-process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT', () => shutdown('SIGINT'));
+  // Graceful shutdown
+  const shutdown = (signal) => {
+    console.log(`\n[${new Date().toISOString()}] Received ${signal}, shutting down gracefully...`);
+    
+    // Close WebSocket connections
+    wsClients.forEach(client => client.close());
+    if (wsServer) wsServer.close();
+    
+    // Close Redis
+    if (redis) redis.quit();
+    
+    server.close((err) => {
+      if (err) {
+        console.error('Error during shutdown:', err);
+        process.exit(1);
+      }
+      console.log('Server closed');
+      process.exit(0);
+    });
+    
+    // Force exit after 10 seconds
+    setTimeout(() => {
+      console.error('Forced shutdown after timeout');
+      process.exit(1);
+    }, 10000);
+  };
+
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
+  
+  return server;
+}
+
+// Start the server
+startServer().catch(err => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
+});
 
 module.exports = app; // For testing
