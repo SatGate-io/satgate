@@ -33,6 +33,9 @@ WORKDIR /app
 # Copy backend from builder stage
 COPY --from=backend-builder /app/backend /app/backend
 
+# Copy dashboard UI (static files)
+COPY proxy/public /app/backend/public
+
 # Copy Aperture config
 COPY deploy/aperture.cloud.yaml /app/aperture.yaml
 
