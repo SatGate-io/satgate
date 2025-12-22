@@ -258,10 +258,20 @@ async function loadBannedTokensFromRedis() {
 }
 
 // Telemetry: Track active tokens observed in traffic (for dashboard)
+// Also tracks Economic Firewall metrics for sales reporting
 const telemetry = {
   activeTokens: new Map(),  // signature -> { lastSeen, ip, depth, constraints }
-  blockedCount: 0,          // 402/403 blocks (Economic Firewall metric)
+  blockedCount: 0,          // 402 challenges sent (unpaid requests blocked)
   bannedHits: 0,            // Requests blocked by Kill Switch
+  
+  // Economic Firewall Metrics
+  paidRequests: { micro: 0, basic: 0, standard: 0, premium: 0, total: 0 },
+  revenueSats: { micro: 0, basic: 0, standard: 0, premium: 0, total: 0 },
+  challengesSent: 0,        // 402 challenges issued
+  
+  // Cost model for "compute saved" estimation
+  // Assume avg backend request costs $0.0001 (Lambda/Cloud Run pricing)
+  AVG_BACKEND_COST_USD: 0.0001,
   
   async init() {
     // Load persisted stats from Redis
@@ -269,23 +279,114 @@ const telemetry = {
       try {
         const blocked = await redis.get('satgate:stats:blocked');
         const banned = await redis.get('satgate:stats:bannedHits');
+        const challenges = await redis.get('satgate:stats:challenges');
+        const paidTotal = await redis.get('satgate:stats:paidTotal');
+        const revenue = await redis.get('satgate:stats:revenueSats');
+        
         if (blocked) this.blockedCount = parseInt(blocked);
         if (banned) this.bannedHits = parseInt(banned);
-        console.log(`[Redis] Loaded stats: blocked=${this.blockedCount}, bannedHits=${this.bannedHits}`);
+        if (challenges) this.challengesSent = parseInt(challenges);
+        if (paidTotal) this.paidRequests.total = parseInt(paidTotal);
+        if (revenue) this.revenueSats.total = parseInt(revenue);
+        
+        // Load per-tier stats
+        for (const tier of ['micro', 'basic', 'standard', 'premium']) {
+          const paid = await redis.get(`satgate:stats:paid:${tier}`);
+          const tierRev = await redis.get(`satgate:stats:revenue:${tier}`);
+          if (paid) this.paidRequests[tier] = parseInt(paid);
+          if (tierRev) this.revenueSats[tier] = parseInt(tierRev);
+        }
+        
+        console.log(`[Redis] Loaded stats: blocked=${this.blockedCount}, challenges=${this.challengesSent}, paid=${this.paidRequests.total}, revenue=${this.revenueSats.total} sats`);
       } catch (e) { /* ignore */ }
     }
   },
   
-  recordBlock: function() {
+  // Record a 402 challenge sent (request blocked until payment)
+  recordChallenge: function() {
     this.blockedCount++;
-    if (redis) redis.incr('satgate:stats:blocked').catch(() => {});
-    wsBroadcast({ type: 'block', total: this.blockedCount });
+    this.challengesSent++;
+    if (redis) {
+      redis.incr('satgate:stats:blocked').catch(() => {});
+      redis.incr('satgate:stats:challenges').catch(() => {});
+    }
+    wsBroadcast({ type: 'challenge', total: this.challengesSent, blocked: this.blockedCount });
+  },
+  
+  // Legacy method for compatibility
+  recordBlock: function() {
+    this.recordChallenge();
   },
   
   recordBannedHit: function() {
     this.bannedHits++;
     if (redis) redis.incr('satgate:stats:bannedHits').catch(() => {});
     wsBroadcast({ type: 'bannedHit', total: this.bannedHits });
+  },
+  
+  // Record a successful paid request
+  recordPaidRequest: function(tier, priceSats) {
+    const normalizedTier = tier.toLowerCase();
+    if (this.paidRequests[normalizedTier] !== undefined) {
+      this.paidRequests[normalizedTier]++;
+      this.revenueSats[normalizedTier] += priceSats;
+    }
+    this.paidRequests.total++;
+    this.revenueSats.total += priceSats;
+    
+    if (redis) {
+      redis.incr('satgate:stats:paidTotal').catch(() => {});
+      redis.incrby('satgate:stats:revenueSats', priceSats).catch(() => {});
+      redis.incr(`satgate:stats:paid:${normalizedTier}`).catch(() => {});
+      redis.incrby(`satgate:stats:revenue:${normalizedTier}`, priceSats).catch(() => {});
+    }
+    
+    wsBroadcast({ 
+      type: 'paid', 
+      tier: normalizedTier, 
+      priceSats, 
+      totalPaid: this.paidRequests.total,
+      totalRevenue: this.revenueSats.total 
+    });
+  },
+  
+  // Get Economic Firewall report for sales/dashboards
+  getEconomicReport: function() {
+    const blockedRequestsSaved = this.blockedCount;
+    const computeSavedUSD = blockedRequestsSaved * this.AVG_BACKEND_COST_USD;
+    const btcPriceUSD = 100000; // Rough estimate, could fetch live
+    const revenueSats = this.revenueSats.total;
+    const revenueUSD = (revenueSats / 100000000) * btcPriceUSD;
+    
+    return {
+      economicFirewall: {
+        challengesSent: this.challengesSent,
+        unpaidRequestsBlocked: this.blockedCount,
+        estimatedComputeSavedUSD: computeSavedUSD.toFixed(4),
+        note: `${blockedRequestsSaved} requests blocked before reaching backend`
+      },
+      revenue: {
+        totalSats: revenueSats,
+        estimatedUSD: revenueUSD.toFixed(4),
+        byTier: {
+          micro: { requests: this.paidRequests.micro, sats: this.revenueSats.micro },
+          basic: { requests: this.paidRequests.basic, sats: this.revenueSats.basic },
+          standard: { requests: this.paidRequests.standard, sats: this.revenueSats.standard },
+          premium: { requests: this.paidRequests.premium, sats: this.revenueSats.premium },
+        }
+      },
+      killSwitch: {
+        bannedTokenAttempts: this.bannedHits,
+        note: 'Requests blocked by revoked tokens'
+      },
+      summary: {
+        totalPaidRequests: this.paidRequests.total,
+        totalBlockedRequests: this.blockedCount + this.bannedHits,
+        protectionRatio: this.paidRequests.total > 0 
+          ? ((this.blockedCount / this.paidRequests.total) * 100).toFixed(1) + '%'
+          : 'N/A'
+      }
+    };
   },
   
   recordUsage: function(tokenSignature, caveats, ip) {
@@ -361,7 +462,11 @@ const telemetry = {
         active: this.activeTokens.size,
         blocked: this.blockedCount,
         banned: bannedSize,
-        bannedHits: this.bannedHits
+        bannedHits: this.bannedHits,
+        // Economic Firewall metrics
+        challengesSent: this.challengesSent,
+        paidRequests: this.paidRequests.total,
+        revenueSats: this.revenueSats.total
       }
     };
   }
@@ -1276,6 +1381,18 @@ app.get('/api/governance/stats', async (req, res) => {
   });
 });
 
+// Economic Firewall Report (for sales dashboards and weekly reporting)
+// Shows: blocked requests, revenue, compute saved, protection metrics
+app.get('/api/governance/economic-report', async (req, res) => {
+  const report = telemetry.getEconomicReport();
+  res.json({
+    ok: true,
+    report,
+    timestamp: new Date().toISOString(),
+    period: 'since-restart' // TODO: Add time windowing with Redis
+  });
+});
+
 // KILL SWITCH: Ban a token (The "Panic Button")
 // Protected by: admin auth + rate limiting + audit logging
 app.post('/api/governance/ban', adminRateLimit, requirePricingAdmin, async (req, res) => {
@@ -1603,17 +1720,17 @@ async function startServer() {
   }
   
   server.listen(config.port, () => {
-    console.log(`[${new Date().toISOString()}] Backend started`);
-    console.log(`  Environment: ${config.env}`);
-    console.log(`  Listening: http://127.0.0.1:${config.port}`);
-    console.log(`  CORS origins: ${config.corsOrigins.join(', ')}`);
+  console.log(`[${new Date().toISOString()}] Backend started`);
+  console.log(`  Environment: ${config.env}`);
+  console.log(`  Listening: http://127.0.0.1:${config.port}`);
+  console.log(`  CORS origins: ${config.corsOrigins.join(', ')}`);
     console.log(`  Redis: ${redis ? 'Connected' : 'In-memory fallback'}`);
     console.log(`  WebSocket: ${wsServer ? 'Enabled' : 'Disabled'}`);
-  });
+});
 
-  // Graceful shutdown
-  const shutdown = (signal) => {
-    console.log(`\n[${new Date().toISOString()}] Received ${signal}, shutting down gracefully...`);
+// Graceful shutdown
+const shutdown = (signal) => {
+  console.log(`\n[${new Date().toISOString()}] Received ${signal}, shutting down gracefully...`);
     
     // Close WebSocket connections
     wsClients.forEach(client => client.close());
@@ -1621,25 +1738,25 @@ async function startServer() {
     
     // Close Redis
     if (redis) redis.quit();
-    
-    server.close((err) => {
-      if (err) {
-        console.error('Error during shutdown:', err);
-        process.exit(1);
-      }
-      console.log('Server closed');
-      process.exit(0);
-    });
-    
-    // Force exit after 10 seconds
-    setTimeout(() => {
-      console.error('Forced shutdown after timeout');
+  
+  server.close((err) => {
+    if (err) {
+      console.error('Error during shutdown:', err);
       process.exit(1);
-    }, 10000);
-  };
+    }
+    console.log('Server closed');
+    process.exit(0);
+  });
+  
+  // Force exit after 10 seconds
+  setTimeout(() => {
+    console.error('Forced shutdown after timeout');
+    process.exit(1);
+  }, 10000);
+};
 
-  process.on('SIGTERM', () => shutdown('SIGTERM'));
-  process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
   
   return server;
 }
