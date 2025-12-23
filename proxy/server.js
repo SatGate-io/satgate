@@ -1071,7 +1071,7 @@ app.get('/api/premium/export', trackPaidRequest('premium', 1000), (req, res) => 
       recordCount: 15420,
       dateRange: { start: '2025-10-01', end: '2025-11-25' },
       fields: ['user_id', 'event', 'timestamp', 'value', 'metadata'],
-      downloadUrl: '/api/premium/export/download?token=sample',
+      downloadUrl: '/api/premium/export/download?id=sample-export-001',
       expiresIn: 3600
     }
   });
@@ -2197,34 +2197,95 @@ async function startServer() {
     wsServer = new WebSocket.Server({ server, path: '/ws/governance' });
     
     wsServer.on('connection', (ws, req) => {
-      // Check authentication in prod mode (token via query param)
-      const url = new URL(req.url, `http://${req.headers.host}`);
-      const token = url.searchParams.get('token');
-      const { valid: isAdmin, actor } = checkAdminToken(token);
+      // SECURITY: First-message authentication pattern
+      // Token is sent as first message, never in URL (prevents log/referrer leakage)
+      ws.isAuthenticated = false;
+      ws.isAdmin = false;
+      ws.actorId = 'unauthenticated';
       
-      // In prod mode, require admin auth; in demo mode with dashboardPublic, allow public
-      if (config.isProd && !isAdmin) {
-        console.log('[WebSocket] Unauthorized connection attempt (no valid token)');
-        ws.close(4401, 'Unauthorized');
-        return;
-      }
+      // Auth timeout: client must authenticate within 5 seconds
+      ws.authTimeout = setTimeout(() => {
+        if (!ws.isAuthenticated) {
+          console.log('[WebSocket] Authentication timeout');
+          ws.close(4001, 'Authentication timeout');
+        }
+      }, 5000);
       
-      console.log(`[WebSocket] Dashboard client connected (${isAdmin ? actor : 'public'})`);
-      wsClients.add(ws);
+      console.log('[WebSocket] New connection, awaiting authentication...');
       
-      // Send initial state (redacted if not admin)
-      telemetry.getGraphData().then(data => {
-        const responseData = isAdmin ? data : redactForDemo(data, { isAdmin: false });
-        ws.send(JSON.stringify({ type: 'init', ...responseData }));
+      ws.on('message', (data) => {
+        let msg;
+        try {
+          msg = JSON.parse(data.toString());
+        } catch (e) {
+          ws.send(JSON.stringify({ type: 'error', message: 'Invalid JSON' }));
+          return;
+        }
+        
+        // First message must be auth
+        if (!ws.isAuthenticated) {
+          if (msg.type === 'auth') {
+            const { valid, actor } = checkAdminToken(msg.token);
+            
+            // In prod mode, require valid admin token
+            // In demo mode with dashboardPublic, allow public access
+            if (valid) {
+              ws.isAuthenticated = true;
+              ws.isAdmin = true;
+              ws.actorId = actor;
+              clearTimeout(ws.authTimeout);
+              wsClients.add(ws);
+              console.log(`[WebSocket] Authenticated as admin (${actor})`);
+              ws.send(JSON.stringify({ type: 'auth', status: 'ok', role: 'admin' }));
+              
+              // Send initial state (full data for admin)
+              telemetry.getGraphData().then(graphData => {
+                ws.send(JSON.stringify({ type: 'init', ...graphData }));
+              });
+            } else if (config.isDemo && config.dashboardPublic) {
+              // Public access allowed in demo mode
+              ws.isAuthenticated = true;
+              ws.isAdmin = false;
+              ws.actorId = 'public';
+              clearTimeout(ws.authTimeout);
+              wsClients.add(ws);
+              console.log('[WebSocket] Authenticated as public (demo mode)');
+              ws.send(JSON.stringify({ type: 'auth', status: 'ok', role: 'public' }));
+              
+              // Send initial state (redacted for public)
+              telemetry.getGraphData().then(graphData => {
+                const redacted = redactForDemo(graphData, { isAdmin: false });
+                ws.send(JSON.stringify({ type: 'init', ...redacted }));
+              });
+            } else {
+              console.log('[WebSocket] Authentication failed (invalid token)');
+              ws.send(JSON.stringify({ type: 'auth', status: 'error', message: 'Invalid token' }));
+              ws.close(4003, 'Authentication failed');
+            }
+            return;
+          } else {
+            // Non-auth message before authentication
+            ws.send(JSON.stringify({ type: 'error', message: 'Authentication required' }));
+            ws.close(4003, 'Authentication required');
+            return;
+          }
+        }
+        
+        // Handle authenticated messages (future: commands, subscriptions, etc.)
+        if (msg.type === 'ping') {
+          ws.send(JSON.stringify({ type: 'pong', timestamp: Date.now() }));
+        }
       });
       
       ws.on('close', () => {
+        clearTimeout(ws.authTimeout);
         wsClients.delete(ws);
-        console.log('[WebSocket] Dashboard client disconnected');
+        console.log(`[WebSocket] Client disconnected (${ws.actorId})`);
       });
       
       ws.on('error', (err) => {
         console.error('[WebSocket] Error:', err.message);
+        clearTimeout(ws.authTimeout);
         wsClients.delete(ws);
       });
     });

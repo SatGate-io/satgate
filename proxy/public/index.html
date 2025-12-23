@@ -681,37 +681,59 @@
     
     function connectWebSocket() {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      let wsUrl = `${protocol}//${window.location.host}/ws/governance`;
-      
-      // Pass admin token as query param (WebSocket doesn't support custom headers)
-      if (adminToken) {
-        wsUrl += `?token=${encodeURIComponent(adminToken)}`;
-      }
+      // SECURITY: No token in URL - use first-message auth pattern
+      const wsUrl = `${protocol}//${window.location.host}/ws/governance`;
       
       try {
         ws = new WebSocket(wsUrl);
         
         ws.onopen = function() {
-          console.log('[WS] Connected');
-          isWebSocketConnected = true;
-          updateConnectionStatus('connected');
+          console.log('[WS] Connected, sending authentication...');
+          updateConnectionStatus('connecting');
           
-          // Stop polling if it was running
-          if (pollingInterval) {
-            clearInterval(pollingInterval);
-            pollingInterval = null;
-          }
+          // SECURITY: Send auth as first message (not in URL)
+          // This prevents token leakage in logs, referrers, and browser history
+          ws.send(JSON.stringify({ 
+            type: 'auth', 
+            token: adminToken || '' // Empty string for public access attempt
+          }));
         };
         
         ws.onmessage = function(event) {
           const data = JSON.parse(event.data);
+          
+          // Handle auth response
+          if (data.type === 'auth') {
+            if (data.status === 'ok') {
+              console.log(`[WS] Authenticated as ${data.role}`);
+              isWebSocketConnected = true;
+              updateConnectionStatus('connected');
+              
+              // Stop polling if it was running
+              if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+              }
+            } else {
+              console.log('[WS] Authentication failed:', data.message);
+              updateConnectionStatus('disconnected');
+            }
+            return;
+          }
+          
+          // Handle other messages
           handleMessage(data);
         };
         
-        ws.onclose = function() {
-          console.log('[WS] Disconnected, falling back to polling');
+        ws.onclose = function(event) {
+          console.log('[WS] Disconnected:', event.code, event.reason || 'No reason');
           isWebSocketConnected = false;
-          startPolling();
+          updateConnectionStatus('disconnected');
+          
+          // Only retry/poll if not an auth failure
+          if (event.code !== 4003 && event.code !== 4001) {
+            startPolling();
+          }
         };
         
         ws.onerror = function(err) {
