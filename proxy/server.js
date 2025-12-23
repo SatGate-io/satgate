@@ -16,6 +16,7 @@
  *   - POST /api/governance/ban     - Ban a token (kill switch)
  *   - POST /api/governance/unban   - Unban a token
  *   - GET /api/governance/banned   - List all banned tokens
+ *   - POST /api/governance/reset   - Reset dashboard (clear counters & tokens)
  *   - POST /api/free/pricing       - Update pricing
  * 
  * L402 PROTECTED endpoints (require Lightning payment):
@@ -522,6 +523,37 @@ const telemetry = {
         revenueSats: this.revenueSats.total
       }
     };
+  },
+  
+  // Reset all telemetry counters and tokens (admin action)
+  async reset() {
+    // Clear in-memory state
+    this.activeTokens.clear();
+    this.blockedCount = 0;
+    this.bannedHits = 0;
+    this.challengesSent = 0;
+    this.paidRequests = { micro: 0, basic: 0, standard: 0, premium: 0, total: 0 };
+    this.revenueSats = { micro: 0, basic: 0, standard: 0, premium: 0, total: 0 };
+    
+    // Clear Redis persisted stats
+    if (redis) {
+      try {
+        await redis.del('satgate:stats:blocked');
+        await redis.del('satgate:stats:bannedHits');
+        await redis.del('satgate:stats:challenges');
+        await redis.del('satgate:stats:paidTotal');
+        await redis.del('satgate:stats:revenueSats');
+        console.log('[Telemetry] Reset: cleared Redis stats');
+      } catch (e) {
+        console.error('[Telemetry] Reset: Redis error:', e.message);
+      }
+    }
+    
+    // Broadcast reset to dashboard
+    this.broadcast({ type: 'reset' });
+    
+    console.log('[Telemetry] Dashboard reset by admin');
+    return { success: true, message: 'Dashboard reset' };
   }
 };
 
@@ -608,7 +640,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.7.2',
+    version: '1.7.3',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1720,6 +1752,20 @@ app.get('/api/governance/audit', adminRateLimit, requirePricingAdmin, async (req
   }
   
   res.json({ ok: true, count: logs.length, logs });
+});
+
+// Reset dashboard counters and tokens (admin only)
+// Use this to start fresh for a demo
+app.post('/api/governance/reset', adminRateLimit, requirePricingAdmin, async (req, res) => {
+  logAdminAction('DASHBOARD_RESET', {}, req);
+  
+  const result = await telemetry.reset();
+  
+  res.json({
+    ok: true,
+    message: 'Dashboard reset successfully',
+    note: 'All counters zeroed, active tokens cleared. Banned tokens NOT cleared (use /unban).'
+  });
 });
 
 // -----------------------------------------------------------------------------
