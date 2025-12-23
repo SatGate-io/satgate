@@ -116,7 +116,8 @@ const healthRateLimit = rateLimit({
 // MODE=prod: always requires admin auth
 // MODE=demo + DASHBOARD_PUBLIC=true: allows public access with redaction
 function optionalAdminAuth(req, res, next) {
-  const token = req.headers['x-admin-token'] || req.query.token;
+  // SECURITY: header-only admin auth (query string tokens leak via logs/referrers)
+  const token = req.headers['x-admin-token'];
   const { valid, actor } = checkAdminToken(token);
   
   // If valid admin token, grant full access
@@ -649,7 +650,19 @@ const MODE = process.env.MODE || 'prod';
 const config = {
   port: process.env.BACKEND_PORT || 8083,
   env: process.env.NODE_ENV || 'development',
-  corsOrigins: process.env.CORS_ORIGINS?.split(',') || ['http://127.0.0.1:8081', 'http://localhost:8081', 'http://localhost:8080', 'http://127.0.0.1:8080'],
+  // SECURITY: Never allow CORS_ORIGINS="*" in production
+  corsOrigins: (() => {
+    const origins = process.env.CORS_ORIGINS;
+    if (!origins || origins === '*') {
+      if (MODE === 'prod') {
+        console.warn('[SECURITY] CORS_ORIGINS not set or "*" in prod - defaulting to localhost only');
+        return ['http://127.0.0.1:8081', 'http://localhost:8081'];
+      }
+      // Demo mode allows broader access
+      return ['http://127.0.0.1:8081', 'http://localhost:8081', 'http://localhost:8080', 'http://127.0.0.1:8080'];
+    }
+    return origins.split(',').map(o => o.trim());
+  })(),
   rateLimitWindow: 15 * 60 * 1000, // 15 minutes
   rateLimitMax: 100, // requests per window
   
@@ -777,10 +790,12 @@ app.use((req, res, next) => {
   }
   
   const origin = req.headers.origin;
-  if (config.corsOrigins.includes(origin) || config.corsOrigins.includes('*')) {
-    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  // SECURITY: Never allow wildcard CORS in production
+  const allowWildcard = config.corsOrigins.includes('*') && !config.isProd;
+  if (config.corsOrigins.includes(origin) || allowWildcard) {
+    res.setHeader('Access-Control-Allow-Origin', origin || (allowWildcard ? '*' : ''));
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Admin-Token');
     res.setHeader('Access-Control-Max-Age', '86400');
   }
   if (req.method === 'OPTIONS') {
@@ -1386,7 +1401,7 @@ app.use('/api/capability', (req, res, next) => {
 app.post('/api/capability/mint', express.json(), (req, res) => {
   // Security gate: require admin auth unless in demo mode
   if (!config.isDemo) {
-    const token = req.headers['x-admin-token'] || req.query.token;
+    const token = req.headers['x-admin-token'];
     const { valid } = checkAdminToken(token);
     if (!valid) {
       return res.status(403).json({ 
@@ -1476,9 +1491,9 @@ app.get('/api/token/test', requirePricingAdmin, (req, res) => {
 });
 
 // Delegate a capability token (create a child with restricted scope)
-// This demonstrates the "Chain of Custody" - parent delegates to child
-// Using GET to bypass any POST-related issues
-app.get('/api/token/delegate', (req, res) => {
+// SECURITY: admin-only. Delegation should normally be done client-side via attenuation.
+// This endpoint is kept as an admin tool for demos/testing.
+app.get('/api/token/delegate', requirePricingAdmin, (req, res) => {
   console.log('[DELEGATE] === GET REQUEST RECEIVED ===');
   
   const authHeader = req.get('authorization') || '';
@@ -1610,7 +1625,7 @@ app.get('/api/capability/data', (req, res) => {
 app.post('/api/capability/demo/delegate', (req, res) => {
   // Security gate: demo endpoints only in demo mode or with admin auth
   if (!config.isDemo) {
-    const token = req.headers['x-admin-token'] || req.query.token;
+    const token = req.headers['x-admin-token'];
     const { valid } = checkAdminToken(token);
     if (!valid) {
       return res.status(403).json({ 
