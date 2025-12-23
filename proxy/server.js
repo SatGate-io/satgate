@@ -391,7 +391,10 @@ const telemetry = {
   
   recordUsage: function(tokenSignature, caveats, ip) {
     const now = Date.now();
-    const depth = caveats.length;  // Heuristic: more caveats = deeper delegation
+    
+    // Calculate depth based on delegation caveats
+    const delegationCaveats = caveats.filter(c => c.startsWith('delegated_from'));
+    const depth = delegationCaveats.length;  // Each delegation adds a delegated_from caveat
     
     const tokenData = {
       id: tokenSignature.substring(0, 12) + '...',
@@ -1210,6 +1213,72 @@ app.post('/api/capability/mint', express.json(), (req, res) => {
   } catch (e) {
     console.error(`[CAPABILITY] Mint error: ${e.message}`);
     res.status(500).json({ error: 'Failed to mint token', reason: e.message });
+  }
+});
+
+// Delegate a capability token (create a child with restricted scope)
+// This demonstrates the "Chain of Custody" - parent delegates to child
+app.post('/api/capability/delegate', express.json(), (req, res) => {
+  const authHeader = req.get('authorization');
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ 
+      error: 'Parent token required',
+      hint: 'Use "Authorization: Bearer <parent_token>" header'
+    });
+  }
+  
+  const parentTokenBase64 = authHeader.slice(7);
+  const { scope = 'api:capability:ping', expiresIn = 300 } = req.body || {};
+  
+  try {
+    // Decode parent token
+    const parentBytes = Buffer.from(parentTokenBase64, 'base64');
+    const parentMacaroon = macaroon.importMacaroon(parentBytes);
+    
+    // Get parent signature for chain of custody tracking
+    const parentSig = parentMacaroon.signature ? 
+      Buffer.from(parentMacaroon.signature).toString('hex').substring(0, 16) : 
+      'unknown';
+    
+    // Add MORE RESTRICTIVE caveats to create child
+    // (Macaroons can only ADD caveats, never remove - this is the security model)
+    const expiresAt = Date.now() + (expiresIn * 1000);
+    parentMacaroon.addFirstPartyCaveat(Buffer.from(`expires = ${expiresAt}`, 'utf8'));
+    parentMacaroon.addFirstPartyCaveat(Buffer.from(`scope = ${scope}`, 'utf8'));
+    parentMacaroon.addFirstPartyCaveat(Buffer.from(`delegated_from = ${parentSig}`, 'utf8'));
+    parentMacaroon.addFirstPartyCaveat(Buffer.from(`delegation_time = ${Date.now()}`, 'utf8'));
+    
+    // Export child token
+    const childBytes = parentMacaroon.exportBinary();
+    const childTokenBase64 = Buffer.from(childBytes).toString('base64');
+    
+    // Get child signature for display
+    const childSig = parentMacaroon.signature ? 
+      Buffer.from(parentMacaroon.signature).toString('hex').substring(0, 16) : 
+      'unknown';
+    
+    console.log(`[CAPABILITY] Delegated token: parent=${parentSig}..., child=${childSig}..., scope=${scope}`);
+    
+    res.json({
+      ok: true,
+      token: childTokenBase64,
+      chainOfCustody: {
+        parentSignature: parentSig + '...',
+        childSignature: childSig + '...',
+        relationship: 'Parent → Child (attenuated)'
+      },
+      caveats: {
+        scope: `${scope} [RESTRICTED]`,
+        expires: new Date(expiresAt).toISOString(),
+        expiresIn: `${expiresIn} seconds [EPHEMERAL]`
+      },
+      note: 'Child token has MORE restrictions than parent. This is cryptographically enforced.'
+    });
+    
+  } catch (e) {
+    console.error(`[CAPABILITY] Delegate error: ${e.message}`);
+    res.status(400).json({ error: 'Failed to delegate token', reason: e.message });
   }
 });
 
