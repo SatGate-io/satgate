@@ -550,7 +550,7 @@ const telemetry = {
     }
     
     // Broadcast reset to dashboard
-    this.broadcast({ type: 'reset' });
+    wsBroadcast({ type: 'reset' });
     
     console.log('[Telemetry] Dashboard reset by admin');
     return { success: true, message: 'Dashboard reset' };
@@ -640,7 +640,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.7.3',
+    version: '1.7.4',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
