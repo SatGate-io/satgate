@@ -609,7 +609,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.5.3',
+    version: '1.5.4',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1248,6 +1248,17 @@ app.post('/api/token/delegate', express.json(), (req, res) => {
     console.log('[DELEGATE] Starting delegation...');
     console.log('[DELEGATE] Parent token length:', parentTokenBase64.length);
     
+    // Validate inputs
+    if (!CAPABILITY_ROOT_KEY) {
+      throw new Error('CAPABILITY_ROOT_KEY is not defined');
+    }
+    if (!CAPABILITY_IDENTIFIER) {
+      throw new Error('CAPABILITY_IDENTIFIER is not defined');
+    }
+    if (!CAPABILITY_LOCATION) {
+      throw new Error('CAPABILITY_LOCATION is not defined');
+    }
+    
     // Create a hash of the parent token as its "signature" for linking
     const parentSig = crypto.createHash('sha256')
       .update(parentTokenBase64)
@@ -1256,15 +1267,24 @@ app.post('/api/token/delegate', express.json(), (req, res) => {
     console.log('[DELEGATE] Parent sig:', parentSig);
     
     // Create a NEW child macaroon (server-side delegation for demo)
-    const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
+    const keyString = String(CAPABILITY_ROOT_KEY);
+    console.log('[DELEGATE] Key string length:', keyString.length);
+    
+    const keyBytes = Buffer.from(keyString, 'utf8');
     console.log('[DELEGATE] Key bytes length:', keyBytes.length);
     
     const childId = `${CAPABILITY_IDENTIFIER}:child:${Date.now()}`;
     console.log('[DELEGATE] Child ID:', childId);
     
+    const idBytes = Buffer.from(childId, 'utf8');
+    console.log('[DELEGATE] ID bytes length:', idBytes.length);
+    
+    const locString = String(CAPABILITY_LOCATION);
+    console.log('[DELEGATE] Location:', locString);
+    
     let childMac = macaroon.newMacaroon({
-      identifier: Buffer.from(childId, 'utf8'),
-      location: CAPABILITY_LOCATION,
+      identifier: idBytes,
+      location: locString,
       rootKey: keyBytes
     });
     console.log('[DELEGATE] Child macaroon created');
