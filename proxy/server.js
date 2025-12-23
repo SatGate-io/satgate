@@ -609,7 +609,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.5.6',
+    version: '1.5.7',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1272,21 +1272,26 @@ app.post('/api/token/delegate', express.json(), (req, res) => {
   console.log('[DELEGATE] Scope:', scope, 'ExpiresIn:', expiresIn);
   
   try {
-    console.log('[DELEGATE] Starting delegation v1.5.6...');
+    console.log('[DELEGATE] Starting delegation v1.5.7...');
     
-    // Simple test: just create a macaroon like the /test endpoint
-    const testKey = Buffer.from('test-delegation-key', 'utf8');
-    const testId = Buffer.from('delegate-test-' + Date.now(), 'utf8');
+    // Hash parent token to create chain of custody link
+    const parentSig = crypto.createHash('sha256')
+      .update(parentTokenBase64)
+      .digest('hex')
+      .substring(0, 16);
+    console.log('[DELEGATE] Parent sig:', parentSig);
     
-    console.log('[DELEGATE] Creating test macaroon...');
+    // Create child macaroon with real credentials
+    const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
+    const childId = `${CAPABILITY_IDENTIFIER}:child:${Date.now()}`;
     
     let childMac = macaroon.newMacaroon({
-      identifier: testId,
-      location: 'https://satgate.io',
-      rootKey: testKey
+      identifier: Buffer.from(childId, 'utf8'),
+      location: CAPABILITY_LOCATION,
+      rootKey: keyBytes
     });
     
-    console.log('[DELEGATE] Test macaroon created!');
+    console.log('[DELEGATE] Child macaroon created!');
     
     // Add restricted caveats to child
     const expiresAt = Date.now() + (expiresIn * 1000);
