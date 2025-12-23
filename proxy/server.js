@@ -609,7 +609,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.5.1',
+    version: '1.5.2',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1244,20 +1244,29 @@ app.post('/api/capability/delegate', express.json(), (req, res) => {
   const { scope = 'api:capability:ping', expiresIn = 300 } = req.body || {};
   
   try {
+    console.log('[DELEGATE] Starting delegation...');
+    console.log('[DELEGATE] Parent token length:', parentTokenBase64.length);
+    
     // Create a hash of the parent token as its "signature" for linking
     const parentSig = crypto.createHash('sha256')
       .update(parentTokenBase64)
       .digest('hex')
       .substring(0, 16);
+    console.log('[DELEGATE] Parent sig:', parentSig);
     
     // Create a NEW child macaroon (server-side delegation for demo)
     const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
+    console.log('[DELEGATE] Key bytes length:', keyBytes.length);
+    
     const childId = `${CAPABILITY_IDENTIFIER}:child:${Date.now()}`;
+    console.log('[DELEGATE] Child ID:', childId);
+    
     let childMac = macaroon.newMacaroon({
       identifier: Buffer.from(childId, 'utf8'),
       location: CAPABILITY_LOCATION,
       rootKey: keyBytes
     });
+    console.log('[DELEGATE] Child macaroon created');
     
     // Add restricted caveats to child
     const expiresAt = Date.now() + (expiresIn * 1000);
