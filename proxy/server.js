@@ -609,7 +609,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.5.7',
+    version: '1.5.8',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1228,21 +1228,30 @@ app.post('/api/capability/mint', express.json(), (req, res) => {
   }
 });
 
-// TEST: Minimal macaroon creation
+// TEST: Minimal macaroon creation with real keys
 app.get('/api/token/test', (req, res) => {
   try {
-    const testKey = Buffer.from('test-key-12345', 'utf8');
-    const testId = Buffer.from('test-id-' + Date.now(), 'utf8');
+    // Test with real keys to debug
+    const keyDebug = {
+      CAPABILITY_ROOT_KEY_defined: !!CAPABILITY_ROOT_KEY,
+      CAPABILITY_ROOT_KEY_type: typeof CAPABILITY_ROOT_KEY,
+      CAPABILITY_ROOT_KEY_length: CAPABILITY_ROOT_KEY ? String(CAPABILITY_ROOT_KEY).length : 0,
+      CAPABILITY_ROOT_KEY_preview: CAPABILITY_ROOT_KEY ? String(CAPABILITY_ROOT_KEY).substring(0, 20) : null
+    };
+    
+    // Try to create macaroon with the real key
+    const realKey = Buffer.from(String(CAPABILITY_ROOT_KEY || 'fallback-key'), 'utf8');
+    const testId = Buffer.from(`${CAPABILITY_IDENTIFIER}:test:${Date.now()}`, 'utf8');
     
     const m = macaroon.newMacaroon({
       identifier: testId,
-      location: 'https://test.com',
-      rootKey: testKey
+      location: CAPABILITY_LOCATION,
+      rootKey: realKey
     });
     
     const sig = Buffer.from(m.signature).toString('hex').substring(0, 16);
     
-    res.json({ ok: true, signature: sig });
+    res.json({ ok: true, signature: sig, keyDebug });
   } catch (e) {
     res.status(500).json({ error: e.message, stack: e.stack?.split('\n').slice(0, 5) });
   }
