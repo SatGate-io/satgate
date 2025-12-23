@@ -609,7 +609,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.6.6',
+    version: '1.6.7',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1136,9 +1136,12 @@ app.use('/api/capability', (req, res, next) => {
         return null; // OK
       }
       
-      // Delegation marker - accept (informational only)
-      if (caveatStr.startsWith('delegated_by = ')) {
-        return null; // OK
+      // Delegation markers - accept (informational only)
+      if (caveatStr.startsWith('delegated_by = ') ||
+          caveatStr.startsWith('delegated_from = ') ||
+          caveatStr.startsWith('delegation_depth = ') ||
+          caveatStr.startsWith('delegation_time = ')) {
+        return null; // OK - delegation tracking caveats
       }
       
       // Unknown caveat - reject for security
