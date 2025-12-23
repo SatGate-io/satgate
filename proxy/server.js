@@ -45,6 +45,54 @@ const path = require('path');
 const http = require('http');
 const crypto = require('crypto');
 
+// =============================================================================
+// L402 NATIVE MODE (SatGate as L402 Authority)
+// =============================================================================
+// When L402_MODE=native, SatGate handles invoice issuance and LSAT validation.
+// When L402_MODE=aperture (default), Aperture handles L402, SatGate just tracks.
+
+const L402_MODE = process.env.L402_MODE || 'aperture'; // 'native' or 'aperture'
+let L402Service, createL402Middleware, l402Service;
+
+// L402 initialization (deferred - Redis passed later when available)
+function initializeL402(redisClient) {
+  if (L402_MODE !== 'native') {
+    console.log('[L402] Aperture sidecar mode (SatGate tracks, Aperture enforces)');
+    return;
+  }
+  
+  try {
+    const l402Module = require('./l402');
+    
+    L402Service = l402Module.L402Service;
+    createL402Middleware = l402Module.createL402Middleware;
+    
+    // Initialize L402 service with Lightning provider
+    const lightningConfig = {
+      backend: process.env.LIGHTNING_BACKEND || 'mock',
+      url: process.env.LIGHTNING_URL || process.env.PHOENIXD_URL,
+      password: process.env.PHOENIXD_PASSWORD,
+      macaroon: process.env.LND_MACAROON,
+      apiKey: process.env.OPENNODE_API_KEY
+    };
+    
+    l402Service = new L402Service({
+      rootKey: process.env.L402_ROOT_KEY || process.env.CAPABILITY_ROOT_KEY,
+      lightningConfig,
+      redis: redisClient,
+      defaultTTL: parseInt(process.env.L402_DEFAULT_TTL) || 3600,
+      defaultMaxCalls: parseInt(process.env.L402_DEFAULT_MAX_CALLS) || 100
+    });
+    
+    console.log(`[L402] Native mode enabled (Lightning: ${lightningConfig.backend})`);
+  } catch (e) {
+    console.warn(`[L402] Native mode requested but failed to load: ${e.message}`);
+    console.warn('[L402] Falling back to Aperture sidecar mode');
+  }
+}
+
+// Note: L402 is initialized after Redis connection (or immediately if no Redis)
+
 const app = express();
 
 // =============================================================================
@@ -234,18 +282,25 @@ if (REDIS_URL) {
       retryDelayOnFailover: 100,
       lazyConnect: true
     });
-    redis.on('connect', () => console.log('[Redis] Connected'));
+    redis.on('connect', () => {
+      console.log('[Redis] Connected');
+      // Initialize L402 with Redis once connected
+      initializeL402(redis);
+    });
     redis.on('error', (err) => console.error('[Redis] Error:', err.message));
     redis.connect().catch(err => {
       console.log('[Redis] Connection failed, using in-memory storage');
       redis = null;
+      initializeL402(null);
     });
   } catch (e) {
     console.log('[Redis] Module not available, using in-memory storage');
     redis = null;
+    initializeL402(null);
   }
 } else {
   console.log('[Storage] No REDIS_URL set, using in-memory storage');
+  initializeL402(null);
 }
 
 // Broadcast to all WebSocket clients
@@ -1012,20 +1067,36 @@ const isL402Auth = (req) => {
   return auth.toLowerCase().startsWith('l402') || auth.toLowerCase().startsWith('lsat');
 };
 
-// Middleware to track L402 paid requests
-// Call this on paid tier endpoints to record revenue
-const trackPaidRequest = (tier, priceSats) => (req, res, next) => {
-  // If request reached paid endpoint, it MUST have paid (Aperture enforces this)
-  // So we track all requests to paid endpoints as paid
-  telemetry.recordPaidRequest(tier, priceSats);
+// =============================================================================
+// L402 PAID ENDPOINT MIDDLEWARE
+// =============================================================================
+// In native mode: SatGate issues 402 challenges and validates LSAT tokens
+// In aperture mode: Aperture handles L402, SatGate just tracks requests
+
+const createPaidMiddleware = (tier, priceSats) => {
+  // L402 Native Mode: SatGate is the L402 authority
+  if (L402_MODE === 'native' && l402Service && createL402Middleware) {
+    return createL402Middleware(l402Service, {
+      tier,
+      scope: `api:${tier}:*`,
+      tierCost: priceSats,
+      maxCalls: parseInt(process.env.L402_DEFAULT_MAX_CALLS) || 100,
+      ttl: parseInt(process.env.L402_DEFAULT_TTL) || 3600
+    });
+  }
   
-  // Also create a visible node on the governance graph
-  telemetry.recordPaymentNode(tier, priceSats, req.path);
-  
-  console.log(`[L402] Paid request: ${tier} tier, ${priceSats} sats, endpoint: ${req.path}`);
-  
-  next();
+  // Aperture Sidecar Mode: Just track (Aperture enforces payment)
+  return (req, res, next) => {
+    // If request reached paid endpoint, it MUST have paid (Aperture enforces this)
+    telemetry.recordPaidRequest(tier, priceSats);
+    telemetry.recordPaymentNode(tier, priceSats, req.path);
+    console.log(`[L402] Paid request (aperture): ${tier} tier, ${priceSats} sats, endpoint: ${req.path}`);
+    next();
+  };
 };
+
+// Backward compatibility alias
+const trackPaidRequest = createPaidMiddleware;
 
 // ---------------------------------------------------------------------------
 // PREMIUM TIER - 1000 sats ($1.00) per request
@@ -1281,7 +1352,7 @@ async function decrementCapabilityBudget(tokenSignature, budgetSats, cost, expir
     ? Math.max(1, Math.ceil((expiresAtMs - now) / 1000))
     : 3600;
 
-  // Redis-backed atomic init + decrby
+  // Redis-backed atomic init + conditional decrby (never go negative)
   if (redis) {
     const key = `satgate:budget:${tokenSignature}`;
     const script = `
@@ -1292,12 +1363,21 @@ async function decrementCapabilityBudget(tokenSignature, budgetSats, cost, expir
       if redis.call('EXISTS', key) == 0 then
         redis.call('SET', key, init, 'EX', ttl)
       end
+      local current = tonumber(redis.call('GET', key))
+      if current == nil then
+        return { -999999, 0 }
+      end
+      if current < cost then
+        return { current, 0 }
+      end
       local remaining = redis.call('DECRBY', key, cost)
-      return remaining
+      return { remaining, 1 }
     `;
     try {
-      const remaining = await redis.eval(script, 1, key, String(budgetSats), String(cost), String(ttlSeconds));
-      return { remaining: Number(remaining), cost, ttlSeconds, backend: 'redis' };
+      const result = await redis.eval(script, 1, key, String(budgetSats), String(cost), String(ttlSeconds));
+      const remaining = Array.isArray(result) ? Number(result[0]) : Number(result);
+      const charged = Array.isArray(result) ? Number(result[1]) === 1 : true;
+      return { remaining, charged, cost, ttlSeconds, backend: 'redis' };
     } catch (e) {
       // Fall back to memory below
     }
@@ -1313,8 +1393,11 @@ async function decrementCapabilityBudget(tokenSignature, budgetSats, cost, expir
   }
 
   const current = capabilityBudgetMemory.get(tokenSignature);
+  if (current.remaining < cost) {
+    return { remaining: current.remaining, charged: false, cost, ttlSeconds, backend: 'memory' };
+  }
   current.remaining -= cost;
-  return { remaining: current.remaining, cost, ttlSeconds, backend: 'memory' };
+  return { remaining: current.remaining, charged: true, cost, ttlSeconds, backend: 'memory' };
 }
 
 // Middleware: Validate macaroon for /api/capability/* routes
@@ -1543,7 +1626,7 @@ app.use('/api/capability', async (req, res, next) => {
     // Enforce budget_sats if present (decremented by tier cost)
     if (budgetSats) {
       const cost = getTierCost(tokenScope || requiredScope);
-      const { remaining, backend } = await decrementCapabilityBudget(tokenSignature, budgetSats, cost, expiresAtMs);
+      const { remaining, charged, backend } = await decrementCapabilityBudget(tokenSignature, budgetSats, cost, expiresAtMs);
       res.setHeader('X-Budget-Limit', String(budgetSats));
       res.setHeader('X-Budget-Remaining', String(Math.max(0, remaining)));
       res.setHeader('X-Budget-Cost', String(cost));
@@ -1553,7 +1636,9 @@ app.use('/api/capability', async (req, res, next) => {
       req.capability.budgetRemaining = Math.max(0, remaining);
       req.capability.requestCost = cost;
 
-      if (remaining < 0) {
+      // If we did not charge, there wasn't enough budget to cover this request.
+      // Return 402 so clients can "re-challenge" (mint/pay for a new token).
+      if (!charged) {
         return res.status(402).json({
           error: 'Budget exhausted',
           code: 'BUDGET_EXHAUSTED',
@@ -2195,7 +2280,17 @@ app.get('/api/governance/audit/export', adminRateLimit, requirePricingAdmin, asy
 
 // System info (admin-only) - version, build, mode
 // Version info is NOT exposed on public endpoints for security
-app.get('/api/governance/info', adminRateLimit, requirePricingAdmin, (req, res) => {
+app.get('/api/governance/info', adminRateLimit, requirePricingAdmin, async (req, res) => {
+  // Get Lightning status if in native mode
+  let lightningStatus = null;
+  if (L402_MODE === 'native' && l402Service && l402Service.lightning) {
+    try {
+      lightningStatus = await l402Service.lightning.getStatus();
+    } catch (e) {
+      lightningStatus = { ok: false, error: e.message };
+    }
+  }
+  
   res.json({
     ok: true,
     version: config.version,
@@ -2206,10 +2301,43 @@ app.get('/api/governance/info', adminRateLimit, requirePricingAdmin, (req, res) 
       websocket: !!wsServer,
       dashboardPublic: config.dashboardPublic,
       tokenRotation: !!ADMIN_TOKEN_NEXT,
+      l402Mode: L402_MODE,
+      l402Native: L402_MODE === 'native' && !!l402Service,
     },
+    lightning: lightningStatus,
     uptime: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
   });
+});
+
+// Lightning status endpoint (admin-only)
+app.get('/api/governance/lightning', adminRateLimit, requirePricingAdmin, async (req, res) => {
+  if (L402_MODE !== 'native' || !l402Service) {
+    return res.json({
+      ok: true,
+      mode: 'aperture',
+      message: 'L402 in Aperture sidecar mode. Lightning handled by Aperture.',
+      hint: 'Set L402_MODE=native to use SatGate as L402 authority.'
+    });
+  }
+  
+  try {
+    const status = await l402Service.lightning.getStatus();
+    res.json({
+      ok: status.ok,
+      mode: 'native',
+      backend: status.backend,
+      nodeId: status.nodeId,
+      error: status.error,
+      timestamp: new Date().toISOString()
+    });
+  } catch (e) {
+    res.status(500).json({
+      ok: false,
+      mode: 'native',
+      error: e.message
+    });
+  }
 });
 
 // Reset dashboard counters and tokens (admin only)

@@ -1,150 +1,373 @@
 /**
- * SatGate Multi-Backend Lightning Module
+ * SatGate Lightning Provider Abstraction
  * 
- * Provides a unified interface for multiple Lightning backends.
- * Configure via environment variables or programmatically.
+ * Supports multiple Lightning backends for invoice issuance and payment verification.
+ * This makes SatGate the L402 authority (not dependent on Aperture for enforcement).
  * 
- * Environment Variables:
- *   LIGHTNING_PROVIDER=phoenixd|lnd|opennode|aperture
- *   
- *   For phoenixd:
- *     PHOENIXD_URL=http://localhost:9740
- *     PHOENIXD_PASSWORD=your-password
- *   
- *   For lnd:
- *     LND_URL=https://localhost:8080
- *     LND_MACAROON=hex-encoded-macaroon
- *   
- *   For opennode:
- *     OPENNODE_API_KEY=your-api-key
- *     OPENNODE_ENV=live|dev
- *   
- *   For aperture (legacy):
- *     Continue using LNC env vars - Aperture handles Lightning
+ * Supported backends:
+ *   - phoenixd: Self-custodial, easy setup (recommended for getting started)
+ *   - lnd: Enterprise standard (LND REST API)
+ *   - opennode: Hosted solution (no node required)
+ *   - mock: For testing/demo (no real Lightning)
  */
 
-const { LightningProvider } = require('./provider');
-const { PhoenixdProvider } = require('./phoenixd');
-const { LNDProvider } = require('./lnd');
-const { OpenNodeProvider } = require('./opennode');
+const crypto = require('crypto');
 
-/**
- * Create a Lightning provider from environment variables
- * @returns {LightningProvider}
- */
-function createProvider() {
-  const providerType = (process.env.LIGHTNING_PROVIDER || 'aperture').toLowerCase();
+// =============================================================================
+// PROVIDER INTERFACE
+// =============================================================================
 
-  console.log(`[Lightning] Initializing provider: ${providerType}`);
+class LightningProvider {
+  /**
+   * Create an invoice for the given amount
+   * @param {number} amountSats - Amount in satoshis
+   * @param {string} memo - Invoice description
+   * @param {number} expirySecs - Invoice expiry in seconds
+   * @returns {Promise<{paymentHash: string, paymentRequest: string, expiresAt: number}>}
+   */
+  async createInvoice(amountSats, memo, expirySecs = 3600) {
+    throw new Error('createInvoice not implemented');
+  }
 
-  switch (providerType) {
-    case 'phoenixd':
-    case 'phoenix':
-      if (!process.env.PHOENIXD_PASSWORD) {
-        console.warn('[Lightning] PHOENIXD_PASSWORD not set');
-      }
-      return new PhoenixdProvider({
-        url: process.env.PHOENIXD_URL || 'http://localhost:9740',
-        password: process.env.PHOENIXD_PASSWORD || '',
-      });
+  /**
+   * Check if an invoice has been paid
+   * @param {string} paymentHash - The payment hash (hex)
+   * @returns {Promise<{paid: boolean, preimage?: string, settledAt?: number}>}
+   */
+  async checkInvoice(paymentHash) {
+    throw new Error('checkInvoice not implemented');
+  }
 
-    case 'lnd':
-    case 'lnd-rest':
-      if (!process.env.LND_MACAROON) {
-        throw new Error('LND_MACAROON environment variable required for LND provider');
-      }
-      return new LNDProvider({
-        url: process.env.LND_URL || 'https://localhost:8080',
-        macaroon: process.env.LND_MACAROON,
-        cert: process.env.LND_CERT || null,
-      });
+  /**
+   * Verify a preimage matches a payment hash
+   * @param {string} preimage - The preimage (hex)
+   * @param {string} paymentHash - The payment hash (hex)
+   * @returns {boolean}
+   */
+  verifyPreimage(preimage, paymentHash) {
+    const computed = crypto.createHash('sha256')
+      .update(Buffer.from(preimage, 'hex'))
+      .digest('hex');
+    return computed === paymentHash;
+  }
 
-    case 'opennode':
-      if (!process.env.OPENNODE_API_KEY) {
-        throw new Error('OPENNODE_API_KEY environment variable required for OpenNode provider');
-      }
-      return new OpenNodeProvider({
-        apiKey: process.env.OPENNODE_API_KEY,
-        environment: process.env.OPENNODE_ENV || 'live',
-      });
-
-    case 'aperture':
-    case 'lnc':
-    default:
-      // Aperture mode - Lightning is handled by Aperture via LNC
-      // Return a stub provider that indicates Aperture is handling L402
-      return new ApertureStubProvider();
+  /**
+   * Get provider status/health
+   * @returns {Promise<{ok: boolean, backend: string, error?: string}>}
+   */
+  async getStatus() {
+    throw new Error('getStatus not implemented');
   }
 }
 
-/**
- * Stub provider for when Aperture handles Lightning
- * This indicates that L402 challenges should be left to Aperture
- */
-class ApertureStubProvider extends LightningProvider {
-  constructor() {
-    super({});
-    this.name = 'aperture';
-    this.isStub = true;
+// =============================================================================
+// PHOENIXD PROVIDER (Self-custodial, recommended)
+// =============================================================================
+
+class PhoenixdProvider extends LightningProvider {
+  constructor(config) {
+    super();
+    this.baseUrl = config.url || 'http://localhost:9740';
+    this.password = config.password || process.env.PHOENIXD_PASSWORD;
+    this.name = 'phoenixd';
   }
 
-  async createInvoice() {
-    throw new Error(
-      'Invoice creation handled by Aperture. ' +
-      'Set LIGHTNING_PROVIDER to use native L402.'
-    );
+  async createInvoice(amountSats, memo, expirySecs = 3600) {
+    const response = await fetch(`${this.baseUrl}/createinvoice`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${Buffer.from(`:${this.password}`).toString('base64')}`
+      },
+      body: new URLSearchParams({
+        amountSat: String(amountSats),
+        description: memo,
+        expirySeconds: String(expirySecs)
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`phoenixd createinvoice failed: ${error}`);
+    }
+
+    const data = await response.json();
+    return {
+      paymentHash: data.paymentHash,
+      paymentRequest: data.serialized,
+      expiresAt: Date.now() + (expirySecs * 1000)
+    };
   }
 
-  async checkPayment() {
-    throw new Error('Payment verification handled by Aperture.');
+  async checkInvoice(paymentHash) {
+    const response = await fetch(`${this.baseUrl}/payments/incoming/${paymentHash}`, {
+      headers: {
+        'Authorization': `Basic ${Buffer.from(`:${this.password}`).toString('base64')}`
+      }
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return { paid: false };
+      }
+      throw new Error(`phoenixd check failed: ${await response.text()}`);
+    }
+
+    const data = await response.json();
+    return {
+      paid: data.isPaid === true,
+      preimage: data.preimage,
+      settledAt: data.completedAt
+    };
   }
 
   async getStatus() {
-    return {
-      ok: true,
-      info: {
-        provider: 'aperture',
-        mode: 'passthrough',
-        note: 'Lightning handled by Aperture via LNC',
+    try {
+      const response = await fetch(`${this.baseUrl}/getinfo`, {
+        headers: {
+          'Authorization': `Basic ${Buffer.from(`:${this.password}`).toString('base64')}`
+        }
+      });
+      if (!response.ok) throw new Error('Not reachable');
+      const data = await response.json();
+      return { ok: true, backend: 'phoenixd', nodeId: data.nodeId };
+    } catch (e) {
+      return { ok: false, backend: 'phoenixd', error: e.message };
+    }
+  }
+}
+
+// =============================================================================
+// LND PROVIDER (Enterprise standard)
+// =============================================================================
+
+class LndProvider extends LightningProvider {
+  constructor(config) {
+    super();
+    this.baseUrl = config.url || process.env.LND_REST_URL || 'https://localhost:8080';
+    this.macaroon = config.macaroon || process.env.LND_MACAROON;
+    this.name = 'lnd';
+  }
+
+  async createInvoice(amountSats, memo, expirySecs = 3600) {
+    const response = await fetch(`${this.baseUrl}/v1/invoices`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Grpc-Metadata-macaroon': this.macaroon
       },
+      body: JSON.stringify({
+        value: String(amountSats),
+        memo: memo,
+        expiry: String(expirySecs)
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`LND createinvoice failed: ${await response.text()}`);
+    }
+
+    const data = await response.json();
+    return {
+      paymentHash: Buffer.from(data.r_hash, 'base64').toString('hex'),
+      paymentRequest: data.payment_request,
+      expiresAt: Date.now() + (expirySecs * 1000)
     };
   }
-}
 
-// Singleton instance
-let _provider = null;
+  async checkInvoice(paymentHash) {
+    const hashBase64 = Buffer.from(paymentHash, 'hex').toString('base64')
+      .replace(/\+/g, '-').replace(/\//g, '_');
+    
+    const response = await fetch(`${this.baseUrl}/v1/invoice/${hashBase64}`, {
+      headers: {
+        'Grpc-Metadata-macaroon': this.macaroon
+      }
+    });
 
-/**
- * Get the configured Lightning provider (singleton)
- * @returns {LightningProvider}
- */
-function getProvider() {
-  if (!_provider) {
-    _provider = createProvider();
+    if (!response.ok) {
+      return { paid: false };
+    }
+
+    const data = await response.json();
+    return {
+      paid: data.state === 'SETTLED',
+      preimage: data.r_preimage ? Buffer.from(data.r_preimage, 'base64').toString('hex') : undefined,
+      settledAt: data.settle_date ? parseInt(data.settle_date) * 1000 : undefined
+    };
   }
-  return _provider;
+
+  async getStatus() {
+    try {
+      const response = await fetch(`${this.baseUrl}/v1/getinfo`, {
+        headers: { 'Grpc-Metadata-macaroon': this.macaroon }
+      });
+      if (!response.ok) throw new Error('Not reachable');
+      const data = await response.json();
+      return { ok: true, backend: 'lnd', nodeId: data.identity_pubkey };
+    } catch (e) {
+      return { ok: false, backend: 'lnd', error: e.message };
+    }
+  }
 }
 
-/**
- * Check if we're in Aperture mode (L402 handled externally)
- * @returns {boolean}
- */
-function isApertureMode() {
-  const provider = getProvider();
-  return provider.isStub === true;
+// =============================================================================
+// OPENNODE PROVIDER (Hosted, no node required)
+// =============================================================================
+
+class OpenNodeProvider extends LightningProvider {
+  constructor(config) {
+    super();
+    this.apiKey = config.apiKey || process.env.OPENNODE_API_KEY;
+    this.baseUrl = 'https://api.opennode.com/v1';
+    this.name = 'opennode';
+  }
+
+  async createInvoice(amountSats, memo, expirySecs = 3600) {
+    const response = await fetch(`${this.baseUrl}/charges`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': this.apiKey
+      },
+      body: JSON.stringify({
+        amount: amountSats,
+        description: memo,
+        callback_url: null, // We poll instead
+        ttl: Math.floor(expirySecs / 60) // OpenNode uses minutes
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenNode create failed: ${await response.text()}`);
+    }
+
+    const data = await response.json();
+    return {
+      paymentHash: data.data.id, // OpenNode uses charge ID
+      paymentRequest: data.data.lightning_invoice.payreq,
+      expiresAt: Date.now() + (expirySecs * 1000)
+    };
+  }
+
+  async checkInvoice(chargeId) {
+    const response = await fetch(`${this.baseUrl}/charge/${chargeId}`, {
+      headers: { 'Authorization': this.apiKey }
+    });
+
+    if (!response.ok) {
+      return { paid: false };
+    }
+
+    const data = await response.json();
+    return {
+      paid: data.data.status === 'paid',
+      preimage: data.data.lightning_invoice?.settled_at ? chargeId : undefined, // OpenNode doesn't expose preimage
+      settledAt: data.data.lightning_invoice?.settled_at
+    };
+  }
+
+  async getStatus() {
+    try {
+      const response = await fetch(`${this.baseUrl}/account/balance`, {
+        headers: { 'Authorization': this.apiKey }
+      });
+      if (!response.ok) throw new Error('Not reachable');
+      return { ok: true, backend: 'opennode' };
+    } catch (e) {
+      return { ok: false, backend: 'opennode', error: e.message };
+    }
+  }
+}
+
+// =============================================================================
+// MOCK PROVIDER (Testing/Demo)
+// =============================================================================
+
+class MockProvider extends LightningProvider {
+  constructor() {
+    super();
+    this.invoices = new Map();
+    this.name = 'mock';
+  }
+
+  async createInvoice(amountSats, memo, expirySecs = 3600) {
+    const paymentHash = crypto.randomBytes(32).toString('hex');
+    const preimage = crypto.randomBytes(32).toString('hex');
+    
+    // Store for later "payment"
+    this.invoices.set(paymentHash, {
+      preimage,
+      amountSats,
+      memo,
+      paid: false,
+      expiresAt: Date.now() + (expirySecs * 1000)
+    });
+
+    // Generate a fake bolt11 invoice
+    const paymentRequest = `lnbc${amountSats}n1mock${paymentHash.substring(0, 40)}`;
+
+    return {
+      paymentHash,
+      paymentRequest,
+      expiresAt: Date.now() + (expirySecs * 1000),
+      _mockPreimage: preimage // For testing: auto-pay by including preimage
+    };
+  }
+
+  async checkInvoice(paymentHash) {
+    const invoice = this.invoices.get(paymentHash);
+    if (!invoice) {
+      return { paid: false };
+    }
+    return {
+      paid: invoice.paid,
+      preimage: invoice.paid ? invoice.preimage : undefined,
+      settledAt: invoice.settledAt
+    };
+  }
+
+  // Mock-only: simulate payment
+  simulatePayment(paymentHash) {
+    const invoice = this.invoices.get(paymentHash);
+    if (invoice) {
+      invoice.paid = true;
+      invoice.settledAt = Date.now();
+      return invoice.preimage;
+    }
+    return null;
+  }
+
+  async getStatus() {
+    return { ok: true, backend: 'mock', note: 'Mock provider for testing' };
+  }
+}
+
+// =============================================================================
+// PROVIDER FACTORY
+// =============================================================================
+
+function createLightningProvider(config = {}) {
+  const backend = config.backend || process.env.LIGHTNING_BACKEND || 'mock';
+  
+  switch (backend.toLowerCase()) {
+    case 'phoenixd':
+      return new PhoenixdProvider(config);
+    case 'lnd':
+      return new LndProvider(config);
+    case 'opennode':
+      return new OpenNodeProvider(config);
+    case 'mock':
+    default:
+      return new MockProvider();
+  }
 }
 
 module.exports = {
-  // Factory
-  createProvider,
-  getProvider,
-  isApertureMode,
-  
-  // Classes for direct use
   LightningProvider,
   PhoenixdProvider,
-  LNDProvider,
+  LndProvider,
   OpenNodeProvider,
-  ApertureStubProvider,
+  MockProvider,
+  createLightningProvider
 };
-
