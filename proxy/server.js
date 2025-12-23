@@ -35,6 +35,7 @@ const express = require('express');
 const os = require('os');
 const path = require('path');
 const http = require('http');
+const crypto = require('crypto');
 
 const app = express();
 
@@ -1235,7 +1236,6 @@ app.post('/api/capability/delegate', express.json(), (req, res) => {
   
   try {
     // Create a hash of the parent token as its "signature" for linking
-    const crypto = require('crypto');
     const parentSig = crypto.createHash('sha256')
       .update(parentTokenBase64)
       .digest('hex')
