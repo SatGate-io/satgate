@@ -5,15 +5,20 @@
  * SECURITY MODEL (Enterprise-Ready):
  * ===================================
  * 
- * CONTROL PLANE (admin-only by default):
- *   - /dashboard                   - Governance dashboard UI
- *   - /api/governance/graph        - Telemetry graph data
- *   - /api/governance/stats        - Summary metrics
- *   - POST /api/governance/ban     - Ban a token (kill switch)
- *   - POST /api/governance/unban   - Remove ban
- *   - GET /api/governance/banned   - List banned tokens
- *   - POST /api/governance/reset   - Reset telemetry
- *   - POST /api/free/pricing       - Update pricing
+ * MODES:
+ *   MODE=prod (default) - Dashboard/telemetry require admin auth, no redaction
+ *   MODE=demo           - Public dashboard allowed (with DASHBOARD_PUBLIC=true), data redacted
+ * 
+ * CONTROL PLANE (admin-only):
+ *   - /dashboard                      - Governance dashboard UI
+ *   - GET /api/governance/graph       - Telemetry graph data
+ *   - GET /api/governance/stats       - Summary metrics
+ *   - GET /api/governance/info        - Version/build info (admin-only)
+ *   - GET /api/governance/audit       - Audit log
+ *   - GET /api/governance/audit/export - JSONL export for SIEM
+ *   - POST /api/governance/ban        - Ban a token (kill switch)
+ *   - POST /api/governance/unban      - Remove ban
+ *   - POST /api/governance/reset      - Reset telemetry
  * 
  * DATA PLANE:
  *   - /api/capability/*            - Macaroon-authenticated (no payment)
@@ -23,15 +28,16 @@
  *   - /api/premium/*               - L402 protected (1000 sats)
  *   - /api/free/*                  - Free tier (rate limited)
  * 
- * HEALTH (rate limited):
- *   - /health, /ready              - Minimal info, no secrets
+ * HEALTH (rate limited, minimal response):
+ *   - /health, /ready              - Returns only { status: 'ok' }
  * 
  * Environment Variables:
- *   PRICING_ADMIN_TOKEN    - Secret for admin endpoints (REQUIRED in production)
- *   DASHBOARD_PUBLIC       - 'true' to allow public dashboard (default: false)
- *   DEMO_MODE              - 'true' to redact sensitive data in public views
+ *   MODE                   - 'prod' (default) or 'demo'
+ *   PRICING_ADMIN_TOKEN    - Primary admin token (REQUIRED, min 32 chars)
+ *   ADMIN_TOKEN_NEXT       - Secondary token for rotation (optional)
+ *   DASHBOARD_PUBLIC       - 'true' to allow public dashboard (demo mode only)
  *   ADMIN_RATE_LIMIT       - Admin requests/min per IP (default: 30)
- *   HEALTH_RATE_LIMIT      - Health check requests/min per IP (default: 600)
+ *   HEALTH_RATE_LIMIT      - Health requests/min per IP (default: 600)
  */
 const express = require('express');
 const os = require('os');
@@ -107,32 +113,42 @@ const healthRateLimit = rateLimit({
 });
 
 // Optional admin auth for governance read endpoints
-// In production (DASHBOARD_PUBLIC=false), requires admin token
-// In demo mode, allows public access with redaction
+// MODE=prod: always requires admin auth
+// MODE=demo + DASHBOARD_PUBLIC=true: allows public access with redaction
 function optionalAdminAuth(req, res, next) {
-  // If dashboard is public, allow access
-  if (config.dashboardPublic) {
-    req.isAdmin = false;
+  const token = req.headers['x-admin-token'] || req.query.token;
+  const { valid, actor } = checkAdminToken(token);
+  
+  // If valid admin token, grant full access
+  if (valid) {
+    req.isAdmin = true;
+    req.adminActor = actor;
     return next();
   }
   
-  // Check for admin token
-  const token = req.headers['x-admin-token'] || req.query.token;
-  if (token && PRICING_ADMIN_TOKEN && token === PRICING_ADMIN_TOKEN) {
-    req.isAdmin = true;
+  // In demo mode with public dashboard enabled, allow read-only access (data will be redacted)
+  if (config.isDemo && config.dashboardPublic) {
+    req.isAdmin = false;
+    req.adminActor = 'public';
     return next();
   }
   
   // Not authorized
   return res.status(403).json({ 
     error: 'Forbidden',
-    message: 'Dashboard access requires authentication. Set DASHBOARD_PUBLIC=true for public demos.'
+    message: config.isProd 
+      ? 'Dashboard access requires authentication.'
+      : 'Dashboard access requires authentication. Use MODE=demo and DASHBOARD_PUBLIC=true for public demos.'
   });
 }
 
-// Redact sensitive data in DEMO_MODE
-function redactForDemo(data) {
-  if (!config.demoMode) return data;
+// Redact sensitive data in demo mode
+// Always redacts in MODE=demo, regardless of other settings
+function redactForDemo(data, req) {
+  // In prod mode, never redact (admin-only access anyway)
+  // In demo mode, always redact for public access
+  if (config.isProd) return data;
+  if (req && req.isAdmin) return data; // Admin sees full data even in demo mode
   
   // Deep clone to avoid mutating original
   const redacted = JSON.parse(JSON.stringify(data));
@@ -179,6 +195,7 @@ function logAdminAction(action, details, req) {
     timestamp: new Date().toISOString(),
     action,
     details,
+    actor: req.adminActor || 'unknown',  // Stable actor ID for SIEM correlation
     ip: req.ip || req.connection.remoteAddress,
     userAgent: req.get('user-agent'),
   };
@@ -186,7 +203,8 @@ function logAdminAction(action, details, req) {
   auditLog.unshift(entry);
   if (auditLog.length > MAX_AUDIT_LOG) auditLog.pop();
   
-  console.log(`[AUDIT] ${action}:`, JSON.stringify(details));
+  // Structured JSON log for SIEM ingestion
+  console.log(JSON.stringify({ level: 'audit', ...entry }));
   
   // Persist to Redis if available
   if (redis) {
@@ -622,6 +640,12 @@ const telemetry = {
 // =============================================================================
 // CONFIGURATION
 // =============================================================================
+
+// Explicit MODE: 'prod' (default) or 'demo'
+// - prod: dashboard + telemetry require admin auth, no redaction
+// - demo: dashboard may be public (if DASHBOARD_PUBLIC=true), data is redacted
+const MODE = process.env.MODE || 'prod';
+
 const config = {
   port: process.env.BACKEND_PORT || 8083,
   env: process.env.NODE_ENV || 'development',
@@ -630,18 +654,60 @@ const config = {
   rateLimitMax: 100, // requests per window
   
   // Security settings (enterprise defaults)
-  dashboardPublic: process.env.DASHBOARD_PUBLIC === 'true',    // Default: false (admin-only)
-  demoMode: process.env.DEMO_MODE === 'true',                  // Default: false (no redaction)
-  healthRateLimit: parseInt(process.env.HEALTH_RATE_LIMIT) || 600,  // 600/min for probes
+  mode: MODE,
+  isDemo: MODE === 'demo',
+  isProd: MODE === 'prod',
+  // In demo mode, DASHBOARD_PUBLIC can enable public access (with redaction)
+  // In prod mode, dashboard always requires admin auth regardless of DASHBOARD_PUBLIC
+  dashboardPublic: MODE === 'demo' && process.env.DASHBOARD_PUBLIC === 'true',
+  healthRateLimit: parseInt(process.env.HEALTH_RATE_LIMIT) || 600,
+  
+  // Version info (only exposed via admin endpoint)
+  version: '1.8.1',
+  buildTime: new Date().toISOString(),
 };
 
-// Admin token for control plane endpoints (REQUIRED in production)
-const PRICING_ADMIN_TOKEN = process.env.PRICING_ADMIN_TOKEN || '';
+// Admin tokens for control plane endpoints
+// Support rotation: both CURRENT and NEXT tokens are valid during rotation
+const ADMIN_TOKEN_CURRENT = process.env.PRICING_ADMIN_TOKEN || process.env.ADMIN_TOKEN_CURRENT || '';
+const ADMIN_TOKEN_NEXT = process.env.ADMIN_TOKEN_NEXT || '';
+const MIN_ADMIN_TOKEN_LENGTH = 32; // Minimum 32 chars (256 bits) for security
 
-// Warn if no admin token in production
-if (config.env === 'production' && !PRICING_ADMIN_TOKEN) {
-  console.warn('[SECURITY] ⚠️  No PRICING_ADMIN_TOKEN set - admin endpoints unprotected!');
+// Validate admin token strength
+function isValidAdminToken(token) {
+  if (!token) return false;
+  if (token.length < MIN_ADMIN_TOKEN_LENGTH) {
+    console.warn(`[SECURITY] ⚠️  Admin token too short (${token.length} chars, need ${MIN_ADMIN_TOKEN_LENGTH}+)`);
+    return false;
+  }
+  return true;
 }
+
+// Check if a provided token matches any valid admin token
+function checkAdminToken(token) {
+  if (!token) return { valid: false, actor: null };
+  if (ADMIN_TOKEN_CURRENT && token === ADMIN_TOKEN_CURRENT) {
+    return { valid: true, actor: 'admin-token-current' };
+  }
+  if (ADMIN_TOKEN_NEXT && token === ADMIN_TOKEN_NEXT) {
+    return { valid: true, actor: 'admin-token-next' };
+  }
+  return { valid: false, actor: null };
+}
+
+// Startup security checks
+if (config.env === 'production' || config.isProd) {
+  if (!ADMIN_TOKEN_CURRENT) {
+    console.warn('[SECURITY] ⚠️  No PRICING_ADMIN_TOKEN set - admin endpoints unprotected!');
+  } else if (!isValidAdminToken(ADMIN_TOKEN_CURRENT)) {
+    console.warn('[SECURITY] ⚠️  Admin token does not meet minimum length requirements');
+  }
+  if (config.dashboardPublic) {
+    console.warn('[SECURITY] ⚠️  DASHBOARD_PUBLIC ignored in prod mode - use MODE=demo for public demos');
+  }
+}
+
+console.log(`[CONFIG] Mode: ${MODE} | Dashboard: ${config.dashboardPublic ? 'public' : 'admin-only'} | Token rotation: ${ADMIN_TOKEN_NEXT ? 'enabled' : 'disabled'}`);
 
 // =============================================================================
 // MIDDLEWARE
@@ -660,13 +726,34 @@ app.use((req, res, next) => {
 // JSON body parser with size limit
 app.use(express.json({ limit: '10kb' }));
 
-// Security headers
+// Security headers (enterprise-grade)
 app.use((req, res, next) => {
+  // Prevent MIME-sniffing
   res.setHeader('X-Content-Type-Options', 'nosniff');
+  // Prevent clickjacking
   res.setHeader('X-Frame-Options', 'DENY');
+  // XSS protection (legacy browsers)
   res.setHeader('X-XSS-Protection', '1; mode=block');
+  // Referrer policy
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  if (config.env === 'production') {
+  // Permissions policy (disable unused features)
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  
+  // Content Security Policy for dashboard
+  if (req.path.startsWith('/dashboard') || req.path === '/') {
+    res.setHeader('Content-Security-Policy', 
+      "default-src 'self'; " +
+      "script-src 'self' 'unsafe-inline' https://unpkg.com; " +  // Cytoscape from CDN
+      "style-src 'self' 'unsafe-inline'; " +
+      "img-src 'self' data:; " +
+      "connect-src 'self' wss: ws:; " +  // WebSocket for dashboard
+      "font-src 'self'; " +
+      "frame-ancestors 'none';"
+    );
+  }
+  
+  // HSTS in production
+  if (config.env === 'production' || config.isProd) {
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   }
   next();
@@ -708,21 +795,15 @@ app.use((req, res, next) => {
 // =============================================================================
 
 // Health check (for load balancers, k8s probes)
-// Rate limited to prevent probe storms
+// Returns minimal info only - no version/build details for security
 app.get('/health', healthRateLimit, (req, res) => {
-  res.json({ 
-    status: 'healthy',
-    version: '1.8.0',
-    uptime: Math.floor(process.uptime())
-    // Note: No env/build details exposed for security
-  });
+  res.json({ status: 'ok' });
 });
 
-// Readiness check
-// Rate limited to prevent probe storms
+// Readiness check (for k8s/orchestrators)
+// Returns minimal info only
 app.get('/ready', healthRateLimit, (req, res) => {
-  // Add checks for database connections, external services, etc.
-  res.json({ ready: true });
+  res.json({ status: 'ok' });
 });
 
 // Lightning provider status
@@ -804,19 +885,20 @@ app.get('/api/free/pricing', (req, res) => {
 });
 
 function requirePricingAdmin(req, res, next) {
-  // For the public demo we allow reads, but disallow writes in production unless
-  // an explicit shared secret is configured.
-  if (config.env !== 'production') return next();
-  if (!PRICING_ADMIN_TOKEN) {
-    return res.status(403).json({ error: 'Pricing updates disabled in production' });
-  }
-  const token =
-    req.get('x-admin-token') ||
-    req.get('x-satgate-admin-token') ||
-    '';
-  if (token !== PRICING_ADMIN_TOKEN) {
+  // Admin endpoints always require authentication (even in demo mode)
+  const token = req.get('x-admin-token') || req.get('x-satgate-admin-token') || '';
+  const { valid, actor } = checkAdminToken(token);
+  
+  if (!valid) {
+    // In development without token set, allow for testing
+    if (config.env !== 'production' && !ADMIN_TOKEN_CURRENT) {
+      req.adminActor = 'dev-mode';
+      return next();
+    }
     return res.status(403).json({ error: 'Forbidden' });
   }
+  
+  req.adminActor = actor;
   return next();
 }
 
@@ -1678,7 +1760,7 @@ app.get('/api/micro/data', trackPaidRequest('micro', 1), (req, res) => {
 // Protected by: optional admin auth (public if DASHBOARD_PUBLIC=true)
 app.get('/api/governance/graph', optionalAdminAuth, async (req, res) => {
   const graphData = await telemetry.getGraphData();
-  res.json(redactForDemo(graphData));
+  res.json(redactForDemo(graphData, req));
 });
 
 // Get governance stats (quick summary)
@@ -1689,7 +1771,7 @@ app.get('/api/governance/stats', optionalAdminAuth, async (req, res) => {
     ok: true,
     stats: data.stats,
     timestamp: new Date().toISOString()
-  }));
+  }, req));
 });
 
 // Economic Firewall Report (for sales dashboards and weekly reporting)
@@ -1827,6 +1909,50 @@ app.get('/api/governance/audit', adminRateLimit, requirePricingAdmin, async (req
   }
   
   res.json({ ok: true, count: logs.length, logs });
+});
+
+// SIEM-friendly audit export (JSONL format)
+// Each line is a complete JSON object for easy log ingestion
+app.get('/api/governance/audit/export', adminRateLimit, requirePricingAdmin, async (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 1000, MAX_AUDIT_LOG);
+  
+  let logs = auditLog.slice(0, limit);
+  
+  // Try Redis for more complete history
+  if (redis) {
+    try {
+      const redisLogs = await redis.lrange('satgate:audit', 0, limit - 1);
+      if (redisLogs.length > 0) {
+        logs = redisLogs.map(l => JSON.parse(l));
+      }
+    } catch (e) {
+      // Fall back to in-memory
+    }
+  }
+  
+  // Return JSONL (newline-delimited JSON)
+  res.setHeader('Content-Type', 'application/x-ndjson');
+  res.setHeader('Content-Disposition', `attachment; filename="satgate-audit-${Date.now()}.jsonl"`);
+  res.send(logs.map(l => JSON.stringify(l)).join('\n'));
+});
+
+// System info (admin-only) - version, build, mode
+// Version info is NOT exposed on public endpoints for security
+app.get('/api/governance/info', adminRateLimit, requirePricingAdmin, (req, res) => {
+  res.json({
+    ok: true,
+    version: config.version,
+    mode: config.mode,
+    env: config.env,
+    features: {
+      redis: !!redis,
+      websocket: !!wsServer,
+      dashboardPublic: config.dashboardPublic,
+      tokenRotation: !!ADMIN_TOKEN_NEXT,
+    },
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // Reset dashboard counters and tokens (admin only)
