@@ -145,12 +145,12 @@ async function checkReadiness(apiUrl) {
   
   const checks = [];
   
-  // Check 1: API Health
+  // Check 1: API Health (v1.8.1+: returns minimal {"status":"ok"})
   step(1, 'Checking API health...');
   try {
     const res = await request(`${apiUrl}/health`);
-    if (res.status === 200 && res.data?.status === 'healthy') {
-      result(true, `API healthy (uptime: ${Math.floor(res.data.uptime)}s)`);
+    if (res.status === 200 && res.data?.status === 'ok') {
+      result(true, 'API healthy');
       checks.push({ name: 'API Health', pass: true });
     } else {
       result(false, `API unhealthy: ${res.status}`);
@@ -161,13 +161,26 @@ async function checkReadiness(apiUrl) {
     checks.push({ name: 'API Health', pass: false });
   }
 
-  // Check 2: Governance Dashboard
+  // Check 2: Governance Dashboard (v1.8.1+: requires admin auth in prod mode)
+  // 403 = secured (correct), 200 with token = accessible
   step(2, 'Checking governance dashboard...');
   try {
-    const res = await request(`${apiUrl}/api/governance/stats`);
+    const adminToken = process.env.SATGATE_ADMIN_TOKEN || process.env.PRICING_ADMIN_TOKEN;
+    const headers = adminToken ? { 'X-Admin-Token': adminToken } : {};
+    const res = await request(`${apiUrl}/api/governance/stats`, { headers });
+    
     if (res.status === 200 && res.data?.ok) {
       result(true, `Dashboard online (${res.data.stats?.active || 0} active tokens)`);
       checks.push({ name: 'Dashboard', pass: true });
+    } else if (res.status === 403) {
+      // 403 without token is correct behavior (secured)
+      if (adminToken) {
+        result(false, 'Dashboard auth failed (check admin token)');
+        checks.push({ name: 'Dashboard', pass: false });
+      } else {
+        result(true, 'Dashboard secured (set SATGATE_ADMIN_TOKEN for full access)');
+        checks.push({ name: 'Dashboard', pass: true });
+      }
     } else {
       result(false, `Dashboard error: ${res.status}`);
       checks.push({ name: 'Dashboard', pass: false });

@@ -656,6 +656,10 @@
     let pollingInterval = null;
     let isWebSocketConnected = false;
     
+    // Get admin token from URL query param (?token=xxx)
+    const urlParams = new URLSearchParams(window.location.search);
+    const adminToken = urlParams.get('token');
+    
     function updateConnectionStatus(status) {
       const dot = document.getElementById('statusDot');
       const text = document.getElementById('statusText');
@@ -677,7 +681,12 @@
     
     function connectWebSocket() {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${window.location.host}/ws/governance`;
+      let wsUrl = `${protocol}//${window.location.host}/ws/governance`;
+      
+      // Pass admin token as query param (WebSocket doesn't support custom headers)
+      if (adminToken) {
+        wsUrl += `?token=${encodeURIComponent(adminToken)}`;
+      }
       
       try {
         ws = new WebSocket(wsUrl);
@@ -727,7 +736,19 @@
     
     async function fetchData() {
       try {
-        const response = await fetch('/api/governance/graph');
+        const headers = {};
+        if (adminToken) {
+          headers['X-Admin-Token'] = adminToken;
+        }
+        const response = await fetch('/api/governance/graph', { headers });
+        
+        if (response.status === 403) {
+          console.error('[Polling] 403 Forbidden - admin token required');
+          updateConnectionStatus('disconnected');
+          document.getElementById('statusText').textContent = 'Auth Required';
+          return;
+        }
+        
         const data = await response.json();
         handleMessage({ type: 'init', ...data });
       } catch (err) {

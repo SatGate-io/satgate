@@ -85,7 +85,7 @@ Admin endpoints require the `X-Admin-Token` header. They should **never** be pub
 
 #### Demo Mode (Optional)
 
-To support public demos, SatGate can enable `DEMO_MODE`, which:
+To support public demos, SatGate can enable demo mode, which:
 
 - ✅ Redacts token identifiers (hash/truncate)
 - ✅ Removes IP / user-agent from views
@@ -95,11 +95,11 @@ To support public demos, SatGate can enable `DEMO_MODE`, which:
 **Usage:**
 ```bash
 # For public demo environments only
-DEMO_MODE=true
+MODE=demo
 DASHBOARD_PUBLIC=true
 ```
 
-> ⚠️ Only use `DASHBOARD_PUBLIC=true` when paired with `DEMO_MODE=true`
+> 🔒 **Guardrail:** In `MODE=prod` (the default), `DASHBOARD_PUBLIC=true` is **ignored** — the dashboard always requires admin authentication. This prevents accidental exposure if someone misconfigures environment variables. A startup warning is logged if this misconfiguration is detected.
 
 ---
 
@@ -253,12 +253,15 @@ Attackers may try to DoS invoice creation or create churn.
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `PRICING_ADMIN_TOKEN` | Secret for admin endpoints | ✅ (prod) | None |
-| `DASHBOARD_PUBLIC` | Allow public dashboard access | No | `false` |
-| `DEMO_MODE` | Redact/aggregate telemetry for public demo | No | `false` |
+| `MODE` | Operating mode: `prod` (secure) or `demo` (public demos) | No | `prod` |
+| `PRICING_ADMIN_TOKEN` | Secret for admin endpoints (min 32 chars) | ✅ (prod) | None |
+| `ADMIN_TOKEN_NEXT` | Secondary admin token for rotation | No | None |
+| `DASHBOARD_PUBLIC` | Allow public dashboard access (only in `MODE=demo`) | No | `false` |
 | `ADMIN_RATE_LIMIT` | Admin req/min per IP | No | `30` |
 | `HEALTH_RATE_LIMIT` | Health check req/min per IP | No | `600` |
 | `REDIS_URL` | Redis connection for persistence | No | in-memory |
+
+> **Note:** `DASHBOARD_PUBLIC=true` is ignored when `MODE=prod` — see guardrail above.
 
 ---
 

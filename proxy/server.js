@@ -702,8 +702,10 @@ if (config.env === 'production' || config.isProd) {
   } else if (!isValidAdminToken(ADMIN_TOKEN_CURRENT)) {
     console.warn('[SECURITY] ⚠️  Admin token does not meet minimum length requirements');
   }
-  if (config.dashboardPublic) {
-    console.warn('[SECURITY] ⚠️  DASHBOARD_PUBLIC ignored in prod mode - use MODE=demo for public demos');
+  // Warn if someone sets DASHBOARD_PUBLIC in prod mode (it's ignored but they should know)
+  if (process.env.DASHBOARD_PUBLIC === 'true') {
+    console.warn('[SECURITY] ⚠️  DASHBOARD_PUBLIC=true ignored in MODE=prod - dashboard requires admin auth');
+    console.warn('[SECURITY] ℹ️  For public demos, use MODE=demo AND DASHBOARD_PUBLIC=true');
   }
 }
 
@@ -2146,12 +2148,25 @@ async function startServer() {
     wsServer = new WebSocket.Server({ server, path: '/ws/governance' });
     
     wsServer.on('connection', (ws, req) => {
-      console.log('[WebSocket] Dashboard client connected');
+      // Check authentication in prod mode (token via query param)
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const token = url.searchParams.get('token');
+      const { valid: isAdmin, actor } = checkAdminToken(token);
+      
+      // In prod mode, require admin auth; in demo mode with dashboardPublic, allow public
+      if (config.isProd && !isAdmin) {
+        console.log('[WebSocket] Unauthorized connection attempt (no valid token)');
+        ws.close(4401, 'Unauthorized');
+        return;
+      }
+      
+      console.log(`[WebSocket] Dashboard client connected (${isAdmin ? actor : 'public'})`);
       wsClients.add(ws);
       
-      // Send initial state
+      // Send initial state (redacted if not admin)
       telemetry.getGraphData().then(data => {
-        ws.send(JSON.stringify({ type: 'init', ...data }));
+        const responseData = isAdmin ? data : redactForDemo(data, { isAdmin: false });
+        ws.send(JSON.stringify({ type: 'init', ...responseData }));
       });
       
       ws.on('close', () => {
