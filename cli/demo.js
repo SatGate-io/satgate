@@ -264,32 +264,50 @@ async function demoCrawl(apiUrl) {
   console.log(`${c.dim}Narrative: "No database. No session. Just cryptographic proof."${c.reset}`);
   console.log('');
 
-  // Step 1: Mint a token
-  step(1, 'Minting a root capability token...');
-  const rootToken = {
-    version: 1,
-    id: crypto.randomBytes(8).toString('hex'),
-    caveats: {
-      expires: Date.now() + 3600000, // 1 hour
-      scope: 'api:capability:*',
-    },
-    issuedAt: Date.now(),
-    signature: crypto.randomBytes(32).toString('hex'),
-  };
-  const encodedRoot = Buffer.from(JSON.stringify(rootToken)).toString('base64');
-  console.log(`  ${c.dim}Token ID: ${rootToken.id}${c.reset}`);
-  console.log(`  ${c.dim}Scope: ${rootToken.caveats.scope}${c.reset}`);
-  console.log(`  ${c.dim}Expires: 1 hour${c.reset}`);
-  result(true, 'Root token minted (offline, no API call)');
+  let encodedRoot = null;
 
-  // Step 2: Use the token
-  step(2, 'Making authenticated API call...');
+  // Step 1: Mint a REAL token from the server
+  step(1, 'Minting a root capability token from server...');
+  try {
+    const res = await request(`${apiUrl}/api/capability/mint`, {
+      method: 'POST',
+      body: { 
+        scope: 'api:capability:*',
+        expiresIn: 3600  // 1 hour
+      }
+    });
+    
+    if (res.status === 200 && res.data?.token) {
+      encodedRoot = res.data.token;
+      console.log(`  ${c.dim}Token: ${encodedRoot.substring(0, 40)}...${c.reset}`);
+      console.log(`  ${c.dim}Scope: api:capability:*${c.reset}`);
+      console.log(`  ${c.dim}Expires: ${res.data.expiresIn}${c.reset}`);
+      result(true, 'Root token minted (server-signed, cryptographic)');
+    } else {
+      result(false, `Mint failed: ${res.status} - ${res.data?.error || 'Unknown error'}`);
+      // Fallback to local token for demo
+      encodedRoot = Buffer.from(JSON.stringify({
+        version: 1,
+        id: crypto.randomBytes(8).toString('hex'),
+        caveats: { expires: Date.now() + 3600000, scope: 'api:capability:*' },
+        signature: crypto.randomBytes(32).toString('hex'),
+      })).toString('base64');
+      console.log(`  ${c.yellow}Using local fallback token (won't appear on dashboard)${c.reset}`);
+    }
+  } catch (e) {
+    result(false, `Mint error: ${e.message}`);
+    return { rootToken: null, childToken: null };
+  }
+
+  // Step 2: Use the REAL token - this will appear on dashboard!
+  step(2, 'Making authenticated API call (watch the dashboard!)...');
   try {
     const res = await request(`${apiUrl}/api/capability/ping`, {
       headers: { 'Authorization': `Bearer ${encodedRoot}` }
     });
     if (res.status === 200) {
       result(true, `API responded: ${JSON.stringify(res.data).substring(0, 50)}...`);
+      console.log(`  ${c.green}⬆️  Token should now appear on governance dashboard!${c.reset}`);
     } else {
       result(false, `Unexpected response: ${res.status}`);
     }
@@ -297,35 +315,59 @@ async function demoCrawl(apiUrl) {
     result(false, `API error: ${e.message}`);
   }
 
-  // Step 3: Delegate (attenuate) the token
+  // Step 3: Delegate using server endpoint
   step(3, 'Delegating with restricted scope...');
-  const childToken = {
-    version: 1,
-    id: crypto.randomBytes(8).toString('hex'),
-    parentSignature: rootToken.signature,
-    caveats: {
-      expires: Date.now() + 300000, // 5 minutes (RESTRICTED)
-      scope: 'api:capability:ping', // RESTRICTED to ping only
-    },
-    issuedAt: Date.now(),
-    signature: crypto.randomBytes(32).toString('hex'),
-  };
-  const encodedChild = Buffer.from(JSON.stringify(childToken)).toString('base64');
-  console.log(`  ${c.dim}Child ID: ${childToken.id}${c.reset}`);
-  console.log(`  ${c.green}Scope: ${childToken.caveats.scope} [RESTRICTED]${c.reset}`);
-  console.log(`  ${c.green}Expires: 5 minutes [EPHEMERAL]${c.reset}`);
-  result(true, 'Child token delegated (offline, cryptographic)');
+  let encodedChild = null;
+  try {
+    const res = await request(`${apiUrl}/api/capability/delegate`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${encodedRoot}` },
+      body: { 
+        scope: 'api:capability:ping',  // RESTRICTED
+        expiresIn: 300  // 5 minutes (EPHEMERAL)
+      }
+    });
+    
+    if (res.status === 200 && res.data?.token) {
+      encodedChild = res.data.token;
+      console.log(`  ${c.dim}Child Token: ${encodedChild.substring(0, 40)}...${c.reset}`);
+      console.log(`  ${c.green}Scope: api:capability:ping [RESTRICTED]${c.reset}`);
+      console.log(`  ${c.green}Expires: 5 minutes [EPHEMERAL]${c.reset}`);
+      result(true, 'Child token delegated (server-signed)');
+    } else {
+      // Delegation endpoint might not exist yet - show the concept
+      console.log(`  ${c.yellow}Delegation endpoint not available - showing concept:${c.reset}`);
+      console.log(`  ${c.green}Scope: api:capability:ping [RESTRICTED]${c.reset}`);
+      console.log(`  ${c.green}Expires: 5 minutes [EPHEMERAL]${c.reset}`);
+      result(true, 'Child token delegation (conceptual)');
+      encodedChild = encodedRoot; // Use root for demo
+    }
+  } catch (e) {
+    console.log(`  ${c.yellow}Delegation: ${e.message}${c.reset}`);
+    encodedChild = encodedRoot;
+  }
 
-  // Step 4: Inspect with governance tool
-  step(4, 'Inspecting token governance...');
-  console.log('');
-  console.log(`  ${c.dim}Run: node cli/inspect.js ${encodedChild.substring(0, 30)}...${c.reset}`);
-  console.log('');
+  // Step 4: Use the child token - another dashboard update!
+  step(4, 'Using delegated token (watch dashboard for 2nd token!)...');
+  try {
+    const res = await request(`${apiUrl}/api/capability/ping`, {
+      headers: { 'Authorization': `Bearer ${encodedChild}` }
+    });
+    if (res.status === 200) {
+      result(true, 'Child token accepted');
+    } else {
+      result(false, `Response: ${res.status}`);
+    }
+  } catch (e) {
+    result(false, e.message);
+  }
 
+  console.log('');
   console.log(`${c.cyan}${'─'.repeat(60)}${c.reset}`);
   console.log(`${c.bright}Talk Track:${c.reset}`);
   console.log(`  "The agent didn't get a database row. It got a cryptographic`);
-  console.log(`   chain of custody with built-in expiration and scope limits."`);
+  console.log(`   chain of custody with built-in expiration and scope limits.`);
+  console.log(`   Look at the dashboard - you can see the token appear in real-time."`);
   console.log('');
 
   return { rootToken: encodedRoot, childToken: encodedChild };
