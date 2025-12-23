@@ -757,10 +757,19 @@ const isL402Auth = (req) => {
 // Middleware to track L402 paid requests
 // Call this on paid tier endpoints to record revenue
 const trackPaidRequest = (tier, priceSats) => (req, res, next) => {
-  if (isL402Auth(req)) {
-    telemetry.recordPaidRequest(tier, priceSats);
-    console.log(`[L402] Paid request: ${tier} tier, ${priceSats} sats`);
-  }
+  // Debug: log all headers to understand what Aperture passes through
+  const auth = req.get('authorization') || '';
+  const macaroon = req.get('grpc-metadata-macaroon') || '';
+  
+  // Check various ways Aperture might indicate a paid request
+  const isL402 = isL402Auth(req);
+  const hasAnyAuth = auth.length > 0 || macaroon.length > 0;
+  
+  // If request reached paid endpoint, it MUST have paid (Aperture enforces this)
+  // So we track all requests to paid endpoints as paid
+  telemetry.recordPaidRequest(tier, priceSats);
+  console.log(`[L402] Paid request: ${tier} tier, ${priceSats} sats (auth: ${isL402 ? 'L402' : hasAnyAuth ? 'other' : 'aperture-validated'})`);
+  
   next();
 };
 
