@@ -1,6 +1,6 @@
 {
   "name": "satgate-backend",
-  "version": "1.1.0",
+  "version": "1.9.0",
   "private": true,
   "description": "Backend API for SatGate demo (behind Aperture)",
   "main": "server.js",
