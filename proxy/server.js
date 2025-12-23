@@ -609,7 +609,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.6.5',
+    version: '1.6.6',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1306,12 +1306,11 @@ app.get('/api/token/delegate', (req, res) => {
       rootKey: keyBytes
     });
     
-    // Add caveats including delegation tracking
+    // Add caveats - keep it minimal to avoid macaroon library issues
     step = 6;
     const expiresAt = Date.now() + (expiresIn * 1000);
     childMac.addFirstPartyCaveat(Buffer.from(`expires = ${expiresAt}`, 'utf8'));
     childMac.addFirstPartyCaveat(Buffer.from(`scope = ${scope}`, 'utf8'));
-    childMac.addFirstPartyCaveat(Buffer.from(`delegated_from = ${parentSig}`, 'utf8'));
     childMac.addFirstPartyCaveat(Buffer.from(`delegation_depth = 1`, 'utf8'));
     
     step = 7;
