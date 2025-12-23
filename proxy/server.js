@@ -609,7 +609,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.5.9',
+    version: '1.6.0',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1283,26 +1283,34 @@ app.get('/api/token/delegate', (req, res) => {
   console.log('[DELEGATE] Scope:', scope, 'ExpiresIn:', expiresIn);
   
   try {
-    console.log('[DELEGATE] Starting delegation v1.5.7...');
+    console.log('[DELEGATE] Step 1: Starting v1.6.0...');
     
-    // Hash parent token to create chain of custody link
+    console.log('[DELEGATE] Step 2: Hashing parent...');
     const parentSig = crypto.createHash('sha256')
       .update(parentTokenBase64)
       .digest('hex')
       .substring(0, 16);
-    console.log('[DELEGATE] Parent sig:', parentSig);
+    console.log('[DELEGATE] Step 2 done, parentSig:', parentSig);
     
-    // Create child macaroon with real credentials
+    console.log('[DELEGATE] Step 3: Creating keyBytes...');
     const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
-    const childId = `${CAPABILITY_IDENTIFIER}:child:${Date.now()}`;
+    console.log('[DELEGATE] Step 3 done, keyBytes length:', keyBytes.length);
     
+    console.log('[DELEGATE] Step 4: Creating childId...');
+    const childId = `${CAPABILITY_IDENTIFIER}:child:${Date.now()}`;
+    console.log('[DELEGATE] Step 4 done, childId:', childId);
+    
+    console.log('[DELEGATE] Step 5: Creating idBytes...');
+    const idBytes = Buffer.from(childId, 'utf8');
+    console.log('[DELEGATE] Step 5 done, idBytes length:', idBytes.length);
+    
+    console.log('[DELEGATE] Step 6: Calling macaroon.newMacaroon...');
     let childMac = macaroon.newMacaroon({
-      identifier: Buffer.from(childId, 'utf8'),
+      identifier: idBytes,
       location: CAPABILITY_LOCATION,
       rootKey: keyBytes
     });
-    
-    console.log('[DELEGATE] Child macaroon created!');
+    console.log('[DELEGATE] Step 6 done, macaroon created!');
     
     // Add restricted caveats to child
     const expiresAt = Date.now() + (expiresIn * 1000);
