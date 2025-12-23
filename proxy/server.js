@@ -609,7 +609,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.5.4',
+    version: '1.5.5',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1225,6 +1225,26 @@ app.post('/api/capability/mint', express.json(), (req, res) => {
   } catch (e) {
     console.error(`[CAPABILITY] Mint error: ${e.message}`);
     res.status(500).json({ error: 'Failed to mint token', reason: e.message });
+  }
+});
+
+// TEST: Minimal macaroon creation
+app.get('/api/token/test', (req, res) => {
+  try {
+    const testKey = Buffer.from('test-key-12345', 'utf8');
+    const testId = Buffer.from('test-id-' + Date.now(), 'utf8');
+    
+    const m = macaroon.newMacaroon({
+      identifier: testId,
+      location: 'https://test.com',
+      rootKey: testKey
+    });
+    
+    const sig = Buffer.from(m.signature).toString('hex').substring(0, 16);
+    
+    res.json({ ok: true, signature: sig });
+  } catch (e) {
+    res.status(500).json({ error: e.message, stack: e.stack?.split('\n').slice(0, 5) });
   }
 });
 
