@@ -460,15 +460,27 @@ const telemetry = {
       .sort((a, b) => a.depth - b.depth);
     
     sortedTokens.forEach((token, index) => {
+      // Generate appropriate label based on token type
+      let label;
+      if (token.isPayment) {
+        // Extract tier from constraints (e.g., "tier:micro")
+        const tierConstraint = token.constraints.find(c => c.startsWith('tier:'));
+        const tier = tierConstraint ? tierConstraint.split(':')[1].toUpperCase() : 'L402';
+        label = `⚡ ${tier}`;
+      } else {
+        label = `Token (Depth ${token.depth})`;
+      }
+      
       nodes.push({
         group: 'nodes',
         data: {
           id: token.fullSignature,
-          label: `Token (Depth ${token.depth})`,
+          label: label,
           constraints: token.constraints,
           lastSeen: new Date(token.lastSeen).toLocaleTimeString(),
           depth: token.depth,
-          status: token.status
+          status: token.status,
+          isPayment: token.isPayment || false
         }
       });
       
