@@ -609,7 +609,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.6.0',
+    version: '1.6.1',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1282,35 +1282,30 @@ app.get('/api/token/delegate', (req, res) => {
   const expiresIn = parseInt(req.query.expiresIn) || 300;
   console.log('[DELEGATE] Scope:', scope, 'ExpiresIn:', expiresIn);
   
+  let step = 0;
   try {
-    console.log('[DELEGATE] Step 1: Starting v1.6.0...');
-    
-    console.log('[DELEGATE] Step 2: Hashing parent...');
+    step = 1;
     const parentSig = crypto.createHash('sha256')
       .update(parentTokenBase64)
       .digest('hex')
       .substring(0, 16);
-    console.log('[DELEGATE] Step 2 done, parentSig:', parentSig);
     
-    console.log('[DELEGATE] Step 3: Creating keyBytes...');
+    step = 2;
     const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
-    console.log('[DELEGATE] Step 3 done, keyBytes length:', keyBytes.length);
     
-    console.log('[DELEGATE] Step 4: Creating childId...');
+    step = 3;
     const childId = `${CAPABILITY_IDENTIFIER}:child:${Date.now()}`;
-    console.log('[DELEGATE] Step 4 done, childId:', childId);
     
-    console.log('[DELEGATE] Step 5: Creating idBytes...');
+    step = 4;
     const idBytes = Buffer.from(childId, 'utf8');
-    console.log('[DELEGATE] Step 5 done, idBytes length:', idBytes.length);
     
-    console.log('[DELEGATE] Step 6: Calling macaroon.newMacaroon...');
+    step = 5;
     let childMac = macaroon.newMacaroon({
       identifier: idBytes,
       location: CAPABILITY_LOCATION,
       rootKey: keyBytes
     });
-    console.log('[DELEGATE] Step 6 done, macaroon created!');
+    step = 6;
     
     // Add restricted caveats to child
     const expiresAt = Date.now() + (expiresIn * 1000);
@@ -1345,8 +1340,8 @@ app.get('/api/token/delegate', (req, res) => {
     });
     
   } catch (e) {
-    console.error(`[CAPABILITY] Delegate error: ${e.message}`);
-    res.status(400).json({ error: 'Failed to delegate token', reason: e.message });
+    console.error(`[CAPABILITY] Delegate error at step ${step}: ${e.message}`);
+    res.status(400).json({ error: 'Failed to delegate token', step: step, reason: e.message });
   }
 });
 
