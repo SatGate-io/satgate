@@ -391,17 +391,17 @@ const telemetry = {
     };
   },
   
-  recordUsage: function(tokenSignature, caveats, ip) {
+  recordUsage: function(tokenSignature, caveats, ip, identifier) {
     const now = Date.now();
     
-    // Calculate depth based on delegation_depth caveat or delegated_from presence
-    console.log('[TELEMETRY] Caveats received:', JSON.stringify(caveats));
+    // Calculate depth based on identifier (child tokens have ':child:' in identifier)
+    // or delegation_depth caveat
+    const isChild = identifier && identifier.includes(':child:');
     const depthCaveat = caveats.find(c => c.startsWith('delegation_depth'));
-    console.log('[TELEMETRY] Found depthCaveat:', depthCaveat);
-    const hasDelegatedFrom = caveats.some(c => c.startsWith('delegated_from'));
-    const depth = depthCaveat ? parseInt(depthCaveat.split('=')[1]?.trim() || '1') : 
-                  hasDelegatedFrom ? 1 : 0;
-    console.log('[TELEMETRY] Calculated depth:', depth);
+    const depth = isChild ? 1 : 
+                  depthCaveat ? parseInt(depthCaveat.split('=')[1]?.trim() || '1') : 
+                  0;
+    console.log('[TELEMETRY] identifier:', identifier, 'isChild:', isChild, 'depth:', depth);
     
     const tokenData = {
       id: tokenSignature.substring(0, 12) + '...',
@@ -612,7 +612,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.6.9',
+    version: '1.7.0',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1182,7 +1182,7 @@ app.use('/api/capability', (req, res, next) => {
     
     // TELEMETRY: Record this token usage for governance dashboard
     const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
-    telemetry.recordUsage(tokenSignature, caveats, clientIp);
+    telemetry.recordUsage(tokenSignature, caveats, clientIp, identifier);
     
     console.log(`[CAPABILITY] ✓ Valid token with scope for ${req.path}`);
     next();
