@@ -609,7 +609,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.5.8',
+    version: '1.5.9',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1259,9 +1259,9 @@ app.get('/api/token/test', (req, res) => {
 
 // Delegate a capability token (create a child with restricted scope)
 // This demonstrates the "Chain of Custody" - parent delegates to child
-// Using /api/token/delegate to bypass /api/capability middleware
-app.post('/api/token/delegate', express.json(), (req, res) => {
-  console.log('[DELEGATE] === REQUEST RECEIVED ===');
+// Using GET to bypass any POST-related issues
+app.get('/api/token/delegate', (req, res) => {
+  console.log('[DELEGATE] === GET REQUEST RECEIVED ===');
   
   const authHeader = req.get('authorization') || '';
   console.log('[DELEGATE] Auth header present:', authHeader.length > 0);
@@ -1277,7 +1277,9 @@ app.post('/api/token/delegate', express.json(), (req, res) => {
   const parentTokenBase64 = authHeader.slice(7).trim();
   console.log('[DELEGATE] Token extracted, length:', parentTokenBase64.length);
   
-  const { scope = 'api:capability:ping', expiresIn = 300 } = req.body || {};
+  // Use query params instead of body for GET
+  const scope = req.query.scope || 'api:capability:ping';
+  const expiresIn = parseInt(req.query.expiresIn) || 300;
   console.log('[DELEGATE] Scope:', scope, 'ExpiresIn:', expiresIn);
   
   try {
