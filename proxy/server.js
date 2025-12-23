@@ -70,12 +70,20 @@ function initializeL402(redisClient) {
     // Initialize L402 service with Lightning provider
     const lightningConfig = {
       backend: process.env.LIGHTNING_BACKEND || 'mock',
-      url: process.env.LIGHTNING_URL || process.env.PHOENIXD_URL,
+      // Allow a backend-specific URL while keeping a generic override.
+      // - phoenixd: PHOENIXD_URL
+      // - lnd: LND_REST_URL
+      // - (optional override): LIGHTNING_URL
+      url: process.env.LIGHTNING_URL || process.env.PHOENIXD_URL || process.env.LND_REST_URL,
       password: process.env.PHOENIXD_PASSWORD,
       macaroon: process.env.LND_MACAROON,
       apiKey: process.env.OPENNODE_API_KEY
     };
     
+    if (config.isProd && !process.env.L402_ROOT_KEY) {
+      console.warn('[L402][SECURITY] L402_MODE=native but no L402_ROOT_KEY set. Set L402_ROOT_KEY (separate from CAPABILITY_ROOT_KEY) to a strong secret in production.');
+    }
+
     l402Service = new L402Service({
       rootKey: process.env.L402_ROOT_KEY || process.env.CAPABILITY_ROOT_KEY,
       lightningConfig,
@@ -878,27 +886,30 @@ app.get('/ready', healthRateLimit, (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// Lightning provider status
-app.get('/lightning/status', async (req, res) => {
+// Lightning provider status (admin-only; can expose node IDs / backend details)
+app.get('/lightning/status', adminRateLimit, requirePricingAdmin, async (req, res) => {
   try {
-    const { getProvider, isApertureMode } = require('./lightning');
-    const provider = getProvider();
-    const status = await provider.getStatus();
-    
-    res.json({
-      mode: isApertureMode() ? 'aperture' : 'native',
-      provider: provider.name,
-      ...status
+    if (L402_MODE === 'native' && l402Service?.lightning?.getStatus) {
+      const status = await l402Service.lightning.getStatus();
+      return res.json({
+        ok: true,
+        mode: 'native',
+        provider: status.backend || 'unknown',
+        ...status,
+      });
+    }
+
+    // Aperture sidecar mode: Lightning is handled by Aperture/LNC
+    return res.json({
+      ok: true,
+      mode: 'aperture',
+      provider: 'aperture',
+      info: { note: 'Lightning handled by Aperture (LNC)' },
     });
   } catch (error) {
     res.json({
-      mode: 'aperture',
-      provider: 'aperture',
-      ok: true,
-      info: {
-        note: 'Lightning handled by Aperture (LNC)',
-        error: error.message
-      }
+      ok: false,
+      error: error.message
     });
   }
 });
@@ -952,7 +963,7 @@ app.get('/api/free/pricing', (req, res) => {
     pricing: pricingStore.tiers,
     lastUpdated: pricingStore.lastUpdated,
     updatedBy: pricingStore.updatedBy,
-    note: 'Prices in satoshis. These are display prices; actual L402 prices are enforced by Aperture.'
+    note: `Prices in satoshis. These are display prices; actual L402 enforcement is handled by ${L402_MODE === 'native' ? 'SatGate (native mode)' : 'Aperture (sidecar mode)'}.`
   });
 });
 
@@ -1076,22 +1087,26 @@ const isL402Auth = (req) => {
 const createPaidMiddleware = (tier, priceSats) => {
   // L402 Native Mode: SatGate is the L402 authority
   if (L402_MODE === 'native' && l402Service && createL402Middleware) {
-    return createL402Middleware(l402Service, {
+    const l402Mw = createL402Middleware(l402Service, {
       tier,
       scope: `api:${tier}:*`,
       tierCost: priceSats,
       maxCalls: parseInt(process.env.L402_DEFAULT_MAX_CALLS) || 100,
       ttl: parseInt(process.env.L402_DEFAULT_TTL) || 3600
     });
+    // IMPORTANT: rate-limit challenge issuance to prevent invoice-spam DoS.
+    return (req, res, next) => apiRateLimit(req, res, () => l402Mw(req, res, next));
   }
   
   // Aperture Sidecar Mode: Just track (Aperture enforces payment)
   return (req, res, next) => {
-    // If request reached paid endpoint, it MUST have paid (Aperture enforces this)
-    telemetry.recordPaidRequest(tier, priceSats);
-    telemetry.recordPaymentNode(tier, priceSats, req.path);
-    console.log(`[L402] Paid request (aperture): ${tier} tier, ${priceSats} sats, endpoint: ${req.path}`);
-    next();
+    apiRateLimit(req, res, () => {
+      // If request reached paid endpoint, it MUST have paid (Aperture enforces this)
+      telemetry.recordPaidRequest(tier, priceSats);
+      telemetry.recordPaymentNode(tier, priceSats, req.path);
+      console.log(`[L402] Paid request (aperture): ${tier} tier, ${priceSats} sats, endpoint: ${req.path}`);
+      next();
+    });
   };
 };
 

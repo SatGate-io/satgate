@@ -243,9 +243,30 @@ class OpenNodeProvider extends LightningProvider {
     }
 
     const data = await response.json();
+    const charge = data?.data || {};
+    const ln = charge.lightning_invoice || {};
+    const paymentRequest = ln.payreq;
+
+    // IMPORTANT: For LSAT/L402 preimage verification we need the Lightning payment hash
+    // (sha256(preimage)). Some hosted providers return a charge id instead; that will
+    // break verifyPreimage().
+    const paymentHash =
+      ln.payment_hash ||
+      ln.hash ||
+      charge.payment_hash ||
+      charge.hash ||
+      null;
+
+    if (!paymentRequest) {
+      throw new Error('OpenNode create failed: missing lightning_invoice.payreq');
+    }
+    if (!paymentHash) {
+      throw new Error('OpenNode backend does not expose a Lightning payment hash; cannot verify LSAT preimage. Use phoenixd or lnd.');
+    }
+
     return {
-      paymentHash: data.data.id, // OpenNode uses charge ID
-      paymentRequest: data.data.lightning_invoice.payreq,
+      paymentHash: paymentHash,
+      paymentRequest: paymentRequest,
       expiresAt: Date.now() + (expirySecs * 1000)
     };
   }
@@ -363,11 +384,34 @@ function createLightningProvider(config = {}) {
   }
 }
 
+// -----------------------------------------------------------------------------
+// Backwards-compatible helpers (older code expected these)
+// -----------------------------------------------------------------------------
+let _cachedProvider = null;
+
+function getProvider(config = {}) {
+  if (_cachedProvider && !config.forceNew) return _cachedProvider;
+  _cachedProvider = createLightningProvider({
+    backend: config.backend || process.env.LIGHTNING_BACKEND || 'mock',
+    url: config.url || process.env.LIGHTNING_URL || process.env.PHOENIXD_URL || process.env.LND_REST_URL,
+    password: config.password || process.env.PHOENIXD_PASSWORD,
+    macaroon: config.macaroon || process.env.LND_MACAROON,
+    apiKey: config.apiKey || process.env.OPENNODE_API_KEY,
+  });
+  return _cachedProvider;
+}
+
+function isApertureMode() {
+  return (process.env.L402_MODE || 'aperture') !== 'native';
+}
+
 module.exports = {
   LightningProvider,
   PhoenixdProvider,
   LndProvider,
   OpenNodeProvider,
   MockProvider,
-  createLightningProvider
+  createLightningProvider,
+  getProvider,
+  isApertureMode,
 };

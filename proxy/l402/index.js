@@ -344,6 +344,12 @@ function createL402Middleware(l402Service, options = {}) {
   const tier = options.tier || 'basic';
   const scope = options.scope || `api:${tier}:*`;
   const tierCost = options.tierCost || l402Service.getTierPrice(tier);
+  const challengeOptions = {
+    scope,
+    ttl: options.ttl,
+    maxCalls: options.maxCalls,
+    budgetSats: options.budgetSats,
+  };
 
   return async (req, res, next) => {
     const authHeader = req.get('authorization');
@@ -351,12 +357,7 @@ function createL402Middleware(l402Service, options = {}) {
 
     // No LSAT token - issue challenge
     if (!lsat) {
-      const challenge = await l402Service.createChallenge(tier, {
-        scope,
-        ttl: options.ttl,
-        maxCalls: options.maxCalls,
-        budgetSats: options.budgetSats
-      });
+      const challenge = await l402Service.createChallenge(tier, challengeOptions);
       
       for (const [key, value] of Object.entries(challenge.headers)) {
         res.setHeader(key, value);
@@ -370,7 +371,7 @@ function createL402Middleware(l402Service, options = {}) {
     if (!validation.valid) {
       // Invalid token - issue new challenge
       console.log(`[L402] Invalid token: ${validation.error}`);
-      const challenge = await l402Service.createChallenge(tier, { scope });
+      const challenge = await l402Service.createChallenge(tier, challengeOptions);
       for (const [key, value] of Object.entries(challenge.headers)) {
         res.setHeader(key, value);
       }
@@ -403,7 +404,7 @@ function createL402Middleware(l402Service, options = {}) {
       if (exhausted) {
         // Re-challenge
         console.log(`[L402] Calls exhausted, re-challenging`);
-        const challenge = await l402Service.createChallenge(tier, { scope });
+        const challenge = await l402Service.createChallenge(tier, challengeOptions);
         for (const [key, value] of Object.entries(challenge.headers)) {
           res.setHeader(key, value);
         }
@@ -427,7 +428,7 @@ function createL402Middleware(l402Service, options = {}) {
       if (!charged) {
         // Re-challenge
         console.log(`[L402] Budget exhausted, re-challenging`);
-        const challenge = await l402Service.createChallenge(tier, { scope });
+        const challenge = await l402Service.createChallenge(tier, challengeOptions);
         for (const [key, value] of Object.entries(challenge.headers)) {
           res.setHeader(key, value);
         }
