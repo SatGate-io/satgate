@@ -319,13 +319,9 @@ async function demoCrawl(apiUrl) {
   step(3, 'Delegating with restricted scope...');
   let encodedChild = null;
   try {
-    const res = await request(`${apiUrl}/api/token/delegate`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${encodedRoot}` },
-      body: { 
-        scope: 'api:capability:ping',  // RESTRICTED
-        expiresIn: 300  // 5 minutes (EPHEMERAL)
-      }
+    const res = await request(`${apiUrl}/api/token/delegate?scope=api:capability:ping&expiresIn=300`, {
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${encodedRoot}` }
     });
     
     if (res.status === 200 && res.data?.token) {
