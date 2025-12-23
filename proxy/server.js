@@ -609,7 +609,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.6.3',
+    version: '1.6.4',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1306,31 +1306,21 @@ app.get('/api/token/delegate', (req, res) => {
       rootKey: keyBytes
     });
     
-    // Try exporting immediately without caveats to test
+    // Add only 2 caveats like the mint endpoint
     step = 6;
-    const testExport = childMac.exportBinary();
-    step = 7;
-    
-    // Now add caveats
     const expiresAt = Date.now() + (expiresIn * 1000);
     childMac.addFirstPartyCaveat(Buffer.from(`expires = ${expiresAt}`, 'utf8'));
     
-    step = 8;
+    step = 7;
     childMac.addFirstPartyCaveat(Buffer.from(`scope = ${scope}`, 'utf8'));
     
-    step = 9;
-    childMac.addFirstPartyCaveat(Buffer.from(`delegated_from = ${parentSig}`, 'utf8'));
-    
-    step = 10;
-    childMac.addFirstPartyCaveat(Buffer.from(`delegation_depth = 1`, 'utf8'));
-    
-    step = 11;
+    step = 8;
     const childBytes = childMac.exportBinary();
     
-    step = 12;
+    step = 9;
     const childTokenBase64 = Buffer.from(childBytes).toString('base64');
     
-    step = 13;
+    step = 10;
     const childSig = Buffer.from(childMac.signature).toString('hex').substring(0, 16);
     
     console.log(`[CAPABILITY] Delegated token: parent=${parentSig}..., child=${childSig}..., scope=${scope}`);
