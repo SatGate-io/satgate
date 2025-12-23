@@ -739,7 +739,7 @@ const config = {
   healthRateLimit: parseInt(process.env.HEALTH_RATE_LIMIT) || 600,
   
   // Version info (only exposed via admin endpoint)
-  version: '1.8.1',
+  version: '1.9.0',
   buildTime: new Date().toISOString(),
 };
 
