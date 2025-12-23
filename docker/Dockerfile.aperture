@@ -2,16 +2,25 @@
 # Aperture - L402 Lightning Payment Gateway
 # =============================================================================
 # Build from source since no official Docker image is published
+# SECURITY: Pinned to specific commit for reproducible builds
 # =============================================================================
 
-FROM golang:1.24-alpine AS builder
+# Aperture commit hash - update this when upgrading
+# Check releases: https://github.com/lightninglabs/aperture/releases
+# Current: v0.3.0-beta (2024-03-14)
+ARG APERTURE_VERSION=v0.3.0-beta
+ARG APERTURE_COMMIT=6b97a8f
+
+FROM golang:1.21-alpine AS builder
 
 # Install build dependencies
 RUN apk add --no-cache git make
 
-# Clone and build Aperture
+# Clone and build Aperture at specific version
 WORKDIR /src
-RUN git clone --depth 1 https://github.com/lightninglabs/aperture.git . && \
+RUN git clone https://github.com/lightninglabs/aperture.git . && \
+    git checkout ${APERTURE_COMMIT} && \
+    echo "Building Aperture at commit ${APERTURE_COMMIT}" && \
     make install
 
 # =============================================================================

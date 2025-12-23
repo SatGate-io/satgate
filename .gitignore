@@ -13,7 +13,7 @@ docs/private/
 
 # Dependencies
 node_modules/
-package-lock.json
+# Note: package-lock.json is committed for reproducible builds (supply-chain security)
 
 # Python
 venv/

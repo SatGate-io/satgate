@@ -1382,8 +1382,21 @@ app.use('/api/capability', (req, res, next) => {
   }
 });
 
-// Mint a capability token (for demo purposes - in prod, this would be admin-only)
+// Mint a capability token (requires admin auth in prod, open in demo mode)
 app.post('/api/capability/mint', express.json(), (req, res) => {
+  // Security gate: require admin auth unless in demo mode
+  if (!config.isDemo) {
+    const token = req.headers['x-admin-token'] || req.query.token;
+    const { valid } = checkAdminToken(token);
+    if (!valid) {
+      return res.status(403).json({ 
+        error: 'Forbidden',
+        message: 'Token minting requires admin authentication in production.',
+        hint: 'Use X-Admin-Token header or set MODE=demo for testing.'
+      });
+    }
+  }
+  
   const { scope = 'api:capability:read', expiresIn = 3600 } = req.body || {};
   
   try {
@@ -1426,32 +1439,39 @@ app.post('/api/capability/mint', express.json(), (req, res) => {
   }
 });
 
-// TEST: Minimal macaroon creation with real keys
-app.get('/api/token/test', (req, res) => {
+// TEST: Token system health check (admin-only, no key material exposed)
+app.get('/api/token/test', requirePricingAdmin, (req, res) => {
   try {
-    // Test with real keys to debug
-    const keyDebug = {
-      CAPABILITY_ROOT_KEY_defined: !!CAPABILITY_ROOT_KEY,
-      CAPABILITY_ROOT_KEY_type: typeof CAPABILITY_ROOT_KEY,
-      CAPABILITY_ROOT_KEY_length: CAPABILITY_ROOT_KEY ? String(CAPABILITY_ROOT_KEY).length : 0,
-      CAPABILITY_ROOT_KEY_preview: CAPABILITY_ROOT_KEY ? String(CAPABILITY_ROOT_KEY).substring(0, 20) : null
+    // Only expose safe metadata, never key material
+    const systemStatus = {
+      macaroonLibrary: 'loaded',
+      keyConfigured: !!CAPABILITY_ROOT_KEY,
+      keyLength: CAPABILITY_ROOT_KEY ? CAPABILITY_ROOT_KEY.length : 0,
+      location: CAPABILITY_LOCATION,
+      identifier: CAPABILITY_IDENTIFIER
     };
     
-    // Try to create macaroon with the real key
-    const realKey = Buffer.from(String(CAPABILITY_ROOT_KEY || 'fallback-key'), 'utf8');
+    // Verify we can create a macaroon (without exposing the key)
+    const keyBytes = Buffer.from(String(CAPABILITY_ROOT_KEY || 'fallback-key'), 'utf8');
     const testId = Buffer.from(`${CAPABILITY_IDENTIFIER}:test:${Date.now()}`, 'utf8');
     
     const m = macaroon.newMacaroon({
       identifier: testId,
       location: CAPABILITY_LOCATION,
-      rootKey: realKey
+      rootKey: keyBytes
     });
     
-    const sig = Buffer.from(m.signature).toString('hex').substring(0, 16);
+    // Only return signature prefix (not key material)
+    const sigPrefix = Buffer.from(m.signature).toString('hex').substring(0, 8);
     
-    res.json({ ok: true, signature: sig, keyDebug });
+    res.json({ 
+      ok: true, 
+      status: 'Token system operational',
+      signaturePrefix: sigPrefix,
+      system: systemStatus 
+    });
   } catch (e) {
-    res.status(500).json({ error: e.message, stack: e.stack?.split('\n').slice(0, 5) });
+    res.status(500).json({ error: 'Token system error', message: e.message });
   }
 });
 
@@ -1585,8 +1605,22 @@ app.get('/api/capability/data', (req, res) => {
 // This endpoint simulates the "offline" agent behavior for demo purposes
 // when you don't have access to your local Node.js environment.
 // "Two is one, and one is none" - always have a backup for critical demos.
+// SECURITY: Only available in demo mode or with admin auth
 
 app.post('/api/capability/demo/delegate', (req, res) => {
+  // Security gate: demo endpoints only in demo mode or with admin auth
+  if (!config.isDemo) {
+    const token = req.headers['x-admin-token'] || req.query.token;
+    const { valid } = checkAdminToken(token);
+    if (!valid) {
+      return res.status(403).json({ 
+        error: 'Forbidden',
+        message: 'Demo endpoints disabled in production.',
+        hint: 'Use MODE=demo for testing or provide admin token.'
+      });
+    }
+  }
+  
   try {
     const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
     const now = Date.now();
