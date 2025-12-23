@@ -612,7 +612,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.6.8',
+    version: '1.6.9',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1066,13 +1066,21 @@ app.use('/api/capability', (req, res, next) => {
     
     // Extract caveats from macaroon for logging
     const caveats = [];
-    if (m._caveats && Array.isArray(m._caveats)) {
-      m._caveats.forEach(c => {
-        if (c._identifier) {
-          caveats.push(c._identifier.toString('utf8'));
-        }
+    console.log('[DEBUG] Macaroon keys:', Object.keys(m));
+    console.log('[DEBUG] m._caveats:', m._caveats);
+    console.log('[DEBUG] m.caveats:', m.caveats);
+    
+    // Try multiple ways to access caveats
+    const caveatSource = m._caveats || m.caveats || [];
+    if (Array.isArray(caveatSource)) {
+      caveatSource.forEach(c => {
+        const cavStr = c._identifier ? c._identifier.toString('utf8') : 
+                       c.identifier ? c.identifier.toString('utf8') :
+                       typeof c === 'string' ? c : null;
+        if (cavStr) caveats.push(cavStr);
       });
     }
+    console.log('[DEBUG] Extracted caveats:', caveats);
     
     console.log(`[PEP] Path: ${req.path} | Required Scope: ${requiredScope}`);
     console.log(`[PEP] Token caveats: ${JSON.stringify(caveats)}`);
