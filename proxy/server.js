@@ -1,7 +1,7 @@
 /* backend/server.js
  * SatGate - Lightning-powered API access control
  * Production backend that sits behind Aperture for L402 authentication
- * Version: 1.5.0 - Fixed delegation endpoint
+ * Version: 1.5.1 - Skip middleware for delegation
  * 
  * SECURITY MODEL:
  * ===============
@@ -609,7 +609,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.5.0',
+    version: '1.5.1',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
