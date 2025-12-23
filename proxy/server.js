@@ -1,37 +1,37 @@
 /* backend/server.js
  * SatGate - Lightning-powered API access control
  * Production backend that sits behind Aperture for L402 authentication
- * Version: 1.5.1 - Skip middleware for delegation
  * 
- * SECURITY MODEL:
- * ===============
- * PUBLIC endpoints (no auth required):
- *   - /health, /ready              - Health checks
- *   - /api/free/*                  - Free tier APIs
- *   - /api/governance/graph        - Public telemetry (read-only)
- *   - /api/governance/stats        - Public stats (read-only)
- *   - /dashboard                   - Governance dashboard (optionally protected)
+ * SECURITY MODEL (Enterprise-Ready):
+ * ===================================
  * 
- * ADMIN endpoints (require X-Admin-Token header):
+ * CONTROL PLANE (admin-only by default):
+ *   - /dashboard                   - Governance dashboard UI
+ *   - /api/governance/graph        - Telemetry graph data
+ *   - /api/governance/stats        - Summary metrics
  *   - POST /api/governance/ban     - Ban a token (kill switch)
- *   - POST /api/governance/unban   - Unban a token
- *   - GET /api/governance/banned   - List all banned tokens
- *   - POST /api/governance/reset   - Reset dashboard (clear counters & tokens)
+ *   - POST /api/governance/unban   - Remove ban
+ *   - GET /api/governance/banned   - List banned tokens
+ *   - POST /api/governance/reset   - Reset telemetry
  *   - POST /api/free/pricing       - Update pricing
  * 
- * L402 PROTECTED endpoints (require Lightning payment):
- *   - /api/micro/*                 - 1 sat per request
- *   - /api/basic/*                 - 10 sats per request
- *   - /api/standard/*              - 100 sats per request
- *   - /api/premium/*               - 1000 sats per request
+ * DATA PLANE:
+ *   - /api/capability/*            - Macaroon-authenticated (no payment)
+ *   - /api/micro/*                 - L402 protected (1 sat)
+ *   - /api/basic/*                 - L402 protected (10 sats)
+ *   - /api/standard/*              - L402 protected (100 sats)
+ *   - /api/premium/*               - L402 protected (1000 sats)
+ *   - /api/free/*                  - Free tier (rate limited)
  * 
- * CAPABILITY endpoints (require valid macaroon):
- *   - /api/capability/*            - Macaroon-authenticated
+ * HEALTH (rate limited):
+ *   - /health, /ready              - Minimal info, no secrets
  * 
  * Environment Variables:
- *   PRICING_ADMIN_TOKEN    - Secret for admin endpoints (required in production)
- *   DASHBOARD_PUBLIC       - Set to 'true' to allow public dashboard access
- *   ADMIN_RATE_LIMIT       - Requests per minute for admin endpoints (default: 30)
+ *   PRICING_ADMIN_TOKEN    - Secret for admin endpoints (REQUIRED in production)
+ *   DASHBOARD_PUBLIC       - 'true' to allow public dashboard (default: false)
+ *   DEMO_MODE              - 'true' to redact sensitive data in public views
+ *   ADMIN_RATE_LIMIT       - Admin requests/min per IP (default: 30)
+ *   HEALTH_RATE_LIMIT      - Health check requests/min per IP (default: 600)
  */
 const express = require('express');
 const os = require('os');
@@ -97,6 +97,68 @@ const adminRateLimit = rateLimit({
   keyGenerator: (req) => `admin:${req.ip}`,
   message: 'Admin rate limit exceeded'
 });
+
+// Health endpoint rate limiter (generous but protected)
+const healthRateLimit = rateLimit({
+  windowMs: 60000,
+  max: parseInt(process.env.HEALTH_RATE_LIMIT || '600'),
+  keyGenerator: (req) => `health:${req.ip}`,
+  message: 'Health check rate limit exceeded'
+});
+
+// Optional admin auth for governance read endpoints
+// In production (DASHBOARD_PUBLIC=false), requires admin token
+// In demo mode, allows public access with redaction
+function optionalAdminAuth(req, res, next) {
+  // If dashboard is public, allow access
+  if (config.dashboardPublic) {
+    req.isAdmin = false;
+    return next();
+  }
+  
+  // Check for admin token
+  const token = req.headers['x-admin-token'] || req.query.token;
+  if (token && PRICING_ADMIN_TOKEN && token === PRICING_ADMIN_TOKEN) {
+    req.isAdmin = true;
+    return next();
+  }
+  
+  // Not authorized
+  return res.status(403).json({ 
+    error: 'Forbidden',
+    message: 'Dashboard access requires authentication. Set DASHBOARD_PUBLIC=true for public demos.'
+  });
+}
+
+// Redact sensitive data in DEMO_MODE
+function redactForDemo(data) {
+  if (!config.demoMode) return data;
+  
+  // Deep clone to avoid mutating original
+  const redacted = JSON.parse(JSON.stringify(data));
+  
+  // Redact token signatures (show first 8 chars only)
+  if (redacted.nodes) {
+    redacted.nodes = redacted.nodes.map(node => ({
+      ...node,
+      data: {
+        ...node.data,
+        id: node.data.id ? node.data.id.substring(0, 8) + '...[redacted]' : node.data.id
+      }
+    }));
+  }
+  
+  // Remove IP/user-agent from any logged data
+  if (redacted.logs) {
+    redacted.logs = redacted.logs.map(log => ({
+      ...log,
+      ip: '[redacted]',
+      userAgent: '[redacted]'
+    }));
+  }
+  
+  return redacted;
+}
 
 // General API rate limiter (more permissive)
 const apiRateLimit = rateLimit({
@@ -566,11 +628,20 @@ const config = {
   corsOrigins: process.env.CORS_ORIGINS?.split(',') || ['http://127.0.0.1:8081', 'http://localhost:8081', 'http://localhost:8080', 'http://127.0.0.1:8080'],
   rateLimitWindow: 15 * 60 * 1000, // 15 minutes
   rateLimitMax: 100, // requests per window
+  
+  // Security settings (enterprise defaults)
+  dashboardPublic: process.env.DASHBOARD_PUBLIC === 'true',    // Default: false (admin-only)
+  demoMode: process.env.DEMO_MODE === 'true',                  // Default: false (no redaction)
+  healthRateLimit: parseInt(process.env.HEALTH_RATE_LIMIT) || 600,  // 600/min for probes
 };
 
-// Optional shared-secret for “control plane” endpoints in production.
-// Set `PRICING_ADMIN_TOKEN` in the Railway service if you need to mutate pricing.
+// Admin token for control plane endpoints (REQUIRED in production)
 const PRICING_ADMIN_TOKEN = process.env.PRICING_ADMIN_TOKEN || '';
+
+// Warn if no admin token in production
+if (config.env === 'production' && !PRICING_ADMIN_TOKEN) {
+  console.warn('[SECURITY] ⚠️  No PRICING_ADMIN_TOKEN set - admin endpoints unprotected!');
+}
 
 // =============================================================================
 // MIDDLEWARE
@@ -637,17 +708,19 @@ app.use((req, res, next) => {
 // =============================================================================
 
 // Health check (for load balancers, k8s probes)
-app.get('/health', (req, res) => {
+// Rate limited to prevent probe storms
+app.get('/health', healthRateLimit, (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.7.4',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    version: '1.8.0',
+    uptime: Math.floor(process.uptime())
+    // Note: No env/build details exposed for security
   });
 });
 
 // Readiness check
-app.get('/ready', (req, res) => {
+// Rate limited to prevent probe storms
+app.get('/ready', healthRateLimit, (req, res) => {
   // Add checks for database connections, external services, etc.
   res.json({ ready: true });
 });
@@ -1602,19 +1675,21 @@ app.get('/api/micro/data', trackPaidRequest('micro', 1), (req, res) => {
 // =============================================================================
 
 // Get governance graph data (for dashboard visualization)
-app.get('/api/governance/graph', async (req, res) => {
+// Protected by: optional admin auth (public if DASHBOARD_PUBLIC=true)
+app.get('/api/governance/graph', optionalAdminAuth, async (req, res) => {
   const graphData = await telemetry.getGraphData();
-  res.json(graphData);
+  res.json(redactForDemo(graphData));
 });
 
 // Get governance stats (quick summary)
-app.get('/api/governance/stats', async (req, res) => {
+// Protected by: optional admin auth (public if DASHBOARD_PUBLIC=true)
+app.get('/api/governance/stats', optionalAdminAuth, async (req, res) => {
   const data = await telemetry.getGraphData();
-  res.json({
+  res.json(redactForDemo({
     ok: true,
     stats: data.stats,
     timestamp: new Date().toISOString()
-  });
+  }));
 });
 
 // Economic Firewall Report (for sales dashboards and weekly reporting)
@@ -1791,8 +1866,8 @@ app.get('/', (req, res) => {
 // =============================================================================
 
 // Serve dashboard at /dashboard
-// Try file first, fall back to inline minimal version
-app.get('/dashboard', (req, res) => {
+// Protected by: optional admin auth (public if DASHBOARD_PUBLIC=true)
+app.get('/dashboard', optionalAdminAuth, (req, res) => {
   const dashboardPath = path.join(__dirname, 'public', 'index.html');
   
   res.sendFile(dashboardPath, (err) => {

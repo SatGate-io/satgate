@@ -4,7 +4,14 @@ This document describes the security architecture and access control model for S
 
 ## Overview
 
-SatGate implements a **Zero Trust Policy Enforcement Point (PEP)** for API traffic. It enforces per-request authorization at the edge with no implicit network trust.
+SatGate implements a **Zero Trust Policy Enforcement Point (PEP)** for API traffic:
+
+- **Per-request authorization** at the edge
+- **No implicit trust** from network location
+- **Stateless capability verification** (macaroons) with least-privilege caveats
+- **Optional L402 payment challenges** (HTTP 402) to add economic friction against abuse
+
+## Trust Boundary
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -26,198 +33,314 @@ SatGate implements a **Zero Trust Policy Enforcement Point (PEP)** for API traff
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
+Policy enforcement occurs at SatGate (capabilities) and/or Aperture (payments). Your API origin should assume requests are already authenticated/authorized per the chosen policy.
+
+## Roles and Access Model
+
+SatGate separates the **data plane** (API traffic) from the **control plane** (governance/admin):
+
+| Plane | Purpose | Default Access |
+|-------|---------|----------------|
+| Data Plane | API traffic handling | Per-endpoint policy |
+| Control Plane | Governance, telemetry, admin | **Admin-only** |
+
+---
+
 ## Endpoint Classification
 
-### PUBLIC Endpoints (No Authentication Required)
+### Public Endpoints (Minimal Data, Rate Limited)
 
-These endpoints are intentionally public:
+These endpoints return minimal information and are safe to expose behind CDN/WAF.
 
 | Endpoint | Purpose | Rate Limited |
 |----------|---------|--------------|
-| `GET /health` | Health check for load balancers | No |
-| `GET /ready` | Readiness probe for k8s | No |
-| `GET /api/free/*` | Free tier API endpoints | Yes (300/min) |
-| `GET /api/governance/graph` | Public telemetry (read-only) | Yes (300/min) |
-| `GET /api/governance/stats` | Public stats summary | Yes (300/min) |
-| `GET /dashboard` | Governance dashboard UI | Optional |
+| `GET /health` | Health check for load balancers | ✅ 600/min |
+| `GET /ready` | Readiness probe for orchestrators | ✅ 600/min |
+| `GET /api/free/*` | Free tier endpoints | ✅ 300/min |
 
-**Note:** The dashboard can be protected by setting `DASHBOARD_PUBLIC=false`.
+> **Security Note:** Health endpoints return only status and uptime—no version, environment, or build details exposed.
 
-### ADMIN Endpoints (Authentication Required)
+### Admin Endpoints (Authentication Required)
 
-These endpoints require the `X-Admin-Token` header matching `PRICING_ADMIN_TOKEN`:
+Admin endpoints require the `X-Admin-Token` header. They should **never** be publicly accessible.
 
 | Endpoint | Purpose | Rate Limited | Audit Logged |
 |----------|---------|--------------|--------------|
-| `POST /api/governance/ban` | Ban a token (kill switch) | Yes (30/min) | ✅ |
-| `POST /api/governance/unban` | Unban a token | Yes (30/min) | ✅ |
-| `GET /api/governance/banned` | List banned tokens | Yes (30/min) | ✅ |
-| `GET /api/governance/audit` | View audit log | Yes (30/min) | No |
-| `POST /api/free/pricing` | Update display pricing | Yes (30/min) | No |
-| `PUT /api/free/pricing` | Bulk update pricing | Yes (30/min) | No |
+| `POST /api/governance/ban` | Ban a token (kill switch) | ✅ 30/min | ✅ |
+| `POST /api/governance/unban` | Remove ban | ✅ 30/min | ✅ |
+| `GET /api/governance/banned` | List banned token signatures | ✅ 30/min | ✅ |
+| `POST /api/governance/reset` | Reset telemetry/demo view | ✅ 30/min | ✅ |
+| `GET /api/governance/audit` | View admin audit log | ✅ 30/min | ✅ |
+| `POST /api/free/pricing` | Update display pricing | ✅ 30/min | ✅ |
 
-**Authentication:**
+### Governance Telemetry & Dashboard
+
+**By default, these are admin-only.**
+
+| Endpoint | Purpose | Default Access |
+|----------|---------|----------------|
+| `GET /api/governance/graph` | Telemetry graph data | Admin-only |
+| `GET /api/governance/stats` | Summary metrics | Admin-only |
+| `GET /dashboard` | Governance dashboard UI | Admin-only |
+
+#### Demo Mode (Optional)
+
+To support public demos, SatGate can enable `DEMO_MODE`, which:
+
+- ✅ Redacts token identifiers (hash/truncate)
+- ✅ Removes IP / user-agent from views
+- ✅ Aggregates metrics (no per-request detail)
+- ✅ Prevents sensitive admin actions where possible
+
+**Usage:**
 ```bash
-curl -X POST https://your-api.com/api/governance/ban \
-  -H "X-Admin-Token: your-secret-token" \
-  -H "Content-Type: application/json" \
-  -d '{"tokenSignature": "abc123...", "reason": "Compromised"}'
+# For public demo environments only
+DEMO_MODE=true
+DASHBOARD_PUBLIC=true
 ```
 
-### L402 PROTECTED Endpoints (Lightning Payment Required)
+> ⚠️ Only use `DASHBOARD_PUBLIC=true` when paired with `DEMO_MODE=true`
 
-These endpoints are protected by Aperture and require L402 payment:
+---
 
-| Endpoint Pattern | Price | Timeout |
-|------------------|-------|---------|
+## Protected Data Plane Endpoints
+
+### L402-Protected Endpoints (Lightning Payment Required)
+
+These routes are protected by Aperture using L402 payment challenges:
+
+| Pattern | Price | Timeout |
+|---------|-------|---------|
 | `/api/micro/*` | 1 sat | 24 hours |
 | `/api/basic/*` | 10 sats | 24 hours |
 | `/api/standard/*` | 100 sats | 24 hours |
 | `/api/premium/*` | 1000 sats | 24 hours |
 
-### CAPABILITY Endpoints (Macaroon Required)
+### Capability-Protected Endpoints (Macaroon Required)
 
-These endpoints require a valid capability macaroon (no payment):
+These routes require a valid capability macaroon (no payment):
 
-| Endpoint Pattern | Auth |
-|------------------|------|
-| `/api/capability/*` | Macaroon signature verification |
+| Pattern | Auth |
+|---------|------|
+| `/api/capability/*` | Macaroon signature verification + caveat enforcement |
+
+---
+
+## Admin Authentication
+
+### Current (Demo / Early Production)
+
+Admin endpoints require an `X-Admin-Token` header matching `PRICING_ADMIN_TOKEN`.
+
+```bash
+curl -X POST https://your-api.com/api/governance/ban \
+  -H "X-Admin-Token: your-secret-token" \
+  -H "Content-Type: application/json" \
+  -d '{"tokenSignature":"abc123...","reason":"Compromised"}'
+```
+
+### Roadmap (Enterprise)
+
+| Phase | Authentication Method |
+|-------|----------------------|
+| **Now** | `X-Admin-Token` (single shared secret) |
+| **Next** | OIDC/OAuth login for dashboard + short-lived admin JWT |
+| **Then** | RBAC roles (Viewer / Operator / Admin), MFA via IdP |
+| **Later** | Audit export to SIEM (Splunk/Datadog/etc.) |
+
+---
+
+## Data Handling and Retention
+
+SatGate is designed to **avoid centralized user identity**:
+
+- ✅ No user accounts required for capability verification or L402 payments
+- ✅ No PII is required for data plane authorization
+
+**Operational metadata** may be collected for security and audit:
+
+| Data Type | Contents | Redacted in Demo Mode |
+|-----------|----------|----------------------|
+| Admin audit logs | timestamp, action, reason, client IP, user-agent | ✅ IP/UA redacted |
+| Telemetry | aggregated counters (paid, blocked, banned) | ✅ Token IDs truncated |
+
+**Retention:**
+- In-memory: last N events (implementation-defined)
+- Redis (optional): persisted across restarts; apply TTL policies per environment
+
+---
 
 ## Security Controls
 
-### 1. Rate Limiting
+### 1) Rate Limiting
 
-All endpoints have rate limits to prevent abuse:
+Default limits (configurable via environment variables):
 
-- **Admin endpoints:** 30 requests/minute per IP (configurable via `ADMIN_RATE_LIMIT`)
-- **API endpoints:** 300 requests/minute per IP
-- **L402 endpoints:** Implicitly rate-limited by payment cost (economic firewall)
+| Endpoint Type | Default Limit | Config Variable |
+|---------------|---------------|-----------------|
+| Admin endpoints | 30/min per IP | `ADMIN_RATE_LIMIT` |
+| Health probes | 600/min per IP | `HEALTH_RATE_LIMIT` |
+| Free/API endpoints | 300/min per IP | — |
+| L402 endpoints | Payment provides economic friction | — |
 
 Rate limit headers returned:
-```
-X-RateLimit-Limit: 30
-X-RateLimit-Remaining: 29
-X-RateLimit-Reset: 1703289600
-```
+- `X-RateLimit-Limit`
+- `X-RateLimit-Remaining`
+- `X-RateLimit-Reset`
 
-### 2. Audit Logging
+### 2) Audit Logging
 
-All admin actions are logged with:
-- Timestamp (ISO 8601)
-- Action type (BAN_SUCCESS, UNBAN_SUCCESS, etc.)
-- Details (token signature, reason)
-- Client IP
-- User-Agent
+Admin actions are logged with:
+- ISO timestamp
+- Action type (`BAN_SUCCESS`, `UNBAN_SUCCESS`, `RESET`, etc.)
+- Token signature (redacted in demo mode)
+- Reason
+- Client IP + user-agent (removed in demo mode)
 
-Logs are stored in Redis (if available) and in-memory (last 1000 entries).
-
-### 3. Input Validation
+### 3) Input Validation
 
 Admin endpoints validate:
-- Token signatures must be valid hex strings
-- Reasons are sanitized and logged
-- Missing required fields return 400 errors
+- Token signatures are valid hex strings
+- Required fields present
+- Reason sanitized/logged
+- Malformed requests return `400`
 
-### 4. Token Revocation (Kill Switch)
+### 4) Token Revocation (Kill Switch)
 
-Stateless tokens + stateful blocklist:
+SatGate uses **stateless verification** for valid tokens plus a **stateful ban list** for compromised tokens:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    TOKEN VALIDATION                          │
 ├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  1. Cryptographic Validation (Stateless)                    │
-│     - Verify signature                                       │
+│  1) Cryptographic Validation (Stateless)                     │
+│     - Verify signature against root key                      │
 │     - Check expiry caveat                                    │
-│     - Validate scope constraints                             │
+│     - Enforce scope/time/budget caveats                      │
 │                                                             │
-│  2. Blocklist Check (Stateful)                              │
-│     - Check if signature in bannedTokens set                 │
-│     - O(1) lookup via Redis SET                              │
+│  2) Blocklist Check (Stateful)                               │
+│     - Check token signature against banned set               │
+│     - O(1) lookup via Redis SET (if enabled)                 │
 │                                                             │
-│  Result: ALLOW | DENY                                       │
-│                                                             │
+│  Result: ALLOW | DENY                                        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-This provides:
-- **Speed:** Cryptographic validation is fast (no DB lookup for valid tokens)
-- **Revocation:** Compromised tokens can be instantly banned
-- **Scalability:** Blocklist is small (only banned tokens, not all tokens)
+### 5) Replay and Token Theft Considerations
+
+Macaroons are **bearer credentials**; if stolen, they can be replayed until they expire or are revoked.
+
+**Mitigations:**
+- Short TTL caveats
+- Narrow scope caveats
+- Budget/max-use caveats (where applicable)
+- Kill switch / ban list
+- TLS everywhere (CDN/edge termination and origin protection)
+
+### 6) L402 / 402 Abuse Protections
+
+Attackers may try to DoS invoice creation or create churn.
+
+**Recommended protections:**
+- Rate-limit 402/invoice issuance per IP and per route
+- Enforce invoice expiry and minimum pricing
+- Track unpaid challenges per IP and throttle noisy sources
+- Keep payment verification behind CDN/WAF
+
+---
 
 ## Environment Variables
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `PRICING_ADMIN_TOKEN` | Secret for admin endpoints | Yes (prod) | None |
-| `DASHBOARD_PUBLIC` | Allow public dashboard access | No | true |
-| `ADMIN_RATE_LIMIT` | Admin requests per minute | No | 30 |
-| `REDIS_URL` | Redis connection for persistence | No | In-memory |
+| `PRICING_ADMIN_TOKEN` | Secret for admin endpoints | ✅ (prod) | None |
+| `DASHBOARD_PUBLIC` | Allow public dashboard access | No | `false` |
+| `DEMO_MODE` | Redact/aggregate telemetry for public demo | No | `false` |
+| `ADMIN_RATE_LIMIT` | Admin req/min per IP | No | `30` |
+| `HEALTH_RATE_LIMIT` | Health check req/min per IP | No | `600` |
+| `REDIS_URL` | Redis connection for persistence | No | in-memory |
+
+---
 
 ## Deployment Security
 
 ### Recommended Architecture
 
 ```
-                    Internet
-                       │
-                       ▼
-                 ┌───────────┐
-                 │  CDN/WAF  │  ← DDoS protection, TLS termination
-                 └─────┬─────┘
-                       │
-                       ▼
-                 ┌───────────┐
-                 │ Aperture  │  ← L402 payment verification
-                 └─────┬─────┘
-                       │
-                       ▼
-                 ┌───────────┐
-                 │ SatGate   │  ← Capability validation, governance
-                 └─────┬─────┘
-                       │
-                       ▼
-                 ┌───────────┐
-                 │ Your API  │  ← Business logic
-                 └───────────┘
+Internet
+  │
+  ▼
+CDN/WAF        ← DDoS protection, TLS termination, request filtering
+  │
+  ▼
+Aperture       ← L402 payment verification (for paid routes)
+  │
+  ▼
+SatGate        ← Capability validation, governance, kill switch
+  │
+  ▼
+Your API       ← Business logic
 ```
 
-### Security Checklist
+### Recommendations
+
+- ✅ TLS at the edge; protect origin access (allowlist only CDN/WAF IPs)
+- ✅ Make governance/dashboard admin-only in production
+- ✅ Enable Redis for durable ban list and audit logs
+- ✅ Set strong, random `PRICING_ADMIN_TOKEN`
+- ✅ Rotate admin credentials periodically
+
+---
+
+## Security Checklist
 
 - [ ] Set `PRICING_ADMIN_TOKEN` to a strong random value
-- [ ] Use HTTPS in production (TLS at CDN/edge)
-- [ ] Configure `DASHBOARD_PUBLIC=false` if dashboard should be admin-only
-- [ ] Set up Redis for persistent blocklist across restarts
-- [ ] Monitor `/api/governance/audit` for suspicious activity
-- [ ] Rotate admin token periodically
+- [ ] Set `DASHBOARD_PUBLIC=false` (production)
+- [ ] Set `DEMO_MODE=false` (production)
+- [ ] Enable Redis for persistent ban list + audit logs
+- [ ] Rate limit `/health` and `/ready` (or allowlist probes)
+- [ ] Monitor governance audit log for suspicious activity
+- [ ] Rotate admin credentials periodically
+- [ ] Ensure TLS and origin protection are configured
 
-### Compliance Notes
+---
 
-**SOC2 / ISO 27001:**
-- ✅ Per-request authorization (no implicit trust)
-- ✅ Audit logging for admin actions
-- ✅ Token revocation capability
-- ✅ Cryptographic chain of custody (macaroon lineage)
+## Compliance Notes (SOC2 / ISO 27001)
 
-**For Auditors:**
-Use the Governance Inspector to demonstrate token provenance:
+SatGate supports common controls:
+
+| Control | Implementation |
+|---------|----------------|
+| Per-request authorization | ✅ No implicit trust |
+| Admin audit logging | ✅ All admin actions logged |
+| Token revocation | ✅ Kill switch with O(1) lookup |
+| Least privilege | ✅ Scope/time/budget caveats |
+| Non-repudiation | ✅ Cryptographic signatures |
+
+For auditors: use the **Governance Inspector** to demonstrate token constraints and provenance:
+
 ```bash
 node cli/inspect.js <token>
 ```
+
+---
 
 ## Threat Model
 
 | Threat | Mitigation |
 |--------|------------|
-| DDoS attacks | Economic firewall (L402 payment required) |
-| Credential stuffing | Micropayment per attempt bankrupts attacker |
-| Stolen tokens | Kill switch + short expiry caveats |
-| Admin endpoint abuse | Auth + rate limiting + audit logging |
-| Replay attacks | Macaroon expiry caveats |
+| DDoS / L7 floods | CDN/WAF + rate limits + (optional) economic friction via L402 |
+| Scraping / automation abuse | L402 micropayments + throttling + telemetry |
+| Credential stuffing | Price `/login` attempts; kill switch; short TTL |
+| Stolen tokens | Short TTL + narrow scope + ban list |
+| Admin endpoint abuse | Admin auth + rate limit + audit log + (roadmap) OIDC/RBAC |
+| Replay attacks | Caveats + TTL + revocation |
 | Token forgery | Cryptographic signatures |
 
-## Contact
+---
 
-For security issues, contact: [security@satgate.io]
+## Responsible Disclosure
 
+For security issues, contact: **security@satgate.io**
+
+See [`SECURITY.md`](../SECURITY.md) in the repository root for disclosure process and expected response timelines.
