@@ -319,6 +319,7 @@
     .legend-dot.child { background: var(--accent-cyan); }
     .legend-dot.deep { background: var(--accent-purple); }
     .legend-dot.banned { background: var(--accent-red); }
+    .legend-dot.paid { background: #ffd700; }
     
     /* Node Details Panel */
     .node-details {
@@ -476,6 +477,10 @@
             <div class="legend-dot banned"></div>
             <span>Banned</span>
           </div>
+          <div class="legend-item">
+            <div class="legend-dot paid"></div>
+            <span>Paid (L402)</span>
+          </div>
         </div>
       </div>
       
@@ -562,6 +567,16 @@
             'background-color': '#ff4757',
             'border-color': '#ff4757',
             'border-width': 3
+          }
+        },
+        {
+          selector: 'node[status = "PAID"]',
+          style: {
+            'background-color': '#ffd700',
+            'border-color': '#ffd700',
+            'border-width': 3,
+            'width': 40,
+            'height': 40
           }
         },
         {

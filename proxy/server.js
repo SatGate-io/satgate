@@ -417,6 +417,41 @@ const telemetry = {
     wsBroadcast({ type: 'token', data: tokenData });
   },
   
+  // Record an L402 payment as a visible node on the graph
+  recordPaymentNode: function(tier, priceSats, endpoint) {
+    const now = Date.now();
+    const paymentId = `payment_${tier}_${now}`;
+    
+    const paymentNode = {
+      id: paymentId.substring(0, 16) + '...',
+      fullSignature: paymentId,
+      lastSeen: now,
+      ip: 'L402',
+      depth: 0,  // Root level - these are L402 payment tokens
+      constraints: [
+        `tier:${tier}`,
+        `price:${priceSats} sats`,
+        `endpoint:${endpoint}`,
+        `time:${new Date(now).toLocaleTimeString()}`
+      ],
+      status: 'PAID',
+      isPayment: true
+    };
+    
+    this.activeTokens.set(paymentId, paymentNode);
+    
+    // Cleanup old payment nodes (keep last 10 minutes)
+    const cutoff = now - (10 * 60 * 1000);
+    for (const [sig, data] of this.activeTokens) {
+      if (data.lastSeen < cutoff) {
+        this.activeTokens.delete(sig);
+      }
+    }
+    
+    // Broadcast to dashboard
+    wsBroadcast({ type: 'token', data: paymentNode });
+  },
+  
   async getGraphData() {
     const nodes = [];
     const edges = [];
@@ -757,18 +792,14 @@ const isL402Auth = (req) => {
 // Middleware to track L402 paid requests
 // Call this on paid tier endpoints to record revenue
 const trackPaidRequest = (tier, priceSats) => (req, res, next) => {
-  // Debug: log all headers to understand what Aperture passes through
-  const auth = req.get('authorization') || '';
-  const macaroon = req.get('grpc-metadata-macaroon') || '';
-  
-  // Check various ways Aperture might indicate a paid request
-  const isL402 = isL402Auth(req);
-  const hasAnyAuth = auth.length > 0 || macaroon.length > 0;
-  
   // If request reached paid endpoint, it MUST have paid (Aperture enforces this)
   // So we track all requests to paid endpoints as paid
   telemetry.recordPaidRequest(tier, priceSats);
-  console.log(`[L402] Paid request: ${tier} tier, ${priceSats} sats (auth: ${isL402 ? 'L402' : hasAnyAuth ? 'other' : 'aperture-validated'})`);
+  
+  // Also create a visible node on the governance graph
+  telemetry.recordPaymentNode(tier, priceSats, req.path);
+  
+  console.log(`[L402] Paid request: ${tier} tier, ${priceSats} sats, endpoint: ${req.path}`);
   
   next();
 };
