@@ -158,7 +158,68 @@ This isn't ideological—it's practical. Lightning is currently the **only** pay
 
 ## Architecture
 
-### Standard Deployment (Full Gateway)
+### L402 Native Mode (Recommended - v1.9.0+)
+
+SatGate is now the L402 authority. No Aperture required for L402 enforcement.
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                              INTERNET                                    │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         CDN/WAF (Optional)                               │
+│                    DDoS protection • TLS termination • Caching           │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                                                                          │
+│                      SATGATE (L402 Authority)                            │
+│                                                                          │
+│   ┌────────────────┐   ┌────────────────┐   ┌────────────────────────┐  │
+│   │ Request Router │   │    L402        │   │    Token Validator     │  │
+│   │                │   │   Middleware   │   │  (Macaroon + Preimage) │  │
+│   │ • Path matching│   │                │   │                        │  │
+│   │ • Tier pricing │   │ • 402 challenge│   │  • Signature check     │  │
+│   │ • Free vs paid │   │ • Invoice gen  │   │  • Expiry validation   │  │
+│   └────────────────┘   │ • LSAT verify  │   │  • Caveat enforcement  │  │
+│                        └────────────────┘   └────────────────────────┘  │
+│                                                                          │
+│   ┌────────────────┐   ┌────────────────┐   ┌────────────────────────┐  │
+│   │    Redis       │   │    Metering    │   │     Governance         │  │
+│   │                │   │                │   │                        │  │
+│   │ • Ban list     │   │ • max_calls    │   │  • Dashboard           │  │
+│   │ • Audit logs   │   │ • budget_sats  │   │  • Kill switch         │  │
+│   │ • Counters     │   │ • Re-challenge │   │  • Audit API           │  │
+│   └────────────────┘   └────────────────┘   └────────────────────────┘  │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+           │                                              │
+           │ Lightning Backend                            │ HTTP Proxy
+           ▼                                              ▼
+┌─────────────────────────┐                ┌──────────────────────────────┐
+│                         │                │                              │
+│    LIGHTNING PROVIDER   │                │     YOUR API (Origin)        │
+│                         │                │                              │
+│  Supported backends:    │                │   ┌────────────────────────┐ │
+│  • phoenixd (recommended)                │   │  /api/analytics (paid) │ │
+│  • LND (REST)           │                │   │  /api/free/ping (free) │ │
+│  • OpenNode (limited)   │                │   │  Your business logic   │ │
+│  • Mock (testing)       │                │   └────────────────────────┘ │
+│                         │                │                              │
+└─────────────────────────┘                └──────────────────────────────┘
+```
+
+**Key Benefits of Native Mode:**
+- ✅ Per-request metering via `max_calls` and `budget_sats` caveats
+- ✅ Automatic re-challenge when budget/calls exhausted
+- ✅ Multi-backend Lightning support (phoenixd, LND)
+- ✅ No Aperture dependency for L402 enforcement
+- ✅ Atomic Redis counters for accurate metering
+
+### Aperture Sidecar Mode (Legacy)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -279,13 +340,14 @@ SatGate can be deployed as a **Sidecar** rather than a full gateway replacement.
 
 | Layer | Technology | Purpose |
 |-------|------------|---------|
-| **Gateway** | Aperture (Go) | L402 protocol, invoice generation, token validation |
-| **Backend** | Node.js + Express | Business logic, API endpoints, health checks |
-| **Lightning** | Voltage LND + LNC | Payment infrastructure, hosted node |
+| **L402 Authority** | SatGate (Node.js) | L402 challenges, LSAT validation, metering |
+| **L402 Sidecar** | Aperture (Go, optional) | Legacy L402 gateway mode |
+| **Backend** | Node.js + Express | Business logic, API endpoints, governance |
+| **Lightning** | phoenixd / LND / OpenNode | Invoice creation, preimage verification |
+| **Metering** | Redis | Atomic counters for `max_calls`, `budget_sats` |
 | **Frontend** | Next.js + Tailwind | Landing page, interactive playground |
-| **SDKs** | JavaScript, Python | Client libraries for browsers and agents |
-| **Database** | SQLite | Token storage, payment tracking |
-| **Reverse Proxy** | Nginx | TLS, rate limiting, caching |
+| **SDKs** | JavaScript, Python, Go | Client libraries for browsers and agents |
+| **Reverse Proxy** | Nginx / CDN | TLS, rate limiting, caching |
 | **Container** | Docker + Compose | Deployment, orchestration |
 
 ---
@@ -416,9 +478,11 @@ SatGate uses **capability-based** access: "Present a token that *already encodes
 ### Security Features
 
 - **No Accounts Required** — Access via L402 bearer tokens (macaroons + proof-of-payment), not usernames or API keys
-- **Edge Verification** — Tokens verified cryptographically at the gateway; no centralized identity store needed (usage accounting/quotas can be tracked without storing PII)
-- **Least Privilege** — Add caveats to constrain scope, time, audience, and budget (e.g., `"valid_until": 5min`, `"max_calls": 10`)
+- **Edge Verification** — Tokens verified cryptographically at the gateway; no centralized identity store needed
+- **Least Privilege** — Add caveats to constrain scope, time, and budget (e.g., `expires = 5min`, `max_calls = 10`, `budget_sats = 100`)
 - **Delegatable** — Attenuate tokens before passing to sub-agents; permissions only shrink, never grow
+- **Per-Request Metering** — Stateful enforcement of `max_calls` and `budget_sats` via Redis (L402 Native Mode)
+- **Automatic Re-Challenge** — New 402 challenge issued when budget/calls exhausted (L402 Native Mode)
 
 > **The security primitive:** L402 creates *paid capabilities* — cryptographic tokens where payment gates issuance and the token itself encodes permissions.
 
@@ -439,7 +503,32 @@ SatGate is a **Zero Trust Policy Enforcement Point** — the gateway that verifi
 
 ## Configuration
 
-### Pricing & Access Control
+### L402 Native Mode (Recommended)
+
+```bash
+# .env for L402 Native Mode
+L402_MODE=native
+LIGHTNING_BACKEND=phoenixd
+PHOENIXD_URL=http://localhost:9740
+PHOENIXD_PASSWORD=your-password
+L402_DEFAULT_TTL=3600
+L402_DEFAULT_MAX_CALLS=100
+REDIS_URL=redis://localhost:6379
+```
+
+| Environment Variable | Description | Default |
+|---------------------|-------------|---------|
+| `L402_MODE` | `native` or `aperture` | `aperture` |
+| `LIGHTNING_BACKEND` | `phoenixd`, `lnd`, `opennode`, `mock` | Required if native |
+| `PHOENIXD_URL` | phoenixd REST API URL | — |
+| `PHOENIXD_PASSWORD` | phoenixd API password | — |
+| `LND_REST_URL` | LND REST API URL | — |
+| `LND_MACAROON` | LND admin macaroon (hex) | — |
+| `OPENNODE_API_KEY` | OpenNode API key | — |
+| `L402_DEFAULT_TTL` | Default token TTL (seconds) | `3600` |
+| `L402_DEFAULT_MAX_CALLS` | Default max calls per token | `100` |
+
+### Aperture Sidecar Mode (Legacy)
 
 ```yaml
 # aperture.yaml
@@ -463,8 +552,9 @@ services:
 
 | Parameter | Value |
 |-----------|-------|
-| **Price per request** | 1,000 sats (~$1.00) |
-| **Token validity** | 1 hour |
+| **Tier Pricing** | micro=1, basic=10, standard=100, premium=1000 sats |
+| **Token validity (default)** | 1 hour |
+| **Max calls (default)** | 100 |
 | **Free endpoints** | `/api/free/*`, `/health`, `/ready` |
 | **Rate limit (API)** | 100 requests / 15 minutes |
 | **Rate limit (Nginx)** | 10 requests / second |
@@ -672,9 +762,17 @@ cd satgate-landing && npm run dev
 
 ---
 
-*Document Version: 2.0 | Last Updated: November 2025*
+*Document Version: 3.0 | Last Updated: December 2025*
 
 ## Changelog
+
+### v3.0 (December 2025) — L402 Native Mode
+- **L402 Native Mode**: SatGate is now the L402 authority (Aperture optional)
+- Added **Lightning provider abstraction** (phoenixd, LND, OpenNode, mock)
+- Added **Per-request metering** via `max_calls` and `budget_sats` caveats
+- Added **Automatic re-challenge** when budget/calls exhausted
+- Added **Stateful Redis counters** for atomic metering
+- Security hardening: WebSocket first-message auth, CORS hardening, supply-chain pinning
 
 ### v2.2 (December 2025)
 - Added **Governance Dashboard** with real-time WebSocket updates

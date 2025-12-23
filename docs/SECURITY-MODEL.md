@@ -13,9 +13,41 @@ SatGate implements a **Zero Trust Policy Enforcement Point (PEP)** for API traff
 
 ## Trust Boundary
 
+SatGate supports two L402 deployment modes:
+
+### L402 Native Mode (Recommended)
+
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                          TRUST BOUNDARY                                 │
+│                    TRUST BOUNDARY (L402 Native)                         │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   [Internet]                                                            │
+│       │                                                                 │
+│       ▼                                                                 │
+│   ┌─────────┐    ┌─────────────────────────────────┐    ┌───────────┐  │
+│   │ CDN/WAF │───▶│           SatGate               │───▶│ Your API  │  │
+│   │         │    │  (L402 Authority + Governance)  │    │ (Origin)  │  │
+│   └─────────┘    └─────────────────────────────────┘    └───────────┘  │
+│                        │              │                                │
+│                        │              │                                │
+│              Lightning Backend   Capability Token                      │
+│              (phoenixd/LND)      Verification                          │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+In **L402 Native Mode** (`L402_MODE=native`), SatGate is the L402 authority:
+- Issues 402 challenges with `WWW-Authenticate: L402`
+- Validates `Authorization: LSAT <macaroon>:<preimage>`
+- Enforces per-request metering via `max_calls` and `budget_sats` caveats
+- Re-challenges when budget/calls exhausted
+
+### Aperture Sidecar Mode (Legacy)
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    TRUST BOUNDARY (Aperture Sidecar)                    │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │   [Internet]                                                            │
@@ -33,7 +65,7 @@ SatGate implements a **Zero Trust Policy Enforcement Point (PEP)** for API traff
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-Policy enforcement occurs at SatGate (capabilities) and/or Aperture (payments). Your API origin should assume requests are already authenticated/authorized per the chosen policy.
+In **Aperture Sidecar Mode** (`L402_MODE=aperture`, default), Aperture handles L402 challenges and SatGate tracks/validates.
 
 ## Roles and Access Model
 
@@ -107,14 +139,32 @@ DASHBOARD_PUBLIC=true
 
 ### L402-Protected Endpoints (Lightning Payment Required)
 
-These routes are protected by Aperture using L402 payment challenges:
+These routes are protected using L402 payment challenges:
 
-| Pattern | Price | Timeout |
-|---------|-------|---------|
-| `/api/micro/*` | 1 sat | 24 hours |
-| `/api/basic/*` | 10 sats | 24 hours |
-| `/api/standard/*` | 100 sats | 24 hours |
-| `/api/premium/*` | 1000 sats | 24 hours |
+| Pattern | Price | Default TTL | Default Max Calls |
+|---------|-------|-------------|-------------------|
+| `/api/micro/*` | 1 sat | 1 hour | 100 |
+| `/api/basic/*` | 10 sats | 1 hour | 100 |
+| `/api/standard/*` | 100 sats | 1 hour | 100 |
+| `/api/premium/*` | 1000 sats | 1 hour | 100 |
+
+#### Per-Request Metering (L402 Native Mode)
+
+When `L402_MODE=native`, SatGate enforces **per-request-within-window** metering:
+
+| Caveat | Purpose | Exhaustion Behavior |
+|--------|---------|---------------------|
+| `max_calls = N` | Limits requests within TTL | HTTP 429, then 402 re-challenge |
+| `budget_sats = M` | Limits economic spend within TTL | HTTP 402 re-challenge |
+
+The SDK flow is:
+1. Client calls paid endpoint
+2. SatGate returns `402` with `WWW-Authenticate: L402 macaroon="...", invoice="..."`
+3. Client pays invoice, retries with `Authorization: LSAT <macaroon>:<preimage>`
+4. SatGate validates + decrements counters atomically (Redis)
+5. When exhausted → SatGate returns new 402 challenge (SDK pays again)
+
+This ensures **"per request, per time window"** is technically enforceable.
 
 ### Capability-Protected Endpoints (Macaroon Required)
 
@@ -123,6 +173,10 @@ These routes require a valid capability macaroon (no payment):
 | Pattern | Auth |
 |---------|------|
 | `/api/capability/*` | Macaroon signature verification + caveat enforcement |
+
+Capability tokens support stateful metering via:
+- `max_calls = N` caveat (HTTP 429 on exhaustion)
+- `budget_sats = M` caveat (HTTP 402 on exhaustion)
 
 ---
 
@@ -251,6 +305,8 @@ Attackers may try to DoS invoice creation or create churn.
 
 ## Environment Variables
 
+### Core Configuration
+
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
 | `MODE` | Operating mode: `prod` (secure) or `demo` (public demos) | No | `prod` |
@@ -260,14 +316,51 @@ Attackers may try to DoS invoice creation or create churn.
 | `ADMIN_RATE_LIMIT` | Admin req/min per IP | No | `30` |
 | `HEALTH_RATE_LIMIT` | Health check req/min per IP | No | `600` |
 | `REDIS_URL` | Redis connection for persistence | No | in-memory |
+| `CORS_ORIGINS` | Comma-separated allowed origins | No | localhost only |
 
 > **Note:** `DASHBOARD_PUBLIC=true` is ignored when `MODE=prod` — see guardrail above.
+
+### L402 Native Mode Configuration
+
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `L402_MODE` | L402 mode: `native` or `aperture` | No | `aperture` |
+| `LIGHTNING_BACKEND` | Backend: `phoenixd`, `lnd`, `opennode`, `mock` | If native | None |
+| `PHOENIXD_URL` | phoenixd REST API URL | If phoenixd | None |
+| `PHOENIXD_PASSWORD` | phoenixd API password | If phoenixd | None |
+| `LND_REST_URL` | LND REST API URL | If lnd | None |
+| `LND_MACAROON` | LND admin macaroon (hex) | If lnd | None |
+| `OPENNODE_API_KEY` | OpenNode API key | If opennode | None |
+| `L402_DEFAULT_TTL` | Default token TTL (seconds) | No | `3600` |
+| `L402_DEFAULT_MAX_CALLS` | Default max calls per token | No | `100` |
+
+> **Warning:** OpenNode may not expose the Lightning payment hash required for LSAT preimage verification. Use phoenixd or LND for production.
 
 ---
 
 ## Deployment Security
 
-### Recommended Architecture
+### Recommended Architecture (L402 Native Mode)
+
+```
+Internet
+  │
+  ▼
+CDN/WAF              ← DDoS protection, TLS termination, request filtering
+  │
+  ▼
+SatGate              ← L402 authority, capability validation, governance
+  │
+  ├───▶ Lightning    ← phoenixd / LND (invoice creation, preimage verification)
+  │     Backend
+  │
+  ├───▶ Redis        ← Metering counters, ban list, audit logs
+  │
+  ▼
+Your API             ← Business logic
+```
+
+### Alternative: Aperture Sidecar Mode
 
 ```
 Internet
@@ -289,22 +382,32 @@ Your API       ← Business logic
 
 - ✅ TLS at the edge; protect origin access (allowlist only CDN/WAF IPs)
 - ✅ Make governance/dashboard admin-only in production
-- ✅ Enable Redis for durable ban list and audit logs
+- ✅ Enable Redis for durable ban list, audit logs, and metering counters
 - ✅ Set strong, random `PRICING_ADMIN_TOKEN`
 - ✅ Rotate admin credentials periodically
+- ✅ Use `L402_MODE=native` with phoenixd or LND for enforceable per-request metering
 
 ---
 
 ## Security Checklist
 
-- [ ] Set `PRICING_ADMIN_TOKEN` to a strong random value
+### Core Security
+- [ ] Set `PRICING_ADMIN_TOKEN` to a strong random value (min 32 chars)
+- [ ] Set `MODE=prod` in production
 - [ ] Set `DASHBOARD_PUBLIC=false` (production)
-- [ ] Set `DEMO_MODE=false` (production)
-- [ ] Enable Redis for persistent ban list + audit logs
+- [ ] Enable Redis for persistent ban list, audit logs, and metering
 - [ ] Rate limit `/health` and `/ready` (or allowlist probes)
 - [ ] Monitor governance audit log for suspicious activity
 - [ ] Rotate admin credentials periodically
 - [ ] Ensure TLS and origin protection are configured
+
+### L402 Native Mode (if enabled)
+- [ ] Set `L402_MODE=native`
+- [ ] Configure Lightning backend (`LIGHTNING_BACKEND`, credentials)
+- [ ] Use phoenixd or LND (OpenNode may not support preimage verification)
+- [ ] Enable Redis for atomic metering counters
+- [ ] Set appropriate `L402_DEFAULT_TTL` and `L402_DEFAULT_MAX_CALLS`
+- [ ] Verify `/api/lightning/status` returns healthy
 
 ---
 
@@ -332,13 +435,16 @@ node cli/inspect.js <token>
 
 | Threat | Mitigation |
 |--------|------------|
-| DDoS / L7 floods | CDN/WAF + rate limits + (optional) economic friction via L402 |
+| DDoS / L7 floods | CDN/WAF + rate limits + economic friction via L402 |
 | Scraping / automation abuse | L402 micropayments + throttling + telemetry |
 | Credential stuffing | Price `/login` attempts; kill switch; short TTL |
-| Stolen tokens | Short TTL + narrow scope + ban list |
+| Stolen tokens | Short TTL + narrow scope + ban list + `max_calls` limit |
 | Admin endpoint abuse | Admin auth + rate limit + audit log + (roadmap) OIDC/RBAC |
-| Replay attacks | Caveats + TTL + revocation |
-| Token forgery | Cryptographic signatures |
+| Replay attacks | Caveats + TTL + revocation + stateful metering (`max_calls`, `budget_sats`) |
+| Token forgery | Cryptographic signatures (macaroon HMAC chain) |
+| Invoice-spam DoS | Rate limit challenge issuance per IP |
+| Token exhaustion gaming | Atomic Redis counters; re-challenge on exhaustion |
+| Lightning backend failure | Multi-backend support; health monitoring |
 
 ---
 
