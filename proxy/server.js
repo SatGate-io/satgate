@@ -609,7 +609,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.5.5',
+    version: '1.5.6',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1252,9 +1252,13 @@ app.get('/api/token/test', (req, res) => {
 // This demonstrates the "Chain of Custody" - parent delegates to child
 // Using /api/token/delegate to bypass /api/capability middleware
 app.post('/api/token/delegate', express.json(), (req, res) => {
-  const authHeader = req.get('authorization');
+  console.log('[DELEGATE] === REQUEST RECEIVED ===');
   
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  const authHeader = req.get('authorization') || '';
+  console.log('[DELEGATE] Auth header present:', authHeader.length > 0);
+  
+  if (!authHeader.startsWith('Bearer ')) {
+    console.log('[DELEGATE] Missing Bearer token');
     return res.status(401).json({ 
       error: 'Parent token required',
       hint: 'Use "Authorization: Bearer <parent_token>" header'
@@ -1262,52 +1266,27 @@ app.post('/api/token/delegate', express.json(), (req, res) => {
   }
   
   const parentTokenBase64 = authHeader.slice(7).trim();
+  console.log('[DELEGATE] Token extracted, length:', parentTokenBase64.length);
+  
   const { scope = 'api:capability:ping', expiresIn = 300 } = req.body || {};
+  console.log('[DELEGATE] Scope:', scope, 'ExpiresIn:', expiresIn);
   
   try {
-    console.log('[DELEGATE] Starting delegation...');
-    console.log('[DELEGATE] Parent token length:', parentTokenBase64.length);
+    console.log('[DELEGATE] Starting delegation v1.5.6...');
     
-    // Validate inputs
-    if (!CAPABILITY_ROOT_KEY) {
-      throw new Error('CAPABILITY_ROOT_KEY is not defined');
-    }
-    if (!CAPABILITY_IDENTIFIER) {
-      throw new Error('CAPABILITY_IDENTIFIER is not defined');
-    }
-    if (!CAPABILITY_LOCATION) {
-      throw new Error('CAPABILITY_LOCATION is not defined');
-    }
+    // Simple test: just create a macaroon like the /test endpoint
+    const testKey = Buffer.from('test-delegation-key', 'utf8');
+    const testId = Buffer.from('delegate-test-' + Date.now(), 'utf8');
     
-    // Create a hash of the parent token as its "signature" for linking
-    const parentSig = crypto.createHash('sha256')
-      .update(parentTokenBase64)
-      .digest('hex')
-      .substring(0, 16);
-    console.log('[DELEGATE] Parent sig:', parentSig);
-    
-    // Create a NEW child macaroon (server-side delegation for demo)
-    const keyString = String(CAPABILITY_ROOT_KEY);
-    console.log('[DELEGATE] Key string length:', keyString.length);
-    
-    const keyBytes = Buffer.from(keyString, 'utf8');
-    console.log('[DELEGATE] Key bytes length:', keyBytes.length);
-    
-    const childId = `${CAPABILITY_IDENTIFIER}:child:${Date.now()}`;
-    console.log('[DELEGATE] Child ID:', childId);
-    
-    const idBytes = Buffer.from(childId, 'utf8');
-    console.log('[DELEGATE] ID bytes length:', idBytes.length);
-    
-    const locString = String(CAPABILITY_LOCATION);
-    console.log('[DELEGATE] Location:', locString);
+    console.log('[DELEGATE] Creating test macaroon...');
     
     let childMac = macaroon.newMacaroon({
-      identifier: idBytes,
-      location: locString,
-      rootKey: keyBytes
+      identifier: testId,
+      location: 'https://satgate.io',
+      rootKey: testKey
     });
-    console.log('[DELEGATE] Child macaroon created');
+    
+    console.log('[DELEGATE] Test macaroon created!');
     
     // Add restricted caveats to child
     const expiresAt = Date.now() + (expiresIn * 1000);
