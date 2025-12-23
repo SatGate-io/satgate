@@ -770,6 +770,23 @@
         case 'unban':
           fetchData(); // Refresh full state
           break;
+        case 'reset':
+          // Admin triggered reset - clear everything
+          console.log('[Dashboard] Reset triggered by admin');
+          document.getElementById('activeCount').textContent = '0';
+          document.getElementById('blockedCount').textContent = '0';
+          document.getElementById('bannedHitsCount').textContent = '0';
+          document.getElementById('paidCount').textContent = '0';
+          document.getElementById('revenueCount').textContent = '0';
+          if (cy) {
+            cy.elements().remove(); // Clear graph
+          }
+          // Flash effect
+          document.querySelectorAll('.stat-card').forEach(card => {
+            card.style.boxShadow = '0 0 20px #ff6b6b';
+            setTimeout(() => card.style.boxShadow = '', 500);
+          });
+          break;
       }
     }
     
