@@ -395,13 +395,8 @@ const telemetry = {
     const now = Date.now();
     
     // Calculate depth based on identifier (child tokens have ':child:' in identifier)
-    // or delegation_depth caveat
     const isChild = identifier && identifier.includes(':child:');
-    const depthCaveat = caveats.find(c => c.startsWith('delegation_depth'));
-    const depth = isChild ? 1 : 
-                  depthCaveat ? parseInt(depthCaveat.split('=')[1]?.trim() || '1') : 
-                  0;
-    console.log('[TELEMETRY] identifier:', identifier, 'isChild:', isChild, 'depth:', depth);
+    const depth = isChild ? 1 : 0;
     
     const tokenData = {
       id: tokenSignature.substring(0, 12) + '...',
@@ -478,7 +473,8 @@ const telemetry = {
         const tier = tierConstraint ? tierConstraint.split(':')[1].toUpperCase() : 'L402';
         label = `⚡ ${tier}`;
       } else {
-        label = `Token (Depth ${token.depth})`;
+        // Capability tokens: show ROOT vs CHILD
+        label = token.depth === 0 ? '👑 ROOT' : `📜 CHILD (L${token.depth})`;
       }
       
       nodes.push({
@@ -612,7 +608,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.7.1',
+    version: '1.7.2',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1064,13 +1060,8 @@ app.use('/api/capability', (req, res, next) => {
     const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
     const now = Date.now();
     
-    // Extract caveats from macaroon for logging
+    // Extract caveats from macaroon
     const caveats = [];
-    console.log('[DEBUG] Macaroon keys:', Object.keys(m));
-    console.log('[DEBUG] m._caveats:', m._caveats);
-    console.log('[DEBUG] m.caveats:', m.caveats);
-    
-    // Try multiple ways to access caveats
     const caveatSource = m._caveats || m.caveats || [];
     if (Array.isArray(caveatSource)) {
       caveatSource.forEach(c => {
@@ -1080,7 +1071,6 @@ app.use('/api/capability', (req, res, next) => {
         if (cavStr) caveats.push(cavStr);
       });
     }
-    console.log('[DEBUG] Extracted caveats:', caveats);
     
     console.log(`[PEP] Path: ${req.path} | Required Scope: ${requiredScope}`);
     console.log(`[PEP] Token caveats: ${JSON.stringify(caveats)}`);
@@ -1168,18 +1158,13 @@ app.use('/api/capability', (req, res, next) => {
       throw new Error('Token has no scope caveat');
     }
     
-    // Extract identifier - list all properties to find the right one
-    console.log('[DEBUG] Macaroon object keys:', Object.keys(m));
-    console.log('[DEBUG] Macaroon prototype keys:', Object.getOwnPropertyNames(Object.getPrototypeOf(m)));
-    
-    // Try accessing identifier - the macaroon library uses 'identifier' property
+    // Extract identifier from macaroon
     let identifier = 'unknown';
     if (m.identifier && m.identifier.length > 0) {
       identifier = Buffer.from(m.identifier).toString('utf8');
     } else if (m._identifier) {
       identifier = m._identifier.toString('utf8');
     }
-    console.log('[DEBUG] Final identifier:', identifier);
     
     // Attach parsed info to request for endpoints
     req.capability = {
