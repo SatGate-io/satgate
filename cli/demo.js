@@ -319,7 +319,7 @@ async function demoCrawl(apiUrl) {
   step(3, 'Delegating with restricted scope...');
   let encodedChild = null;
   try {
-    const res = await request(`${apiUrl}/api/capability/delegate`, {
+    const res = await request(`${apiUrl}/api/token/delegate`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${encodedRoot}` },
       body: { 

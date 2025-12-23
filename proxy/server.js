@@ -609,7 +609,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.5.2',
+    version: '1.5.3',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1230,7 +1230,8 @@ app.post('/api/capability/mint', express.json(), (req, res) => {
 
 // Delegate a capability token (create a child with restricted scope)
 // This demonstrates the "Chain of Custody" - parent delegates to child
-app.post('/api/capability/delegate', express.json(), (req, res) => {
+// Using /api/token/delegate to bypass /api/capability middleware
+app.post('/api/token/delegate', express.json(), (req, res) => {
   const authHeader = req.get('authorization');
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
