@@ -745,7 +745,7 @@ app.use((req, res, next) => {
   if (req.path.startsWith('/dashboard') || req.path === '/') {
     res.setHeader('Content-Security-Policy', 
       "default-src 'self'; " +
-      "script-src 'self' 'unsafe-inline' https://unpkg.com; " +  // Cytoscape from CDN
+      "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; " +  // Cytoscape from CDN
       "style-src 'self' 'unsafe-inline'; " +
       "img-src 'self' data:; " +
       "connect-src 'self' wss: ws:; " +  // WebSocket for dashboard
