@@ -735,6 +735,22 @@
         case 'bannedHit':
           updateStats({ bannedHits: data.total });
           break;
+        case 'paid':
+          // Real-time paid request update
+          document.getElementById('paidCount').textContent = data.totalPaid || 0;
+          document.getElementById('revenueCount').textContent = data.totalRevenue || 0;
+          // Flash effect on update
+          const paidCard = document.querySelector('.stat-card.paid');
+          const revenueCard = document.querySelector('.stat-card.revenue');
+          if (paidCard) {
+            paidCard.style.boxShadow = '0 0 20px #00ff9d';
+            setTimeout(() => paidCard.style.boxShadow = '', 500);
+          }
+          if (revenueCard) {
+            revenueCard.style.boxShadow = '0 0 20px #ffd700';
+            setTimeout(() => revenueCard.style.boxShadow = '', 500);
+          }
+          break;
         case 'ban':
         case 'unban':
           fetchData(); // Refresh full state
