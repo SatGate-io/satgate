@@ -612,7 +612,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.7.0',
+    version: '1.7.1',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -1168,8 +1168,18 @@ app.use('/api/capability', (req, res, next) => {
       throw new Error('Token has no scope caveat');
     }
     
-    // Extract identifier
-    const identifier = m._identifier ? m._identifier.toString('utf8') : 'unknown';
+    // Extract identifier - list all properties to find the right one
+    console.log('[DEBUG] Macaroon object keys:', Object.keys(m));
+    console.log('[DEBUG] Macaroon prototype keys:', Object.getOwnPropertyNames(Object.getPrototypeOf(m)));
+    
+    // Try accessing identifier - the macaroon library uses 'identifier' property
+    let identifier = 'unknown';
+    if (m.identifier && m.identifier.length > 0) {
+      identifier = Buffer.from(m.identifier).toString('utf8');
+    } else if (m._identifier) {
+      identifier = m._identifier.toString('utf8');
+    }
+    console.log('[DEBUG] Final identifier:', identifier);
     
     // Attach parsed info to request for endpoints
     req.capability = {
