@@ -276,6 +276,28 @@ function renderTree(macaroon, options = {}) {
       }
     }
   }
+
+  // Max calls (stateful budget enforcement)
+  if (macaroon.caveats?.max_calls) {
+    console.log(`    ${icons.lock} Max Calls: ${macaroon.caveats.max_calls}`);
+  } else if (macaroon.caveats && Array.isArray(macaroon.caveats)) {
+    for (const caveat of macaroon.caveats) {
+      if (caveat.toLowerCase().includes('max_calls')) {
+        console.log(`    ${icons.lock} ${caveat}`);
+      }
+    }
+  }
+  
+  // Budget sats (stateful sats budget enforcement)
+  if (macaroon.caveats?.budget_sats) {
+    console.log(`    ${icons.key} Budget: ${macaroon.caveats.budget_sats} sats`);
+  } else if (macaroon.caveats && Array.isArray(macaroon.caveats)) {
+    for (const caveat of macaroon.caveats) {
+      if (caveat.toLowerCase().includes('budget_sats')) {
+        console.log(`    ${icons.key} ${caveat}`);
+      }
+    }
+  }
   
   // Tier
   if (macaroon.caveats?.tier) {

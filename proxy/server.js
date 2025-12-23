@@ -1201,9 +1201,125 @@ const CAPABILITY_ROOT_KEY = process.env.CAPABILITY_ROOT_KEY || 'satgate-phase1-d
 const CAPABILITY_LOCATION = 'https://satgate.io';
 const CAPABILITY_IDENTIFIER = 'satgate-capability-v1';
 
+// =============================================================================
+// STATEFUL ENFORCEMENT: max_calls & budget_sats (Redis-backed, in-memory fallback)
+// =============================================================================
+// This closes the "pay/mint once, unlimited within TTL" loophole by enforcing
+// per-token call and budget limits on every authorized request.
+//
+// Caveat formats:
+//   max_calls = <int>      - Maximum number of requests allowed
+//   budget_sats = <int>    - Maximum sats budget (decremented by tier cost per request)
+//
+// Storage:
+//   Redis keys:
+//     satgate:calls:<tokenSignature>  - remaining call count
+//     satgate:budget:<tokenSignature> - remaining sats budget
+//   TTL: matches token expiry
+
+const capabilityCallsMemory = new Map();  // tokenSignature -> { remaining: number, expiresAtMs: number }
+const capabilityBudgetMemory = new Map(); // tokenSignature -> { remaining: number, expiresAtMs: number }
+
+// Tier costs in sats (used for budget_sats enforcement)
+const TIER_COSTS = {
+  'api:capability:read': 1,
+  'api:capability:ping': 1,
+  'api:capability:data': 5,
+  'api:capability:admin': 10,
+  'api:capability:*': 1, // Default for wildcard
+  'default': 1
+};
+
+function getTierCost(scope) {
+  return TIER_COSTS[scope] || TIER_COSTS['default'];
+}
+
+async function decrementCapabilityCalls(tokenSignature, maxCalls, expiresAtMs) {
+  const now = Date.now();
+  const ttlSeconds = expiresAtMs
+    ? Math.max(1, Math.ceil((expiresAtMs - now) / 1000))
+    : 3600;
+
+  // Redis-backed atomic init + decrement
+  if (redis) {
+    const key = `satgate:calls:${tokenSignature}`;
+    const script = `
+      local key = KEYS[1]
+      local init = tonumber(ARGV[1])
+      local ttl = tonumber(ARGV[2])
+      if redis.call('EXISTS', key) == 0 then
+        redis.call('SET', key, init, 'EX', ttl)
+      end
+      local remaining = redis.call('DECR', key)
+      return remaining
+    `;
+    try {
+      const remaining = await redis.eval(script, 1, key, String(maxCalls), String(ttlSeconds));
+      return { remaining: Number(remaining), ttlSeconds, backend: 'redis' };
+    } catch (e) {
+      // Fall back to memory below
+    }
+  }
+
+  // In-memory fallback (single-instance only)
+  const entry = capabilityCallsMemory.get(tokenSignature);
+  if (!entry || (entry.expiresAtMs && entry.expiresAtMs < now)) {
+    capabilityCallsMemory.set(tokenSignature, {
+      remaining: maxCalls,
+      expiresAtMs: expiresAtMs || (now + ttlSeconds * 1000),
+    });
+  }
+
+  const current = capabilityCallsMemory.get(tokenSignature);
+  current.remaining -= 1;
+  return { remaining: current.remaining, ttlSeconds, backend: 'memory' };
+}
+
+async function decrementCapabilityBudget(tokenSignature, budgetSats, cost, expiresAtMs) {
+  const now = Date.now();
+  const ttlSeconds = expiresAtMs
+    ? Math.max(1, Math.ceil((expiresAtMs - now) / 1000))
+    : 3600;
+
+  // Redis-backed atomic init + decrby
+  if (redis) {
+    const key = `satgate:budget:${tokenSignature}`;
+    const script = `
+      local key = KEYS[1]
+      local init = tonumber(ARGV[1])
+      local cost = tonumber(ARGV[2])
+      local ttl = tonumber(ARGV[3])
+      if redis.call('EXISTS', key) == 0 then
+        redis.call('SET', key, init, 'EX', ttl)
+      end
+      local remaining = redis.call('DECRBY', key, cost)
+      return remaining
+    `;
+    try {
+      const remaining = await redis.eval(script, 1, key, String(budgetSats), String(cost), String(ttlSeconds));
+      return { remaining: Number(remaining), cost, ttlSeconds, backend: 'redis' };
+    } catch (e) {
+      // Fall back to memory below
+    }
+  }
+
+  // In-memory fallback (single-instance only)
+  const entry = capabilityBudgetMemory.get(tokenSignature);
+  if (!entry || (entry.expiresAtMs && entry.expiresAtMs < now)) {
+    capabilityBudgetMemory.set(tokenSignature, {
+      remaining: budgetSats,
+      expiresAtMs: expiresAtMs || (now + ttlSeconds * 1000),
+    });
+  }
+
+  const current = capabilityBudgetMemory.get(tokenSignature);
+  current.remaining -= cost;
+  return { remaining: current.remaining, cost, ttlSeconds, backend: 'memory' };
+}
+
 // Middleware: Validate macaroon for /api/capability/* routes
 // Implements DYNAMIC SCOPE ENFORCEMENT based on requested path
-app.use('/api/capability', (req, res, next) => {
+app.use('/api/capability', async (req, res, next) => {
   const authHeader = req.get('authorization') || '';
   
   // Determine required scope for this path
@@ -1282,6 +1398,10 @@ app.use('/api/capability', (req, res, next) => {
     // Track if scope was validated
     let scopeValidated = false;
     let scopeError = null;
+    let expiresAtMs = null;
+    let maxCalls = null;
+    let budgetSats = null;
+    let tokenScope = null;
     
     // Verify HMAC signature with dynamic scope checking
     const checkCaveat = (caveat) => {
@@ -1290,15 +1410,36 @@ app.use('/api/capability', (req, res, next) => {
       // Time-based expiry
       if (caveatStr.startsWith('expires = ')) {
         const expiry = parseInt(caveatStr.split(' = ')[1], 10);
+        expiresAtMs = expiry;
         if (now > expiry) {
           return 'token expired';
         }
         return null; // OK
       }
       
+      // Stateful call budget (per request, per time window)
+      if (caveatStr.startsWith('max_calls = ')) {
+        const v = parseInt(caveatStr.split(' = ')[1], 10);
+        if (!Number.isFinite(v) || v <= 0) {
+          return 'invalid max_calls caveat';
+        }
+        maxCalls = v;
+        return null; // OK
+      }
+      
+      // Stateful sats budget (decremented by tier cost per request)
+      if (caveatStr.startsWith('budget_sats = ')) {
+        const v = parseInt(caveatStr.split(' = ')[1], 10);
+        if (!Number.isFinite(v) || v <= 0) {
+          return 'invalid budget_sats caveat';
+        }
+        budgetSats = v;
+        return null; // OK
+      }
+
       // DYNAMIC SCOPE CHECK
       if (caveatStr.startsWith('scope = ')) {
-        const tokenScope = caveatStr.split(' = ')[1].trim();
+        tokenScope = caveatStr.split(' = ')[1].trim();
         
         // Check if token scope covers the required scope
         // Wildcard: "api:capability:*" covers everything
@@ -1378,6 +1519,50 @@ app.use('/api/capability', (req, res, next) => {
       validatedAt: new Date().toISOString(),
       tokenSignature: tokenSignature
     };
+
+    // Enforce max_calls if present
+    if (maxCalls) {
+      const { remaining, backend } = await decrementCapabilityCalls(tokenSignature, maxCalls, expiresAtMs);
+      res.setHeader('X-Calls-Limit', String(maxCalls));
+      res.setHeader('X-Calls-Remaining', String(Math.max(0, remaining)));
+      res.setHeader('X-Calls-Backend', backend); // debug/ops visibility (safe; remove if undesired)
+
+      req.capability.maxCalls = maxCalls;
+      req.capability.callsRemaining = Math.max(0, remaining);
+
+      if (remaining < 0) {
+        return res.status(429).json({
+          error: 'Call limit exhausted',
+          code: 'CALL_LIMIT_EXHAUSTED',
+          message: 'This token has no calls remaining. Mint/pay for a new token.',
+          callsRemaining: 0,
+        });
+      }
+    }
+    
+    // Enforce budget_sats if present (decremented by tier cost)
+    if (budgetSats) {
+      const cost = getTierCost(tokenScope || requiredScope);
+      const { remaining, backend } = await decrementCapabilityBudget(tokenSignature, budgetSats, cost, expiresAtMs);
+      res.setHeader('X-Budget-Limit', String(budgetSats));
+      res.setHeader('X-Budget-Remaining', String(Math.max(0, remaining)));
+      res.setHeader('X-Budget-Cost', String(cost));
+      res.setHeader('X-Budget-Backend', backend);
+
+      req.capability.budgetSats = budgetSats;
+      req.capability.budgetRemaining = Math.max(0, remaining);
+      req.capability.requestCost = cost;
+
+      if (remaining < 0) {
+        return res.status(402).json({
+          error: 'Budget exhausted',
+          code: 'BUDGET_EXHAUSTED',
+          message: 'This token has insufficient sats budget. Mint/pay for a new token.',
+          budgetRemaining: 0,
+          requestCost: cost,
+        });
+      }
+    }
     
     // TELEMETRY: Record this token usage for governance dashboard
     const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
@@ -1412,7 +1597,19 @@ app.post('/api/capability/mint', express.json(), (req, res) => {
     }
   }
   
-  const { scope = 'api:capability:read', expiresIn = 3600 } = req.body || {};
+  const { scope = 'api:capability:read', expiresIn = 3600, max_calls, maxCalls, budget_sats, budgetSats } = req.body || {};
+  
+  // Validate max_calls
+  const maxCallsValue = typeof max_calls === 'number' ? max_calls : (typeof maxCalls === 'number' ? maxCalls : null);
+  if (maxCallsValue !== null && (!Number.isFinite(maxCallsValue) || maxCallsValue <= 0)) {
+    return res.status(400).json({ error: 'Invalid max_calls', hint: 'max_calls must be a positive integer' });
+  }
+  
+  // Validate budget_sats
+  const budgetSatsValue = typeof budget_sats === 'number' ? budget_sats : (typeof budgetSats === 'number' ? budgetSats : null);
+  if (budgetSatsValue !== null && (!Number.isFinite(budgetSatsValue) || budgetSatsValue <= 0)) {
+    return res.status(400).json({ error: 'Invalid budget_sats', hint: 'budget_sats must be a positive integer' });
+  }
   
   try {
     // Create base macaroon
@@ -1429,6 +1626,12 @@ app.post('/api/capability/mint', express.json(), (req, res) => {
     const expiresAt = Date.now() + (expiresIn * 1000);
     m.addFirstPartyCaveat(Buffer.from(`expires = ${expiresAt}`, 'utf8'));
     m.addFirstPartyCaveat(Buffer.from(`scope = ${scope}`, 'utf8'));
+    if (maxCallsValue) {
+      m.addFirstPartyCaveat(Buffer.from(`max_calls = ${Math.floor(maxCallsValue)}`, 'utf8'));
+    }
+    if (budgetSatsValue) {
+      m.addFirstPartyCaveat(Buffer.from(`budget_sats = ${Math.floor(budgetSatsValue)}`, 'utf8'));
+    }
     
     // Export as base64
     const tokenBytes = m.exportBinary();
@@ -1443,8 +1646,11 @@ app.post('/api/capability/mint', express.json(), (req, res) => {
       caveats: {
         scope,
         expires: new Date(expiresAt).toISOString(),
-        expiresIn: `${expiresIn} seconds`
+        expiresIn: `${expiresIn} seconds`,
+        ...(maxCallsValue ? { max_calls: Math.floor(maxCallsValue) } : {}),
+        ...(budgetSatsValue ? { budget_sats: Math.floor(budgetSatsValue) } : {})
       },
+      tierCosts: TIER_COSTS,
       note: 'This is a Phase 1 capability token. No payment required.'
     });
     
