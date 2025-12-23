@@ -395,10 +395,13 @@ const telemetry = {
     const now = Date.now();
     
     // Calculate depth based on delegation_depth caveat or delegated_from presence
+    console.log('[TELEMETRY] Caveats received:', JSON.stringify(caveats));
     const depthCaveat = caveats.find(c => c.startsWith('delegation_depth'));
+    console.log('[TELEMETRY] Found depthCaveat:', depthCaveat);
     const hasDelegatedFrom = caveats.some(c => c.startsWith('delegated_from'));
     const depth = depthCaveat ? parseInt(depthCaveat.split('=')[1]?.trim() || '1') : 
                   hasDelegatedFrom ? 1 : 0;
+    console.log('[TELEMETRY] Calculated depth:', depth);
     
     const tokenData = {
       id: tokenSignature.substring(0, 12) + '...',
@@ -609,7 +612,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
-    version: '1.6.7',
+    version: '1.6.8',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
