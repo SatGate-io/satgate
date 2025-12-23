@@ -1016,6 +1016,13 @@ app.use('/api/capability', (req, res, next) => {
     return next();
   }
   
+  // Allow /delegate to handle its own auth (creates child tokens)
+  // The delegate endpoint validates the parent token itself
+  if (req.path === '/delegate') {
+    console.log(`[PEP] Delegating to /delegate endpoint for auth`);
+    return next();
+  }
+  
   // Allow unauthenticated access to /demo/* for backup demo purposes
   if (req.path.startsWith('/demo/')) {
     console.log(`[PEP] Allowing demo endpoint: ${req.path}`);
