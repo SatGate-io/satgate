@@ -656,9 +656,10 @@
     let pollingInterval = null;
     let isWebSocketConnected = false;
     
-    // Get admin token from URL query param (?token=xxx)
-    const urlParams = new URLSearchParams(window.location.search);
-    const adminToken = urlParams.get('token');
+    // SECURITY: Admin token is never accepted via URL (no ?token=...).
+    // To use the admin dashboard, set it in localStorage:
+    //   localStorage.setItem('satgateAdminToken', '...'); location.reload();
+    const adminToken = localStorage.getItem('satgateAdminToken') || '';
     
     function updateConnectionStatus(status) {
       const dot = document.getElementById('statusDot');
