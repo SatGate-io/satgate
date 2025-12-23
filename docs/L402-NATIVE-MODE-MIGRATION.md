@@ -38,13 +38,15 @@ Internet → Aperture (L402) → SatGate → Your API
 Internet → SatGate (L402 + Governance) → Your API
               ↓
          Lightning Backend
-         (phoenixd / LND / Alby Hub)
+         (phoenixd / LND)
 ```
 
 - SatGate handles everything
 - Simpler deployment (one service)
 - Supports multiple Lightning backends
 - Enables per-request metering
+
+> **Note on OpenNode**: OpenNode is supported as a Lightning backend only if the API exposes a **real Lightning payment hash** (sha256(preimage)). If it does not, SatGate cannot verify LSAT preimages reliably. Prefer **phoenixd** or **LND** for Native Mode.
 
 ---
 
@@ -56,7 +58,7 @@ Internet → SatGate (L402 + Governance) → Your API
 |---------|----------|-------------------|
 | **phoenixd** | Self-custodial, easy setup | URL + Password |
 | **LND** | Enterprise, existing infrastructure | REST URL + Macaroon |
-| **Alby Hub** | Start9 users | phoenixd or LND credentials |
+| **Alby Hub / Start9** | If it provides phoenixd or LND access | phoenixd or LND credentials |
 | **mock** | Testing/demos | None |
 
 ### Step 2: Get Lightning Credentials
@@ -152,14 +154,16 @@ stdout_logfile=/dev/stdout
 stdout_logfile_maxbytes=0
 stderr_logfile=/dev/stderr
 stderr_logfile_maxbytes=0
-environment=BACKEND_PORT="8081",NODE_ENV="production",CORS_ORIGINS="%(ENV_CORS_ORIGINS)s"
+; IMPORTANT: SatGate listens on BACKEND_PORT (default 8083).
+; On Railway, set BACKEND_PORT to match Railway's PORT (recommended: BACKEND_PORT="%(ENV_PORT)s").
+environment=BACKEND_PORT="%(ENV_PORT)s",NODE_ENV="production",CORS_ORIGINS="%(ENV_CORS_ORIGINS)s"
 
 # DISABLED: Aperture no longer needed in L402 Native Mode
 # [program:aperture]
 # command=...
 ```
 
-Note: Changed `BACKEND_PORT` to `8081` so SatGate listens on the public port.
+Note: Railway provides `PORT`. SatGate uses `BACKEND_PORT`, so set `BACKEND_PORT=%(ENV_PORT)s` (or set `BACKEND_PORT=$PORT` in Railway vars).
 
 #### Option B: Create Separate Service (Safer)
 
@@ -172,7 +176,7 @@ WORKDIR /app
 COPY proxy/package*.json ./
 RUN npm ci --production
 COPY proxy/ ./
-EXPOSE 8081
+EXPOSE 8083
 CMD ["node", "server.js"]
 ```
 
@@ -186,7 +190,8 @@ Add these to Railway:
 # Core
 MODE=prod
 NODE_ENV=production
-BACKEND_PORT=8081
+# Railway: set BACKEND_PORT=$PORT (recommended) or expose 8083
+BACKEND_PORT=${PORT}
 
 # L402 Native Mode
 L402_MODE=native
@@ -201,6 +206,9 @@ PHOENIXD_PASSWORD=your-password-here
 # LND_REST_URL=https://100.x.y.z:8080
 # LND_MACAROON=0201036c6e64...
 
+# Optional generic override (advanced)
+# LIGHTNING_URL=http://100.x.y.z:9740   # Overrides PHOENIXD_URL/LND_REST_URL
+
 # L402 Token Settings
 L402_DEFAULT_TTL=3600
 L402_DEFAULT_MAX_CALLS=100
@@ -208,6 +216,7 @@ L402_DEFAULT_MAX_CALLS=100
 # Admin & Security
 PRICING_ADMIN_TOKEN=your-secure-admin-token
 CAPABILITY_ROOT_KEY=your-secure-root-key
+L402_ROOT_KEY=your-secure-l402-root-key  # REQUIRED in native mode for production
 
 # Optional: Redis for persistence
 # REDIS_URL=redis://...
@@ -218,6 +227,7 @@ CAPABILITY_ROOT_KEY=your-secure-root-key
 ```bash
 # Set your new service URL
 export SATGATE_URL=https://your-new-service.up.railway.app
+export SATGATE_ADMIN_TOKEN=your-secure-admin-token
 
 # 1. Health check
 curl $SATGATE_URL/health
@@ -225,7 +235,10 @@ curl $SATGATE_URL/health
 
 # 2. Check L402 mode
 curl -H "X-Admin-Token: $SATGATE_ADMIN_TOKEN" $SATGATE_URL/api/governance/info | jq .features
-# Expected: "l402Mode": "native", "lightningBackend": "phoenixd"
+# Expected: "l402Mode": "native", "l402Native": true
+
+# (Optional) 2b. Check Lightning backend status (admin-only)
+curl -H "X-Admin-Token: $SATGATE_ADMIN_TOKEN" $SATGATE_URL/api/governance/lightning | jq .
 
 # 3. Test 402 challenge
 curl -i $SATGATE_URL/api/micro/ping
@@ -291,7 +304,7 @@ curl -v http://YOUR_PHOENIXD_URL:9740/getinfo
 | `max_calls` Caveat | ❌ | ✅ Redis counters |
 | `budget_sats` Caveat | ❌ | ✅ Redis counters |
 | Re-challenge on Exhaust | ❌ | ✅ Automatic |
-| Lightning Backends | LND only | phoenixd, LND, OpenNode |
+| Lightning Backends | LND only | phoenixd, LND (OpenNode experimental) |
 | Deployment Complexity | Higher (2 services) | Lower (1 service) |
 
 ---
