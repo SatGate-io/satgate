@@ -164,6 +164,14 @@
       color: var(--accent-purple);
     }
     
+    .stat-card.revenue .stat-value {
+      color: #ffd700;
+    }
+    
+    .stat-card.paid .stat-value {
+      color: #00ff9d;
+    }
+    
     .stat-subtitle {
       font-size: 11px;
       color: var(--text-secondary);
@@ -423,6 +431,18 @@
           <h3>Revocation Hits</h3>
           <div class="stat-value" id="bannedHitsCount">0</div>
           <div class="stat-subtitle">Blocked by Kill Switch</div>
+        </div>
+        
+        <div class="stat-card paid">
+          <h3>💰 Paid Requests</h3>
+          <div class="stat-value" id="paidCount">0</div>
+          <div class="stat-subtitle">L402 transactions</div>
+        </div>
+        
+        <div class="stat-card revenue">
+          <h3>⚡ Revenue</h3>
+          <div class="stat-value" id="revenueCount">0</div>
+          <div class="stat-subtitle">satoshis earned</div>
         </div>
       </div>
       
@@ -734,6 +754,8 @@
       document.getElementById('blockedCount').textContent = stats.blocked || 0;
       document.getElementById('bannedCount').textContent = stats.banned || 0;
       document.getElementById('bannedHitsCount').textContent = stats.bannedHits || 0;
+      document.getElementById('paidCount').textContent = stats.paidRequests || 0;
+      document.getElementById('revenueCount').textContent = stats.revenueSats || 0;
       
       // Update token list
       updateTokenList(nodes);
