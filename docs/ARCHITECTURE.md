@@ -735,10 +735,13 @@ cd satgate-landing && npm run dev
 
 ## Resources
 
+- **L402 Native Mode Migration**: [L402-NATIVE-MODE-MIGRATION.md](./L402-NATIVE-MODE-MIGRATION.md)
+- **Security Model**: [SECURITY-MODEL.md](./SECURITY-MODEL.md)
 - **L402 Protocol Specification**: [lightning.engineering/posts/2020-03-30-lsat](https://lightning.engineering/posts/2020-03-30-lsat/)
 - **Aperture Documentation**: [github.com/lightninglabs/aperture](https://github.com/lightninglabs/aperture)
 - **Lightning Network**: [lightning.network](https://lightning.network)
 - **Voltage (Hosted LND)**: [voltage.cloud](https://voltage.cloud)
+- **phoenixd**: [github.com/ACINQ/phoenixd](https://github.com/ACINQ/phoenixd)
 - **WebLN Specification**: [webln.guide](https://www.webln.guide/)
 
 ---
