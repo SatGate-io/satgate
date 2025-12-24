@@ -52,6 +52,7 @@ const crypto = require('crypto');
 // When L402_MODE=aperture (default), Aperture handles L402, SatGate just tracks.
 
 const L402_MODE = process.env.L402_MODE || 'aperture'; // 'native' or 'aperture'
+const MODE = process.env.MODE || 'prod'; // Define early for L402 initialization
 let L402Service, createL402Middleware, l402Service;
 
 // L402 initialization (deferred - Redis passed later when available)
@@ -710,10 +711,9 @@ const telemetry = {
 // CONFIGURATION
 // =============================================================================
 
-// Explicit MODE: 'prod' (default) or 'demo'
+// MODE is defined at the top of the file for early L402 initialization
 // - prod: dashboard + telemetry require admin auth, no redaction
 // - demo: dashboard may be public (if DASHBOARD_PUBLIC=true), data is redacted
-const MODE = process.env.MODE || 'prod';
 
 const config = {
   // Railway sets PORT; fallback to BACKEND_PORT for local/docker
