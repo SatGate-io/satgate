@@ -177,10 +177,8 @@ function optionalAdminAuth(req, res, next) {
   const token = req.get('x-admin-token') || '';
   const { valid, actor } = checkAdminToken(token);
   
-  // Debug: log token check
-  if (!valid && token) {
-    console.log(`[AUTH-OPTIONAL] Failed: token=${token.substring(0, 8)}..., expected=${ADMIN_TOKEN_CURRENT ? ADMIN_TOKEN_CURRENT.substring(0, 8) + '...' : 'NOT SET'}`);
-  }
+  // Debug: ALWAYS log auth attempts (remove after debugging)
+  console.error(`[AUTH-DEBUG] path=${req.path} token=${token ? token.substring(0, 8) + '...' : 'NONE'} expected=${ADMIN_TOKEN_CURRENT ? ADMIN_TOKEN_CURRENT.substring(0, 8) + '...' : 'NOT SET'} valid=${valid}`);
   
   // If valid admin token, grant full access
   if (valid) {
@@ -979,10 +977,8 @@ function requirePricingAdmin(req, res, next) {
   const token = req.get('x-admin-token') || req.get('x-satgate-admin-token') || '';
   const { valid, actor } = checkAdminToken(token);
   
-  // Debug: log token check (remove in production after debugging)
-  if (!valid) {
-    console.log(`[AUTH] Admin auth failed: token=${token ? token.substring(0, 8) + '...' : 'none'}, expected=${ADMIN_TOKEN_CURRENT ? ADMIN_TOKEN_CURRENT.substring(0, 8) + '...' : 'NOT SET'}`);
-  }
+  // Debug: ALWAYS log auth attempts (remove after debugging)
+  console.error(`[AUTH-ADMIN] path=${req.path} token=${token ? token.substring(0, 8) + '...' : 'NONE'} expected=${ADMIN_TOKEN_CURRENT ? ADMIN_TOKEN_CURRENT.substring(0, 8) + '...' : 'NOT SET'} valid=${valid}`);
   
   if (!valid) {
     // In development without token set, allow for testing
