@@ -1,0 +1,34 @@
+# SatGate L402 Native Mode Environment Variables
+# Copy these to your Railway project
+
+# =============================================================================
+# REQUIRED: Core Configuration
+# =============================================================================
+
+MODE=prod
+NODE_ENV=production
+
+# =============================================================================
+# REQUIRED: L402 Native Mode
+# =============================================================================
+
+L402_MODE=native
+LIGHTNING_BACKEND=lnd
+LND_REST_URL=https://start.tailf7a7b.ts.net
+LND_MACAROON=<your-hex-macaroon>
+L402_ROOT_KEY=<generate-with-openssl-rand-hex-32>
+
+# =============================================================================
+# REQUIRED: Admin Authentication
+# =============================================================================
+
+PRICING_ADMIN_TOKEN=<your-admin-token>
+CAPABILITY_ROOT_KEY=<generate-with-openssl-rand-hex-32>
+
+# =============================================================================
+# OPTIONAL: L402 Settings
+# =============================================================================
+
+L402_DEFAULT_TTL=3600
+L402_DEFAULT_MAX_CALLS=100
+

@@ -1,0 +1,24 @@
+# SatGate L402 Native Mode
+# No Aperture - SatGate handles L402 directly
+
+FROM node:20-slim
+
+WORKDIR /app
+
+# Install dependencies
+COPY proxy/package*.json ./
+RUN npm ci --production
+
+# Copy application code
+COPY proxy/ ./
+
+# Expose port (Railway will set PORT env var)
+EXPOSE 8083
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:${PORT:-8083}/health || exit 1
+
+# Start SatGate
+CMD ["node", "server.js"]
+
