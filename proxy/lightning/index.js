@@ -164,6 +164,9 @@ class LndProvider extends LightningProvider {
       expiry: String(expirySecs)
     });
     
+    console.log(`[LND] Creating invoice: ${url.toString()} | host=${url.hostname} port=${url.port || 443} path=${url.pathname}`);
+    console.log(`[LND] Macaroon (first 20 chars): ${this.macaroon.substring(0, 20)}...`);
+    
     const response = await new Promise((resolve, reject) => {
       const req = https.request({
         hostname: url.hostname,
@@ -179,9 +182,15 @@ class LndProvider extends LightningProvider {
       }, (res) => {
         let data = '';
         res.on('data', chunk => data += chunk);
-        res.on('end', () => resolve({ ok: res.statusCode >= 200 && res.statusCode < 300, status: res.statusCode, text: () => Promise.resolve(data), json: () => Promise.resolve(JSON.parse(data)) }));
+        res.on('end', () => {
+          console.log(`[LND] Response: status=${res.statusCode} body=${data.substring(0, 200)}`);
+          resolve({ ok: res.statusCode >= 200 && res.statusCode < 300, status: res.statusCode, text: () => Promise.resolve(data), json: () => Promise.resolve(JSON.parse(data)) });
+        });
       });
-      req.on('error', reject);
+      req.on('error', (err) => {
+        console.error(`[LND] Request error: ${err.message}`);
+        reject(err);
+      });
       req.write(postData);
       req.end();
     });
