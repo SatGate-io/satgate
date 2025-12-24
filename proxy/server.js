@@ -786,7 +786,7 @@ if (config.env === 'production' || config.isProd) {
   }
 }
 
-console.log(`[CONFIG] Mode: ${MODE} | Dashboard: ${config.dashboardPublic ? 'public' : 'admin-only'} | Token rotation: ${ADMIN_TOKEN_NEXT ? 'enabled' : 'disabled'}`);
+console.log(`[CONFIG] Mode: ${MODE} | Dashboard: ${config.dashboardPublic ? 'public' : 'admin-only'} | Admin token: ${ADMIN_TOKEN_CURRENT ? 'set (' + ADMIN_TOKEN_CURRENT.length + ' chars)' : 'NOT SET'} | Rotation: ${ADMIN_TOKEN_NEXT ? 'enabled' : 'disabled'}`);
 
 // =============================================================================
 // MIDDLEWARE
@@ -972,6 +972,11 @@ function requirePricingAdmin(req, res, next) {
   // Admin endpoints always require authentication (even in demo mode)
   const token = req.get('x-admin-token') || req.get('x-satgate-admin-token') || '';
   const { valid, actor } = checkAdminToken(token);
+  
+  // Debug: log token check (remove in production after debugging)
+  if (!valid) {
+    console.log(`[AUTH] Admin auth failed: token=${token ? token.substring(0, 8) + '...' : 'none'}, expected=${ADMIN_TOKEN_CURRENT ? ADMIN_TOKEN_CURRENT.substring(0, 8) + '...' : 'NOT SET'}`);
+  }
   
   if (!valid) {
     // In development without token set, allow for testing
