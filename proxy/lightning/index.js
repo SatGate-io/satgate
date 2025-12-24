@@ -12,6 +12,10 @@
  */
 
 const crypto = require('crypto');
+const https = require('https');
+
+// HTTPS agent that accepts self-signed certificates (required for LND)
+const insecureAgent = new https.Agent({ rejectUnauthorized: false });
 
 // =============================================================================
 // PROVIDER INTERFACE
@@ -152,17 +156,34 @@ class LndProvider extends LightningProvider {
   }
 
   async createInvoice(amountSats, memo, expirySecs = 3600) {
-    const response = await fetch(`${this.baseUrl}/v1/invoices`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Grpc-Metadata-macaroon': this.macaroon
-      },
-      body: JSON.stringify({
-        value: String(amountSats),
-        memo: memo,
-        expiry: String(expirySecs)
-      })
+    // Use https module for self-signed cert support
+    const url = new URL(`${this.baseUrl}/v1/invoices`);
+    const postData = JSON.stringify({
+      value: String(amountSats),
+      memo: memo,
+      expiry: String(expirySecs)
+    });
+    
+    const response = await new Promise((resolve, reject) => {
+      const req = https.request({
+        hostname: url.hostname,
+        port: url.port || 443,
+        path: url.pathname,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData),
+          'Grpc-Metadata-macaroon': this.macaroon
+        },
+        rejectUnauthorized: false // Accept self-signed certs
+      }, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => resolve({ ok: res.statusCode >= 200 && res.statusCode < 300, status: res.statusCode, text: () => Promise.resolve(data), json: () => Promise.resolve(JSON.parse(data)) }));
+      });
+      req.on('error', reject);
+      req.write(postData);
+      req.end();
     });
 
     if (!response.ok) {
@@ -181,10 +202,23 @@ class LndProvider extends LightningProvider {
     const hashBase64 = Buffer.from(paymentHash, 'hex').toString('base64')
       .replace(/\+/g, '-').replace(/\//g, '_');
     
-    const response = await fetch(`${this.baseUrl}/v1/invoice/${hashBase64}`, {
-      headers: {
-        'Grpc-Metadata-macaroon': this.macaroon
-      }
+    const url = new URL(`${this.baseUrl}/v1/invoice/${hashBase64}`);
+    
+    const response = await new Promise((resolve, reject) => {
+      const req = https.request({
+        hostname: url.hostname,
+        port: url.port || 443,
+        path: url.pathname,
+        method: 'GET',
+        headers: { 'Grpc-Metadata-macaroon': this.macaroon },
+        rejectUnauthorized: false
+      }, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => resolve({ ok: res.statusCode >= 200 && res.statusCode < 300, json: () => Promise.resolve(JSON.parse(data)) }));
+      });
+      req.on('error', reject);
+      req.end();
     });
 
     if (!response.ok) {
@@ -201,18 +235,31 @@ class LndProvider extends LightningProvider {
 
   async getStatus() {
     try {
-      // Use /v1/invoices endpoint which invoice macaroon has access to
-      // Just check if we can reach LND - a 400 (bad request) still means reachable
-      const response = await fetch(`${this.baseUrl}/v1/invoices`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Grpc-Metadata-macaroon': this.macaroon 
-        },
-        body: JSON.stringify({ value: '0' }) // Invalid but tests reachability
+      const url = new URL(`${this.baseUrl}/v1/invoices`);
+      const postData = JSON.stringify({ value: '0' });
+      
+      await new Promise((resolve, reject) => {
+        const req = https.request({
+          hostname: url.hostname,
+          port: url.port || 443,
+          path: url.pathname,
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(postData),
+            'Grpc-Metadata-macaroon': this.macaroon 
+          },
+          rejectUnauthorized: false
+        }, (res) => {
+          let data = '';
+          res.on('data', chunk => data += chunk);
+          res.on('end', () => resolve({ ok: true }));
+        });
+        req.on('error', reject);
+        req.write(postData);
+        req.end();
       });
-      // Any response (even error) means LND is reachable
-      // Network errors will throw and be caught below
+      
       return { ok: true, backend: 'lnd', note: 'Invoice macaroon connected' };
     } catch (e) {
       return { ok: false, backend: 'lnd', error: e.message };
