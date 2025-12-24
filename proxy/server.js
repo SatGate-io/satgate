@@ -80,7 +80,8 @@ function initializeL402(redisClient) {
       apiKey: process.env.OPENNODE_API_KEY
     };
     
-    if (config.isProd && !process.env.L402_ROOT_KEY) {
+    // Check for L402_ROOT_KEY in production (use MODE directly since config isn't defined yet)
+    if (MODE === 'prod' && !process.env.L402_ROOT_KEY) {
       console.warn('[L402][SECURITY] L402_MODE=native but no L402_ROOT_KEY set. Set L402_ROOT_KEY (separate from CAPABILITY_ROOT_KEY) to a strong secret in production.');
     }
 
