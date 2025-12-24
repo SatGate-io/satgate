@@ -173,8 +173,14 @@ const healthRateLimit = rateLimit({
 // MODE=demo + DASHBOARD_PUBLIC=true: allows public access with redaction
 function optionalAdminAuth(req, res, next) {
   // SECURITY: header-only admin auth (query string tokens leak via logs/referrers)
-  const token = req.headers['x-admin-token'];
+  // Use req.get() for case-insensitive header access
+  const token = req.get('x-admin-token') || '';
   const { valid, actor } = checkAdminToken(token);
+  
+  // Debug: log token check
+  if (!valid && token) {
+    console.log(`[AUTH-OPTIONAL] Failed: token=${token.substring(0, 8)}..., expected=${ADMIN_TOKEN_CURRENT ? ADMIN_TOKEN_CURRENT.substring(0, 8) + '...' : 'NOT SET'}`);
+  }
   
   // If valid admin token, grant full access
   if (valid) {
