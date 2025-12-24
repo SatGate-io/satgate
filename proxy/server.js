@@ -711,7 +711,8 @@ const telemetry = {
 const MODE = process.env.MODE || 'prod';
 
 const config = {
-  port: process.env.BACKEND_PORT || 8083,
+  // Railway sets PORT; fallback to BACKEND_PORT for local/docker
+  port: parseInt(process.env.PORT) || parseInt(process.env.BACKEND_PORT) || 8083,
   env: process.env.NODE_ENV || 'development',
   // SECURITY: Never allow CORS_ORIGINS="*" in production
   corsOrigins: (() => {

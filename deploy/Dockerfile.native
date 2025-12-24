@@ -5,18 +5,26 @@ FROM node:20-slim
 
 WORKDIR /app
 
+# Install curl for healthcheck
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
 # Install dependencies
 COPY proxy/package*.json ./
 RUN npm ci --production
 
-# Copy application code
+# Copy application code (includes l402/ directory)
 COPY proxy/ ./
 
-# Expose port (Railway will set PORT env var)
+# Set default environment
+ENV NODE_ENV=production
+# Railway will set PORT; we default to 8083 for local dev
+ENV PORT=8083
+
+# Expose port (Railway overrides this)
 EXPOSE 8083
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:${PORT:-8083}/health || exit 1
 
 # Start SatGate
