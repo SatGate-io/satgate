@@ -86,9 +86,11 @@ class L402Service {
     const timestamp = Date.now().toString(36); // Base36 timestamp for brevity
     const hashPrefix = invoice.paymentHash.substring(0, 16); // First 16 chars of hash
     const identifier = `sg:${hashPrefix}:${timestamp}`;
-    const keyBytes = Buffer.from(this.rootKey, 'hex'); // Expect hex-encoded root key
     
-    console.log(`[L402] Creating macaroon: id=${identifier}, keyLen=${keyBytes.length}`);
+    // Use rootKey as UTF-8 string (avoid hex decoding issues with macaroon lib)
+    const keyBytes = Buffer.from(this.rootKey, 'utf8');
+    
+    console.log(`[L402] Creating macaroon: id=${identifier}, keyLen=${keyBytes.length}, rootKey(first10)=${this.rootKey.substring(0,10)}`);
     
     let m = macaroon.newMacaroon({
       identifier: Buffer.from(identifier, 'utf8'),
