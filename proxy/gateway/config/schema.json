@@ -1,0 +1,319 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://satgate.io/schemas/gateway.v1.json",
+  "title": "SatGate Gateway Configuration",
+  "description": "Configuration schema for SatGate Gateway Mode (reverse proxy with L402 enforcement)",
+  "type": "object",
+  "required": ["version", "upstreams", "routes"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Configuration schema version"
+    },
+    "server": {
+      "type": "object",
+      "description": "Data plane (public) server configuration",
+      "additionalProperties": false,
+      "properties": {
+        "listen": {
+          "type": "string",
+          "default": "0.0.0.0:8080",
+          "pattern": "^[^:]+:[0-9]+$",
+          "description": "Listen address:port for data plane"
+        },
+        "trustProxy": {
+          "oneOf": [
+            { "type": "boolean" },
+            { "type": "integer", "minimum": 0 }
+          ],
+          "default": 1,
+          "description": "Trust proxy headers (true, false, or hop count)"
+        }
+      }
+    },
+    "admin": {
+      "type": "object",
+      "description": "Control plane (private) server configuration",
+      "additionalProperties": false,
+      "properties": {
+        "listen": {
+          "type": "string",
+          "default": "127.0.0.1:9090",
+          "pattern": "^[^:]+:[0-9]+$",
+          "description": "Listen address:port for admin plane"
+        },
+        "requireAdminToken": {
+          "type": "boolean",
+          "default": true,
+          "description": "Require X-Admin-Token for admin endpoints"
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "description": "Request/response limits",
+      "additionalProperties": false,
+      "properties": {
+        "maxRequestBodyBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 10485760,
+          "description": "Maximum request body size (bytes, default 10MB)"
+        },
+        "maxHeadersBytes": {
+          "type": "integer",
+          "minimum": 1024,
+          "default": 32768,
+          "description": "Maximum headers size (bytes, default 32KB)"
+        },
+        "upstreamTimeoutMs": {
+          "type": "integer",
+          "minimum": 1000,
+          "default": 30000,
+          "description": "Total upstream timeout (ms, default 30s)"
+        },
+        "upstreamConnectTimeoutMs": {
+          "type": "integer",
+          "minimum": 100,
+          "default": 3000,
+          "description": "Upstream connect timeout (ms, default 3s)"
+        }
+      }
+    },
+    "cors": {
+      "type": "object",
+      "description": "CORS configuration",
+      "additionalProperties": false,
+      "properties": {
+        "origins": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "Allowed origins (empty = no CORS headers)"
+        },
+        "allowCredentials": {
+          "type": "boolean",
+          "default": false,
+          "description": "Allow credentials (cookies, auth headers)"
+        }
+      }
+    },
+    "l402": {
+      "type": "object",
+      "description": "L402 payment configuration",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["native", "aperture"],
+          "default": "native",
+          "description": "L402 mode: native (SatGate issues 402) or aperture (sidecar)"
+        },
+        "rootKeyEnv": {
+          "type": "string",
+          "default": "L402_ROOT_KEY",
+          "description": "Environment variable containing L402 root key"
+        },
+        "defaultTTLSeconds": {
+          "type": "integer",
+          "minimum": 60,
+          "default": 3600,
+          "description": "Default token TTL (seconds)"
+        },
+        "defaultMaxCalls": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 100,
+          "description": "Default max calls per token"
+        },
+        "defaultBudgetSats": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Default sats budget per token (optional)"
+        }
+      }
+    },
+    "metering": {
+      "type": "object",
+      "description": "Metering backend configuration",
+      "additionalProperties": false,
+      "properties": {
+        "backend": {
+          "type": "string",
+          "enum": ["redis", "memory"],
+          "default": "memory",
+          "description": "Metering storage backend"
+        },
+        "redisUrlEnv": {
+          "type": "string",
+          "default": "REDIS_URL",
+          "description": "Environment variable containing Redis URL"
+        }
+      }
+    },
+    "upstreams": {
+      "type": "object",
+      "description": "Named upstream targets (SSRF prevention: only these can be reached)",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["url"],
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Upstream base URL (http:// or https://)"
+          },
+          "passHostHeader": {
+            "type": "boolean",
+            "default": false,
+            "description": "Pass original Host header to upstream"
+          },
+          "addHeaders": {
+            "type": "object",
+            "additionalProperties": { "type": "string" },
+            "description": "Headers to add to upstream requests"
+          },
+          "allowRequestHeaders": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": ["content-type", "accept", "user-agent"],
+            "description": "Request headers to forward to upstream"
+          },
+          "denyRequestHeaders": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": ["x-admin-token", "x-satgate-admin-token"],
+            "description": "Request headers to strip (never forward)"
+          },
+          "allowResponseHeaders": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": ["*"],
+            "description": "Response headers to forward to client (* = all)"
+          },
+          "timeoutMs": {
+            "type": "integer",
+            "minimum": 1000,
+            "description": "Per-upstream timeout override (ms)"
+          }
+        }
+      }
+    },
+    "routes": {
+      "type": "array",
+      "description": "Route matching rules (order matters: first match wins)",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "match", "policy"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z0-9_-]+$",
+            "description": "Route name (lowercase, alphanumeric, dashes, underscores)"
+          },
+          "match": {
+            "type": "object",
+            "description": "Request matching criteria",
+            "additionalProperties": false,
+            "properties": {
+              "pathPrefix": {
+                "type": "string",
+                "description": "Match requests starting with this path"
+              },
+              "exactPath": {
+                "type": "string",
+                "description": "Match requests with exactly this path"
+              },
+              "methods": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]
+                },
+                "default": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+                "description": "HTTP methods to match"
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": { "type": "string" },
+                "description": "Headers that must be present with these values"
+              }
+            },
+            "oneOf": [
+              { "required": ["pathPrefix"] },
+              { "required": ["exactPath"] }
+            ]
+          },
+          "upstream": {
+            "type": "string",
+            "description": "Upstream name (must exist in upstreams)"
+          },
+          "policy": {
+            "type": "object",
+            "required": ["kind"],
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": ["public", "deny", "l402", "capability"],
+                "description": "Policy type: public (passthrough), deny (block), l402 (payment), capability (macaroon)"
+              },
+              "status": {
+                "type": "integer",
+                "minimum": 400,
+                "maximum": 599,
+                "default": 403,
+                "description": "Status code for deny policy"
+              },
+              "tier": {
+                "type": "string",
+                "description": "Pricing tier (for l402 policy)"
+              },
+              "priceSats": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Price in satoshis (for l402 policy)"
+              },
+              "scope": {
+                "type": "string",
+                "description": "Token scope (for l402/capability policies)"
+              },
+              "ttlSeconds": {
+                "type": "integer",
+                "minimum": 60,
+                "description": "Token TTL override"
+              },
+              "maxCalls": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Max calls per token"
+              },
+              "budgetSats": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Sats budget per token"
+              }
+            },
+            "allOf": [
+              {
+                "if": { "properties": { "kind": { "const": "l402" } } },
+                "then": { "required": ["tier", "priceSats", "scope"] }
+              },
+              {
+                "if": { "properties": { "kind": { "const": "capability" } } },
+                "then": { "required": ["scope"] }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+

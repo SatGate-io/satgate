@@ -1,16 +1,19 @@
 {
   "name": "satgate-backend",
-  "version": "1.9.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "Backend API for SatGate demo (behind Aperture)",
+  "description": "SatGate L402 Gateway and API Protection",
   "main": "server.js",
   "license": "MIT",
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "express": "4.21.2",
     "ioredis": "^5.4.1",
+    "js-yaml": "^4.1.0",
     "ws": "^8.18.0"
   }
 }

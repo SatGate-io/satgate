@@ -1,0 +1,216 @@
+# SatGate Gateway Configuration
+# 
+# This file configures SatGate in Gateway Mode (reverse proxy with L402 enforcement).
+# 
+# Usage:
+#   SATGATE_RUNTIME=gateway node proxy/server.js
+#
+# For full schema documentation, see: proxy/gateway/config/schema.json
+
+version: 1
+
+# =============================================================================
+# DATA PLANE (Public)
+# =============================================================================
+# Handles proxied requests from clients
+
+server:
+  listen: "0.0.0.0:8080"
+  trustProxy: 1  # Trust first hop (load balancer/CDN)
+
+# =============================================================================
+# ADMIN PLANE (Private)
+# =============================================================================
+# Handles governance, auth decision API, and admin endpoints
+# IMPORTANT: Bind to localhost or internal network only
+
+admin:
+  listen: "127.0.0.1:9090"
+  requireAdminToken: true
+
+# =============================================================================
+# LIMITS
+# =============================================================================
+# Request/response limits to prevent abuse
+
+limits:
+  maxRequestBodyBytes: 10485760      # 10MB
+  maxHeadersBytes: 32768             # 32KB
+  upstreamTimeoutMs: 30000           # 30s total
+  upstreamConnectTimeoutMs: 3000     # 3s connect
+
+# =============================================================================
+# CORS
+# =============================================================================
+# Cross-origin resource sharing configuration
+
+cors:
+  origins:
+    - "https://satgate.io"
+    - "http://localhost:8081"
+  allowCredentials: true
+
+# =============================================================================
+# L402 CONFIGURATION
+# =============================================================================
+# Lightning payment settings
+
+l402:
+  mode: "native"                     # native | aperture
+  rootKeyEnv: "L402_ROOT_KEY"        # Environment variable for root key
+  defaultTTLSeconds: 3600            # 1 hour
+  defaultMaxCalls: 100
+  # defaultBudgetSats: 100           # Optional: sats budget per token
+
+# =============================================================================
+# METERING
+# =============================================================================
+# Backend for tracking max_calls and budget_sats
+
+metering:
+  backend: "redis"                   # redis | memory
+  redisUrlEnv: "REDIS_URL"
+
+# =============================================================================
+# UPSTREAMS
+# =============================================================================
+# Named upstream targets. ONLY these URLs can be reached (SSRF prevention).
+# 
+# Each upstream can have:
+#   - url: The backend URL (required)
+#   - passHostHeader: Forward original Host header (default: false)
+#   - addHeaders: Headers to add to upstream requests
+#   - allowRequestHeaders: Headers to forward from client (default: common safe headers)
+#   - denyRequestHeaders: Headers to strip (default: admin tokens, hop-by-hop)
+#   - allowResponseHeaders: Headers to forward to client (default: "*")
+#   - timeoutMs: Per-upstream timeout override
+
+upstreams:
+  # Example: Your backend API
+  customer_api:
+    url: "http://10.0.2.10:8080"
+    passHostHeader: false
+    addHeaders:
+      X-SatGate-Upstream: "customer_api"
+    allowRequestHeaders:
+      - "content-type"
+      - "authorization"
+      - "accept"
+      - "accept-language"
+      - "user-agent"
+      - "x-request-id"
+    denyRequestHeaders:
+      - "x-admin-token"
+      - "x-satgate-admin-token"
+
+  # Example: Health check backend (different service)
+  health_backend:
+    url: "http://10.0.2.10:8080"
+    timeoutMs: 5000
+
+# =============================================================================
+# ROUTES
+# =============================================================================
+# Route matching rules. Order matters: first match wins.
+# 
+# Each route has:
+#   - name: Unique route identifier (lowercase, alphanumeric, dashes, underscores)
+#   - match: Request matching criteria
+#       - pathPrefix: Match paths starting with this prefix
+#       - exactPath: Match exactly this path
+#       - methods: HTTP methods to match (default: GET, POST, PUT, PATCH, DELETE)
+#       - headers: Headers that must match (optional)
+#   - upstream: Name of upstream to proxy to
+#   - policy: Access control policy
+#       - kind: public | deny | l402 | capability
+#       - For l402: tier, priceSats, scope (required)
+#       - For capability: scope (required)
+#       - For deny: status (default: 403)
+
+routes:
+  # Block admin endpoints from data plane
+  - name: "block-governance"
+    match:
+      pathPrefix: "/api/governance/"
+    policy:
+      kind: "deny"
+      status: 404
+
+  # Premium tier: 1000 sats
+  - name: "premium"
+    match:
+      pathPrefix: "/v1/premium/"
+      methods: ["GET", "POST"]
+    upstream: "customer_api"
+    policy:
+      kind: "l402"
+      tier: "premium"
+      priceSats: 1000
+      scope: "api:premium:*"
+      ttlSeconds: 3600
+      maxCalls: 100
+
+  # Standard tier: 100 sats
+  - name: "standard"
+    match:
+      pathPrefix: "/v1/standard/"
+      methods: ["GET", "POST"]
+    upstream: "customer_api"
+    policy:
+      kind: "l402"
+      tier: "standard"
+      priceSats: 100
+      scope: "api:standard:*"
+
+  # Basic tier: 10 sats
+  - name: "basic"
+    match:
+      pathPrefix: "/v1/basic/"
+      methods: ["GET", "POST"]
+    upstream: "customer_api"
+    policy:
+      kind: "l402"
+      tier: "basic"
+      priceSats: 10
+      scope: "api:basic:*"
+
+  # Micro tier: 1 sat
+  - name: "micro"
+    match:
+      pathPrefix: "/v1/micro/"
+      methods: ["GET", "POST"]
+    upstream: "customer_api"
+    policy:
+      kind: "l402"
+      tier: "micro"
+      priceSats: 1
+      scope: "api:micro:*"
+
+  # Capability-only access (no payment)
+  - name: "capability"
+    match:
+      pathPrefix: "/v1/capability/"
+      methods: ["GET", "POST"]
+    upstream: "customer_api"
+    policy:
+      kind: "capability"
+      scope: "api:capability:*"
+      maxCalls: 100
+
+  # Health check (public, no auth)
+  - name: "health"
+    match:
+      exactPath: "/health"
+      methods: ["GET"]
+    upstream: "health_backend"
+    policy:
+      kind: "public"
+
+  # Catch-all: deny by default (fail-closed)
+  - name: "default-deny"
+    match:
+      pathPrefix: "/"
+    policy:
+      kind: "deny"
+      status: 403
+
