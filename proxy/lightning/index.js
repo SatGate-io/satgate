@@ -161,7 +161,8 @@ class LndProvider extends LightningProvider {
     const postData = JSON.stringify({
       value: String(amountSats),
       memo: memo,
-      expiry: String(expirySecs)
+      expiry: String(expirySecs),
+      private: true  // Include route hints for private channels
     });
     
     console.log(`[LND] Creating invoice: ${url.toString()} | host=${url.hostname} port=${url.port || 443} path=${url.pathname}`);
