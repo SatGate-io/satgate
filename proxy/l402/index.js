@@ -87,17 +87,15 @@ class L402Service {
     const hashPrefix = invoice.paymentHash.substring(0, 16); // First 16 chars of hash
     const identifier = `sg:${hashPrefix}:${timestamp}`;
     
-    // Use TextEncoder for clean Uint8Array conversion (macaroon lib bug workaround)
-    const encoder = new TextEncoder();
-    const keyBytes = encoder.encode(this.rootKey.substring(0, 32)); // Use first 32 chars as key
-    const idBytes = encoder.encode(identifier);
+    // Simple string-based macaroon (avoid Uint8Array issues)
+    const key = this.rootKey.substring(0, 32);
     
-    console.log(`[L402] Creating macaroon: id=${identifier}, keyLen=${keyBytes.length}`);
+    console.log(`[L402] Creating macaroon: id=${identifier}, keyLen=${key.length}`);
     
     let m = macaroon.newMacaroon({
-      identifier: idBytes,
-      location: MACAROON_LOCATION, // location must be string, not Uint8Array
-      rootKey: keyBytes
+      identifier: identifier,
+      location: MACAROON_LOCATION,
+      rootKey: key
     });
 
     // Add caveats - keep them short and ASCII-safe
@@ -117,7 +115,7 @@ class L402Service {
     
     for (const caveat of caveats) {
       console.log(`[L402] Adding caveat: ${caveat}`);
-      m.addFirstPartyCaveat(encoder.encode(caveat));
+      m.addFirstPartyCaveat(caveat);
     }
 
     console.log(`[L402] Exporting macaroon...`);
