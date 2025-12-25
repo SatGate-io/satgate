@@ -87,14 +87,17 @@ class L402Service {
     const hashPrefix = invoice.paymentHash.substring(0, 16); // First 16 chars of hash
     const identifier = `sg:${hashPrefix}:${timestamp}`;
     
-    // Use rootKey as UTF-8 string (avoid hex decoding issues with macaroon lib)
-    const keyBytes = Buffer.from(this.rootKey, 'utf8');
+    // Use TextEncoder for clean Uint8Array conversion (macaroon lib bug workaround)
+    const encoder = new TextEncoder();
+    const keyBytes = encoder.encode(this.rootKey.substring(0, 32)); // Use first 32 chars as key
+    const idBytes = encoder.encode(identifier);
+    const locBytes = encoder.encode(MACAROON_LOCATION);
     
-    console.log(`[L402] Creating macaroon: id=${identifier}, keyLen=${keyBytes.length}, rootKey(first10)=${this.rootKey.substring(0,10)}`);
+    console.log(`[L402] Creating macaroon: id=${identifier}, keyLen=${keyBytes.length}`);
     
     let m = macaroon.newMacaroon({
-      identifier: Buffer.from(identifier, 'utf8'),
-      location: MACAROON_LOCATION,
+      identifier: idBytes,
+      location: locBytes,
       rootKey: keyBytes
     });
 
@@ -115,14 +118,15 @@ class L402Service {
     
     for (const caveat of caveats) {
       console.log(`[L402] Adding caveat: ${caveat}`);
-      m.addFirstPartyCaveat(Buffer.from(caveat, 'ascii'));
+      m.addFirstPartyCaveat(encoder.encode(caveat));
     }
 
     console.log(`[L402] Exporting macaroon...`);
     let macaroonBase64;
     try {
       const binary = m.exportBinary();
-      console.log(`[L402] Export success, binary length: ${binary.length}`);
+      console.log(`[L402] Export success, binary length: ${binary.length}, type: ${binary.constructor.name}`);
+      // Convert Uint8Array to base64 (Node.js compatible)
       macaroonBase64 = Buffer.from(binary).toString('base64');
     } catch (exportErr) {
       console.error(`[L402] Export failed: ${exportErr.message}`);
