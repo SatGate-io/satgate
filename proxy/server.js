@@ -862,12 +862,19 @@ app.use((req, res, next) => {
   const origin = req.headers.origin;
   // SECURITY: Never allow wildcard CORS in production
   const allowWildcard = config.corsOrigins.includes('*') && !config.isProd;
-  if (config.corsOrigins.includes(origin) || allowWildcard) {
-    res.setHeader('Access-Control-Allow-Origin', origin || (allowWildcard ? '*' : ''));
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Admin-Token');
+  const originAllowed = origin && config.corsOrigins.includes(origin);
+  
+  if (originAllowed || allowWildcard) {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Admin-Token, X-SatGate-Admin-Token');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Max-Age', '86400');
+    res.setHeader('Access-Control-Expose-Headers', 'WWW-Authenticate, X-L402-Price, X-L402-Tier, X-L402-TTL, X-L402-Max-Calls, X-Calls-Remaining, X-Budget-Remaining');
+  } else if (origin) {
+    console.log(`[CORS] Origin rejected: ${origin} not in ${JSON.stringify(config.corsOrigins)}`);
   }
+  
   if (req.method === 'OPTIONS') {
     return res.status(204).end();
   }
