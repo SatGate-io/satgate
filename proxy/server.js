@@ -845,20 +845,11 @@ app.use((req, res, next) => {
 });
 
 // CORS configuration
-// Note: When behind Aperture (port 8081), Aperture handles CORS.
-// We only add CORS headers for direct backend access (port 8083).
+// In L402 native mode, we handle CORS directly.
+// In Aperture sidecar mode, Aperture handles CORS.
 app.use((req, res, next) => {
-  // Check if request came through Aperture (it adds specific headers)
-  const viaAperture = req.headers['x-forwarded-for'] || req.headers['x-real-ip'];
-  
-  // Skip CORS if Aperture already handled it (to avoid duplicate headers)
-  if (viaAperture) {
-    if (req.method === 'OPTIONS') {
-      return res.status(204).end();
-    }
-    return next();
-  }
-  
+  // In native mode (no Aperture), always handle CORS ourselves
+  // The old check for X-Forwarded-For doesn't work because Railway/CDNs also set it
   const origin = req.headers.origin;
   // SECURITY: Never allow wildcard CORS in production
   const allowWildcard = config.corsOrigins.includes('*') && !config.isProd;
