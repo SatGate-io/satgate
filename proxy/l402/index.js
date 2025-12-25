@@ -106,9 +106,10 @@ class L402Service {
     this.budgetMemory = new Map();
     
     // Tier pricing (sats per request)
-    // Note: micro is 10 sats minimum to ensure routability (many channels have min HTLC > 1 sat)
+    // Note: 1 sat payments may fail on some routes (min HTLC limits) - this is intentional
+    // to demonstrate the fallback to manual payment with alternate wallets
     this.tierPrices = config.tierPrices || {
-      'micro': 10,
+      'micro': 1,
       'basic': 10,
       'standard': 100,
       'premium': 1000,

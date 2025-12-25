@@ -5,9 +5,9 @@ import { Terminal, Zap, ShieldAlert, CheckCircle, Play, ArrowLeft, Wifi, WifiOff
 import Link from 'next/link';
 
 // --- ENDPOINT OPTIONS ---
-// Note: micro is now 10 sats to ensure routability (1 sat often fails due to routing minimums)
+// Note: 1 sat may fail on some wallet routes - demonstrates fallback to manual payment
 const ENDPOINTS = [
-  { path: '/api/micro/ping', price: 10, label: '/api/micro/ping (10 sats)' },
+  { path: '/api/micro/ping', price: 1, label: '/api/micro/ping (1 sat)' },
   { path: '/api/basic/quote', price: 10, label: '/api/basic/quote (10 sats)' },
   { path: '/api/standard/analytics', price: 100, label: '/api/standard/analytics (100 sats)' },
   { path: '/api/premium/insights', price: 1000, label: '/api/premium/insights (1000 sats)' },
