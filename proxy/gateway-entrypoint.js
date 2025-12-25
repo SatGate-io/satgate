@@ -74,31 +74,70 @@ async function startGatewayMode() {
       
       // Simple metering service wrapper
       meteringService = {
+        /**
+         * Meter a token in a time window.
+         *
+         * @param {string} tokenId - stable token id (we use macaroon signature)
+         * @param {object} limits
+         * @param {number} [limits.maxCalls]
+         * @param {number} [limits.budgetSats]
+         * @param {number} [limits.costSats] - cost to decrement from budget per request (default 1)
+         * @param {number} [limits.expiresAtMs] - token expiry time (ms since epoch) for TTL alignment
+         */
         async check(tokenId, limits) {
-          const callKey = `sg:calls:${tokenId.substring(0, 32)}`;
+          const id = String(tokenId || '');
+          const keyPrefix = id.substring(0, 32);
           const now = Date.now();
-          const ttl = 3600; // 1 hour default
-          
-          // Atomic check-and-decrement for calls
-          if (limits.maxCalls) {
-            const script = `
+          const expiresAtMs = Number.isFinite(limits?.expiresAtMs) ? limits.expiresAtMs : null;
+          const ttlSeconds = expiresAtMs ? Math.max(1, Math.ceil((expiresAtMs - now) / 1000)) : (config.l402.defaultTTLSeconds || 3600);
+          const costSats = Number.isFinite(limits?.costSats) && limits.costSats > 0 ? limits.costSats : 1;
+
+          const result = { exhausted: false };
+
+          // Atomic init+decr for calls
+          if (Number.isFinite(limits?.maxCalls) && limits.maxCalls > 0) {
+            const callKey = `sg:calls:${keyPrefix}`;
+            const callScript = `
               local key = KEYS[1]
-              local max = tonumber(ARGV[1])
+              local init = tonumber(ARGV[1])
               local ttl = tonumber(ARGV[2])
               if redis.call('EXISTS', key) == 0 then
-                redis.call('SET', key, max, 'EX', ttl)
+                redis.call('SET', key, init, 'EX', ttl)
               end
               local remaining = redis.call('DECR', key)
               return remaining
             `;
-            const remaining = await redis.eval(script, 1, callKey, limits.maxCalls, ttl);
-            if (remaining < 0) {
-              return { exhausted: true, reason: 'calls', callsRemaining: 0 };
-            }
-            return { exhausted: false, callsRemaining: Math.max(0, remaining) };
+            const remaining = await redis.eval(callScript, 1, callKey, String(limits.maxCalls), String(ttlSeconds));
+            const rem = Number(remaining);
+            result.callsRemaining = Math.max(0, rem);
+            if (rem < 0) return { exhausted: true, reason: 'calls', callsRemaining: 0 };
           }
-          
-          return { exhausted: false };
+
+          // Atomic init+conditional decr for budget
+          if (Number.isFinite(limits?.budgetSats) && limits.budgetSats > 0) {
+            const budgetKey = `sg:budget:${keyPrefix}`;
+            const budgetScript = `
+              local key = KEYS[1]
+              local init = tonumber(ARGV[1])
+              local cost = tonumber(ARGV[2])
+              local ttl = tonumber(ARGV[3])
+              if redis.call('EXISTS', key) == 0 then
+                redis.call('SET', key, init, 'EX', ttl)
+              end
+              local current = tonumber(redis.call('GET', key))
+              if current == nil then return { -999999, 0 } end
+              if current < cost then return { current, 0 } end
+              local remaining = redis.call('DECRBY', key, cost)
+              return { remaining, 1 }
+            `;
+            const arr = await redis.eval(budgetScript, 1, budgetKey, String(limits.budgetSats), String(costSats), String(ttlSeconds));
+            const remainingBudget = Array.isArray(arr) ? Number(arr[0]) : Number(arr);
+            const charged = Array.isArray(arr) ? Number(arr[1]) === 1 : true;
+            result.budgetRemaining = Math.max(0, remainingBudget);
+            if (!charged) return { exhausted: true, reason: 'budget', budgetRemaining: Math.max(0, remainingBudget) };
+          }
+
+          return result;
         },
       };
     } catch (e) {
@@ -108,20 +147,43 @@ async function startGatewayMode() {
   
   // Fallback to in-memory metering
   if (!meteringService) {
-    const callCounts = new Map();
+    const calls = new Map();   // keyPrefix -> { remaining, expiresAtMs }
+    const budget = new Map();  // keyPrefix -> { remaining, expiresAtMs }
     meteringService = {
       async check(tokenId, limits) {
-        if (!limits.maxCalls) return { exhausted: false };
-        
-        const key = tokenId.substring(0, 32);
-        let count = callCounts.get(key) || limits.maxCalls;
-        count -= 1;
-        callCounts.set(key, count);
-        
-        if (count < 0) {
-          return { exhausted: true, reason: 'calls', callsRemaining: 0 };
+        const id = String(tokenId || '');
+        const key = id.substring(0, 32);
+        const now = Date.now();
+        const expiresAtMs = Number.isFinite(limits?.expiresAtMs) ? limits.expiresAtMs : null;
+        const ttlSeconds = expiresAtMs ? Math.max(1, Math.ceil((expiresAtMs - now) / 1000)) : (config.l402.defaultTTLSeconds || 3600);
+        const exp = expiresAtMs || (now + ttlSeconds * 1000);
+        const costSats = Number.isFinite(limits?.costSats) && limits.costSats > 0 ? limits.costSats : 1;
+
+        // Calls
+        if (Number.isFinite(limits?.maxCalls) && limits.maxCalls > 0) {
+          const entry = calls.get(key);
+          if (!entry || entry.expiresAtMs < now) calls.set(key, { remaining: limits.maxCalls, expiresAtMs: exp });
+          const cur = calls.get(key);
+          cur.remaining -= 1;
+          if (cur.remaining < 0) return { exhausted: true, reason: 'calls', callsRemaining: 0 };
+          // fall through: still may have budget
         }
-        return { exhausted: false, callsRemaining: Math.max(0, count) };
+
+        // Budget
+        if (Number.isFinite(limits?.budgetSats) && limits.budgetSats > 0) {
+          const entry = budget.get(key);
+          if (!entry || entry.expiresAtMs < now) budget.set(key, { remaining: limits.budgetSats, expiresAtMs: exp });
+          const cur = budget.get(key);
+          if (cur.remaining < costSats) return { exhausted: true, reason: 'budget', budgetRemaining: Math.max(0, cur.remaining) };
+          cur.remaining -= costSats;
+        }
+
+        const out = { exhausted: false };
+        const c = calls.get(key);
+        const b = budget.get(key);
+        if (c) out.callsRemaining = Math.max(0, c.remaining);
+        if (b) out.budgetRemaining = Math.max(0, b.remaining);
+        return out;
       },
     };
     console.log('[Gateway] Using in-memory metering (single-instance only)');

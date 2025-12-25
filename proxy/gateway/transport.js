@@ -259,6 +259,8 @@ async function handleL402(req, res, config, route, policy, upstream, satgateCont
       const meter = await meteringService.check(tokenSig, {
         maxCalls: policy.maxCalls || config.l402.defaultMaxCalls,
         budgetSats: policy.budgetSats || config.l402.defaultBudgetSats,
+        costSats: policy.priceSats,
+        expiresAtMs: validation.caveats?.expiresAt || null,
       });
       
       if (meter.exhausted) {
@@ -413,8 +415,13 @@ async function handleCapability(req, res, config, route, policy, upstream, satga
     }
     
     // Check metering
-    if (meteringService && policy.maxCalls) {
-      const meter = await meteringService.check(mac.signature, { maxCalls: policy.maxCalls });
+    if (meteringService && (policy.maxCalls || policy.budgetSats)) {
+      const meter = await meteringService.check(mac.signature, {
+        maxCalls: policy.maxCalls,
+        budgetSats: policy.budgetSats,
+        costSats: 1,
+        expiresAtMs,
+      });
       
       if (meter.exhausted) {
         res.status(429).json({
@@ -426,6 +433,9 @@ async function handleCapability(req, res, config, route, policy, upstream, satga
       }
       
       satgateContext.callsRemaining = meter.callsRemaining;
+      if (meter.budgetRemaining !== undefined) {
+        satgateContext.budgetRemaining = meter.budgetRemaining;
+      }
     }
     
     // Valid - proxy

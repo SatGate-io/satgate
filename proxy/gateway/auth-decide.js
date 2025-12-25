@@ -314,6 +314,8 @@ async function handleL402Policy(
       const meter = await meteringService.check(tokenSig, {
         maxCalls: policy.maxCalls || config.l402.defaultMaxCalls,
         budgetSats: policy.budgetSats || config.l402.defaultBudgetSats,
+        costSats: policy.priceSats,
+        expiresAtMs: validation.caveats?.expiresAt || null,
       });
       
       if (meter.exhausted) {
@@ -420,9 +422,12 @@ async function handleCapabilityPolicy(
     }
     
     // Check metering
-    if (meteringService && policy.maxCalls) {
+    if (meteringService && (policy.maxCalls || policy.budgetSats)) {
       const meter = await meteringService.check(parsed.tokenSignature, {
         maxCalls: policy.maxCalls,
+        budgetSats: policy.budgetSats,
+        costSats: 1,
+        expiresAtMs: parsed.expiresAtMs || null,
       });
       
       if (meter.exhausted) {
@@ -435,6 +440,9 @@ async function handleCapabilityPolicy(
       }
       
       res.setHeader('X-Calls-Remaining', meter.callsRemaining);
+      if (meter.budgetRemaining !== undefined) {
+        res.setHeader('X-Budget-Remaining', meter.budgetRemaining);
+      }
     }
     
     // Token valid - allow

@@ -58,7 +58,10 @@ const SATGATE_RUNTIME = process.env.SATGATE_RUNTIME || '';
 if (SATGATE_RUNTIME === 'gateway') {
   console.log('[SatGate] Starting in GATEWAY MODE');
   const { startGatewayMode } = require('./gateway-entrypoint');
-  startGatewayMode();
+  startGatewayMode().catch((e) => {
+    console.error('[Gateway] Unhandled startup error:', e);
+    process.exit(1);
+  });
   return; // Exit this module - gateway handles everything
 }
 
@@ -70,7 +73,10 @@ if (SATGATE_RUNTIME !== 'embedded' && fs.existsSync(gatewayConfigPath)) {
   console.log('[SatGate] Starting in GATEWAY MODE (auto-detected)');
   console.log('[SatGate] Tip: Set SATGATE_RUNTIME=embedded to force embedded mode');
   const { startGatewayMode } = require('./gateway-entrypoint');
-  startGatewayMode();
+  startGatewayMode().catch((e) => {
+    console.error('[Gateway] Unhandled startup error:', e);
+    process.exit(1);
+  });
   return; // Exit this module - gateway handles everything
 }
 
