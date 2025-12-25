@@ -82,41 +82,39 @@ class L402Service {
     const invoice = await this.lightning.createInvoice(price, memo, Math.min(ttl, 600)); // Invoice expires in max 10 min
 
     // Create macaroon with payment hash caveat
-    // Use shorter identifier to avoid macaroon library overflow issues
     const timestamp = Date.now().toString(36); // Base36 timestamp for brevity
     const hashPrefix = invoice.paymentHash.substring(0, 16); // First 16 chars of hash
     const identifier = `sg:${hashPrefix}:${timestamp}`;
     
-    // Simple string-based macaroon (avoid Uint8Array issues)
-    const key = this.rootKey.substring(0, 32);
+    // Use proper Uint8Array via Buffer.from for macaroon library v3.0.4
+    const keyBytes = new Uint8Array(Buffer.from(this.rootKey.substring(0, 32), 'utf8'));
+    const idBytes = new Uint8Array(Buffer.from(identifier, 'utf8'));
     
-    console.log(`[L402] Creating macaroon: id=${identifier}, keyLen=${key.length}`);
+    console.log(`[L402] Creating macaroon: id=${identifier} (${idBytes.length} bytes), key=${keyBytes.length} bytes`);
     
     let m = macaroon.newMacaroon({
-      identifier: identifier,
+      identifier: idBytes,
       location: MACAROON_LOCATION,
-      rootKey: key
+      rootKey: keyBytes
     });
 
     // Add caveats - keep them short and ASCII-safe
     const expiresAt = Date.now() + (ttl * 1000);
-    // Use only first 16 chars of payment hash to keep caveat short
     const shortHash = invoice.paymentHash.substring(0, 16);
     
-    const caveats = [
-      `ph=${shortHash}`,
-      `exp=${expiresAt}`,
-      `scope=${scope}`,
-      `tier=${tier}`
-    ];
+    // Add caveats as Uint8Array
+    const addCaveat = (str) => {
+      const bytes = new Uint8Array(Buffer.from(str, 'utf8'));
+      console.log(`[L402] Adding caveat: ${str} (${bytes.length} bytes)`);
+      m.addFirstPartyCaveat(bytes);
+    };
     
-    if (maxCalls) caveats.push(`mc=${maxCalls}`);
-    if (budgetSats) caveats.push(`bs=${budgetSats}`);
-    
-    for (const caveat of caveats) {
-      console.log(`[L402] Adding caveat: ${caveat}`);
-      m.addFirstPartyCaveat(caveat);
-    }
+    addCaveat(`ph=${shortHash}`);
+    addCaveat(`exp=${expiresAt}`);
+    addCaveat(`scope=${scope}`);
+    addCaveat(`tier=${tier}`);
+    if (maxCalls) addCaveat(`mc=${maxCalls}`);
+    if (budgetSats) addCaveat(`bs=${budgetSats}`);
 
     console.log(`[L402] Exporting macaroon...`);
     let macaroonBase64;
