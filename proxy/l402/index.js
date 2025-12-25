@@ -91,13 +91,12 @@ class L402Service {
     const encoder = new TextEncoder();
     const keyBytes = encoder.encode(this.rootKey.substring(0, 32)); // Use first 32 chars as key
     const idBytes = encoder.encode(identifier);
-    const locBytes = encoder.encode(MACAROON_LOCATION);
     
     console.log(`[L402] Creating macaroon: id=${identifier}, keyLen=${keyBytes.length}`);
     
     let m = macaroon.newMacaroon({
       identifier: idBytes,
-      location: locBytes,
+      location: MACAROON_LOCATION, // location must be string, not Uint8Array
       rootKey: keyBytes
     });
 
