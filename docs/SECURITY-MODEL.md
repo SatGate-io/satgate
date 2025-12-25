@@ -312,29 +312,44 @@ Attackers may try to DoS invoice creation or create churn.
 | `MODE` | Operating mode: `prod` (secure) or `demo` (public demos) | No | `prod` |
 | `PRICING_ADMIN_TOKEN` | Secret for admin endpoints (min 32 chars) | ✅ (prod) | None |
 | `ADMIN_TOKEN_NEXT` | Secondary admin token for rotation | No | None |
+| `CAPABILITY_ROOT_KEY` | Root key for capability tokens (must not be demo default in prod) | ✅ (prod) | None |
 | `DASHBOARD_PUBLIC` | Allow public dashboard access (only in `MODE=demo`) | No | `false` |
 | `ADMIN_RATE_LIMIT` | Admin req/min per IP | No | `30` |
 | `HEALTH_RATE_LIMIT` | Health check req/min per IP | No | `600` |
 | `REDIS_URL` | Redis connection for persistence | No | in-memory |
 | `CORS_ORIGINS` | Comma-separated allowed origins | No | localhost only |
+| `TRUST_PROXY` | Trust proxy headers (`true`, `false`, or hop count) | No | `1` in prod |
 
 > **Note:** `DASHBOARD_PUBLIC=true` is ignored when `MODE=prod` — see guardrail above.
+
+### Debug Configuration (Never enable in production)
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `AUTH_DEBUG` | Log admin token validation attempts | `false` |
+| `LND_DEBUG` | Log LND API requests | `false` |
+| `L402_DEBUG` | Log L402 token creation/validation | `false` |
+| `PEP_DEBUG` | Log capability PEP decisions | `false` |
 
 ### L402 Native Mode Configuration
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
 | `L402_MODE` | L402 mode: `native` or `aperture` | No | `aperture` |
+| `L402_ROOT_KEY` | Root key for L402 tokens (distinct from `CAPABILITY_ROOT_KEY`) | ✅ (native + prod) | None |
 | `LIGHTNING_BACKEND` | Backend: `phoenixd`, `lnd`, `opennode`, `mock` | If native | None |
 | `PHOENIXD_URL` | phoenixd REST API URL | If phoenixd | None |
 | `PHOENIXD_PASSWORD` | phoenixd API password | If phoenixd | None |
 | `LND_REST_URL` | LND REST API URL | If lnd | None |
-| `LND_MACAROON` | LND admin macaroon (hex) | If lnd | None |
+| `LND_MACAROON` | LND invoice macaroon (base64) | If lnd | None |
+| `LND_INSECURE_TLS` | Allow insecure TLS for LND (only for localhost by default) | No | `false` |
 | `OPENNODE_API_KEY` | OpenNode API key | If opennode | None |
 | `L402_DEFAULT_TTL` | Default token TTL (seconds) | No | `3600` |
 | `L402_DEFAULT_MAX_CALLS` | Default max calls per token | No | `100` |
 
 > **Warning:** OpenNode may not expose the Lightning payment hash required for LSAT preimage verification. Use phoenixd or LND for production.
+>
+> **Security:** `LND_MACAROON` should be stored as base64 (converted to hex internally). Use an invoice-scoped macaroon, not admin.
 
 ---
 
@@ -389,25 +404,68 @@ Your API       ← Business logic
 
 ---
 
+## Security Hardening (v1.9.0)
+
+The following security improvements were implemented in v1.9.0:
+
+### 1. Fail-Fast in Production
+
+SatGate now **refuses to start** in `MODE=prod` if:
+- `PRICING_ADMIN_TOKEN` is missing or less than 32 characters
+- `CAPABILITY_ROOT_KEY` is set to the demo default value
+- `L402_MODE=native` but `L402_ROOT_KEY` is missing
+
+### 2. Timing-Safe Token Comparison
+
+Admin token validation uses `crypto.timingSafeEqual()` to prevent timing side-channel attacks.
+
+### 3. Full Payment Hash Binding (L402)
+
+L402 tokens now embed the **full 64-character payment hash** (not a prefix), and validation requires an exact SHA256 match of the preimage.
+
+### 4. Debug Logging Opt-In Only
+
+Sensitive debug logging is disabled by default. Enable only when needed:
+- `AUTH_DEBUG=true` - Admin token validation logging
+- `LND_DEBUG=true` - LND API request/response logging
+- `L402_DEBUG=true` - L402 token creation/validation logging
+
+> ⚠️ **Never enable debug flags in production** — they may log sensitive material.
+
+### 5. Secure TLS by Default (LND)
+
+LND connections now require valid TLS certificates by default. Insecure TLS is only allowed:
+- Automatically for `localhost` / `127.0.0.1`
+- Explicitly via `LND_INSECURE_TLS=true`
+
+### 6. No Secret Logging
+
+Admin tokens, macaroons, and preimages are never logged (even prefixes). Only boolean flags like `tokenPresent=true` appear in logs.
+
+---
+
 ## Security Checklist
 
 ### Core Security
 - [ ] Set `PRICING_ADMIN_TOKEN` to a strong random value (min 32 chars)
 - [ ] Set `MODE=prod` in production
 - [ ] Set `DASHBOARD_PUBLIC=false` (production)
+- [ ] Set `CAPABILITY_ROOT_KEY` to a unique value (not the demo default)
 - [ ] Enable Redis for persistent ban list, audit logs, and metering
 - [ ] Rate limit `/health` and `/ready` (or allowlist probes)
 - [ ] Monitor governance audit log for suspicious activity
 - [ ] Rotate admin credentials periodically
 - [ ] Ensure TLS and origin protection are configured
+- [ ] Verify `AUTH_DEBUG`, `LND_DEBUG`, `L402_DEBUG` are **unset** in production
 
 ### L402 Native Mode (if enabled)
 - [ ] Set `L402_MODE=native`
+- [ ] Set `L402_ROOT_KEY` to a unique value (distinct from `CAPABILITY_ROOT_KEY`)
 - [ ] Configure Lightning backend (`LIGHTNING_BACKEND`, credentials)
 - [ ] Use phoenixd or LND (OpenNode may not support preimage verification)
 - [ ] Enable Redis for atomic metering counters
 - [ ] Set appropriate `L402_DEFAULT_TTL` and `L402_DEFAULT_MAX_CALLS`
-- [ ] Verify `/api/lightning/status` returns healthy
+- [ ] Verify `/api/governance/lightning` returns healthy (requires admin auth)
 
 ---
 
