@@ -1289,7 +1289,8 @@ app.get('/api/basic/quote', trackPaidRequest('basic', 10), (req, res) => {
 // Aperture whitelists this path; we enforce macaroon auth in app layer.
 // This demonstrates "Zero Trust PEP" without requiring Lightning payments.
 
-const macaroon = require('macaroon');
+// Use our SimpleMacaroon implementation (no external macaroon library needed)
+const { SimpleMacaroon } = require('./l402');
 
 // Shared secret for Phase 1 demo (in production, use env var)
 const CAPABILITY_ROOT_KEY = process.env.CAPABILITY_ROOT_KEY || 'satgate-phase1-demo-key-change-in-prod';
@@ -1467,12 +1468,11 @@ app.use('/api/capability', async (req, res, next) => {
   const tokenBase64 = authHeader.slice(7); // Remove "Bearer "
   
   try {
-    // Decode and import the macaroon
-    const tokenBytes = Buffer.from(tokenBase64, 'base64');
-    const m = macaroon.importMacaroon(tokenBytes);
+    // Decode and import the macaroon using SimpleMacaroon
+    const m = SimpleMacaroon.deserialize(tokenBase64);
     
     // KILL SWITCH: Check if token is banned (uses sync in-memory check for speed)
-    const tokenSignature = Buffer.from(m.signature).toString('hex');
+    const tokenSignature = m.signature;
     if (bannedTokens.hasSync(tokenSignature)) {
       console.log(`[KILL SWITCH] 🛑 Blocked banned token: ${tokenSignature.substring(0, 16)}...`);
       telemetry.recordBannedHit();
@@ -1483,21 +1483,10 @@ app.use('/api/capability', async (req, res, next) => {
       });
     }
     
-    // Verify signature with root key
-    const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
     const now = Date.now();
     
-    // Extract caveats from macaroon
-    const caveats = [];
-    const caveatSource = m._caveats || m.caveats || [];
-    if (Array.isArray(caveatSource)) {
-      caveatSource.forEach(c => {
-        const cavStr = c._identifier ? c._identifier.toString('utf8') : 
-                       c.identifier ? c.identifier.toString('utf8') :
-                       typeof c === 'string' ? c : null;
-        if (cavStr) caveats.push(cavStr);
-      });
-    }
+    // Extract caveats from macaroon (SimpleMacaroon stores as array of strings)
+    const caveats = m.caveats || [];
     
     console.log(`[PEP] Path: ${req.path} | Required Scope: ${requiredScope}`);
     console.log(`[PEP] Token caveats: ${JSON.stringify(caveats)}`);
@@ -1510,49 +1499,45 @@ app.use('/api/capability', async (req, res, next) => {
     let budgetSats = null;
     let tokenScope = null;
     
-    // Verify HMAC signature with dynamic scope checking
-    const checkCaveat = (caveat) => {
-      const caveatStr = typeof caveat === 'string' ? caveat : caveat.toString('utf8');
-      
+    // Verify macaroon signature first
+    if (!m.verify(CAPABILITY_ROOT_KEY)) {
+      throw new Error('Invalid macaroon signature');
+    }
+    
+    // Process caveats
+    for (const caveatStr of caveats) {
       // Time-based expiry
       if (caveatStr.startsWith('expires = ')) {
         const expiry = parseInt(caveatStr.split(' = ')[1], 10);
         expiresAtMs = expiry;
         if (now > expiry) {
-          return 'token expired';
+          throw new Error('token expired');
         }
-        return null; // OK
       }
       
       // Stateful call budget (per request, per time window)
-      if (caveatStr.startsWith('max_calls = ')) {
+      else if (caveatStr.startsWith('max_calls = ')) {
         const v = parseInt(caveatStr.split(' = ')[1], 10);
         if (!Number.isFinite(v) || v <= 0) {
-          return 'invalid max_calls caveat';
+          throw new Error('invalid max_calls caveat');
         }
         maxCalls = v;
-        return null; // OK
       }
       
       // Stateful sats budget (decremented by tier cost per request)
-      if (caveatStr.startsWith('budget_sats = ')) {
+      else if (caveatStr.startsWith('budget_sats = ')) {
         const v = parseInt(caveatStr.split(' = ')[1], 10);
         if (!Number.isFinite(v) || v <= 0) {
-          return 'invalid budget_sats caveat';
+          throw new Error('invalid budget_sats caveat');
         }
         budgetSats = v;
-        return null; // OK
       }
 
       // DYNAMIC SCOPE CHECK
-      if (caveatStr.startsWith('scope = ')) {
+      else if (caveatStr.startsWith('scope = ')) {
         tokenScope = caveatStr.split(' = ')[1].trim();
         
         // Check if token scope covers the required scope
-        // Wildcard: "api:capability:*" covers everything
-        // Specific: "api:capability:ping" only covers /ping
-        // Admin: "api:capability:admin" covers admin actions
-        
         let isAllowed = false;
         
         // Wildcard scope covers everything
@@ -1581,42 +1566,34 @@ app.use('/api/capability', async (req, res, next) => {
         if (!isAllowed) {
           scopeError = `Scope violation: token has '${tokenScope}', need '${requiredScope}'`;
           console.log(`[PEP] ⛔ ${scopeError}`);
-          return scopeError;
+          throw new Error(scopeError);
         }
         
         scopeValidated = true;
         console.log(`[PEP] ✓ Scope OK: '${tokenScope}' covers '${requiredScope}'`);
-        return null; // OK
       }
       
       // Delegation markers - accept (informational only)
-      if (caveatStr.startsWith('delegated_by = ') ||
+      else if (caveatStr.startsWith('delegated_by = ') ||
           caveatStr.startsWith('delegated_from = ') ||
           caveatStr.startsWith('delegation_depth = ') ||
           caveatStr.startsWith('delegation_time = ')) {
-        return null; // OK - delegation tracking caveats
+        // OK - delegation tracking caveats
       }
       
       // Unknown caveat - reject for security
-      return 'unknown caveat: ' + caveatStr;
-    };
-    
-    // Verify signature and caveats
-    m.verify(keyBytes, checkCaveat);
+      else {
+        throw new Error('unknown caveat: ' + caveatStr);
+      }
+    }
     
     // If we get here but scope wasn't validated, reject
-    // (This handles tokens without any scope caveat)
     if (!scopeValidated) {
       throw new Error('Token has no scope caveat');
     }
     
-    // Extract identifier from macaroon
-    let identifier = 'unknown';
-    if (m.identifier && m.identifier.length > 0) {
-      identifier = Buffer.from(m.identifier).toString('utf8');
-    } else if (m._identifier) {
-      identifier = m._identifier.toString('utf8');
-    }
+    // Extract identifier from macaroon (SimpleMacaroon stores as string)
+    const identifier = m.identifier || 'unknown';
     
     // Attach parsed info to request for endpoints
     req.capability = {
@@ -1721,30 +1698,24 @@ app.post('/api/capability/mint', express.json(), (req, res) => {
   }
   
   try {
-    // Create base macaroon
-    const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
+    // Create base macaroon using SimpleMacaroon
     const identifier = `${CAPABILITY_IDENTIFIER}:${Date.now()}`;
     
-    let m = macaroon.newMacaroon({
-      identifier: Buffer.from(identifier, 'utf8'),
-      location: CAPABILITY_LOCATION,
-      rootKey: keyBytes
-    });
+    const m = new SimpleMacaroon(CAPABILITY_LOCATION, identifier, CAPABILITY_ROOT_KEY);
     
-    // Add caveats (method on macaroon object)
+    // Add caveats
     const expiresAt = Date.now() + (expiresIn * 1000);
-    m.addFirstPartyCaveat(Buffer.from(`expires = ${expiresAt}`, 'utf8'));
-    m.addFirstPartyCaveat(Buffer.from(`scope = ${scope}`, 'utf8'));
+    m.addFirstPartyCaveat(`expires = ${expiresAt}`);
+    m.addFirstPartyCaveat(`scope = ${scope}`);
     if (maxCallsValue) {
-      m.addFirstPartyCaveat(Buffer.from(`max_calls = ${Math.floor(maxCallsValue)}`, 'utf8'));
+      m.addFirstPartyCaveat(`max_calls = ${Math.floor(maxCallsValue)}`);
     }
     if (budgetSatsValue) {
-      m.addFirstPartyCaveat(Buffer.from(`budget_sats = ${Math.floor(budgetSatsValue)}`, 'utf8'));
+      m.addFirstPartyCaveat(`budget_sats = ${Math.floor(budgetSatsValue)}`);
     }
     
-    // Export as base64
-    const tokenBytes = m.exportBinary();
-    const tokenBase64 = Buffer.from(tokenBytes).toString('base64');
+    // Serialize to base64
+    const tokenBase64 = m.serialize();
     
     console.log(`[CAPABILITY] Minted token: scope=${scope}, expires=${new Date(expiresAt).toISOString()}`);
     
@@ -1782,17 +1753,12 @@ app.get('/api/token/test', requirePricingAdmin, (req, res) => {
     };
     
     // Verify we can create a macaroon (without exposing the key)
-    const keyBytes = Buffer.from(String(CAPABILITY_ROOT_KEY || 'fallback-key'), 'utf8');
-    const testId = Buffer.from(`${CAPABILITY_IDENTIFIER}:test:${Date.now()}`, 'utf8');
+    const testId = `${CAPABILITY_IDENTIFIER}:test:${Date.now()}`;
     
-    const m = macaroon.newMacaroon({
-      identifier: testId,
-      location: CAPABILITY_LOCATION,
-      rootKey: keyBytes
-    });
+    const m = new SimpleMacaroon(CAPABILITY_LOCATION, testId, CAPABILITY_ROOT_KEY || 'fallback-key');
     
     // Only return signature prefix (not key material)
-    const sigPrefix = Buffer.from(m.signature).toString('hex').substring(0, 8);
+    const sigPrefix = m.signature.substring(0, 8);
     
     res.json({ 
       ok: true, 
@@ -1845,30 +1811,25 @@ app.get('/api/token/delegate', requirePricingAdmin, (req, res) => {
     const childId = `${CAPABILITY_IDENTIFIER}:child:${Date.now()}`;
     
     step = 4;
-    const idBytes = Buffer.from(childId, 'utf8');
-    
+    // Create child macaroon using SimpleMacaroon
     step = 5;
-    let childMac = macaroon.newMacaroon({
-      identifier: idBytes,
-      location: CAPABILITY_LOCATION,
-      rootKey: keyBytes
-    });
+    const childMac = new SimpleMacaroon(CAPABILITY_LOCATION, childId, CAPABILITY_ROOT_KEY);
     
-    // Add caveats - keep it minimal to avoid macaroon library issues
+    // Add caveats
     step = 6;
     const expiresAt = Date.now() + (expiresIn * 1000);
-    childMac.addFirstPartyCaveat(Buffer.from(`expires = ${expiresAt}`, 'utf8'));
-    childMac.addFirstPartyCaveat(Buffer.from(`scope = ${scope}`, 'utf8'));
-    childMac.addFirstPartyCaveat(Buffer.from(`delegation_depth = 1`, 'utf8'));
+    childMac.addFirstPartyCaveat(`expires = ${expiresAt}`);
+    childMac.addFirstPartyCaveat(`scope = ${scope}`);
+    childMac.addFirstPartyCaveat(`delegation_depth = 1`);
     
     step = 7;
-    const childBytes = childMac.exportBinary();
+    const childTokenBase64 = childMac.serialize();
     
     step = 8;
-    const childTokenBase64 = Buffer.from(childBytes).toString('base64');
+    // No extra step needed
     
     step = 9;
-    const childSig = Buffer.from(childMac.signature).toString('hex').substring(0, 16);
+    const childSig = childMac.signature.substring(0, 16);
     
     console.log(`[CAPABILITY] Delegated token: parent=${parentSig}..., child=${childSig}..., scope=${scope}`);
     
@@ -1952,42 +1913,33 @@ app.post('/api/capability/demo/delegate', (req, res) => {
   }
   
   try {
-    const keyBytes = Buffer.from(CAPABILITY_ROOT_KEY, 'utf8');
     const now = Date.now();
     
     // 1. Create parent token (Simulating the Agent's existing credential)
     const parentId = `${CAPABILITY_IDENTIFIER}:parent:${now}`;
-    let parentMacaroon = macaroon.newMacaroon({
-      identifier: Buffer.from(parentId, 'utf8'),
-      location: CAPABILITY_LOCATION,
-      rootKey: keyBytes
-    });
+    const parentMacaroon = new SimpleMacaroon(CAPABILITY_LOCATION, parentId, CAPABILITY_ROOT_KEY);
     
     // Parent: broad scope, 1 hour expiry
     const parentExpiry = now + (60 * 60 * 1000);
-    parentMacaroon.addFirstPartyCaveat(Buffer.from(`expires = ${parentExpiry}`, 'utf8'));
-    parentMacaroon.addFirstPartyCaveat(Buffer.from(`scope = api:capability:*`, 'utf8'));
+    parentMacaroon.addFirstPartyCaveat(`expires = ${parentExpiry}`);
+    parentMacaroon.addFirstPartyCaveat(`scope = api:capability:*`);
     
-    const parentToken = Buffer.from(parentMacaroon.exportBinary()).toString('base64');
+    const parentToken = parentMacaroon.serialize();
     
     // 2. Create child token with MORE restrictive caveats
     // In a real scenario, this would be done by attenuating the parent
     // For demo purposes, we create it directly with the restricted caveats
     const childId = `${CAPABILITY_IDENTIFIER}:child:${now}`;
-    let childMacaroon = macaroon.newMacaroon({
-      identifier: Buffer.from(childId, 'utf8'),
-      location: CAPABILITY_LOCATION,
-      rootKey: keyBytes
-    });
+    const childMacaroon = new SimpleMacaroon(CAPABILITY_LOCATION, childId, CAPABILITY_ROOT_KEY);
     
     // Child: ALL parent caveats PLUS more restrictive ones
     // (This simulates what attenuation produces)
     const childExpiry = now + (5 * 60 * 1000); // 5 minutes (shorter than parent)
-    childMacaroon.addFirstPartyCaveat(Buffer.from(`expires = ${childExpiry}`, 'utf8'));
-    childMacaroon.addFirstPartyCaveat(Buffer.from(`scope = api:capability:ping`, 'utf8')); // Narrower
-    childMacaroon.addFirstPartyCaveat(Buffer.from(`delegated_by = agent-001`, 'utf8'));
+    childMacaroon.addFirstPartyCaveat(`expires = ${childExpiry}`);
+    childMacaroon.addFirstPartyCaveat(`scope = api:capability:ping`); // Narrower
+    childMacaroon.addFirstPartyCaveat(`delegated_by = agent-001`);
     
-    const childToken = Buffer.from(childMacaroon.exportBinary()).toString('base64');
+    const childToken = childMacaroon.serialize();
     
     // 3. Format the output to match the CLI demo script exactly
     const output = `
