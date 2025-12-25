@@ -82,8 +82,13 @@ class L402Service {
     const invoice = await this.lightning.createInvoice(price, memo, Math.min(ttl, 600)); // Invoice expires in max 10 min
 
     // Create macaroon with payment hash caveat
-    const identifier = `${MACAROON_IDENTIFIER_PREFIX}:${invoice.paymentHash}:${Date.now()}`;
-    const keyBytes = Buffer.from(this.rootKey, 'utf8');
+    // Use shorter identifier to avoid macaroon library overflow issues
+    const timestamp = Date.now().toString(36); // Base36 timestamp for brevity
+    const hashPrefix = invoice.paymentHash.substring(0, 16); // First 16 chars of hash
+    const identifier = `sg:${hashPrefix}:${timestamp}`;
+    const keyBytes = Buffer.from(this.rootKey, 'hex'); // Expect hex-encoded root key
+    
+    console.log(`[L402] Creating macaroon: id=${identifier}, keyLen=${keyBytes.length}`);
     
     let m = macaroon.newMacaroon({
       identifier: Buffer.from(identifier, 'utf8'),
