@@ -18,6 +18,7 @@
  */
 
 const { matchRoute, getConfig } = require('./index');
+const { SimpleMacaroon } = require('../l402');
 
 /**
  * Required headers from ingress
@@ -61,6 +62,86 @@ function buildWWWAuthenticate(macaroon, invoice) {
 }
 
 /**
+ * Scope match helper (supports wildcard suffix like "api:foo:*")
+ */
+function scopeMatches(tokenScope, requiredScope) {
+  if (!tokenScope || !requiredScope) return false;
+  if (tokenScope === requiredScope) return true;
+  if (tokenScope.endsWith(':*')) {
+    const prefix = tokenScope.slice(0, -1); // keep trailing ':'
+    return requiredScope.startsWith(prefix);
+  }
+  return false;
+}
+
+/**
+ * Parse and verify a capability macaroon.
+ * Accepts:
+ * - Authorization: Capability <base64-macaroon>
+ * - Authorization: Bearer <base64-macaroon>
+ */
+function parseAndVerifyCapabilityToken(authorization, capabilityRootKey) {
+  if (!authorization) return { ok: false, error: 'missing_authorization' };
+  const m = authorization.match(/^(?:Capability|Bearer)\s+(.+)$/i);
+  if (!m) return { ok: false, error: 'invalid_authorization_format' };
+
+  const tokenBase64 = m[1].trim();
+  let mac;
+  try {
+    mac = SimpleMacaroon.deserialize(tokenBase64);
+  } catch (e) {
+    return { ok: false, error: 'invalid_token_format' };
+  }
+
+  if (!capabilityRootKey) return { ok: false, error: 'capability_root_key_missing' };
+  if (!mac.verify(capabilityRootKey)) return { ok: false, error: 'invalid_signature' };
+
+  const now = Date.now();
+  const caveats = mac.caveats || [];
+  let scope = null;
+  let expiresAtMs = null;
+
+  for (const caveat of caveats) {
+    if (typeof caveat !== 'string') return { ok: false, error: 'invalid_caveat' };
+
+    if (caveat.startsWith('expires = ')) {
+      const v = parseInt(caveat.split(' = ')[1], 10);
+      if (!Number.isFinite(v)) return { ok: false, error: 'invalid_expires' };
+      expiresAtMs = v;
+      if (now > v) return { ok: false, error: 'token_expired' };
+      continue;
+    }
+    if (caveat.startsWith('scope = ')) {
+      scope = caveat.split(' = ')[1].trim();
+      continue;
+    }
+
+    // Allow delegation markers (informational)
+    if (
+      caveat.startsWith('delegated_by = ') ||
+      caveat.startsWith('delegated_from = ') ||
+      caveat.startsWith('delegation_depth = ') ||
+      caveat.startsWith('delegation_time = ')
+    ) {
+      continue;
+    }
+
+    // Unknown caveat -> reject (conservative)
+    return { ok: false, error: 'unknown_caveat' };
+  }
+
+  if (!scope) return { ok: false, error: 'missing_scope' };
+
+  return {
+    ok: true,
+    tokenSignature: mac.signature,
+    scope,
+    expiresAtMs,
+    rawCaveats: caveats,
+  };
+}
+
+/**
  * Auth Decision handler
  * 
  * @param {object} req - Express request
@@ -78,6 +159,19 @@ async function authDecideHandler(req, res, l402Service, meteringService) {
   res.setHeader('Pragma', 'no-cache');
   
   try {
+    // Hardening: /auth/decide should be a bodyless request from ingress.
+    // Reject any non-empty body to avoid accidental buffering/abuse.
+    const contentLength = req.headers['content-length'];
+    if (contentLength && parseInt(contentLength, 10) > 0) {
+      res.status(413).json({
+        error: 'Payload Too Large',
+        code: 'AUTH_DECIDE_BODY_NOT_ALLOWED',
+        message: 'Request body not allowed for /auth/decide',
+        requestId,
+      });
+      return;
+    }
+
     // Validate required headers
     for (const header of REQUIRED_HEADERS) {
       if (!req.headers[header]) {
@@ -94,7 +188,7 @@ async function authDecideHandler(req, res, l402Service, meteringService) {
     const originalMethod = req.headers['x-original-method'].toUpperCase();
     const originalUri = req.headers['x-original-uri'];
     const originalHost = req.headers['x-original-host'] || req.headers['host'] || 'unknown';
-    const originalProto = req.headers['x-original-proto'] || 'https';
+    const originalProto = req.headers['x-original-proto'] || req.headers['x-forwarded-proto'] || 'https';
     const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
     const authorization = req.headers['authorization'];
     
@@ -131,12 +225,7 @@ async function authDecideHandler(req, res, l402Service, meteringService) {
         // Allow immediately
         res.setHeader('X-SatGate-Route', route.name);
         res.setHeader('X-SatGate-Policy', 'public');
-        res.status(200).json({
-          allow: true,
-          route: route.name,
-          policy: 'public',
-          requestId,
-        });
+        res.status(200).end();
         return;
         
       case 'deny':
@@ -209,33 +298,28 @@ async function handleL402Policy(
       console.log(`[AuthDecide] Token invalid: ${validation.error}`);
       return issueL402Challenge(res, policy, l402Service, requestId);
     }
+
+    const tokenScope = validation.caveats?.scope || null;
+    const tokenSig = validation.tokenSignature;
     
     // Check scope match
-    if (policy.scope && validation.scope !== policy.scope) {
+    if (policy.scope && !scopeMatches(tokenScope, policy.scope)) {
       // Scope mismatch - issue new challenge for correct scope
-      console.log(`[AuthDecide] Scope mismatch: ${validation.scope} vs ${policy.scope}`);
+      console.log(`[AuthDecide] Scope mismatch: ${tokenScope} vs ${policy.scope}`);
       return issueL402Challenge(res, policy, l402Service, requestId);
     }
     
     // Check metering (if enabled)
     if (meteringService && (policy.maxCalls || policy.budgetSats)) {
-      const meter = await meteringService.check(validation.tokenId, {
+      const meter = await meteringService.check(tokenSig, {
         maxCalls: policy.maxCalls || config.l402.defaultMaxCalls,
         budgetSats: policy.budgetSats || config.l402.defaultBudgetSats,
       });
       
       if (meter.exhausted) {
-        if (meter.reason === 'calls') {
-          res.status(429).json({
-            error: 'Too Many Requests',
-            message: 'Call limit exhausted',
-            requestId,
-          });
-        } else {
-          // Budget exhausted - issue re-challenge
-          return issueL402Challenge(res, policy, l402Service, requestId);
-        }
-        return;
+        // Re-challenge on exhaustion (calls or budget) so clients can pay for a new token window.
+        res.setHeader('X-SatGate-Reason', meter.reason === 'calls' ? 'call_exhausted' : 'budget_exhausted');
+        return issueL402Challenge(res, policy, l402Service, requestId);
       }
       
       // Set metering headers for upstream
@@ -249,15 +333,8 @@ async function handleL402Policy(
     res.setHeader('X-SatGate-Route', route.name);
     res.setHeader('X-SatGate-Policy', 'l402');
     res.setHeader('X-SatGate-Tier', policy.tier || 'default');
-    res.setHeader('X-SatGate-Scope', validation.scope || '');
-    res.status(200).json({
-      allow: true,
-      route: route.name,
-      policy: 'l402',
-      tier: policy.tier,
-      scope: validation.scope,
-      requestId,
-    });
+    res.setHeader('X-SatGate-Scope', tokenScope || '');
+    res.status(200).end();
     
   } catch (err) {
     console.error(`[AuthDecide] L402 validation error: ${err.message}`);
@@ -271,31 +348,28 @@ async function handleL402Policy(
  */
 async function issueL402Challenge(res, policy, l402Service, requestId) {
   try {
-    const challenge = await l402Service.createChallenge({
-      tier: policy.tier,
-      price: policy.priceSats,
+    // Reuse existing SatGate native L402 implementation:
+    // createChallenge(tier, options) -> { statusCode, headers, body }
+    const tier = policy.tier || 'default';
+    const challenge = await l402Service.createChallenge(tier, {
       scope: policy.scope,
       ttl: policy.ttlSeconds,
       maxCalls: policy.maxCalls,
       budgetSats: policy.budgetSats,
+      // Optional explicit override if the service supports it
+      priceSats: policy.priceSats,
     });
-    
-    res.setHeader('WWW-Authenticate', buildWWWAuthenticate(challenge.macaroon, challenge.invoice));
-    res.setHeader('X-L402-Price', policy.priceSats);
-    res.setHeader('X-L402-Tier', policy.tier || 'default');
-    if (policy.ttlSeconds) res.setHeader('X-L402-TTL', policy.ttlSeconds);
-    if (policy.maxCalls) res.setHeader('X-L402-Max-Calls', policy.maxCalls);
-    res.setHeader('Content-Type', 'application/json');
-    
+
+    // Copy headers from the challenge
+    for (const [k, v] of Object.entries(challenge.headers || {})) {
+      res.setHeader(k, v);
+    }
+    res.setHeader('X-Request-Id', requestId);
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Pragma', 'no-cache');
+
     res.status(402).json({
-      error: 'Payment Required',
-      macaroon: challenge.macaroon,
-      invoice: challenge.invoice,
-      price: policy.priceSats,
-      tier: policy.tier,
-      scope: policy.scope,
-      ttl: policy.ttlSeconds,
-      maxCalls: policy.maxCalls,
+      ...challenge.body,
       requestId,
     });
     
@@ -317,47 +391,29 @@ async function handleCapabilityPolicy(
   mockReq, authorization, meteringService, requestId
 ) {
   // Extract capability token from Authorization header
-  // Format: Capability <base64-macaroon>
-  const capMatch = authorization?.match(/^Capability\s+(.+)$/i);
-  
-  if (!capMatch) {
+  // Formats supported:
+  // - Capability <base64-macaroon>
+  // - Bearer <base64-macaroon>
+  const capabilityRootKey = process.env.CAPABILITY_ROOT_KEY || '';
+  const parsed = parseAndVerifyCapabilityToken(authorization, capabilityRootKey);
+  if (!parsed.ok) {
     res.status(401).json({
       error: 'Unauthorized',
       message: 'Capability token required',
-      hint: 'Authorization: Capability <token>',
+      hint: 'Authorization: Capability <token> (or Bearer <token>)',
       requestId,
     });
     return;
   }
   
-  // Validate capability token
-  // This would use a similar mechanism to L402 but without payment binding
-  // For now, we'll accept any base64 token with a valid signature
-  
   try {
-    // TODO: Implement capability token validation
-    // For MVP, we'll check the token structure and signature
-    
-    const tokenData = Buffer.from(capMatch[1], 'base64').toString('utf8');
-    let token;
-    try {
-      token = JSON.parse(tokenData);
-    } catch {
-      res.status(401).json({
-        error: 'Unauthorized',
-        message: 'Invalid capability token format',
-        requestId,
-      });
-      return;
-    }
-    
     // Check scope match
-    if (policy.scope && token.scope !== policy.scope) {
+    if (policy.scope && !scopeMatches(parsed.scope, policy.scope)) {
       res.status(403).json({
         error: 'Forbidden',
         message: 'Scope mismatch',
         required: policy.scope,
-        provided: token.scope,
+        provided: parsed.scope,
         requestId,
       });
       return;
@@ -365,7 +421,7 @@ async function handleCapabilityPolicy(
     
     // Check metering
     if (meteringService && policy.maxCalls) {
-      const meter = await meteringService.check(token.id, {
+      const meter = await meteringService.check(parsed.tokenSignature, {
         maxCalls: policy.maxCalls,
       });
       
@@ -384,14 +440,8 @@ async function handleCapabilityPolicy(
     // Token valid - allow
     res.setHeader('X-SatGate-Route', route.name);
     res.setHeader('X-SatGate-Policy', 'capability');
-    res.setHeader('X-SatGate-Scope', token.scope || '');
-    res.status(200).json({
-      allow: true,
-      route: route.name,
-      policy: 'capability',
-      scope: token.scope,
-      requestId,
-    });
+    res.setHeader('X-SatGate-Scope', parsed.scope || '');
+    res.status(200).end();
     
   } catch (err) {
     console.error(`[AuthDecide] Capability validation error: ${err.message}`);

@@ -1,6 +1,11 @@
 /* backend/server.js
  * SatGate - Lightning-powered API access control
- * Production backend that sits behind Aperture for L402 authentication
+ * 
+ * RUNTIME MODES (SATGATE_RUNTIME):
+ * ================================
+ *   gateway  - Full reverse proxy with L402 enforcement (two listeners)
+ *   embedded - Demo/playground mode (single server, built-in endpoints)
+ *   (default)- Auto-detect based on satgate.gateway.yaml presence
  * 
  * SECURITY MODEL (Enterprise-Ready):
  * ===================================
@@ -32,6 +37,8 @@
  *   - /health, /ready              - Returns only { status: 'ok' }
  * 
  * Environment Variables:
+ *   SATGATE_RUNTIME        - 'gateway', 'embedded', or auto-detect
+ *   SATGATE_GATEWAY_CONFIG - Path to gateway config (default: ./satgate.gateway.yaml)
  *   MODE                   - 'prod' (default) or 'demo'
  *   PRICING_ADMIN_TOKEN    - Primary admin token (REQUIRED, min 32 chars)
  *   ADMIN_TOKEN_NEXT       - Secondary token for rotation (optional)
@@ -39,6 +46,40 @@
  *   ADMIN_RATE_LIMIT       - Admin requests/min per IP (default: 30)
  *   HEALTH_RATE_LIMIT      - Health requests/min per IP (default: 600)
  */
+
+// =============================================================================
+// RUNTIME MODE DETECTION (Gateway vs Embedded)
+// =============================================================================
+// Check this FIRST before loading any other modules
+
+const SATGATE_RUNTIME = process.env.SATGATE_RUNTIME || '';
+
+// If gateway mode, delegate to the gateway module entirely
+if (SATGATE_RUNTIME === 'gateway') {
+  console.log('[SatGate] Starting in GATEWAY MODE');
+  const { startGatewayMode } = require('./gateway-entrypoint');
+  startGatewayMode();
+  return; // Exit this module - gateway handles everything
+}
+
+// Auto-detect: check for gateway config file
+const fs = require('fs');
+const gatewayConfigPath = process.env.SATGATE_GATEWAY_CONFIG || './satgate.gateway.yaml';
+if (SATGATE_RUNTIME !== 'embedded' && fs.existsSync(gatewayConfigPath)) {
+  console.log(`[SatGate] Auto-detected gateway config at ${gatewayConfigPath}`);
+  console.log('[SatGate] Starting in GATEWAY MODE (auto-detected)');
+  console.log('[SatGate] Tip: Set SATGATE_RUNTIME=embedded to force embedded mode');
+  const { startGatewayMode } = require('./gateway-entrypoint');
+  startGatewayMode();
+  return; // Exit this module - gateway handles everything
+}
+
+console.log('[SatGate] Starting in EMBEDDED MODE (demo/playground)');
+
+// =============================================================================
+// EMBEDDED MODE (Original server.js code continues below)
+// =============================================================================
+
 const express = require('express');
 const os = require('os');
 const path = require('path');

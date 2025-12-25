@@ -146,7 +146,12 @@ class L402Service {
    * Create a new L402 challenge (402 response)
    */
   async createChallenge(tier = 'basic', options = {}) {
-    const price = this.getTierPrice(tier);
+    // Allow an explicit price override (gateway mode may attach policies with explicit priceSats).
+    const overridePrice =
+      Number.isFinite(options.priceSats) ? options.priceSats :
+      (Number.isFinite(options.price) ? options.price : null);
+
+    const price = overridePrice !== null ? overridePrice : this.getTierPrice(tier);
     const ttl = options.ttl || this.defaultTTL;
     const maxCalls = options.maxCalls ?? this.defaultMaxCalls;
     const budgetSats = options.budgetSats ?? this.defaultBudgetSats;

@@ -245,29 +245,25 @@ async function handleL402(req, res, config, route, policy, upstream, satgateCont
     if (!validation.valid) {
       return issueChallenge(res, policy, l402Service, requestId);
     }
+
+    const tokenScope = validation.caveats?.scope || null;
+    const tokenSig = validation.tokenSignature;
     
     // Check scope
-    if (policy.scope && validation.scope !== policy.scope) {
+    if (policy.scope && tokenScope !== policy.scope) {
       return issueChallenge(res, policy, l402Service, requestId);
     }
     
     // Check metering
     if (meteringService && (policy.maxCalls || policy.budgetSats)) {
-      const meter = await meteringService.check(validation.tokenId, {
+      const meter = await meteringService.check(tokenSig, {
         maxCalls: policy.maxCalls || config.l402.defaultMaxCalls,
         budgetSats: policy.budgetSats || config.l402.defaultBudgetSats,
       });
       
       if (meter.exhausted) {
-        if (meter.reason === 'calls') {
-          res.status(429).json({
-            error: 'Too Many Requests',
-            message: 'Call limit exhausted',
-            requestId,
-          });
-          return;
-        }
-        // Budget exhausted - re-challenge
+        // Re-challenge on exhaustion so clients can pay for a new token window.
+        res.setHeader('X-SatGate-Reason', meter.reason === 'calls' ? 'call_exhausted' : 'budget_exhausted');
         return issueChallenge(res, policy, l402Service, requestId);
       }
       
@@ -297,31 +293,25 @@ async function handleL402(req, res, config, route, policy, upstream, satgateCont
  * Issue L402 challenge
  */
 async function issueChallenge(res, policy, l402Service, requestId) {
-  const { buildWWWAuthenticate } = require('./auth-decide');
-  
   try {
-    const challenge = await l402Service.createChallenge({
-      tier: policy.tier,
-      price: policy.priceSats,
+    const tier = policy.tier || 'default';
+    const challenge = await l402Service.createChallenge(tier, {
       scope: policy.scope,
       ttl: policy.ttlSeconds,
       maxCalls: policy.maxCalls,
       budgetSats: policy.budgetSats,
+      priceSats: policy.priceSats,
     });
-    
-    res.setHeader('WWW-Authenticate', buildWWWAuthenticate(challenge.macaroon, challenge.invoice));
-    res.setHeader('X-L402-Price', policy.priceSats);
-    res.setHeader('X-L402-Tier', policy.tier || 'default');
+
+    for (const [k, v] of Object.entries(challenge.headers || {})) {
+      res.setHeader(k, v);
+    }
     res.setHeader('X-Request-Id', requestId);
     res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Pragma', 'no-cache');
     
     res.status(402).json({
-      error: 'Payment Required',
-      macaroon: challenge.macaroon,
-      invoice: challenge.invoice,
-      price: policy.priceSats,
-      tier: policy.tier,
-      scope: policy.scope,
+      ...challenge.body,
       requestId,
     });
     
@@ -343,24 +333,77 @@ async function handleCapability(req, res, config, route, policy, upstream, satga
   
   // Extract capability token
   const authHeader = req.headers['authorization'];
-  const capMatch = authHeader?.match(/^Capability\s+(.+)$/i);
-  
+  const capMatch = authHeader?.match(/^(?:Capability|Bearer)\s+(.+)$/i);
   if (!capMatch) {
     res.status(401).json({
       error: 'Unauthorized',
       message: 'Capability token required',
-      hint: 'Authorization: Capability <token>',
+      hint: 'Authorization: Capability <token> (or Bearer <token>)',
       requestId,
     });
     return;
   }
   
   try {
-    const tokenData = Buffer.from(capMatch[1], 'base64').toString('utf8');
-    const token = JSON.parse(tokenData);
+    const { SimpleMacaroon } = require('../l402');
+    const capabilityRootKey = process.env.CAPABILITY_ROOT_KEY || '';
+    if (!capabilityRootKey) {
+      return res.status(500).json({
+        error: 'Internal Server Error',
+        message: 'CAPABILITY_ROOT_KEY not configured',
+        requestId,
+      });
+    }
+
+    const mac = SimpleMacaroon.deserialize(capMatch[1].trim());
+    if (!mac.verify(capabilityRootKey)) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Invalid capability token',
+        requestId,
+      });
+    }
+
+    // Extract scope + expiry
+    const caveats = mac.caveats || [];
+    let tokenScope = null;
+    let expiresAtMs = null;
+    const now = Date.now();
+    for (const c of caveats) {
+      if (typeof c !== 'string') throw new Error('invalid caveat');
+      if (c.startsWith('expires = ')) {
+        const v = parseInt(c.split(' = ')[1], 10);
+        expiresAtMs = v;
+        if (now > v) {
+          return res.status(403).json({
+            error: 'Forbidden',
+            message: 'Token expired',
+            requestId,
+          });
+        }
+      } else if (c.startsWith('scope = ')) {
+        tokenScope = c.split(' = ')[1].trim();
+      } else if (
+        c.startsWith('delegated_by = ') ||
+        c.startsWith('delegated_from = ') ||
+        c.startsWith('delegation_depth = ') ||
+        c.startsWith('delegation_time = ')
+      ) {
+        // allowed informational caveats
+      } else {
+        throw new Error('unknown caveat');
+      }
+    }
+    if (!tokenScope) {
+      return res.status(403).json({
+        error: 'Forbidden',
+        message: 'Missing scope caveat',
+        requestId,
+      });
+    }
     
     // Check scope
-    if (policy.scope && token.scope !== policy.scope) {
+    if (policy.scope && tokenScope !== policy.scope) {
       res.status(403).json({
         error: 'Forbidden',
         message: 'Scope mismatch',
@@ -371,7 +414,7 @@ async function handleCapability(req, res, config, route, policy, upstream, satga
     
     // Check metering
     if (meteringService && policy.maxCalls) {
-      const meter = await meteringService.check(token.id, { maxCalls: policy.maxCalls });
+      const meter = await meteringService.check(mac.signature, { maxCalls: policy.maxCalls });
       
       if (meter.exhausted) {
         res.status(429).json({

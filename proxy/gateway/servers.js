@@ -101,8 +101,8 @@ function createAdminPlaneApp(config, l402Service, meteringService, governanceRou
   // Disable X-Powered-By
   app.disable('x-powered-by');
   
-  // Parse JSON bodies for admin endpoints
-  app.use(express.json());
+  // Parse JSON bodies for admin endpoints (keep small; auth/decide should be bodyless)
+  app.use(express.json({ limit: '10kb' }));
   
   // Request ID
   app.use(requestIdMiddleware);

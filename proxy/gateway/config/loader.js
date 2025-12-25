@@ -229,6 +229,16 @@ function loadConfig(configPath) {
   
   // Compile routes
   config.routes = compileRoutes(rawConfig.routes, config.upstreams);
+
+  // SECURITY: If capability routes are configured, require CAPABILITY_ROOT_KEY in production.
+  const hasCapabilityRoutes = Array.isArray(rawConfig.routes) && rawConfig.routes.some(r => r?.policy?.kind === 'capability');
+  if (hasCapabilityRoutes) {
+    const capabilityKey = process.env.CAPABILITY_ROOT_KEY || '';
+    const mode = process.env.MODE || 'prod';
+    if (mode === 'prod' && !capabilityKey) {
+      throw new Error('Capability routes configured but CAPABILITY_ROOT_KEY is not set (required in production)');
+    }
+  }
   
   // Resolve environment variable references
   config.l402.rootKey = process.env[config.l402.rootKeyEnv];
