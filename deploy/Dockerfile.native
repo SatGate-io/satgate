@@ -12,8 +12,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf 
 COPY proxy/package*.json ./
 RUN npm ci --production
 
-# Copy application code (includes l402/ directory)
+# Copy application code (includes l402/ and gateway/ directories)
 COPY proxy/ ./
+
+# Copy gateway config (for Gateway Mode)
+COPY satgate.gateway.yaml ./
 
 # Set default environment
 ENV NODE_ENV=production
