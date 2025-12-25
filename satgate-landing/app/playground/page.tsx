@@ -69,7 +69,7 @@ export default function PlaygroundPage() {
     setLogs([]);
     setStatus('idle');
     
-    const BASE_URL = 'https://satgate-production.up.railway.app';
+    const BASE_URL = 'https://satgate-production-9354.up.railway.app';
     const TARGET_URL = `${BASE_URL}${selectedEndpoint.path}`;
 
     try {

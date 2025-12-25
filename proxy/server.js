@@ -724,11 +724,12 @@ const config = {
     const origins = process.env.CORS_ORIGINS;
     if (!origins || origins === '*') {
       if (MODE === 'prod') {
-        console.warn('[SECURITY] CORS_ORIGINS not set or "*" in prod - defaulting to localhost only');
-        return ['http://127.0.0.1:8081', 'http://localhost:8081'];
+        console.warn('[SECURITY] CORS_ORIGINS not set or "*" in prod - defaulting to satgate.io + localhost');
+        // Allow satgate.io (our official landing page) and localhost for development
+        return ['https://satgate.io', 'https://www.satgate.io', 'http://127.0.0.1:8081', 'http://localhost:8081'];
       }
       // Demo mode allows broader access
-      return ['http://127.0.0.1:8081', 'http://localhost:8081', 'http://localhost:8080', 'http://127.0.0.1:8080'];
+      return ['https://satgate.io', 'https://www.satgate.io', 'http://127.0.0.1:8081', 'http://localhost:8081', 'http://localhost:8080', 'http://127.0.0.1:8080'];
     }
     return origins.split(',').map(o => o.trim());
   })(),
