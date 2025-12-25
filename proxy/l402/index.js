@@ -106,8 +106,9 @@ class L402Service {
     this.budgetMemory = new Map();
     
     // Tier pricing (sats per request)
+    // Note: micro is 10 sats minimum to ensure routability (many channels have min HTLC > 1 sat)
     this.tierPrices = config.tierPrices || {
-      'micro': 1,
+      'micro': 10,
       'basic': 10,
       'standard': 100,
       'premium': 1000,

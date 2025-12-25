@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Terminal, Zap, ShieldAlert, CheckCircle, Play, ArrowLeft, Wifi, WifiOff } from 'lucide-react';
+import { Terminal, Zap, ShieldAlert, CheckCircle, Play, ArrowLeft, Wifi, WifiOff, Copy, Check } from 'lucide-react';
 import Link from 'next/link';
 
 // --- ENDPOINT OPTIONS ---
+// Note: micro is now 10 sats to ensure routability (1 sat often fails due to routing minimums)
 const ENDPOINTS = [
-  { path: '/api/micro/ping', price: 1, label: '/api/micro/ping (1 sat)' },
+  { path: '/api/micro/ping', price: 10, label: '/api/micro/ping (10 sats)' },
   { path: '/api/basic/quote', price: 10, label: '/api/basic/quote (10 sats)' },
   { path: '/api/standard/analytics', price: 100, label: '/api/standard/analytics (100 sats)' },
   { path: '/api/premium/insights', price: 1000, label: '/api/premium/insights (1000 sats)' },
@@ -54,7 +55,16 @@ export default function PlaygroundPage() {
   const [logs, setLogs] = useState<Array<{msg: string, type: 'info'|'error'|'success'|'warn'}>>([]);
   const [status, setStatus] = useState<'idle' | 'blocked' | 'paying' | 'success'>('idle');
   const [isLoading, setIsLoading] = useState(false);
+  const [showInvoice, setShowInvoice] = useState<{invoice: string, macaroon: string, price: number} | null>(null);
+  const [preimageInput, setPreimageInput] = useState('');
+  const [copied, setCopied] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  
+  const copyToClipboard = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const addLog = (msg: string, type: 'info'|'error'|'success'|'warn' = 'info') => {
     setLogs(prev => [...prev, { msg, type }]);
@@ -156,42 +166,48 @@ export default function PlaygroundPage() {
             if (e.message?.includes('rejected') || e.message?.includes('cancelled')) {
               throw e; // User cancelled
             }
-            // WebLN payment failed - show manual option
+            // WebLN payment failed - show manual invoice panel
             addLog(`⚠️ WebLN payment failed: ${e.message}`, 'warn');
-            addLog(``, 'info');
-            addLog(`📱 Pay manually with any Lightning wallet:`, 'info');
-            addLog(`   Invoice: ${invoice}`, 'info');
-            addLog(``, 'info');
-            addLog(`🔗 Or copy invoice: ${invoice.substring(0, 30)}...`, 'info');
+            addLog(`📱 Showing invoice for manual payment...`, 'info');
             
-            // Prompt for manual preimage entry
-            const manualPreimage = prompt(
-              `WebLN payment failed. Pay this invoice with any wallet:\n\n${invoice}\n\nAfter paying, paste the PREIMAGE here:`
-            );
-            
-            if (!manualPreimage) {
-              throw new Error('Payment cancelled - no preimage provided');
-            }
-            preimage = manualPreimage.trim();
+            // Show invoice panel and wait for preimage
+            setShowInvoice({ invoice, macaroon, price: selectedEndpoint.price });
+            preimage = await new Promise<string>((resolve, reject) => {
+              const checkInterval = setInterval(() => {
+                if (preimageInput && preimageInput.length >= 64) {
+                  clearInterval(checkInterval);
+                  resolve(preimageInput);
+                }
+              }, 500);
+              // Timeout after 10 minutes
+              setTimeout(() => {
+                clearInterval(checkInterval);
+                reject(new Error('Payment timeout'));
+              }, 600000);
+            });
+            setShowInvoice(null);
+            setPreimageInput('');
             addLog(`✅ Manual preimage received.`, 'success');
           }
         } else {
-          // No WebLN - show invoice for manual payment
-          addLog(`📱 No WebLN wallet detected. Pay manually:`, 'info');
-          addLog(``, 'info');
-          addLog(`⚡ Invoice (${selectedEndpoint.price} sat):`, 'info');
-          addLog(`   ${invoice.substring(0, 40)}...`, 'info');
-          addLog(``, 'info');
+          // No WebLN - show invoice panel
+          addLog(`📱 No WebLN wallet. Showing invoice for manual payment...`, 'info');
           
-          // Prompt for manual preimage entry
-          const manualPreimage = prompt(
-            `Pay this invoice with any Lightning wallet:\n\n${invoice}\n\nAfter paying, paste the PREIMAGE here:`
-          );
-          
-          if (!manualPreimage) {
-            throw new Error('Payment cancelled - no preimage provided');
-          }
-          preimage = manualPreimage.trim();
+          setShowInvoice({ invoice, macaroon, price: selectedEndpoint.price });
+          preimage = await new Promise<string>((resolve, reject) => {
+            const checkInterval = setInterval(() => {
+              if (preimageInput && preimageInput.length >= 64) {
+                clearInterval(checkInterval);
+                resolve(preimageInput);
+              }
+            }, 500);
+            setTimeout(() => {
+              clearInterval(checkInterval);
+              reject(new Error('Payment timeout'));
+            }, 600000);
+          });
+          setShowInvoice(null);
+          setPreimageInput('');
           addLog(`✅ Manual preimage received.`, 'success');
         }
       } else {
@@ -382,6 +398,70 @@ export default function PlaygroundPage() {
         <StatusStep active={status === 'paying'} completed={status === 'success'} icon={<Zap size={20} />} label="2. Lightning Payment" />
         <StatusStep active={status === 'success'} completed={status === 'success'} icon={<CheckCircle size={20} />} label="3. Data Unlocked" />
       </div>
+
+      {/* Invoice Panel Modal */}
+      {showInvoice && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 border border-purple-500 rounded-xl max-w-lg w-full p-6 space-y-4">
+            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <Zap className="text-yellow-400" /> Pay {showInvoice.price} sats
+            </h3>
+            
+            <p className="text-gray-400 text-sm">
+              Copy this invoice and pay with any Lightning wallet (Phoenix, WoS, etc.)
+            </p>
+            
+            {/* Invoice display with copy button */}
+            <div className="bg-black rounded-lg p-3 font-mono text-xs break-all text-gray-300 relative">
+              <div className="pr-10">{showInvoice.invoice}</div>
+              <button 
+                onClick={() => copyToClipboard(showInvoice.invoice)}
+                className="absolute top-2 right-2 p-2 bg-gray-800 hover:bg-gray-700 rounded transition"
+              >
+                {copied ? <Check size={16} className="text-green-400" /> : <Copy size={16} />}
+              </button>
+            </div>
+            
+            {/* Preimage input */}
+            <div className="space-y-2">
+              <label className="text-sm text-gray-400">
+                After paying, paste the PREIMAGE here:
+              </label>
+              <input 
+                type="text"
+                value={preimageInput}
+                onChange={(e) => setPreimageInput(e.target.value)}
+                placeholder="64-character hex preimage..."
+                className="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 font-mono text-sm text-white focus:border-purple-500 focus:outline-none"
+              />
+            </div>
+            
+            <div className="flex gap-3">
+              <button 
+                onClick={() => { setShowInvoice(null); setPreimageInput(''); }}
+                className="flex-1 px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  if (preimageInput.length >= 64) {
+                    // The useEffect will pick this up
+                  }
+                }}
+                disabled={preimageInput.length < 64}
+                className={`flex-1 px-4 py-2 rounded-lg font-bold transition ${
+                  preimageInput.length >= 64 
+                    ? 'bg-purple-600 text-white hover:bg-purple-500' 
+                    : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                Submit Preimage
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
