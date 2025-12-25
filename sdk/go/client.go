@@ -467,3 +467,4 @@ func (w *LNDWallet) PayInvoice(invoice string) (string, error) {
 	return hex.EncodeToString(preimageBytes), nil
 }
 
+

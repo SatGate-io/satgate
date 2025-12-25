@@ -786,8 +786,7 @@ async function payWithWebLN() {
       preimageInput.value = result.preimage;
       saveToken();
       enableRetryButton();
-      
-      console.log('WebLN: Token saved. Macaroon (first 30):', state.macaroon.substring(0, 30));
+      // SECURITY: Do not log macaroon/preimage material to the console.
       
       // Show success state
       preimageSection.style.display = 'none';
@@ -902,13 +901,8 @@ async function retryWithL402() {
   
   // Log what we're sending for debugging
   const invoiceId = state.invoice ? state.invoice.slice(-8).toUpperCase() : 'unknown';
-  console.log('L402 Authorization attempt:', {
-    endpoint: selectedEndpoint,
-    macaroon: state.macaroon.substring(0, 30) + '...',
-    preimage: preimage.substring(0, 16) + '...',
-    preimageLength: preimage.length,
-    invoiceId: invoiceId
-  });
+  // SECURITY: Do not log token material to the console (browsers/extensions can collect logs).
+  console.log('L402 Authorization attempt:', { endpoint: selectedEndpoint, invoiceId });
   
   try {
     const response = await fetch(CONFIG.apertureBase + selectedEndpoint, {

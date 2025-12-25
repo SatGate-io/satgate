@@ -97,7 +97,20 @@ const MACAROON_LOCATION = 'https://satgate.io';
 
 class L402Service {
   constructor(config = {}) {
-    this.rootKey = config.rootKey || process.env.L402_ROOT_KEY || process.env.CAPABILITY_ROOT_KEY || 'satgate-l402-demo-key-change-in-prod';
+    const demoFallbackKey = 'satgate-l402-demo-key-change-in-prod';
+    this.rootKey =
+      config.rootKey ||
+      process.env.L402_ROOT_KEY ||
+      process.env.CAPABILITY_ROOT_KEY ||
+      (process.env.MODE === 'demo' ? demoFallbackKey : null);
+
+    // SECURITY: never allow missing or demo keys in production-like mode.
+    if (!this.rootKey) {
+      throw new Error('L402 root key is required (set L402_ROOT_KEY)');
+    }
+    if ((process.env.MODE === 'prod' || process.env.NODE_ENV === 'production') && this.rootKey === demoFallbackKey) {
+      throw new Error('Refusing to use demo L402 root key in production');
+    }
     this.lightning = config.lightning || createLightningProvider(config.lightningConfig);
     this.redis = config.redis || null;
     
@@ -148,14 +161,17 @@ class L402Service {
     const hashPrefix = invoice.paymentHash.substring(0, 16);
     const identifier = `sg:${hashPrefix}:${timestamp}`;
     
-    console.log(`[L402] Creating macaroon: id=${identifier}`);
+    const L402_DEBUG = process.env.L402_DEBUG === 'true';
+    if (L402_DEBUG) console.log(`[L402] Creating macaroon: id=${identifier}`);
     
     const m = new SimpleMacaroon(MACAROON_LOCATION, identifier, this.rootKey);
 
     // Add caveats
     const expiresAt = Date.now() + (ttl * 1000);
     
-    m.addFirstPartyCaveat(`ph=${hashPrefix}`);
+    // SECURITY: bind the token to the FULL payment hash (not a prefix).
+    // A prefix reduces the verification strength unnecessarily.
+    m.addFirstPartyCaveat(`ph=${invoice.paymentHash}`);
     m.addFirstPartyCaveat(`exp=${expiresAt}`);
     m.addFirstPartyCaveat(`scope=${scope}`);
     m.addFirstPartyCaveat(`tier=${tier}`);
@@ -163,7 +179,7 @@ class L402Service {
     if (budgetSats) m.addFirstPartyCaveat(`bs=${budgetSats}`);
 
     const macaroonBase64 = m.serialize();
-    console.log(`[L402] Macaroon created, length: ${macaroonBase64.length}`);
+    if (L402_DEBUG) console.log(`[L402] Macaroon created, length: ${macaroonBase64.length}`);
 
     // Build WWW-Authenticate header (L402 format)
     const wwwAuth = `L402 macaroon="${macaroonBase64}", invoice="${invoice.paymentRequest}"`;
@@ -246,12 +262,26 @@ class L402Service {
       if (!paymentHash) {
         return { valid: false, error: 'Missing payment_hash caveat' };
       }
+
+      // Basic input validation
+      if (!/^[a-fA-F0-9]{64}$/.test(paymentHash)) {
+        return { valid: false, error: 'Invalid payment hash format' };
+      }
+      if (!/^[a-fA-F0-9]{64}$/.test(preimage)) {
+        return { valid: false, error: 'Invalid preimage format' };
+      }
+      if (!scope) {
+        return { valid: false, error: 'Missing scope caveat' };
+      }
+      if (!tier) {
+        return { valid: false, error: 'Missing tier caveat' };
+      }
       
       const preimageHash = crypto.createHash('sha256')
         .update(Buffer.from(preimage, 'hex'))
         .digest('hex');
       
-      if (!preimageHash.startsWith(paymentHash)) {
+      if (preimageHash !== paymentHash) {
         return { valid: false, error: 'Invalid preimage' };
       }
 

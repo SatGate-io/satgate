@@ -81,9 +81,10 @@ function initializeL402(redisClient) {
       apiKey: process.env.OPENNODE_API_KEY
     };
     
-    // Check for L402_ROOT_KEY in production (use MODE directly since config isn't defined yet)
+    // SECURITY: In native mode, L402_ROOT_KEY is REQUIRED in production. Do not silently fall back.
     if (MODE === 'prod' && !process.env.L402_ROOT_KEY) {
-      console.warn('[L402][SECURITY] L402_MODE=native but no L402_ROOT_KEY set. Set L402_ROOT_KEY (separate from CAPABILITY_ROOT_KEY) to a strong secret in production.');
+      console.error('[L402][SECURITY] ❌ L402_MODE=native requires L402_ROOT_KEY in MODE=prod. Refusing to start.');
+      process.exit(1);
     }
 
     l402Service = new L402Service({
@@ -104,6 +105,22 @@ function initializeL402(redisClient) {
 // Note: L402 is initialized after Redis connection (or immediately if no Redis)
 
 const app = express();
+
+// Trust proxy in production (so req.ip and rate limiting work correctly behind Railway/CDN).
+// SECURITY: do not blindly trust arbitrary X-Forwarded-For in dev.
+// Set TRUST_PROXY=true (or a number) to override.
+if (process.env.TRUST_PROXY) {
+  const v = process.env.TRUST_PROXY;
+  if (v === 'true') app.set('trust proxy', true);
+  else if (v === 'false') app.set('trust proxy', false);
+  else {
+    const n = parseInt(v, 10);
+    app.set('trust proxy', Number.isFinite(n) ? n : true);
+  }
+} else if (MODE === 'prod') {
+  // Common default: trust first hop (e.g., load balancer)
+  app.set('trust proxy', 1);
+}
 
 // =============================================================================
 // RATE LIMITING (Simple in-memory, use Redis in production at scale)
@@ -176,11 +193,14 @@ const healthRateLimit = rateLimit({
 function optionalAdminAuth(req, res, next) {
   // SECURITY: header-only admin auth (query string tokens leak via logs/referrers)
   // Use req.get() for case-insensitive header access
-  const token = req.get('x-admin-token') || '';
+  const token = req.get('x-admin-token') || req.get('x-satgate-admin-token') || '';
   const { valid, actor } = checkAdminToken(token);
   
-  // Debug: ALWAYS log auth attempts (remove after debugging)
-  console.error(`[AUTH-DEBUG] path=${req.path} token=${token ? token.substring(0, 8) + '...' : 'NONE'} expected=${ADMIN_TOKEN_CURRENT ? ADMIN_TOKEN_CURRENT.substring(0, 8) + '...' : 'NOT SET'} valid=${valid}`);
+  // SECURITY: Never log secrets. Optional debug logging can be enabled explicitly.
+  const AUTH_DEBUG = process.env.AUTH_DEBUG === 'true';
+  if (AUTH_DEBUG) {
+    console.error(`[AUTH] optionalAdminAuth path=${req.path} tokenPresent=${!!token} valid=${valid}`);
+  }
   
   // If valid admin token, grant full access
   if (valid) {
@@ -769,10 +789,19 @@ function isValidAdminToken(token) {
 // Check if a provided token matches any valid admin token
 function checkAdminToken(token) {
   if (!token) return { valid: false, actor: null };
-  if (ADMIN_TOKEN_CURRENT && token === ADMIN_TOKEN_CURRENT) {
+  // SECURITY: use timing-safe comparisons to reduce side-channel leakage.
+  function timingSafeEquals(a, b) {
+    if (!a || !b) return false;
+    const aBuf = Buffer.from(String(a));
+    const bBuf = Buffer.from(String(b));
+    if (aBuf.length !== bBuf.length) return false;
+    return crypto.timingSafeEqual(aBuf, bBuf);
+  }
+
+  if (ADMIN_TOKEN_CURRENT && timingSafeEquals(token, ADMIN_TOKEN_CURRENT)) {
     return { valid: true, actor: 'admin-token-current' };
   }
-  if (ADMIN_TOKEN_NEXT && token === ADMIN_TOKEN_NEXT) {
+  if (ADMIN_TOKEN_NEXT && timingSafeEquals(token, ADMIN_TOKEN_NEXT)) {
     return { valid: true, actor: 'admin-token-next' };
   }
   return { valid: false, actor: null };
@@ -781,9 +810,11 @@ function checkAdminToken(token) {
 // Startup security checks
 if (config.env === 'production' || config.isProd) {
   if (!ADMIN_TOKEN_CURRENT) {
-    console.warn('[SECURITY] ⚠️  No PRICING_ADMIN_TOKEN set - admin endpoints unprotected!');
+    console.error('[SECURITY] ❌ No PRICING_ADMIN_TOKEN set - admin endpoints would be unprotected. Refusing to start in MODE=prod.');
+    if (config.isProd) process.exit(1);
   } else if (!isValidAdminToken(ADMIN_TOKEN_CURRENT)) {
-    console.warn('[SECURITY] ⚠️  Admin token does not meet minimum length requirements');
+    console.error('[SECURITY] ❌ Admin token does not meet minimum length requirements. Refusing to start in MODE=prod.');
+    if (config.isProd) process.exit(1);
   }
   // Warn if someone sets DASHBOARD_PUBLIC in prod mode (it's ignored but they should know)
   if (process.env.DASHBOARD_PUBLIC === 'true') {
@@ -856,10 +887,21 @@ app.use((req, res, next) => {
   const originAllowed = origin && config.corsOrigins.includes(origin);
   
   if (originAllowed || allowWildcard) {
-    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+    // Vary by Origin when reflecting
+    if (origin) {
+      const existingVary = res.getHeader('Vary');
+      res.setHeader('Vary', existingVary ? `${existingVary}, Origin` : 'Origin');
+    }
+
+    // Only reflect a concrete origin. Avoid "*" with credentials.
+    const allowOriginValue = originAllowed ? origin : (origin ? origin : '*');
+    res.setHeader('Access-Control-Allow-Origin', allowOriginValue);
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Admin-Token, X-SatGate-Admin-Token');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    // Only enable credentials when we are reflecting a concrete origin.
+    if (allowOriginValue !== '*') {
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
     res.setHeader('Access-Control-Max-Age', '86400');
     res.setHeader('Access-Control-Expose-Headers', 'WWW-Authenticate, X-L402-Price, X-L402-Tier, X-L402-TTL, X-L402-Max-Calls, X-Calls-Remaining, X-Budget-Remaining');
   } else if (origin) {
@@ -977,8 +1019,11 @@ function requirePricingAdmin(req, res, next) {
   const token = req.get('x-admin-token') || req.get('x-satgate-admin-token') || '';
   const { valid, actor } = checkAdminToken(token);
   
-  // Debug: ALWAYS log auth attempts (remove after debugging)
-  console.error(`[AUTH-ADMIN] path=${req.path} token=${token ? token.substring(0, 8) + '...' : 'NONE'} expected=${ADMIN_TOKEN_CURRENT ? ADMIN_TOKEN_CURRENT.substring(0, 8) + '...' : 'NOT SET'} valid=${valid}`);
+  // SECURITY: Never log secrets. Optional debug logging can be enabled explicitly.
+  const AUTH_DEBUG = process.env.AUTH_DEBUG === 'true';
+  if (AUTH_DEBUG) {
+    console.error(`[AUTH] requirePricingAdmin path=${req.path} tokenPresent=${!!token} valid=${valid}`);
+  }
   
   if (!valid) {
     // In development without token set, allow for testing
@@ -1296,6 +1341,16 @@ const CAPABILITY_ROOT_KEY = process.env.CAPABILITY_ROOT_KEY || 'satgate-phase1-d
 const CAPABILITY_LOCATION = 'https://satgate.io';
 const CAPABILITY_IDENTIFIER = 'satgate-capability-v1';
 
+// SECURITY: Fail-fast if default demo key is used in production.
+if (config.isProd && CAPABILITY_ROOT_KEY === 'satgate-phase1-demo-key-change-in-prod') {
+  console.error('[SECURITY] ❌ CAPABILITY_ROOT_KEY is using the default demo value in MODE=prod. Refusing to start.');
+  process.exit(1);
+}
+// SECURITY: Recommend distinct root keys for capability vs L402 tokens.
+if (config.isProd && process.env.L402_ROOT_KEY && process.env.L402_ROOT_KEY === process.env.CAPABILITY_ROOT_KEY) {
+  console.warn('[SECURITY] ⚠️  L402_ROOT_KEY and CAPABILITY_ROOT_KEY are identical. Recommend separate keys for blast-radius separation.');
+}
+
 // =============================================================================
 // STATEFUL ENFORCEMENT: max_calls & budget_sats (Redis-backed, in-memory fallback)
 // =============================================================================
@@ -1428,6 +1483,7 @@ async function decrementCapabilityBudget(tokenSignature, budgetSats, cost, expir
 // Implements DYNAMIC SCOPE ENFORCEMENT based on requested path
 app.use('/api/capability', async (req, res, next) => {
   const authHeader = req.get('authorization') || '';
+  const PEP_DEBUG = process.env.PEP_DEBUG === 'true';
   
   // Determine required scope for this path
   let requiredScope = 'api:capability:read'; // Default for /ping, /data
@@ -1487,8 +1543,10 @@ app.use('/api/capability', async (req, res, next) => {
     // Extract caveats from macaroon (SimpleMacaroon stores as array of strings)
     const caveats = m.caveats || [];
     
-    console.log(`[PEP] Path: ${req.path} | Required Scope: ${requiredScope}`);
-    console.log(`[PEP] Token caveats: ${JSON.stringify(caveats)}`);
+    if (PEP_DEBUG) {
+      console.log(`[PEP] Path: ${req.path} | Required Scope: ${requiredScope}`);
+      console.log(`[PEP] Token caveats: ${JSON.stringify(caveats)}`);
+    }
     
     // Track if scope was validated
     let scopeValidated = false;
@@ -2093,14 +2151,14 @@ app.get('/api/governance/stats', optionalAdminAuth, async (req, res) => {
 
 // Economic Firewall Report (for sales dashboards and weekly reporting)
 // Shows: blocked requests, revenue, compute saved, protection metrics
-app.get('/api/governance/economic-report', async (req, res) => {
+app.get('/api/governance/economic-report', optionalAdminAuth, apiRateLimit, async (req, res) => {
   const report = telemetry.getEconomicReport();
-  res.json({
+  res.json(redactForDemo({
     ok: true,
     report,
     timestamp: new Date().toISOString(),
     period: 'since-restart' // TODO: Add time windowing with Redis
-  });
+  }, req));
 });
 
 // KILL SWITCH: Ban a token (The "Panic Button")
@@ -2482,9 +2540,10 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error(`[ERROR] ${new Date().toISOString()}`, err);
   
+  const prodLike = config.env === 'production' || config.isProd;
   res.status(err.status || 500).json({
-    error: config.env === 'production' ? 'Internal Server Error' : err.message,
-    ...(config.env !== 'production' && { stack: err.stack })
+    error: prodLike ? 'Internal Server Error' : err.message,
+    ...(!prodLike && { stack: err.stack })
   });
 });
 

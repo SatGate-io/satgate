@@ -14,8 +14,18 @@
 const crypto = require('crypto');
 const https = require('https');
 
-// HTTPS agent that accepts self-signed certificates (required for LND)
-const insecureAgent = new https.Agent({ rejectUnauthorized: false });
+function isLocalhostHostname(hostname) {
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
+}
+
+function shouldAllowInsecureTLSForLnd(hostname) {
+  // SECURITY: default to secure TLS; only allow insecure TLS automatically for localhost.
+  // Can be overridden explicitly with LND_INSECURE_TLS=true|false.
+  const v = process.env.LND_INSECURE_TLS;
+  if (v === 'true') return true;
+  if (v === 'false') return false;
+  return isLocalhostHostname(hostname);
+}
 
 // =============================================================================
 // PROVIDER INTERFACE
@@ -165,8 +175,13 @@ class LndProvider extends LightningProvider {
       private: true  // Include route hints for private channels
     });
     
-    console.log(`[LND] Creating invoice: ${url.toString()} | host=${url.hostname} port=${url.port || 443} path=${url.pathname}`);
-    console.log(`[LND] Macaroon (first 20 chars): ${this.macaroon.substring(0, 20)}...`);
+    // SECURITY: never log macaroons or request bodies. Optional debug logging can be enabled explicitly.
+    const LND_DEBUG = process.env.LND_DEBUG === 'true';
+    if (LND_DEBUG) {
+      console.log(`[LND] Creating invoice: host=${url.hostname} port=${url.port || 443} path=${url.pathname}`);
+    }
+
+    const insecureTLS = shouldAllowInsecureTLSForLnd(url.hostname);
     
     const response = await new Promise((resolve, reject) => {
       const req = https.request({
@@ -179,17 +194,19 @@ class LndProvider extends LightningProvider {
           'Content-Length': Buffer.byteLength(postData),
           'Grpc-Metadata-macaroon': this.macaroon
         },
-        rejectUnauthorized: false // Accept self-signed certs
+        rejectUnauthorized: !insecureTLS
       }, (res) => {
         let data = '';
         res.on('data', chunk => data += chunk);
         res.on('end', () => {
-          console.log(`[LND] Response: status=${res.statusCode} body=${data.substring(0, 200)}`);
+          if (LND_DEBUG) {
+            console.log(`[LND] Response: status=${res.statusCode}`);
+          }
           resolve({ ok: res.statusCode >= 200 && res.statusCode < 300, status: res.statusCode, text: () => Promise.resolve(data), json: () => Promise.resolve(JSON.parse(data)) });
         });
       });
       req.on('error', (err) => {
-        console.error(`[LND] Request error: ${err.message}`);
+        if (LND_DEBUG) console.error(`[LND] Request error: ${err.message}`);
         reject(err);
       });
       req.write(postData);
@@ -213,6 +230,7 @@ class LndProvider extends LightningProvider {
       .replace(/\+/g, '-').replace(/\//g, '_');
     
     const url = new URL(`${this.baseUrl}/v1/invoice/${hashBase64}`);
+    const insecureTLS = shouldAllowInsecureTLSForLnd(url.hostname);
     
     const response = await new Promise((resolve, reject) => {
       const req = https.request({
@@ -221,7 +239,7 @@ class LndProvider extends LightningProvider {
         path: url.pathname,
         method: 'GET',
         headers: { 'Grpc-Metadata-macaroon': this.macaroon },
-        rejectUnauthorized: false
+        rejectUnauthorized: !insecureTLS
       }, (res) => {
         let data = '';
         res.on('data', chunk => data += chunk);
@@ -247,6 +265,7 @@ class LndProvider extends LightningProvider {
     try {
       const url = new URL(`${this.baseUrl}/v1/invoices`);
       const postData = JSON.stringify({ value: '0' });
+      const insecureTLS = shouldAllowInsecureTLSForLnd(url.hostname);
       
       await new Promise((resolve, reject) => {
         const req = https.request({
@@ -259,7 +278,7 @@ class LndProvider extends LightningProvider {
             'Content-Length': Buffer.byteLength(postData),
             'Grpc-Metadata-macaroon': this.macaroon 
           },
-          rejectUnauthorized: false
+          rejectUnauthorized: !insecureTLS
         }, (res) => {
           let data = '';
           res.on('data', chunk => data += chunk);
