@@ -116,10 +116,11 @@ class L402Service {
       m.addFirstPartyCaveat(Buffer.from(`budget_sats = ${budgetSats}`, 'utf8'));
     }
 
-    console.log(`[L402] Exporting macaroon...`);
+    console.log(`[L402] Exporting macaroon (V1 format)...`);
     let macaroonBase64;
     try {
-      const binary = m.exportBinary();
+      // Use V1 format - V2 has overflow bugs with certain data
+      const binary = m._exportBinaryV1();
       console.log(`[L402] Export success, binary length: ${binary.length}`);
       macaroonBase64 = Buffer.from(binary).toString('base64');
     } catch (exportErr) {
