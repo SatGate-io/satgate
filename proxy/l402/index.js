@@ -96,31 +96,30 @@ class L402Service {
       rootKey: keyBytes
     });
 
-    // Add caveats
+    // Add caveats - keep them short and ASCII-safe
     const expiresAt = Date.now() + (ttl * 1000);
-    console.log(`[L402] Adding caveat: payment_hash = ${invoice.paymentHash.substring(0, 20)}...`);
-    m.addFirstPartyCaveat(Buffer.from(`payment_hash = ${invoice.paymentHash}`, 'utf8'));
-    console.log(`[L402] Adding caveat: expires = ${expiresAt}`);
-    m.addFirstPartyCaveat(Buffer.from(`expires = ${expiresAt}`, 'utf8'));
-    console.log(`[L402] Adding caveat: scope = ${scope}`);
-    m.addFirstPartyCaveat(Buffer.from(`scope = ${scope}`, 'utf8'));
-    console.log(`[L402] Adding caveat: tier = ${tier}`);
-    m.addFirstPartyCaveat(Buffer.from(`tier = ${tier}`, 'utf8'));
+    // Use only first 16 chars of payment hash to keep caveat short
+    const shortHash = invoice.paymentHash.substring(0, 16);
     
-    if (maxCalls) {
-      console.log(`[L402] Adding caveat: max_calls = ${maxCalls}`);
-      m.addFirstPartyCaveat(Buffer.from(`max_calls = ${maxCalls}`, 'utf8'));
-    }
-    if (budgetSats) {
-      console.log(`[L402] Adding caveat: budget_sats = ${budgetSats}`);
-      m.addFirstPartyCaveat(Buffer.from(`budget_sats = ${budgetSats}`, 'utf8'));
+    const caveats = [
+      `ph=${shortHash}`,
+      `exp=${expiresAt}`,
+      `scope=${scope}`,
+      `tier=${tier}`
+    ];
+    
+    if (maxCalls) caveats.push(`mc=${maxCalls}`);
+    if (budgetSats) caveats.push(`bs=${budgetSats}`);
+    
+    for (const caveat of caveats) {
+      console.log(`[L402] Adding caveat: ${caveat}`);
+      m.addFirstPartyCaveat(Buffer.from(caveat, 'ascii'));
     }
 
-    console.log(`[L402] Exporting macaroon (V1 format)...`);
+    console.log(`[L402] Exporting macaroon...`);
     let macaroonBase64;
     try {
-      // Use V1 format - V2 has overflow bugs with certain data
-      const binary = m._exportBinaryV1();
+      const binary = m.exportBinary();
       console.log(`[L402] Export success, binary length: ${binary.length}`);
       macaroonBase64 = Buffer.from(binary).toString('base64');
     } catch (exportErr) {
