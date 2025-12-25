@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "express": "4.21.2",
-    "macaroon": "^3.0.4",
     "ioredis": "^5.4.1",
     "ws": "^8.18.0"
   }

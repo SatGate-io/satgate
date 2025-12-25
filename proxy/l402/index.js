@@ -7,26 +7,89 @@
  * - Enforces per-request metering via max_calls and budget_sats
  * - Re-challenges when budget/calls exhausted
  * 
- * L402 Protocol:
- *   1. Client requests paid endpoint
- *   2. Server returns 402 with WWW-Authenticate: L402 macaroon="...", invoice="..."
- *   3. Client pays invoice, receives preimage
- *   4. Client retries with Authorization: LSAT <macaroon>:<preimage>
- *   5. Server validates macaroon signature + preimage + caveats
- *   6. If max_calls/budget_sats exhausted, goto step 2 (re-challenge)
+ * Uses a minimal macaroon implementation to avoid npm library issues.
  */
 
 const crypto = require('crypto');
-const macaroon = require('macaroon');
 const { createLightningProvider } = require('../lightning');
+
+// =============================================================================
+// MINIMAL MACAROON IMPLEMENTATION
+// =============================================================================
+
+/**
+ * Simple macaroon implementation using HMAC-SHA256
+ * Format: base64(JSON({id, location, caveats, signature}))
+ */
+class SimpleMacaroon {
+  constructor(location, identifier, rootKey) {
+    this.location = location;
+    this.identifier = identifier;
+    this.caveats = [];
+    // Initial signature is HMAC of identifier with root key
+    this.signature = this._hmac(rootKey, identifier);
+  }
+
+  _hmac(key, data) {
+    // Key should be 32 bytes for HMAC-SHA256
+    const keyBuf = typeof key === 'string' ? Buffer.from(key, 'utf8') : key;
+    return crypto.createHmac('sha256', keyBuf).update(data).digest('hex');
+  }
+
+  addFirstPartyCaveat(caveat) {
+    this.caveats.push(caveat);
+    // Chain signature: new_sig = HMAC(old_sig, caveat)
+    this.signature = this._hmac(Buffer.from(this.signature, 'hex'), caveat);
+  }
+
+  serialize() {
+    const obj = {
+      v: 1, // version
+      l: this.location,
+      i: this.identifier,
+      c: this.caveats,
+      s: this.signature
+    };
+    return Buffer.from(JSON.stringify(obj)).toString('base64');
+  }
+
+  static deserialize(base64) {
+    try {
+      const json = Buffer.from(base64, 'base64').toString('utf8');
+      const obj = JSON.parse(json);
+      const m = new SimpleMacaroon(obj.l, obj.i, '');
+      m.caveats = obj.c || [];
+      m.signature = obj.s;
+      return m;
+    } catch (e) {
+      throw new Error('Invalid macaroon format: ' + e.message);
+    }
+  }
+
+  /**
+   * Verify the macaroon signature
+   * @param {string} rootKey - The root key used to create the macaroon
+   * @returns {boolean} - True if signature is valid
+   */
+  verify(rootKey) {
+    // Recreate the signature chain
+    let sig = crypto.createHmac('sha256', Buffer.from(rootKey, 'utf8'))
+      .update(this.identifier).digest('hex');
+    
+    for (const caveat of this.caveats) {
+      sig = crypto.createHmac('sha256', Buffer.from(sig, 'hex'))
+        .update(caveat).digest('hex');
+    }
+    
+    return sig === this.signature;
+  }
+}
 
 // =============================================================================
 // L402 CONSTANTS
 // =============================================================================
 
-const L402_VERSION = '0';
 const MACAROON_LOCATION = 'https://satgate.io';
-const MACAROON_IDENTIFIER_PREFIX = 'satgate-l402-v1';
 
 // =============================================================================
 // L402 SERVICE
@@ -66,9 +129,6 @@ class L402Service {
 
   /**
    * Create a new L402 challenge (402 response)
-   * @param {string} tier - The pricing tier (micro, basic, standard, premium)
-   * @param {object} options - Additional options (scope, ttl, maxCalls, budgetSats)
-   * @returns {Promise<{statusCode: number, headers: object, body: object}>}
    */
   async createChallenge(tier = 'basic', options = {}) {
     const price = this.getTierPrice(tier);
@@ -79,54 +139,29 @@ class L402Service {
 
     // Create invoice
     const memo = `SatGate ${tier} access - ${maxCalls ? maxCalls + ' calls' : 'unlimited'} for ${ttl}s`;
-    const invoice = await this.lightning.createInvoice(price, memo, Math.min(ttl, 600)); // Invoice expires in max 10 min
+    const invoice = await this.lightning.createInvoice(price, memo, Math.min(ttl, 600));
 
     // Create macaroon with payment hash caveat
-    const timestamp = Date.now().toString(36); // Base36 timestamp for brevity
-    const hashPrefix = invoice.paymentHash.substring(0, 16); // First 16 chars of hash
+    const timestamp = Date.now().toString(36);
+    const hashPrefix = invoice.paymentHash.substring(0, 16);
     const identifier = `sg:${hashPrefix}:${timestamp}`;
     
-    // Use proper Uint8Array via Buffer.from for macaroon library v3.0.4
-    const keyBytes = new Uint8Array(Buffer.from(this.rootKey.substring(0, 32), 'utf8'));
-    const idBytes = new Uint8Array(Buffer.from(identifier, 'utf8'));
+    console.log(`[L402] Creating macaroon: id=${identifier}`);
     
-    console.log(`[L402] Creating macaroon: id=${identifier} (${idBytes.length} bytes), key=${keyBytes.length} bytes`);
-    
-    let m = macaroon.newMacaroon({
-      identifier: idBytes,
-      location: MACAROON_LOCATION,
-      rootKey: keyBytes
-    });
+    const m = new SimpleMacaroon(MACAROON_LOCATION, identifier, this.rootKey);
 
-    // Add caveats - keep them short and ASCII-safe
+    // Add caveats
     const expiresAt = Date.now() + (ttl * 1000);
-    const shortHash = invoice.paymentHash.substring(0, 16);
     
-    // Add caveats as Uint8Array
-    const addCaveat = (str) => {
-      const bytes = new Uint8Array(Buffer.from(str, 'utf8'));
-      console.log(`[L402] Adding caveat: ${str} (${bytes.length} bytes)`);
-      m.addFirstPartyCaveat(bytes);
-    };
-    
-    addCaveat(`ph=${shortHash}`);
-    addCaveat(`exp=${expiresAt}`);
-    addCaveat(`scope=${scope}`);
-    addCaveat(`tier=${tier}`);
-    if (maxCalls) addCaveat(`mc=${maxCalls}`);
-    if (budgetSats) addCaveat(`bs=${budgetSats}`);
+    m.addFirstPartyCaveat(`ph=${hashPrefix}`);
+    m.addFirstPartyCaveat(`exp=${expiresAt}`);
+    m.addFirstPartyCaveat(`scope=${scope}`);
+    m.addFirstPartyCaveat(`tier=${tier}`);
+    if (maxCalls) m.addFirstPartyCaveat(`mc=${maxCalls}`);
+    if (budgetSats) m.addFirstPartyCaveat(`bs=${budgetSats}`);
 
-    console.log(`[L402] Exporting macaroon...`);
-    let macaroonBase64;
-    try {
-      const binary = m.exportBinary();
-      console.log(`[L402] Export success, binary length: ${binary.length}, type: ${binary.constructor.name}`);
-      // Convert Uint8Array to base64 (Node.js compatible)
-      macaroonBase64 = Buffer.from(binary).toString('base64');
-    } catch (exportErr) {
-      console.error(`[L402] Export failed: ${exportErr.message}`);
-      throw exportErr;
-    }
+    const macaroonBase64 = m.serialize();
+    console.log(`[L402] Macaroon created, length: ${macaroonBase64.length}`);
 
     // Build WWW-Authenticate header (L402 format)
     const wwwAuth = `L402 macaroon="${macaroonBase64}", invoice="${invoice.paymentRequest}"`;
@@ -160,8 +195,6 @@ class L402Service {
 
   /**
    * Parse an LSAT Authorization header
-   * @param {string} authHeader - The Authorization header value
-   * @returns {{macaroon: string, preimage: string} | null}
    */
   parseLSATHeader(authHeader) {
     if (!authHeader) return null;
@@ -178,17 +211,12 @@ class L402Service {
 
   /**
    * Validate an LSAT token
-   * @param {string} macaroonBase64 - The macaroon (base64)
-   * @param {string} preimage - The payment preimage (hex)
-   * @returns {Promise<{valid: boolean, error?: string, caveats?: object, tokenSignature?: string}>}
    */
   async validateLSAT(macaroonBase64, preimage) {
     try {
-      // Decode macaroon
-      const tokenBytes = Buffer.from(macaroonBase64, 'base64');
-      const m = macaroon.importMacaroon(tokenBytes);
+      const m = SimpleMacaroon.deserialize(macaroonBase64);
       
-      // Extract payment hash from caveats
+      // Extract caveats
       let paymentHash = null;
       let expiresAt = null;
       let scope = null;
@@ -196,32 +224,32 @@ class L402Service {
       let maxCalls = null;
       let budgetSats = null;
       
-      const caveats = [];
-      for (const caveat of m._exportAsJSONObjectV2().c || []) {
-        const caveatStr = caveat.i ? Buffer.from(caveat.i, 'base64').toString('utf8') : '';
-        caveats.push(caveatStr);
-        
-        if (caveatStr.startsWith('payment_hash = ')) {
-          paymentHash = caveatStr.split(' = ')[1];
-        } else if (caveatStr.startsWith('expires = ')) {
-          expiresAt = parseInt(caveatStr.split(' = ')[1], 10);
-        } else if (caveatStr.startsWith('scope = ')) {
-          scope = caveatStr.split(' = ')[1];
-        } else if (caveatStr.startsWith('tier = ')) {
-          tier = caveatStr.split(' = ')[1];
-        } else if (caveatStr.startsWith('max_calls = ')) {
-          maxCalls = parseInt(caveatStr.split(' = ')[1], 10);
-        } else if (caveatStr.startsWith('budget_sats = ')) {
-          budgetSats = parseInt(caveatStr.split(' = ')[1], 10);
+      for (const caveat of m.caveats) {
+        if (caveat.startsWith('ph=')) {
+          paymentHash = caveat.substring(3);
+        } else if (caveat.startsWith('exp=')) {
+          expiresAt = parseInt(caveat.substring(4), 10);
+        } else if (caveat.startsWith('scope=')) {
+          scope = caveat.substring(6);
+        } else if (caveat.startsWith('tier=')) {
+          tier = caveat.substring(5);
+        } else if (caveat.startsWith('mc=')) {
+          maxCalls = parseInt(caveat.substring(3), 10);
+        } else if (caveat.startsWith('bs=')) {
+          budgetSats = parseInt(caveat.substring(3), 10);
         }
       }
 
-      // Verify preimage matches payment hash
+      // Verify preimage matches payment hash (partial match since we only store prefix)
       if (!paymentHash) {
         return { valid: false, error: 'Missing payment_hash caveat' };
       }
       
-      if (!this.lightning.verifyPreimage(preimage, paymentHash)) {
+      const preimageHash = crypto.createHash('sha256')
+        .update(Buffer.from(preimage, 'hex'))
+        .digest('hex');
+      
+      if (!preimageHash.startsWith(paymentHash)) {
         return { valid: false, error: 'Invalid preimage' };
       }
 
@@ -231,33 +259,14 @@ class L402Service {
       }
 
       // Verify macaroon signature
-      const keyBytes = Buffer.from(this.rootKey, 'utf8');
-      const checkCaveat = (caveat) => {
-        const caveatStr = typeof caveat === 'string' ? caveat : caveat.toString('utf8');
-        
-        // All our caveats are informational (checked above)
-        // Accept known caveats
-        if (caveatStr.startsWith('payment_hash = ') ||
-            caveatStr.startsWith('expires = ') ||
-            caveatStr.startsWith('scope = ') ||
-            caveatStr.startsWith('tier = ') ||
-            caveatStr.startsWith('max_calls = ') ||
-            caveatStr.startsWith('budget_sats = ')) {
-          return null; // OK
-        }
-        
-        return 'unknown caveat: ' + caveatStr;
-      };
-      
-      m.verify(keyBytes, checkCaveat);
-
-      // Get token signature for metering key
-      const tokenSignature = Buffer.from(m.signature).toString('hex');
+      if (!m.verify(this.rootKey)) {
+        return { valid: false, error: 'Invalid macaroon signature' };
+      }
 
       return {
         valid: true,
-        caveats: { paymentHash, expiresAt, scope, tier, maxCalls, budgetSats, raw: caveats },
-        tokenSignature
+        caveats: { paymentHash, expiresAt, scope, tier, maxCalls, budgetSats, raw: m.caveats },
+        tokenSignature: m.signature
       };
 
     } catch (e) {
@@ -267,14 +276,13 @@ class L402Service {
 
   /**
    * Decrement call counter for a token
-   * @returns {Promise<{remaining: number, exhausted: boolean, backend: string}>}
    */
   async decrementCalls(tokenSignature, maxCalls, expiresAtMs) {
     const now = Date.now();
     const ttlSeconds = expiresAtMs ? Math.max(1, Math.ceil((expiresAtMs - now) / 1000)) : 3600;
 
     if (this.redis) {
-      const key = `satgate:l402:calls:${tokenSignature}`;
+      const key = `satgate:l402:calls:${tokenSignature.substring(0, 32)}`;
       const script = `
         local key = KEYS[1]
         local init = tonumber(ARGV[1])
@@ -294,25 +302,25 @@ class L402Service {
     }
 
     // In-memory fallback
-    const entry = this.callsMemory.get(tokenSignature);
+    const sigKey = tokenSignature.substring(0, 32);
+    const entry = this.callsMemory.get(sigKey);
     if (!entry || (entry.expiresAtMs && entry.expiresAtMs < now)) {
-      this.callsMemory.set(tokenSignature, { remaining: maxCalls, expiresAtMs: expiresAtMs || (now + ttlSeconds * 1000) });
+      this.callsMemory.set(sigKey, { remaining: maxCalls, expiresAtMs: expiresAtMs || (now + ttlSeconds * 1000) });
     }
-    const current = this.callsMemory.get(tokenSignature);
+    const current = this.callsMemory.get(sigKey);
     current.remaining -= 1;
     return { remaining: current.remaining, exhausted: current.remaining < 0, backend: 'memory' };
   }
 
   /**
    * Decrement budget for a token (conditional - won't go negative)
-   * @returns {Promise<{remaining: number, charged: boolean, cost: number, backend: string}>}
    */
   async decrementBudget(tokenSignature, budgetSats, cost, expiresAtMs) {
     const now = Date.now();
     const ttlSeconds = expiresAtMs ? Math.max(1, Math.ceil((expiresAtMs - now) / 1000)) : 3600;
 
     if (this.redis) {
-      const key = `satgate:l402:budget:${tokenSignature}`;
+      const key = `satgate:l402:budget:${tokenSignature.substring(0, 32)}`;
       const script = `
         local key = KEYS[1]
         local init = tonumber(ARGV[1])
@@ -338,11 +346,12 @@ class L402Service {
     }
 
     // In-memory fallback
-    const entry = this.budgetMemory.get(tokenSignature);
+    const sigKey = tokenSignature.substring(0, 32);
+    const entry = this.budgetMemory.get(sigKey);
     if (!entry || (entry.expiresAtMs && entry.expiresAtMs < now)) {
-      this.budgetMemory.set(tokenSignature, { remaining: budgetSats, expiresAtMs: expiresAtMs || (now + ttlSeconds * 1000) });
+      this.budgetMemory.set(sigKey, { remaining: budgetSats, expiresAtMs: expiresAtMs || (now + ttlSeconds * 1000) });
     }
-    const current = this.budgetMemory.get(tokenSignature);
+    const current = this.budgetMemory.get(sigKey);
     if (current.remaining < cost) {
       return { remaining: current.remaining, charged: false, cost, backend: 'memory' };
     }
@@ -357,9 +366,6 @@ class L402Service {
 
 /**
  * Create L402 middleware for Express
- * @param {L402Service} l402Service - The L402 service instance
- * @param {object} options - Middleware options
- * @returns {Function} Express middleware
  */
 function createL402Middleware(l402Service, options = {}) {
   const tier = options.tier || 'basic';
@@ -390,7 +396,6 @@ function createL402Middleware(l402Service, options = {}) {
     const validation = await l402Service.validateLSAT(lsat.macaroon, lsat.preimage);
     
     if (!validation.valid) {
-      // Invalid token - issue new challenge
       console.log(`[L402] Invalid token: ${validation.error}`);
       const challenge = await l402Service.createChallenge(tier, challengeOptions);
       for (const [key, value] of Object.entries(challenge.headers)) {
@@ -423,7 +428,6 @@ function createL402Middleware(l402Service, options = {}) {
       res.setHeader('X-Calls-Remaining', String(Math.max(0, remaining)));
       
       if (exhausted) {
-        // Re-challenge
         console.log(`[L402] Calls exhausted, re-challenging`);
         const challenge = await l402Service.createChallenge(tier, challengeOptions);
         for (const [key, value] of Object.entries(challenge.headers)) {
@@ -447,7 +451,6 @@ function createL402Middleware(l402Service, options = {}) {
       res.setHeader('X-Budget-Cost', String(tierCost));
       
       if (!charged) {
-        // Re-challenge
         console.log(`[L402] Budget exhausted, re-challenging`);
         const challenge = await l402Service.createChallenge(tier, challengeOptions);
         for (const [key, value] of Object.entries(challenge.headers)) {
@@ -493,6 +496,6 @@ function scopeMatches(tokenScope, requiredScope) {
 
 module.exports = {
   L402Service,
-  createL402Middleware
+  createL402Middleware,
+  SimpleMacaroon
 };
-
