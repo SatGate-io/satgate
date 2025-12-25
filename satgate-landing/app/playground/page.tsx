@@ -59,11 +59,19 @@ export default function PlaygroundPage() {
   const [preimageInput, setPreimageInput] = useState('');
   const [copied, setCopied] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const preimageResolverRef = useRef<((value: string) => void) | null>(null);
   
   const copyToClipboard = async (text: string) => {
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+  
+  const submitPreimage = () => {
+    if (preimageInput.length >= 64 && preimageResolverRef.current) {
+      preimageResolverRef.current(preimageInput);
+      preimageResolverRef.current = null;
+    }
   };
 
   const addLog = (msg: string, type: 'info'|'error'|'success'|'warn' = 'info') => {
@@ -173,16 +181,13 @@ export default function PlaygroundPage() {
             // Show invoice panel and wait for preimage
             setShowInvoice({ invoice, macaroon, price: selectedEndpoint.price });
             preimage = await new Promise<string>((resolve, reject) => {
-              const checkInterval = setInterval(() => {
-                if (preimageInput && preimageInput.length >= 64) {
-                  clearInterval(checkInterval);
-                  resolve(preimageInput);
-                }
-              }, 500);
+              preimageResolverRef.current = resolve;
               // Timeout after 10 minutes
               setTimeout(() => {
-                clearInterval(checkInterval);
-                reject(new Error('Payment timeout'));
+                if (preimageResolverRef.current) {
+                  preimageResolverRef.current = null;
+                  reject(new Error('Payment timeout'));
+                }
               }, 600000);
             });
             setShowInvoice(null);
@@ -195,15 +200,12 @@ export default function PlaygroundPage() {
           
           setShowInvoice({ invoice, macaroon, price: selectedEndpoint.price });
           preimage = await new Promise<string>((resolve, reject) => {
-            const checkInterval = setInterval(() => {
-              if (preimageInput && preimageInput.length >= 64) {
-                clearInterval(checkInterval);
-                resolve(preimageInput);
-              }
-            }, 500);
+            preimageResolverRef.current = resolve;
             setTimeout(() => {
-              clearInterval(checkInterval);
-              reject(new Error('Payment timeout'));
+              if (preimageResolverRef.current) {
+                preimageResolverRef.current = null;
+                reject(new Error('Payment timeout'));
+              }
             }, 600000);
           });
           setShowInvoice(null);
@@ -444,11 +446,7 @@ export default function PlaygroundPage() {
                 Cancel
               </button>
               <button 
-                onClick={() => {
-                  if (preimageInput.length >= 64) {
-                    // The useEffect will pick this up
-                  }
-                }}
+                onClick={submitPreimage}
                 disabled={preimageInput.length < 64}
                 className={`flex-1 px-4 py-2 rounded-lg font-bold transition ${
                   preimageInput.length >= 64 
