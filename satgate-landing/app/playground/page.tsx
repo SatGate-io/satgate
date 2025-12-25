@@ -132,20 +132,68 @@ export default function PlaygroundPage() {
       let preimage = "";
 
       if (useRealNetwork) {
-        addLog(`💸 Launching WebLN (Alby) to pay ${selectedEndpoint.price} sats...`, 'info');
-        
-        // @ts-ignore
-        if (typeof window.webln === 'undefined') {
-            throw new Error("WebLN not found. Please install Alby extension.");
+        // Try WebLN first (Alby), fall back to manual payment
+        let webLNAvailable = false;
+        try {
+          // @ts-ignore
+          if (typeof window.webln !== 'undefined') {
+            // @ts-ignore
+            await window.webln.enable();
+            webLNAvailable = true;
+          }
+        } catch (e) {
+          // WebLN enable failed
         }
-        // @ts-ignore
-        await window.webln.enable();
-        // @ts-ignore
-        const payment = await window.webln.sendPayment(invoice);
-        preimage = payment.preimage;
 
-        // Don't display preimages in UI logs (sensitive proof-of-payment material).
-        addLog(`✅ Payment Sent! Preimage received.`, 'success');
+        if (webLNAvailable) {
+          try {
+            addLog(`💸 Launching WebLN (Alby) to pay ${selectedEndpoint.price} sats...`, 'info');
+            // @ts-ignore
+            const payment = await window.webln.sendPayment(invoice);
+            preimage = payment.preimage;
+            addLog(`✅ Payment Sent! Preimage received.`, 'success');
+          } catch (e: any) {
+            if (e.message?.includes('rejected') || e.message?.includes('cancelled')) {
+              throw e; // User cancelled
+            }
+            // WebLN payment failed - show manual option
+            addLog(`⚠️ WebLN payment failed: ${e.message}`, 'warn');
+            addLog(``, 'info');
+            addLog(`📱 Pay manually with any Lightning wallet:`, 'info');
+            addLog(`   Invoice: ${invoice}`, 'info');
+            addLog(``, 'info');
+            addLog(`🔗 Or copy invoice: ${invoice.substring(0, 30)}...`, 'info');
+            
+            // Prompt for manual preimage entry
+            const manualPreimage = prompt(
+              `WebLN payment failed. Pay this invoice with any wallet:\n\n${invoice}\n\nAfter paying, paste the PREIMAGE here:`
+            );
+            
+            if (!manualPreimage) {
+              throw new Error('Payment cancelled - no preimage provided');
+            }
+            preimage = manualPreimage.trim();
+            addLog(`✅ Manual preimage received.`, 'success');
+          }
+        } else {
+          // No WebLN - show invoice for manual payment
+          addLog(`📱 No WebLN wallet detected. Pay manually:`, 'info');
+          addLog(``, 'info');
+          addLog(`⚡ Invoice (${selectedEndpoint.price} sat):`, 'info');
+          addLog(`   ${invoice.substring(0, 40)}...`, 'info');
+          addLog(``, 'info');
+          
+          // Prompt for manual preimage entry
+          const manualPreimage = prompt(
+            `Pay this invoice with any Lightning wallet:\n\n${invoice}\n\nAfter paying, paste the PREIMAGE here:`
+          );
+          
+          if (!manualPreimage) {
+            throw new Error('Payment cancelled - no preimage provided');
+          }
+          preimage = manualPreimage.trim();
+          addLog(`✅ Manual preimage received.`, 'success');
+        }
       } else {
         addLog(`💸 Paying Invoice (${selectedEndpoint.price} sats)...`, 'info');
         await new Promise(r => setTimeout(r, 1500)); 
