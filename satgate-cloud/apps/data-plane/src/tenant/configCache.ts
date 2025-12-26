@@ -64,19 +64,23 @@ export function invalidateConfig(slug: string): void {
 
 /**
  * Fetch config from database
- * TODO: Replace with actual database query
  */
 async function fetchConfigFromDb(slug: string): Promise<{ yaml_content: string; version: string } | null> {
-  // Placeholder - will be replaced with actual Postgres query
-  // 
-  // SELECT cv.yaml_content, cv.id as version
-  // FROM config_versions cv
-  // JOIN projects p ON cv.project_id = p.id
-  // WHERE p.slug = $1 AND cv.is_active = true
+  // Import dynamically to avoid circular dependencies
+  const { query } = await import('../db');
   
-  logger.warn('Using placeholder config fetch', { slug });
+  const result = await query<{ yaml_content: string; version: string }>(
+    `SELECT cv.yaml_content, cv.id::text as version
+     FROM config_versions cv
+     JOIN projects p ON cv.project_id = p.id
+     WHERE p.slug = $1 AND cv.is_active = true`,
+    [slug]
+  );
   
-  // Return null to trigger "not found" for now
-  return null;
+  if (result.rowCount === 0) {
+    return null;
+  }
+  
+  return result.rows[0];
 }
 

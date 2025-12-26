@@ -8,22 +8,48 @@ import express from 'express';
 import { logger } from '@satgate/common';
 import { resolveSlug } from './tenant/resolveSlug';
 import { getConfig, invalidateConfig } from './tenant/configCache';
+import { gatewayMiddleware } from './gateway/middleware';
+import { healthCheck as dbHealthCheck } from './db';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// Internal auth token for control plane webhooks
+const INTERNAL_AUTH_TOKEN = process.env.INTERNAL_AUTH_TOKEN;
+
 // Health check (not tenant-specific)
-app.get('/healthz', (req, res) => {
-  res.json({ status: 'ok', plane: 'data', timestamp: new Date().toISOString() });
+app.get('/healthz', async (req, res) => {
+  const dbOk = await dbHealthCheck();
+  
+  if (!dbOk) {
+    return res.status(503).json({
+      status: 'unhealthy',
+      plane: 'data',
+      db: false,
+    });
+  }
+  
+  res.json({
+    status: 'ok',
+    plane: 'data',
+    db: true,
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // Config invalidation webhook (from control plane)
-app.post('/_internal/invalidate/:slug', async (req, res) => {
-  const { slug } = req.params;
+app.post('/_internal/invalidate/:slug', express.json(), async (req, res) => {
+  // Verify internal auth
+  const authHeader = req.headers.authorization;
   
-  // TODO: Verify internal auth
+  if (INTERNAL_AUTH_TOKEN && authHeader !== `Bearer ${INTERNAL_AUTH_TOKEN}`) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  
+  const { slug } = req.params;
   invalidateConfig(slug);
   
+  logger.info('Config invalidated via webhook', { slug });
   res.json({ ok: true, slug });
 });
 
@@ -56,23 +82,13 @@ app.use(async (req, res, next) => {
   }
 });
 
-// Gateway middleware (TODO: integrate with existing gateway engine)
-app.use((req, res) => {
-  const slug = (req as any).tenantSlug;
-  const config = (req as any).gatewayConfig;
-  
-  // TODO: Route matching + L402 enforcement + proxy
-  res.status(501).json({
-    error: 'Not implemented',
-    message: 'Gateway middleware not yet connected',
-    tenant: slug,
-    routes: config?.routes?.length || 0,
-  });
-});
+// Gateway middleware - route matching, L402 enforcement, proxy
+app.use(gatewayMiddleware);
 
 // Error handler
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  logger.error('Unhandled error', { error: err.message });
+  const tenantSlug = (req as any).tenantSlug || 'unknown';
+  logger.error('Unhandled error', { tenant: tenantSlug, error: err.message });
   res.status(500).json({ error: 'Internal server error' });
 });
 
