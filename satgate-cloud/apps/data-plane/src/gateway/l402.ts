@@ -7,12 +7,13 @@ import { Request, Response } from 'express';
 import { L402Policy } from '@satgate/gateway-config';
 import { SimpleMacaroon, parseCaveats, verifyCaveats, Caveats } from '@satgate/l402-core';
 import { logger } from '@satgate/common';
+import { getLightningProvider, LightningProvider } from '../lightning';
 
 // L402 root key (per-tenant in future, single key for v1)
 const L402_ROOT_KEY = process.env.L402_ROOT_KEY || '';
 
-// Lightning service (placeholder - will integrate with managed Lightning)
-const LIGHTNING_ENABLED = process.env.LIGHTNING_ENABLED === 'true';
+// Lightning provider (initialized lazily)
+let lightningProvider: LightningProvider | null = null;
 
 interface L402Result {
   allowed: boolean;
@@ -150,33 +151,23 @@ async function createChallenge(
     };
   }
   
-  if (!LIGHTNING_ENABLED) {
-    // For v1 without Lightning, return a placeholder challenge
-    return {
-      allowed: false,
-      statusCode: 402,
-      headers: {
-        'WWW-Authenticate': `L402 macaroon="placeholder", invoice="lnbc1..."`,
-        'X-L402-Price': String(policy.priceSats),
-        'X-L402-Tier': policy.tier,
-      },
-      body: {
-        error: 'Payment Required',
-        price: policy.priceSats,
-        tier: policy.tier,
-        message: 'Lightning payments coming soon',
-      },
-    };
-  }
-  
   try {
-    // Generate payment hash
-    const paymentPreimage = crypto.randomBytes(32);
-    const paymentHash = crypto.createHash('sha256').update(paymentPreimage).digest('hex');
+    // Get Lightning provider (lazily initialized)
+    if (!lightningProvider) {
+      lightningProvider = await getLightningProvider();
+    }
     
-    // Create macaroon with caveats
+    // Create invoice first (this gives us the payment hash)
+    const ttlSeconds = policy.ttlSeconds || 3600;
+    const invoice = await lightningProvider.createInvoice({
+      amountSats: policy.priceSats,
+      memo: `SatGate:${tenantSlug}:${policy.tier}`,
+      expirySecs: ttlSeconds,
+    });
+    
+    // Create macaroon with caveats (payment hash from invoice)
     const tokenId = generateTokenId();
-    const expiresAt = Math.floor(Date.now() / 1000) + (policy.ttlSeconds || 3600);
+    const expiresAt = Math.floor(Date.now() / 1000) + ttlSeconds;
     
     const macaroon = new SimpleMacaroon(
       `${tenantSlug}.satgate.cloud`,
@@ -186,7 +177,7 @@ async function createChallenge(
     macaroon.addFirstPartyCaveat(`scope=${policy.scope}`);
     macaroon.addFirstPartyCaveat(`aud=${tenantSlug}.satgate.cloud`);
     macaroon.addFirstPartyCaveat(`exp=${expiresAt}`);
-    macaroon.addFirstPartyCaveat(`ph=${paymentHash}`);
+    macaroon.addFirstPartyCaveat(`ph=${invoice.paymentHash}`);
     
     if (policy.maxCalls) {
       macaroon.addFirstPartyCaveat(`mc=${policy.maxCalls}`);
@@ -195,23 +186,30 @@ async function createChallenge(
       macaroon.addFirstPartyCaveat(`bs=${policy.budgetSats}`);
     }
     
-    // Create invoice (placeholder - will integrate with managed Lightning)
-    const invoice = await createInvoice(policy.priceSats, `${tenantSlug}:${policy.tier}`, paymentHash);
+    logger.info('L402 challenge created', {
+      tenant: tenantSlug,
+      tier: policy.tier,
+      price: policy.priceSats,
+      provider: lightningProvider.name,
+    });
     
     return {
       allowed: false,
       statusCode: 402,
       headers: {
-        'WWW-Authenticate': `L402 macaroon="${macaroon.serialize()}", invoice="${invoice}"`,
+        'WWW-Authenticate': `L402 macaroon="${macaroon.serialize()}", invoice="${invoice.paymentRequest}"`,
         'X-L402-Price': String(policy.priceSats),
         'X-L402-Tier': policy.tier,
+        'X-L402-Expires': String(expiresAt),
         'Cache-Control': 'no-store',
       },
       body: {
         error: 'Payment Required',
         price: policy.priceSats,
         tier: policy.tier,
-        invoice,
+        invoice: invoice.paymentRequest,
+        paymentHash: invoice.paymentHash,
+        expiresAt,
       },
     };
   } catch (err) {
@@ -232,9 +230,21 @@ function generateTokenId(): string {
 }
 
 /**
- * Create Lightning invoice (placeholder)
+ * Verify payment was made (optional server-side verification)
+ * This is used to verify payment if we want to check with the Lightning node
+ * instead of just trusting the preimage.
  */
-async function createInvoice(amountSats: number, memo: string, paymentHash: string): Promise<string> {
-  // TODO: Integrate with managed Lightning (phoenixd)
-  return `lnbc${amountSats}n1placeholder`;
+export async function verifyPayment(paymentHash: string): Promise<{
+  paid: boolean;
+  preimage?: string;
+}> {
+  if (!lightningProvider) {
+    lightningProvider = await getLightningProvider();
+  }
+  
+  const status = await lightningProvider.getInvoiceStatus(paymentHash);
+  return {
+    paid: status.paid,
+    preimage: status.preimage,
+  };
 }

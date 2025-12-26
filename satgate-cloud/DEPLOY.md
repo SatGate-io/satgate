@@ -160,14 +160,61 @@ curl -i https://test-api-abc123.satgate.cloud/api/test
 | `SECRETS_ENCRYPTION_KEY` | ✓ | Same as control plane |
 | `INTERNAL_AUTH_TOKEN` | ✓ | Token for /_internal endpoints |
 | `L402_ROOT_KEY` | ✓ | Root key for macaroon signing |
-| `LIGHTNING_ENABLED` | | Set to "true" when Lightning ready |
-| `PHOENIXD_URL` | | phoenixd REST URL |
-| `PHOENIXD_PASSWORD` | | phoenixd auth |
+| `LIGHTNING_ENABLED` | | Set to "true" for real Lightning |
+| `LIGHTNING_BACKEND` | | `phoenixd` or `mock` (default: mock) |
+| `PHOENIXD_URL` | | phoenixd REST URL (e.g., http://localhost:9740) |
+| `PHOENIXD_PASSWORD` | | phoenixd HTTP auth password |
 
 ### Dashboard
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `NEXT_PUBLIC_API_URL` | ✓ | Control plane API URL |
+
+## Lightning Configuration
+
+SatGate Cloud supports multiple Lightning providers:
+
+### Mock (default)
+For testing without real payments:
+```bash
+# No additional config needed (default)
+LIGHTNING_ENABLED=false
+```
+
+### phoenixd (recommended for production)
+[phoenixd](https://phoenix.acinq.co/server) is a lightweight Lightning node by ACINQ:
+
+```bash
+# Install phoenixd
+curl -sSL https://phoenix.acinq.co/server/install.sh | sh
+
+# Start phoenixd
+phoenixd
+
+# Configure data plane
+fly secrets set \
+  LIGHTNING_ENABLED=true \
+  LIGHTNING_BACKEND=phoenixd \
+  PHOENIXD_URL=http://your-phoenixd-host:9740 \
+  PHOENIXD_PASSWORD=your-password \
+  -a satgate-cloud-data
+```
+
+phoenixd creates invoices at `/createinvoice` and reports payment status at `/getincomingpayment`.
+
+### Testing Payments
+
+With mock provider, you can test the L402 flow:
+1. Request → 402 Payment Required (with fake invoice)
+2. Client "pays" by computing preimage for the payment hash
+3. Client retries with `Authorization: L402 <macaroon>:<preimage>`
+4. Request succeeds
+
+With real Lightning:
+1. Request → 402 Payment Required (with real BOLT11 invoice)
+2. Client pays via Lightning wallet
+3. Client retries with the preimage from payment
+4. Request succeeds
 
 ## Scaling
 
