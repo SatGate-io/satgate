@@ -15,12 +15,14 @@
     "@satgate/common": "workspace:*",
     "express": "^4.18.2",
     "pg": "^8.11.3",
-    "cookie": "^0.6.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
     "nodemailer": "^6.9.7"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
-    "@types/cookie": "^0.6.0",
+    "@types/cookie-parser": "^1.4.6",
+    "@types/cors": "^2.8.17",
     "@types/nodemailer": "^6.4.14",
     "@types/pg": "^8.10.9",
     "tsx": "^4.7.0",

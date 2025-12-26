@@ -12,11 +12,13 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE TABLE tenants (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   email TEXT UNIQUE NOT NULL,
+  slug TEXT UNIQUE NOT NULL,  -- e.g., "acme-abc123"
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX idx_tenants_email ON tenants(email);
+CREATE INDEX idx_tenants_slug ON tenants(slug);
 
 -- =============================================================================
 -- AUTH CODES (Magic Link)
@@ -76,6 +78,7 @@ ALTER TABLE projects ADD CONSTRAINT chk_slug_format
 CREATE TABLE config_versions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  version INTEGER NOT NULL DEFAULT 1,
   yaml_content TEXT NOT NULL,
   route_summary JSONB,  -- cached: [{name, path, tier, price}]
   is_active BOOLEAN NOT NULL DEFAULT false,

@@ -60,3 +60,6 @@ export class ForbiddenError extends SatGateError {
   }
 }
 
+// Alias for common use
+export const AuthError = UnauthorizedError;
+

@@ -57,7 +57,7 @@ export function generateTextSummary(config: GatewayConfig): string {
     const policy = route.policy || {};
     const path = match.exactPath || match.pathPrefix || '*';
     
-    let policyStr = policy.kind || 'unknown';
+    let policyStr: string = policy.kind || 'unknown';
     if (policy.kind === 'l402') {
       const l402 = policy as any;
       policyStr = `l402 (${l402.priceSats} sats, tier: ${l402.tier})`;

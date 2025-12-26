@@ -12,11 +12,20 @@ export interface LoadOptions {
   skipCloudPolicy?: boolean;
 }
 
+export type ParseResult = 
+  | { success: true; data: unknown }
+  | { success: false; error: string };
+
 /**
  * Parse YAML string to config object
  */
-export function parseYaml(yamlContent: string): unknown {
-  return yaml.load(yamlContent);
+export function parseYaml(yamlContent: string): ParseResult {
+  try {
+    const data = yaml.load(yamlContent);
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: (err as Error).message };
+  }
 }
 
 /**
@@ -24,7 +33,13 @@ export function parseYaml(yamlContent: string): unknown {
  */
 export function loadConfig(yamlContent: string, options: LoadOptions = {}): GatewayConfig {
   // Parse YAML
-  const raw = parseYaml(yamlContent);
+  const parseResult = parseYaml(yamlContent);
+  
+  if (!parseResult.success) {
+    throw new Error(`YAML parse error: ${parseResult.error}`);
+  }
+  
+  const raw = parseResult.data;
   
   if (!raw || typeof raw !== 'object') {
     throw new Error('Invalid config: must be a YAML object');
