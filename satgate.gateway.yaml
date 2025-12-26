@@ -86,12 +86,13 @@ metering:
 #   - timeoutMs: Per-upstream timeout override
 
 upstreams:
-  # Example: Your backend API
-  customer_api:
-    url: "http://10.0.2.10:8080"
+  # Test backend using httpbin (public echo service)
+  # Replace with your actual backend URL for production
+  test_api:
+    url: "https://httpbin.org"
     passHostHeader: false
     addHeaders:
-      X-SatGate-Upstream: "customer_api"
+      X-SatGate-Upstream: "test_api"
     allowRequestHeaders:
       - "content-type"
       - "authorization"
@@ -103,9 +104,9 @@ upstreams:
       - "x-admin-token"
       - "x-satgate-admin-token"
 
-  # Example: Health check backend (different service)
+  # Health check - uses httpbin's status endpoint
   health_backend:
-    url: "http://10.0.2.10:8080"
+    url: "https://httpbin.org"
     timeoutMs: 5000
 
 # =============================================================================
@@ -136,12 +137,15 @@ routes:
       kind: "deny"
       status: 404
 
-  # Premium tier: 1000 sats
+  # Note: Use /healthz for health checks (built into gateway, no upstream needed)
+  # The data plane responds to /healthz directly without proxying
+
+  # Premium tier: 1000 sats - proxies to httpbin/anything
   - name: "premium"
     match:
       pathPrefix: "/v1/premium/"
       methods: ["GET", "POST"]
-    upstream: "customer_api"
+    upstream: "test_api"
     policy:
       kind: "l402"
       tier: "premium"
@@ -155,7 +159,7 @@ routes:
     match:
       pathPrefix: "/v1/standard/"
       methods: ["GET", "POST"]
-    upstream: "customer_api"
+    upstream: "test_api"
     policy:
       kind: "l402"
       tier: "standard"
@@ -167,7 +171,7 @@ routes:
     match:
       pathPrefix: "/v1/basic/"
       methods: ["GET", "POST"]
-    upstream: "customer_api"
+    upstream: "test_api"
     policy:
       kind: "l402"
       tier: "basic"
@@ -179,7 +183,7 @@ routes:
     match:
       pathPrefix: "/v1/micro/"
       methods: ["GET", "POST"]
-    upstream: "customer_api"
+    upstream: "test_api"
     policy:
       kind: "l402"
       tier: "micro"
@@ -191,20 +195,11 @@ routes:
     match:
       pathPrefix: "/v1/capability/"
       methods: ["GET", "POST"]
-    upstream: "customer_api"
+    upstream: "test_api"
     policy:
       kind: "capability"
       scope: "api:capability:*"
       maxCalls: 100
-
-  # Health check (public, no auth)
-  - name: "health"
-    match:
-      exactPath: "/health"
-      methods: ["GET"]
-    upstream: "health_backend"
-    policy:
-      kind: "public"
 
   # Catch-all: deny by default (fail-closed)
   - name: "default-deny"
