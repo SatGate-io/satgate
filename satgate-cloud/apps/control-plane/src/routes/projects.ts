@@ -274,6 +274,9 @@ router.post('/:slug/config', async (req: Request, res: Response) => {
       version: result.version,
     });
     
+    // Invalidate data plane cache
+    await invalidateDataPlaneCache(slug);
+    
     return res.status(201).json({
       config: {
         id: result.id,
@@ -370,6 +373,46 @@ router.post('/:slug/config/validate', async (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+/**
+ * Invalidate data plane cache for a project
+ * Called after config upload to ensure immediate propagation
+ */
+async function invalidateDataPlaneCache(slug: string): Promise<void> {
+  const dataPlaneUrl = process.env.DATA_PLANE_URL;
+  const internalToken = process.env.DATA_PLANE_INTERNAL_TOKEN;
+  
+  if (!dataPlaneUrl) {
+    logger.debug('DATA_PLANE_URL not set, skipping cache invalidation');
+    return;
+  }
+  
+  try {
+    const res = await fetch(`${dataPlaneUrl}/_internal/invalidate/${slug}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(internalToken ? { 'Authorization': `Bearer ${internalToken}` } : {}),
+      },
+    });
+    
+    if (!res.ok) {
+      logger.warn('Data plane invalidation failed', { 
+        slug, 
+        status: res.status,
+        body: await res.text().catch(() => ''),
+      });
+    } else {
+      logger.debug('Data plane cache invalidated', { slug });
+    }
+  } catch (err) {
+    // Non-fatal: cache will refresh on TTL
+    logger.warn('Data plane invalidation error', { 
+      slug, 
+      error: (err as Error).message 
+    });
+  }
+}
 
 export default router;
 

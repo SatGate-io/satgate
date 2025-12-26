@@ -1,0 +1,43 @@
+# SatGate Cloud - Data Plane
+# Multi-tenant L402 gateway
+
+app = "satgate-cloud-data"
+primary_region = "ord"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type = "requests"
+    hard_limit = 1000
+    soft_limit = 800
+
+[[http_service.checks]]
+  grace_period = "10s"
+  interval = "30s"
+  method = "GET"
+  path = "/healthz"
+  timeout = "5s"
+
+# Required secrets (set via `fly secrets set`):
+# DATABASE_URL - Postgres connection string
+# SECRETS_ENCRYPTION_KEY - 32+ character key (same as control plane)
+# INTERNAL_AUTH_TOKEN - Token for /_internal/* endpoints
+# L402_ROOT_KEY - Root key for macaroon signing
+#
+# For real Lightning (when ready):
+# LIGHTNING_ENABLED=true
+# PHOENIXD_URL - phoenixd REST URL
+# PHOENIXD_PASSWORD - phoenixd auth
+

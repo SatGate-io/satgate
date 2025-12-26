@@ -1,0 +1,40 @@
+# SatGate Cloud - Control Plane
+# API for auth, projects, config, and secrets
+
+app = "satgate-cloud-control"
+primary_region = "ord"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "3000"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type = "requests"
+    hard_limit = 250
+    soft_limit = 200
+
+[[http_service.checks]]
+  grace_period = "10s"
+  interval = "30s"
+  method = "GET"
+  path = "/healthz"
+  timeout = "5s"
+
+# Required secrets (set via `fly secrets set`):
+# DATABASE_URL - Postgres connection string
+# SECRETS_ENCRYPTION_KEY - 32+ character key for encrypting project secrets
+# DATA_PLANE_URL - URL of data plane for cache invalidation
+# DATA_PLANE_INTERNAL_TOKEN - Token for authenticating to data plane
+# SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS - For magic link emails
+# APP_URL - Dashboard URL for magic link (e.g., https://cloud.satgate.io)
+
