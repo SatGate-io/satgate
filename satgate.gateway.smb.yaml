@@ -78,6 +78,11 @@ upstreams:
     addHeaders:
       X-Gateway: "satgate"
       X-Forwarded-By: "satgate-gateway"
+      # ─────────────────────────────────────────────────────────────
+      # UPSTREAM AUTH: If your API requires authentication, add here
+      # ─────────────────────────────────────────────────────────────
+      # X-API-Key: "${API_KEY}"                    # API key header
+      # Authorization: "Bearer ${UPSTREAM_TOKEN}" # Bearer token
     # Headers to BLOCK (never forward to upstream)
     denyRequestHeaders:
       - "x-admin-token"

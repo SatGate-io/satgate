@@ -24,9 +24,9 @@ This guide describes the **SMB/Startup-first** onboarding path: connect your exi
 **What SatGate handles:**
 - L402 invoice issuance + validation
 - Per-request metering (`maxCalls`, `budgetSats`)
-- Lightning payment processing (managed node)
+- Lightning payment processing (SatGate Cloud: managed node; self-hosted: your node)
 - Request proxying to your upstream
-- Analytics + revenue dashboard
+- Analytics + revenue dashboard (SatGate Cloud)
 
 **What you provide:**
 - A publicly reachable API endpoint (your upstream)
@@ -49,10 +49,7 @@ This guide describes the **SMB/Startup-first** onboarding path: connect your exi
 Start with the SMB starter template:
 
 ```bash
-# Download the SMB-optimized config
-curl -O https://raw.githubusercontent.com/SatGate-io/satgate/main/satgate.gateway.smb.yaml
-
-# Or copy from the repo
+# Copy from this repo
 cp satgate.gateway.smb.yaml my-gateway.yaml
 ```
 
@@ -98,11 +95,29 @@ routes:
       status: 403
 ```
 
+### Upstream Authentication (If Your API Requires It)
+
+Most APIs require an API key or Bearer token. Add it to `addHeaders`:
+
+```yaml
+upstreams:
+  my_api:
+    url: "https://api.yourcompany.com"
+    addHeaders:
+      # Option 1: API Key header
+      X-API-Key: "${API_KEY}"
+      
+      # Option 2: Bearer token
+      # Authorization: "Bearer ${UPSTREAM_TOKEN}"
+```
+
+> 💡 **Tip:** Use environment variable references (`${VAR}`) for secrets instead of hardcoding them in the config file.
+
 ---
 
 ## Step 2: Test Locally (Optional)
 
-Before deploying to SatGate Cloud, you can test locally:
+Before deploying, you can test locally:
 
 ```bash
 # Set environment
@@ -111,7 +126,11 @@ export MODE=demo
 export LIGHTNING_BACKEND=mock  # No real payments in test
 export L402_ROOT_KEY=test-key-for-local-dev-only
 
-# Run gateway
+# Point SatGate at your config (choose ONE option)
+export SATGATE_GATEWAY_CONFIG=./my-gateway.yaml
+# OR: cp my-gateway.yaml satgate.gateway.yaml
+
+# Run the gateway
 node proxy/server.js
 ```
 
@@ -134,26 +153,31 @@ curl -i http://localhost:8080/unknown
 
 ### Option A: Hosted Gateway (Recommended for SMB)
 
-1. **Sign up** at `https://cloud.satgate.io` (coming soon)
-2. **Upload your config** (or paste YAML in dashboard)
-3. **Get your gateway URL**: `https://your-project.satgate.cloud`
-4. **Update your DNS** (optional): CNAME `api.yourcompany.com` → `your-project.satgate.cloud`
+> **Coming soon:** SatGate Cloud (hosted gateway + managed Lightning).  
+> Until then, use **Option B: Self-Hosted** with the same config model.
+
+When SatGate Cloud is available:
+1. **Upload your config** (or paste YAML in dashboard)
+2. **Get your gateway URL** (example): `https://your-project.satgate.cloud`
+3. **Update your DNS** (optional): CNAME `api.yourcompany.com` → `your-project.satgate.cloud`
 
 ### Option B: Self-Hosted (Railway/Fly/Docker)
 
-Deploy to Railway with one click:
-
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/satgate)
-
-Or manually:
+Deploy on your platform of choice (Railway/Fly/Docker) using the same config + env vars.
 
 ```bash
 # Set production environment
 SATGATE_RUNTIME=gateway
 MODE=prod
-LIGHTNING_BACKEND=lnd
-LND_REST_URL=https://your-lnd-node:8080
-LND_MACAROON=<base64-macaroon>
+# Lightning backend (recommended for SMB self-host): phoenixd
+LIGHTNING_BACKEND=phoenixd
+PHOENIXD_URL=http://localhost:9740
+PHOENIXD_PASSWORD=<phoenixd-password>
+
+# Or Lightning backend: LND
+# LIGHTNING_BACKEND=lnd
+# LND_REST_URL=https://your-lnd-node:8080
+# LND_MACAROON=<base64-macaroon>
 L402_ROOT_KEY=<32-char-random-key>
 PRICING_ADMIN_TOKEN=<32-char-random-key>
 ```
@@ -162,24 +186,28 @@ PRICING_ADMIN_TOKEN=<32-char-random-key>
 
 ## Step 4: Verify Your Gateway
 
+> Replace `<your-gateway-host>` with your actual gateway URL:
+> - **Self-hosted:** Your Railway/Fly/Docker URL (e.g., `my-gateway.up.railway.app`)
+> - **SatGate Cloud:** Provided when Cloud launches (e.g., `your-project.satgate.cloud`)
+
 ### Test 1: Health Check
 
 ```bash
-curl https://your-gateway.satgate.cloud/healthz
+curl https://<your-gateway-host>/healthz
 # Expected: {"status":"ok","plane":"data",...}
 ```
 
 ### Test 2: L402 Challenge
 
 ```bash
-curl -i https://your-gateway.satgate.cloud/v1/premium/test
+curl -i https://<your-gateway-host>/v1/premium/test
 # Expected: HTTP 402 + WWW-Authenticate: L402 macaroon="...", invoice="lnbc..."
 ```
 
 ### Test 3: Fail-Closed
 
 ```bash
-curl -i https://your-gateway.satgate.cloud/unknown
+curl -i https://<your-gateway-host>/unknown
 # Expected: HTTP 403 + {"error":"Forbidden","route":"default-deny"}
 ```
 
@@ -195,7 +223,7 @@ PREIMAGE="abc123..."
 # Retry with LSAT token
 MACAROON="eyJ..."
 curl -H "Authorization: LSAT ${MACAROON}:${PREIMAGE}" \
-  https://your-gateway.satgate.cloud/v1/premium/test
+  https://<your-gateway-host>/v1/premium/test
 # Expected: HTTP 200 + response from your upstream API
 ```
 
@@ -205,11 +233,13 @@ curl -H "Authorization: LSAT ${MACAROON}:${PREIMAGE}" \
 
 ### DNS Setup (Optional but Recommended)
 
-Point your API subdomain to the SatGate gateway:
+Point your API subdomain to your SatGate gateway:
 
 ```
-api.yourcompany.com  CNAME  your-project.satgate.cloud
+api.yourcompany.com  CNAME  <your-gateway-host>
 ```
+
+> **Example:** `api.yourcompany.com CNAME my-gateway.up.railway.app`
 
 ### Announce to Your Users
 
@@ -244,9 +274,9 @@ Your API now requires Lightning payment. Provide users with:
 
 ### What's Included (v1)
 
-- ✅ Hosted gateway endpoint
-- ✅ Managed Lightning (no node setup)
-- ✅ Metering + basic analytics
+- ✅ Hosted gateway endpoint (SatGate Cloud)
+- ✅ Managed Lightning (SatGate Cloud)
+- ✅ Metering + basic analytics (SatGate Cloud)
 - ✅ Route/pricing configuration
 - ✅ API keys + rotation
 
@@ -257,7 +287,7 @@ Your API now requires Lightning payment. Provide users with:
 - ❌ Custom domains (use CNAME)
 - ❌ Multi-region (single region in v1)
 
-> 💡 Need enterprise features? Contact sales@satgate.io for "SatGate Operate" (managed deployment in your infra).
+> 💡 Need enterprise features? Contact sales@satgate.io for **SatGate Operate** (managed deployment in your infra).
 
 ---
 
