@@ -105,13 +105,14 @@ upstreams:
     url: "https://api.yourcompany.com"
     addHeaders:
       # Option 1: API Key header
-      X-API-Key: "${API_KEY}"
+      X-API-Key: "<YOUR_API_KEY>"
       
       # Option 2: Bearer token
-      # Authorization: "Bearer ${UPSTREAM_TOKEN}"
+      # Authorization: "Bearer <YOUR_UPSTREAM_TOKEN>"
 ```
 
-> 💡 **Tip:** Use environment variable references (`${VAR}`) for secrets instead of hardcoding them in the config file.
+> 💡 **Tip (important):** SatGate Gateway does **not** interpolate `${VAR}` inside YAML today—`addHeaders` values are treated as **literal strings**.  
+> If you want env-based secrets, render your YAML at deploy time (e.g., CI templating) or inject them via your platform’s secret/template mechanism.
 
 ---
 

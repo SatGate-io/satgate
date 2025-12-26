@@ -46,12 +46,17 @@ SATGATE_RUNTIME=gateway node proxy/server.js
 ```
 
 **Resources:**
-- 📄 **Onboarding Guide:** `docs/gateway/SMB_ONBOARDING.md`
+- 🚀 **Deploy Guide:** [`DEPLOY_SELF_HOSTED.md`](./DEPLOY_SELF_HOSTED.md) — Railway, Fly, Docker
+- ✅ **First Success:** [`FIRST_SUCCESS_DEMO.md`](./FIRST_SUCCESS_DEMO.md) — Verify your gateway works
+- 📄 **Onboarding:** [`SMB_ONBOARDING.md`](./SMB_ONBOARDING.md) — Full walkthrough
+- 🔐 **Upstream Auth:** [`UPSTREAM_AUTH_PATTERNS.md`](./UPSTREAM_AUTH_PATTERNS.md) — API keys, tokens, templating
 - 📋 **Starter Config:** `satgate.gateway.smb.yaml`
-- 📚 **Full Reference:** `satgate.gateway.yaml`
+- 🛠️ **Validate Config:** `node cli/validate-gateway-config.js <path>`
 
 **Example config:**
 ```yaml
+version: 1
+
 upstreams:
   my_api:
     url: "https://api.yourcompany.com"  # Your API
@@ -64,6 +69,8 @@ routes:
     policy:
       kind: "l402"
       priceSats: 100
+      tier: "premium"
+      scope: "api:premium:*"
 
   - name: "basic"
     match:
@@ -72,12 +79,15 @@ routes:
     policy:
       kind: "l402"
       priceSats: 10
+      tier: "basic"
+      scope: "api:basic:*"
 
   - name: "default-deny"
     match:
       pathPrefix: "/"
     policy:
       kind: "deny"
+      status: 403
 ```
 
 ### Railway note (two services)

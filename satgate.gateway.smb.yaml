@@ -81,8 +81,11 @@ upstreams:
       # ─────────────────────────────────────────────────────────────
       # UPSTREAM AUTH: If your API requires authentication, add here
       # ─────────────────────────────────────────────────────────────
-      # X-API-Key: "${API_KEY}"                    # API key header
-      # Authorization: "Bearer ${UPSTREAM_TOKEN}" # Bearer token
+      # NOTE: The gateway does NOT interpolate ${VARS} in YAML today.
+      # If you want env-based secrets, render this YAML at deploy time (CI templating),
+      # or set literal values here.
+      # X-API-Key: "<YOUR_API_KEY>"                    # API key header
+      # Authorization: "Bearer <YOUR_UPSTREAM_TOKEN>" # Bearer token
     # Headers to BLOCK (never forward to upstream)
     denyRequestHeaders:
       - "x-admin-token"

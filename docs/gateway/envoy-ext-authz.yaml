@@ -73,7 +73,10 @@ static_resources:
                       # Use HTTP service (not gRPC)
                       http_service:
                         server_uri:
-                          uri: satgate_auth:9090
+                          # NOTE: Must include scheme for Envoy HTTP service URIs.
+                          # If Envoy is running as a sidecar on the same host as SatGate, use 127.0.0.1.
+                          # If Envoy runs elsewhere (K8s), point at the SatGate admin-plane Service DNS.
+                          uri: "http://127.0.0.1:9090"
                           cluster: satgate_auth_cluster
                           timeout: 5s
                         
