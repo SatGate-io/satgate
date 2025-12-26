@@ -2,12 +2,30 @@
  * Gateway middleware - ties together routing, L402, and proxy
  */
 
+import * as crypto from 'crypto';
 import { Request, Response, NextFunction } from 'express';
 import { GatewayConfig } from '@satgate/gateway-config';
 import { logger } from '@satgate/common';
 import { matchRoute } from './router';
 import { enforceL402 } from './l402';
 import { proxyRequest } from './proxy';
+import { logUsageEvent, EventType } from '../usage/events';
+
+/**
+ * Extended request with tenant context
+ */
+interface TenantRequest extends Request {
+  tenantSlug: string;
+  gatewayConfig: GatewayConfig;
+  projectId: string;
+}
+
+/**
+ * Generate a request ID
+ */
+function generateRequestId(): string {
+  return `${Date.now().toString(36)}-${crypto.randomBytes(4).toString('hex')}`;
+}
 
 /**
  * Gateway middleware for Cloud data plane
@@ -17,14 +35,15 @@ export async function gatewayMiddleware(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const tenantSlug = (req as any).tenantSlug as string;
-  const config = (req as any).gatewayConfig as GatewayConfig;
+  const tenantReq = req as unknown as TenantRequest;
+  const { tenantSlug, gatewayConfig: config, projectId } = tenantReq;
   
   if (!tenantSlug || !config) {
     res.status(500).json({ error: 'Missing tenant context' });
     return;
   }
   
+  const requestId = generateRequestId();
   const path = req.path || '/';
   const method = req.method;
   
@@ -33,6 +52,14 @@ export async function gatewayMiddleware(
   
   if (!route) {
     // No matching route - default deny (fail-closed)
+    if (projectId) {
+      logUsageEvent({
+        projectId,
+        routeName: '__no_match__',
+        eventType: 'denied',
+        requestId,
+      });
+    }
     res.status(403).json({
       error: 'Forbidden',
       message: 'No matching route',
@@ -46,11 +73,27 @@ export async function gatewayMiddleware(
   switch (policy.kind) {
     case 'public':
       // No auth required - proxy directly
+      if (projectId) {
+        logUsageEvent({
+          projectId,
+          routeName: route.name,
+          eventType: 'allowed',
+          requestId,
+        });
+      }
       await proxyRequest(req, res, config, route, tenantSlug);
       break;
       
     case 'deny':
       // Explicit deny
+      if (projectId) {
+        logUsageEvent({
+          projectId,
+          routeName: route.name,
+          eventType: 'denied',
+          requestId,
+        });
+      }
       res.status(policy.status || 403).json({
         error: 'Forbidden',
         message: 'Access denied',
@@ -63,7 +106,15 @@ export async function gatewayMiddleware(
       
       if (result.allowed) {
         // Log successful L402 access
-        logUsageEvent(tenantSlug, route.name, 'allowed', policy.priceSats);
+        if (projectId) {
+          logUsageEvent({
+            projectId,
+            routeName: route.name,
+            eventType: 'allowed',
+            priceSats: policy.priceSats,
+            requestId,
+          });
+        }
         
         // Attach token info for metering
         (req as any).l402TokenId = result.tokenId;
@@ -72,8 +123,14 @@ export async function gatewayMiddleware(
         await proxyRequest(req, res, config, route, tenantSlug);
       } else {
         // Send challenge or error
-        if (result.statusCode === 402) {
-          logUsageEvent(tenantSlug, route.name, 'challenge', policy.priceSats);
+        if (projectId) {
+          logUsageEvent({
+            projectId,
+            routeName: route.name,
+            eventType: result.statusCode === 402 ? 'challenge' : 'denied',
+            priceSats: result.statusCode === 402 ? policy.priceSats : undefined,
+            requestId,
+          });
         }
         
         if (result.headers) {
@@ -102,23 +159,3 @@ export async function gatewayMiddleware(
       });
   }
 }
-
-/**
- * Log a usage event
- */
-function logUsageEvent(
-  tenantSlug: string,
-  routeName: string,
-  eventType: 'challenge' | 'paid' | 'allowed' | 'denied',
-  priceSats?: number
-): void {
-  // For v1, just log to console
-  // TODO: Write to usage_events table
-  logger.debug('Usage event', {
-    tenant: tenantSlug,
-    route: routeName,
-    event: eventType,
-    price: priceSats,
-  });
-}
-

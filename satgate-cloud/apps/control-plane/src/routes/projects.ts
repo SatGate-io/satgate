@@ -6,7 +6,7 @@ import { Router, Request, Response, IRouter } from 'express';
 import * as crypto from 'crypto';
 import { query, transaction } from '../db';
 import { requireAuth, AuthenticatedRequest } from '../auth';
-import { validateConfig, normalizeConfig, printSummary } from '@satgate/gateway-config';
+import { validateConfig, normalizeConfig, printSummary, validateCloudPolicy } from '@satgate/gateway-config';
 import { logger, ValidationError } from '@satgate/common';
 
 const router: IRouter = Router();
@@ -105,7 +105,8 @@ router.post('/', async (req: Request, res: Response) => {
         id: project.id,
         slug: project.slug,
         name: project.name,
-        host: `${authReq.tenant.slug}-${slug}.satgate.cloud`,
+        // Data plane resolves host as: <project.slug>.satgate.cloud
+        host: `${project.slug}.satgate.cloud`,
         createdAt: project.created_at,
       },
     });
@@ -144,7 +145,7 @@ router.get('/:slug', async (req: Request, res: Response) => {
         id: row.id,
         slug: row.slug,
         name: row.name,
-        host: `${authReq.tenant.slug}-${row.slug}.satgate.cloud`,
+        host: `${row.slug}.satgate.cloud`,
         activeConfig: row.config_id ? {
           id: row.config_id,
           version: row.version,
@@ -226,8 +227,9 @@ router.post('/:slug/config', async (req: Request, res: Response) => {
       });
     }
     
-    // Cloud-specific validation
-    const cloudValidation = validateCloudConfig(validation.config!);
+    // Cloud policy validation (schema-valid + Cloud guardrails)
+    const normalizedForPolicy = normalizeConfig(validation.config!);
+    const cloudValidation = validateCloudPolicy(normalizedForPolicy);
     if (!cloudValidation.valid) {
       return res.status(400).json({
         error: 'Configuration not allowed for Cloud',
@@ -346,7 +348,8 @@ router.post('/:slug/config/validate', async (req: Request, res: Response) => {
     }
     
     // Cloud policy validation
-    const cloudValidation = validateCloudConfig(validation.config!);
+    const normalizedForPolicy = normalizeConfig(validation.config!);
+    const cloudValidation = validateCloudPolicy(normalizedForPolicy);
     if (!cloudValidation.valid) {
       return res.json({
         valid: false,
@@ -367,50 +370,6 @@ router.post('/:slug/config/validate', async (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-/**
- * Cloud-specific config validation
- */
-function validateCloudConfig(config: any): { valid: boolean; errors: string[] } {
-  const errors: string[] = [];
-  
-  // Check upstreams are public HTTPS URLs
-  if (config.upstreams) {
-    for (const [name, upstream] of Object.entries(config.upstreams as Record<string, any>)) {
-      const origin = upstream.origin || '';
-      
-      // Must be HTTPS
-      if (!origin.startsWith('https://')) {
-        errors.push(`Upstream '${name}': Cloud requires HTTPS URLs (got: ${origin})`);
-      }
-      
-      // Cannot be private IPs
-      if (/^https?:\/\/(localhost|127\.|10\.|172\.(1[6-9]|2|3[0-1])\.|192\.168\.)/.test(origin)) {
-        errors.push(`Upstream '${name}': Private IP addresses not allowed in Cloud`);
-      }
-    }
-  }
-  
-  // Must have a default-deny route
-  let hasDefaultDeny = false;
-  if (config.routes) {
-    for (const route of config.routes) {
-      if (route.match?.path === '/' && route.policy?.kind === 'deny') {
-        hasDefaultDeny = true;
-        break;
-      }
-    }
-  }
-  
-  if (!hasDefaultDeny) {
-    errors.push('Cloud requires a default-deny route (match: { path: "/" }, policy: { kind: deny })');
-  }
-  
-  return {
-    valid: errors.length === 0,
-    errors,
-  };
-}
 
 export default router;
 

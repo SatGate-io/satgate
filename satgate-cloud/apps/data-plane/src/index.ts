@@ -7,15 +7,22 @@
 import express from 'express';
 import { logger } from '@satgate/common';
 import { resolveSlug } from './tenant/resolveSlug';
-import { getConfig, invalidateConfig } from './tenant/configCache';
+import { getConfig, getProjectId, invalidateConfig } from './tenant/configCache';
 import { gatewayMiddleware } from './gateway/middleware';
 import { healthCheck as dbHealthCheck } from './db';
+import { shutdown as shutdownUsage } from './usage/events';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
 // Internal auth token for control plane webhooks
 const INTERNAL_AUTH_TOKEN = process.env.INTERNAL_AUTH_TOKEN;
+
+// Fail-fast: require INTERNAL_AUTH_TOKEN in production
+if (process.env.NODE_ENV === 'production' && !INTERNAL_AUTH_TOKEN) {
+  logger.error('INTERNAL_AUTH_TOKEN is required in production');
+  process.exit(1);
+}
 
 // Health check (not tenant-specific)
 app.get('/healthz', async (req, res) => {
@@ -39,7 +46,7 @@ app.get('/healthz', async (req, res) => {
 
 // Config invalidation webhook (from control plane)
 app.post('/_internal/invalidate/:slug', express.json(), async (req, res) => {
-  // Verify internal auth
+  // Verify internal auth (required if INTERNAL_AUTH_TOKEN is set)
   const authHeader = req.headers.authorization;
   
   if (INTERNAL_AUTH_TOKEN && authHeader !== `Bearer ${INTERNAL_AUTH_TOKEN}`) {
@@ -67,10 +74,12 @@ app.use(async (req, res, next) => {
   
   try {
     const config = await getConfig(slug);
+    const projectId = getProjectId(slug);
     
     // Attach tenant context to request
     (req as any).tenantSlug = slug;
     (req as any).gatewayConfig = config;
+    (req as any).projectId = projectId;
     
     next();
   } catch (err) {
@@ -92,8 +101,20 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   res.status(500).json({ error: 'Internal server error' });
 });
 
+// Graceful shutdown
+async function shutdown(signal: string) {
+  logger.info(`Received ${signal}, shutting down gracefully...`);
+  
+  // Flush any pending usage events
+  await shutdownUsage();
+  
+  process.exit(0);
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
+
 // Start server
 app.listen(PORT, () => {
   logger.info(`Data plane listening on port ${PORT}`);
 });
-
