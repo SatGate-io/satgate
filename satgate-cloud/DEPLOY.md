@@ -111,7 +111,8 @@ cd satgate-cloud/apps/dashboard
 fly apps create satgate-cloud-dashboard
 
 # Deploy with API URL
-fly deploy --build-arg NEXT_PUBLIC_API_URL=https://satgate-cloud-control.fly.dev
+# Recommended once you cut over: https://api.satgate.io
+fly deploy --build-arg NEXT_PUBLIC_API_URL=https://api.satgate.io
 
 # Add custom domain
 fly certs create cloud.satgate.io
@@ -268,7 +269,8 @@ fly logs -a satgate-cloud-data
 fly logs -a satgate-cloud-control
 
 # Check health
-curl https://satgate-cloud-control.fly.dev/healthz
+curl https://api.satgate.io/healthz            # after cutover
+curl https://satgate-cloud-control.fly.dev/healthz  # before cutover
 curl https://satgate-cloud-data.fly.dev/healthz
 ```
 

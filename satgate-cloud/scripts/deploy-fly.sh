@@ -31,6 +31,13 @@ DATA_PLANE_APP="satgate-cloud-data"
 DASHBOARD_APP="satgate-cloud-dashboard"
 POSTGRES_APP="satgate-cloud-db"
 
+# Public URLs (override if you have custom domains)
+# Example:
+#   CONTROL_PLANE_PUBLIC_URL=https://api.satgate.io ./deploy-fly.sh all --yes
+CONTROL_PLANE_PUBLIC_URL="${CONTROL_PLANE_PUBLIC_URL:-https://$CONTROL_PLANE_APP.fly.dev}"
+DATA_PLANE_PUBLIC_URL="${DATA_PLANE_PUBLIC_URL:-https://$DATA_PLANE_APP.fly.dev}"
+DASHBOARD_PUBLIC_URL="${DASHBOARD_PUBLIC_URL:-https://$DASHBOARD_APP.fly.dev}"
+
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -136,7 +143,7 @@ deploy_control_plane() {
     fly secrets set \
         DATABASE_URL="$DATABASE_URL" \
         SECRETS_ENCRYPTION_KEY="$SECRETS_ENCRYPTION_KEY" \
-        DATA_PLANE_URL="https://$DATA_PLANE_APP.fly.dev" \
+        DATA_PLANE_URL="$DATA_PLANE_PUBLIC_URL" \
         DATA_PLANE_INTERNAL_TOKEN="$INTERNAL_AUTH_TOKEN" \
         --app "$CONTROL_PLANE_APP"
     
@@ -188,9 +195,10 @@ deploy_dashboard() {
     # Deploy with build arg
     fly deploy \
         --app "$DASHBOARD_APP" \
-        --build-arg NEXT_PUBLIC_API_URL="https://$CONTROL_PLANE_APP.fly.dev"
+        --build-arg NEXT_PUBLIC_API_URL="$CONTROL_PLANE_PUBLIC_URL"
     
     info "Dashboard deployed: https://$DASHBOARD_APP.fly.dev"
+    info "Dashboard configured API URL: $CONTROL_PLANE_PUBLIC_URL"
 }
 
 # Step 7: Configure wildcard domain

@@ -31,7 +31,7 @@ primary_region = "ord"
   timeout = "5s"
 
 # Build-time env vars:
-# NEXT_PUBLIC_API_URL - Control plane API URL (e.g., https://satgate-cloud-control.fly.dev)
+# NEXT_PUBLIC_API_URL - Control plane API URL (recommended: https://api.satgate.io)
 #
 # Note: For same-origin cookie auth, consider:
 # - Serving dashboard at cloud.satgate.io
