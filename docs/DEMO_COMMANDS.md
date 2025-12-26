@@ -10,10 +10,11 @@ Quick reference for demonstrating SatGate capabilities.
 |-----------|-----|
 | **Landing Page** | https://satgate.io |
 | **Playground** | https://satgate.io/playground |
-| **Dashboard (Live)** | https://satgate-production.up.railway.app/dashboard |
-| **Gateway** | https://satgate-production.up.railway.app |
-| **Health Check** | https://satgate-production.up.railway.app/health |
-| **Governance API** | https://satgate-production.up.railway.app/api/governance/graph |
+| **Embedded (Playground backend)** | https://satgate-production-9354.up.railway.app |
+| **Embedded Health** | https://satgate-production-9354.up.railway.app/health |
+| **Embedded Governance Dashboard** | https://satgate-production-9354.up.railway.app/dashboard |
+| **Gateway (Customer proxy)** | https://satgate-production-4c3c.up.railway.app |
+| **Gateway Health** | https://satgate-production-4c3c.up.railway.app/healthz |
 
 ---
 
@@ -21,22 +22,22 @@ Quick reference for demonstrating SatGate capabilities.
 
 ### Health Check
 ```bash
-curl https://satgate-production.up.railway.app/health
+curl https://satgate-production-9354.up.railway.app/health
 ```
 
 ### Mint a Token
 ```bash
-curl -X POST https://satgate-production.up.railway.app/api/capability/mint
+curl -X POST https://satgate-production-9354.up.railway.app/api/capability/mint
 ```
 
 ### Use a Token
 ```bash
 # Store token in variable
-TOKEN=$(curl -s -X POST https://satgate-production.up.railway.app/api/capability/mint | jq -r '.token')
+TOKEN=$(curl -s -X POST https://satgate-production-9354.up.railway.app/api/capability/mint | jq -r '.token')
 
 # Use it
 curl -H "Authorization: Bearer $TOKEN" \
-  https://satgate-production.up.railway.app/api/capability/ping
+  https://satgate-production-9354.up.railway.app/api/capability/ping
 ```
 
 ### Offline Delegation Demo
@@ -45,7 +46,7 @@ curl -H "Authorization: Bearer $TOKEN" \
 node cli/delegation-demo.js
 
 # Option B: Server-side (works from any device)
-curl -X POST https://satgate-production.up.railway.app/api/capability/demo/delegate
+curl -X POST https://satgate-production-9354.up.railway.app/api/capability/demo/delegate
 ```
 
 ### Token Inspection (Governance)
@@ -60,15 +61,15 @@ node cli/inspect.js <TOKEN> --json
 ### Scope Enforcement Test
 ```bash
 # Get a delegated child token (scope: ping only)
-CHILD=$(curl -s -X POST https://satgate-production.up.railway.app/api/capability/demo/delegate | jq -r '.childToken')
+CHILD=$(curl -s -X POST https://satgate-production-9354.up.railway.app/api/capability/demo/delegate | jq -r '.childToken')
 
 # This works (allowed scope)
 curl -H "Authorization: Bearer $CHILD" \
-  https://satgate-production.up.railway.app/api/capability/ping
+  https://satgate-production-9354.up.railway.app/api/capability/ping
 
 # This fails (scope violation)
 curl -X POST -H "Authorization: Bearer $CHILD" \
-  https://satgate-production.up.railway.app/api/capability/mint
+  https://satgate-production-9354.up.railway.app/api/capability/mint
 ```
 
 ---
@@ -77,7 +78,7 @@ curl -X POST -H "Authorization: Bearer $CHILD" \
 
 ### Trigger 402 Challenge
 ```bash
-curl -i https://satgate-production.up.railway.app/api/micro/ping
+curl -i https://satgate-production-9354.up.railway.app/api/micro/ping
 ```
 
 ### Interactive Playground
@@ -88,7 +89,7 @@ Open https://satgate.io/playground with an Alby wallet to complete the full paym
 ## 🛡️ Governance & Kill Switch
 
 ### View Live Dashboard
-Open https://satgate-production.up.railway.app/dashboard in a browser.
+Open https://satgate-production-9354.up.railway.app/dashboard in a browser.
 
 The dashboard shows:
 - **Active Tokens** — Observed agents in last 10 minutes
@@ -97,12 +98,12 @@ The dashboard shows:
 
 ### Get Governance Data (API)
 ```bash
-curl https://satgate-production.up.railway.app/api/governance/graph
+curl https://satgate-production-9354.up.railway.app/api/governance/graph
 ```
 
 ### Get Stats Summary
 ```bash
-curl https://satgate-production.up.railway.app/api/governance/stats
+curl https://satgate-production-9354.up.railway.app/api/governance/stats
 ```
 
 ### Kill Switch: Ban a Token
@@ -110,19 +111,19 @@ curl https://satgate-production.up.railway.app/api/governance/stats
 # Get a token signature first (from inspect tool or dashboard)
 curl -X POST -H "Content-Type: application/json" \
   -d '{"tokenSignature":"<TOKEN_SIGNATURE>","reason":"Compromised"}' \
-  https://satgate-production.up.railway.app/api/governance/ban
+  https://satgate-production-9354.up.railway.app/api/governance/ban
 ```
 
 ### Kill Switch: Unban a Token
 ```bash
 curl -X POST -H "Content-Type: application/json" \
   -d '{"tokenSignature":"<TOKEN_SIGNATURE>"}' \
-  https://satgate-production.up.railway.app/api/governance/unban
+  https://satgate-production-9354.up.railway.app/api/governance/unban
 ```
 
 ### List Banned Tokens
 ```bash
-curl https://satgate-production.up.railway.app/api/governance/banned
+curl https://satgate-production-9354.up.railway.app/api/governance/banned
 ```
 
 ---
@@ -153,5 +154,7 @@ curl -X POST http://localhost:8083/api/capability/mint
 
 All commands work from any terminal with `curl` — iPad, borrowed laptop, phone SSH.
 
-Base URL: `https://satgate-production.up.railway.app`
+Base URLs:
+- Embedded: `https://satgate-production-9354.up.railway.app`
+- Gateway: `https://satgate-production-4c3c.up.railway.app`
 
