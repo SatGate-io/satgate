@@ -1,0 +1,25 @@
+{
+  "name": "satgate-cloud",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SatGate Cloud - Hosted L402 Gateway for SMBs",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "test": "turbo test",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "db:migrate": "cd db && ./migrate.sh",
+    "clean": "turbo clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.3.0",
+    "@types/node": "^20.10.0"
+  },
+  "packageManager": "pnpm@8.15.0",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
+
