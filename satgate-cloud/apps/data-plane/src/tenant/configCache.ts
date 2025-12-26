@@ -19,8 +19,30 @@ const cache = new Map<string, CacheEntry>();
 // Cache TTL (60 seconds for v1; add pub/sub invalidation later)
 const TTL_MS = 60_000;
 
-// Secrets encryption key
+// Secrets encryption key (must match control plane)
 const SECRETS_KEY = process.env.SECRETS_ENCRYPTION_KEY;
+
+/**
+ * Get the encryption key as a 32-byte Buffer
+ */
+function getEncryptionKey(): Buffer {
+  if (!SECRETS_KEY || SECRETS_KEY.length < 32) {
+    throw new Error('SECRETS_ENCRYPTION_KEY not configured or too short (need 32+ chars)');
+  }
+  
+  // Try base64 decode first (preferred)
+  try {
+    const decoded = Buffer.from(SECRETS_KEY, 'base64');
+    if (decoded.length >= 32) {
+      return decoded.slice(0, 32);
+    }
+  } catch {
+    // Not valid base64, fall through
+  }
+  
+  // Fall back to UTF-8 (less secure but backwards compatible)
+  return Buffer.from(SECRETS_KEY.slice(0, 32), 'utf8');
+}
 
 /**
  * Get config for a tenant, with caching
@@ -122,18 +144,19 @@ async function fetchSecretsFromDb(projectId: string): Promise<Record<string, str
 }
 
 /**
- * Decrypt a secret value
+ * Decrypt a secret value using AES-256-GCM
+ * Format: Nonce (12 bytes) + Ciphertext + AuthTag (16 bytes)
  */
 function decrypt(encrypted: Buffer): string {
-  if (!SECRETS_KEY || SECRETS_KEY.length < 32) {
-    throw new Error('SECRETS_ENCRYPTION_KEY not configured');
-  }
+  const key = getEncryptionKey();
   
-  const key = Buffer.from(SECRETS_KEY.slice(0, 32), 'utf8');
-  const iv = encrypted.slice(0, 16);
-  const ciphertext = encrypted.slice(16);
+  // Extract components
+  const nonce = encrypted.slice(0, 12);
+  const authTag = encrypted.slice(-16);
+  const ciphertext = encrypted.slice(12, -16);
   
-  const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+  const decipher = crypto.createDecipheriv('aes-256-gcm', key, nonce);
+  decipher.setAuthTag(authTag);
   
   return Buffer.concat([
     decipher.update(ciphertext),

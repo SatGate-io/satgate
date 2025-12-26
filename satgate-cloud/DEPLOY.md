@@ -117,6 +117,38 @@ fly deploy --build-arg NEXT_PUBLIC_API_URL=https://satgate-cloud-control.fly.dev
 fly certs create cloud.satgate.io
 ```
 
+## Step 6b: Configure Same-Origin Cookies (Recommended)
+
+For session cookies to work reliably, the dashboard and control plane should share a domain:
+
+**Option A: Same-origin (recommended)**
+```
+Dashboard:     cloud.satgate.io
+Control Plane: cloud.satgate.io/api/* (via Fly internal routing or Caddy)
+```
+No additional cookie config needed.
+
+**Option B: Same-site subdomain**
+```
+Dashboard:     cloud.satgate.io  
+Control Plane: api.satgate.io
+```
+Set on control plane:
+```bash
+fly secrets set COOKIE_DOMAIN=".satgate.io" -a satgate-cloud-control
+```
+
+**Option C: Cross-site (not recommended)**
+```
+Dashboard:     cloud.satgate.io
+Control Plane: satgate-cloud-control.fly.dev
+```
+Set on control plane:
+```bash
+fly secrets set COOKIE_CROSS_SITE=true -a satgate-cloud-control
+```
+Note: Cross-site cookies are increasingly blocked by browsers.
+
 ## Step 7: Smoke Test
 
 ```bash
@@ -142,7 +174,7 @@ curl -i https://test-api-abc123.satgate.cloud/api/test
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `DATABASE_URL` | ✓ | Postgres connection string |
-| `SECRETS_ENCRYPTION_KEY` | ✓ | 32+ char key for encrypting secrets |
+| `SECRETS_ENCRYPTION_KEY` | ✓ | Base64-encoded 32 bytes, or 32+ char string |
 | `DATA_PLANE_URL` | ✓ | Data plane base URL |
 | `DATA_PLANE_INTERNAL_TOKEN` | ✓ | Token for cache invalidation |
 | `APP_URL` | ✓ | Dashboard URL (for magic links) |
@@ -152,6 +184,8 @@ curl -i https://test-api-abc123.satgate.cloud/api/test
 | `SMTP_PASS` | ✓ | SMTP password |
 | `EMAIL_FROM` | | From address (default: noreply@satgate.io) |
 | `CORS_ORIGINS` | | Allowed origins (default: APP_URL) |
+| `COOKIE_DOMAIN` | | Shared cookie domain (e.g., `.satgate.io`) |
+| `COOKIE_CROSS_SITE` | | Set to `true` for cross-site cookies (SameSite=None) |
 
 ### Data Plane
 | Variable | Required | Description |

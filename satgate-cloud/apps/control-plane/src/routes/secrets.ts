@@ -18,42 +18,64 @@ const router: IRouter = Router();
 router.use(requireAuth);
 
 // Encryption key from environment (must be 32 bytes for AES-256)
+// Should be base64-encoded 32 bytes, or at minimum a 32+ char string
 const SECRETS_KEY = process.env.SECRETS_ENCRYPTION_KEY;
 
 /**
- * Encrypt a secret value
+ * Get the encryption key as a 32-byte Buffer
  */
-function encrypt(value: string): Buffer {
+function getEncryptionKey(): Buffer {
   if (!SECRETS_KEY || SECRETS_KEY.length < 32) {
-    throw new Error('SECRETS_ENCRYPTION_KEY not configured or too short');
+    throw new Error('SECRETS_ENCRYPTION_KEY not configured or too short (need 32+ chars)');
   }
   
-  const key = Buffer.from(SECRETS_KEY.slice(0, 32), 'utf8');
-  const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+  // Try base64 decode first (preferred)
+  try {
+    const decoded = Buffer.from(SECRETS_KEY, 'base64');
+    if (decoded.length >= 32) {
+      return decoded.slice(0, 32);
+    }
+  } catch {
+    // Not valid base64, fall through
+  }
   
-  const encrypted = Buffer.concat([
-    cipher.update(value, 'utf8'),
-    cipher.final(),
-  ]);
-  
-  // Return IV + ciphertext
-  return Buffer.concat([iv, encrypted]);
+  // Fall back to UTF-8 (less secure but backwards compatible)
+  return Buffer.from(SECRETS_KEY.slice(0, 32), 'utf8');
 }
 
 /**
- * Decrypt a secret value
+ * Encrypt a secret value using AES-256-GCM (authenticated encryption)
+ * Format: Nonce (12 bytes) + Ciphertext + AuthTag (16 bytes)
+ */
+function encrypt(value: string): Buffer {
+  const key = getEncryptionKey();
+  const nonce = crypto.randomBytes(12); // GCM standard nonce size
+  
+  const cipher = crypto.createCipheriv('aes-256-gcm', key, nonce);
+  const ciphertext = Buffer.concat([
+    cipher.update(value, 'utf8'),
+    cipher.final(),
+  ]);
+  const authTag = cipher.getAuthTag(); // 16 bytes
+  
+  // Return Nonce + Ciphertext + AuthTag
+  return Buffer.concat([nonce, ciphertext, authTag]);
+}
+
+/**
+ * Decrypt a secret value using AES-256-GCM
+ * Format: Nonce (12 bytes) + Ciphertext + AuthTag (16 bytes)
  */
 function decrypt(encrypted: Buffer): string {
-  if (!SECRETS_KEY || SECRETS_KEY.length < 32) {
-    throw new Error('SECRETS_ENCRYPTION_KEY not configured or too short');
-  }
+  const key = getEncryptionKey();
   
-  const key = Buffer.from(SECRETS_KEY.slice(0, 32), 'utf8');
-  const iv = encrypted.slice(0, 16);
-  const ciphertext = encrypted.slice(16);
+  // Extract components
+  const nonce = encrypted.slice(0, 12);
+  const authTag = encrypted.slice(-16);
+  const ciphertext = encrypted.slice(12, -16);
   
-  const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+  const decipher = crypto.createDecipheriv('aes-256-gcm', key, nonce);
+  decipher.setAuthTag(authTag);
   
   return Buffer.concat([
     decipher.update(ciphertext),

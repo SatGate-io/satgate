@@ -3,10 +3,24 @@ set -e
 
 # SatGate Cloud - Fly.io Deployment Script
 # Prerequisites: flyctl installed and authenticated
+#
+# Usage:
+#   ./deploy-fly.sh all           # Interactive mode with prompts
+#   ./deploy-fly.sh all --yes     # Non-interactive (CI/automation)
+#   ./deploy-fly.sh postgres      # Just create Postgres
+#   ./deploy-fly.sh test          # Just run smoke tests
 
 echo "╔══════════════════════════════════════════════════════════════════╗"
 echo "║              SatGate Cloud - Fly.io Deployment                    ║"
 echo "╚══════════════════════════════════════════════════════════════════╝"
+
+# Parse --yes flag
+INTERACTIVE=true
+for arg in "$@"; do
+  if [ "$arg" = "--yes" ] || [ "$arg" = "-y" ]; then
+    INTERACTIVE=false
+  fi
+done
 
 # Configuration
 REGION="${FLY_REGION:-ord}"
@@ -248,11 +262,20 @@ case "${1:-all}" in
     all)
         create_postgres
         echo ""
-        read -p "Press enter to continue after reviewing Postgres setup..."
+        if [ "$INTERACTIVE" = true ]; then
+            read -p "Press enter to continue after reviewing Postgres setup..."
+        else
+            info "Continuing (non-interactive mode)..."
+            sleep 2
+        fi
         apply_schema
         generate_secrets
         echo ""
-        read -p "Press enter to continue after saving secrets..."
+        if [ "$INTERACTIVE" = true ]; then
+            read -p "Press enter to continue after saving secrets..."
+        else
+            info "Continuing (non-interactive mode)..."
+        fi
         deploy_control_plane
         deploy_data_plane
         deploy_dashboard

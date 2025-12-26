@@ -154,30 +154,57 @@ export async function validateSession(token: string): Promise<Session | null> {
 }
 
 /**
+ * Get cookie options based on environment
+ * 
+ * Same-origin (recommended):
+ *   Dashboard & API on same domain → SameSite=Strict
+ * 
+ * Cross-origin (if needed):
+ *   Set COOKIE_CROSS_SITE=true → SameSite=None; Secure
+ *   Set COOKIE_DOMAIN=.satgate.io for shared cookies
+ */
+function getCookieOptions(expiresAt?: Date): {
+  httpOnly: boolean;
+  secure: boolean;
+  sameSite: 'strict' | 'lax' | 'none';
+  domain?: string;
+  path: string;
+  expires?: Date;
+} {
+  const isProduction = process.env.NODE_ENV === 'production';
+  const isCrossSite = process.env.COOKIE_CROSS_SITE === 'true';
+  const cookieDomain = process.env.COOKIE_DOMAIN; // e.g., ".satgate.io"
+  
+  const options: ReturnType<typeof getCookieOptions> = {
+    httpOnly: true,
+    secure: isProduction || isCrossSite, // Secure required for SameSite=None
+    sameSite: isCrossSite ? 'none' : 'strict',
+    path: '/',
+  };
+  
+  if (cookieDomain) {
+    options.domain = cookieDomain;
+  }
+  
+  if (expiresAt) {
+    options.expires = expiresAt;
+  }
+  
+  return options;
+}
+
+/**
  * Set session cookie on response
  */
 export function setSessionCookie(res: Response, token: string, expiresAt: Date): void {
-  const secure = process.env.NODE_ENV === 'production';
-  
-  res.cookie(SESSION_COOKIE, token, {
-    httpOnly: true,
-    secure,
-    sameSite: 'strict',
-    expires: expiresAt,
-    path: '/',
-  });
+  res.cookie(SESSION_COOKIE, token, getCookieOptions(expiresAt));
 }
 
 /**
  * Clear session cookie
  */
 export function clearSessionCookie(res: Response): void {
-  res.clearCookie(SESSION_COOKIE, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    path: '/',
-  });
+  res.clearCookie(SESSION_COOKIE, getCookieOptions());
 }
 
 /**

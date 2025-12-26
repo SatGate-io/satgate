@@ -98,8 +98,31 @@ export const phoenixdProvider: LightningProvider = {
   },
   
   async getInvoiceStatus(paymentHash: string): Promise<InvoiceStatus> {
+    // Try both API paths for compatibility with different phoenixd versions
+    // v0.1.x uses /getincomingpayment?paymentHash=...
+    // v0.2.x+ uses /payments/incoming/<hash>
+    
+    // Try newer API first
     try {
-      // phoenixd /getincomingpayment endpoint
+      const response = await phoenixdRequest<{
+        paymentHash: string;
+        preimage: string;
+        isPaid: boolean;
+        receivedSat: number;
+        completedAt?: number;
+      }>('GET', `/payments/incoming/${paymentHash}`);
+      
+      return {
+        paid: response.isPaid,
+        preimage: response.isPaid ? response.preimage : undefined,
+        paidAt: response.completedAt,
+      };
+    } catch (err) {
+      // Fall through to try older API
+    }
+    
+    // Try older API (getincomingpayment)
+    try {
       const response = await phoenixdRequest<{
         paymentHash: string;
         preimage: string;
