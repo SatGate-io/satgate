@@ -1,0 +1,184 @@
+# ============================================================================
+# SatGate Gateway — SMB/Startup Starter Config
+# ============================================================================
+#
+# The fastest path to monetizing your API with Lightning payments.
+#
+# HOW TO USE:
+#   1. Copy this file: cp satgate.gateway.smb.yaml satgate.gateway.yaml
+#   2. Replace "https://api.example.com" with your actual API URL
+#   3. Customize routes and pricing for your endpoints
+#   4. Deploy (Railway, Fly, Docker, or SatGate Cloud)
+#
+# REQUIRED ENVIRONMENT VARIABLES:
+#   SATGATE_RUNTIME=gateway
+#   MODE=prod
+#   L402_ROOT_KEY=<32+ random characters>
+#   PRICING_ADMIN_TOKEN=<32+ random characters>
+#   LIGHTNING_BACKEND=lnd (or phoenixd)
+#   LND_REST_URL=<your LND endpoint>
+#   LND_MACAROON=<base64-encoded invoice macaroon>
+#
+# For full documentation: docs/gateway/SMB_ONBOARDING.md
+# ============================================================================
+
+version: 1
+
+# -----------------------------------------------------------------------------
+# SERVER - Data plane (public traffic)
+# -----------------------------------------------------------------------------
+server:
+  listen: "0.0.0.0:8080"
+  trustProxy: 1
+
+# -----------------------------------------------------------------------------
+# ADMIN - Control plane (internal only)
+# -----------------------------------------------------------------------------
+admin:
+  listen: "127.0.0.1:9090"
+  requireAdminToken: true
+
+# -----------------------------------------------------------------------------
+# LIMITS - Protect against abuse
+# -----------------------------------------------------------------------------
+limits:
+  maxRequestBodyBytes: 5242880       # 5MB (adjust for your API)
+  maxHeadersBytes: 16384             # 16KB
+  upstreamTimeoutMs: 30000           # 30s
+  upstreamConnectTimeoutMs: 3000     # 3s
+
+# -----------------------------------------------------------------------------
+# L402 - Lightning payment configuration
+# -----------------------------------------------------------------------------
+l402:
+  mode: "native"
+  rootKeyEnv: "L402_ROOT_KEY"
+  defaultTTLSeconds: 3600            # 1 hour token validity
+  defaultMaxCalls: 100               # Requests per token
+
+# -----------------------------------------------------------------------------
+# METERING - Track usage per token
+# -----------------------------------------------------------------------------
+metering:
+  backend: "memory"                  # Use "redis" for multi-instance
+  # redisUrlEnv: "REDIS_URL"         # Uncomment if using Redis
+
+# -----------------------------------------------------------------------------
+# UPSTREAMS - Your API (replace with your actual URL)
+# -----------------------------------------------------------------------------
+# IMPORTANT: Only URLs listed here can be proxied to (SSRF prevention)
+
+upstreams:
+  # ┌─────────────────────────────────────────────────────────────────┐
+  # │  REPLACE THIS with your actual API URL                          │
+  # └─────────────────────────────────────────────────────────────────┘
+  my_api:
+    url: "https://api.example.com"   # ← YOUR API URL HERE
+    passHostHeader: false
+    addHeaders:
+      X-Gateway: "satgate"
+      X-Forwarded-By: "satgate-gateway"
+    # Headers to BLOCK (never forward to upstream)
+    denyRequestHeaders:
+      - "x-admin-token"
+      - "x-satgate-admin-token"
+      - "x-internal-key"
+      - "x-debug"
+
+# -----------------------------------------------------------------------------
+# ROUTES - Define pricing for your endpoints
+# -----------------------------------------------------------------------------
+# ROUTE ORDER MATTERS: First match wins. Put specific routes before general.
+# Always end with a default-deny catch-all.
+
+routes:
+
+  # ┌─────────────────────────────────────────────────────────────────┐
+  # │  CUSTOMIZE: Add your own routes with appropriate pricing         │
+  # └─────────────────────────────────────────────────────────────────┘
+
+  # ─────────────────────────────────────────────────────────────────────
+  # PREMIUM TIER - 100 sats (~$0.10 at $100k BTC)
+  # For: expensive operations, AI inference, bulk data
+  # ─────────────────────────────────────────────────────────────────────
+  - name: "premium"
+    match:
+      pathPrefix: "/v1/premium/"
+      methods: ["GET", "POST", "PUT", "DELETE"]
+    upstream: "my_api"
+    policy:
+      kind: "l402"
+      tier: "premium"
+      priceSats: 100
+      scope: "api:premium:*"
+      ttlSeconds: 7200               # 2 hour token validity
+      maxCalls: 500                  # More calls for premium
+
+  # ─────────────────────────────────────────────────────────────────────
+  # BASIC TIER - 10 sats (~$0.01)
+  # For: standard API access, normal operations
+  # ─────────────────────────────────────────────────────────────────────
+  - name: "basic"
+    match:
+      pathPrefix: "/v1/"
+      methods: ["GET", "POST", "PUT", "DELETE"]
+    upstream: "my_api"
+    policy:
+      kind: "l402"
+      tier: "basic"
+      priceSats: 10
+      scope: "api:basic:*"
+
+  # ─────────────────────────────────────────────────────────────────────
+  # MICRO TIER - 1 sat (~$0.001)
+  # For: high-volume, low-value calls (still stops bots!)
+  # ─────────────────────────────────────────────────────────────────────
+  - name: "micro"
+    match:
+      pathPrefix: "/v2/micro/"
+      methods: ["GET"]
+    upstream: "my_api"
+    policy:
+      kind: "l402"
+      tier: "micro"
+      priceSats: 1
+      scope: "api:micro:*"
+
+  # ─────────────────────────────────────────────────────────────────────
+  # PUBLIC ENDPOINTS (optional - uncomment if needed)
+  # For: landing pages, docs, health checks
+  # ─────────────────────────────────────────────────────────────────────
+  # - name: "public-docs"
+  #   match:
+  #     pathPrefix: "/docs"
+  #     methods: ["GET"]
+  #   upstream: "my_api"
+  #   policy:
+  #     kind: "public"
+
+  # ─────────────────────────────────────────────────────────────────────
+  # DEFAULT DENY - Catch-all (REQUIRED for security)
+  # Everything not explicitly routed returns 403
+  # ─────────────────────────────────────────────────────────────────────
+  - name: "default-deny"
+    match:
+      pathPrefix: "/"
+    policy:
+      kind: "deny"
+      status: 403
+
+# ============================================================================
+# QUICK TEST COMMANDS (after deploying)
+# ============================================================================
+#
+# Health check:
+#   curl https://your-gateway/healthz
+#
+# L402 challenge (expect 402):
+#   curl -i https://your-gateway/v1/premium/test
+#
+# Fail-closed (expect 403):
+#   curl -i https://your-gateway/unknown
+#
+# ============================================================================
+

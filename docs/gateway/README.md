@@ -35,30 +35,59 @@ SatGate v2.0 introduces **Gateway Mode** - a full reverse proxy with L402 enforc
 
 SatGate acts as a full reverse proxy, handling all traffic:
 
-```yaml
-# satgate.gateway.yaml
-version: 1
+**Quick Start:**
+```bash
+# 1. Copy the SMB starter config
+cp satgate.gateway.smb.yaml satgate.gateway.yaml
 
+# 2. Edit to add your upstream URL and routes
+# 3. Deploy
+SATGATE_RUNTIME=gateway node proxy/server.js
+```
+
+**Resources:**
+- 📄 **Onboarding Guide:** `docs/gateway/SMB_ONBOARDING.md`
+- 📋 **Starter Config:** `satgate.gateway.smb.yaml`
+- 📚 **Full Reference:** `satgate.gateway.yaml`
+
+**Example config:**
+```yaml
 upstreams:
-  customer_api:
-    url: "http://internal-api:8080"
+  my_api:
+    url: "https://api.yourcompany.com"  # Your API
 
 routes:
   - name: "premium"
     match:
       pathPrefix: "/v1/premium/"
-    upstream: "customer_api"
+    upstream: "my_api"
     policy:
       kind: "l402"
-      tier: "premium"
-      priceSats: 1000
-      scope: "api:premium:*"
+      priceSats: 100
+
+  - name: "basic"
+    match:
+      pathPrefix: "/v1/"
+    upstream: "my_api"
+    policy:
+      kind: "l402"
+      priceSats: 10
+
+  - name: "default-deny"
+    match:
+      pathPrefix: "/"
+    policy:
+      kind: "deny"
 ```
 
-Start with:
-```bash
-SATGATE_RUNTIME=gateway node proxy/server.js
-```
+### Railway note (two services)
+
+If you run `satgate.io/playground` from Railway, keep that service pinned to **embedded**:
+
+- Playground service: `SATGATE_RUNTIME=embedded`
+- Gateway service: `SATGATE_RUNTIME=gateway`
+
+This matters because `proxy/server.js` will auto-detect gateway mode if `satgate.gateway.yaml` exists, unless you explicitly force embedded.
 
 ### 2. Ingress Integration (Enterprise)
 
