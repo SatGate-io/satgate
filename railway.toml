@@ -4,7 +4,9 @@ builder = "dockerfile"
 dockerfilePath = "deploy/Dockerfile.native"
 
 [deploy]
-healthcheckPath = "/health"
+# Health check path is set per-service in Railway UI:
+#   - Embedded mode: /health
+#   - Gateway mode:  /healthz
 healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
