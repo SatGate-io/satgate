@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0a0a0f;
+  --foreground: #f5f5f7;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Focus states */
+*:focus-visible {
+  outline: 2px solid #a855f7;
+  outline-offset: 2px;
+}
+
+/* Button base */
+.btn {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-all duration-200;
+}
+
+.btn-primary {
+  @apply bg-primary-600 hover:bg-primary-500 text-white shadow-lg shadow-primary-600/25;
+}
+
+.btn-secondary {
+  @apply bg-surface-100 hover:bg-surface-200 text-white border border-white/10;
+}
+
+/* Card */
+.card {
+  @apply bg-surface-50 border border-white/5 rounded-xl;
+}
+
+/* Input */
+.input {
+  @apply w-full px-4 py-3 bg-surface-100 border border-white/10 rounded-lg text-white placeholder-white/40 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors;
+}
+
