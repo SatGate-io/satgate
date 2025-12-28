@@ -1,4 +1,8 @@
-# SatGate Gateway Mode
+<p align="center">
+  <img src="../assets/brand/logo_blue_transparent.png" alt="SatGate™" width="140" />
+</p>
+
+# SatGate™ Gateway Mode
 
 SatGate v2.0 introduces **Gateway Mode** - a full reverse proxy with L402 enforcement, designed to protect any upstream API without code changes.
 

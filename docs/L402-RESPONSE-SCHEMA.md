@@ -1,4 +1,8 @@
-# L402 Response Schema
+<p align="center">
+  <img src="./assets/brand/logo_blue_transparent.png" alt="SatGate™" width="140" />
+</p>
+
+# L402 Response Schema (SatGate™)
 
 This document defines the standard response format for L402 (402 Payment Required) challenges issued by SatGate.
 

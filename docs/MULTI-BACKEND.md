@@ -1,4 +1,8 @@
-# SatGate Multi-Backend Lightning Architecture
+<p align="center">
+  <img src="./assets/brand/logo_blue_transparent.png" alt="SatGate™" width="140" />
+</p>
+
+# SatGate™ Multi-Backend Lightning Architecture
 
 SatGate supports multiple Lightning backends, giving enterprises flexibility to choose the right infrastructure for their needs.
 

@@ -1,4 +1,8 @@
-# SatGate Security Model
+<p align="center">
+  <img src="./assets/brand/logo_blue_transparent.png" alt="SatGate™" width="140" />
+</p>
+
+# SatGate™ Security Model
 
 This document describes the security architecture and access control model for SatGate.
 

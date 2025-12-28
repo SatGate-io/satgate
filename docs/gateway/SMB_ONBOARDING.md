@@ -1,4 +1,8 @@
-# SatGate Cloud (SMB/Startup) — Bring Your Own Upstream
+<p align="center">
+  <img src="../assets/brand/logo_blue_transparent.png" alt="SatGate™" width="140" />
+</p>
+
+# SatGate™ Cloud (SMB/Startup) — Bring Your Own Upstream
 
 **The fastest way to monetize and protect your API.**
 
@@ -154,13 +158,15 @@ curl -i http://localhost:8080/unknown
 
 ### Option A: Hosted Gateway (Recommended for SMB)
 
-> **Coming soon:** SatGate Cloud (hosted gateway + managed Lightning).  
-> Until then, use **Option B: Self-Hosted** with the same config model.
+SatGate Cloud is live:
 
-When SatGate Cloud is available:
-1. **Upload your config** (or paste YAML in dashboard)
-2. **Get your gateway URL** (example): `https://your-project.satgate.cloud`
-3. **Update your DNS** (optional): CNAME `api.yourcompany.com` → `your-project.satgate.cloud`
+1. Sign up at `https://cloud.satgate.io` (magic link)
+2. Create a project → you’ll get `https://<project>.satgate.cloud`
+3. Upload your config (paste YAML in the dashboard)
+4. Test the gateway URL (see Step 4)
+5. (Optional) Add a custom domain (CNAME + TXT verification)
+
+> **Billing note (Plan A):** SatGate Cloud uses a monthly platform subscription. If your subscription is inactive, you can still log in and view projects, but **mutating actions** (create project, upload config, secrets/domains changes) are blocked until billing is active.
 
 ### Option B: Self-Hosted (Railway/Fly/Docker)
 
@@ -189,7 +195,7 @@ PRICING_ADMIN_TOKEN=<32-char-random-key>
 
 > Replace `<your-gateway-host>` with your actual gateway URL:
 > - **Self-hosted:** Your Railway/Fly/Docker URL (e.g., `my-gateway.up.railway.app`)
-> - **SatGate Cloud:** Provided when Cloud launches (e.g., `your-project.satgate.cloud`)
+> - **SatGate Cloud:** Your tenant host (e.g., `your-project.satgate.cloud`)
 
 ### Test 1: Health Check
 

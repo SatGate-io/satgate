@@ -1,4 +1,8 @@
-# First Success Demo
+<p align="center">
+  <img src="../assets/brand/logo_blue_transparent.png" alt="SatGate™" width="140" />
+</p>
+
+# SatGate™ Gateway Mode — First Success Demo
 
 **Goal:** Verify your gateway is working: 403 fail-closed → 402 challenge → pay → 200 success.
 

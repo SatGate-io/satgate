@@ -1,4 +1,8 @@
-# L402 Native Mode Migration Guide
+<p align="center">
+  <img src="./assets/brand/logo_blue_transparent.png" alt="SatGate™" width="140" />
+</p>
+
+# L402 Native Mode Migration Guide (SatGate™)
 
 > **Migrate from Aperture Sidecar to SatGate as the L402 Authority**
 

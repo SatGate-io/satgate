@@ -1,4 +1,8 @@
-# Upstream Authentication Patterns
+<p align="center">
+  <img src="../assets/brand/logo_blue_transparent.png" alt="SatGate™" width="140" />
+</p>
+
+# SatGate™ Upstream Authentication Patterns
 
 Your upstream API likely requires authentication. This guide covers common patterns for passing auth headers through SatGate Gateway.
 

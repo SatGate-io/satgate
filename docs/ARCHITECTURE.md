@@ -1,4 +1,8 @@
-# ⚡ SatGate
+<p align="center">
+  <img src="./assets/brand/logo_blue_transparent.png" alt="SatGate™" width="140" />
+</p>
+
+# ⚡ SatGate™
 
 ## Stripe for AI Agents • EZ-Pass for the API Economy
 
@@ -88,7 +92,7 @@ const data = await client.get('/api/premium');
 ┌──────────────┐                      ┌──────────────┐
 │              │   1. Request API     │              │
 │    Client    │─────────────────────▶│   SatGate    │
-│              │                      │  (Aperture)  │
+│              │                      │ (L402 Auth)  │
 │              │◀─────────────────────│              │
 │              │   2. 402 + Invoice   │              │
 │              │                      │              │
@@ -110,7 +114,7 @@ const data = await client.get('/api/premium');
 | **1** | Client requests protected resource | `GET /api/analytics` |
 | **2** | Server returns payment challenge | `402` + `WWW-Authenticate: L402 macaroon="...", invoice="..."` |
 | **3** | Client pays Lightning invoice | Receives cryptographic preimage as proof |
-| **4** | Client retries with token | `Authorization: L402 <macaroon>:<preimage>` |
+| **4** | Client retries with token | `Authorization: LSAT <macaroon>:<preimage>` |
 | **5** | Server validates & responds | Token valid for 1 hour, reusable |
 
 ---

@@ -1,4 +1,8 @@
-# Deploy SatGate Gateway (Self-Hosted)
+<p align="center">
+  <img src="../assets/brand/logo_blue_transparent.png" alt="SatGate™" width="140" />
+</p>
+
+# Deploy SatGate™ Gateway (Self-Hosted)
 
 **Time to deploy:** ~15 minutes  
 **Prerequisites:** Your API is publicly reachable via HTTPS
