@@ -10,6 +10,21 @@
 
 ---
 
+## Production Deployment (satgate.io)
+
+The live playground at [satgate.io/playground](https://satgate.io/playground) uses:
+
+| Component | Provider | Details |
+|-----------|----------|---------|
+| **Landing Page** | Vercel | Next.js app |
+| **Gateway** | Railway | L402 enforcement, Redis |
+| **Lightning** | Start9 (self-hosted) | Alby Hub + LND via Tailscale |
+| **DNS/SSL** | Cloudflare | Edge security |
+
+> **Note:** For the managed multi-tenant solution, see [SatGate Cloud](https://cloud.satgate.io).
+
+---
+
 ## Executive Summary
 
 **SatGate** is a production-ready API monetization gateway that uses Bitcoin's Lightning Network to charge for API access. No accounts, no API keys, no credit cards — just instant micropayments that work globally, 24/7.
@@ -208,8 +223,8 @@ SatGate is now the L402 authority. No Aperture required for L402 enforcement.
 │    LIGHTNING PROVIDER   │                │     YOUR API (Origin)        │
 │                         │                │                              │
 │  Supported backends:    │                │   ┌────────────────────────┐ │
-│  • phoenixd (recommended)                │   │  /api/analytics (paid) │ │
-│  • LND (REST)           │                │   │  /api/free/ping (free) │ │
+│  • LND (REST) ✓         │                │   │  /api/analytics (paid) │ │
+│  • phoenixd             │                │   │  /api/free/ping (free) │ │
 │  • OpenNode (limited)   │                │   │  Your business logic   │ │
 │  • Mock (testing)       │                │   └────────────────────────┘ │
 │                         │                │                              │
