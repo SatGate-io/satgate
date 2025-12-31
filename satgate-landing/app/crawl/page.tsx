@@ -339,7 +339,7 @@ export default function CrawlDemoPage() {
       addLog('💡 The math enforced least privilege. Not a database lookup.', 'success');
       
       setEnforcementResults({ allowed: allowedResult, blocked: blockedResult });
-      setCurrentScene('summary');
+      // Don't auto-advance - let user click "Next: Kill Switch"
       setIsLoading(false);
       return;
     }
@@ -396,7 +396,7 @@ export default function CrawlDemoPage() {
     addLog('💡 The math enforced least privilege. Not a database lookup.', 'success');
     
     setEnforcementResults({ allowed: allowedResult, blocked: blockedResult });
-    setCurrentScene('summary');
+    // Don't auto-advance - let user click "Next: Kill Switch"
     setIsLoading(false);
   };
 
