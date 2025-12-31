@@ -187,7 +187,7 @@ const LandingPage = () => {
                 <h3 className="font-bold text-lg">Secure API Access</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Capability tokens replace accounts and API keys. No PII, no credential stuffing. Cryptographic access control for APIs and agents.
+                Capability tokens replace accounts and API keys. No PII, no credential stuffing. Cryptographic access control to protect APIs and agents.
               </p>
             </div>
             <div className="p-6 rounded-xl bg-gradient-to-br from-purple-950/30 to-purple-900/10 border border-purple-800/30 hover:border-purple-600/50 transition">
@@ -198,7 +198,7 @@ const LandingPage = () => {
                 <h3 className="font-bold text-lg">Monetize APIs per request</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Charge 1 sat per call—sub-cent pricing that's impossible on card rails. No minimums, no chargebacks, instant settlement.
+                Every request costs something—an economic firewall against bots and abuse. Sub-cent pricing, no chargebacks, instant settlement.
               </p>
             </div>
           </div>
