@@ -147,7 +147,6 @@ const LandingPage = () => {
                 muted 
                 playsInline
                 className="w-full"
-                poster="/demo-poster.png"
               >
                 <source src="/satgate-hero-demo.mp4" type="video/mp4" />
                 {/* Fallback for browsers that don't support video */}
