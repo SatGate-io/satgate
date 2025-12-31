@@ -129,7 +129,8 @@ export default function DashboardPage() {
   // Derive display data from graph
   const tokens = graphData.nodes.map(n => {
     const data = n.data;
-    const type = data.depth === 0 ? 'ROOT' : data.depth === 1 ? 'AGENT' : 'WORKER';
+    // Depth 1 = AGENT (minted), Depth 2 = WORKER (delegated child)
+    const type = data.depth === 1 ? 'AGENT' : data.depth === 2 ? 'WORKER' : 'ROOT';
     const scope = data.constraints.find(c => c.startsWith('scope ='))?.replace('scope = ', '') || 'unknown';
     const expiresRaw = data.constraints.find(c => c.startsWith('expires ='))?.replace('expires = ', '');
     const expires = expiresRaw ? formatExpiry(expiresRaw) : 'No expiry';
@@ -188,7 +189,7 @@ export default function DashboardPage() {
       case 'ROOT': return '👑';
       case 'AGENT': return '🤖';
       case 'WORKER': return '⚙️';
-      default: return '🔒';
+      default: return '🤖'; // Default to agent icon
     }
   };
 

@@ -612,9 +612,10 @@ const telemetry = {
   recordUsage: function(tokenSignature, caveats, ip, identifier) {
     const now = Date.now();
     
-    // Calculate depth based on identifier (child tokens have ':child:' in identifier)
+    // Calculate depth based on identifier pattern
+    // For demo: minted tokens are AGENT (depth 1), delegated children are WORKER (depth 2)
     const isChild = identifier && identifier.includes(':child:');
-    const depth = isChild ? 1 : 0;
+    const depth = isChild ? 2 : 1; // AGENT=1, WORKER=2
     
     const tokenData = {
       id: tokenSignature.substring(0, 12) + '...',
