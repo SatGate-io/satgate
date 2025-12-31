@@ -1356,35 +1356,29 @@ export default function CrawlDemoPage() {
               </div>
 
               <div className="relative flex items-center justify-center gap-8 md:gap-16 min-h-[200px]">
-                {/* Parent Token Node */}
+                {/* Parent Token Node - Agent always stays active (only child is banned) */}
                 {parentToken && (
                   <div className="flex flex-col items-center">
                     {/* Node */}
-                    <div className={`relative w-24 h-24 md:w-32 md:h-32 rounded-full border-4 flex items-center justify-center transition-all duration-500 ${
-                      bannedToken ? 'border-gray-600 bg-gray-900/50' : 'border-cyan-500 bg-cyan-950/50'
-                    }`}>
-                      {/* Pulse Animation */}
-                      {!bannedToken && (
-                        <div className="absolute inset-0 rounded-full border-4 border-cyan-400 animate-ping opacity-20" />
-                      )}
+                    <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-cyan-500 bg-cyan-950/50 flex items-center justify-center transition-all duration-500">
+                      {/* Pulse Animation - always active */}
+                      <div className="absolute inset-0 rounded-full border-4 border-cyan-400 animate-ping opacity-20" />
                       <div className="text-center">
-                        <Bot className={`mx-auto mb-1 ${bannedToken ? 'text-gray-500' : 'text-cyan-400'}`} size={28} />
-                        <span className={`text-xs font-bold ${bannedToken ? 'text-gray-500' : 'text-cyan-300'}`}>Agent</span>
+                        <Bot className="mx-auto mb-1 text-cyan-400" size={28} />
+                        <span className="text-xs font-bold text-cyan-300">Agent</span>
                       </div>
                     </div>
                     {/* Label */}
                     <div className="mt-3 text-center">
-                      <div className={`text-sm font-semibold ${bannedToken ? 'text-gray-500' : 'text-cyan-400'}`}>
+                      <div className="text-sm font-semibold text-cyan-400">
                         Parent Token (from CISO)
                       </div>
                       <div className="text-xs text-gray-500 font-mono mt-1">
                         {parentToken.scope}
                       </div>
-                      <div className={`mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${
-                        bannedToken ? 'bg-gray-800 text-gray-500' : 'bg-green-900/50 text-green-400'
-                      }`}>
-                        <div className={`w-1.5 h-1.5 rounded-full ${bannedToken ? 'bg-gray-500' : 'bg-green-400 animate-pulse'}`} />
-                        {bannedToken ? 'Inactive' : 'Active'}
+                      <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-green-900/50 text-green-400">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                        Active
                       </div>
                     </div>
                   </div>
@@ -1475,12 +1469,11 @@ export default function CrawlDemoPage() {
 
             {/* Token Details Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Agent Token - always stays active (only child gets banned) */}
               {parentToken && (
-                <div className={`bg-black rounded-xl border p-4 transition-all ${
-                  bannedToken ? 'border-gray-700' : 'border-cyan-800/50'
-                }`}>
+                <div className="bg-black rounded-xl border border-cyan-800/50 p-4 transition-all">
                   <div className="flex items-center justify-between mb-2">
-                    <span className={`font-semibold ${bannedToken ? 'text-gray-500' : 'text-cyan-400'}`}>
+                    <span className="font-semibold text-cyan-400">
                       Agent Token (from CISO)
                     </span>
                     <button
@@ -1496,8 +1489,10 @@ export default function CrawlDemoPage() {
                   <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
                     <div className="text-gray-500">Scope:</div>
                     <div className="text-cyan-400 font-mono">{parentToken.scope}</div>
-                    <div className="text-gray-500">Can Mint:</div>
-                    <div className="text-green-400">Yes (Admin)</div>
+                    <div className="text-gray-500">Can Delegate:</div>
+                    <div className="text-green-400">Yes</div>
+                    <div className="text-gray-500">Status:</div>
+                    <div className="text-green-400">Active ✓</div>
                   </div>
                 </div>
               )}
