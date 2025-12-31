@@ -299,13 +299,14 @@ export default function MonetizeDemoPage() {
     <div className="min-h-screen bg-black text-gray-100 font-sans flex flex-col items-center py-12 px-4">
       
       {/* Header */}
-      <div className="w-full max-w-3xl mb-4 flex items-center justify-between">
-        <Link href="/" className="text-gray-500 hover:text-white flex items-center gap-2 transition">
+      <div className="w-full max-w-3xl mb-4 grid grid-cols-3 items-center">
+        <Link href="/" className="text-gray-500 hover:text-white flex items-center gap-2 transition justify-self-start">
           <ArrowLeft size={18} /> Back to Home
         </Link>
-        <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
+        <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 text-center justify-self-center">
           ⚡ Monetize Mode Demo
         </h1>
+        <div></div>
       </div>
 
       {/* Hero Description */}
