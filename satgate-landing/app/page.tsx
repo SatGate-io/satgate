@@ -30,7 +30,8 @@ const LandingPage = () => {
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
             <Link href="#features" className="hover:text-white transition">Features</Link>
             <Link href="/crawl" className="hover:text-white transition">Protect Demo</Link>
-            <Link href="/playground" className="hover:text-white transition">Monetize Demo</Link>
+            <Link href="/monetize" className="hover:text-white transition">Monetize Demo</Link>
+            <Link href="/gateway" className="hover:text-white transition">Gateway</Link>
             <Link href="/dashboard" className="hover:text-white transition">Dashboard</Link>
             <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a>
           </div>
@@ -68,11 +69,18 @@ const LandingPage = () => {
               Protect Demo
             </Link>
             <Link 
-              href="/playground" 
+              href="/monetize" 
               onClick={() => setMobileMenuOpen(false)} 
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Monetize Demo
+            </Link>
+            <Link 
+              href="/gateway" 
+              onClick={() => setMobileMenuOpen(false)} 
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              Gateway
             </Link>
             <Link 
               href="/dashboard" 
