@@ -1313,17 +1313,155 @@ export default function CrawlDemoPage() {
           </div>
         </div>
 
-        {/* Token Showcase */}
+        {/* Token Lineage Visualization */}
         {(parentToken || childToken) && (
           <div className="mt-8 bg-gray-900 rounded-xl border border-gray-800 p-6">
-            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <Key className="text-purple-400" /> Active Tokens
+            <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+              <GitBranch className="text-purple-400" /> Token Lineage Graph
             </h3>
+            
+            {/* Visual Graph */}
+            <div className="relative bg-black rounded-xl border border-gray-800 p-8 mb-6 overflow-hidden">
+              {/* Background Grid */}
+              <div className="absolute inset-0 opacity-10">
+                <svg width="100%" height="100%">
+                  <defs>
+                    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="currentColor" strokeWidth="0.5"/>
+                    </pattern>
+                  </defs>
+                  <rect width="100%" height="100%" fill="url(#grid)" />
+                </svg>
+              </div>
+
+              <div className="relative flex items-center justify-center gap-8 md:gap-16 min-h-[200px]">
+                {/* Parent Token Node */}
+                {parentToken && (
+                  <div className="flex flex-col items-center">
+                    {/* Node */}
+                    <div className={`relative w-24 h-24 md:w-32 md:h-32 rounded-full border-4 flex items-center justify-center transition-all duration-500 ${
+                      bannedToken ? 'border-gray-600 bg-gray-900/50' : 'border-cyan-500 bg-cyan-950/50'
+                    }`}>
+                      {/* Pulse Animation */}
+                      {!bannedToken && (
+                        <div className="absolute inset-0 rounded-full border-4 border-cyan-400 animate-ping opacity-20" />
+                      )}
+                      <div className="text-center">
+                        <User className={`mx-auto mb-1 ${bannedToken ? 'text-gray-500' : 'text-cyan-400'}`} size={28} />
+                        <span className={`text-xs font-bold ${bannedToken ? 'text-gray-500' : 'text-cyan-300'}`}>CISO</span>
+                      </div>
+                    </div>
+                    {/* Label */}
+                    <div className="mt-3 text-center">
+                      <div className={`text-sm font-semibold ${bannedToken ? 'text-gray-500' : 'text-cyan-400'}`}>
+                        Parent Token
+                      </div>
+                      <div className="text-xs text-gray-500 font-mono mt-1">
+                        {parentToken.scope}
+                      </div>
+                      <div className={`mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${
+                        bannedToken ? 'bg-gray-800 text-gray-500' : 'bg-green-900/50 text-green-400'
+                      }`}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${bannedToken ? 'bg-gray-500' : 'bg-green-400 animate-pulse'}`} />
+                        {bannedToken ? 'Inactive' : 'Active'}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Connection Line */}
+                {parentToken && childToken && (
+                  <div className="flex flex-col items-center">
+                    {/* Animated Line */}
+                    <div className="relative w-16 md:w-32 h-1">
+                      <div className={`absolute inset-0 rounded-full ${
+                        bannedToken ? 'bg-red-900/50' : 'bg-gradient-to-r from-cyan-500 to-purple-500'
+                      }`} />
+                      {!bannedToken && (
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 to-purple-400 animate-pulse" />
+                      )}
+                      {/* Arrow */}
+                      <div className={`absolute -right-2 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[8px] ${
+                        bannedToken ? 'border-l-red-900/50' : 'border-l-purple-500'
+                      }`} />
+                    </div>
+                    {/* Delegation Label */}
+                    <div className={`mt-2 text-xs font-medium ${bannedToken ? 'text-red-400' : 'text-gray-400'}`}>
+                      {bannedToken ? '✗ REVOKED' : '→ delegated'}
+                    </div>
+                  </div>
+                )}
+
+                {/* Child Token Node */}
+                {childToken && (
+                  <div className="flex flex-col items-center">
+                    {/* Node */}
+                    <div className={`relative w-24 h-24 md:w-32 md:h-32 rounded-full border-4 flex items-center justify-center transition-all duration-500 ${
+                      bannedToken 
+                        ? 'border-red-500 bg-red-950/50' 
+                        : 'border-purple-500 bg-purple-950/50'
+                    }`}>
+                      {/* Banned Animation */}
+                      {bannedToken && (
+                        <div className="absolute inset-0 rounded-full border-4 border-red-500 animate-pulse opacity-50" />
+                      )}
+                      {/* Strike-through for banned */}
+                      {bannedToken && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-full h-1 bg-red-500 rotate-45 transform" />
+                        </div>
+                      )}
+                      <div className="text-center">
+                        <Bot className={`mx-auto mb-1 ${bannedToken ? 'text-red-400' : 'text-purple-400'}`} size={28} />
+                        <span className={`text-xs font-bold ${bannedToken ? 'text-red-300' : 'text-purple-300'}`}>Worker</span>
+                      </div>
+                    </div>
+                    {/* Label */}
+                    <div className="mt-3 text-center">
+                      <div className={`text-sm font-semibold ${bannedToken ? 'text-red-400' : 'text-purple-400'}`}>
+                        Child Token
+                      </div>
+                      <div className="text-xs text-gray-500 font-mono mt-1">
+                        {childToken.scope}
+                      </div>
+                      <div className={`mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${
+                        bannedToken 
+                          ? 'bg-red-900/50 text-red-400' 
+                          : 'bg-green-900/50 text-green-400'
+                      }`}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${
+                          bannedToken ? 'bg-red-400' : 'bg-green-400 animate-pulse'
+                        }`} />
+                        {bannedToken ? 'BANNED' : 'Active'}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Legend */}
+              <div className="absolute bottom-3 right-3 flex items-center gap-4 text-xs text-gray-500">
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-green-400" />
+                  <span>Active</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-red-400" />
+                  <span>Banned</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Token Details Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {parentToken && (
-                <div className="bg-black rounded-xl border border-cyan-800/50 p-4">
+                <div className={`bg-black rounded-xl border p-4 transition-all ${
+                  bannedToken ? 'border-gray-700' : 'border-cyan-800/50'
+                }`}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-cyan-400 font-semibold">Parent Token</span>
+                    <span className={`font-semibold ${bannedToken ? 'text-gray-500' : 'text-cyan-400'}`}>
+                      Parent Token (CISO)
+                    </span>
                     <button
                       onClick={() => copyToClipboard(parentToken.raw, 'parent-showcase')}
                       className="p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 rounded transition"
@@ -1332,17 +1470,24 @@ export default function CrawlDemoPage() {
                     </button>
                   </div>
                   <div className="text-xs font-mono text-gray-400 break-all bg-gray-900 rounded p-2">
-                    {parentToken.raw.substring(0, 60)}...
+                    {parentToken.raw.substring(0, 50)}...
                   </div>
-                  <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
-                    <Clock size={12} /> Scope: {parentToken.scope}
+                  <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                    <div className="text-gray-500">Scope:</div>
+                    <div className="text-cyan-400 font-mono">{parentToken.scope}</div>
+                    <div className="text-gray-500">Can Mint:</div>
+                    <div className="text-green-400">Yes (Admin)</div>
                   </div>
                 </div>
               )}
               {childToken && (
-                <div className="bg-black rounded-xl border border-purple-800/50 p-4">
+                <div className={`bg-black rounded-xl border p-4 transition-all ${
+                  bannedToken ? 'border-red-800/50' : 'border-purple-800/50'
+                }`}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-purple-400 font-semibold">Child Token (Restricted)</span>
+                    <span className={`font-semibold ${bannedToken ? 'text-red-400' : 'text-purple-400'}`}>
+                      Child Token (Worker) {bannedToken && '🚫'}
+                    </span>
                     <button
                       onClick={() => copyToClipboard(childToken.raw, 'child-showcase')}
                       className="p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 rounded transition"
@@ -1350,11 +1495,22 @@ export default function CrawlDemoPage() {
                       {copied === 'child-showcase' ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
                     </button>
                   </div>
-                  <div className="text-xs font-mono text-gray-400 break-all bg-gray-900 rounded p-2">
-                    {childToken.raw.substring(0, 60)}...
+                  <div className={`text-xs font-mono break-all bg-gray-900 rounded p-2 ${
+                    bannedToken ? 'text-red-400/50 line-through' : 'text-gray-400'
+                  }`}>
+                    {childToken.raw.substring(0, 50)}...
                   </div>
-                  <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
-                    <Lock size={12} /> Scope: {childToken.scope} (attenuated)
+                  <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                    <div className="text-gray-500">Scope:</div>
+                    <div className="text-purple-400 font-mono">{childToken.scope}</div>
+                    <div className="text-gray-500">Can Mint:</div>
+                    <div className="text-red-400">No (Restricted)</div>
+                    {bannedToken && (
+                      <>
+                        <div className="text-gray-500">Status:</div>
+                        <div className="text-red-400 font-bold">BANNED</div>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
