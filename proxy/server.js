@@ -726,11 +726,15 @@ const telemetry = {
     
     const bannedSize = await bannedTokens.size();
     
+    // Count only tokens with ACTIVE status (not BANNED ones)
+    const activeCount = Array.from(this.activeTokens.values())
+      .filter(t => t.status === 'ACTIVE').length;
+    
     return {
       nodes,
       edges,
       stats: {
-        active: this.activeTokens.size,
+        active: activeCount,
         blocked: this.blockedCount,
         banned: bannedSize,
         bannedHits: this.bannedHits,
