@@ -22,6 +22,13 @@ function generateMockMacaroon(): string {
   return result;
 }
 
+// Mock signature generation for simulation mode (64 char hex string)
+function generateMockSignature(): string {
+  return Array.from({ length: 64 }, () => 
+    '0123456789abcdef'[Math.floor(Math.random() * 16)]
+  ).join('');
+}
+
 interface Token {
   raw: string;
   scope: string;
