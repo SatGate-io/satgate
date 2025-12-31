@@ -1838,6 +1838,7 @@ app.post('/api/capability/mint', express.json(), (req, res) => {
     res.json({
       ok: true,
       token: tokenBase64,
+      signature: m.signature, // Hex signature for dashboard correlation
       usage: `curl -H "Authorization: Bearer ${tokenBase64}" https://satgate-production.up.railway.app/api/capability/ping`,
       caveats: {
         scope,

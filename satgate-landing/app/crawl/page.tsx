@@ -103,18 +103,21 @@ export default function ProtectDemoPage() {
         // Simulate the minting process
         await new Promise(r => setTimeout(r, 800));
         const mockToken = generateMockMacaroon();
+        const mockSignature = generateMockSignature();
         const expiresAt = new Date(Date.now() + 3600000).toISOString();
         
         addLog('✅ Token minted successfully!', 'success');
         addLog('📜 Scope: api:capability:*', 'info');
         addLog(`⏰ Expires: ${expiresAt}`, 'info');
+        addLog(`🔑 Token ID: ${mockSignature.substring(0, 12)}...`, 'info');
         addLog('💡 No database write. No service account. Pure cryptography.', 'success');
         
         setParentToken({
           raw: mockToken,
           scope: 'api:capability:*',
           expiresAt: expiresAt,
-          caveats: { scope: 'api:capability:*', expires: expiresAt }
+          caveats: { scope: 'api:capability:*', expires: expiresAt },
+          signature: mockSignature
         });
         
         setCurrentScene('use');
@@ -150,8 +153,13 @@ export default function ProtectDemoPage() {
         raw: data.token,
         scope: data.caveats?.scope || 'api:capability:*',
         expiresAt: data.caveats?.expires || '',
-        caveats: data.caveats || {}
+        caveats: data.caveats || {},
+        signature: data.signature // Store hex signature for dashboard correlation
       });
+      
+      if (data.signature) {
+        addLog(`🔑 Token ID: ${data.signature.substring(0, 12)}...`, 'info');
+      }
 
       setCurrentScene('use');
     } catch (err: any) {
@@ -261,6 +269,7 @@ export default function ProtectDemoPage() {
           signature: mockSignature
         });
         addLog('✅ Child token created with restricted scope!', 'success');
+        addLog(`🔑 Token ID: ${mockSignature.substring(0, 12)}... (matches dashboard)`, 'info');
         
         setCurrentScene('enforce');
         return;
@@ -298,7 +307,7 @@ export default function ProtectDemoPage() {
         });
         addLog('✅ Child token created with restricted scope!', 'success');
         if (data.childSignature) {
-          addLog(`🔑 Signature: ${data.childSignature.substring(0, 16)}...`, 'info');
+          addLog(`🔑 Token ID: ${data.childSignature.substring(0, 12)}... (matches dashboard)`, 'info');
         }
       }
       
@@ -1554,6 +1563,10 @@ export default function ProtectDemoPage() {
                       {copied === 'parent-showcase' ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
                     </button>
                   </div>
+                  {/* Show Token ID that matches dashboard */}
+                  <div className="text-xs font-mono text-cyan-300 bg-cyan-900/30 rounded px-2 py-1 mb-2 inline-block">
+                    ID: {parentToken.signature?.substring(0, 12) || 'N/A'}...
+                  </div>
                   <div className="text-xs font-mono text-gray-400 break-all bg-gray-900 rounded p-2">
                     {parentToken.raw.substring(0, 50)}...
                   </div>
@@ -1581,6 +1594,12 @@ export default function ProtectDemoPage() {
                     >
                       {copied === 'child-showcase' ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
                     </button>
+                  </div>
+                  {/* Show Token ID that matches dashboard */}
+                  <div className={`text-xs font-mono rounded px-2 py-1 mb-2 inline-block ${
+                    bannedToken ? 'text-red-300 bg-red-900/30' : 'text-purple-300 bg-purple-900/30'
+                  }`}>
+                    ID: {childToken.signature?.substring(0, 12) || 'N/A'}...
                   </div>
                   <div className={`text-xs font-mono break-all bg-gray-900 rounded p-2 ${
                     bannedToken ? 'text-red-400/50 line-through' : 'text-gray-400'
