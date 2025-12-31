@@ -19,6 +19,7 @@
 
 const { matchRoute, getConfig } = require('./index');
 const { SimpleMacaroon } = require('../l402');
+const crypto = require('crypto');
 
 /**
  * Required headers from ingress
@@ -32,7 +33,8 @@ const REQUIRED_HEADERS = [
  * Generate a unique request ID
  */
 function generateRequestId() {
-  return `sg-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 9)}`;
+  const rand = crypto.randomBytes(12).toString('hex');
+  return `sg-${Date.now().toString(36)}-${rand}`;
 }
 
 /**

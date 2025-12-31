@@ -77,6 +77,11 @@ function validateUpstreamUrl(name, url) {
   if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
     throw new Error(`Upstream '${name}' must use http or https (got ${parsed.protocol})`);
   }
+
+  // SECURITY: Do not allow credentials in upstream URLs (can leak via logs/errors).
+  if (parsed.username || parsed.password) {
+    throw new Error(`Upstream '${name}' URL must not include credentials (username/password)`);
+  }
   
   // Disallow file://, data://, javascript://, etc.
   // Disallow localhost/127.0.0.1 in production? (configurable)

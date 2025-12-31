@@ -6,6 +6,7 @@
  */
 
 const { hopByHopHeaders, satgateRequestHeaders } = require('./config/defaults');
+const crypto = require('crypto');
 
 /**
  * Create limits middleware
@@ -90,7 +91,12 @@ function sanitizeRequestHeaders(incomingHeaders, upstreamConfig, satgateContext)
   // Add upstream-specific headers
   if (upstreamConfig.addHeaders) {
     for (const [key, value] of Object.entries(upstreamConfig.addHeaders)) {
-      sanitized[key.toLowerCase()] = value;
+      const headerName = String(key || '').trim().toLowerCase();
+      // SECURITY: prevent header injection / request splitting via header name/value.
+      if (!/^[a-z0-9-]+$/.test(headerName)) continue;
+      if (typeof value !== 'string') continue;
+      if (/[\r\n]/.test(value)) continue;
+      sanitized[headerName] = value;
     }
   }
   
@@ -168,7 +174,10 @@ function sanitizeResponseHeaders(upstreamHeaders, upstreamConfig) {
  * Generate a unique request ID
  */
 function generateRequestId() {
-  return `sg-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 9)}`;
+  // SECURITY: use cryptographically strong randomness (not Math.random).
+  // Keep it short for headers/logs.
+  const rand = crypto.randomBytes(12).toString('hex');
+  return `sg-${Date.now().toString(36)}-${rand}`;
 }
 
 /**

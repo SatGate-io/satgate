@@ -4,7 +4,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Key, Shield, Lock, Unlock, Play, ArrowLeft, Copy, Check, 
   ChevronRight, AlertTriangle, CheckCircle, XCircle, User, 
-  Bot, GitBranch, Clock, RefreshCw, Eye, Trash2, Wifi, WifiOff
+  Bot, GitBranch, Clock, RefreshCw, Eye, Trash2, Wifi, WifiOff,
+  Ban, ShieldOff, Zap
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -34,7 +35,7 @@ interface LogEntry {
   timestamp: Date;
 }
 
-type DemoScene = 'intro' | 'mint' | 'use' | 'delegate' | 'enforce' | 'summary';
+type DemoScene = 'intro' | 'mint' | 'use' | 'delegate' | 'enforce' | 'revoke' | 'summary';
 
 export default function CrawlDemoPage() {
   const [currentScene, setCurrentScene] = useState<DemoScene>('intro');
@@ -46,6 +47,8 @@ export default function CrawlDemoPage() {
   const [pingResult, setPingResult] = useState<any>(null);
   const [delegationResult, setDelegationResult] = useState<any>(null);
   const [enforcementResults, setEnforcementResults] = useState<{allowed: any; blocked: any} | null>(null);
+  const [bannedToken, setBannedToken] = useState<string | null>(null);
+  const [revocationResult, setRevocationResult] = useState<{banned: boolean; tested: boolean; error?: string} | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [useSimulation, setUseSimulation] = useState(true); // Default to simulation since prod mode needs auth
 
@@ -369,6 +372,121 @@ export default function CrawlDemoPage() {
     setIsLoading(false);
   };
 
+  // Scene 5: Kill Switch (Revocation)
+  const handleBanToken = async () => {
+    if (!childToken) return;
+    
+    setIsLoading(true);
+    clearLogs();
+    addLog('🚨 CISO: "Emergency! The child token has been compromised!"', 'warn');
+    addLog(`📡 POST /api/governance/ban ${useSimulation ? '(SIMULATION)' : '(LIVE)'}`, 'info');
+    addLog(`🎯 Target: ${childToken.raw.substring(0, 30)}...`, 'info');
+    
+    try {
+      if (useSimulation) {
+        await new Promise(r => setTimeout(r, 600));
+        
+        addLog('', 'info');
+        addLog('✅ Token BANNED successfully!', 'success');
+        addLog('⚡ Propagation: INSTANT (no sync delay)', 'success');
+        addLog('📝 Ban reason: "Demo revocation - compromised token"', 'info');
+        addLog('🔗 All child tokens derived from this: ALSO BANNED', 'warn');
+        
+        setBannedToken(childToken.raw);
+        setRevocationResult({ banned: true, tested: false });
+        return;
+      }
+
+      // Live mode would require admin auth
+      const response = await fetch(`${BASE_URL}/api/governance/ban`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          // Note: Live mode requires X-Admin-Token header
+        },
+        body: JSON.stringify({
+          tokenSignature: childToken.raw.substring(0, 32),
+          reason: 'Demo revocation - compromised token'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Admin authentication required for live ban');
+      }
+
+      const data = await response.json();
+      addLog('', 'info');
+      addLog('✅ Token BANNED successfully!', 'success');
+      addLog('⚡ Propagation: INSTANT', 'success');
+      
+      setBannedToken(childToken.raw);
+      setRevocationResult({ banned: true, tested: false });
+    } catch (err: any) {
+      addLog(`❌ Error: ${err.message}`, 'error');
+      addLog('💡 Live ban requires admin authentication. Using simulation.', 'warn');
+      
+      // Fall back to simulation
+      await new Promise(r => setTimeout(r, 400));
+      addLog('', 'info');
+      addLog('✅ Token BANNED (simulated)', 'success');
+      setBannedToken(childToken.raw);
+      setRevocationResult({ banned: true, tested: false });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleTestBannedToken = async () => {
+    if (!bannedToken) return;
+    
+    setIsLoading(true);
+    addLog('', 'info');
+    addLog('🤖 Worker: "Trying to use my old token..."', 'info');
+    addLog(`📡 GET /api/capability/ping ${useSimulation ? '(SIMULATION)' : '(LIVE)'}`, 'info');
+    addLog(`🔑 Authorization: Bearer ${bannedToken.substring(0, 30)}...`, 'info');
+    
+    try {
+      if (useSimulation) {
+        await new Promise(r => setTimeout(r, 500));
+        
+        addLog('', 'info');
+        addLog('🚫 403 Forbidden - TOKEN REVOKED!', 'error');
+        addLog('', 'info');
+        addLog('📝 Response:', 'info');
+        addLog('   error: "Token Revoked"', 'error');
+        addLog('   reason: "This token has been banned by an administrator"', 'error');
+        addLog('   code: "TOKEN_BANNED"', 'error');
+        addLog('', 'info');
+        addLog('💡 The Panic Button worked. Token is dead globally.', 'success');
+        
+        setRevocationResult({ banned: true, tested: true });
+        return;
+      }
+
+      const response = await fetch(`${BASE_URL}/api/capability/ping`, {
+        headers: { 'Authorization': `Bearer ${bannedToken}` }
+      });
+
+      const data = await response.json();
+      
+      if (response.status === 403) {
+        addLog('', 'info');
+        addLog('🚫 403 Forbidden - TOKEN REVOKED!', 'error');
+        addLog(`📝 Response: ${JSON.stringify(data)}`, 'info');
+        addLog('', 'info');
+        addLog('💡 The Panic Button worked. Token is dead globally.', 'success');
+        setRevocationResult({ banned: true, tested: true });
+      } else {
+        addLog(`⚠️ Unexpected response: ${response.status}`, 'warn');
+        setRevocationResult({ banned: true, tested: true, error: 'Unexpected response' });
+      }
+    } catch (err: any) {
+      addLog(`❌ Error: ${err.message}`, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const resetDemo = () => {
     setCurrentScene('intro');
     setParentToken(null);
@@ -376,6 +494,8 @@ export default function CrawlDemoPage() {
     setPingResult(null);
     setDelegationResult(null);
     setEnforcementResults(null);
+    setBannedToken(null);
+    setRevocationResult(null);
     clearLogs();
   };
 
@@ -419,13 +539,14 @@ export default function CrawlDemoPage() {
             { id: 'use', label: 'Use Token', icon: Unlock },
             { id: 'delegate', label: 'Delegate', icon: GitBranch },
             { id: 'enforce', label: 'Enforce', icon: Lock },
+            { id: 'revoke', label: 'Kill Switch', icon: Ban },
             { id: 'summary', label: 'Summary', icon: CheckCircle },
           ].map((scene, idx, arr) => (
             <React.Fragment key={scene.id}>
               <button
                 onClick={() => {
                   // Only allow going back to completed scenes
-                  const scenes: DemoScene[] = ['intro', 'mint', 'use', 'delegate', 'enforce', 'summary'];
+                  const scenes: DemoScene[] = ['intro', 'mint', 'use', 'delegate', 'enforce', 'revoke', 'summary'];
                   const currentIdx = scenes.indexOf(currentScene);
                   const targetIdx = scenes.indexOf(scene.id as DemoScene);
                   if (targetIdx <= currentIdx) {
@@ -542,6 +663,25 @@ export default function CrawlDemoPage() {
                     "Can the child token escalate privileges? Let's test it. The Gateway will reject it — 
                     not because we looked it up in a database, but because the 
                     <strong className="text-red-400"> token itself</strong> said 'I can only access /ping'."
+                  </p>
+                </>
+              )}
+
+              {currentScene === 'revoke' && (
+                <>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-3 bg-orange-900/50 rounded-xl">
+                      <Ban className="text-orange-400" size={28} />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-white">Scene 5: Kill Switch</h2>
+                      <p className="text-gray-400 text-sm">Emergency Token Revocation</p>
+                    </div>
+                  </div>
+                  <p className="text-gray-300 leading-relaxed">
+                    "The token is compromised. Ban it <strong className="text-orange-400">globally and instantly</strong>. 
+                    We're stateless for validation (fast), but stateful for revocation (secure). 
+                    This is the <strong className="text-orange-400">Panic Button</strong>."
                   </p>
                 </>
               )}
@@ -837,6 +977,128 @@ export default function CrawlDemoPage() {
                       </div>
 
                       <button
+                        onClick={() => setCurrentScene('revoke')}
+                        className="w-full py-3 bg-white text-black rounded-xl font-bold hover:bg-gray-200 transition flex items-center justify-center gap-2"
+                      >
+                        Next: Kill Switch Demo <ChevronRight size={18} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {currentScene === 'revoke' && (
+                <div className="space-y-4">
+                  {!revocationResult?.banned ? (
+                    <>
+                      <div className="bg-orange-950/30 border border-orange-800/50 rounded-xl p-4">
+                        <div className="flex items-center gap-2 text-orange-400 font-semibold mb-2">
+                          <AlertTriangle size={18} /> Emergency Scenario
+                        </div>
+                        <p className="text-gray-400 text-sm">
+                          The child token has been compromised! An attacker obtained it from a worker's logs. 
+                          We need to revoke it <strong>immediately</strong>.
+                        </p>
+                      </div>
+
+                      <div className="bg-black rounded-xl border border-gray-800 p-4">
+                        <div className="text-sm text-gray-400 mb-2">Token to ban:</div>
+                        <div className="text-xs font-mono text-orange-400 break-all">
+                          {childToken?.raw.substring(0, 50)}...
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={handleBanToken}
+                        disabled={isLoading || !childToken}
+                        className={`w-full py-4 rounded-xl font-bold text-lg transition flex items-center justify-center gap-2 ${
+                          isLoading || !childToken
+                            ? 'bg-gray-800 text-gray-500 cursor-not-allowed' 
+                            : 'bg-orange-600 text-white hover:bg-orange-500'
+                        }`}
+                      >
+                        {isLoading ? (
+                          <>
+                            <RefreshCw size={20} className="animate-spin" /> Banning...
+                          </>
+                        ) : (
+                          <>
+                            <Ban size={20} /> Trigger Kill Switch
+                          </>
+                        )}
+                      </button>
+                    </>
+                  ) : !revocationResult?.tested ? (
+                    <div className="space-y-4">
+                      <div className="bg-green-950/30 border border-green-800/50 rounded-xl p-4">
+                        <div className="flex items-center gap-2 text-green-400 font-semibold mb-2">
+                          <CheckCircle size={18} /> Token Banned!
+                        </div>
+                        <p className="text-gray-400 text-sm">
+                          The token is now on the global ban list. Let's verify it's actually blocked.
+                        </p>
+                      </div>
+
+                      <div className="bg-gradient-to-r from-orange-950/30 to-red-950/30 rounded-xl p-4 border border-orange-800/30">
+                        <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
+                          <Zap size={16} className="text-yellow-400" /> Instant Propagation
+                        </h4>
+                        <p className="text-gray-400 text-sm">
+                          Unlike traditional IAM where revocation can take minutes/hours to propagate, 
+                          SatGate's ban list is checked on every request. The token is dead <strong>now</strong>.
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={handleTestBannedToken}
+                        disabled={isLoading}
+                        className={`w-full py-4 rounded-xl font-bold text-lg transition flex items-center justify-center gap-2 ${
+                          isLoading 
+                            ? 'bg-gray-800 text-gray-500 cursor-not-allowed' 
+                            : 'bg-red-600 text-white hover:bg-red-500'
+                        }`}
+                      >
+                        {isLoading ? (
+                          <>
+                            <RefreshCw size={20} className="animate-spin" /> Testing...
+                          </>
+                        ) : (
+                          <>
+                            <ShieldOff size={20} /> Try Using Banned Token
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="bg-red-950/30 border border-red-800/50 rounded-xl p-4">
+                        <div className="flex items-center gap-2 text-red-400 font-semibold mb-2">
+                          <XCircle size={18} /> Token Rejected!
+                        </div>
+                        <p className="text-gray-400 text-sm mb-3">
+                          The banned token was instantly rejected. The attacker is locked out.
+                        </p>
+                        <pre className="text-xs bg-black rounded-lg p-3 text-red-400 overflow-x-auto">
+{`{
+  "error": "Token Revoked",
+  "reason": "This token has been banned by an administrator",
+  "code": "TOKEN_BANNED"
+}`}
+                        </pre>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="p-4 bg-black rounded-xl border border-orange-800/50 text-center">
+                          <div className="text-2xl font-bold text-orange-400 mb-1">Instant</div>
+                          <div className="text-gray-400 text-xs">Revocation Time</div>
+                        </div>
+                        <div className="p-4 bg-black rounded-xl border border-red-800/50 text-center">
+                          <div className="text-2xl font-bold text-red-400 mb-1">Global</div>
+                          <div className="text-gray-400 text-xs">Ban Scope</div>
+                        </div>
+                      </div>
+
+                      <button
                         onClick={() => setCurrentScene('summary')}
                         className="w-full py-3 bg-white text-black rounded-xl font-bold hover:bg-gray-200 transition flex items-center justify-center gap-2"
                       >
@@ -849,7 +1111,7 @@ export default function CrawlDemoPage() {
 
               {currentScene === 'summary' && (
                 <div className="space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="p-4 bg-black rounded-xl border border-green-800/50">
                       <div className="text-3xl font-bold text-green-400 mb-1">0</div>
                       <div className="text-gray-400 text-sm">Network calls for delegation</div>
@@ -857,6 +1119,10 @@ export default function CrawlDemoPage() {
                     <div className="p-4 bg-black rounded-xl border border-purple-800/50">
                       <div className="text-3xl font-bold text-purple-400 mb-1">0</div>
                       <div className="text-gray-400 text-sm">Admin tickets required</div>
+                    </div>
+                    <div className="p-4 bg-black rounded-xl border border-orange-800/50">
+                      <div className="text-3xl font-bold text-orange-400 mb-1">Instant</div>
+                      <div className="text-gray-400 text-sm">Kill Switch revocation</div>
                     </div>
                   </div>
 
@@ -874,6 +1140,10 @@ export default function CrawlDemoPage() {
                       <li className="flex items-start gap-2">
                         <CheckCircle size={16} className="text-green-400 mt-0.5 flex-shrink-0" />
                         <span>CISO retains authority (tokens are read-only by default)</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle size={16} className="text-green-400 mt-0.5 flex-shrink-0" />
+                        <span>Instant Kill Switch revocation — no propagation delay</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle size={16} className="text-green-400 mt-0.5 flex-shrink-0" />
