@@ -12,6 +12,37 @@ import Link from 'next/link';
 // Railway embedded mode deployment
 const BASE_URL = 'https://satgate-production.up.railway.app';
 
+// Fetch with timeout to prevent hanging
+async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 10000): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Request timed out - server may be unavailable');
+    }
+    throw error;
+  }
+}
+
+// Safe JSON parse that won't crash
+async function safeJsonParse(response: Response): Promise<any> {
+  try {
+    const text = await response.text();
+    return JSON.parse(text);
+  } catch {
+    return { error: 'Invalid response from server' };
+  }
+}
+
 // Mock token generation for simulation mode
 function generateMockMacaroon(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -136,7 +167,7 @@ export default function ProtectDemoPage() {
         headers['X-Admin-Token'] = adminToken;
       }
 
-      const response = await fetch(`${BASE_URL}/api/capability/mint`, {
+      const response = await fetchWithTimeout(`${BASE_URL}/api/capability/mint`, {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -145,12 +176,11 @@ export default function ProtectDemoPage() {
         })
       });
 
+      const data = await safeJsonParse(response);
+      
       if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.message || errData.error || `Server returned ${response.status}`);
+        throw new Error(data.message || data.error || `Server returned ${response.status}`);
       }
-
-      const data = await response.json();
       addLog('✅ Token minted successfully!', 'success');
       addLog(`📜 Scope: ${data.caveats?.scope || 'api:capability:*'}`, 'info');
       addLog(`⏰ Expires: ${data.caveats?.expires || 'in 1 hour'}`, 'info');
@@ -211,13 +241,13 @@ export default function ProtectDemoPage() {
         return;
       }
 
-      const response = await fetch(`${BASE_URL}/api/capability/ping`, {
+      const response = await fetchWithTimeout(`${BASE_URL}/api/capability/ping`, {
         headers: {
           'Authorization': `Bearer ${parentToken.raw}`
         }
       });
 
-      const data = await response.json();
+      const data = await safeJsonParse(response);
       
       if (response.ok) {
         addLog('✅ 200 OK - Authenticated instantly!', 'success');
