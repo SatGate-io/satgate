@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "buildCommand": "cd satgate-landing && npm install && npm run build",
+  "outputDirectory": "satgate-landing/.next",
+  "installCommand": "echo 'skipping root install'"
+}
+
