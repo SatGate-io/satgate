@@ -1368,14 +1368,14 @@ export default function CrawlDemoPage() {
                         <div className="absolute inset-0 rounded-full border-4 border-cyan-400 animate-ping opacity-20" />
                       )}
                       <div className="text-center">
-                        <User className={`mx-auto mb-1 ${bannedToken ? 'text-gray-500' : 'text-cyan-400'}`} size={28} />
-                        <span className={`text-xs font-bold ${bannedToken ? 'text-gray-500' : 'text-cyan-300'}`}>CISO</span>
+                        <Bot className={`mx-auto mb-1 ${bannedToken ? 'text-gray-500' : 'text-cyan-400'}`} size={28} />
+                        <span className={`text-xs font-bold ${bannedToken ? 'text-gray-500' : 'text-cyan-300'}`}>Agent</span>
                       </div>
                     </div>
                     {/* Label */}
                     <div className="mt-3 text-center">
                       <div className={`text-sm font-semibold ${bannedToken ? 'text-gray-500' : 'text-cyan-400'}`}>
-                        Parent Token
+                        Parent Token (from CISO)
                       </div>
                       <div className="text-xs text-gray-500 font-mono mt-1">
                         {parentToken.scope}
@@ -1440,7 +1440,7 @@ export default function CrawlDemoPage() {
                     {/* Label */}
                     <div className="mt-3 text-center">
                       <div className={`text-sm font-semibold ${bannedToken ? 'text-red-400' : 'text-purple-400'}`}>
-                        Child Token
+                        Child Token (from Agent)
                       </div>
                       <div className="text-xs text-gray-500 font-mono mt-1">
                         {childToken.scope}
@@ -1481,7 +1481,7 @@ export default function CrawlDemoPage() {
                 }`}>
                   <div className="flex items-center justify-between mb-2">
                     <span className={`font-semibold ${bannedToken ? 'text-gray-500' : 'text-cyan-400'}`}>
-                      Parent Token (CISO)
+                      Agent Token (from CISO)
                     </span>
                     <button
                       onClick={() => copyToClipboard(parentToken.raw, 'parent-showcase')}
@@ -1507,7 +1507,7 @@ export default function CrawlDemoPage() {
                 }`}>
                   <div className="flex items-center justify-between mb-2">
                     <span className={`font-semibold ${bannedToken ? 'text-red-400' : 'text-purple-400'}`}>
-                      Child Token (Worker) {bannedToken && '🚫'}
+                      Worker Token (from Agent) {bannedToken && '🚫'}
                     </span>
                     <button
                       onClick={() => copyToClipboard(childToken.raw, 'child-showcase')}
