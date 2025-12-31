@@ -54,6 +54,24 @@ export default function CrawlDemoPage() {
   const [adminToken, setAdminToken] = useState(''); // Admin token for live mode
   const [showAdminInput, setShowAdminInput] = useState(false);
 
+  // Load admin token from localStorage on mount
+  useEffect(() => {
+    const savedToken = localStorage.getItem('satgate_admin_token');
+    if (savedToken) {
+      setAdminToken(savedToken);
+    }
+  }, []);
+
+  // Save admin token to localStorage when it changes
+  const handleSetAdminToken = (token: string) => {
+    setAdminToken(token);
+    if (token) {
+      localStorage.setItem('satgate_admin_token', token);
+    } else {
+      localStorage.removeItem('satgate_admin_token');
+    }
+  };
+
   const addLog = (msg: string, type: LogEntry['type'] = 'info') => {
     setLogs(prev => [...prev, { msg, type, timestamp: new Date() }]);
   };
@@ -561,10 +579,19 @@ export default function CrawlDemoPage() {
               <input
                 type="password"
                 value={adminToken}
-                onChange={(e) => setAdminToken(e.target.value)}
+                onChange={(e) => handleSetAdminToken(e.target.value)}
                 placeholder="Enter your ADMIN_TOKEN from Railway..."
                 className="flex-1 px-3 py-2 bg-black border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none"
               />
+              {adminToken && (
+                <button
+                  onClick={() => handleSetAdminToken('')}
+                  className="px-3 py-2 bg-red-900/30 border border-red-800 text-red-400 rounded-lg text-sm font-medium hover:bg-red-900/50 transition"
+                  title="Clear saved token"
+                >
+                  Clear
+                </button>
+              )}
               <div className="flex gap-2">
                 <button
                   onClick={() => {
@@ -591,7 +618,8 @@ export default function CrawlDemoPage() {
               </div>
             </div>
             <p className="max-w-6xl mx-auto mt-2 text-xs text-gray-500">
-              Get your admin token from Railway: <code className="text-purple-400">railway variables -s satgate | grep ADMIN_TOKEN</code>
+              Get your token from <a href="https://railway.app/dashboard" target="_blank" rel="noopener noreferrer" className="text-purple-400 underline">Railway Dashboard</a> → Variables → ADMIN_TOKEN
+              {adminToken && <span className="text-green-400 ml-2">✓ Token saved to this browser</span>}
             </p>
           </div>
         )}
