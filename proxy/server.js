@@ -2269,6 +2269,15 @@ app.post('/api/governance/ban', adminRateLimit, requirePricingAdmin, async (req,
   }
   
   await bannedTokens.add(sig);
+  
+  // Update status in activeTokens so dashboard reflects immediately
+  for (const [tokenSig, tokenData] of telemetry.activeTokens) {
+    if (tokenSig === sig || tokenData.fullSignature === sig) {
+      tokenData.status = 'BANNED';
+      wsBroadcast({ type: 'token', data: tokenData });
+    }
+  }
+  
   logAdminAction('BAN_SUCCESS', { 
     tokenSignature: sig.substring(0, 16), 
     reason: reason || 'Not specified' 
@@ -2308,6 +2317,15 @@ app.post('/api/governance/unban', adminRateLimit, requirePricingAdmin, async (re
   }
   
   await bannedTokens.delete(sig);
+  
+  // Update status in activeTokens so dashboard reflects immediately
+  for (const [tokenSig, tokenData] of telemetry.activeTokens) {
+    if (tokenSig === sig || tokenData.fullSignature === sig) {
+      tokenData.status = 'ACTIVE';
+      wsBroadcast({ type: 'token', data: tokenData });
+    }
+  }
+  
   logAdminAction('UNBAN_SUCCESS', { tokenSignature: sig.substring(0, 16) }, req);
   console.log(`[KILL SWITCH] ✅ Token unbanned: ${sig.substring(0, 16)}...`);
   
