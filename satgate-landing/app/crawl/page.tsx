@@ -548,6 +548,49 @@ export default function ProtectDemoPage() {
     clearLogs();
   };
 
+  // Reset backend dashboard counters and tokens
+  const resetBackendDashboard = async () => {
+    if (!adminToken) {
+      addLog('⚠️ Admin token required to reset dashboard', 'warn');
+      return false;
+    }
+    
+    setIsLoading(true);
+    addLog('🔄 Resetting dashboard...', 'info');
+    
+    try {
+      const response = await fetch(`${BASE_URL}/api/governance/reset`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Token': adminToken
+        }
+      });
+      
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || `Server returned ${response.status}`);
+      }
+      
+      addLog('✅ Dashboard reset successfully!', 'success');
+      addLog('📊 All counters zeroed, active tokens cleared', 'info');
+      return true;
+    } catch (err: any) {
+      addLog(`❌ Reset failed: ${err.message}`, 'error');
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Full reset: demo state + backend dashboard
+  const fullReset = async () => {
+    resetDemo();
+    if (!useSimulation && adminToken) {
+      await resetBackendDashboard();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       
@@ -1285,19 +1328,31 @@ export default function ProtectDemoPage() {
                     </ul>
                   </div>
 
-                  <div className="flex gap-4">
-                    <button
-                      onClick={resetDemo}
-                      className="flex-1 py-3 bg-gray-800 text-white rounded-xl font-bold hover:bg-gray-700 transition flex items-center justify-center gap-2"
-                    >
-                      <RefreshCw size={18} /> Run Again
-                    </button>
-                    <Link
-                      href="/playground"
-                      className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-xl font-bold hover:opacity-90 transition flex items-center justify-center gap-2"
-                    >
-                      Try Monetize Mode <ChevronRight size={18} />
-                    </Link>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex gap-4">
+                      <button
+                        onClick={fullReset}
+                        disabled={isLoading}
+                        className="flex-1 py-3 bg-gray-800 text-white rounded-xl font-bold hover:bg-gray-700 transition flex items-center justify-center gap-2 disabled:opacity-50"
+                      >
+                        <RefreshCw size={18} className={isLoading ? 'animate-spin' : ''} /> Run Again
+                      </button>
+                      <Link
+                        href="/playground"
+                        className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-xl font-bold hover:opacity-90 transition flex items-center justify-center gap-2"
+                      >
+                        Try Monetize Mode <ChevronRight size={18} />
+                      </Link>
+                    </div>
+                    {!useSimulation && adminToken && (
+                      <button
+                        onClick={resetBackendDashboard}
+                        disabled={isLoading}
+                        className="w-full py-2 bg-orange-900/30 border border-orange-800/50 text-orange-400 rounded-lg text-sm font-medium hover:bg-orange-900/50 transition flex items-center justify-center gap-2 disabled:opacity-50"
+                      >
+                        <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} /> Reset Dashboard Only
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
