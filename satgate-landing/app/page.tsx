@@ -186,7 +186,7 @@ const LandingPage = () => {
                 <h3 className="font-bold text-lg">Secure API Access</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Capability tokens replace accounts and API keys. No PII, no credential stuffing. Cryptographic access control to protect APIs and agents.
+                Capability tokens replace accounts and API keys. No PII, no credential stuffing. Zero Trust cryptographic access control to protect APIs and agents.
               </p>
             </div>
             <div className="p-6 rounded-xl bg-gradient-to-br from-purple-950/30 to-purple-900/10 border border-purple-800/30 hover:border-purple-600/50 transition">
