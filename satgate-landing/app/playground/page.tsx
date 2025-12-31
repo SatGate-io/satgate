@@ -49,7 +49,7 @@ class RealSatGateClient {
   }
 }
 
-export default function PlaygroundPage() {
+export default function MonetizeDemoPage() {
   const [useRealNetwork, setUseRealNetwork] = useState(false);
   const [selectedEndpoint, setSelectedEndpoint] = useState(ENDPOINTS[0]); // Default to cheapest
   const [logs, setLogs] = useState<Array<{msg: string, type: 'info'|'error'|'success'|'warn'}>>([]);
@@ -299,13 +299,27 @@ export default function PlaygroundPage() {
     <div className="min-h-screen bg-black text-gray-100 font-sans flex flex-col items-center py-12 px-4">
       
       {/* Header */}
-      <div className="w-full max-w-3xl mb-8 flex items-center justify-between">
+      <div className="w-full max-w-3xl mb-4 flex items-center justify-between">
         <Link href="/" className="text-gray-500 hover:text-white flex items-center gap-2 transition">
           <ArrowLeft size={18} /> Back to Home
         </Link>
         <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
-          ⚡ SatGate™ Playground
+          ⚡ Monetize Mode Demo
         </h1>
+      </div>
+
+      {/* Hero Description */}
+      <div className="w-full max-w-3xl mb-8 text-center">
+        <h2 className="text-xl sm:text-2xl font-bold mb-3">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-400">
+            Zero Invoices. Zero Contracts. Zero Wait.
+          </span>
+        </h2>
+        <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-xl mx-auto">
+          Watch an AI agent <strong className="text-white">pay for API access in real-time</strong> using 
+          Bitcoin Lightning. No credit cards. No monthly bills. Just instant, per-request micropayments 
+          that settle in milliseconds.
+        </p>
       </div>
 
       {/* Main Console UI */}

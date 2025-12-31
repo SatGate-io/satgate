@@ -1296,7 +1296,7 @@ export default function ProtectDemoPage() {
                       href="/playground"
                       className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-xl font-bold hover:opacity-90 transition flex items-center justify-center gap-2"
                     >
-                      Try Payments <ChevronRight size={18} />
+                      Try Monetize Mode <ChevronRight size={18} />
                     </Link>
                   </div>
                 </div>
@@ -1568,7 +1568,7 @@ export default function ProtectDemoPage() {
               href="/playground"
               className="text-cyan-400 hover:text-cyan-300 text-sm underline underline-offset-4 transition"
             >
-              Try L402 Payments →
+              Try Monetize Mode →
             </Link>
           </div>
         </div>
