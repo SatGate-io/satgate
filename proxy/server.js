@@ -1825,7 +1825,15 @@ app.post('/api/capability/mint', express.json(), (req, res) => {
     // Serialize to base64
     const tokenBase64 = m.serialize();
     
-    console.log(`[CAPABILITY] Minted token: scope=${scope}, expires=${new Date(expiresAt).toISOString()}`);
+    // Record in telemetry so it appears in dashboard immediately
+    const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || 'demo';
+    const caveats = [`scope = ${scope}`, `expires = ${expiresAt}`];
+    if (maxCallsValue) caveats.push(`max_calls = ${Math.floor(maxCallsValue)}`);
+    if (budgetSatsValue) caveats.push(`budget_sats = ${Math.floor(budgetSatsValue)}`);
+    
+    telemetry.recordUsage(m.signature, caveats, clientIp, identifier);
+    
+    console.log(`[CAPABILITY] Minted token: scope=${scope}, expires=${new Date(expiresAt).toISOString()}, sig=${m.signature.substring(0,12)}...`);
     
     res.json({
       ok: true,
@@ -2128,6 +2136,27 @@ curl -X POST -H "Authorization: Bearer ${childToken.substring(0, 40)}..." \\
   ✓ MATHEMATICALLY restricted scope
 
 `;
+
+    // Record tokens in telemetry so they appear in dashboard immediately
+    const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || 'demo';
+    
+    // Record parent (Agent) token
+    telemetry.recordUsage(
+      parentMacaroon.signature,
+      [`scope = api:capability:*`, `expires = ${parentExpiry}`],
+      clientIp,
+      parentId
+    );
+    
+    // Record child (Worker) token
+    telemetry.recordUsage(
+      childMacaroon.signature,
+      [`scope = api:capability:ping`, `expires = ${childExpiry}`, `delegated_by = agent-001`],
+      clientIp,
+      childId
+    );
+    
+    console.log(`[DEMO] Delegation recorded in telemetry: parent=${parentMacaroon.signature.substring(0,12)}..., child=${childMacaroon.signature.substring(0,12)}...`);
 
     // Check if client wants JSON (for API/UI use) or text (for terminal demos)
     const wantsJson = req.accepts('application/json') && !req.accepts('text/plain');
