@@ -38,7 +38,7 @@ interface LogEntry {
 
 type DemoScene = 'intro' | 'mint' | 'use' | 'delegate' | 'enforce' | 'revoke' | 'summary';
 
-export default function CrawlDemoPage() {
+export default function ProtectDemoPage() {
   const [currentScene, setCurrentScene] = useState<DemoScene>('intro');
   const [isLoading, setIsLoading] = useState(false);
   const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -560,7 +560,7 @@ export default function CrawlDemoPage() {
           <h1 className="text-lg sm:text-xl font-bold flex items-center gap-2">
             <Shield className="text-purple-400" size={24} />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
-              Crawl Phase Demo
+              Protect Mode Demo
             </span>
           </h1>
           {/* Mode Toggle */}
@@ -646,6 +646,22 @@ export default function CrawlDemoPage() {
         )}
       </div>
 
+      {/* Hero Description */}
+      <div className="bg-gradient-to-b from-purple-950/20 to-transparent border-b border-gray-800/50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400">
+              Zero Trust. Zero Payments. Zero Friction.
+            </span>
+          </h2>
+          <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
+            See how <strong className="text-white">capability tokens</strong> enable fast, secure agent access 
+            without the overhead of traditional IAM. No service accounts. No API keys to rotate. 
+            Just cryptographically-enforced, self-expiring credentials.
+          </p>
+        </div>
+      </div>
+
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         
         {/* Scene Progress */}
@@ -699,12 +715,12 @@ export default function CrawlDemoPage() {
                       <Shield className="text-purple-400" size={28} />
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-white">Phase 1: Crawl</h2>
+                      <h2 className="text-xl font-bold text-white">Protect Mode</h2>
                       <p className="text-gray-400 text-sm">Zero Trust Security via Capability Tokens</p>
                     </div>
                   </div>
                   <p className="text-gray-300 leading-relaxed">
-                    Crawl is the foundation of SatGate's maturity model. It proves we solve IAM scale problems 
+                    Protect Mode is the foundation of SatGate's security model. It solves IAM scale problems 
                     <strong className="text-white"> today</strong>, without any Bitcoin or payment rail.
                   </p>
                 </>
@@ -810,13 +826,13 @@ export default function CrawlDemoPage() {
                       <CheckCircle className="text-green-400" size={28} />
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-white">Crawl Complete!</h2>
+                      <h2 className="text-xl font-bold text-white">Protect Demo Complete!</h2>
                       <p className="text-gray-400 text-sm">Zero Trust. Zero Bitcoin. Zero Friction.</p>
                     </div>
                   </div>
                   <p className="text-gray-300 leading-relaxed">
                     Everything you just saw happened without a single satoshi of Bitcoin. 
-                    Crawl is live. Run (Payments) is just a config change away.
+                    Protect Mode is live. Monetize Mode (Payments) is just a config change away.
                   </p>
                 </>
               )}
@@ -1244,7 +1260,7 @@ export default function CrawlDemoPage() {
                   </div>
 
                   <div className="bg-gradient-to-r from-purple-950/30 to-cyan-950/30 rounded-xl p-4 border border-purple-800/30">
-                    <h4 className="font-semibold text-white mb-3">What Crawl Proves:</h4>
+                    <h4 className="font-semibold text-white mb-3">What Protect Mode Proves:</h4>
                     <ul className="text-gray-300 text-sm space-y-2">
                       <li className="flex items-start gap-2">
                         <CheckCircle size={16} className="text-green-400 mt-0.5 flex-shrink-0" />
