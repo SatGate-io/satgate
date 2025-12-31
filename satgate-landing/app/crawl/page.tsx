@@ -1563,12 +1563,10 @@ export default function ProtectDemoPage() {
                       {copied === 'parent-showcase' ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
                     </button>
                   </div>
-                  {/* Show Token ID that matches dashboard */}
-                  <div className="text-xs font-mono text-cyan-300 bg-cyan-900/30 rounded px-2 py-1 mb-2 inline-block">
-                    ID: {parentToken.signature?.substring(0, 12) || 'N/A'}...
-                  </div>
-                  <div className="text-xs font-mono text-gray-400 break-all bg-gray-900 rounded p-2">
-                    {parentToken.raw.substring(0, 50)}...
+                  {/* Show Token ID prominently - this is what matches dashboard */}
+                  <div className="text-sm font-mono text-cyan-300 bg-cyan-900/30 border border-cyan-700/50 rounded px-3 py-2 mb-3">
+                    <span className="text-cyan-500 text-xs">Token ID: </span>
+                    {parentToken.signature?.substring(0, 16) || 'N/A'}...
                   </div>
                   <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
                     <div className="text-gray-500">Scope:</div>
@@ -1595,28 +1593,24 @@ export default function ProtectDemoPage() {
                       {copied === 'child-showcase' ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
                     </button>
                   </div>
-                  {/* Show Token ID that matches dashboard */}
-                  <div className={`text-xs font-mono rounded px-2 py-1 mb-2 inline-block ${
-                    bannedToken ? 'text-red-300 bg-red-900/30' : 'text-purple-300 bg-purple-900/30'
+                  {/* Show Token ID prominently - this is what matches dashboard */}
+                  <div className={`text-sm font-mono rounded px-3 py-2 mb-3 border ${
+                    bannedToken 
+                      ? 'text-red-300 bg-red-900/30 border-red-700/50 line-through' 
+                      : 'text-purple-300 bg-purple-900/30 border-purple-700/50'
                   }`}>
-                    ID: {childToken.signature?.substring(0, 12) || 'N/A'}...
-                  </div>
-                  <div className={`text-xs font-mono break-all bg-gray-900 rounded p-2 ${
-                    bannedToken ? 'text-red-400/50 line-through' : 'text-gray-400'
-                  }`}>
-                    {childToken.raw.substring(0, 50)}...
+                    <span className={`text-xs ${bannedToken ? 'text-red-500' : 'text-purple-500'}`}>Token ID: </span>
+                    {childToken.signature?.substring(0, 16) || 'N/A'}...
                   </div>
                   <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
                     <div className="text-gray-500">Scope:</div>
                     <div className="text-purple-400 font-mono">{childToken.scope}</div>
                     <div className="text-gray-500">Can Mint:</div>
                     <div className="text-red-400">No (Restricted)</div>
-                    {bannedToken && (
-                      <>
-                        <div className="text-gray-500">Status:</div>
-                        <div className="text-red-400 font-bold">BANNED</div>
-                      </>
-                    )}
+                    <div className="text-gray-500">Status:</div>
+                    <div className={bannedToken ? 'text-red-400 font-bold' : 'text-green-400'}>
+                      {bannedToken ? 'BANNED 🚫' : 'Active ✓'}
+                    </div>
                   </div>
                 </div>
               )}
