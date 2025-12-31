@@ -51,6 +51,8 @@ export default function CrawlDemoPage() {
   const [revocationResult, setRevocationResult] = useState<{banned: boolean; tested: boolean; error?: string} | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [useSimulation, setUseSimulation] = useState(true); // Default to simulation since prod mode needs auth
+  const [adminToken, setAdminToken] = useState(''); // Admin token for live mode
+  const [showAdminInput, setShowAdminInput] = useState(false);
 
   const addLog = (msg: string, type: LogEntry['type'] = 'info') => {
     setLogs(prev => [...prev, { msg, type, timestamp: new Date() }]);
@@ -100,9 +102,14 @@ export default function CrawlDemoPage() {
         return;
       }
 
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (adminToken) {
+        headers['X-Admin-Token'] = adminToken;
+      }
+
       const response = await fetch(`${BASE_URL}/api/capability/mint`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           scope: 'api:capability:*',
           expiresIn: 3600
@@ -111,7 +118,7 @@ export default function CrawlDemoPage() {
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.message || `Server returned ${response.status}`);
+        throw new Error(errData.message || errData.error || `Server returned ${response.status}`);
       }
 
       const data = await response.json();
@@ -130,7 +137,7 @@ export default function CrawlDemoPage() {
       setCurrentScene('use');
     } catch (err: any) {
       addLog(`❌ Error: ${err.message}`, 'error');
-      addLog('💡 Try enabling Simulation Mode (the server may require admin auth).', 'warn');
+      addLog('💡 Try adding your Admin Token or enabling Simulation Mode.', 'warn');
     } finally {
       setIsLoading(false);
     }
@@ -397,13 +404,15 @@ export default function CrawlDemoPage() {
         return;
       }
 
-      // Live mode would require admin auth
+      // Live mode requires admin auth
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (adminToken) {
+        headers['X-Admin-Token'] = adminToken;
+      }
+
       const response = await fetch(`${BASE_URL}/api/governance/ban`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          // Note: Live mode requires X-Admin-Token header
-        },
+        headers,
         body: JSON.stringify({
           tokenSignature: childToken.raw.substring(0, 32),
           reason: 'Demo revocation - compromised token'
@@ -411,7 +420,8 @@ export default function CrawlDemoPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Admin authentication required for live ban');
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.message || errData.error || 'Admin authentication required for live ban');
       }
 
       const data = await response.json();
@@ -515,18 +525,76 @@ export default function CrawlDemoPage() {
             </span>
           </h1>
           {/* Mode Toggle */}
-          <button 
-            onClick={() => setUseSimulation(!useSimulation)}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${
-              useSimulation 
-                ? 'bg-gray-800 border-gray-600 text-gray-400' 
-                : 'bg-purple-900/30 border-purple-500 text-purple-300'
-            }`}
-          >
-            {useSimulation ? <WifiOff size={14} /> : <Wifi size={14} />}
-            <span className="hidden sm:inline">{useSimulation ? 'SIMULATION' : 'LIVE'}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => {
+                if (useSimulation) {
+                  setShowAdminInput(true);
+                } else {
+                  setUseSimulation(true);
+                  setShowAdminInput(false);
+                }
+              }}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${
+                useSimulation 
+                  ? 'bg-gray-800 border-gray-600 text-gray-400' 
+                  : 'bg-purple-900/30 border-purple-500 text-purple-300'
+              }`}
+            >
+              {useSimulation ? <WifiOff size={14} /> : <Wifi size={14} />}
+              <span className="hidden sm:inline">{useSimulation ? 'SIMULATION' : 'LIVE'}</span>
+            </button>
+            {!useSimulation && adminToken && (
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="Admin token set" />
+            )}
+          </div>
         </div>
+        
+        {/* Admin Token Input Modal */}
+        {showAdminInput && (
+          <div className="bg-gray-900 border-b border-gray-800 px-4 py-3">
+            <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center gap-3">
+              <div className="flex items-center gap-2 text-sm text-gray-400">
+                <Key size={14} />
+                <span>Admin Token for Live Mode:</span>
+              </div>
+              <input
+                type="password"
+                value={adminToken}
+                onChange={(e) => setAdminToken(e.target.value)}
+                placeholder="Enter your ADMIN_TOKEN from Railway..."
+                className="flex-1 px-3 py-2 bg-black border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setUseSimulation(false);
+                    setShowAdminInput(false);
+                  }}
+                  disabled={!adminToken}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                    adminToken 
+                      ? 'bg-purple-600 text-white hover:bg-purple-500' 
+                      : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  Enable Live Mode
+                </button>
+                <button
+                  onClick={() => {
+                    setShowAdminInput(false);
+                  }}
+                  className="px-4 py-2 bg-gray-800 text-gray-400 rounded-lg text-sm font-medium hover:bg-gray-700 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+            <p className="max-w-6xl mx-auto mt-2 text-xs text-gray-500">
+              Get your admin token from Railway: <code className="text-purple-400">railway variables -s satgate | grep ADMIN_TOKEN</code>
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
