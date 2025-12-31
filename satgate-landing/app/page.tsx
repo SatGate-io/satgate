@@ -29,6 +29,7 @@ const LandingPage = () => {
           {/* Desktop menu */}
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
             <Link href="#features" className="hover:text-white transition">Features</Link>
+            <Link href="/crawl" className="hover:text-white transition">Crawl Demo</Link>
             <Link href="/playground" className="hover:text-white transition">Playground</Link>
             <Link href="/dashboard" className="hover:text-white transition">Dashboard</Link>
             <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a>
@@ -48,7 +49,7 @@ const LandingPage = () => {
         {/* Mobile menu dropdown */}
         <div 
           className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            mobileMenuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
+            mobileMenuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'
           }`}
         >
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
@@ -58,6 +59,13 @@ const LandingPage = () => {
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Features
+            </Link>
+            <Link 
+              href="/crawl" 
+              onClick={() => setMobileMenuOpen(false)} 
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              Crawl Demo
             </Link>
             <Link 
               href="/playground" 
