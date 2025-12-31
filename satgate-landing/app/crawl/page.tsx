@@ -27,6 +27,7 @@ interface Token {
   scope: string;
   expiresAt: string;
   caveats: Record<string, any>;
+  signature?: string; // Hex signature for governance/ban operations
 }
 
 interface LogEntry {
@@ -245,13 +246,19 @@ export default function CrawlDemoPage() {
         addLog('🔐 [CRYPTO] Token attenuated mathematically', 'success');
         addLog('', 'info');
         
-        setDelegationResult({ childToken: mockChildToken, childExpiry });
+        // Generate a mock hex signature for simulation
+        const mockSignature = Array.from({ length: 64 }, () => 
+          '0123456789abcdef'[Math.floor(Math.random() * 16)]
+        ).join('');
+        
+        setDelegationResult({ childToken: mockChildToken, childExpiry, childSignature: mockSignature });
         
         setChildToken({
           raw: mockChildToken,
           scope: 'api:capability:ping',
           expiresAt: childExpiry,
-          caveats: { scope: 'api:capability:ping', expires: childExpiry }
+          caveats: { scope: 'api:capability:ping', expires: childExpiry },
+          signature: mockSignature
         });
         addLog('✅ Child token created with restricted scope!', 'success');
         
@@ -286,9 +293,13 @@ export default function CrawlDemoPage() {
           raw: data.childToken,
           scope: 'api:capability:ping',
           expiresAt: data.childExpiry || '',
-          caveats: { scope: 'api:capability:ping', expires: data.childExpiry }
+          caveats: { scope: 'api:capability:ping', expires: data.childExpiry },
+          signature: data.childSignature // Store hex signature for ban operations
         });
         addLog('✅ Child token created with restricted scope!', 'success');
+        if (data.childSignature) {
+          addLog(`🔑 Signature: ${data.childSignature.substring(0, 16)}...`, 'info');
+        }
       }
       
       setCurrentScene('enforce');
@@ -408,7 +419,10 @@ export default function CrawlDemoPage() {
     clearLogs();
     addLog('🚨 CISO: "Emergency! The child token has been compromised!"', 'warn');
     addLog(`📡 POST /api/governance/ban ${useSimulation ? '(SIMULATION)' : '(LIVE)'}`, 'info');
-    addLog(`🎯 Target: ${childToken.raw.substring(0, 30)}...`, 'info');
+    
+    // Use hex signature if available, otherwise use token prefix
+    const tokenSig = childToken.signature || childToken.raw.substring(0, 32);
+    addLog(`🎯 Target: ${tokenSig.substring(0, 16)}...`, 'info');
     
     try {
       if (useSimulation) {
@@ -425,7 +439,11 @@ export default function CrawlDemoPage() {
         return;
       }
 
-      // Live mode requires admin auth
+      // Live mode requires admin auth and hex signature
+      if (!childToken.signature) {
+        throw new Error('No token signature available - live ban requires delegation in live mode first');
+      }
+      
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (adminToken) {
         headers['X-Admin-Token'] = adminToken;
@@ -435,7 +453,7 @@ export default function CrawlDemoPage() {
         method: 'POST',
         headers,
         body: JSON.stringify({
-          tokenSignature: childToken.raw.substring(0, 32),
+          tokenSignature: childToken.signature, // Use hex signature
           reason: 'Demo revocation - compromised token'
         })
       });

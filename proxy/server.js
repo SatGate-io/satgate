@@ -2130,14 +2130,17 @@ curl -X POST -H "Authorization: Bearer ${childToken.substring(0, 40)}..." \\
     
     if (wantsJson || req.headers['accept'] === 'application/json') {
       // Return structured JSON for API clients
+      // Include full signatures (hex) for use with governance/ban endpoint
       res.json({
         ok: true,
         parentToken,
         parentExpiry: new Date(parentExpiry).toISOString(),
         parentScope: 'api:capability:*',
+        parentSignature: parentMacaroon.signature, // Full hex signature for governance
         childToken,
         childExpiry: new Date(childExpiry).toISOString(),
         childScope: 'api:capability:ping',
+        childSignature: childMacaroon.signature, // Full hex signature for governance
         delegatedBy: 'agent-001',
         note: 'ZERO network calls - offline delegation with mathematical scope restriction'
       });
