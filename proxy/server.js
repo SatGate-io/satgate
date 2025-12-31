@@ -2125,12 +2125,36 @@ curl -X POST -H "Authorization: Bearer ${childToken.substring(0, 40)}..." \\
 
 `;
 
-    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-    res.send(output);
+    // Check if client wants JSON (for API/UI use) or text (for terminal demos)
+    const wantsJson = req.accepts('application/json') && !req.accepts('text/plain');
+    
+    if (wantsJson || req.headers['accept'] === 'application/json') {
+      // Return structured JSON for API clients
+      res.json({
+        ok: true,
+        parentToken,
+        parentExpiry: new Date(parentExpiry).toISOString(),
+        parentScope: 'api:capability:*',
+        childToken,
+        childExpiry: new Date(childExpiry).toISOString(),
+        childScope: 'api:capability:ping',
+        delegatedBy: 'agent-001',
+        note: 'ZERO network calls - offline delegation with mathematical scope restriction'
+      });
+    } else {
+      // Return formatted text for terminal demos
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      res.send(output);
+    }
     
   } catch (e) {
     console.error(`[DEMO] Delegation simulation error: ${e.message}`);
-    res.status(500).send(`Error: ${e.message}`);
+    const wantsJson = req.accepts('application/json');
+    if (wantsJson) {
+      res.status(500).json({ error: 'Delegation failed', message: e.message });
+    } else {
+      res.status(500).send(`Error: ${e.message}`);
+    }
   }
 });
 

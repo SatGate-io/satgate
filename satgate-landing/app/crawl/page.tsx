@@ -261,7 +261,10 @@ export default function CrawlDemoPage() {
 
       const response = await fetch(`${BASE_URL}/api/capability/demo/delegate`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
       });
 
       if (!response.ok) {
