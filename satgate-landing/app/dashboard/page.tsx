@@ -52,6 +52,44 @@ export default function DashboardPage() {
   const [isConnected, setIsConnected] = useState(false);
   const [lastFetch, setLastFetch] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [adminToken, setAdminToken] = useState<string>('');
+  const [showAdminInput, setShowAdminInput] = useState(false);
+  const [resetStatus, setResetStatus] = useState<string | null>(null);
+
+  // Reset dashboard data
+  const handleResetDashboard = async () => {
+    if (!adminToken) {
+      setResetStatus('❌ Admin token required');
+      setTimeout(() => setResetStatus(null), 3000);
+      return;
+    }
+    
+    try {
+      setResetStatus('⏳ Resetting...');
+      const response = await fetch(`${API_BASE}/api/governance/reset`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Token': adminToken
+        }
+      });
+      
+      if (response.ok) {
+        setResetStatus('✅ Dashboard reset!');
+        // Immediately refetch to show empty state
+        await fetchGraphData();
+      } else {
+        const errorText = await response.text();
+        setResetStatus(`❌ Failed: ${response.status}`);
+        console.error('Reset failed:', errorText);
+      }
+    } catch (err) {
+      setResetStatus('❌ Connection error');
+      console.error('Reset error:', err);
+    }
+    
+    setTimeout(() => setResetStatus(null), 3000);
+  };
 
   // Fetch data from API
   const fetchGraphData = useCallback(async () => {
@@ -187,14 +225,56 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Governance Dashboard</h1>
-            <p className="text-gray-500">Real-time visibility into your agent workforce and economic firewall.</p>
-            {lastFetch && (
-              <p className="text-xs text-gray-600 mt-1">
-                Last updated: {lastFetch.toLocaleTimeString()} 
-                {!isConnected && error && <span className="text-red-400 ml-2">• {error}</span>}
-              </p>
-            )}
+            <div className="flex items-start justify-between">
+              <div>
+                <h1 className="text-3xl font-bold mb-2">Governance Dashboard</h1>
+                <p className="text-gray-500">Real-time visibility into your agent workforce and economic firewall.</p>
+                {lastFetch && (
+                  <p className="text-xs text-gray-600 mt-1">
+                    Last updated: {lastFetch.toLocaleTimeString()} 
+                    {!isConnected && error && <span className="text-red-400 ml-2">• {error}</span>}
+                  </p>
+                )}
+              </div>
+              
+              {/* Reset Controls */}
+              <div className="flex flex-col items-end gap-2">
+                {!showAdminInput ? (
+                  <button
+                    onClick={() => setShowAdminInput(true)}
+                    className="text-sm text-gray-500 hover:text-white transition flex items-center gap-1"
+                  >
+                    <RefreshCw size={14} />
+                    Reset Dashboard
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="password"
+                      placeholder="Admin token"
+                      value={adminToken}
+                      onChange={(e) => setAdminToken(e.target.value)}
+                      className="px-3 py-1.5 bg-gray-800 border border-gray-700 rounded text-sm text-white w-40"
+                    />
+                    <button
+                      onClick={handleResetDashboard}
+                      className="px-3 py-1.5 bg-red-800 hover:bg-red-700 rounded text-sm text-white transition"
+                    >
+                      Reset
+                    </button>
+                    <button
+                      onClick={() => setShowAdminInput(false)}
+                      className="text-gray-500 hover:text-white text-sm"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+                {resetStatus && (
+                  <span className="text-sm">{resetStatus}</span>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Stats Cards */}

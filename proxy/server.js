@@ -2137,18 +2137,10 @@ curl -X POST -H "Authorization: Bearer ${childToken.substring(0, 40)}..." \\
 
 `;
 
-    // Record tokens in telemetry so they appear in dashboard immediately
+    // Record only the child (Worker) token in telemetry
+    // Parent (Agent) token is already recorded during minting
     const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || 'demo';
     
-    // Record parent (Agent) token
-    telemetry.recordUsage(
-      parentMacaroon.signature,
-      [`scope = api:capability:*`, `expires = ${parentExpiry}`],
-      clientIp,
-      parentId
-    );
-    
-    // Record child (Worker) token
     telemetry.recordUsage(
       childMacaroon.signature,
       [`scope = api:capability:ping`, `expires = ${childExpiry}`, `delegated_by = agent-001`],
@@ -2156,7 +2148,7 @@ curl -X POST -H "Authorization: Bearer ${childToken.substring(0, 40)}..." \\
       childId
     );
     
-    console.log(`[DEMO] Delegation recorded in telemetry: parent=${parentMacaroon.signature.substring(0,12)}..., child=${childMacaroon.signature.substring(0,12)}...`);
+    console.log(`[DEMO] Delegation recorded in telemetry: child=${childMacaroon.signature.substring(0,12)}...`);
 
     // Check if client wants JSON (for API/UI use) or text (for terminal demos)
     const wantsJson = req.accepts('application/json') && !req.accepts('text/plain');
