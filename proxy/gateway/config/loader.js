@@ -1,5 +1,5 @@
 /**
- * SatGate Gateway Configuration Loader
+ * SatGate Proxy Configuration Loader
  * 
  * Loads and validates gateway configuration from YAML file.
  * Fail-fast: any validation error stops server startup.

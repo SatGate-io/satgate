@@ -1,4 +1,4 @@
-# SatGate Cloud Demo - Multi-service Dockerfile
+# SatGate Demo - Multi-service Dockerfile
 # Runs Aperture (L402 gateway) + Backend (Demo API)
 
 FROM node:20-slim AS backend-builder

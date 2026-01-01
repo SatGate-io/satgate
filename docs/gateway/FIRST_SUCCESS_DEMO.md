@@ -243,7 +243,7 @@ echo $INVOICE
 - [ ] After payment, LSAT token grants access (200)
 - [ ] Response is proxied from upstream API
 
-**Congratulations!** Your SatGate Gateway is fully operational. 🎉
+**Congratulations!** Your SatGate proxy is fully operational.
 
 ---
 

@@ -63,26 +63,13 @@ Agents can't "create accounts and enter card details" per tool call — so devel
 
 ---
 
-## 🌩️ SatGate Cloud (Managed)
-
-Don't want to run your own Lightning node?
-
-**[cloud.satgate.io](https://cloud.satgate.io)** — Zero ops, instant setup:
-- ✅ Managed Lightning (no node required)
-- ✅ Multi-tenant gateway  
-- ✅ Dashboard with analytics & earnings
-- ✅ Built-in payouts to Lightning Address
-- ✅ Pay with Lightning (annual) or Stripe (monthly)
-
----
-
 ## 📁 This Repository (OSS)
 
-This is the **open-source** SatGate gateway, SDKs, and documentation.
+This is the **open-source** SatGate proxy, SDKs, and documentation.
 
 | Directory | Description |
 |-----------|-------------|
-| `proxy/` | L402 gateway (Aperture config + Node.js) |
+| `proxy/` | L402 proxy (Aperture config + Node.js) |
 | `sdk/` | Python, JavaScript, Go SDKs |
 | `docker/` | One-click Docker deployment |
 | `deploy/` | Cloud deployment configs (Railway, etc.) |

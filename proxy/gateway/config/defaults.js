@@ -1,5 +1,5 @@
 /**
- * SatGate Gateway Configuration Defaults
+ * SatGate Proxy Configuration Defaults
  * 
  * These defaults are applied when values are not specified in the config file.
  * Security-first: defaults are restrictive, not permissive.

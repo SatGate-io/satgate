@@ -1,5 +1,5 @@
 /**
- * SatGate Gateway Servers
+ * SatGate Proxy Servers
  * 
  * Two-listener setup:
  * - Data Plane: Public-facing proxy (port 8080 by default)

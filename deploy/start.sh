@@ -1,9 +1,9 @@
 #!/bin/sh
-# SatGate Cloud Startup Script
+# SatGate Startup Script
 # Updated: 2024-12-22
 set -eu
 
-echo "=== SatGate Cloud Starting ==="
+echo "=== SatGate Starting ==="
 echo "Time: $(date)"
 echo "PORT env: ${PORT:-not set}"
 echo "BACKEND_PORT: ${BACKEND_PORT:-8083}"

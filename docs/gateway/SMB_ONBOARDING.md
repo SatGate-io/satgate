@@ -2,7 +2,7 @@
   <img src="../assets/brand/logo_blue_transparent.png" alt="SatGate™" width="140" />
 </p>
 
-# SatGate™ Cloud (SMB/Startup) — Bring Your Own Upstream
+# SatGate™ (SMB/Startup) — Bring Your Own Upstream
 
 **The fastest way to monetize and protect your API.**
 
@@ -14,23 +14,23 @@ This guide describes the **SMB/Startup-first** onboarding path: connect your exi
 
 ```
 ┌─────────────┐     ┌─────────────────┐     ┌──────────────┐
-│   Client    │────▶│  SatGate Cloud  │────▶│  Your API    │
+│   Client    │────▶│     SatGate     │────▶│  Your API    │
 │  (pays)     │     │  (L402 + proxy) │     │  (upstream)  │
 └─────────────┘     └─────────────────┘     └──────────────┘
                            │
                            ▼
                     ┌─────────────┐
                     │  Lightning  │
-                    │  (managed)  │
+                    │ (your node) │
                     └─────────────┘
 ```
 
 **What SatGate handles:**
 - L402 invoice issuance + validation
 - Per-request metering (`maxCalls`, `budgetSats`)
-- Lightning payment processing (SatGate Cloud: managed node; self-hosted: your node)
+- Lightning payment processing (your node / provider)
 - Request proxying to your upstream
-- Analytics + revenue dashboard (SatGate Cloud)
+- Analytics + usage dashboard (optional)
 
 **What you provide:**
 - A publicly reachable API endpoint (your upstream)
@@ -44,7 +44,7 @@ This guide describes the **SMB/Startup-first** onboarding path: connect your exi
 - [ ] You know which endpoints to monetize
 - [ ] You have pricing in mind (sats per request per tier)
 
-> 💡 **No Lightning node required.** SatGate Cloud manages the payment infrastructure.
+> 💡 If you want to avoid running a Lightning node, use a compatible Lightning provider/wallet backend.
 
 ---
 
@@ -115,7 +115,7 @@ upstreams:
       # Authorization: "Bearer <YOUR_UPSTREAM_TOKEN>"
 ```
 
-> 💡 **Tip (important):** SatGate Gateway does **not** interpolate `${VAR}` inside YAML today—`addHeaders` values are treated as **literal strings**.  
+> 💡 **Tip (important):** SatGate does **not** interpolate `${VAR}` inside YAML today—`addHeaders` values are treated as **literal strings**.  
 > If you want env-based secrets, render your YAML at deploy time (e.g., CI templating) or inject them via your platform’s secret/template mechanism.
 
 ---
@@ -154,21 +154,7 @@ curl -i http://localhost:8080/unknown
 
 ---
 
-## Step 3: Deploy to SatGate Cloud
-
-### Option A: Hosted Gateway (Recommended for SMB)
-
-SatGate Cloud is live:
-
-1. Sign up at `https://cloud.satgate.io` (magic link)
-2. Create a project → you’ll get `https://<project>.satgate.cloud`
-3. Upload your config (paste YAML in the dashboard)
-4. Test the gateway URL (see Step 4)
-5. (Optional) Add a custom domain (CNAME + TXT verification)
-
-> **Billing note (Plan A):** SatGate Cloud uses a monthly platform subscription. If your subscription is inactive, you can still log in and view projects, but **mutating actions** (create project, upload config, secrets/domains changes) are blocked until billing is active.
-
-### Option B: Self-Hosted (Railway/Fly/Docker)
+## Step 3: Deploy (Self-Hosted)
 
 Deploy on your platform of choice (Railway/Fly/Docker) using the same config + env vars.
 
@@ -195,7 +181,6 @@ PRICING_ADMIN_TOKEN=<32-char-random-key>
 
 > Replace `<your-gateway-host>` with your actual gateway URL:
 > - **Self-hosted:** Your Railway/Fly/Docker URL (e.g., `my-gateway.up.railway.app`)
-> - **SatGate Cloud:** Your tenant host (e.g., `your-project.satgate.cloud`)
 
 ### Test 1: Health Check
 
@@ -240,7 +225,7 @@ curl -H "Authorization: LSAT ${MACAROON}:${PREIMAGE}" \
 
 ### DNS Setup (Optional but Recommended)
 
-Point your API subdomain to your SatGate gateway:
+Point your API subdomain to your SatGate proxy:
 
 ```
 api.yourcompany.com  CNAME  <your-gateway-host>
@@ -281,9 +266,6 @@ Your API now requires Lightning payment. Provide users with:
 
 ### What's Included (v1)
 
-- ✅ Hosted gateway endpoint (SatGate Cloud)
-- ✅ Managed Lightning (SatGate Cloud)
-- ✅ Metering + basic analytics (SatGate Cloud)
 - ✅ Route/pricing configuration
 - ✅ API keys + rotation
 
@@ -302,7 +284,7 @@ Your API now requires Lightning payment. Provide users with:
 
 ### "502 Bad Gateway"
 
-Your upstream is unreachable from SatGate Cloud.
+Your upstream is unreachable from the SatGate proxy.
 
 **Fix:** Ensure your API is publicly accessible via HTTPS.
 

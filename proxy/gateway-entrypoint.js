@@ -1,5 +1,5 @@
 /**
- * SatGate Gateway Mode Entrypoint
+ * SatGate Proxy Mode Entrypoint
  * 
  * This module starts SatGate in Gateway Mode - a full reverse proxy
  * with L402 enforcement and two-listener architecture.
@@ -225,7 +225,7 @@ async function startGatewayMode() {
     );
     
     console.log('[Gateway] ═══════════════════════════════════════════════');
-    console.log('[Gateway] SatGate Gateway Mode v2.0.0 started');
+    console.log('[Gateway] SatGate Proxy Mode v2.0.0 started');
     console.log(`[Gateway]   Data plane:  ${config.server.listen}`);
     console.log(`[Gateway]   Admin plane: ${config.admin.listen}`);
     console.log(`[Gateway]   L402 mode:   ${config.l402.mode}`);

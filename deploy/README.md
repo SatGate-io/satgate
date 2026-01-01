@@ -1,4 +1,4 @@
-# SatGate Cloud Deployment
+# SatGate Deployment
 
 Deploy Aperture + Demo API to Railway for live demos from anywhere.
 

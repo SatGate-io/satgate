@@ -1,5 +1,5 @@
 /**
- * SatGate Gateway Limits & Header Sanitization
+ * SatGate Proxy Limits & Header Sanitization
  * 
  * Enforces request/response limits and sanitizes headers
  * to prevent abuse and ensure security.

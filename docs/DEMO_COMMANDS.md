@@ -14,8 +14,6 @@ Quick reference for demonstrating SatGate capabilities.
 |-----------|-----|
 | **Landing Page** | https://satgate.io |
 | **Playground** | https://satgate.io/playground |
-| **SatGate Cloud Dashboard** | https://cloud.satgate.io |
-| **SatGate Cloud Control Plane** | https://api.satgate.io |
 | **Embedded (Playground backend)** | https://satgate-production-9354.up.railway.app |
 | **Embedded Health** | https://satgate-production-9354.up.railway.app/health |
 | **Embedded Governance Dashboard** | https://satgate-production-9354.up.railway.app/dashboard |
@@ -23,32 +21,6 @@ Quick reference for demonstrating SatGate capabilities.
 | **Gateway Health** | https://satgate-production-4c3c.up.railway.app/healthz |
 
 ---
-
-## ☁️ SatGate Cloud v1 (Self-Serve)
-
-1) Sign up and create a project in `https://cloud.satgate.io` → you’ll get a tenant host:
-
-- `https://<project>.satgate.cloud`
-
-2) Verify fail-closed + 402 challenge:
-
-```bash
-export TENANT_HOST="https://<project>.satgate.cloud"
-
-# Fail-closed (unknown route)
-curl -i "$TENANT_HOST/unknown-route"
-
-# 402 challenge (a priced route from your config)
-curl -i "$TENANT_HOST/basic"
-```
-
-3) Pay the invoice and retry with LSAT:
-
-```bash
-# Authorization header format (NO extra spaces):
-# Authorization: LSAT <macaroon>:<preimage-hex>
-curl -i -H "Authorization: LSAT <macaroon>:<preimage>" "$TENANT_HOST/basic"
-```
 
 ## 🔐 Phase 1: Capability Tokens (No Crypto Required)
 

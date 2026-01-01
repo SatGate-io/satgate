@@ -1,4 +1,4 @@
-# SatGate Cloud Demo
+# SatGate Demo
 # Build Aperture from source for reliability
 
 # Stage 1: Build Aperture from source

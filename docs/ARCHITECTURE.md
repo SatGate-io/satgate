@@ -21,7 +21,7 @@ The live playground at [satgate.io/playground](https://satgate.io/playground) us
 | **Lightning** | Start9 (self-hosted) | Alby Hub + LND via Tailscale |
 | **DNS/SSL** | Cloudflare | Edge security |
 
-> **Note:** For the managed multi-tenant solution, see [SatGate Cloud](https://cloud.satgate.io).
+> **Note:** Any managed multi-tenant offering is intentionally not part of this OSS repository.
 
 ---
 

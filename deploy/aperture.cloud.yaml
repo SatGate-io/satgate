@@ -1,4 +1,4 @@
-# SatGate Cloud - Aperture Configuration
+# SatGate - Aperture Configuration
 # This config is for cloud deployment (Railway, etc.)
 
 listenaddr: "0.0.0.0:8080"

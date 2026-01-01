@@ -1,5 +1,5 @@
 /**
- * SatGate Gateway Mode
+ * SatGate Proxy Mode
  * 
  * Reverse proxy with L402 enforcement for protecting any upstream API.
  * 

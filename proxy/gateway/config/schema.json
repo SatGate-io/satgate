@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://satgate.io/schemas/gateway.v1.json",
-  "title": "SatGate Gateway Configuration",
-  "description": "Configuration schema for SatGate Gateway Mode (reverse proxy with L402 enforcement)",
+  "title": "SatGate Configuration",
+  "description": "Configuration schema for SatGate proxy mode (reverse proxy with L402 enforcement)",
   "type": "object",
   "required": ["version", "upstreams", "routes"],
   "additionalProperties": false,

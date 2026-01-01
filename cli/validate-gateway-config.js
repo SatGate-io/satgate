@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * SatGate Gateway Config Validator
+ * SatGate Config Validator
  * 
  * Validates a gateway configuration file against the schema and prints a summary.
  * 
@@ -23,7 +23,7 @@ process.env.MODE = process.env.MODE || 'demo';
 // Help text
 function printHelp() {
   console.log(`
-SatGate Gateway Config Validator
+SatGate Config Validator
 
 Usage:
   node cli/validate-gateway-config.js <config-path>

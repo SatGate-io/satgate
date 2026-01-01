@@ -1,5 +1,5 @@
 /**
- * SatGate Gateway Router
+ * SatGate Proxy Router
  * 
  * Fast path matching and route resolution for incoming requests.
  * First match wins (order matters).

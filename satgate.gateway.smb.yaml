@@ -1,5 +1,5 @@
 # ============================================================================
-# SatGate Gateway — SMB/Startup Starter Config
+# SatGate — SMB/Startup Starter Config
 # ============================================================================
 #
 # The fastest path to monetizing your API with Lightning payments.
@@ -8,7 +8,7 @@
 #   1. Copy this file: cp satgate.gateway.smb.yaml satgate.gateway.yaml
 #   2. Replace "https://api.example.com" with your actual API URL
 #   3. Customize routes and pricing for your endpoints
-#   4. Deploy (Railway, Fly, Docker, or SatGate Cloud)
+#   4. Deploy (Railway, Fly, or Docker)
 #
 # REQUIRED ENVIRONMENT VARIABLES:
 #   SATGATE_RUNTIME=gateway

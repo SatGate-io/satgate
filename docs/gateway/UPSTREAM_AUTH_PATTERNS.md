@@ -4,13 +4,13 @@
 
 # SatGate™ Upstream Authentication Patterns
 
-Your upstream API likely requires authentication. This guide covers common patterns for passing auth headers through SatGate Gateway.
+Your upstream API likely requires authentication. This guide covers common patterns for passing auth headers through SatGate.
 
 ---
 
 ## Key Concept
 
-SatGate Gateway uses `addHeaders` in the upstream config to inject headers into requests forwarded to your API.
+SatGate uses `addHeaders` in the upstream config to inject headers into requests forwarded to your API.
 
 ```yaml
 upstreams:

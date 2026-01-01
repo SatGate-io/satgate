@@ -1,5 +1,5 @@
 /**
- * SatGate Gateway Transport
+ * SatGate Proxy Transport
  * 
  * Streaming HTTP/HTTPS proxy using Node.js native modules.
  * 

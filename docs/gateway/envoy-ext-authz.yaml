@@ -1,5 +1,5 @@
 # =============================================================================
-# SatGate Gateway Mode: Envoy External Authorization Configuration
+# SatGate Proxy Mode: Envoy External Authorization Configuration
 # =============================================================================
 #
 # This configuration uses Envoy's ext_authz HTTP filter to integrate with

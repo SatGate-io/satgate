@@ -1,8 +1,8 @@
-# SatGate Cloud
+# Managed Hosting
 
-Looking for managed hosting? 
+This repository is the open-source SatGate proxy + SDKs + docs.
 
-👉 **[cloud.satgate.io](https://cloud.satgate.io)**
+If you’re looking for a managed/hosted offering, that lives outside this OSS repository.
 
 ## Features
 
@@ -23,5 +23,4 @@ If you prefer to run your own infrastructure:
 
 ## Support
 
-- **Cloud customers:** support@satgate.io
-- **OSS users:** [GitHub Issues](https://github.com/satgate/satgate/issues)
+- **OSS users**: [GitHub Issues](https://github.com/satgate/satgate/issues)

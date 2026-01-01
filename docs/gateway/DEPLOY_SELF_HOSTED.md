@@ -7,7 +7,7 @@
 **Time to deploy:** ~15 minutes  
 **Prerequisites:** Your API is publicly reachable via HTTPS
 
-This guide covers deploying SatGate Gateway to **Railway**, **Fly.io**, or **Docker**. Choose your platform and follow the steps.
+This guide covers deploying SatGate to **Railway**, **Fly.io**, or **Docker**. Choose your platform and follow the steps.
 
 ---
 

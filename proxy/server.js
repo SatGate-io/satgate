@@ -2512,7 +2512,7 @@ app.post('/api/governance/reset', adminRateLimit, requirePricingAdmin, async (re
 app.get('/', (req, res) => {
   res.json({
     ok: true,
-    name: 'SatGate Cloud API',
+    name: 'SatGate API',
     endpoints: {
       health: '/health',
       freePing: '/api/free/ping',
