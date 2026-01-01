@@ -68,3 +68,6 @@ data/
 
 .vercel
 .env*.local
+
+# Private repo embedded by accident (never commit to OSS repo)
+satgate-cloud/
