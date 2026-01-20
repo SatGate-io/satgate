@@ -22,11 +22,11 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
-	"github.com/satgate-io/satgate/internal/config"
-	"github.com/satgate-io/satgate/internal/governance"
-	"github.com/satgate-io/satgate/internal/lightning"
-	"github.com/satgate-io/satgate/internal/macaroon"
-	"github.com/satgate-io/satgate/internal/proxy"
+	"github.com/satgate-io/satgate/pkg/config"
+	"github.com/satgate-io/satgate/pkg/governance"
+	"github.com/satgate-io/satgate/pkg/lightning"
+	"github.com/satgate-io/satgate/pkg/macaroon"
+	"github.com/satgate-io/satgate/pkg/proxy"
 )
 
 var (

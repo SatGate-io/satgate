@@ -2,7 +2,7 @@ module github.com/satgate-io/satgate
 
 go 1.24.0
 
-toolchain go1.24.5
+toolchain go1.24.11
 
 require (
 	github.com/redis/go-redis/v9 v9.17.2
