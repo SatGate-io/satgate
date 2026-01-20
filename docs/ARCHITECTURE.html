@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>SatGate Gateway Architecture</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/dark.min.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">SatGate Gateway Architecture</h1>
+</header>
+<p align="center">
+<img src="logo_white_transparent.png" alt="SatGate Logo" width="200">
+</p>
+<h1 id="satgate-gateway-architecture">SatGate Gateway Architecture</h1>
+<blockquote>
+<p>Technical architecture, deployment patterns, and system design</p>
+<p><strong>SatGate™ Gateway Documentation</strong></p>
+</blockquote>
+<hr />
+<p>📚 <strong>Documentation Navigation</strong> | <a
+href="./OVERVIEW.md">Overview</a> | <strong>Architecture</strong> | <a
+href="./CAPABILITY_TOKENS.md">Capability Tokens</a> | <a
+href="./POLICY_MODES.md">Policy Modes</a> |
+|:————————-:|:—————-:|:——————————————-:|:——————————–:| | <em>What &amp;
+Why</em> | <em>How It’s Built</em> | <em>Credential System</em> |
+<em>Protection Levels</em> |</p>
+<hr />
+<h2 id="executive-summary">Executive Summary</h2>
+<p>SatGate Gateway is an <strong>API Gateway</strong> purpose-built for
+the agent economy. It sits between clients (humans, services, AI agents)
+and your upstream APIs, providing:</p>
+<ul>
+<li><strong>Authentication</strong> via capability tokens
+(macaroons)</li>
+<li><strong>Authorization</strong> via scope matching</li>
+<li><strong>Metering</strong> for usage tracking and observability</li>
+<li><strong>Budget Enforcement</strong> for cost control (Control
+mode)</li>
+<li><strong>Payment Integration</strong> via Lightning Network L402 or
+Fiat402 (Charge mode)</li>
+<li><strong>Governance</strong> for revocation, audit, and
+compliance</li>
+</ul>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                              SatGate Gateway                                │
+│                                                                             │
+│   &quot;EZ-Pass for the Agent Economy&quot;                                           │
+│   &quot;Protection by default. Payments optional.&quot;                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="system-architecture-overview">System Architecture Overview</h2>
+<h3 id="high-level-architecture">High-Level Architecture</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                              Clients Layer                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│   ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐                │
+│   │  Human   │   │  Service │   │ AI Agent │   │   CLI    │                │
+│   │  User    │   │  (M2M)   │   │  (LLM)   │   │  Tool    │                │
+│   └────┬─────┘   └────┬─────┘   └────┬─────┘   └────┬─────┘                │
+│        │              │              │              │                       │
+│        └──────────────┴──────┬───────┴──────────────┘                       │
+│                              │                                              │
+│              Authorization: Bearer &lt;capability_token&gt;                       │
+│                         (or L402 mac:preimage)                              │
+│                              │                                              │
+└──────────────────────────────┼──────────────────────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           SatGate Gateway                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                         Request Pipeline                              │  │
+│  ├───────────────────────────────────────────────────────────────────────┤  │
+│  │                                                                       │  │
+│  │   ┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐│  │
+│  │   │  Rate   │──▶│ Request │──▶│  Auth   │──▶│ Policy  │──▶│ Metrics ││  │
+│  │   │ Limiter │   │  Parse  │   │ Verify  │   │ Engine  │   │ Record  ││  │
+│  │   └─────────┘   └─────────┘   └─────────┘   └─────────┘   └─────────┘│  │
+│  │                                                                       │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  ┌───────────────┐ ┌───────────────┐ ┌───────────────┐ ┌───────────────┐   │
+│  │   Macaroon    │ │   Budget      │ │   Payment     │ │  Governance   │   │
+│  │   Service     │ │   Service     │ │   Service     │ │   Service     │   │
+│  │               │ │               │ │               │ │               │   │
+│  │ • Mint        │ │ • Allocate    │ │ • Lightning   │ │ • Ban/Unban   │   │
+│  │ • Verify      │ │ • Check       │ │ • Stripe      │ │ • Audit Log   │   │
+│  │ • Delegate    │ │ • Enforce     │ │ • Invoices    │ │ • Lineage     │   │
+│  │ • Decode      │ │ • Alert       │ │ • Settlement  │ │ • Export      │   │
+│  └───────────────┘ └───────────────┘ └───────────────┘ └───────────────┘   │
+│                                                                             │
+│  ┌───────────────┐ ┌───────────────┐ ┌───────────────┐ ┌───────────────┐   │
+│  │   Metering    │ │   Config      │ │   Cloud       │ │   Mint        │   │
+│  │   Service     │ │   Service     │ │   Service     │ │   Service     │   │
+│  │               │ │               │ │               │ │               │   │
+│  │ • Count       │ │ • Routes      │ │ • Tenants     │ │ • Identity    │   │
+│  │ • Aggregate   │ │ • Upstreams   │ │ • Sessions    │ │ • Policy      │   │
+│  │ • Export      │ │ • Reload      │ │ • Lifecycle   │ │ • Exchange    │   │
+│  │ • Prometheus  │ │ • Validate    │ │ • WebSocket   │ │ • Rotate      │   │
+│  └───────────────┘ └───────────────┘ └───────────────┘ └───────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           Upstreams Layer                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐                   │
+│   │  REST API    │   │  GraphQL     │   │  gRPC        │                   │
+│   │  Service     │   │  Service     │   │  Service     │                   │
+│   └──────────────┘   └──────────────┘   └──────────────┘                   │
+│                                                                             │
+│   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐                   │
+│   │  LLM API     │   │  Database    │   │  Internal    │                   │
+│   │  (OpenAI)    │   │  Service     │   │  Microservice│                   │
+│   └──────────────┘   └──────────────┘   └──────────────┘                   │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="request-flow">Request Flow</h2>
+<h3 id="complete-request-lifecycle">Complete Request Lifecycle</h3>
+<pre><code>┌───────────────────────────────────────────────────────────────────────────────┐
+│                         SatGate Request Pipeline                              │
+├───────────────────────────────────────────────────────────────────────────────┤
+│                                                                               │
+│  ┌──────────────────────────────────────────────────────────────────────────┐│
+│  │ 1. REQUEST RECEIVED                                                      ││
+│  │    ─────────────────                                                     ││
+│  │    • TLS termination (if configured)                                     ││
+│  │    • Request ID assigned (X-Request-ID)                                  ││
+│  │    • Rate limit check (fail-closed if store unavailable)                 ││
+│  └──────────────────────────────────────────────────────────────────────────┘│
+│                                    │                                          │
+│                                    ▼                                          │
+│  ┌──────────────────────────────────────────────────────────────────────────┐│
+│  │ 2. ROUTE MATCHING                                                        ││
+│  │    ──────────────                                                        ││
+│  │    • Match request path against configured routes                        ││
+│  │    • Select upstream and policy                                          ││
+│  │    • If no route matches: 404 Not Found                                  ││
+│  └──────────────────────────────────────────────────────────────────────────┘│
+│                                    │                                          │
+│                                    ▼                                          │
+│  ┌──────────────────────────────────────────────────────────────────────────┐│
+│  │ 3. POLICY CHECK                                                          ││
+│  │    ────────────                                                          ││
+│  │                                                                          ││
+│  │    ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐  ││
+│  │    │   PUBLIC     │ │   OBSERVE    │ │   CONTROL    │ │   CHARGE     │  ││
+│  │    │              │ │              │ │              │ │              │  ││
+│  │    │ • No auth    │ │ • Token req  │ │ • Token req  │ │ • Token req  │  ││
+│  │    │ • No meter   │ │ • Metering   │ │ • Metering   │ │ • Metering   │  ││
+│  │    │ • Pass-thru  │ │ • No enforce │ │ • Budget chk │ │ • Payment chk│  ││
+│  │    │              │ │              │ │ • 429 on fail│ │ • 402 on fail│  ││
+│  │    └──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘  ││
+│  │                                                                          ││
+│  └──────────────────────────────────────────────────────────────────────────┘│
+│                                    │                                          │
+│                                    ▼                                          │
+│  ┌──────────────────────────────────────────────────────────────────────────┐│
+│  │ 4. TOKEN VALIDATION (if policy requires)                                 ││
+│  │    ────────────────────────────────────                                  ││
+│  │    a. Extract token from Authorization header                            ││
+│  │       └── Bearer &lt;token&gt; | L402 &lt;mac&gt;:&lt;preimage&gt; | Receipt &lt;jwt&gt;         ││
+│  │    b. Base64 decode → JSON parse                                         ││
+│  │    c. Verify HMAC signature (HMAC-SHA256)                                ││
+│  │    d. Check caveats (expires, scope, tenant_id, custom)                  ││
+│  │    e. Check governance ban list                                          ││
+│  │    f. If L402: verify preimage against payment_hash                      ││
+│  │                                                                          ││
+│  │    ❌ Invalid? → 401 Unauthorized                                         ││
+│  └──────────────────────────────────────────────────────────────────────────┘│
+│                                    │                                          │
+│                                    ▼                                          │
+│  ┌──────────────────────────────────────────────────────────────────────────┐│
+│  │ 5. BUDGET CHECK (Control mode only)                                      ││
+│  │    ──────────────────────────────                                        ││
+│  │    • Look up budget allocation for token/tenant                          ││
+│  │    • Check: current_usage &lt; budget_limit                                 ││
+│  │    • Add X-Budget-Remaining header                                       ││
+│  │                                                                          ││
+│  │    ❌ Budget exceeded? → 429 Too Many Requests                            ││
+│  │       └── Retry-After header included                                    ││
+│  └──────────────────────────────────────────────────────────────────────────┘│
+│                                    │                                          │
+│                                    ▼                                          │
+│  ┌──────────────────────────────────────────────────────────────────────────┐│
+│  │ 6. PAYMENT CHECK (Charge mode only)                                      ││
+│  │    ────────────────────────────────                                      ││
+│  │                                                                          ││
+│  │    L402 (Lightning):                                                     ││
+│  │    • Check if payment preimage provided                                  ││
+│  │    • Verify SHA256(preimage) == payment_hash in macaroon                 ││
+│  │    • Mark invoice as settled                                             ││
+│  │                                                                          ││
+│  │    Fiat402 (Stripe):                                                     ││
+│  │    • Verify JWT receipt from Stripe                                      ││
+│  │    • Check payment intent status                                         ││
+│  │                                                                          ││
+│  │    ❌ No payment? → 402 Payment Required                                  ││
+│  │       └── WWW-Authenticate: L402 macaroon=&quot;...&quot;, invoice=&quot;...&quot;           ││
+│  └──────────────────────────────────────────────────────────────────────────┘│
+│                                    │                                          │
+│                                    ▼                                          │
+│  ┌──────────────────────────────────────────────────────────────────────────┐│
+│  │ 7. METERING                                                              ││
+│  │    ────────                                                              ││
+│  │    • Record request metadata (timestamp, path, method, token)            ││
+│  │    • Increment usage counters (tenant, token, route)                     ││
+│  │    • Export to Prometheus metrics                                        ││
+│  │    • Check for usage alerts/thresholds                                   ││
+│  └──────────────────────────────────────────────────────────────────────────┘│
+│                                    │                                          │
+│                                    ▼                                          │
+│  ┌──────────────────────────────────────────────────────────────────────────┐│
+│  │ 8. PROXY TO UPSTREAM                                                     ││
+│  │    ─────────────────                                                     ││
+│  │    • Forward request with original headers                               ││
+│  │    • Add X-Forwarded-For, X-Request-ID                                   ││
+│  │    • Add X-SatGate-Tenant-ID, X-SatGate-Token-Signature                  ││
+│  │    • Configurable timeout, retries                                       ││
+│  └──────────────────────────────────────────────────────────────────────────┘│
+│                                    │                                          │
+│                                    ▼                                          │
+│  ┌──────────────────────────────────────────────────────────────────────────┐│
+│  │ 9. RESPONSE                                                              ││
+│  │    ────────                                                              ││
+│  │    • Pass upstream response to client                                    ││
+│  │    • Record response status for metrics                                  ││
+│  │    • Update latency histograms                                           ││
+│  │    • Audit log (if enabled)                                              ││
+│  └──────────────────────────────────────────────────────────────────────────┘│
+│                                                                               │
+└───────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="component-architecture">Component Architecture</h2>
+<h3 id="core-services">Core Services</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                          Gateway Core Services                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                         Macaroon Service                             │   │
+│  ├─────────────────────────────────────────────────────────────────────┤   │
+│  │                                                                     │   │
+│  │  Responsibilities:                                                  │   │
+│  │  • Mint capability tokens with configurable scope, TTL              │   │
+│  │  • Verify token signatures (HMAC-SHA256)                            │   │
+│  │  • Decode and parse token structure                                 │   │
+│  │  • Validate caveats (expires, scope, custom)                        │   │
+│  │  • Support delegation (child token creation)                        │   │
+│  │                                                                     │   │
+│  │  Dependencies:                                                      │   │
+│  │  • CAPABILITY_ROOT_KEY (environment variable)                       │   │
+│  │  • Governance Service (ban list check)                              │   │
+│  │                                                                     │   │
+│  │  Key Functions:                                                     │   │
+│  │  • Mint(scope, ttl) → Token                                         │   │
+│  │  • Verify(token) → Claims, error                                    │   │
+│  │  • Delegate(parentToken, caveats) → ChildToken                      │   │
+│  │                                                                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                         Budget Service                               │   │
+│  ├─────────────────────────────────────────────────────────────────────┤   │
+│  │                                                                     │   │
+│  │  Responsibilities:                                                  │   │
+│  │  • Manage budget allocations per tenant/token                       │   │
+│  │  • Track usage against budgets                                      │   │
+│  │  • Enforce limits (429 when exceeded)                               │   │
+│  │  • Support budget delegation (child budgets)                        │   │
+│  │  • Alert on threshold warnings (80%, 90%, 100%)                     │   │
+│  │                                                                     │   │
+│  │  Storage:                                                           │   │
+│  │  • PostgreSQL (persistent allocation records)                       │   │
+│  │  • Redis (real-time usage counters, optional)                       │   │
+│  │                                                                     │   │
+│  │  Key Functions:                                                     │   │
+│  │  • AllocateBudget(tokenSig, limit, period) → Allocation             │   │
+│  │  • CheckBudget(tokenSig) → Remaining, error                         │   │
+│  │  • IncrementUsage(tokenSig, amount) → error                         │   │
+│  │  • DelegateBudget(parentSig, childSig, amount) → error              │   │
+│  │                                                                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                        Payment Service                               │   │
+│  ├─────────────────────────────────────────────────────────────────────┤   │
+│  │                                                                     │   │
+│  │  Responsibilities:                                                  │   │
+│  │  • Generate Lightning invoices (L402)                               │   │
+│  │  • Verify payment preimages                                         │   │
+│  │  • Integrate with Stripe (Fiat402)                                  │   │
+│  │  • Track payment status                                             │   │
+│  │  • Support settlement and reconciliation                            │   │
+│  │                                                                     │   │
+│  │  Providers:                                                         │   │
+│  │  • LND (Lightning Network Daemon)                                   │   │
+│  │  • CLN (Core Lightning)                                             │   │
+│  │  • LNBits (Lightning backend)                                       │   │
+│  │  • Stripe (fiat payments)                                           │   │
+│  │                                                                     │   │
+│  │  Key Functions:                                                     │   │
+│  │  • CreateInvoice(amountSats, memo) → Invoice                        │   │
+│  │  • VerifyPreimage(paymentHash, preimage) → bool                     │   │
+│  │  • CreateStripeIntent(amount, currency) → PaymentIntent             │   │
+│  │  • CheckPaymentStatus(invoiceID) → Status                           │   │
+│  │                                                                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                       Governance Service                             │   │
+│  ├─────────────────────────────────────────────────────────────────────┤   │
+│  │                                                                     │   │
+│  │  Responsibilities:                                                  │   │
+│  │  • Maintain token ban list (instant revocation)                     │   │
+│  │  • Track token lineage (parent → child relationships)               │   │
+│  │  • Record all minted tokens                                         │   │
+│  │  • Audit logging (immutable)                                        │   │
+│  │  • Compliance exports (SOC2, audit)                                 │   │
+│  │                                                                     │   │
+│  │  Storage:                                                           │   │
+│  │  • PostgreSQL (audit_log, token_governance tables)                  │   │
+│  │  • Immutable tables (RLS + triggers prevent modification)           │   │
+│  │                                                                     │   │
+│  │  Key Functions:                                                     │   │
+│  │  • Ban(signature, reason) → error                                   │   │
+│  │  • Unban(signature) → error                                         │   │
+│  │  • IsBanned(signature) → bool                                       │   │
+│  │  • RecordMint(token, metadata) → error                              │   │
+│  │  • GetLineage(signature) → []Token                                  │   │
+│  │  • ExportAuditLog(startTime, endTime) → []Event                     │   │
+│  │                                                                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                        Metering Service                              │   │
+│  ├─────────────────────────────────────────────────────────────────────┤   │
+│  │                                                                     │   │
+│  │  Responsibilities:                                                  │   │
+│  │  • Record all request metadata                                      │   │
+│  │  • Aggregate usage by tenant, token, route                          │   │
+│  │  • Export metrics to Prometheus                                     │   │
+│  │  • Support custom metric labels                                     │   │
+│  │  • Real-time usage dashboards                                       │   │
+│  │                                                                     │   │
+│  │  Metrics Exposed:                                                   │   │
+│  │  • satgate_requests_total (counter)                                 │   │
+│  │  • satgate_request_duration_seconds (histogram)                     │   │
+│  │  • satgate_active_connections (gauge)                               │   │
+│  │  • satgate_budget_usage_ratio (gauge)                               │   │
+│  │  • satgate_payment_revenue_sats (counter)                           │   │
+│  │                                                                     │   │
+│  │  Key Functions:                                                     │   │
+│  │  • RecordRequest(req, resp, latency) → error                        │   │
+│  │  • GetUsage(tenantID, period) → Usage                               │   │
+│  │  • ExportPrometheus() → string                                      │   │
+│  │                                                                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                          Mint Service                                │   │
+│  ├─────────────────────────────────────────────────────────────────────┤   │
+│  │                                                                     │   │
+│  │  Responsibilities:                                                  │   │
+│  │  • Exchange platform credentials for capability tokens              │   │
+│  │  • Verify identity providers (K8s, AWS IAM, OIDC)                   │   │
+│  │  • Apply policy-as-code rules                                       │   │
+│  │  • Support automatic token rotation                                 │   │
+│  │  • Track issued tokens for governance                               │   │
+│  │                                                                     │   │
+│  │  Identity Providers:                                                │   │
+│  │  • Kubernetes (ServiceAccount JWT)                                  │   │
+│  │  • AWS IAM (instance/role identity)                                 │   │
+│  │  • Azure AD (OIDC tokens)                                           │   │
+│  │  • Okta (OIDC tokens)                                               │   │
+│  │  • Custom OIDC providers                                            │   │
+│  │                                                                     │   │
+│  │  Key Functions:                                                     │   │
+│  │  • Exchange(provider, credentials, scopes) → Token                  │   │
+│  │  • Delegate(parentToken, caveats) → ChildToken                      │   │
+│  │  • ListPolicies() → []Policy                                        │   │
+│  │  • ListProviders() → []Provider                                     │   │
+│  │                                                                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="policy-modes">Policy Modes</h2>
+<p>SatGate supports four policy modes that determine how requests are
+processed:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                           Policy Mode Spectrum                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │                                                                     │   │
+│   │   PUBLIC        OBSERVE         CONTROL         CHARGE              │   │
+│   │   (Open)     (Authentication) (Budget Limit)  (Payment Gate)        │   │
+│   │                                                                     │   │
+│   │      ●────────────●────────────●────────────●                       │   │
+│   │                                                                     │   │
+│   │   No Auth     Token Required  Token + Budget  Token + Payment       │   │
+│   │   No Meter    Metering Only   Enforce Limits  Pay-per-Use           │   │
+│   │                                                                     │   │
+│   └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│   &quot;Protection by default. Payments optional.&quot;                               │
+│                                                                             │
+│   Start with OBSERVE for visibility, graduate to CONTROL for budgets,       │
+│   add CHARGE when you&#39;re ready to monetize.                                 │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="mode-comparison">Mode Comparison</h3>
+<table>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 19%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+<col style="width: 19%" />
+</colgroup>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Public</th>
+<th>Observe</th>
+<th>Control</th>
+<th>Charge</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Token Required</strong></td>
+<td>❌</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Metering</strong></td>
+<td>❌</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Budget Enforcement</strong></td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong>Payment Required</strong></td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Fail Response</strong></td>
+<td>N/A</td>
+<td>401</td>
+<td>401 / 429</td>
+<td>401 / 402</td>
+</tr>
+<tr>
+<td><strong>Use Case</strong></td>
+<td>Public APIs</td>
+<td>Visibility</td>
+<td>Cost Control</td>
+<td>Monetization</td>
+</tr>
+</tbody>
+</table>
+<h3 id="configuration-example">Configuration Example</h3>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">routes</span><span class="kw">:</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> public-health</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">match</span><span class="kw">:</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">pathPrefix</span><span class="kw">:</span><span class="at"> /health</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">upstream</span><span class="kw">:</span><span class="at"> http://api:8080</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">policy</span><span class="kw">:</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">kind</span><span class="kw">:</span><span class="at"> public</span><span class="co">           # No authentication</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> api-observe</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">match</span><span class="kw">:</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">pathPrefix</span><span class="kw">:</span><span class="at"> /api/v1/analytics</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">upstream</span><span class="kw">:</span><span class="at"> http://analytics:8080</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">policy</span><span class="kw">:</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">kind</span><span class="kw">:</span><span class="at"> observe</span><span class="co">          # Token required, metering only</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">scope</span><span class="kw">:</span><span class="at"> api:analytics:read</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> api-control</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">match</span><span class="kw">:</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">pathPrefix</span><span class="kw">:</span><span class="at"> /api/v1/compute</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">upstream</span><span class="kw">:</span><span class="at"> http://compute:8080</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">policy</span><span class="kw">:</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">kind</span><span class="kw">:</span><span class="at"> control</span><span class="co">          # Token + budget enforcement</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">scope</span><span class="kw">:</span><span class="at"> api:compute</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">budget</span><span class="kw">:</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">default</span><span class="kw">:</span><span class="at"> </span><span class="dv">10000</span><span class="co">       # Default budget per token</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">period</span><span class="kw">:</span><span class="at"> daily</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> api-charge</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">match</span><span class="kw">:</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">pathPrefix</span><span class="kw">:</span><span class="at"> /api/v1/premium</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">upstream</span><span class="kw">:</span><span class="at"> http://premium:8080</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">policy</span><span class="kw">:</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">kind</span><span class="kw">:</span><span class="at"> charge</span><span class="co">           # Payment required</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">scope</span><span class="kw">:</span><span class="at"> api:premium</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">price</span><span class="kw">:</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">sats</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span><span class="co">            # Satoshis per request</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">currency</span><span class="kw">:</span><span class="at"> BTC</span></span></code></pre></div>
+<hr />
+<h2 id="deployment-patterns">Deployment Patterns</h2>
+<h3 id="single-instance-developmenttesting">Single Instance
+(Development/Testing)</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                      Single Instance Deployment                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│                        ┌───────────────────┐                                │
+│                        │   Load Balancer   │                                │
+│                        │   (optional)      │                                │
+│                        └─────────┬─────────┘                                │
+│                                  │                                          │
+│                                  ▼                                          │
+│                        ┌───────────────────┐                                │
+│                        │  SatGate Gateway  │                                │
+│                        │    (single)       │                                │
+│                        │                   │                                │
+│                        │  • All services   │                                │
+│                        │  • In-memory state│                                │
+│                        │  • SQLite/Postgres│                                │
+│                        └─────────┬─────────┘                                │
+│                                  │                                          │
+│                                  ▼                                          │
+│                        ┌───────────────────┐                                │
+│                        │   Upstream APIs   │                                │
+│                        └───────────────────┘                                │
+│                                                                             │
+│   Suitable for:                                                             │
+│   • Development environments                                                │
+│   • Testing and staging                                                     │
+│   • Low-traffic production (&lt;1000 RPS)                                      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="high-availability-production">High Availability
+(Production)</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                   High Availability Deployment                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│                        ┌───────────────────┐                                │
+│                        │   Load Balancer   │                                │
+│                        │   (L7, health)    │                                │
+│                        └─────────┬─────────┘                                │
+│                                  │                                          │
+│              ┌───────────────────┼───────────────────┐                      │
+│              │                   │                   │                      │
+│              ▼                   ▼                   ▼                      │
+│     ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐            │
+│     │ SatGate Gateway │ │ SatGate Gateway │ │ SatGate Gateway │            │
+│     │   Instance 1    │ │   Instance 2    │ │   Instance 3    │            │
+│     │                 │ │                 │ │    (N+1)        │            │
+│     └────────┬────────┘ └────────┬────────┘ └────────┬────────┘            │
+│              │                   │                   │                      │
+│              └───────────────────┼───────────────────┘                      │
+│                                  │                                          │
+│              ┌───────────────────┼───────────────────┐                      │
+│              │                   │                   │                      │
+│              ▼                   ▼                   ▼                      │
+│     ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐            │
+│     │   PostgreSQL    │ │     Redis       │ │  Lightning Node │            │
+│     │   (Primary/     │ │   (Cluster)     │ │  (LND/CLN)      │            │
+│     │    Replica)     │ │                 │ │                 │            │
+│     └─────────────────┘ └─────────────────┘ └─────────────────┘            │
+│                                                                             │
+│   Features:                                                                 │
+│   • Horizontal scaling (add instances as needed)                            │
+│   • Session affinity not required (stateless auth)                          │
+│   • Shared state via PostgreSQL                                             │
+│   • Real-time counters via Redis                                            │
+│   • Leader election for singleton jobs                                      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="satgate-cloud-saas-hybrid-gateway">SatGate Cloud (SaaS) + Hybrid
+Gateway</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                    SatGate Cloud + Hybrid Deployment                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                        SatGate Cloud (SaaS)                           │  │
+│  │                    https://cloud.satgate.io                           │  │
+│  │                                                                       │  │
+│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐     │  │
+│  │  │   Control   │ │   Config    │ │  Governance │ │   Billing   │     │  │
+│  │  │   Plane     │ │   Store     │ │    Store    │ │   Service   │     │  │
+│  │  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘     │  │
+│  │                                                                       │  │
+│  │                         WebSocket Control                             │  │
+│  │                    wss://cloud.satgate.io/gateway/v1                  │  │
+│  │                                                                       │  │
+│  └───────────────────────────────────┬───────────────────────────────────┘  │
+│                                      │                                      │
+│                                      │ Config push, Telemetry               │
+│                                      │                                      │
+│  ┌───────────────────────────────────┼───────────────────────────────────┐  │
+│  │                     Customer VPC / Data Center                        │  │
+│  │                                                                       │  │
+│  │  ┌───────────────────────────────────────────────────────────────┐   │  │
+│  │  │                    Hybrid Gateway                              │   │  │
+│  │  │                                                                │   │  │
+│  │  │   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐        │   │  │
+│  │  │   │   Request   │   │   Policy    │   │   Local     │        │   │  │
+│  │  │   │   Pipeline  │   │   Engine    │   │   Cache     │        │   │  │
+│  │  │   └─────────────┘   └─────────────┘   └─────────────┘        │   │  │
+│  │  │                                                                │   │  │
+│  │  │   • Processes all API traffic locally (data never leaves VPC) │   │  │
+│  │  │   • Syncs config from control plane                            │   │  │
+│  │  │   • Reports telemetry (aggregated, no PII)                     │   │  │
+│  │  │   • Operates independently during network partitions           │   │  │
+│  │  │                                                                │   │  │
+│  │  └───────────────────────────────────────────────────────────────┘   │  │
+│  │                                      │                                │  │
+│  │                                      ▼                                │  │
+│  │  ┌───────────────────────────────────────────────────────────────┐   │  │
+│  │  │              Customer Internal APIs (Upstreams)                │   │  │
+│  │  │                                                                │   │  │
+│  │  │   ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐   │   │  │
+│  │  │   │  API 1   │   │  API 2   │   │  API 3   │   │  API N   │   │   │  │
+│  │  │   └──────────┘   └──────────┘   └──────────┘   └──────────┘   │   │  │
+│  │  │                                                                │   │  │
+│  │  └───────────────────────────────────────────────────────────────┘   │  │
+│  │                                                                       │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│   Benefits:                                                                 │
+│   • Data sovereignty: API traffic stays in customer VPC                     │
+│   • Low latency: Local processing, no round-trip to SaaS                    │
+│   • Control plane benefits: Central config, governance, billing             │
+│   • Offline resilience: Gateway operates with cached config                 │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="data-flow">Data Flow</h2>
+<h3 id="authentication-flow">Authentication Flow</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                        Authentication Data Flow                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Client                    Gateway                         Upstream         │
+│    │                          │                               │             │
+│    │  POST /api/resource      │                               │             │
+│    │  Authorization: Bearer   │                               │             │
+│    │  &lt;capability_token&gt;      │                               │             │
+│    │─────────────────────────▶│                               │             │
+│    │                          │                               │             │
+│    │                  ┌───────┴───────┐                       │             │
+│    │                  │ Extract token │                       │             │
+│    │                  │ from header   │                       │             │
+│    │                  └───────┬───────┘                       │             │
+│    │                          │                               │             │
+│    │                  ┌───────┴───────┐                       │             │
+│    │                  │ Base64 decode │                       │             │
+│    │                  │ JSON parse    │                       │             │
+│    │                  └───────┬───────┘                       │             │
+│    │                          │                               │             │
+│    │                  ┌───────┴───────┐                       │             │
+│    │                  │ Verify HMAC   │                       │             │
+│    │                  │ signature     │                       │             │
+│    │                  └───────┬───────┘                       │             │
+│    │                          │                               │             │
+│    │                  ┌───────┴───────┐                       │             │
+│    │                  │ Check caveats │                       │             │
+│    │                  │ • expires     │                       │             │
+│    │                  │ • scope       │                       │             │
+│    │                  │ • custom      │                       │             │
+│    │                  └───────┬───────┘                       │             │
+│    │                          │                               │             │
+│    │                  ┌───────┴───────┐                       │             │
+│    │                  │ Check ban list│                       │             │
+│    │                  └───────┬───────┘                       │             │
+│    │                          │                               │             │
+│    │                          │ If valid:                     │             │
+│    │                          │ POST /api/resource            │             │
+│    │                          │ X-SatGate-Tenant-ID: xxx      │             │
+│    │                          │ X-SatGate-Token-Signature:xxx │             │
+│    │                          │──────────────────────────────▶│             │
+│    │                          │                               │             │
+│    │                          │◀──────────────────────────────│             │
+│    │                          │         200 OK                │             │
+│    │                          │                               │             │
+│    │◀─────────────────────────│                               │             │
+│    │         200 OK           │                               │             │
+│    │                          │                               │             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="l402-payment-flow">L402 Payment Flow</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                          L402 Payment Data Flow                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Client              Gateway              LN Node           Upstream        │
+│    │                    │                    │                 │            │
+│    │ GET /api/premium   │                    │                 │            │
+│    │ (no payment)       │                    │                 │            │
+│    │───────────────────▶│                    │                 │            │
+│    │                    │                    │                 │            │
+│    │                    │ Create invoice     │                 │            │
+│    │                    │───────────────────▶│                 │            │
+│    │                    │                    │                 │            │
+│    │                    │◀───────────────────│                 │            │
+│    │                    │ invoice, hash      │                 │            │
+│    │                    │                    │                 │            │
+│    │◀───────────────────│                    │                 │            │
+│    │ 402 Payment Req    │                    │                 │            │
+│    │ WWW-Authenticate:  │                    │                 │            │
+│    │   L402 macaroon=...,│                   │                 │            │
+│    │   invoice=...       │                   │                 │            │
+│    │                    │                    │                 │            │
+│    │                    │                    │                 │            │
+│    │ (Client pays invoice via Lightning wallet)                │            │
+│    │                    │                    │                 │            │
+│    │                    │                    │                 │            │
+│    │ GET /api/premium   │                    │                 │            │
+│    │ Authorization:     │                    │                 │            │
+│    │   L402 &lt;mac&gt;:&lt;preimage&gt;                 │                 │            │
+│    │───────────────────▶│                    │                 │            │
+│    │                    │                    │                 │            │
+│    │                    │ Verify:            │                 │            │
+│    │                    │ • Macaroon sig     │                 │            │
+│    │                    │ • SHA256(preimage) │                 │            │
+│    │                    │   == payment_hash  │                 │            │
+│    │                    │                    │                 │            │
+│    │                    │ Proxy request      │                 │            │
+│    │                    │─────────────────────────────────────▶│            │
+│    │                    │                    │                 │            │
+│    │                    │◀─────────────────────────────────────│            │
+│    │                    │                    │       200 OK    │            │
+│    │                    │                    │                 │            │
+│    │◀───────────────────│                    │                 │            │
+│    │        200 OK      │                    │                 │            │
+│    │                    │                    │                 │            │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="storage-architecture">Storage Architecture</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                          Storage Architecture                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                         PostgreSQL                                    │  │
+│  ├───────────────────────────────────────────────────────────────────────┤  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐       │  │
+│  │  │  audit_log      │  │ token_governance│  │  budget_alloc   │       │  │
+│  │  │  (immutable)    │  │  (ban list)     │  │  (allocations)  │       │  │
+│  │  │                 │  │                 │  │                 │       │  │
+│  │  │ • event_type    │  │ • signature     │  │ • token_sig     │       │  │
+│  │  │ • tenant_id     │  │ • banned_at     │  │ • limit         │       │  │
+│  │  │ • actor         │  │ • reason        │  │ • period        │       │  │
+│  │  │ • resource      │  │ • parent_sig    │  │ • used          │       │  │
+│  │  │ • metadata      │  │ • lineage       │  │ • reset_at      │       │  │
+│  │  │ • timestamp     │  │                 │  │                 │       │  │
+│  │  └─────────────────┘  └─────────────────┘  └─────────────────┘       │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐       │  │
+│  │  │ cloud_tenants   │  │ cloud_sessions  │  │ metering_events │       │  │
+│  │  │ (multi-tenant)  │  │  (auth)         │  │ (usage data)    │       │  │
+│  │  │                 │  │                 │  │                 │       │  │
+│  │  │ • id            │  │ • session_id    │  │ • tenant_id     │       │  │
+│  │  │ • email         │  │ • tenant_id     │  │ • token_sig     │       │  │
+│  │  │ • plan          │  │ • expires_at    │  │ • route         │       │  │
+│  │  │ • status        │  │ • created_at    │  │ • request_count │       │  │
+│  │  │ • config        │  │                 │  │ • timestamp     │       │  │
+│  │  └─────────────────┘  └─────────────────┘  └─────────────────┘       │  │
+│  │                                                                       │  │
+│  │  Security Features:                                                   │  │
+│  │  • Row Level Security (RLS) for tenant isolation                      │  │
+│  │  • Immutable audit_log (INSERT only, triggers prevent UPDATE/DELETE)  │  │
+│  │  • Encrypted connections (TLS required)                               │  │
+│  │  • Prepared statements (SQL injection prevention)                     │  │
+│  │                                                                       │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                           Redis (Optional)                            │  │
+│  ├───────────────────────────────────────────────────────────────────────┤  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐       │  │
+│  │  │  rate_limits    │  │  budget_counters│  │  session_cache  │       │  │
+│  │  │                 │  │                 │  │                 │       │  │
+│  │  │ Key:            │  │ Key:            │  │ Key:            │       │  │
+│  │  │ rate:{ip}:{min} │  │ budget:{sig}    │  │ session:{id}    │       │  │
+│  │  │                 │  │                 │  │                 │       │  │
+│  │  │ Value: count    │  │ Value: used     │  │ Value: claims   │       │  │
+│  │  │ TTL: 60s        │  │ TTL: period     │  │ TTL: 1h         │       │  │
+│  │  └─────────────────┘  └─────────────────┘  └─────────────────┘       │  │
+│  │                                                                       │  │
+│  │  Use Cases:                                                           │  │
+│  │  • Rate limiting (high-frequency counters)                            │  │
+│  │  • Budget enforcement (real-time usage)                               │  │
+│  │  • Session caching (reduce DB load)                                   │  │
+│  │  • Distributed locking (leader election)                              │  │
+│  │                                                                       │  │
+│  │  Fail Behavior:                                                       │  │
+│  │  • Rate limiting: Fail CLOSED (503 if Redis unavailable)              │  │
+│  │  • Session cache: Fall back to PostgreSQL                             │  │
+│  │                                                                       │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="security-architecture">Security Architecture</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                         Security Architecture                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                       Network Security                                │  │
+│  │                                                                       │  │
+│  │  • TLS 1.3 for all external connections                               │  │
+│  │  • mTLS optional for hybrid gateways                                  │  │
+│  │  • IP allowlist for admin endpoints                                   │  │
+│  │  • Rate limiting at edge (fail-closed)                                │  │
+│  │                                                                       │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                      Authentication Security                          │  │
+│  │                                                                       │  │
+│  │  • HMAC-SHA256 token signatures (256-bit key)                         │  │
+│  │  • Time-based expiration (caveats)                                    │  │
+│  │  • Instant revocation (governance ban list)                           │  │
+│  │  • Scope-based authorization                                          │  │
+│  │  • No token storage (stateless validation)                            │  │
+│  │                                                                       │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                       Data Security                                   │  │
+│  │                                                                       │  │
+│  │  • Secrets in environment variables (not config files)                │  │
+│  │  • Database encryption at rest                                        │  │
+│  │  • Audit log immutability (RLS + triggers)                            │  │
+│  │  • PII minimization in logs                                           │  │
+│  │  • Request ID correlation (not tokens)                                │  │
+│  │                                                                       │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                    Response Headers                                   │  │
+│  │                                                                       │  │
+│  │  Content-Security-Policy: default-src &#39;self&#39;; ...                     │  │
+│  │  X-Content-Type-Options: nosniff                                      │  │
+│  │  X-Frame-Options: DENY                                                │  │
+│  │  Referrer-Policy: strict-origin-when-cross-origin                     │  │
+│  │  Permissions-Policy: geolocation=(), microphone=(), camera=()         │  │
+│  │  Strict-Transport-Security: max-age=31536000; includeSubDomains       │  │
+│  │                                                                       │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="observability">Observability</h2>
+<h3 id="metrics-prometheus">Metrics (Prometheus)</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                        Prometheus Metrics                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  # Request metrics                                                          │
+│  satgate_requests_total{tenant, route, status, policy_mode}                 │
+│  satgate_request_duration_seconds{tenant, route, quantile}                  │
+│  satgate_request_size_bytes{tenant, route}                                  │
+│  satgate_response_size_bytes{tenant, route}                                 │
+│                                                                             │
+│  # Auth metrics                                                             │
+│  satgate_auth_attempts_total{tenant, result}  # success, invalid, banned    │
+│  satgate_tokens_minted_total{tenant, scope}                                 │
+│  satgate_tokens_revoked_total{tenant}                                       │
+│                                                                             │
+│  # Budget metrics                                                           │
+│  satgate_budget_usage_ratio{tenant, token_sig}  # 0.0 - 1.0                 │
+│  satgate_budget_exceeded_total{tenant}                                      │
+│  satgate_budget_remaining{tenant, token_sig}                                │
+│                                                                             │
+│  # Payment metrics                                                          │
+│  satgate_payment_revenue_sats_total{tenant, route}                          │
+│  satgate_payment_attempts_total{tenant, status}  # success, failed          │
+│  satgate_invoices_created_total{tenant}                                     │
+│                                                                             │
+│  # System metrics                                                           │
+│  satgate_upstreams_health{upstream, status}                                 │
+│  satgate_active_connections                                                 │
+│  satgate_goroutines                                                         │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="logging">Logging</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                          Structured Logging                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  {                                                                          │
+│    &quot;level&quot;: &quot;info&quot;,                                                         │
+│    &quot;time&quot;: &quot;2024-01-15T10:30:00Z&quot;,                                          │
+│    &quot;request_id&quot;: &quot;abc123&quot;,                                                  │
+│    &quot;tenant_id&quot;: &quot;tenant-456&quot;,                                               │
+│    &quot;method&quot;: &quot;GET&quot;,                                                         │
+│    &quot;path&quot;: &quot;/api/v1/resource&quot;,                                              │
+│    &quot;status&quot;: 200,                                                           │
+│    &quot;latency_ms&quot;: 45,                                                        │
+│    &quot;policy_mode&quot;: &quot;control&quot;,                                                │
+│    &quot;token_signature&quot;: &quot;a1b2c3...&quot;,  // truncated                            │
+│    &quot;budget_remaining&quot;: 9500,                                                │
+│    &quot;upstream&quot;: &quot;backend-api&quot;                                                │
+│  }                                                                          │
+│                                                                             │
+│  Log Levels:                                                                │
+│  • debug: Detailed request tracing (dev only)                               │
+│  • info: Normal operations, request logs                                    │
+│  • warn: Recoverable issues, budget warnings                                │
+│  • error: Failures, upstream errors                                         │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="configuration-reference">Configuration Reference</h2>
+<h3 id="complete-gateway.yaml-example">Complete gateway.yaml
+Example</h3>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SatGate Gateway Configuration</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Version: 1.0</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">server</span><span class="kw">:</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">host</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.0.0.0</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">port</span><span class="kw">:</span><span class="at"> </span><span class="dv">8080</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">metricsPort</span><span class="kw">:</span><span class="at"> </span><span class="dv">9090</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">readTimeout</span><span class="kw">:</span><span class="at"> 30s</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">writeTimeout</span><span class="kw">:</span><span class="at"> 30s</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">shutdownTimeout</span><span class="kw">:</span><span class="at"> 10s</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="fu">admin</span><span class="kw">:</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">token</span><span class="kw">:</span><span class="at"> ${ADMIN_TOKEN}</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">capabilityRootKey</span><span class="kw">:</span><span class="at"> ${CAPABILITY_ROOT_KEY}</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">ipAllowlist</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;10.0.0.0/8,192.168.0.0/16&quot;</span><span class="co">  # Optional</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="fu">database</span><span class="kw">:</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">postgres</span><span class="kw">:</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">url</span><span class="kw">:</span><span class="at"> ${DATABASE_URL}</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">maxConnections</span><span class="kw">:</span><span class="at"> </span><span class="dv">25</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">autoMigrate</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a><span class="fu">redis</span><span class="kw">:</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">url</span><span class="kw">:</span><span class="at"> ${REDIS_URL}</span><span class="co">  # Optional, enables real-time counters</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a><span class="fu">lightning</span><span class="kw">:</span></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">backend</span><span class="kw">:</span><span class="at"> lnd</span><span class="co">  # lnd, cln, lnbits</span></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">lnd</span><span class="kw">:</span></span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">rpcHost</span><span class="kw">:</span><span class="at"> ${LND_HOST}</span></span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">macaroonPath</span><span class="kw">:</span><span class="at"> ${LND_MACAROON_PATH}</span></span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">tlsCertPath</span><span class="kw">:</span><span class="at"> ${LND_TLS_CERT_PATH}</span></span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a><span class="fu">stripe</span><span class="kw">:</span><span class="co">  # Optional, for Fiat402</span></span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">secretKey</span><span class="kw">:</span><span class="at"> ${STRIPE_SECRET_KEY}</span></span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">webhookSecret</span><span class="kw">:</span><span class="at"> ${STRIPE_WEBHOOK_SECRET}</span></span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a><span class="fu">upstreams</span><span class="kw">:</span></span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> backend-api</span></span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">url</span><span class="kw">:</span><span class="at"> http://api:8080</span></span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">timeout</span><span class="kw">:</span><span class="at"> 30s</span></span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">retries</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">healthCheck</span><span class="kw">:</span></span>
+<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">path</span><span class="kw">:</span><span class="at"> /health</span></span>
+<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">interval</span><span class="kw">:</span><span class="at"> 10s</span></span>
+<span id="cb16-45"><a href="#cb16-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-46"><a href="#cb16-46" aria-hidden="true" tabindex="-1"></a><span class="fu">routes</span><span class="kw">:</span></span>
+<span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> public-health</span></span>
+<span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">match</span><span class="kw">:</span></span>
+<span id="cb16-49"><a href="#cb16-49" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">pathPrefix</span><span class="kw">:</span><span class="at"> /health</span></span>
+<span id="cb16-50"><a href="#cb16-50" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">upstream</span><span class="kw">:</span><span class="at"> backend-api</span></span>
+<span id="cb16-51"><a href="#cb16-51" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">policy</span><span class="kw">:</span></span>
+<span id="cb16-52"><a href="#cb16-52" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">kind</span><span class="kw">:</span><span class="at"> public</span></span>
+<span id="cb16-53"><a href="#cb16-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-54"><a href="#cb16-54" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> api-observe</span></span>
+<span id="cb16-55"><a href="#cb16-55" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">match</span><span class="kw">:</span></span>
+<span id="cb16-56"><a href="#cb16-56" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">pathPrefix</span><span class="kw">:</span><span class="at"> /api/v1/read</span></span>
+<span id="cb16-57"><a href="#cb16-57" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">upstream</span><span class="kw">:</span><span class="at"> backend-api</span></span>
+<span id="cb16-58"><a href="#cb16-58" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">policy</span><span class="kw">:</span></span>
+<span id="cb16-59"><a href="#cb16-59" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">kind</span><span class="kw">:</span><span class="at"> observe</span></span>
+<span id="cb16-60"><a href="#cb16-60" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">scope</span><span class="kw">:</span><span class="at"> api:read</span></span>
+<span id="cb16-61"><a href="#cb16-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-62"><a href="#cb16-62" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> api-control</span></span>
+<span id="cb16-63"><a href="#cb16-63" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">match</span><span class="kw">:</span></span>
+<span id="cb16-64"><a href="#cb16-64" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">pathPrefix</span><span class="kw">:</span><span class="at"> /api/v1/compute</span></span>
+<span id="cb16-65"><a href="#cb16-65" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">upstream</span><span class="kw">:</span><span class="at"> backend-api</span></span>
+<span id="cb16-66"><a href="#cb16-66" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">policy</span><span class="kw">:</span></span>
+<span id="cb16-67"><a href="#cb16-67" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">kind</span><span class="kw">:</span><span class="at"> control</span></span>
+<span id="cb16-68"><a href="#cb16-68" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">scope</span><span class="kw">:</span><span class="at"> api:compute</span></span>
+<span id="cb16-69"><a href="#cb16-69" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">budget</span><span class="kw">:</span></span>
+<span id="cb16-70"><a href="#cb16-70" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">default</span><span class="kw">:</span><span class="at"> </span><span class="dv">10000</span></span>
+<span id="cb16-71"><a href="#cb16-71" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">period</span><span class="kw">:</span><span class="at"> daily</span></span>
+<span id="cb16-72"><a href="#cb16-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-73"><a href="#cb16-73" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> api-charge</span></span>
+<span id="cb16-74"><a href="#cb16-74" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">match</span><span class="kw">:</span></span>
+<span id="cb16-75"><a href="#cb16-75" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">pathPrefix</span><span class="kw">:</span><span class="at"> /api/v1/premium</span></span>
+<span id="cb16-76"><a href="#cb16-76" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">upstream</span><span class="kw">:</span><span class="at"> backend-api</span></span>
+<span id="cb16-77"><a href="#cb16-77" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">policy</span><span class="kw">:</span></span>
+<span id="cb16-78"><a href="#cb16-78" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">kind</span><span class="kw">:</span><span class="at"> charge</span></span>
+<span id="cb16-79"><a href="#cb16-79" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">scope</span><span class="kw">:</span><span class="at"> api:premium</span></span>
+<span id="cb16-80"><a href="#cb16-80" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">price</span><span class="kw">:</span></span>
+<span id="cb16-81"><a href="#cb16-81" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">sats</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
+<span id="cb16-82"><a href="#cb16-82" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">currency</span><span class="kw">:</span><span class="at"> BTC</span></span>
+<span id="cb16-83"><a href="#cb16-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-84"><a href="#cb16-84" aria-hidden="true" tabindex="-1"></a><span class="fu">logging</span><span class="kw">:</span></span>
+<span id="cb16-85"><a href="#cb16-85" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">level</span><span class="kw">:</span><span class="at"> info</span></span>
+<span id="cb16-86"><a href="#cb16-86" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">format</span><span class="kw">:</span><span class="at"> json</span></span>
+<span id="cb16-87"><a href="#cb16-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-88"><a href="#cb16-88" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span><span class="kw">:</span></span>
+<span id="cb16-89"><a href="#cb16-89" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">enabled</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb16-90"><a href="#cb16-90" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">prefix</span><span class="kw">:</span><span class="at"> satgate</span></span></code></pre></div>
+<h3 id="environment-variables">Environment Variables</h3>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 39%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ADMIN_TOKEN</code></td>
+<td>Admin API authentication token</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>CAPABILITY_ROOT_KEY</code></td>
+<td>Root key for token signing (32+ bytes hex)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>DATABASE_URL</code></td>
+<td>PostgreSQL connection string</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>REDIS_URL</code></td>
+<td>Redis connection string</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>LND_HOST</code></td>
+<td>Lightning node RPC host</td>
+<td>For Charge mode</td>
+</tr>
+<tr>
+<td><code>LND_MACAROON_PATH</code></td>
+<td>Path to LND macaroon</td>
+<td>For Charge mode</td>
+</tr>
+<tr>
+<td><code>STRIPE_SECRET_KEY</code></td>
+<td>Stripe API key</td>
+<td>For Fiat402</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="api-reference">API Reference</h2>
+<h3 id="admin-endpoints">Admin Endpoints</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 32%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/tokens</code></td>
+<td>Mint a new capability token</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/tokens</code></td>
+<td>List minted tokens</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/api/v1/tokens/{sig}</code></td>
+<td>Revoke a token</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/tokens/{sig}/delegate</code></td>
+<td>Delegate (attenuate) a token</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/governance/ban</code></td>
+<td>Ban a token</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/governance/unban</code></td>
+<td>Unban a token</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/governance/graph</code></td>
+<td>Get token lineage graph</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/metrics</code></td>
+<td>Prometheus metrics</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/health</code></td>
+<td>Health check</td>
+</tr>
+</tbody>
+</table>
+<h3 id="mint-endpoints-when-enabled">Mint Endpoints (when enabled)</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/v1/mint</code></td>
+<td>Exchange credentials for token</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/v1/mint/delegate</code></td>
+<td>Delegate with additional caveats</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/v1/mint/policies</code></td>
+<td>List configured policies</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/v1/mint/providers</code></td>
+<td>List identity providers</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="resources">Resources</h2>
+<ul>
+<li><a href="https://satgate.io/docs">SatGate Gateway
+Documentation</a></li>
+<li><a href="https://github.com/SatGate-io/satgate-gateway">GitHub
+Repository</a></li>
+<li><a href="./CAPABILITY_TOKENS.md">Capability Tokens</a></li>
+<li><a href="./POLICY_MODES.md">Policy Modes</a></li>
+<li><a href="./SELFHOST.md">Self-Host Guide</a></li>
+</ul>
+<hr />
+<p align="center">
+<img src="logo_white_transparent.png" alt="SatGate Logo" width="120">
+</p>
+<p align="center">
+<strong>SatGate™ Gateway</strong> — EZ-Pass for the Agent Economy ⚡
+</p>
+<p align="center">
+<em>“Protection by default. Payments optional.”</em>
+</p>
+<p align="center">
+<sub>SatGate™ is a trademark of SatGate, Inc. All rights reserved.</sub>
+</p>
+</body>
+</html>

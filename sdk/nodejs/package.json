@@ -1,0 +1,51 @@
+{
+  "name": "@satgate/client",
+  "version": "1.0.0",
+  "description": "Node.js SDK for SatGate Enterprise Gateway",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "satgate",
+    "l402",
+    "lightning",
+    "bitcoin",
+    "api-gateway",
+    "macaroons",
+    "micropayments"
+  ],
+  "author": "SatGate Team <team@satgate.io>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/satgate-io/satgate-gateway.git"
+  },
+  "homepage": "https://satgate.io",
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+
+
+

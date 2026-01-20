@@ -1,0 +1,72 @@
+# SatGate OSS - Docker Compose
+# ============================
+# Self-hosted deployment with Redis for rate limiting
+
+version: '3.8'
+
+services:
+  satgate:
+    image: satgate/satgate:latest
+    # Or build locally:
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./gateway.yaml:/app/gateway.yaml:ro
+    environment:
+      - LOG_LEVEL=info
+      - JSON_LOGS=true
+    depends_on:
+      - redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  redis_data:
+
+# Example gateway.yaml:
+#
+# listen: ":8080"
+#
+# capability:
+#   rootKey: "your-64-char-hex-key-here"
+#
+# redis:
+#   url: "redis://redis:6379"
+#
+# upstreams:
+#   api:
+#     url: "http://your-backend:3000"
+#
+# routes:
+#   - name: health
+#     path: /health
+#     upstream: api
+#     policy:
+#       kind: public
+#
+#   - name: api
+#     path: /api/*
+#     upstream: api
+#     policy:
+#       kind: capability

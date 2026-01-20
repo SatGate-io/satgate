@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SatGate Gateway vs Aperture - Comparison</title>
+    <style>
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --border: #1e1e2e;
+            --text-primary: #e4e4e7;
+            --text-secondary: #71717a;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-green: #22c55e;
+            --accent-orange: #f97316;
+            --accent-red: #ef4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        h2::before {
+            content: "⚡";
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+        
+        .summary-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-card.aperture {
+            border-left: 3px solid var(--accent-orange);
+        }
+        
+        .summary-card.satgate {
+            border-left: 3px solid var(--accent-green);
+        }
+        
+        .summary-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0 2rem;
+            background: var(--bg-card);
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            background: rgba(59, 130, 246, 0.1);
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+        
+        th:first-child {
+            text-align: left;
+        }
+        
+        th:not(:first-child), td:not(:first-child) {
+            text-align: center;
+        }
+        
+        tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .check {
+            color: var(--accent-green);
+            font-size: 1.2rem;
+        }
+        
+        .cross {
+            color: var(--accent-red);
+            font-size: 1.2rem;
+        }
+        
+        .partial {
+            color: var(--accent-orange);
+            font-size: 0.85rem;
+        }
+        
+        .architecture {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1rem 0 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .architecture {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .arch-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+        
+        .arch-card h4 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .arch-card.aperture h4 {
+            color: var(--accent-orange);
+        }
+        
+        .arch-card.satgate h4 {
+            color: var(--accent-green);
+        }
+        
+        pre {
+            background: #000;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        .code-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin: 1rem 0 2rem;
+        }
+        
+        .benefit-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+        
+        .benefit-card h4 {
+            color: var(--accent-purple);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .benefit-card ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .benefit-card li {
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .benefit-card li::before {
+            content: "→ ";
+            color: var(--accent-green);
+        }
+        
+        .use-case-table td:first-child {
+            font-weight: 500;
+        }
+        
+        .recommended {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--accent-green);
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .either {
+            background: rgba(113, 113, 122, 0.2);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.85rem;
+        }
+        
+        .migration-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1rem 0 2rem;
+        }
+        
+        .migration-section h4 {
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .migration-note {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid var(--accent-blue);
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        
+        footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="logo_white_transparent.png" alt="SatGate Logo" style="height: 60px; margin-bottom: 1rem;">
+            <h1>SatGate™ Gateway vs Aperture</h1>
+            <p class="tagline">Enterprise-grade API protection and payments for the Agent Economy</p>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">SatGate™ Gateway Documentation</p>
+        </header>
+
+        <h2>Executive Summary</h2>
+        <div class="summary-grid">
+            <div class="summary-card aperture">
+                <h3>Aperture (Lightning Labs)</h3>
+                <p><strong>Focus:</strong> L402 payments only</p>
+                <p><strong>Target:</strong> Developers, hobbyists</p>
+                <p><strong>Status:</strong> Community maintained, limited updates</p>
+                <p><strong>Lightning:</strong> LND only</p>
+            </div>
+            <div class="summary-card satgate">
+                <h3>SatGate Gateway</h3>
+                <p><strong>Focus:</strong> Protection + Payments ("Protect & Pay")</p>
+                <p><strong>Target:</strong> Enterprise, AI/Agent platforms</p>
+                <p><strong>Status:</strong> Active development</p>
+                <p><strong>Lightning:</strong> Phoenixd, LND, CLN, Alby, LNbits, Strike</p>
+            </div>
+        </div>
+
+        <h2>Feature Comparison</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Aperture</th>
+                    <th>SatGate Gateway</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>L402 Lightning Payments</td>
+                    <td><span class="check">✓</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>Capability Tokens (no payment)</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>Chargeback/Showback Mode</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>Fiat402 (JWT receipts)</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>Multi-tenant Isolation</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>Token Governance (ban/lineage)</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>Admin Dashboard UI</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>SCIM 2.0 Provisioning</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>GitOps Signed Configs</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>Audit Logging (WORM)</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>Budget Management</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>Rate Limiting</td>
+                    <td><span class="partial">Basic</span></td>
+                    <td><span class="check">✓</span> Per-route, Redis HA</td>
+                </tr>
+                <tr>
+                    <td>mTLS to Upstreams</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>Circuit Breaker</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>Prometheus Metrics</td>
+                    <td><span class="partial">Basic</span></td>
+                    <td><span class="check">✓</span> Full observability</td>
+                </tr>
+                <tr>
+                    <td>Helm Chart</td>
+                    <td><span class="partial">Community</span></td>
+                    <td><span class="check">✓</span> Official</td>
+                </tr>
+                <tr>
+                    <td>Client SDKs</td>
+                    <td><span class="partial">Go only</span></td>
+                    <td><span class="check">✓</span> Go, Node.js, Python</td>
+                </tr>
+                <tr>
+                    <td>Supply Chain Security</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span> Cosign, SBOM, attestations</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Architecture Comparison</h2>
+        <div class="architecture">
+            <div class="arch-card aperture">
+                <h4>🟠 Aperture</h4>
+                <pre>
+┌─────────────────────────────────┐
+│          APERTURE               │
+├─────────────────────────────────┤
+│  ┌──────────────┐               │
+│  │   L402 Proxy │               │
+│  │  (pay only)  │               │
+│  └──────────────┘               │
+│         │                       │
+│  ┌──────┴──────┐                │
+│  │  LND only   │                │
+│  │  (coupled)  │                │
+│  └─────────────┘                │
+└─────────────────────────────────┘</pre>
+            </div>
+            <div class="arch-card satgate">
+                <h4>🟢 SatGate Gateway</h4>
+                <pre>
+┌─────────────────────────────────┐
+│       SATGATE GATEWAY           │
+├─────────────────────────────────┤
+│  Protection │ Payments │ Gov    │
+│  (Capability)│(L402/Fiat)│(Audit)│
+├─────────────────────────────────┤
+│  Pluggable Lightning Providers  │
+│  Phoenixd│LND│CLN│Alby│Strike   │
+├─────────────────────────────────┤
+│  Enterprise Infrastructure      │
+│  Postgres│Redis│Prometheus│SCIM │
+└─────────────────────────────────┘</pre>
+            </div>
+        </div>
+
+        <h2>Key Benefits of SatGate Gateway</h2>
+        <div class="benefits-grid">
+            <div class="benefit-card">
+                <h4>🛡️ Protection by Default</h4>
+                <ul>
+                    <li>Start with capability tokens (API security)</li>
+                    <li>No procurement friction - payments optional</li>
+                    <li>Add monetization when business model proven</li>
+                    <li>Aperture forces payment decision upfront</li>
+                </ul>
+            </div>
+            <div class="benefit-card">
+                <h4>🔐 Enterprise Security</h4>
+                <ul>
+                    <li>Tamper-evident audit logs with hash chains</li>
+                    <li>Token ban/revocation capabilities</li>
+                    <li>Token lineage tracking for compliance</li>
+                    <li>SCIM 2.0 user provisioning</li>
+                    <li>Signed config enforcement via GitOps</li>
+                    <li>WORM export for regulatory compliance</li>
+                </ul>
+            </div>
+            <div class="benefit-card">
+                <h4>💰 Flexible Payment Modes</h4>
+                <ul>
+                    <li><strong>Capability:</strong> Free but authenticated</li>
+                    <li><strong>Chargeback:</strong> Metered, billed internally</li>
+                    <li><strong>L402:</strong> Pay-per-request with Lightning</li>
+                    <li><strong>Fiat402:</strong> JWT receipts, enterprise billing</li>
+                    <li>Per-route payment policy configuration</li>
+                </ul>
+            </div>
+            <div class="benefit-card">
+                <h4>🏢 Multi-Tenant Design</h4>
+                <ul>
+                    <li>Full tenant isolation out of the box</li>
+                    <li>Per-tenant budgets and quotas</li>
+                    <li>Trusted proxy header enforcement</li>
+                    <li>Aperture: Single tenant only</li>
+                </ul>
+            </div>
+            <div class="benefit-card">
+                <h4>⚙️ Operational Excellence</h4>
+                <ul>
+                    <li>Full Admin Dashboard UI</li>
+                    <li>Config generator (YAML, Helm, Env)</li>
+                    <li>Preflight enterprise readiness checks</li>
+                    <li>One-click support bundle diagnostics</li>
+                    <li>Documented backup/restore runbooks</li>
+                </ul>
+            </div>
+            <div class="benefit-card">
+                <h4>⚡ Lightning Flexibility</h4>
+                <ul>
+                    <li>Phoenixd (recommended for simplicity)</li>
+                    <li>LND (full node)</li>
+                    <li>Core Lightning (CLN)</li>
+                    <li>Alby (custodial)</li>
+                    <li>LNbits, Strike, and more</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>When to Use Each</h2>
+        <table class="use-case-table">
+            <thead>
+                <tr>
+                    <th>Use Case</th>
+                    <th>Recommended</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Simple hobby project with LND</td>
+                    <td><span class="either">Either</span></td>
+                </tr>
+                <tr>
+                    <td>Quick L402 demo</td>
+                    <td><span class="either">Either</span></td>
+                </tr>
+                <tr>
+                    <td>Enterprise API monetization</td>
+                    <td><span class="recommended">SatGate Gateway</span></td>
+                </tr>
+                <tr>
+                    <td>Multi-tenant SaaS platform</td>
+                    <td><span class="recommended">SatGate Gateway</span></td>
+                </tr>
+                <tr>
+                    <td>AI Agent authentication</td>
+                    <td><span class="recommended">SatGate Gateway</span></td>
+                </tr>
+                <tr>
+                    <td>FinOps / chargeback tracking</td>
+                    <td><span class="recommended">SatGate Gateway</span></td>
+                </tr>
+                <tr>
+                    <td>Compliance requirements (SOC2, audit)</td>
+                    <td><span class="recommended">SatGate Gateway</span></td>
+                </tr>
+                <tr>
+                    <td>Production deployment with SLAs</td>
+                    <td><span class="recommended">SatGate Gateway</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Migration from Aperture</h2>
+        <div class="migration-section">
+            <h4>Drop-in Compatible Configuration</h4>
+            <div class="code-label">Aperture config:</div>
+            <pre>services:
+  - name: myapi
+    price: 100</pre>
+            
+            <div class="code-label" style="margin-top: 1rem;">SatGate Gateway equivalent:</div>
+            <pre>routes:
+  - name: myapi
+    match:
+      pathPrefix: /
+    upstream: http://myapi:8080
+    policy:
+      kind: l402
+      priceSats: 100</pre>
+            
+            <div class="migration-note">
+                <strong>💡 Wire Compatibility:</strong> SatGate maintains L402 wire compatibility—existing macaroon clients work unchanged. You can migrate incrementally, route by route.
+            </div>
+        </div>
+
+        <h2>Configuration Examples</h2>
+        <div class="migration-section">
+            <h4>Flexible Per-Route Policies</h4>
+            <pre>routes:
+  # Free tier - authenticated but no payment
+  - name: free-api
+    match: { pathPrefix: /api/v1/free }
+    upstream: http://api:8080
+    policy:
+      kind: capability
+      scopes: [api:read]
+
+  # Internal chargeback - metered for FinOps
+  - name: internal-api
+    match: { pathPrefix: /api/v1/internal }
+    upstream: http://api:8080
+    policy:
+      kind: pay
+      pay:
+        mode: chargeback
+        price: 10
+        unit: credits
+        costCenterHeader: X-Cost-Center
+        enforceBudget: true
+
+  # Premium - pay with Lightning
+  - name: premium-api
+    match: { pathPrefix: /api/v1/premium }
+    upstream: http://api:8080
+    policy:
+      kind: pay
+      pay:
+        mode: l402
+        price: 100
+        unit: sats</pre>
+        </div>
+
+        <footer>
+            <img src="logo_blue_transparent.png" alt="SatGate Logo" style="height: 40px; margin-bottom: 0.5rem;">
+            <p>
+                <strong>SatGate™ Gateway</strong> — Protection and Payments for the Enterprise
+            </p>
+            <p style="margin-top: 0.5rem;">
+                <a href="https://satgate.io">satgate.io</a> · 
+                <a href="https://github.com/SatGate-io/satgate-gateway">GitHub</a> · 
+                <a href="https://satgate.io/docs">Documentation</a>
+            </p>
+            <p style="margin-top: 1rem; font-size: 0.85rem;">
+                "Protection by default. Payments optional."
+            </p>
+            <p style="margin-top: 1rem; font-size: 0.7rem; color: var(--text-secondary);">
+                SatGate™ is a trademark of SatGate, Inc. All rights reserved.
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
+
