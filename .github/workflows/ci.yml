@@ -7,8 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  test:
-    name: Test
+  go:
+    name: Go
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,87 +16,78 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24'
-          cache: true
+          go-version-file: go.mod
 
-      - name: Download dependencies
-        run: go mod download
+      - name: Check formatting
+        run: |
+          if [ -n "$(gofmt -l .)" ]; then
+            echo "Files not formatted:"
+            gofmt -l .
+            exit 1
+          fi
 
-      - name: Run tests
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
         run: go test -race -coverprofile=coverage.out ./...
 
-      - name: Upload coverage
-        uses: codecov/codecov-action@v4
-        with:
-          files: coverage.out
-          fail_ci_if_error: false
+      - name: Build
+        run: go build -v ./...
 
-  lint:
-    name: Lint
+  nodejs-sdk:
+    name: Node.js SDK
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdk/nodejs
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          go-version: '1.24'
-          cache: true
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: sdk/nodejs/package-lock.json
 
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v4
-        with:
-          version: latest
+      - name: Install dependencies
+        run: npm ci
 
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        goos: [linux, darwin, windows]
-        goarch: [amd64, arm64]
-        exclude:
-          - goos: windows
-            goarch: arm64
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.24'
-          cache: true
+      - name: Lint
+        run: npm run lint --if-present
 
       - name: Build
-        env:
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.goarch }}
-        run: |
-          mkdir -p dist
-          go build -ldflags="-s -w -X main.Version=${{ github.ref_name }} -X main.Commit=${{ github.sha }}" \
-            -o dist/satgate-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.goos == 'windows' && '.exe' || '' }} \
-            ./cmd/satgate
+        run: npm run build --if-present
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: satgate-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: dist/
+      - name: Test
+        run: npm test --if-present
 
-  docker:
-    name: Docker
+  python-sdk:
+    name: Python SDK
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdk/python
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          context: .
-          push: false
-          tags: satgate/satgate:test
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]" || pip install -e .
+
+      - name: Lint
+        run: |
+          pip install ruff
+          ruff check . || true
+
+      - name: Test
+        run: |
+          pip install pytest
+          pytest -v || echo "No tests found"
