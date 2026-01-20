@@ -8,9 +8,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/satgate-io/satgate/internal/ha"
 	"gopkg.in/yaml.v3"
 )
+
+// HAConfig holds High Availability configuration (enterprise feature).
+type HAConfig struct {
+	Enabled        bool   `yaml:"enabled,omitempty"`
+	Region         string `yaml:"region,omitempty"`
+	CoordinatorURL string `yaml:"coordinatorUrl,omitempty"`
+}
 
 // Config represents the gateway configuration
 type Config struct {
@@ -22,7 +28,7 @@ type Config struct {
 	Cloud         *CloudConfig         `yaml:"cloud,omitempty"`         // SatGate Cloud multi-tenant platform
 	Mint          *MintConfig          `yaml:"mint,omitempty"`          // SatGate Mint trust broker for agent provisioning
 	Redis         *RedisConfig         `yaml:"redis,omitempty"`         // Optional Redis for HA
-	HA            *ha.Config           `yaml:"ha,omitempty"`            // Multi-region HA coordination
+	HA            *HAConfig            `yaml:"ha,omitempty"`            // Multi-region HA coordination
 	Postgres      *PostgresConfig      `yaml:"postgres,omitempty"`      // Optional Postgres for persistence
 	GitOps        *GitOpsConfig        `yaml:"gitops,omitempty"`        // Optional GitOps signed config verification
 	Notifications *NotificationsConfig `yaml:"notifications,omitempty"` // Alert webhooks (Slack, Discord, HTTP, Email)

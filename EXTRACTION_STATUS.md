@@ -1,115 +1,104 @@
 # OSS Extraction Status
 
-## Current State: ~80% Complete
-
-The extraction script has successfully copied:
-- ✅ Core packages: proxy, config, macaroon, governance, lightning
-- ✅ SDKs: python, nodejs, go
-- ✅ Documentation (OSS-appropriate only)
-- ✅ Templates: README, LICENSE, Dockerfile, CI/CD
-
-## Build Status: Requires Refactoring
-
-```
-go build ./...
-# Fails due to proxy.go enterprise dependencies
-```
-
-### Issues to Resolve
-
-The `internal/proxy/proxy.go` has deep integration with enterprise features:
-
-| Issue | File | Resolution |
-|-------|------|------------|
-| `l402.NewRedisStore` signature mismatch | proxy.go:223 | Update l402 stub or refactor proxy |
-| `l402.NewServiceWithStore` signature | proxy.go:227 | Update l402 stub or refactor proxy |
-| `tenantEnforcer.GetTenant` signature | proxy.go:468 | Update tenant stub or refactor proxy |
-| `tenantEnforcer.RecordUsage` signature | proxy.go:476 | Update tenant stub or refactor proxy |
-| `GetRouteWithHeaders` signature | proxy.go:495 | Update cloud stub or refactor proxy |
-
-## Recommended Next Steps
-
-### Option A: Refactor proxy.go for OSS (Recommended)
-
-Create an OSS-specific proxy that:
-1. Only supports `public`, `capability`, `l402` policies
-2. Uses static config (no tenant routing)
-3. Removes enterprise billing/budget/delegation calls
-
-```go
-// internal/proxy/proxy_oss.go
-// Simplified proxy for OSS builds
-```
-
-### Option B: Make proxy.go conditional
-
-Add build tags to switch between OSS and enterprise behavior:
-
-```go
-//go:build !enterprise
-
-func (g *Gateway) initL402() {
-    // OSS: simplified L402
-}
-```
-
-### Option C: Complete stub matching
-
-Update all stub packages to match exact enterprise function signatures.
-This is brittle and not recommended.
-
-## Stub Packages Created
-
-| Package | Purpose | Status |
-|---------|---------|--------|
-| `internal/cloud/stub.go` | Tenant routing | Partial |
-| `internal/tenant/stub.go` | Tenant isolation | Partial |
-| `internal/l402/stub.go` | L402 payments | Partial |
-| `internal/ha/stub.go` | High availability | Complete |
-
-## Files Ready
-
-```
-satgate/
-├── cmd/satgate/main.go          ✅ Template (needs proxy init update)
-├── internal/
-│   ├── proxy/                   ⚠️ Needs refactoring
-│   ├── config/                  ✅ Works
-│   ├── macaroon/               ✅ Works
-│   ├── governance/             ✅ Works
-│   ├── lightning/              ✅ Works
-│   ├── cloud/                  ⚠️ Stub needs more methods
-│   ├── tenant/                 ⚠️ Stub needs signature updates
-│   ├── l402/                   ⚠️ Stub needs signature updates
-│   └── ha/                     ✅ Stub complete
-├── sdk/                        ✅ Complete
-├── docs/                       ✅ OSS docs only
-├── README.md                   ✅ Complete
-├── LICENSE                     ✅ Apache 2.0
-├── Dockerfile                  ✅ Complete
-├── go.mod                      ✅ Dependencies resolved
-└── .github/workflows/          ✅ CI/CD ready
-```
-
-## Estimated Remaining Work
-
-| Task | Effort |
-|------|--------|
-| Refactor proxy.go for OSS | 2-4 hours |
-| Complete l402 stub | 1 hour |
-| Update cmd/satgate/main.go | 30 min |
-| Test builds | 30 min |
-| **Total** | **4-6 hours** |
-
-## Commands for Testing
+## ✅ COMPLETE - Build Successful
 
 ```bash
-# After fixing proxy.go:
-cd /Users/waynewonder/satgate
-go mod tidy
-go build ./...
-go test ./...
+$ go build ./...   # ✅ Success
+$ go test ./...    # ✅ Passing
+$ ./satgate --version
+SatGate OSS dev
+  Policies: public, capability, l402
+```
 
-# Build binary
+## What's Included
+
+### Core Packages
+| Package | Status | Description |
+|---------|--------|-------------|
+| `internal/proxy/proxy_oss.go` | ✅ | Clean OSS proxy (public, capability, l402) |
+| `internal/config` | ✅ | Configuration loading |
+| `internal/macaroon` | ✅ | Capability token handling |
+| `internal/governance` | ✅ | Ban lists, revocation, usage tracking |
+| `internal/lightning` | ✅ | L402 providers (LND, Phoenixd, Mock) |
+
+### SDKs
+| SDK | Status |
+|-----|--------|
+| `sdk/python` | ✅ |
+| `sdk/nodejs` | ✅ |
+
+### Documentation
+- 18 OSS-appropriate docs
+- ARCHITECTURE, QUICK_START, SDK guides
+- Configuration reference
+
+### Templates
+- README.md (polished OSS README)
+- LICENSE (Apache 2.0)
+- Dockerfile
+- docker-compose.yml
+- .github/workflows (CI + Release)
+- CONTRIBUTING.md
+
+## What's NOT Included (Enterprise Only)
+
+| Feature | Package |
+|---------|---------|
+| Observe/Control/Charge policies | `internal/cloud` |
+| Multi-tenant routing | `internal/tenant` |
+| Budget enforcement | `internal/budget` |
+| Delegation v2 | `internal/delegation` |
+| SatGate Mint | `internal/mint` |
+| Fiat402 billing | `internal/billing` |
+| Web dashboard | `dashboard/` |
+| Support ticketing | `internal/support` |
+| Hybrid mode | `internal/hybrid` |
+| HA coordination | Enterprise HA |
+
+## Architecture
+
+```
+OSS Proxy Flow:
+┌─────────┐    ┌──────────────┐    ┌──────────┐
+│ Request │───▶│  matchRoute  │───▶│  Policy  │
+└─────────┘    └──────────────┘    └──────────┘
+                                        │
+           ┌────────────────────────────┼────────────────────────────┐
+           ▼                            ▼                            ▼
+      ┌─────────┐                 ┌────────────┐              ┌──────────┐
+      │ public  │                 │ capability │              │   l402   │
+      │  (pass) │                 │ (macaroon) │              │ (payment)│
+      └────┬────┘                 └─────┬──────┘              └────┬─────┘
+           │                            │                          │
+           │                     ┌──────▼──────┐            ┌──────▼──────┐
+           │                     │   Verify    │            │  Challenge  │
+           │                     │  Macaroon   │            │  or Verify  │
+           │                     └──────┬──────┘            └──────┬──────┘
+           │                            │                          │
+           └────────────────────────────┼──────────────────────────┘
+                                        ▼
+                                 ┌─────────────┐
+                                 │   Upstream  │
+                                 └─────────────┘
+```
+
+## Next Steps
+
+1. **Create GitHub repo**: `gh repo create satgate-io/satgate --public`
+2. **Push code**: `git remote add origin ... && git push`
+3. **Tag release**: `git tag v0.1.0 && git push origin v0.1.0`
+4. **Update enterprise** to import OSS as dependency
+
+## Test Commands
+
+```bash
+# Build
 go build -o satgate ./cmd/satgate
+
+# Run with example config
+./satgate --config examples/gateway.yaml
+
+# Build with version info
+go build -ldflags="-X main.Version=v0.1.0 -X main.Commit=$(git rev-parse HEAD)" \
+  -o satgate ./cmd/satgate
 ```

@@ -1,0 +1,84 @@
+# SatGate OSS Gateway Configuration
+# ==================================
+# Example configuration for the open-source gateway.
+#
+# Supported policies:
+#   - public: No authentication
+#   - capability: Macaroon-based authentication
+#   - l402: Lightning payment required
+
+version: 1
+
+server:
+  listen: ":8080"
+
+admin:
+  # Generate with: openssl rand -hex 32
+  # Or set CAPABILITY_ROOT_KEY environment variable
+  capabilityRootKey: "${CAPABILITY_ROOT_KEY}"
+
+# Lightning provider (optional, required for l402 policy)
+lightning:
+  provider: "mock"  # Options: phoenixd, lnd, mock, disabled
+  # For phoenixd:
+  # provider: phoenixd
+  # config:
+  #   apiUrl: "http://localhost:9740"
+  #   apiPassword: "${PHOENIXD_PASSWORD}"
+
+# Upstreams (backend services)
+upstreams:
+  api:
+    url: "http://localhost:3000"
+  httpbin:
+    url: "https://httpbin.org"
+
+# Routes
+routes:
+  # Public routes - no authentication
+  - name: health
+    match:
+      pathExact: /health
+    upstream: api
+    policy:
+      kind: public
+
+  - name: docs
+    match:
+      pathPrefix: /docs
+    upstream: api
+    policy:
+      kind: public
+
+  # Protected routes - require valid Macaroon
+  - name: api
+    match:
+      pathPrefix: /api/v1
+    upstream: api
+    policy:
+      kind: capability
+      scope: "api:read"
+
+  # Paid routes - require Lightning payment (L402)
+  - name: premium
+    match:
+      pathPrefix: /premium
+    upstream: api
+    policy:
+      kind: l402
+      priceSats: 100
+
+  # Example with httpbin for testing
+  - name: test-public
+    match:
+      pathPrefix: /test/public
+    upstream: httpbin
+    policy:
+      kind: public
+
+  - name: test-protected
+    match:
+      pathPrefix: /test/protected
+    upstream: httpbin
+    policy:
+      kind: capability
