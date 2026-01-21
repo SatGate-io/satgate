@@ -168,7 +168,7 @@ Official SDKs for interacting with SatGate-protected APIs:
 
 ## SatGate Enterprise
 
-Need more? [SatGate Enterprise](https://satgate.io/enterprise) adds:
+Need more? [SatGate Enterprise](https://cloud.satgate.io) adds:
 
 - 🏢 **Multi-tenant Control Plane** — Managed dashboard for teams
 - 📊 **Observe Policy** — Usage metering and FinOps visibility
@@ -180,7 +180,7 @@ Need more? [SatGate Enterprise](https://satgate.io/enterprise) adds:
 - 📝 **Tamper-Evident Audit** — Compliance-ready logging
 - 🎫 **Support & SLA** — Enterprise support
 
-[Contact Sales](https://satgate.io/contact) | [Start Free Trial](https://cloud.satgate.io)
+[Contact Sales](mailto:contact@satgate.io) | [Start Free Trial](https://cloud.satgate.io)
 
 ## Contributing
 
