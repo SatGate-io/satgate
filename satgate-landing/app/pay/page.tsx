@@ -55,11 +55,13 @@ export default function PayDemoPage() {
   const [logs, setLogs] = useState<Array<{msg: string, type: 'info'|'error'|'success'|'warn'}>>([]);
   const [status, setStatus] = useState<'idle' | 'blocked' | 'paying' | 'success'>('idle');
   const [isLoading, setIsLoading] = useState(false);
-  const [showInvoice, setShowInvoice] = useState<{invoice: string, macaroon: string, price: number} | null>(null);
+  const [showInvoice, setShowInvoice] = useState<{invoice: string, macaroon: string, price: number, paymentHash: string} | null>(null);
   const [preimageInput, setPreimageInput] = useState('');
   const [copied, setCopied] = useState(false);
+  const [pollingStatus, setPollingStatus] = useState<'idle' | 'polling' | 'paid'>('idle');
   const scrollRef = useRef<HTMLDivElement>(null);
   const preimageResolverRef = useRef<((value: string) => void) | null>(null);
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
   
   const copyToClipboard = async (text: string) => {
     await navigator.clipboard.writeText(text);
@@ -73,6 +75,15 @@ export default function PayDemoPage() {
       preimageResolverRef.current = null;
     }
   };
+  
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+      }
+    };
+  }, []);
 
   const addLog = (msg: string, type: 'info'|'error'|'success'|'warn' = 'info') => {
     setLogs(prev => [...prev, { msg, type }]);
@@ -97,6 +108,7 @@ export default function PayDemoPage() {
 
       let invoice = "";
       let macaroon = "";
+      let paymentHash = "";
 
       // --- STEP A: INITIAL REQUEST ---
       try {
@@ -132,6 +144,15 @@ export default function PayDemoPage() {
                    invoice = invMatch[1];
                    // Show truncated invoice
                    addLog(`📜 Invoice: ${invoice.substring(0, 20)}...${invoice.substring(invoice.length - 10)}`, 'info');
+                   
+                   // Try to get payment_hash from response body
+                   try {
+                     const bodyJson = JSON.parse(err.body || '{}');
+                     paymentHash = bodyJson.payment_hash || '';
+                     if (paymentHash) {
+                       addLog(`🔑 Payment hash: ${paymentHash.substring(0, 16)}...`, 'info');
+                     }
+                   } catch { /* ignore parse errors */ }
                } else {
                    throw new Error(`Invalid header format: ${authHeader}`);
                }
@@ -163,6 +184,42 @@ export default function PayDemoPage() {
           // WebLN enable failed
         }
 
+        // Helper function to poll for payment status
+        const pollForPayment = async (hash: string): Promise<boolean> => {
+          return new Promise((resolve, reject) => {
+            setPollingStatus('polling');
+            let attempts = 0;
+            const maxAttempts = 120; // 10 minutes at 5 second intervals
+            
+            const checkPayment = async () => {
+              try {
+                const res = await fetch(`${BASE_URL}/check-payment/${hash}`);
+                const data = await res.json();
+                if (data.paid) {
+                  if (pollingRef.current) clearInterval(pollingRef.current);
+                  setPollingStatus('paid');
+                  resolve(true);
+                  return;
+                }
+              } catch (e) {
+                console.error('Polling error:', e);
+              }
+              
+              attempts++;
+              if (attempts >= maxAttempts) {
+                if (pollingRef.current) clearInterval(pollingRef.current);
+                setPollingStatus('idle');
+                reject(new Error('Payment timeout'));
+              }
+            };
+            
+            // Check immediately
+            checkPayment();
+            // Then poll every 5 seconds
+            pollingRef.current = setInterval(checkPayment, 5000);
+          });
+        };
+
         if (webLNAvailable) {
           try {
             addLog(`💸 Launching WebLN (Alby) to pay ${selectedEndpoint.price} sats...`, 'info');
@@ -187,15 +244,48 @@ export default function PayDemoPage() {
             if (e.message?.includes('rejected') || e.message?.includes('cancelled')) {
               throw e; // User cancelled
             }
-            // WebLN payment failed - show manual invoice panel
+            // WebLN payment failed - show manual invoice panel with polling
             addLog(`⚠️ WebLN payment failed: ${e.message}`, 'warn');
             addLog(`📱 Showing invoice for manual payment...`, 'info');
             
-            // Show invoice panel and wait for preimage
-            setShowInvoice({ invoice, macaroon, price: selectedEndpoint.price });
+            setShowInvoice({ invoice, macaroon, price: selectedEndpoint.price, paymentHash });
+            
+            if (paymentHash) {
+              addLog(`🔄 Auto-detecting payment... (pay with any Lightning wallet)`, 'info');
+              await pollForPayment(paymentHash);
+              preimage = 'payment_verified_via_polling'; // Dummy value - gateway only checks settled status
+              addLog(`✅ Payment detected!`, 'success');
+            } else {
+              // Fallback to manual preimage entry if no payment hash
+              preimage = await new Promise<string>((resolve, reject) => {
+                preimageResolverRef.current = resolve;
+                setTimeout(() => {
+                  if (preimageResolverRef.current) {
+                    preimageResolverRef.current = null;
+                    reject(new Error('Payment timeout'));
+                  }
+                }, 600000);
+              });
+              addLog(`✅ Manual preimage received.`, 'success');
+            }
+            setShowInvoice(null);
+            setPreimageInput('');
+          }
+        } else {
+          // No WebLN - show invoice panel with auto-detect polling
+          addLog(`📱 No WebLN wallet detected. Showing invoice...`, 'info');
+          
+          setShowInvoice({ invoice, macaroon, price: selectedEndpoint.price, paymentHash });
+          
+          if (paymentHash) {
+            addLog(`🔄 Auto-detecting payment... (pay with any Lightning wallet)`, 'info');
+            await pollForPayment(paymentHash);
+            preimage = 'payment_verified_via_polling'; // Dummy value - gateway only checks settled status
+            addLog(`✅ Payment detected!`, 'success');
+          } else {
+            // Fallback to manual preimage entry if no payment hash
             preimage = await new Promise<string>((resolve, reject) => {
               preimageResolverRef.current = resolve;
-              // Timeout after 10 minutes
               setTimeout(() => {
                 if (preimageResolverRef.current) {
                   preimageResolverRef.current = null;
@@ -203,27 +293,10 @@ export default function PayDemoPage() {
                 }
               }, 600000);
             });
-            setShowInvoice(null);
-            setPreimageInput('');
             addLog(`✅ Manual preimage received.`, 'success');
           }
-        } else {
-          // No WebLN - show invoice panel
-          addLog(`📱 No WebLN wallet. Showing invoice for manual payment...`, 'info');
-          
-          setShowInvoice({ invoice, macaroon, price: selectedEndpoint.price });
-          preimage = await new Promise<string>((resolve, reject) => {
-            preimageResolverRef.current = resolve;
-            setTimeout(() => {
-              if (preimageResolverRef.current) {
-                preimageResolverRef.current = null;
-                reject(new Error('Payment timeout'));
-              }
-            }, 600000);
-          });
           setShowInvoice(null);
           setPreimageInput('');
-          addLog(`✅ Manual preimage received.`, 'success');
         }
       } else {
         addLog(`💸 Paying Invoice (${selectedEndpoint.price} sats)...`, 'info');
@@ -453,7 +526,7 @@ export default function PayDemoPage() {
             </h3>
             
             <p className="text-gray-400 text-sm">
-              Scan with any Lightning wallet (Phoenix, WoS, Alby, etc.)
+              Scan with any Lightning wallet (Phoenix, Wallet of Satoshi, etc.)
             </p>
             
             {/* QR Code */}
@@ -477,38 +550,69 @@ export default function PayDemoPage() {
               </button>
             </div>
             
-            {/* Preimage input */}
-            <div className="space-y-2">
-              <label className="text-sm text-gray-400">
-                After paying, paste the PREIMAGE here:
-              </label>
-              <input 
-                type="text"
-                value={preimageInput}
-                onChange={(e) => setPreimageInput(e.target.value)}
-                placeholder="64-character hex preimage..."
-                className="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 font-mono text-sm text-white focus:border-purple-500 focus:outline-none"
-              />
-            </div>
+            {/* Polling Status Indicator */}
+            {showInvoice.paymentHash && pollingStatus === 'polling' && (
+              <div className="bg-purple-900/30 border border-purple-500/50 rounded-lg p-4 text-center">
+                <div className="flex items-center justify-center gap-2 text-purple-300">
+                  <div className="w-4 h-4 border-2 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="font-medium">Waiting for payment...</span>
+                </div>
+                <p className="text-gray-400 text-xs mt-2">
+                  Payment will be detected automatically once confirmed
+                </p>
+              </div>
+            )}
+            
+            {pollingStatus === 'paid' && (
+              <div className="bg-green-900/30 border border-green-500/50 rounded-lg p-4 text-center">
+                <div className="flex items-center justify-center gap-2 text-green-300">
+                  <CheckCircle size={20} />
+                  <span className="font-medium">Payment received!</span>
+                </div>
+              </div>
+            )}
+            
+            {/* Manual Preimage input - only show if no polling available */}
+            {!showInvoice.paymentHash && (
+              <div className="space-y-2">
+                <label className="text-sm text-gray-400">
+                  After paying, paste the PREIMAGE here:
+                </label>
+                <input 
+                  type="text"
+                  value={preimageInput}
+                  onChange={(e) => setPreimageInput(e.target.value)}
+                  placeholder="64-character hex preimage..."
+                  className="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 font-mono text-sm text-white focus:border-purple-500 focus:outline-none"
+                />
+              </div>
+            )}
             
             <div className="flex gap-3">
               <button 
-                onClick={() => { setShowInvoice(null); setPreimageInput(''); }}
+                onClick={() => { 
+                  setShowInvoice(null); 
+                  setPreimageInput(''); 
+                  setPollingStatus('idle');
+                  if (pollingRef.current) clearInterval(pollingRef.current);
+                }}
                 className="flex-1 px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition"
               >
                 Cancel
               </button>
-              <button 
-                onClick={submitPreimage}
-                disabled={preimageInput.length < 64}
-                className={`flex-1 px-4 py-2 rounded-lg font-bold transition ${
-                  preimageInput.length >= 64 
-                    ? 'bg-purple-600 text-white hover:bg-purple-500' 
-                    : 'bg-gray-800 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                Submit Preimage
-              </button>
+              {!showInvoice.paymentHash && (
+                <button 
+                  onClick={submitPreimage}
+                  disabled={preimageInput.length < 64}
+                  className={`flex-1 px-4 py-2 rounded-lg font-bold transition ${
+                    preimageInput.length >= 64 
+                      ? 'bg-purple-600 text-white hover:bg-purple-500' 
+                      : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  Submit Preimage
+                </button>
+              )}
             </div>
           </div>
         </div>

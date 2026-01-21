@@ -126,6 +126,12 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check payment status endpoint (for polling from frontend)
+	if strings.HasPrefix(r.URL.Path, "/check-payment/") {
+		g.handleCheckPayment(w, r)
+		return
+	}
+
 	start := time.Now()
 	g.metrics.TotalRequests++
 
@@ -310,8 +316,40 @@ func (g *Gateway) issueL402Challenge(w http.ResponseWriter, r *http.Request, rou
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusPaymentRequired)
 
-	// Write JSON response
-	fmt.Fprintf(w, `{"error":"payment_required","invoice":"%s","amount_sats":%d}`, invoice, priceSats)
+	// Write JSON response with payment_hash so frontend can poll
+	fmt.Fprintf(w, `{"error":"payment_required","invoice":"%s","amount_sats":%d,"payment_hash":"%s"}`, invoice, priceSats, paymentHash)
+}
+
+// handleCheckPayment allows frontend to poll for payment status
+func (g *Gateway) handleCheckPayment(w http.ResponseWriter, r *http.Request) {
+	// Extract payment hash from URL: /check-payment/{payment_hash}
+	paymentHash := strings.TrimPrefix(r.URL.Path, "/check-payment/")
+	if paymentHash == "" || len(paymentHash) != 64 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, `{"error":"invalid_payment_hash","message":"payment hash must be 64 hex characters"}`)
+		return
+	}
+
+	if g.lightning == nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusServiceUnavailable)
+		fmt.Fprintf(w, `{"error":"lightning_unavailable","message":"lightning provider not configured"}`)
+		return
+	}
+
+	paid, err := g.lightning.CheckPayment(paymentHash)
+	if err != nil {
+		log.Debug().Err(err).Str("payment_hash", paymentHash).Msg("Error checking payment status")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK) // Return 200 with paid=false on errors
+		fmt.Fprintf(w, `{"paid":false,"error":"%s"}`, err.Error())
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, `{"paid":%t}`, paid)
 }
 
 // matchRoute finds the route matching the request.
