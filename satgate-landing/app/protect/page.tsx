@@ -10,7 +10,7 @@ import {
 import Link from 'next/link';
 
 // Railway embedded mode deployment
-const BASE_URL = 'https://satgate-production.up.railway.app';
+const BASE_URL = 'https://satgate-production-9354.up.railway.app';
 
 // Fetch with timeout to prevent hanging
 async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 10000): Promise<Response> {
