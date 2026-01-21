@@ -11,6 +11,8 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"net/http"
@@ -87,7 +89,14 @@ func main() {
 		rootKey = os.Getenv("CAPABILITY_ROOT_KEY")
 	}
 	if rootKey == "" {
-		log.Fatal().Msg("CAPABILITY_ROOT_KEY is required (set in config or environment)")
+		// Auto-generate for demo mode (tokens won't persist across restarts)
+		keyBytes := make([]byte, 32)
+		if _, err := rand.Read(keyBytes); err != nil {
+			log.Fatal().Err(err).Msg("Failed to generate random root key")
+		}
+		rootKey = hex.EncodeToString(keyBytes)
+		log.Warn().Msg("CAPABILITY_ROOT_KEY not set - using auto-generated key (demo mode)")
+		log.Warn().Msg("Tokens will NOT persist across restarts. Set CAPABILITY_ROOT_KEY for production.")
 	}
 
 	macaroonSvc, err := macaroon.NewService(rootKey)

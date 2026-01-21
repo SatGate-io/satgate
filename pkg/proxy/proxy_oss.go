@@ -102,6 +102,14 @@ func (g *Gateway) SetMetricsHook(hook MetricsHook) {
 
 // ServeHTTP implements http.Handler.
 func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Built-in health endpoint (doesn't depend on upstreams)
+	if r.URL.Path == "/health" || r.URL.Path == "/healthz" {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w, `{"status":"healthy","service":"satgate-oss","routes":%d}`, len(g.config.Routes))
+		return
+	}
+
 	start := time.Now()
 	g.metrics.TotalRequests++
 

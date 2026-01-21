@@ -1,0 +1,6 @@
+1:"$Sreact.fragment"
+2:I[23191,["/_next/static/chunks/af207a3ec1e5941f.js","/_next/static/chunks/2328ae78d5fda0ad.js"],"ViewportBoundary"]
+3:I[23191,["/_next/static/chunks/af207a3ec1e5941f.js","/_next/static/chunks/2328ae78d5fda0ad.js"],"MetadataBoundary"]
+4:"$Sreact.suspense"
+5:I[90157,["/_next/static/chunks/af207a3ec1e5941f.js","/_next/static/chunks/2328ae78d5fda0ad.js"],"IconMark"]
+0:{"buildId":"gHK9060lK_SsLu648S27C","rsc":["$","$1","h",{"children":[["$","meta",null,{"name":"robots","content":"noindex"}],["$","$L2",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$L3",null,{"children":["$","$4",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"SatGate™ - Stripe for AI Agents"}],["$","meta","1",{"name":"description","content":"API monetization via Lightning micropayments. Meter in sats per request. No accounts. No bank required."}],["$","link","2",{"rel":"icon","href":"/favicon.ico?favicon.0b3bf435.ico","sizes":"256x256","type":"image/x-icon"}],["$","link","3",{"rel":"icon","href":"/logo.png"}],["$","link","4",{"rel":"apple-touch-icon","href":"/logo.png"}],["$","$L5","5",{}]]}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"loading":null,"isPartial":false}

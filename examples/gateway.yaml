@@ -6,6 +6,10 @@
 #   - public: No authentication
 #   - capability: Macaroon-based authentication
 #   - l402: Lightning payment required
+#
+# Built-in endpoints (always available, no config needed):
+#   - /health  - Health check
+#   - /healthz - Health check (alias)
 
 version: 1
 
@@ -28,57 +32,45 @@ lightning:
 
 # Upstreams (backend services)
 upstreams:
-  api:
-    url: "http://localhost:3000"
   httpbin:
     url: "https://httpbin.org"
+  # Add your own upstreams:
+  # api:
+  #   url: "http://localhost:3000"
 
 # Routes
 routes:
-  # Public routes - no authentication
-  - name: health
+  # Public route - no authentication required
+  - name: public-demo
     match:
-      pathExact: /health
-    upstream: api
+      pathPrefix: /public
+    upstream: httpbin
     policy:
       kind: public
 
-  - name: docs
+  # Protected route - requires valid Macaroon token
+  - name: protected-demo
     match:
-      pathPrefix: /docs
-    upstream: api
-    policy:
-      kind: public
-
-  # Protected routes - require valid Macaroon
-  - name: api
-    match:
-      pathPrefix: /api/v1
-    upstream: api
+      pathPrefix: /api
+    upstream: httpbin
     policy:
       kind: capability
       scope: "api:read"
 
-  # Paid routes - require Lightning payment (L402)
-  - name: premium
+  # Paid route - requires Lightning payment (L402)
+  # Note: Requires lightning provider to be configured
+  - name: premium-demo
     match:
       pathPrefix: /premium
-    upstream: api
+    upstream: httpbin
     policy:
       kind: l402
       priceSats: 100
 
-  # Example with httpbin for testing
-  - name: test-public
+  # Catch-all for httpbin testing (public)
+  - name: httpbin
     match:
-      pathPrefix: /test/public
+      pathPrefix: /
     upstream: httpbin
     policy:
       kind: public
-
-  - name: test-protected
-    match:
-      pathPrefix: /test/protected
-    upstream: httpbin
-    policy:
-      kind: capability
