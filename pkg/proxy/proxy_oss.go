@@ -102,6 +102,22 @@ func (g *Gateway) SetMetricsHook(hook MetricsHook) {
 
 // ServeHTTP implements http.Handler.
 func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// CORS headers for browser requests (demo page, etc.)
+	origin := r.Header.Get("Origin")
+	if origin != "" {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+		w.Header().Set("Access-Control-Expose-Headers", "WWW-Authenticate")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+	}
+
+	// Handle CORS preflight
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
 	// Built-in health endpoint (doesn't depend on upstreams)
 	if r.URL.Path == "/health" || r.URL.Path == "/healthz" {
 		w.Header().Set("Content-Type", "application/json")
