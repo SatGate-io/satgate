@@ -36,8 +36,24 @@ func (m *MockProvider) CreateInvoice(amountSats int64, memo string) (*Invoice, e
 	paymentHashBytes := sha256.Sum256(preimageBytes)
 	paymentHash := hex.EncodeToString(paymentHashBytes[:])
 
-	// Generate mock BOLT11
-	bolt11 := "lnbc" + hex.EncodeToString(preimageBytes[:10])
+	// Generate realistic-looking mock BOLT11
+	// Format: lnbc + amount + random data (bech32-like) + signature
+	// This is NOT a valid invoice - it's for demo/testing UI only
+	amountStr := "1u" // Default to 1u (100 sats)
+	if amountSats >= 1000 {
+		amountStr = "1m" // 1000 sats
+	} else if amountSats >= 100 {
+		amountStr = "100u" // 100 sats
+	} else if amountSats >= 10 {
+		amountStr = "10u" // 10 sats  
+	}
+	
+	// Generate enough random data to look realistic (real invoices are 200+ chars)
+	extraData := make([]byte, 100)
+	rand.Read(extraData)
+	bolt11 := "lnbc" + amountStr + "1p" + hex.EncodeToString(paymentHashBytes[:])[:40] + 
+		"pp" + hex.EncodeToString(extraData)[:120] + 
+		"qp" + hex.EncodeToString(preimageBytes)[:32]
 
 	invoice := &Invoice{
 		Bolt11:      bolt11,
