@@ -21,10 +21,11 @@ admin:
   # Or set CAPABILITY_ROOT_KEY environment variable
   capabilityRootKey: "${CAPABILITY_ROOT_KEY}"
 
-# Lightning provider (optional, required for l402 policy)
+# Lightning provider (required for l402 policy)
+# Using mock provider for demo - generates fake invoices
 lightning:
   provider: "mock"  # Options: phoenixd, lnd, mock, disabled
-  # For phoenixd:
+  # For real payments with phoenixd:
   # provider: phoenixd
   # config:
   #   apiUrl: "http://localhost:9740"
@@ -38,8 +39,49 @@ upstreams:
   # api:
   #   url: "http://localhost:3000"
 
-# Routes
+# Routes - order matters! More specific routes should come first.
 routes:
+  # =====================================================
+  # L402 Demo Routes (for satgate.io/pay demo page)
+  # These demonstrate tiered pricing with Lightning payments
+  # =====================================================
+  
+  - name: api-micro
+    match:
+      pathPrefix: /api/micro
+    upstream: httpbin
+    policy:
+      kind: l402
+      priceSats: 1
+
+  - name: api-basic
+    match:
+      pathPrefix: /api/basic
+    upstream: httpbin
+    policy:
+      kind: l402
+      priceSats: 10
+
+  - name: api-standard
+    match:
+      pathPrefix: /api/standard
+    upstream: httpbin
+    policy:
+      kind: l402
+      priceSats: 100
+
+  - name: api-premium
+    match:
+      pathPrefix: /api/premium
+    upstream: httpbin
+    policy:
+      kind: l402
+      priceSats: 1000
+
+  # =====================================================
+  # General Demo Routes
+  # =====================================================
+
   # Public route - no authentication required
   - name: public-demo
     match:
@@ -51,14 +93,13 @@ routes:
   # Protected route - requires valid Macaroon token
   - name: protected-demo
     match:
-      pathPrefix: /api
+      pathPrefix: /protected
     upstream: httpbin
     policy:
       kind: capability
       scope: "api:read"
 
   # Paid route - requires Lightning payment (L402)
-  # Note: Requires lightning provider to be configured
   - name: premium-demo
     match:
       pathPrefix: /premium
