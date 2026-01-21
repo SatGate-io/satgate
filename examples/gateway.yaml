@@ -24,7 +24,7 @@ admin:
 # Lightning provider (required for l402 policy)
 # Options: phoenixd, lnd, mock, disabled
 lightning:
-  provider: "${LIGHTNING_PROVIDER:-mock}"
+  provider: "${LIGHTNING_BACKEND:-${LIGHTNING_PROVIDER:-mock}}"
   config:
     # LND configuration (for Start9 via Tailscale):
     restUrl: "${LND_REST_URL}"
