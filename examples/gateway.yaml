@@ -22,14 +22,18 @@ admin:
   capabilityRootKey: "${CAPABILITY_ROOT_KEY}"
 
 # Lightning provider (required for l402 policy)
-# Using mock provider for demo - generates fake invoices
+# Options: phoenixd, lnd, mock, disabled
 lightning:
-  provider: "mock"  # Options: phoenixd, lnd, mock, disabled
-  # For real payments with phoenixd:
-  # provider: phoenixd
-  # config:
-  #   apiUrl: "http://localhost:9740"
-  #   apiPassword: "${PHOENIXD_PASSWORD}"
+  provider: "${LIGHTNING_PROVIDER:-mock}"
+  config:
+    # LND configuration (for Start9 via Tailscale):
+    restUrl: "${LND_REST_URL}"
+    macaroon: "${LND_MACAROON}"
+    tlsCert: "${LND_TLS_CERT}"
+    insecureSkipVerify: false
+    # Phoenixd configuration:
+    # apiUrl: "${PHOENIXD_URL}"
+    # apiPassword: "${PHOENIXD_PASSWORD}"
 
 # Upstreams (backend services)
 upstreams:
