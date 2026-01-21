@@ -36,6 +36,17 @@ func NewLNDProvider(config map[string]interface{}) (*LNDProvider, error) {
 	if macaroon == "" {
 		return nil, fmt.Errorf("LND requires macaroon")
 	}
+	
+	// LND REST API requires hex-encoded macaroon
+	// Support both base64-encoded and hex-encoded input
+	if _, err := hex.DecodeString(macaroon); err != nil {
+		// Not valid hex, try base64
+		decoded, err := base64.StdEncoding.DecodeString(macaroon)
+		if err != nil {
+			return nil, fmt.Errorf("macaroon must be hex or base64 encoded: %w", err)
+		}
+		macaroon = hex.EncodeToString(decoded)
+	}
 
 	// Build TLS config - secure by default
 	tlsConfig := &tls.Config{
