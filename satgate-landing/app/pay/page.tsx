@@ -36,7 +36,12 @@ class RealSatGateClient {
       const error: any = new Error("Payment Required");
       error.status = 402;
       error.headers = res.headers;
-      try { error.body = await res.text(); } catch(e) {} 
+      try { 
+        error.body = await res.text();
+        console.log('RealSatGateClient: 402 body:', error.body);
+      } catch(e) {
+        console.error('RealSatGateClient: Failed to read body:', e);
+      } 
       throw error;
     }
     
@@ -147,12 +152,19 @@ export default function PayDemoPage() {
                    
                    // Try to get payment_hash from response body
                    try {
-                     const bodyJson = JSON.parse(err.body || '{}');
-                     paymentHash = bodyJson.payment_hash || '';
-                     if (paymentHash) {
-                       addLog(`🔑 Payment hash: ${paymentHash.substring(0, 16)}...`, 'info');
+                     console.log('Response body:', err.body);
+                     if (err.body) {
+                       const bodyJson = JSON.parse(err.body);
+                       paymentHash = bodyJson.payment_hash || '';
+                       if (paymentHash) {
+                         addLog(`🔑 Payment hash: ${paymentHash.substring(0, 16)}...`, 'info');
+                       }
+                     } else {
+                       console.log('No response body found on error object');
                      }
-                   } catch { /* ignore parse errors */ }
+                   } catch (parseErr) { 
+                     console.error('Failed to parse response body:', parseErr);
+                   }
                } else {
                    throw new Error(`Invalid header format: ${authHeader}`);
                }
