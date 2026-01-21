@@ -2,6 +2,7 @@ package lightning
 
 import (
 	"fmt"
+	"strings"
 )
 
 // Provider defines the interface for Lightning backends
@@ -40,6 +41,12 @@ type NodeInfo struct {
 
 // NewProvider creates a Lightning provider by name
 func NewProvider(name string, config map[string]interface{}) (Provider, error) {
+	// Trim whitespace and handle empty provider name
+	name = strings.TrimSpace(name)
+	if name == "" {
+		name = "mock" // Default to mock if no provider specified
+	}
+	
 	switch name {
 	case "phoenixd":
 		return NewPhoenixdProvider(config)
