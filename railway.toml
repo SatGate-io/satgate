@@ -1,0 +1,13 @@
+# SatGate OSS - Railway Configuration
+# =====================================
+# Uses the root Dockerfile to build the Go gateway
+
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
