@@ -344,13 +344,17 @@ export default function ProtectDemoPage() {
       const expiresCaveat = childCaveats.find((c: string) => c.startsWith('expires = '));
       const childExpiry = expiresCaveat ? expiresCaveat.replace('expires = ', '') : '';
       
-      // Extract signature from token (it's base64 encoded JSON with 's' field)
-      let childSignature = '';
-      try {
-        const decoded = JSON.parse(atob(childToken));
-        childSignature = decoded.s || '';
-      } catch (e) {
-        // Ignore decode errors
+      // Use signature from API response (now returned directly by backend)
+      let childSignature = data.signature || '';
+      
+      // Fallback: try to extract from token if not in response
+      if (!childSignature) {
+        try {
+          const decoded = JSON.parse(atob(childToken));
+          childSignature = decoded.s || '';
+        } catch (e) {
+          // Ignore decode errors
+        }
       }
       
       setDelegationResult({ childToken, childExpiry, childSignature });

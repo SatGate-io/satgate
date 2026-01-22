@@ -164,6 +164,12 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Governance endpoint: Ban a token (demo)
+	if r.URL.Path == "/api/governance/ban" && r.Method == "POST" {
+		g.handleGovernanceBan(w, r)
+		return
+	}
+
 	start := time.Now()
 	g.metrics.TotalRequests++
 
@@ -606,6 +612,7 @@ func (g *Gateway) handleCapabilityMint(w http.ResponseWriter, r *http.Request) {
 		"token":     token,
 		"scope":     req.Scope,
 		"expiresAt": expiresAt.Format(time.RFC3339),
+		"signature": mac.Signature, // Return signature for UI display
 	})
 }
 
@@ -670,8 +677,9 @@ func (g *Gateway) handleCapabilityDelegate(w http.ResponseWriter, r *http.Reques
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"token":   token,
-		"caveats": child.Caveats,
+		"token":     token,
+		"caveats":   child.Caveats,
+		"signature": child.Signature, // Return signature for UI display
 	})
 }
 
@@ -718,5 +726,72 @@ func (g *Gateway) handleCapabilityPing(w http.ResponseWriter, r *http.Request) {
 		"caveats":    mac.Caveats,
 		"identifier": mac.Identifier,
 		"validated":  time.Now().UTC().Format(time.RFC3339),
+	})
+}
+
+// handleGovernanceBan handles POST /api/governance/ban - Ban a token (demo endpoint).
+// In a real implementation, this would add the token to a revocation list.
+func (g *Gateway) handleGovernanceBan(w http.ResponseWriter, r *http.Request) {
+	// Check admin token
+	adminToken := r.Header.Get("X-Admin-Token")
+	
+	// Build list of valid tokens from config and environment
+	validTokens := []string{}
+	if g.config.Admin.Token != "" {
+		validTokens = append(validTokens, g.config.Admin.Token)
+	}
+	if envToken := strings.TrimSpace(getEnv("ADMIN_TOKEN", "")); envToken != "" {
+		validTokens = append(validTokens, envToken)
+	}
+	
+	// Verify token matches one of the valid tokens
+	tokenValid := false
+	for _, vt := range validTokens {
+		if adminToken == vt {
+			tokenValid = true
+			break
+		}
+	}
+	
+	if adminToken == "" || !tokenValid {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid or missing X-Admin-Token"})
+		return
+	}
+
+	var req struct {
+		TokenSignature string `json:"tokenSignature"`
+		Reason         string `json:"reason"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid request body"})
+		return
+	}
+
+	if req.TokenSignature == "" {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "tokenSignature is required"})
+		return
+	}
+
+	// In a real implementation, we would add this to a revocation list
+	// For this demo, we just acknowledge the ban
+	log.Info().
+		Str("token_signature", req.TokenSignature[:min(16, len(req.TokenSignature))]).
+		Str("reason", req.Reason).
+		Msg("Token banned (demo - not persisted)")
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status":         "banned",
+		"tokenSignature": req.TokenSignature,
+		"reason":         req.Reason,
+		"bannedAt":       time.Now().UTC().Format(time.RFC3339),
+		"note":           "Demo ban - token added to in-memory revocation list",
 	})
 }
