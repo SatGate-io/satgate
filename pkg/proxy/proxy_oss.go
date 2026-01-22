@@ -11,7 +11,9 @@ package proxy
 
 import (
 	"context"
+	"crypto/sha256"
 	"crypto/tls"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -286,34 +288,48 @@ func (g *Gateway) verifyL402Token(ctx context.Context, token string, route *conf
 	// L402 format: macaroon:preimage
 	parts := strings.SplitN(token, ":", 2)
 	if len(parts) != 2 {
+		log.Debug().Msg("L402: invalid token format, expected macaroon:preimage")
 		return false
 	}
 
-	macaroonStr, _ := parts[0], parts[1]
+	macaroonStr, preimageHex := parts[0], parts[1]
 
-	// Verify macaroon
+	// Verify macaroon signature
 	mac, err := g.macaroonSvc.Verify(macaroonStr)
 	if err != nil {
+		log.Debug().Err(err).Msg("L402: macaroon verification failed")
 		return false
 	}
 
 	// Check for payment_hash caveat
 	paymentHash := mac.GetCaveat("payment_hash")
 	if paymentHash == "" {
+		log.Debug().Msg("L402: no payment_hash caveat in macaroon")
 		return false
 	}
 
-	// Check if payment was received
-	if g.lightning != nil {
-		paid, err := g.lightning.CheckPayment(paymentHash)
-		if err != nil {
-			log.Debug().Err(err).Msg("Payment check failed")
-			return false
-		}
-		return paid
+	// CRYPTOGRAPHIC PROOF: Verify that SHA256(preimage) == payment_hash
+	// This is the definitive proof of payment - no need to query the Lightning node
+	preimageBytes, err := hex.DecodeString(preimageHex)
+	if err != nil {
+		log.Debug().Err(err).Msg("L402: invalid preimage hex")
+		return false
 	}
 
-	return false
+	// Compute SHA256 of preimage
+	hash := sha256.Sum256(preimageBytes)
+	computedHash := hex.EncodeToString(hash[:])
+
+	if computedHash != paymentHash {
+		log.Debug().
+			Str("computed", computedHash).
+			Str("expected", paymentHash).
+			Msg("L402: preimage hash mismatch")
+		return false
+	}
+
+	log.Debug().Str("payment_hash", paymentHash[:16]+"...").Msg("L402: payment verified via preimage")
+	return true
 }
 
 // issueL402Challenge issues an HTTP 402 payment challenge.
