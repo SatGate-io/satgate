@@ -409,12 +409,12 @@ export default function ProtectDemoPage() {
       addLog('', 'info');
       await new Promise(r => setTimeout(r, 300));
       
-      addLog('TEST 2: Child token → /api/capability/mint (SHOULD FAIL)', 'info');
+      addLog('TEST 2: Child token → /api/capability/admin (SHOULD FAIL)', 'info');
       addLog(`🔑 Authorization: Bearer ${childToken.raw.substring(0, 30)}...`, 'info');
       
       await new Promise(r => setTimeout(r, 500));
       addLog('🚫 403 Forbidden - Escalation blocked!', 'error');
-      addLog('📝 Reason: caveat check failed (scope = api:capability:ping): Scope violation', 'info');
+      addLog('📝 Reason: caveat check failed (scope = api:capability:ping): Scope violation: token has \'api:capability:ping\', need \'api:capability:admin\'', 'info');
       blockedResult = { 
         error: 'Access Denied', 
         reason: 'caveat check failed (scope = api:capability:ping): Scope violation: token has \'api:capability:ping\', need \'api:capability:admin\''
@@ -448,30 +448,29 @@ export default function ProtectDemoPage() {
 
     addLog('', 'info');
     
-    // Test 2: Blocked action (mint)
-    addLog('TEST 2: Child token → /api/capability/mint (SHOULD FAIL)', 'info');
+    // Test 2: Blocked action (admin endpoint - requires admin scope)
+    addLog('TEST 2: Child token → /api/capability/admin (SHOULD FAIL)', 'info');
     addLog(`🔑 Authorization: Bearer ${childToken.raw.substring(0, 30)}...`, 'info');
     
     try {
-      const mintRes = await fetch(`${BASE_URL}/api/capability/mint`, {
-        method: 'POST',
+      const adminRes = await fetch(`${BASE_URL}/api/capability/admin`, {
+        method: 'GET',
         headers: { 
-          'Authorization': `Bearer ${childToken.raw}`,
-          'Content-Type': 'application/json'
+          'Authorization': `Bearer ${childToken.raw}`
         }
       });
-      const mintData = await mintRes.json();
+      const adminData = await adminRes.json();
       
-      if (mintRes.status === 403) {
+      if (adminRes.status === 403) {
         addLog('🚫 403 Forbidden - Escalation blocked!', 'error');
-        addLog(`📝 Reason: ${mintData.reason || mintData.error}`, 'info');
-        blockedResult = mintData;
-      } else if (mintRes.ok) {
+        addLog(`📝 Reason: ${adminData.reason || adminData.error}`, 'info');
+        blockedResult = adminData;
+      } else if (adminRes.ok) {
         addLog('⚠️ Warning: Should have been blocked!', 'warn');
         blockedResult = { unexpected: 'allowed' };
       } else {
-        addLog(`❌ ${mintRes.status}: ${mintData.error}`, 'error');
-        blockedResult = mintData;
+        addLog(`❌ ${adminRes.status}: ${adminData.error || adminData.message}`, 'error');
+        blockedResult = adminData;
       }
     } catch (err: any) {
       addLog(`❌ Error: ${err.message}`, 'error');

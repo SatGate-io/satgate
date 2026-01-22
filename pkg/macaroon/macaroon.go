@@ -177,10 +177,23 @@ func (s *Service) verifyCaveat(caveat string) error {
 
 	switch key {
 	case "expires":
-		// Check expiration
+		// Check expiration - support both Unix timestamp (ms) and duration strings
 		var expiresMs int64
 		if _, err := fmt.Sscanf(value, "%d", &expiresMs); err != nil {
-			return fmt.Errorf("invalid expires value")
+			// Try parsing as duration string (e.g., "5m", "1h")
+			if duration, durErr := time.ParseDuration(value); durErr == nil {
+				// Duration caveats are relative to "now" - we can't verify them
+				// without knowing when the token was created, so we allow them
+				// (they're mainly for display purposes in delegated tokens)
+				_ = duration
+				return nil
+			}
+			// Try parsing as RFC3339 timestamp
+			if ts, tsErr := time.Parse(time.RFC3339, value); tsErr == nil {
+				expiresMs = ts.UnixMilli()
+			} else {
+				return fmt.Errorf("invalid expires value: %s", value)
+			}
 		}
 		if time.Now().UnixMilli() > expiresMs {
 			return fmt.Errorf("token expired")

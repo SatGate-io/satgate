@@ -166,6 +166,12 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Capability admin endpoint: Requires scope = api:capability:admin (for scope enforcement demo)
+	if r.URL.Path == "/api/capability/admin" && r.Method == "GET" {
+		g.handleCapabilityAdmin(w, r)
+		return
+	}
+
 	// Governance endpoint: Ban a token (demo)
 	if r.URL.Path == "/api/governance/ban" && r.Method == "POST" {
 		g.handleGovernanceBan(w, r)
@@ -915,6 +921,80 @@ func (g *Gateway) handleCapabilityPing(w http.ResponseWriter, r *http.Request) {
 		"status":     "ok",
 		"message":    "Token validated successfully",
 		"caveats":    mac.Caveats,
+		"identifier": mac.Identifier,
+		"validated":  time.Now().UTC().Format(time.RFC3339),
+	})
+}
+
+// handleCapabilityAdmin handles GET /api/capability/admin - requires admin scope (for scope enforcement demo).
+func (g *Gateway) handleCapabilityAdmin(w http.ResponseWriter, r *http.Request) {
+	// Extract authorization header
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{
+			"error":   "Missing Authorization header",
+			"message": "Provide a capability token via 'Authorization: Bearer <token>'",
+		})
+		return
+	}
+
+	// Parse Bearer token
+	token := ""
+	if strings.HasPrefix(authHeader, "Bearer ") {
+		token = strings.TrimPrefix(authHeader, "Bearer ")
+	} else {
+		token = authHeader
+	}
+
+	// Verify the macaroon (includes decode + signature validation)
+	mac, err := g.macaroonSvc.Verify(token)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{
+			"error":   "Token verification failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	// Check scope caveat - require admin scope
+	requiredScope := "api:capability:admin"
+	hasAdminScope := false
+	tokenScope := ""
+	
+	for _, caveat := range mac.Caveats {
+		if strings.HasPrefix(caveat, "scope = ") {
+			tokenScope = strings.TrimPrefix(caveat, "scope = ")
+			// Check if token scope includes admin (e.g., api:capability:* or api:capability:admin)
+			if tokenScope == requiredScope || 
+			   tokenScope == "api:capability:*" || 
+			   tokenScope == "api:*" ||
+			   strings.HasSuffix(tokenScope, ":*") && strings.HasPrefix(requiredScope, strings.TrimSuffix(tokenScope, "*")) {
+				hasAdminScope = true
+			}
+		}
+	}
+
+	if !hasAdminScope {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusForbidden)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"error":  "Access Denied",
+			"reason": fmt.Sprintf("caveat check failed (scope = %s): Scope violation: token has '%s', need '%s'", tokenScope, tokenScope, requiredScope),
+		})
+		return
+	}
+
+	// Success - token has admin scope
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status":     "ok",
+		"message":    "Admin access granted",
+		"scope":      tokenScope,
 		"identifier": mac.Identifier,
 		"validated":  time.Now().UTC().Format(time.RFC3339),
 	})
