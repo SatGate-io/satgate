@@ -158,6 +158,12 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Capability ping endpoint: Verifies a capability token and returns success
+	if r.URL.Path == "/api/capability/ping" && r.Method == "GET" {
+		g.handleCapabilityPing(w, r)
+		return
+	}
+
 	start := time.Now()
 	g.metrics.TotalRequests++
 
@@ -666,5 +672,62 @@ func (g *Gateway) handleCapabilityDelegate(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"token":   token,
 		"caveats": child.Caveats,
+	})
+}
+
+// handleCapabilityPing handles GET /api/capability/ping - validates a capability token and returns success.
+func (g *Gateway) handleCapabilityPing(w http.ResponseWriter, r *http.Request) {
+	// Extract authorization header
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{
+			"error":   "Missing Authorization header",
+			"message": "Provide a capability token via 'Authorization: Bearer <token>'",
+		})
+		return
+	}
+
+	// Parse Bearer token
+	token := ""
+	if strings.HasPrefix(authHeader, "Bearer ") {
+		token = strings.TrimPrefix(authHeader, "Bearer ")
+	} else {
+		token = authHeader
+	}
+
+	// Decode and verify the macaroon
+	mac, err := g.macaroonSvc.Decode(token)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{
+			"error":   "Invalid token",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	// Verify the macaroon signature
+	if err := g.macaroonSvc.Verify(mac); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{
+			"error":   "Token verification failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	// Success - token is valid
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status":     "ok",
+		"message":    "Token validated successfully",
+		"caveats":    mac.Caveats,
+		"identifier": mac.Identifier,
+		"validated":  time.Now().UTC().Format(time.RFC3339),
 	})
 }
