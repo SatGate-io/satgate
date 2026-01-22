@@ -398,6 +398,9 @@ export default function ProtectDemoPage() {
     let allowedResult = null;
     let blockedResult = null;
     
+    // Get the token ID (signature) to display - should match what we're testing with
+    const tokenId = childToken.signature || childToken.raw.substring(0, 16);
+    
     if (useSimulation) {
       await new Promise(r => setTimeout(r, 500));
       addLog('✅ 200 OK - Access granted (within scope)', 'success');
@@ -410,7 +413,7 @@ export default function ProtectDemoPage() {
       addLog(`🔑 Authorization: Bearer ${childToken.raw.substring(0, 30)}...`, 'info');
       
       await new Promise(r => setTimeout(r, 500));
-      addLog('✅ 403 Forbidden - Escalation blocked!', 'success');
+      addLog('🚫 403 Forbidden - Escalation blocked!', 'error');
       addLog('📝 Reason: caveat check failed (scope = api:capability:ping): Scope violation', 'info');
       blockedResult = { 
         error: 'Access Denied', 
@@ -418,7 +421,7 @@ export default function ProtectDemoPage() {
       };
       
       addLog('', 'info');
-      addLog('💡 The math enforced least privilege. Not a database lookup.', 'success');
+      addLog(`💡 The math enforced least privilege. Not a database lookup.       Token ID: ${tokenId.substring(0, 16)}...`, 'success');
       
       setEnforcementResults({ allowed: allowedResult, blocked: blockedResult });
       // Don't auto-advance - let user click "Next: Kill Switch"
@@ -460,7 +463,7 @@ export default function ProtectDemoPage() {
       const mintData = await mintRes.json();
       
       if (mintRes.status === 403) {
-        addLog('✅ 403 Forbidden - Escalation blocked!', 'success');
+        addLog('🚫 403 Forbidden - Escalation blocked!', 'error');
         addLog(`📝 Reason: ${mintData.reason || mintData.error}`, 'info');
         blockedResult = mintData;
       } else if (mintRes.ok) {
@@ -475,7 +478,7 @@ export default function ProtectDemoPage() {
     }
 
     addLog('', 'info');
-    addLog('💡 The math enforced least privilege. Not a database lookup.', 'success');
+    addLog(`💡 The math enforced least privilege. Not a database lookup.       Token ID: ${tokenId.substring(0, 16)}...`, 'success');
     
     setEnforcementResults({ allowed: allowedResult, blocked: blockedResult });
     // Don't auto-advance - let user click "Next: Kill Switch"
