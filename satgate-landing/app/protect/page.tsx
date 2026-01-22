@@ -703,13 +703,12 @@ export default function ProtectDemoPage() {
             {!useSimulation && adminToken && (
               <>
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="Admin token set" />
-                <Link
-                  href="/dashboard"
-                  target="_blank"
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-900/30 border border-cyan-700/50 text-cyan-400 rounded-full text-xs font-bold hover:bg-cyan-900/50 transition"
+                <button
+                  onClick={() => window.open('/dashboard', 'SatGate Dashboard', 'width=1200,height=800,menubar=no,toolbar=no,location=no,status=no')}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-900/30 border border-cyan-700/50 text-cyan-400 rounded-full text-xs font-bold hover:bg-cyan-900/50 transition cursor-pointer"
                 >
                   <Activity size={12} /> Dashboard ↗
-                </Link>
+                </button>
               </>
             )}
           </div>
@@ -1450,13 +1449,12 @@ export default function ProtectDemoPage() {
                         >
                           <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} /> Reset
                         </button>
-                        <Link
-                          href="/dashboard"
-                          target="_blank"
-                          className="flex-1 py-2 bg-cyan-900/30 border border-cyan-800/50 text-cyan-400 rounded-lg text-sm font-medium hover:bg-cyan-900/50 transition flex items-center justify-center gap-2"
+                        <button
+                          onClick={() => window.open('/dashboard', 'SatGate Dashboard', 'width=1200,height=800,menubar=no,toolbar=no,location=no,status=no')}
+                          className="flex-1 py-2 bg-cyan-900/30 border border-cyan-800/50 text-cyan-400 rounded-lg text-sm font-medium hover:bg-cyan-900/50 transition flex items-center justify-center gap-2 cursor-pointer"
                         >
                           <Activity size={14} /> Live Dashboard ↗
-                        </Link>
+                        </button>
                       </div>
                     )}
                   </div>
