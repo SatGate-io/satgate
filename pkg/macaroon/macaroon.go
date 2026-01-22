@@ -178,26 +178,45 @@ func (s *Service) verifyCaveat(caveat string) error {
 	switch key {
 	case "expires":
 		// Check expiration - support both Unix timestamp (ms) and duration strings
+		// IMPORTANT: Check duration first because fmt.Sscanf partially parses "5m" as 5!
+		
+		// Try parsing as duration string first (e.g., "5m", "1h")
+		if _, durErr := time.ParseDuration(value); durErr == nil {
+			// Duration caveats are relative to token creation time
+			// We can't verify them without that context, so we allow them
+			// (they're mainly for display purposes in delegated tokens)
+			return nil
+		}
+		
+		// Try parsing as Unix timestamp in milliseconds (must be all digits)
 		var expiresMs int64
-		if _, err := fmt.Sscanf(value, "%d", &expiresMs); err != nil {
-			// Try parsing as duration string (e.g., "5m", "1h")
-			if duration, durErr := time.ParseDuration(value); durErr == nil {
-				// Duration caveats are relative to "now" - we can't verify them
-				// without knowing when the token was created, so we allow them
-				// (they're mainly for display purposes in delegated tokens)
-				_ = duration
+		if n, err := fmt.Sscanf(value, "%d", &expiresMs); err == nil && n == 1 {
+			// Verify it's actually all digits (not "5m" which would parse as 5)
+			isAllDigits := true
+			for _, c := range value {
+				if c < '0' || c > '9' {
+					isAllDigits = false
+					break
+				}
+			}
+			if isAllDigits {
+				if time.Now().UnixMilli() > expiresMs {
+					return fmt.Errorf("token expired")
+				}
 				return nil
 			}
-			// Try parsing as RFC3339 timestamp
-			if ts, tsErr := time.Parse(time.RFC3339, value); tsErr == nil {
-				expiresMs = ts.UnixMilli()
-			} else {
-				return fmt.Errorf("invalid expires value: %s", value)
+		}
+		
+		// Try parsing as RFC3339 timestamp
+		if ts, tsErr := time.Parse(time.RFC3339, value); tsErr == nil {
+			if time.Now().After(ts) {
+				return fmt.Errorf("token expired")
 			}
+			return nil
 		}
-		if time.Now().UnixMilli() > expiresMs {
-			return fmt.Errorf("token expired")
-		}
+		
+		// Unknown format - fail safe by rejecting
+		return fmt.Errorf("invalid expires value: %s", value)
 
 	case "scope":
 		// Scope is checked at request time, not here
