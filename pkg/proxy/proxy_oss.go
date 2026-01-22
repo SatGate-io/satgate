@@ -697,20 +697,9 @@ func (g *Gateway) handleCapabilityPing(w http.ResponseWriter, r *http.Request) {
 		token = authHeader
 	}
 
-	// Decode and verify the macaroon
-	mac, err := g.macaroonSvc.Decode(token)
+	// Verify the macaroon (includes decode + signature validation)
+	mac, err := g.macaroonSvc.Verify(token)
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(map[string]string{
-			"error":   "Invalid token",
-			"message": err.Error(),
-		})
-		return
-	}
-
-	// Verify the macaroon signature
-	if err := g.macaroonSvc.Verify(mac); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(map[string]string{
