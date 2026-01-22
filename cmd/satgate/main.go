@@ -31,6 +31,14 @@ import (
 	"github.com/satgate-io/satgate/pkg/proxy"
 )
 
+// safePreview returns a safe preview of a secret key (first 8 chars + ...)
+func safePreview(s string) string {
+	if len(s) <= 8 {
+		return "***"
+	}
+	return s[:8] + "..."
+}
+
 var (
 	// Version is set at build time
 	Version = "dev"
@@ -85,8 +93,16 @@ func main() {
 
 	// Initialize macaroon service
 	rootKey := cfg.Admin.CapabilityRootKey
-	if rootKey == "" {
+	log.Info().Str("cfg_key_len", fmt.Sprintf("%d", len(rootKey))).
+		Str("cfg_key_preview", safePreview(rootKey)).
+		Msg("Root key from config")
+	
+	if rootKey == "" || rootKey == "${CAPABILITY_ROOT_KEY}" {
+		// YAML didn't expand the env var, try direct read
 		rootKey = os.Getenv("CAPABILITY_ROOT_KEY")
+		log.Info().Str("env_key_len", fmt.Sprintf("%d", len(rootKey))).
+			Str("env_key_preview", safePreview(rootKey)).
+			Msg("Root key from env var")
 	}
 	if rootKey == "" {
 		// Auto-generate for demo mode (tokens won't persist across restarts)
@@ -98,6 +114,10 @@ func main() {
 		log.Warn().Msg("CAPABILITY_ROOT_KEY not set - using auto-generated key (demo mode)")
 		log.Warn().Msg("Tokens will NOT persist across restarts. Set CAPABILITY_ROOT_KEY for production.")
 	}
+
+	log.Info().Str("final_key_len", fmt.Sprintf("%d", len(rootKey))).
+		Str("final_key_preview", safePreview(rootKey)).
+		Msg("Using root key for macaroon service")
 
 	macaroonSvc, err := macaroon.NewService(rootKey)
 	if err != nil {
