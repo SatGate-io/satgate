@@ -471,6 +471,12 @@ func (g *Gateway) proxyRequest(w http.ResponseWriter, r *http.Request, route *co
 		return
 	}
 
+	// Apply path rewrite if configured
+	if route.Rewrite != "" {
+		r.URL.Path = route.Rewrite
+		r.URL.RawPath = route.Rewrite
+	}
+
 	// Forward request
 	proxy.ServeHTTP(w, r)
 }

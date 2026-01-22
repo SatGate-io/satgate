@@ -58,6 +58,7 @@ routes:
     match:
       pathPrefix: /api/micro
     upstream: httpbin
+    rewrite: /anything/micro   # Rewrite to httpbin's /anything endpoint
     policy:
       kind: l402
       priceSats: 1
@@ -66,6 +67,7 @@ routes:
     match:
       pathPrefix: /api/basic
     upstream: httpbin
+    rewrite: /anything/basic   # Rewrite to httpbin's /anything endpoint
     policy:
       kind: l402
       priceSats: 10
@@ -74,6 +76,7 @@ routes:
     match:
       pathPrefix: /api/standard
     upstream: httpbin
+    rewrite: /anything/standard   # Rewrite to httpbin's /anything endpoint
     policy:
       kind: l402
       priceSats: 100
@@ -82,6 +85,7 @@ routes:
     match:
       pathPrefix: /api/premium
     upstream: httpbin
+    rewrite: /anything/premium   # Rewrite to httpbin's /anything endpoint
     policy:
       kind: l402
       priceSats: 1000

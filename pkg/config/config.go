@@ -505,6 +505,7 @@ type Route struct {
 	Name      string      `yaml:"name"`
 	Match     RouteMatch  `yaml:"match"`
 	Upstream  string      `yaml:"upstream"`
+	Rewrite   string      `yaml:"rewrite,omitempty"` // Rewrite path before proxying
 	Policy    RoutePolicy `yaml:"policy"`
 	Transform *Transform  `yaml:"transform,omitempty"`
 	RateLimit *RateLimit  `yaml:"rateLimit,omitempty"`
