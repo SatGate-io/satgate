@@ -317,7 +317,11 @@ export default function ProtectDemoPage() {
         headers: { 
           'Content-Type': 'application/json',
           'Accept': 'application/json'
-        }
+        },
+        body: JSON.stringify({
+          parentToken: parentToken?.raw,
+          caveats: ['scope = api:capability:ping', 'expires = 5m']
+        })
       });
 
       if (!response.ok) {
@@ -332,19 +336,36 @@ export default function ProtectDemoPage() {
       addLog('🔐 [CRYPTO] Token attenuated mathematically', 'success');
       addLog('', 'info');
       
-      setDelegationResult(data);
+      // Backend returns { token, caveats } - convert to expected format
+      const childToken = data.token;
+      const childCaveats = data.caveats || [];
       
-      if (data.childToken) {
+      // Extract expiry from caveats
+      const expiresCaveat = childCaveats.find((c: string) => c.startsWith('expires = '));
+      const childExpiry = expiresCaveat ? expiresCaveat.replace('expires = ', '') : '';
+      
+      // Extract signature from token (it's base64 encoded JSON with 's' field)
+      let childSignature = '';
+      try {
+        const decoded = JSON.parse(atob(childToken));
+        childSignature = decoded.s || '';
+      } catch (e) {
+        // Ignore decode errors
+      }
+      
+      setDelegationResult({ childToken, childExpiry, childSignature });
+      
+      if (childToken) {
         setChildToken({
-          raw: data.childToken,
+          raw: childToken,
           scope: 'api:capability:ping',
-          expiresAt: data.childExpiry || '',
-          caveats: { scope: 'api:capability:ping', expires: data.childExpiry },
-          signature: data.childSignature // Store hex signature for ban operations
+          expiresAt: childExpiry,
+          caveats: { scope: 'api:capability:ping', expires: childExpiry },
+          signature: childSignature
         });
         addLog('✅ Child token created with restricted scope!', 'success');
-        if (data.childSignature) {
-          addLog(`🔑 Token ID: ${data.childSignature.substring(0, 12)}... (matches dashboard)`, 'info');
+        if (childSignature) {
+          addLog(`🔑 Token ID: ${childSignature.substring(0, 12)}... (matches dashboard)`, 'info');
         }
       }
       
