@@ -413,7 +413,19 @@ func (n *NWCProvider) CreateInvoice(amountSats int64, memo string) (*Invoice, er
 
 // CheckPayment checks if an invoice has been paid via NWC
 func (n *NWCProvider) CheckPayment(paymentHash string) (bool, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	// Try lookup_invoice first (more specific)
+	paid, err := n.checkPaymentViaLookup(paymentHash)
+	if err == nil {
+		return paid, nil
+	}
+
+	// If lookup_invoice fails (not supported by some wallets), try list_transactions
+	return n.checkPaymentViaList(paymentHash)
+}
+
+// checkPaymentViaLookup uses the lookup_invoice NWC method
+func (n *NWCProvider) checkPaymentViaLookup(paymentHash string) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	params := lookupInvoiceParams{
@@ -426,9 +438,9 @@ func (n *NWCProvider) CheckPayment(paymentHash string) (bool, error) {
 	}
 
 	if resp.Error != nil {
-		// Not found is not an error - invoice just hasn't been paid
-		if resp.Error.Code == "NOT_FOUND" {
-			return false, nil
+		// Method not supported or invoice not found
+		if resp.Error.Code == "NOT_FOUND" || resp.Error.Code == "NOT_IMPLEMENTED" || resp.Error.Code == "UNSUPPORTED_METHOD" {
+			return false, fmt.Errorf("lookup not supported: %s", resp.Error.Code)
 		}
 		return false, fmt.Errorf("NWC error: %s - %s", resp.Error.Code, resp.Error.Message)
 	}
@@ -438,12 +450,7 @@ func (n *NWCProvider) CheckPayment(paymentHash string) (bool, error) {
 		return false, fmt.Errorf("failed to parse lookup result: %w", err)
 	}
 
-	// Invoice is settled if any of these conditions are met:
-	// - Has a preimage (definitive proof of payment)
-	// - Has settled_at timestamp
-	// - Settled field is true
-	// - Paid field is true
-	// - State is "SETTLED"
+	// Invoice is settled if any of these conditions are met
 	isPaid := result.Preimage != "" ||
 		result.SettledAt > 0 ||
 		result.Settled ||
@@ -452,6 +459,67 @@ func (n *NWCProvider) CheckPayment(paymentHash string) (bool, error) {
 		result.State == "settled"
 
 	return isPaid, nil
+}
+
+// checkPaymentViaList uses list_transactions to find the invoice
+func (n *NWCProvider) checkPaymentViaList(paymentHash string) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	// Request recent incoming transactions
+	params := map[string]interface{}{
+		"type":  "incoming",
+		"limit": 50,
+	}
+
+	resp, err := n.sendRequest(ctx, "list_transactions", params)
+	if err != nil {
+		return false, fmt.Errorf("NWC list_transactions failed: %w", err)
+	}
+
+	if resp.Error != nil {
+		return false, fmt.Errorf("NWC error: %s - %s", resp.Error.Code, resp.Error.Message)
+	}
+
+	// Parse the transactions list
+	var result struct {
+		Transactions []struct {
+			Type        string `json:"type"`
+			Invoice     string `json:"invoice,omitempty"`
+			PaymentHash string `json:"payment_hash"`
+			Preimage    string `json:"preimage,omitempty"`
+			SettledAt   int64  `json:"settled_at,omitempty"`
+		} `json:"transactions"`
+	}
+
+	if err := json.Unmarshal(resp.Result, &result); err != nil {
+		// Try alternate format (array directly)
+		var txs []struct {
+			Type        string `json:"type"`
+			PaymentHash string `json:"payment_hash"`
+			Preimage    string `json:"preimage,omitempty"`
+			SettledAt   int64  `json:"settled_at,omitempty"`
+		}
+		if err2 := json.Unmarshal(resp.Result, &txs); err2 != nil {
+			return false, fmt.Errorf("failed to parse transactions: %w", err)
+		}
+		// Check if our payment hash is in the list
+		for _, tx := range txs {
+			if tx.PaymentHash == paymentHash && (tx.Preimage != "" || tx.SettledAt > 0) {
+				return true, nil
+			}
+		}
+		return false, nil
+	}
+
+	// Check if our payment hash is in the transactions
+	for _, tx := range result.Transactions {
+		if tx.PaymentHash == paymentHash && (tx.Preimage != "" || tx.SettledAt > 0) {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
 
 // GetBalance returns the wallet balance via NWC
