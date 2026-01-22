@@ -103,8 +103,14 @@ func (g *Gateway) SetMetricsHook(hook MetricsHook) {
 // ServeHTTP implements http.Handler.
 func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// CORS headers for browser requests (demo page, etc.)
+	// Delete any existing CORS headers first to avoid duplicates (Railway proxy may add its own)
 	origin := r.Header.Get("Origin")
 	if origin != "" {
+		w.Header().Del("Access-Control-Allow-Origin")
+		w.Header().Del("Access-Control-Allow-Methods")
+		w.Header().Del("Access-Control-Allow-Headers")
+		w.Header().Del("Access-Control-Expose-Headers")
+		w.Header().Del("Access-Control-Allow-Credentials")
 		w.Header().Set("Access-Control-Allow-Origin", origin)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Admin-Token, X-Request-ID")
@@ -427,6 +433,17 @@ func (g *Gateway) createProxy(upstreamURL string) (*httputil.ReverseProxy, error
 		IdleConnTimeout:       90 * time.Second,
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
+	}
+
+	// Modify response to strip CORS headers from upstream (we set our own)
+	proxy.ModifyResponse = func(resp *http.Response) error {
+		resp.Header.Del("Access-Control-Allow-Origin")
+		resp.Header.Del("Access-Control-Allow-Methods")
+		resp.Header.Del("Access-Control-Allow-Headers")
+		resp.Header.Del("Access-Control-Expose-Headers")
+		resp.Header.Del("Access-Control-Allow-Credentials")
+		resp.Header.Del("Access-Control-Max-Age")
+		return nil
 	}
 
 	// Error handler
