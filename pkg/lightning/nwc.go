@@ -69,6 +69,10 @@ type lookupInvoiceResult struct {
 	PaymentHash string `json:"payment_hash"`
 	Amount      int64  `json:"amount"` // millisats
 	SettledAt   int64  `json:"settled_at,omitempty"`
+	// Alternative fields some NWC implementations use
+	Settled bool   `json:"settled,omitempty"`
+	State   string `json:"state,omitempty"` // "SETTLED", "PENDING", etc.
+	Paid    bool   `json:"paid,omitempty"`
 }
 
 type getBalanceResult struct {
@@ -160,8 +164,16 @@ func (n *NWCProvider) connect() error {
 	n.mu.Lock()
 	defer n.mu.Unlock()
 
+	// Check if existing connection is still alive
 	if n.conn != nil {
-		return nil // Already connected
+		// Try a ping to verify connection is alive
+		if err := n.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+			// Connection is dead, close it
+			n.conn.Close()
+			n.conn = nil
+		} else {
+			return nil // Connection is alive
+		}
 	}
 
 	dialer := websocket.Dialer{
@@ -170,8 +182,15 @@ func (n *NWCProvider) connect() error {
 
 	conn, _, err := dialer.Dial(n.relayURL, nil)
 	if err != nil {
-		return fmt.Errorf("failed to connect to relay: %w", err)
+		return fmt.Errorf("failed to connect to relay %s: %w", n.relayURL, err)
 	}
+
+	// Set read deadline to detect dead connections
+	conn.SetReadDeadline(time.Now().Add(60 * time.Second))
+	conn.SetPongHandler(func(string) error {
+		conn.SetReadDeadline(time.Now().Add(60 * time.Second))
+		return nil
+	})
 
 	n.conn = conn
 
@@ -306,16 +325,7 @@ func (n *NWCProvider) sendRequest(ctx context.Context, method string, params int
 	n.pending[event.ID] = responseChan
 	n.mu.Unlock()
 
-	// Send event
-	eventMsg, _ := json.Marshal([]interface{}{"EVENT", event})
-	n.mu.Lock()
-	err = n.conn.WriteMessage(websocket.TextMessage, eventMsg)
-	n.mu.Unlock()
-	if err != nil {
-		return nil, fmt.Errorf("failed to send event: %w", err)
-	}
-
-	// Subscribe to responses
+	// Subscribe to responses BEFORE sending event (avoid race condition)
 	subID := generateSubID()
 	subMsg, _ := json.Marshal([]interface{}{
 		"REQ",
@@ -331,6 +341,18 @@ func (n *NWCProvider) sendRequest(ctx context.Context, method string, params int
 	n.mu.Unlock()
 	if err != nil {
 		return nil, fmt.Errorf("failed to subscribe: %w", err)
+	}
+
+	// Small delay to ensure subscription is active
+	time.Sleep(50 * time.Millisecond)
+
+	// Send event
+	eventMsg, _ := json.Marshal([]interface{}{"EVENT", event})
+	n.mu.Lock()
+	err = n.conn.WriteMessage(websocket.TextMessage, eventMsg)
+	n.mu.Unlock()
+	if err != nil {
+		return nil, fmt.Errorf("failed to send event: %w", err)
 	}
 
 	// Wait for response with timeout
@@ -416,8 +438,20 @@ func (n *NWCProvider) CheckPayment(paymentHash string) (bool, error) {
 		return false, fmt.Errorf("failed to parse lookup result: %w", err)
 	}
 
-	// Invoice is settled if it has a preimage or settled_at timestamp
-	return result.Preimage != "" || result.SettledAt > 0, nil
+	// Invoice is settled if any of these conditions are met:
+	// - Has a preimage (definitive proof of payment)
+	// - Has settled_at timestamp
+	// - Settled field is true
+	// - Paid field is true
+	// - State is "SETTLED"
+	isPaid := result.Preimage != "" ||
+		result.SettledAt > 0 ||
+		result.Settled ||
+		result.Paid ||
+		result.State == "SETTLED" ||
+		result.State == "settled"
+
+	return isPaid, nil
 }
 
 // GetBalance returns the wallet balance via NWC
