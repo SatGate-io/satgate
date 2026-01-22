@@ -156,9 +156,10 @@ export default function DashboardPage() {
     bannedHits: graphData.stats.bannedHits,
   };
 
-  // Calculate block rate
-  const totalRequests = stats.activeTokens + stats.totalBlocked;
-  const blockRate = totalRequests > 0 ? ((stats.totalBlocked / totalRequests) * 100).toFixed(1) : '0.0';
+  // Calculate block rate (includes both unpaid requests and banned token hits)
+  const totalBlocked = stats.totalBlocked + stats.bannedHits;
+  const totalRequests = stats.activeTokens + totalBlocked;
+  const blockRate = totalRequests > 0 ? ((totalBlocked / totalRequests) * 100).toFixed(1) : '0.0';
 
   function formatExpiry(expiry: string): string {
     // If it's a timestamp, convert to relative time
