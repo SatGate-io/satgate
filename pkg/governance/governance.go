@@ -2,6 +2,7 @@ package governance
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -17,14 +18,22 @@ type Service struct {
 	usage   map[string]*UsageStats
 	minted  map[string]*MintedToken
 	mu      sync.RWMutex
+
+	// Counters for dashboard stats
+	blockedRequests int64 // Unpaid requests (402s)
+	bannedHits      int64 // Requests from banned tokens
+	counterMu       sync.Mutex
 }
 
 // MintedToken tracks a minted token
 type MintedToken struct {
-	Signature string
-	Scope     string
-	CreatedAt time.Time
-	ExpiresAt time.Time
+	Signature  string
+	Scope      string
+	CreatedAt  time.Time
+	ExpiresAt  time.Time
+	ParentSig  string // Parent token signature (empty for root tokens)
+	Depth      int    // 0 = root, 1 = minted, 2+ = delegated
+	Label      string // Human-readable label
 }
 
 // BanRecord represents a banned token
@@ -128,8 +137,13 @@ func (s *Service) loadFromStore(ctx context.Context) error {
 	return nil
 }
 
-// RegisterMint records a newly minted token
+// RegisterMint records a newly minted token (depth 1, no parent)
 func (s *Service) RegisterMint(signature, scope string, expiresAt time.Time) {
+	s.RegisterMintWithLineage(signature, scope, expiresAt, "", 1, "Agent Token")
+}
+
+// RegisterMintWithLineage records a token with full lineage info
+func (s *Service) RegisterMintWithLineage(signature, scope string, expiresAt time.Time, parentSig string, depth int, label string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -138,6 +152,9 @@ func (s *Service) RegisterMint(signature, scope string, expiresAt time.Time) {
 		Scope:     scope,
 		CreatedAt: time.Now(),
 		ExpiresAt: expiresAt,
+		ParentSig: parentSig,
+		Depth:     depth,
+		Label:     label,
 	}
 	s.minted[signature] = token
 
@@ -149,6 +166,33 @@ func (s *Service) RegisterMint(signature, scope string, expiresAt time.Time) {
 			log.Error().Err(err).Str("signature", signature).Msg("Failed to persist minted token")
 		}
 	}()
+}
+
+// RegisterDelegation records a delegated child token
+func (s *Service) RegisterDelegation(signature, scope string, expiresAt time.Time, parentSig string) {
+	// Determine depth based on parent
+	depth := 2 // Default for delegated tokens
+	s.mu.RLock()
+	if parent, ok := s.minted[parentSig]; ok {
+		depth = parent.Depth + 1
+	}
+	s.mu.RUnlock()
+
+	s.RegisterMintWithLineage(signature, scope, expiresAt, parentSig, depth, "Worker Token")
+}
+
+// RecordBlockedRequest increments the blocked requests counter
+func (s *Service) RecordBlockedRequest() {
+	s.counterMu.Lock()
+	s.blockedRequests++
+	s.counterMu.Unlock()
+}
+
+// RecordBannedHit increments the banned hits counter
+func (s *Service) RecordBannedHit() {
+	s.counterMu.Lock()
+	s.bannedHits++
+	s.counterMu.Unlock()
 }
 
 // Ban adds a token to the ban list
@@ -437,6 +481,162 @@ func (s *Service) GetStats() map[string]interface{} {
 	}
 }
 
+// GraphNode represents a node in the token lineage graph
+type GraphNode struct {
+	Data GraphNodeData `json:"data"`
+}
+
+// GraphNodeData contains the node details
+type GraphNodeData struct {
+	ID          string   `json:"id"`
+	Label       string   `json:"label"`
+	Constraints []string `json:"constraints"`
+	LastSeen    string   `json:"lastSeen"`
+	Depth       int      `json:"depth"`
+	Status      string   `json:"status"`
+}
+
+// GraphEdge represents an edge in the token lineage graph
+type GraphEdge struct {
+	Data GraphEdgeData `json:"data"`
+}
+
+// GraphEdgeData contains the edge details
+type GraphEdgeData struct {
+	Source string `json:"source"`
+	Target string `json:"target"`
+}
+
+// GraphStats contains aggregate statistics
+type GraphStats struct {
+	Active     int   `json:"active"`
+	Blocked    int64 `json:"blocked"`
+	Banned     int   `json:"banned"`
+	BannedHits int64 `json:"bannedHits"`
+}
+
+// GraphResponse is the full response for /api/governance/graph
+type GraphResponse struct {
+	Nodes []GraphNode `json:"nodes"`
+	Edges []GraphEdge `json:"edges"`
+	Stats GraphStats  `json:"stats"`
+}
+
+// GetGraph returns the token lineage graph for the dashboard
+func (s *Service) GetGraph() GraphResponse {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	nodes := make([]GraphNode, 0)
+	edges := make([]GraphEdge, 0)
+
+	for sig, token := range s.minted {
+		// Determine status
+		status := "ACTIVE"
+		if _, banned := s.banned[sig]; banned {
+			status = "BANNED"
+		} else if time.Now().After(token.ExpiresAt) {
+			status = "EXPIRED"
+		}
+
+		// Build constraints list
+		constraints := []string{
+			fmt.Sprintf("scope = %s", token.Scope),
+		}
+		
+		// Add expiry as relative time
+		expiresIn := time.Until(token.ExpiresAt)
+		if expiresIn > 0 {
+			if expiresIn < time.Minute {
+				constraints = append(constraints, fmt.Sprintf("expires = %ds", int(expiresIn.Seconds())))
+			} else if expiresIn < time.Hour {
+				constraints = append(constraints, fmt.Sprintf("expires = %dm", int(expiresIn.Minutes())))
+			} else {
+				constraints = append(constraints, fmt.Sprintf("expires = %dh", int(expiresIn.Hours())))
+			}
+		} else {
+			constraints = append(constraints, "expires = expired")
+		}
+
+		// Determine last seen from usage
+		lastSeen := "never"
+		if usage, ok := s.usage[sig]; ok {
+			ago := time.Since(usage.LastUsed)
+			if ago < time.Second {
+				lastSeen = "just now"
+			} else if ago < time.Minute {
+				lastSeen = fmt.Sprintf("%ds ago", int(ago.Seconds()))
+			} else if ago < time.Hour {
+				lastSeen = fmt.Sprintf("%dm ago", int(ago.Minutes()))
+			} else {
+				lastSeen = fmt.Sprintf("%dh ago", int(ago.Hours()))
+			}
+		}
+
+		// Determine label
+		label := token.Label
+		if label == "" {
+			switch token.Depth {
+			case 0:
+				label = "Root Token"
+			case 1:
+				label = "Agent Token"
+			default:
+				label = "Worker Token"
+			}
+		}
+
+		nodes = append(nodes, GraphNode{
+			Data: GraphNodeData{
+				ID:          sig,
+				Label:       label,
+				Constraints: constraints,
+				LastSeen:    lastSeen,
+				Depth:       token.Depth,
+				Status:      status,
+			},
+		})
+
+		// Add edge from parent if exists
+		if token.ParentSig != "" {
+			edges = append(edges, GraphEdge{
+				Data: GraphEdgeData{
+					Source: token.ParentSig,
+					Target: sig,
+				},
+			})
+		}
+	}
+
+	// Get counters
+	s.counterMu.Lock()
+	blocked := s.blockedRequests
+	bannedHits := s.bannedHits
+	s.counterMu.Unlock()
+
+	// Count active and banned tokens
+	activeCount := 0
+	bannedCount := 0
+	for sig := range s.minted {
+		if _, banned := s.banned[sig]; banned {
+			bannedCount++
+		} else {
+			activeCount++
+		}
+	}
+
+	return GraphResponse{
+		Nodes: nodes,
+		Edges: edges,
+		Stats: GraphStats{
+			Active:     activeCount,
+			Blocked:    blocked,
+			Banned:     bannedCount,
+			BannedHits: bannedHits,
+		},
+	}
+}
+
 // Reset clears all governance data
 func (s *Service) Reset() {
 	s.mu.Lock()
@@ -445,6 +645,12 @@ func (s *Service) Reset() {
 	s.banned = make(map[string]BanRecord)
 	s.usage = make(map[string]*UsageStats)
 	s.minted = make(map[string]*MintedToken)
+
+	// Reset counters
+	s.counterMu.Lock()
+	s.blockedRequests = 0
+	s.bannedHits = 0
+	s.counterMu.Unlock()
 
 	// Reset store
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

@@ -172,6 +172,18 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Governance endpoint: Get token graph for dashboard
+	if r.URL.Path == "/api/governance/graph" && r.Method == "GET" {
+		g.handleGovernanceGraph(w, r)
+		return
+	}
+
+	// Governance endpoint: Reset dashboard data
+	if r.URL.Path == "/api/governance/reset" && r.Method == "POST" {
+		g.handleGovernanceReset(w, r)
+		return
+	}
+
 	start := time.Now()
 	g.metrics.TotalRequests++
 
@@ -745,6 +757,11 @@ func (g *Gateway) handleCapabilityMint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Register with governance for dashboard tracking
+	if g.governance != nil {
+		g.governance.RegisterMintWithLineage(mac.Signature, req.Scope, expiresAt, "", 1, "Agent Token")
+	}
+
 	// Encode the token
 	token := g.macaroonSvc.Encode(mac)
 
@@ -804,6 +821,13 @@ func (g *Gateway) handleCapabilityDelegate(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	// Get parent signature for lineage tracking
+	parentMac, _ := g.macaroonSvc.Verify(req.ParentToken)
+	parentSig := ""
+	if parentMac != nil {
+		parentSig = parentMac.Signature
+	}
+
 	// Delegate the token
 	child, err := g.macaroonSvc.Delegate(req.ParentToken, req.Caveats)
 	if err != nil {
@@ -811,6 +835,26 @@ func (g *Gateway) handleCapabilityDelegate(w http.ResponseWriter, r *http.Reques
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
+	}
+
+	// Register delegation with governance for dashboard tracking
+	if g.governance != nil {
+		// Extract scope from caveats
+		scope := "api:*"
+		expiresAt := time.Now().Add(1 * time.Hour) // Default
+		for _, caveat := range child.Caveats {
+			if strings.HasPrefix(caveat, "scope = ") {
+				scope = strings.TrimPrefix(caveat, "scope = ")
+			}
+			if strings.HasPrefix(caveat, "expires = ") {
+				if ts, err := time.Parse(time.RFC3339, strings.TrimPrefix(caveat, "expires = ")); err == nil {
+					expiresAt = ts
+				} else if exp, err := time.ParseDuration(strings.TrimPrefix(caveat, "expires = ")); err == nil {
+					expiresAt = time.Now().Add(exp)
+				}
+			}
+		}
+		g.governance.RegisterDelegation(child.Signature, scope, expiresAt, parentSig)
 	}
 
 	// Encode the child token
@@ -857,6 +901,11 @@ func (g *Gateway) handleCapabilityPing(w http.ResponseWriter, r *http.Request) {
 			"message": err.Error(),
 		})
 		return
+	}
+
+	// Record usage with governance
+	if g.governance != nil {
+		g.governance.RecordUsage(mac.Signature, "/api/capability/ping")
 	}
 
 	// Success - token is valid
@@ -920,12 +969,15 @@ func (g *Gateway) handleGovernanceBan(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// In a real implementation, we would add this to a revocation list
-	// For this demo, we just acknowledge the ban
+	// Add to revocation list via governance service
+	if g.governance != nil {
+		g.governance.Ban(req.TokenSignature, req.Reason, "admin")
+	}
+	
 	log.Info().
 		Str("token_signature", req.TokenSignature[:min(16, len(req.TokenSignature))]).
 		Str("reason", req.Reason).
-		Msg("Token banned (demo - not persisted)")
+		Msg("Token banned")
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -934,6 +986,86 @@ func (g *Gateway) handleGovernanceBan(w http.ResponseWriter, r *http.Request) {
 		"tokenSignature": req.TokenSignature,
 		"reason":         req.Reason,
 		"bannedAt":       time.Now().UTC().Format(time.RFC3339),
-		"note":           "Demo ban - token added to in-memory revocation list",
+	})
+}
+
+// handleGovernanceGraph handles GET /api/governance/graph - Returns token lineage for dashboard.
+func (g *Gateway) handleGovernanceGraph(w http.ResponseWriter, r *http.Request) {
+	// CORS for dashboard access
+	origin := r.Header.Get("Origin")
+	if origin != "" {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+	}
+	
+	w.Header().Set("Content-Type", "application/json")
+	
+	if g.governance == nil {
+		// Return empty graph if governance not initialized
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"nodes": []interface{}{},
+			"edges": []interface{}{},
+			"stats": map[string]interface{}{
+				"active":     0,
+				"blocked":    0,
+				"banned":     0,
+				"bannedHits": 0,
+			},
+		})
+		return
+	}
+	
+	graph := g.governance.GetGraph()
+	json.NewEncoder(w).Encode(graph)
+}
+
+// handleGovernanceReset handles POST /api/governance/reset - Resets dashboard data.
+func (g *Gateway) handleGovernanceReset(w http.ResponseWriter, r *http.Request) {
+	// CORS for dashboard access
+	origin := r.Header.Get("Origin")
+	if origin != "" {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+	}
+	
+	// Check admin token
+	adminToken := r.Header.Get("X-Admin-Token")
+	
+	// Build list of valid tokens from config and environment
+	validTokens := []string{}
+	if g.config.Admin.Token != "" {
+		validTokens = append(validTokens, g.config.Admin.Token)
+	}
+	if envToken := strings.TrimSpace(getEnv("ADMIN_TOKEN", "")); envToken != "" {
+		validTokens = append(validTokens, envToken)
+	}
+	
+	// Verify token matches one of the valid tokens
+	tokenValid := false
+	for _, vt := range validTokens {
+		if adminToken == vt {
+			tokenValid = true
+			break
+		}
+	}
+	
+	if adminToken == "" || !tokenValid {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid or missing X-Admin-Token"})
+		return
+	}
+	
+	if g.governance != nil {
+		g.governance.Reset()
+	}
+	
+	log.Info().Msg("Dashboard data reset")
+	
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status":  "reset",
+		"resetAt": time.Now().UTC().Format(time.RFC3339),
 	})
 }

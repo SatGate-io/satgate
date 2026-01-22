@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 // API endpoint - Railway backend
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://satgate-production.up.railway.app';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://satgate-production-9354.up.railway.app';
 
 // Token type from API
 interface TokenData {
