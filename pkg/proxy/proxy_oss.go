@@ -377,6 +377,8 @@ func (g *Gateway) issueL402Challenge(w http.ResponseWriter, r *http.Request, rou
 		return
 	}
 	mac.AddCaveat("payment_hash", paymentHash)
+	// CRITICAL: Recalculate signature after adding caveats!
+	mac.Signature = g.macaroonSvc.RecalculateSignature(mac)
 	macaroonStr := g.macaroonSvc.Encode(mac)
 
 	// Set L402 challenge header
