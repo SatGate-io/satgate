@@ -1,4 +1,5 @@
 'use client';
+// v2.1 - Manual preimage entry, no polling
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Terminal, Zap, ShieldAlert, CheckCircle, Play, ArrowLeft, Wifi, WifiOff, Copy, Check } from 'lucide-react';
