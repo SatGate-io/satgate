@@ -986,30 +986,37 @@ func (g *Gateway) handleCapabilityAdmin(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// Check scope caveat - require admin scope
+	// Check scope caveats - ALL scope caveats must allow the required scope
+	// (macaroon semantics: adding caveats can only restrict, never expand permissions)
 	requiredScope := "api:capability:admin"
-	hasAdminScope := false
-	tokenScope := ""
+	mostRestrictiveScope := "" // Track the most restrictive scope found
+	allScopesAllow := true     // Assume allowed until proven otherwise
 	
 	for _, caveat := range mac.Caveats {
 		if strings.HasPrefix(caveat, "scope = ") {
-			tokenScope = strings.TrimPrefix(caveat, "scope = ")
-			// Check if token scope includes admin (e.g., api:capability:* or api:capability:admin)
-			if tokenScope == requiredScope || 
-			   tokenScope == "api:capability:*" || 
-			   tokenScope == "api:*" ||
-			   strings.HasSuffix(tokenScope, ":*") && strings.HasPrefix(requiredScope, strings.TrimSuffix(tokenScope, "*")) {
-				hasAdminScope = true
+			scopeValue := strings.TrimPrefix(caveat, "scope = ")
+			mostRestrictiveScope = scopeValue // Keep track of last (most restrictive) scope
+			
+			// Check if this specific scope caveat allows the required scope
+			scopeAllows := scopeValue == requiredScope || 
+			              scopeValue == "api:capability:*" || 
+			              scopeValue == "api:*" ||
+			              (strings.HasSuffix(scopeValue, ":*") && strings.HasPrefix(requiredScope, strings.TrimSuffix(scopeValue, "*")))
+			
+			// If ANY scope caveat denies access, the token is denied (macaroon AND semantics)
+			if !scopeAllows {
+				allScopesAllow = false
+				// Don't break - keep looping to find the most restrictive scope for error message
 			}
 		}
 	}
 
-	if !hasAdminScope {
+	if !allScopesAllow || mostRestrictiveScope == "" {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusForbidden)
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"error":  "Access Denied",
-			"reason": fmt.Sprintf("caveat check failed (scope = %s): Scope violation: token has '%s', need '%s'", tokenScope, tokenScope, requiredScope),
+			"reason": fmt.Sprintf("caveat check failed (scope = %s): Scope violation: token has '%s', need '%s'", mostRestrictiveScope, mostRestrictiveScope, requiredScope),
 		})
 		return
 	}
@@ -1020,7 +1027,7 @@ func (g *Gateway) handleCapabilityAdmin(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"status":     "ok",
 		"message":    "Admin access granted",
-		"scope":      tokenScope,
+		"scope":      mostRestrictiveScope,
 		"identifier": mac.Identifier,
 		"validated":  time.Now().UTC().Format(time.RFC3339),
 	})
