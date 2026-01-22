@@ -152,8 +152,8 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Admin endpoint: Token delegation
-	if r.URL.Path == "/api/capability/delegate" && r.Method == "POST" {
+	// Admin endpoint: Token delegation (both direct and demo path)
+	if (r.URL.Path == "/api/capability/delegate" || r.URL.Path == "/api/capability/demo/delegate") && r.Method == "POST" {
 		g.handleCapabilityDelegate(w, r)
 		return
 	}
