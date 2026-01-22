@@ -5,7 +5,7 @@ import {
   Key, Shield, Lock, Unlock, Play, ArrowLeft, Copy, Check, 
   ChevronRight, AlertTriangle, CheckCircle, XCircle, User, 
   Bot, GitBranch, Clock, RefreshCw, Eye, Trash2, Wifi, WifiOff,
-  Ban, ShieldOff, Zap
+  Ban, ShieldOff, Zap, Activity
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -1433,13 +1433,22 @@ export default function ProtectDemoPage() {
                       </Link>
                     </div>
                     {!useSimulation && adminToken && (
-                      <button
-                        onClick={resetBackendDashboard}
-                        disabled={isLoading}
-                        className="w-full py-2 bg-orange-900/30 border border-orange-800/50 text-orange-400 rounded-lg text-sm font-medium hover:bg-orange-900/50 transition flex items-center justify-center gap-2 disabled:opacity-50"
-                      >
-                        <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} /> Reset Dashboard Only
-                      </button>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={resetBackendDashboard}
+                          disabled={isLoading}
+                          className="flex-1 py-2 bg-orange-900/30 border border-orange-800/50 text-orange-400 rounded-lg text-sm font-medium hover:bg-orange-900/50 transition flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                          <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} /> Reset
+                        </button>
+                        <Link
+                          href="/dashboard"
+                          target="_blank"
+                          className="flex-1 py-2 bg-cyan-900/30 border border-cyan-800/50 text-cyan-400 rounded-lg text-sm font-medium hover:bg-cyan-900/50 transition flex items-center justify-center gap-2"
+                        >
+                          <Activity size={14} /> Live Dashboard ↗
+                        </Link>
+                      </div>
                     )}
                   </div>
                 </div>
