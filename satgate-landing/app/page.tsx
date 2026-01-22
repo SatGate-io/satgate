@@ -114,7 +114,7 @@ const LandingPage = () => {
               SatGate gives them a <b>Lightning Wallet</b> and an <b>L402 Gateway</b> to buy data, API calls, and compute instantly—and route to the best provider based on price, latency, and availability.
             </p>
             <div className="flex gap-4">
-              <Link href="/playground" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center gap-2">
+              <Link href="/pay" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center gap-2">
                 Try Demo <ArrowRight size={18} />
               </Link>
               <button 
@@ -671,14 +671,14 @@ curl -H <span className="text-green-400">"Authorization: L402 &lt;macaroon&gt;:&
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="text-gray-500 text-sm">Stripe for AI Agents.<br/>EZ-Pass for the API Economy.</p>
+              <p className="text-gray-500 text-sm">EZ-Pass for the API Economy.</p>
               <p className="text-gray-600 text-xs mt-3">Non-custodial. We never hold your keys.</p>
             </div>
             <div>
               <h4 className="font-bold text-white mb-4">Resources</h4>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
-                <li><Link href="/playground" className="hover:text-white transition">Monetize Demo</Link></li>
+                <li><Link href="/pay" className="hover:text-white transition">Pay Demo</Link></li>
                 <li><a href="https://github.com/SatGate-io/satgate#-quick-start" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Documentation</a></li>
               </ul>
             </div>

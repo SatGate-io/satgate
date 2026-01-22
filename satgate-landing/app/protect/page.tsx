@@ -1426,10 +1426,10 @@ export default function ProtectDemoPage() {
                         <RefreshCw size={18} className={isLoading ? 'animate-spin' : ''} /> Run Again
                       </button>
                       <Link
-                        href="/playground"
+                        href="/pay"
                         className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-xl font-bold hover:opacity-90 transition flex items-center justify-center gap-2"
                       >
-                        Try Monetize Mode <ChevronRight size={18} />
+                        Try Pay Mode <ChevronRight size={18} />
                       </Link>
                     </div>
                     {!useSimulation && adminToken && (
@@ -1721,10 +1721,10 @@ export default function ProtectDemoPage() {
               View Source on GitHub →
             </a>
             <Link 
-              href="/playground"
+              href="/pay"
               className="text-cyan-400 hover:text-cyan-300 text-sm underline underline-offset-4 transition"
             >
-              Try Monetize Mode →
+              Try Pay Mode →
             </Link>
           </div>
         </div>
