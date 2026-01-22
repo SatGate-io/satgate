@@ -678,7 +678,6 @@ curl -H <span className="text-green-400">"Authorization: L402 &lt;macaroon&gt;:&
               <h4 className="font-bold text-white mb-4">Resources</h4>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
-                <li><Link href="/pay" className="hover:text-white transition">Pay Demo</Link></li>
                 <li><a href="https://github.com/SatGate-io/satgate#-quick-start" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Documentation</a></li>
               </ul>
             </div>
