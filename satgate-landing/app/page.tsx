@@ -183,10 +183,10 @@ const LandingPage = () => {
                 <div className="p-2.5 bg-cyan-900/50 rounded-lg">
                   <Shield className="text-cyan-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Secure API Access</h3>
+                <h3 className="font-bold text-lg">Protects against unauthorized API access</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Capability tokens replace accounts and API keys. No PII, no credential stuffing. Zero Trust cryptographic access control to protect APIs and agents.
+                Capability tokens replace accounts and API keys. No PII, no credential stuffing. Zero Trust cryptographic access control to enable high-velocity agent access.
               </p>
             </div>
             <div className="p-6 rounded-xl bg-gradient-to-br from-purple-950/30 to-purple-900/10 border border-purple-800/30 hover:border-purple-600/50 transition">
@@ -194,10 +194,10 @@ const LandingPage = () => {
                 <div className="p-2.5 bg-purple-900/50 rounded-lg">
                   <DollarSign className="text-purple-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Monetize APIs per request</h3>
+                <h3 className="font-bold text-lg">Prevents API overuse and abuse</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Every request costs something—an economic firewall against bots and abuse. Sub-cent pricing, no chargebacks, instant settlement.
+                Every request requires a payment—an economic firewall against bots and abuse. Sub-cent pricing, no chargebacks, instant settlement.
               </p>
             </div>
           </div>
