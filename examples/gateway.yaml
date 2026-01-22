@@ -22,11 +22,14 @@ admin:
   capabilityRootKey: "${CAPABILITY_ROOT_KEY}"
 
 # Lightning provider (required for l402 policy)
-# Options: phoenixd, lnd, mock, disabled
+# Options: phoenixd, lnd, nwc (Nostr Wallet Connect), alby, mock, disabled
 # Set LIGHTNING_BACKEND or LIGHTNING_PROVIDER env var (defaults to mock if neither set)
 lightning:
   provider: "${LIGHTNING_BACKEND}${LIGHTNING_PROVIDER}"
   config:
+    # NWC/Alby configuration (recommended - best routing):
+    # Get connection string from Alby Hub: Settings → Wallet Connections → Add
+    connectionString: "${NWC_CONNECTION_STRING}"
     # LND configuration (for Start9 via Tailscale):
     restUrl: "${LND_REST_URL}"
     macaroon: "${LND_MACAROON}"

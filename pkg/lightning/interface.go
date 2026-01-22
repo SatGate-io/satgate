@@ -52,6 +52,8 @@ func NewProvider(name string, config map[string]interface{}) (Provider, error) {
 		return NewPhoenixdProvider(config)
 	case "lnd":
 		return NewLNDProvider(config)
+	case "nwc", "alby":
+		return NewNWCProvider(config)
 	case "mock":
 		return NewMockProvider(), nil
 	default:
