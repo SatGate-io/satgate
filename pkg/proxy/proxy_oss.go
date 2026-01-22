@@ -18,6 +18,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -508,15 +509,42 @@ func extractL402Token(r *http.Request) string {
 	return ""
 }
 
+// getEnv returns an environment variable value or a default.
+func getEnv(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}
+
 // handleCapabilityMint handles POST /api/capability/mint - Admin endpoint for minting capability tokens.
 func (g *Gateway) handleCapabilityMint(w http.ResponseWriter, r *http.Request) {
-	// Check admin token
+	// Check admin token - try multiple sources
 	adminToken := r.Header.Get("X-Admin-Token")
-	expectedToken := g.config.Admin.Token
-	if expectedToken == "" {
-		expectedToken = g.config.Admin.CapabilityRootKey // Fallback to capability root key
+	
+	// Build list of valid tokens from config and environment
+	validTokens := []string{}
+	if g.config.Admin.Token != "" {
+		validTokens = append(validTokens, g.config.Admin.Token)
 	}
-	if adminToken == "" || adminToken != expectedToken {
+	if g.config.Admin.CapabilityRootKey != "" {
+		validTokens = append(validTokens, g.config.Admin.CapabilityRootKey)
+	}
+	// Also check ADMIN_TOKEN environment variable (for demo deployments)
+	if envToken := strings.TrimSpace(getEnv("ADMIN_TOKEN", "")); envToken != "" {
+		validTokens = append(validTokens, envToken)
+	}
+	
+	// Verify token matches one of the valid tokens
+	tokenValid := false
+	for _, vt := range validTokens {
+		if adminToken == vt {
+			tokenValid = true
+			break
+		}
+	}
+	
+	if adminToken == "" || !tokenValid {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid or missing X-Admin-Token"})
