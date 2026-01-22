@@ -972,6 +972,7 @@ func (g *Gateway) handleGovernanceBan(w http.ResponseWriter, r *http.Request) {
 	// Add to revocation list via governance service
 	if g.governance != nil {
 		g.governance.Ban(req.TokenSignature, req.Reason, "admin")
+		g.governance.RecordBannedHit() // Increment kill switch counter
 	}
 	
 	log.Info().
