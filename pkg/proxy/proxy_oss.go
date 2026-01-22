@@ -454,6 +454,14 @@ func (g *Gateway) matchRoute(r *http.Request) *config.Route {
 
 // proxyRequest forwards the request to the upstream.
 func (g *Gateway) proxyRequest(w http.ResponseWriter, r *http.Request, route *config.Route) {
+	// Check for demo routes - return mock data instead of proxying
+	if demoResponse := g.getDemoResponse(route); demoResponse != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(demoResponse)
+		return
+	}
+
 	// Get upstream name
 	upstreamName := route.Upstream
 	if upstreamName == "" {
@@ -479,6 +487,83 @@ func (g *Gateway) proxyRequest(w http.ResponseWriter, r *http.Request, route *co
 
 	// Forward request
 	proxy.ServeHTTP(w, r)
+}
+
+// getDemoResponse returns mock demo data for L402 demo routes
+func (g *Gateway) getDemoResponse(route *config.Route) map[string]interface{} {
+	switch route.Name {
+	case "api-micro":
+		return map[string]interface{}{
+			"tier":    "micro",
+			"price":   "1 sat",
+			"message": "🏓 Pong! Micro-payment verified.",
+			"data": map[string]interface{}{
+				"latency_ms": 42,
+				"status":     "healthy",
+				"timestamp":  time.Now().UTC().Format(time.RFC3339),
+			},
+		}
+	case "api-basic":
+		return map[string]interface{}{
+			"tier":    "basic",
+			"price":   "10 sats",
+			"message": "📊 Basic quote data unlocked.",
+			"data": map[string]interface{}{
+				"btc_usd":    105420.50,
+				"btc_eur":    97830.25,
+				"btc_gbp":    83150.75,
+				"change_24h": "+2.4%",
+				"timestamp":  time.Now().UTC().Format(time.RFC3339),
+			},
+		}
+	case "api-standard":
+		return map[string]interface{}{
+			"tier":    "standard",
+			"price":   "100 sats",
+			"message": "📈 Analytics dashboard unlocked.",
+			"data": map[string]interface{}{
+				"market_cap":       "2.1T USD",
+				"volume_24h":       "48.2B USD",
+				"dominance":        "52.3%",
+				"fear_greed_index": 72,
+				"sentiment":        "Greed",
+				"top_movers": []map[string]interface{}{
+					{"symbol": "BTC", "change": "+2.4%"},
+					{"symbol": "ETH", "change": "+3.1%"},
+					{"symbol": "SOL", "change": "+5.8%"},
+				},
+				"timestamp": time.Now().UTC().Format(time.RFC3339),
+			},
+		}
+	case "api-premium":
+		return map[string]interface{}{
+			"tier":    "premium",
+			"price":   "1000 sats",
+			"message": "🔮 Premium AI insights unlocked.",
+			"data": map[string]interface{}{
+				"prediction": map[string]interface{}{
+					"btc_7d":     "+8.2%",
+					"btc_30d":    "+15.4%",
+					"confidence": 0.78,
+					"model":      "SatGate-GPT-v2",
+				},
+				"signals": []map[string]interface{}{
+					{"asset": "BTC", "signal": "STRONG_BUY", "score": 0.92},
+					{"asset": "ETH", "signal": "BUY", "score": 0.76},
+					{"asset": "SOL", "signal": "HOLD", "score": 0.54},
+				},
+				"whale_activity": map[string]interface{}{
+					"large_txs_24h": 847,
+					"net_flow":      "+12,450 BTC",
+					"exchange_trend": "outflow",
+				},
+				"risk_score": 0.34,
+				"timestamp":  time.Now().UTC().Format(time.RFC3339),
+			},
+		}
+	default:
+		return nil // Not a demo route, proxy normally
+	}
 }
 
 // createProxy creates a reverse proxy for an upstream URL.
