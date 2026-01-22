@@ -12,6 +12,7 @@ package proxy
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -135,6 +136,24 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Check payment status endpoint (for polling from frontend)
 	if strings.HasPrefix(r.URL.Path, "/check-payment/") {
 		g.handleCheckPayment(w, r)
+		return
+	}
+
+	// Admin endpoint: Capability token minting
+	if r.URL.Path == "/api/capability/mint" && r.Method == "POST" {
+		g.handleCapabilityMint(w, r)
+		return
+	}
+
+	// Admin endpoint: Token validation
+	if r.URL.Path == "/api/capability/validate" && r.Method == "POST" {
+		g.handleCapabilityValidate(w, r)
+		return
+	}
+
+	// Admin endpoint: Token delegation
+	if r.URL.Path == "/api/capability/delegate" && r.Method == "POST" {
+		g.handleCapabilityDelegate(w, r)
 		return
 	}
 
@@ -487,4 +506,137 @@ func extractL402Token(r *http.Request) string {
 		return strings.TrimPrefix(auth, "L402 ")
 	}
 	return ""
+}
+
+// handleCapabilityMint handles POST /api/capability/mint - Admin endpoint for minting capability tokens.
+func (g *Gateway) handleCapabilityMint(w http.ResponseWriter, r *http.Request) {
+	// Check admin token
+	adminToken := r.Header.Get("X-Admin-Token")
+	expectedToken := g.config.Admin.Token
+	if expectedToken == "" {
+		expectedToken = g.config.Admin.CapabilityRootKey // Fallback to capability root key
+	}
+	if adminToken == "" || adminToken != expectedToken {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid or missing X-Admin-Token"})
+		return
+	}
+
+	// Parse request body
+	var req struct {
+		Scope    string `json:"scope"`
+		Duration string `json:"duration"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid request body"})
+		return
+	}
+
+	// Default scope and duration
+	if req.Scope == "" {
+		req.Scope = "api:read"
+	}
+	if req.Duration == "" {
+		req.Duration = "1h"
+	}
+
+	// Parse duration
+	duration, err := time.ParseDuration(req.Duration)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid duration format"})
+		return
+	}
+
+	// Mint the token
+	expiresAt := time.Now().Add(duration)
+	mac, err := g.macaroonSvc.Mint(req.Scope, expiresAt)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to mint capability token")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to mint token"})
+		return
+	}
+
+	// Encode the token
+	token := g.macaroonSvc.Encode(mac)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"token":     token,
+		"scope":     req.Scope,
+		"expiresAt": expiresAt.Format(time.RFC3339),
+	})
+}
+
+// handleCapabilityValidate handles POST /api/capability/validate - Validate a capability token.
+func (g *Gateway) handleCapabilityValidate(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Token string `json:"token"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid request body"})
+		return
+	}
+
+	// Verify the token
+	mac, err := g.macaroonSvc.Verify(req.Token)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"valid": false,
+			"error": err.Error(),
+		})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"valid":      true,
+		"identifier": mac.Identifier,
+		"caveats":    mac.Caveats,
+	})
+}
+
+// handleCapabilityDelegate handles POST /api/capability/delegate - Delegate a token with additional caveats.
+func (g *Gateway) handleCapabilityDelegate(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		ParentToken string   `json:"parentToken"`
+		Caveats     []string `json:"caveats"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid request body"})
+		return
+	}
+
+	// Delegate the token
+	child, err := g.macaroonSvc.Delegate(req.ParentToken, req.Caveats)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	// Encode the child token
+	token := g.macaroonSvc.Encode(child)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"token":   token,
+		"caveats": child.Caveats,
+	})
 }
