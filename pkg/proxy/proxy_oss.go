@@ -285,34 +285,42 @@ func (g *Gateway) handleL402(w http.ResponseWriter, r *http.Request, route *conf
 
 // verifyL402Token verifies an L402 payment proof.
 func (g *Gateway) verifyL402Token(ctx context.Context, token string, route *config.Route) bool {
+	log.Info().Str("token_len", fmt.Sprintf("%d", len(token))).Msg("verifyL402Token: starting verification")
+	
 	// L402 format: macaroon:preimage
 	parts := strings.SplitN(token, ":", 2)
 	if len(parts) != 2 {
-		log.Debug().Msg("L402: invalid token format, expected macaroon:preimage")
+		log.Warn().Str("token_preview", token[:min(50, len(token))]).Msg("L402: invalid token format, expected macaroon:preimage")
 		return false
 	}
 
 	macaroonStr, preimageHex := parts[0], parts[1]
+	log.Info().
+		Int("macaroon_len", len(macaroonStr)).
+		Int("preimage_len", len(preimageHex)).
+		Str("preimage", preimageHex).
+		Msg("verifyL402Token: parsed token components")
 
 	// Verify macaroon signature
 	mac, err := g.macaroonSvc.Verify(macaroonStr)
 	if err != nil {
-		log.Debug().Err(err).Msg("L402: macaroon verification failed")
+		log.Warn().Err(err).Str("macaroon_preview", macaroonStr[:min(30, len(macaroonStr))]).Msg("L402: macaroon verification failed")
 		return false
 	}
 
 	// Check for payment_hash caveat
 	paymentHash := mac.GetCaveat("payment_hash")
 	if paymentHash == "" {
-		log.Debug().Msg("L402: no payment_hash caveat in macaroon")
+		log.Warn().Msg("L402: no payment_hash caveat in macaroon")
 		return false
 	}
+	log.Info().Str("payment_hash", paymentHash).Msg("verifyL402Token: found payment_hash in macaroon")
 
 	// CRYPTOGRAPHIC PROOF: Verify that SHA256(preimage) == payment_hash
 	// This is the definitive proof of payment - no need to query the Lightning node
 	preimageBytes, err := hex.DecodeString(preimageHex)
 	if err != nil {
-		log.Debug().Err(err).Msg("L402: invalid preimage hex")
+		log.Warn().Err(err).Str("preimage", preimageHex).Msg("L402: invalid preimage hex")
 		return false
 	}
 
@@ -320,15 +328,21 @@ func (g *Gateway) verifyL402Token(ctx context.Context, token string, route *conf
 	hash := sha256.Sum256(preimageBytes)
 	computedHash := hex.EncodeToString(hash[:])
 
+	log.Info().
+		Str("computed", computedHash).
+		Str("expected", paymentHash).
+		Bool("match", computedHash == paymentHash).
+		Msg("verifyL402Token: hash comparison")
+
 	if computedHash != paymentHash {
-		log.Debug().
+		log.Warn().
 			Str("computed", computedHash).
 			Str("expected", paymentHash).
-			Msg("L402: preimage hash mismatch")
+			Msg("L402: preimage hash mismatch - payment verification failed")
 		return false
 	}
 
-	log.Debug().Str("payment_hash", paymentHash[:16]+"...").Msg("L402: payment verified via preimage")
+	log.Info().Str("payment_hash", paymentHash[:16]+"...").Msg("L402: payment verified via preimage ✓")
 	return true
 }
 
@@ -529,12 +543,31 @@ func extractBearerToken(r *http.Request) string {
 }
 
 // extractL402Token extracts L402 token from Authorization header.
+// Supports both "L402 macaroon:preimage" and "LSAT macaroon:preimage" formats.
 func extractL402Token(r *http.Request) string {
 	auth := r.Header.Get("Authorization")
+	log.Debug().Str("auth_header", auth).Msg("extractL402Token: checking Authorization header")
+	
 	if strings.HasPrefix(auth, "L402 ") {
-		return strings.TrimPrefix(auth, "L402 ")
+		token := strings.TrimPrefix(auth, "L402 ")
+		log.Debug().Str("token_preview", token[:min(30, len(token))]+"...").Msg("extractL402Token: found L402 format")
+		return token
 	}
+	if strings.HasPrefix(auth, "LSAT ") {
+		token := strings.TrimPrefix(auth, "LSAT ")
+		log.Debug().Str("token_preview", token[:min(30, len(token))]+"...").Msg("extractL402Token: found LSAT format")
+		return token
+	}
+	
+	log.Debug().Msg("extractL402Token: no L402/LSAT token found")
 	return ""
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 // getEnv returns an environment variable value or a default.
