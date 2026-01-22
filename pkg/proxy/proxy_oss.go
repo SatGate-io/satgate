@@ -909,6 +909,19 @@ func (g *Gateway) handleCapabilityPing(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check if token is banned
+	if g.governance != nil && g.governance.IsBanned(mac.Signature) {
+		g.governance.RecordBannedHit() // Increment banned hits counter
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusForbidden)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"error":  "Token Revoked",
+			"reason": "This token has been banned by an administrator",
+			"code":   "TOKEN_BANNED",
+		})
+		return
+	}
+
 	// Record usage with governance
 	if g.governance != nil {
 		g.governance.RecordUsage(mac.Signature, "/api/capability/ping")
@@ -956,6 +969,19 @@ func (g *Gateway) handleCapabilityAdmin(w http.ResponseWriter, r *http.Request) 
 		json.NewEncoder(w).Encode(map[string]string{
 			"error":   "Token verification failed",
 			"message": err.Error(),
+		})
+		return
+	}
+
+	// Check if token is banned
+	if g.governance != nil && g.governance.IsBanned(mac.Signature) {
+		g.governance.RecordBannedHit()
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusForbidden)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"error":  "Token Revoked",
+			"reason": "This token has been banned by an administrator",
+			"code":   "TOKEN_BANNED",
 		})
 		return
 	}
