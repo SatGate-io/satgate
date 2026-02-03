@@ -497,10 +497,22 @@ func (g *Gateway) proxyRequest(w http.ResponseWriter, r *http.Request, route *co
 		return
 	}
 
-	// Apply path rewrite if configured
+	// Apply path rewrite if configured (static rewrite takes precedence)
 	if route.Rewrite != "" {
 		r.URL.Path = route.Rewrite
 		r.URL.RawPath = route.Rewrite
+	} else if route.StripPrefix && route.Match.PathPrefix != "" {
+		// Strip the matched prefix from the path before proxying
+		prefix := route.Match.PathPrefix
+		if strings.HasSuffix(prefix, "*") {
+			prefix = strings.TrimSuffix(prefix, "*")
+		}
+		newPath := strings.TrimPrefix(r.URL.Path, prefix)
+		if !strings.HasPrefix(newPath, "/") {
+			newPath = "/" + newPath
+		}
+		r.URL.Path = newPath
+		r.URL.RawPath = newPath
 	}
 
 	// Forward request
