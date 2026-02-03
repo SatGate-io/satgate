@@ -95,10 +95,12 @@ routes:
   # =====================================================
 
   # Public route - no authentication required
+  # stripPrefix removes /public before proxying, so /public/get → httpbin.org/get
   - name: public-demo
     match:
       pathPrefix: /public
     upstream: httpbin
+    stripPrefix: true
     policy:
       kind: public
 
@@ -107,6 +109,7 @@ routes:
     match:
       pathPrefix: /protected
     upstream: httpbin
+    stripPrefix: true
     policy:
       kind: capability
       scope: "api:read"
@@ -116,6 +119,7 @@ routes:
     match:
       pathPrefix: /premium
     upstream: httpbin
+    stripPrefix: true
     policy:
       kind: l402
       priceSats: 100

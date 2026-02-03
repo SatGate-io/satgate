@@ -243,15 +243,18 @@ No database. No Redis. No Docker. Just a single binary.
 
 The example config (`examples/gateway.yaml`) sets up:
 
-| Route | Path | Policy | Description |
-|-------|------|--------|-------------|
-| health | `/health` | Built-in | Always available |
-| public-demo | `/public/*` | `public` | No auth required |
-| protected-demo | `/protected/*` | `capability` | Requires valid Macaroon |
-| api-micro | `/api/micro` | `l402` (1 sat) | Lightning micropayment |
-| api-basic | `/api/basic` | `l402` (10 sats) | Lightning payment |
-| api-standard | `/api/standard` | `l402` (100 sats) | Lightning payment |
-| api-premium | `/api/premium` | `l402` (1000 sats) | Lightning payment |
+| Route | Path | Policy | Strip Prefix | Description |
+|-------|------|--------|:---:|-------------|
+| health | `/health` | Built-in | — | Always available |
+| public-demo | `/public/*` | `public` | ✓ | No auth required |
+| protected-demo | `/protected/*` | `capability` | ✓ | Requires valid Macaroon |
+| premium-demo | `/premium/*` | `l402` (100 sats) | ✓ | Lightning payment |
+| api-micro | `/api/micro` | `l402` (1 sat) | — | Lightning micropayment |
+| api-basic | `/api/basic` | `l402` (10 sats) | — | Lightning payment |
+| api-standard | `/api/standard` | `l402` (100 sats) | — | Lightning payment |
+| api-premium | `/api/premium` | `l402` (1000 sats) | — | Lightning payment |
+
+> **Tip:** `stripPrefix: true` removes the matched path prefix before proxying. So `/public/get` → upstream receives `/get`. Use `rewrite` for static path replacement instead.
 
 ---
 
