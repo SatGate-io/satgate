@@ -1,5 +1,5 @@
 /**
- * SatGate Gateway Type Definitions
+ * SatGate Gateway Type Definitions (OSS)
  */
 
 export interface Token {
@@ -9,15 +9,19 @@ export interface Token {
   signature: string;
   /** Token scope */
   scope?: string;
-  /** Expiration timestamp */
+  /** Expiration timestamp (ISO 8601) */
   expiresAt?: string;
+  /** Token caveats */
+  caveats?: string[];
 }
 
 export interface TokenInfo {
-  /** Hex-encoded token signature */
+  /** Hex-encoded token signature (or node id in graph) */
   signature: string;
-  /** Token status: active, revoked, expired */
-  status: 'active' | 'revoked' | 'expired' | 'banned';
+  /** Token status: active, banned */
+  status: 'active' | 'banned';
+  /** Token scope */
+  scope?: string;
   /** Total number of requests */
   totalRequests: number;
   /** Last used timestamp */
@@ -28,6 +32,10 @@ export interface TokenInfo {
   bannedAt?: string;
   /** Reason for ban */
   banReason?: string;
+  /** Parent token signature (for delegation tree) */
+  parentSignature?: string;
+  /** Label (e.g., "Agent Token") */
+  label?: string;
 }
 
 export interface BanRecord {
@@ -41,30 +49,24 @@ export interface BanRecord {
   bannedBy: string;
 }
 
-export interface Stats {
-  /** Total requests processed */
-  totalRequests: number;
-  /** Total L402 (paid) requests */
-  totalL402: number;
-  /** Total capability token requests */
-  totalCapability: number;
-  /** Total denied requests */
-  totalDenied: number;
-  /** Total error responses */
-  totalErrors: number;
-  /** Governance statistics */
-  governance: {
-    active: number;
-    banned: number;
-    totalRequests: number;
-  };
+export interface GraphStats {
+  /** Active (non-banned) tokens */
+  active: number;
+  /** Blocked tokens */
+  blocked: number;
+  /** Banned tokens */
+  banned: number;
+  /** Number of requests hitting banned tokens */
+  bannedHits: number;
 }
 
-export interface MintRequest {
-  /** Token scope (e.g., "api:read", "api:*") */
-  scope?: string;
-  /** Token lifetime in seconds */
-  expiresIn?: number;
+export interface GraphData {
+  /** Token nodes */
+  nodes: TokenInfo[];
+  /** Delegation edges */
+  edges: { source: string; target: string }[];
+  /** Summary stats */
+  stats: GraphStats;
 }
 
 export interface DelegateRequest {
@@ -81,15 +83,6 @@ export interface BanRequest {
   reason?: string;
 }
 
-export interface GatewayConfig {
-  version: number;
-  server?: object;
-  admin?: object;
-  lightning?: object;
-  upstreams?: Record<string, object>;
-  routes?: RouteConfig[];
-}
-
 /**
  * Economic Policy types
  * 
@@ -99,11 +92,8 @@ export interface GatewayConfig {
  */
 export type PolicyKind = 
   | 'public'      // Exception: No protection
-  | 'deny'        // Exception: Block all
-  | 'protected'   // Layer 0: Verify only (alias: capability, protect)
-  | 'observe'     // Layer 1: Verify → meter/log (alias: chargeback, audit)
-  | 'control'     // Layer 1: Verify → budget enforcement (alias: fiat402, budget)
-  | 'charge';     // Layer 1: Verify → payment required (alias: l402, monetize, pay)
+  | 'capability'  // Layer 0: Verify only (macaroon-based)
+  | 'l402';       // Layer 1: Verify → payment required (Lightning)
 
 export interface RouteConfig {
   /** Route name */
@@ -117,48 +107,11 @@ export interface RouteConfig {
   /** Economic policy */
   policy: {
     kind: PolicyKind;
-    /** L402 config for Charge policy */
-    l402?: {
-      priceSats: number;
-      unit?: 'per_request' | 'per_kb';
-    };
-    /** Budget config for Control policy */
-    budget?: {
-      amountCents: number;
-      period: 'hourly' | 'daily' | 'monthly';
-    };
+    /** Required scope for capability policy */
+    scope?: string;
+    /** Price in sats for L402 policy */
+    priceSats?: number;
   };
   /** Upstream to proxy to */
   upstream: string;
-  /** Rate limiting */
-  rateLimit?: {
-    requestsPerSecond: number;
-    burstSize?: number;
-  };
 }
-
-/**
- * Usage summary with separate observe/billable counts
- */
-export interface UsageSummary {
-  tenantId: string;
-  periodStart: string;
-  periodEnd: string;
-  /** Total requests (all policies) */
-  totalRequests: number;
-  /** Billable requests (Control/Charge only) */
-  billableRequests: number;
-  /** Free observe requests (unlimited) */
-  observeRequests: number;
-  /** Total bytes transferred */
-  totalBytes: number;
-  /** L402 revenue in satoshis */
-  l402RevenueSats: number;
-  /** Platform fee (2%) in satoshis */
-  platformFeeSats: number;
-  /** Net revenue after fee */
-  netRevenueSats: number;
-}
-
-
-

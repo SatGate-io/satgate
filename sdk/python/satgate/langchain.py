@@ -2,7 +2,7 @@
 SatGate LangChain Integration - Budget-Aware Tools for AI Agents
 
 This module provides LangChain-compatible tools that automatically handle
-SatGate's economic gates (402 challenges, budgets, payments).
+SatGate's capability tokens and L402 payment challenges.
 
 Example usage:
     from langchain.agents import initialize_agent, AgentType
@@ -10,24 +10,24 @@ Example usage:
     from satgate.langchain import SatGateTool, SatGateToolkit
     
     # Create a budget-aware tool
-    market_tool = SatGateTool(
-        name="corporate_market_data",
-        description="Fetch market data from the corporate database. Costs $0.50 per query.",
-        gateway_url="https://gateway.internal",
-        endpoint="/api/v1/market/query",
-        budget_limit=50.00
+    tool = SatGateTool(
+        name="api_query",
+        description="Query the protected API endpoint",
+        gateway_url="http://localhost:8080",
+        admin_token="your-admin-token",
+        endpoint="/api/data/query",
     )
     
     # Use in a LangChain agent
     llm = ChatOpenAI(temperature=0)
     agent = initialize_agent(
-        tools=[market_tool],
+        tools=[tool],
         llm=llm,
         agent=AgentType.OPENAI_FUNCTIONS,
         verbose=True
     )
     
-    result = agent.run("Get the Q4 sales forecast")
+    result = agent.run("Get the latest data")
 """
 
 from typing import Any, Callable, Dict, List, Optional, Type, Union
@@ -36,7 +36,6 @@ import json
 
 from .agent_client import (
     SatGateAgentClient,
-    IdentityProvider,
     LightningWallet,
 )
 from .exceptions import (
@@ -93,8 +92,8 @@ class SatGateTool(BaseTool if LANGCHAIN_AVAILABLE else object):
     A LangChain tool that wraps a SatGate-protected API endpoint.
     
     Automatically handles:
-    - Identity badge-in (K8s, AWS, OIDC)
-    - 402 Payment Required challenges
+    - Capability token minting via X-Admin-Token
+    - L402 Payment Required challenges (with optional wallet)
     - Budget tracking and enforcement
     - Semantic error messages for LLM reasoning
     
@@ -104,7 +103,8 @@ class SatGateTool(BaseTool if LANGCHAIN_AVAILABLE else object):
         gateway_url: SatGate gateway URL
         endpoint: API endpoint path
         method: HTTP method (GET, POST, etc.)
-        identity: Identity provider ("auto", "k8s", "aws", "oidc", or IdentityProvider)
+        admin_token: Admin token for minting capability tokens
+        token: Pre-existing capability token (alternative to admin_token)
         wallet: Lightning wallet for L402 payments
         budget_limit: Maximum budget for this tool
         cost_per_call: Expected cost per call (for description)
@@ -119,7 +119,8 @@ class SatGateTool(BaseTool if LANGCHAIN_AVAILABLE else object):
     gateway_url: str = ""
     endpoint: str = "/"
     method: str = "POST"
-    identity: Union[str, IdentityProvider] = "auto"
+    admin_token: Optional[str] = None
+    token: Optional[str] = None
     wallet: Optional[LightningWallet] = None
     budget_limit: Optional[float] = None
     cost_per_call: Optional[float] = None
@@ -136,7 +137,8 @@ class SatGateTool(BaseTool if LANGCHAIN_AVAILABLE else object):
         gateway_url: str,
         endpoint: str = "/",
         method: str = "POST",
-        identity: Union[str, IdentityProvider] = "auto",
+        admin_token: Optional[str] = None,
+        token: Optional[str] = None,
         wallet: Optional[LightningWallet] = None,
         budget_limit: Optional[float] = None,
         cost_per_call: Optional[float] = None,
@@ -161,7 +163,8 @@ class SatGateTool(BaseTool if LANGCHAIN_AVAILABLE else object):
         self.gateway_url = gateway_url
         self.endpoint = endpoint
         self.method = method
-        self.identity = identity
+        self.admin_token = admin_token
+        self.token = token
         self.wallet = wallet
         self.budget_limit = budget_limit
         self.cost_per_call = cost_per_call
@@ -174,7 +177,8 @@ class SatGateTool(BaseTool if LANGCHAIN_AVAILABLE else object):
         if self._client is None:
             self._client = SatGateAgentClient(
                 gateway_url=self.gateway_url,
-                identity=self.identity,
+                admin_token=self.admin_token,
+                token=self.token,
                 wallet=self.wallet,
                 budget_limit=self.budget_limit,
                 on_budget_alert=self.on_budget_alert,
@@ -206,7 +210,7 @@ class SatGateTool(BaseTool if LANGCHAIN_AVAILABLE else object):
             # Format response for LLM
             result = {
                 "success": True,
-                "data": response.json() if hasattr(response, 'json') else response.data,
+                "data": response.json() if hasattr(response, 'json') else response.text(),
                 "cost": response.cost,
             }
             
@@ -287,7 +291,7 @@ class SatGateRESTTool(SatGateTool):
         name: str = "satgate_rest_api",
         description: str = "Make HTTP requests to a SatGate-protected REST API",
         gateway_url: str = "",
-        base_path: str = "/api/v1",
+        base_path: str = "/api",
         **kwargs
     ):
         super().__init__(
@@ -339,7 +343,7 @@ class SatGateRESTTool(SatGateTool):
             return json.dumps({
                 "success": True,
                 "status_code": response.status_code,
-                "data": response.json() if hasattr(response, 'json') else response.data,
+                "data": response.json(),
                 "cost": response.cost,
             }, indent=2)
             
@@ -359,21 +363,22 @@ class SatGateToolkit:
     
     Example:
         toolkit = SatGateToolkit(
-            gateway_url="https://gateway.internal",
+            gateway_url="http://localhost:8080",
+            admin_token="your-admin-token",
             budget_limit=100.00
         )
         
         # Create tools
-        market_tool = toolkit.create_tool(
-            name="market_data",
-            description="Get market data",
-            endpoint="/api/v1/market"
+        data_tool = toolkit.create_tool(
+            name="data_query",
+            description="Query the data API",
+            endpoint="/api/data/query"
         )
         
         analytics_tool = toolkit.create_tool(
             name="analytics",
             description="Run analytics queries",
-            endpoint="/api/v1/analytics"
+            endpoint="/api/analytics"
         )
         
         # Get all tools for an agent
@@ -383,7 +388,8 @@ class SatGateToolkit:
     def __init__(
         self,
         gateway_url: str,
-        identity: Union[str, IdentityProvider] = "auto",
+        admin_token: Optional[str] = None,
+        token: Optional[str] = None,
         wallet: Optional[LightningWallet] = None,
         budget_limit: Optional[float] = None,
         on_budget_alert: Optional[Callable[[float, float], None]] = None,
@@ -391,7 +397,8 @@ class SatGateToolkit:
         require_langchain()
         
         self.gateway_url = gateway_url
-        self.identity = identity
+        self.admin_token = admin_token
+        self.token = token
         self.wallet = wallet
         self.budget_limit = budget_limit
         self.on_budget_alert = on_budget_alert
@@ -404,7 +411,8 @@ class SatGateToolkit:
         if self._shared_client is None:
             self._shared_client = SatGateAgentClient(
                 gateway_url=self.gateway_url,
-                identity=self.identity,
+                admin_token=self.admin_token,
+                token=self.token,
                 wallet=self.wallet,
                 budget_limit=self.budget_limit,
                 on_budget_alert=self.on_budget_alert,
@@ -426,7 +434,8 @@ class SatGateToolkit:
             gateway_url=self.gateway_url,
             endpoint=endpoint,
             method=method,
-            identity=self.identity,
+            admin_token=self.admin_token,
+            token=self.token,
             wallet=self.wallet,
             budget_limit=self.budget_limit,
             cost_per_call=cost_per_call,
@@ -469,9 +478,9 @@ def create_satgate_tool(
         tool = create_satgate_tool(
             name="weather",
             description="Get weather data",
-            gateway_url="https://api.weather.com",
-            endpoint="/v1/forecast",
-            budget_limit=10.00
+            gateway_url="http://localhost:8080",
+            endpoint="/api/weather",
+            admin_token="your-admin-token",
         )
     """
     return SatGateTool(

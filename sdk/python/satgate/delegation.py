@@ -197,7 +197,11 @@ class DelegationBuilder:
         }
     
     def delegate(self, client: 'SatGateClient') -> 'Token':
-        """Execute the delegation via client"""
+        """
+        Execute the delegation via client.
+        
+        Uses POST /api/capability/delegate on the OSS gateway.
+        """
         return client.tokens.delegate(
             parent_token=self._parent_token,
             caveats=self._caveats

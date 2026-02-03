@@ -1,0 +1,24 @@
+# Binary releases
+dist/
+
+# Python
+sdk/python/venv/
+sdk/python/dist/
+sdk/python/*.egg-info/
+__pycache__/
+*.pyc
+*.pyo
+
+# Node
+sdk/nodejs/node_modules/
+sdk/nodejs/dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

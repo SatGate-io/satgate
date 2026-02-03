@@ -1,5 +1,5 @@
 /**
- * SatGate Gateway Node.js SDK
+ * SatGate Gateway Node.js SDK (OSS)
  *
  * ## Admin Client (for operators)
  * 
@@ -8,12 +8,12 @@
  * import { SatGateClient } from '@satgate/sdk';
  *
  * const client = new SatGateClient({
- *   url: 'http://localhost:9090',
+ *   url: 'http://localhost:8080',
  *   token: 'your-admin-token'
  * });
  *
  * // Mint a new token
- * const token = await client.tokens.mint({ scope: 'api:*', expiresIn: 3600 });
+ * const token = await client.tokens.mint({ scope: 'api:*', duration: '1h' });
  * console.log('Token:', token.token);
  * ```
  * 
@@ -23,27 +23,15 @@
  * ```typescript
  * import { SatGateAgentClient } from '@satgate/sdk';
  * 
- * // Auto-detect environment (K8s/AWS)
+ * // With admin token (auto-mints capability tokens)
  * const client = new SatGateAgentClient({
- *   gatewayUrl: 'https://gateway.internal',
- *   identity: 'auto'
+ *   gatewayUrl: 'http://localhost:8080',
+ *   adminToken: 'your-admin-token'
  * });
  * 
- * // Make requests - 402 handling is automatic
- * const response = await client.get('/api/v1/data');
- * console.log(`Cost: $${response.cost}`);
- * ```
- * 
- * ## With Lightning wallet for external APIs
- * 
- * @example
- * ```typescript
- * import { SatGateAgentClient, LNDWallet } from '@satgate/sdk';
- * 
- * const client = new SatGateAgentClient({
- *   gatewayUrl: 'https://api.external.com',
- *   wallet: new LNDWallet({ macaroonPath: '~/.lnd/admin.macaroon' })
- * });
+ * // Make requests - token management is automatic
+ * const response = await client.get('/api/data');
+ * console.log(response.data);
  * ```
  */
 
@@ -56,10 +44,6 @@ export {
   SatGateAgentClientOptions,
   AgentResponse,
   CachedToken,
-  IdentityProvider,
-  KubernetesIdentity,
-  AWSIdentity,
-  OIDCIdentity,
   LightningWallet,
   LNDWallet,
   LNDWalletOptions,
@@ -68,7 +52,17 @@ export {
 } from './agent-client';
 
 // Types
-export { Token, TokenInfo, BanRecord, Stats, MintRequest, DelegateRequest } from './types';
+export {
+  Token,
+  TokenInfo,
+  BanRecord,
+  GraphData,
+  GraphStats,
+  DelegateRequest,
+  BanRequest,
+  PolicyKind,
+  RouteConfig,
+} from './types';
 
 // Delegation helpers
 export {
@@ -93,4 +87,3 @@ export {
   TokenExpiredError,
   DelegationError,
 } from './errors';
-

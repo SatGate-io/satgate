@@ -8,7 +8,7 @@ setup(
     version="1.0.0",
     author="SatGate Team",
     author_email="team@satgate.io",
-    description="Python SDK for SatGate Enterprise Gateway",
+    description="Python SDK for SatGate Gateway (OSS)",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/satgate-io/satgate-gateway",

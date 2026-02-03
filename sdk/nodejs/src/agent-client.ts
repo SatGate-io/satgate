@@ -1,31 +1,30 @@
 /**
- * SatGate Agent Client - Economic Middleware for AI Agents
+ * SatGate Agent Client - Economic Middleware for AI Agents (OSS)
  * 
  * Automatically handles:
- * - Identity badge-in (K8s, AWS, OIDC)
- * - 402 Payment Required challenges (Fiat402 and L402)
+ * - Token minting via POST /api/capability/mint (X-Admin-Token)
+ * - Token delegation via POST /api/capability/delegate
+ * - L402 Payment Required challenges
  * - Token caching and refresh
- * - Offline delegation for worker agents
  * - Budget tracking and alerts
  * 
  * @example
  * ```typescript
  * import { SatGateAgentClient } from '@satgate/sdk';
  * 
- * // Auto-detect environment (K8s/AWS)
+ * // With admin token (auto-mints capability tokens)
  * const client = new SatGateAgentClient({
- *   gatewayUrl: 'https://gateway.internal',
- *   identity: 'auto'
+ *   gatewayUrl: 'http://localhost:8080',
+ *   adminToken: 'your-admin-token'
  * });
  * 
- * // Make requests - 402 handling is automatic
- * const response = await client.get('/api/v1/data');
- * console.log(`Cost: $${response.cost}`);
+ * // Make requests - token management is automatic
+ * const response = await client.get('/api/data');
+ * console.log(response.data);
  * ```
  */
 
 import * as fs from 'fs';
-import * as https from 'https';
 import {
   SatGateError,
   AuthenticationError,
@@ -46,107 +45,10 @@ export interface CachedToken {
   token: string;
   signature: string;
   expiresAt: number;
+  scope: string;
   budgetLimit?: number;
   budgetUsed: number;
   caveats: string[];
-}
-
-// Identity Providers
-
-export interface IdentityProvider {
-  getCredentials(): Promise<string>;
-  providerType(): string;
-}
-
-export class KubernetesIdentity implements IdentityProvider {
-  private tokenPath: string;
-  
-  constructor(tokenPath = '/var/run/secrets/kubernetes.io/serviceaccount/token') {
-    this.tokenPath = tokenPath;
-  }
-  
-  async getCredentials(): Promise<string> {
-    try {
-      return fs.readFileSync(this.tokenPath, 'utf8').trim();
-    } catch (e) {
-      throw new SatGateError(`K8s token not found at ${this.tokenPath}`);
-    }
-  }
-  
-  providerType(): string {
-    return 'kubernetes';
-  }
-  
-  static isAvailable(): boolean {
-    return fs.existsSync('/var/run/secrets/kubernetes.io/serviceaccount/token');
-  }
-}
-
-export class AWSIdentity implements IdentityProvider {
-  private roleArn?: string;
-  
-  constructor(roleArn?: string) {
-    this.roleArn = roleArn;
-  }
-  
-  async getCredentials(): Promise<string> {
-    // Check for EKS IRSA token
-    const irsaTokenPath = process.env.AWS_WEB_IDENTITY_TOKEN_FILE;
-    if (irsaTokenPath && fs.existsSync(irsaTokenPath)) {
-      const token = fs.readFileSync(irsaTokenPath, 'utf8').trim();
-      return JSON.stringify({ irsaToken: token });
-    }
-    
-    // Use AWS SDK if available
-    try {
-      const { STSClient, GetCallerIdentityCommand } = await import('@aws-sdk/client-sts');
-      const sts = new STSClient({});
-      const identity = await sts.send(new GetCallerIdentityCommand({}));
-      return JSON.stringify({
-        stsResponse: {
-          Account: identity.Account,
-          Arn: identity.Arn,
-          UserId: identity.UserId,
-        }
-      });
-    } catch (e) {
-      throw new SatGateError('AWS SDK required for AWS identity');
-    }
-  }
-  
-  providerType(): string {
-    return 'aws';
-  }
-  
-  static isAvailable(): boolean {
-    return !!(
-      process.env.AWS_WEB_IDENTITY_TOKEN_FILE ||
-      process.env.AWS_ACCESS_KEY_ID ||
-      process.env.AWS_ROLE_ARN
-    );
-  }
-}
-
-export class OIDCIdentity implements IdentityProvider {
-  private token?: string;
-  private tokenEnv: string;
-  
-  constructor(token?: string, tokenEnv = 'OIDC_TOKEN') {
-    this.token = token;
-    this.tokenEnv = tokenEnv;
-  }
-  
-  async getCredentials(): Promise<string> {
-    const token = this.token || process.env[this.tokenEnv];
-    if (!token) {
-      throw new SatGateError(`OIDC token not found in ${this.tokenEnv}`);
-    }
-    return token;
-  }
-  
-  providerType(): string {
-    return 'oidc';
-  }
 }
 
 // Lightning Wallets
@@ -284,21 +186,26 @@ export class AlbyWallet implements LightningWallet {
 // Agent Client
 
 export interface SatGateAgentClientOptions {
-  /** Gateway URL (for API requests) */
+  /** Gateway URL */
   gatewayUrl: string;
   /** 
-   * Separate URL for Mint service (e.g., "http://gateway-admin:9090")
-   * In enterprise deployments, Mint may be on a separate internal listener.
-   * If not specified, uses gatewayUrl + "/v1/mint".
-   * Can also be set via SATGATE_MINT_URL environment variable.
+   * Admin token for minting capability tokens (X-Admin-Token header).
+   * Can also be set via SATGATE_ADMIN_TOKEN environment variable.
    */
-  mintUrl?: string;
-  /** Identity provider: "auto", "k8s", "aws", "oidc", "none", or IdentityProvider instance */
-  identity?: string | IdentityProvider;
+  adminToken?: string;
+  /**
+   * Pre-existing capability token (alternative to adminToken).
+   * Can also be set via SATGATE_TOKEN environment variable.
+   */
+  token?: string;
   /** Lightning wallet for L402 payments */
   wallet?: LightningWallet;
   /** Maximum budget to spend */
   budgetLimit?: number;
+  /** Default scope for minted tokens (default: "api:*") */
+  scope?: string;
+  /** Default duration for minted tokens (default: "1h") */
+  duration?: string;
   /** Request timeout in milliseconds */
   timeout?: number;
   /** Maximum retry attempts for 402 challenges */
@@ -309,10 +216,11 @@ export interface SatGateAgentClientOptions {
 
 export class SatGateAgentClient {
   private gatewayUrl: string;
-  private mintUrl: string;
-  private identity?: IdentityProvider;
+  private adminToken?: string;
   private wallet?: LightningWallet;
   private budgetLimit?: number;
+  private defaultScope: string;
+  private defaultDuration: string;
   private timeout: number;
   private maxRetries: number;
   private onBudgetAlert?: (remaining: number, limit: number) => void;
@@ -322,41 +230,27 @@ export class SatGateAgentClient {
   
   constructor(options: SatGateAgentClientOptions) {
     this.gatewayUrl = options.gatewayUrl.replace(/\/$/, '');
-    
-    // Mint URL: explicit > env > gateway_url
-    this.mintUrl = (options.mintUrl || process.env.SATGATE_MINT_URL || this.gatewayUrl).replace(/\/$/, '');
-    
+    this.adminToken = options.adminToken || process.env.SATGATE_ADMIN_TOKEN;
     this.wallet = options.wallet;
     this.budgetLimit = options.budgetLimit;
+    this.defaultScope = options.scope || 'api:*';
+    this.defaultDuration = options.duration || '1h';
     this.timeout = options.timeout || 30000;
     this.maxRetries = options.maxRetries || 3;
     this.onBudgetAlert = options.onBudgetAlert;
     
-    // Initialize identity provider
-    const identity = options.identity || 'auto';
-    if (typeof identity === 'object') {
-      this.identity = identity;
-    } else if (identity === 'auto') {
-      this.identity = this.autoDetectIdentity();
-    } else if (identity === 'k8s' || identity === 'kubernetes') {
-      this.identity = new KubernetesIdentity();
-    } else if (identity === 'aws') {
-      this.identity = new AWSIdentity();
-    } else if (identity === 'oidc') {
-      this.identity = new OIDCIdentity();
-    } else if (identity !== 'none') {
-      throw new SatGateError(`Unknown identity provider: ${identity}`);
+    // If a pre-existing token was provided, cache it
+    const preToken = options.token || process.env.SATGATE_TOKEN;
+    if (preToken) {
+      this.tokenCache = {
+        token: preToken,
+        signature: 'pre-provided',
+        expiresAt: Date.now() + 3600000,
+        scope: this.defaultScope,
+        budgetUsed: 0,
+        caveats: [],
+      };
     }
-  }
-  
-  private autoDetectIdentity(): IdentityProvider | undefined {
-    if (KubernetesIdentity.isAvailable()) {
-      return new KubernetesIdentity();
-    }
-    if (AWSIdentity.isAvailable()) {
-      return new AWSIdentity();
-    }
-    return undefined;
   }
   
   private async getToken(): Promise<string | undefined> {
@@ -365,165 +259,88 @@ export class SatGateAgentClient {
       return this.tokenCache.token;
     }
     
-    // No identity provider
-    if (!this.identity) {
+    // No admin token - can't mint
+    if (!this.adminToken) {
       return undefined;
     }
     
-    // Mint new token (use separate mintUrl for enterprise deployments)
+    // Mint new token via OSS endpoint
     try {
-      const credentials = await this.identity.getCredentials();
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
       
-      const response = await fetch(`${this.mintUrl}/v1/mint`, {
+      const response = await fetch(`${this.gatewayUrl}/api/capability/mint`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Token': this.adminToken,
+        },
         body: JSON.stringify({
-          provider: this.identity.providerType(),
-          credentials,
+          scope: this.defaultScope,
+          duration: this.defaultDuration,
         }),
+        signal: controller.signal,
       });
       
+      clearTimeout(timeoutId);
+      
       if (!response.ok) {
-        throw new AuthenticationError(`Mint failed: ${await response.text()}`);
+        throw new AuthenticationError(`Mint failed (${response.status}): ${await response.text()}`);
       }
       
       const result = await response.json() as {
-        macaroon: string;
+        token: string;
         signature: string;
-        budget?: { limit?: number };
-        caveats?: string[];
+        scope?: string;
+        expiresAt?: string;
       };
       
+      // Parse expiration
+      let expiresAt = Date.now() + 3600000; // Default 1 hour
+      if (result.expiresAt) {
+        const parsed = new Date(result.expiresAt).getTime();
+        if (!isNaN(parsed)) {
+          expiresAt = parsed;
+        }
+      }
+      
       this.tokenCache = {
-        token: result.macaroon,
-        signature: result.signature,
-        expiresAt: Date.now() + 3600000, // 1 hour
-        budgetLimit: result.budget?.limit,
+        token: result.token,
+        signature: result.signature || '',
+        expiresAt,
+        scope: result.scope || this.defaultScope,
         budgetUsed: 0,
-        caveats: result.caveats || [],
+        caveats: [],
       };
       
       return this.tokenCache.token;
     } catch (e) {
-      throw new AuthenticationError(`Failed to get token: ${e}`);
+      if (e instanceof SatGateError) throw e;
+      throw new AuthenticationError(`Failed to mint token: ${e}`);
     }
   }
   
-  private async handle402(
+  private async handleL402(
     response: Response,
     method: string,
     url: string,
     options: RequestInit
   ): Promise<AgentResponse> {
     const wwwAuth = response.headers.get('WWW-Authenticate') || '';
-    const contentType = response.headers.get('Content-Type') || '';
     
     let challenge: Record<string, unknown> = {};
+    const contentType = response.headers.get('Content-Type') || '';
     if (contentType.includes('application/json')) {
       try {
         challenge = await response.json() as Record<string, unknown>;
       } catch {}
     }
     
-    const challengeType = challenge.type as string || '';
-    
-    // Fiat402 challenge (internal budget)
-    if (wwwAuth.includes('SatGate-Billing') || challengeType === 'fiat402') {
-      return this.handleFiat402(challenge, method, url, options);
-    }
-    
-    // L402 challenge (Lightning payment)
-    if (wwwAuth.includes('L402') || wwwAuth.includes('LSAT') || challengeType === 'l402') {
-      return this.handleL402(wwwAuth, challenge, method, url, options);
-    }
-    
-    throw new PaymentRequiredError('Unknown 402 challenge type', challenge);
-  }
-  
-  private async handleFiat402(
-    challenge: Record<string, unknown>,
-    method: string,
-    url: string,
-    options: RequestInit
-  ): Promise<AgentResponse> {
-    const invoiceId = challenge.invoice_id as string;
-    const amount = (challenge.amount as number) || 0;
-    
-    if (!invoiceId) {
-      throw new PaymentRequiredError('Missing invoice_id in Fiat402 challenge', challenge);
-    }
-    
-    // Check budget
-    if (this.budgetLimit && this.totalCost + amount > this.budgetLimit) {
-      throw new BudgetExceededError(
-        `Budget exceeded: $${this.totalCost} + $${amount} > $${this.budgetLimit}`,
-        this.totalCost,
-        this.budgetLimit
-      );
-    }
-    
-    // Get receipt
-    const receiptUrl = (challenge.receipt_url as string) || `/api/v1/billing/receipts?invoice_id=${invoiceId}`;
-    const fullReceiptUrl = new URL(receiptUrl, this.gatewayUrl).toString();
-    
-    const receiptResponse = await fetch(fullReceiptUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ invoiceId }),
-    });
-    
-    if (!receiptResponse.ok) {
-      throw new PaymentRequiredError(`Failed to get receipt: ${await receiptResponse.text()}`, challenge);
-    }
-    
-    const receiptData = await receiptResponse.json() as { receipt?: string; token?: string };
-    const receiptToken = receiptData.receipt || receiptData.token;
-    
-    if (!receiptToken) {
-      throw new PaymentRequiredError('No receipt token in response', challenge);
-    }
-    
-    // Retry with receipt
-    const headers = new Headers(options.headers);
-    headers.set('Authorization', `Receipt ${receiptToken}`);
-    
-    const retryResponse = await fetch(url, { ...options, headers });
-    
-    // Track cost
-    this.totalCost += amount;
-    if (this.tokenCache) {
-      this.tokenCache.budgetUsed += amount;
-    }
-    
-    // Check budget alert
-    if (this.onBudgetAlert && this.budgetLimit) {
-      const remaining = this.budgetLimit - this.totalCost;
-      if (remaining < this.budgetLimit * 0.2) {
-        this.onBudgetAlert(remaining, this.budgetLimit);
-      }
-    }
-    
-    return {
-      statusCode: retryResponse.status,
-      headers: Object.fromEntries(retryResponse.headers.entries()),
-      data: await retryResponse.json(),
-      cost: amount,
-      budgetRemaining: this.budgetLimit ? this.budgetLimit - this.totalCost : undefined,
-    };
-  }
-  
-  private async handleL402(
-    wwwAuth: string,
-    challenge: Record<string, unknown>,
-    method: string,
-    url: string,
-    options: RequestInit
-  ): Promise<AgentResponse> {
     if (!this.wallet) {
       throw new PaymentRequiredError('L402 payment required but no wallet configured', challenge);
     }
     
-    // Parse L402 header
+    // Parse L402 header: L402 macaroon="...", invoice="..."
     let macaroon = '';
     let invoice = '';
     
@@ -552,16 +369,13 @@ export class SatGateAgentClient {
       throw new PaymentFailedError(`Lightning payment failed: ${e}`);
     }
     
-    // Build L402 token
+    // Build L402 token and retry
     const l402Token = `L402 ${macaroon}:${preimage}`;
-    
-    // Retry with L402 token
     const headers = new Headers(options.headers);
     headers.set('Authorization', l402Token);
     
     const retryResponse = await fetch(url, { ...options, headers });
-    
-    const costSats = (challenge.amount as number) || 0;
+    const costSats = (challenge.amount_sats as number) || (challenge.amount as number) || 0;
     
     return {
       statusCode: retryResponse.status,
@@ -578,10 +392,10 @@ export class SatGateAgentClient {
   ): Promise<AgentResponse<T>> {
     const url = new URL(path, this.gatewayUrl).toString();
     
-    // Add token if available
+    // Add capability token if available
     const token = await this.getToken();
     const headers = new Headers(options.headers);
-    if (token) {
+    if (token && !headers.has('Authorization')) {
       headers.set('Authorization', `Bearer ${token}`);
     }
     
@@ -617,9 +431,9 @@ export class SatGateAgentClient {
           };
         }
         
-        // Payment required
+        // Payment required (L402)
         if (response.status === 402) {
-          return this.handle402(response, method, url, requestOptions) as Promise<AgentResponse<T>>;
+          return this.handleL402(response, method, url, requestOptions) as Promise<AgentResponse<T>>;
         }
         
         // Auth error - refresh token
@@ -676,12 +490,38 @@ export class SatGateAgentClient {
   }
   
   /**
+   * Ping the gateway to verify the capability token is valid.
+   * 
+   * GET /api/capability/ping with Bearer token
+   */
+  async ping(): Promise<Record<string, unknown>> {
+    const response = await this.get<Record<string, unknown>>('/api/capability/ping');
+    return response.data;
+  }
+  
+  /**
+   * Validate the current capability token.
+   * 
+   * POST /api/capability/validate
+   */
+  async validateToken(token?: string): Promise<Record<string, unknown>> {
+    const t = token || this.tokenCache?.token;
+    if (!t) throw new SatGateError('No token available to validate');
+    
+    const response = await this.post<Record<string, unknown>>(
+      '/api/capability/validate',
+      { token: t }
+    );
+    return response.data;
+  }
+  
+  /**
    * Create a delegated (child) token for a worker agent.
+   * 
+   * POST /api/capability/delegate
    */
   async delegate(options: {
-    additionalCaveats?: string[];
-    ttl?: string;
-    budgetLimit?: number;
+    caveats?: string[];
   } = {}): Promise<string> {
     if (!this.tokenCache) {
       await this.getToken();
@@ -691,26 +531,33 @@ export class SatGateAgentClient {
       throw new SatGateError('No token available for delegation');
     }
     
-    const caveats = options.additionalCaveats || [];
-    if (options.ttl) caveats.push(`ttl = ${options.ttl}`);
-    if (options.budgetLimit) caveats.push(`budget_limit = ${options.budgetLimit}`);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
     
-    // Use mintUrl for delegation (may be on separate listener)
-    const response = await fetch(`${this.mintUrl}/v1/mint/delegate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        parentMacaroon: this.tokenCache.token,
-        additionalCaveats: caveats,
-      }),
-    });
-    
-    if (!response.ok) {
-      throw new SatGateError(`Delegation failed: ${await response.text()}`);
+    try {
+      const response = await fetch(`${this.gatewayUrl}/api/capability/delegate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          parentToken: this.tokenCache.token,
+          caveats: options.caveats || [],
+        }),
+        signal: controller.signal,
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new SatGateError(`Delegation failed: ${await response.text()}`);
+      }
+      
+      const result = await response.json() as { token: string };
+      return result.token;
+    } catch (e) {
+      clearTimeout(timeoutId);
+      if (e instanceof SatGateError) throw e;
+      throw new SatGateError(`Delegation failed: ${e}`);
     }
-    
-    const result = await response.json() as { macaroon: string };
-    return result.macaroon;
   }
   
   /** Total cost incurred by this client */
@@ -722,5 +569,18 @@ export class SatGateAgentClient {
   getBudgetRemaining(): number | undefined {
     if (this.budgetLimit === undefined) return undefined;
     return Math.max(0, this.budgetLimit - this.totalCost);
+  }
+  
+  /** The current cached token, if any */
+  getCurrentToken(): string | undefined {
+    if (this.tokenCache && Date.now() < this.tokenCache.expiresAt) {
+      return this.tokenCache.token;
+    }
+    return undefined;
+  }
+  
+  /** The signature of the current cached token, if any */
+  getCurrentSignature(): string | undefined {
+    return this.tokenCache?.signature;
   }
 }

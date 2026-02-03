@@ -1,16 +1,18 @@
 /**
- * SatGate Gateway Client
+ * SatGate Gateway Client (OSS)
+ * 
+ * Admin client for the SatGate OSS Gateway. Provides access to:
+ * - Token minting (POST /api/capability/mint)
+ * - Token validation (POST /api/capability/validate)
+ * - Token delegation (POST /api/capability/delegate)
+ * - Governance: ban, graph, reset
+ * - Health checks
  */
 
 import {
   Token,
-  TokenInfo,
-  BanRecord,
-  Stats,
-  MintRequest,
   DelegateRequest,
-  BanRequest,
-  GatewayConfig,
+  GraphData,
 } from './types';
 import {
   SatGateError,
@@ -20,9 +22,9 @@ import {
 } from './errors';
 
 export interface SatGateClientOptions {
-  /** Gateway admin API URL */
+  /** Gateway URL (e.g., "http://localhost:8080") */
   url: string;
-  /** Admin API token */
+  /** Admin API token (sent as X-Admin-Token header) */
   token: string;
   /** Request timeout in milliseconds (default: 30000) */
   timeout?: number;
@@ -35,8 +37,6 @@ export class SatGateClient {
 
   public readonly tokens: TokensService;
   public readonly governance: GovernanceService;
-  public readonly config: ConfigService;
-  public readonly stats: StatsService;
 
   constructor(options: SatGateClientOptions) {
     this.baseUrl = options.url.replace(/\/$/, '');
@@ -45,25 +45,29 @@ export class SatGateClient {
 
     this.tokens = new TokensService(this);
     this.governance = new GovernanceService(this);
-    this.config = new ConfigService(this);
-    this.stats = new StatsService(this);
   }
 
   async request<T>(
     method: string,
     path: string,
-    body?: unknown
+    body?: unknown,
+    options?: { includeAdminToken?: boolean }
   ): Promise<T> {
+    const includeAdminToken = options?.includeAdminToken ?? true;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
     try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (includeAdminToken) {
+        headers['X-Admin-Token'] = this.token;
+      }
+
       const response = await fetch(`${this.baseUrl}${path}`, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Admin-Token': this.token,
-        },
+        headers,
         body: body ? JSON.stringify(body) : undefined,
         signal: controller.signal,
       });
@@ -102,13 +106,37 @@ export class SatGateClient {
     }
   }
 
-  /** Check if gateway is healthy */
+  /** Check if gateway is healthy (GET /health) */
   async health(): Promise<boolean> {
     try {
-      const result = await this.request<{ status: string }>('GET', '/healthz');
-      return result.status === 'ok';
+      const result = await this.request<{ status: string }>(
+        'GET', '/health', undefined, { includeAdminToken: false }
+      );
+      return result.status === 'healthy';
     } catch {
       return false;
+    }
+  }
+
+  /** 
+   * Ping the gateway with a capability token (GET /api/capability/ping)
+   * @param bearerToken The capability token to verify
+   */
+  async ping(bearerToken: string): Promise<Record<string, unknown>> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    
+    try {
+      const response = await fetch(`${this.baseUrl}/api/capability/ping`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${bearerToken}` },
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      return response.json();
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw new SatGateError(`Ping failed: ${error}`);
     }
   }
 }
@@ -116,94 +144,80 @@ export class SatGateClient {
 class TokensService {
   constructor(private client: SatGateClient) {}
 
-  /** Mint a new root token */
-  async mint(request: MintRequest = {}): Promise<Token> {
-    return this.client.request<Token>('POST', '/api/v1/tokens', {
-      scope: request.scope ?? 'api:*',
-      expiresIn: request.expiresIn ?? 3600,
+  /**
+   * Mint a new capability token.
+   * 
+   * POST /api/capability/mint (requires X-Admin-Token header)
+   * 
+   * @param scope Token scope (default: "api:*")
+   * @param duration Token lifetime as Go duration string (default: "1h")
+   */
+  async mint(options: { scope?: string; duration?: string } = {}): Promise<Token> {
+    return this.client.request<Token>('POST', '/api/capability/mint', {
+      scope: options.scope ?? 'api:*',
+      duration: options.duration ?? '1h',
     });
   }
 
-  /** List all tokens */
-  async list(): Promise<TokenInfo[]> {
-    return this.client.request<TokenInfo[]>('GET', '/api/v1/tokens');
+  /**
+   * Validate a capability token.
+   * 
+   * POST /api/capability/validate
+   * 
+   * @param token The token string to validate
+   */
+  async validate(token: string): Promise<{ valid: boolean; identifier?: string; caveats?: string[]; error?: string }> {
+    return this.client.request('POST', '/api/capability/validate', { token }, { includeAdminToken: false });
   }
 
-  /** Get token details */
-  async get(signature: string): Promise<TokenInfo> {
-    return this.client.request<TokenInfo>('GET', `/api/v1/tokens/${signature}`);
-  }
-
-  /** Revoke a token */
-  async revoke(signature: string): Promise<void> {
-    await this.client.request('DELETE', `/api/v1/tokens/${signature}`);
-  }
-
-  /** Delegate (create child) token */
+  /**
+   * Delegate (create child) token.
+   * 
+   * POST /api/capability/delegate
+   */
   async delegate(request: DelegateRequest): Promise<Token> {
-    return this.client.request<Token>('POST', '/api/v1/tokens/delegate', request);
+    return this.client.request<Token>(
+      'POST', '/api/capability/delegate',
+      request,
+      { includeAdminToken: false }
+    );
   }
 }
 
 class GovernanceService {
   constructor(private client: SatGateClient) {}
 
-  /** Ban a token */
+  /**
+   * Ban a token by its signature.
+   * 
+   * POST /api/governance/ban (requires X-Admin-Token header)
+   */
   async ban(signature: string, reason?: string): Promise<void> {
-    await this.client.request('POST', '/api/v1/governance/ban', {
+    await this.client.request('POST', '/api/governance/ban', {
       tokenSignature: signature,
       reason: reason ?? '',
     });
   }
 
-  /** Unban a token */
-  async unban(signature: string): Promise<void> {
-    await this.client.request('DELETE', `/api/v1/governance/ban/${signature}`);
+  /**
+   * Get the governance graph (token lineage, stats).
+   * 
+   * GET /api/governance/graph
+   */
+  async getGraph(): Promise<GraphData> {
+    return this.client.request<GraphData>(
+      'GET', '/api/governance/graph',
+      undefined,
+      { includeAdminToken: false }
+    );
   }
 
-  /** Get ban list */
-  async getBanList(): Promise<BanRecord[]> {
-    return this.client.request<BanRecord[]>('GET', '/api/v1/governance/banlist');
-  }
-
-  /** Reset all governance data */
+  /**
+   * Reset all governance data (tokens, bans, usage).
+   * 
+   * POST /api/governance/reset (requires X-Admin-Token header)
+   */
   async reset(): Promise<void> {
-    await this.client.request('POST', '/api/v1/governance/reset');
+    await this.client.request('POST', '/api/governance/reset');
   }
 }
-
-class ConfigService {
-  constructor(private client: SatGateClient) {}
-
-  /** Get current configuration */
-  async get(): Promise<GatewayConfig> {
-    return this.client.request<GatewayConfig>('GET', '/api/v1/config');
-  }
-
-  /** Validate a configuration */
-  async validate(config: GatewayConfig): Promise<boolean> {
-    try {
-      await this.client.request('POST', '/api/v1/config/validate', config);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-}
-
-class StatsService {
-  constructor(private client: SatGateClient) {}
-
-  /** Get gateway statistics */
-  async get(): Promise<Stats> {
-    return this.client.request<Stats>('GET', '/api/v1/stats');
-  }
-
-  /** Get per-token statistics */
-  async getTokenStats(): Promise<TokenInfo[]> {
-    return this.client.request<TokenInfo[]>('GET', '/api/v1/stats/tokens');
-  }
-}
-
-
-

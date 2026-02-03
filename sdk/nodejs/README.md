@@ -1,15 +1,6 @@
 # @satgate/client
 
-Official Node.js SDK for the SatGate Enterprise Gateway Admin API.
-
-## Economic Policies
-
-SatGate uses an "Economic Firewall" model with Default Protection (Layer 0) and Economic Policies (Layer 1):
-
-- **Default Protection**: All non-PUBLIC routes require cryptographic credentials (Macaroons)
-- **Observe**: Meter and log traffic without blocking (FinOps visibility)
-- **Control**: Enforce budgets with Fiat402
-- **Charge**: Monetize with L402 (Lightning) or Fiat402 (Stripe)
+Official Node.js SDK for the [SatGate](https://github.com/SatGate-io/satgate) OSS Gateway.
 
 ## Installation
 
@@ -19,12 +10,15 @@ npm install @satgate/client
 
 ## Quick Start
 
+### Admin Client
+
+The `SatGateClient` provides direct access to gateway admin operations.
+
 ```typescript
 import { SatGateClient } from '@satgate/client';
 
-// Initialize client
 const client = new SatGateClient({
-  url: 'http://localhost:9090',
+  url: 'http://localhost:8080',
   token: 'your-admin-token',
 });
 
@@ -32,91 +26,112 @@ const client = new SatGateClient({
 const healthy = await client.health();
 console.log('Gateway healthy:', healthy);
 
-// Mint a new token
+// Mint a new capability token
 const token = await client.tokens.mint({
   scope: 'api:read',
-  expiresIn: 3600,
+  duration: '1h',
 });
 console.log('Token:', token.token);
 console.log('Signature:', token.signature);
 
-// List all tokens
-const tokens = await client.tokens.list();
-for (const t of tokens) {
-  console.log(`${t.signature.slice(0, 16)}... - ${t.status} - ${t.totalRequests} requests`);
-}
+// Validate a token
+const result = await client.tokens.validate(token.token);
+console.log('Valid:', result.valid);
+
+// Delegate a token with additional restrictions
+const child = await client.tokens.delegate({
+  parentToken: token.token,
+  caveats: ['scope = api:read'],
+});
+console.log('Child signature:', child.signature);
+
+// Ping with a capability token
+const ping = await client.ping(token.token);
+console.log('Ping:', ping);
 
 // Ban a compromised token
 await client.governance.ban(token.signature, 'Compromised credentials');
 
-// Get gateway stats
-const stats = await client.stats.get();
-console.log('Total requests:', stats.totalRequests);
-console.log('Active tokens:', stats.governance.active);
-console.log('Banned tokens:', stats.governance.banned);
+// Get governance graph (token lineage, stats)
+const graph = await client.governance.getGraph();
+console.log('Active tokens:', graph.stats.active);
+
+// Reset governance data
+await client.governance.reset();
+```
+
+### Agent Client
+
+The `SatGateAgentClient` is designed for AI agents — it automatically
+mints tokens, caches them, and handles L402 payment challenges.
+
+```typescript
+import { SatGateAgentClient } from '@satgate/client';
+
+// With admin token (auto-mints capability tokens)
+const client = new SatGateAgentClient({
+  gatewayUrl: 'http://localhost:8080',
+  adminToken: 'your-admin-token',
+  scope: 'api:read',
+  duration: '1h',
+});
+
+// Or with a pre-existing capability token
+const client2 = new SatGateAgentClient({
+  gatewayUrl: 'http://localhost:8080',
+  token: 'your-capability-token',
+});
+
+// Or via environment variables
+// SATGATE_ADMIN_TOKEN=your-admin-token
+// SATGATE_TOKEN=your-capability-token (alternative)
+const client3 = new SatGateAgentClient({
+  gatewayUrl: 'http://localhost:8080',
+});
+
+// Make requests — token handling is automatic
+const response = await client.get('/api/data');
+console.log(response.data);
+
+// Ping to verify the token
+const pingResult = await client.ping();
+console.log(pingResult);
+
+// Delegate a child token for a worker
+const childToken = await client.delegate({
+  caveats: ['scope = api:read'],
+});
 ```
 
 ## Token Delegation
 
-### Basic Delegation
-
-```typescript
-// Create a child token with reduced scope
-const child = await client.tokens.delegate({
-  parentToken: token.token,
-  caveats: ['scope = api:read:users'],
-});
-console.log('Child signature:', child.signature);
-```
-
 ### Fluent Delegation Builder
 
 ```typescript
-import { delegate, Caveats, DelegationPatterns } from '@satgate/client';
+import { SatGateClient, delegate, Caveats, DelegationPatterns } from '@satgate/client';
+
+const client = new SatGateClient({
+  url: 'http://localhost:8080',
+  token: 'admin-token',
+});
+const root = await client.tokens.mint({ scope: 'api:*', duration: '24h' });
 
 // Fluent builder pattern
-const teamToken = await delegate(rootToken)
+const teamToken = await delegate(root.token)
   .withScope('api:read')
-  .withExpiry(24 * 3600)  // 24 hours
-  .withBudget(100, 'USD')
+  .withExpiry(24 * 3600)
   .forTeam('engineering')
   .delegate(client);
 
 // Pre-built patterns
-const readOnlyToken = await DelegationPatterns.readOnly(rootToken).delegate(client);
+const readOnlyToken = await DelegationPatterns.readOnly(root.token).delegate(client);
+const tempToken = await DelegationPatterns.temporary(root.token, 2).delegate(client);
 
-const tempToken = await DelegationPatterns.temporary(rootToken, 2).delegate(client); // 2 hours
-
-const apiClientToken = await DelegationPatterns.apiClient(
-  rootToken,
-  'my-app-client',
-  1000  // requests per minute
-).delegate(client);
-
-// Webhook callback token (single route, short expiry)
-const webhookToken = await DelegationPatterns.webhook(
-  rootToken,
-  '/api/webhooks/stripe',
-  30  // 30 minutes
-).delegate(client);
-
-// CI/CD pipeline token
-const ciToken = await DelegationPatterns.cicd(
-  rootToken,
-  'deploy-prod-123',
-  60  // 60 minutes
-).delegate(client);
-
-// Agent swarm token with budget
+// Agent swarm token
 const swarmToken = await DelegationPatterns.agentSwarm(
-  rootToken,
-  'ai-agents-prod',
-  {
-    budget: 500,
-    currency: 'USD',
-    requestsPerMinute: 5000,
-    maxAgents: 100,
-  }
+  root.token,
+  'ai-agents',
+  { budget: 500, requestsPerMinute: 5000 }
 ).delegate(client);
 ```
 
@@ -125,39 +140,36 @@ const swarmToken = await DelegationPatterns.agentSwarm(
 ```typescript
 import { Caveats } from '@satgate/client';
 
-// Build caveats programmatically
 const caveats = [
-  Caveats.scope('api:read:users,api:read:posts'),
-  Caveats.expires(3600),  // 1 hour
-  Caveats.routes(['/api/v1/*', '/health']),
-  Caveats.rateLimit(100, 60),  // 100 req/min
-  Caveats.budget(50, 'USD'),
-  Caveats.sourceIp(['10.0.0.0/8']),
+  Caveats.scope('api:read'),
+  Caveats.expires(3600),
+  Caveats.routes(['/api/*', '/health']),
+  Caveats.rateLimit(100, 60),
   Caveats.methods(['GET', 'POST']),
   Caveats.team('engineering'),
-  Caveats.project('api-gateway'),
-  Caveats.label('env', 'production'),
 ];
 
 const token = await client.tokens.delegate({
-  parentToken: rootToken,
+  parentToken: root.token,
   caveats,
 });
 ```
 
-## Configuration
+## OSS Gateway Endpoints
 
-```typescript
-// Get current config
-const config = await client.config.get();
-console.log('Routes:', config.routes?.length);
+This SDK targets the SatGate OSS gateway endpoints:
 
-// Validate a configuration
-const isValid = await client.config.validate({
-  version: 1,
-  routes: [...],
-});
-```
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `POST` | `/api/capability/mint` | X-Admin-Token | Mint a new capability token |
+| `POST` | `/api/capability/validate` | — | Validate a token |
+| `POST` | `/api/capability/delegate` | — | Delegate a token with caveats |
+| `GET` | `/api/capability/ping` | Bearer token | Verify a token is valid |
+| `GET` | `/api/capability/admin` | Bearer token | Admin-scope verification |
+| `POST` | `/api/governance/ban` | X-Admin-Token | Ban a token |
+| `GET` | `/api/governance/graph` | — | Get token lineage graph |
+| `POST` | `/api/governance/reset` | X-Admin-Token | Reset governance data |
+| `GET` | `/health` | — | Health check |
 
 ## Error Handling
 
@@ -171,15 +183,13 @@ import {
 
 try {
   const client = new SatGateClient({
-    url: 'http://localhost:9090',
+    url: 'http://localhost:8080',
     token: 'invalid-token',
   });
-  await client.tokens.list();
+  await client.tokens.mint();
 } catch (error) {
   if (error instanceof AuthenticationError) {
     console.error('Invalid admin token!');
-  } else if (error instanceof NotFoundError) {
-    console.error('Resource not found!');
   } else if (error instanceof SatGateError) {
     console.error('API error:', error.message);
   }
@@ -188,15 +198,12 @@ try {
 
 ## TypeScript Support
 
-This package includes TypeScript type definitions. All types are exported:
+This package includes full TypeScript type definitions:
 
 ```typescript
-import type { Token, TokenInfo, Stats, MintRequest } from '@satgate/client';
+import type { Token, TokenInfo, GraphData, DelegateRequest } from '@satgate/client';
 ```
 
 ## License
 
 MIT License
-
-
-
