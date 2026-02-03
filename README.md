@@ -42,74 +42,99 @@ SatGate is an **Economic Firewall**—an API gateway that adds cryptographic cap
 
 ## Quick Start
 
-### Using Docker (Recommended)
+### 60-Second Demo
 
 ```bash
-# Clone the repo
-git clone https://github.com/satgate-io/satgate.git
-cd satgate
-
-# Start with Docker Compose
-docker compose up -d
-
-# Gateway is now running on http://localhost:8080
-```
-
-### Using Binary
-
-```bash
-# Download latest release
-curl -L https://github.com/satgate-io/satgate/releases/latest/download/satgate-linux-amd64 -o satgate
+# Download the binary (macOS Apple Silicon shown — see docs for other platforms)
+curl -L https://github.com/satgate-io/satgate/releases/latest/download/satgate-darwin-arm64 -o satgate
 chmod +x satgate
 
-# Run with config
-./satgate --config gateway.yaml
+# Start with the example config (mock Lightning, auto-generated keys)
+export ADMIN_TOKEN=my-secret-token
+export LIGHTNING_BACKEND=mock
+./satgate --config examples/gateway.yaml
 ```
 
-### Using Go
+**In another terminal, try the three policies:**
 
 ```bash
-go install github.com/satgate-io/satgate/cmd/satgate@latest
-satgate --config gateway.yaml
+# 1. Public route — no auth needed
+curl http://localhost:8080/health
+
+# 2. Protected route — mint a token, then use it
+curl -X POST http://localhost:8080/api/capability/mint \
+  -H "X-Admin-Token: my-secret-token" \
+  -H "Content-Type: application/json" \
+  -d '{"scope": "api:read", "duration": "1h"}'
+
+# Save the token from the response, then:
+curl -H "Authorization: Bearer <your-token>" \
+  http://localhost:8080/api/capability/ping
+
+# 3. Paid route — get an L402 challenge
+curl http://localhost:8080/api/micro
+# Returns HTTP 402 with a Lightning invoice
+```
+
+That's it. Protection → Capability → Payment. Three commands.
+
+📖 **[Full Quick Start Guide →](docs/getting-started/quickstart.md)**
+
+### Other Install Methods
+
+**Docker:**
+
+```bash
+git clone https://github.com/satgate-io/satgate.git
+cd satgate && docker compose up -d
+```
+
+**Build from source:**
+
+```bash
+git clone https://github.com/satgate-io/satgate.git
+cd satgate && go build -o satgate ./cmd/satgate
 ```
 
 ## Configuration
 
-Create a `gateway.yaml`:
-
 ```yaml
-# SatGate Configuration
-listen: ":8080"
+version: 1
 
-# Root key for Macaroon signing (generate with: openssl rand -hex 32)
-capability:
-  rootKey: "your-64-char-hex-key-here"
+server:
+  listen: ":8080"
 
-# Upstreams (your backend services)
+admin:
+  capabilityRootKey: "${CAPABILITY_ROOT_KEY}"
+
+lightning:
+  provider: "${LIGHTNING_BACKEND}"
+  config:
+    connectionString: "${NWC_CONNECTION_STRING}"
+
 upstreams:
   api:
     url: "http://localhost:3000"
-    healthPath: "/health"
 
-# Routes
 routes:
-  # Public routes (no auth required)
-  - name: health
-    path: /health
+  - name: public-health
+    match:
+      pathPrefix: /health
     upstream: api
     policy:
       kind: public
 
-  # Protected routes (require valid Macaroon)
-  - name: api
-    path: /api/*
+  - name: protected-api
+    match:
+      pathPrefix: /api/
     upstream: api
     policy:
       kind: capability
+      scope: "api:read"
 
-  # Paid routes (require L402 payment)
-  - name: premium
-    path: /premium/*
+  - name: premium-api
+    match:
+      pathPrefix: /premium/
     upstream: api
     policy:
       kind: l402

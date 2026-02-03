@@ -1,109 +1,260 @@
 # Quick Start
 
-Get SatGate Gateway running locally in 5 minutes.
+Get SatGate running and see the Economic Firewall in action. Three policies, three curl commands, sixty seconds.
 
 ## Prerequisites
 
-- Docker and Docker Compose
-- curl (for testing)
+- **macOS/Linux** (or Windows WSL)
+- **curl** (for testing)
 
-## Step 1: Clone and Start
+## Step 1: Download and Run
+
+**Option A: Pre-built Binary (fastest)**
 
 ```bash
-git clone https://github.com/SatGate-io/satgate-gateway.git
-cd satgate-gateway/deploy/docker-compose
+# macOS (Apple Silicon)
+curl -L https://github.com/satgate-io/satgate/releases/latest/download/satgate-darwin-arm64 -o satgate
 
+# macOS (Intel)
+curl -L https://github.com/satgate-io/satgate/releases/latest/download/satgate-darwin-amd64 -o satgate
+
+# Linux (x86_64)
+curl -L https://github.com/satgate-io/satgate/releases/latest/download/satgate-linux-amd64 -o satgate
+
+chmod +x satgate
+```
+
+**Option B: Build from Source**
+
+```bash
+git clone https://github.com/satgate-io/satgate.git
+cd satgate
+go build -o satgate ./cmd/satgate
+```
+
+**Option C: Docker**
+
+```bash
+git clone https://github.com/satgate-io/satgate.git
+cd satgate
 docker compose up -d
+# Gateway is now running on http://localhost:8080
 ```
 
-## Step 2: Verify Health
+## Step 2: Start the Gateway
 
 ```bash
-curl http://localhost:8080/healthz
+# Set an admin token (or one will be auto-generated)
+export ADMIN_TOKEN=my-secret-admin-token
+
+# Use the mock Lightning provider for this demo
+export LIGHTNING_BACKEND=mock
+
+# Start with the example config
+./satgate --config examples/gateway.yaml
 ```
 
-Expected response:
+You should see:
+
+```
+INF Starting SatGate OSS Gateway version=dev
+WRN CAPABILITY_ROOT_KEY not set - using auto-generated key (demo mode)
+INF Macaroon service initialized
+INF Governance service initialized (in-memory)
+INF Lightning provider initialized provider=mock
+INF Routes configured routes=8
+INF Gateway listening listen=:8080
+INF Supported policies: public, capability, l402
+```
+
+> **Note:** Demo mode auto-generates a root key. Tokens won't persist across restarts. Set `CAPABILITY_ROOT_KEY` for production (see [Configuration](../configuration/)).
+
+## Step 3: See the Three Policies
+
+Open a **new terminal** and try these:
+
+### Policy 1: Public (open access)
+
+```bash
+curl http://localhost:8080/health
+```
+
 ```json
-{"status":"ok"}
+{"status":"healthy","service":"satgate-oss","routes":8}
 ```
 
-## Step 3: Mint a Capability Token
+No token needed. Public routes are explicitly opted out of protection.
+
+---
+
+### Policy 2: Capability (protected)
+
+**Without a token — blocked:**
 
 ```bash
-curl -X POST http://localhost:9090/api/v1/tokens \
-  -H "X-Admin-Token: quickstart-admin-token-change-me" \
-  -H "Content-Type: application/json" \
-  -d '{"scope": "api:read", "expiresIn": 3600}'
+curl http://localhost:8080/protected/get
 ```
 
-Response:
+```
+Authorization required
+```
+
+**Mint a capability token:**
+
+```bash
+curl -s -X POST http://localhost:8080/api/capability/mint \
+  -H "X-Admin-Token: my-secret-admin-token" \
+  -H "Content-Type: application/json" \
+  -d '{"scope": "api:read", "duration": "1h"}'
+```
+
 ```json
 {
-  "token": "eyJ2IjoxLCJsIjoiaHR0cHM6Ly9zYXRnYXRlLmlvIi...",
-  "signature": "abc123...",
-  "expiresAt": "2024-01-01T12:00:00Z"
+  "token": "eyJ2IjoxLCJs...",
+  "scope": "api:read",
+  "expiresAt": "2026-02-03T13:00:00Z",
+  "signature": "e05e049c..."
 }
 ```
 
 Save the token:
+
 ```bash
-export TOKEN="eyJ2IjoxLCJsIjoiaHR0cHM6Ly9zYXRnYXRlLmlvIi..."
+export TOKEN="eyJ2IjoxLCJs..."
 ```
 
-## Step 4: Test Protected Route
+**With a token — access granted:**
 
-**Without token (rejected):**
 ```bash
-curl http://localhost:8080/api/get
+curl -H "Authorization: Bearer $TOKEN" \
+  http://localhost:8080/api/capability/ping
 ```
 
-Response:
-```json
-{"error":"Authorization required"}
-```
-
-**With token (success):**
-```bash
-curl http://localhost:8080/api/get \
-  -H "Authorization: Bearer $TOKEN"
-```
-
-Response:
 ```json
 {
-  "args": {},
-  "headers": {
-    "Authorization": "Bearer eyJ2IjoxLCJsIjoiaHR0cHM6Ly9zYXRnYXRlLmlvIi...",
-    "Host": "httpbin.org",
-    ...
-  },
-  "url": "https://httpbin.org/get"
+  "status": "ok",
+  "message": "Token validated successfully",
+  "caveats": ["expires = ...", "scope = api:read"],
+  "validated": "2026-02-03T12:00:00Z"
 }
 ```
 
-## Step 5: Test Public Route
+Your request was cryptographically verified using a [Macaroon](../ARCHITECTURE.md) bearer token with embedded caveats.
 
-Public routes don't require tokens:
+---
+
+### Policy 3: L402 (paid)
 
 ```bash
-curl http://localhost:8080/demo/posts/1
+curl http://localhost:8080/api/micro
 ```
+
+```json
+{
+  "error": "payment_required",
+  "invoice": "lnbc1u1p...",
+  "amount_sats": 1,
+  "payment_hash": "5348..."
+}
+```
+
+HTTP 402 — Payment Required. The gateway issued a Lightning invoice. Pay it, submit the preimage, and access is granted. That's the [L402 protocol](../ARCHITECTURE.md#l402-protocol).
+
+---
+
+## Step 4: Delegate a Token
+
+One of the most powerful features — create a child token with *fewer* permissions, without contacting the server:
+
+```bash
+curl -s -X POST http://localhost:8080/api/capability/delegate \
+  -H "Content-Type: application/json" \
+  -d "{\"parentToken\": \"$TOKEN\", \"caveats\": [\"scope = api:read:limited\"]}"
+```
+
+```json
+{
+  "token": "eyJ2IjoxLCJs...",
+  "caveats": ["expires = ...", "scope = api:read", "scope = api:read:limited"],
+  "signature": "ec91c4d8..."
+}
+```
+
+The child token inherits the parent's caveats *plus* the new restriction. Caveats can only be added, never removed. This is how agent swarms work — a master agent delegates restricted tokens to workers.
+
+## Step 5: Revoke a Token
+
+Instant kill switch — ban a token by its signature:
+
+```bash
+curl -s -X POST http://localhost:8080/api/governance/ban \
+  -H "X-Admin-Token: my-secret-admin-token" \
+  -H "Content-Type: application/json" \
+  -d '{"tokenSignature": "e05e049c...", "reason": "Compromised"}'
+```
+
+```json
+{
+  "status": "banned",
+  "tokenSignature": "e05e049c...",
+  "reason": "Compromised",
+  "bannedAt": "2026-02-03T12:05:00Z"
+}
+```
+
+The token is now dead. Any request using it — or any child token delegated from it — will be rejected.
+
+## Step 6: View the Token Graph
+
+```bash
+curl http://localhost:8080/api/governance/graph
+```
+
+Returns a full lineage graph of all minted and delegated tokens, their status (active/banned), usage counts, and relationships.
+
+---
 
 ## What Just Happened?
 
-1. **Gateway started** with PostgreSQL and Redis
-2. **Token minted** with `api:read` scope
-3. **Protected route** validated the token before proxying
-4. **Public route** proxied without authentication
+In under a minute, you:
 
-## Next Steps
+1. **Started** an API gateway with zero dependencies
+2. **Protected** routes with cryptographic capability tokens
+3. **Monetized** routes with Lightning micropayments (L402)
+4. **Delegated** tokens with restricted permissions
+5. **Revoked** a compromised token instantly
+6. **Inspected** the full token lineage graph
 
-- [Core Concepts](concepts.md) — Understand capability tokens
-- [Add Your API](first-route.md) — Protect your own endpoints
-- [Kubernetes Deployment](../guides/kubernetes.md) — Production setup
+No database. No Redis. No Docker. Just a single binary.
+
+---
+
+## What's Next?
+
+| Guide | Description |
+|-------|-------------|
+| [Core Concepts](concepts.md) | Understand Macaroons, caveats, and delegation |
+| [Add Your API](first-route.md) | Protect your own backend endpoints |
+| [Configuration Reference](../configuration/) | Full YAML reference |
+| [Architecture](../ARCHITECTURE.md) | How SatGate works under the hood |
+| [Self-Hosted Deployment](../operations/) | Production deployment guide |
+
+## Configuration Used
+
+The example config (`examples/gateway.yaml`) sets up:
+
+| Route | Path | Policy | Description |
+|-------|------|--------|-------------|
+| health | `/health` | Built-in | Always available |
+| public-demo | `/public/*` | `public` | No auth required |
+| protected-demo | `/protected/*` | `capability` | Requires valid Macaroon |
+| api-micro | `/api/micro` | `l402` (1 sat) | Lightning micropayment |
+| api-basic | `/api/basic` | `l402` (10 sats) | Lightning payment |
+| api-standard | `/api/standard` | `l402` (100 sats) | Lightning payment |
+| api-premium | `/api/premium` | `l402` (1000 sats) | Lightning payment |
+
+---
 
 ## Clean Up
 
-```bash
-docker compose down -v
-```
+Just kill the process (`Ctrl+C`). No state to clean up — everything is in-memory in demo mode.
