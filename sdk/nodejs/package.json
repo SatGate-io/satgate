@@ -1,7 +1,7 @@
 {
   "name": "@satgate/client",
   "version": "1.0.0",
-  "description": "Node.js SDK for SatGate Enterprise Gateway",
+  "description": "Node.js SDK for SatGate Gateway (OSS)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [

@@ -1,15 +1,6 @@
 # SatGate Gateway Python SDK
 
-Official Python client for the SatGate Enterprise Gateway Admin API.
-
-## Economic Policies
-
-SatGate uses an "Economic Firewall" model with Default Protection (Layer 0) and Economic Policies (Layer 1):
-
-- **Default Protection**: All non-PUBLIC routes require cryptographic credentials (Macaroons)
-- **Observe**: Meter and log traffic without blocking (FinOps visibility)
-- **Control**: Enforce budgets with Fiat402
-- **Charge**: Monetize with L402 (Lightning) or Fiat402 (Stripe)
+Official Python client for the [SatGate](https://github.com/SatGate-io/satgate) OSS Gateway.
 
 ## Installation
 
@@ -19,12 +10,15 @@ pip install satgate
 
 ## Quick Start
 
+### Admin Client
+
+The `SatGateClient` provides direct access to gateway admin operations.
+
 ```python
 from satgate import SatGateClient
 
-# Initialize client
 client = SatGateClient(
-    base_url="http://localhost:9090",
+    base_url="http://localhost:8080",
     admin_token="your-admin-token"
 )
 
@@ -32,85 +26,99 @@ client = SatGateClient(
 if client.health():
     print("Gateway is healthy!")
 
-# Mint a new token
-token = client.tokens.mint(scope="api:read", expires_in=3600)
+# Mint a new capability token
+token = client.tokens.mint(scope="api:read", duration="1h")
 print(f"Token: {token.token}")
 print(f"Signature: {token.signature}")
 
-# List all tokens
-tokens = client.tokens.list()
-for t in tokens:
-    print(f"{t.signature[:16]}... - {t.status} - {t.total_requests} requests")
+# Validate a token
+result = client.tokens.validate(token.token)
+print(f"Valid: {result['valid']}")
+
+# Delegate a token with additional restrictions
+child = client.tokens.delegate(
+    parent_token=token.token,
+    caveats=["scope = api:read"]
+)
+print(f"Child token: {child.signature}")
 
 # Ban a compromised token
-client.governance.ban(token.signature, reason="Compromised credentials")
+client.governance.ban(token.signature, reason="Compromised")
 
-# Get gateway stats
-stats = client.stats.get()
-print(f"Total requests: {stats.total_requests}")
-print(f"Active tokens: {stats.active_tokens}")
-print(f"Banned tokens: {stats.banned_tokens}")
+# Get governance graph (token lineage, stats)
+graph = client.governance.get_graph()
+print(f"Active tokens: {graph['stats']['active']}")
+
+# Reset governance data
+client.governance.reset()
+```
+
+### Agent Client
+
+The `SatGateAgentClient` is designed for AI agents — it automatically
+mints tokens, caches them, and handles L402 payment challenges.
+
+```python
+from satgate import SatGateAgentClient
+
+# With admin token (auto-mints capability tokens)
+client = SatGateAgentClient(
+    gateway_url="http://localhost:8080",
+    admin_token="your-admin-token",
+    scope="api:read",
+    duration="1h"
+)
+
+# Or with a pre-existing capability token
+client = SatGateAgentClient(
+    gateway_url="http://localhost:8080",
+    token="your-capability-token"
+)
+
+# Or via environment variables
+# export SATGATE_ADMIN_TOKEN=your-admin-token
+# export SATGATE_TOKEN=your-capability-token (alternative)
+client = SatGateAgentClient(gateway_url="http://localhost:8080")
+
+# Make requests — token handling is automatic
+response = client.get("/api/data")
+print(response.json())
+
+# Ping the gateway to verify your token
+result = client.ping()
+print(result)  # {"status": "ok", "message": "Token validated successfully", ...}
+
+# Delegate a child token for a worker agent
+child_token = client.delegate(caveats=["scope = api:read"])
 ```
 
 ## Token Delegation
 
-### Basic Delegation
-
-```python
-# Create a child token with reduced scope
-child = client.tokens.delegate(
-    parent_token=token.token,
-    caveats=["scope = api:read:users"]
-)
-print(f"Child token: {child.signature}")
-```
-
 ### Fluent Delegation Builder
 
 ```python
-from satgate import delegate, Caveats, DelegationPatterns
+from satgate import SatGateClient, delegate, Caveats, DelegationPatterns
+
+client = SatGateClient(base_url="http://localhost:8080", admin_token="admin-token")
+root = client.tokens.mint(scope="api:*", duration="24h")
 
 # Fluent builder pattern
-team_token = (delegate(root_token)
+team_token = (delegate(root.token)
     .with_scope('api:read')
-    .with_expiry(seconds=24 * 3600)  # 24 hours
-    .with_budget(100, 'USD')
+    .with_expiry(seconds=24 * 3600)
     .for_team('engineering')
     .delegate(client))
 
 # Pre-built patterns
-read_only_token = DelegationPatterns.read_only(root_token).delegate(client)
+read_only = DelegationPatterns.read_only(root.token).delegate(client)
+temp_token = DelegationPatterns.temporary(root.token, hours=2).delegate(client)
 
-temp_token = DelegationPatterns.temporary(root_token, hours=2).delegate(client)
-
-api_client_token = DelegationPatterns.api_client(
-    root_token,
-    client_id='my-app-client',
-    requests_per_minute=1000
-).delegate(client)
-
-# Webhook callback token (single route, short expiry)
-webhook_token = DelegationPatterns.webhook(
-    root_token,
-    callback_path='/api/webhooks/stripe',
-    expiry_minutes=30
-).delegate(client)
-
-# CI/CD pipeline token
-ci_token = DelegationPatterns.cicd(
-    root_token,
-    pipeline_id='deploy-prod-123',
-    expiry_minutes=60
-).delegate(client)
-
-# Agent swarm token with budget
+# Agent swarm token
 swarm_token = DelegationPatterns.agent_swarm(
-    root_token,
-    swarm_id='ai-agents-prod',
+    root.token,
+    swarm_id='ai-agents',
     budget=500,
-    currency='USD',
     requests_per_minute=5000,
-    max_agents=100
 ).delegate(client)
 ```
 
@@ -119,59 +127,70 @@ swarm_token = DelegationPatterns.agent_swarm(
 ```python
 from satgate import Caveats
 
-# Build caveats programmatically
 caveats = [
-    Caveats.scope('api:read:users,api:read:posts'),
-    Caveats.expires(seconds=3600),  # 1 hour
-    Caveats.routes(['/api/v1/*', '/health']),
-    Caveats.rate_limit(100, period=60),  # 100 req/min
-    Caveats.budget(50, 'USD'),
-    Caveats.source_ip(['10.0.0.0/8']),
+    Caveats.scope('api:read'),
+    Caveats.expires(seconds=3600),
+    Caveats.routes(['/api/*', '/health']),
+    Caveats.rate_limit(100, period=60),
     Caveats.methods(['GET', 'POST']),
     Caveats.team('engineering'),
-    Caveats.project('api-gateway'),
-    Caveats.label('env', 'production'),
 ]
 
-token = client.tokens.delegate(
-    parent_token=root_token,
-    caveats=caveats
-)
+child = client.tokens.delegate(parent_token=root.token, caveats=caveats)
 ```
 
-## Configuration
+## OSS Gateway Endpoints
 
-```python
-# Get current config
-config = client.config.get()
-print(f"Routes: {len(config['routes'])}")
+This SDK targets the SatGate OSS gateway endpoints:
 
-# Validate a configuration
-is_valid = client.config.validate({
-    "version": 1,
-    "routes": [...]
-})
-```
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `POST` | `/api/capability/mint` | X-Admin-Token | Mint a new capability token |
+| `POST` | `/api/capability/validate` | — | Validate a token |
+| `POST` | `/api/capability/delegate` | — | Delegate a token with caveats |
+| `GET` | `/api/capability/ping` | Bearer token | Verify a token is valid |
+| `GET` | `/api/capability/admin` | Bearer token | Admin-scope verification |
+| `POST` | `/api/governance/ban` | X-Admin-Token | Ban a token |
+| `GET` | `/api/governance/graph` | — | Get token lineage graph |
+| `POST` | `/api/governance/reset` | X-Admin-Token | Reset governance data |
+| `GET` | `/health` | — | Health check |
 
 ## Error Handling
 
 ```python
-from satgate import SatGateClient, AuthenticationError, NotFoundError, SatGateError
+from satgate import (
+    SatGateClient,
+    AuthenticationError,
+    NotFoundError,
+    SatGateError,
+    PaymentRequiredError,
+)
 
 try:
-    client = SatGateClient(base_url="http://localhost:9090", admin_token="invalid")
-    client.tokens.list()
+    client = SatGateClient(base_url="http://localhost:8080", admin_token="invalid")
+    client.tokens.mint()
 except AuthenticationError:
     print("Invalid admin token!")
-except NotFoundError:
-    print("Resource not found!")
 except SatGateError as e:
     print(f"API error: {e}")
+```
+
+## LangChain Integration
+
+See the [LangChain Integration Guide](../../docs/guides/langchain-integration.md) for detailed examples.
+
+```python
+from satgate.langchain import SatGateTool
+
+tool = SatGateTool(
+    name="data_query",
+    description="Query the protected data API",
+    gateway_url="http://localhost:8080",
+    admin_token="your-admin-token",
+    endpoint="/api/data/query",
+)
 ```
 
 ## License
 
 MIT License
-
-
-

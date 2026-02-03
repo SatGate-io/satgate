@@ -2,31 +2,31 @@
 SatGate Agent Client - Economic Middleware for AI Agents
 
 This module provides the SatGateAgentClient, which automatically handles:
-- Identity badge-in (K8s, AWS, OIDC)
-- 402 Payment Required challenges (Fiat402 and L402)
+- Admin token authentication for minting (OSS gateway)
+- 402 Payment Required challenges (L402)
 - Token caching and refresh
 - Offline delegation for worker agents
 - Budget tracking and alerts
 
-Example usage:
+Example usage (OSS Gateway):
     from satgate import SatGateAgentClient
     
-    # Auto-detect environment (K8s/AWS)
+    # With admin token (OSS mode)
     client = SatGateAgentClient(
-        gateway_url="https://gateway.internal",
-        identity="auto"
+        gateway_url="http://localhost:8080",
+        admin_token="your-admin-token"
     )
     
-    # Make requests - 402 handling is automatic
-    response = client.get("/api/v1/data")
-    print(f"Cost: ${response.cost:.2f}")
+    # Make requests through the gateway
+    response = client.get("/api/data")
     
-    # With Lightning wallet for external APIs
-    from satgate.wallets import LNDWallet
+    # With Lightning wallet for L402 endpoints
+    from satgate.agent_client import LNDWallet
     
     client = SatGateAgentClient(
-        gateway_url="https://api.external.com",
-        wallet=LNDWallet(...)
+        gateway_url="http://localhost:8080",
+        admin_token="your-admin-token",
+        wallet=LNDWallet(macaroon_path="~/.lnd/admin.macaroon")
     )
 """
 
@@ -73,6 +73,7 @@ class CachedToken:
     token: str
     signature: str
     expires_at: float
+    scope: str = "api:*"
     budget_limit: Optional[float] = None
     budget_used: float = 0.0
     caveats: List[str] = field(default_factory=list)
@@ -86,104 +87,6 @@ class CachedToken:
         if self.budget_limit is None:
             return None
         return max(0, self.budget_limit - self.budget_used)
-
-
-class IdentityProvider:
-    """Base class for identity providers"""
-    
-    def get_credentials(self) -> str:
-        """Return credentials for the Mint API"""
-        raise NotImplementedError
-    
-    def provider_type(self) -> str:
-        """Return the provider type identifier"""
-        raise NotImplementedError
-
-
-class KubernetesIdentity(IdentityProvider):
-    """Kubernetes ServiceAccount identity provider"""
-    
-    TOKEN_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/token"
-    
-    def __init__(self, token_path: Optional[str] = None):
-        self.token_path = token_path or self.TOKEN_PATH
-    
-    def get_credentials(self) -> str:
-        try:
-            with open(self.token_path, 'r') as f:
-                return f.read().strip()
-        except FileNotFoundError:
-            raise SatGateError(f"K8s token not found at {self.token_path}")
-    
-    def provider_type(self) -> str:
-        return "kubernetes"
-    
-    @classmethod
-    def is_available(cls) -> bool:
-        return os.path.exists(cls.TOKEN_PATH)
-
-
-class AWSIdentity(IdentityProvider):
-    """AWS IAM identity provider using STS"""
-    
-    def __init__(self, role_arn: Optional[str] = None):
-        self.role_arn = role_arn
-    
-    def get_credentials(self) -> str:
-        # Check for EKS IRSA token
-        irsa_token_path = os.environ.get('AWS_WEB_IDENTITY_TOKEN_FILE')
-        if irsa_token_path and os.path.exists(irsa_token_path):
-            with open(irsa_token_path, 'r') as f:
-                return json.dumps({"irsaToken": f.read().strip()})
-        
-        # Use boto3 if available
-        try:
-            import boto3
-            sts = boto3.client('sts')
-            identity = sts.get_caller_identity()
-            return json.dumps({
-                "stsResponse": {
-                    "Account": identity['Account'],
-                    "Arn": identity['Arn'],
-                    "UserId": identity['UserId']
-                }
-            })
-        except ImportError:
-            raise SatGateError("boto3 required for AWS identity")
-        except Exception as e:
-            raise SatGateError(f"AWS identity failed: {e}")
-    
-    def provider_type(self) -> str:
-        return "aws"
-    
-    @classmethod
-    def is_available(cls) -> bool:
-        # Check for IRSA
-        if os.environ.get('AWS_WEB_IDENTITY_TOKEN_FILE'):
-            return True
-        # Check for AWS credentials
-        return any([
-            os.environ.get('AWS_ACCESS_KEY_ID'),
-            os.environ.get('AWS_ROLE_ARN'),
-            os.path.exists(os.path.expanduser('~/.aws/credentials'))
-        ])
-
-
-class OIDCIdentity(IdentityProvider):
-    """OIDC identity provider"""
-    
-    def __init__(self, token: Optional[str] = None, token_env: str = 'OIDC_TOKEN'):
-        self.token = token
-        self.token_env = token_env
-    
-    def get_credentials(self) -> str:
-        token = self.token or os.environ.get(self.token_env)
-        if not token:
-            raise SatGateError(f"OIDC token not found in {self.token_env}")
-        return token
-    
-    def provider_type(self) -> str:
-        return "oidc"
 
 
 class LightningWallet:
@@ -320,9 +223,13 @@ class SatGateAgentClient:
     """
     SatGate Agent Client - Economic Middleware for AI Agents
     
+    For the OSS gateway, uses admin token authentication to mint
+    capability tokens, then uses those tokens for API access.
+    
     Automatically handles:
-    - Identity badge-in (K8s, AWS, OIDC)
-    - 402 Payment Required challenges
+    - Token minting via POST /api/capability/mint (X-Admin-Token)
+    - Token delegation via POST /api/capability/delegate
+    - L402 Payment Required challenges
     - Token caching and refresh
     - Budget tracking
     """
@@ -330,38 +237,39 @@ class SatGateAgentClient:
     def __init__(
         self,
         gateway_url: str,
-        identity: Union[str, IdentityProvider] = "auto",
+        admin_token: Optional[str] = None,
+        token: Optional[str] = None,
         wallet: Optional[LightningWallet] = None,
         budget_limit: Optional[float] = None,
+        scope: str = "api:*",
+        duration: str = "1h",
         timeout: int = 30,
         max_retries: int = 3,
         on_budget_alert: Optional[Callable[[float, float], None]] = None,
-        mint_url: Optional[str] = None,
     ):
         """
         Initialize the agent client.
         
         Args:
-            gateway_url: Base URL of the SatGate gateway (for API requests)
-            identity: Identity provider ("auto", "k8s", "aws", "oidc") or IdentityProvider instance
+            gateway_url: Base URL of the SatGate gateway
+            admin_token: Admin token for minting capability tokens (X-Admin-Token header).
+                         Can also be set via SATGATE_ADMIN_TOKEN environment variable.
+            token: Pre-existing capability token to use (skips minting).
+                   Can also be set via SATGATE_TOKEN environment variable.
             wallet: Lightning wallet for L402 payments (optional)
             budget_limit: Maximum budget to spend (optional)
+            scope: Default scope for minted tokens (default: "api:*")
+            duration: Default duration for minted tokens (default: "1h")
             timeout: Request timeout in seconds
             max_retries: Maximum retry attempts for 402 challenges
             on_budget_alert: Callback when budget is running low
-            mint_url: Separate URL for Mint service (e.g., "http://gateway-admin:9090")
-                      In enterprise deployments, Mint may be on a separate internal listener.
-                      If not specified, uses gateway_url + "/v1/mint".
-                      Can also be set via SATGATE_MINT_URL environment variable.
         """
         self.gateway_url = gateway_url.rstrip('/')
-        
-        # Mint URL: explicit > env > gateway_url
-        self.mint_url = mint_url or os.environ.get('SATGATE_MINT_URL') or self.gateway_url
-        self.mint_url = self.mint_url.rstrip('/')
-        
+        self.admin_token = admin_token or os.environ.get('SATGATE_ADMIN_TOKEN')
         self.wallet = wallet
         self.budget_limit = budget_limit
+        self.default_scope = scope
+        self.default_duration = duration
         self.timeout = timeout
         self.max_retries = max_retries
         self.on_budget_alert = on_budget_alert
@@ -372,32 +280,18 @@ class SatGateAgentClient:
         # Token cache
         self._token_cache: Optional[CachedToken] = None
         
+        # If a pre-existing token was provided, cache it
+        pre_token = token or os.environ.get('SATGATE_TOKEN')
+        if pre_token:
+            self._token_cache = CachedToken(
+                token=pre_token,
+                signature="pre-provided",
+                expires_at=time.time() + 3600,
+                scope=scope,
+            )
+        
         # Total cost tracking
         self._total_cost: float = 0.0
-        
-        # Initialize identity provider
-        if isinstance(identity, IdentityProvider):
-            self._identity = identity
-        elif identity == "auto":
-            self._identity = self._auto_detect_identity()
-        elif identity == "k8s" or identity == "kubernetes":
-            self._identity = KubernetesIdentity()
-        elif identity == "aws":
-            self._identity = AWSIdentity()
-        elif identity == "oidc":
-            self._identity = OIDCIdentity()
-        elif identity == "none":
-            self._identity = None
-        else:
-            raise SatGateError(f"Unknown identity provider: {identity}")
-    
-    def _auto_detect_identity(self) -> Optional[IdentityProvider]:
-        """Auto-detect the best available identity provider"""
-        if KubernetesIdentity.is_available():
-            return KubernetesIdentity()
-        if AWSIdentity.is_available():
-            return AWSIdentity()
-        return None
     
     def _get_token(self) -> Optional[str]:
         """Get a valid token, minting if necessary"""
@@ -405,138 +299,64 @@ class SatGateAgentClient:
         if self._token_cache and not self._token_cache.is_expired:
             return self._token_cache.token
         
-        # No identity provider - can't mint
-        if not self._identity:
+        # No admin token - can't mint
+        if not self.admin_token:
             return None
         
-        # Mint new token
+        # Mint new token via OSS endpoint
         try:
-            credentials = self._identity.get_credentials()
-            
-            # Use separate mint_url (for enterprise deployments with separate listeners)
-            mint_endpoint = urljoin(self.mint_url, "/v1/mint")
             resp = self.session.post(
-                mint_endpoint,
+                f"{self.gateway_url}/api/capability/mint",
                 json={
-                    "provider": self._identity.provider_type(),
-                    "credentials": credentials
+                    "scope": self.default_scope,
+                    "duration": self.default_duration,
+                },
+                headers={
+                    "Content-Type": "application/json",
+                    "X-Admin-Token": self.admin_token,
                 },
                 timeout=self.timeout
             )
             
             if resp.status_code != 200:
-                raise AuthenticationError(f"Mint failed: {resp.text}")
+                raise AuthenticationError(f"Mint failed ({resp.status_code}): {resp.text}")
             
             result = resp.json()
             
+            # Parse expiration
+            expires_at = time.time() + 3600  # Default 1 hour
+            if 'expiresAt' in result:
+                try:
+                    from datetime import datetime
+                    dt = datetime.fromisoformat(result['expiresAt'].replace('Z', '+00:00'))
+                    expires_at = dt.timestamp()
+                except (ValueError, ImportError):
+                    pass
+            
             # Cache token
             self._token_cache = CachedToken(
-                token=result['macaroon'],
-                signature=result['signature'],
-                expires_at=time.time() + 3600,  # Default 1 hour
-                budget_limit=result.get('budget', {}).get('limit'),
-                caveats=result.get('caveats', [])
+                token=result['token'],
+                signature=result.get('signature', ''),
+                expires_at=expires_at,
+                scope=result.get('scope', self.default_scope),
             )
             
             return self._token_cache.token
             
-        except Exception as e:
-            raise AuthenticationError(f"Failed to get token: {e}")
+        except requests.RequestException as e:
+            raise AuthenticationError(f"Failed to mint token: {e}")
     
-    def _handle_402(self, response: requests.Response, method: str, url: str, **kwargs) -> AgentResponse:
-        """Handle a 402 Payment Required response"""
-        
-        # Parse the challenge
+    def _handle_l402(self, response: requests.Response, method: str, url: str, **kwargs) -> AgentResponse:
+        """Handle an L402 Payment Required response"""
         www_auth = response.headers.get('WWW-Authenticate', '')
-        content_type = response.headers.get('Content-Type', '')
         
         challenge = {}
+        content_type = response.headers.get('Content-Type', '')
         if 'application/json' in content_type:
             try:
                 challenge = response.json()
-            except:
+            except Exception:
                 pass
-        
-        challenge_type = challenge.get('type', '')
-        
-        # Fiat402 challenge (internal budget)
-        if 'SatGate-Billing' in www_auth or challenge_type == 'fiat402':
-            return self._handle_fiat402(challenge, method, url, **kwargs)
-        
-        # L402 challenge (Lightning payment)
-        if 'L402' in www_auth or 'LSAT' in www_auth or challenge_type == 'l402':
-            return self._handle_l402(www_auth, challenge, method, url, **kwargs)
-        
-        # Unknown challenge type
-        raise PaymentRequiredError(
-            f"Unknown 402 challenge type",
-            challenge=challenge
-        )
-    
-    def _handle_fiat402(self, challenge: dict, method: str, url: str, **kwargs) -> AgentResponse:
-        """Handle Fiat402 (internal budget) challenge"""
-        
-        invoice_id = challenge.get('invoice_id')
-        amount = challenge.get('amount', 0)
-        
-        if not invoice_id:
-            raise PaymentRequiredError("Missing invoice_id in Fiat402 challenge", challenge=challenge)
-        
-        # Check budget
-        if self.budget_limit and self._total_cost + amount > self.budget_limit:
-            raise BudgetExceededError(
-                f"Budget exceeded: ${self._total_cost:.2f} + ${amount:.2f} > ${self.budget_limit:.2f}",
-                used=self._total_cost,
-                limit=self.budget_limit
-            )
-        
-        # Get receipt from gateway
-        receipt_url = challenge.get('receipt_url', f"/api/v1/billing/receipts?invoice_id={invoice_id}")
-        full_receipt_url = urljoin(self.gateway_url, receipt_url)
-        
-        receipt_resp = self.session.post(
-            full_receipt_url,
-            json={"invoiceId": invoice_id},
-            timeout=self.timeout
-        )
-        
-        if receipt_resp.status_code != 200:
-            raise PaymentRequiredError(f"Failed to get receipt: {receipt_resp.text}", challenge=challenge)
-        
-        receipt_data = receipt_resp.json()
-        receipt_token = receipt_data.get('receipt') or receipt_data.get('token')
-        
-        if not receipt_token:
-            raise PaymentRequiredError("No receipt token in response", challenge=challenge)
-        
-        # Retry with receipt
-        headers = kwargs.get('headers', {})
-        headers['Authorization'] = f"Receipt {receipt_token}"
-        kwargs['headers'] = headers
-        
-        retry_resp = self.session.request(method, url, timeout=self.timeout, **kwargs)
-        
-        # Track cost
-        self._total_cost += amount
-        if self._token_cache:
-            self._token_cache.budget_used += amount
-        
-        # Check budget alert
-        if self.on_budget_alert and self.budget_limit:
-            remaining = self.budget_limit - self._total_cost
-            if remaining < self.budget_limit * 0.2:  # 20% remaining
-                self.on_budget_alert(remaining, self.budget_limit)
-        
-        return AgentResponse(
-            status_code=retry_resp.status_code,
-            headers=dict(retry_resp.headers),
-            content=retry_resp.content,
-            cost=amount,
-            budget_remaining=self.budget_limit - self._total_cost if self.budget_limit else None
-        )
-    
-    def _handle_l402(self, www_auth: str, challenge: dict, method: str, url: str, **kwargs) -> AgentResponse:
-        """Handle L402 (Lightning payment) challenge"""
         
         if not self.wallet:
             raise PaymentRequiredError(
@@ -570,18 +390,15 @@ class SatGateAgentClient:
         except Exception as e:
             raise PaymentFailedError(f"Lightning payment failed: {e}")
         
-        # Build L402 token
+        # Build L402 token and retry
         l402_token = f"L402 {macaroon}:{preimage}"
-        
-        # Retry with L402 token
         headers = kwargs.get('headers', {})
         headers['Authorization'] = l402_token
         kwargs['headers'] = headers
         
         retry_resp = self.session.request(method, url, timeout=self.timeout, **kwargs)
         
-        # Extract cost from invoice (simplified - would need BOLT11 decoder)
-        cost_sats = challenge.get('amount', 0)
+        cost_sats = challenge.get('amount_sats', challenge.get('amount', 0))
         
         return AgentResponse(
             status_code=retry_resp.status_code,
@@ -597,7 +414,7 @@ class SatGateAgentClient:
         **kwargs
     ) -> AgentResponse:
         """
-        Make an HTTP request with automatic 402 handling.
+        Make an HTTP request with automatic token and L402 handling.
         
         Args:
             method: HTTP method (GET, POST, etc.)
@@ -607,14 +424,15 @@ class SatGateAgentClient:
         Returns:
             AgentResponse with status, content, and cost information
         """
-        url = urljoin(self.gateway_url, path)
+        url = urljoin(self.gateway_url + "/", path.lstrip("/"))
         
-        # Add token if available
+        # Add capability token if available
         token = self._get_token()
         if token:
             headers = kwargs.get('headers', {})
-            headers['Authorization'] = f"Bearer {token}"
-            kwargs['headers'] = headers
+            if 'Authorization' not in headers:
+                headers['Authorization'] = f"Bearer {token}"
+                kwargs['headers'] = headers
         
         # Make request
         for attempt in range(self.max_retries):
@@ -630,9 +448,9 @@ class SatGateAgentClient:
                     budget_remaining=self._token_cache.budget_remaining if self._token_cache else None
                 )
             
-            # Payment required
+            # Payment required (L402)
             if resp.status_code == 402:
-                return self._handle_402(resp, method, url, **kwargs)
+                return self._handle_l402(resp, method, url, **kwargs)
             
             # Auth error - try refreshing token
             if resp.status_code == 401 and attempt < self.max_retries - 1:
@@ -665,22 +483,57 @@ class SatGateAgentClient:
         """Make a DELETE request"""
         return self.request("DELETE", path, **kwargs)
     
+    def ping(self) -> dict:
+        """
+        Ping the gateway to verify the capability token is valid.
+        
+        Calls GET /api/capability/ping with the Bearer token.
+        
+        Returns:
+            dict with validation result
+        """
+        response = self.get("/api/capability/ping")
+        return response.json()
+    
+    def validate_token(self, token: Optional[str] = None) -> dict:
+        """
+        Validate a capability token.
+        
+        Args:
+            token: Token to validate. If not provided, uses the cached token.
+            
+        Returns:
+            dict with validation result including caveats
+        """
+        t = token or (self._token_cache.token if self._token_cache else None)
+        if not t:
+            raise SatGateError("No token available to validate")
+        
+        resp = self.session.post(
+            f"{self.gateway_url}/api/capability/validate",
+            json={"token": t},
+            timeout=self.timeout
+        )
+        
+        if resp.status_code != 200:
+            raise SatGateError(f"Validation failed: {resp.text}")
+        
+        return resp.json()
+    
     def delegate(
         self,
-        additional_caveats: Optional[List[str]] = None,
-        ttl: Optional[str] = None,
-        budget_limit: Optional[float] = None
+        caveats: Optional[List[str]] = None,
     ) -> str:
         """
         Create a delegated (child) token for a worker agent.
         
+        Uses POST /api/capability/delegate with the current token as parent.
+        
         Args:
-            additional_caveats: Additional restrictions to add
-            ttl: Reduced lifetime (e.g., "5m", "1h")
-            budget_limit: Maximum budget for the child token
+            caveats: Additional caveats/restrictions to add to the child token
             
         Returns:
-            Base64-encoded child macaroon
+            The delegated child token string
         """
         if not self._token_cache:
             self._get_token()
@@ -688,20 +541,11 @@ class SatGateAgentClient:
         if not self._token_cache:
             raise SatGateError("No token available for delegation")
         
-        caveats = additional_caveats or []
-        
-        if ttl:
-            caveats.append(f"ttl = {ttl}")
-        if budget_limit:
-            caveats.append(f"budget_limit = {budget_limit}")
-        
-        # Use mint_url for delegation (may be on separate listener)
-        delegate_endpoint = urljoin(self.mint_url, "/v1/mint/delegate")
         resp = self.session.post(
-            delegate_endpoint,
+            f"{self.gateway_url}/api/capability/delegate",
             json={
-                "parentMacaroon": self._token_cache.token,
-                "additionalCaveats": caveats
+                "parentToken": self._token_cache.token,
+                "caveats": caveats or [],
             },
             timeout=self.timeout
         )
@@ -709,7 +553,7 @@ class SatGateAgentClient:
         if resp.status_code != 200:
             raise SatGateError(f"Delegation failed: {resp.text}")
         
-        return resp.json()['macaroon']
+        return resp.json()['token']
     
     @property
     def total_cost(self) -> float:
@@ -722,3 +566,17 @@ class SatGateAgentClient:
         if self.budget_limit is None:
             return None
         return max(0, self.budget_limit - self._total_cost)
+    
+    @property
+    def current_token(self) -> Optional[str]:
+        """The currently cached capability token, if any"""
+        if self._token_cache and not self._token_cache.is_expired:
+            return self._token_cache.token
+        return None
+    
+    @property
+    def current_signature(self) -> Optional[str]:
+        """The signature of the currently cached token, if any"""
+        if self._token_cache:
+            return self._token_cache.signature
+        return None

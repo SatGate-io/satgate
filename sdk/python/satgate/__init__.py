@@ -1,42 +1,40 @@
 """
 SatGate Gateway Python SDK
 
-A Python SDK for interacting with the SatGate Enterprise Gateway.
+A Python SDK for interacting with the SatGate OSS Gateway.
 
 ## Admin Client (for operators)
 
     from satgate import SatGateClient
     
     client = SatGateClient(
-        base_url="http://localhost:9090",
+        base_url="http://localhost:8080",
         admin_token="your-admin-token"
     )
     
     # Mint a new token
-    token = client.tokens.mint(scope="api:*", expires_in=3600)
+    token = client.tokens.mint(scope="api:*", duration="1h")
     print(f"Token: {token.token}")
 
 ## Agent Client (for AI agents)
 
     from satgate import SatGateAgentClient
     
-    # Auto-detect environment (K8s/AWS)
     client = SatGateAgentClient(
-        gateway_url="https://gateway.internal",
-        identity="auto"
+        gateway_url="http://localhost:8080",
+        admin_token="your-admin-token"
     )
     
-    # Make requests - 402 handling is automatic
-    response = client.get("/api/v1/data")
-    print(f"Cost: ${response.cost:.2f}")
+    # Make requests - token management is automatic
+    response = client.get("/api/data")
 
-## With Lightning wallet for external APIs
+## With a pre-existing token
 
-    from satgate import SatGateAgentClient, LNDWallet
+    from satgate import SatGateAgentClient
     
     client = SatGateAgentClient(
-        gateway_url="https://api.external.com",
-        wallet=LNDWallet(macaroon_path="~/.lnd/admin.macaroon")
+        gateway_url="http://localhost:8080",
+        token="your-capability-token"
     )
 """
 
@@ -44,10 +42,6 @@ from .client import SatGateClient
 from .agent_client import (
     SatGateAgentClient,
     AgentResponse,
-    IdentityProvider,
-    KubernetesIdentity,
-    AWSIdentity,
-    OIDCIdentity,
     LightningWallet,
     LNDWallet,
     AlbyWallet,
@@ -68,7 +62,8 @@ except ImportError:
     SatGateRESTTool = None
     SatGateToolkit = None
     create_satgate_tool = None
-from .models import Token, TokenInfo, BanRecord, Stats
+
+from .models import Token, TokenInfo, BanRecord, Stats, GraphData
 from .delegation import (
     Caveats,
     DelegationBuilder,
@@ -98,12 +93,6 @@ __all__ = [
     "SatGateAgentClient",
     "AgentResponse",
     
-    # Identity providers
-    "IdentityProvider",
-    "KubernetesIdentity",
-    "AWSIdentity",
-    "OIDCIdentity",
-    
     # Lightning wallets
     "LightningWallet",
     "LNDWallet",
@@ -121,6 +110,7 @@ __all__ = [
     "TokenInfo",
     "BanRecord",
     "Stats",
+    "GraphData",
     
     # Delegation helpers
     "Caveats",
@@ -141,6 +131,3 @@ __all__ = [
     "TokenExpiredError",
     "DelegationError",
 ]
-
-
-
