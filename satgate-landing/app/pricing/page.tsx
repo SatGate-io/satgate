@@ -8,11 +8,15 @@ import Image from 'next/image';
 const faqs = [
   {
     q: 'What counts as a request?',
-    a: 'Every API call proxied through the gateway in Control or Charge mode. Observe mode is always free and unlimited.',
+    a: 'Every API call proxied through the gateway in Control or Charge mode counts as a metered request. Observe-mode requests are always free and unlimited — no catches.',
+  },
+  {
+    q: 'How does the Free → Pro upgrade work?',
+    a: 'Start with Free to see what your agents are spending. When you\'re ready to enforce budgets and set hard stops, upgrade to Pro in one click. No data migration — your dashboards carry over.',
   },
   {
     q: 'Can I switch plans?',
-    a: 'Yes, upgrade or downgrade anytime. Changes take effect immediately.',
+    a: 'Yes, upgrade or downgrade anytime. Changes take effect immediately. No lock-in.',
   },
   {
     q: 'Do you offer annual billing?',
@@ -20,15 +24,15 @@ const faqs = [
   },
   {
     q: 'What happens if I exceed my request limit?',
-    a: 'Overage is billed at $0.10 per 1,000 requests. No surprise charges — you\'ll get alerts at 80% and 90%.',
+    a: 'Overage is billed at $0.10 per 1,000 requests. No surprise charges — you\'ll get alerts at 80% and 90% so you can adjust budgets before you hit the limit.',
   },
   {
     q: 'Is there a free trial of Pro?',
-    a: 'Every account starts with a 14-day Pro trial. No credit card required.',
+    a: 'Every account starts with a 14-day Pro trial. No credit card required. After the trial, you drop to Free (Observe) — you never lose visibility.',
   },
   {
     q: 'Do you support hybrid/on-prem deployment?',
-    a: 'Yes, on the Enterprise plan. The gateway runs in your infrastructure with our managed control plane. Or fully air-gapped.',
+    a: 'Yes, on the Enterprise plan. The gateway runs in your infrastructure with our managed control plane. Or fully air-gapped — your choice.',
   },
 ];
 
@@ -85,19 +89,43 @@ const PricingPage = () => {
       </nav>
 
       {/* Hero */}
-      <header className="pt-32 pb-16 px-6 text-center">
+      <header className="pt-32 pb-10 px-6 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-            Simple, Transparent{' '}
+            See the Bill.{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-              Pricing
+              Then Stop It.
             </span>
           </h1>
-          <p className="text-xl text-gray-400 max-w-lg mx-auto leading-relaxed">
-            Start free. Scale when you&apos;re ready.
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+            Start with free, unlimited observability. Upgrade to enforce budgets when your CFO asks &ldquo;how much are we spending on AI?&rdquo;
           </p>
         </div>
       </header>
+
+      {/* Observe → Control → Charge Journey */}
+      <section className="pb-10 px-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-900/20 border border-cyan-800/30">
+              <span className="text-cyan-400 font-bold text-sm">👁 Observe</span>
+              <span className="text-gray-500 text-xs">See the spend</span>
+            </div>
+            <span className="text-gray-600 text-xl hidden md:block">→</span>
+            <span className="text-gray-600 md:hidden">↓</span>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-900/20 border border-purple-800/30">
+              <span className="text-purple-400 font-bold text-sm">🛡 Control</span>
+              <span className="text-gray-500 text-xs">Stop the bleed</span>
+            </div>
+            <span className="text-gray-600 text-xl hidden md:block">→</span>
+            <span className="text-gray-600 md:hidden">↓</span>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-yellow-900/20 border border-yellow-800/30">
+              <span className="text-yellow-400 font-bold text-sm">⚡ Charge</span>
+              <span className="text-gray-500 text-xs">Monetize your APIs</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Pricing Cards */}
       <section className="pb-20 px-6">
@@ -106,15 +134,16 @@ const PricingPage = () => {
           <div className="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-600 transition flex flex-col">
             <div className="mb-6">
               <h3 className="text-lg font-bold text-cyan-400 mb-1">Free</h3>
-              <p className="text-gray-500 text-sm">Observe</p>
+              <p className="text-gray-500 text-sm">See what your agents are spending</p>
             </div>
             <div className="mb-6">
               <span className="text-4xl font-extrabold text-white">$0</span>
-              <span className="text-gray-500 text-sm">/month</span>
+              <span className="text-gray-500 text-sm">/month forever</span>
             </div>
             <ul className="space-y-3 text-sm text-gray-400 mb-8 flex-1">
-              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Unlimited observe-mode requests</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Usage dashboard + analytics</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" /><span><b className="text-gray-200">Unlimited</b> observe-mode requests</span></li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Real-time usage dashboard</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Cost attribution by agent &amp; team</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Up to 3 routes</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Community support</li>
             </ul>
@@ -124,7 +153,7 @@ const PricingPage = () => {
               rel="noopener noreferrer"
               className="block text-center py-3 rounded-lg border border-gray-700 font-bold hover:border-gray-500 hover:bg-gray-800 transition"
             >
-              Start Free →
+              Start Observing — Free →
             </a>
           </div>
 
@@ -135,19 +164,21 @@ const PricingPage = () => {
             </div>
             <div className="mb-6">
               <h3 className="text-lg font-bold text-purple-400 mb-1">Pro</h3>
-              <p className="text-gray-500 text-sm">Control + Charge</p>
+              <p className="text-gray-500 text-sm">Enforce budgets. Stop overruns.</p>
             </div>
             <div className="mb-6">
               <span className="text-4xl font-extrabold text-white">$99</span>
               <span className="text-gray-500 text-sm">/month</span>
             </div>
+            <p className="text-xs text-gray-500 mb-4 -mt-4">Everything in Free, plus:</p>
             <ul className="space-y-3 text-sm text-gray-400 mb-8 flex-1">
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" /><span><b className="text-gray-200">Budget enforcement</b> — hard stops per agent, team, or API</span></li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Real-time alerts at 80%, 90%, and limit</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />1M control/charge requests included</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Then $0.10 per 1K requests</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Then $0.10 per 1K overage</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Unlimited routes</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Budget enforcement + alerts</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />CFO chargeback reports</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Security dashboard + compliance exports</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />CFO-ready chargeback reports</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Compliance exports</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Email support</li>
             </ul>
             <a
@@ -156,7 +187,7 @@ const PricingPage = () => {
               rel="noopener noreferrer"
               className="block text-center py-3 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-bold hover:opacity-90 transition shadow-lg shadow-purple-500/20"
             >
-              Start Pro →
+              Start Pro — 14 Days Free →
             </a>
           </div>
 
@@ -164,24 +195,26 @@ const PricingPage = () => {
           <div className="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-600 transition flex flex-col">
             <div className="mb-6">
               <h3 className="text-lg font-bold text-green-400 mb-1">Enterprise</h3>
-              <p className="text-gray-500 text-sm">Custom</p>
+              <p className="text-gray-500 text-sm">Full governance, audit &amp; compliance</p>
             </div>
             <div className="mb-6">
               <span className="text-4xl font-extrabold text-white">Custom</span>
             </div>
+            <p className="text-xs text-gray-500 mb-4 -mt-4">Everything in Pro, plus:</p>
             <ul className="space-y-3 text-sm text-gray-400 mb-8 flex-1">
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Unlimited requests</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Hybrid deployment (your infrastructure)</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />SSO/SCIM integration</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Dedicated support + SLA</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />SOC2 compliance package</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Custom integrations</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" /><span><b className="text-gray-200">Unlimited</b> requests — no metering caps</span></li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Hybrid / on-prem / air-gapped deployment</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />SSO/SCIM + RBAC</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Full audit trail &amp; retention policies</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />SOC 2 compliance package</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Dedicated CSM + SLA</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Custom integrations &amp; onboarding</li>
             </ul>
             <a
               href="mailto:contact@satgate.io"
               className="block text-center py-3 rounded-lg border border-gray-700 font-bold hover:border-gray-500 hover:bg-gray-800 transition"
             >
-              Contact Sales
+              Talk to Us →
             </a>
           </div>
         </div>
@@ -222,17 +255,26 @@ const PricingPage = () => {
       {/* Bottom CTA */}
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-xl text-gray-400 mb-6">
-            Not sure which plan? Start with Free — upgrade when your CFO sees the report.
+          <h2 className="text-2xl font-bold mb-3">Not sure? Start with Observe.</h2>
+          <p className="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
+            Free, unlimited, zero risk. See what your agents are really spending — then decide if you need to stop them.
           </p>
-          <a
-            href="https://cloud.satgate.io"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block bg-white text-black px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-200 transition"
-          >
-            Start Free →
-          </a>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a
+              href="https://cloud.satgate.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-white text-black px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-200 transition"
+            >
+              Start Free →
+            </a>
+            <a
+              href="mailto:contact@satgate.io"
+              className="inline-block border border-gray-700 text-gray-300 px-10 py-4 rounded-full font-bold text-lg hover:border-gray-500 hover:bg-gray-800 transition"
+            >
+              Talk to Sales
+            </a>
+          </div>
         </div>
       </section>
 

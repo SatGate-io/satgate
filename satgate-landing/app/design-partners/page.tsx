@@ -116,7 +116,7 @@ export default function DesignPartnersPage() {
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
             We're working with <strong className="text-white">10 enterprises</strong> to build the economic firewall
-            for the agent economy. Get free access, direct engineering support, and a product shaped by your needs.
+            for the agent economy. Gate your MCP tool servers, REST APIs, and LLM endpoints — see what each agent spends per call. Get free access, direct engineering support, and a product shaped by your needs.
           </p>
           <a href="#apply" className="inline-flex items-center gap-2 bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
             Apply Now <ArrowRight size={18} />
@@ -139,7 +139,7 @@ export default function DesignPartnersPage() {
                 <h3 className="font-bold text-lg">Free Observe Mode</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Full visibility into your AI agent traffic on your staging environment. See every API call, every token, every cost—completely free.
+                Full visibility into your AI agent traffic on your staging environment. See every API call, every token, every cost—across MCP servers, REST APIs, LLM endpoints—completely free.
               </p>
             </div>
 

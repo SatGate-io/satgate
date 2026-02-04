@@ -176,7 +176,7 @@ export default function GovernPage() {
                 <h3 className="font-bold text-lg">Observe</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                See every API call, every token, every agent. Full visibility with zero enforcement.
+                See every API call, every token, every agent — across MCP servers, REST APIs, and LLM endpoints. Full visibility with zero enforcement.
               </p>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li className="text-purple-400">✓ Real-time request logging</li>
