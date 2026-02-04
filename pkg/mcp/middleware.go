@@ -16,8 +16,9 @@ import (
 //   - Respects maxBodySize to avoid buffering huge payloads.
 //   - Replays the body so the upstream proxy can read it unmodified.
 //   - Falls through transparently for non-MCP traffic.
-//   - Resolves per-tool cost via the supplied CostProfile.
-func Middleware(maxBodySize int64, cp *CostProfile) func(http.Handler) http.Handler {
+//
+// Per-tool cost attribution is available in SatGate Enterprise.
+func Middleware(maxBodySize int64) func(http.Handler) http.Handler {
 	if maxBodySize <= 0 {
 		maxBodySize = DefaultMaxBodySize
 	}
@@ -35,22 +36,14 @@ func Middleware(maxBodySize int64, cp *CostProfile) func(http.Handler) http.Hand
 				return
 			}
 
-			// Resolve cost.
-			if cp != nil && info.Method == MethodToolsCall && info.ToolName != "" {
-				info.CostCredits = cp.Lookup(info.ToolName)
-			} else if cp != nil {
-				info.CostCredits = cp.DefaultCost
-			}
-
 			// Log the parsed MCP request.
 			log.Debug().
 				Str("mcp.method", info.Method).
 				Str("mcp.tool", info.ToolName).
-				Int("mcp.cost", info.CostCredits).
 				Bool("mcp.batch", info.IsBatch).
 				Msg("MCP request detected")
 
-			// Stash in context.
+			// Stash in context for downstream handlers and telemetry.
 			ctx := WithInfo(r.Context(), info)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

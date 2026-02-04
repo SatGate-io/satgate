@@ -1,9 +1,12 @@
-// Package mcp provides MCP (Model Context Protocol) request parsing and
-// cost attribution for the SatGate gateway proxy.
+// Package mcp provides MCP (Model Context Protocol) request parsing
+// for the SatGate gateway proxy.
 //
 // MCP uses JSON-RPC 2.0 over HTTP. This package detects MCP traffic,
-// parses the JSON-RPC envelope, and extracts tool-level metadata so
-// the gateway can attribute costs per-tool instead of per-route.
+// parses the JSON-RPC envelope, and extracts tool-level metadata
+// (method, tool name, resource URI) for logging and telemetry.
+//
+// Per-tool cost attribution and budget enforcement are available in
+// SatGate Enterprise.
 package mcp
 
 import "context"
@@ -45,6 +48,8 @@ type RequestInfo struct {
 	BatchSize int
 
 	// CostCredits is the resolved cost for this request after tool-cost lookup.
+	// This field is populated by SatGate Enterprise's cost attribution engine.
+	// In the OSS gateway it remains zero.
 	CostCredits int
 }
 

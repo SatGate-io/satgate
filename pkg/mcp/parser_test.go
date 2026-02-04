@@ -206,7 +206,6 @@ func TestParse_MalformedJSON(t *testing.T) {
 }
 
 func TestParse_NotJSONRPC(t *testing.T) {
-	// Valid JSON but not JSON-RPC 2.0.
 	r := newJSONRequest(`{"foo":"bar"}`)
 	info := Parse(r, DefaultMaxBodySize)
 	if info != nil {
@@ -248,12 +247,10 @@ func TestParse_EmptyBody(t *testing.T) {
 }
 
 func TestParse_OversizedBody(t *testing.T) {
-	// Create a body larger than the limit.
 	big := `{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"x","arguments":{"data":"` +
 		strings.Repeat("A", 200) + `"}}}`
 	r := newJSONRequest(big)
 
-	// Use a very small limit.
 	info := Parse(r, 50)
 	if info != nil {
 		t.Errorf("expected nil for oversized body, got %+v", info)
@@ -279,78 +276,11 @@ func TestParse_LeadingWhitespace(t *testing.T) {
 }
 
 // ---------------------------------------------------------------------------
-// Cost profile tests
-// ---------------------------------------------------------------------------
-
-func TestCostProfile_ExactMatch(t *testing.T) {
-	cp := &CostProfile{
-		ToolCosts:   map[string]int{"database_query": 1, "gpt4_summarize": 10},
-		DefaultCost: 5,
-	}
-	if got := cp.Lookup("database_query"); got != 1 {
-		t.Errorf("Lookup(database_query) = %d, want 1", got)
-	}
-	if got := cp.Lookup("gpt4_summarize"); got != 10 {
-		t.Errorf("Lookup(gpt4_summarize) = %d, want 10", got)
-	}
-}
-
-func TestCostProfile_DefaultCost(t *testing.T) {
-	cp := &CostProfile{
-		ToolCosts:   map[string]int{"known": 1},
-		DefaultCost: 42,
-	}
-	if got := cp.Lookup("unknown_tool"); got != 42 {
-		t.Errorf("Lookup(unknown) = %d, want 42", got)
-	}
-}
-
-func TestCostProfile_WildcardMatch(t *testing.T) {
-	cp := &CostProfile{
-		ToolCosts: map[string]int{
-			"db_*":    3,
-			"db_wri*": 7, // more specific wildcard
-		},
-		DefaultCost: 5,
-	}
-	if got := cp.Lookup("db_query"); got != 3 {
-		t.Errorf("Lookup(db_query) = %d, want 3", got)
-	}
-	if got := cp.Lookup("db_write"); got != 7 {
-		t.Errorf("Lookup(db_write) = %d, want 7 (longest prefix wins)", got)
-	}
-	if got := cp.Lookup("db_write_batch"); got != 7 {
-		t.Errorf("Lookup(db_write_batch) = %d, want 7", got)
-	}
-	if got := cp.Lookup("slack_send"); got != 5 {
-		t.Errorf("Lookup(slack_send) = %d, want 5 (default)", got)
-	}
-}
-
-func TestCostProfile_NilProfile(t *testing.T) {
-	var cp *CostProfile
-	if got := cp.Lookup("anything"); got != 0 {
-		t.Errorf("Lookup on nil = %d, want 0", got)
-	}
-}
-
-func TestCostProfile_WildcardStar(t *testing.T) {
-	// A bare "*" should match everything.
-	cp := &CostProfile{
-		ToolCosts:   map[string]int{"*": 99},
-		DefaultCost: 1,
-	}
-	if got := cp.Lookup("anything"); got != 99 {
-		t.Errorf("Lookup(anything) with * = %d, want 99", got)
-	}
-}
-
-// ---------------------------------------------------------------------------
 // Context round-trip tests
 // ---------------------------------------------------------------------------
 
 func TestContext_RoundTrip(t *testing.T) {
-	info := &RequestInfo{Method: MethodToolsCall, ToolName: "test_tool", CostCredits: 42}
+	info := &RequestInfo{Method: MethodToolsCall, ToolName: "test_tool"}
 	ctx := WithInfo(context.Background(), info)
 	got := GetInfo(ctx)
 	if got == nil {
@@ -358,9 +288,6 @@ func TestContext_RoundTrip(t *testing.T) {
 	}
 	if got.ToolName != "test_tool" {
 		t.Errorf("ToolName = %q, want %q", got.ToolName, "test_tool")
-	}
-	if got.CostCredits != 42 {
-		t.Errorf("CostCredits = %d, want 42", got.CostCredits)
 	}
 }
 
@@ -376,13 +303,8 @@ func TestContext_Missing(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestMiddleware_MCPRequest(t *testing.T) {
-	cp := &CostProfile{
-		ToolCosts:   map[string]int{"web_search": 8},
-		DefaultCost: 5,
-	}
-
 	var captured *RequestInfo
-	handler := Middleware(DefaultMaxBodySize, cp)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := Middleware(DefaultMaxBodySize)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		captured = GetInfo(r.Context())
 		// Verify body is still readable.
 		body, _ := io.ReadAll(r.Body)
@@ -404,13 +326,10 @@ func TestMiddleware_MCPRequest(t *testing.T) {
 	if captured.ToolName != "web_search" {
 		t.Errorf("tool = %q, want web_search", captured.ToolName)
 	}
-	if captured.CostCredits != 8 {
-		t.Errorf("cost = %d, want 8", captured.CostCredits)
-	}
 }
 
 func TestMiddleware_NonMCPPassthrough(t *testing.T) {
-	handler := Middleware(DefaultMaxBodySize, nil)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := Middleware(DefaultMaxBodySize)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		info := GetInfo(r.Context())
 		if info != nil {
 			t.Errorf("expected nil info for non-MCP request, got %+v", info)
@@ -418,7 +337,6 @@ func TestMiddleware_NonMCPPassthrough(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
-	// GET request — should skip.
 	req := httptest.NewRequest(http.MethodGet, "/api/data", nil)
 	rr := httptest.NewRecorder()
 	handler.ServeHTTP(rr, req)
@@ -428,7 +346,7 @@ func TestMiddleware_NonMCPPassthrough(t *testing.T) {
 }
 
 func TestMiddleware_NonJSONContentType(t *testing.T) {
-	handler := Middleware(DefaultMaxBodySize, nil)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := Middleware(DefaultMaxBodySize)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		info := GetInfo(r.Context())
 		if info != nil {
 			t.Errorf("expected nil info for non-JSON content, got %+v", info)
@@ -445,38 +363,14 @@ func TestMiddleware_NonJSONContentType(t *testing.T) {
 	}
 }
 
-func TestMiddleware_DefaultCostForNonToolsCall(t *testing.T) {
-	cp := &CostProfile{DefaultCost: 5}
-
-	var captured *RequestInfo
-	handler := Middleware(DefaultMaxBodySize, cp)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		captured = GetInfo(r.Context())
-		w.WriteHeader(http.StatusOK)
-	}))
-
-	body := `{"jsonrpc":"2.0","id":1,"method":"tools/list"}`
-	req := httptest.NewRequest(http.MethodPost, "/mcp", strings.NewReader(body))
-	req.Header.Set("Content-Type", "application/json")
-	rr := httptest.NewRecorder()
-	handler.ServeHTTP(rr, req)
-
-	if captured == nil {
-		t.Fatal("expected context info for tools/list")
-	}
-	if captured.CostCredits != 5 {
-		t.Errorf("cost = %d, want 5 (default)", captured.CostCredits)
-	}
-}
-
 func TestMiddleware_MalformedJSONPassthrough(t *testing.T) {
 	called := false
-	handler := Middleware(DefaultMaxBodySize, nil)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := Middleware(DefaultMaxBodySize)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		called = true
 		info := GetInfo(r.Context())
 		if info != nil {
 			t.Error("expected nil info for malformed JSON")
 		}
-		// Body should still be readable.
 		body, _ := io.ReadAll(r.Body)
 		if string(body) != `{bad json` {
 			t.Errorf("body = %q, want {bad json", string(body))
@@ -497,7 +391,7 @@ func TestMiddleware_MalformedJSONPassthrough(t *testing.T) {
 func TestMiddleware_BodyReplayAfterParsing(t *testing.T) {
 	original := `{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"test","arguments":{"key":"value"}}}`
 
-	handler := Middleware(DefaultMaxBodySize, nil)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := Middleware(DefaultMaxBodySize)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			t.Fatalf("failed to read replayed body: %v", err)
@@ -515,8 +409,7 @@ func TestMiddleware_BodyReplayAfterParsing(t *testing.T) {
 }
 
 func TestMiddleware_OversizedSkipsParsingButPassesThrough(t *testing.T) {
-	cp := &CostProfile{DefaultCost: 5}
-	handler := Middleware(50, cp)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := Middleware(50)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		info := GetInfo(r.Context())
 		if info != nil {
 			t.Error("expected nil info for oversized body")
