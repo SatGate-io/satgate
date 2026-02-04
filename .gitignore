@@ -1,5 +1,6 @@
 # Binary releases
 dist/
+/satgate
 
 # Python
 sdk/python/venv/
@@ -10,8 +11,12 @@ __pycache__/
 *.pyo
 
 # Node
+node_modules/
 sdk/nodejs/node_modules/
 sdk/nodejs/dist/
+
+# Next.js build output
+.next/
 
 # OS
 .DS_Store

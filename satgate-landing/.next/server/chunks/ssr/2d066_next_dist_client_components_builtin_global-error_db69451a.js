@@ -1,3 +1,0 @@
-module.exports=[64671,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(7196);a.n(d("[project]/satgate-landing/node_modules/next/dist/client/components/builtin/global-error.js <module evaluation>"))},87748,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(7196);a.n(d("[project]/satgate-landing/node_modules/next/dist/client/components/builtin/global-error.js"))},92057,a=>{"use strict";a.i(64671);var b=a.i(87748);a.n(b)}];
-
-//# sourceMappingURL=2d066_next_dist_client_components_builtin_global-error_db69451a.js.map
