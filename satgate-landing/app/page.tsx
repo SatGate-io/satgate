@@ -28,11 +28,12 @@ const LandingPage = () => {
           
           {/* Desktop menu */}
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
-            <Link href="#features" className="hover:text-white transition">Features</Link>
             <Link href="/protect" className="hover:text-white transition">Protect Demo</Link>
             <Link href="/pay" className="hover:text-white transition">Pay Demo</Link>
-            <Link href="/dashboard" className="hover:text-white transition">Dashboard</Link>
-            <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a>
+            <Link href="/govern" className="hover:text-white transition">Govern</Link>
+            <Link href="#" className="hover:text-white transition">Pricing</Link>
+            <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
+            <a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud</a>
           </div>
           
           {/* Mobile menu button */}
@@ -54,13 +55,6 @@ const LandingPage = () => {
         >
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
             <Link 
-              href="#features" 
-              onClick={() => setMobileMenuOpen(false)} 
-              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
-            >
-              Features
-            </Link>
-            <Link 
               href="/protect" 
               onClick={() => setMobileMenuOpen(false)} 
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
@@ -75,11 +69,18 @@ const LandingPage = () => {
               Pay Demo
             </Link>
             <Link 
-              href="/dashboard" 
+              href="/govern" 
               onClick={() => setMobileMenuOpen(false)} 
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
-              Dashboard
+              Govern
+            </Link>
+            <Link 
+              href="#" 
+              onClick={() => setMobileMenuOpen(false)} 
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              Pricing
             </Link>
             <a 
               href="https://github.com/SatGate-io/satgate" 
@@ -88,7 +89,16 @@ const LandingPage = () => {
               onClick={() => setMobileMenuOpen(false)} 
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
-              GitHub
+              Docs
+            </a>
+            <a 
+              href="https://cloud.satgate.io" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)} 
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              Cloud
             </a>
           </div>
         </div>
