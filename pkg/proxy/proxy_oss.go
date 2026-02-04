@@ -31,6 +31,7 @@ import (
 	"github.com/satgate-io/satgate/pkg/governance"
 	"github.com/satgate-io/satgate/pkg/lightning"
 	"github.com/satgate-io/satgate/pkg/macaroon"
+	"github.com/satgate-io/satgate/pkg/mcp"
 )
 
 // Gateway is the OSS reverse proxy with capability token support.
@@ -472,6 +473,35 @@ func (g *Gateway) matchRoute(r *http.Request) *config.Route {
 
 // proxyRequest forwards the request to the upstream.
 func (g *Gateway) proxyRequest(w http.ResponseWriter, r *http.Request, route *config.Route) {
+	// MCP parsing: if the route has MCP enabled, parse the request body
+	// to extract tool-level metadata for cost attribution and telemetry.
+	if route.MCP != nil && route.MCP.Enabled {
+		maxBody := route.MCP.MaxBodySize
+		if maxBody <= 0 {
+			maxBody = mcp.DefaultMaxBodySize
+		}
+		cp := &mcp.CostProfile{
+			ToolCosts:   route.MCP.ToolCosts,
+			DefaultCost: route.MCP.DefaultCost,
+		}
+		info := mcp.Parse(r, maxBody)
+		if info != nil {
+			if info.Method == mcp.MethodToolsCall && info.ToolName != "" {
+				info.CostCredits = cp.Lookup(info.ToolName)
+			} else {
+				info.CostCredits = cp.DefaultCost
+			}
+			ctx := mcp.WithInfo(r.Context(), info)
+			r = r.WithContext(ctx)
+			log.Debug().
+				Str("route", route.Name).
+				Str("mcp.method", info.Method).
+				Str("mcp.tool", info.ToolName).
+				Int("mcp.cost", info.CostCredits).
+				Msg("MCP request parsed")
+		}
+	}
+
 	// Check for demo routes - return mock data instead of proxying
 	if demoResponse := g.getDemoResponse(route); demoResponse != nil {
 		w.Header().Set("Content-Type", "application/json")

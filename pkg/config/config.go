@@ -500,6 +500,16 @@ type CircuitBreaker struct {
 	HalfOpenMaxReqs int           `yaml:"halfOpenMaxReqs"`
 }
 
+// MCPConfig configures MCP (Model Context Protocol) request parsing for a route.
+// When enabled, the gateway parses JSON-RPC 2.0 request bodies to extract
+// tool-level metadata for cost attribution and telemetry.
+type MCPConfig struct {
+	Enabled     bool           `yaml:"enabled"`
+	ToolCosts   map[string]int `yaml:"toolCosts"`   // tool_name (or glob like "db_*") -> credits
+	DefaultCost int            `yaml:"defaultCost"` // fallback cost for unknown tools
+	MaxBodySize int64          `yaml:"maxBodySize"` // max bytes to buffer for parsing (default 1MB)
+}
+
 // Route defines how requests are matched and handled
 type Route struct {
 	Name        string      `yaml:"name"`
@@ -510,6 +520,7 @@ type Route struct {
 	Policy      RoutePolicy `yaml:"policy"`
 	Transform   *Transform  `yaml:"transform,omitempty"`
 	RateLimit   *RateLimit  `yaml:"rateLimit,omitempty"`
+	MCP         *MCPConfig  `yaml:"mcp,omitempty"` // MCP request parsing for tool-level cost attribution
 }
 
 // RouteMatch defines matching criteria
