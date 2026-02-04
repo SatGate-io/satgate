@@ -358,10 +358,12 @@ const LandingPage = () => {
               <span className="text-gray-600 md:hidden">↓</span>
               <div className="px-5 py-3 rounded-lg bg-green-900/30 border border-green-700/50 text-center min-w-[140px]">
                 <span className="text-green-400 font-medium">Your API</span>
+                <span className="text-gray-600 text-xs block">REST / MCP / GraphQL</span>
               </div>
             </div>
             <p className="text-center text-gray-500 text-sm mt-6">
               SatGate sits <span className="text-white">behind</span> your CDN/WAF (volumetric protection) and <span className="text-white">in front of</span> your API origin.
+              <br/>Works with <span className="text-white">MCP servers</span>, REST APIs, GraphQL — any HTTP endpoint.
             </p>
           </div>
 
