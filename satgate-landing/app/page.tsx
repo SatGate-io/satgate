@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock, DollarSign, Bot, GitBranch, Activity, RefreshCw, Menu, X } from 'lucide-react';
+import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock, DollarSign, Bot, GitBranch, Activity, RefreshCw, Menu, X, Eye, SlidersHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -31,7 +31,7 @@ const LandingPage = () => {
             <Link href="/protect" className="hover:text-white transition">Protect Demo</Link>
             <Link href="/pay" className="hover:text-white transition">Pay Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Govern</Link>
-            <Link href="#" className="hover:text-white transition">Pricing</Link>
+            <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
             <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
             <a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud</a>
           </div>
@@ -76,7 +76,7 @@ const LandingPage = () => {
               Govern
             </Link>
             <Link 
-              href="#" 
+              href="/pricing" 
               onClick={() => setMobileMenuOpen(false)} 
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
@@ -111,22 +111,21 @@ const LandingPage = () => {
           {/* Left: Copy */}
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-6">
-              <Zap size={12} /> v1.0 Now Live: Python SDK Support
+              <Zap size={12} /> Now Live: Enterprise Dashboard + Python SDK
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-              The Economic Layer for <br/>
+              Your AI Agents Are Spending Money.<br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-                Autonomous Agents
+                Do You Know How Much?
               </span>
-          </h1>
+            </h1>
             <p className="text-xl text-gray-400 mb-8 max-w-lg leading-relaxed">
-              Agents can't pass KYC. They can't hold bank accounts. 
-              SatGate gives them a <b>Lightning Wallet</b> and an <b>L402 Gateway</b> to buy data, API calls, and compute instantly—and route to the best provider based on price, latency, and availability.
+              SatGate is the <b>Economic Firewall</b> — see every API call, set budgets per agent, and monetize your APIs. One DNS change. Zero code changes.
             </p>
             <div className="flex gap-4">
-              <Link href="/pay" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center gap-2">
-                Try Demo <ArrowRight size={18} />
-              </Link>
+              <a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center gap-2">
+                Start Free →
+              </a>
               <button 
                 onClick={copyToClipboard}
                 className="border border-gray-700 px-8 py-3 rounded-lg font-bold hover:border-gray-500 transition font-mono flex items-center gap-2 group"
@@ -215,6 +214,72 @@ const LandingPage = () => {
           <p className="text-center text-gray-600 text-xs mt-8">
             L402 is the access-control primitive; settlement rails can vary. Lightning now—others pluggable.
           </p>
+        </div>
+      </section>
+
+      {/* Three Modes Section */}
+      <section className="py-20 px-6 border-b border-gray-800 bg-gradient-to-b from-gray-900/30 to-black">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-3">Three Modes. One Gateway.</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">Start with visibility. Add controls when you&apos;re ready. Monetize when the time is right.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {/* Observe */}
+            <div className="p-6 rounded-xl bg-gradient-to-br from-cyan-950/30 to-cyan-900/10 border border-cyan-800/30 hover:border-cyan-600/50 transition relative">
+              <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-cyan-900/50 border border-cyan-700/50 text-cyan-300 text-xs font-bold">
+                FREE
+              </div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 bg-cyan-900/50 rounded-lg">
+                  <Eye className="text-cyan-400" size={22} />
+                </div>
+                <h3 className="font-bold text-lg">Observe</h3>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                See every API call by agent, team, and cost. Usage attribution, cost center tagging, zero latency impact.
+              </p>
+            </div>
+
+            {/* Control */}
+            <div className="p-6 rounded-xl bg-gradient-to-br from-purple-950/30 to-purple-900/10 border border-purple-800/30 hover:border-purple-600/50 transition relative">
+              <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-purple-900/50 border border-purple-700/50 text-purple-300 text-xs font-bold">
+                $99/mo
+              </div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 bg-purple-900/50 rounded-lg">
+                  <SlidersHorizontal className="text-purple-400" size={22} />
+                </div>
+                <h3 className="font-bold text-lg">Control</h3>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Set budgets per agent, per team, per API. Hard stops when limits hit. Real-time alerts.
+              </p>
+            </div>
+
+            {/* Charge */}
+            <div className="p-6 rounded-xl bg-gradient-to-br from-yellow-950/30 to-yellow-900/10 border border-yellow-800/30 hover:border-yellow-600/50 transition relative">
+              <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-yellow-900/50 border border-yellow-700/50 text-yellow-300 text-xs font-bold">
+                Custom
+              </div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 bg-yellow-900/50 rounded-lg">
+                  <Zap className="text-yellow-400" size={22} />
+                </div>
+                <h3 className="font-bold text-lg">Charge</h3>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Monetize your APIs with per-request micropayments. L402 Lightning-native. Instant settlement.
+              </p>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <Link href="/govern" className="text-sm text-purple-400 hover:text-purple-300 transition underline underline-offset-4">
+              See how enterprises use Govern mode →
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -669,10 +734,18 @@ curl -H <span className="text-green-400">"Authorization: L402 &lt;macaroon&gt;:&
       <footer className="py-20 border-t border-gray-800">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-6">Ready to monetize the robots?</h2>
-            <a href="mailto:contact@satgate.io" className="inline-block bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-10 py-4 rounded-full font-bold text-lg hover:opacity-90 transition shadow-lg shadow-purple-500/20">
-              Get in Touch
-            </a>
+            <h2 className="text-3xl font-bold mb-6">Ready to see what your agents are spending?</h2>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
+              <a href="mailto:contact@satgate.io" className="inline-block bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-10 py-4 rounded-full font-bold text-lg hover:opacity-90 transition shadow-lg shadow-purple-500/20">
+                Get in Touch
+              </a>
+              <a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="inline-block bg-white text-black px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-200 transition">
+                Start Free →
+              </a>
+            </div>
+            <p className="text-gray-500 text-sm">
+              Or <Link href="/govern" className="text-purple-400 hover:text-purple-300 transition underline underline-offset-4">learn how enterprises are controlling AI agent spend →</Link>
+            </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 py-12 border-t border-gray-800">
@@ -689,6 +762,10 @@ curl -H <span className="text-green-400">"Authorization: L402 &lt;macaroon&gt;:&
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
                 <li><a href="https://github.com/SatGate-io/satgate#-quick-start" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Documentation</a></li>
+                <li><Link href="/govern" className="hover:text-white transition">Govern</Link></li>
+                <li><Link href="/design-partners" className="hover:text-white transition">Design Partners</Link></li>
+                <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
+                <li><a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud Dashboard</a></li>
               </ul>
             </div>
             <div>
