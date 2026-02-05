@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowLeft, Shield, Lock, Eye, AlertTriangle, Key, Zap } from 'lucide-react';
+import { ArrowLeft, Shield, Lock, Eye, AlertTriangle, Key, Zap, CheckCircle, User, Calendar, Code, GitBranch } from 'lucide-react';
 
 export const metadata = {
   title: 'Security - SatGate™',
@@ -152,6 +152,89 @@ export default function SecurityPage() {
             </a>
           </section>
 
+          {/* Security Practices */}
+          <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Code className="text-blue-400" size={24} />
+              <h2 className="text-xl font-bold text-white m-0">Security Practices</h2>
+            </div>
+            <ul className="text-gray-500 text-sm space-y-3">
+              <li className="flex items-start gap-2">
+                <CheckCircle className="text-green-400 mt-0.5 flex-shrink-0" size={16} />
+                <span><strong className="text-gray-300">Dependency Management:</strong> Automated updates via Dependabot, vulnerability scanning via GitHub Security Advisories, Go modules with checksum verification</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle className="text-green-400 mt-0.5 flex-shrink-0" size={16} />
+                <span><strong className="text-gray-300">Code Quality:</strong> Required code review for all changes, automated testing on every PR, static analysis and linting enforced</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle className="text-green-400 mt-0.5 flex-shrink-0" size={16} />
+                <span><strong className="text-gray-300">Infrastructure:</strong> TLS 1.3 required, no sensitive data persistence in gateway by default, Kubernetes-native with pod security standards</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle className="text-green-400 mt-0.5 flex-shrink-0" size={16} />
+                <span><strong className="text-gray-300">Minimal Attack Surface:</strong> Stateless gateway design, minimal dependency footprint, secrets never transit the gateway layer</span>
+              </li>
+            </ul>
+          </section>
+
+          {/* Leadership */}
+          <section className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-800/30 rounded-xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <User className="text-blue-400" size={24} />
+              <h2 className="text-xl font-bold text-white m-0">Leadership</h2>
+            </div>
+            <p className="text-gray-400 leading-relaxed mb-4">
+              SatGate was founded by{' '}
+              <a 
+                href="https://linkedin.com/in/waynemattadeen" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:text-blue-300"
+              >
+                Wayne Mattadeen
+              </a>
+              , a cybersecurity executive with <strong className="text-gray-300">27+ years of experience</strong> across 
+              Deloitte, Accenture, and EY—including partner-level roles focused on enterprise security architecture and Zero Trust.
+            </p>
+            <p className="text-gray-400 leading-relaxed m-0">
+              Security isn't something we're learning. It's where we come from.
+            </p>
+          </section>
+
+          {/* Compliance Roadmap */}
+          <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Calendar className="text-purple-400" size={24} />
+              <h2 className="text-xl font-bold text-white m-0">Compliance Roadmap</h2>
+            </div>
+            <p className="text-gray-400 leading-relaxed mb-4">
+              We're building toward formal certifications as we scale:
+            </p>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <CheckCircle className="text-green-400 flex-shrink-0" size={18} />
+                <span className="text-gray-300">Responsible disclosure program</span>
+                <span className="text-green-400 text-sm ml-auto">Active</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="text-green-400 flex-shrink-0" size={18} />
+                <span className="text-gray-300">Automated vulnerability scanning</span>
+                <span className="text-green-400 text-sm ml-auto">Active</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <GitBranch className="text-yellow-400 flex-shrink-0" size={18} />
+                <span className="text-gray-300">Third-party penetration test</span>
+                <span className="text-yellow-400 text-sm ml-auto">Q2 2026</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <GitBranch className="text-gray-500 flex-shrink-0" size={18} />
+                <span className="text-gray-400">SOC 2 Type I</span>
+                <span className="text-gray-500 text-sm ml-auto">Post-revenue</span>
+              </div>
+            </div>
+          </section>
+
           <section>
             <h2 className="text-2xl font-bold text-white mb-4">Best Practices</h2>
             <ul className="list-disc list-inside text-gray-400 space-y-2">
@@ -172,12 +255,21 @@ export default function SecurityPage() {
               Found a security vulnerability? We appreciate responsible disclosure. Please report 
               security issues privately before public disclosure.
             </p>
-            <p className="text-gray-400 leading-relaxed m-0">
+            <p className="text-gray-400 leading-relaxed mb-4">
               Email:{' '}
-              <a href="mailto:contact@satgate.io" className="text-yellow-400 hover:text-yellow-300 font-mono">
-                contact@satgate.io
+              <a href="mailto:security@satgate.io" className="text-yellow-400 hover:text-yellow-300 font-mono">
+                security@satgate.io
               </a>
             </p>
+            <div className="mt-4 pt-4 border-t border-yellow-800/30">
+              <p className="text-gray-500 text-sm mb-2"><strong className="text-gray-400">Our commitment:</strong></p>
+              <ul className="text-gray-500 text-sm space-y-1">
+                <li>• Acknowledge receipt within 48 hours</li>
+                <li>• Provide initial assessment within 7 days</li>
+                <li>• Work with you on coordinated disclosure</li>
+                <li>• Credit you publicly (unless you prefer anonymity)</li>
+              </ul>
+            </div>
           </section>
 
           <section>
