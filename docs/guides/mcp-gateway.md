@@ -119,8 +119,9 @@ Agents present this token on every request. SatGate verifies it locally (sub-mil
 - ✅ Token scoping by URL path
 - ✅ Full audit trail
 
-### Coming Soon (MCP-Aware)
-- 🔜 **Per-tool cost attribution** — parse MCP tool calls to attribute costs at the tool level, not just the endpoint level
+### MCP-Aware (SatGate Enterprise)
+- ✅ **Per-tool cost attribution** — parses MCP tool calls to attribute costs at the tool level, not just the endpoint level. Configure per-tool cost profiles with wildcard matching.
+- ✅ **Tool-level budget enforcement** — set budgets per tool, per agent, per team. Hard stops when budgets are spent.
 - 🔜 **Tool-level access control** — scope tokens to specific MCP tools (e.g., "this agent can call `search` but not `delete`")
 - 🔜 **Tool marketplace** — publish MCP tools with per-call pricing, monetized via L402 micropayments
 
