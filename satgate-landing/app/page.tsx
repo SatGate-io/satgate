@@ -669,6 +669,7 @@ curl -H <span className="text-green-400">"Authorization: L402 &lt;macaroon&gt;:&
                 <li><Link href="/govern" className="hover:text-white transition">Govern</Link></li>
                 <li><Link href="/design-partners" className="hover:text-white transition">Design Partners</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
+                <li><Link href="/compare" className="hover:text-white transition">Compare</Link></li>
                 <li><a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud Dashboard</a></li>
               </ul>
             </div>
