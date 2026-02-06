@@ -226,7 +226,7 @@ const LandingPage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {/* Observe */}
+            {/* Free (Observe) */}
             <div className="p-6 rounded-xl bg-gradient-to-br from-cyan-950/30 to-cyan-900/10 border border-cyan-800/30 hover:border-cyan-600/50 transition relative">
               <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-cyan-900/50 border border-cyan-700/50 text-cyan-300 text-xs font-bold">
                 FREE
@@ -235,15 +235,15 @@ const LandingPage = () => {
                 <div className="p-2.5 bg-cyan-900/50 rounded-lg">
                   <Eye className="text-cyan-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Observe</h3>
+                <h3 className="font-bold text-lg">Free</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                See every API call by agent, team, and cost. Usage attribution, cost center tagging, zero latency impact.
+                <span className="text-cyan-400 font-medium">Observe mode.</span> See every API call by agent, team, and cost. Usage attribution, cost center tagging, zero latency impact.
               </p>
             </div>
 
-            {/* Control */}
-            <div className="p-6 rounded-xl bg-gradient-to-br from-purple-950/30 to-purple-900/10 border border-purple-800/30 hover:border-purple-600/50 transition relative">
+            {/* Pro (Control + Charge) */}
+            <div className="p-6 rounded-xl bg-gradient-to-br from-purple-950/30 to-purple-900/10 border-2 border-purple-500/50 hover:border-purple-400/70 transition relative">
               <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-purple-900/50 border border-purple-700/50 text-purple-300 text-xs font-bold">
                 $99/mo
               </div>
@@ -251,33 +251,33 @@ const LandingPage = () => {
                 <div className="p-2.5 bg-purple-900/50 rounded-lg">
                   <SlidersHorizontal className="text-purple-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Control</h3>
+                <h3 className="font-bold text-lg">Pro</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Set budgets per agent, per team, per API. Hard stops when limits hit. Real-time alerts.
+                <span className="text-purple-400 font-medium">Control + Charge.</span> Set budgets per agent, team, API. Hard stops when limits hit. Plus L402 monetization for your APIs.
               </p>
             </div>
 
-            {/* Charge */}
-            <div className="p-6 rounded-xl bg-gradient-to-br from-yellow-950/30 to-yellow-900/10 border border-yellow-800/30 hover:border-yellow-600/50 transition relative">
-              <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-yellow-900/50 border border-yellow-700/50 text-yellow-300 text-xs font-bold">
+            {/* Enterprise */}
+            <div className="p-6 rounded-xl bg-gradient-to-br from-green-950/30 to-green-900/10 border border-green-800/30 hover:border-green-600/50 transition relative">
+              <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-green-900/50 border border-green-700/50 text-green-300 text-xs font-bold">
                 Custom
               </div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="p-2.5 bg-yellow-900/50 rounded-lg">
-                  <Zap className="text-yellow-400" size={22} />
+                <div className="p-2.5 bg-green-900/50 rounded-lg">
+                  <Shield className="text-green-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Charge</h3>
+                <h3 className="font-bold text-lg">Enterprise</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Monetize your APIs with per-request micropayments. L402 Lightning-native. Instant settlement.
+                <span className="text-green-400 font-medium">Full governance.</span> Unlimited requests, hybrid/on-prem deployment, SSO/SCIM, audit trails, SOC 2 compliance, dedicated support.
               </p>
             </div>
           </div>
 
           <div className="text-center">
-            <Link href="/govern" className="text-sm text-purple-400 hover:text-purple-300 transition underline underline-offset-4">
-              See how enterprises use Govern mode →
+            <Link href="/pricing" className="text-sm text-purple-400 hover:text-purple-300 transition underline underline-offset-4">
+              See full pricing details →
             </Link>
           </div>
         </div>
