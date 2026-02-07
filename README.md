@@ -5,7 +5,8 @@
 <h1 align="center">SatGate</h1>
 
 <p align="center">
-  <strong>The Open Source Economic Firewall for APIs</strong>
+  <strong>The Economic Firewall for AI Agents</strong><br/>
+  <em>Hard budget enforcement · Per-tool cost attribution · L402 micropayments</em>
 </p>
 
 <p align="center">
@@ -16,82 +17,102 @@
 </p>
 
 <p align="center">
+  <a href="#the-problem">Why</a> •
   <a href="#features">Features</a> •
   <a href="#quick-start">Quick Start</a> •
   <a href="#documentation">Docs</a> •
-  <a href="#architecture">Architecture</a> •
-  <a href="https://satgate.io">Website</a>
+  <a href="https://satgate.io">Website</a> •
+  <a href="https://satgate.io/blog/why-routing-isnt-governance">Blog</a>
 </p>
 
 ---
 
+## The Problem
+
+AI agents are making API calls autonomously. They spawn sub-agents, call MCP tools, and run overnight while you sleep.
+
+Your existing stack answers: *"Is this request authenticated?"*
+
+Nobody answers: **"Should this agent spend this?"**
+
+```
+✓ Network Firewall    → "Can this packet enter?"
+✓ Application Firewall → "Is this request safe?"
+? Economic Firewall    → "Should this agent spend this?"
+```
+
+That's the gap. SatGate fills it.
+
 ## What is SatGate?
 
-SatGate is an **Economic Firewall**—an API gateway that adds cryptographic capability verification and payment protocols to any backend. It's designed for the agentic web, where AI agents and automated systems need secure, verifiable access to APIs.
+SatGate is an open-source API gateway that adds **economic governance** to any HTTP endpoint. Drop it in front of your APIs — it handles authentication, budget enforcement, cost attribution, and optional micropayments.
 
-**Protection by default. Economics optional.**
+**Not another routing layer.** Routing gateways (Bifrost, LiteLLM, Portkey) optimize *which provider* handles a call. SatGate governs *whether the call should happen at all* based on budgets, policies, and cost.
+
+Use them together:
+
+```
+Agent → SatGate (economic governance) → Routing Gateway → LLM Providers
+```
 
 ## Features
 
-- 🛡️ **Capability Tokens (Macaroons)** — Cryptographic API keys with built-in caveats, delegation, and instant revocation
-- ⚡ **L402 Protocol** — Native Bitcoin Lightning payments for API monetization
-- 🔒 **Default Protection** — All routes require valid credentials unless explicitly public
-- 🚀 **<50ms Latency** — Lightweight proxy with minimal overhead
-- 📦 **Self-Hosted** — Run on your infrastructure with full control
-- 🔌 **Drop-in** — Works with any HTTP backend, no code changes required
+- 🛡️ **Capability Tokens (Macaroons)** — Cryptographic credentials with built-in caveats, delegation, and instant revocation. Not API keys — tokens that agents can safely sub-delegate.
+- 🎯 **MCP-Aware** — Parses MCP JSON-RPC tool calls. Know that Agent X spent $47 on `search_database` and $12 on `send_email` — not just "1,000 requests."
+- 💰 **Budget Enforcement** — Hard stops per agent, team, or API. When the budget hits zero, requests are *blocked*. Not logged. Not alerted. Blocked.
+- ⚡ **L402 Protocol** — Native Bitcoin Lightning micropayments for API monetization. Sub-cent pricing that's uneconomical on card rails.
+- 🔒 **Default-Deny** — All routes require valid credentials unless explicitly public. Zero Trust by design.
+- 🚀 **<50ms Overhead** — Lightweight Go proxy. Adds governance without adding latency.
+- 📦 **Self-Hosted** — Your infrastructure, your rules. Single binary, Docker, or Kubernetes.
+- 🔌 **Drop-in** — Works with any HTTP backend. REST, GraphQL, MCP servers. No code changes.
 
 ## Quick Start
 
 ### 60-Second Demo
 
 ```bash
-# Download the binary (macOS Apple Silicon shown — see docs for other platforms)
+# Download the binary (macOS Apple Silicon — see Releases for other platforms)
 curl -L https://github.com/satgate-io/satgate/releases/latest/download/satgate-darwin-arm64 -o satgate
 chmod +x satgate
 
-# Start with the example config (mock Lightning, auto-generated keys)
+# Start with example config (mock Lightning, auto-generated keys)
 export ADMIN_TOKEN=my-secret-token
 export LIGHTNING_BACKEND=mock
 ./satgate --config examples/gateway.yaml
 ```
 
-**In another terminal, try the three policies:**
+**Try the three policies:**
 
 ```bash
-# 1. Public route — no auth needed
+# 1. Public — no auth needed
 curl http://localhost:8080/health
 
-# 2. Protected route — mint a token, then use it
+# 2. Protected — mint a capability token, then use it
 curl -X POST http://localhost:8080/api/capability/mint \
   -H "X-Admin-Token: my-secret-token" \
   -H "Content-Type: application/json" \
   -d '{"scope": "api:read", "duration": "1h"}'
 
-# Save the token from the response, then:
+# Use the token:
 curl -H "Authorization: Bearer <your-token>" \
   http://localhost:8080/api/capability/ping
 
-# 3. Paid route — get an L402 challenge
+# 3. Paid — get an L402 challenge (HTTP 402 + Lightning invoice)
 curl http://localhost:8080/api/micro
-# Returns HTTP 402 with a Lightning invoice
 ```
 
-That's it. Protection → Capability → Payment. Three commands.
+Public → Protected → Paid. Three policies, one gateway.
 
 📖 **[Full Quick Start Guide →](docs/getting-started/quickstart.md)**
 
 ### Other Install Methods
 
-**Docker:**
-
 ```bash
+# Docker
 git clone https://github.com/satgate-io/satgate.git
 cd satgate && docker compose up -d
-```
 
-**Build from source:**
-
-```bash
+# Build from source
 git clone https://github.com/satgate-io/satgate.git
 cd satgate && go build -o satgate ./cmd/satgate
 ```
@@ -149,33 +170,43 @@ routes:
 | `capability` | Requires valid Macaroon | Protected API endpoints |
 | `l402` | Requires Lightning payment | Monetized endpoints |
 
+## How It's Different
+
+| | SatGate | Routing Gateways | Traditional API Gateways |
+|---|---|---|---|
+| **Primary concern** | Economic governance | Provider routing | Traffic management |
+| **Budget enforcement** | Hard caps (blocked at limit) | Soft alerts only | ❌ |
+| **MCP cost attribution** | Per-tool granularity | ❌ | ❌ |
+| **Credential model** | Macaroons (delegatable) | API keys | API keys / OAuth |
+| **Agent delegation** | Sub-tokens with reduced budgets | ❌ | ❌ |
+| **Micropayments** | L402 Lightning-native | ❌ | ❌ |
+| **Works alongside** | — | ✅ Use together | ✅ Use together |
+
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        SatGate                              │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │                    Request Flow                       │   │
-│  │                                                       │   │
-│  │   Request → Policy Check → Credential Verify → Proxy │   │
-│  │                    ↓                                  │   │
-│  │              [public: pass]                           │   │
-│  │              [capability: verify macaroon]            │   │
-│  │              [l402: verify payment proof]             │   │
-│  └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────┐
+│                    SatGate                        │
+│                                                   │
+│  Request → Route Match → Policy Check → Proxy    │
+│                             │                     │
+│              ┌──────────────┼──────────────┐     │
+│              │              │              │      │
+│          [public]    [capability]      [l402]     │
+│          pass        verify token     verify     │
+│                      check budget     payment    │
+│                      log MCP tool     + token    │
+└──────────────────────────────────────────────────┘
 ```
 
 **Key Concepts:**
 
-- **Macaroons**: Cryptographic bearer tokens with embedded caveats (expiry, scope, IP restrictions)
-- **Delegation**: Create child tokens with reduced permissions without contacting the server
-- **Revocation**: Instantly ban tokens via governance endpoints
-- **L402**: HTTP 402 Payment Required + Lightning invoice for machine-to-machine payments
+- **Macaroons**: Bearer tokens with embedded caveats (expiry, scope, budget, IP). Not API keys — they support *delegation* without server roundtrips.
+- **Delegation**: Agent A gives Agent B a sub-token with reduced permissions and a $50 budget cap. B can't escalate.
+- **MCP Parsing**: SatGate reads MCP JSON-RPC payloads to attribute costs to specific tool calls, not just HTTP endpoints.
+- **L402**: HTTP 402 + Lightning invoice for machine-to-machine payments. The protocol for the agent economy.
 
 ## SDKs
-
-Official SDKs for interacting with SatGate-protected APIs:
 
 | Language | Package | Docs |
 |----------|---------|------|
@@ -191,38 +222,27 @@ Official SDKs for interacting with SatGate-protected APIs:
 - [Self-Hosted Deployment](docs/SELF_HOSTED.md)
 - [API Reference](docs/API.md)
 
-## SatGate Enterprise
+## SatGate Cloud & Enterprise
 
-Need more? [SatGate Enterprise](https://cloud.satgate.io) adds:
+The open-source gateway handles protection and payments. [SatGate Cloud](https://cloud.satgate.io) adds the control plane:
 
-- 🏢 **Multi-tenant Control Plane** — Managed dashboard for teams
-- 📊 **Observe Policy** — Usage metering and FinOps visibility
-- 🎚️ **Control Policy** — Budget enforcement with Fiat402
-- 💰 **Charge Policy** — Stripe billing integration
-- 🔐 **Delegation v2** — Hierarchical tokens with budgets
+- 📊 **Observe** — Real-time dashboards, usage attribution, cost center tagging
+- 🎚️ **Control** — Budget enforcement with Fiat402 (enterprise credits)
 - 🤖 **SatGate Mint** — Zero-touch agent provisioning (K8s, AWS, OIDC)
-- 🌐 **Hybrid Mode** — Self-hosted gateway with cloud control plane
-- 📝 **Tamper-Evident Audit** — Compliance-ready logging
-- 🎫 **Support & SLA** — Enterprise support
+- 🏢 **Multi-tenant** — Team isolation, RBAC, SSO/SCIM
+- 📝 **Audit** — Tamper-evident logging, compliance exports
 
-[Contact Sales](mailto:contact@satgate.io) | [Start Free Trial](https://cloud.satgate.io)
+**[Start Free →](https://cloud.satgate.io)** (Observe mode is free, unlimited, forever)
 
 ## Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ```bash
-# Clone
 git clone https://github.com/satgate-io/satgate.git
 cd satgate
-
-# Install dependencies
 go mod download
-
-# Run tests
 go test ./...
-
-# Build
 go build -o satgate ./cmd/satgate
 ```
 
@@ -230,14 +250,15 @@ go build -o satgate ./cmd/satgate
 
 Apache License 2.0 — see [LICENSE](LICENSE) for details.
 
-## Community
+## Links
 
+- 🌐 [satgate.io](https://satgate.io)
+- 📝 [Blog](https://satgate.io/blog)
 - 🐦 [Twitter](https://twitter.com/satgate_io)
-- 💬 [Discord](https://discord.gg/satgate)
-- 📧 [Email](mailto:hello@satgate.io)
+- 📧 [contact@satgate.io](mailto:contact@satgate.io)
 
 ---
 
 <p align="center">
-  <sub>Built with ⚡ by <a href="https://satgate.io">SatGate</a></sub>
+  <sub>Built with ⚡ by <a href="https://satgate.io">SatGate</a> — The Economic Firewall</sub>
 </p>
