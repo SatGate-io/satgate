@@ -101,8 +101,8 @@ func main() {
 			log.Fatal().Err(err).Msg("Failed to generate random root key")
 		}
 		rootKey = hex.EncodeToString(keyBytes)
-		log.Warn().Msg("CAPABILITY_ROOT_KEY not set - using auto-generated key (demo mode)")
-		log.Warn().Msg("Tokens will NOT persist across restarts. Set CAPABILITY_ROOT_KEY for production.")
+		log.Error().Msg("SECURITY WARNING: Using ephemeral root key. Set CAPABILITY_ROOT_KEY for production use.")
+		log.Error().Msg("Tokens will NOT persist across restarts. This is NOT safe for production.")
 	}
 
 	log.Info().Bool("key_configured", rootKey != "").
