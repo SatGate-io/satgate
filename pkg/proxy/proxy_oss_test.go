@@ -48,7 +48,7 @@ func newTestGatewayWithUpstream(t *testing.T, upstream *httptest.Server, policyK
 	t.Helper()
 	cfg := &config.Config{
 		Server: config.ServerConfig{Listen: ":8080"},
-		Admin:  config.AdminConfig{Token: "admin-secret"},
+		Admin:  config.AdminConfig{Token: "admin-secret", CORSAllowedOrigins: []string{"https://example.com"}},
 		Upstreams: map[string]config.Upstream{
 			"backend": {URL: upstream.URL, Timeout: 10 * time.Second},
 		},
@@ -316,7 +316,7 @@ func TestCapabilityPolicy_ScopeEnforcement(t *testing.T) {
 
 	cfg := &config.Config{
 		Server: config.ServerConfig{Listen: ":8080"},
-		Admin:  config.AdminConfig{Token: "admin-secret"},
+		Admin:  config.AdminConfig{Token: "admin-secret", CORSAllowedOrigins: []string{"https://example.com"}},
 		Upstreams: map[string]config.Upstream{
 			"backend": {URL: upstream.URL},
 		},
@@ -359,7 +359,7 @@ func TestL402Policy_NoToken_Returns402(t *testing.T) {
 
 	cfg := &config.Config{
 		Server: config.ServerConfig{Listen: ":8080"},
-		Admin:  config.AdminConfig{Token: "admin-secret"},
+		Admin:  config.AdminConfig{Token: "admin-secret", CORSAllowedOrigins: []string{"https://example.com"}},
 		Upstreams: map[string]config.Upstream{
 			"backend": {URL: upstream.URL},
 		},
@@ -847,6 +847,7 @@ func TestGovernanceGraph_ReturnsData(t *testing.T) {
 	gw, _ := newTestGatewayWithUpstream(t, upstream, "public")
 
 	req := httptest.NewRequest("GET", "/api/governance/graph", nil)
+	req.Header.Set("X-Admin-Token", "admin-secret")
 	w := httptest.NewRecorder()
 	gw.ServeHTTP(w, req)
 
