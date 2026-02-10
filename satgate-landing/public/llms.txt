@@ -89,5 +89,4 @@ Lightning Network now—others pluggable.
 
 ## Contact
 - Email: contact@satgate.io
-- Twitter/X: @SatGateIO
 
