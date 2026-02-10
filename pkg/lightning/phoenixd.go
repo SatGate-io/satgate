@@ -49,7 +49,7 @@ func (p *PhoenixdProvider) CreateInvoice(amountSats int64, memo string) (*Invoic
 		return nil, fmt.Errorf("failed to generate preimage: %w", err)
 	}
 	preimage := hex.EncodeToString(preimageBytes)
-	
+
 	// Calculate payment hash (used as fallback if API doesn't return one)
 	paymentHashBytes := sha256.Sum256(preimageBytes)
 	_ = paymentHashBytes // Used below as fallback
@@ -187,4 +187,3 @@ func (p *PhoenixdProvider) GetInfo() (*NodeInfo, error) {
 		Synced:  true,
 	}, nil
 }
-

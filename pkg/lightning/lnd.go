@@ -21,7 +21,7 @@ type LNDProvider struct {
 }
 
 // NewLNDProvider creates a new LND provider
-// 
+//
 // Security: TLS verification is ENABLED by default. You must provide either:
 // - tlsCert: Base64-encoded PEM certificate for custom CA
 // - tlsServerName: Expected server name for SNI verification
@@ -36,7 +36,7 @@ func NewLNDProvider(config map[string]interface{}) (*LNDProvider, error) {
 	if macaroon == "" {
 		return nil, fmt.Errorf("LND requires macaroon")
 	}
-	
+
 	// LND REST API requires hex-encoded macaroon
 	// Support both base64-encoded and hex-encoded input
 	if _, err := hex.DecodeString(macaroon); err != nil {
@@ -63,7 +63,7 @@ func NewLNDProvider(config map[string]interface{}) (*LNDProvider, error) {
 	// If TLS cert is provided, use it for CA verification
 	if tlsCert := getConfigString(config, "tlsCert"); tlsCert != "" {
 		certPool := x509.NewCertPool()
-		
+
 		// Support both base64-encoded and raw PEM
 		var certBytes []byte
 		decoded, err := base64.StdEncoding.DecodeString(tlsCert)
@@ -73,7 +73,7 @@ func NewLNDProvider(config map[string]interface{}) (*LNDProvider, error) {
 		} else {
 			certBytes = decoded
 		}
-		
+
 		if ok := certPool.AppendCertsFromPEM(certBytes); !ok {
 			return nil, fmt.Errorf("failed to add TLS cert to pool - invalid PEM format")
 		}
@@ -232,14 +232,14 @@ func (l *LNDProvider) GetInfo() (*NodeInfo, error) {
 	defer resp.Body.Close()
 
 	var result struct {
-		Alias           string `json:"alias"`
-		IdentityPubkey  string `json:"identity_pubkey"`
-		Chains          []struct {
+		Alias          string `json:"alias"`
+		IdentityPubkey string `json:"identity_pubkey"`
+		Chains         []struct {
 			Chain   string `json:"chain"`
 			Network string `json:"network"`
 		} `json:"chains"`
-		BlockHeight     int64 `json:"block_height"`
-		SyncedToChain   bool  `json:"synced_to_chain"`
+		BlockHeight   int64 `json:"block_height"`
+		SyncedToChain bool  `json:"synced_to_chain"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, err
@@ -258,4 +258,3 @@ func (l *LNDProvider) GetInfo() (*NodeInfo, error) {
 		Synced:      result.SyncedToChain,
 	}, nil
 }
-

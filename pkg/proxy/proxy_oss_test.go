@@ -938,9 +938,9 @@ func TestDemoRoutes_ReturnMockData(t *testing.T) {
 
 func TestExtractBearerToken(t *testing.T) {
 	tests := []struct {
-		name  string
-		auth  string
-		want  string
+		name string
+		auth string
+		want string
 	}{
 		{"bearer", "Bearer abc123", "abc123"},
 		{"no prefix", "raw-token", "raw-token"},
