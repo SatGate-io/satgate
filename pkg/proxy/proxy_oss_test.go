@@ -881,11 +881,11 @@ func TestMetrics_Tracked(t *testing.T) {
 	}
 
 	metrics := gw.GetMetrics()
-	if metrics.TotalRequests < 3 {
-		t.Errorf("expected at least 3 total requests, got %d", metrics.TotalRequests)
+	if metrics.TotalRequests.Load() < 3 {
+		t.Errorf("expected at least 3 total requests, got %d", metrics.TotalRequests.Load())
 	}
-	if metrics.TotalPublic < 3 {
-		t.Errorf("expected at least 3 public requests, got %d", metrics.TotalPublic)
+	if metrics.TotalPublic.Load() < 3 {
+		t.Errorf("expected at least 3 public requests, got %d", metrics.TotalPublic.Load())
 	}
 }
 

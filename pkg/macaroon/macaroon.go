@@ -226,8 +226,6 @@ func (s *Service) verifyCaveat(caveat string) error {
 		// Unknown caveats are ignored (forward compatibility)
 		return nil
 	}
-
-	return nil
 }
 
 // HasScope checks if the macaroon has a specific scope
