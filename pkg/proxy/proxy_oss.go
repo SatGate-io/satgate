@@ -329,7 +329,6 @@ func (g *Gateway) verifyL402Token(ctx context.Context, token string, route *conf
 	log.Info().
 		Int("macaroon_len", len(macaroonStr)).
 		Int("preimage_len", len(preimageHex)).
-		Str("preimage", preimageHex).
 		Msg("verifyL402Token: parsed token components")
 
 	// Verify macaroon signature
@@ -351,7 +350,7 @@ func (g *Gateway) verifyL402Token(ctx context.Context, token string, route *conf
 	// This is the definitive proof of payment - no need to query the Lightning node
 	preimageBytes, err := hex.DecodeString(preimageHex)
 	if err != nil {
-		log.Warn().Err(err).Str("preimage", preimageHex).Msg("L402: invalid preimage hex")
+		log.Warn().Err(err).Msg("L402: invalid preimage hex")
 		return false
 	}
 
@@ -444,7 +443,8 @@ func (g *Gateway) handleCheckPayment(w http.ResponseWriter, r *http.Request) {
 		log.Debug().Err(err).Str("payment_hash", paymentHash).Msg("Error checking payment status")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK) // Return 200 with paid=false on errors
-		fmt.Fprintf(w, `{"paid":false,"error":"%s"}`, err.Error())
+		resp, _ := json.Marshal(map[string]interface{}{"paid": false, "error": "payment verification failed"})
+		w.Write(resp)
 		return
 	}
 
