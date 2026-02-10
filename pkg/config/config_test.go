@@ -659,8 +659,8 @@ func TestRouteMatches_Methods(t *testing.T) {
 	}{
 		{"GET", true},
 		{"POST", true},
-		{"get", true},   // case insensitive
-		{"post", true},  // case insensitive
+		{"get", true},  // case insensitive
+		{"post", true}, // case insensitive
 		{"PUT", false},
 		{"DELETE", false},
 	}
@@ -876,10 +876,10 @@ func TestIsPrivateIP(t *testing.T) {
 		{"10.0.0.1", true},
 		{"172.16.0.1", true},
 		{"192.168.1.1", true},
-		{"169.254.1.1", true},   // link-local
-		{"8.8.8.8", false},      // public
-		{"1.1.1.1", false},      // public
-		{"example.com", false},  // DNS name, not IP
+		{"169.254.1.1", true},  // link-local
+		{"8.8.8.8", false},     // public
+		{"1.1.1.1", false},     // public
+		{"example.com", false}, // DNS name, not IP
 	}
 	for _, tt := range tests {
 		t.Run(tt.host, func(t *testing.T) {
@@ -895,11 +895,11 @@ func TestIsPrivateIP(t *testing.T) {
 
 func TestParseURL(t *testing.T) {
 	tests := []struct {
-		url       string
-		scheme    string
-		host      string
-		hasUser   bool
-		wantErr   bool
+		url     string
+		scheme  string
+		host    string
+		hasUser bool
+		wantErr bool
 	}{
 		{"https://api.example.com", "https", "api.example.com", false, false},
 		{"http://api.example.com:8080/path", "http", "api.example.com:8080", false, false},

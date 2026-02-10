@@ -14,10 +14,10 @@ type Service struct {
 	store Store // Backing store (Redis or memory)
 
 	// Local cache for hot path (IsBanned checks)
-	banned  map[string]BanRecord
-	usage   map[string]*UsageStats
-	minted  map[string]*MintedToken
-	mu      sync.RWMutex
+	banned map[string]BanRecord
+	usage  map[string]*UsageStats
+	minted map[string]*MintedToken
+	mu     sync.RWMutex
 
 	// Counters for dashboard stats
 	blockedRequests int64 // Unpaid requests (402s)
@@ -27,13 +27,13 @@ type Service struct {
 
 // MintedToken tracks a minted token
 type MintedToken struct {
-	Signature  string
-	Scope      string
-	CreatedAt  time.Time
-	ExpiresAt  time.Time
-	ParentSig  string // Parent token signature (empty for root tokens)
-	Depth      int    // 0 = root, 1 = minted, 2+ = delegated
-	Label      string // Human-readable label
+	Signature string
+	Scope     string
+	CreatedAt time.Time
+	ExpiresAt time.Time
+	ParentSig string // Parent token signature (empty for root tokens)
+	Depth     int    // 0 = root, 1 = minted, 2+ = delegated
+	Label     string // Human-readable label
 }
 
 // BanRecord represents a banned token
@@ -46,24 +46,24 @@ type BanRecord struct {
 
 // UsageStats tracks token usage
 type UsageStats struct {
-	Signature    string
+	Signature     string
 	TotalRequests int64
-	LastUsed     time.Time
-	Routes       map[string]int64 // route -> count
+	LastUsed      time.Time
+	Routes        map[string]int64 // route -> count
 }
 
 // TokenInfo represents token status for API responses
 type TokenInfo struct {
-	Signature     string            `json:"signature"`
-	Status        string            `json:"status"`
-	Scope         string            `json:"scope,omitempty"`
-	CreatedAt     *time.Time        `json:"createdAt,omitempty"`
-	ExpiresAt     *time.Time        `json:"expiresAt,omitempty"`
-	TotalRequests int64             `json:"totalRequests"`
-	LastUsed      *time.Time        `json:"lastUsed,omitempty"`
-	Routes        map[string]int64  `json:"routes,omitempty"`
-	BannedAt      *time.Time        `json:"bannedAt,omitempty"`
-	BanReason     string            `json:"banReason,omitempty"`
+	Signature     string           `json:"signature"`
+	Status        string           `json:"status"`
+	Scope         string           `json:"scope,omitempty"`
+	CreatedAt     *time.Time       `json:"createdAt,omitempty"`
+	ExpiresAt     *time.Time       `json:"expiresAt,omitempty"`
+	TotalRequests int64            `json:"totalRequests"`
+	LastUsed      *time.Time       `json:"lastUsed,omitempty"`
+	Routes        map[string]int64 `json:"routes,omitempty"`
+	BannedAt      *time.Time       `json:"bannedAt,omitempty"`
+	BanReason     string           `json:"banReason,omitempty"`
 }
 
 // NewService creates a new governance service with the given store
@@ -543,7 +543,7 @@ func (s *Service) GetGraph() GraphResponse {
 		constraints := []string{
 			fmt.Sprintf("scope = %s", token.Scope),
 		}
-		
+
 		// Add expiry as relative time
 		expiresIn := time.Until(token.ExpiresAt)
 		if expiresIn > 0 {
@@ -669,4 +669,3 @@ func (s *Service) Close() error {
 func (s *Service) GetStore() Store {
 	return s.store
 }
-

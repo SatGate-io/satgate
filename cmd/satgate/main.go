@@ -87,7 +87,7 @@ func main() {
 	rootKey := cfg.Admin.CapabilityRootKey
 	log.Info().Bool("key_configured", rootKey != "").
 		Msg("Root key from config")
-	
+
 	if rootKey == "" || rootKey == "${CAPABILITY_ROOT_KEY}" {
 		// YAML didn't expand the env var, try direct read
 		rootKey = os.Getenv("CAPABILITY_ROOT_KEY")

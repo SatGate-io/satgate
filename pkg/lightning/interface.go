@@ -9,13 +9,13 @@ import (
 type Provider interface {
 	// CreateInvoice generates a new Lightning invoice
 	CreateInvoice(amountSats int64, memo string) (*Invoice, error)
-	
+
 	// CheckPayment verifies if a payment has been received
 	CheckPayment(paymentHash string) (bool, error)
-	
+
 	// GetBalance returns the node's balance in sats
 	GetBalance() (int64, error)
-	
+
 	// GetInfo returns node information
 	GetInfo() (*NodeInfo, error)
 }
@@ -27,16 +27,16 @@ type Invoice struct {
 	Preimage    string // Hex-encoded preimage (for verification)
 	Amount      int64  // Amount in sats
 	Memo        string
-	ExpiresAt   int64  // Unix timestamp
+	ExpiresAt   int64 // Unix timestamp
 }
 
 // NodeInfo contains Lightning node information
 type NodeInfo struct {
-	Alias      string
-	PubKey     string
-	Network    string // mainnet, testnet, signet
+	Alias       string
+	PubKey      string
+	Network     string // mainnet, testnet, signet
 	BlockHeight int64
-	Synced     bool
+	Synced      bool
 }
 
 // NewProvider creates a Lightning provider by name
@@ -46,7 +46,7 @@ func NewProvider(name string, config map[string]interface{}) (Provider, error) {
 	if name == "" {
 		name = "mock" // Default to mock if no provider specified
 	}
-	
+
 	switch name {
 	case "phoenixd":
 		return NewPhoenixdProvider(config)
@@ -70,6 +70,3 @@ func getConfigString(config map[string]interface{}, key string) string {
 	}
 	return ""
 }
-
-
-
