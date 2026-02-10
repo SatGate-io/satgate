@@ -24,9 +24,9 @@ type NWCProvider struct {
 	clientPubkey string
 	sharedSecret []byte // Precomputed shared secret for NIP-04 encryption
 
-	mu       sync.Mutex
-	conn     *websocket.Conn
-	pending  map[string]chan *nwcResponse
+	mu      sync.Mutex
+	conn    *websocket.Conn
+	pending map[string]chan *nwcResponse
 }
 
 // NWC request/response structures (NIP-47)

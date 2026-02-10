@@ -226,4 +226,3 @@ func BenchmarkIsBanned(b *testing.B) {
 		svc.IsBanned("test-token")
 	}
 }
-

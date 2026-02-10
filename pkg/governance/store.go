@@ -168,4 +168,3 @@ func (m *MemoryStore) Reset(ctx context.Context) error {
 func (m *MemoryStore) Close() error {
 	return nil
 }
-

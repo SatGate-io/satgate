@@ -319,7 +319,7 @@ func (g *Gateway) handleL402(w http.ResponseWriter, r *http.Request, route *conf
 // verifyL402Token verifies an L402 payment proof.
 func (g *Gateway) verifyL402Token(ctx context.Context, token string, route *config.Route) bool {
 	log.Info().Str("token_len", fmt.Sprintf("%d", len(token))).Msg("verifyL402Token: starting verification")
-	
+
 	// L402 format: macaroon:preimage
 	parts := strings.SplitN(token, ":", 2)
 	if len(parts) != 2 {
@@ -618,8 +618,8 @@ func (g *Gateway) getDemoResponse(route *config.Route) map[string]interface{} {
 					{"asset": "SOL", "signal": "HOLD", "score": 0.54},
 				},
 				"whale_activity": map[string]interface{}{
-					"large_txs_24h": 847,
-					"net_flow":      "+12,450 BTC",
+					"large_txs_24h":  847,
+					"net_flow":       "+12,450 BTC",
 					"exchange_trend": "outflow",
 				},
 				"risk_score": 0.34,
@@ -705,7 +705,7 @@ func extractBearerToken(r *http.Request) string {
 func extractL402Token(r *http.Request) string {
 	auth := r.Header.Get("Authorization")
 	log.Debug().Str("auth_header", auth).Msg("extractL402Token: checking Authorization header")
-	
+
 	if strings.HasPrefix(auth, "L402 ") {
 		token := strings.TrimPrefix(auth, "L402 ")
 		log.Debug().Str("token_preview", token[:min(30, len(token))]+"...").Msg("extractL402Token: found L402 format")
@@ -716,7 +716,7 @@ func extractL402Token(r *http.Request) string {
 		log.Debug().Str("token_preview", token[:min(30, len(token))]+"...").Msg("extractL402Token: found LSAT format")
 		return token
 	}
-	
+
 	log.Debug().Msg("extractL402Token: no L402/LSAT token found")
 	return ""
 }
@@ -740,7 +740,7 @@ func getEnv(key, defaultValue string) string {
 func (g *Gateway) handleCapabilityMint(w http.ResponseWriter, r *http.Request) {
 	// Check admin token - try multiple sources
 	adminToken := r.Header.Get("X-Admin-Token")
-	
+
 	// Build list of valid tokens from config and environment
 	validTokens := []string{}
 	if g.config.Admin.Token != "" {
@@ -750,7 +750,7 @@ func (g *Gateway) handleCapabilityMint(w http.ResponseWriter, r *http.Request) {
 	if envToken := strings.TrimSpace(getEnv("ADMIN_TOKEN", "")); envToken != "" {
 		validTokens = append(validTokens, envToken)
 	}
-	
+
 	// Verify token matches one of the valid tokens
 	tokenValid := false
 	for _, vt := range validTokens {
@@ -759,7 +759,7 @@ func (g *Gateway) handleCapabilityMint(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-	
+
 	if adminToken == "" || !tokenValid {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
@@ -1037,18 +1037,18 @@ func (g *Gateway) handleCapabilityAdmin(w http.ResponseWriter, r *http.Request) 
 	requiredScope := "api:capability:admin"
 	mostRestrictiveScope := "" // Track the most restrictive scope found
 	allScopesAllow := true     // Assume allowed until proven otherwise
-	
+
 	for _, caveat := range mac.Caveats {
 		if strings.HasPrefix(caveat, "scope = ") {
 			scopeValue := strings.TrimPrefix(caveat, "scope = ")
 			mostRestrictiveScope = scopeValue // Keep track of last (most restrictive) scope
-			
+
 			// Check if this specific scope caveat allows the required scope
-			scopeAllows := scopeValue == requiredScope || 
-			              scopeValue == "api:capability:*" || 
-			              scopeValue == "api:*" ||
-			              (strings.HasSuffix(scopeValue, ":*") && strings.HasPrefix(requiredScope, strings.TrimSuffix(scopeValue, "*")))
-			
+			scopeAllows := scopeValue == requiredScope ||
+				scopeValue == "api:capability:*" ||
+				scopeValue == "api:*" ||
+				(strings.HasSuffix(scopeValue, ":*") && strings.HasPrefix(requiredScope, strings.TrimSuffix(scopeValue, "*")))
+
 			// If ANY scope caveat denies access, the token is denied (macaroon AND semantics)
 			if !scopeAllows {
 				allScopesAllow = false
@@ -1084,7 +1084,7 @@ func (g *Gateway) handleCapabilityAdmin(w http.ResponseWriter, r *http.Request) 
 func (g *Gateway) handleGovernanceBan(w http.ResponseWriter, r *http.Request) {
 	// Check admin token
 	adminToken := r.Header.Get("X-Admin-Token")
-	
+
 	// Build list of valid tokens from config and environment
 	validTokens := []string{}
 	if g.config.Admin.Token != "" {
@@ -1093,7 +1093,7 @@ func (g *Gateway) handleGovernanceBan(w http.ResponseWriter, r *http.Request) {
 	if envToken := strings.TrimSpace(getEnv("ADMIN_TOKEN", "")); envToken != "" {
 		validTokens = append(validTokens, envToken)
 	}
-	
+
 	// Verify token matches one of the valid tokens
 	tokenValid := false
 	for _, vt := range validTokens {
@@ -1102,7 +1102,7 @@ func (g *Gateway) handleGovernanceBan(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-	
+
 	if adminToken == "" || !tokenValid {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
@@ -1134,7 +1134,7 @@ func (g *Gateway) handleGovernanceBan(w http.ResponseWriter, r *http.Request) {
 		g.governance.Ban(req.TokenSignature, req.Reason, "admin")
 		g.governance.RecordBannedHit() // Increment kill switch counter
 	}
-	
+
 	log.Info().
 		Str("token_signature", req.TokenSignature[:min(16, len(req.TokenSignature))]).
 		Str("reason", req.Reason).
@@ -1179,7 +1179,7 @@ func (g *Gateway) handleGovernanceGraph(w http.ResponseWriter, r *http.Request) 
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	
+
 	if g.governance == nil {
 		// Return empty graph if governance not initialized
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -1194,7 +1194,7 @@ func (g *Gateway) handleGovernanceGraph(w http.ResponseWriter, r *http.Request) 
 		})
 		return
 	}
-	
+
 	graph := g.governance.GetGraph()
 	json.NewEncoder(w).Encode(graph)
 }
@@ -1203,7 +1203,7 @@ func (g *Gateway) handleGovernanceGraph(w http.ResponseWriter, r *http.Request) 
 func (g *Gateway) handleGovernanceReset(w http.ResponseWriter, r *http.Request) {
 	// Check admin token
 	adminToken := r.Header.Get("X-Admin-Token")
-	
+
 	// Build list of valid tokens from config and environment
 	validTokens := []string{}
 	if g.config.Admin.Token != "" {
@@ -1212,7 +1212,7 @@ func (g *Gateway) handleGovernanceReset(w http.ResponseWriter, r *http.Request) 
 	if envToken := strings.TrimSpace(getEnv("ADMIN_TOKEN", "")); envToken != "" {
 		validTokens = append(validTokens, envToken)
 	}
-	
+
 	// Verify token matches one of the valid tokens
 	tokenValid := false
 	for _, vt := range validTokens {
@@ -1221,20 +1221,20 @@ func (g *Gateway) handleGovernanceReset(w http.ResponseWriter, r *http.Request) 
 			break
 		}
 	}
-	
+
 	if adminToken == "" || !tokenValid {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid or missing X-Admin-Token"})
 		return
 	}
-	
+
 	if g.governance != nil {
 		g.governance.Reset()
 	}
-	
+
 	log.Info().Msg("Dashboard data reset")
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{

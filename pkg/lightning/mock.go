@@ -31,7 +31,7 @@ func (m *MockProvider) CreateInvoice(amountSats int64, memo string) (*Invoice, e
 	preimageBytes := make([]byte, 32)
 	rand.Read(preimageBytes)
 	preimage := hex.EncodeToString(preimageBytes)
-	
+
 	// Calculate payment hash
 	paymentHashBytes := sha256.Sum256(preimageBytes)
 	paymentHash := hex.EncodeToString(paymentHashBytes[:])
@@ -45,14 +45,14 @@ func (m *MockProvider) CreateInvoice(amountSats int64, memo string) (*Invoice, e
 	} else if amountSats >= 100 {
 		amountStr = "100u" // 100 sats
 	} else if amountSats >= 10 {
-		amountStr = "10u" // 10 sats  
+		amountStr = "10u" // 10 sats
 	}
-	
+
 	// Generate enough random data to look realistic (real invoices are 200+ chars)
 	extraData := make([]byte, 100)
 	rand.Read(extraData)
-	bolt11 := "lnbc" + amountStr + "1p" + hex.EncodeToString(paymentHashBytes[:])[:40] + 
-		"pp" + hex.EncodeToString(extraData)[:120] + 
+	bolt11 := "lnbc" + amountStr + "1p" + hex.EncodeToString(paymentHashBytes[:])[:40] +
+		"pp" + hex.EncodeToString(extraData)[:120] +
 		"qp" + hex.EncodeToString(preimageBytes)[:32]
 
 	invoice := &Invoice{
@@ -75,7 +75,7 @@ func (m *MockProvider) CreateInvoice(amountSats int64, memo string) (*Invoice, e
 func (m *MockProvider) CheckPayment(paymentHash string) (bool, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	
+
 	if paid, ok := m.paid[paymentHash]; ok {
 		return paid, nil
 	}
@@ -86,7 +86,7 @@ func (m *MockProvider) CheckPayment(paymentHash string) (bool, error) {
 func (m *MockProvider) SimulatePayment(paymentHash string) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	
+
 	m.paid[paymentHash] = true
 	if inv, ok := m.invoices[paymentHash]; ok {
 		m.balance += inv.Amount
@@ -110,6 +110,3 @@ func (m *MockProvider) GetInfo() (*NodeInfo, error) {
 		Synced:      true,
 	}, nil
 }
-
-
-

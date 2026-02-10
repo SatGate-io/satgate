@@ -11,13 +11,13 @@ import (
 
 const (
 	// Redis key prefixes
-	keyBanList   = "satgate:banlist"      // SET of banned signatures
-	keyBanRecord = "satgate:ban:"         // HASH for ban record details
-	keyMinted    = "satgate:minted:"      // HASH for minted token details
-	keyMintedSet = "satgate:minted:all"   // SET of all minted signatures
-	keyUsage     = "satgate:usage:"       // HASH for usage stats
-	keyUsageSet  = "satgate:usage:all"    // SET of all usage signatures
-	keyCounter   = "satgate:counter:"     // STRING for counters (rate limiting)
+	keyBanList   = "satgate:banlist"    // SET of banned signatures
+	keyBanRecord = "satgate:ban:"       // HASH for ban record details
+	keyMinted    = "satgate:minted:"    // HASH for minted token details
+	keyMintedSet = "satgate:minted:all" // SET of all minted signatures
+	keyUsage     = "satgate:usage:"     // HASH for usage stats
+	keyUsageSet  = "satgate:usage:all"  // SET of all usage signatures
+	keyCounter   = "satgate:counter:"   // STRING for counters (rate limiting)
 )
 
 // RedisStore implements Store using Redis for HA persistence
@@ -328,4 +328,3 @@ func (r *RedisStore) Close() error {
 func (r *RedisStore) IncrWithTTL(ctx context.Context, key string, ttl time.Duration) (int64, error) {
 	return r.IncrementCounter(ctx, key, ttl)
 }
-

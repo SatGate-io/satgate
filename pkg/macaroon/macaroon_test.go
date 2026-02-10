@@ -200,6 +200,3 @@ func BenchmarkVerify(b *testing.B) {
 		svc.Verify(token)
 	}
 }
-
-
-

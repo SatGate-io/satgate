@@ -30,10 +30,10 @@ func NewService(secret string) (*Service, error) {
 	if secret == "" {
 		return nil, fmt.Errorf("secret key required")
 	}
-	
+
 	// Derive root key from secret
 	h := sha256.Sum256([]byte(secret))
-	
+
 	return &Service{
 		rootKey: h[:],
 	}, nil
@@ -50,7 +50,7 @@ func (s *Service) Mint(scope string, expiresAt time.Time) (*Macaroon, error) {
 
 	// Add expiry caveat
 	mac.Caveats = append(mac.Caveats, fmt.Sprintf("expires = %d", expiresAt.UnixMilli()))
-	
+
 	// Add scope caveat
 	if scope != "" {
 		mac.Caveats = append(mac.Caveats, fmt.Sprintf("scope = %s", scope))
@@ -153,15 +153,15 @@ func (s *Service) RecalculateSignature(mac *Macaroon) string {
 // calculateSignatureWithKey computes signature with a specific key
 func (s *Service) calculateSignatureWithKey(mac *Macaroon, key []byte) string {
 	h := hmac.New(sha256.New, key)
-	
+
 	// Include identifier
 	h.Write([]byte(mac.Identifier))
-	
+
 	// Include each caveat
 	for _, caveat := range mac.Caveats {
 		h.Write([]byte(caveat))
 	}
-	
+
 	return hex.EncodeToString(h.Sum(nil))
 }
 
@@ -179,7 +179,7 @@ func (s *Service) verifyCaveat(caveat string) error {
 	case "expires":
 		// Check expiration - support both Unix timestamp (ms) and duration strings
 		// IMPORTANT: Check duration first because fmt.Sscanf partially parses "5m" as 5!
-		
+
 		// Try parsing as duration string first (e.g., "5m", "1h")
 		if _, durErr := time.ParseDuration(value); durErr == nil {
 			// Duration caveats are relative to token creation time
@@ -187,7 +187,7 @@ func (s *Service) verifyCaveat(caveat string) error {
 			// (they're mainly for display purposes in delegated tokens)
 			return nil
 		}
-		
+
 		// Try parsing as Unix timestamp in milliseconds (must be all digits)
 		var expiresMs int64
 		if n, err := fmt.Sscanf(value, "%d", &expiresMs); err == nil && n == 1 {
@@ -206,7 +206,7 @@ func (s *Service) verifyCaveat(caveat string) error {
 				return nil
 			}
 		}
-		
+
 		// Try parsing as RFC3339 timestamp
 		if ts, tsErr := time.Parse(time.RFC3339, value); tsErr == nil {
 			if time.Now().After(ts) {
@@ -214,7 +214,7 @@ func (s *Service) verifyCaveat(caveat string) error {
 			}
 			return nil
 		}
-		
+
 		// Unknown format - fail safe by rejecting
 		return fmt.Errorf("invalid expires value: %s", value)
 
@@ -357,4 +357,3 @@ func (w *MintWrapper) Delegate(parentToken string, additionalCaveats []string) (
 	}
 	return w.svc.Encode(child), nil
 }
-
