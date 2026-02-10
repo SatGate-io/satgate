@@ -11,7 +11,19 @@ import (
 	"time"
 )
 
-// Macaroon represents a capability token
+// Macaroon represents a capability token using chained HMAC signatures.
+//
+// Signature chaining works as follows:
+//
+//	sig₀ = HMAC(rootKey, identifier)
+//	sig₁ = HMAC(sig₀, caveat₁)
+//	sig₂ = HMAC(sig₁, caveat₂)
+//	...
+//	sigₙ = final signature
+//
+// This enables third-party attenuation: anyone holding a macaroon can add
+// caveats by chaining from the current signature without knowing the root key.
+// The verifier reconstructs the chain from the root key to verify.
 type Macaroon struct {
 	Version    int      `json:"v"`
 	Location   string   `json:"l"`
@@ -56,21 +68,22 @@ func (s *Service) Mint(scope string, expiresAt time.Time) (*Macaroon, error) {
 		mac.Caveats = append(mac.Caveats, fmt.Sprintf("scope = %s", scope))
 	}
 
-	// Calculate signature
-	mac.Signature = s.calculateSignature(mac)
+	// Calculate chained signature
+	mac.Signature = s.chainedSignature(mac)
 
 	return mac, nil
 }
 
-// Verify validates a macaroon token
+// Verify validates a macaroon token by reconstructing the HMAC chain
+// from the root key and comparing the final signature.
 func (s *Service) Verify(token string) (*Macaroon, error) {
 	mac, err := s.Decode(token)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode token: %w", err)
 	}
 
-	// Verify signature
-	expectedSig := s.calculateSignature(mac)
+	// Reconstruct the chained signature from root key
+	expectedSig := s.chainedSignature(mac)
 	if !hmac.Equal([]byte(mac.Signature), []byte(expectedSig)) {
 		return nil, fmt.Errorf("invalid signature")
 	}
@@ -85,31 +98,80 @@ func (s *Service) Verify(token string) (*Macaroon, error) {
 	return mac, nil
 }
 
-// Delegate creates a child macaroon with additional caveats
+// Delegate creates a child macaroon with additional caveats using proper
+// HMAC chaining. The new caveats are chained from the parent's signature,
+// meaning the delegator does NOT need the root key — only the current token.
+//
+// This is the core macaroon attenuation property: permissions can only be
+// narrowed, never widened, because caveats are cumulative and signatures
+// are cryptographically chained.
 func (s *Service) Delegate(parentToken string, additionalCaveats []string) (*Macaroon, error) {
 	parent, err := s.Decode(parentToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode parent: %w", err)
 	}
 
-	// Verify parent first - only valid tokens can be delegated
+	// Verify parent first — only valid tokens can be delegated
 	if _, err := s.Verify(parentToken); err != nil {
 		return nil, fmt.Errorf("invalid parent token: %w", err)
 	}
 
-	// Create child with parent's caveats plus new ones
-	// Caveats are cumulative - can only add restrictions, never remove
+	// Create child with parent's identifier, all parent caveats, plus new ones
 	child := &Macaroon{
 		Version:    parent.Version,
 		Location:   parent.Location,
-		Identifier: fmt.Sprintf("%s:child:%d", parent.Identifier, time.Now().UnixMilli()),
+		Identifier: parent.Identifier,
 		Caveats:    append(append([]string{}, parent.Caveats...), additionalCaveats...),
 	}
 
-	// Calculate signature using root key for verification compatibility
-	// Security note: The attenuation property is preserved because caveats
-	// are cumulative (child has all parent caveats plus additional ones)
-	child.Signature = s.calculateSignature(child)
+	// Chain signature: start from parent's signature and chain through new caveats.
+	// This is equivalent to reconstructing from root key through ALL caveats,
+	// but demonstrates that delegation only needs the parent signature.
+	sig, err := hex.DecodeString(parent.Signature)
+	if err != nil {
+		return nil, fmt.Errorf("invalid parent signature: %w", err)
+	}
+	for _, caveat := range additionalCaveats {
+		mac := hmac.New(sha256.New, sig)
+		mac.Write([]byte(caveat))
+		sig = mac.Sum(nil)
+	}
+	child.Signature = hex.EncodeToString(sig)
+
+	return child, nil
+}
+
+// DelegateWithoutVerify creates an attenuated child macaroon without
+// requiring the root key for verification. This enables true third-party
+// delegation: any token holder can add caveats by chaining from their
+// token's signature.
+//
+// WARNING: The caller is responsible for ensuring the parent token is valid.
+// Use Delegate() when the service has the root key available.
+func (s *Service) DelegateWithoutVerify(parentToken string, additionalCaveats []string) (*Macaroon, error) {
+	parent, err := s.Decode(parentToken)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode parent: %w", err)
+	}
+
+	child := &Macaroon{
+		Version:    parent.Version,
+		Location:   parent.Location,
+		Identifier: parent.Identifier,
+		Caveats:    append(append([]string{}, parent.Caveats...), additionalCaveats...),
+	}
+
+	// Chain from parent signature through new caveats
+	sig, err := hex.DecodeString(parent.Signature)
+	if err != nil {
+		return nil, fmt.Errorf("invalid parent signature: %w", err)
+	}
+	for _, caveat := range additionalCaveats {
+		mac := hmac.New(sha256.New, sig)
+		mac.Write([]byte(caveat))
+		sig = mac.Sum(nil)
+	}
+	child.Signature = hex.EncodeToString(sig)
 
 	return child, nil
 }
@@ -139,30 +201,30 @@ func (s *Service) Decode(token string) (*Macaroon, error) {
 	return &mac, nil
 }
 
-// calculateSignature computes the HMAC signature
-func (s *Service) calculateSignature(mac *Macaroon) string {
-	return s.calculateSignatureWithKey(mac, s.rootKey)
-}
-
-// RecalculateSignature recalculates the signature for a macaroon
-// This MUST be called after adding caveats to ensure signature validity
-func (s *Service) RecalculateSignature(mac *Macaroon) string {
-	return s.calculateSignature(mac)
-}
-
-// calculateSignatureWithKey computes signature with a specific key
-func (s *Service) calculateSignatureWithKey(mac *Macaroon, key []byte) string {
-	h := hmac.New(sha256.New, key)
-
-	// Include identifier
+// chainedSignature computes the chained HMAC signature for a macaroon.
+//
+//	sig₀ = HMAC(rootKey, identifier)
+//	sigₙ = HMAC(sigₙ₋₁, caveatₙ)
+func (s *Service) chainedSignature(mac *Macaroon) string {
+	// sig₀ = HMAC(rootKey, identifier)
+	h := hmac.New(sha256.New, s.rootKey)
 	h.Write([]byte(mac.Identifier))
+	sig := h.Sum(nil)
 
-	// Include each caveat
+	// sigₙ = HMAC(sigₙ₋₁, caveatₙ)
 	for _, caveat := range mac.Caveats {
+		h = hmac.New(sha256.New, sig)
 		h.Write([]byte(caveat))
+		sig = h.Sum(nil)
 	}
 
-	return hex.EncodeToString(h.Sum(nil))
+	return hex.EncodeToString(sig)
+}
+
+// RecalculateSignature recalculates the chained signature for a macaroon.
+// This MUST be called after adding caveats to ensure signature validity.
+func (s *Service) RecalculateSignature(mac *Macaroon) string {
+	return s.chainedSignature(mac)
 }
 
 // verifyCaveat checks if a caveat is satisfied
@@ -286,7 +348,7 @@ func (m *Macaroon) GetScope() string {
 var _ = (*Macaroon)(nil) // Ensure Macaroon type exists
 
 // AddCaveat adds a new caveat to the macaroon
-// Note: This must be done BEFORE calculating the signature
+// Note: After adding caveats, call RecalculateSignature to update the signature.
 func (m *Macaroon) AddCaveat(key, value string) {
 	m.Caveats = append(m.Caveats, fmt.Sprintf("%s = %s", key, value))
 }
@@ -340,8 +402,8 @@ func (w *MintWrapper) Mint(scope string, expiresAt time.Time) (interface{ AddCav
 // Encode serializes the macaroon to a string
 func (w *MintWrapper) Encode(mac interface{}) string {
 	if wrapper, ok := mac.(*MacaroonWrapper); ok {
-		// Recalculate signature after adding caveats
-		wrapper.mac.Signature = w.svc.calculateSignature(wrapper.mac)
+		// Recalculate chained signature after adding caveats
+		wrapper.mac.Signature = w.svc.chainedSignature(wrapper.mac)
 		return w.svc.Encode(wrapper.mac)
 	}
 	return ""
