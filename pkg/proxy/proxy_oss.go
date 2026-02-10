@@ -12,6 +12,7 @@ package proxy
 import (
 	"context"
 	"crypto/sha256"
+	"crypto/subtle"
 	"crypto/tls"
 	"encoding/hex"
 	"encoding/json"
@@ -107,20 +108,31 @@ func (g *Gateway) SetMetricsHook(hook MetricsHook) {
 
 // ServeHTTP implements http.Handler.
 func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// CORS headers for browser requests (demo page, etc.)
-	// Delete any existing CORS headers first to avoid duplicates (Railway proxy may add its own)
+	// CORS headers for browser requests — only allow configured origins.
+	// If no AllowedOrigins are configured, CORS headers are not set (safe default).
 	origin := r.Header.Get("Origin")
-	if origin != "" {
-		w.Header().Del("Access-Control-Allow-Origin")
-		w.Header().Del("Access-Control-Allow-Methods")
-		w.Header().Del("Access-Control-Allow-Headers")
-		w.Header().Del("Access-Control-Expose-Headers")
-		w.Header().Del("Access-Control-Allow-Credentials")
-		w.Header().Set("Access-Control-Allow-Origin", origin)
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Admin-Token, X-Request-ID")
-		w.Header().Set("Access-Control-Expose-Headers", "WWW-Authenticate")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
+	if origin != "" && len(g.config.Admin.CORSAllowedOrigins) > 0 {
+		originAllowed := false
+		for _, allowed := range g.config.Admin.CORSAllowedOrigins {
+			if allowed == origin {
+				originAllowed = true
+				break
+			}
+		}
+		if originAllowed {
+			w.Header().Del("Access-Control-Allow-Origin")
+			w.Header().Del("Access-Control-Allow-Methods")
+			w.Header().Del("Access-Control-Allow-Headers")
+			w.Header().Del("Access-Control-Expose-Headers")
+			w.Header().Del("Access-Control-Allow-Credentials")
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Admin-Token, X-Request-ID")
+			w.Header().Set("Access-Control-Expose-Headers", "WWW-Authenticate")
+			if g.config.Admin.CORSAllowCredentials {
+				w.Header().Set("Access-Control-Allow-Credentials", "true")
+			}
+		}
 	}
 
 	// Handle CORS preflight
@@ -732,9 +744,6 @@ func (g *Gateway) handleCapabilityMint(w http.ResponseWriter, r *http.Request) {
 	if g.config.Admin.Token != "" {
 		validTokens = append(validTokens, g.config.Admin.Token)
 	}
-	if g.config.Admin.CapabilityRootKey != "" {
-		validTokens = append(validTokens, g.config.Admin.CapabilityRootKey)
-	}
 	// Also check ADMIN_TOKEN environment variable (for demo deployments)
 	if envToken := strings.TrimSpace(getEnv("ADMIN_TOKEN", "")); envToken != "" {
 		validTokens = append(validTokens, envToken)
@@ -743,7 +752,7 @@ func (g *Gateway) handleCapabilityMint(w http.ResponseWriter, r *http.Request) {
 	// Verify token matches one of the valid tokens
 	tokenValid := false
 	for _, vt := range validTokens {
-		if adminToken == vt {
+		if subtle.ConstantTimeCompare([]byte(adminToken), []byte(vt)) == 1 {
 			tokenValid = true
 			break
 		}
@@ -1084,7 +1093,7 @@ func (g *Gateway) handleGovernanceBan(w http.ResponseWriter, r *http.Request) {
 	// Verify token matches one of the valid tokens
 	tokenValid := false
 	for _, vt := range validTokens {
-		if adminToken == vt {
+		if subtle.ConstantTimeCompare([]byte(adminToken), []byte(vt)) == 1 {
 			tokenValid = true
 			break
 		}
@@ -1138,13 +1147,32 @@ func (g *Gateway) handleGovernanceBan(w http.ResponseWriter, r *http.Request) {
 
 // handleGovernanceGraph handles GET /api/governance/graph - Returns token lineage for dashboard.
 func (g *Gateway) handleGovernanceGraph(w http.ResponseWriter, r *http.Request) {
-	// CORS for dashboard access
-	origin := r.Header.Get("Origin")
-	if origin != "" {
-		w.Header().Set("Access-Control-Allow-Origin", origin)
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
+	// Require admin token
+	adminToken := r.Header.Get("X-Admin-Token")
+
+	validTokens := []string{}
+	if g.config.Admin.Token != "" {
+		validTokens = append(validTokens, g.config.Admin.Token)
 	}
-	
+	if envToken := strings.TrimSpace(getEnv("ADMIN_TOKEN", "")); envToken != "" {
+		validTokens = append(validTokens, envToken)
+	}
+
+	tokenValid := false
+	for _, vt := range validTokens {
+		if subtle.ConstantTimeCompare([]byte(adminToken), []byte(vt)) == 1 {
+			tokenValid = true
+			break
+		}
+	}
+
+	if adminToken == "" || !tokenValid {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid or missing X-Admin-Token"})
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	
 	if g.governance == nil {
@@ -1168,13 +1196,6 @@ func (g *Gateway) handleGovernanceGraph(w http.ResponseWriter, r *http.Request) 
 
 // handleGovernanceReset handles POST /api/governance/reset - Resets dashboard data.
 func (g *Gateway) handleGovernanceReset(w http.ResponseWriter, r *http.Request) {
-	// CORS for dashboard access
-	origin := r.Header.Get("Origin")
-	if origin != "" {
-		w.Header().Set("Access-Control-Allow-Origin", origin)
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-	}
-	
 	// Check admin token
 	adminToken := r.Header.Get("X-Admin-Token")
 	
@@ -1190,7 +1211,7 @@ func (g *Gateway) handleGovernanceReset(w http.ResponseWriter, r *http.Request) 
 	// Verify token matches one of the valid tokens
 	tokenValid := false
 	for _, vt := range validTokens {
-		if adminToken == vt {
+		if subtle.ConstantTimeCompare([]byte(adminToken), []byte(vt)) == 1 {
 			tokenValid = true
 			break
 		}

@@ -71,7 +71,7 @@ func (s *Service) Verify(token string) (*Macaroon, error) {
 
 	// Verify signature
 	expectedSig := s.calculateSignature(mac)
-	if mac.Signature != expectedSig {
+	if !hmac.Equal([]byte(mac.Signature), []byte(expectedSig)) {
 		return nil, fmt.Errorf("invalid signature")
 	}
 
