@@ -686,7 +686,6 @@ curl -H <span className="text-green-400">"Authorization: L402 &lt;macaroon&gt;:&
               <h4 className="font-bold text-white mb-4">Contact</h4>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><a href="mailto:contact@satgate.io" className="hover:text-white transition">contact@satgate.io</a></li>
-                <li><a href="https://x.com/SatGateIO" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">@SatGateIO</a></li>
               </ul>
             </div>
           </div>
