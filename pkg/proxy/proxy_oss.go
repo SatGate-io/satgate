@@ -47,6 +47,9 @@ type Gateway struct {
 	proxyMu     sync.RWMutex
 	metrics     *Metrics
 
+	// Rate limiter for admin endpoints
+	adminLimiter *rateLimiter
+
 	// Optional hooks (set via SetXxx methods)
 	metricsHook MetricsHook
 }
@@ -82,13 +85,20 @@ func New(opts Options) (*Gateway, error) {
 		return nil, fmt.Errorf("macaroon service is required")
 	}
 
+	// Initialize admin rate limiter (default: 60 req/min if not configured)
+	adminRPM := opts.Config.Admin.RateLimitPerMinute
+	if adminRPM == 0 {
+		adminRPM = 60
+	}
+
 	g := &Gateway{
-		config:      opts.Config,
-		macaroonSvc: opts.Macaroon,
-		governance:  opts.Governance,
-		lightning:   opts.Lightning,
-		proxies:     make(map[string]*httputil.ReverseProxy),
-		metrics:     &Metrics{},
+		config:       opts.Config,
+		macaroonSvc:  opts.Macaroon,
+		governance:   opts.Governance,
+		lightning:    opts.Lightning,
+		proxies:      make(map[string]*httputil.ReverseProxy),
+		metrics:      &Metrics{},
+		adminLimiter: newRateLimiter(adminRPM),
 	}
 
 	// Initialize proxies for configured upstreams
@@ -155,6 +165,18 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if strings.HasPrefix(r.URL.Path, "/check-payment/") {
 		g.handleCheckPayment(w, r)
 		return
+	}
+
+	// Rate limit admin API endpoints
+	if strings.HasPrefix(r.URL.Path, "/api/") {
+		clientIP := extractIP(r)
+		if !g.adminLimiter.allow(clientIP) {
+			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set("Retry-After", "60")
+			w.WriteHeader(http.StatusTooManyRequests)
+			json.NewEncoder(w).Encode(map[string]string{"error": "Rate limit exceeded"})
+			return
+		}
 	}
 
 	// Admin endpoint: Capability token minting
