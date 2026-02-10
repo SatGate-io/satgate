@@ -81,13 +81,13 @@ export class SatGateClient {
         throw new NotFoundError();
       }
       if (response.status === 400) {
-        const error = await response.json();
-        throw new ValidationError(error.error || 'Validation failed');
+        const errBody = await response.json() as Record<string, unknown>;
+        throw new ValidationError((errBody.error as string) || 'Validation failed');
       }
       if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
+        const errBody = await response.json().catch(() => ({})) as Record<string, unknown>;
         throw new SatGateError(
-          error.error || `Request failed with status ${response.status}`,
+          (errBody.error as string) || `Request failed with status ${response.status}`,
           response.status
         );
       }
@@ -96,13 +96,13 @@ export class SatGateClient {
         return {} as T;
       }
 
-      return response.json();
-    } catch (error) {
+      return response.json() as Promise<T>;
+    } catch (err: unknown) {
       clearTimeout(timeoutId);
-      if (error instanceof SatGateError) {
-        throw error;
+      if (err instanceof SatGateError) {
+        throw err;
       }
-      throw new SatGateError(`Request failed: ${error}`);
+      throw new SatGateError(`Request failed: ${err}`);
     }
   }
 
@@ -133,10 +133,10 @@ export class SatGateClient {
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
-      return response.json();
-    } catch (error) {
+      return response.json() as Promise<Record<string, unknown>>;
+    } catch (err: unknown) {
       clearTimeout(timeoutId);
-      throw new SatGateError(`Ping failed: ${error}`);
+      throw new SatGateError(`Ping failed: ${err}`);
     }
   }
 }
