@@ -256,7 +256,6 @@ Apache License 2.0 — see [LICENSE](LICENSE) for details.
 
 - 🌐 [satgate.io](https://satgate.io)
 - 📝 [Blog](https://satgate.io/blog)
-- 🐦 [Twitter](https://twitter.com/satgate_io)
 - 📧 [contact@satgate.io](mailto:contact@satgate.io)
 
 ---
