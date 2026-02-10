@@ -17,6 +17,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -24,6 +25,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -49,13 +51,13 @@ type Gateway struct {
 	metricsHook MetricsHook
 }
 
-// Metrics tracks gateway statistics.
+// Metrics tracks gateway statistics using atomic counters for concurrent safety.
 type Metrics struct {
-	TotalRequests   int64
-	TotalPublic     int64
-	TotalCapability int64
-	TotalL402       int64
-	TotalErrors     int64
+	TotalRequests   atomic.Int64
+	TotalPublic     atomic.Int64
+	TotalCapability atomic.Int64
+	TotalL402       atomic.Int64
+	TotalErrors     atomic.Int64
 }
 
 // MetricsHook allows external metrics collection.
@@ -167,8 +169,8 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Admin endpoint: Token delegation (both direct and demo path)
-	if (r.URL.Path == "/api/capability/delegate" || r.URL.Path == "/api/capability/demo/delegate") && r.Method == "POST" {
+	// Admin endpoint: Token delegation
+	if r.URL.Path == "/api/capability/delegate" && r.Method == "POST" {
 		g.handleCapabilityDelegate(w, r)
 		return
 	}
@@ -204,13 +206,13 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	start := time.Now()
-	g.metrics.TotalRequests++
+	g.metrics.TotalRequests.Add(1)
 
 	// Find matching route
 	route := g.matchRoute(r)
 	if route == nil {
 		http.Error(w, "No matching route", http.StatusNotFound)
-		g.metrics.TotalErrors++
+		g.metrics.TotalErrors.Add(1)
 		return
 	}
 
@@ -226,15 +228,15 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Handle based on policy
 	switch policyKind {
 	case "public":
-		g.metrics.TotalPublic++
+		g.metrics.TotalPublic.Add(1)
 		g.handlePublic(wrapped, r, route)
 
 	case "capability":
-		g.metrics.TotalCapability++
+		g.metrics.TotalCapability.Add(1)
 		g.handleCapability(wrapped, r, route)
 
 	case "l402":
-		g.metrics.TotalL402++
+		g.metrics.TotalL402.Add(1)
 		g.handleL402(wrapped, r, route)
 
 	default:
@@ -242,7 +244,7 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Warn().Str("policy", policyKind).Str("route", route.Name).
 			Msg("Unknown policy kind in OSS build")
 		http.Error(w, fmt.Sprintf("Policy '%s' not supported in OSS", policyKind), http.StatusNotImplemented)
-		g.metrics.TotalErrors++
+		g.metrics.TotalErrors.Add(1)
 		return
 	}
 
@@ -765,7 +767,8 @@ func (g *Gateway) handleCapabilityMint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Parse request body
+	// Parse request body (limit to 1MB)
+	r.Body = io.NopCloser(io.LimitReader(r.Body, 1048576))
 	var req struct {
 		Scope    string `json:"scope"`
 		Duration string `json:"duration"`
@@ -858,6 +861,7 @@ func (g *Gateway) handleCapabilityValidate(w http.ResponseWriter, r *http.Reques
 
 // handleCapabilityDelegate handles POST /api/capability/delegate - Delegate a token with additional caveats.
 func (g *Gateway) handleCapabilityDelegate(w http.ResponseWriter, r *http.Request) {
+	r.Body = io.NopCloser(io.LimitReader(r.Body, 1048576))
 	var req struct {
 		ParentToken string   `json:"parentToken"`
 		Caveats     []string `json:"caveats"`
@@ -1106,6 +1110,7 @@ func (g *Gateway) handleGovernanceBan(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	r.Body = io.NopCloser(io.LimitReader(r.Body, 1048576))
 	var req struct {
 		TokenSignature string `json:"tokenSignature"`
 		Reason         string `json:"reason"`
