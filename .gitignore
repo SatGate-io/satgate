@@ -18,6 +18,10 @@ sdk/nodejs/dist/
 # Next.js build output
 .next/
 
+# Environment secrets
+.env.local
+*.env.local
+
 # OS
 .DS_Store
 Thumbs.db
