@@ -109,8 +109,9 @@ Public → Protected → Paid. Three policies, one gateway.
 
 ```bash
 # Docker
-git clone https://github.com/satgate-io/satgate.git
-cd satgate && docker compose up -d
+docker run -v $(pwd)/gateway.yaml:/etc/satgate/gateway.yaml \
+  -e ADMIN_TOKEN=my-secret-token -e LIGHTNING_BACKEND=mock \
+  -p 8080:8080 ghcr.io/satgate-io/satgate:latest
 
 # Build from source
 git clone https://github.com/satgate-io/satgate.git
@@ -211,16 +212,17 @@ routes:
 | Language | Package | Docs |
 |----------|---------|------|
 | Python | `pip install satgate` | [README](sdk/python/README.md) |
-| JavaScript | `npm install @satgate/client` | [README](sdk/js/README.md) |
-| Go | `go get github.com/satgate-io/satgate/sdk/go` | [README](sdk/go/README.md) |
+| JavaScript | `npm install @satgate/client` | [README](sdk/nodejs/README.md) |
 
 ## Documentation
 
 - [Architecture Overview](docs/ARCHITECTURE.md)
-- [Security Model](docs/SECURITY-MODEL.md)
-- [L402 Response Schema](docs/L402-RESPONSE-SCHEMA.md)
-- [Self-Hosted Deployment](docs/SELF_HOSTED.md)
-- [API Reference](docs/API.md)
+- [Quick Start Guide](docs/getting-started/quickstart.md)
+- [Configuration Reference](docs/reference/configuration.md)
+- [Production Checklist](docs/operations/production-checklist.md)
+- [Kubernetes Deployment](docs/guides/kubernetes.md)
+- [LangChain Integration](docs/guides/langchain-integration.md)
+- [MCP Gateway Guide](docs/guides/mcp-gateway.md)
 
 ## SatGate Cloud & Enterprise
 
