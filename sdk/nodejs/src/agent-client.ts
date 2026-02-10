@@ -30,7 +30,6 @@ import {
   AuthenticationError,
   PaymentRequiredError,
   PaymentFailedError,
-  BudgetExceededError,
 } from './errors';
 
 export interface AgentResponse<T = unknown> {
@@ -333,7 +332,7 @@ export class SatGateAgentClient {
     if (contentType.includes('application/json')) {
       try {
         challenge = await response.json() as Record<string, unknown>;
-      } catch {}
+      } catch { /* ignore parse errors */ }
     }
     
     if (!this.wallet) {
