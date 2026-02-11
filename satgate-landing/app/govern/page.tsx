@@ -209,7 +209,7 @@ export default function GovernPage() {
             <div className="p-6 rounded-xl bg-gray-900 border border-yellow-800/30 hover:border-yellow-600/50 transition">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2.5 bg-yellow-900/50 rounded-lg">
-                  <CreditCard className="text-yellow-400" size={22} />
+                  <DollarSign className="text-yellow-400" size={22} />
                 </div>
                 <h3 className="font-bold text-lg">Charge</h3>
               </div>
@@ -233,7 +233,7 @@ export default function GovernPage() {
               <Sliders size={14} className="text-cyan-400" />
               <span>Control</span>
               <ChevronRight size={14} className="text-gray-600" />
-              <CreditCard size={14} className="text-yellow-400" />
+              <DollarSign size={14} className="text-yellow-400" />
               <span>Charge</span>
             </div>
           </div>
