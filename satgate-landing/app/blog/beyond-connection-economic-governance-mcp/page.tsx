@@ -303,11 +303,11 @@ routes:
             <p>A macaroon is a permission slip that can be narrowed but never widened:</p>
 
             <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 my-6 font-mono text-sm overflow-x-auto">
-              <pre className="text-gray-300">{`Root Token (Hallmark Corp)
+              <pre className="text-gray-300">{`Root Token (Acme Corp)
   └─ budget = 30,000 credits
   └─ expires = 2027-02-11
   │
-  ├─ Division Token (Hallmark Cards)
+  ├─ Division Token (Acme Digital)
   │   └─ budget = 8,000 credits  (narrowed from 30,000)
   │   └─ routes = /v1/chat/*
   │   │
@@ -315,7 +315,7 @@ routes:
   │       └─ budget = 7,000 credits  (narrowed from 8,000)
   │       └─ routes = /v1/chat/completions
   │
-  └─ Division Token (Crayola)
+  └─ Division Token (Acme Creative)
       └─ budget = 3,500 credits
       │
       └─ Agent Token (Design Generator)
@@ -339,7 +339,7 @@ X-SatGate-Budget-Limit: 2500
 
 {
   "error": "budget_exceeded",
-  "message": "Agent 'crayola-design-gen' has exhausted its budget",
+  "message": "Agent 'acme-design-gen' has exhausted its budget",
   "spent": 2500,
   "limit": 2500
 }`}</pre>
@@ -353,8 +353,8 @@ X-SatGate-Budget-Limit: 2500
             <h2 className="text-2xl font-bold text-white mt-12 mb-4">What This Looks Like in Practice</h2>
 
             <p>
-              We run a demo environment modeled on a real enterprise structure — a media conglomerate with 
-              three subsidiaries, each running multiple AI agents:
+              We run a demo environment modeled on a real enterprise structure — a technology company with 
+              four divisions, each running multiple AI agents:
             </p>
 
             <div className="overflow-x-auto my-6">
@@ -371,35 +371,35 @@ X-SatGate-Budget-Limit: 2500
                 <tbody>
                   <tr className="border-b border-gray-800">
                     <td className="p-3 font-mono text-purple-300">CS Bot</td>
-                    <td className="p-3">Hallmark Cards</td>
+                    <td className="p-3">Acme Digital</td>
                     <td className="p-3 text-right text-yellow-300">$3,712</td>
                     <td className="p-3 text-right">$7,000</td>
                     <td className="p-3 text-gray-400">Customer service (GPT-4o)</td>
                   </tr>
                   <tr className="border-b border-gray-800">
                     <td className="p-3 font-mono text-purple-300">Design Generator</td>
-                    <td className="p-3">Crayola</td>
+                    <td className="p-3">Acme Creative</td>
                     <td className="p-3 text-right text-yellow-300">$1,064</td>
                     <td className="p-3 text-right">$2,500</td>
                     <td className="p-3 text-gray-400">Image generation (DALL-E 3)</td>
                   </tr>
                   <tr className="border-b border-gray-800">
                     <td className="p-3 font-mono text-purple-300">Script Assistant</td>
-                    <td className="p-3">Hallmark Media</td>
+                    <td className="p-3">Acme Media</td>
                     <td className="p-3 text-right text-yellow-300">$571</td>
                     <td className="p-3 text-right">$1,800</td>
                     <td className="p-3 text-gray-400">Script writing (Claude)</td>
                   </tr>
                   <tr className="border-b border-gray-800">
                     <td className="p-3 font-mono text-purple-300">Safety Review</td>
-                    <td className="p-3">Crayola</td>
+                    <td className="p-3">Acme Creative</td>
                     <td className="p-3 text-right text-yellow-300">$138</td>
                     <td className="p-3 text-right">$800</td>
                     <td className="p-3 text-gray-400">Compliance checks (Claude)</td>
                   </tr>
                   <tr className="border-b border-gray-800">
                     <td className="p-3 font-mono text-purple-300">Subtitle Gen</td>
-                    <td className="p-3">Hallmark Media</td>
+                    <td className="p-3">Acme Media</td>
                     <td className="p-3 text-right text-yellow-300">$83</td>
                     <td className="p-3 text-right">$300</td>
                     <td className="p-3 text-gray-400">Transcription (Whisper)</td>
@@ -416,7 +416,7 @@ X-SatGate-Budget-Limit: 2500
             </div>
 
             <p>
-              The Crayola Design Generator spikes every Tuesday — batch jobs for weekly design reviews. Without 
+              The Design Generator spikes every Tuesday — batch jobs for weekly design reviews. Without 
               per-tool attribution, that spike is invisible in aggregate API spend. With SatGate, the CFO sees 
               exactly which agent, which division, which tool, and which day.
             </p>
