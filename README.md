@@ -214,6 +214,23 @@ routes:
 | Python | `pip install satgate` | [README](sdk/python/README.md) |
 | JavaScript | `npm install @satgate/client` | [README](sdk/nodejs/README.md) |
 
+## MCP Proxy (NEW)
+
+SatGate now includes a native **MCP proxy** that governs tool calls for any MCP-compatible agent:
+
+```bash
+# Run MCP proxy with 1000-credit budget
+satgate-mcp --config satgate-mcp.yaml
+```
+
+- **Budget enforcement**: Hard 402 when agents exhaust their allocation
+- **Delegation**: Parent agents mint sub-agent tokens with carved budgets
+- **Per-tool costs**: `web_search: 5`, `dalle_generate: 50` (wildcard patterns supported)
+- **Two transports**: stdio (local sidecar) or SSE/HTTP (remote multi-agent)
+- **Three auth modes**: none, static token, macaroon (HMAC chain)
+
+See [`pkg/mcpserver/README.md`](pkg/mcpserver/README.md) for full documentation.
+
 ## Documentation
 
 - [Architecture Overview](docs/ARCHITECTURE.md)
