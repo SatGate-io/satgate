@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	macaroonv2 "gopkg.in/macaroon.v2"
 )
 
 // Macaroon represents a capability token using chained HMAC signatures.
@@ -76,10 +78,15 @@ func (s *Service) Mint(scope string, expiresAt time.Time) (*Macaroon, error) {
 
 // Verify validates a macaroon token by reconstructing the HMAC chain
 // from the root key and comparing the final signature.
+// Accepts both binary (libmacaroon V2) and JSON (custom) formats.
 func (s *Service) Verify(token string) (*Macaroon, error) {
-	mac, err := s.Decode(token)
+	// Try binary format first (lnget/Aperture clients), then JSON format (our SDKs)
+	mac, err := s.DecodeBinary(token)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode token: %w", err)
+		mac, err = s.Decode(token)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode token: %w", err)
+		}
 	}
 
 	// Reconstruct the chained signature from root key
@@ -174,6 +181,63 @@ func (s *Service) DelegateWithoutVerify(parentToken string, additionalCaveats []
 	child.Signature = hex.EncodeToString(sig)
 
 	return child, nil
+}
+
+// EncodeBinary converts our Macaroon to a gopkg.in/macaroon.v2 binary-serialized
+// base64 string (standard libmacaroon V2 format). This is the format expected by
+// lnget, Aperture, and other standard L402 clients.
+func (s *Service) EncodeBinary(mac *Macaroon) (string, error) {
+	// Create a new v2 macaroon using our root key — this computes sig₀ = HMAC(rootKey, id)
+	v2mac, err := macaroonv2.New(s.rootKey, []byte(mac.Identifier), mac.Location, macaroonv2.V2)
+	if err != nil {
+		return "", fmt.Errorf("failed to create v2 macaroon: %w", err)
+	}
+
+	// Add each caveat — this chains the HMAC signature identically to our implementation
+	for _, caveat := range mac.Caveats {
+		if err := v2mac.AddFirstPartyCaveat([]byte(caveat)); err != nil {
+			return "", fmt.Errorf("failed to add caveat: %w", err)
+		}
+	}
+
+	// Binary serialize
+	data, err := v2mac.MarshalBinary()
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal binary: %w", err)
+	}
+
+	return base64.StdEncoding.EncodeToString(data), nil
+}
+
+// DecodeBinary deserializes a base64 standard-format binary macaroon into our Macaroon struct.
+func (s *Service) DecodeBinary(token string) (*Macaroon, error) {
+	data, err := base64.StdEncoding.DecodeString(token)
+	if err != nil {
+		// Try raw standard base64
+		data, err = base64.RawStdEncoding.DecodeString(token)
+		if err != nil {
+			return nil, fmt.Errorf("invalid base64: %w", err)
+		}
+	}
+
+	var v2mac macaroonv2.Macaroon
+	if err := v2mac.UnmarshalBinary(data); err != nil {
+		return nil, fmt.Errorf("invalid binary macaroon: %w", err)
+	}
+
+	mac := &Macaroon{
+		Version:    2,
+		Location:   v2mac.Location(),
+		Identifier: string(v2mac.Id()),
+		Caveats:    make([]string, 0),
+		Signature:  hex.EncodeToString(v2mac.Signature()),
+	}
+
+	for _, cav := range v2mac.Caveats() {
+		mac.Caveats = append(mac.Caveats, string(cav.Id))
+	}
+
+	return mac, nil
 }
 
 // Encode serializes a macaroon to a string

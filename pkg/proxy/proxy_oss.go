@@ -433,7 +433,13 @@ func (g *Gateway) issueL402Challenge(w http.ResponseWriter, r *http.Request, rou
 	mac.AddCaveat("payment_hash", paymentHash)
 	// CRITICAL: Recalculate signature after adding caveats!
 	mac.Signature = g.macaroonSvc.RecalculateSignature(mac)
-	macaroonStr := g.macaroonSvc.Encode(mac)
+	// Use binary format for L402 challenge (standard libmacaroon V2 — compatible with lnget/Aperture)
+	macaroonStr, err := g.macaroonSvc.EncodeBinary(mac)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to encode L402 macaroon as binary")
+		http.Error(w, "Internal error", http.StatusInternalServerError)
+		return
+	}
 
 	// Set L402 challenge header
 	w.Header().Set("WWW-Authenticate", fmt.Sprintf(`L402 macaroon="%s", invoice="%s"`, macaroonStr, invoice))
