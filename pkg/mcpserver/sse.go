@@ -1,0 +1,277 @@
+package mcpserver
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/rs/zerolog/log"
+)
+
+// SSEServer implements the MCP SSE transport.
+// Each client connects via GET /sse (event stream) and sends messages via POST /message.
+// This enables multiple agents to connect to a single MCP proxy over HTTP.
+type SSEServer struct {
+	proxy  *Proxy
+	mux    *http.ServeMux
+	server *http.Server
+
+	mu       sync.Mutex
+	sessions map[string]*sseSession
+}
+
+// sseSession represents one connected MCP client over SSE.
+type sseSession struct {
+	id       string
+	messages chan json.RawMessage // outbound messages to client
+	ctx      context.Context
+	cancel   context.CancelFunc
+}
+
+// NewSSEServer creates an SSE transport server for the given proxy.
+func NewSSEServer(proxy *Proxy, addr string) *SSEServer {
+	s := &SSEServer{
+		proxy:    proxy,
+		sessions: make(map[string]*sseSession),
+	}
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/sse", s.handleSSE)
+	mux.HandleFunc("/message", s.handleMessage)
+	mux.HandleFunc("/health", s.handleHealth)
+
+	s.mux = mux
+	s.server = &http.Server{
+		Addr:         addr,
+		Handler:      mux,
+		ReadTimeout:  0, // SSE needs no read timeout
+		WriteTimeout: 0, // SSE needs no write timeout
+		IdleTimeout:  0,
+	}
+
+	return s
+}
+
+// ListenAndServe starts the SSE server. Blocks until context cancelled.
+func (s *SSEServer) ListenAndServe(ctx context.Context) error {
+	// Start upstreams first
+	if err := s.proxy.upstream.Start(ctx); err != nil {
+		return fmt.Errorf("start upstreams: %w", err)
+	}
+
+	log.Info().
+		Str("addr", s.server.Addr).
+		Str("auth", s.proxy.config.Auth.Mode).
+		Str("enforcement", s.proxy.config.Enforcement.Mode).
+		Int64("budget", s.proxy.config.Budget.Limit).
+		Msg("MCP SSE server listening")
+
+	// Graceful shutdown on context cancel
+	go func() {
+		<-ctx.Done()
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		s.server.Shutdown(shutdownCtx)
+		s.proxy.upstream.Close()
+	}()
+
+	if err := s.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		return err
+	}
+	return nil
+}
+
+// handleSSE establishes an SSE connection for a client.
+// GET /sse
+// Response: text/event-stream with JSON-RPC messages as "message" events.
+// The endpoint URL for posting messages is sent as the first event.
+func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		http.Error(w, "streaming not supported", http.StatusInternalServerError)
+		return
+	}
+
+	// Create session
+	sessionID := generateSessionID()
+	ctx, cancel := context.WithCancel(r.Context())
+	session := &sseSession{
+		id:       sessionID,
+		messages: make(chan json.RawMessage, 64),
+		ctx:      ctx,
+		cancel:   cancel,
+	}
+
+	s.mu.Lock()
+	s.sessions[sessionID] = session
+	s.mu.Unlock()
+
+	defer func() {
+		s.mu.Lock()
+		delete(s.sessions, sessionID)
+		s.mu.Unlock()
+		cancel()
+		log.Info().Str("session", sessionID).Msg("SSE session closed")
+	}()
+
+	log.Info().Str("session", sessionID).Msg("SSE session established")
+
+	// Set SSE headers
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	w.Header().Set("X-Accel-Buffering", "no") // nginx
+	w.WriteHeader(http.StatusOK)
+
+	// Send endpoint event — tells the client where to POST messages
+	messageURL := fmt.Sprintf("/message?sessionId=%s", sessionID)
+	fmt.Fprintf(w, "event: endpoint\ndata: %s\n\n", messageURL)
+	flusher.Flush()
+
+	// Stream outbound messages
+	for {
+		select {
+		case msg := <-session.messages:
+			fmt.Fprintf(w, "event: message\ndata: %s\n\n", string(msg))
+			flusher.Flush()
+
+		case <-ctx.Done():
+			return
+
+		case <-r.Context().Done():
+			return
+		}
+	}
+}
+
+// handleMessage receives a JSON-RPC message from a client.
+// POST /message?sessionId=xxx
+// Body: JSON-RPC request
+// Response: 202 Accepted (response comes via SSE)
+func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+
+	sessionID := r.URL.Query().Get("sessionId")
+	if sessionID == "" {
+		http.Error(w, "sessionId required", http.StatusBadRequest)
+		return
+	}
+
+	s.mu.Lock()
+	session, ok := s.sessions[sessionID]
+	s.mu.Unlock()
+	if !ok {
+		http.Error(w, "session not found", http.StatusNotFound)
+		return
+	}
+
+	// Read request body
+	body, err := io.ReadAll(io.LimitReader(r.Body, 10*1024*1024)) // 10MB max
+	if err != nil {
+		http.Error(w, "read error", http.StatusBadRequest)
+		return
+	}
+
+	// Also check Authorization header for token (SSE auth)
+	authToken := extractAuthToken(r)
+
+	// Parse and handle
+	req, _, parseErr := ParseMessage(json.RawMessage(body))
+	if parseErr != nil {
+		http.Error(w, "invalid JSON-RPC", http.StatusBadRequest)
+		return
+	}
+
+	if req == nil {
+		w.WriteHeader(http.StatusAccepted)
+		return
+	}
+
+	// Inject auth token into params._meta if from header
+	if authToken != "" && req.Params != nil {
+		req.Params = injectMetaToken(req.Params, authToken)
+	} else if authToken != "" && req.Params == nil {
+		req.Params = json.RawMessage(fmt.Sprintf(`{"_meta":{"token":"%s"}}`, authToken))
+	}
+
+	// Handle request
+	resp, handleErr := s.proxy.handleRequest(session.ctx, req)
+	if handleErr != nil {
+		resp = NewErrorResponse(req.ID, CodeInternalError, handleErr.Error())
+	}
+
+	// Send response via SSE (not HTTP response body)
+	if resp != nil {
+		data, _ := json.Marshal(resp)
+		select {
+		case session.messages <- data:
+		default:
+			log.Warn().Str("session", sessionID).Msg("SSE message buffer full, dropping")
+		}
+	}
+
+	w.WriteHeader(http.StatusAccepted)
+}
+
+func (s *SSEServer) handleHealth(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status":  "ok",
+		"server":  s.proxy.config.Server.Name,
+		"version": s.proxy.config.Server.Version,
+		"sessions": func() int {
+			s.mu.Lock()
+			defer s.mu.Unlock()
+			return len(s.sessions)
+		}(),
+	})
+}
+
+// extractAuthToken pulls Bearer token from Authorization header.
+func extractAuthToken(r *http.Request) string {
+	auth := r.Header.Get("Authorization")
+	if auth == "" {
+		return ""
+	}
+	return strings.TrimPrefix(auth, "Bearer ")
+}
+
+// injectMetaToken adds _meta.token to params JSON if not already present.
+func injectMetaToken(params json.RawMessage, token string) json.RawMessage {
+	var m map[string]json.RawMessage
+	if err := json.Unmarshal(params, &m); err != nil {
+		return params
+	}
+
+	// Check if _meta already has a token
+	if metaRaw, ok := m["_meta"]; ok {
+		var meta map[string]interface{}
+		if err := json.Unmarshal(metaRaw, &meta); err == nil {
+			if _, hasToken := meta["token"]; hasToken {
+				return params // already has token, don't override
+			}
+			meta["token"] = token
+			metaJSON, _ := json.Marshal(meta)
+			m["_meta"] = metaJSON
+		}
+	} else {
+		metaJSON, _ := json.Marshal(map[string]string{"token": token})
+		m["_meta"] = metaJSON
+	}
+
+	result, _ := json.Marshal(m)
+	return result
+}
+
+// generateSessionID creates a short unique session ID.
+func generateSessionID() string {
+	return fmt.Sprintf("mcp-%s", hashToken(fmt.Sprintf("%d", time.Now().UnixNano()))[:8])
+}

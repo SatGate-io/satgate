@@ -1,0 +1,40 @@
+# SatGate MCP Proxy — SSE Transport Config
+# Multiple agents connect over HTTP. Each gets their own SSE session.
+
+server:
+  transport: sse
+  port: 9100
+  name: satgate-mcp-proxy
+  version: 0.1.0
+
+auth:
+  mode: header
+  rootKey: demo-root-key-2024
+  autoMintRoot: true
+
+upstreams:
+  mock:
+    transport: stdio
+    command: ["python3", "mock-mcp-server.py"]
+    timeout: 30s
+
+budget:
+  backend: memory
+  limit: 1000
+  failMode: closed
+
+tools:
+  defaultCost: 5
+  costs:
+    web_search: 5
+    database_query: 5
+    gpt4_summarize: 25
+    dalle_generate: 50
+    code_execute: 15
+
+enforcement:
+  mode: hard
+
+logging:
+  level: info
+  json: false

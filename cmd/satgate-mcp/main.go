@@ -65,9 +65,6 @@ func main() {
 		log.Fatal().Err(err).Msg("Failed to create MCP proxy")
 	}
 
-	// Create client transport (stdio)
-	clientTransport := mcpserver.NewStdioTransport(os.Stdin, os.Stdout, nil)
-
 	// Context with signal handling
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -80,10 +77,25 @@ func main() {
 		cancel()
 	}()
 
-	// Run proxy (blocks until context cancelled or error)
-	if err := proxy.Run(ctx, clientTransport); err != nil {
-		log.Error().Err(err).Msg("MCP proxy error")
-		os.Exit(1)
+	// Run based on transport mode
+	switch cfg.Server.Transport {
+	case "sse", "http":
+		addr := fmt.Sprintf(":%d", cfg.Server.Port)
+		if cfg.Server.Port == 0 {
+			addr = ":9100"
+		}
+		sseServer := mcpserver.NewSSEServer(proxy, addr)
+		if err := sseServer.ListenAndServe(ctx); err != nil {
+			log.Error().Err(err).Msg("SSE server error")
+			os.Exit(1)
+		}
+
+	default: // stdio
+		clientTransport := mcpserver.NewStdioTransport(os.Stdin, os.Stdout, nil)
+		if err := proxy.Run(ctx, clientTransport); err != nil {
+			log.Error().Err(err).Msg("MCP proxy error")
+			os.Exit(1)
+		}
 	}
 
 	log.Info().Msg("MCP proxy stopped")
