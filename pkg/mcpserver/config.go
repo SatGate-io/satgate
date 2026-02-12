@@ -63,6 +63,10 @@ type AuthConfig struct {
 
 	// RootKey for macaroon verification (for mode=header).
 	RootKey string `yaml:"rootKey,omitempty"`
+
+	// AutoMintRoot: if true (and mode=header), auto-mint a root macaroon on startup
+	// and print it to stderr. Useful for demos and development.
+	AutoMintRoot bool `yaml:"autoMintRoot,omitempty"`
 }
 
 // UpstreamConfig defines an upstream MCP server.

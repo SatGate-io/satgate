@@ -1,0 +1,42 @@
+# SatGate MCP Proxy — Delegation Demo Config
+#
+# Parent agent gets 1000 credits, delegates sub-budgets to child agents.
+# Each child operates independently with their own budget allocation.
+# When a child exhausts their budget, they get a 402 — siblings unaffected.
+
+server:
+  transport: stdio
+  name: satgate-mcp-proxy
+  version: 0.1.0
+
+auth:
+  mode: header
+  rootKey: demo-root-key-2024
+  autoMintRoot: true
+
+upstreams:
+  mock:
+    transport: stdio
+    command: ["python3", "mock-mcp-server.py"]
+    timeout: 30s
+
+budget:
+  backend: memory
+  limit: 1000     # Parent gets 1000 credits
+  failMode: closed
+
+tools:
+  defaultCost: 5
+  costs:
+    web_search: 5
+    database_query: 5
+    gpt4_summarize: 25
+    dalle_generate: 50
+    code_execute: 15
+
+enforcement:
+  mode: hard
+
+logging:
+  level: info
+  json: false

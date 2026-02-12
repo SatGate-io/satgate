@@ -1,0 +1,153 @@
+package mcpserver
+
+import (
+	"context"
+	"fmt"
+	"strings"
+
+	"github.com/satgate-io/satgate/pkg/macaroon"
+)
+
+// TokenInfo holds the verified identity from a request's auth token.
+type TokenInfo struct {
+	// TokenID is a stable identifier for the token (hash of identifier + caveats).
+	TokenID string
+
+	// BudgetID is the budget subject — either from a "budget_id" caveat or derived from TokenID.
+	BudgetID string
+
+	// Scope from the "scope" caveat.
+	Scope string
+
+	// ParentTokenID from "parent" caveat (for delegated tokens).
+	ParentTokenID string
+
+	// Raw macaroon (for delegation).
+	Raw *macaroon.Macaroon
+
+	// RawToken is the encoded token string (for re-delegation).
+	RawToken string
+}
+
+// Authenticator verifies tokens on incoming requests.
+type Authenticator interface {
+	// Verify checks a token and returns the identity, or error if invalid.
+	Verify(ctx context.Context, token string) (*TokenInfo, error)
+}
+
+// --- No-auth (for local/dev use) ---
+
+// NoAuthAuthenticator always succeeds with a default identity.
+type NoAuthAuthenticator struct {
+	DefaultTokenID string
+}
+
+func (a *NoAuthAuthenticator) Verify(_ context.Context, _ string) (*TokenInfo, error) {
+	tid := a.DefaultTokenID
+	if tid == "" {
+		tid = "default"
+	}
+	return &TokenInfo{
+		TokenID:  tid,
+		BudgetID: tid,
+		Scope:    "*",
+	}, nil
+}
+
+// --- Static token auth (config file) ---
+
+// StaticTokenAuthenticator verifies against a single configured token.
+type StaticTokenAuthenticator struct {
+	Token   string
+	TokenID string
+}
+
+func (a *StaticTokenAuthenticator) Verify(_ context.Context, token string) (*TokenInfo, error) {
+	if token == "" {
+		return nil, fmt.Errorf("token required")
+	}
+	if token != a.Token {
+		return nil, fmt.Errorf("invalid token")
+	}
+	return &TokenInfo{
+		TokenID:  a.TokenID,
+		BudgetID: a.TokenID,
+		Scope:    "*",
+	}, nil
+}
+
+// --- Macaroon auth (per-request verification) ---
+
+// MacaroonAuthenticator verifies macaroon tokens using the SatGate macaroon service.
+type MacaroonAuthenticator struct {
+	Service *macaroon.Service
+}
+
+func (a *MacaroonAuthenticator) Verify(_ context.Context, token string) (*TokenInfo, error) {
+	if token == "" {
+		return nil, fmt.Errorf("token required")
+	}
+
+	// Strip "Bearer " prefix if present
+	token = strings.TrimPrefix(token, "Bearer ")
+
+	mac, err := a.Service.Verify(token)
+	if err != nil {
+		return nil, fmt.Errorf("invalid macaroon: %w", err)
+	}
+
+	// TokenID must be unique per token — use identifier + signature
+	// (delegated tokens share the same identifier but have different signatures)
+	tokenID := hashToken(mac.Identifier + mac.Signature)
+
+	info := &TokenInfo{
+		TokenID:  tokenID,
+		Scope:    mac.GetScope(),
+		Raw:      mac,
+		RawToken: token,
+	}
+
+	// Check for budget_id caveat
+	if budgetID := mac.GetCaveat("budget_id"); budgetID != "" {
+		info.BudgetID = budgetID
+	} else {
+		info.BudgetID = tokenID
+	}
+
+	// Check for parent caveat
+	if parent := mac.GetCaveat("parent"); parent != "" {
+		info.ParentTokenID = parent
+	}
+
+	return info, nil
+}
+
+// NewAuthenticator creates the appropriate authenticator from config.
+func NewAuthenticator(cfg AuthConfig) (Authenticator, error) {
+	switch cfg.Mode {
+	case "none", "":
+		return &NoAuthAuthenticator{}, nil
+
+	case "config":
+		if cfg.Token == "" {
+			return nil, fmt.Errorf("auth.token required for mode=config")
+		}
+		return &StaticTokenAuthenticator{
+			Token:   cfg.Token,
+			TokenID: hashToken(cfg.Token),
+		}, nil
+
+	case "header":
+		if cfg.RootKey == "" {
+			return nil, fmt.Errorf("auth.rootKey required for mode=header")
+		}
+		svc, err := macaroon.NewService(cfg.RootKey)
+		if err != nil {
+			return nil, fmt.Errorf("macaroon service: %w", err)
+		}
+		return &MacaroonAuthenticator{Service: svc}, nil
+
+	default:
+		return nil, fmt.Errorf("unknown auth mode: %q", cfg.Mode)
+	}
+}

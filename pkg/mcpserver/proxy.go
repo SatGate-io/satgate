@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -14,12 +15,15 @@ import (
 // Proxy is the MCP proxy gateway. It sits between an MCP client and one or
 // more upstream MCP servers, enforcing budgets and attributing costs.
 type Proxy struct {
-	config   *Config
-	client   Transport       // client-facing transport
-	upstream *UpstreamManager
-	budget   BudgetEnforcer
-	costs    CostResolver
-	tokenID  string // current session token (from config or auth)
+	config    *Config
+	client    Transport       // client-facing transport
+	upstream  *UpstreamManager
+	budget    BudgetEnforcer
+	costs     CostResolver
+	auth      Authenticator
+	delegator *Delegator
+	tokenID   string // default session token (from config or first auth)
+	rootToken string // auto-minted root token (for delegation demos)
 }
 
 // New creates a new MCP proxy from configuration.
@@ -30,6 +34,12 @@ func New(cfg *Config) (*Proxy, error) {
 	// Build budget enforcer
 	budget := NewInMemoryBudgetEnforcer()
 
+	// Build authenticator
+	auth, err := NewAuthenticator(cfg.Auth)
+	if err != nil {
+		return nil, fmt.Errorf("auth: %w", err)
+	}
+
 	// Build upstream manager
 	upstream := NewUpstreamManager(cfg.Upstreams, cfg.Routing, cfg.DefaultUpstream)
 
@@ -38,6 +48,12 @@ func New(cfg *Config) (*Proxy, error) {
 		upstream: upstream,
 		budget:   budget,
 		costs:    costs,
+		auth:     auth,
+	}
+
+	// If macaroon auth, create delegator
+	if macAuth, ok := auth.(*MacaroonAuthenticator); ok {
+		p.delegator = NewDelegator(macAuth.Service, budget)
 	}
 
 	// Initialize budget if configured
@@ -46,6 +62,24 @@ func New(cfg *Config) (*Proxy, error) {
 		if cfg.Auth.Token != "" {
 			tokenID = hashToken(cfg.Auth.Token)
 		}
+
+		// Auto-mint root macaroon for macaroon auth mode
+		if cfg.Auth.AutoMintRoot {
+			if macAuth, ok := auth.(*MacaroonAuthenticator); ok {
+				rootMac, mintErr := macAuth.Service.Mint("api:*", time.Now().Add(24*time.Hour))
+				if mintErr != nil {
+					return nil, fmt.Errorf("auto-mint root token: %w", mintErr)
+				}
+				rootToken := macAuth.Service.Encode(rootMac)
+				// Must match MacaroonAuthenticator.Verify — identifier + signature
+				tokenID = hashToken(rootMac.Identifier + rootMac.Signature)
+				p.rootToken = rootToken
+				log.Info().Str("tokenId", tokenID).Msg("auto-minted root token")
+				fmt.Fprintf(os.Stderr, "ROOT_TOKEN=%s\n", rootToken)
+				fmt.Fprintf(os.Stderr, "TOKEN_ID=%s\n", tokenID)
+			}
+		}
+
 		p.tokenID = tokenID
 		if err := budget.Initialize(context.Background(), tokenID, cfg.Budget.Limit); err != nil {
 			return nil, fmt.Errorf("initialize budget: %w", err)
@@ -59,11 +93,25 @@ func New(cfg *Config) (*Proxy, error) {
 // SetBudgetEnforcer replaces the budget enforcer (e.g., with enterprise Redis-backed one).
 func (p *Proxy) SetBudgetEnforcer(e BudgetEnforcer) {
 	p.budget = e
+	// Update delegator if it exists
+	if p.delegator != nil {
+		p.delegator.budget = e
+	}
 }
 
 // SetCostResolver replaces the cost resolver (e.g., with enterprise per-tenant costs).
 func (p *Proxy) SetCostResolver(r CostResolver) {
 	p.costs = r
+}
+
+// RootToken returns the auto-minted root token (empty if not using autoMintRoot).
+func (p *Proxy) RootToken() string {
+	return p.rootToken
+}
+
+// SetAuthenticator replaces the authenticator.
+func (p *Proxy) SetAuthenticator(a Authenticator) {
+	p.auth = a
 }
 
 // Run starts the proxy. It blocks until ctx is cancelled or an error occurs.
@@ -79,6 +127,7 @@ func (p *Proxy) Run(ctx context.Context, clientTransport Transport) error {
 	log.Info().
 		Str("transport", p.config.Server.Transport).
 		Str("enforcement", p.config.Enforcement.Mode).
+		Str("auth", p.config.Auth.Mode).
 		Int64("budget", p.config.Budget.Limit).
 		Msg("MCP proxy running")
 
@@ -100,7 +149,6 @@ func (p *Proxy) Run(ctx context.Context, clientTransport Transport) error {
 		}
 
 		if req == nil {
-			// Response from client — shouldn't happen in normal flow
 			log.Debug().Msg("unexpected response from client")
 			continue
 		}
@@ -132,12 +180,14 @@ func (p *Proxy) Run(ctx context.Context, clientTransport Transport) error {
 
 // handleRequest dispatches a JSON-RPC request to the appropriate handler.
 func (p *Proxy) handleRequest(ctx context.Context, req *Request) (*Response, error) {
+	// Authenticate — extract token from _meta.token if present, otherwise use default
+	tokenInfo := p.authenticate(ctx, req)
+
 	switch req.Method {
 	case MethodInitialize:
 		return p.handleInitialize(req)
 
 	case MethodInitialized:
-		// Notification — no response
 		return nil, nil
 
 	case MethodPing:
@@ -147,20 +197,62 @@ func (p *Proxy) handleRequest(ctx context.Context, req *Request) (*Response, err
 		return p.handleToolsList(req)
 
 	case MethodToolsCall:
-		return p.handleToolsCall(ctx, req)
+		return p.handleToolsCall(ctx, req, tokenInfo)
+
+	case MethodSatGateDelegate:
+		return p.handleDelegate(ctx, req, tokenInfo)
+
+	case MethodSatGateBudget:
+		return HandleBudget(ctx, req, p.budget, tokenInfo)
 
 	case MethodCancelled:
-		// TODO: propagate cancellation to upstream
 		log.Debug().RawJSON("params", req.Params).Msg("cancellation received")
 		return nil, nil
 
 	default:
-		// Forward unknown methods to default upstream
 		if IsNotification(req.Method) {
 			return nil, nil
 		}
 		return p.forwardToDefault(ctx, req)
 	}
+}
+
+// authenticate extracts token from the request's _meta field or falls back to config.
+func (p *Proxy) authenticate(ctx context.Context, req *Request) *TokenInfo {
+	// Try to extract token from params._meta.token (MCP convention for metadata)
+	token := extractMetaToken(req.Params)
+
+	if token != "" {
+		info, err := p.auth.Verify(ctx, token)
+		if err != nil {
+			log.Debug().Err(err).Msg("auth failed, using default")
+		} else {
+			return info
+		}
+	}
+
+	// Fall back to default token
+	return &TokenInfo{
+		TokenID:  p.tokenID,
+		BudgetID: p.tokenID,
+		Scope:    "*",
+	}
+}
+
+// extractMetaToken pulls the token from params._meta.token if present.
+func extractMetaToken(params json.RawMessage) string {
+	if len(params) == 0 {
+		return ""
+	}
+	var meta struct {
+		Meta struct {
+			Token string `json:"token"`
+		} `json:"_meta"`
+	}
+	if err := json.Unmarshal(params, &meta); err != nil {
+		return ""
+	}
+	return meta.Meta.Token
 }
 
 // handleInitialize responds to the MCP initialize request.
@@ -214,7 +306,7 @@ func (p *Proxy) handleToolsList(req *Request) (*Response, error) {
 }
 
 // handleToolsCall is the hot path — intercepts tool calls for budget enforcement.
-func (p *Proxy) handleToolsCall(ctx context.Context, req *Request) (*Response, error) {
+func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *TokenInfo) (*Response, error) {
 	// Parse tool call
 	tc, err := ParseToolCall(req.Params)
 	if err != nil {
@@ -224,26 +316,32 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request) (*Response, e
 	// Resolve cost
 	cost := p.costs.Resolve(tc.Name)
 
+	// Determine budget identity
+	budgetID := tokenInfo.BudgetID
+	if budgetID == "" {
+		budgetID = p.tokenID
+	}
+
 	// Generate request ID for idempotency
-	requestID := generateRequestID(p.tokenID, tc.Name, req.ID)
+	requestID := generateRequestID(budgetID, tc.Name, req.ID)
 
 	log.Debug().
 		Str("tool", tc.Name).
 		Int64("cost", cost).
 		Str("enforcement", p.config.Enforcement.Mode).
-		Str("token", p.tokenID).
+		Str("budgetId", budgetID).
+		Str("tokenId", tokenInfo.TokenID).
 		Msg("tool call intercepted")
 
 	// Enforce budget (unless shadow mode)
-	if p.config.Enforcement.Mode != "shadow" && p.tokenID != "" && cost > 0 {
-		result, err := p.budget.Spend(ctx, p.tokenID, tc.Name, cost, requestID)
+	if p.config.Enforcement.Mode != "shadow" && budgetID != "" && cost > 0 {
+		result, err := p.budget.Spend(ctx, budgetID, tc.Name, cost, requestID)
 		if err != nil {
-			// Budget exhausted
 			log.Warn().
 				Str("tool", tc.Name).
 				Int64("cost", cost).
 				Int64("remaining", result.Remaining).
-				Str("token", p.tokenID).
+				Str("budgetId", budgetID).
 				Msg("budget exhausted — denying tool call")
 
 			if p.config.Enforcement.Mode == "hard" {
@@ -252,7 +350,8 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request) (*Response, e
 					"tool":              tc.Name,
 					"cost_credits":      cost,
 					"remaining_credits": result.Remaining,
-					"token_id":          p.tokenID,
+					"token_id":          tokenInfo.TokenID,
+					"budget_id":         budgetID,
 				}), nil
 			}
 			// Soft mode: warn but continue
@@ -262,6 +361,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request) (*Response, e
 				Str("tool", tc.Name).
 				Int64("cost", cost).
 				Int64("remaining", result.Remaining).
+				Str("budgetId", budgetID).
 				Msg("budget spent")
 		}
 	} else if p.config.Enforcement.Mode == "shadow" && cost > 0 {
@@ -284,8 +384,15 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request) (*Response, e
 
 	// Rewrite the response ID to match the client's request ID
 	resp.ID = req.ID
-
 	return resp, nil
+}
+
+// handleDelegate processes satgate/delegate requests.
+func (p *Proxy) handleDelegate(ctx context.Context, req *Request, tokenInfo *TokenInfo) (*Response, error) {
+	if p.delegator == nil {
+		return NewErrorResponse(req.ID, CodeMethodNotFound, "delegation requires auth.mode=header"), nil
+	}
+	return p.delegator.HandleDelegate(ctx, req, tokenInfo)
 }
 
 // forwardToDefault forwards an unrecognized method to the default upstream.
