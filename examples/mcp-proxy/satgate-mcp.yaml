@@ -1,0 +1,40 @@
+# SatGate MCP Proxy — Example Configuration
+#
+# This config proxies MCP traffic to a mock server with a 500-credit budget.
+# Tool calls cost between 5-50 credits depending on the tool.
+# The agent gets ~10-15 calls before hitting a hard 402.
+
+server:
+  transport: stdio
+  name: satgate-mcp-proxy
+  version: 0.1.0
+
+auth:
+  mode: none  # local demo, no auth needed
+
+upstreams:
+  mock:
+    transport: stdio
+    command: ["python3", "mock-mcp-server.py"]
+    timeout: 30s
+
+budget:
+  backend: memory
+  limit: 500       # 500 credits total
+  failMode: closed # deny on failure (secure default)
+
+tools:
+  defaultCost: 5
+  costs:
+    web_search: 5
+    database_query: 5
+    gpt4_summarize: 25
+    dalle_generate: 50
+    code_execute: 15
+
+enforcement:
+  mode: hard  # hard | soft | shadow
+
+logging:
+  level: info
+  json: false
