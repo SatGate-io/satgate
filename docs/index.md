@@ -25,6 +25,7 @@ SatGate Gateway is an enterprise API gateway that provides:
 | See the architecture | [Architecture](ARCHITECTURE.md) |
 | Understand policy modes | [Policy Modes](POLICY_MODES.md) |
 | Learn about tokens | [Capability Tokens](CAPABILITY_TOKENS.md) |
+| Use with lnget (Lightning Labs) | [lnget Integration](guides/lnget-integration.md) |
 | Deploy to Kubernetes | [Helm Installation](guides/kubernetes.md) |
 | See the API reference | [API Reference](api/overview.md) |
 | Run in production | [Production Checklist](operations/production-checklist.md) |
