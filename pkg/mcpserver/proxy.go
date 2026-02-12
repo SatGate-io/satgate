@@ -56,6 +56,16 @@ func New(cfg *Config) (*Proxy, error) {
 	return p, nil
 }
 
+// SetBudgetEnforcer replaces the budget enforcer (e.g., with enterprise Redis-backed one).
+func (p *Proxy) SetBudgetEnforcer(e BudgetEnforcer) {
+	p.budget = e
+}
+
+// SetCostResolver replaces the cost resolver (e.g., with enterprise per-tenant costs).
+func (p *Proxy) SetCostResolver(r CostResolver) {
+	p.costs = r
+}
+
 // Run starts the proxy. It blocks until ctx is cancelled or an error occurs.
 func (p *Proxy) Run(ctx context.Context, clientTransport Transport) error {
 	p.client = clientTransport
