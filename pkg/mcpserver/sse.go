@@ -133,11 +133,19 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "event: endpoint\ndata: %s\n\n", messageURL)
 	flusher.Flush()
 
-	// Stream outbound messages
+	// Stream outbound messages with keepalive
+	keepalive := time.NewTicker(15 * time.Second)
+	defer keepalive.Stop()
+
 	for {
 		select {
 		case msg := <-session.messages:
 			fmt.Fprintf(w, "event: message\ndata: %s\n\n", string(msg))
+			flusher.Flush()
+
+		case <-keepalive.C:
+			// SSE comment line — keeps connection alive through proxies/load balancers
+			fmt.Fprintf(w, ": keepalive\n\n")
 			flusher.Flush()
 
 		case <-ctx.Done():
@@ -202,21 +210,22 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 		req.Params = json.RawMessage(fmt.Sprintf(`{"_meta":{"token":"%s"}}`, authToken))
 	}
 
-	// Handle request
-	resp, handleErr := s.proxy.handleRequest(session.ctx, req)
-	if handleErr != nil {
-		resp = NewErrorResponse(req.ID, CodeInternalError, handleErr.Error())
-	}
-
-	// Send response via SSE (not HTTP response body)
-	if resp != nil {
-		data, _ := json.Marshal(resp)
-		select {
-		case session.messages <- data:
-		default:
-			log.Warn().Str("session", sessionID).Msg("SSE message buffer full, dropping")
+	// Handle request asynchronously — don't block the HTTP response
+	go func() {
+		resp, handleErr := s.proxy.handleRequest(session.ctx, req)
+		if handleErr != nil {
+			resp = NewErrorResponse(req.ID, CodeInternalError, handleErr.Error())
 		}
-	}
+
+		if resp != nil {
+			data, _ := json.Marshal(resp)
+			select {
+			case session.messages <- data:
+			default:
+				log.Warn().Str("session", sessionID).Msg("SSE message buffer full, dropping")
+			}
+		}
+	}()
 
 	w.WriteHeader(http.StatusAccepted)
 }
