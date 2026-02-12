@@ -9,6 +9,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'beyond-connection-economic-governance-mcp',
+    title: 'Beyond Connection: The Case for Economic Governance in MCP',
+    description: 'The MCP ecosystem talks about capability. Nobody talks about cost. Here\'s why economic policy is the missing layer — and how to enforce it at the protocol level with L402 and macaroons.',
+    date: '2026-02-12',
+    readTime: '12 min read',
+    author: 'SatGate Team',
+    tags: ['MCP', 'L402', 'Macaroons', 'Agent Economy'],
+  },
+  {
     slug: 'why-routing-isnt-governance',
     title: 'Why Routing Isn\'t Governance',
     description: 'AI gateways excel at routing LLM calls. But when agents control spend autonomously, routing isn\'t enough. You need economic governance.',
