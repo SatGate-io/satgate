@@ -180,14 +180,6 @@ func (p *Proxy) Run(ctx context.Context, clientTransport Transport) error {
 
 // handleRequest dispatches a JSON-RPC request to the appropriate handler.
 func (p *Proxy) handleRequest(ctx context.Context, req *Request) (*Response, error) {
-	// Authenticate — extract token from _meta.token if present, otherwise use default.
-	// Fail-closed: if a token is provided but invalid, deny immediately.
-	tokenInfo, authErr := p.authenticate(ctx, req)
-	if authErr != nil {
-		log.Warn().Err(authErr).Str("method", req.Method).Msg("authentication failed")
-		return NewErrorResponse(req.ID, CodeInvalidParams, authErr.Error()), nil
-	}
-
 	switch req.Method {
 	case MethodInitialize:
 		return p.handleInitialize(req)
@@ -201,14 +193,22 @@ func (p *Proxy) handleRequest(ctx context.Context, req *Request) (*Response, err
 	case MethodToolsList:
 		return p.handleToolsList(req)
 
-	case MethodToolsCall:
-		return p.handleToolsCall(ctx, req, tokenInfo)
-
-	case MethodSatGateDelegate:
-		return p.handleDelegate(ctx, req, tokenInfo)
-
-	case MethodSatGateBudget:
-		return HandleBudget(ctx, req, p.budget, tokenInfo)
+	case MethodToolsCall, MethodSatGateDelegate, MethodSatGateBudget:
+		// These methods require authentication.
+		tokenInfo, authErr := p.authenticate(ctx, req)
+		if authErr != nil {
+			log.Warn().Err(authErr).Str("method", req.Method).Msg("authentication failed")
+			return NewErrorResponse(req.ID, CodeInvalidParams, authErr.Error()), nil
+		}
+		switch req.Method {
+		case MethodToolsCall:
+			return p.handleToolsCall(ctx, req, tokenInfo)
+		case MethodSatGateDelegate:
+			return p.handleDelegate(ctx, req, tokenInfo)
+		case MethodSatGateBudget:
+			return HandleBudget(ctx, req, p.budget, tokenInfo)
+		}
+		return nil, fmt.Errorf("unreachable")
 
 	case MethodCancelled:
 		log.Debug().RawJSON("params", req.Params).Msg("cancellation received")
@@ -238,7 +238,13 @@ func (p *Proxy) authenticate(ctx context.Context, req *Request) (*TokenInfo, err
 		return info, nil
 	}
 
-	// No token provided — use default identity (for auth modes "none" and "config")
+	// No token provided.
+	// In header mode, a missing token is an auth bypass — deny it.
+	if p.config.Auth.Mode == "header" {
+		return nil, fmt.Errorf("authentication required: no token provided")
+	}
+
+	// For auth modes "none" and "config", fall back to default identity.
 	return &TokenInfo{
 		TokenID:  p.tokenID,
 		BudgetID: p.tokenID,

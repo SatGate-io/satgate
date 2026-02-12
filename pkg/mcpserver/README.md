@@ -5,7 +5,7 @@ A transparent MCP (Model Context Protocol) proxy that sits between AI agents and
 ## Architecture
 
 ```
-Agent(s) → [stdio/SSE] → SatGate MCP Proxy → [stdio/HTTP] → Upstream MCP Server(s)
+Agent(s) → [stdio/SSE] → SatGate MCP Proxy → [stdio] → Upstream MCP Server(s)
                                │
                         Budget Enforcement
                         (in-memory / Redis)

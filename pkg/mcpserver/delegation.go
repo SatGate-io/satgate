@@ -11,6 +11,12 @@ import (
 	"github.com/satgate-io/satgate/pkg/macaroon"
 )
 
+type ctxKey string
+
+// CtxDelegationID is the context key for passing delegation request ID
+// from Spend to Initialize for enterprise atomic transfer correlation.
+const CtxDelegationID ctxKey = "satgate_delegation_id"
+
 // Delegation methods — SatGate extensions to MCP.
 // These are namespaced under "satgate/" to avoid conflicts with standard MCP methods.
 const (
@@ -109,8 +115,10 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 	childToken := d.macaroonSvc.Encode(childMac)
 	childTokenID := hashToken(childMac.Identifier + childMac.Signature)
 
-	// Initialize child budget
-	if err := d.budget.Initialize(ctx, childTokenID, params.Budget); err != nil {
+	// Initialize child budget — pass delegationID via context for enterprise
+	// atomic transfer correlation (matches Spend → Initialize by exact ID).
+	initCtx := context.WithValue(ctx, CtxDelegationID, delegationID)
+	if err := d.budget.Initialize(initCtx, childTokenID, params.Budget); err != nil {
 		return nil, fmt.Errorf("initialize child budget: %w", err)
 	}
 
