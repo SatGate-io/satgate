@@ -2,6 +2,7 @@ package mcpserver
 
 import (
 	"context"
+	"crypto/subtle"
 	"fmt"
 	"strings"
 
@@ -66,7 +67,7 @@ func (a *StaticTokenAuthenticator) Verify(_ context.Context, token string) (*Tok
 	if token == "" {
 		return nil, fmt.Errorf("token required")
 	}
-	if token != a.Token {
+	if subtle.ConstantTimeCompare([]byte(token), []byte(a.Token)) != 1 {
 		return nil, fmt.Errorf("invalid token")
 	}
 	return &TokenInfo{

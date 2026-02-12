@@ -2,6 +2,8 @@ package mcpserver
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 
@@ -74,9 +76,13 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		return nil, fmt.Errorf("delegation requires macaroon auth (mode=header)")
 	}
 
-	// Carve budget from parent: atomically check & decrement parent, set child
-	// This is the critical section — parent budget goes down, child budget appears
-	parentResult, err := d.budget.Spend(ctx, parent.BudgetID, "_delegation", params.Budget, "delegate-"+parent.BudgetID)
+	// Carve budget from parent: atomically check & decrement parent, set child.
+	// Each delegation gets a unique idempotency key (nonce) so repeated calls
+	// are treated as new spends, not retries of the same operation.
+	nonce := make([]byte, 8)
+	_, _ = rand.Read(nonce)
+	delegationID := fmt.Sprintf("delegate-%s-%s-%d-%s", parent.BudgetID, params.Label, params.Budget, hex.EncodeToString(nonce))
+	parentResult, err := d.budget.Spend(ctx, parent.BudgetID, "_delegation", params.Budget, delegationID)
 	if err != nil {
 		return nil, fmt.Errorf("insufficient parent budget: %w", err)
 	}

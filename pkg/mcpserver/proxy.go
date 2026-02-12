@@ -180,8 +180,13 @@ func (p *Proxy) Run(ctx context.Context, clientTransport Transport) error {
 
 // handleRequest dispatches a JSON-RPC request to the appropriate handler.
 func (p *Proxy) handleRequest(ctx context.Context, req *Request) (*Response, error) {
-	// Authenticate — extract token from _meta.token if present, otherwise use default
-	tokenInfo := p.authenticate(ctx, req)
+	// Authenticate — extract token from _meta.token if present, otherwise use default.
+	// Fail-closed: if a token is provided but invalid, deny immediately.
+	tokenInfo, authErr := p.authenticate(ctx, req)
+	if authErr != nil {
+		log.Warn().Err(authErr).Str("method", req.Method).Msg("authentication failed")
+		return NewErrorResponse(req.ID, CodeInvalidParams, authErr.Error()), nil
+	}
 
 	switch req.Method {
 	case MethodInitialize:
@@ -218,25 +223,27 @@ func (p *Proxy) handleRequest(ctx context.Context, req *Request) (*Response, err
 }
 
 // authenticate extracts token from the request's _meta field or falls back to config.
-func (p *Proxy) authenticate(ctx context.Context, req *Request) *TokenInfo {
+// If a token is provided but fails verification, authentication fails (fail-closed).
+func (p *Proxy) authenticate(ctx context.Context, req *Request) (*TokenInfo, error) {
 	// Try to extract token from params._meta.token (MCP convention for metadata)
 	token := extractMetaToken(req.Params)
 
 	if token != "" {
 		info, err := p.auth.Verify(ctx, token)
 		if err != nil {
-			log.Debug().Err(err).Msg("auth failed, using default")
-		} else {
-			return info
+			// Fail-closed: if a token was provided but is invalid, deny the request.
+			// Never silently fall back to default identity on auth failure.
+			return nil, fmt.Errorf("authentication failed: %w", err)
 		}
+		return info, nil
 	}
 
-	// Fall back to default token
+	// No token provided — use default identity (for auth modes "none" and "config")
 	return &TokenInfo{
 		TokenID:  p.tokenID,
 		BudgetID: p.tokenID,
 		Scope:    "*",
-	}
+	}, nil
 }
 
 // extractMetaToken pulls the token from params._meta.token if present.

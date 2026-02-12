@@ -6,7 +6,7 @@
 //   - Transparent relay of all MCP JSON-RPC methods (tools/list, tools/call, etc.)
 //   - Per-tool cost attribution and budget enforcement
 //   - Request/response correlation with cancellation propagation
-//   - stdio and SSE transport support (both client-facing and upstream)
+//   - stdio and SSE transport support (client-facing); stdio upstream (HTTP upstream planned)
 //
 // The OSS version provides in-memory budget enforcement with a single budget counter.
 // SatGate Enterprise adds Redis-backed budgets, delegation hierarchies, spend ledgers,
@@ -14,7 +14,7 @@
 //
 // Architecture:
 //
-//	Agent → [stdio/SSE] → SatGate MCP Proxy → [stdio/HTTP] → Upstream MCP Server(s)
+//	Agent → [stdio/SSE] → SatGate MCP Proxy → [stdio] → Upstream MCP Server(s)
 //	                            │
 //	                     BudgetEnforcer
 //	                     (in-memory / Redis)
