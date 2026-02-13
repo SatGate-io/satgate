@@ -69,7 +69,17 @@ export default function CompareBifrostPage() {
                   <td className="py-4 text-center"><X className="inline text-red-400" size={18} /></td>
                 </tr>
                 <tr className="border-b border-gray-800">
-                  <td className="py-4 font-medium text-gray-300">MCP-aware</td>
+                  <td className="py-4 font-medium text-gray-300">MCP proxy (per-tool budgets)</td>
+                  <td className="py-4 text-center"><Check className="inline text-green-400" size={18} /></td>
+                  <td className="py-4 text-center"><X className="inline text-red-400" size={18} /></td>
+                </tr>
+                <tr className="border-b border-gray-800">
+                  <td className="py-4 font-medium text-gray-300">Budget delegation (sub-agents)</td>
+                  <td className="py-4 text-center"><Check className="inline text-green-400" size={18} /></td>
+                  <td className="py-4 text-center"><X className="inline text-red-400" size={18} /></td>
+                </tr>
+                <tr className="border-b border-gray-800">
+                  <td className="py-4 font-medium text-gray-300">MCP-aware (protocol support)</td>
                   <td className="py-4 text-center"><Check className="inline text-green-400" size={18} /></td>
                   <td className="py-4 text-center"><Check className="inline text-green-400" size={18} /></td>
                 </tr>

@@ -176,7 +176,7 @@ export default function GovernPage() {
                 <h3 className="font-bold text-lg">Observe</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                See every API call, every token, every agent — across MCP servers, REST APIs, and LLM endpoints. Full visibility with zero enforcement.
+                See every API call, every token, every agent — across MCP servers, REST APIs, and LLM endpoints. MCP proxy tracks per-tool costs in real time. Full visibility with zero enforcement.
               </p>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li className="text-purple-400">✓ Real-time request logging</li>
@@ -195,7 +195,7 @@ export default function GovernPage() {
                 <h3 className="font-bold text-lg">Control</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                Set budgets, enforce policies, gate access. Observe + enforcement.
+                Set budgets per agent, per MCP tool, per team. Hard enforcement — agents get 402'd when budgets run out. Delegation hierarchies for sub-agents.
               </p>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li className="text-cyan-400">✓ Per-agent budget limits</li>

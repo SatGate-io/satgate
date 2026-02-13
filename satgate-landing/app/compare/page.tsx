@@ -36,7 +36,7 @@ export default function ComparePage() {
                   <h2 className="text-xl font-bold">SatGate vs Bifrost</h2>
                 </div>
                 <p className="text-gray-400">
-                  LLM routing vs economic governance. Both have MCP — one controls spend.
+                  LLM routing vs economic governance. Both have MCP — only one enforces per-tool budgets on agent tool calls.
                 </p>
               </div>
               <ArrowRight className="text-gray-600 group-hover:text-purple-400 transition" size={24} />
@@ -89,7 +89,8 @@ export default function ComparePage() {
             Most AI gateways focus on <strong className="text-white">routing</strong> (Bifrost) or{' '}
             <strong className="text-white">API management</strong> (Zuplo, Kong). SatGate focuses on{' '}
             <strong className="text-cyan-400">economic governance</strong> — hard budget enforcement, 
-            per-tool cost attribution, and API monetization. Different problem, different solution.
+            per-tool cost attribution via MCP proxy, delegation hierarchies for sub-agents, and API monetization. 
+            Different problem, different solution.
           </p>
         </section>
 
