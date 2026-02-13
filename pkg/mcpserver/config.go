@@ -67,6 +67,11 @@ type AuthConfig struct {
 	// AutoMintRoot: if true (and mode=header), auto-mint a root macaroon on startup
 	// and print it to stderr. Useful for demos and development.
 	AutoMintRoot bool `yaml:"autoMintRoot,omitempty"`
+
+	// RootToken: if set (with autoMintRoot), reuse this token instead of minting a
+	// new one each startup. Keeps the token ID stable across proxy restarts so
+	// clients don't need reconfiguration and Redis budgets survive.
+	RootToken string `yaml:"rootToken,omitempty"`
 }
 
 // UpstreamConfig defines an upstream MCP server.

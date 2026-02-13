@@ -68,17 +68,30 @@ func New(cfg *Config) (*Proxy, error) {
 		// Auto-mint root macaroon for macaroon auth mode
 		if cfg.Auth.AutoMintRoot {
 			if macAuth, ok := auth.(*MacaroonAuthenticator); ok {
-				rootMac, mintErr := macAuth.Service.Mint("api:*", time.Now().Add(24*time.Hour))
-				if mintErr != nil {
-					return nil, fmt.Errorf("auto-mint root token: %w", mintErr)
+				if cfg.Auth.RootToken != "" {
+					// Reuse a pre-supplied root token (stable across restarts)
+					rootMac, verifyErr := macAuth.Service.Verify(cfg.Auth.RootToken)
+					if verifyErr != nil {
+						return nil, fmt.Errorf("verify supplied root token: %w", verifyErr)
+					}
+					tokenID = hashToken(rootMac.Identifier + rootMac.Signature)
+					p.rootToken = cfg.Auth.RootToken
+					log.Info().Str("tokenId", tokenID).Msg("reusing supplied root token")
+					fmt.Fprintf(os.Stderr, "ROOT_TOKEN=%s\n", cfg.Auth.RootToken)
+					fmt.Fprintf(os.Stderr, "TOKEN_ID=%s\n", tokenID)
+				} else {
+					rootMac, mintErr := macAuth.Service.Mint("api:*", time.Now().Add(24*time.Hour))
+					if mintErr != nil {
+						return nil, fmt.Errorf("auto-mint root token: %w", mintErr)
+					}
+					rootToken := macAuth.Service.Encode(rootMac)
+					// Must match MacaroonAuthenticator.Verify — identifier + signature
+					tokenID = hashToken(rootMac.Identifier + rootMac.Signature)
+					p.rootToken = rootToken
+					log.Info().Str("tokenId", tokenID).Msg("auto-minted root token")
+					fmt.Fprintf(os.Stderr, "ROOT_TOKEN=%s\n", rootToken)
+					fmt.Fprintf(os.Stderr, "TOKEN_ID=%s\n", tokenID)
 				}
-				rootToken := macAuth.Service.Encode(rootMac)
-				// Must match MacaroonAuthenticator.Verify — identifier + signature
-				tokenID = hashToken(rootMac.Identifier + rootMac.Signature)
-				p.rootToken = rootToken
-				log.Info().Str("tokenId", tokenID).Msg("auto-minted root token")
-				fmt.Fprintf(os.Stderr, "ROOT_TOKEN=%s\n", rootToken)
-				fmt.Fprintf(os.Stderr, "TOKEN_ID=%s\n", tokenID)
 			}
 		}
 
