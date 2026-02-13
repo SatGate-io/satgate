@@ -198,7 +198,7 @@ func (p *Proxy) handleRequest(ctx context.Context, req *Request) (*Response, err
 		tokenInfo, authErr := p.authenticate(ctx, req)
 		if authErr != nil {
 			log.Warn().Err(authErr).Str("method", req.Method).Msg("authentication failed")
-			return NewErrorResponse(req.ID, CodeInvalidParams, authErr.Error()), nil
+			return NewErrorResponse(req.ID, CodePolicyDenied, authErr.Error()), nil
 		}
 		switch req.Method {
 		case MethodToolsCall:
@@ -350,25 +350,52 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	if p.config.Enforcement.Mode != "shadow" && budgetID != "" && cost > 0 {
 		result, err := p.budget.Spend(ctx, budgetID, tc.Name, cost, requestID)
 		if err != nil {
-			log.Warn().
-				Str("tool", tc.Name).
-				Int64("cost", cost).
-				Int64("remaining", result.Remaining).
-				Str("budgetId", budgetID).
-				Msg("budget exhausted — denying tool call")
+			// Distinguish budget exhaustion (result has ErrorCode) from backend failures.
+			isBudgetExhausted := result != nil && result.ErrorCode == "budget_exhausted"
 
-			if p.config.Enforcement.Mode == "hard" {
-				return NewErrorResponseWithData(req.ID, CodeBudgetExhausted, "Budget exhausted", map[string]interface{}{
-					"error":             "budget_exhausted",
-					"tool":              tc.Name,
-					"cost_credits":      cost,
-					"remaining_credits": result.Remaining,
-					"token_id":          tokenInfo.TokenID,
-					"budget_id":         budgetID,
-				}), nil
+			if isBudgetExhausted {
+				remaining := int64(0)
+				if result != nil {
+					remaining = result.Remaining
+				}
+				log.Warn().
+					Str("tool", tc.Name).
+					Int64("cost", cost).
+					Int64("remaining", remaining).
+					Str("budgetId", budgetID).
+					Msg("budget exhausted")
+
+				if p.config.Enforcement.Mode == "hard" {
+					return NewErrorResponseWithData(req.ID, CodeBudgetExhausted, "Budget exhausted", map[string]interface{}{
+						"error":             "budget_exhausted",
+						"tool":              tc.Name,
+						"cost_credits":      cost,
+						"remaining_credits": remaining,
+						"token_id":          tokenInfo.TokenID,
+						"budget_id":         budgetID,
+					}), nil
+				}
+				// Soft mode: warn but continue
+				log.Warn().Str("tool", tc.Name).Msg("soft enforcement: allowing despite budget exhaustion")
+			} else {
+				// Backend failure (Redis down, network error, etc.)
+				log.Error().Err(err).
+					Str("tool", tc.Name).
+					Str("budgetId", budgetID).
+					Str("failMode", p.config.Budget.FailMode).
+					Msg("budget backend error")
+
+				if p.config.Budget.FailMode != "open" {
+					// fail-closed (default): deny on backend error
+					return NewErrorResponseWithData(req.ID, CodeInternalError, "Budget service unavailable", map[string]interface{}{
+						"error":    "budget_backend_error",
+						"tool":     tc.Name,
+						"failMode": "closed",
+					}), nil
+				}
+				// fail-open: log and allow through
+				log.Warn().Str("tool", tc.Name).Msg("fail-open: allowing despite budget backend error")
 			}
-			// Soft mode: warn but continue
-			log.Warn().Str("tool", tc.Name).Msg("soft enforcement: allowing despite budget exhaustion")
 		} else if result != nil {
 			log.Info().
 				Str("tool", tc.Name).

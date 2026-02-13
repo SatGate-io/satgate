@@ -218,9 +218,7 @@ func (c *Config) validate() error {
 				return fmt.Errorf("upstream %q: stdio transport requires command", name)
 			}
 		case "http", "sse":
-			if u.URL == "" {
-				return fmt.Errorf("upstream %q: http transport requires url", name)
-			}
+			return fmt.Errorf("upstream %q: http/sse upstream transport is not yet implemented (use stdio)", name)
 		default:
 			return fmt.Errorf("upstream %q: unknown transport %q (want stdio, http, or sse)", name, u.Transport)
 		}

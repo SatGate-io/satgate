@@ -219,10 +219,15 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 
 		if resp != nil {
 			data, _ := json.Marshal(resp)
+			// Block up to 5s for buffer space; if still full, drop with error log.
+			// Clients should handle missing responses via JSON-RPC request timeouts.
 			select {
 			case session.messages <- data:
-			default:
-				log.Warn().Str("session", sessionID).Msg("SSE message buffer full, dropping")
+			case <-time.After(5 * time.Second):
+				log.Error().Str("session", sessionID).Str("reqId", string(req.ID)).
+					Msg("SSE message buffer full after 5s, dropping response")
+			case <-session.ctx.Done():
+				log.Debug().Str("session", sessionID).Msg("session closed during send")
 			}
 		}
 	}()
