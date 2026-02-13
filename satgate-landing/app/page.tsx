@@ -111,7 +111,7 @@ const LandingPage = () => {
           {/* Left: Copy */}
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-6">
-              <Zap size={12} /> Now Live: Enterprise Dashboard + Python SDK
+              <Zap size={12} /> New: MCP Proxy — per-tool budget enforcement for AI agents
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
               Your AI Agents Are Spending Money.<br/>
@@ -120,7 +120,7 @@ const LandingPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-8 max-w-lg leading-relaxed">
-              SatGate is the <b>Economic Firewall</b> — see every API call, set budgets per agent, and monetize your APIs. One DNS change. Zero code changes.
+              SatGate is the <b>Economic Firewall</b> — govern every API call and MCP tool call. Per-agent budgets, per-tool cost attribution, delegation hierarchies. Works with REST APIs and MCP servers.
             </p>
             <div className="flex gap-4">
               <a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center gap-2">
@@ -183,8 +183,8 @@ const LandingPage = () => {
       {/* Two Products Section */}
       <section className="py-16 px-6 border-b border-gray-800">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-3">Two Products in One</h2>
-          <p className="text-gray-500 text-center mb-10">Use SatGate for either—or both.</p>
+          <h2 className="text-2xl font-bold text-center mb-3">Two Modes. Total Coverage.</h2>
+          <p className="text-gray-500 text-center mb-10">Govern HTTP APIs and MCP tool calls — or both.</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="p-6 rounded-xl bg-gradient-to-br from-cyan-950/30 to-cyan-900/10 border border-cyan-800/30 hover:border-cyan-600/50 transition">
@@ -192,27 +192,40 @@ const LandingPage = () => {
                 <div className="p-2.5 bg-cyan-900/50 rounded-lg">
                   <Shield className="text-cyan-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Protects against unauthorized API access</h3>
+                <h3 className="font-bold text-lg">HTTP Proxy Gateway</h3>
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Capability tokens replace accounts and API keys. No PII, no credential stuffing. Zero Trust cryptographic access control to enable high-velocity agent access.
+              <p className="text-gray-400 text-sm leading-relaxed mb-3">
+                Drop-in reverse proxy for REST APIs, LLM endpoints, and SaaS services. Capability tokens replace API keys. Per-route policies with zero code changes.
               </p>
+              <ul className="text-xs text-gray-500 space-y-1">
+                <li>✓ One DNS change deployment</li>
+                <li>✓ Cryptographic access control (Macaroons)</li>
+                <li>✓ L402 monetization + Fiat402 budgets</li>
+              </ul>
             </div>
-            <div className="p-6 rounded-xl bg-gradient-to-br from-purple-950/30 to-purple-900/10 border border-purple-800/30 hover:border-purple-600/50 transition">
+            <div className="p-6 rounded-xl bg-gradient-to-br from-purple-950/30 to-purple-900/10 border border-purple-800/30 hover:border-purple-600/50 transition relative">
+              <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-purple-900/50 border border-purple-700/50 text-purple-300 text-xs font-bold">
+                NEW
+              </div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2.5 bg-purple-900/50 rounded-lg">
                   <DollarSign className="text-purple-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Prevents API overuse and abuse</h3>
+                <h3 className="font-bold text-lg">MCP Proxy</h3>
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Every request requires a payment—an economic firewall against bots and abuse. Sub-cent pricing, no chargebacks, instant settlement.
+              <p className="text-gray-400 text-sm leading-relaxed mb-3">
+                Intercepts every MCP tool call at the JSON-RPC level. Per-tool cost profiles, hard budget enforcement, and delegation hierarchies for sub-agents.
               </p>
+              <ul className="text-xs text-gray-500 space-y-1">
+                <li>✓ Per-tool cost attribution (web_search: 10cr, code_execute: 50cr)</li>
+                <li>✓ Budget delegation — parent agents carve sub-budgets atomically</li>
+                <li>✓ Works with Claude Code, Agent Zero, Cursor, any MCP framework</li>
+              </ul>
             </div>
           </div>
           
           <p className="text-center text-gray-600 text-xs mt-8">
-            L402 is the access-control primitive; settlement rails can vary. Lightning now—others pluggable.
+            Both modes use the same token system (Macaroons), same dashboard, same delegation hierarchy.
           </p>
         </div>
       </section>
@@ -401,6 +414,37 @@ const LandingPage = () => {
             </div>
             <p className="text-center text-gray-600 text-xs mt-6">
               Route only agent traffic through SatGate. Keep existing infrastructure for legacy clients.
+            </p>
+          </div>
+
+          {/* MCP Proxy Deployment */}
+          <div className="bg-gray-900/50 border border-purple-800/30 rounded-xl p-8 mt-8">
+            <h4 className="text-center text-sm font-semibold text-purple-400 mb-2">MCP PROXY MODE <span className="ml-2 px-2 py-0.5 rounded-full bg-purple-900/50 border border-purple-700/50 text-purple-300 text-xs font-bold">NEW</span></h4>
+            <p className="text-center text-gray-500 text-sm mb-6">
+              Govern every MCP tool call. Per-tool budgets, delegation trees, real-time dashboard.
+            </p>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
+              <div className="px-5 py-3 rounded-lg bg-gray-800 border border-gray-700 text-center min-w-[160px]">
+                <span className="text-gray-300 font-medium">AI Agents</span>
+                <span className="text-gray-600 text-xs block">Claude Code / Agent Zero / Cursor</span>
+              </div>
+              <span className="text-gray-600 text-xl hidden md:block">→</span>
+              <span className="text-gray-600 md:hidden">↓</span>
+              <div className="px-5 py-4 rounded-lg bg-purple-900/40 border-2 border-purple-500/60 text-center min-w-[180px]">
+                <span className="text-purple-300 font-bold block">SatGate MCP Proxy</span>
+                <span className="text-gray-500 text-xs block mt-1">Auth · Budget · Delegation</span>
+                <span className="text-gray-500 text-xs block">Per-tool cost attribution</span>
+              </div>
+              <span className="text-gray-600 text-xl hidden md:block">→</span>
+              <span className="text-gray-600 md:hidden">↓</span>
+              <div className="px-5 py-3 rounded-lg bg-green-900/30 border border-green-700/50 text-center min-w-[160px]">
+                <span className="text-green-400 font-medium">MCP Servers</span>
+                <span className="text-gray-600 text-xs block">Tools / Databases / APIs</span>
+              </div>
+            </div>
+            <p className="text-center text-gray-500 text-sm mt-6">
+              Agents get a <span className="text-white">clean MCP error</span> when budgets run out. No agent code changes needed.
+              <br/>Supports <span className="text-white">stdio</span> (subprocess) and <span className="text-white">SSE</span> (multi-agent) transports.
             </p>
           </div>
         </div>
