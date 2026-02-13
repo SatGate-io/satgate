@@ -57,6 +57,16 @@ func NewSSEServer(proxy *Proxy, addr string) *SSEServer {
 	return s
 }
 
+// Handle registers an additional handler on the SSE server's mux.
+func (s *SSEServer) Handle(pattern string, handler http.Handler) {
+	s.mux.Handle(pattern, handler)
+}
+
+// HandleFunc registers an additional handler function on the SSE server's mux.
+func (s *SSEServer) HandleFunc(pattern string, handler http.HandlerFunc) {
+	s.mux.HandleFunc(pattern, handler)
+}
+
 // ListenAndServe starts the SSE server. Blocks until context cancelled.
 func (s *SSEServer) ListenAndServe(ctx context.Context) error {
 	// Start upstreams first

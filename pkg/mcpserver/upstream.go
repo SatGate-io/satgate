@@ -124,6 +124,7 @@ func (m *UpstreamManager) connectStdio(name string, cfg UpstreamConfig) (*Upstre
 }
 
 // readLoop continuously reads responses from an upstream and dispatches them.
+// If the upstream process dies, it attempts to respawn (stdio only).
 func (m *UpstreamManager) readLoop(ctx context.Context, client *UpstreamClient) {
 	for {
 		msg, err := client.transport.ReadMessage(ctx)
@@ -132,7 +133,51 @@ func (m *UpstreamManager) readLoop(ctx context.Context, client *UpstreamClient) 
 				return // context cancelled, clean shutdown
 			}
 			log.Error().Err(err).Str("upstream", client.name).Msg("upstream read error")
-			return
+
+			// Attempt respawn for stdio upstreams
+			cfg, hasCfg := m.config[client.name]
+			if hasCfg && cfg.Transport == "stdio" {
+				for attempt := 1; attempt <= 5; attempt++ {
+					if ctx.Err() != nil {
+						return
+					}
+					backoff := time.Duration(attempt) * 2 * time.Second
+					log.Info().Str("upstream", client.name).Int("attempt", attempt).
+						Dur("backoff", backoff).Msg("respawning upstream")
+					time.Sleep(backoff)
+
+					newClient, err := m.connectStdio(client.name, cfg)
+					if err != nil {
+						log.Error().Err(err).Str("upstream", client.name).Msg("respawn connect failed")
+						continue
+					}
+
+					// Re-initialize and discover tools
+					if err := m.initializeUpstream(ctx, newClient); err != nil {
+						log.Error().Err(err).Str("upstream", client.name).Msg("respawn initialize failed")
+						continue
+					}
+					if err := m.discoverTools(ctx, newClient); err != nil {
+						log.Error().Err(err).Str("upstream", client.name).Msg("respawn discover failed")
+						continue
+					}
+
+					// Swap client in place
+					m.mu.Lock()
+					client.transport = newClient.transport
+					client.tools = newClient.tools
+					client.toolNames = newClient.toolNames
+					client.ready = true
+					m.mu.Unlock()
+
+					log.Info().Str("upstream", client.name).Int("tools", len(newClient.toolNames)).
+						Msg("upstream respawned successfully")
+					break
+				}
+			} else {
+				return
+			}
+			continue
 		}
 
 		_, resp, err := ParseMessage(msg)
@@ -284,6 +329,17 @@ func (m *UpstreamManager) ResolveUpstream(toolName string) (*UpstreamClient, err
 				if client, ok := m.clients[rule.Upstream]; ok {
 					return client, nil
 				}
+			}
+		}
+	}
+
+	// Auto-resolve: find the upstream that discovered this tool
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	for _, client := range m.clients {
+		for _, tn := range client.toolNames {
+			if tn == toolName {
+				return client, nil
 			}
 		}
 	}
