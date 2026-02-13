@@ -117,9 +117,19 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 		s.mu.Unlock()
 		cancel()
 		log.Info().Str("session", sessionID).Msg("SSE session closed")
+		s.proxy.events.Publish(Event{
+			Type:      EventSessionClose,
+			Timestamp: time.Now(),
+			SessionID: sessionID,
+		})
 	}()
 
 	log.Info().Str("session", sessionID).Msg("SSE session established")
+	s.proxy.events.Publish(Event{
+		Type:      EventSessionConnect,
+		Timestamp: time.Now(),
+		SessionID: sessionID,
+	})
 
 	// Set SSE headers
 	w.Header().Set("Content-Type", "text/event-stream")

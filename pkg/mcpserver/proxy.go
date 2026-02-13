@@ -22,6 +22,7 @@ type Proxy struct {
 	costs     CostResolver
 	auth      Authenticator
 	delegator *Delegator
+	events    EventPublisher
 	tokenID   string // default session token (from config or first auth)
 	rootToken string // auto-minted root token (for delegation demos)
 }
@@ -49,6 +50,7 @@ func New(cfg *Config) (*Proxy, error) {
 		budget:   budget,
 		costs:    costs,
 		auth:     auth,
+		events:   &NoOpPublisher{},
 	}
 
 	// If macaroon auth, create delegator
@@ -112,6 +114,14 @@ func (p *Proxy) RootToken() string {
 // SetAuthenticator replaces the authenticator.
 func (p *Proxy) SetAuthenticator(a Authenticator) {
 	p.auth = a
+}
+
+// SetEventPublisher replaces the event publisher (e.g., with enterprise Redis pub/sub).
+func (p *Proxy) SetEventPublisher(ep EventPublisher) {
+	p.events = ep
+	if p.delegator != nil {
+		p.delegator.SetEventPublisher(ep)
+	}
 }
 
 // Run starts the proxy. It blocks until ctx is cancelled or an error occurs.
@@ -198,6 +208,14 @@ func (p *Proxy) handleRequest(ctx context.Context, req *Request) (*Response, err
 		tokenInfo, authErr := p.authenticate(ctx, req)
 		if authErr != nil {
 			log.Warn().Err(authErr).Str("method", req.Method).Msg("authentication failed")
+			p.events.Publish(Event{
+				Type:      EventAuthFailure,
+				Timestamp: time.Now(),
+				Data: map[string]interface{}{
+					"method": req.Method,
+					"error":  authErr.Error(),
+				},
+			})
 			return NewErrorResponse(req.ID, CodePolicyDenied, authErr.Error()), nil
 		}
 		switch req.Method {
@@ -365,6 +383,18 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 					Str("budgetId", budgetID).
 					Msg("budget exhausted")
 
+				p.events.Publish(Event{
+					Type:      EventBudgetExhaust,
+					Timestamp: time.Now(),
+					TokenID:   tokenInfo.TokenID,
+					BudgetID:  budgetID,
+					Data: map[string]interface{}{
+						"tool":      tc.Name,
+						"cost":      cost,
+						"remaining": remaining,
+					},
+				})
+
 				if p.config.Enforcement.Mode == "hard" {
 					return NewErrorResponseWithData(req.ID, CodeBudgetExhausted, "Budget exhausted", map[string]interface{}{
 						"error":             "budget_exhausted",
@@ -403,6 +433,18 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				Int64("remaining", result.Remaining).
 				Str("budgetId", budgetID).
 				Msg("budget spent")
+
+			p.events.Publish(Event{
+				Type:      EventBudgetSpend,
+				Timestamp: time.Now(),
+				TokenID:   tokenInfo.TokenID,
+				BudgetID:  budgetID,
+				Data: map[string]interface{}{
+					"tool":      tc.Name,
+					"cost":      cost,
+					"remaining": result.Remaining,
+				},
+			})
 		}
 	} else if p.config.Enforcement.Mode == "shadow" && cost > 0 {
 		log.Info().
@@ -410,6 +452,19 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			Int64("cost", cost).
 			Msg("shadow mode: would have charged")
 	}
+
+	// Publish tool call event
+	p.events.Publish(Event{
+		Type:      EventToolCall,
+		Timestamp: time.Now(),
+		TokenID:   tokenInfo.TokenID,
+		BudgetID:  budgetID,
+		Data: map[string]interface{}{
+			"tool":        tc.Name,
+			"cost":        cost,
+			"enforcement": p.config.Enforcement.Mode,
+		},
+	})
 
 	// Forward to upstream
 	timeout := 30 * time.Second

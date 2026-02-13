@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/satgate-io/satgate/pkg/macaroon"
@@ -62,6 +63,7 @@ type DelegateResult struct {
 type Delegator struct {
 	macaroonSvc *macaroon.Service
 	budget      BudgetEnforcer
+	events      EventPublisher
 }
 
 // NewDelegator creates a new delegator. Requires macaroon auth mode.
@@ -69,7 +71,13 @@ func NewDelegator(macaroonSvc *macaroon.Service, budget BudgetEnforcer) *Delegat
 	return &Delegator{
 		macaroonSvc: macaroonSvc,
 		budget:      budget,
+		events:      &NoOpPublisher{},
 	}
+}
+
+// SetEventPublisher sets the event publisher for delegation events.
+func (d *Delegator) SetEventPublisher(ep EventPublisher) {
+	d.events = ep
 }
 
 // Delegate creates a child token with a carved budget from the parent.
@@ -129,6 +137,20 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		Int64("parentRemaining", parentResult.Remaining).
 		Str("label", params.Label).
 		Msg("token delegated")
+
+	d.events.Publish(Event{
+		Type:      EventDelegation,
+		Timestamp: time.Now(),
+		TokenID:   parent.TokenID,
+		BudgetID:  parent.BudgetID,
+		Data: map[string]interface{}{
+			"childTokenId":    childTokenID,
+			"childBudget":     params.Budget,
+			"parentRemaining": parentResult.Remaining,
+			"label":           params.Label,
+			"scope":           params.Scope,
+		},
+	})
 
 	return &DelegateResult{
 		Token:           childToken,
