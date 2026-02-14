@@ -9,6 +9,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'security-as-a-profit-center',
+    title: 'Security as a Profit Center: Why Your Economic Firewall Pays for Itself',
+    description: 'Every security tool tells you how many attacks it stopped. SatGate tells you how many dollars it saved. Here\'s the CFO math on why economic governance is a profit center.',
+    date: '2026-02-14',
+    readTime: '12 min read',
+    author: 'Matt Dean',
+    tags: ['ROI', 'Governance', 'Enterprise', 'Cost Management'],
+  },
+  {
     slug: 'hard-capping-mcp-tool-spend',
     title: 'Hard-Capping MCP Tool Spend with SatGate Proxy',
     description: 'Your AI agent burned $500 overnight calling tools in a loop. Here\'s how to enforce real-time budget hard caps at the protocol level.',
