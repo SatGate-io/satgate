@@ -12,6 +12,20 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// ContextKey type for context values.
+type contextKey string
+
+// CtxTenantID is the context key for the tenant ID extracted from the token.
+const CtxTenantID contextKey = "satgate_tenant_id"
+
+// TenantFromContext extracts the tenant ID from a context, or returns empty string.
+func TenantFromContext(ctx context.Context) string {
+	if v, ok := ctx.Value(CtxTenantID).(string); ok {
+		return v
+	}
+	return ""
+}
+
 // Proxy is the MCP proxy gateway. It sits between an MCP client and one or
 // more upstream MCP servers, enforcing budgets and attributing costs.
 type Proxy struct {
@@ -231,6 +245,10 @@ func (p *Proxy) handleRequest(ctx context.Context, req *Request) (*Response, err
 			})
 			return NewErrorResponse(req.ID, CodePolicyDenied, authErr.Error()), nil
 		}
+		// Inject tenant ID into context for downstream use (multi-tenant budget routing)
+		if tokenInfo.TenantID != "" {
+			ctx = context.WithValue(ctx, CtxTenantID, tokenInfo.TenantID)
+		}
 		switch req.Method {
 		case MethodToolsCall:
 			return p.handleToolsCall(ctx, req, tokenInfo)
@@ -366,6 +384,9 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		budgetID = p.tokenID
 	}
 
+	// Tenant ID for event routing (multi-tenant)
+	tenantID := tokenInfo.TenantID
+
 	// Generate request ID for idempotency
 	requestID := generateRequestID(budgetID, tc.Name, req.ID)
 
@@ -401,6 +422,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 					Timestamp: time.Now(),
 					TokenID:   tokenInfo.TokenID,
 					BudgetID:  budgetID,
+					TenantID:  tenantID,
 					Data: map[string]interface{}{
 						"tool":      tc.Name,
 						"cost":      cost,
@@ -452,6 +474,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				Timestamp: time.Now(),
 				TokenID:   tokenInfo.TokenID,
 				BudgetID:  budgetID,
+				TenantID:  tenantID,
 				Data: map[string]interface{}{
 					"tool":      tc.Name,
 					"cost":      cost,
@@ -472,6 +495,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		Timestamp: time.Now(),
 		TokenID:   tokenInfo.TokenID,
 		BudgetID:  budgetID,
+		TenantID:  tenantID,
 		Data: map[string]interface{}{
 			"tool":        tc.Name,
 			"cost":        cost,

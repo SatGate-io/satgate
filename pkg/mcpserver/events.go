@@ -26,6 +26,7 @@ type Event struct {
 	SessionID string                 `json:"sessionId,omitempty"`
 	TokenID   string                 `json:"tokenId,omitempty"`
 	BudgetID  string                 `json:"budgetId,omitempty"`
+	TenantID  string                 `json:"tenantId,omitempty"`
 	Data      map[string]interface{} `json:"data,omitempty"`
 }
 

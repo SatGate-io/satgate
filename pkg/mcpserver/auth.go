@@ -17,6 +17,9 @@ type TokenInfo struct {
 	// BudgetID is the budget subject — either from a "budget_id" caveat or derived from TokenID.
 	BudgetID string
 
+	// TenantID from the "tenant_id" caveat (for multi-tenant routing).
+	TenantID string
+
 	// Scope from the "scope" caveat.
 	Scope string
 
@@ -113,6 +116,11 @@ func (a *MacaroonAuthenticator) Verify(_ context.Context, token string) (*TokenI
 		info.BudgetID = budgetID
 	} else {
 		info.BudgetID = tokenID
+	}
+
+	// Check for tenant_id caveat (multi-tenant routing)
+	if tenantID := mac.GetCaveat("tenant_id"); tenantID != "" {
+		info.TenantID = tenantID
 	}
 
 	// Check for parent caveat
