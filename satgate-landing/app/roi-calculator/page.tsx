@@ -234,7 +234,7 @@ export default function ROICalculatorPage() {
               Start Free Shadow Audit →
             </Link>
             <a
-              href="mailto:wayne@satgate.io"
+              href="mailto:contact@satgate.io"
               className="inline-block border border-gray-700 text-gray-300 px-10 py-4 rounded-full font-bold text-lg hover:border-gray-500 hover:bg-gray-800 transition"
             >
               Talk to Sales
