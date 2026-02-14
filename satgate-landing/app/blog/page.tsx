@@ -9,6 +9,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'hard-capping-mcp-tool-spend',
+    title: 'Hard-Capping MCP Tool Spend with SatGate Proxy',
+    description: 'Your AI agent burned $500 overnight calling tools in a loop. Here\'s how to enforce real-time budget hard caps at the protocol level.',
+    date: '2026-02-14',
+    readTime: '10 min read',
+    author: 'Matt Dean',
+    tags: ['MCP', 'Budget Control', 'L402', 'Cost Management'],
+  },
+  {
     slug: 'how-we-built-budget-enforcement-mcp',
     title: 'How We Built Budget Enforcement for MCP Tool Calls',
     description: '2,164 lines of Go, 28 tests, and one evening. An open-source MCP proxy that enforces per-tool budgets with cryptographic delegation.',

@@ -1,0 +1,316 @@
+import Link from 'next/link';
+import { ArrowLeft, Calendar, Clock, ExternalLink } from 'lucide-react';
+
+export const metadata = {
+  title: 'Hard-Capping MCP Tool Spend with SatGate Proxy - SatGate Blog',
+  description: 'Your AI agent burned $500 overnight calling tools in a loop. SatGate MCP Proxy enforces real-time budget hard caps so it never happens again.',
+  openGraph: {
+    title: 'Hard-Capping MCP Tool Spend with SatGate Proxy',
+    description: 'Real-time budget enforcement for MCP tool calls. Stop agent spend spirals before they start.',
+    type: 'article',
+    authors: ['Matt Dean'],
+    publishedTime: '2026-02-14T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Hard-Capping MCP Tool Spend with SatGate Proxy',
+    description: 'Real-time budget enforcement for MCP tool calls. Stop agent spend spirals before they start.',
+  },
+  keywords: ['MCP tool cost', 'Claude Code spending limit', 'MCP budget control', 'AI agent cost management', 'MCP proxy', 'L402', 'macaroons'],
+};
+
+export default function HardCappingMcpToolSpendPage() {
+  return (
+    <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <div className="max-w-3xl mx-auto px-6 py-16">
+        <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
+          <ArrowLeft size={18} /> Back to Blog
+        </Link>
+        
+        <header className="mb-12">
+          <div className="flex flex-wrap gap-2 mb-4">
+            <span className="px-2 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono">MCP</span>
+            <span className="px-2 py-1 rounded-full bg-cyan-900/30 border border-cyan-500/30 text-cyan-300 text-xs font-mono">Budget Control</span>
+            <span className="px-2 py-1 rounded-full bg-yellow-900/30 border border-yellow-500/30 text-yellow-300 text-xs font-mono">L402</span>
+            <span className="px-2 py-1 rounded-full bg-green-900/30 border border-green-500/30 text-green-300 text-xs font-mono">Cost Management</span>
+          </div>
+          
+          <h1 className="text-4xl font-bold mb-4">Hard-Capping MCP Tool Spend with SatGate Proxy</h1>
+          
+          <p className="text-xl text-gray-400 mb-6 italic">
+            Your AI agent burned $500 overnight. Here&apos;s how to make sure it never happens again.
+          </p>
+          
+          <div className="flex items-center gap-4 text-sm text-gray-500">
+            <span className="flex items-center gap-1"><Calendar size={14} /> February 14, 2026</span>
+            <span className="flex items-center gap-1"><Clock size={14} /> 10 min read</span>
+            <span>Matt Dean</span>
+          </div>
+        </header>
+
+        <article className="prose prose-invert prose-lg max-w-none">
+          
+          {/* Hook */}
+          <p className="text-gray-300 text-lg leading-relaxed">
+            Your AI agent just burned $500 overnight calling Google Search in a loop. You found out when the bill arrived. Sound familiar?
+          </p>
+          <p className="text-gray-300 leading-relaxed">
+            If you&apos;re running Claude Code, Cursor, or Claude Desktop with MCP tools, you&apos;ve probably had a version of this moment. Maybe it was $50, maybe $5,000. The pattern is always the same: an agent gets stuck, loops on a tool call, and your API bill explodes while you sleep.
+          </p>
+          <p className="text-gray-300 leading-relaxed">
+            There&apos;s a fix. And it doesn&apos;t involve monitoring dashboards, Slack alerts, or hoping you catch it in time.
+          </p>
+
+          {/* The Problem */}
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Problem: MCP Has No Credit Card Limit</h2>
+          
+          <p className="text-gray-300 leading-relaxed">
+            The <a href="https://spec.modelcontextprotocol.io" className="text-purple-400 hover:text-purple-300 underline" target="_blank" rel="noopener noreferrer">Model Context Protocol</a> is brilliant at what it does: giving AI agents structured access to tools. Search engines, databases, code execution, image generation — MCP makes it all available through a clean JSON-RPC interface.
+          </p>
+          <p className="text-gray-300 leading-relaxed">
+            What MCP doesn&apos;t do is care about cost. Every <code className="text-purple-300">tools/call</code> request flows through to the upstream server with no budget awareness whatsoever. The spec has no concept of &quot;you&apos;ve spent too much&quot; or &quot;stop here.&quot;
+          </p>
+          
+          <p className="text-gray-300 leading-relaxed font-semibold">This creates a specific, expensive failure mode:</p>
+          
+          <ul className="text-gray-300 space-y-2">
+            <li><strong className="text-white">Agent loops</strong> — A stuck agent can make thousands of tool calls before anyone notices. Each call costs real money: API credits, compute, tokens.</li>
+            <li><strong className="text-white">No built-in limits</strong> — The MCP spec includes no budget, quota, or cost mechanism. It&apos;s a capability protocol, not an economic one.</li>
+            <li><strong className="text-white">Rate limits don&apos;t help</strong> — Rate limits protect <em>servers</em> from overload. They don&apos;t protect <em>your wallet</em> from a runaway agent staying within rate limits but burning money for hours.</li>
+            <li><strong className="text-white">Manual monitoring is reactive</strong> — By the time you check a dashboard or get a Slack alert, the damage is done.</li>
+          </ul>
+
+          <div className="bg-red-900/20 border border-red-800/40 rounded-lg p-6 my-8">
+            <p className="text-red-300 font-mono text-sm mb-0">
+              💸 Real scenario: A developer left Claude Code running overnight with a web search MCP server. The agent hit a reasoning loop, called <code>brave_search</code> 3,200 times in 6 hours. Cost: $480 in API credits. The agent was technically working — just not productively.
+            </p>
+          </div>
+
+          {/* The Solution */}
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Solution: Economic Governance at the Protocol Level</h2>
+          
+          <p className="text-gray-300 leading-relaxed">
+            SatGate MCP Proxy sits between your MCP client and your MCP servers. It intercepts every <code className="text-purple-300">tools/call</code>, tracks cost in real-time, and enforces hard budget caps — not soft alerts, not warnings, actual enforcement.
+          </p>
+          <p className="text-gray-300 leading-relaxed">
+            When the budget is exhausted, the proxy returns <code className="text-purple-300">HTTP 402 Payment Required</code>. The agent receives a clean &quot;Budget exceeded&quot; message and stops. No infinite loops. No surprise bills.
+          </p>
+          <p className="text-gray-300 leading-relaxed">
+            The enforcement mechanism uses <strong className="text-white">L402 macaroons</strong> — cryptographic tokens with embedded budget constraints. Unlike API keys (which grant unlimited access until revoked), a macaroon can encode: &quot;This agent can spend up to $5 on search tools, expiring in 1 hour.&quot; The constraints are baked into the token itself and verified on every call.
+          </p>
+
+          {/* Comparison Table */}
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Governance Gap</h2>
+          
+          <p className="text-gray-300 leading-relaxed mb-6">
+            Here&apos;s what changes when you add economic governance to MCP:
+          </p>
+          
+          <div className="overflow-x-auto my-8">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-700">
+                  <th className="text-left py-3 px-4 text-gray-400 font-mono">Feature</th>
+                  <th className="text-left py-3 px-4 text-gray-400 font-mono">Standard MCP</th>
+                  <th className="text-left py-3 px-4 text-purple-400 font-mono">SatGate-Enabled MCP</th>
+                </tr>
+              </thead>
+              <tbody className="text-gray-300">
+                <tr className="border-b border-gray-800">
+                  <td className="py-3 px-4 font-medium text-white">Budget Enforcement</td>
+                  <td className="py-3 px-4 text-red-400">Faith-based (wait for bill)</td>
+                  <td className="py-3 px-4 text-green-400">Real-time hard caps</td>
+                </tr>
+                <tr className="border-b border-gray-800">
+                  <td className="py-3 px-4 font-medium text-white">Cost Attribution</td>
+                  <td className="py-3 px-4 text-red-400">Aggregate (one big bill)</td>
+                  <td className="py-3 px-4 text-green-400">Per-tool, per-agent</td>
+                </tr>
+                <tr className="border-b border-gray-800">
+                  <td className="py-3 px-4 font-medium text-white">Access Control</td>
+                  <td className="py-3 px-4 text-red-400">Static API keys</td>
+                  <td className="py-3 px-4 text-green-400">Attenuated macaroons</td>
+                </tr>
+                <tr className="border-b border-gray-800">
+                  <td className="py-3 px-4 font-medium text-white">Visibility</td>
+                  <td className="py-3 px-4 text-red-400">Post-mortem logs</td>
+                  <td className="py-3 px-4 text-green-400">Live economic telemetry</td>
+                </tr>
+                <tr className="border-b border-gray-800">
+                  <td className="py-3 px-4 font-medium text-white">Agent Loops</td>
+                  <td className="py-3 px-4 text-red-400">Infinite spend potential</td>
+                  <td className="py-3 px-4 text-green-400">Automated kill-switch</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* How It Works */}
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">How It Works</h2>
+
+          <h3 className="text-xl font-bold text-white mt-8 mb-3">Architecture</h3>
+          <p className="text-gray-300 leading-relaxed">
+            The proxy is transparent to both sides. Your MCP client thinks it&apos;s talking to the server. The server thinks it&apos;s talking to the client. SatGate sits in the middle, enforcing policy.
+          </p>
+          
+          <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
+            <code className="text-gray-300">{`┌─────────────┐     ┌──────────────────┐     ┌────────────────┐
+│  Claude Code │────▶│  SatGate Proxy   │────▶│  MCP Server    │
+│  Cursor      │◀────│                  │◀────│  (search, db…) │
+│  Claude      │     │  ✓ Budget check  │     │                │
+│  Desktop     │     │  ✓ Cost tracking │     │                │
+│              │     │  ✓ 402 on limit  │     │                │
+└─────────────┘     └──────────────────┘     └────────────────┘`}</code>
+          </pre>
+
+          <h3 className="text-xl font-bold text-white mt-8 mb-3">Configuration</h3>
+          <p className="text-gray-300 leading-relaxed">
+            Point your MCP client to SatGate instead of directly to the upstream server. Here&apos;s an example for Claude Desktop:
+          </p>
+
+          <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
+            <code className="text-green-300">{`{
+  "mcpServers": {
+    "search": {
+      "command": "satgate-proxy",
+      "args": [
+        "--upstream", "npx @anthropic/mcp-server-brave-search",
+        "--budget", "500",
+        "--budget-window", "1h",
+        "--cost-per-call", "5"
+      ]
+    }
+  }
+}`}</code>
+          </pre>
+
+          <p className="text-gray-300 leading-relaxed">
+            That&apos;s it. Your agent now has a hard cap of 500 sats per hour on search calls. No code changes. No agent modifications.
+          </p>
+
+          <h3 className="text-xl font-bold text-white mt-8 mb-3">What Happens on Each Tool Call</h3>
+          <ol className="text-gray-300 space-y-2">
+            <li><strong className="text-white">Intercept</strong> — Proxy receives the <code className="text-purple-300">tools/call</code> JSON-RPC request</li>
+            <li><strong className="text-white">Resolve cost</strong> — Looks up the tool name in the cost table (exact match or wildcard)</li>
+            <li><strong className="text-white">Check budget</strong> — Compares accumulated spend against the macaroon&apos;s budget caveat</li>
+            <li><strong className="text-white">Forward or reject</strong> — If within budget: forward to upstream, debit cost. If over budget: return 402 with a clear error message</li>
+          </ol>
+
+          <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
+            <code className="text-red-300">{`// What the agent sees when budget is exhausted:
+{
+  "jsonrpc": "2.0",
+  "error": {
+    "code": -32000,
+    "message": "Budget exceeded: 500/500 sats used. Reset in 23m."
+  }
+}`}</code>
+          </pre>
+
+          <p className="text-gray-300 leading-relaxed">
+            The agent receives a clean error, stops calling the tool, and continues with other work. No crash, no hang — just a boundary.
+          </p>
+
+          <h3 className="text-xl font-bold text-white mt-8 mb-3">Macaroon Delegation</h3>
+          <p className="text-gray-300 leading-relaxed">
+            This is where it gets powerful. L402 macaroons support <em>attenuation</em> — you can take a token and add restrictions to it, but never remove them. This lets you create delegation chains:
+          </p>
+
+          <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
+            <code className="text-cyan-300">{`# Create a root macaroon with $10 budget
+satgate token create --budget 1000 --tools "web_search,database_query"
+
+# Delegate to an agent: $5 budget, expires in 1 hour
+satgate token attenuate <root-token> \\
+  --max-budget 500 \\
+  --expires 1h \\
+  --tools "web_search"
+
+# Result: agent can spend up to $5 on web_search only, for 1 hour
+# No way to escalate beyond these constraints`}</code>
+          </pre>
+
+          <p className="text-gray-300 leading-relaxed">
+            Give your coding agent a tight budget for search. Give your research agent more for database access. Each gets exactly the permissions and budget they need — cryptographically enforced.
+          </p>
+
+          {/* Getting Started */}
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">Getting Started</h2>
+          
+          <div className="grid gap-4 my-8">
+            <a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="block bg-gray-900 border border-gray-800 rounded-lg p-6 hover:border-purple-600/50 transition no-underline">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-1">☁️ SatGate Cloud</h3>
+                  <p className="text-gray-400 text-sm mb-0">Managed proxy — deploy in minutes, no infrastructure to manage.</p>
+                </div>
+                <ExternalLink size={18} className="text-gray-500" />
+              </div>
+            </a>
+            
+            <a href="https://github.com/nicethings/satgate" target="_blank" rel="noopener noreferrer" className="block bg-gray-900 border border-gray-800 rounded-lg p-6 hover:border-purple-600/50 transition no-underline">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-1">🔧 Self-Hosted</h3>
+                  <p className="text-gray-400 text-sm mb-0">Open-source proxy — run it on your own infrastructure.</p>
+                </div>
+                <ExternalLink size={18} className="text-gray-500" />
+              </div>
+            </a>
+            
+            <Link href="/roi-calculator" className="block bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-purple-800/40 rounded-lg p-6 hover:border-purple-600/50 transition no-underline">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-1">📊 ROI Calculator</h3>
+                  <p className="text-gray-400 text-sm mb-0">Calculate how much you&apos;re losing to uncontrolled agent spend.</p>
+                </div>
+                <ExternalLink size={18} className="text-gray-500" />
+              </div>
+            </Link>
+          </div>
+
+          {/* Close */}
+          <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-8 my-12">
+            <p className="text-gray-300 text-lg leading-relaxed mb-0">
+              MCP is powerful. But power without governance is just risk. SatGate adds the economic guardrails that let you deploy agents with confidence — and a budget.
+            </p>
+          </div>
+
+        </article>
+
+        {/* Share */}
+        <div className="border-t border-gray-800 pt-8 mt-12">
+          <p className="text-gray-400 text-sm mb-4">Share this post:</p>
+          <div className="flex gap-4">
+            <a 
+              href="https://twitter.com/intent/tweet?text=Hard-Capping%20MCP%20Tool%20Spend%20with%20SatGate%20Proxy&url=https://satgate.io/blog/hard-capping-mcp-tool-spend"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm text-gray-300 hover:border-purple-600/50 hover:text-white transition"
+            >
+              Share on Twitter / X
+            </a>
+            <a 
+              href="https://www.linkedin.com/sharing/share-offsite/?url=https://satgate.io/blog/hard-capping-mcp-tool-spend"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm text-gray-300 hover:border-purple-600/50 hover:text-white transition"
+            >
+              Share on LinkedIn
+            </a>
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className="mt-12 flex flex-wrap gap-4">
+          <Link href="/pricing" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
+            View Pricing
+          </Link>
+          <Link href="/roi-calculator" className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-6 py-3 rounded-lg font-bold hover:border-purple-600/50 transition">
+            Calculate Your ROI
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
