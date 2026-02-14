@@ -92,13 +92,13 @@ const PricingPage = () => {
       <header className="pt-32 pb-10 px-6 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-            See the Bill.{' '}
+            Stop Paying for{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-              Then Stop It.
+              Agent Mistakes.
             </span>
           </h1>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Start with free, unlimited observability. Upgrade to enforce budgets when your CFO asks &ldquo;how much are we spending on AI?&rdquo;
+            Every other security tool tells you how many attacks they stopped. SatGate tells you how many dollars we saved you.
           </p>
         </div>
       </header>
@@ -133,8 +133,8 @@ const PricingPage = () => {
           {/* Free (Observe) */}
           <div className="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-600 transition flex flex-col">
             <div className="mb-6">
-              <h3 className="text-lg font-bold text-cyan-400 mb-1">Free</h3>
-              <p className="text-gray-500 text-sm">See what your agents are spending</p>
+              <h3 className="text-lg font-bold text-cyan-400 mb-1">Builder</h3>
+              <p className="text-gray-500 text-sm">Get out of the dark. See every cent in real-time.</p>
             </div>
             <div className="mb-6">
               <span className="text-4xl font-extrabold text-white">$0</span>
@@ -163,8 +163,8 @@ const PricingPage = () => {
               MOST POPULAR
             </div>
             <div className="mb-6">
-              <h3 className="text-lg font-bold text-purple-400 mb-1">Pro</h3>
-              <p className="text-gray-500 text-sm">Enforce budgets. Stop overruns.</p>
+              <h3 className="text-lg font-bold text-purple-400 mb-1">Professional</h3>
+              <p className="text-gray-500 text-sm">The only security tool that pays for itself.</p>
             </div>
             <div className="mb-6">
               <span className="text-4xl font-extrabold text-white">$99</span>
@@ -195,7 +195,7 @@ const PricingPage = () => {
           <div className="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-600 transition flex flex-col">
             <div className="mb-6">
               <h3 className="text-lg font-bold text-green-400 mb-1">Enterprise</h3>
-              <p className="text-gray-500 text-sm">Full governance, audit &amp; compliance</p>
+              <p className="text-gray-500 text-sm">Turn your infrastructure into a marketplace.</p>
             </div>
             <div className="mb-6">
               <span className="text-4xl font-extrabold text-white">Custom</span>
@@ -216,6 +216,80 @@ const PricingPage = () => {
             >
               Talk to Us →
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Why SatGate Wins */}
+      <section className="py-20 px-6 border-t border-gray-800">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-4">The Governance Gap</h2>
+          <p className="text-gray-400 text-center mb-12 max-w-2xl mx-auto">Standard MCP is an open tap for your API credits. SatGate adds the meter — and the shutoff valve.</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-800">
+                  <th className="text-left py-3 px-4 text-gray-500 font-medium">Capability</th>
+                  <th className="text-left py-3 px-4 text-gray-500 font-medium">Standard MCP</th>
+                  <th className="text-left py-3 px-4 text-purple-400 font-medium">SatGate-Enabled</th>
+                </tr>
+              </thead>
+              <tbody className="text-gray-400">
+                <tr className="border-b border-gray-800/50">
+                  <td className="py-3 px-4 text-gray-300">Budget Enforcement</td>
+                  <td className="py-3 px-4">&ldquo;Faith-based&rdquo; — wait for the bill</td>
+                  <td className="py-3 px-4 text-white">Real-time hard caps at protocol level</td>
+                </tr>
+                <tr className="border-b border-gray-800/50">
+                  <td className="py-3 px-4 text-gray-300">Cost Attribution</td>
+                  <td className="py-3 px-4">Aggregate — one big API bill</td>
+                  <td className="py-3 px-4 text-white">Per-tool / per-agent granularity</td>
+                </tr>
+                <tr className="border-b border-gray-800/50">
+                  <td className="py-3 px-4 text-gray-300">Access Control</td>
+                  <td className="py-3 px-4">Static API keys — all or nothing</td>
+                  <td className="py-3 px-4 text-white">Attenuated macaroons — time/tool limited</td>
+                </tr>
+                <tr className="border-b border-gray-800/50">
+                  <td className="py-3 px-4 text-gray-300">Visibility</td>
+                  <td className="py-3 px-4">Post-mortem — look back at logs</td>
+                  <td className="py-3 px-4 text-white">Live economic telemetry</td>
+                </tr>
+                <tr className="border-b border-gray-800/50">
+                  <td className="py-3 px-4 text-gray-300">Agent Loops</td>
+                  <td className="py-3 px-4">Potentially infinite spend</td>
+                  <td className="py-3 px-4 text-white">Automated kill-switch at threshold</td>
+                </tr>
+                <tr>
+                  <td className="py-3 px-4 text-gray-300">Authentication</td>
+                  <td className="py-3 px-4">Basic / bearer tokens</td>
+                  <td className="py-3 px-4 text-white">L402 — cryptographic proof-of-budget</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* Value Props */}
+      <section className="py-20 px-6 border-t border-gray-800">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="text-3xl mb-3">🛡</div>
+              <h3 className="font-bold text-white mb-2">Cost Avoidance</h3>
+              <p className="text-gray-400 text-sm">Stop the $500 &ldquo;hallucination loop&rdquo; at $2. Automatically revoke access for idle or runaway agents.</p>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl mb-3">⚡</div>
+              <h3 className="font-bold text-white mb-2">Operational Efficiency</h3>
+              <p className="text-gray-400 text-sm">Engineers stop acting as manual billing auditors. One proxy to govern all MCP servers.</p>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl mb-3">💰</div>
+              <h3 className="font-bold text-white mb-2">Revenue Enablement</h3>
+              <p className="text-gray-400 text-sm">Charge other companies&apos; agents micropayments via L402. Trust-as-a-Service for enterprise deals.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -255,9 +329,9 @@ const PricingPage = () => {
       {/* Bottom CTA */}
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-3">Not sure? Start with Observe.</h2>
+          <h2 className="text-2xl font-bold mb-3">If your agents aren&apos;t governed, they&apos;re a liability.</h2>
           <p className="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
-            Free, unlimited, zero risk. See what your agents are really spending — then decide if you need to stop them.
+            With SatGate, they&apos;re an asset. Start with free Observe mode and see exactly where your first $1,000 in savings will come from.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
@@ -317,7 +391,7 @@ const PricingPage = () => {
             </div>
           </div>
           <div className="pt-8 border-t border-gray-800 text-center text-gray-600 text-sm">
-            © 2025 SatGate Inc. All rights reserved. SatGate™ is a trademark of SatGate Inc. Patent Pending.
+            © 2026 SatGate Inc. All rights reserved. SatGate™ is a trademark of SatGate Inc. Patent Pending.
           </div>
         </div>
       </footer>
