@@ -32,6 +32,7 @@ const LandingPage = () => {
             <Link href="/pay" className="hover:text-white transition">Pay Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Govern</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
+            <Link href="/roi-calculator" className="hover:text-white transition">ROI Calculator</Link>
             <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
             <a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud</a>
           </div>

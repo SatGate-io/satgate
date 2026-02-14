@@ -56,6 +56,7 @@ const PricingPage = () => {
             <Link href="/pay" className="hover:text-white transition">Pay Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Govern</Link>
             <Link href="/pricing" className="text-white transition">Pricing</Link>
+            <Link href="/roi-calculator" className="hover:text-white transition">ROI Calculator</Link>
             <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
             <a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud</a>
           </div>
@@ -82,6 +83,7 @@ const PricingPage = () => {
             <Link href="/pay" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Pay Demo</Link>
             <Link href="/govern" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Govern</Link>
             <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="block text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Pricing</Link>
+            <Link href="/roi-calculator" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">ROI Calculator</Link>
             <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Docs</a>
             <a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Cloud</a>
           </div>
@@ -331,7 +333,7 @@ const PricingPage = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl font-bold mb-3">If your agents aren&apos;t governed, they&apos;re a liability.</h2>
           <p className="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
-            With SatGate, they&apos;re an asset. Start with free Observe mode and see exactly where your first $1,000 in savings will come from.
+            With SatGate, they&apos;re an asset. <Link href="/roi-calculator" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">Calculate your savings →</Link>
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
