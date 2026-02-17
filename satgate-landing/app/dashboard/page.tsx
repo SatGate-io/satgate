@@ -314,7 +314,7 @@ export default function DashboardPage() {
                 <AlertTriangle size={16} className="text-orange-400" />
               </div>
               <div className="text-2xl font-bold text-orange-400">{blockRate}%</div>
-              <div className="text-xs text-gray-600 mt-1">Attacks bankrupted</div>
+              <div className="text-xs text-gray-600 mt-1">Attacks deterred</div>
             </div>
           </div>
 
