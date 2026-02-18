@@ -302,12 +302,12 @@ const LandingPage = () => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-900/30 border border-red-500/30 text-red-300 text-xs font-mono mb-6">
-              <Shield size={12} /> Active Defense
+              <Shield size={12} /> Economic Friction
             </div>
             <h2 className="text-2xl font-bold mb-3">The Economic Firewall</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Most attacks rely on <span className="text-white font-medium">zero marginal cost</span>. DDoS, credential stuffing, scraping—all free for attackers. 
-              SatGate flips this by attaching a cryptographic cost to every request.
+              Most abuse relies on <span className="text-white font-medium">zero marginal cost</span>. DDoS, credential stuffing, scraping — all free to attempt. 
+              SatGate changes the cost structure by attaching a cryptographic cost to every request.
             </p>
           </div>
           
@@ -316,30 +316,30 @@ const LandingPage = () => {
               <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
                 <span className="text-red-400">⛔</span> DDoS
               </h4>
-              <p className="text-gray-500 text-sm mb-3">Without SatGate: <span className="text-red-400">You pay AWS</span> to reject their traffic.</p>
-              <p className="text-gray-400 text-sm">With SatGate: <span className="text-green-400">They pay</span> to annoy you.</p>
+              <p className="text-gray-500 text-sm mb-3">Without SatGate: <span className="text-red-400">You absorb the cost</span> of rejecting their traffic.</p>
+              <p className="text-gray-400 text-sm">With SatGate: <span className="text-green-400">Every request carries a cost</span> — floods become uneconomical.</p>
             </div>
             <div className="p-5 rounded-xl bg-gray-900 border border-gray-800">
               <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
                 <span className="text-red-400">🤖</span> Scraping
               </h4>
-              <p className="text-gray-500 text-sm mb-3">Without SatGate: Free data theft, rotating IPs bypass rate limits.</p>
-              <p className="text-gray-400 text-sm">With SatGate: <span className="text-green-400">Massive bill</span> for mass scrapers.</p>
+              <p className="text-gray-500 text-sm mb-3">Without SatGate: Free data extraction, rotating IPs bypass rate limits.</p>
+              <p className="text-gray-400 text-sm">With SatGate: <span className="text-green-400">Economic friction</span> makes bulk scraping unprofitable.</p>
             </div>
             <div className="p-5 rounded-xl bg-gray-900 border border-gray-800">
               <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
                 <span className="text-red-400">🔑</span> Credential Stuffing
               </h4>
-              <p className="text-gray-500 text-sm mb-3">Without SatGate: Free brute force, 1M guesses cost $0.</p>
-              <p className="text-gray-400 text-sm">With SatGate: 1M guesses = <span className="text-green-400">$50,000</span>.</p>
+              <p className="text-gray-500 text-sm mb-3">Without SatGate: Free brute force — 1M guesses cost nothing.</p>
+              <p className="text-gray-400 text-sm">With SatGate: <span className="text-green-400">Each attempt costs real money</span> — the math stops working.</p>
             </div>
           </div>
           
           <div className="bg-gradient-to-r from-red-900/20 to-orange-900/20 border border-red-800/30 rounded-xl p-6 text-center">
             <p className="text-gray-300 text-sm">
-              <span className="text-white font-semibold">"We don't just block the adversary—we bankrupt them."</span>
+              <span className="text-white font-semibold">"We don't fight abuse — we remove its economic incentive."</span>
               <br/>
-              <span className="text-gray-500 text-xs mt-2 block">Economic friction eliminates the ROI of automated attacks.</span>
+              <span className="text-gray-500 text-xs mt-2 block">When every request carries a real cost, automated abuse loses its ROI.</span>
             </p>
           </div>
         </div>
