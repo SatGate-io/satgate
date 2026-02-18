@@ -502,7 +502,7 @@ satgate spend`}</pre>
             <p>
               <strong className="text-white">SatGate Cloud</strong>: Full per-tool cost attribution, delegation 
               hierarchies, and budget enforcement.{' '}
-              <a href="https://cloud.satgate.io" className="text-purple-400 hover:text-purple-300 underline">
+              <a href="https://cloud.satgate.io/cloud/login" className="text-purple-400 hover:text-purple-300 underline">
                 Sign up for the beta
               </a>{' '}
               or{' '}

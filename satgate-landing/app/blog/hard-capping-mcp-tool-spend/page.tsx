@@ -238,7 +238,7 @@ satgate token attenuate <root-token> \\
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Getting Started</h2>
           
           <div className="grid gap-4 my-8">
-            <a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="block bg-gray-900 border border-gray-800 rounded-lg p-6 hover:border-purple-600/50 transition no-underline">
+            <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="block bg-gray-900 border border-gray-800 rounded-lg p-6 hover:border-purple-600/50 transition no-underline">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-bold text-white mb-1">☁️ SatGate Cloud</h3>
