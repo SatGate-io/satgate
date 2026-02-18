@@ -673,7 +673,7 @@ export default function GovernPage() {
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="text-gray-500 text-sm">Economic Access Control for the agent economy.</p>
+              <p className="text-gray-500 text-sm">The Economic Firewall for AI agent requests.</p>
             </div>
             <div>
               <h4 className="font-bold text-white mb-4">Product</h4>

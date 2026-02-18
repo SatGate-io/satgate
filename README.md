@@ -45,7 +45,7 @@ That's the gap. SatGate fills it.
 
 ## What is SatGate?
 
-SatGate is an open-source API gateway that adds **economic governance** to any HTTP endpoint. Drop it in front of your APIs — it handles authentication, budget enforcement, cost attribution, and optional micropayments.
+SatGate is an **Economic Firewall** that enforces **Economic Access Control** for AI agent requests. Drop it in front of your APIs — it handles authentication, budget enforcement, cost attribution, and optional micropayments.
 
 **Not another routing layer.** Routing gateways (Bifrost, LiteLLM, Portkey) optimize *which provider* handles a call. SatGate governs *whether the call should happen at all* based on budgets, policies, and cost.
 

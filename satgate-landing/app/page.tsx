@@ -115,16 +115,16 @@ const LandingPage = () => {
               <Zap size={12} /> Economic Access Control — the security primitive for the agent economy
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-              Economic Access Control<br/>
+              The Economic Firewall<br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-                for the Agent Economy.
+                for AI Agent Requests.
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              Not &ldquo;who are you?&rdquo; — <b>&ldquo;what can you afford?&rdquo;</b> The shift from identity-based to economic security.
+              SatGate is an Economic Firewall that enforces <b className="text-white">Economic Access Control</b> for AI agent requests.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
-              SatGate enforces <b className="text-white">Economic Access Control (EAC)</b> — per-agent budgets, per-tool cost attribution, delegation hierarchies. Math doesn&apos;t care how smart the AI is.
+              Per-agent budgets, per-tool cost attribution, delegation hierarchies. Not &ldquo;who are you?&rdquo; — <b>&ldquo;what can you afford?&rdquo;</b> Math doesn&apos;t care how smart the AI is.
             </p>
             <div className="flex gap-4">
               <a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center gap-2">
@@ -752,7 +752,7 @@ curl -H <span className="text-green-400">"Authorization: L402 &lt;macaroon&gt;:&
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="text-gray-500 text-sm">Economic Access Control for the API Economy.</p>
+              <p className="text-gray-500 text-sm">The Economic Firewall for AI agent requests.</p>
               <p className="text-gray-600 text-xs mt-3">Non-custodial. We never hold your keys.</p>
             </div>
             <div>

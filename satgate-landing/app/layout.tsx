@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SatGate™ - EZ-Pass for the API Economy",
-  description: "API protection and payments via Lightning micropayments. Meter in sats per request. No accounts. No bank required.",
+  title: "SatGate™ - The Economic Firewall for AI Agent Requests",
+  description: "SatGate is an Economic Firewall that enforces Economic Access Control for AI agent requests. Per-agent budgets, per-tool cost attribution, delegation hierarchies.",
   icons: {
     icon: "/logo.png",
     apple: "/logo.png",

@@ -115,8 +115,8 @@ export default function DesignPartnersPage() {
             </span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            We're working with <strong className="text-white">10 enterprises</strong> to build the economic firewall
-            for the agent economy. Gate your MCP tool servers, REST APIs, and LLM endpoints — see what each agent spends per call. Get free access, direct engineering support, and a product shaped by your needs.
+            We're working with <strong className="text-white">10 enterprises</strong> to deploy the Economic Firewall
+            that enforces Economic Access Control for AI agent requests. Gate your MCP tool servers, REST APIs, and LLM endpoints — see what each agent spends per call. Get free access, direct engineering support, and a product shaped by your needs.
           </p>
           <a href="#apply" className="inline-flex items-center gap-2 bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
             Apply Now <ArrowRight size={18} />
@@ -454,7 +454,7 @@ export default function DesignPartnersPage() {
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="text-gray-500 text-sm">The governance layer for AI agents.</p>
+              <p className="text-gray-500 text-sm">The Economic Firewall for AI agent requests.</p>
             </div>
             <div>
               <h4 className="font-bold text-white mb-4">Product</h4>

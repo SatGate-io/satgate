@@ -252,7 +252,7 @@ export default function ROICalculatorPage() {
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="text-gray-500 text-sm">EZ-Pass for the API Economy.</p>
+              <p className="text-gray-500 text-sm">The Economic Firewall for AI agent requests.</p>
               <p className="text-gray-600 text-xs mt-3">Non-custodial. We never hold your keys.</p>
             </div>
             <div>
