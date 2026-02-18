@@ -70,17 +70,17 @@ export default function GovernPage() {
       <header className="pt-32 pb-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-6">
-            <Shield size={12} /> Enterprise AI Governance
+            <Shield size={12} /> Economic Access Control (EAC)
           </div>
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-            See Everything.{' '}
+            Economic Access Control.{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-              Control What Matters.
+              Not &ldquo;Who Are You?&rdquo; — &ldquo;What Can You Afford?&rdquo;
             </span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Your AI agents are spending money, calling APIs, and making decisions—with zero visibility.
-            SatGate gives you the governance layer: <strong className="text-white">observe</strong> every call,{' '}
+            RBAC asks for identity. EAC asks for a budget. Your AI agents are spending money, calling APIs, and making decisions — with zero economic constraints.
+            SatGate enforces <strong className="text-white">Economic Access Control</strong>: <strong className="text-white">observe</strong> every call,{' '}
             <strong className="text-white">control</strong> every budget, and{' '}
             <strong className="text-white">charge back</strong> every dollar to the right team.
           </p>
@@ -556,6 +556,93 @@ export default function GovernPage() {
         </div>
       </section>
 
+      {/* Tragedy of the Commons */}
+      <section className="py-20 px-6 border-t border-gray-800 bg-gradient-to-b from-orange-950/10 to-black">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-900/30 border border-orange-500/30 text-orange-300 text-xs font-mono mb-6">
+              <AlertTriangle size={12} /> The Core Problem
+            </div>
+            <h2 className="text-3xl font-bold mb-4">The Tragedy of the Commons — Inside Your Company</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Every shared internal API is a commons. When agents have unlimited access, they over-consume. 
+              The team that built the service pays the infrastructure bill. The team running the agent gets free compute. 
+              <span className="text-white font-medium"> Nobody optimizes because nobody pays.</span>
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="p-6 rounded-xl bg-red-950/20 border border-red-900/30">
+              <h3 className="font-bold text-red-300 mb-3 flex items-center gap-2">
+                <AlertTriangle size={18} className="text-red-400" /> Without EAC
+              </h3>
+              <ul className="space-y-3 text-sm text-gray-400">
+                <li>• Agent team says &ldquo;we need unlimited access&rdquo;</li>
+                <li>• Platform team absorbs the cost</li>
+                <li>• No signal on which calls are valuable vs. wasteful</li>
+                <li>• Agents spam the most powerful tool because it&apos;s free</li>
+                <li className="text-red-400 font-medium">• IT remains a cost center forever</li>
+              </ul>
+            </div>
+            <div className="p-6 rounded-xl bg-green-950/20 border border-green-900/30">
+              <h3 className="font-bold text-green-300 mb-3 flex items-center gap-2">
+                <CheckCircle size={18} className="text-green-400" /> With EAC
+              </h3>
+              <ul className="space-y-3 text-sm text-gray-400">
+                <li>• Every agent gets a budget — hard cap, no exceptions</li>
+                <li>• High-risk actions cost more, loops bankrupt themselves</li>
+                <li>• Agents naturally optimize for efficiency</li>
+                <li>• Platform teams become measurable <span className="text-green-400">profit centers</span></li>
+                <li className="text-green-400 font-medium">• You can&apos;t out-smart an AI swarm, but you can hard-cap its wallet</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Internal API Market */}
+      <section className="py-20 px-6 border-t border-gray-800">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-900/30 border border-cyan-500/30 text-cyan-300 text-xs font-mono mb-6">
+              <Coins size={12} /> The Opportunity
+            </div>
+            <h2 className="text-3xl font-bold mb-4">Your Internal APIs Are an Untapped Market</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Every internal service — databases, search indexes, ML models — has a real cost per call. 
+              EAC makes that cost visible and enforceable. Suddenly your internal tooling isn&apos;t overhead. 
+              It&apos;s a <span className="text-white font-medium">marketplace</span>.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="p-5 rounded-xl bg-gray-900 border border-gray-800 text-center">
+              <div className="text-3xl mb-3">📊</div>
+              <h4 className="font-semibold text-white mb-2">Price Discovery</h4>
+              <p className="text-gray-500 text-sm">When every call has a cost, you learn which internal APIs are actually valuable vs. over-provisioned.</p>
+            </div>
+            <div className="p-5 rounded-xl bg-gray-900 border border-gray-800 text-center">
+              <div className="text-3xl mb-3">⚖️</div>
+              <h4 className="font-semibold text-white mb-2">Natural Load Balancing</h4>
+              <p className="text-gray-500 text-sm">Expensive calls get used thoughtfully. Cheap calls get used freely. The market allocates resources better than any policy doc.</p>
+            </div>
+            <div className="p-5 rounded-xl bg-gray-900 border border-gray-800 text-center">
+              <div className="text-3xl mb-3">💰</div>
+              <h4 className="font-semibold text-white mb-2">Profit Centers</h4>
+              <p className="text-gray-500 text-sm">Platform teams charge for what they provide. Agent teams budget for what they consume. IT finally has a P&amp;L.</p>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-cyan-900/20 to-purple-900/20 border border-cyan-800/30 rounded-xl p-6 text-center">
+            <p className="text-gray-300 text-sm">
+              <span className="text-white font-semibold">&ldquo;Stop giving AI agents an all-you-can-eat buffet pass.&rdquo;</span>
+              <br/>
+              <span className="text-gray-500 text-xs mt-2 block">Give them a budget. Let economics do what policy never could.</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="py-20 px-6 border-t border-gray-800 bg-gradient-to-b from-purple-950/20 to-black">
         <div className="max-w-3xl mx-auto text-center">
@@ -586,7 +673,7 @@ export default function GovernPage() {
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="text-gray-500 text-sm">The governance layer for AI agents.</p>
+              <p className="text-gray-500 text-sm">Economic Access Control for the agent economy.</p>
             </div>
             <div>
               <h4 className="font-bold text-white mb-4">Product</h4>

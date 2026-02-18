@@ -112,16 +112,19 @@ const LandingPage = () => {
           {/* Left: Copy */}
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-6">
-              <Zap size={12} /> New: MCP Proxy — per-tool budget enforcement for AI agents
+              <Zap size={12} /> Economic Access Control — the security primitive for the agent economy
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-              Your AI Agents Are Spending Money.<br/>
+              Economic Access Control<br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-                Do You Know How Much?
+                for the Agent Economy.
               </span>
             </h1>
-            <p className="text-xl text-gray-400 mb-8 max-w-lg leading-relaxed">
-              SatGate is the <b>Economic Firewall</b> — govern every API call and MCP tool call. Per-agent budgets, per-tool cost attribution, delegation hierarchies. Works with REST APIs and MCP servers.
+            <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
+              Not &ldquo;who are you?&rdquo; — <b>&ldquo;what can you afford?&rdquo;</b> The shift from identity-based to economic security.
+            </p>
+            <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
+              SatGate enforces <b className="text-white">Economic Access Control (EAC)</b> — per-agent budgets, per-tool cost attribution, delegation hierarchies. Math doesn&apos;t care how smart the AI is.
             </p>
             <div className="flex gap-4">
               <a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center gap-2">
@@ -180,6 +183,52 @@ const LandingPage = () => {
           </div>
         </div>
       </header>
+
+      {/* RBAC vs EAC Comparison */}
+      <section className="py-16 px-6 border-b border-gray-800 bg-gradient-to-b from-purple-950/10 to-black">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl font-bold mb-3">RBAC Was Built for Humans. EAC Is Built for Agents.</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Stop giving AI agents an all-you-can-eat buffet pass. You can&apos;t out-smart an AI swarm, but you can hard-cap its wallet.
+            </p>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="border-b border-gray-800">
+                  <th className="text-left py-3 px-4 text-gray-500 font-medium">Feature</th>
+                  <th className="text-left py-3 px-4 text-red-400 font-medium">RBAC <span className="text-gray-600 font-normal">(Legacy)</span></th>
+                  <th className="text-left py-3 px-4 text-green-400 font-medium">EAC <span className="text-gray-600 font-normal">(SatGate)</span></th>
+                </tr>
+              </thead>
+              <tbody className="text-gray-400">
+                <tr className="border-b border-gray-800/50">
+                  <td className="py-4 px-4 text-white font-medium">Core Metric</td>
+                  <td className="py-4 px-4"><span className="text-red-400/80">Identity &amp; Title</span> — static, context-blind</td>
+                  <td className="py-4 px-4"><span className="text-green-400">Budgets &amp; Macaroons</span> — dynamic, self-enforcing</td>
+                </tr>
+                <tr className="border-b border-gray-800/50">
+                  <td className="py-4 px-4 text-white font-medium">Agent Behavior</td>
+                  <td className="py-4 px-4">Spams most powerful tool available</td>
+                  <td className="py-4 px-4"><span className="text-green-400">Naturally optimizes for efficiency</span></td>
+                </tr>
+                <tr className="border-b border-gray-800/50">
+                  <td className="py-4 px-4 text-white font-medium">Risk Management</td>
+                  <td className="py-4 px-4">Context blind — runaway agent can drop DB in seconds</td>
+                  <td className="py-4 px-4"><span className="text-green-400">Self-healing</span> — high-risk actions cost more, loops bankrupt themselves</td>
+                </tr>
+                <tr>
+                  <td className="py-4 px-4 text-white font-medium">Financial Impact</td>
+                  <td className="py-4 px-4">IT = Cost Center</td>
+                  <td className="py-4 px-4"><span className="text-green-400">Internal tools = measurable Profit Centers</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
 
       {/* Two Products Section */}
       <section className="py-16 px-6 border-b border-gray-800">
@@ -304,10 +353,10 @@ const LandingPage = () => {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-900/30 border border-red-500/30 text-red-300 text-xs font-mono mb-6">
               <Shield size={12} /> Economic Friction
             </div>
-            <h2 className="text-2xl font-bold mb-3">The Economic Firewall</h2>
+            <h2 className="text-2xl font-bold mb-3">Economic Access Control in Action</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Most abuse relies on <span className="text-white font-medium">zero marginal cost</span>. DDoS, credential stuffing, scraping — all free to attempt. 
-              SatGate changes the cost structure by attaching a cryptographic cost to every request.
+              EAC changes the cost structure: every request carries a cryptographic cost. Math doesn&apos;t care how smart the AI is.
             </p>
           </div>
           
@@ -703,7 +752,7 @@ curl -H <span className="text-green-400">"Authorization: L402 &lt;macaroon&gt;:&
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="text-gray-500 text-sm">EZ-Pass for the API Economy.</p>
+              <p className="text-gray-500 text-sm">Economic Access Control for the API Economy.</p>
               <p className="text-gray-600 text-xs mt-3">Non-custodial. We never hold your keys.</p>
             </div>
             <div>
