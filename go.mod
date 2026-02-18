@@ -1,14 +1,13 @@
 module github.com/satgate-io/satgate
 
-go 1.24.1
-
-toolchain go1.24.11
+go 1.25.0
 
 require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/nbd-wtf/go-nostr v0.52.3
 	github.com/redis/go-redis/v9 v9.17.3
 	github.com/rs/zerolog v1.34.0
+	gopkg.in/macaroon.v2 v2.1.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -38,12 +37,11 @@ require (
 	github.com/tidwall/match v1.2.0 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
-	golang.org/x/arch v0.23.0 // indirect
+	golang.org/x/arch v0.24.0 // indirect
 	golang.org/x/crypto v0.47.0 // indirect
-	golang.org/x/exp v0.0.0-20260112195511-716be5621a96 // indirect
+	golang.org/x/exp v0.0.0-20260212183809-81e46e3db34a // indirect
 	golang.org/x/net v0.49.0 // indirect
-	golang.org/x/sys v0.40.0 // indirect
-	gopkg.in/macaroon.v2 v2.1.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
 )
 
 // Note: Run `go mod tidy` after extraction to update dependencies
