@@ -35,7 +35,7 @@ const LandingPage = () => {
             <Link href="/roi-calculator" className="hover:text-white transition">ROI Calculator</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
             <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a>
-            <a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud</a>
+            <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud</a>
           </div>
           
           {/* Mobile menu button */}
@@ -103,7 +103,7 @@ const LandingPage = () => {
               GitHub
             </a>
             <a 
-              href="https://cloud.satgate.io" 
+              href="https://cloud.satgate.io/cloud/login" 
               target="_blank" 
               rel="noopener noreferrer"
               onClick={() => setMobileMenuOpen(false)} 
@@ -137,7 +137,7 @@ const LandingPage = () => {
               Per-agent budgets, per-tool cost attribution, delegation hierarchies. Not &ldquo;who are you?&rdquo; — <b>&ldquo;what can you afford?&rdquo;</b> Math doesn&apos;t care how smart the AI is.
             </p>
             <div className="flex gap-4">
-              <a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center gap-2">
+              <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center gap-2">
                 Start Free →
               </a>
               <button 
@@ -747,7 +747,7 @@ curl -H <span className="text-green-400">"Authorization: L402 &lt;macaroon&gt;:&
               <a href="mailto:contact@satgate.io" className="inline-block bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-10 py-4 rounded-full font-bold text-lg hover:opacity-90 transition shadow-lg shadow-purple-500/20">
                 Get in Touch
               </a>
-              <a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="inline-block bg-white text-black px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-200 transition">
+              <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="inline-block bg-white text-black px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-200 transition">
                 Start Free →
               </a>
             </div>
@@ -775,7 +775,7 @@ curl -H <span className="text-green-400">"Authorization: L402 &lt;macaroon&gt;:&
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
                 <li><Link href="/compare" className="hover:text-white transition">Compare</Link></li>
                 <li><Link href="/blog" className="hover:text-white transition">Blog</Link></li>
-                <li><a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud Dashboard</a></li>
+                <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud Dashboard</a></li>
               </ul>
             </div>
             <div>
