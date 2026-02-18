@@ -33,7 +33,8 @@ const LandingPage = () => {
             <Link href="/govern" className="hover:text-white transition">Govern</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
             <Link href="/roi-calculator" className="hover:text-white transition">ROI Calculator</Link>
-            <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
+            <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
+            <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a>
             <a href="https://cloud.satgate.io" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud</a>
           </div>
           
@@ -84,13 +85,22 @@ const LandingPage = () => {
               Pricing
             </Link>
             <a 
-              href="https://github.com/SatGate-io/satgate" 
+              href="https://cloud.satgate.io/docs" 
               target="_blank" 
               rel="noopener noreferrer"
               onClick={() => setMobileMenuOpen(false)} 
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Docs
+            </a>
+            <a 
+              href="https://github.com/SatGate-io/satgate" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)} 
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              GitHub
             </a>
             <a 
               href="https://cloud.satgate.io" 
@@ -233,7 +243,7 @@ const LandingPage = () => {
       {/* Two Products Section */}
       <section className="py-16 px-6 border-b border-gray-800">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-3">Two Modes. Total Coverage.</h2>
+          <h2 className="text-2xl font-bold text-center mb-3">Two Proxies. Total Coverage.</h2>
           <p className="text-gray-500 text-center mb-10">Govern HTTP APIs and MCP tool calls — or both.</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -284,7 +294,7 @@ const LandingPage = () => {
       <section className="py-20 px-6 border-b border-gray-800 bg-gradient-to-b from-gray-900/30 to-black">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3">Three Modes. One Gateway.</h2>
+            <h2 className="text-3xl font-bold mb-3">Three Tiers. One Gateway.</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">Start with visibility. Add controls when you&apos;re ready. Monetize when the time is right.</p>
           </div>
 
@@ -759,7 +769,7 @@ curl -H <span className="text-green-400">"Authorization: L402 &lt;macaroon&gt;:&
               <h4 className="font-bold text-white mb-4">Resources</h4>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
-                <li><a href="https://github.com/SatGate-io/satgate#-quick-start" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Documentation</a></li>
+                <li><a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Documentation</a></li>
                 <li><Link href="/govern" className="hover:text-white transition">Govern</Link></li>
                 <li><Link href="/design-partners" className="hover:text-white transition">Design Partners</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
