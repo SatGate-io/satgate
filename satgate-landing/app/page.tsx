@@ -290,65 +290,128 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Three Modes Section */}
+      {/* Default Protection + Economic Policies */}
       <section className="py-20 px-6 border-b border-gray-800 bg-gradient-to-b from-gray-900/30 to-black">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3">Three Tiers. One Gateway.</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">Start with visibility. Add controls when you&apos;re ready. Monetize when the time is right.</p>
+            <h2 className="text-3xl font-bold mb-3">Default Protection + Economic Policies</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">Protection is the foundation. Choose your economic policy per route.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {/* Free (Observe) */}
-            <div className="p-6 rounded-xl bg-gradient-to-br from-cyan-950/30 to-cyan-900/10 border border-cyan-800/30 hover:border-cyan-600/50 transition relative">
+          {/* Default Protection - Foundation */}
+          <div className="p-8 rounded-xl bg-black border-2 border-purple-500/50 mb-6 relative">
+            <div className="absolute -top-3 left-6 bg-purple-600 text-xs font-bold px-3 py-1 rounded">
+              DEFAULT PROTECTION
+            </div>
+            <div className="flex items-center gap-3 mb-4 mt-2">
+              <div className="p-3 bg-purple-900/30 rounded-lg">
+                <Shield className="text-purple-400" size={24} />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold">Cryptographic Capability Verification</h3>
+                <p className="text-gray-500 text-sm">Always-on for non-PUBLIC routes</p>
+              </div>
+            </div>
+            <p className="text-gray-400 leading-relaxed mb-4">
+              Every protected route requires valid credentials (Macaroons). Capabilities, caveats, 
+              delegation, and revocation—built into the protocol, not bolted on.
+            </p>
+            <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+              <span>✓ Capabilities + Caveats</span>
+              <span>✓ Delegation chains</span>
+              <span>✓ Instant revocation</span>
+              <span>✓ Tamper-evident audit</span>
+            </div>
+          </div>
+
+          {/* Economic Policy Cards with Pricing Tiers */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            {/* Observe — Free */}
+            <div className="p-6 rounded-xl bg-black border border-cyan-800/30 hover:border-cyan-600/50 transition relative">
               <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-cyan-900/50 border border-cyan-700/50 text-cyan-300 text-xs font-bold">
                 FREE
               </div>
-              <div className="flex items-center gap-3 mb-4">
+              <div className="text-xs text-purple-400 mb-2">Protected by default →</div>
+              <div className="flex items-center gap-3 mb-3">
                 <div className="p-2.5 bg-cyan-900/50 rounded-lg">
                   <Eye className="text-cyan-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Free</h3>
+                <h3 className="font-bold text-lg">Observe</h3>
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                <span className="text-cyan-400 font-medium">Observe mode.</span> See every API call by agent, team, and cost. Usage attribution, cost center tagging, zero latency impact.
+              <p className="text-gray-400 text-sm mb-3">
+                verify → allow → meter/log
               </p>
+              <p className="text-xs text-cyan-400/80 mb-3 italic">
+                Perfect for audit logs and FinOps visibility.
+              </p>
+              <ul className="text-xs text-gray-500 space-y-1">
+                <li>✓ Usage attribution by team</li>
+                <li>✓ Cost center tagging</li>
+                <li>✓ Zero latency impact</li>
+              </ul>
             </div>
 
-            {/* Pro (Control + Charge) */}
-            <div className="p-6 rounded-xl bg-gradient-to-br from-purple-950/30 to-purple-900/10 border-2 border-purple-500/50 hover:border-purple-400/70 transition relative">
+            {/* Control — $99/mo */}
+            <div className="p-6 rounded-xl bg-black border-2 border-purple-500/50 hover:border-purple-400/70 transition relative">
               <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-purple-900/50 border border-purple-700/50 text-purple-300 text-xs font-bold">
                 $99/mo
               </div>
-              <div className="flex items-center gap-3 mb-4">
+              <div className="text-xs text-purple-400 mb-2">Protected by default →</div>
+              <div className="flex items-center gap-3 mb-3">
                 <div className="p-2.5 bg-purple-900/50 rounded-lg">
                   <SlidersHorizontal className="text-purple-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Pro</h3>
+                <h3 className="font-bold text-lg">Control</h3>
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                <span className="text-purple-400 font-medium">Control + Charge.</span> Set budgets per agent, team, API. Hard stops when limits hit. Plus L402 monetization for your APIs.
+              <p className="text-gray-400 text-sm mb-3">
+                verify → enforce budget → allow
               </p>
+              <p className="text-xs text-purple-400/80 mb-3 italic">
+                Enforce strict budgets and spending caps.
+              </p>
+              <ul className="text-xs text-gray-500 space-y-1">
+                <li>✓ Real-time budget enforcement</li>
+                <li>✓ Fiat402 challenge/response</li>
+                <li>✓ ERP/billing integration</li>
+              </ul>
             </div>
 
-            {/* Enterprise */}
-            <div className="p-6 rounded-xl bg-gradient-to-br from-green-950/30 to-green-900/10 border border-green-800/30 hover:border-green-600/50 transition relative">
+            {/* Charge — Custom */}
+            <div className="p-6 rounded-xl bg-black border border-green-800/30 hover:border-green-600/50 transition relative">
               <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-green-900/50 border border-green-700/50 text-green-300 text-xs font-bold">
                 Custom
               </div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2.5 bg-green-900/50 rounded-lg">
-                  <Shield className="text-green-400" size={22} />
+              <div className="text-xs text-purple-400 mb-2">Protected by default →</div>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2.5 bg-yellow-900/50 rounded-lg">
+                  <DollarSign className="text-yellow-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Enterprise</h3>
+                <h3 className="font-bold text-lg">Charge</h3>
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                <span className="text-green-400 font-medium">Full governance.</span> Unlimited requests, hybrid/on-prem deployment, SSO/SCIM, audit trails, SOC 2 compliance, dedicated support.
+              <p className="text-gray-400 text-sm mb-3">
+                verify → payment proof → allow
               </p>
+              <p className="text-xs text-yellow-400/80 mb-3 italic">
+                Monetize via L402 or Fiat billing.
+              </p>
+              <ul className="text-xs text-gray-500 space-y-1">
+                <li>✓ Bitcoin Lightning (instant)</li>
+                <li>✓ Per-request pricing</li>
+                <li>✓ Agent-native payments</li>
+              </ul>
             </div>
           </div>
 
-          <div className="text-center">
+          {/* PUBLIC callout */}
+          <div className="p-4 rounded-lg bg-green-950/20 border border-green-900/30">
+            <p className="text-sm text-gray-400">
+              <span className="text-green-400 font-medium">PUBLIC</span> is the explicit opt-out for 
+              probes (<code className="bg-gray-800 px-1 rounded text-gray-300">/healthz</code>), docs, and webhooks. 
+              Everything else is protected by default.
+            </p>
+          </div>
+
+          <div className="text-center mt-8">
             <Link href="/pricing" className="text-sm text-purple-400 hover:text-purple-300 transition underline underline-offset-4">
               See full pricing details →
             </Link>
@@ -400,6 +463,275 @@ const LandingPage = () => {
               <br/>
               <span className="text-gray-500 text-xs mt-2 block">When every request carries a real cost, automated abuse loses its ROI.</span>
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Enterprise-Safe Architecture */}
+      <section className="py-20 px-6 border-b border-gray-800 bg-gradient-to-b from-purple-950/10 to-black">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-6">
+              <Cpu size={12} /> SatGate Architecture
+            </div>
+            <h2 className="text-3xl font-bold mb-3">Enterprise-Safe by Design</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Separate trust boundaries, auditable config lifecycle, and per-tenant isolation built in.
+            </p>
+          </div>
+
+          {/* Architecture Components */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="p-6 rounded-xl bg-gray-900 border border-purple-800/30">
+              <div className="flex items-center gap-3 mb-3">
+                <Key className="text-purple-400" size={20} />
+                <h4 className="font-semibold text-purple-400">The Mint (Trust Broker)</h4>
+              </div>
+              <p className="text-sm text-gray-400">
+                The &ldquo;Badge Office.&rdquo; Translates platform identities 
+                (Kubernetes tokens, AWS roles, OIDC) into SatGate Macaroons.
+              </p>
+            </div>
+            <div className="p-6 rounded-xl bg-gray-900 border border-green-800/30">
+              <div className="flex items-center gap-3 mb-3">
+                <Shield className="text-green-400" size={20} />
+                <h4 className="font-semibold text-green-400">The Gateway (HTTP Proxy)</h4>
+              </div>
+              <p className="text-sm text-gray-400">
+                Reverse proxy for REST APIs, LLM endpoints, SaaS services. Per-route policies, 
+                budget enforcement, L402/Fiat402 monetization.
+              </p>
+            </div>
+            <div className="p-6 rounded-xl bg-gray-900 border border-cyan-800/30 relative">
+              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-cyan-900/50 border border-cyan-700/50 text-cyan-300 text-[10px] font-bold">NEW</div>
+              <div className="flex items-center gap-3 mb-3">
+                <Zap className="text-cyan-400" size={20} />
+                <h4 className="font-semibold text-cyan-400">MCP Proxy (Agent Tools)</h4>
+              </div>
+              <p className="text-sm text-gray-400">
+                Intercepts MCP tool calls at the JSON-RPC level. Per-tool cost profiles, 
+                budget delegation for sub-agents, real-time MCP dashboard.
+              </p>
+            </div>
+          </div>
+
+          {/* Control Plane vs Data Plane */}
+          <div className="p-8 rounded-xl bg-gray-900/50 border border-gray-800 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-purple-900/30 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Lock className="text-purple-400" size={28} />
+                </div>
+                <h4 className="font-semibold mb-2 text-purple-400">Control Plane</h4>
+                <p className="text-sm text-gray-500">
+                  Private API for admin + config. Never exposed to public internet.
+                </p>
+              </div>
+              <div className="hidden md:flex items-center justify-center">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <span>←</span>
+                  <span className="text-xs">Isolated</span>
+                  <span>→</span>
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-900/30 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Activity className="text-green-400" size={28} />
+                </div>
+                <h4 className="font-semibold mb-2 text-green-400">Data Plane</h4>
+                <p className="text-sm text-gray-500">
+                  Public gateway endpoint. Only proxies tenant traffic. No admin access.
+                </p>
+              </div>
+            </div>
+
+            {/* Request Flow */}
+            <div className="mt-8 pt-6 border-t border-gray-800">
+              <p className="text-xs text-gray-500 text-center mb-3">Request Flow (Data Plane)</p>
+              <div className="flex items-center justify-center gap-2 text-sm flex-wrap">
+                <code className="bg-gray-800 px-3 py-1 rounded text-gray-400">Request</code>
+                <span className="text-gray-600">→</span>
+                <code className="bg-purple-900/30 px-3 py-1 rounded text-purple-400 border border-purple-500/30">Verify capability</code>
+                <span className="text-gray-600">→</span>
+                <code className="bg-cyan-900/30 px-3 py-1 rounded text-cyan-400 border border-cyan-500/30">Apply policy</code>
+                <span className="text-gray-600">→</span>
+                <code className="bg-gray-800 px-3 py-1 rounded text-gray-400">Upstream</code>
+              </div>
+            </div>
+          </div>
+
+          {/* Enterprise Checklist */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { icon: <Shield size={18} className="text-purple-400" />, title: 'SSRF-safe upstream validation', desc: 'Blocks private IPs, metadata endpoints, DNS rebinding' },
+              { icon: <GitBranch size={18} className="text-cyan-400" />, title: 'Config versioning + applied gating', desc: 'Draft → Save → Apply workflow with rollback' },
+              { icon: <Activity size={18} className="text-green-400" />, title: 'Per-tenant limits enforced', desc: 'Routes, upstreams, requests—all plan-gated' },
+              { icon: <RefreshCw size={18} className="text-yellow-400" />, title: 'Audit log for all mutations', desc: 'Actor, timestamp, config hash, diff summary' },
+              { icon: <Lock size={18} className="text-red-400" />, title: 'Tenant routing isolation', desc: 'No cross-tenant config bleed, fail-closed on errors' },
+              { icon: <Key size={18} className="text-blue-400" />, title: 'HttpOnly session cookies', desc: 'No localStorage tokens, CSRF protected' },
+            ].map((item, i) => (
+              <div key={i} className="flex items-start gap-3 p-4 rounded-lg bg-gray-900/50 border border-gray-800">
+                {item.icon}
+                <div>
+                  <div className="font-medium text-white">{item.title}</div>
+                  <div className="text-sm text-gray-500">{item.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Settlement Rails */}
+      <section className="py-20 px-6 border-b border-gray-800">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-3">Charge <span className="text-gray-500 font-normal">(optional)</span>: Settlement Rails</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              When you choose the <span className="text-yellow-400">Charge</span> policy, pick your settlement mechanism. 
+              Same gateway, same protection, different payment rails.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-6 rounded-xl bg-gray-900 border border-purple-800/30">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-purple-900/30 rounded-lg">
+                  <Activity className="text-purple-400" size={20} />
+                </div>
+                <div>
+                  <h3 className="font-bold">Internal</h3>
+                  <span className="text-xs text-purple-400">Observe / Control policies</span>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm mb-4">
+                Track usage per tenant/team/project. No end-user payment—meter (Observe) 
+                or enforce budgets (Control) internally.
+              </p>
+              <div className="text-xs text-gray-500">
+                <strong className="text-gray-400">Best for:</strong> Internal platforms, FinOps, cost allocation
+              </div>
+            </div>
+
+            <div className="p-6 rounded-xl bg-gray-900 border border-cyan-800/30">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-cyan-900/30 rounded-lg">
+                  <DollarSign className="text-cyan-400" size={20} />
+                </div>
+                <div>
+                  <h3 className="font-bold">Fiat402</h3>
+                  <span className="text-xs text-cyan-400">Stripe-backed</span>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm mb-4">
+                Standard billing workflows via card or invoice. Same gateway enforcement, 
+                enterprise procurement-friendly.
+              </p>
+              <div className="text-xs text-gray-500">
+                <strong className="text-gray-400">Best for:</strong> Enterprise teams, procurement, SaaS billing
+              </div>
+            </div>
+
+            <div className="p-6 rounded-xl bg-gray-900 border border-yellow-800/30">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-yellow-900/30 rounded-lg">
+                  <Zap className="text-yellow-400" size={20} />
+                </div>
+                <div>
+                  <h3 className="font-bold">L402</h3>
+                  <span className="text-xs text-yellow-400">Lightning / instant</span>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm mb-4">
+                Sub-second settlement, no chargebacks, per-request pricing. 
+                Perfect for developer APIs, AI agents, and micropayments.
+              </p>
+              <div className="text-xs text-gray-500">
+                <strong className="text-gray-400">Best for:</strong> Developer-first APIs, agents, global users
+              </div>
+            </div>
+          </div>
+
+          <p className="text-center text-gray-500 text-sm mt-8">
+            Start with Observe or Control, enable Charge when ready—per route, per tenant.
+          </p>
+        </div>
+      </section>
+
+      {/* Three Deployment Models */}
+      <section className="py-20 px-6 border-b border-gray-800 bg-gradient-to-b from-gray-900/30 to-black">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-3">One Platform, Three Deployment Models</h2>
+            <p className="text-gray-400">Pick the model that fits your ops, security, and data residency requirements.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* SaaS */}
+            <div className="p-6 rounded-xl bg-gray-900 border border-green-800/30">
+              <div className="flex items-center gap-3 mb-3">
+                <Zap className="text-green-400" size={20} />
+                <h3 className="text-lg font-bold text-green-400">SaaS</h3>
+                <span className="text-xs bg-green-600 px-2 py-0.5 rounded">Fast Start</span>
+              </div>
+              <p className="text-gray-500 text-xs mb-3 italic">Fully managed gateway + control plane</p>
+              <p className="text-gray-400 text-sm mb-3">
+                Point DNS to SatGate. We run everything. Zero ops—live in minutes.
+              </p>
+              <ul className="text-xs text-gray-500 space-y-1">
+                <li>✓ Zero infra—we handle everything</li>
+                <li>✓ *.satgate.cloud or custom domain</li>
+                <li>✓ Dashboard, billing, audit logs</li>
+                <li>✓ Best for public APIs &amp; edge endpoints</li>
+              </ul>
+            </div>
+
+            {/* Hybrid */}
+            <div className="p-6 rounded-xl bg-gray-900 border-2 border-purple-500/50 relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-600 text-xs px-3 py-1 rounded-full font-bold">
+                Recommended
+              </div>
+              <div className="flex items-center gap-3 mb-3">
+                <Cpu className="text-purple-400" size={20} />
+                <h3 className="text-lg font-bold text-purple-400">Hybrid</h3>
+              </div>
+              <p className="text-gray-500 text-xs mb-3 italic">Managed control plane + gateway in your VPC</p>
+              <p className="text-gray-400 text-sm mb-3">
+                Policies + dashboard in SatGate Cloud; data plane runs in your network. 
+                Payloads never leave your VPC.
+              </p>
+              <ul className="text-xs text-gray-500 space-y-1">
+                <li>✓ Data stays in your network</li>
+                <li>✓ Cloud dashboard + config versioning</li>
+                <li>✓ Telemetry + audit logs hosted</li>
+                <li>✓ Deploy gateway via Helm/Docker</li>
+              </ul>
+            </div>
+
+            {/* Self-Host */}
+            <div className="p-6 rounded-xl bg-gray-900 border border-gray-800">
+              <div className="flex items-center gap-3 mb-3">
+                <Lock className="text-gray-400" size={20} />
+                <h3 className="text-lg font-bold">Self-Host</h3>
+              </div>
+              <p className="text-gray-500 text-xs mb-3 italic">You run both planes</p>
+              <p className="text-gray-400 text-sm mb-3">
+                Full control. Deploy control plane + gateway in your own infra. 
+                Air-gapped, on-prem, or private cloud.
+              </p>
+              <ul className="text-xs text-gray-500 space-y-1">
+                <li>✓ Complete data sovereignty</li>
+                <li>✓ SSO/SCIM, IP allowlists, GitOps</li>
+                <li>✓ Air-gapped + compliance exports</li>
+                <li>✓ Private networking, no egress</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="text-center mt-8">
+            <a href="mailto:contact@satgate.io" className="text-purple-400 hover:text-purple-300 transition">
+              Talk to us about Enterprise or Self-Host deployment →
+            </a>
           </div>
         </div>
       </section>
@@ -627,42 +959,97 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* How L402 Works Section */}
-      <section className="py-16 px-6 border-b border-gray-800">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-3">How L402 Works</h2>
-          <p className="text-gray-500 text-center mb-10">Three steps. No accounts. Instant access.</p>
+      {/* How It Works - 4-Step Walkthrough */}
+      <section className="py-20 px-6 border-b border-gray-800 bg-gradient-to-b from-gray-900/30 to-black">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-3">How It Works</h2>
+            <p className="text-gray-400 max-w-xl mx-auto">
+              Four steps to protect your API. No code changes required.
+            </p>
+          </div>
           
-          {/* 3-Step Flow */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-2 mb-10">
-            <div className="flex-1 max-w-[200px] p-5 rounded-xl bg-gray-900 border border-gray-800 text-center">
-              <div className="text-2xl font-bold text-purple-400 mb-2">1</div>
-              <div className="font-semibold text-white mb-1">Request API</div>
-              <div className="text-xs text-gray-500">Client hits protected endpoint</div>
-            </div>
-            <div className="text-gray-600 text-2xl hidden md:block">→</div>
-            <div className="text-gray-600 text-xl md:hidden">↓</div>
-            <div className="flex-1 max-w-[200px] p-5 rounded-xl bg-gray-900 border border-gray-800 text-center">
-              <div className="text-2xl font-bold text-yellow-400 mb-2">2</div>
-              <div className="font-semibold text-white mb-1">402 + Invoice</div>
-              <div className="text-xs text-gray-500">Gateway returns Lightning invoice</div>
-            </div>
-            <div className="text-gray-600 text-2xl hidden md:block">→</div>
-            <div className="text-gray-600 text-xl md:hidden">↓</div>
-            <div className="flex-1 max-w-[200px] p-5 rounded-xl bg-gray-900 border border-gray-800 text-center">
-              <div className="text-2xl font-bold text-cyan-400 mb-2">3</div>
-              <div className="font-semibold text-white mb-1">Pay → Access</div>
-              <div className="text-xs text-gray-500">Pay invoice, get L402 token</div>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {[
+              {
+                step: "1",
+                title: "Pick Your Policy",
+                description: "Define routes with economic policies. PUBLIC for probes/docs, protected for everything else.",
+                code: `routes:\n  - path: /healthz\n    policy: public\n  - path: /v1/*\n    policy: observe\n  - path: /premium/*\n    policy: charge`
+              },
+              {
+                step: "2",
+                title: "Apply Config",
+                description: "Apply when ready. Version history + audit log. Rollback if needed.",
+                code: `v3 (applied) ← current\nv2 (available)\nv1 (available)\n\nAudit: who, when, diff`
+              },
+              {
+                step: "3",
+                title: "Point Your DNS",
+                description: "Use *.satgate.cloud or your custom domain. Traffic flows through SatGate.",
+                code: `# Your domain\napi.yoursite.com\n  CNAME → satgate.cloud\n\n# Or use ours\nyourapp.satgate.cloud`
+              },
+              {
+                step: "4",
+                title: "See Verified Traffic",
+                description: "Real-time: verified vs challenged. Enable Charge policy when ready for revenue.",
+                code: `Verified:   1,203 requests\nChallenged: 12,847 (402s)\nMetered:    $847 usage\n\n→ Enable Charge policy?`
+              }
+            ].map((item, i) => (
+              <div key={i} className="relative">
+                <div className="absolute -left-3 -top-3 w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-lg font-bold z-10">
+                  {item.step}
+                </div>
+                <div className="p-6 pt-10 rounded-xl bg-gray-900 border border-gray-800 h-full">
+                  <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+                  <p className="text-gray-400 text-sm mb-4">{item.description}</p>
+                  <pre className="bg-black text-xs p-3 rounded-lg overflow-x-auto text-gray-400 font-mono">
+                    {item.code}
+                  </pre>
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* Token explanation */}
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 text-center">
-            <p className="text-gray-400 text-sm mb-2">
-              <span className="text-white font-semibold">L402 Token</span> = Macaroon + Preimage
+          {/* Agent Token Flow */}
+          <div className="mt-16 p-8 rounded-xl bg-gray-900/50 border border-gray-800">
+            <h3 className="text-lg font-semibold text-center mb-2">How do agents get tokens?</h3>
+            <p className="text-gray-500 text-sm text-center mb-6">
+              SatGate Mint issues tokens at startup. Gateway verifies them on every request—no identity lookups on the hot path.
             </p>
-            <p className="text-gray-500 text-xs">
-              A bearer credential with embedded permissions (caveats) that proves payment. No centralized identity lookup required.
+            <div className="flex items-center justify-center gap-2 md:gap-4 flex-wrap text-sm">
+              <div className="flex flex-col items-center p-3 bg-gray-800 rounded-lg">
+                <Bot className="text-gray-300 mb-1" size={24} />
+                <span className="text-gray-300 font-medium">Agent Starts</span>
+                <span className="text-[10px] text-gray-500">K8s / AWS / OIDC</span>
+              </div>
+              <span className="text-gray-600 text-xl">→</span>
+              <div className="flex flex-col items-center p-3 bg-purple-900/30 border border-purple-500/30 rounded-lg">
+                <Key className="text-purple-400 mb-1" size={24} />
+                <span className="text-purple-400 font-medium">Mint</span>
+                <span className="text-[10px] text-gray-500">Badge-in (once)</span>
+              </div>
+              <span className="text-gray-600 text-xl">→</span>
+              <div className="flex flex-col items-center p-3 bg-cyan-900/30 border border-cyan-500/30 rounded-lg">
+                <Lock className="text-cyan-400 mb-1" size={24} />
+                <span className="text-cyan-400 font-medium">Macaroon</span>
+                <span className="text-[10px] text-gray-500">With caveats</span>
+              </div>
+              <span className="text-gray-600 text-xl">→</span>
+              <div className="flex flex-col items-center p-3 bg-green-900/30 border border-green-500/30 rounded-lg">
+                <Shield className="text-green-400 mb-1" size={24} />
+                <span className="text-green-400 font-medium">Gateway</span>
+                <span className="text-[10px] text-gray-500">Verify (every req)</span>
+              </div>
+              <span className="text-gray-600 text-xl">→</span>
+              <div className="flex flex-col items-center p-3 bg-gray-800 rounded-lg">
+                <Activity className="text-gray-300 mb-1" size={24} />
+                <span className="text-gray-300 font-medium">Upstream</span>
+                <span className="text-[10px] text-gray-500">Your API</span>
+              </div>
+            </div>
+            <p className="text-xs text-gray-600 text-center mt-4">
+              Manual token issuance also available via Dashboard or API. Mint is optional for automated agent provisioning.
             </p>
           </div>
         </div>
