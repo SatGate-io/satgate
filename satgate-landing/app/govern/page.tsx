@@ -162,7 +162,7 @@ export default function GovernPage() {
       {/* Observe → Control → Charge */}
       <section id="observe" className="py-20 px-6 border-t border-gray-800 bg-gradient-to-b from-gray-900/30 to-black">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">Three Modes. One Gateway.</h2>
+          <h2 className="text-3xl font-bold text-center mb-4">Three Tiers. One Gateway.</h2>
           <p className="text-gray-500 text-center mb-12">Start with visibility. Add control when you're ready. Monetize when it makes sense.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -700,7 +700,7 @@ export default function GovernPage() {
             </div>
           </div>
           <div className="pt-8 border-t border-gray-800 text-center text-gray-600 text-sm">
-            © 2025 SatGate Inc. All rights reserved. SatGate™ is a trademark of SatGate Inc. Patent Pending.
+            © 2025–2026 SatGate Inc. All rights reserved. SatGate™ is a trademark of SatGate Inc. Patent Pending.
           </div>
         </div>
       </footer>

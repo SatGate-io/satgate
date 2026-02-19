@@ -481,7 +481,7 @@ export default function DesignPartnersPage() {
             </div>
           </div>
           <div className="pt-8 border-t border-gray-800 text-center text-gray-600 text-sm">
-            © 2025 SatGate Inc. All rights reserved. SatGate™ is a trademark of SatGate Inc. Patent Pending.
+            © 2025–2026 SatGate Inc. All rights reserved. SatGate™ is a trademark of SatGate Inc. Patent Pending.
           </div>
         </div>
       </footer>

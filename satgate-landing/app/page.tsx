@@ -184,7 +184,7 @@ const LandingPage = () => {
                 Watch an AI agent autonomously pay for API access in real-time.
               </p>
               <Link 
-                href="/playground" 
+                href="/pay" 
                 className="inline-flex items-center gap-2 text-sm font-medium text-purple-400 hover:text-purple-300 transition"
               >
                 Try it live in 15 seconds <ArrowRight size={14} />
@@ -1182,7 +1182,7 @@ curl -H <span className="text-green-400">"Authorization: L402 &lt;macaroon&gt;:&
           </div>
           
           <div className="pt-8 border-t border-gray-800 text-center text-gray-600 text-sm">
-            © 2025 SatGate Inc. All rights reserved. SatGate™ is a trademark of SatGate Inc. Patent Pending.
+            © 2025–2026 SatGate Inc. All rights reserved. SatGate™ is a trademark of SatGate Inc. Patent Pending.
           </div>
         </div>
       </footer>

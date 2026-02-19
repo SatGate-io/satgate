@@ -238,10 +238,10 @@ export default function SecurityPage() {
           <section>
             <h2 className="text-2xl font-bold text-white mb-4">Best Practices</h2>
             <ul className="list-disc list-inside text-gray-400 space-y-2">
-              <li>Keep your LNC pairing phrase secure—treat it like a password</li>
+              <li>Keep your capability root key secure—treat it like a password</li>
               <li>Use environment variables for sensitive configuration</li>
               <li>Deploy behind a CDN/WAF (Cloudflare, AWS Shield) for network-layer protection</li>
-              <li>Set appropriate macaroon expiration times in your aperture.yaml</li>
+              <li>Set appropriate macaroon expiration times in your gateway.yaml</li>
               <li>Monitor your Lightning node for unusual activity</li>
             </ul>
           </section>
