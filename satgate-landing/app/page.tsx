@@ -131,7 +131,7 @@ const LandingPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              SatGate is an Economic Firewall that enforces <b className="text-white">Economic Access Control</b> for AI agent requests.
+              SatGate is an Economic Firewall that enforces <b className="text-white">Economic Access Control (EAC)</b> for AI agent requests.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
               Per-agent budgets, per-tool cost attribution, delegation hierarchies. Not &ldquo;who are you?&rdquo; — <b>&ldquo;what can you afford?&rdquo;</b> Math doesn&apos;t care how smart the AI is.
@@ -244,7 +244,7 @@ const LandingPage = () => {
       <section className="py-16 px-6 border-b border-gray-800">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-2xl font-bold text-center mb-3">Two Proxies. Total Coverage.</h2>
-          <p className="text-gray-500 text-center mb-10">Govern HTTP APIs and MCP tool calls — or both.</p>
+          <p className="text-gray-500 text-center mb-10">Govern HTTP APIs and MCP tool calls.</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="p-6 rounded-xl bg-gradient-to-br from-cyan-950/30 to-cyan-900/10 border border-cyan-800/30 hover:border-cyan-600/50 transition">
@@ -264,9 +264,6 @@ const LandingPage = () => {
               </ul>
             </div>
             <div className="p-6 rounded-xl bg-gradient-to-br from-purple-950/30 to-purple-900/10 border border-purple-800/30 hover:border-purple-600/50 transition relative">
-              <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-purple-900/50 border border-purple-700/50 text-purple-300 text-xs font-bold">
-                NEW
-              </div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2.5 bg-purple-900/50 rounded-lg">
                   <DollarSign className="text-purple-400" size={22} />
@@ -503,7 +500,6 @@ const LandingPage = () => {
               </p>
             </div>
             <div className="p-6 rounded-xl bg-gray-900 border border-cyan-800/30 relative">
-              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-cyan-900/50 border border-cyan-700/50 text-cyan-300 text-[10px] font-bold">NEW</div>
               <div className="flex items-center gap-3 mb-3">
                 <Zap className="text-cyan-400" size={20} />
                 <h4 className="font-semibold text-cyan-400">MCP Proxy (Agent Tools)</h4>
@@ -586,10 +582,10 @@ const LandingPage = () => {
       <section className="py-20 px-6 border-b border-gray-800">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3">Charge <span className="text-gray-500 font-normal">(optional)</span>: Settlement Rails</h2>
+            <h2 className="text-3xl font-bold mb-3">Three Modes. One Gateway.</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              When you choose the <span className="text-yellow-400">Charge</span> policy, pick your settlement mechanism. 
-              Same gateway, same protection, different payment rails.
+              Start by observing. Enforce when ready. Monetize when it makes sense.
+              Same gateway, same protection — you choose the policy per route.
             </p>
           </div>
 
@@ -811,7 +807,7 @@ const LandingPage = () => {
 
           {/* MCP Proxy Deployment */}
           <div className="bg-gray-900/50 border border-purple-800/30 rounded-xl p-8 mt-8">
-            <h4 className="text-center text-sm font-semibold text-purple-400 mb-2">MCP PROXY MODE <span className="ml-2 px-2 py-0.5 rounded-full bg-purple-900/50 border border-purple-700/50 text-purple-300 text-xs font-bold">NEW</span></h4>
+            <h4 className="text-center text-sm font-semibold text-purple-400 mb-2">MCP PROXY MODE</h4>
             <p className="text-center text-gray-500 text-sm mb-6">
               Govern every MCP tool call. Per-tool budgets, delegation trees, real-time dashboard.
             </p>
