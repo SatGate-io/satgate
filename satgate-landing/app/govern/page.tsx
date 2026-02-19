@@ -214,13 +214,13 @@ export default function GovernPage() {
                 <h3 className="font-bold text-lg">Charge</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                Meter usage, generate invoices, bill internal teams or external consumers.
+                Monetize your APIs with L402. Sub-second Lightning settlement, per-request pricing, no chargebacks. Machine-native payments.
               </p>
               <ul className="space-y-2 text-sm text-gray-500">
-                <li className="text-yellow-400">✓ Per-request metering</li>
-                <li className="text-yellow-400">✓ Internal chargeback automation</li>
-                <li className="text-yellow-400">✓ External billing integration</li>
-                <li className="text-yellow-400">✓ Lightning micropayments</li>
+                <li className="text-yellow-400">✓ L402 protocol (HTTP 402 + Lightning)</li>
+                <li className="text-yellow-400">✓ Per-request micropayments</li>
+                <li className="text-yellow-400">✓ Sub-second settlement</li>
+                <li className="text-yellow-400">✓ No chargebacks, no invoices</li>
               </ul>
             </div>
           </div>
