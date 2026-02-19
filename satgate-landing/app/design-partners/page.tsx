@@ -182,10 +182,10 @@ export default function DesignPartnersPage() {
                 <div className="p-2.5 bg-gray-800 rounded-lg">
                   <Server className="text-gray-300" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">A Staging Endpoint</h3>
+                <h3 className="font-bold text-lg">One Endpoint or Tool</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Point one staging API endpoint through SatGate. One DNS change, no code modifications.
+                Point one staging API endpoint or MCP tool through SatGate. One DNS change or config update, no code modifications.
               </p>
             </div>
 
