@@ -243,7 +243,7 @@ const LandingPage = () => {
       {/* Two Products Section */}
       <section className="py-16 px-6 border-b border-gray-800">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-3">Two Proxies. Total Coverage.</h2>
+          <h2 className="text-2xl font-bold text-center mb-3">One Gateway. Total Coverage.</h2>
           <p className="text-gray-500 text-center mb-10">Govern HTTP APIs and MCP tool calls.</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -252,7 +252,7 @@ const LandingPage = () => {
                 <div className="p-2.5 bg-cyan-900/50 rounded-lg">
                   <Shield className="text-cyan-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">HTTP Proxy Gateway</h3>
+                <h3 className="font-bold text-lg">HTTP Proxy</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed mb-3">
                 Drop-in reverse proxy for REST APIs, LLM endpoints, and SaaS services. Capability tokens replace API keys. Per-route policies with zero code changes.
