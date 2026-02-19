@@ -616,12 +616,12 @@ const LandingPage = () => {
                 </div>
                 <div>
                   <h3 className="font-bold">Control</h3>
-                  <span className="text-xs text-purple-400">Budget enforcement</span>
+                  <span className="text-xs text-purple-400">Fiat402 / budget enforcement</span>
                 </div>
               </div>
               <p className="text-gray-400 text-sm mb-4">
-                Hard-cap budgets per agent, team, or project. Requests that exceed 
-                limits get blocked — HTTP 402. No overruns, no surprises.
+                Hard-cap budgets per agent, team, or project. Stripe-backed credit system (Fiat402). 
+                Requests that exceed limits get blocked — HTTP 402. No overruns, no surprises.
               </p>
               <div className="text-xs text-gray-500">
                 <strong className="text-gray-400">Best for:</strong> Enterprise cost control, agent guardrails, compliance
@@ -635,12 +635,12 @@ const LandingPage = () => {
                 </div>
                 <div>
                   <h3 className="font-bold">Charge</h3>
-                  <span className="text-xs text-yellow-400">Fiat402 / L402 settlement</span>
+                  <span className="text-xs text-yellow-400">L402 / Lightning settlement</span>
                 </div>
               </div>
               <p className="text-gray-400 text-sm mb-4">
-                Monetize your APIs. Fiat402 for enterprise billing (Stripe-backed), 
-                L402 for instant Lightning micropayments. Per-request pricing.
+                Monetize your APIs with L402. Sub-second Lightning settlement, 
+                per-request pricing, no chargebacks. Machine-native payments.
               </p>
               <div className="text-xs text-gray-500">
                 <strong className="text-gray-400">Best for:</strong> API monetization, developer marketplaces, agent commerce
