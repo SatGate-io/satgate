@@ -389,7 +389,7 @@ const LandingPage = () => {
                 verify → payment proof → allow
               </p>
               <p className="text-xs text-yellow-400/80 mb-3 italic">
-                Monetize via L402 or Fiat billing.
+                Monetize via L402 Lightning payments.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ Bitcoin Lightning (instant)</li>
