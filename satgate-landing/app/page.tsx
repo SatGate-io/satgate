@@ -590,66 +590,66 @@ const LandingPage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-xl bg-gray-900 border border-purple-800/30">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-purple-900/30 rounded-lg">
-                  <Activity className="text-purple-400" size={20} />
-                </div>
-                <div>
-                  <h3 className="font-bold">Internal</h3>
-                  <span className="text-xs text-purple-400">Observe / Control policies</span>
-                </div>
-              </div>
-              <p className="text-gray-400 text-sm mb-4">
-                Track usage per tenant/team/project. No end-user payment—meter (Observe) 
-                or enforce budgets (Control) internally.
-              </p>
-              <div className="text-xs text-gray-500">
-                <strong className="text-gray-400">Best for:</strong> Internal platforms, FinOps, cost allocation
-              </div>
-            </div>
-
             <div className="p-6 rounded-xl bg-gray-900 border border-cyan-800/30">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-cyan-900/30 rounded-lg">
-                  <DollarSign className="text-cyan-400" size={20} />
+                  <Eye className="text-cyan-400" size={20} />
                 </div>
                 <div>
-                  <h3 className="font-bold">Fiat402</h3>
-                  <span className="text-xs text-cyan-400">Stripe-backed</span>
+                  <h3 className="font-bold">Observe</h3>
+                  <span className="text-xs text-cyan-400">No payment required</span>
                 </div>
               </div>
               <p className="text-gray-400 text-sm mb-4">
-                Standard billing workflows via card or invoice. Same gateway enforcement, 
-                enterprise procurement-friendly.
+                Shadow mode. Track every request, attribute costs per agent and tool, 
+                generate chargeback reports — without blocking anything.
               </p>
               <div className="text-xs text-gray-500">
-                <strong className="text-gray-400">Best for:</strong> Enterprise teams, procurement, SaaS billing
+                <strong className="text-gray-400">Best for:</strong> FinOps visibility, cost allocation, audit trails
+              </div>
+            </div>
+
+            <div className="p-6 rounded-xl bg-gray-900 border border-purple-800/30">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-purple-900/30 rounded-lg">
+                  <SlidersHorizontal className="text-purple-400" size={20} />
+                </div>
+                <div>
+                  <h3 className="font-bold">Control</h3>
+                  <span className="text-xs text-purple-400">Budget enforcement</span>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm mb-4">
+                Hard-cap budgets per agent, team, or project. Requests that exceed 
+                limits get blocked — HTTP 402. No overruns, no surprises.
+              </p>
+              <div className="text-xs text-gray-500">
+                <strong className="text-gray-400">Best for:</strong> Enterprise cost control, agent guardrails, compliance
               </div>
             </div>
 
             <div className="p-6 rounded-xl bg-gray-900 border border-yellow-800/30">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-yellow-900/30 rounded-lg">
-                  <Zap className="text-yellow-400" size={20} />
+                  <DollarSign className="text-yellow-400" size={20} />
                 </div>
                 <div>
-                  <h3 className="font-bold">L402</h3>
-                  <span className="text-xs text-yellow-400">Lightning / instant</span>
+                  <h3 className="font-bold">Charge</h3>
+                  <span className="text-xs text-yellow-400">Fiat402 / L402 settlement</span>
                 </div>
               </div>
               <p className="text-gray-400 text-sm mb-4">
-                Sub-second settlement, no chargebacks, per-request pricing. 
-                Perfect for developer APIs, AI agents, and micropayments.
+                Monetize your APIs. Fiat402 for enterprise billing (Stripe-backed), 
+                L402 for instant Lightning micropayments. Per-request pricing.
               </p>
               <div className="text-xs text-gray-500">
-                <strong className="text-gray-400">Best for:</strong> Developer-first APIs, agents, global users
+                <strong className="text-gray-400">Best for:</strong> API monetization, developer marketplaces, agent commerce
               </div>
             </div>
           </div>
 
           <p className="text-center text-gray-500 text-sm mt-8">
-            Start with Observe or Control, enable Charge when ready—per route, per tenant.
+            Start with Observe, enforce with Control, monetize with Charge — per route, per tenant.
           </p>
         </div>
       </section>
