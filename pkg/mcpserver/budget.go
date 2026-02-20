@@ -84,12 +84,16 @@ func (e *InMemoryBudgetEnforcer) Check(_ context.Context, tokenID string, cost i
 	}
 
 	if remaining < cost {
+		errorCode := "budget_exhausted"
+		if remaining > 0 {
+			errorCode = "insufficient_budget"
+		}
 		return &BudgetResult{
 			Allowed:   false,
 			Remaining: remaining,
 			TokenID:   tokenID,
 			Cost:      cost,
-			ErrorCode: "budget_exhausted",
+			ErrorCode: errorCode,
 		}, nil
 	}
 

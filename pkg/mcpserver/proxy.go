@@ -403,7 +403,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		result, err := p.budget.Spend(ctx, budgetID, tc.Name, cost, requestID)
 		if err != nil {
 			// Distinguish budget exhaustion (result has ErrorCode) from backend failures.
-			isBudgetExhausted := result != nil && result.ErrorCode == "budget_exhausted"
+			isBudgetExhausted := result != nil && (result.ErrorCode == "budget_exhausted" || result.ErrorCode == "insufficient_budget")
 
 			if isBudgetExhausted {
 				remaining := int64(0)
@@ -431,8 +431,13 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				})
 
 				if p.config.Enforcement.Mode == "hard" {
-					return NewErrorResponseWithData(req.ID, CodeBudgetExhausted, "Budget exhausted", map[string]interface{}{
-						"error":             "budget_exhausted",
+					errMsg := "Budget exhausted"
+					errCode := result.ErrorCode
+					if errCode == "insufficient_budget" {
+						errMsg = fmt.Sprintf("Insufficient budget: tool '%s' costs %d credits, %d remaining", tc.Name, cost, remaining)
+					}
+					return NewErrorResponseWithData(req.ID, CodeBudgetExhausted, errMsg, map[string]interface{}{
+						"error":             errCode,
 						"tool":              tc.Name,
 						"cost_credits":      cost,
 						"remaining_credits": remaining,
