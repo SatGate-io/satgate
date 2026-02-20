@@ -12,7 +12,7 @@ For managing the gateway (tokens, governance, configuration):
 |----------|---------|--------|
 | [Go](go.md) | `github.com/satgate-io/satgate-go` | ✅ Stable |
 | [Python](python.md) | `satgate` | ✅ Stable |
-| [Node.js](nodejs.md) | `@satgate/client` | ✅ Stable |
+| [Node.js](nodejs.md) | `satgate-sdk` | ✅ Stable |
 
 ### Agent SDKs
 

@@ -560,7 +560,7 @@ const browserToken = await serverClient.delegate({
 });
 
 // Browser: Use the delegated token
-import { SatGateClient } from '@satgate/client';
+import { SatGateClient } from 'satgate-sdk';
 
 const client = new SatGateClient('https://api.example.com', {
   token: browserToken

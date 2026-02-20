@@ -1,11 +1,11 @@
-# @satgate/client
+# satgate-sdk
 
 Official Node.js SDK for the [SatGate](https://github.com/SatGate-io/satgate) OSS Gateway.
 
 ## Installation
 
 ```bash
-npm install @satgate/client
+npm install satgate-sdk
 ```
 
 ## Quick Start
@@ -15,7 +15,7 @@ npm install @satgate/client
 The `SatGateClient` provides direct access to gateway admin operations.
 
 ```typescript
-import { SatGateClient } from '@satgate/client';
+import { SatGateClient } from 'satgate-sdk';
 
 const client = new SatGateClient({
   url: 'http://localhost:8080',
@@ -66,7 +66,7 @@ The `SatGateAgentClient` is designed for AI agents — it automatically
 mints tokens, caches them, and handles L402 payment challenges.
 
 ```typescript
-import { SatGateAgentClient } from '@satgate/client';
+import { SatGateAgentClient } from 'satgate-sdk';
 
 // With admin token (auto-mints capability tokens)
 const client = new SatGateAgentClient({
@@ -108,7 +108,7 @@ const childToken = await client.delegate({
 ### Fluent Delegation Builder
 
 ```typescript
-import { SatGateClient, delegate, Caveats, DelegationPatterns } from '@satgate/client';
+import { SatGateClient, delegate, Caveats, DelegationPatterns } from 'satgate-sdk';
 
 const client = new SatGateClient({
   url: 'http://localhost:8080',
@@ -138,7 +138,7 @@ const swarmToken = await DelegationPatterns.agentSwarm(
 ### Caveat Builders
 
 ```typescript
-import { Caveats } from '@satgate/client';
+import { Caveats } from 'satgate-sdk';
 
 const caveats = [
   Caveats.scope('api:read'),
@@ -179,7 +179,7 @@ import {
   AuthenticationError,
   NotFoundError,
   SatGateError,
-} from '@satgate/client';
+} from 'satgate-sdk';
 
 try {
   const client = new SatGateClient({
@@ -201,7 +201,7 @@ try {
 This package includes full TypeScript type definitions:
 
 ```typescript
-import type { Token, TokenInfo, GraphData, DelegateRequest } from '@satgate/client';
+import type { Token, TokenInfo, GraphData, DelegateRequest } from 'satgate-sdk';
 ```
 
 ## License

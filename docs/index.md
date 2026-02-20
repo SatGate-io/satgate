@@ -70,7 +70,7 @@ SatGate Gateway is an enterprise API gateway that provides:
 |----------|---------|---------------|
 | Go | `github.com/satgate-io/satgate-go` | [Go SDK](sdks/go.md) |
 | Python | `satgate` | [Python SDK](sdks/python.md) |
-| Node.js | `@satgate/client` | [Node.js SDK](sdks/nodejs.md) |
+| Node.js | `satgate-sdk` | [Node.js SDK](sdks/nodejs.md) |
 
 ## Architecture Overview
 

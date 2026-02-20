@@ -1106,10 +1106,10 @@ agent.run(<span className="text-green-400">"Get the latest stock report"</span>)
 &nbsp;&nbsp;token: <span className="text-green-400">'your-admin-token'</span>,<br/>
 {'}'});<br/>
 <br/>
-<span className="text-gray-500">// Mint a budget-capped token for an agent</span><br/>
-<span className="text-purple-400">const</span> token = <span className="text-purple-400">await</span> client.mint({'{'} budget: 1000 {'}'});<br/>
-<span className="text-gray-500">// Validate + check remaining budget</span><br/>
-<span className="text-purple-400">const</span> info = <span className="text-purple-400">await</span> client.validate(token.macaroon);
+<span className="text-gray-500">// Mint a scoped capability token</span><br/>
+<span className="text-purple-400">const</span> token = <span className="text-purple-400">await</span> client.tokens.mint({'{'} scope: <span className="text-green-400">'api:read'</span>, duration: <span className="text-green-400">'1h'</span> {'}'});<br/>
+<span className="text-gray-500">// Validate a token</span><br/>
+<span className="text-purple-400">const</span> result = <span className="text-purple-400">await</span> client.tokens.validate(token.token);
 </pre>
               )}
               {activeTab === 'curl' && (

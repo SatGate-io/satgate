@@ -5,17 +5,17 @@ Official Node.js/TypeScript client for SatGate Gateway.
 ## Installation
 
 ```bash
-npm install @satgate/client
+npm install satgate-sdk
 # or
-yarn add @satgate/client
+yarn add satgate-sdk
 # or
-pnpm add @satgate/client
+pnpm add satgate-sdk
 ```
 
 ## Quick Start
 
 ```typescript
-import { SatGateClient } from '@satgate/client';
+import { SatGateClient } from 'satgate-sdk';
 
 // Create client
 const client = new SatGateClient('https://api.example.com', {
@@ -36,7 +36,7 @@ console.log(`Expires: ${token.expiresAt}`);
 ## Client Configuration
 
 ```typescript
-import { SatGateClient } from '@satgate/client';
+import { SatGateClient } from 'satgate-sdk';
 
 // Basic configuration
 const client = new SatGateClient('https://api.example.com', {
@@ -221,7 +221,7 @@ const users = await response.json();
 ## WebSocket Telemetry
 
 ```typescript
-import { SatGateClient, EventType } from '@satgate/client';
+import { SatGateClient, EventType } from 'satgate-sdk';
 
 const client = new SatGateClient('https://api.example.com', {
   adminToken: '...'
@@ -264,7 +264,7 @@ import {
   RateLimitError,
   NotFoundError,
   ValidationError
-} from '@satgate/client';
+} from 'satgate-sdk';
 
 try {
   const token = await client.tokens.mint({ scope: 'api:read' });
@@ -296,7 +296,7 @@ import type {
   Policy,
   GatewayStats,
   TelemetryEvent
-} from '@satgate/client';
+} from 'satgate-sdk';
 
 function mintToken(client: SatGateClient, request: MintRequest): Promise<Token> {
   return client.tokens.mint(request);
@@ -308,7 +308,7 @@ function mintToken(client: SatGateClient, request: MintRequest): Promise<Token> 
 Use the mock client for testing:
 
 ```typescript
-import { MockSatGateClient } from '@satgate/client/testing';
+import { MockSatGateClient } from 'satgate-sdk/testing';
 
 describe('MyService', () => {
   it('should mint token', async () => {
@@ -334,7 +334,7 @@ The SDK works in browsers with bundlers:
 
 ```typescript
 // Works with Vite, webpack, etc.
-import { SatGateClient } from '@satgate/client';
+import { SatGateClient } from 'satgate-sdk';
 
 const client = new SatGateClient('https://api.example.com', {
   adminToken: 'your-token'
@@ -346,7 +346,7 @@ const client = new SatGateClient('https://api.example.com', {
 ## CommonJS
 
 ```javascript
-const { SatGateClient } = require('@satgate/client');
+const { SatGateClient } = require('satgate-sdk');
 
 const client = new SatGateClient('https://api.example.com', {
   adminToken: 'your-admin-token'
@@ -356,7 +356,7 @@ const client = new SatGateClient('https://api.example.com', {
 ## Logging
 
 ```typescript
-import { SatGateClient, LogLevel } from '@satgate/client';
+import { SatGateClient, LogLevel } from 'satgate-sdk';
 
 const client = new SatGateClient('https://api.example.com', {
   adminToken: 'your-token',
