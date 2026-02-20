@@ -11,7 +11,8 @@ type EventType string
 const (
 	EventToolCall       EventType = "tool_call"
 	EventBudgetSpend    EventType = "budget_spend"
-	EventBudgetExhaust  EventType = "budget_exhausted"
+	EventBudgetExhaust       EventType = "budget_exhausted"
+	EventBudgetInsufficient  EventType = "insufficient_budget"
 	EventBudgetError    EventType = "budget_error"
 	EventDelegation     EventType = "delegation"
 	EventAuthFailure    EventType = "auth_failure"

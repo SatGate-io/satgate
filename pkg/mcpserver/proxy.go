@@ -417,8 +417,12 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 					Str("budgetId", budgetID).
 					Msg("budget exhausted")
 
+				eventType := EventBudgetExhaust
+				if result.ErrorCode == "insufficient_budget" {
+					eventType = EventBudgetInsufficient
+				}
 				p.events.Publish(Event{
-					Type:      EventBudgetExhaust,
+					Type:      eventType,
 					Timestamp: time.Now(),
 					TokenID:   tokenInfo.TokenID,
 					BudgetID:  budgetID,
