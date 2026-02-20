@@ -348,10 +348,10 @@ const LandingPage = () => {
               </ul>
             </div>
 
-            {/* Control — $99/mo */}
+            {/* Control — included in Pro */}
             <div className="p-6 rounded-xl bg-black border-2 border-purple-500/50 hover:border-purple-400/70 transition relative">
               <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-purple-900/50 border border-purple-700/50 text-purple-300 text-xs font-bold">
-                $99/mo
+                PRO
               </div>
               <div className="text-xs text-purple-400 mb-2">Protected by default →</div>
               <div className="flex items-center gap-3 mb-3">
@@ -373,10 +373,10 @@ const LandingPage = () => {
               </ul>
             </div>
 
-            {/* Charge — Custom */}
-            <div className="p-6 rounded-xl bg-black border border-green-800/30 hover:border-green-600/50 transition relative">
-              <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-green-900/50 border border-green-700/50 text-green-300 text-xs font-bold">
-                Custom
+            {/* Charge — included in Pro */}
+            <div className="p-6 rounded-xl bg-black border border-yellow-800/30 hover:border-yellow-600/50 transition relative">
+              <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-purple-900/50 border border-purple-700/50 text-purple-300 text-xs font-bold">
+                PRO
               </div>
               <div className="text-xs text-purple-400 mb-2">Protected by default →</div>
               <div className="flex items-center gap-3 mb-3">
