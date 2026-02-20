@@ -120,15 +120,9 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 		cancel:   cancel,
 	}
 
-	// Extract auth token from SSE connection for session tracking.
-	// This lets the event publisher resolve tenant/token for session events.
-	if authToken := extractAuthToken(r); authToken != "" && s.proxy.auth != nil {
-		if info, err := s.proxy.auth.Verify(ctx, authToken); err == nil {
-			session.tokenID = info.TokenID
-			session.tenantID = info.TenantID
-			session.budgetID = info.BudgetID
-		}
-	}
+	// Capture auth token from header before writing response.
+	// Verification happens after SSE stream is established to avoid blocking.
+	authToken := extractAuthToken(r)
 
 	s.mu.Lock()
 	s.sessions[sessionID] = session
@@ -150,17 +144,8 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 		})
 	}()
 
-	log.Info().Str("session", sessionID).Msg("SSE session established")
-	s.proxy.events.Publish(Event{
-		Type:      EventSessionConnect,
-		Timestamp: time.Now(),
-		SessionID: sessionID,
-		TokenID:   session.tokenID,
-		TenantID:  session.tenantID,
-		BudgetID:  session.budgetID,
-	})
-
-	// Set SSE headers
+	// Set SSE headers and flush FIRST — the client needs the stream open
+	// before we do any potentially slow operations (auth verify, Redis publish).
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
@@ -171,6 +156,25 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 	messageURL := fmt.Sprintf("/message?sessionId=%s", sessionID)
 	fmt.Fprintf(w, "event: endpoint\ndata: %s\n\n", messageURL)
 	flusher.Flush()
+
+	// Now verify auth token (after stream is open, so client doesn't timeout)
+	if authToken != "" && s.proxy.auth != nil {
+		if info, err := s.proxy.auth.Verify(ctx, authToken); err == nil {
+			session.tokenID = info.TokenID
+			session.tenantID = info.TenantID
+			session.budgetID = info.BudgetID
+		}
+	}
+
+	log.Info().Str("session", sessionID).Msg("SSE session established")
+	s.proxy.events.Publish(Event{
+		Type:      EventSessionConnect,
+		Timestamp: time.Now(),
+		SessionID: sessionID,
+		TokenID:   session.tokenID,
+		TenantID:  session.tenantID,
+		BudgetID:  session.budgetID,
+	})
 
 	// Stream outbound messages with keepalive
 	keepalive := time.NewTicker(15 * time.Second)
