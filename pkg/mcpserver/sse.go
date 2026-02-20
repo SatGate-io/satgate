@@ -31,6 +31,8 @@ type sseSession struct {
 	messages chan json.RawMessage // outbound messages to client
 	ctx      context.Context
 	cancel   context.CancelFunc
+	tokenID  string // from auth at connect time (may be empty)
+	tenantID string // from auth at connect time (may be empty)
 }
 
 // NewSSEServer creates an SSE transport server for the given proxy.
@@ -117,6 +119,15 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 		cancel:   cancel,
 	}
 
+	// Extract auth token from SSE connection for session tracking.
+	// This lets the event publisher resolve tenant/token for session events.
+	if authToken := extractAuthToken(r); authToken != "" && s.proxy.auth != nil {
+		if info, err := s.proxy.auth.Verify(ctx, authToken); err == nil {
+			session.tokenID = info.TokenID
+			session.tenantID = info.TenantID
+		}
+	}
+
 	s.mu.Lock()
 	s.sessions[sessionID] = session
 	s.mu.Unlock()
@@ -131,6 +142,8 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 			Type:      EventSessionClose,
 			Timestamp: time.Now(),
 			SessionID: sessionID,
+			TokenID:   session.tokenID,
+			TenantID:  session.tenantID,
 		})
 	}()
 
@@ -139,6 +152,8 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 		Type:      EventSessionConnect,
 		Timestamp: time.Now(),
 		SessionID: sessionID,
+		TokenID:   session.tokenID,
+		TenantID:  session.tenantID,
 	})
 
 	// Set SSE headers
