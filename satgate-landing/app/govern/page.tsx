@@ -530,7 +530,7 @@ export default function GovernPage() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {[
-              { icon: <Container size={24} className="text-cyan-400" />, label: 'Docker', desc: 'docker pull satgate/satgate' },
+              { icon: <Container size={24} className="text-cyan-400" />, label: 'Docker', desc: 'ghcr.io/satgate-io/gateway' },
               { icon: <Layers size={24} className="text-purple-400" />, label: 'Kubernetes', desc: 'Helm chart included' },
               { icon: <FileCode size={24} className="text-green-400" />, label: 'Terraform', desc: 'IaC modules ready' },
               { icon: <Cloud size={24} className="text-yellow-400" />, label: 'SaaS', desc: 'cloud.satgate.io' },
