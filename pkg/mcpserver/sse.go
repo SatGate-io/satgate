@@ -2,6 +2,7 @@ package mcpserver
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -157,12 +158,26 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "event: endpoint\ndata: %s\n\n", messageURL)
 	flusher.Flush()
 
-	// Now verify auth token (after stream is open, so client doesn't timeout)
-	if authToken != "" && s.proxy.auth != nil {
-		if info, err := s.proxy.auth.Verify(ctx, authToken); err == nil {
-			session.tokenID = info.TokenID
-			session.tenantID = info.TenantID
-			session.budgetID = info.BudgetID
+	// Now extract session identity from auth token (after stream is open).
+	// Try full verification first; fall back to caveat extraction if verify fails
+	// (e.g., token signed by a different root key in multi-tenant SaaS).
+	if authToken != "" {
+		var resolved bool
+		if s.proxy.auth != nil {
+			if info, err := s.proxy.auth.Verify(ctx, authToken); err == nil {
+				session.tokenID = info.TokenID
+				session.tenantID = info.TenantID
+				session.budgetID = info.BudgetID
+				resolved = true
+			}
+		}
+		if !resolved {
+			// Best-effort: decode macaroon and read caveats for dashboard tracking.
+			// This is NOT security enforcement — tool calls are verified on /message.
+			if tid, bid := extractTokenCaveats(authToken); tid != "" {
+				session.tenantID = tid
+				session.budgetID = bid
+			}
 		}
 	}
 
@@ -331,4 +346,36 @@ func injectMetaToken(params json.RawMessage, token string) json.RawMessage {
 // generateSessionID creates a short unique session ID.
 func generateSessionID() string {
 	return fmt.Sprintf("mcp-%s", hashToken(fmt.Sprintf("%d", time.Now().UnixNano()))[:8])
+}
+
+// extractTokenCaveats does a best-effort decode of a macaroon token to read
+// tenant_id and budget_id caveats without cryptographic verification.
+// Used for dashboard session tracking when the SSE proxy can't verify the token
+// (e.g., token signed by a different per-tenant root key in multi-tenant SaaS).
+func extractTokenCaveats(token string) (tenantID, budgetID string) {
+	// Macaroon tokens are base64-encoded JSON with a "c" (caveats) array
+	decoded, err := base64.RawURLEncoding.DecodeString(token)
+	if err != nil {
+		// Try standard base64
+		decoded, err = base64.StdEncoding.DecodeString(token)
+		if err != nil {
+			return "", ""
+		}
+	}
+
+	var raw struct {
+		Caveats []string `json:"c"`
+	}
+	if err := json.Unmarshal(decoded, &raw); err != nil {
+		return "", ""
+	}
+
+	for _, c := range raw.Caveats {
+		if strings.HasPrefix(c, "tenant_id = ") {
+			tenantID = strings.TrimPrefix(c, "tenant_id = ")
+		} else if strings.HasPrefix(c, "budget_id = ") {
+			budgetID = strings.TrimPrefix(c, "budget_id = ")
+		}
+	}
+	return tenantID, budgetID
 }
