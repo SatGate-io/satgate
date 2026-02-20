@@ -1081,39 +1081,48 @@ const LandingPage = () => {
               {activeTab === 'python' && (
 <pre className="text-sm font-mono text-gray-300 leading-relaxed">
 <span className="text-purple-400">from</span> satgate.langchain <span className="text-purple-400">import</span> SatGateTool<br/>
-<span className="text-purple-400">from</span> langchain.agents <span className="text-purple-400">import</span> initialize_agent<br/>
+<span className="text-purple-400">from</span> langchain.agents <span className="text-purple-400">import</span> initialize_agent, AgentType<br/>
+<span className="text-purple-400">from</span> langchain.chat_models <span className="text-purple-400">import</span> ChatOpenAI<br/>
 <br/>
-<span className="text-gray-500"># 1. Give your agent a wallet</span><br/>
-tools = [SatGateTool(wallet=my_lnd_node)]<br/>
+<span className="text-gray-500"># 1. Create a budget-aware tool</span><br/>
+tool = SatGateTool(<br/>
+&nbsp;&nbsp;gateway_url=<span className="text-green-400">"https://gateway.yourcompany.com"</span>,<br/>
+&nbsp;&nbsp;admin_token=<span className="text-green-400">"your-admin-token"</span>,<br/>
+&nbsp;&nbsp;endpoint=<span className="text-green-400">"/api/data/query"</span>,<br/>
+)<br/>
 <br/>
-<span className="text-gray-500"># 2. Let it roam the economy</span><br/>
-agent = initialize_agent(tools, llm, agent=<span className="text-green-400">"openai-functions"</span>)<br/>
-agent.run(<span className="text-green-400">"Buy the latest stock report from AlphaVantage"</span>)
+<span className="text-gray-500"># 2. Agent gets budget enforcement automatically</span><br/>
+agent = initialize_agent([tool], ChatOpenAI(), agent=AgentType.OPENAI_FUNCTIONS)<br/>
+agent.run(<span className="text-green-400">"Get the latest stock report"</span>)
 </pre>
               )}
               {activeTab === 'nodejs' && (
 <pre className="text-sm font-mono text-gray-300 leading-relaxed">
 <span className="text-purple-400">import</span> {'{ SatGateClient }'} <span className="text-purple-400">from</span> <span className="text-green-400">'satgate-sdk'</span>;<br/>
 <br/>
-<span className="text-gray-500">// Initialize client (uses WebLN in browser)</span><br/>
-<span className="text-purple-400">const</span> client = <span className="text-purple-400">new</span> SatGateClient();<br/>
+<span className="text-gray-500">// Connect to your SatGate gateway</span><br/>
+<span className="text-purple-400">const</span> client = <span className="text-purple-400">new</span> SatGateClient({'{'}<br/>
+&nbsp;&nbsp;url: <span className="text-green-400">'https://gateway.yourcompany.com'</span>,<br/>
+&nbsp;&nbsp;token: <span className="text-green-400">'your-admin-token'</span>,<br/>
+{'}'});<br/>
 <br/>
-<span className="text-gray-500">// Automatic: 402 → Pay → Retry → Response</span><br/>
-<span className="text-purple-400">const</span> data = <span className="text-purple-400">await</span> client.get(<span className="text-green-400">'https://api.example.com/premium'</span>);<br/>
-console.log(data);
+<span className="text-gray-500">// Mint a budget-capped token for an agent</span><br/>
+<span className="text-purple-400">const</span> token = <span className="text-purple-400">await</span> client.mint({'{'} budget: 1000 {'}'});<br/>
+<span className="text-gray-500">// Validate + check remaining budget</span><br/>
+<span className="text-purple-400">const</span> info = <span className="text-purple-400">await</span> client.validate(token.macaroon);
 </pre>
               )}
               {activeTab === 'curl' && (
 <pre className="text-sm font-mono text-gray-300 leading-relaxed">
-<span className="text-gray-500"># 1. Request protected endpoint → get 402 + invoice</span><br/>
-curl -i https://api.example.com/api/premium<br/>
+<span className="text-gray-500"># 1. Hit a SatGate-protected endpoint → 402 + Lightning invoice</span><br/>
+curl -i https://gateway.yourcompany.com/api/premium<br/>
 <br/>
-<span className="text-gray-500"># 2. Pay the Lightning invoice (via your wallet)</span><br/>
-<span className="text-gray-500"># Returns preimage as proof of payment</span><br/>
+<span className="text-gray-500"># 2. Pay the invoice (any Lightning wallet)</span><br/>
+<span className="text-gray-500"># → returns preimage as proof of payment</span><br/>
 <br/>
-<span className="text-gray-500"># 3. Retry with L402 token</span><br/>
+<span className="text-gray-500"># 3. Retry with L402 credential</span><br/>
 curl -H <span className="text-green-400">"Authorization: L402 &lt;macaroon&gt;:&lt;preimage&gt;"</span> \<br/>
-&nbsp;&nbsp;https://api.example.com/api/premium
+&nbsp;&nbsp;https://gateway.yourcompany.com/api/premium
 </pre>
               )}
             </div>
