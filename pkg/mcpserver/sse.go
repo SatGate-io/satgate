@@ -33,6 +33,7 @@ type sseSession struct {
 	cancel   context.CancelFunc
 	tokenID  string // from auth at connect time (may be empty)
 	tenantID string // from auth at connect time (may be empty)
+	budgetID string // from auth at connect time (may be empty)
 }
 
 // NewSSEServer creates an SSE transport server for the given proxy.
@@ -125,6 +126,7 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 		if info, err := s.proxy.auth.Verify(ctx, authToken); err == nil {
 			session.tokenID = info.TokenID
 			session.tenantID = info.TenantID
+			session.budgetID = info.BudgetID
 		}
 	}
 
@@ -144,6 +146,7 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 			SessionID: sessionID,
 			TokenID:   session.tokenID,
 			TenantID:  session.tenantID,
+			BudgetID:  session.budgetID,
 		})
 	}()
 
@@ -154,6 +157,7 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 		SessionID: sessionID,
 		TokenID:   session.tokenID,
 		TenantID:  session.tenantID,
+		BudgetID:  session.budgetID,
 	})
 
 	// Set SSE headers
