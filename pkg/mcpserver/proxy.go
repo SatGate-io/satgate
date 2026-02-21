@@ -26,12 +26,26 @@ func TenantFromContext(ctx context.Context) string {
 	return ""
 }
 
+// UpstreamRouter resolves upstreams per-request. The default implementation
+// uses the shared UpstreamManager. Enterprise can override this to provide
+// per-tenant upstream isolation in multi-tenant deployments.
+type UpstreamRouter interface {
+	// AllToolsForTenant returns the aggregated tools list for a specific tenant.
+	// If tenantID is empty, returns tools from the shared/default upstreams.
+	AllToolsForTenant(ctx context.Context, tenantID string) []json.RawMessage
+
+	// ForwardToolCallForTenant forwards a tool call to the appropriate upstream
+	// for the given tenant. Falls back to shared upstreams if tenant has none.
+	ForwardToolCallForTenant(ctx context.Context, tenantID, toolName string, params json.RawMessage, timeout time.Duration) (*Response, error)
+}
+
 // Proxy is the MCP proxy gateway. It sits between an MCP client and one or
 // more upstream MCP servers, enforcing budgets and attributing costs.
 type Proxy struct {
 	config    *Config
 	client    Transport       // client-facing transport
 	upstream  *UpstreamManager
+	router    UpstreamRouter  // per-tenant routing (nil = use shared upstream)
 	budget    BudgetEnforcer
 	costs     CostResolver
 	auth      Authenticator
@@ -39,6 +53,25 @@ type Proxy struct {
 	events    EventPublisher
 	tokenID   string // default session token (from config or first auth)
 	rootToken string // auto-minted root token (for delegation demos)
+}
+
+// defaultRouter wraps the shared UpstreamManager for non-multi-tenant use.
+type defaultRouter struct {
+	mgr *UpstreamManager
+}
+
+func (r *defaultRouter) AllToolsForTenant(_ context.Context, _ string) []json.RawMessage {
+	return r.mgr.AllTools()
+}
+
+func (r *defaultRouter) ForwardToolCallForTenant(ctx context.Context, _ string, toolName string, params json.RawMessage, timeout time.Duration) (*Response, error) {
+	return r.mgr.ForwardToolCall(ctx, toolName, params, timeout)
+}
+
+// SetUpstreamRouter overrides the upstream routing strategy.
+// Use this for multi-tenant per-tenant upstream isolation.
+func (p *Proxy) SetUpstreamRouter(router UpstreamRouter) {
+	p.router = router
 }
 
 // New creates a new MCP proxy from configuration.
@@ -61,6 +94,7 @@ func New(cfg *Config) (*Proxy, error) {
 	p := &Proxy{
 		config:   cfg,
 		upstream: upstream,
+		router:   &defaultRouter{mgr: upstream},
 		budget:   budget,
 		costs:    costs,
 		auth:     auth,
@@ -282,7 +316,7 @@ func (p *Proxy) handleRequest(ctx context.Context, req *Request) (*Response, err
 		return p.handlePing(req), nil
 
 	case MethodToolsList:
-		return p.handleToolsList(req)
+		return p.handleToolsListWithCtx(ctx, req)
 
 	case MethodToolsCall, MethodSatGateDelegate, MethodSatGateBudget:
 		// These methods require authentication.
@@ -404,8 +438,10 @@ func (p *Proxy) handlePing(req *Request) *Response {
 }
 
 // handleToolsList returns the aggregated tools from all upstreams.
-func (p *Proxy) handleToolsList(req *Request) (*Response, error) {
-	tools := p.upstream.AllTools()
+// In multi-tenant mode with an UpstreamRouter, returns tenant-specific tools.
+func (p *Proxy) handleToolsListWithCtx(ctx context.Context, req *Request) (*Response, error) {
+	tenantID := TenantFromContext(ctx)
+	tools := p.router.AllToolsForTenant(ctx, tenantID)
 
 	result, err := json.Marshal(map[string]interface{}{
 		"tools": tools,
@@ -572,7 +608,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		timeout = ucfg.Timeout
 	}
 
-	resp, err := p.upstream.ForwardToolCall(ctx, tc.Name, req.Params, timeout)
+	resp, err := p.router.ForwardToolCallForTenant(ctx, tenantID, tc.Name, req.Params, timeout)
 	if err != nil {
 		return NewErrorResponse(req.ID, CodeUpstreamError, fmt.Sprintf("upstream error: %v", err)), nil
 	}

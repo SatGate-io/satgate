@@ -270,7 +270,13 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 
 	// Handle request asynchronously — don't block the HTTP response
 	go func() {
-		resp, handleErr := s.proxy.handleRequest(session.ctx, req)
+		// Inject session's tenant ID into context so tools/list and other
+		// methods can access it (for multi-tenant upstream routing).
+		reqCtx := session.ctx
+		if session.tenantID != "" {
+			reqCtx = context.WithValue(reqCtx, CtxTenantID, session.tenantID)
+		}
+		resp, handleErr := s.proxy.handleRequest(reqCtx, req)
 		if handleErr != nil {
 			resp = NewErrorResponse(req.ID, CodeInternalError, handleErr.Error())
 		}
