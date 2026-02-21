@@ -74,15 +74,67 @@ func (m *UpstreamManager) Start(ctx context.Context) error {
 	return nil
 }
 
-func (m *UpstreamManager) connect(_ context.Context, name string, cfg UpstreamConfig) (*UpstreamClient, error) {
+func (m *UpstreamManager) connect(ctx context.Context, name string, cfg UpstreamConfig) (*UpstreamClient, error) {
 	switch cfg.Transport {
 	case "stdio":
 		return m.connectStdio(name, cfg)
-	case "http", "sse":
-		return nil, fmt.Errorf("HTTP/SSE upstream not yet implemented (use stdio)")
+	case "sse":
+		return m.connectSSE(ctx, name, cfg)
+	case "http", "streamable":
+		return m.connectStreamable(ctx, name, cfg)
 	default:
 		return nil, fmt.Errorf("unknown transport %q", cfg.Transport)
 	}
+}
+
+func (m *UpstreamManager) connectSSE(ctx context.Context, name string, cfg UpstreamConfig) (*UpstreamClient, error) {
+	if cfg.URL == "" {
+		return nil, fmt.Errorf("url is required for SSE transport")
+	}
+
+	transport := NewSSETransport(cfg.URL, cfg.Headers, cfg.TLSSkipVerify)
+
+	connectCtx := ctx
+	if cfg.Timeout > 0 {
+		var cancel context.CancelFunc
+		connectCtx, cancel = context.WithTimeout(ctx, cfg.Timeout)
+		defer cancel()
+	}
+
+	if err := transport.Connect(connectCtx); err != nil {
+		transport.Close()
+		return nil, fmt.Errorf("SSE connect to %s: %w", cfg.URL, err)
+	}
+
+	return &UpstreamClient{
+		name:      name,
+		transport: transport,
+	}, nil
+}
+
+func (m *UpstreamManager) connectStreamable(ctx context.Context, name string, cfg UpstreamConfig) (*UpstreamClient, error) {
+	if cfg.URL == "" {
+		return nil, fmt.Errorf("url is required for streamable HTTP transport")
+	}
+
+	transport := NewStreamableHTTPTransport(cfg.URL, cfg.Headers, cfg.TLSSkipVerify)
+
+	connectCtx := ctx
+	if cfg.Timeout > 0 {
+		var cancel context.CancelFunc
+		connectCtx, cancel = context.WithTimeout(ctx, cfg.Timeout)
+		defer cancel()
+	}
+
+	if err := transport.Connect(connectCtx); err != nil {
+		transport.Close()
+		return nil, fmt.Errorf("streamable HTTP connect to %s: %w", cfg.URL, err)
+	}
+
+	return &UpstreamClient{
+		name:      name,
+		transport: transport,
+	}, nil
 }
 
 func (m *UpstreamManager) connectStdio(name string, cfg UpstreamConfig) (*UpstreamClient, error) {
