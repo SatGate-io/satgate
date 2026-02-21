@@ -133,6 +133,17 @@ func (p *Proxy) SetCostResolver(r CostResolver) {
 	p.costs = r
 }
 
+// SetEnforcementMode changes the enforcement mode at runtime (shadow, soft, hard).
+func (p *Proxy) SetEnforcementMode(mode string) {
+	p.config.Enforcement.Mode = mode
+	log.Info().Str("mode", mode).Msg("enforcement mode updated")
+}
+
+// GetEnforcementMode returns the current enforcement mode.
+func (p *Proxy) GetEnforcementMode() string {
+	return p.config.Enforcement.Mode
+}
+
 // RootToken returns the auto-minted root token (empty if not using autoMintRoot).
 func (p *Proxy) RootToken() string {
 	return p.rootToken
