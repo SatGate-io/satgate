@@ -76,13 +76,16 @@ type AuthConfig struct {
 
 // UpstreamConfig defines an upstream MCP server.
 type UpstreamConfig struct {
-	// Transport: "stdio" or "http"
+	// Transport: "stdio", "sse", "http", or "streamable"
+	//   - "stdio": subprocess (command required)
+	//   - "sse": legacy SSE protocol (url required)
+	//   - "http" or "streamable": Streamable HTTP protocol (url required, preferred)
 	Transport string `yaml:"transport"`
 
 	// Command to start the upstream (for stdio transport).
 	Command []string `yaml:"command,omitempty"`
 
-	// URL for HTTP/SSE upstream.
+	// URL for HTTP/SSE/Streamable upstream.
 	URL string `yaml:"url,omitempty"`
 
 	// Timeout for upstream requests.
@@ -90,6 +93,14 @@ type UpstreamConfig struct {
 
 	// Env additional environment variables for subprocess.
 	Env map[string]string `yaml:"env,omitempty"`
+
+	// Headers are additional HTTP headers sent with every request (e.g., Authorization).
+	// Only used for HTTP/SSE/Streamable transports.
+	Headers map[string]string `yaml:"headers,omitempty"`
+
+	// TLSSkipVerify disables TLS certificate verification.
+	// WARNING: Only use for development with self-signed certificates.
+	TLSSkipVerify bool `yaml:"tlsSkipVerify,omitempty"`
 }
 
 // RoutingRule maps tool name patterns to an upstream.
