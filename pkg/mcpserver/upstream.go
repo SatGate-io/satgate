@@ -431,6 +431,74 @@ func (m *UpstreamManager) ForwardRequest(ctx context.Context, method string, par
 	return m.sendRequest(ctx, client, method, params, timeout)
 }
 
+// AddUpstream connects a new upstream at runtime (live reload).
+// If an upstream with the same name already exists, it is replaced.
+func (m *UpstreamManager) AddUpstream(ctx context.Context, name string, cfg UpstreamConfig) error {
+	client, err := m.connect(ctx, name, cfg)
+	if err != nil {
+		return fmt.Errorf("connect upstream %q: %w", name, err)
+	}
+
+	// Start read loop
+	go m.readLoop(ctx, client)
+
+	// Initialize
+	if err := m.initializeUpstream(ctx, client); err != nil {
+		client.transport.Close()
+		return fmt.Errorf("initialize upstream %q: %w", name, err)
+	}
+
+	// Discover tools
+	if err := m.discoverTools(ctx, client); err != nil {
+		client.transport.Close()
+		return fmt.Errorf("discover tools for %q: %w", name, err)
+	}
+
+	// Swap into clients map (close old if replacing)
+	m.mu.Lock()
+	if old, exists := m.clients[name]; exists {
+		old.transport.Close()
+	}
+	m.clients[name] = client
+	m.config[name] = cfg
+	m.mu.Unlock()
+
+	log.Info().Str("upstream", name).Int("tools", len(client.toolNames)).
+		Strs("tools", client.toolNames).Msg("upstream added (live)")
+	return nil
+}
+
+// RemoveUpstream disconnects and removes an upstream at runtime.
+func (m *UpstreamManager) RemoveUpstream(name string) error {
+	m.mu.Lock()
+	client, exists := m.clients[name]
+	if !exists {
+		m.mu.Unlock()
+		return fmt.Errorf("upstream %q not found", name)
+	}
+	delete(m.clients, name)
+	delete(m.config, name)
+	m.mu.Unlock()
+
+	if err := client.transport.Close(); err != nil {
+		log.Warn().Err(err).Str("upstream", name).Msg("error closing removed upstream")
+	}
+
+	log.Info().Str("upstream", name).Msg("upstream removed (live)")
+	return nil
+}
+
+// UpstreamNames returns the names of all connected upstreams.
+func (m *UpstreamManager) UpstreamNames() []string {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	names := make([]string, 0, len(m.clients))
+	for name := range m.clients {
+		names = append(names, name)
+	}
+	return names
+}
+
 // Close shuts down all upstream connections.
 func (m *UpstreamManager) Close() error {
 	m.mu.Lock()

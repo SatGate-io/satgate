@@ -162,6 +162,49 @@ func (p *Proxy) SetEventPublisher(ep EventPublisher) {
 	}
 }
 
+// ReloadUpstreams adds, removes, or replaces upstreams at runtime without restart.
+// It compares the new config against current upstreams and applies the diff.
+func (p *Proxy) ReloadUpstreams(ctx context.Context, newUpstreams map[string]UpstreamConfig) error {
+	current := make(map[string]bool)
+	for _, name := range p.upstream.UpstreamNames() {
+		current[name] = true
+	}
+
+	var errors []string
+
+	// Add or update upstreams
+	for name, cfg := range newUpstreams {
+		if current[name] {
+			// Replace: remove then add
+			p.upstream.RemoveUpstream(name)
+		}
+		if err := p.upstream.AddUpstream(ctx, name, cfg); err != nil {
+			errors = append(errors, fmt.Sprintf("%s: %v", name, err))
+			log.Error().Err(err).Str("upstream", name).Msg("failed to add upstream during reload")
+		}
+		delete(current, name)
+	}
+
+	// Remove upstreams that are no longer in the new config
+	for name := range current {
+		if err := p.upstream.RemoveUpstream(name); err != nil {
+			log.Warn().Err(err).Str("upstream", name).Msg("failed to remove upstream during reload")
+		}
+	}
+
+	if len(errors) > 0 {
+		return fmt.Errorf("reload errors: %s", errors)
+	}
+
+	log.Info().Int("upstreams", len(newUpstreams)).Msg("upstreams reloaded")
+	return nil
+}
+
+// GetUpstream returns the underlying UpstreamManager (for enterprise extensions).
+func (p *Proxy) GetUpstreamManager() *UpstreamManager {
+	return p.upstream
+}
+
 // Run starts the proxy. It blocks until ctx is cancelled or an error occurs.
 func (p *Proxy) Run(ctx context.Context, clientTransport Transport) error {
 	p.client = clientTransport
