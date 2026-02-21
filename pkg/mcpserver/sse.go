@@ -205,6 +205,15 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 			// SSE comment line — keeps connection alive through proxies/load balancers
 			fmt.Fprintf(w, ": keepalive\n\n")
 			flusher.Flush()
+			// Publish keepalive event so enterprise Redis TTLs stay fresh
+			s.proxy.events.Publish(Event{
+				Type:      EventSessionKeepalive,
+				Timestamp: time.Now(),
+				SessionID: sessionID,
+				TokenID:   session.tokenID,
+				TenantID:  session.tenantID,
+				BudgetID:  session.budgetID,
+			})
 
 		case <-ctx.Done():
 			return

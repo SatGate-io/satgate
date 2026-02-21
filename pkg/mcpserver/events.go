@@ -16,8 +16,9 @@ const (
 	EventBudgetError    EventType = "budget_error"
 	EventDelegation     EventType = "delegation"
 	EventAuthFailure    EventType = "auth_failure"
-	EventSessionConnect EventType = "session_connect"
-	EventSessionClose   EventType = "session_close"
+	EventSessionConnect   EventType = "session_connect"
+	EventSessionClose     EventType = "session_close"
+	EventSessionKeepalive EventType = "session_keepalive"
 )
 
 // Event is a structured event emitted by the MCP proxy.
