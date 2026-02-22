@@ -47,7 +47,8 @@ type Proxy struct {
 	upstream  *UpstreamManager
 	router    UpstreamRouter  // per-tenant routing (nil = use shared upstream)
 	budget    BudgetEnforcer
-	costs     CostResolver
+	costs       CostResolver
+	tenantCosts TenantCostResolver // optional, per-tenant cost resolution
 	auth      Authenticator
 	delegator *Delegator
 	events    EventPublisher
@@ -162,9 +163,17 @@ func (p *Proxy) SetBudgetEnforcer(e BudgetEnforcer) {
 	}
 }
 
-// SetCostResolver replaces the cost resolver (e.g., with enterprise per-tenant costs).
+// SetCostResolver replaces the global cost resolver.
+// In single-tenant mode, this is the only resolver needed.
 func (p *Proxy) SetCostResolver(r CostResolver) {
 	p.costs = r
+}
+
+// SetTenantCostResolver sets a per-tenant cost resolver for multi-tenant mode.
+// When set, this takes priority over the global CostResolver for requests
+// that have a tenant ID in their token.
+func (p *Proxy) SetTenantCostResolver(r TenantCostResolver) {
+	p.tenantCosts = r
 }
 
 // SetEnforcementMode changes the enforcement mode at runtime (shadow, soft, hard).
@@ -465,8 +474,13 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		return NewErrorResponse(req.ID, CodeInvalidParams, err.Error()), nil
 	}
 
-	// Resolve cost
-	cost := p.costs.Resolve(tc.Name)
+	// Resolve cost (per-tenant if available, else global)
+	var cost int64
+	if p.tenantCosts != nil && tokenInfo.TenantID != "" {
+		cost = p.tenantCosts.ResolveForTenant(tokenInfo.TenantID, tc.Name)
+	} else {
+		cost = p.costs.Resolve(tc.Name)
+	}
 
 	// Determine budget identity
 	budgetID := tokenInfo.BudgetID

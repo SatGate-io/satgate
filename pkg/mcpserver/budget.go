@@ -40,6 +40,13 @@ type CostResolver interface {
 	Resolve(toolName string) int64
 }
 
+// TenantCostResolver resolves costs per-tenant. Used in multi-tenant SaaS mode.
+// If set on the proxy, it takes priority over the global CostResolver.
+type TenantCostResolver interface {
+	// ResolveForTenant returns the credit cost for a tool call scoped to a tenant.
+	ResolveForTenant(tenantID string, toolName string) int64
+}
+
 // --- In-memory budget enforcer (OSS) ---
 
 // InMemoryBudgetEnforcer provides single-instance budget enforcement.
