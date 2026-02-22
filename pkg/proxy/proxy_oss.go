@@ -667,6 +667,14 @@ func (g *Gateway) createProxy(upstreamURL string) (*httputil.ReverseProxy, error
 	}
 
 	proxy := httputil.NewSingleHostReverseProxy(target)
+	// Wrap Director to set req.Host = target.Host for CDN compatibility
+	// (Cloudflare, OpenAI, Anthropic etc. reject requests with wrong Host header)
+	defaultDirector := proxy.Director
+	targetHost := target.Host
+	proxy.Director = func(r *http.Request) {
+		defaultDirector(r)
+		r.Host = targetHost
+	}
 
 	// Configure transport
 	proxy.Transport = &http.Transport{
