@@ -81,6 +81,42 @@ export default function SecurityPage() {
             </ul>
           </section>
 
+          {/* Why Macaroons */}
+          <section className="bg-gradient-to-r from-yellow-900/10 to-orange-900/10 border border-yellow-800/20 rounded-xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Key className="text-yellow-400" size={24} />
+              <h2 className="text-xl font-bold text-white m-0">Why Macaroons Beat API Keys</h2>
+            </div>
+            <p className="text-gray-400 leading-relaxed mb-6">
+              API keys are passwords. JWTs are ID cards. Macaroons are <strong>signed checks with spending limits</strong> — 
+              and every person who touches the check can only reduce the limit, never increase it.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-gray-900/50 rounded-lg p-4">
+                <h3 className="font-semibold text-yellow-300 text-sm mb-2">Delegation Without Calling Home</h3>
+                <p className="text-gray-500 text-sm m-0">
+                  A VP mints a token, carves off a weaker one for their team lead, who carves off an even weaker one for an agent. 
+                  Each step is cryptographically chained — no API call, no DB write, no admin portal. Permissions only shrink, never grow.
+                </p>
+              </div>
+              <div className="bg-gray-900/50 rounded-lg p-4">
+                <h3 className="font-semibold text-yellow-300 text-sm mb-2">Runtime Conditions Built In</h3>
+                <p className="text-gray-500 text-sm m-0">
+                  Macaroon caveats encode constraints like &ldquo;only valid until 5pm,&rdquo; &ldquo;only for /openai/*,&rdquo; or 
+                  &ldquo;max 200 credits.&rdquo; These are verified at the gateway on every request. The token <em>itself</em> carries 
+                  the budget constraint.
+                </p>
+              </div>
+              <div className="bg-gray-900/50 rounded-lg p-4">
+                <h3 className="font-semibold text-yellow-300 text-sm mb-2">The Right Primitive for Agents</h3>
+                <p className="text-gray-500 text-sm m-0">
+                  Agents can&apos;t sign up for accounts. They can&apos;t do OAuth flows. But they can hold a bearer token 
+                  that encodes exactly what they&apos;re allowed to do and spend. That&apos;s a macaroon.
+                </p>
+              </div>
+            </div>
+          </section>
+
           <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
               <Zap className="text-yellow-400" size={24} />
