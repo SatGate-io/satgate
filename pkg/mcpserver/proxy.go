@@ -482,11 +482,10 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		cost = p.costs.Resolve(tc.Name)
 	}
 
-	// Determine budget identity
+	// Determine budget identity.
+	// If the token has no budget_id caveat, this is an observe-only token —
+	// skip budget enforcement entirely (don't fall back to tokenID).
 	budgetID := tokenInfo.BudgetID
-	if budgetID == "" {
-		budgetID = p.tokenID
-	}
 
 	// Tenant ID for event routing (multi-tenant)
 	tenantID := tokenInfo.TenantID
