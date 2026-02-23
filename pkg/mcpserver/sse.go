@@ -162,7 +162,6 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 	// Try full verification first; fall back to caveat extraction if verify fails
 	// (e.g., token signed by a different root key in multi-tenant SaaS).
 	if authToken != "" {
-		log.Debug().Str("session", sessionID).Int("tokenLen", len(authToken)).Msg("SSE: auth token present on GET")
 		var resolved bool
 		if s.proxy.auth != nil {
 			if info, err := s.proxy.auth.Verify(ctx, authToken); err == nil {
@@ -170,9 +169,6 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 				session.tenantID = info.TenantID
 				session.budgetID = info.BudgetID
 				resolved = true
-				log.Info().Str("session", sessionID).Str("tenant", info.TenantID).Msg("SSE: identity resolved via auth verify")
-			} else {
-				log.Debug().Str("session", sessionID).Err(err).Msg("SSE: auth verify failed, trying caveat extraction")
 			}
 		}
 		if !resolved {
@@ -181,16 +177,11 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 			if tid, bid := extractTokenCaveats(authToken); tid != "" {
 				session.tenantID = tid
 				session.budgetID = bid
-				log.Info().Str("session", sessionID).Str("tenant", tid).Str("budget", bid).Msg("SSE: identity resolved via caveat extraction")
-			} else {
-				log.Warn().Str("session", sessionID).Msg("SSE: no tenant_id found in token caveats")
 			}
 		}
-	} else {
-		log.Debug().Str("session", sessionID).Msg("SSE: no auth token on GET request")
 	}
 
-	log.Info().Str("session", sessionID).Str("tenant", session.tenantID).Str("token", session.tokenID).Str("budget", session.budgetID).Msg("SSE session established")
+	log.Info().Str("session", sessionID).Str("tenant", session.tenantID).Msg("SSE session established")
 	s.proxy.events.Publish(Event{
 		Type:      EventSessionConnect,
 		Timestamp: time.Now(),
