@@ -258,6 +258,40 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 	// Also check Authorization header for token (SSE auth)
 	authToken := extractAuthToken(r)
 
+	// Late identity resolution: some clients (e.g., Cursor) don't send the
+	// Authorization header on the initial SSE GET — only on POST /message.
+	// When we see a token here for the first time, extract tenant/budget info
+	// and re-publish a session_connect event so the dashboard picks it up.
+	if authToken != "" && session.tenantID == "" {
+		var resolved bool
+		if s.proxy.auth != nil {
+			if info, err := s.proxy.auth.Verify(session.ctx, authToken); err == nil {
+				session.tokenID = info.TokenID
+				session.tenantID = info.TenantID
+				session.budgetID = info.BudgetID
+				resolved = true
+			}
+		}
+		if !resolved {
+			if tid, bid := extractTokenCaveats(authToken); tid != "" {
+				session.tenantID = tid
+				session.budgetID = bid
+			}
+		}
+		// Re-publish session_connect with correct identity
+		if session.tenantID != "" {
+			log.Info().Str("session", sessionID).Str("tenant", session.tenantID).Msg("session identity resolved from message auth")
+			s.proxy.events.Publish(Event{
+				Type:      EventSessionConnect,
+				Timestamp: time.Now(),
+				SessionID: sessionID,
+				TokenID:   session.tokenID,
+				TenantID:  session.tenantID,
+				BudgetID:  session.budgetID,
+			})
+		}
+	}
+
 	// Parse and handle
 	req, _, parseErr := ParseMessage(json.RawMessage(body))
 	if parseErr != nil {
