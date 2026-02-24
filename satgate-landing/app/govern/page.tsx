@@ -82,7 +82,7 @@ export default function GovernPage() {
             RBAC asks for identity. EAC asks for a budget. Your AI agents are spending money, calling APIs, and making decisions — with zero economic constraints.
             SatGate enforces <strong className="text-white">Economic Access Control</strong>: <strong className="text-white">observe</strong> every call,{' '}
             <strong className="text-white">control</strong> every budget, and{' '}
-            <strong className="text-white">charge back</strong> every dollar to the right team.
+            <strong className="text-white">charge</strong> for access to your high-value APIs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/design-partners" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center justify-center gap-2">
