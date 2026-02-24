@@ -673,6 +673,56 @@ export default function GovernPage() {
         </div>
       </section>
 
+      {/* At Scale */}
+      <section className="py-20 px-6 border-t border-gray-800">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              From Demo to Thousands of Agents
+            </h2>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+              The same exchange you just saw works identically at scale. No secrets management. No credential rotation. Identity is the credential.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="bg-[#12121a] border border-gray-800 rounded-xl p-6">
+              <div className="text-2xl font-bold text-purple-400 mb-2">1</div>
+              <h3 className="text-white font-semibold mb-2">Define trust policies</h3>
+              <p className="text-gray-400 text-sm">Map identity claims to budgets, scopes, and TTLs. One policy per agent class — not per agent instance.</p>
+            </div>
+            <div className="bg-[#12121a] border border-gray-800 rounded-xl p-6">
+              <div className="text-2xl font-bold text-cyan-400 mb-2">2</div>
+              <h3 className="text-white font-semibold mb-2">Agents self-provision</h3>
+              <p className="text-gray-400 text-sm">Each agent reads its environment identity (K8s SA, IAM role, OIDC token) and exchanges it for a macaroon. One API call. No human in the loop.</p>
+            </div>
+            <div className="bg-[#12121a] border border-gray-800 rounded-xl p-6">
+              <div className="text-2xl font-bold text-green-400 mb-2">3</div>
+              <h3 className="text-white font-semibold mb-2">Observe everything</h3>
+              <p className="text-gray-400 text-sm">Every tool call, every credit spent, every agent session — visible in real-time on your dashboard. When you&apos;re ready, flip to enforcement.</p>
+            </div>
+          </div>
+
+          <div className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-6 font-mono text-sm text-gray-400 overflow-x-auto">
+            <pre>{`# Agent startup (3 lines — works in any runtime)
+IDENTITY=$(cat /var/run/secrets/tokens/satgate-token)
+TOKEN=$(curl -s -X POST $SATGATE_MINT_URL \\
+  -d "{\\"credentials\\": \\"$IDENTITY\\"}" | jq -r '.token')
+export SATGATE_TOKEN=$TOKEN
+# That's it. Agent connects through SatGate with budget-scoped access.`}</pre>
+          </div>
+
+          <div className="text-center mt-8">
+            <Link
+              href="https://cloud.satgate.io/docs/guides/mint-identity"
+              className="text-purple-400 hover:text-purple-300 transition text-sm underline underline-offset-2"
+            >
+              Read the full integration guide →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="py-20 px-6 border-t border-gray-800 bg-gradient-to-b from-purple-950/20 to-black">
         <div className="max-w-3xl mx-auto text-center">
