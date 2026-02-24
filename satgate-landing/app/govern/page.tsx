@@ -643,6 +643,36 @@ export default function GovernPage() {
         </div>
       </section>
 
+      {/* Live Mint Demo */}
+      <section className="py-20 px-6 border-t border-gray-800 bg-gradient-to-b from-purple-950/10 to-black">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/10 border border-purple-500/20 rounded-full text-purple-300 text-sm mb-6">
+              <Key size={14} />
+              Live Demo
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              See It Work — Right Now
+            </h2>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+              SatGate Mint exchanges workload identity tokens for capability-bearing macaroons.
+              No secrets to manage. No tokens to rotate. Try it live.
+            </p>
+          </div>
+          <div className="text-center">
+            <Link
+              href="/mint-demo"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 rounded-xl text-white font-semibold text-lg transition shadow-lg shadow-purple-500/20"
+            >
+              Launch Interactive Demo <ArrowRight size={20} />
+            </Link>
+            <p className="text-gray-600 text-sm mt-4">
+              3-step flow: Mock IdP → Mint Exchange → Verified Macaroon
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="py-20 px-6 border-t border-gray-800 bg-gradient-to-b from-purple-950/20 to-black">
         <div className="max-w-3xl mx-auto text-center">

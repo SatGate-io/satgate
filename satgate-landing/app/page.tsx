@@ -29,7 +29,6 @@ const LandingPage = () => {
           {/* Desktop menu */}
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
             <Link href="/mcp" className="hover:text-white transition">MCP Agents</Link>
-            <Link href="/mint-demo" className="hover:text-white transition">Mint Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
@@ -61,13 +60,6 @@ const LandingPage = () => {
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               MCP Agents
-            </Link>
-            <Link 
-              href="/mint-demo" 
-              onClick={() => setMobileMenuOpen(false)} 
-              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
-            >
-              Mint Demo
             </Link>
             <Link 
               href="/govern" 
