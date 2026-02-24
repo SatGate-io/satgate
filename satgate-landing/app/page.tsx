@@ -28,14 +28,12 @@ const LandingPage = () => {
           
           {/* Desktop menu */}
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
-            <Link href="/protect" className="hover:text-white transition">Protect Demo</Link>
-            <Link href="/pay" className="hover:text-white transition">Pay Demo</Link>
-            <Link href="/govern" className="hover:text-white transition">Govern</Link>
+            <Link href="/mcp" className="hover:text-white transition">MCP Agents</Link>
+            <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
-            <Link href="/roi-calculator" className="hover:text-white transition">ROI Calculator</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
             <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a>
-            <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud</a>
+            <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 transition">Cloud →</a>
           </div>
           
           {/* Mobile menu button */}
@@ -57,25 +55,18 @@ const LandingPage = () => {
         >
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
             <Link 
-              href="/protect" 
+              href="/mcp" 
               onClick={() => setMobileMenuOpen(false)} 
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
-              Protect Demo
-            </Link>
-            <Link 
-              href="/pay" 
-              onClick={() => setMobileMenuOpen(false)} 
-              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
-            >
-              Pay Demo
+              MCP Agents
             </Link>
             <Link 
               href="/govern" 
               onClick={() => setMobileMenuOpen(false)} 
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
-              Govern
+              Enterprise
             </Link>
             <Link 
               href="/pricing" 
