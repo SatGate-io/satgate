@@ -48,29 +48,85 @@ func NewUpstreamManager(config map[string]UpstreamConfig, routing []RoutingRule,
 
 // Start launches all upstream connections and discovers tools.
 func (m *UpstreamManager) Start(ctx context.Context) error {
-	for name, cfg := range m.config {
-		client, err := m.connect(ctx, name, cfg)
-		if err != nil {
-			return fmt.Errorf("upstream %q: %w", name, err)
+	if len(m.config) <= 1 {
+		// Single upstream — sequential (no goroutine overhead)
+		for name, cfg := range m.config {
+			if err := m.startOne(ctx, name, cfg); err != nil {
+				return err
+			}
 		}
-		m.clients[name] = client
-
-		// Start reading responses in background
-		go m.readLoop(ctx, client)
-
-		// Initialize MCP session
-		if err := m.initializeUpstream(ctx, client); err != nil {
-			return fmt.Errorf("upstream %q initialize: %w", name, err)
-		}
-
-		// Discover tools
-		if err := m.discoverTools(ctx, client); err != nil {
-			return fmt.Errorf("upstream %q tools/list: %w", name, err)
-		}
-
-		log.Info().Str("upstream", name).Int("tools", len(client.toolNames)).
-			Strs("tools", client.toolNames).Msg("upstream connected")
+		return nil
 	}
+
+	// Multiple upstreams — connect in parallel for faster tool discovery
+	type result struct {
+		name   string
+		client *UpstreamClient
+		err    error
+	}
+	results := make(chan result, len(m.config))
+
+	for name, cfg := range m.config {
+		go func(n string, c UpstreamConfig) {
+			client, err := m.connect(ctx, n, c)
+			if err != nil {
+				results <- result{n, nil, fmt.Errorf("upstream %q: %w", n, err)}
+				return
+			}
+			go m.readLoop(ctx, client)
+			if err := m.initializeUpstream(ctx, client); err != nil {
+				results <- result{n, nil, fmt.Errorf("upstream %q initialize: %w", n, err)}
+				return
+			}
+			if err := m.discoverTools(ctx, client); err != nil {
+				results <- result{n, nil, fmt.Errorf("upstream %q tools/list: %w", n, err)}
+				return
+			}
+			results <- result{n, client, nil}
+		}(name, cfg)
+	}
+
+	var firstErr error
+	for i := 0; i < len(m.config); i++ {
+		r := <-results
+		if r.err != nil {
+			if firstErr == nil {
+				firstErr = r.err
+			}
+			log.Error().Err(r.err).Str("upstream", r.name).Msg("upstream connect failed (parallel)")
+			continue
+		}
+		m.clients[r.name] = r.client
+		log.Info().Str("upstream", r.name).Int("tools", len(r.client.toolNames)).
+			Strs("tools", r.client.toolNames).Msg("upstream connected")
+	}
+
+	// Fail only if ALL upstreams failed; partial success is OK
+	if len(m.clients) == 0 && firstErr != nil {
+		return firstErr
+	}
+	return nil
+}
+
+// startOne connects a single upstream sequentially (connect → init → discover).
+func (m *UpstreamManager) startOne(ctx context.Context, name string, cfg UpstreamConfig) error {
+	client, err := m.connect(ctx, name, cfg)
+	if err != nil {
+		return fmt.Errorf("upstream %q: %w", name, err)
+	}
+	m.clients[name] = client
+
+	go m.readLoop(ctx, client)
+
+	if err := m.initializeUpstream(ctx, client); err != nil {
+		return fmt.Errorf("upstream %q initialize: %w", name, err)
+	}
+	if err := m.discoverTools(ctx, client); err != nil {
+		return fmt.Errorf("upstream %q tools/list: %w", name, err)
+	}
+
+	log.Info().Str("upstream", name).Int("tools", len(client.toolNames)).
+		Strs("tools", client.toolNames).Msg("upstream connected")
 	return nil
 }
 
@@ -224,6 +280,43 @@ func (m *UpstreamManager) readLoop(ctx context.Context, client *UpstreamClient) 
 
 					log.Info().Str("upstream", client.name).Int("tools", len(newClient.toolNames)).
 						Msg("upstream respawned successfully")
+					break
+				}
+			} else if hasCfg && (cfg.Transport == "sse" || cfg.Transport == "http" || cfg.Transport == "streamable") {
+				// Reconnect SSE/streamable upstreams with backoff
+				for attempt := 1; attempt <= 5; attempt++ {
+					if ctx.Err() != nil {
+						return
+					}
+					backoff := time.Duration(attempt) * 2 * time.Second
+					log.Info().Str("upstream", client.name).Int("attempt", attempt).
+						Dur("backoff", backoff).Msg("reconnecting upstream")
+					time.Sleep(backoff)
+
+					newClient, err := m.connect(ctx, client.name, cfg)
+					if err != nil {
+						log.Error().Err(err).Str("upstream", client.name).Msg("reconnect failed")
+						continue
+					}
+
+					if err := m.initializeUpstream(ctx, newClient); err != nil {
+						log.Error().Err(err).Str("upstream", client.name).Msg("reconnect initialize failed")
+						continue
+					}
+					if err := m.discoverTools(ctx, newClient); err != nil {
+						log.Error().Err(err).Str("upstream", client.name).Msg("reconnect discover failed")
+						continue
+					}
+
+					m.mu.Lock()
+					client.transport = newClient.transport
+					client.tools = newClient.tools
+					client.toolNames = newClient.toolNames
+					client.ready = true
+					m.mu.Unlock()
+
+					log.Info().Str("upstream", client.name).Int("tools", len(newClient.toolNames)).
+						Msg("upstream reconnected successfully")
 					break
 				}
 			} else {
