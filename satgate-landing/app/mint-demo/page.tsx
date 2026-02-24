@@ -120,7 +120,7 @@ export default function MintDemoPage() {
             SatGate
           </Link>
           <div className="flex items-center gap-4">
-            <Link href="/docs/guides/mint-identity" className="text-gray-400 hover:text-white text-sm transition">
+            <Link href="https://cloud.satgate.io/docs/guides/mint-identity" className="text-gray-400 hover:text-white text-sm transition">
               Docs
             </Link>
             <Link
@@ -367,13 +367,13 @@ export default function MintDemoPage() {
                 Configure Your IdP <ArrowRight size={14} />
               </Link>
               <Link
-                href="/docs/guides/mint-identity"
+                href="https://cloud.satgate.io/docs/guides/mint-identity"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-medium transition"
               >
                 Read the Guide <ArrowRight size={14} />
               </Link>
               <Link
-                href="/docs/guides/sdk"
+                href="https://cloud.satgate.io/docs/guides/sdk"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-medium transition"
               >
                 SDK Docs <ArrowRight size={14} />
