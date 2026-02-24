@@ -358,11 +358,16 @@ func (s *SSEServer) handleHealth(w http.ResponseWriter, _ *http.Request) {
 
 // extractAuthToken pulls Bearer token from Authorization header.
 func extractAuthToken(r *http.Request) string {
+	// Check Authorization header first
 	auth := r.Header.Get("Authorization")
-	if auth == "" {
-		return ""
+	if auth != "" {
+		return strings.TrimPrefix(auth, "Bearer ")
 	}
-	return strings.TrimPrefix(auth, "Bearer ")
+	// Fall back to ?token= query parameter (used by SSE clients like Cursor)
+	if token := r.URL.Query().Get("token"); token != "" {
+		return token
+	}
+	return ""
 }
 
 // injectMetaToken adds _meta.token to params JSON if not already present.
