@@ -177,16 +177,6 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* Social Proof */}
-      <section className="py-8 px-6 border-b border-gray-800/50">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-gray-500 text-sm">
-            Built by a team from <span className="text-gray-300">Deloitte</span>, <span className="text-gray-300">Accenture</span>, and <span className="text-gray-300">EY</span> — 30 years in enterprise cybersecurity.
-            Open source on <a href="https://github.com/SatGate-io/satgate" className="text-purple-400 hover:text-purple-300 transition">GitHub</a>.
-          </p>
-        </div>
-      </section>
-
       {/* Default Protection + Economic Policies */}
       <section className="py-20 px-6 border-b border-gray-800 bg-gradient-to-b from-gray-900/30 to-black">
         <div className="max-w-5xl mx-auto">
