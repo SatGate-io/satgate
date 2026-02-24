@@ -82,23 +82,28 @@ func (d *Delegator) SetEventPublisher(ep EventPublisher) {
 
 // Delegate creates a child token with a carved budget from the parent.
 func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *DelegateParams) (*DelegateResult, error) {
-	if params.Budget <= 0 {
-		return nil, fmt.Errorf("budget must be positive")
+	if params.Budget < 0 {
+		return nil, fmt.Errorf("budget must be non-negative")
 	}
 
 	if parent.RawToken == "" {
 		return nil, fmt.Errorf("delegation requires macaroon auth (mode=header)")
 	}
 
-	// Carve budget from parent: atomically check & decrement parent, set child.
-	// Each delegation gets a unique idempotency key (nonce) so repeated calls
-	// are treated as new spends, not retries of the same operation.
-	nonce := make([]byte, 8)
-	_, _ = rand.Read(nonce)
-	delegationID := fmt.Sprintf("delegate-%s-%s-%d-%s", parent.BudgetID, params.Label, params.Budget, hex.EncodeToString(nonce))
-	parentResult, err := d.budget.Spend(ctx, parent.BudgetID, "_delegation", params.Budget, delegationID)
-	if err != nil {
-		return nil, fmt.Errorf("insufficient parent budget: %w", err)
+	// Budget transfer: skip for observe-only (0-budget) tokens
+	var parentResult *BudgetResult
+	if params.Budget > 0 {
+		// Carve budget from parent: atomically check & decrement parent, set child.
+		// Each delegation gets a unique idempotency key (nonce) so repeated calls
+		// are treated as new spends, not retries of the same operation.
+		nonce := make([]byte, 8)
+		_, _ = rand.Read(nonce)
+		delegationID := fmt.Sprintf("delegate-%s-%s-%d-%s", parent.BudgetID, params.Label, params.Budget, hex.EncodeToString(nonce))
+		var err error
+		parentResult, err = d.budget.Spend(ctx, parent.BudgetID, "_delegation", params.Budget, delegationID)
+		if err != nil {
+			return nil, fmt.Errorf("insufficient parent budget: %w", err)
+		}
 	}
 
 	// Create child macaroon with additional caveats
@@ -123,18 +128,25 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 	childToken := d.macaroonSvc.Encode(childMac)
 	childTokenID := hashToken(childMac.Identifier + childMac.Signature)
 
-	// Initialize child budget — pass delegationID via context for enterprise
-	// atomic transfer correlation (matches Spend → Initialize by exact ID).
-	initCtx := context.WithValue(ctx, CtxDelegationID, delegationID)
-	if err := d.budget.Initialize(initCtx, childTokenID, params.Budget); err != nil {
-		return nil, fmt.Errorf("initialize child budget: %w", err)
+	// Initialize child budget (skip for observe-only 0-budget tokens)
+	if params.Budget > 0 {
+		delegationID := fmt.Sprintf("delegate-%s-%s-%d", parent.BudgetID, params.Label, params.Budget)
+		initCtx := context.WithValue(ctx, CtxDelegationID, delegationID)
+		if err := d.budget.Initialize(initCtx, childTokenID, params.Budget); err != nil {
+			return nil, fmt.Errorf("initialize child budget: %w", err)
+		}
+	}
+
+	parentRemaining := int64(0)
+	if parentResult != nil {
+		parentRemaining = parentResult.Remaining
 	}
 
 	log.Info().
 		Str("parent", parent.TokenID).
 		Str("child", childTokenID).
 		Int64("budget", params.Budget).
-		Int64("parentRemaining", parentResult.Remaining).
+		Int64("parentRemaining", parentRemaining).
 		Str("label", params.Label).
 		Msg("token delegated")
 
@@ -146,7 +158,7 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		Data: map[string]interface{}{
 			"childTokenId":    childTokenID,
 			"childBudget":     params.Budget,
-			"parentRemaining": parentResult.Remaining,
+			"parentRemaining": parentRemaining,
 			"label":           params.Label,
 			"scope":           params.Scope,
 		},
