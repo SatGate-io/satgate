@@ -116,32 +116,24 @@ const LandingPage = () => {
               <Zap size={12} /> Economic Access Control — the security primitive for the agent economy
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-              The Economic Firewall<br/>
+              Know what your AI agents<br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-                for AI Agent Requests.
+                are spending.
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              SatGate is an Economic Firewall that enforces <b className="text-white">Economic Access Control (EAC)</b> for AI agent requests.
+              Every tool call — authenticated, logged, cost-tracked, and budget-enforced. The <b className="text-white">Economic Firewall</b> for AI agent requests.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
-              Per-agent budgets, per-tool cost attribution, delegation hierarchies. Not &ldquo;who are you?&rdquo; — <b>&ldquo;what can you afford?&rdquo;</b> Math doesn&apos;t care how smart the AI is.
+              Not &ldquo;who are you?&rdquo; — <b>&ldquo;what can you afford?&rdquo;</b> Per-agent budgets. Per-tool costs. Delegation hierarchies. Connect in 5 minutes.
             </p>
             <div className="flex gap-4">
-              <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center gap-2">
-                Start Free →
+              <a href="https://cloud.satgate.io/cloud/onboarding/mcp" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
+                Connect Your Agent <ArrowRight size={16} />
               </a>
-              <button 
-                onClick={copyToClipboard}
-                className="border border-gray-700 px-8 py-3 rounded-lg font-bold hover:border-gray-500 transition font-mono flex items-center gap-2 group"
-              >
-                pip install satgate
-                {copied ? (
-                  <Check size={16} className="text-green-400" />
-                ) : (
-                  <Copy size={16} className="text-gray-500 group-hover:text-gray-300 transition" />
-                )}
-              </button>
+              <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="border border-gray-700 px-8 py-3 rounded-lg font-bold hover:border-gray-500 transition flex items-center gap-2 text-gray-300">
+                View on GitHub
+              </a>
             </div>
           </div>
 
