@@ -128,7 +128,7 @@ const LandingPage = () => {
               Not &ldquo;who are you?&rdquo; — <b>&ldquo;what can you afford?&rdquo;</b> Per-agent budgets. Per-tool costs. Delegation hierarchies. Connect in 5 minutes.
             </p>
             <div className="flex gap-4">
-              <a href="https://cloud.satgate.io/cloud/onboarding/mcp" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
+              <a href="https://cloud.satgate.io/cloud/mcp/connect" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
                 Connect Your Agent <ArrowRight size={16} />
               </a>
               <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="border border-gray-700 px-8 py-3 rounded-lg font-bold hover:border-gray-500 transition flex items-center gap-2 text-gray-300">

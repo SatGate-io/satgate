@@ -54,7 +54,7 @@ export default function MCPLandingPage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="https://cloud.satgate.io/cloud/onboarding/mcp"
+              href="https://cloud.satgate.io/cloud/mcp/connect"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 rounded-xl text-white font-semibold text-lg transition shadow-lg shadow-purple-500/20"
             >
               Connect Your Agent <ArrowRight size={20} />
@@ -235,7 +235,7 @@ export default function MCPLandingPage() {
             Free Observe mode. No credit card. Connect your first agent in 5 minutes.
           </p>
           <a
-            href="https://cloud.satgate.io/cloud/onboarding/mcp"
+            href="https://cloud.satgate.io/cloud/mcp/connect"
             className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 rounded-xl text-white font-semibold text-lg transition shadow-lg shadow-purple-500/20"
           >
             Connect Your Agent — Free <ArrowRight size={20} />
