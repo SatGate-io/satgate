@@ -111,11 +111,11 @@ func (a *MacaroonAuthenticator) Verify(_ context.Context, token string) (*TokenI
 		RawToken: token,
 	}
 
-	// Check for budget_id caveat
+	// Check for budget_id caveat.
+	// If absent, leave BudgetID empty — the proxy skips budget enforcement
+	// for tokens without a budget_id (observe-only / 0-budget delegation tokens).
 	if budgetID := mac.GetCaveat("budget_id"); budgetID != "" {
 		info.BudgetID = budgetID
-	} else {
-		info.BudgetID = tokenID
 	}
 
 	// Check for tenant_id caveat (multi-tenant routing)
