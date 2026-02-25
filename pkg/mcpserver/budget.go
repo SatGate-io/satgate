@@ -76,7 +76,10 @@ func NewInMemoryBudgetEnforcer() *InMemoryBudgetEnforcer {
 func (e *InMemoryBudgetEnforcer) Initialize(_ context.Context, tokenID string, credits int64) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	e.budgets[tokenID] = credits
+	// Only initialize if not already set (idempotent — don't reset spend)
+	if _, exists := e.budgets[tokenID]; !exists {
+		e.budgets[tokenID] = credits
+	}
 	return nil
 }
 

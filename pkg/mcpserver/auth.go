@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/subtle"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/satgate-io/satgate/pkg/macaroon"
@@ -16,6 +17,8 @@ type TokenInfo struct {
 
 	// BudgetID is the budget subject — either from a "budget_id" caveat or derived from TokenID.
 	BudgetID string
+	// BudgetLimit is the token's budget cap (from "budget_limit" caveat), 0 if not set.
+	BudgetLimit int64
 
 	// TenantID from the "tenant_id" caveat (for multi-tenant routing).
 	TenantID string
@@ -112,10 +115,17 @@ func (a *MacaroonAuthenticator) Verify(_ context.Context, token string) (*TokenI
 	}
 
 	// Check for budget_id caveat.
-	// If absent, leave BudgetID empty — the proxy skips budget enforcement
-	// for tokens without a budget_id (observe-only / 0-budget delegation tokens).
+	// If present, use it. Otherwise fall back to tokenID for backward compat
+	// (OSS delegation doesn't add budget_id caveats).
 	if budgetID := mac.GetCaveat("budget_id"); budgetID != "" {
 		info.BudgetID = budgetID
+	} else {
+		info.BudgetID = info.TokenID
+	}
+	if bl := mac.GetCaveat("budget_limit"); bl != "" {
+		if v, err := strconv.ParseFloat(bl, 64); err == nil {
+			info.BudgetLimit = int64(v)
+		}
 	}
 
 	// Check for tenant_id caveat (multi-tenant routing)

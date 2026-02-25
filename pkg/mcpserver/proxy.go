@@ -503,6 +503,10 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 
 	// Enforce budget (unless shadow mode)
 	if p.config.Enforcement.Mode != "shadow" && budgetID != "" && cost > 0 {
+		// Auto-initialize budget from macaroon caveat if not yet initialized
+		if tokenInfo.BudgetLimit > 0 {
+			_ = p.budget.Initialize(ctx, budgetID, tokenInfo.BudgetLimit)
+		}
 		result, err := p.budget.Spend(ctx, budgetID, tc.Name, cost, requestID)
 		if err != nil {
 			// Distinguish budget exhaustion (result has ErrorCode) from backend failures.
