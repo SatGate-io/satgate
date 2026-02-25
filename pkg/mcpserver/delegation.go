@@ -177,6 +177,7 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		BudgetID:  parent.BudgetID,
 		Data: map[string]interface{}{
 			"childTokenId":    childTokenID,
+			"childBudgetId":   childBudgetID,
 			"childBudget":     params.Budget,
 			"parentRemaining": parentRemaining,
 			"label":           params.Label,
