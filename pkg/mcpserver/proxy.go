@@ -352,6 +352,12 @@ func (p *Proxy) handleRequest(ctx context.Context, req *Request) (*Response, err
 		if tokenInfo.TenantID != "" {
 			ctx = context.WithValue(ctx, CtxTenantID, tokenInfo.TenantID)
 		}
+		// Check revocation (after tenant is in context)
+		if p.revocation != nil && tokenInfo.BudgetID != "" {
+			if p.revocation.IsRevoked(ctx, tokenInfo.BudgetID) {
+				return NewErrorResponse(req.ID, CodePolicyDenied, "token revoked"), nil
+			}
+		}
 		switch req.Method {
 		case MethodToolsCall:
 			return p.handleToolsCall(ctx, req, tokenInfo)
@@ -386,12 +392,6 @@ func (p *Proxy) authenticate(ctx context.Context, req *Request) (*TokenInfo, err
 			// Fail-closed: if a token was provided but is invalid, deny the request.
 			// Never silently fall back to default identity on auth failure.
 			return nil, fmt.Errorf("authentication failed: %w", err)
-		}
-		// Check revocation (if checker configured)
-		if p.revocation != nil && info.BudgetID != "" {
-			if p.revocation.IsRevoked(ctx, info.BudgetID) {
-				return nil, fmt.Errorf("token revoked")
-			}
 		}
 		return info, nil
 	}
