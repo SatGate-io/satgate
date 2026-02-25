@@ -50,8 +50,42 @@ type Gateway struct {
 	// Rate limiter for admin endpoints
 	adminLimiter *rateLimiter
 
+	// L402 replay guard — tracks seen payment hashes to prevent proof reuse
+	l402Seen *replayGuard
+
 	// Optional hooks (set via SetXxx methods)
 	metricsHook MetricsHook
+}
+
+// replayGuard prevents L402 preimage replay attacks using an in-memory
+// set with TTL-based expiry. Thread-safe via sync.Map.
+type replayGuard struct {
+	seen sync.Map // payment_hash → expiry time
+}
+
+func newReplayGuard(cleanupInterval time.Duration) *replayGuard {
+	rg := &replayGuard{}
+	go func() {
+		ticker := time.NewTicker(cleanupInterval)
+		defer ticker.Stop()
+		for range ticker.C {
+			now := time.Now()
+			rg.seen.Range(func(key, value any) bool {
+				if expiry, ok := value.(time.Time); ok && now.After(expiry) {
+					rg.seen.Delete(key)
+				}
+				return true
+			})
+		}
+	}()
+	return rg
+}
+
+// markSeen records a payment hash. Returns false if already seen (replay).
+func (rg *replayGuard) markSeen(paymentHash string, ttl time.Duration) bool {
+	expiry := time.Now().Add(ttl)
+	_, loaded := rg.seen.LoadOrStore(paymentHash, expiry)
+	return !loaded // true = first time (allowed), false = replay (blocked)
 }
 
 // Metrics tracks gateway statistics using atomic counters for concurrent safety.
@@ -99,6 +133,7 @@ func New(opts Options) (*Gateway, error) {
 		proxies:      make(map[string]*httputil.ReverseProxy),
 		metrics:      &Metrics{},
 		adminLimiter: newRateLimiter(adminRPM),
+		l402Seen:     newReplayGuard(5 * time.Minute),
 	}
 
 	// Initialize proxies for configured upstreams
@@ -393,6 +428,13 @@ func (g *Gateway) verifyL402Token(ctx context.Context, token string, route *conf
 			Str("computed", computedHash).
 			Str("expected", paymentHash).
 			Msg("L402: preimage hash mismatch - payment verification failed")
+		return false
+	}
+
+	// Replay guard: each payment proof can only be used once.
+	// TTL of 24h — after that the macaroon's own expiry caveats should reject it.
+	if !g.l402Seen.markSeen(paymentHash, 24*time.Hour) {
+		log.Warn().Str("payment_hash", paymentHash[:16]+"...").Msg("L402: replay detected — payment proof already used")
 		return false
 	}
 

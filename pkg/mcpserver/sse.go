@@ -308,7 +308,9 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 	if authToken != "" && req.Params != nil {
 		req.Params = injectMetaToken(req.Params, authToken)
 	} else if authToken != "" && req.Params == nil {
-		req.Params = json.RawMessage(fmt.Sprintf(`{"_meta":{"token":"%s"}}`, authToken))
+		metaJSON, _ := json.Marshal(map[string]string{"token": authToken})
+		paramsJSON, _ := json.Marshal(map[string]json.RawMessage{"_meta": metaJSON})
+		req.Params = paramsJSON
 	}
 
 	// Handle request asynchronously — don't block the HTTP response
