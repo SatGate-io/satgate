@@ -381,7 +381,7 @@ func (g *Gateway) verifyL402Token(ctx context.Context, token string, route *conf
 	// L402 format: macaroon:preimage
 	parts := strings.SplitN(token, ":", 2)
 	if len(parts) != 2 {
-		log.Warn().Str("token_preview", token[:min(50, len(token))]).Msg("L402: invalid token format, expected macaroon:preimage")
+		log.Warn().Str("token_len", fmt.Sprintf("%d", len(token))).Msg("L402: invalid token format, expected macaroon:preimage")
 		return false
 	}
 
@@ -394,7 +394,7 @@ func (g *Gateway) verifyL402Token(ctx context.Context, token string, route *conf
 	// Verify macaroon signature
 	mac, err := g.macaroonSvc.Verify(macaroonStr)
 	if err != nil {
-		log.Warn().Err(err).Str("macaroon_preview", macaroonStr[:min(30, len(macaroonStr))]).Msg("L402: macaroon verification failed")
+		log.Warn().Err(err).Str("macaroon_len", fmt.Sprintf("%d", len(macaroonStr))).Msg("L402: macaroon verification failed")
 		return false
 	}
 
@@ -805,12 +805,12 @@ func extractL402Token(r *http.Request) string {
 
 	if strings.HasPrefix(auth, "L402 ") {
 		token := strings.TrimPrefix(auth, "L402 ")
-		log.Debug().Str("token_preview", token[:min(30, len(token))]+"...").Msg("extractL402Token: found L402 format")
+		log.Debug().Int("token_len", len(token)).Msg("extractL402Token: found L402 format")
 		return token
 	}
 	if strings.HasPrefix(auth, "LSAT ") {
 		token := strings.TrimPrefix(auth, "LSAT ")
-		log.Debug().Str("token_preview", token[:min(30, len(token))]+"...").Msg("extractL402Token: found LSAT format")
+		log.Debug().Int("token_len", len(token)).Msg("extractL402Token: found LSAT format")
 		return token
 	}
 
