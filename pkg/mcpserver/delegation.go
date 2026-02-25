@@ -94,6 +94,16 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		return nil, fmt.Errorf("delegation requires macaroon auth (mode=header)")
 	}
 
+	// Enforce delegation depth limit
+	if parent.DelegationDepth > 0 && parent.Depth >= parent.DelegationDepth {
+		return nil, fmt.Errorf("delegation depth limit reached (%d)", parent.DelegationDepth)
+	}
+
+	// Enforce per-delegation budget cap
+	if parent.DelegationBudget > 0 && params.Budget > parent.DelegationBudget {
+		return nil, fmt.Errorf("delegation budget exceeds cap: requested %d, max %d per delegation", params.Budget, parent.DelegationBudget)
+	}
+
 	// Auto-initialize parent budget from macaroon caveat if not yet initialized
 	if parent.BudgetLimit > 0 && parent.BudgetID != "" {
 		_ = d.budget.Initialize(ctx, parent.BudgetID, parent.BudgetLimit)

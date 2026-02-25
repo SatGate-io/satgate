@@ -26,6 +26,13 @@ type TokenInfo struct {
 	// Scope from the "scope" caveat.
 	Scope string
 
+	// DelegationDepth is the max delegation depth allowed (from "delegation_depth" caveat).
+	DelegationDepth int
+	// DelegationBudget is the max budget per delegation (from "delegation_budget" caveat).
+	DelegationBudget int64
+	// Depth is the current token's depth in the delegation chain.
+	Depth int
+
 	// ParentTokenID from "parent" caveat (for delegated tokens).
 	ParentTokenID string
 
@@ -131,6 +138,25 @@ func (a *MacaroonAuthenticator) Verify(_ context.Context, token string) (*TokenI
 	// Check for tenant_id caveat (multi-tenant routing)
 	if tenantID := mac.GetCaveat("tenant_id"); tenantID != "" {
 		info.TenantID = tenantID
+	}
+
+	// Delegation constraints
+	if dd := mac.GetCaveat("delegation_depth"); dd != "" {
+		if v, err := strconv.Atoi(dd); err == nil {
+			info.DelegationDepth = v
+		}
+	}
+	if db := mac.GetCaveat("delegation_budget"); db != "" {
+		if v, err := strconv.ParseFloat(db, 64); err == nil {
+			info.DelegationBudget = int64(v)
+		}
+	}
+
+	// Count depth by counting "parent" caveats in the chain
+	for _, c := range mac.Caveats {
+		if strings.HasPrefix(c, "parent = ") {
+			info.Depth++
+		}
 	}
 
 	// Check for parent caveat
