@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -51,21 +50,14 @@ type StreamableHTTPTransport struct {
 }
 
 // NewStreamableHTTPTransport creates a transport for the MCP Streamable HTTP protocol.
-func NewStreamableHTTPTransport(url string, headers map[string]string, tlsSkipVerify bool) *StreamableHTTPTransport {
+// allowPrivate bypasses SSRF protection (for local dev/testing).
+func NewStreamableHTTPTransport(url string, headers map[string]string, tlsSkipVerify bool, allowPrivate ...bool) *StreamableHTTPTransport {
 	ctx, cancel := context.WithCancel(context.Background())
 	notifCtx, notifCancel := context.WithCancel(ctx)
 
-	transport := &http.Transport{
-		MaxIdleConns:        10,
-		MaxIdleConnsPerHost: 10,
-		IdleConnTimeout:     90 * time.Second,
-	}
-	if tlsSkipVerify {
-		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	}
-
+	ap := len(allowPrivate) > 0 && allowPrivate[0]
 	httpClient := &http.Client{
-		Transport: transport,
+		Transport: SSRFSafeTransport(tlsSkipVerify, ap),
 		Timeout:   0, // per-request timeouts via context
 	}
 

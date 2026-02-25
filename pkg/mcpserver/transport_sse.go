@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -48,16 +47,14 @@ type SSETransport struct {
 }
 
 // NewSSETransport creates a transport for the legacy MCP SSE protocol.
-func NewSSETransport(baseURL string, headers map[string]string, tlsSkipVerify bool) *SSETransport {
+// allowPrivate bypasses SSRF protection (for local dev/testing).
+func NewSSETransport(baseURL string, headers map[string]string, tlsSkipVerify bool, allowPrivate ...bool) *SSETransport {
 	ctx, cancel := context.WithCancel(context.Background())
 
+	ap := len(allowPrivate) > 0 && allowPrivate[0]
 	httpClient := &http.Client{
-		Timeout: 0, // no global timeout — SSE streams are long-lived
-	}
-	if tlsSkipVerify {
-		httpClient.Transport = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
+		Timeout:   0, // no global timeout — SSE streams are long-lived
+		Transport: SSRFSafeTransport(tlsSkipVerify, ap),
 	}
 
 	return &SSETransport{

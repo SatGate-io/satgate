@@ -36,6 +36,10 @@ type Config struct {
 
 	// Logging controls log output.
 	Logging LoggingConfig `yaml:"logging"`
+
+	// AllowPrivateUpstreams bypasses SSRF protection on upstream connections.
+	// Only enable for local development or when upstreams are on private networks.
+	AllowPrivateUpstreams bool `yaml:"allowPrivateUpstreams,omitempty"`
 }
 
 // ServerConfig configures the client-facing MCP server.

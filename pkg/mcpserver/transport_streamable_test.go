@@ -128,7 +128,7 @@ func TestStreamableHTTPTransport_Connect(t *testing.T) {
 	mock := newMockStreamableServer()
 	defer mock.Close()
 
-	transport := NewStreamableHTTPTransport(mock.server.URL+"/mcp", nil, false)
+	transport := NewStreamableHTTPTransport(mock.server.URL+"/mcp", nil, false, true)
 	defer transport.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -143,7 +143,7 @@ func TestStreamableHTTPTransport_WriteAndRead(t *testing.T) {
 	mock := newMockStreamableServer()
 	defer mock.Close()
 
-	transport := NewStreamableHTTPTransport(mock.server.URL+"/mcp", nil, false)
+	transport := NewStreamableHTTPTransport(mock.server.URL+"/mcp", nil, false, true)
 	defer transport.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -202,7 +202,7 @@ func TestStreamableHTTPTransport_ToolsList(t *testing.T) {
 	mock := newMockStreamableServer()
 	defer mock.Close()
 
-	transport := NewStreamableHTTPTransport(mock.server.URL+"/mcp", nil, false)
+	transport := NewStreamableHTTPTransport(mock.server.URL+"/mcp", nil, false, true)
 	defer transport.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -245,7 +245,7 @@ func TestStreamableHTTPTransport_ToolCall(t *testing.T) {
 	mock := newMockStreamableServer()
 	defer mock.Close()
 
-	transport := NewStreamableHTTPTransport(mock.server.URL+"/mcp", nil, false)
+	transport := NewStreamableHTTPTransport(mock.server.URL+"/mcp", nil, false, true)
 	defer transport.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -289,7 +289,7 @@ func TestStreamableHTTPTransport_Notification(t *testing.T) {
 	mock := newMockStreamableServer()
 	defer mock.Close()
 
-	transport := NewStreamableHTTPTransport(mock.server.URL+"/mcp", nil, false)
+	transport := NewStreamableHTTPTransport(mock.server.URL+"/mcp", nil, false, true)
 	defer transport.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -342,7 +342,7 @@ func TestStreamableHTTPTransport_CustomHeaders(t *testing.T) {
 	headers := map[string]string{
 		"Authorization": "Bearer secret-token",
 	}
-	transport := NewStreamableHTTPTransport(server.URL, headers, false)
+	transport := NewStreamableHTTPTransport(server.URL, headers, false, true)
 	defer transport.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -403,7 +403,7 @@ func TestStreamableHTTPTransport_SSEResponse(t *testing.T) {
 	}))
 	defer server.Close()
 
-	transport := NewStreamableHTTPTransport(server.URL, nil, false)
+	transport := NewStreamableHTTPTransport(server.URL, nil, false, true)
 	defer transport.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -446,7 +446,7 @@ func TestStreamableHTTPTransport_ConcurrentCalls(t *testing.T) {
 	mock := newMockStreamableServer()
 	defer mock.Close()
 
-	transport := NewStreamableHTTPTransport(mock.server.URL+"/mcp", nil, false)
+	transport := NewStreamableHTTPTransport(mock.server.URL+"/mcp", nil, false, true)
 	defer transport.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -495,7 +495,7 @@ func TestStreamableHTTPTransport_Close(t *testing.T) {
 	mock := newMockStreamableServer()
 	defer mock.Close()
 
-	transport := NewStreamableHTTPTransport(mock.server.URL+"/mcp", nil, false)
+	transport := NewStreamableHTTPTransport(mock.server.URL+"/mcp", nil, false, true)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -528,7 +528,7 @@ func TestStreamableHTTPTransport_ServerError(t *testing.T) {
 	}))
 	defer server.Close()
 
-	transport := NewStreamableHTTPTransport(server.URL, nil, false)
+	transport := NewStreamableHTTPTransport(server.URL, nil, false, true)
 	defer transport.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

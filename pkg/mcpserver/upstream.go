@@ -16,9 +16,10 @@ import (
 
 // UpstreamManager manages connections to upstream MCP servers.
 type UpstreamManager struct {
-	config    map[string]UpstreamConfig
-	routing   []RoutingRule
-	defaultUp string
+	config              map[string]UpstreamConfig
+	routing             []RoutingRule
+	defaultUp           string
+	allowPrivateUpstreams bool
 
 	mu        sync.Mutex
 	clients   map[string]*UpstreamClient
@@ -37,12 +38,14 @@ type UpstreamClient struct {
 }
 
 // NewUpstreamManager creates a new upstream manager.
-func NewUpstreamManager(config map[string]UpstreamConfig, routing []RoutingRule, defaultUpstream string) *UpstreamManager {
+func NewUpstreamManager(config map[string]UpstreamConfig, routing []RoutingRule, defaultUpstream string, allowPrivateUpstreams ...bool) *UpstreamManager {
+	allowPrivate := len(allowPrivateUpstreams) > 0 && allowPrivateUpstreams[0]
 	return &UpstreamManager{
-		config:    config,
-		routing:   routing,
-		defaultUp: defaultUpstream,
-		clients:   make(map[string]*UpstreamClient),
+		config:                config,
+		routing:               routing,
+		defaultUp:             defaultUpstream,
+		allowPrivateUpstreams: allowPrivate,
+		clients:               make(map[string]*UpstreamClient),
 	}
 }
 
@@ -148,7 +151,7 @@ func (m *UpstreamManager) connectSSE(ctx context.Context, name string, cfg Upstr
 		return nil, fmt.Errorf("url is required for SSE transport")
 	}
 
-	transport := NewSSETransport(cfg.URL, cfg.Headers, cfg.TLSSkipVerify)
+	transport := NewSSETransport(cfg.URL, cfg.Headers, cfg.TLSSkipVerify, m.allowPrivateUpstreams)
 
 	connectCtx := ctx
 	if cfg.Timeout > 0 {
@@ -173,7 +176,7 @@ func (m *UpstreamManager) connectStreamable(ctx context.Context, name string, cf
 		return nil, fmt.Errorf("url is required for streamable HTTP transport")
 	}
 
-	transport := NewStreamableHTTPTransport(cfg.URL, cfg.Headers, cfg.TLSSkipVerify)
+	transport := NewStreamableHTTPTransport(cfg.URL, cfg.Headers, cfg.TLSSkipVerify, m.allowPrivateUpstreams)
 
 	connectCtx := ctx
 	if cfg.Timeout > 0 {

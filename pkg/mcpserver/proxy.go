@@ -92,7 +92,7 @@ func New(cfg *Config) (*Proxy, error) {
 	}
 
 	// Build upstream manager
-	upstream := NewUpstreamManager(cfg.Upstreams, cfg.Routing, cfg.DefaultUpstream)
+	upstream := NewUpstreamManager(cfg.Upstreams, cfg.Routing, cfg.DefaultUpstream, cfg.AllowPrivateUpstreams)
 
 	p := &Proxy{
 		config:   cfg,

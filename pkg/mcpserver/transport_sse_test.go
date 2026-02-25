@@ -130,7 +130,7 @@ func TestSSETransport_Connect(t *testing.T) {
 	mock := newMockSSEServer()
 	defer mock.Close()
 
-	transport := NewSSETransport(mock.server.URL+"/sse", nil, false)
+	transport := NewSSETransport(mock.server.URL+"/sse", nil, false, true)
 	defer transport.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -152,7 +152,7 @@ func TestSSETransport_WriteAndRead(t *testing.T) {
 	mock := newMockSSEServer()
 	defer mock.Close()
 
-	transport := NewSSETransport(mock.server.URL+"/sse", nil, false)
+	transport := NewSSETransport(mock.server.URL+"/sse", nil, false, true)
 	defer transport.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -204,7 +204,7 @@ func TestSSETransport_CustomHeaders(t *testing.T) {
 		"X-Custom":      "custom-value",
 	}
 
-	transport := NewSSETransport(server.URL+"/sse", headers, false)
+	transport := NewSSETransport(server.URL+"/sse", headers, false, true)
 	defer transport.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -226,7 +226,7 @@ func TestSSETransport_Close(t *testing.T) {
 	mock := newMockSSEServer()
 	defer mock.Close()
 
-	transport := NewSSETransport(mock.server.URL+"/sse", nil, false)
+	transport := NewSSETransport(mock.server.URL+"/sse", nil, false, true)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
