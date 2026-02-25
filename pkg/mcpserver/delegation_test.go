@@ -68,7 +68,7 @@ func TestDelegator_Delegate(t *testing.T) {
 	}
 
 	// Verify child budget exists
-	childRemaining, err := budget.Remaining(ctx, result.TokenID)
+	childRemaining, err := budget.Remaining(ctx, result.BudgetID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -173,7 +173,7 @@ func TestDelegator_MultipleDelegations(t *testing.T) {
 		if err != nil {
 			t.Fatalf("delegation %d failed: %v", i, err)
 		}
-		childIDs = append(childIDs, result.TokenID)
+		childIDs = append(childIDs, result.BudgetID)
 	}
 
 	// Parent should have 400 left (1000 - 3*200)

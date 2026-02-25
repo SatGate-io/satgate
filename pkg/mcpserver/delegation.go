@@ -3,6 +3,7 @@ package mcpserver
 import (
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -57,6 +58,9 @@ type DelegateResult struct {
 
 	// ParentRemaining is the parent's remaining budget after carving.
 	ParentRemaining int64 `json:"parentRemaining"`
+
+	// BudgetID is the child's budget tracking key.
+	BudgetID string `json:"budgetId,omitempty"`
 }
 
 // Delegator handles token delegation with budget carving.
@@ -90,6 +94,11 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		return nil, fmt.Errorf("delegation requires macaroon auth (mode=header)")
 	}
 
+	// Auto-initialize parent budget from macaroon caveat if not yet initialized
+	if parent.BudgetLimit > 0 && parent.BudgetID != "" {
+		_ = d.budget.Initialize(ctx, parent.BudgetID, parent.BudgetLimit)
+	}
+
 	// Budget transfer: skip for observe-only (0-budget) tokens
 	var parentResult *BudgetResult
 	if params.Budget > 0 {
@@ -117,6 +126,19 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 	if params.Scope != "" {
 		caveats = append(caveats, fmt.Sprintf("scope = %s", params.Scope))
 	}
+	// Generate child budget_id deterministically before minting
+	var childBudgetID string
+	if params.Budget > 0 {
+		nonceBuf := make([]byte, 8)
+		_, _ = rand.Read(nonceBuf)
+		h := sha256.New()
+		h.Write([]byte(parent.BudgetID))
+		h.Write([]byte(params.Label))
+		h.Write(nonceBuf)
+		childBudgetID = fmt.Sprintf("del-%s", hex.EncodeToString(h.Sum(nil))[:24])
+		caveats = append(caveats, fmt.Sprintf("budget_id = %s", childBudgetID))
+		caveats = append(caveats, fmt.Sprintf("budget_limit = %.2f", float64(params.Budget)))
+	}
 
 	childMac, err := d.macaroonSvc.Delegate(parent.RawToken, caveats)
 	if err != nil {
@@ -129,10 +151,8 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 	childTokenID := hashToken(childMac.Identifier + childMac.Signature)
 
 	// Initialize child budget (skip for observe-only 0-budget tokens)
-	if params.Budget > 0 {
-		delegationID := fmt.Sprintf("delegate-%s-%s-%d", parent.BudgetID, params.Label, params.Budget)
-		initCtx := context.WithValue(ctx, CtxDelegationID, delegationID)
-		if err := d.budget.Initialize(initCtx, childTokenID, params.Budget); err != nil {
+	if params.Budget > 0 && childBudgetID != "" {
+		if err := d.budget.Initialize(ctx, childBudgetID, params.Budget); err != nil {
 			return nil, fmt.Errorf("initialize child budget: %w", err)
 		}
 	}
@@ -168,7 +188,8 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		Token:           childToken,
 		TokenID:         childTokenID,
 		Budget:          params.Budget,
-		ParentRemaining: parentResult.Remaining,
+		ParentRemaining: parentRemaining,
+		BudgetID:        childBudgetID,
 	}, nil
 }
 
