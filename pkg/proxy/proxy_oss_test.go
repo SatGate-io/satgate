@@ -28,6 +28,14 @@ func newTestMacaroonService(t *testing.T) *macaroon.Service {
 
 func newTestGateway(t *testing.T, cfg *config.Config) *Gateway {
 	t.Helper()
+	// Allow private IPs in tests (upstreams are localhost)
+	if cfg.Cloud == nil {
+		cfg.Cloud = &config.CloudConfig{SSRF: &config.CloudSSRFConfig{AllowPrivateIPs: true}}
+	} else if cfg.Cloud.SSRF == nil {
+		cfg.Cloud.SSRF = &config.CloudSSRFConfig{AllowPrivateIPs: true}
+	} else {
+		cfg.Cloud.SSRF.AllowPrivateIPs = true
+	}
 	macSvc := newTestMacaroonService(t)
 	govSvc := governance.NewService(nil)
 	mockLN := lightning.NewMockProvider()
@@ -47,8 +55,9 @@ func newTestGateway(t *testing.T, cfg *config.Config) *Gateway {
 func newTestGatewayWithUpstream(t *testing.T, upstream *httptest.Server, policyKind string) (*Gateway, *config.Config) {
 	t.Helper()
 	cfg := &config.Config{
-		Server: config.ServerConfig{Listen: ":8080"},
-		Admin:  config.AdminConfig{Token: "admin-secret", CORSAllowedOrigins: []string{"https://example.com"}},
+		Server:   config.ServerConfig{Listen: ":8080"},
+		Admin:    config.AdminConfig{Token: "admin-secret", CORSAllowedOrigins: []string{"https://example.com"}},
+		Cloud: &config.CloudConfig{SSRF: &config.CloudSSRFConfig{AllowPrivateIPs: true}}, // tests use localhost upstreams
 		Upstreams: map[string]config.Upstream{
 			"backend": {URL: upstream.URL, Timeout: 10 * time.Second},
 		},

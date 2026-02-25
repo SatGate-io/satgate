@@ -2,6 +2,7 @@ package mcpserver
 
 import (
 	"context"
+	crypto_rand "crypto/rand"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -401,7 +402,12 @@ func injectMetaToken(params json.RawMessage, token string) json.RawMessage {
 
 // generateSessionID creates a short unique session ID.
 func generateSessionID() string {
-	return fmt.Sprintf("mcp-%s", hashToken(fmt.Sprintf("%d", time.Now().UnixNano()))[:8])
+	b := make([]byte, 16)
+	if _, err := crypto_rand.Read(b); err != nil {
+		// Fallback — should never happen
+		return fmt.Sprintf("mcp-%s", hashToken(fmt.Sprintf("%d", time.Now().UnixNano()))[:16])
+	}
+	return fmt.Sprintf("mcp-%x", b)
 }
 
 // extractTokenCaveats does a best-effort decode of a macaroon token to read

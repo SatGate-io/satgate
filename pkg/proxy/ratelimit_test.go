@@ -52,13 +52,13 @@ func TestRateLimiter_UnlimitedWhenZero(t *testing.T) {
 func TestExtractIP(t *testing.T) {
 	tests := []struct {
 		name     string
-		xff      string
+		flyIP    string
 		remote   string
 		expected string
 	}{
-		{"no xff", "", "192.168.1.1:12345", "192.168.1.1"},
-		{"xff single", "10.0.0.1", "192.168.1.1:12345", "10.0.0.1"},
-		{"xff chain", "10.0.0.1, 172.16.0.1, 192.168.1.1", "proxy:8080", "10.0.0.1"},
+		{"no headers", "", "192.168.1.1:12345", "192.168.1.1"},
+		{"fly-client-ip", "10.0.0.1", "192.168.1.1:12345", "10.0.0.1"},
+		{"xff ignored", "", "proxy:8080", "proxy"},  // XFF no longer trusted
 		{"no port", "", "192.168.1.1", "192.168.1.1"},
 	}
 
@@ -68,8 +68,8 @@ func TestExtractIP(t *testing.T) {
 				RemoteAddr: tt.remote,
 				Header:     http.Header{},
 			}
-			if tt.xff != "" {
-				r.Header.Set("X-Forwarded-For", tt.xff)
+			if tt.flyIP != "" {
+				r.Header.Set("Fly-Client-IP", tt.flyIP)
 			}
 			got := extractIP(r)
 			if got != tt.expected {

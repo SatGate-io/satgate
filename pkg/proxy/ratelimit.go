@@ -3,6 +3,7 @@ package proxy
 import (
 	"net"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 )
@@ -85,25 +86,17 @@ func (b *bucket) prune(cutoff time.Time) {
 	}
 }
 
-// extractIP gets the client IP, respecting X-Forwarded-For for proxied setups
+// extractIP gets the client IP from trusted sources only.
+// X-Forwarded-For is user-spoofable without trusted proxy configuration.
+// Fly.io sets Fly-Client-IP at its edge (not spoofable by clients).
+// Falls back to RemoteAddr (TCP peer) which is always reliable.
 func extractIP(r *http.Request) string {
-	// Check X-Forwarded-For first (leftmost = original client)
-	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
-		// Take the first IP (original client)
-		for i := 0; i < len(xff); i++ {
-			if xff[i] == ',' {
-				ip := xff[:i]
-				// Trim whitespace
-				for len(ip) > 0 && ip[0] == ' ' {
-					ip = ip[1:]
-				}
-				return ip
-			}
-		}
-		return xff
+	// Fly.io edge header — set by the platform, not the client
+	if flyIP := r.Header.Get("Fly-Client-IP"); flyIP != "" {
+		return strings.TrimSpace(flyIP)
 	}
 
-	// Fall back to RemoteAddr
+	// Fall back to RemoteAddr (TCP-level, always trustworthy)
 	host, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
 		return r.RemoteAddr

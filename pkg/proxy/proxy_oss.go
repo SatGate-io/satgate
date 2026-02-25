@@ -26,6 +26,7 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+	"syscall"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -718,12 +719,30 @@ func (g *Gateway) createProxy(upstreamURL string) (*httputil.ReverseProxy, error
 		r.Host = targetHost
 	}
 
-	// Configure transport
+	// Configure transport with SSRF-safe dialer that blocks private IPs at connect time.
+	// Config-time validation catches obvious cases, but DNS can resolve to private IPs
+	// at runtime (DNS rebinding, TOCTOU). This is the runtime enforcement layer.
+	// Bypass when allowPrivateIPs is set (local dev, testing, internal services).
+	ssrfDialer := &net.Dialer{
+		Timeout:   30 * time.Second,
+		KeepAlive: 30 * time.Second,
+	}
+	allowPrivate := g.config.Cloud != nil && g.config.Cloud.SSRF != nil && g.config.Cloud.SSRF.AllowPrivateIPs
+	if !allowPrivate {
+		ssrfDialer.Control = func(network, address string, c syscall.RawConn) error {
+			host, _, err := net.SplitHostPort(address)
+			if err != nil {
+				return err
+			}
+			ip := net.ParseIP(host)
+			if ip != nil && (ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsUnspecified()) {
+				return fmt.Errorf("SSRF blocked: resolved to private/internal IP %s", host)
+			}
+			return nil
+		}
+	}
 	proxy.Transport = &http.Transport{
-		DialContext: (&net.Dialer{
-			Timeout:   30 * time.Second,
-			KeepAlive: 30 * time.Second,
-		}).DialContext,
+		DialContext: ssrfDialer.DialContext,
 		TLSClientConfig: &tls.Config{
 			MinVersion: tls.VersionTLS12,
 		},
