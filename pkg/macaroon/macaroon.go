@@ -293,6 +293,19 @@ func (s *Service) RecalculateSignature(mac *Macaroon) string {
 
 // verifyCaveat checks if a caveat is satisfied
 func (s *Service) verifyCaveat(caveat string) error {
+	// Handle "time < N" caveats (legacy format from enterprise Mint)
+	if strings.HasPrefix(caveat, "time < ") {
+		val := strings.TrimPrefix(caveat, "time < ")
+		var ts int64
+		if _, err := fmt.Sscanf(val, "%d", &ts); err == nil {
+			if time.Now().Unix() > ts {
+				return fmt.Errorf("token expired")
+			}
+			return nil
+		}
+		return fmt.Errorf("invalid time caveat: %s", caveat)
+	}
+
 	parts := strings.SplitN(caveat, " = ", 2)
 	if len(parts) != 2 {
 		return fmt.Errorf("invalid caveat format: %s", caveat)

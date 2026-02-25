@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -486,6 +487,14 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		return NewErrorResponse(req.ID, CodeInvalidParams, err.Error()), nil
 	}
 
+	// Scope enforcement: if token has a restricted scope, check the tool is allowed
+	if tokenInfo.Scope != "" && tokenInfo.Scope != "*" && tokenInfo.Scope != "api:*" {
+		if !matchScope(tokenInfo.Scope, tc.Name) {
+			return NewErrorResponse(req.ID, CodePolicyDenied,
+				fmt.Sprintf("tool %q not in scope %q", tc.Name, tokenInfo.Scope)), nil
+		}
+	}
+
 	// Resolve cost (per-tenant if available, else global)
 	var cost int64
 	if p.tenantCosts != nil && tokenInfo.TenantID != "" {
@@ -669,6 +678,27 @@ func (p *Proxy) forwardToDefault(ctx context.Context, req *Request) (*Response, 
 }
 
 // generateRequestID creates an idempotency key from token + tool + request ID.
+// matchScope checks if a tool name matches a comma-separated scope string.
+// Supports exact match and wildcard prefix (e.g., "db:*" matches "db:query").
+func matchScope(scope, toolName string) bool {
+	for _, s := range strings.Split(scope, ",") {
+		s = strings.TrimSpace(s)
+		if s == "*" || s == "api:*" {
+			return true
+		}
+		if strings.HasSuffix(s, ":*") {
+			prefix := strings.TrimSuffix(s, ":*")
+			if strings.HasPrefix(toolName, prefix+":") || strings.HasPrefix(toolName, prefix+"_") {
+				return true
+			}
+		}
+		if s == toolName {
+			return true
+		}
+	}
+	return false
+}
+
 func generateRequestID(tokenID, toolName string, reqID json.RawMessage) string {
 	h := sha256.New()
 	h.Write([]byte(tokenID))
