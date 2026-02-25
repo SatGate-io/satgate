@@ -52,6 +52,7 @@ type Proxy struct {
 	auth      Authenticator
 	delegator *Delegator
 	events    EventPublisher
+	revocation RevocationChecker // optional, checks if token is revoked
 	tokenID   string // default session token (from config or first auth)
 	rootToken string // auto-minted root token (for delegation demos)
 }
@@ -203,6 +204,11 @@ func (p *Proxy) SetEventPublisher(ep EventPublisher) {
 	if p.delegator != nil {
 		p.delegator.SetEventPublisher(ep)
 	}
+}
+
+// SetRevocationChecker sets the revocation checker for token validation.
+func (p *Proxy) SetRevocationChecker(rc RevocationChecker) {
+	p.revocation = rc
 }
 
 // ReloadUpstreams adds, removes, or replaces upstreams at runtime without restart.
@@ -380,6 +386,12 @@ func (p *Proxy) authenticate(ctx context.Context, req *Request) (*TokenInfo, err
 			// Fail-closed: if a token was provided but is invalid, deny the request.
 			// Never silently fall back to default identity on auth failure.
 			return nil, fmt.Errorf("authentication failed: %w", err)
+		}
+		// Check revocation (if checker configured)
+		if p.revocation != nil && info.BudgetID != "" {
+			if p.revocation.IsRevoked(ctx, info.BudgetID) {
+				return nil, fmt.Errorf("token revoked")
+			}
 		}
 		return info, nil
 	}

@@ -111,13 +111,14 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 
 	// Budget transfer: skip for observe-only (0-budget) tokens
 	var parentResult *BudgetResult
+	var delegationID string
 	if params.Budget > 0 {
 		// Carve budget from parent: atomically check & decrement parent, set child.
 		// Each delegation gets a unique idempotency key (nonce) so repeated calls
 		// are treated as new spends, not retries of the same operation.
 		nonce := make([]byte, 8)
 		_, _ = rand.Read(nonce)
-		delegationID := fmt.Sprintf("delegate-%s-%s-%d-%s", parent.BudgetID, params.Label, params.Budget, hex.EncodeToString(nonce))
+		delegationID = fmt.Sprintf("delegate-%s-%s-%d-%s", parent.BudgetID, params.Label, params.Budget, hex.EncodeToString(nonce))
 		var err error
 		parentResult, err = d.budget.Spend(ctx, parent.BudgetID, "_delegation", params.Budget, delegationID)
 		if err != nil {
@@ -162,7 +163,9 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 
 	// Initialize child budget (skip for observe-only 0-budget tokens)
 	if params.Budget > 0 && childBudgetID != "" {
-		if err := d.budget.Initialize(ctx, childBudgetID, params.Budget); err != nil {
+		// Pass delegation ID via context for atomic TransferBudget in enterprise
+		initCtx := context.WithValue(ctx, CtxDelegationID, delegationID)
+		if err := d.budget.Initialize(initCtx, childBudgetID, params.Budget); err != nil {
 			return nil, fmt.Errorf("initialize child budget: %w", err)
 		}
 	}

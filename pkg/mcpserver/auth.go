@@ -43,6 +43,11 @@ type TokenInfo struct {
 	RawToken string
 }
 
+// RevocationChecker checks if a token has been revoked.
+type RevocationChecker interface {
+	IsRevoked(ctx context.Context, budgetID string) bool
+}
+
 // Authenticator verifies tokens on incoming requests.
 type Authenticator interface {
 	// Verify checks a token and returns the identity, or error if invalid.
