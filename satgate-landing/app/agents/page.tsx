@@ -60,13 +60,13 @@ export default function AgentsLandingPage() {
             >
               Start Free <ArrowRight size={20} />
             </a>
-            <a
-              href="https://cloud.satgate.io/cloud/ez-pass"
+            <Link
+              href="/protect"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-gray-200 font-semibold text-lg transition"
             >
               <MonitorDot size={20} />
-              Agent Simulator
-            </a>
+              See Live Demo
+            </Link>
           </div>
         </div>
       </section>
@@ -331,13 +331,13 @@ export default function AgentsLandingPage() {
             >
               Start Free <ArrowRight size={20} />
             </a>
-            <a
-              href="https://cloud.satgate.io/cloud/ez-pass"
+            <Link
+              href="/protect"
               className="inline-flex items-center gap-2 px-8 py-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-gray-200 font-semibold text-lg transition"
             >
               <Bot size={20} />
-              Try Agent Simulator
-            </a>
+              Try Live Demo
+            </Link>
           </div>
         </div>
       </section>
