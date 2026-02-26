@@ -6,7 +6,8 @@ import Image from 'next/image';
 import {
   ArrowRight, Shield, DollarSign, Activity, Eye,
   SlidersHorizontal, Zap, GitBranch, Bot, Code,
-  Lock, CheckCircle, MonitorDot, Terminal, Plug
+  Lock, CheckCircle, MonitorDot, Terminal, Plug,
+  Fingerprint, Key, Ban
 } from 'lucide-react';
 
 export default function MCPLandingPage() {
@@ -119,13 +120,13 @@ export default function MCPLandingPage() {
               <Zap className="text-yellow-400 mb-4" size={32} />
               <h3 className="text-xl font-semibold text-white mb-2">Charge</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Monetize your APIs. Agents pay per request via Lightning micropayments (L402) 
-                or enterprise credit systems (Fiat402). The API economy, automated.
+                Monetize your APIs for external consumers. Agents pay per request 
+                via Lightning micropayments (L402). No API keys, no subscriptions — just pay and go.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> L402 Lightning payments</li>
-                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> Fiat402 enterprise credits</li>
-                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> Per-request monetization</li>
+                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> Per-request pricing</li>
+                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> Agent-native monetization</li>
               </ul>
             </div>
           </div>
@@ -221,6 +222,70 @@ export default function MCPLandingPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* EZ Pass — Autonomous Agent Onboarding */}
+      <section className="py-20 px-4 border-t border-gray-800/50 bg-gradient-to-b from-black to-gray-900/20">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-900/30 border border-cyan-500/30 text-cyan-300 text-xs font-mono mb-4">
+              <Zap size={12} /> EZ Pass for AI Agents
+            </div>
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Agents authenticate themselves. No humans required.
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Your agents present an identity credential, SatGate mints a budgeted token, 
+              and they&apos;re through the gate. When the budget runs out or you revoke access — they stop. Instantly.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+            {[
+              { icon: <Fingerprint className="text-cyan-400" size={20} />, label: 'Agent authenticates', desc: 'JWT from any OIDC provider' },
+              { icon: <ArrowRight className="text-gray-600" size={16} />, label: '', desc: '' },
+              { icon: <Key className="text-yellow-400" size={20} />, label: 'SatGate Mint', desc: 'Issues budgeted macaroon' },
+              { icon: <ArrowRight className="text-gray-600" size={16} />, label: '', desc: '' },
+              { icon: <Shield className="text-green-400" size={20} />, label: 'Agent calls APIs', desc: 'Budget-enforced, revocable' },
+            ].map((step, i) => (
+              step.label ? (
+                <div key={i} className="bg-gray-900/50 border border-gray-800 rounded-xl p-4 text-center">
+                  <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center mx-auto mb-2">
+                    {step.icon}
+                  </div>
+                  <h4 className="text-white text-sm font-semibold mb-1">{step.label}</h4>
+                  <p className="text-gray-500 text-xs">{step.desc}</p>
+                </div>
+              ) : (
+                <div key={i} className="hidden md:flex justify-center">{step.icon}</div>
+              )
+            ))}
+          </div>
+
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-red-950/20 border border-red-900/30 rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <Ban className="text-red-400" size={16} />
+                <h4 className="text-red-300 font-semibold text-sm">Instant Revocation</h4>
+              </div>
+              <p className="text-gray-500 text-xs">Kill any agent&apos;s access with one click. Token is rejected on the next request. No propagation delay.</p>
+            </div>
+            <div className="bg-amber-950/20 border border-amber-900/30 rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <DollarSign className="text-amber-400" size={16} />
+                <h4 className="text-amber-300 font-semibold text-sm">Budget Enforcement</h4>
+              </div>
+              <p className="text-gray-500 text-xs">Every token carries a spending cap. When credits run out, SatGate returns HTTP 402. No surprise bills.</p>
+            </div>
+            <div className="bg-cyan-950/20 border border-cyan-900/30 rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <GitBranch className="text-cyan-400" size={16} />
+                <h4 className="text-cyan-300 font-semibold text-sm">Full Visibility</h4>
+              </div>
+              <p className="text-gray-500 text-xs">Every agent token appears in the Delegation Tree. See who&apos;s spending what, in real-time. Audit-ready from day one.</p>
+            </div>
           </div>
         </div>
       </section>
