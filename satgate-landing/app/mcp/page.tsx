@@ -119,13 +119,13 @@ export default function MCPLandingPage() {
               <Zap className="text-yellow-400 mb-4" size={32} />
               <h3 className="text-xl font-semibold text-white mb-2">Charge</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Monetize your MCP tools. Agents pay per call via Lightning micropayments (L402) 
+                Monetize your APIs. Agents pay per request via Lightning micropayments (L402) 
                 or enterprise credit systems (Fiat402). The API economy, automated.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> L402 Lightning payments</li>
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> Fiat402 enterprise credits</li>
-                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> Per-tool monetization</li>
+                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> Per-request monetization</li>
               </ul>
             </div>
           </div>
