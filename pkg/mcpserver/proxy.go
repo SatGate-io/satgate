@@ -488,6 +488,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	}
 
 	// Scope enforcement: if token has a restricted scope, check the tool is allowed
+	// Note: scope may be tenant-prefixed (e.g., "tenant-uuid:*") — matchScope handles stripping
 	if tokenInfo.Scope != "" && tokenInfo.Scope != "*" && tokenInfo.Scope != "api:*" {
 		if !matchScope(tokenInfo.Scope, tc.Name) {
 			return NewErrorResponse(req.ID, CodePolicyDenied,
@@ -680,9 +681,18 @@ func (p *Proxy) forwardToDefault(ctx context.Context, req *Request) (*Response, 
 // generateRequestID creates an idempotency key from token + tool + request ID.
 // matchScope checks if a tool name matches a comma-separated scope string.
 // Supports exact match and wildcard prefix (e.g., "db:*" matches "db:query").
+// Handles tenant-prefixed scopes (e.g., "tenant-uuid:*" or "tenant-uuid:mcp:*")
+// by stripping the tenant prefix before matching.
 func matchScope(scope, toolName string) bool {
 	for _, s := range strings.Split(scope, ",") {
 		s = strings.TrimSpace(s)
+
+		// Strip tenant UUID prefix if present (format: "uuid:scope")
+		// UUIDs are 36 chars with hyphens (8-4-4-4-12)
+		if len(s) > 37 && s[36] == ':' && s[8] == '-' && s[13] == '-' {
+			s = s[37:]
+		}
+
 		if s == "*" || s == "api:*" {
 			return true
 		}
