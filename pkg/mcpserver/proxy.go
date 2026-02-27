@@ -489,7 +489,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 
 	// Scope enforcement: if token has a restricted scope, check the tool is allowed
 	// Note: scope may be tenant-prefixed (e.g., "tenant-uuid:*") — matchScope handles stripping
-	if tokenInfo.Scope != "" && tokenInfo.Scope != "*" && tokenInfo.Scope != "api:*" {
+	if tokenInfo.Scope != "" && tokenInfo.Scope != "*" && tokenInfo.Scope != "api:*" && tokenInfo.Scope != "mcp:*" {
 		if !matchScope(tokenInfo.Scope, tc.Name) {
 			return NewErrorResponse(req.ID, CodePolicyDenied,
 				fmt.Sprintf("tool %q not in scope %q", tc.Name, tokenInfo.Scope)), nil
@@ -693,7 +693,7 @@ func matchScope(scope, toolName string) bool {
 			s = s[37:]
 		}
 
-		if s == "*" || s == "api:*" {
+		if s == "*" || s == "api:*" || s == "mcp:*" {
 			return true
 		}
 		if strings.HasSuffix(s, ":*") {
