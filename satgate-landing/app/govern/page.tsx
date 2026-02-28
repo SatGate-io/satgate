@@ -100,7 +100,7 @@ export default function GovernPage() {
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">The Enterprise Buying Committee</h2>
           <p className="text-gray-500 text-center mb-4">Risk. Margins. Growth. Three buyers, one platform.</p>
-          <p className="text-xs text-gray-600 text-center mb-12">Each stakeholder gets a tailored wedge — whoever holds the budget, SatGate speaks their language.</p>
+          <p className="text-xs text-gray-600 text-center mb-12">One platform, three perspectives. SatGate aligns security, finance, and growth under a single pane of glass.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* CISO — Risk */}
@@ -115,13 +115,13 @@ export default function GovernPage() {
                 </div>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed mb-3">
-                <span className="text-red-300 font-medium">The nightmare:</span> A compromised AI agent gets inside the perimeter and spams a sensitive database at machine speed, bypassing traditional rate limits.
+                <span className="text-red-300 font-medium">The problem:</span> A compromised AI agent gets inside the perimeter and spams a sensitive database at machine speed, bypassing traditional rate limits.
               </p>
               <p className="text-gray-300 text-sm leading-relaxed mb-4 border-l-2 border-red-800 pl-3">
                 &ldquo;SatGate provides a deterministic, cryptographic kill-switch. We don&apos;t just alert you — we instantly bankrupt the adversary&apos;s budget before the blast radius expands.&rdquo;
               </p>
               <div className="pt-3 border-t border-red-900/30">
-                <p className="text-xs text-red-400 font-medium mb-2">Winning metric:</p>
+                <p className="text-xs text-red-400 font-medium mb-2">Metrics that matter:</p>
                 <p className="text-xs text-gray-400">Zero unauthorized data exfiltration via runaway agent loops</p>
               </div>
               <div className="mt-4">
@@ -141,13 +141,13 @@ export default function GovernPage() {
                 </div>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed mb-3">
-                <span className="text-cyan-300 font-medium">The nightmare:</span> Unpredictable AI bills. An infinite loop on an expensive MCP tool burns thousands over a weekend. No one notices until the invoice arrives.
+                <span className="text-cyan-300 font-medium">The problem:</span> Unpredictable AI bills. An infinite loop on an expensive MCP tool burns thousands over a weekend. No one notices until the invoice arrives.
               </p>
               <p className="text-gray-300 text-sm leading-relaxed mb-4 border-l-2 border-cyan-800 pl-3">
                 &ldquo;SatGate ends faith-based accounting for AI. We enforce hard, real-time dollar caps on every agent and tool — turning unpredictable AI costs into predictable, hard-capped OpEx.&rdquo;
               </p>
               <div className="pt-3 border-t border-cyan-900/30">
-                <p className="text-xs text-cyan-400 font-medium mb-2">Winning metric:</p>
+                <p className="text-xs text-cyan-400 font-medium mb-2">Metrics that matter:</p>
                 <p className="text-xs text-gray-400">100% elimination of &ldquo;Ghost Spend&rdquo; and AI bill shock</p>
               </div>
               <div className="mt-4">
@@ -167,13 +167,13 @@ export default function GovernPage() {
                 </div>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed mb-3">
-                <span className="text-yellow-300 font-medium">The nightmare:</span> Getting left behind as the internet shifts from human-to-human commerce to machine-to-machine commerce. Your APIs are valuable — but you&apos;re giving them away.
+                <span className="text-yellow-300 font-medium">The problem:</span> Getting left behind as the internet shifts from human-to-human commerce to machine-to-machine commerce. Your APIs are valuable — but you&apos;re giving them away.
               </p>
               <p className="text-gray-300 text-sm leading-relaxed mb-4 border-l-2 border-yellow-800 pl-3">
                 &ldquo;SatGate turns your IT infrastructure from a cost center into an automated storefront. Expose APIs to external AI agents and charge micropayments for every call via L402.&rdquo;
               </p>
               <div className="pt-3 border-t border-yellow-900/30">
-                <p className="text-xs text-yellow-400 font-medium mb-2">Winning metric:</p>
+                <p className="text-xs text-yellow-400 font-medium mb-2">Metrics that matter:</p>
                 <p className="text-xs text-gray-400">Net-new revenue from machine-to-machine API transactions</p>
               </div>
               <div className="mt-4">
