@@ -54,6 +54,7 @@ type Proxy struct {
 	delegator *Delegator
 	events    EventPublisher
 	revocation RevocationChecker // optional, checks if token is revoked
+	toolsListEnricher ToolsListEnricher // optional, enriches tools/list with cost metadata
 	tokenID   string // default session token (from config or first auth)
 	rootToken string // auto-minted root token (for delegation demos)
 }
@@ -212,6 +213,17 @@ func (p *Proxy) SetRevocationChecker(rc RevocationChecker) {
 	p.revocation = rc
 }
 
+// ToolsListEnricher transforms the tools list before returning to clients.
+// Used by enterprise layer to inject cost metadata, budget info, etc.
+type ToolsListEnricher func(ctx context.Context, tenantID string, tools []json.RawMessage) []json.RawMessage
+
+// SetToolsListEnricher sets a function that enriches tool definitions
+// returned by tools/list (e.g., injecting x-satgate cost metadata).
+func (p *Proxy) SetToolsListEnricher(e ToolsListEnricher) {
+	p.toolsListEnricher = e
+}
+
+
 // ReloadUpstreams adds, removes, or replaces upstreams at runtime without restart.
 // It compares the new config against current upstreams and applies the diff.
 func (p *Proxy) ReloadUpstreams(ctx context.Context, newUpstreams map[string]UpstreamConfig) error {
@@ -334,7 +346,7 @@ func (p *Proxy) handleRequest(ctx context.Context, req *Request) (*Response, err
 	case MethodToolsList:
 		return p.handleToolsListWithCtx(ctx, req)
 
-	case MethodToolsCall, MethodSatGateDelegate, MethodSatGateBudget:
+	case MethodToolsCall, MethodSatGateDelegate, MethodSatGateBudget, "budget/check":
 		// These methods require authentication.
 		tokenInfo, authErr := p.authenticate(ctx, req)
 		if authErr != nil {
@@ -464,6 +476,11 @@ func (p *Proxy) handlePing(req *Request) *Response {
 func (p *Proxy) handleToolsListWithCtx(ctx context.Context, req *Request) (*Response, error) {
 	tenantID := TenantFromContext(ctx)
 	tools := p.router.AllToolsForTenant(ctx, tenantID)
+
+	// Allow enterprise layer to enrich tools with cost/budget metadata
+	if p.toolsListEnricher != nil {
+		tools = p.toolsListEnricher(ctx, tenantID, tools)
+	}
 
 	result, err := json.Marshal(map[string]interface{}{
 		"tools": tools,
@@ -722,4 +739,35 @@ func hashToken(token string) string {
 	h := sha256.New()
 	h.Write([]byte(token))
 	return hex.EncodeToString(h.Sum(nil))[:12]
+}
+
+// handleBudgetCheck returns the current token's budget status.
+// This allows economically-aware agents to check their balance before making expensive calls.
+func (p *Proxy) handleBudgetCheck(ctx context.Context, req *Request, tokenInfo *TokenInfo) (*Response, error) {
+
+	response := map[string]interface{}{
+		"token_id":  tokenInfo.TokenID,
+		"tenant_id": tokenInfo.TenantID,
+		"scope":     tokenInfo.Scope,
+	}
+
+	// If budget enforcement is available, get remaining budget
+	if p.budget != nil && tokenInfo.BudgetID != "" {
+		remaining, err := p.budget.Remaining(ctx, tokenInfo.BudgetID)
+		if err == nil {
+			response["budget_id"] = tokenInfo.BudgetID
+			response["budget_remaining_credits"] = remaining
+		}
+	}
+
+	result, err := json.Marshal(response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Response{
+		JSONRPC: "2.0",
+		ID:      req.ID,
+		Result:  result,
+	}, nil
 }
