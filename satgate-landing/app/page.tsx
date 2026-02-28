@@ -122,10 +122,10 @@ const LandingPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              Every tool call — authenticated, logged, cost-tracked, and budget-enforced. The <b className="text-white">Economic Firewall</b> for AI agent requests.
+              Every API request — authenticated, logged, cost-tracked, and budget-enforced. The <b className="text-white">Economic Firewall</b> for AI agent traffic.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
-              Not &ldquo;who are you?&rdquo; — <b>&ldquo;what can you afford?&rdquo;</b> Per-agent budgets. Per-tool costs. Delegation hierarchies. Connect in 5 minutes.
+              Not &ldquo;who are you?&rdquo; — <b>&ldquo;what can you afford?&rdquo;</b> Per-agent budgets. Spending caps. Full delegation control. Connect in 5 minutes.
             </p>
             <div className="flex gap-4">
               <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
