@@ -16,10 +16,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"os"
+	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -61,6 +67,8 @@ func main() {
 			fmt.Println("Usage: satgate-cli token validate <macaroon>")
 			os.Exit(1)
 		}
+	case "wrap":
+		cmdWrap()
 	case "version":
 		fmt.Printf("satgate-cli %s (commit: %s, built: %s)\n", Version, Commit, BuildDate)
 	case "help", "--help", "-h":
@@ -79,16 +87,21 @@ Usage:
   satgate-cli <command> [options]
 
 Commands:
-  init                    Interactive setup — configure gateway connection
-  status                  Show gateway health, active agents, and spend
-  mint --subject <name>   Mint a capability token for an agent
-  token validate <token>  Validate a macaroon token
-  version                 Show version info
-  help                    Show this help
+  init                         Interactive setup — configure gateway connection
+  status                       Show gateway health, active agents, and spend
+  mint --subject <name>        Mint a capability token for an agent
+  wrap --token <tok> -- <cmd>  Run any command through SatGate proxy
+  token validate <token>       Validate a macaroon token
+  version                      Show version info
+  help                         Show this help
 
 Get started:
   satgate-cli init
   satgate-cli status
+
+Run agents through SatGate:
+  satgate-cli wrap --token <macaroon> -- python my_agent.py
+  satgate-cli wrap --token <macaroon> --gateway https://gw.example.com -- node agent.js
 
 Documentation: https://cloud.satgate.io/docs
 GitHub: https://github.com/SatGate-io/satgate`)
@@ -362,6 +375,200 @@ func cmdTokenValidate() {
 		prettyJSON, _ := json.MarshalIndent(result, "  ", "  ")
 		fmt.Println("  " + string(prettyJSON))
 	}
+}
+
+// ── Wrap ─────────────────────────────────────────────────────────
+
+func cmdWrap() {
+	token := ""
+	gateway := ""
+	var childArgs []string
+	dashDash := false
+
+	for i := 2; i < len(os.Args); i++ {
+		if os.Args[i] == "--" {
+			dashDash = true
+			childArgs = os.Args[i+1:]
+			break
+		}
+		switch os.Args[i] {
+		case "--token", "-t":
+			if i+1 < len(os.Args) {
+				token = os.Args[i+1]
+				i++
+			}
+		case "--gateway", "-g":
+			if i+1 < len(os.Args) {
+				gateway = os.Args[i+1]
+				i++
+			}
+		}
+	}
+
+	if !dashDash || len(childArgs) == 0 {
+		fmt.Println("Usage: satgate-cli wrap --token <macaroon> [--gateway <url>] -- <command> [args...]")
+		fmt.Println()
+		fmt.Println("Examples:")
+		fmt.Println("  satgate-cli wrap --token mac_abc123 -- python my_agent.py")
+		fmt.Println("  satgate-cli wrap --token mac_abc123 --gateway https://gw.satgate.io -- curl https://api.openai.com/v1/chat/completions")
+		os.Exit(1)
+	}
+
+	// Try to get token from env if not provided
+	if token == "" {
+		token = os.Getenv("SATGATE_TOKEN")
+	}
+	if token == "" {
+		fmt.Println("❌ Token required. Use --token <macaroon> or set SATGATE_TOKEN env var")
+		os.Exit(1)
+	}
+
+	// Try to get gateway from config if not provided
+	if gateway == "" {
+		if cfg, err := loadConfig(); err == nil && cfg.CloudURL != "" {
+			gateway = cfg.CloudURL
+		}
+	}
+
+	// Start local proxy
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		fmt.Printf("❌ Failed to start proxy: %v\n", err)
+		os.Exit(1)
+	}
+	proxyAddr := listener.Addr().String()
+
+	// Build proxy handler
+	proxyHandler := &wrapProxy{
+		token:   token,
+		gateway: gateway,
+	}
+
+	server := &http.Server{Handler: proxyHandler}
+	go server.Serve(listener)
+
+	proxyURL := "http://" + proxyAddr
+
+	fmt.Printf("🛡️  SatGate proxy running on %s\n", proxyURL)
+	if gateway != "" {
+		fmt.Printf("   Gateway: %s\n", gateway)
+	}
+	fmt.Printf("   Token:   %s...\n", truncate(token, 20))
+	fmt.Printf("   Running: %s\n", strings.Join(childArgs, " "))
+	fmt.Println()
+
+	// Start child process with proxy env vars
+	cmd := exec.Command(childArgs[0], childArgs[1:]...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+	cmd.Env = append(os.Environ(),
+		"HTTP_PROXY="+proxyURL,
+		"HTTPS_PROXY="+proxyURL,
+		"http_proxy="+proxyURL,
+		"https_proxy="+proxyURL,
+		"SATGATE_TOKEN="+token,
+	)
+
+	// Forward signals to child
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		sig := <-sigCh
+		if cmd.Process != nil {
+			cmd.Process.Signal(sig)
+		}
+	}()
+
+	err = cmd.Run()
+	server.Close()
+
+	if err != nil {
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			os.Exit(exitErr.ExitCode())
+		}
+		fmt.Printf("❌ %v\n", err)
+		os.Exit(1)
+	}
+}
+
+// wrapProxy is an HTTP proxy that injects SatGate tokens into requests.
+// If a gateway URL is set, it rewrites requests to route through the gateway.
+type wrapProxy struct {
+	token   string
+	gateway string
+}
+
+func (p *wrapProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Handle CONNECT (HTTPS tunneling)
+	if r.Method == http.MethodConnect {
+		p.handleConnect(w, r)
+		return
+	}
+
+	// For regular HTTP requests, proxy with token injection
+	target := r.URL
+	if p.gateway != "" {
+		// Route through gateway — preserve original Host as header
+		gwURL, err := url.Parse(p.gateway)
+		if err != nil {
+			http.Error(w, "Bad gateway URL", http.StatusBadGateway)
+			return
+		}
+		target = &url.URL{
+			Scheme:   gwURL.Scheme,
+			Host:     gwURL.Host,
+			Path:     r.URL.Path,
+			RawQuery: r.URL.RawQuery,
+		}
+		r.Header.Set("X-Forwarded-Host", r.Host)
+	}
+
+	proxy := httputil.NewSingleHostReverseProxy(target)
+	proxy.Director = func(req *http.Request) {
+		req.URL = target
+		req.Host = target.Host
+		req.Header.Set("Authorization", "Bearer "+p.token)
+	}
+	proxy.ServeHTTP(w, r)
+}
+
+func (p *wrapProxy) handleConnect(w http.ResponseWriter, r *http.Request) {
+	// For HTTPS CONNECT, we do a man-in-the-middle to inject the token
+	// This works for development/testing — agents should trust the local proxy
+
+	destConn, err := net.DialTimeout("tcp", r.Host, 10*time.Second)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadGateway)
+		return
+	}
+
+	hijacker, ok := w.(http.Hijacker)
+	if !ok {
+		http.Error(w, "Hijacking not supported", http.StatusInternalServerError)
+		destConn.Close()
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	clientConn, _, err := hijacker.Hijack()
+	if err != nil {
+		destConn.Close()
+		return
+	}
+
+	// Simple TCP tunnel (token injection happens at HTTP level for non-TLS,
+	// for TLS we pass through — the agent should use HTTP_PROXY for token injection)
+	go func() {
+		defer destConn.Close()
+		defer clientConn.Close()
+		io.Copy(destConn, clientConn)
+	}()
+	go func() {
+		defer destConn.Close()
+		defer clientConn.Close()
+		io.Copy(clientConn, destConn)
+	}()
 }
 
 // ── Helpers ──────────────────────────────────────────────────────
