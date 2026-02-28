@@ -62,9 +62,10 @@ export default function DesignPartnersPage() {
           </Link>
 
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
-            <Link href="/protect" className="hover:text-white transition">Protect Demo</Link>
-            <Link href="/pay" className="hover:text-white transition">Pay Demo</Link>
-            <Link href="/govern" className="hover:text-white transition">Govern</Link>
+            <Link href="/mint-demo" className="hover:text-white transition">Mint Demo</Link>
+            <Link href="/protect" className="hover:text-white transition">Control Demo</Link>
+            <Link href="/pay" className="hover:text-white transition">Charge Demo</Link>
+            <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="#" className="hover:text-white transition">Pricing</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
             <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud</a>
@@ -83,9 +84,10 @@ export default function DesignPartnersPage() {
         <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
             {[
-              { href: '/protect', label: 'Protect Demo' },
-              { href: '/pay', label: 'Pay Demo' },
-              { href: '/govern', label: 'Govern' },
+              { href: '/mint-demo', label: 'Mint Demo' },
+              { href: '/protect', label: 'Control Demo' },
+              { href: '/pay', label: 'Charge Demo' },
+              { href: '/govern', label: 'Enterprise' },
               { href: '#', label: 'Pricing' },
             ].map(item => (
               <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">
@@ -461,7 +463,7 @@ export default function DesignPartnersPage() {
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><Link href="/protect" className="hover:text-white transition">Protect</Link></li>
                 <li><Link href="/pay" className="hover:text-white transition">Pay</Link></li>
-                <li><Link href="/govern" className="hover:text-white transition">Govern</Link></li>
+                <li><Link href="/govern" className="hover:text-white transition">Enterprise</Link></li>
               </ul>
             </div>
             <div>

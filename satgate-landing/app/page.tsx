@@ -563,7 +563,7 @@ const LandingPage = () => {
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
                 <li><a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Documentation</a></li>
-                <li><Link href="/govern" className="hover:text-white transition">Govern</Link></li>
+                <li><Link href="/govern" className="hover:text-white transition">Enterprise</Link></li>
                 <li><Link href="/design-partners" className="hover:text-white transition">Design Partners</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
                 <li><Link href="/compare" className="hover:text-white transition">Compare</Link></li>
