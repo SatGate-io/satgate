@@ -359,7 +359,7 @@ export default function PayDemoPage() {
           <ArrowLeft size={18} /> Back to Home
         </Link>
         <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 text-center justify-self-center">
-          ⚡ Pay Demo
+          ⚡ Charge Demo
         </h1>
         <div></div>
       </div>

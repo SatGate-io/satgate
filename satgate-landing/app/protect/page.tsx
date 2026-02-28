@@ -676,7 +676,7 @@ export default function ProtectDemoPage() {
           <h1 className="text-lg sm:text-xl font-bold flex items-center gap-2">
             <Shield className="text-blue-400" size={24} />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-400">
-              Default Protection Demo
+              Control Demo
             </span>
           </h1>
           {/* Mode Toggle */}
