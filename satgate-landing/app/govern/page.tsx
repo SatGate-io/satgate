@@ -26,10 +26,8 @@ export default function GovernPage() {
           </Link>
 
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
-            <Link href="/protect" className="hover:text-white transition">Protect Demo</Link>
-            <Link href="/pay" className="hover:text-white transition">Pay Demo</Link>
-            <Link href="/govern" className="text-white transition">Govern</Link>
-            <Link href="#" className="hover:text-white transition">Pricing</Link>
+            <Link href="/govern" className="text-white transition">Enterprise</Link>
+            <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
             <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud</a>
           </div>
@@ -47,10 +45,8 @@ export default function GovernPage() {
         <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
             {[
-              { href: '/protect', label: 'Protect Demo' },
-              { href: '/pay', label: 'Pay Demo' },
-              { href: '/govern', label: 'Govern' },
-              { href: '#', label: 'Pricing' },
+              { href: '/govern', label: 'Enterprise' },
+              { href: '/pricing', label: 'Pricing' },
             ].map(item => (
               <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">
                 {item.label}
