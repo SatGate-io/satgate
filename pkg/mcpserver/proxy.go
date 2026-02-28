@@ -18,6 +18,7 @@ type contextKey string
 
 // CtxTenantID is the context key for the tenant ID extracted from the token.
 const CtxTenantID contextKey = "satgate_tenant_id"
+const CtxTokenInfo contextKey = "satgate_token_info"
 
 // TenantFromContext extracts the tenant ID from a context, or returns empty string.
 func TenantFromContext(ctx context.Context) string {
@@ -365,6 +366,7 @@ func (p *Proxy) handleRequest(ctx context.Context, req *Request) (*Response, err
 		if tokenInfo.TenantID != "" {
 			ctx = context.WithValue(ctx, CtxTenantID, tokenInfo.TenantID)
 		}
+		ctx = context.WithValue(ctx, CtxTokenInfo, tokenInfo)
 		// Check revocation (after tenant is in context)
 		if p.revocation != nil && tokenInfo.BudgetID != "" {
 			if p.revocation.IsRevoked(ctx, tokenInfo.BudgetID) {
@@ -770,4 +772,12 @@ func (p *Proxy) handleBudgetCheck(ctx context.Context, req *Request, tokenInfo *
 		ID:      req.ID,
 		Result:  result,
 	}, nil
+}
+
+// TokenInfoFromContext extracts the TokenInfo from context (set during authenticated requests).
+func TokenInfoFromContext(ctx context.Context) *TokenInfo {
+	if v, ok := ctx.Value(CtxTokenInfo).(*TokenInfo); ok {
+		return v
+	}
+	return nil
 }
