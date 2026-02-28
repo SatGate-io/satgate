@@ -98,62 +98,87 @@ export default function GovernPage() {
       {/* Three Personas */}
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">Built for Every Stakeholder</h2>
-          <p className="text-gray-500 text-center mb-12">One platform, three perspectives. Everyone gets what they need.</p>
+          <h2 className="text-3xl font-bold text-center mb-4">The Enterprise Buying Committee</h2>
+          <p className="text-gray-500 text-center mb-4">Risk. Margins. Growth. Three buyers, one platform.</p>
+          <p className="text-xs text-gray-600 text-center mb-12">Each stakeholder gets a tailored wedge — whoever holds the budget, SatGate speaks their language.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* CFO */}
-            <div className="p-6 rounded-xl bg-gradient-to-br from-green-950/30 to-green-900/10 border border-green-800/30 hover:border-green-600/50 transition group">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2.5 bg-green-900/50 rounded-lg group-hover:bg-green-900/70 transition">
-                  <DollarSign className="text-green-400" size={22} />
-                </div>
-                <h3 className="font-bold text-lg">CFO</h3>
-              </div>
-              <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                "Where is the money going?"
-              </p>
-              <ul className="space-y-2 text-sm text-gray-500">
-                <li className="flex items-center gap-2"><BarChart3 size={14} className="text-green-400 flex-shrink-0" /> Cost attribution by team & agent</li>
-                <li className="flex items-center gap-2"><CreditCard size={14} className="text-green-400 flex-shrink-0" /> Automated chargeback reports</li>
-                <li className="flex items-center gap-2"><Activity size={14} className="text-green-400 flex-shrink-0" /> Budget alerts before overruns</li>
-              </ul>
-            </div>
-
-            {/* CISO */}
+            {/* CISO — Risk */}
             <div className="p-6 rounded-xl bg-gradient-to-br from-red-950/30 to-red-900/10 border border-red-800/30 hover:border-red-600/50 transition group">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2.5 bg-red-900/50 rounded-lg group-hover:bg-red-900/70 transition">
                   <Shield className="text-red-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">CISO</h3>
+                <div>
+                  <h3 className="font-bold text-lg">CISO</h3>
+                  <span className="text-xs text-red-400 font-medium">Economic Access Control</span>
+                </div>
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                "Are we secure and compliant?"
+              <p className="text-gray-400 text-sm leading-relaxed mb-3">
+                <span className="text-red-300 font-medium">The nightmare:</span> A compromised AI agent gets inside the perimeter and spams a sensitive database at machine speed, bypassing traditional rate limits.
               </p>
-              <ul className="space-y-2 text-sm text-gray-500">
-                <li className="flex items-center gap-2"><ShieldCheck size={14} className="text-red-400 flex-shrink-0" /> Security dashboard & threat detection</li>
-                <li className="flex items-center gap-2"><AlertTriangle size={14} className="text-red-400 flex-shrink-0" /> Anomalous usage alerts</li>
-                <li className="flex items-center gap-2"><FileSearch size={14} className="text-red-400 flex-shrink-0" /> SOC2/GDPR compliance exports</li>
-              </ul>
+              <p className="text-gray-300 text-sm leading-relaxed mb-4 border-l-2 border-red-800 pl-3">
+                &ldquo;SatGate provides a deterministic, cryptographic kill-switch. We don&apos;t just alert you — we instantly bankrupt the adversary&apos;s budget before the blast radius expands.&rdquo;
+              </p>
+              <div className="pt-3 border-t border-red-900/30">
+                <p className="text-xs text-red-400 font-medium mb-2">Winning metric:</p>
+                <p className="text-xs text-gray-400">Zero unauthorized data exfiltration via runaway agent loops</p>
+              </div>
+              <div className="mt-4">
+                <Link href="https://cloud.satgate.io/cloud/observe/setup" className="text-xs text-red-400 hover:text-red-300 transition">See it in action →</Link>
+              </div>
             </div>
 
-            {/* CTO */}
-            <div className="p-6 rounded-xl bg-gradient-to-br from-purple-950/30 to-purple-900/10 border border-purple-800/30 hover:border-purple-600/50 transition group">
+            {/* CFO — Margins */}
+            <div className="p-6 rounded-xl bg-gradient-to-br from-cyan-950/30 to-cyan-900/10 border-2 border-cyan-500/50 hover:border-cyan-400/70 transition group">
               <div className="flex items-center gap-3 mb-4">
-                <div className="p-2.5 bg-purple-900/50 rounded-lg group-hover:bg-purple-900/70 transition">
-                  <Key className="text-purple-400" size={22} />
+                <div className="p-2.5 bg-cyan-900/50 rounded-lg group-hover:bg-cyan-900/70 transition">
+                  <DollarSign className="text-cyan-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">CTO</h3>
+                <div>
+                  <h3 className="font-bold text-lg">CFO</h3>
+                  <span className="text-xs text-cyan-400 font-medium">Deterministic Cost Control</span>
+                </div>
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                "Who has access, and how do I control it?"
+              <p className="text-gray-400 text-sm leading-relaxed mb-3">
+                <span className="text-cyan-300 font-medium">The nightmare:</span> Unpredictable AI bills. An infinite loop on an expensive MCP tool burns thousands over a weekend. No one notices until the invoice arrives.
               </p>
-              <ul className="space-y-2 text-sm text-gray-500">
-                <li className="flex items-center gap-2"><GitBranch size={14} className="text-purple-400 flex-shrink-0" /> Full audit trail of every token</li>
-                <li className="flex items-center gap-2"><Lock size={14} className="text-purple-400 flex-shrink-0" /> Token delegation & revocation</li>
-                <li className="flex items-center gap-2"><Sliders size={14} className="text-purple-400 flex-shrink-0" /> Governance policies as code</li>
-              </ul>
+              <p className="text-gray-300 text-sm leading-relaxed mb-4 border-l-2 border-cyan-800 pl-3">
+                &ldquo;SatGate ends faith-based accounting for AI. We enforce hard, real-time dollar caps on every agent and tool — turning unpredictable AI costs into predictable, hard-capped OpEx.&rdquo;
+              </p>
+              <div className="pt-3 border-t border-cyan-900/30">
+                <p className="text-xs text-cyan-400 font-medium mb-2">Winning metric:</p>
+                <p className="text-xs text-gray-400">100% elimination of &ldquo;Ghost Spend&rdquo; and AI bill shock</p>
+              </div>
+              <div className="mt-4">
+                <Link href="https://cloud.satgate.io/cloud/ez-pass/setup" className="text-xs text-cyan-400 hover:text-cyan-300 transition">Stop the ghost spend →</Link>
+              </div>
+            </div>
+
+            {/* CEO/CRO — Growth */}
+            <div className="p-6 rounded-xl bg-gradient-to-br from-yellow-950/30 to-yellow-900/10 border border-yellow-800/30 hover:border-yellow-600/50 transition group">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 bg-yellow-900/50 rounded-lg group-hover:bg-yellow-900/70 transition">
+                  <Zap className="text-yellow-400" size={22} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">CEO / CRO</h3>
+                  <span className="text-xs text-yellow-400 font-medium">Monetizing the Agentic Web</span>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed mb-3">
+                <span className="text-yellow-300 font-medium">The nightmare:</span> Getting left behind as the internet shifts from human-to-human commerce to machine-to-machine commerce. Your APIs are valuable — but you&apos;re giving them away.
+              </p>
+              <p className="text-gray-300 text-sm leading-relaxed mb-4 border-l-2 border-yellow-800 pl-3">
+                &ldquo;SatGate turns your IT infrastructure from a cost center into an automated storefront. Expose APIs to external AI agents and charge micropayments for every call via L402.&rdquo;
+              </p>
+              <div className="pt-3 border-t border-yellow-900/30">
+                <p className="text-xs text-yellow-400 font-medium mb-2">Winning metric:</p>
+                <p className="text-xs text-gray-400">Net-new revenue from machine-to-machine API transactions</p>
+              </div>
+              <div className="mt-4">
+                <Link href="https://cloud.satgate.io/cloud/l402" className="text-xs text-yellow-400 hover:text-yellow-300 transition">Start earning →</Link>
+              </div>
             </div>
           </div>
         </div>
