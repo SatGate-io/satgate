@@ -151,6 +151,14 @@ const LandingPage = () => {
                 <Play size={16} /> Try the Sandbox
               </Link>
             </div>
+
+            {/* Proof anchors */}
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-6 text-xs text-gray-500">
+              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Open source — <a href="https://github.com/SatGate-io/satgate" className="text-gray-400 hover:text-white transition underline underline-offset-2">GitHub</a></span>
+              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Sub-ms verification overhead</span>
+              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Design partners in pilot</span>
+              <span className="flex items-center gap-1.5"><Shield size={12} className="text-purple-400" /> <Link href="/security" className="text-gray-400 hover:text-white transition underline underline-offset-2">Security model →</Link></span>
+            </div>
           </div>
 
           {/* Right: Hero Demo Video */}
@@ -371,108 +379,66 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Where It Fits Section */}
+      {/* Where It Fits Section — Clean diagrams */}
       <section className="py-16 px-6 border-b border-gray-800">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-bold text-center mb-3">Where It Fits</h2>
-          <p className="text-gray-500 text-center mb-10">Drop-in deployment. Minimal code changes.</p>
-          
-          {/* Architecture Diagram */}
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8 mb-8">
-            <h4 className="text-center text-sm font-semibold text-gray-400 mb-6">STANDARD DEPLOYMENT</h4>
-            <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
-              <div className="px-5 py-3 rounded-lg bg-gray-800 border border-gray-700 text-center min-w-[140px]">
-                <span className="text-gray-300 font-medium">Client / Agent</span>
-              </div>
-              <span className="text-gray-600 text-xl hidden md:block">→</span>
-              <span className="text-gray-600 md:hidden">↓</span>
-              <div className="px-5 py-3 rounded-lg bg-cyan-900/30 border border-cyan-700/50 text-center min-w-[140px]">
-                <span className="text-cyan-400 font-medium">CDN / WAF</span>
-              </div>
-              <span className="text-gray-600 text-xl hidden md:block">→</span>
-              <span className="text-gray-600 md:hidden">↓</span>
-              <div className="px-5 py-3 rounded-lg bg-purple-900/40 border-2 border-purple-500/60 text-center min-w-[140px]">
-                <span className="text-purple-300 font-bold">SatGate PEP</span>
-              </div>
-              <span className="text-gray-600 text-xl hidden md:block">→</span>
-              <span className="text-gray-600 md:hidden">↓</span>
-              <div className="px-5 py-3 rounded-lg bg-green-900/30 border border-green-700/50 text-center min-w-[140px]">
-                <span className="text-green-400 font-medium">Your API</span>
-                <span className="text-gray-600 text-xs block">REST / MCP / GraphQL</span>
-              </div>
-            </div>
-            <p className="text-center text-gray-500 text-sm mt-6">
-              SatGate sits <span className="text-white">behind</span> your CDN/WAF (volumetric protection) and <span className="text-white">in front of</span> your API origin.
-              <br/>Works with <span className="text-white">MCP servers</span>, REST APIs, GraphQL — any HTTP endpoint.
-            </p>
-          </div>
+          <p className="text-gray-500 text-center mb-10">Three deployment modes. Drop-in. No rip-and-replace.</p>
 
-          {/* Sidecar Deployment */}
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
-            <h4 className="text-center text-sm font-semibold text-gray-400 mb-6">ENTERPRISE "SIDECAR" MODE</h4>
-            <p className="text-center text-gray-500 text-sm mb-6">
-              Already have Kong, Apigee, or AWS API Gateway? Deploy SatGate as a <span className="text-white">sidecar</span>—no rip-and-replace.
-            </p>
-            <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
-              <div className="px-5 py-3 rounded-lg bg-gray-800 border border-gray-700 text-center min-w-[140px]">
-                <span className="text-gray-300 font-medium">Existing Gateway</span>
-                <span className="text-gray-600 text-xs block">Kong / Apigee</span>
-              </div>
-              <div className="flex flex-col items-center gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-sm hidden md:block">→</span>
-                  <div className="px-4 py-2 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-xs">
-                    <span className="text-gray-400">/api/legacy/*</span>
-                  </div>
-                  <span className="text-gray-600 text-sm hidden md:block">→</span>
-                  <span className="text-gray-500 text-xs">Legacy API</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Standard */}
+            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 hover:border-gray-700 transition">
+              <h4 className="text-sm font-bold text-gray-400 mb-4 text-center">STANDARD</h4>
+              <div className="flex flex-col items-center gap-2 text-sm">
+                <div className="w-full px-3 py-2 rounded bg-gray-800 text-center text-gray-400 text-xs">CDN / WAF</div>
+                <span className="text-gray-600">↓</span>
+                <div className="w-full px-3 py-2.5 rounded bg-purple-900/40 border border-purple-500/50 text-center">
+                  <span className="text-purple-300 font-bold text-xs">SatGate</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-sm hidden md:block">→</span>
-                  <div className="px-4 py-2 rounded-lg bg-purple-900/40 border border-purple-500/60 text-center text-xs">
-                    <span className="text-purple-300">/api/agents/*</span>
-                  </div>
-                  <span className="text-gray-600 text-sm hidden md:block">→</span>
-                  <span className="text-purple-400 text-xs font-medium">SatGate</span>
-                  <span className="text-gray-600 text-sm hidden md:block">→</span>
-                  <span className="text-green-400 text-xs">Agent API</span>
-                </div>
+                <span className="text-gray-600">↓</span>
+                <div className="w-full px-3 py-2 rounded bg-green-900/30 border border-green-800/50 text-center text-green-400 text-xs">Your API</div>
               </div>
+              <p className="text-gray-600 text-xs text-center mt-4">REST, GraphQL, any HTTP endpoint</p>
             </div>
-            <p className="text-center text-gray-600 text-xs mt-6">
-              Route only agent traffic through SatGate. Keep existing infrastructure for legacy clients.
-            </p>
-          </div>
 
-          {/* MCP Proxy Deployment */}
-          <div className="bg-gray-900/50 border border-purple-800/30 rounded-xl p-8 mt-8">
-            <h4 className="text-center text-sm font-semibold text-purple-400 mb-2">MCP PROXY MODE</h4>
-            <p className="text-center text-gray-500 text-sm mb-6">
-              Govern every MCP tool call. Per-tool budgets, delegation trees, real-time dashboard.
-            </p>
-            <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
-              <div className="px-5 py-3 rounded-lg bg-gray-800 border border-gray-700 text-center min-w-[160px]">
-                <span className="text-gray-300 font-medium">AI Agents</span>
-                <span className="text-gray-600 text-xs block">Claude Code / Agent Zero / Cursor</span>
+            {/* Sidecar */}
+            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 hover:border-gray-700 transition">
+              <h4 className="text-sm font-bold text-gray-400 mb-4 text-center">SIDECAR</h4>
+              <div className="flex flex-col items-center gap-2 text-sm">
+                <div className="w-full px-3 py-2 rounded bg-gray-800 text-center text-gray-400 text-xs">Existing Gateway</div>
+                <div className="flex items-center gap-2 w-full">
+                  <div className="flex-1 flex flex-col items-center gap-1">
+                    <span className="text-gray-600 text-xs">↓</span>
+                    <div className="w-full px-2 py-1.5 rounded bg-gray-800/50 border border-gray-700 text-center text-gray-500 text-[10px]">Legacy traffic</div>
+                  </div>
+                  <div className="flex-1 flex flex-col items-center gap-1">
+                    <span className="text-purple-400 text-xs">↓</span>
+                    <div className="w-full px-2 py-1.5 rounded bg-purple-900/40 border border-purple-500/50 text-center text-purple-300 text-[10px] font-bold">SatGate</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 w-full">
+                  <div className="flex-1 text-center"><span className="text-gray-600 text-xs">↓</span></div>
+                  <div className="flex-1 text-center"><span className="text-gray-600 text-xs">↓</span></div>
+                </div>
+                <div className="w-full px-3 py-2 rounded bg-green-900/30 border border-green-800/50 text-center text-green-400 text-xs">Your APIs</div>
               </div>
-              <span className="text-gray-600 text-xl hidden md:block">→</span>
-              <span className="text-gray-600 md:hidden">↓</span>
-              <div className="px-5 py-4 rounded-lg bg-purple-900/40 border-2 border-purple-500/60 text-center min-w-[180px]">
-                <span className="text-purple-300 font-bold block">SatGate MCP Proxy</span>
-                <span className="text-gray-500 text-xs block mt-1">Auth · Budget · Delegation</span>
-                <span className="text-gray-500 text-xs block">Per-tool cost attribution</span>
-              </div>
-              <span className="text-gray-600 text-xl hidden md:block">→</span>
-              <span className="text-gray-600 md:hidden">↓</span>
-              <div className="px-5 py-3 rounded-lg bg-green-900/30 border border-green-700/50 text-center min-w-[160px]">
-                <span className="text-green-400 font-medium">MCP Servers</span>
-                <span className="text-gray-600 text-xs block">Tools / Databases / APIs</span>
-              </div>
+              <p className="text-gray-600 text-xs text-center mt-4">Route only agent traffic through SatGate</p>
             </div>
-            <p className="text-center text-gray-500 text-sm mt-6">
-              Agents get a <span className="text-white">clean MCP error</span> when budgets run out. No agent code changes needed.
-              <br/>Supports <span className="text-white">stdio</span> (subprocess) and <span className="text-white">SSE</span> (multi-agent) transports.
-            </p>
+
+            {/* MCP */}
+            <div className="bg-gray-900/50 border border-purple-800/30 rounded-xl p-6 hover:border-purple-700/50 transition">
+              <h4 className="text-sm font-bold text-purple-400 mb-4 text-center">MCP PROXY</h4>
+              <div className="flex flex-col items-center gap-2 text-sm">
+                <div className="w-full px-3 py-2 rounded bg-gray-800 text-center text-gray-400 text-xs">AI Agents</div>
+                <span className="text-gray-600">↓</span>
+                <div className="w-full px-3 py-2.5 rounded bg-purple-900/40 border border-purple-500/50 text-center">
+                  <span className="text-purple-300 font-bold text-xs">SatGate MCP Proxy</span>
+                </div>
+                <span className="text-gray-600">↓</span>
+                <div className="w-full px-3 py-2 rounded bg-green-900/30 border border-green-800/50 text-center text-green-400 text-xs">MCP Servers / Tools</div>
+              </div>
+              <p className="text-gray-600 text-xs text-center mt-4">Per-tool budgets, delegation trees</p>
+            </div>
           </div>
         </div>
       </section>
