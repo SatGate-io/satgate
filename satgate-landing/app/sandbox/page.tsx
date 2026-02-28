@@ -107,7 +107,7 @@ export default function SandboxPage() {
     // Step 2: Mint
     const mintId = 'alpha-mint';
     addEvent({ id: mintId, agent: 'alpha', type: 'mint', status: 'running',
-      label: 'Step 2 → Exchanging JWT for budget-scoped macaroon' });
+      label: 'Step 2 → Exchanging identity for budget-scoped macaroon' });
     await sleep(jitter(500));
     if (abortRef.current) return;
     setAlphaBudget({ spent: 0, limit: 50 });
@@ -183,7 +183,7 @@ export default function SandboxPage() {
     // Step 2: Mint
     const mintId = 'bravo-mint';
     addEvent({ id: mintId, agent: 'bravo', type: 'mint', status: 'running',
-      label: 'Step 2 → Exchanging JWT for budget-scoped macaroon' });
+      label: 'Step 2 → Exchanging identity for budget-scoped macaroon' });
     await sleep(jitter(500));
     if (abortRef.current) return;
     setBravoBudget({ spent: 0, limit: 50 });
@@ -462,7 +462,7 @@ export default function SandboxPage() {
                 {[
                   { icon: <Bot size={24} />, label: 'AI Agent', sub: 'Presents workload identity', color: 'text-blue-400' },
                   { icon: <ArrowRight size={20} />, label: '', sub: '', color: 'text-gray-600' },
-                  { icon: <Key size={24} />, label: 'SatGate Mint', sub: 'JWT → Macaroon exchange', color: 'text-purple-400' },
+                  { icon: <Key size={24} />, label: 'SatGate Mint', sub: 'Identity → Macaroon exchange', color: 'text-purple-400' },
                   { icon: <ArrowRight size={20} />, label: '', sub: '', color: 'text-gray-600' },
                   { icon: <Shield size={24} />, label: 'SatGate Gateway', sub: 'Enforce budget + revocation', color: 'text-cyan-400' },
                   { icon: <ArrowRight size={20} />, label: '', sub: '', color: 'text-gray-600' },
