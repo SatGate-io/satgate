@@ -138,10 +138,10 @@ const LandingPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              Every API request — authenticated, logged, cost-tracked, and budget-enforced. The <b className="text-white">Economic Firewall</b> for AI agent traffic.
+              Control agent spend at the request layer. Every API call is verified, attributed, and governed — before it hits your upstream.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
-              Not &ldquo;who are you?&rdquo; — <b>&ldquo;what can you afford?&rdquo;</b> Per-agent budgets. Spending caps. Instant revocation. Connect in 5 minutes.
+              Not &ldquo;who are you?&rdquo; — <b>&ldquo;what can you afford?&rdquo;</b> Drop-in gateway. Connect in ~5 minutes.
             </p>
             <div className="flex flex-wrap gap-4">
               <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
@@ -274,8 +274,8 @@ const LandingPage = () => {
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ Real-time budget enforcement</li>
-                <li>✓ Fiat402 challenge/response</li>
-                <li>✓ ERP/billing integration</li>
+                <li>✓ Works with Stripe, ERP — no crypto required</li>
+                <li>✓ Per-agent spending caps</li>
               </ul>
             </div>
 
@@ -319,6 +319,55 @@ const LandingPage = () => {
               See full pricing details →
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* EZ Pass — Agent Token Flow (pulled up per feedback) */}
+      <section className="py-16 px-6 border-b border-gray-800 bg-gradient-to-b from-purple-950/10 to-black">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-2">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-3">
+              🚗💨 THE EZ PASS FOR API TRAFFIC
+            </span>
+            <h2 className="text-2xl font-bold mb-2">Badge in once. Fly through every gate.</h2>
+            <p className="text-gray-400 text-sm max-w-xl mx-auto">
+              Agents get a credential at startup — like mounting an EZ Pass. Every request after that flows through the gateway: verified, metered, no slowdowns.
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-2 md:gap-4 flex-wrap text-sm mt-8">
+            <div className="flex flex-col items-center p-3 bg-gray-800 rounded-lg">
+              <Bot className="text-gray-300 mb-1" size={24} />
+              <span className="text-gray-300 font-medium">Agent Starts</span>
+              <span className="text-[10px] text-gray-500">K8s / AWS / OIDC</span>
+            </div>
+            <span className="text-gray-600 text-xl">→</span>
+            <div className="flex flex-col items-center p-3 bg-purple-900/30 border border-purple-500/30 rounded-lg">
+              <Key className="text-purple-400 mb-1" size={24} />
+              <span className="text-purple-400 font-medium">Mint</span>
+              <span className="text-[10px] text-gray-500">Badge in (once)</span>
+            </div>
+            <span className="text-gray-600 text-xl">→</span>
+            <div className="flex flex-col items-center p-3 bg-cyan-900/30 border border-cyan-500/30 rounded-lg">
+              <Lock className="text-cyan-400 mb-1" size={24} />
+              <span className="text-cyan-400 font-medium">EZ Pass</span>
+              <span className="text-[10px] text-gray-500">Capability token</span>
+            </div>
+            <span className="text-gray-600 text-xl">→</span>
+            <div className="flex flex-col items-center p-3 bg-green-900/30 border border-green-500/30 rounded-lg">
+              <Shield className="text-green-400 mb-1" size={24} />
+              <span className="text-green-400 font-medium">Toll Gate</span>
+              <span className="text-[10px] text-gray-500">Verify · Meter · Budget</span>
+            </div>
+            <span className="text-gray-600 text-xl">→</span>
+            <div className="flex flex-col items-center p-3 bg-gray-800 rounded-lg">
+              <Activity className="text-gray-300 mb-1" size={24} />
+              <span className="text-gray-300 font-medium">Upstream</span>
+              <span className="text-[10px] text-gray-500">Your API</span>
+            </div>
+          </div>
+          <p className="text-xs text-gray-600 text-center mt-6">
+            No identity lookups on the hot path. No per-request auth round-trips. Just cryptographic verification at wire speed.
+          </p>
         </div>
       </section>
 
@@ -481,52 +530,7 @@ const LandingPage = () => {
             ))}
           </div>
 
-          {/* EZ Pass — Agent Token Flow */}
-          <div className="mt-16 p-8 rounded-xl bg-gray-900/50 border border-purple-800/30">
-            <div className="text-center mb-2">
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-3">
-                🚗💨 THE EZ PASS FOR API TRAFFIC
-              </span>
-              <h3 className="text-2xl font-bold mb-2">Badge in once. Fly through every gate.</h3>
-              <p className="text-gray-400 text-sm max-w-xl mx-auto">
-                Agents get a credential at startup — like mounting an EZ Pass. Every request after that flows through the gateway: verified, metered, no slowdowns. One token, every toll, full speed.
-              </p>
-            </div>
-            <div className="flex items-center justify-center gap-2 md:gap-4 flex-wrap text-sm mt-8">
-              <div className="flex flex-col items-center p-3 bg-gray-800 rounded-lg">
-                <Bot className="text-gray-300 mb-1" size={24} />
-                <span className="text-gray-300 font-medium">Agent Starts</span>
-                <span className="text-[10px] text-gray-500">K8s / AWS / OIDC</span>
-              </div>
-              <span className="text-gray-600 text-xl">→</span>
-              <div className="flex flex-col items-center p-3 bg-purple-900/30 border border-purple-500/30 rounded-lg">
-                <Key className="text-purple-400 mb-1" size={24} />
-                <span className="text-purple-400 font-medium">Mint</span>
-                <span className="text-[10px] text-gray-500">Badge in (once)</span>
-              </div>
-              <span className="text-gray-600 text-xl">→</span>
-              <div className="flex flex-col items-center p-3 bg-cyan-900/30 border border-cyan-500/30 rounded-lg">
-                <Lock className="text-cyan-400 mb-1" size={24} />
-                <span className="text-cyan-400 font-medium">EZ Pass</span>
-                <span className="text-[10px] text-gray-500">Macaroon + caveats</span>
-              </div>
-              <span className="text-gray-600 text-xl">→</span>
-              <div className="flex flex-col items-center p-3 bg-green-900/30 border border-green-500/30 rounded-lg">
-                <Shield className="text-green-400 mb-1" size={24} />
-                <span className="text-green-400 font-medium">Toll Gate</span>
-                <span className="text-[10px] text-gray-500">Verify · Meter · Budget</span>
-              </div>
-              <span className="text-gray-600 text-xl">→</span>
-              <div className="flex flex-col items-center p-3 bg-gray-800 rounded-lg">
-                <Activity className="text-gray-300 mb-1" size={24} />
-                <span className="text-gray-300 font-medium">Upstream</span>
-                <span className="text-[10px] text-gray-500">Your API</span>
-              </div>
-            </div>
-            <p className="text-xs text-gray-600 text-center mt-6">
-              No identity lookups on the hot path. No per-request auth round-trips. Just cryptographic verification at wire speed.
-            </p>
-          </div>
+
         </div>
       </section>
 
