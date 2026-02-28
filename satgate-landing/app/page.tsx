@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock, DollarSign, Bot, GitBranch, Activity, RefreshCw, Menu, X, Eye, SlidersHorizontal } from 'lucide-react';
+import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock, DollarSign, Bot, GitBranch, Activity, RefreshCw, Menu, X, Eye, SlidersHorizontal, Play } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -143,13 +143,13 @@ const LandingPage = () => {
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
               Not &ldquo;who are you?&rdquo; — <b>&ldquo;what can you afford?&rdquo;</b> Per-agent budgets. Spending caps. Instant revocation. Connect in 5 minutes.
             </p>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
                 Start Free <ArrowRight size={16} />
               </a>
-              <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="border border-gray-700 px-8 py-3 rounded-lg font-bold hover:border-gray-500 transition flex items-center gap-2 text-gray-300">
-                View on GitHub
-              </a>
+              <Link href="/sandbox" className="border border-purple-700/50 bg-purple-900/20 px-8 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition flex items-center gap-2 text-purple-300">
+                <Play size={16} /> Try the Sandbox
+              </Link>
             </div>
           </div>
 
