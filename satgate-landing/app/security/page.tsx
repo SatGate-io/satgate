@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowLeft, Shield, Lock, Eye, AlertTriangle, Key, Zap, CheckCircle, User, Calendar, Code, GitBranch } from 'lucide-react';
+import { ArrowLeft, Shield, Lock, Eye, Key, Zap, CheckCircle, Code, GitBranch, Bot, Activity, Server, FileText } from 'lucide-react';
 
 export const metadata = {
   title: 'Security - SatGate™',
@@ -14,334 +14,308 @@ export default function SecurityPage() {
         </Link>
         
         <h1 className="text-4xl font-bold mb-2">Security</h1>
-        <p className="text-gray-500 mb-12">Capability-based access control for the AI era</p>
+        <p className="text-gray-500 mb-12">Economic Access Control — built by security practitioners, not bolted on after.</p>
 
         <div className="prose prose-invert prose-gray max-w-none space-y-8">
 
-          {/* Capability Security Intro */}
+          {/* Security Model */}
           <section className="bg-gradient-to-r from-purple-900/20 to-cyan-900/20 border border-purple-800/30 rounded-xl p-6">
-            <h2 className="text-xl font-bold text-white mb-4">From Identity to Capabilities</h2>
+            <h2 className="text-xl font-bold text-white mb-4">The Security Model</h2>
             <p className="text-gray-400 leading-relaxed mb-4">
-              Traditional APIs use <strong>identity-based</strong> access: "Prove <em>who you are</em>, then we decide what you can do."
+              SatGate implements <strong className="text-white">Economic Access Control</strong> — a capability-based security model 
+              where every API request must present a cryptographically verified token with embedded access constraints.
+            </p>
+            <p className="text-gray-400 leading-relaxed mb-4">
+              Traditional APIs ask <em>&ldquo;who are you?&rdquo;</em> and maintain identity databases. 
+              SatGate asks <em>&ldquo;what can you afford?&rdquo;</em> — enforcing budgets, scopes, and delegation limits 
+              at the request layer. No user databases. No PII. No credential stuffing surface.
             </p>
             <p className="text-gray-400 leading-relaxed mb-0">
-              SatGate uses <strong>capability-based</strong> access: "Present a cryptographic token that <em>already encodes</em> what you can do."
+              The gateway operates as a <strong className="text-white">Policy Enforcement Point (PEP)</strong>. 
+              No request reaches your upstream without passing cryptographic verification.
             </p>
           </section>
 
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-red-950/20 border border-red-900/30 rounded-xl p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <Lock className="text-red-400" size={18} />
-                <h3 className="font-semibold text-red-300 text-sm">Identity-Based (OAuth/API Keys)</h3>
-              </div>
-              <ul className="text-gray-500 text-sm space-y-1">
-                <li>• Requires user databases & PII</li>
-                <li>• Credential stuffing risks</li>
-                <li>• Agents can't sign up</li>
-              </ul>
-            </div>
-            <div className="bg-green-950/20 border border-green-900/30 rounded-xl p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <Key className="text-green-400" size={18} />
-                <h3 className="font-semibold text-green-300 text-sm">Capability-Based (L402)</h3>
-              </div>
-              <ul className="text-gray-500 text-sm space-y-1">
-                <li className="text-green-400">✓ No accounts required</li>
-                <li className="text-green-400">✓ Payment = Authorization</li>
-                <li className="text-green-400">✓ Perfect for agents</li>
-              </ul>
-            </div>
-          </section>
-          
-          <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+          {/* Mint — Identity Exchange */}
+          <section>
             <div className="flex items-center gap-3 mb-4">
-              <Shield className="text-green-400" size={24} />
-              <h2 className="text-xl font-bold text-white m-0">Non-Custodial Architecture</h2>
-            </div>
-            <p className="text-gray-400 leading-relaxed m-0">
-              SatGate never holds, controls, or has access to your funds. Payments settle directly 
-              from payers to your Lightning node. We never touch your private keys.
-            </p>
-          </section>
-
-          <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Key className="text-purple-400" size={24} />
-              <h2 className="text-xl font-bold text-white m-0">Paid Capabilities (L402)</h2>
+              <Key className="text-purple-400" size={22} />
+              <h2 className="text-xl font-bold text-white mb-0">SatGate Mint — Trust Broker</h2>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              L402 creates a new security primitive: <strong>paid capabilities</strong>. Payment gates token issuance, 
-              and the token itself encodes permissions via macaroon caveats.
+              Agents authenticate through your existing identity infrastructure. SatGate Mint exchanges workload identity tokens 
+              (OIDC JWTs from Kubernetes, AWS IAM, or any OIDC provider) for capability-bearing macaroons with policy-defined constraints.
             </p>
-            <ul className="text-gray-500 text-sm space-y-2">
-              <li><strong className="text-gray-300">Edge Verification:</strong> Tokens verified cryptographically at the gateway—no user database lookup required</li>
-              <li><strong className="text-gray-300">Least Privilege:</strong> Add caveats to constrain scope, time, and budget (e.g., "valid 5 mins", "max 10 calls")</li>
-              <li><strong className="text-gray-300">Delegatable:</strong> Attenuate tokens before passing to sub-agents—permissions only shrink, never grow</li>
+            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5 mb-4">
+              <div className="flex items-center justify-center gap-3 text-sm flex-wrap">
+                <div className="px-3 py-2 rounded bg-gray-800 text-gray-400 text-xs text-center">
+                  <Bot size={16} className="mx-auto mb-1 text-blue-400" />
+                  Agent Identity<br/><span className="text-gray-600">K8s / AWS / OIDC</span>
+                </div>
+                <span className="text-gray-600">→</span>
+                <div className="px-3 py-2 rounded bg-purple-900/40 border border-purple-500/50 text-purple-300 text-xs text-center font-bold">
+                  <Key size={16} className="mx-auto mb-1" />
+                  SatGate Mint<br/><span className="text-gray-500 font-normal">Verify + Policy Match</span>
+                </div>
+                <span className="text-gray-600">→</span>
+                <div className="px-3 py-2 rounded bg-cyan-900/30 border border-cyan-500/50 text-cyan-400 text-xs text-center">
+                  <Lock size={16} className="mx-auto mb-1" />
+                  Macaroon<br/><span className="text-gray-500">Budget + Scope + TTL</span>
+                </div>
+              </div>
+            </div>
+            <ul className="text-gray-400 text-sm space-y-2 list-none pl-0">
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Zero secrets to manage.</strong> Agents present their existing workload identity — no API keys to rotate, no credentials to store.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Policy-driven issuance.</strong> Each agent policy defines budget, scope, TTL, and delegation permissions. Different agents get different constraints.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Multi-provider support.</strong> Same issuer with different audiences routes to different policies — enforce different budgets per agent class.</span></li>
             </ul>
           </section>
 
-          {/* Why Macaroons */}
-          <section className="bg-gradient-to-r from-yellow-900/10 to-orange-900/10 border border-yellow-800/20 rounded-xl p-6">
+          {/* Macaroons */}
+          <section>
             <div className="flex items-center gap-3 mb-4">
-              <Key className="text-yellow-400" size={24} />
-              <h2 className="text-xl font-bold text-white m-0">Why Macaroons Beat API Keys</h2>
+              <Lock className="text-cyan-400" size={22} />
+              <h2 className="text-xl font-bold text-white mb-0">Why Macaroons</h2>
             </div>
-            <p className="text-gray-400 leading-relaxed mb-6">
-              API keys are passwords. JWTs are ID cards. Macaroons are <strong>signed checks with spending limits</strong> — 
+            <p className="text-gray-400 leading-relaxed mb-4">
+              API keys are passwords. JWTs are ID cards. Macaroons are <strong className="text-white">signed checks with spending limits</strong> — 
               and every person who touches the check can only reduce the limit, never increase it.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-gray-900/50 rounded-lg p-4">
-                <h3 className="font-semibold text-yellow-300 text-sm mb-2">Delegation Without Calling Home</h3>
-                <p className="text-gray-500 text-sm m-0">
-                  A VP mints a token, carves off a weaker one for their team lead, who carves off an even weaker one for an agent. 
-                  Each step is cryptographically chained — no API call, no DB write, no admin portal. Permissions only shrink, never grow.
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
+                <h4 className="text-white text-sm font-bold mb-2">Delegation Without Calling Home</h4>
+                <p className="text-gray-500 text-xs">
+                  A manager mints a token, carves off a weaker one for their team, who delegates further to an agent. 
+                  Each step is cryptographically chained — no API call, no DB write. Permissions only shrink.
                 </p>
               </div>
-              <div className="bg-gray-900/50 rounded-lg p-4">
-                <h3 className="font-semibold text-yellow-300 text-sm mb-2">Runtime Conditions Built In</h3>
-                <p className="text-gray-500 text-sm m-0">
-                  Macaroon caveats encode constraints like &ldquo;only valid until 5pm,&rdquo; &ldquo;only for /openai/*,&rdquo; or 
-                  &ldquo;max 200 credits.&rdquo; These are verified at the gateway on every request. The token <em>itself</em> carries 
-                  the budget constraint.
+              <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
+                <h4 className="text-white text-sm font-bold mb-2">Runtime Constraints Built In</h4>
+                <p className="text-gray-500 text-xs">
+                  Caveats encode &ldquo;only until 5pm,&rdquo; &ldquo;only for /openai/*,&rdquo; or &ldquo;max 200 credits.&rdquo; 
+                  Verified at the gateway on every request. The token carries its own budget.
                 </p>
               </div>
-              <div className="bg-gray-900/50 rounded-lg p-4">
-                <h3 className="font-semibold text-yellow-300 text-sm mb-2">The Right Primitive for Agents</h3>
-                <p className="text-gray-500 text-sm m-0">
-                  Agents can&apos;t sign up for accounts. They can&apos;t do OAuth flows. But they can hold a bearer token 
+              <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
+                <h4 className="text-white text-sm font-bold mb-2">The Right Primitive for Agents</h4>
+                <p className="text-gray-500 text-xs">
+                  Agents can&apos;t do OAuth flows or sign up for accounts. But they can hold a bearer token 
                   that encodes exactly what they&apos;re allowed to do and spend. That&apos;s a macaroon.
                 </p>
               </div>
             </div>
-          </section>
 
-          <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Zap className="text-yellow-400" size={24} />
-              <h2 className="text-xl font-bold text-white m-0">Economic Abuse Friction</h2>
+            <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
+              <h4 className="text-white text-sm font-bold mb-2">Cascade Revocation</h4>
+              <p className="text-gray-500 text-xs mb-0">
+                Revoking a parent token instantly invalidates all of its children. No propagation delay — 
+                the gateway checks revocation status on every request. Admin kill switch: immediate.
+              </p>
             </div>
-            <p className="text-gray-400 leading-relaxed m-0">
-              Spam becomes expensive and self-limiting. High-volume callers must continuously pay to continue. 
-              This complements (not replaces) your existing WAF/CDN for network-layer protection.
-            </p>
           </section>
 
-          {/* Zero Trust Section */}
-          <section className="bg-gradient-to-r from-cyan-900/20 to-purple-900/20 border border-cyan-800/30 rounded-xl p-6">
+          {/* Enforcement Modes */}
+          <section>
             <div className="flex items-center gap-3 mb-4">
-              <Shield className="text-cyan-400" size={24} />
-              <h2 className="text-xl font-bold text-white m-0">Zero Trust Access Control (PEP)</h2>
+              <Shield className="text-purple-400" size={22} />
+              <h2 className="text-xl font-bold text-white mb-0">Enforcement Modes</h2>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              SatGate is a <strong>Zero Trust Policy Enforcement Point</strong> for paid and capability-based API access. 
-              It verifies every protected request and enforces scoped access via L402/macaroons—no network trust assumptions.
+              Three modes, one adoption path. Start safe, add enforcement when ready.
             </p>
-            
-            <h3 className="text-sm font-semibold text-gray-300 mb-3 mt-6">How SatGate maps to Zero Trust concepts</h3>
-            <ul className="text-gray-500 text-sm space-y-3">
-              <li>
-                <strong className="text-gray-300">Policy Enforcement Point (PEP):</strong>{' '}
-                The gateway sits in front of services and enforces access decisions on every request (deny-by-default for protected routes).
-              </li>
-              <li>
-                <strong className="text-gray-300">Continuous Authorization:</strong>{' '}
-                Rather than trusting a network zone or long-lived credential, SatGate validates an L402 token on each request before proxying.
-              </li>
-              <li>
-                <strong className="text-gray-300">Least Privilege:</strong>{' '}
-                Macaroon caveats enable fine-grained restriction (route, method, TTL, budget), reducing blast radius and enabling safe delegation.
-              </li>
-              <li>
-                <strong className="text-gray-300">Reduced Trust Dependencies:</strong>{' '}
-                Authorization is cryptographic, not reliant on a centralized user database. Optional state can be used for metering/quotas without requiring PII.
-              </li>
-            </ul>
+            <div className="space-y-3">
+              <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 flex items-start gap-4">
+                <Eye size={20} className="text-green-400 mt-1 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white text-sm font-bold">Observe</h4>
+                  <p className="text-gray-500 text-xs mb-0">Verify → Allow → Log. Full visibility into agent traffic, cost attribution by team, zero enforcement. Free forever.</p>
+                </div>
+              </div>
+              <div className="bg-gray-900/50 border border-purple-800/30 rounded-lg p-4 flex items-start gap-4">
+                <Shield size={20} className="text-purple-400 mt-1 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white text-sm font-bold">Control</h4>
+                  <p className="text-gray-500 text-xs mb-0">Verify → Enforce Budget → Allow. Per-agent spending caps, real-time budget enforcement. Works with Stripe, ERP — no crypto required. HTTP 402 when budget exhausted.</p>
+                </div>
+              </div>
+              <div className="bg-gray-900/50 border border-yellow-800/30 rounded-lg p-4 flex items-start gap-4">
+                <Zap size={20} className="text-yellow-400 mt-1 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white text-sm font-bold">Charge</h4>
+                  <p className="text-gray-500 text-xs mb-0">Verify → Payment Proof → Allow. L402 Lightning micropayments. Per-request pricing. Instant settlement, no invoices, no chargebacks.</p>
+                </div>
+              </div>
+            </div>
+          </section>
 
-            <div className="mt-6 pt-4 border-t border-gray-800">
-              <h3 className="text-sm font-semibold text-gray-300 mb-3">What SatGate is (and isn't)</h3>
-              <ul className="text-gray-500 text-sm space-y-1">
-                <li className="text-green-400">✓ Zero Trust PEP for API access (request-level verification + least privilege)</li>
-                <li className="text-green-400">✓ Complements existing security stack (WAF/CDN, rate limiting, SIEM)</li>
-                <li className="text-yellow-400">⚠ Not a full Zero Trust program (identity governance, device posture, microsegmentation)</li>
+          {/* Non-Custodial Architecture */}
+          <section>
+            <div className="flex items-center gap-3 mb-4">
+              <Server className="text-blue-400" size={22} />
+              <h2 className="text-xl font-bold text-white mb-0">Non-Custodial Architecture</h2>
+            </div>
+            <ul className="text-gray-400 text-sm space-y-2 list-none pl-0">
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Never stores upstream credentials.</strong> SatGate verifies tokens at the gateway. Your API keys, secrets, and upstream credentials stay in your infrastructure.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">No request body inspection.</strong> Gateway inspects only token and routing metadata. Request payloads pass through opaque (MCP proxy reads method/tool name for cost attribution only).</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Tenant-isolated data.</strong> All data scoped by tenant_id. Cross-tenant access is architecturally impossible.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Lightning payments settle directly.</strong> In Charge mode, payments go from payer to your Lightning node. SatGate never touches funds.</span></li>
+            </ul>
+          </section>
+
+          {/* Zero Trust */}
+          <section>
+            <div className="flex items-center gap-3 mb-4">
+              <Activity className="text-cyan-400" size={22} />
+              <h2 className="text-xl font-bold text-white mb-0">Zero Trust Access Control</h2>
+            </div>
+            <p className="text-gray-400 leading-relaxed mb-4">
+              SatGate is a Zero Trust Policy Enforcement Point for API access. It verifies every request and 
+              enforces scoped access — no network trust assumptions.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+              {[
+                { label: 'Policy Enforcement Point', desc: 'Deny-by-default. Every protected request verified before proxying.' },
+                { label: 'Continuous Authorization', desc: 'Token validated on each request — no long-lived sessions or network zone trust.' },
+                { label: 'Least Privilege', desc: 'Macaroon caveats restrict scope, method, TTL, and budget per token.' },
+                { label: 'No Trust Dependencies', desc: 'Cryptographic verification — no centralized user database required.' },
+              ].map((item, i) => (
+                <div key={i} className="bg-gray-900/50 border border-gray-800 rounded-lg p-3">
+                  <h4 className="text-white text-xs font-bold mb-1">{item.label}</h4>
+                  <p className="text-gray-500 text-xs mb-0">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+            <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
+              <h4 className="text-white text-sm font-bold mb-2">What SatGate is (and isn&apos;t)</h4>
+              <ul className="text-gray-400 text-xs space-y-1 list-none pl-0 mb-0">
+                <li><span className="text-green-400">✓</span> Zero Trust PEP for API access (request-level verification + least privilege)</li>
+                <li><span className="text-green-400">✓</span> Economic abuse friction — high-volume abuse becomes self-limiting</li>
+                <li><span className="text-green-400">✓</span> Complements existing security stack (WAF/CDN, rate limiting, SIEM)</li>
+                <li><span className="text-yellow-400">⚠</span> Not a full Zero Trust program (identity governance, device posture, microsegmentation)</li>
               </ul>
             </div>
           </section>
 
-          <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+          {/* Audit & Compliance */}
+          <section>
             <div className="flex items-center gap-3 mb-4">
-              <Eye className="text-cyan-400" size={24} />
-              <h2 className="text-xl font-bold text-white m-0">Open Source Transparency</h2>
+              <FileText className="text-orange-400" size={22} />
+              <h2 className="text-xl font-bold text-white mb-0">Audit & Compliance</h2>
             </div>
-            <p className="text-gray-400 leading-relaxed m-0">
-              All SatGate code is open source under the MIT License. You can audit every line, 
-              fork it, and run your own infrastructure. No black boxes.
-            </p>
-            <a 
-              href="https://github.com/SatGate-io/satgate" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-block mt-4 text-purple-400 hover:text-purple-300"
-            >
-              View Source on GitHub →
-            </a>
-          </section>
-
-          {/* Security Practices */}
-          <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Code className="text-blue-400" size={24} />
-              <h2 className="text-xl font-bold text-white m-0">Security Practices</h2>
-            </div>
-            <ul className="text-gray-500 text-sm space-y-3">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="text-green-400 mt-0.5 flex-shrink-0" size={16} />
-                <span><strong className="text-gray-300">Dependency Management:</strong> Automated updates via Dependabot, vulnerability scanning via GitHub Security Advisories, Go modules with checksum verification</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="text-green-400 mt-0.5 flex-shrink-0" size={16} />
-                <span><strong className="text-gray-300">Code Quality:</strong> Required code review for all changes, automated testing on every PR, static analysis and linting enforced</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="text-green-400 mt-0.5 flex-shrink-0" size={16} />
-                <span><strong className="text-gray-300">Infrastructure:</strong> TLS 1.3 required, no sensitive data persistence in gateway by default, Kubernetes-native with pod security standards</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="text-green-400 mt-0.5 flex-shrink-0" size={16} />
-                <span><strong className="text-gray-300">Minimal Attack Surface:</strong> Stateless gateway design, minimal dependency footprint, secrets never transit the gateway layer</span>
-              </li>
+            <ul className="text-gray-400 text-sm space-y-2 list-none pl-0">
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">55 event types</strong> across 12 categories in immutable audit log. Every mint, revocation, delegation, budget change, and config update recorded.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Real-time alerts</strong> via Slack, Discord, email, or custom webhooks for critical events.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Shadow Report</strong> — real-time dashboard showing all agent traffic, spend, and policy violations.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Export</strong> — CSV/JSON export for audit log and billing data via dashboard and API.</span></li>
             </ul>
           </section>
 
-          {/* Leadership */}
-          <section className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-800/30 rounded-xl p-6">
+          {/* Security Practices */}
+          <section>
             <div className="flex items-center gap-3 mb-4">
-              <User className="text-blue-400" size={24} />
-              <h2 className="text-xl font-bold text-white m-0">Leadership</h2>
+              <Code className="text-green-400" size={22} />
+              <h2 className="text-xl font-bold text-white mb-0">Security Practices</h2>
             </div>
-            <p className="text-gray-400 leading-relaxed mb-4">
-              SatGate was founded by{' '}
-              <a 
-                href="https://linkedin.com/in/waynemattadeen" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-300"
-              >
-                Wayne Mattadeen
-              </a>
-              , a cybersecurity executive with <strong className="text-gray-300">27+ years of experience</strong> across 
-              Deloitte, Accenture, and EY—including partner-level roles focused on enterprise security architecture and Zero Trust.
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {[
+                { title: 'Open Source', items: ['Core gateway is MIT licensed', 'Full source audit at any time', 'No black boxes'] },
+                { title: 'Dependencies', items: ['Automated Dependabot updates', 'Go vulnerability scanning', 'Checksum verification'] },
+                { title: 'Infrastructure', items: ['TLS 1.2+ enforced', 'Stateless gateway design', 'Minimal attack surface'] },
+                { title: 'Code Quality', items: ['Required code review', 'Automated tests on every PR', 'Static analysis enforced'] },
+              ].map((group, i) => (
+                <div key={i} className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
+                  <h4 className="text-white text-sm font-bold mb-2">{group.title}</h4>
+                  <ul className="text-gray-500 text-xs space-y-1 list-none pl-0 mb-0">
+                    {group.items.map((item, j) => (
+                      <li key={j} className="flex items-center gap-1.5"><CheckCircle size={10} className="text-green-500 flex-shrink-0" /> {item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Security Posture Pack CTA */}
+          <section className="bg-purple-900/20 border border-purple-800/30 rounded-xl p-6 text-center">
+            <h2 className="text-xl font-bold text-white mb-3">Enterprise Security Review</h2>
+            <p className="text-gray-400 text-sm mb-4">
+              Need to evaluate SatGate for your security team? Download the full Security Posture Pack — 
+              covers architecture, encryption, data handling, audit, and compliance.
             </p>
-            <p className="text-gray-400 leading-relaxed m-0">
-              Security isn't something we're learning. It's where we come from.
+            <a 
+              href="https://cloud.satgate.io/docs/security-pack" 
+              className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-bold transition"
+            >
+              <FileText size={16} /> View Security Posture Pack →
+            </a>
+          </section>
+
+          {/* Leadership */}
+          <section>
+            <h2 className="text-xl font-bold text-white mb-3">Leadership</h2>
+            <p className="text-gray-400 leading-relaxed">
+              SatGate was founded by{' '}
+              <a href="https://linkedin.com/in/waynemattadeen" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">Wayne Mattadeen</a>, 
+              a cybersecurity executive with 27+ years of experience across Deloitte, Accenture, and EY — including 
+              partner-level roles focused on enterprise security architecture and Zero Trust.
+            </p>
+            <p className="text-gray-400 leading-relaxed">
+              Security isn&apos;t something we&apos;re learning. It&apos;s where we come from.
             </p>
           </section>
 
           {/* Compliance Roadmap */}
-          <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Calendar className="text-purple-400" size={24} />
-              <h2 className="text-xl font-bold text-white m-0">Compliance Roadmap</h2>
-            </div>
-            <p className="text-gray-400 leading-relaxed mb-4">
-              We're building toward formal certifications as we scale:
-            </p>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <CheckCircle className="text-green-400 flex-shrink-0" size={18} />
-                <span className="text-gray-300">Responsible disclosure program</span>
-                <span className="text-green-400 text-sm ml-auto">Active</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <CheckCircle className="text-green-400 flex-shrink-0" size={18} />
-                <span className="text-gray-300">Automated vulnerability scanning</span>
-                <span className="text-green-400 text-sm ml-auto">Active</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <GitBranch className="text-yellow-400 flex-shrink-0" size={18} />
-                <span className="text-gray-300">Third-party penetration test</span>
-                <span className="text-yellow-400 text-sm ml-auto">Q2 2026</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <GitBranch className="text-gray-500 flex-shrink-0" size={18} />
-                <span className="text-gray-400">SOC 2 Type I</span>
-                <span className="text-gray-500 text-sm ml-auto">Post-revenue</span>
-              </div>
+          <section>
+            <h2 className="text-xl font-bold text-white mb-3">Compliance Roadmap</h2>
+            <div className="bg-gray-900/50 border border-gray-800 rounded-lg overflow-hidden">
+              {[
+                { item: 'Responsible disclosure program', status: 'Active', color: 'text-green-400' },
+                { item: 'Automated vulnerability scanning', status: 'Active', color: 'text-green-400' },
+                { item: 'Open source core (MIT)', status: 'Active', color: 'text-green-400' },
+                { item: 'Third-party penetration test', status: 'Q2 2026', color: 'text-yellow-400' },
+                { item: 'SOC 2 Type I', status: 'Post-revenue', color: 'text-gray-500' },
+              ].map((item, i) => (
+                <div key={i} className={`flex items-center justify-between px-4 py-2.5 text-sm ${i > 0 ? 'border-t border-gray-800' : ''}`}>
+                  <span className="text-gray-400">{item.item}</span>
+                  <span className={`text-xs font-bold ${item.color}`}>{item.status}</span>
+                </div>
+              ))}
             </div>
           </section>
 
+          {/* Responsible Disclosure */}
           <section>
-            <h2 className="text-2xl font-bold text-white mb-4">Best Practices</h2>
-            <ul className="list-disc list-inside text-gray-400 space-y-2">
-              <li>Keep your capability root key secure—treat it like a password</li>
-              <li>Use environment variables for sensitive configuration</li>
-              <li>Deploy behind a CDN/WAF (Cloudflare, AWS Shield) for network-layer protection</li>
-              <li>Set appropriate macaroon expiration times in your gateway.yaml</li>
-              <li>Monitor your Lightning node for unusual activity</li>
+            <h2 className="text-xl font-bold text-white mb-3">Responsible Disclosure</h2>
+            <p className="text-gray-400 text-sm leading-relaxed mb-3">
+              Found a security vulnerability? Please report issues privately before public disclosure.
+            </p>
+            <p className="text-gray-400 text-sm mb-3">
+              Email: <a href="mailto:security@satgate.io" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">security@satgate.io</a>
+            </p>
+            <ul className="text-gray-500 text-sm space-y-1 list-none pl-0">
+              <li>• Acknowledge receipt within 48 hours</li>
+              <li>• Initial assessment within 7 days</li>
+              <li>• Coordinated disclosure</li>
+              <li>• Public credit (unless you prefer anonymity)</li>
             </ul>
           </section>
 
-          <section className="bg-yellow-900/20 border border-yellow-800/50 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <AlertTriangle className="text-yellow-400" size={24} />
-              <h2 className="text-xl font-bold text-white m-0">Responsible Disclosure</h2>
+          {/* Open Source */}
+          <section className="text-center pb-8">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <GitBranch className="text-gray-400" size={18} />
+              <h2 className="text-xl font-bold text-white mb-0">Open Source Transparency</h2>
             </div>
-            <p className="text-gray-400 leading-relaxed mb-4">
-              Found a security vulnerability? We appreciate responsible disclosure. Please report 
-              security issues privately before public disclosure.
+            <p className="text-gray-400 text-sm mb-4">
+              All gateway code is open source under the MIT License. Audit every line, fork it, run your own infrastructure.
             </p>
-            <p className="text-gray-400 leading-relaxed mb-4">
-              Email:{' '}
-              <a href="mailto:security@satgate.io" className="text-yellow-400 hover:text-yellow-300 font-mono">
-                security@satgate.io
-              </a>
-            </p>
-            <div className="mt-4 pt-4 border-t border-yellow-800/30">
-              <p className="text-gray-500 text-sm mb-2"><strong className="text-gray-400">Our commitment:</strong></p>
-              <ul className="text-gray-500 text-sm space-y-1">
-                <li>• Acknowledge receipt within 48 hours</li>
-                <li>• Provide initial assessment within 7 days</li>
-                <li>• Work with you on coordinated disclosure</li>
-                <li>• Credit you publicly (unless you prefer anonymity)</li>
-              </ul>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-bold text-white mb-4">What SatGate Protects Against</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-gray-800">
-                    <th className="text-left py-3 text-gray-400 font-medium">Threat</th>
-                    <th className="text-left py-3 text-gray-400 font-medium">Protection</th>
-                  </tr>
-                </thead>
-                <tbody className="text-gray-400">
-                  <tr className="border-b border-gray-800">
-                    <td className="py-3">API scraping</td>
-                    <td className="py-3 text-green-400">✓ Economic cost per request</td>
-                  </tr>
-                  <tr className="border-b border-gray-800">
-                    <td className="py-3">Bot abuse</td>
-                    <td className="py-3 text-green-400">✓ Payment required = economic friction</td>
-                  </tr>
-                  <tr className="border-b border-gray-800">
-                    <td className="py-3">Credential theft</td>
-                    <td className="py-3 text-green-400">✓ Tokens can have short expiration</td>
-                  </tr>
-                  <tr className="border-b border-gray-800">
-                    <td className="py-3">Chargebacks</td>
-                    <td className="py-3 text-green-400">✓ Lightning payments are final</td>
-                  </tr>
-                  <tr className="border-b border-gray-800">
-                    <td className="py-3">Network DDoS (volumetric)</td>
-                    <td className="py-3 text-yellow-400">⚠ Use CDN/WAF (Cloudflare, etc.)</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <a 
+              href="https://github.com/SatGate-io/satgate" 
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-sm font-medium text-gray-300 transition"
+            >
+              <Code size={16} /> View Source on GitHub →
+            </a>
           </section>
 
         </div>
@@ -349,4 +323,3 @@ export default function SecurityPage() {
     </div>
   );
 }
-
