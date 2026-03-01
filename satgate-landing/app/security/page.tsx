@@ -272,7 +272,7 @@ export default function SecurityPage() {
               {[
                 { item: 'Responsible disclosure program', status: 'Active', color: 'text-green-400' },
                 { item: 'Automated vulnerability scanning', status: 'Active', color: 'text-green-400' },
-                { item: 'Open source core (MIT)', status: 'Active', color: 'text-green-400' },
+                { item: 'Open source core (Apache 2.0)', status: 'Active', color: 'text-green-400' },
                 { item: 'Third-party penetration test', status: 'Q2 2026', color: 'text-yellow-400' },
                 { item: 'SOC 2 Type I', status: 'Post-revenue', color: 'text-gray-500' },
               ].map((item, i) => (
@@ -308,7 +308,7 @@ export default function SecurityPage() {
               <h2 className="text-xl font-bold text-white mb-0">Open Source Transparency</h2>
             </div>
             <p className="text-gray-400 text-sm mb-4">
-              All gateway code is open source under the MIT License. Audit every line, fork it, run your own infrastructure.
+              All gateway code is open source under the Apache 2.0 License. Audit every line, fork it, run your own infrastructure.
             </p>
             <a 
               href="https://github.com/SatGate-io/satgate" 
