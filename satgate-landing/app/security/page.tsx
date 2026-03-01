@@ -219,7 +219,7 @@ export default function SecurityPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[
-                { title: 'Open Source', items: ['Core gateway is MIT licensed', 'Full source audit at any time', 'No black boxes'] },
+                { title: 'Open Source', items: ['Core gateway is Apache 2.0 licensed', 'Full source audit at any time', 'No black boxes'] },
                 { title: 'Dependencies', items: ['Automated Dependabot updates', 'Go vulnerability scanning', 'Checksum verification'] },
                 { title: 'Infrastructure', items: ['TLS 1.2+ enforced', 'Stateless gateway design', 'Minimal attack surface'] },
                 { title: 'Code Quality', items: ['Required code review', 'Automated tests on every PR', 'Static analysis enforced'] },
