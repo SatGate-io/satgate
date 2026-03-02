@@ -60,9 +60,9 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-bold text-white mb-4">5. Open Source License</h2>
             <p className="text-gray-400 leading-relaxed">
-              The SatGate open-source software is released under the MIT License. You may use, modify, and distribute 
+              The SatGate open-source software is released under the Apache 2.0 License. You may use, modify, and distribute 
               the software in accordance with that license. Enterprise features are available under a separate 
-              commercial license. The MIT-licensed software is provided &quot;as is&quot; without warranty.
+              commercial license. The Apache 2.0-licensed software is provided &quot;as is&quot; without warranty.
             </p>
           </section>
 

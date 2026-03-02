@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Key, Shield, CheckCircle, Copy, Check, Loader2, ChevronDown, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Key, Shield, CheckCircle, Copy, Check, Loader2, ChevronDown, ExternalLink } from 'lucide-react';
 
 const PRESETS = [
   { id: 'research-agent', label: 'Research Agent', desc: 'K8s namespace: ai-agents, 1000 credits/day', icon: '🔬' },
@@ -111,46 +111,44 @@ export default function MintDemoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white">
+    <div className="min-h-screen bg-black text-gray-100 font-sans">
       {/* Header */}
-      <nav className="border-b border-gray-800/50 backdrop-blur-sm sticky top-0 z-50 bg-[#0a0a0f]/80">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-white font-semibold">
-            <Shield size={20} className="text-purple-400" />
-            SatGate
+      <div className="border-b border-gray-800 bg-black/80 backdrop-blur-sm sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="text-gray-500 hover:text-white flex items-center gap-2 transition">
+            <ArrowLeft size={18} /> <span className="hidden sm:inline">Back to Home</span>
           </Link>
-          <div className="flex items-center gap-4">
-            <Link href="https://cloud.satgate.io/docs/guides/mint-identity" className="text-gray-400 hover:text-white text-sm transition">
-              Docs
-            </Link>
-            <Link
-              href="https://cloud.satgate.io/cloud/mint"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-medium transition"
-            >
-              Configure Mint <ExternalLink size={14} />
-            </Link>
-          </div>
-        </div>
-      </nav>
-
-      <div className="max-w-4xl mx-auto px-6 py-16">
-        {/* Hero */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/10 border border-purple-500/20 rounded-full text-purple-300 text-sm mb-6">
-            <Key size={14} />
-            Interactive Demo
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Identity → Macaroon
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-              in One API Call
+          <h1 className="text-lg sm:text-xl font-bold flex items-center gap-2">
+            <Key className="text-purple-400" size={24} />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
+              Mint Demo
             </span>
           </h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <Link
+            href="https://cloud.satgate.io/cloud/mint"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-medium transition"
+          >
+            Configure Mint <ExternalLink size={14} />
+          </Link>
+        </div>
+      </div>
+
+      {/* Hero Description */}
+      <div className="bg-gradient-to-b from-purple-950/20 to-transparent border-b border-gray-800/50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400">
+              Identity → Macaroon in One API Call
+            </span>
+          </h2>
+          <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
             Watch SatGate Mint exchange a workload identity token for a capability-bearing macaroon. 
             No secrets to manage. No tokens to rotate. The identity <em>is</em> the credential.
           </p>
         </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
 
         {/* Preset Selector */}
         <div className="mb-8">

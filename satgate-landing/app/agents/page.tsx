@@ -22,8 +22,9 @@ export default function AgentsLandingPage() {
             <span className="text-lg sm:text-xl font-bold text-white whitespace-nowrap">SatGate<sup className="text-xs font-normal">™</sup></span>
           </Link>
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
-            <Link href="/" className="hover:text-white transition">Home</Link>
-            <Link href="/agents" className="text-white">Agents</Link>
+            <Link href="/mint-demo" className="hover:text-white transition">Mint Demo</Link>
+            <Link href="/protect" className="hover:text-white transition">Control Demo</Link>
+            <Link href="/pay" className="hover:text-white transition">Charge Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>

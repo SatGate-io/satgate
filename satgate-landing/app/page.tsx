@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock, DollarSign, Bot, GitBranch, Activity, RefreshCw, Menu, X, Eye, SlidersHorizontal } from 'lucide-react';
+import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock, DollarSign, Bot, GitBranch, Activity, RefreshCw, Menu, X, Eye, SlidersHorizontal, Play } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -28,7 +28,9 @@ const LandingPage = () => {
           
           {/* Desktop menu */}
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
-            <Link href="/agents" className="hover:text-white transition">Agents</Link>
+            <Link href="/mint-demo" className="hover:text-white transition">Mint Demo</Link>
+            <Link href="/protect" className="hover:text-white transition">Control Demo</Link>
+            <Link href="/pay" className="hover:text-white transition">Charge Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
@@ -55,11 +57,25 @@ const LandingPage = () => {
         >
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
             <Link 
-              href="/agents" 
+              href="/mint-demo" 
               onClick={() => setMobileMenuOpen(false)} 
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
-              Agents
+              Mint Demo
+            </Link>
+            <Link 
+              href="/protect" 
+              onClick={() => setMobileMenuOpen(false)} 
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              Control Demo
+            </Link>
+            <Link 
+              href="/pay" 
+              onClick={() => setMobileMenuOpen(false)} 
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              Charge Demo
             </Link>
             <Link 
               href="/govern" 
@@ -122,18 +138,26 @@ const LandingPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              Every tool call — authenticated, logged, cost-tracked, and budget-enforced. The <b className="text-white">Economic Firewall</b> for AI agent requests.
+              Control agent spend at the request layer. Every API call is verified, attributed, and governed — before it hits your upstream.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
-              Not &ldquo;who are you?&rdquo; — <b>&ldquo;what can you afford?&rdquo;</b> Per-agent budgets. Per-tool costs. Delegation hierarchies. Connect in 5 minutes.
+              Not &ldquo;who are you?&rdquo; — <b>&ldquo;what can you afford?&rdquo;</b> Drop-in gateway. Connect in ~5 minutes.
             </p>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
                 Start Free <ArrowRight size={16} />
               </a>
-              <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="border border-gray-700 px-8 py-3 rounded-lg font-bold hover:border-gray-500 transition flex items-center gap-2 text-gray-300">
-                View on GitHub
-              </a>
+              <Link href="/sandbox" className="border border-purple-700/50 bg-purple-900/20 px-8 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition flex items-center gap-2 text-purple-300">
+                <Play size={16} /> Try the Sandbox
+              </Link>
+            </div>
+
+            {/* Proof anchors */}
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-6 text-xs text-gray-500">
+              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Open source — <a href="https://github.com/SatGate-io/satgate" className="text-gray-400 hover:text-white transition underline underline-offset-2">GitHub</a></span>
+              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Sub-ms verification overhead</span>
+              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Design partners in pilot</span>
+              <span className="flex items-center gap-1.5"><Shield size={12} className="text-purple-400" /> <Link href="/security" className="text-gray-400 hover:text-white transition underline underline-offset-2">Security model →</Link></span>
             </div>
           </div>
 
@@ -159,18 +183,18 @@ const LandingPage = () => {
                 <img src="/satgate-hero-demo.gif" alt="SatGate Demo" className="w-full" />
               </video>
               <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-gray-300 font-mono">
-                ⚡ Metered in sats
+                🚗💨 EZ Pass — live metering
               </div>
             </div>
             <div className="text-center mt-4">
               <p className="text-sm text-gray-500 mb-3">
-                Watch an AI agent autonomously pay for API access in real-time.
+                Agents badge in once. Every request — verified, metered, budget-enforced.
               </p>
               <Link 
-                href="/pay" 
+                href="/protect" 
                 className="inline-flex items-center gap-2 text-sm font-medium text-purple-400 hover:text-purple-300 transition"
               >
-                Try it live in 15 seconds <ArrowRight size={14} />
+                See how it works <ArrowRight size={14} />
               </Link>
             </div>
           </div>
@@ -258,8 +282,8 @@ const LandingPage = () => {
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ Real-time budget enforcement</li>
-                <li>✓ Fiat402 challenge/response</li>
-                <li>✓ ERP/billing integration</li>
+                <li>✓ Works with Stripe, ERP — no crypto required</li>
+                <li>✓ Per-agent spending caps</li>
               </ul>
             </div>
 
@@ -306,108 +330,115 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Where It Fits Section */}
-      <section className="py-16 px-6 border-b border-gray-800">
+      {/* EZ Pass — Agent Token Flow (pulled up per feedback) */}
+      <section className="py-16 px-6 border-b border-gray-800 bg-gradient-to-b from-purple-950/10 to-black">
         <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-2">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-3">
+              🚗💨 THE EZ PASS FOR API TRAFFIC
+            </span>
+            <h2 className="text-2xl font-bold mb-2">Badge in once. Fly through every gate.</h2>
+            <p className="text-gray-400 text-sm max-w-xl mx-auto">
+              Agents get a credential at startup — like mounting an EZ Pass. Every request after that flows through the gateway: verified, metered, no slowdowns.
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-2 md:gap-4 flex-wrap text-sm mt-8">
+            <div className="flex flex-col items-center p-3 bg-gray-800 rounded-lg">
+              <Bot className="text-gray-300 mb-1" size={24} />
+              <span className="text-gray-300 font-medium">Agent Starts</span>
+              <span className="text-[10px] text-gray-500">K8s / AWS / OIDC</span>
+            </div>
+            <span className="text-gray-600 text-xl">→</span>
+            <div className="flex flex-col items-center p-3 bg-purple-900/30 border border-purple-500/30 rounded-lg">
+              <Key className="text-purple-400 mb-1" size={24} />
+              <span className="text-purple-400 font-medium">Mint</span>
+              <span className="text-[10px] text-gray-500">Badge in (once)</span>
+            </div>
+            <span className="text-gray-600 text-xl">→</span>
+            <div className="flex flex-col items-center p-3 bg-cyan-900/30 border border-cyan-500/30 rounded-lg">
+              <Lock className="text-cyan-400 mb-1" size={24} />
+              <span className="text-cyan-400 font-medium">EZ Pass</span>
+              <span className="text-[10px] text-gray-500">Capability token</span>
+            </div>
+            <span className="text-gray-600 text-xl">→</span>
+            <div className="flex flex-col items-center p-3 bg-green-900/30 border border-green-500/30 rounded-lg">
+              <Shield className="text-green-400 mb-1" size={24} />
+              <span className="text-green-400 font-medium">Toll Gate</span>
+              <span className="text-[10px] text-gray-500">Verify · Meter · Budget</span>
+            </div>
+            <span className="text-gray-600 text-xl">→</span>
+            <div className="flex flex-col items-center p-3 bg-gray-800 rounded-lg">
+              <Activity className="text-gray-300 mb-1" size={24} />
+              <span className="text-gray-300 font-medium">Upstream</span>
+              <span className="text-[10px] text-gray-500">Your API</span>
+            </div>
+          </div>
+          <p className="text-xs text-gray-600 text-center mt-6">
+            No identity lookups on the hot path. No per-request auth round-trips. Just cryptographic verification at wire speed.
+          </p>
+        </div>
+      </section>
+
+      {/* Where It Fits Section — Clean diagrams */}
+      <section className="py-16 px-6 border-b border-gray-800">
+        <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-bold text-center mb-3">Where It Fits</h2>
-          <p className="text-gray-500 text-center mb-10">Drop-in deployment. Minimal code changes.</p>
-          
-          {/* Architecture Diagram */}
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8 mb-8">
-            <h4 className="text-center text-sm font-semibold text-gray-400 mb-6">STANDARD DEPLOYMENT</h4>
-            <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
-              <div className="px-5 py-3 rounded-lg bg-gray-800 border border-gray-700 text-center min-w-[140px]">
-                <span className="text-gray-300 font-medium">Client / Agent</span>
-              </div>
-              <span className="text-gray-600 text-xl hidden md:block">→</span>
-              <span className="text-gray-600 md:hidden">↓</span>
-              <div className="px-5 py-3 rounded-lg bg-cyan-900/30 border border-cyan-700/50 text-center min-w-[140px]">
-                <span className="text-cyan-400 font-medium">CDN / WAF</span>
-              </div>
-              <span className="text-gray-600 text-xl hidden md:block">→</span>
-              <span className="text-gray-600 md:hidden">↓</span>
-              <div className="px-5 py-3 rounded-lg bg-purple-900/40 border-2 border-purple-500/60 text-center min-w-[140px]">
-                <span className="text-purple-300 font-bold">SatGate PEP</span>
-              </div>
-              <span className="text-gray-600 text-xl hidden md:block">→</span>
-              <span className="text-gray-600 md:hidden">↓</span>
-              <div className="px-5 py-3 rounded-lg bg-green-900/30 border border-green-700/50 text-center min-w-[140px]">
-                <span className="text-green-400 font-medium">Your API</span>
-                <span className="text-gray-600 text-xs block">REST / MCP / GraphQL</span>
-              </div>
-            </div>
-            <p className="text-center text-gray-500 text-sm mt-6">
-              SatGate sits <span className="text-white">behind</span> your CDN/WAF (volumetric protection) and <span className="text-white">in front of</span> your API origin.
-              <br/>Works with <span className="text-white">MCP servers</span>, REST APIs, GraphQL — any HTTP endpoint.
-            </p>
-          </div>
+          <p className="text-gray-500 text-center mb-10">Three deployment modes. Drop-in. No rip-and-replace.</p>
 
-          {/* Sidecar Deployment */}
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
-            <h4 className="text-center text-sm font-semibold text-gray-400 mb-6">ENTERPRISE "SIDECAR" MODE</h4>
-            <p className="text-center text-gray-500 text-sm mb-6">
-              Already have Kong, Apigee, or AWS API Gateway? Deploy SatGate as a <span className="text-white">sidecar</span>—no rip-and-replace.
-            </p>
-            <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
-              <div className="px-5 py-3 rounded-lg bg-gray-800 border border-gray-700 text-center min-w-[140px]">
-                <span className="text-gray-300 font-medium">Existing Gateway</span>
-                <span className="text-gray-600 text-xs block">Kong / Apigee</span>
-              </div>
-              <div className="flex flex-col items-center gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-sm hidden md:block">→</span>
-                  <div className="px-4 py-2 rounded-lg bg-gray-800/50 border border-gray-700 text-center text-xs">
-                    <span className="text-gray-400">/api/legacy/*</span>
-                  </div>
-                  <span className="text-gray-600 text-sm hidden md:block">→</span>
-                  <span className="text-gray-500 text-xs">Legacy API</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Standard */}
+            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 hover:border-gray-700 transition">
+              <h4 className="text-sm font-bold text-gray-400 mb-4 text-center">STANDARD</h4>
+              <div className="flex flex-col items-center gap-2 text-sm">
+                <div className="w-full px-3 py-2 rounded bg-gray-800 text-center text-gray-400 text-xs">CDN / WAF</div>
+                <span className="text-gray-600">↓</span>
+                <div className="w-full px-3 py-2.5 rounded bg-purple-900/40 border border-purple-500/50 text-center">
+                  <span className="text-purple-300 font-bold text-xs">SatGate</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-sm hidden md:block">→</span>
-                  <div className="px-4 py-2 rounded-lg bg-purple-900/40 border border-purple-500/60 text-center text-xs">
-                    <span className="text-purple-300">/api/agents/*</span>
-                  </div>
-                  <span className="text-gray-600 text-sm hidden md:block">→</span>
-                  <span className="text-purple-400 text-xs font-medium">SatGate</span>
-                  <span className="text-gray-600 text-sm hidden md:block">→</span>
-                  <span className="text-green-400 text-xs">Agent API</span>
-                </div>
+                <span className="text-gray-600">↓</span>
+                <div className="w-full px-3 py-2 rounded bg-green-900/30 border border-green-800/50 text-center text-green-400 text-xs">Your API</div>
               </div>
+              <p className="text-gray-600 text-xs text-center mt-4">REST, GraphQL, any HTTP endpoint</p>
             </div>
-            <p className="text-center text-gray-600 text-xs mt-6">
-              Route only agent traffic through SatGate. Keep existing infrastructure for legacy clients.
-            </p>
-          </div>
 
-          {/* MCP Proxy Deployment */}
-          <div className="bg-gray-900/50 border border-purple-800/30 rounded-xl p-8 mt-8">
-            <h4 className="text-center text-sm font-semibold text-purple-400 mb-2">MCP PROXY MODE</h4>
-            <p className="text-center text-gray-500 text-sm mb-6">
-              Govern every MCP tool call. Per-tool budgets, delegation trees, real-time dashboard.
-            </p>
-            <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
-              <div className="px-5 py-3 rounded-lg bg-gray-800 border border-gray-700 text-center min-w-[160px]">
-                <span className="text-gray-300 font-medium">AI Agents</span>
-                <span className="text-gray-600 text-xs block">Claude Code / Agent Zero / Cursor</span>
+            {/* Sidecar */}
+            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 hover:border-gray-700 transition">
+              <h4 className="text-sm font-bold text-gray-400 mb-4 text-center">SIDECAR</h4>
+              <div className="flex flex-col items-center gap-2 text-sm">
+                <div className="w-full px-3 py-2 rounded bg-gray-800 text-center text-gray-400 text-xs">Existing Gateway</div>
+                <div className="flex items-center gap-2 w-full">
+                  <div className="flex-1 flex flex-col items-center gap-1">
+                    <span className="text-gray-600 text-xs">↓</span>
+                    <div className="w-full px-2 py-1.5 rounded bg-gray-800/50 border border-gray-700 text-center text-gray-500 text-[10px]">Legacy traffic</div>
+                  </div>
+                  <div className="flex-1 flex flex-col items-center gap-1">
+                    <span className="text-purple-400 text-xs">↓</span>
+                    <div className="w-full px-2 py-1.5 rounded bg-purple-900/40 border border-purple-500/50 text-center text-purple-300 text-[10px] font-bold">SatGate</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 w-full">
+                  <div className="flex-1 text-center"><span className="text-gray-600 text-xs">↓</span></div>
+                  <div className="flex-1 text-center"><span className="text-gray-600 text-xs">↓</span></div>
+                </div>
+                <div className="w-full px-3 py-2 rounded bg-green-900/30 border border-green-800/50 text-center text-green-400 text-xs">Your APIs</div>
               </div>
-              <span className="text-gray-600 text-xl hidden md:block">→</span>
-              <span className="text-gray-600 md:hidden">↓</span>
-              <div className="px-5 py-4 rounded-lg bg-purple-900/40 border-2 border-purple-500/60 text-center min-w-[180px]">
-                <span className="text-purple-300 font-bold block">SatGate MCP Proxy</span>
-                <span className="text-gray-500 text-xs block mt-1">Auth · Budget · Delegation</span>
-                <span className="text-gray-500 text-xs block">Per-tool cost attribution</span>
-              </div>
-              <span className="text-gray-600 text-xl hidden md:block">→</span>
-              <span className="text-gray-600 md:hidden">↓</span>
-              <div className="px-5 py-3 rounded-lg bg-green-900/30 border border-green-700/50 text-center min-w-[160px]">
-                <span className="text-green-400 font-medium">MCP Servers</span>
-                <span className="text-gray-600 text-xs block">Tools / Databases / APIs</span>
-              </div>
+              <p className="text-gray-600 text-xs text-center mt-4">Route only agent traffic through SatGate</p>
             </div>
-            <p className="text-center text-gray-500 text-sm mt-6">
-              Agents get a <span className="text-white">clean MCP error</span> when budgets run out. No agent code changes needed.
-              <br/>Supports <span className="text-white">stdio</span> (subprocess) and <span className="text-white">SSE</span> (multi-agent) transports.
-            </p>
+
+            {/* MCP */}
+            <div className="bg-gray-900/50 border border-purple-800/30 rounded-xl p-6 hover:border-purple-700/50 transition">
+              <h4 className="text-sm font-bold text-purple-400 mb-4 text-center">MCP PROXY</h4>
+              <div className="flex flex-col items-center gap-2 text-sm">
+                <div className="w-full px-3 py-2 rounded bg-gray-800 text-center text-gray-400 text-xs">AI Agents</div>
+                <span className="text-gray-600">↓</span>
+                <div className="w-full px-3 py-2.5 rounded bg-purple-900/40 border border-purple-500/50 text-center">
+                  <span className="text-purple-300 font-bold text-xs">SatGate MCP Proxy</span>
+                </div>
+                <span className="text-gray-600">↓</span>
+                <div className="w-full px-3 py-2 rounded bg-green-900/30 border border-green-800/50 text-center text-green-400 text-xs">MCP Servers / Tools</div>
+              </div>
+              <p className="text-gray-600 text-xs text-center mt-4">Per-tool budgets, delegation trees</p>
+            </div>
           </div>
         </div>
       </section>
@@ -465,47 +496,7 @@ const LandingPage = () => {
             ))}
           </div>
 
-          {/* Agent Token Flow */}
-          <div className="mt-16 p-8 rounded-xl bg-gray-900/50 border border-gray-800">
-            <h3 className="text-lg font-semibold text-center mb-2">How do agents get tokens?</h3>
-            <p className="text-gray-500 text-sm text-center mb-6">
-              SatGate Mint issues tokens at startup. Gateway verifies them on every request—no identity lookups on the hot path.
-            </p>
-            <div className="flex items-center justify-center gap-2 md:gap-4 flex-wrap text-sm">
-              <div className="flex flex-col items-center p-3 bg-gray-800 rounded-lg">
-                <Bot className="text-gray-300 mb-1" size={24} />
-                <span className="text-gray-300 font-medium">Agent Starts</span>
-                <span className="text-[10px] text-gray-500">K8s / AWS / OIDC</span>
-              </div>
-              <span className="text-gray-600 text-xl">→</span>
-              <div className="flex flex-col items-center p-3 bg-purple-900/30 border border-purple-500/30 rounded-lg">
-                <Key className="text-purple-400 mb-1" size={24} />
-                <span className="text-purple-400 font-medium">Mint</span>
-                <span className="text-[10px] text-gray-500">Badge-in (once)</span>
-              </div>
-              <span className="text-gray-600 text-xl">→</span>
-              <div className="flex flex-col items-center p-3 bg-cyan-900/30 border border-cyan-500/30 rounded-lg">
-                <Lock className="text-cyan-400 mb-1" size={24} />
-                <span className="text-cyan-400 font-medium">Macaroon</span>
-                <span className="text-[10px] text-gray-500">With caveats</span>
-              </div>
-              <span className="text-gray-600 text-xl">→</span>
-              <div className="flex flex-col items-center p-3 bg-green-900/30 border border-green-500/30 rounded-lg">
-                <Shield className="text-green-400 mb-1" size={24} />
-                <span className="text-green-400 font-medium">Gateway</span>
-                <span className="text-[10px] text-gray-500">Verify (every req)</span>
-              </div>
-              <span className="text-gray-600 text-xl">→</span>
-              <div className="flex flex-col items-center p-3 bg-gray-800 rounded-lg">
-                <Activity className="text-gray-300 mb-1" size={24} />
-                <span className="text-gray-300 font-medium">Upstream</span>
-                <span className="text-[10px] text-gray-500">Your API</span>
-              </div>
-            </div>
-            <p className="text-xs text-gray-600 text-center mt-4">
-              Manual token issuance also available via Dashboard or API. Mint is optional for automated agent provisioning.
-            </p>
-          </div>
+
         </div>
       </section>
 
@@ -542,7 +533,7 @@ const LandingPage = () => {
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
                 <li><a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Documentation</a></li>
-                <li><Link href="/govern" className="hover:text-white transition">Govern</Link></li>
+                <li><Link href="/govern" className="hover:text-white transition">Enterprise</Link></li>
                 <li><Link href="/design-partners" className="hover:text-white transition">Design Partners</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
                 <li><Link href="/compare" className="hover:text-white transition">Compare</Link></li>

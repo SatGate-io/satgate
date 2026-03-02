@@ -351,32 +351,41 @@ export default function PayDemoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-gray-100 font-sans flex flex-col items-center py-12 px-4">
-      
+    <div className="min-h-screen bg-black text-gray-100 font-sans">
+
       {/* Header */}
-      <div className="w-full max-w-3xl mb-4 grid grid-cols-3 items-center">
-        <Link href="/" className="text-gray-500 hover:text-white flex items-center gap-2 transition justify-self-start">
-          <ArrowLeft size={18} /> Back to Home
-        </Link>
-        <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 text-center justify-self-center">
-          ⚡ Pay Demo
-        </h1>
-        <div></div>
+      <div className="border-b border-gray-800 bg-black/80 backdrop-blur-sm sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="text-gray-500 hover:text-white flex items-center gap-2 transition">
+            <ArrowLeft size={18} /> <span className="hidden sm:inline">Back to Home</span>
+          </Link>
+          <h1 className="text-lg sm:text-xl font-bold flex items-center gap-2">
+            <Zap className="text-yellow-400" size={24} />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-400">
+              Charge Demo
+            </span>
+          </h1>
+          <div className="w-[120px]"></div>
+        </div>
       </div>
 
       {/* Hero Description */}
-      <div className="w-full max-w-3xl mb-8 text-center">
-        <h2 className="text-xl sm:text-2xl font-bold mb-3">
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-400">
-            Zero Invoices. Zero Contracts. Zero Wait.
-          </span>
-        </h2>
-        <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-xl mx-auto">
-          Watch an AI agent <strong className="text-white">pay for API access in real-time</strong> using 
-          Bitcoin Lightning. No credit cards. No monthly bills. Just instant, per-request micropayments 
-          that settle in milliseconds.
-        </p>
+      <div className="bg-gradient-to-b from-yellow-950/20 to-transparent border-b border-gray-800/50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-400">
+              Zero Invoices. Zero Contracts. Zero Wait.
+            </span>
+          </h2>
+          <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
+            Watch an AI agent <strong className="text-white">pay for API access in real-time</strong> using 
+            Bitcoin Lightning. No credit cards. No monthly bills. Just instant, per-request micropayments 
+            that settle in milliseconds.
+          </p>
+        </div>
       </div>
+
+      <div className="flex flex-col items-center py-8 px-4">
 
       {/* Main Console UI */}
       <div className="w-full max-w-3xl bg-gray-900 rounded-xl border border-gray-800 shadow-2xl overflow-hidden relative">
@@ -547,6 +556,7 @@ export default function PayDemoPage() {
         </div>
       )}
 
+    </div>
     </div>
   );
 }

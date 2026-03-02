@@ -12,9 +12,6 @@ import Image from 'next/image';
 export default function DesignPartnersPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [submitError, setSubmitError] = useState("");
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -36,22 +33,36 @@ export default function DesignPartnersPage() {
     }));
   };
 
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    setSubmitError("");
+    setSubmitStatus('sending');
     try {
       const res = await fetch('/api/design-partner', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-      if (!res.ok) throw new Error('Submission failed');
-      setSubmitted(true);
+      if (res.ok) {
+        setSubmitStatus('sent');
+      } else {
+        // Fallback to mailto
+        const subject = encodeURIComponent('Design Partner Application');
+        const body = encodeURIComponent(
+          `Name: ${formData.name}\nEmail: ${formData.email}\nCompany: ${formData.company}\nRole: ${formData.role}\nAI Agents: ${formData.agentCount}\nAPIs: ${formData.apis.join(', ')}\n\nBiggest Challenge:\n${formData.challenge}`
+        );
+        window.location.href = `mailto:contact@satgate.io?subject=${subject}&body=${body}`;
+        setSubmitStatus('sent');
+      }
     } catch {
-      setSubmitError("Something went wrong. Please email contact@satgate.io directly.");
-    } finally {
-      setSubmitting(false);
+      // Fallback to mailto
+      const subject = encodeURIComponent('Design Partner Application');
+      const body = encodeURIComponent(
+        `Name: ${formData.name}\nEmail: ${formData.email}\nCompany: ${formData.company}\nRole: ${formData.role}\nAI Agents: ${formData.agentCount}\nAPIs: ${formData.apis.join(', ')}\n\nBiggest Challenge:\n${formData.challenge}`
+      );
+      window.location.href = `mailto:contact@satgate.io?subject=${subject}&body=${body}`;
+      setSubmitStatus('sent');
     }
   };
 
@@ -75,9 +86,10 @@ export default function DesignPartnersPage() {
           </Link>
 
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
-            <Link href="/protect" className="hover:text-white transition">Protect Demo</Link>
-            <Link href="/pay" className="hover:text-white transition">Pay Demo</Link>
-            <Link href="/govern" className="hover:text-white transition">Govern</Link>
+            <Link href="/mint-demo" className="hover:text-white transition">Mint Demo</Link>
+            <Link href="/protect" className="hover:text-white transition">Control Demo</Link>
+            <Link href="/pay" className="hover:text-white transition">Charge Demo</Link>
+            <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="#" className="hover:text-white transition">Pricing</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
             <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud</a>
@@ -96,9 +108,10 @@ export default function DesignPartnersPage() {
         <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
             {[
-              { href: '/protect', label: 'Protect Demo' },
-              { href: '/pay', label: 'Pay Demo' },
-              { href: '/govern', label: 'Govern' },
+              { href: '/mint-demo', label: 'Mint Demo' },
+              { href: '/protect', label: 'Control Demo' },
+              { href: '/pay', label: 'Charge Demo' },
+              { href: '/govern', label: 'Enterprise' },
               { href: '#', label: 'Pricing' },
             ].map(item => (
               <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">
@@ -392,22 +405,19 @@ export default function DesignPartnersPage() {
             </div>
 
             {/* Submit */}
-            {submitted ? (
-              <div className="w-full py-6 bg-green-900/30 border border-green-500/30 rounded-xl text-center">
-                <CheckCircle className="mx-auto mb-2 text-green-400" size={32} />
-                <p className="text-green-400 font-bold text-lg">Application Received!</p>
-                <p className="text-gray-400 text-sm mt-1">We will respond within 24 hours.</p>
+            {submitStatus === 'sent' ? (
+              <div className="w-full py-4 bg-green-900/30 border border-green-700/50 text-green-400 rounded-xl font-bold text-lg flex items-center justify-center gap-2">
+                ✓ Application received! We&apos;ll be in touch within 24 hours.
               </div>
             ) : (
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={submitStatus === 'sending'}
                 className="w-full py-4 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-xl font-bold text-lg hover:opacity-90 transition shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                {submitting ? 'Submitting...' : 'Submit Application'} {!submitting && <Send size={18} />}
+                {submitStatus === 'sending' ? 'Submitting...' : 'Submit Application'} <Send size={18} />
               </button>
             )}
-            {submitError && <p className="text-center text-red-400 text-sm">{submitError}</p>}
 
             <p className="text-center text-gray-600 text-xs">
               By submitting, you agree to our{' '}
@@ -484,7 +494,7 @@ export default function DesignPartnersPage() {
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><Link href="/protect" className="hover:text-white transition">Protect</Link></li>
                 <li><Link href="/pay" className="hover:text-white transition">Pay</Link></li>
-                <li><Link href="/govern" className="hover:text-white transition">Govern</Link></li>
+                <li><Link href="/govern" className="hover:text-white transition">Enterprise</Link></li>
               </ul>
             </div>
             <div>

@@ -52,9 +52,10 @@ const PricingPage = () => {
 
           {/* Desktop menu */}
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
-            <Link href="/protect" className="hover:text-white transition">Protect Demo</Link>
-            <Link href="/pay" className="hover:text-white transition">Pay Demo</Link>
-            <Link href="/govern" className="hover:text-white transition">Govern</Link>
+            <Link href="/mint-demo" className="hover:text-white transition">Mint Demo</Link>
+            <Link href="/protect" className="hover:text-white transition">Control Demo</Link>
+            <Link href="/pay" className="hover:text-white transition">Charge Demo</Link>
+            <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/pricing" className="text-white transition">Pricing</Link>
             <Link href="/roi-calculator" className="hover:text-white transition">ROI Calculator</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
@@ -79,9 +80,10 @@ const PricingPage = () => {
           }`}
         >
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
-            <Link href="/protect" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Protect Demo</Link>
-            <Link href="/pay" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Pay Demo</Link>
-            <Link href="/govern" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Govern</Link>
+            <Link href="/mint-demo" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Mint Demo</Link>
+            <Link href="/protect" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Control Demo</Link>
+            <Link href="/pay" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Charge Demo</Link>
+            <Link href="/govern" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Enterprise</Link>
             <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="block text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Pricing</Link>
             <Link href="/roi-calculator" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">ROI Calculator</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Docs</a>
@@ -371,7 +373,7 @@ const PricingPage = () => {
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
                 <li><a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Documentation</a></li>
-                <li><Link href="/govern" className="hover:text-white transition">Govern</Link></li>
+                <li><Link href="/govern" className="hover:text-white transition">Enterprise</Link></li>
                 <li><Link href="/design-partners" className="hover:text-white transition">Design Partners</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
                 <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud Dashboard</a></li>
