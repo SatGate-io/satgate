@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
 
-// Lazy init to avoid build-time crash when env var is missing
-let _resend: Resend | null = null;
-function getResend() {
-  if (!_resend) {
-    if (!process.env.RESEND_API_KEY) throw new Error('RESEND_API_KEY not configured');
-    _resend = new Resend(process.env.RESEND_API_KEY);
+async function sendEmail(apiKey: string, params: { from: string; to: string[]; cc?: string[]; subject: string; html: string }) {
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Resend API error ${res.status}: ${err}`);
   }
-  return _resend;
+  return res.json();
 }
 
 export async function POST(req: NextRequest) {
@@ -20,12 +25,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      console.error('[Design Partner] RESEND_API_KEY not configured');
+      // Still log the submission even if email fails
+      console.log(`[Design Partner] ${company} — ${name} (${email})`);
+      return NextResponse.json({ ok: true, message: "Application received! We'll be in touch within 24 hours." });
+    }
+
     const fromName = process.env.RESEND_FROM_NAME || 'SatGate';
     const fromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@satgate.io';
-    const resend = getResend();
 
     // Send notification to Wayne + Matt
-    await resend.emails.send({
+    await sendEmail(apiKey, {
       from: `${fromName} <${fromEmail}>`,
       to: ['wayne@satgate.io'],
       cc: ['matt@satgate.io'],
@@ -54,7 +66,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Send confirmation to applicant
-    await resend.emails.send({
+    await sendEmail(apiKey, {
       from: `${fromName} <${fromEmail}>`,
       to: [email],
       subject: 'SatGate Design Partner Application Received',
@@ -75,7 +87,7 @@ export async function POST(req: NextRequest) {
       `,
     });
 
-    console.log(`[Design Partner] ${company} — ${name} (${email})`);
+    console.log(`[Design Partner] ✅ ${company} — ${name} (${email})`);
     return NextResponse.json({ ok: true, message: "Application received! We'll be in touch within 24 hours." });
   } catch (err) {
     console.error('[Design Partner] Error:', err);
