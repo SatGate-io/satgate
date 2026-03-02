@@ -12,6 +12,9 @@ import Image from 'next/image';
 export default function DesignPartnersPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -33,13 +36,23 @@ export default function DesignPartnersPage() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const subject = encodeURIComponent('Design Partner Application');
-    const body = encodeURIComponent(
-      `Name: ${formData.name}\nEmail: ${formData.email}\nCompany: ${formData.company}\nRole: ${formData.role}\nAI Agents: ${formData.agentCount}\nAPIs: ${formData.apis.join(', ')}\n\nBiggest Challenge:\n${formData.challenge}`
-    );
-    window.location.href = `mailto:contact@satgate.io?subject=${subject}&body=${body}`;
+    setSubmitting(true);
+    setSubmitError("");
+    try {
+      const res = await fetch('/api/design-partner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (!res.ok) throw new Error('Submission failed');
+      setSubmitted(true);
+    } catch {
+      setSubmitError("Something went wrong. Please email contact@satgate.io directly.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const faqs = [
@@ -379,12 +392,22 @@ export default function DesignPartnersPage() {
             </div>
 
             {/* Submit */}
-            <button
-              type="submit"
-              className="w-full py-4 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-xl font-bold text-lg hover:opacity-90 transition shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2"
-            >
-              Submit Application <Send size={18} />
-            </button>
+            {submitted ? (
+              <div className="w-full py-6 bg-green-900/30 border border-green-500/30 rounded-xl text-center">
+                <CheckCircle className="mx-auto mb-2 text-green-400" size={32} />
+                <p className="text-green-400 font-bold text-lg">Application Received!</p>
+                <p className="text-gray-400 text-sm mt-1">We will respond within 24 hours.</p>
+              </div>
+            ) : (
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full py-4 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-xl font-bold text-lg hover:opacity-90 transition shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {submitting ? 'Submitting...' : 'Submit Application'} {!submitting && <Send size={18} />}
+              </button>
+            )}
+            {submitError && <p className="text-center text-red-400 text-sm">{submitError}</p>}
 
             <p className="text-center text-gray-600 text-xs">
               By submitting, you agree to our{' '}
