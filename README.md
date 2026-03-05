@@ -271,8 +271,14 @@ Apache License 2.0 — see [LICENSE](LICENSE) for details.
 
 ## Links
 
-- 🌐 [satgate.io](https://satgate.io)
-- 📝 [Blog](https://satgate.io/blog)
+- 🌐 [satgate.io](https://satgate.io) — Website
+- 📝 [Blog](https://satgate.io/blog) — Technical articles
+- 🏢 [Enterprise Governance](https://satgate.io/govern) — CISO/CFO/CTO use cases
+- 💰 [Pricing](https://satgate.io/pricing) — Free Observe tier, Pro for enforcement
+- 🔒 [Security Model](https://satgate.io/security) — Architecture & compliance
+- 🧪 [Sandbox](https://satgate.io/sandbox) — Try without signup
+- 📊 [ROI Calculator](https://satgate.io/roi-calculator) — Estimate savings
+- ⚖️ [Compare](https://satgate.io/compare) — SatGate vs Zuplo, Bifrost, cloud-native
 - 📧 [contact@satgate.io](mailto:contact@satgate.io)
 
 ---

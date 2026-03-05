@@ -9,6 +9,42 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'ai-agent-api-cost-control',
+    title: 'How to Control AI Agent API Costs: Rate Limiting vs Economic Firewalls',
+    description: 'Rate limiting doesn\'t understand money. Learn how economic firewalls give you real budget enforcement for AI agent API spend — per agent, per tool, in real time.',
+    date: '2026-03-05',
+    readTime: '8 min read',
+    author: 'Matt Dean',
+    tags: ['Cost Control', 'AI Agents', 'Gateway'],
+  },
+  {
+    slug: 'what-is-an-economic-firewall',
+    title: 'What Is an Economic Firewall? The Security Primitive for the Agent Economy',
+    description: 'An economic firewall enforces budget limits on AI agent API calls at the gateway layer. Learn how it differs from traditional API security and why agents need it.',
+    date: '2026-03-05',
+    readTime: '6 min read',
+    author: 'Matt Dean',
+    tags: ['Concepts', 'Economic Firewall', 'Agent Economy'],
+  },
+  {
+    slug: 'mcp-budget-enforcement-guide',
+    title: 'MCP Budget Enforcement: A Practical Guide to Controlling AI Tool Spend',
+    description: 'How to enforce per-tool budgets on MCP servers. Assign costs per tool call, cap agent spending, and attribute costs across teams.',
+    date: '2026-03-05',
+    readTime: '10 min read',
+    author: 'Matt Dean',
+    tags: ['MCP', 'Budget Enforcement', 'Tutorial'],
+  },
+  {
+    slug: 'agent-swarms-cost-governance',
+    title: 'Agent Swarms Are Here. Who\'s Controlling the Spend?',
+    description: 'Multi-agent AI systems multiply API costs exponentially. Without economic governance, agent swarms can burn through budgets in minutes.',
+    date: '2026-03-05',
+    readTime: '7 min read',
+    author: 'Matt Dean',
+    tags: ['Agent Economy', 'Cost Control', 'Multi-Agent'],
+  },
+  {
     slug: 'security-as-a-profit-center',
     title: 'Security as a Profit Center: Why Your Economic Firewall Pays for Itself',
     description: 'Every security tool tells you how many attacks it stopped. SatGate tells you how many dollars it saved. Here\'s the CFO math on why economic governance is a profit center.',
