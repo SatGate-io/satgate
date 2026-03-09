@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Pricing",
+  alternates: { canonical: "https://satgate.io/pricing" },
   description:
     "SatGate pricing — free Observe tier for audit and attribution. Pro tier for real-time budget enforcement, per-agent spending caps, and L402 Lightning monetization.",
 };

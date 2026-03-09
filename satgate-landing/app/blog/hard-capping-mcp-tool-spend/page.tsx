@@ -17,6 +17,7 @@ export const metadata = {
     description: 'Real-time budget enforcement for MCP tool calls. Stop agent spend spirals before they start.',
   },
   keywords: ['MCP tool cost', 'Claude Code spending limit', 'MCP budget control', 'AI agent cost management', 'MCP proxy', 'L402', 'macaroons'],
+  alternates: { canonical: 'https://satgate.io/blog/hard-capping-mcp-tool-spend' },
 };
 
 export default function HardCappingMcpToolSpendPage() {

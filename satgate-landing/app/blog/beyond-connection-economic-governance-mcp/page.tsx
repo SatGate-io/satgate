@@ -4,6 +4,7 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 export const metadata = {
   title: 'Beyond Connection: The Case for Economic Governance in MCP - SatGate Blog',
   description: 'The MCP ecosystem talks about capability. Nobody talks about cost. Here\'s why economic policy is the missing layer — and how to enforce it at the protocol level.',
+  alternates: { canonical: 'https://satgate.io/blog/beyond-connection-economic-governance-mcp' },
 };
 
 export default function BeyondConnectionPage() {

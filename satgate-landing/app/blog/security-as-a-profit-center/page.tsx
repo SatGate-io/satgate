@@ -17,6 +17,7 @@ export const metadata = {
     description: 'Your security stack is a cost center. Your economic firewall is a profit center. Here\'s the CFO math.',
   },
   keywords: ['AI security ROI', 'AI agent governance', 'AI cost management enterprise', 'economic firewall', 'AI agent cost control', 'MCP governance', 'AI budget enforcement'],
+  alternates: { canonical: 'https://satgate.io/blog/security-as-a-profit-center' },
 };
 
 export default function SecurityAsAProfitCenterPage() {

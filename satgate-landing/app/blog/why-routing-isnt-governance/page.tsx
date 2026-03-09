@@ -4,6 +4,7 @@ import { ArrowLeft, Calendar, Clock, User } from 'lucide-react';
 export const metadata = {
   title: 'Why Routing Isn\'t Governance - SatGate Blog',
   description: 'AI gateways excel at routing LLM calls. But when agents control spend autonomously, routing isn\'t enough. You need economic governance.',
+  alternates: { canonical: 'https://satgate.io/blog/why-routing-isnt-governance' },
 };
 
 export default function WhyRoutingIsntGovernancePage() {

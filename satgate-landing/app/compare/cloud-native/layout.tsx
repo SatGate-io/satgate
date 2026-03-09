@@ -14,6 +14,7 @@ export const metadata: Metadata = {
     'MCP proxy',
     'agent budget enforcement',
   ],
+  alternates: { canonical: 'https://satgate.io/compare/cloud-native' },
   openGraph: {
     title: 'SatGate vs Cloud-Native AI Governance',
     description: "Why your cloud provider's built-in tools aren't enough for the Agentic Web",

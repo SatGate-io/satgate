@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
   title: 'Terms of Service - SatGate',
+  alternates: { canonical: 'https://satgate.io/terms' },
 };
 
 export default function TermsPage() {

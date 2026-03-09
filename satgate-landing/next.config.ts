@@ -1,6 +1,17 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  trailingSlash: false,
+  async redirects() {
+    return [
+      { source: '/blog/agent-to-agent-collaboration-security', destination: '/blog', permanent: true },
+      { source: '/docs', destination: '/', permanent: true },
+      { source: '/about', destination: '/', permanent: true },
+      { source: '/contact', destination: '/design-partners', permanent: true },
+      { source: '/demo', destination: '/sandbox', permanent: true },
+      { source: '/api', destination: '/', permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

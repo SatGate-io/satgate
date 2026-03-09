@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Zap, Shield, Server } from 'lucide-react';
 export const metadata = {
   title: 'Compare SatGate - vs Bifrost, Zuplo, and more',
   description: 'See how SatGate compares to other AI gateways. Economic controls vs routing vs API management.',
+  alternates: { canonical: 'https://satgate.io/compare' },
 };
 
 export default function ComparePage() {

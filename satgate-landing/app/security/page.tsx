@@ -3,6 +3,7 @@ import { ArrowLeft, Shield, Lock, Eye, Key, Zap, CheckCircle, Code, GitBranch, B
 
 export const metadata = {
   title: 'Security - SatGate™',
+  alternates: { canonical: 'https://satgate.io/security' },
 };
 
 export default function SecurityPage() {

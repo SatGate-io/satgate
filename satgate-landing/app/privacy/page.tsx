@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
   title: 'Privacy Policy - SatGate',
+  alternates: { canonical: 'https://satgate.io/privacy' },
 };
 
 export default function PrivacyPage() {

@@ -4,6 +4,7 @@ import { ArrowLeft, Check, X, Minus, Shield, DollarSign, Zap, Eye, Lock, BarChar
 export const metadata = {
   title: 'SatGate vs Zuplo - Comparison',
   description: 'Compare SatGate and Zuplo API gateways. See why economic controls matter for the agent economy.',
+  alternates: { canonical: 'https://satgate.io/compare/zuplo' },
 };
 
 export default function CompareZuploPage() {
