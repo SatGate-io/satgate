@@ -1,1 +1,182 @@
-[{'lucide-react': 'import Link from \'next/link\';\nimport { ArrowLeft, ArrowRight, Calendar, Clock, User } from \'lucide-react\';\n\nexport const metadata = {\n  title: \'Blog - SatGate\',\n  description: \'Insights on API economics, agent governance, and the future of machine-to-machine commerce.\',\n};\n\nexport default function BlogPage() {\n  // Blog post data - in a real setup this would come from a CMS or markdown files\n  const posts = [\n    {\n      slug: \'ai-agent-spending-limits\',\n      title: \'AI Agent Spending Limits: Why API Keys Aren\\\'t Enough\',\n      description: \'API rate limits don\\\'t control agent costs. Learn how economic firewalls enforce real-time budget limits on autonomous AI spend — per agent, per tool.\',\n      date: \'2026-03-10\',\n      readTime: \'9 min read\',\n      author: \'Matt Dean\',\n      tags: [\'Cost Control\', \'AI Agents\', \'Budget Enforcement\'],\n    },\n    {\n      slug: \'ai-agent-api-cost-control\',\n      title: \'How to Control AI Agent API Costs: Rate Limiting vs Economic Firewalls\',\n      description: \'Rate limiting doesn\\\'t understand money. Learn how economic firewalls give you real budget enforcement for AI agent API spend — per agent, per tool, in real time.\',\n      date: \'2026-03-05\',\n      readTime: \'8 min read\',\n      author: \'Matt Dean\',\n      tags: [\'Cost Control\', \'AI Agents\', \'Gateway\'],\n    },\n    {\n      slug: \'what-is-an-economic-firewall\',\n      title: \'What Is an Economic Firewall? The Security Primitive for the Agent Economy\',\n      description: \'An economic firewall enforces budget limits on AI agent API calls at the gateway layer. Learn how it differs from traditional API security and why agents need it.\',\n      date: \'2026-03-05\',\n      readTime: \'6 min read\',\n      author: \'Matt Dean\',\n      tags: [\'Concepts\', \'Economic Firewall\', \'Agent Economy\'],\n    },\n    {\n      slug: \'mcp-budget-enforcement-guide\',\n      title: \'MCP Budget Enforcement: A Practical Guide to Controlling AI Tool Spend\',\n      description: \'How to enforce per-tool budgets on MCP servers. Assign costs per tool call, cap agent spending, and attribute costs across teams.\',\n      date: \'2026-03-05\',\n      readTime: \'10 min read\',\n      author: \'Matt Dean\',\n      tags: [\'MCP\', \'Budget Enforcement\', \'Tutorial\'],\n    },\n    {\n      slug: \'agent-swarms-cost-governance\',\n      title: \'Agent Swarms Are Here. Who\\\'s Controlling the Spend?\',\n      description: \'Multi-agent AI systems multiply API costs exponentially. Without economic governance, agent swarms can burn through budgets in minutes.\',\n      date: \'2026-03-05\',\n      readTime: \'7 min read\',\n      author: \'Matt Dean\',\n      tags: [\'Agent Economy\', \'Cost Control\', \'Multi-Agent\'],\n    },\n    {\n      slug: \'security-as-a-profit-center\',\n      title: \'Security as a Profit Center: Why Your Economic Firewall Pays for Itself\',\n      description: \'Every security tool tells you how many attacks it stopped. SatGate tells you how many dollars it saved. Here\\\'s the CFO math on why economic governance is a profit center.\',\n      date: \'2026-02-14\',\n      readTime: \'12 min read\',\n      author: \'Matt Dean\',\n      tags: [\'ROI\', \'Governance\', \'Enterprise\', \'Cost Management\'],\n    },\n    {\n      slug: \'hard-capping-mcp-tool-spend\',\n      title: \'Hard-Capping MCP Tool Spend with SatGate Proxy\',\n      description: \'Your AI agent burned $500 overnight calling tools in a loop. Here\\\'s how to enforce real-time budget hard caps at the protocol level.\',\n      date: \'2026-02-14\',\n      readTime: \'10 min read\',\n      author: \'Matt Dean\',\n      tags: [\'MCP\', \'Budget Control\', \'L402\', \'Cost Management\'],\n    },\n    {\n      slug: \'how-we-built-budget-enforcement-mcp\',\n      title: \'How We Built Budget Enforcement for MCP Tool Calls\',\n      description: \'2,164 lines of Go, 28 tests, and one evening. An open-source MCP proxy that enforces per-tool budgets with cryptographic delegation.\',\n      date: \'2026-02-13\',\n      readTime: \'8 min read\',\n      author: \'SatGate Team\',\n      tags: [\'MCP\', \'Go\', \'Macaroons\', \'Engineering\'],\n    },\n    {\n      slug: \'beyond-connection-economic-governance-mcp\',\n      title: \'Beyond Connection: The Case for Economic Governance in MCP\',\n      description: \'The MCP ecosystem talks about capability. Nobody talks about cost. Here\\\'s why economic policy is the missing layer — and how to enforce it at the protocol level with L402 and macaroons.\',\n      date: \'2026-02-12\',\n      readTime: \'12 min read\',\n      author: \'SatGate Team\',\n      tags: [\'MCP\', \'L402\', \'Macaroons\', \'Agent Economy\'],\n    },\n    {\n      slug: \'why-routing-isnt-governance\',\n      title: \'Why Routing Isn\\\'t Governance\',\n      description: \'AI gateways excel at routing LLM calls. But when agents control spend autonomously, routing isn\\\'t enough. You need economic governance.\',\n      date: \'2026-02-06\',\n      readTime: \'5 min read\',\n      author: \'SatGate Team\',\n      tags: [\'MCP\', \'Governance\', \'Agent Economy\'],\n    },\n  ];\n\n  return (\n    <div className="min-h-screen bg-black text-gray-100 font-sans">\n      <div className="max-w-4xl mx-auto px-6 py-16">\n        <Link href="/" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">\n          <ArrowLeft size={18} /> Back to Home\n        </Link>\n        \n        <div className="mb-12">\n          <h1 className="text-4xl font-bold mb-4">Blog</h1>\n          <p className="text-xl text-gray-400">\n            Insights on API economics, agent governance, and the future of machine-to-machine commerce.\n          </p>\n        </div>\n\n        <div className="space-y-6">\n          {posts.map((post) => (\n            <Link \n              key={post.slug}\n              href={`/blog/${post.slug}`}\n              className="block bg-gray-900 border border-gray-800 rounded-xl p-6 hover:border-purple-600/50 transition group"\n            >\n              <div className="flex flex-wrap gap-2 mb-3">\n                {post.tags.map((tag) => (\n                  <span \n                    key={tag}\n                    className="px-2 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono"\n                  >\n                    {tag}\n                  </span>\n                ))}\n              </div>\n              \n              <h2 className="text-xl font-bold mb-2 group-hover:text-purple-400 transition">\n                {post.title}\n              </h2>\n              \n              <p className="text-gray-400 mb-4">\n                {post.description}\n              </p>\n              \n              <div className="flex items-center gap-4 text-sm text-gray-500">\n                <span className="flex items-center gap-1">\n                  <Calendar size={14} />\n                  {new Date(post.date).toLocaleDateString(\'en-US\', { \n                    month: \'short\', \n                    day: \'numeric\', \n                    year: \'numeric\' \n                  })}\n                </span>\n                <span className="flex items-center gap-1">\n                  <Clock size={14} />\n                  {post.readTime}\n                </span>\n              </div>\n              \n              <div className="mt-4 flex items-center text-purple-400 text-sm font-medium group-hover:gap-2 transition-all">\n                Read more <ArrowRight size={16} className="ml-1" />\n              </div>\n            </Link>\n          ))}\n        </div>\n\n        {/* Newsletter CTA */}\n        <section className="mt-16 bg-gradient-to-r from-purple-900/20 to-cyan-900/20 border border-purple-800/30 rounded-xl p-8 text-center">\n          <h2 className="text-2xl font-bold mb-3">Stay Updated</h2>\n          <p className="text-gray-400 mb-6">\n            Get insights on API economics and agent governance delivered to your inbox.\n          </p>\n          <a \n            href="mailto:contact@satgate.io?subject=Newsletter%20Subscription"\n            className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition"\n          >\n            Subscribe to Updates\n          </a>\n        </section>\n      </div>\n    </div>\n  );\n}'}]
+import Link from 'next/link';
+import { ArrowLeft, ArrowRight, Calendar, Clock, User } from 'lucide-react';
+
+export const metadata = {
+  title: 'Blog - SatGate',
+  description: 'Insights on API economics, agent governance, and the future of machine-to-machine commerce.',
+};
+
+// Blog post data - in a real setup this would come from a CMS or markdown files
+const posts = [
+  {
+    slug: 'ai-agent-spending-limits',
+    title: 'AI Agent Spending Limits: Why API Keys Aren\'t Enough',
+    description: 'API rate limits don\'t control agent costs. Learn how economic firewalls enforce real-time budget limits on autonomous AI spend — per agent, per tool.',
+    date: '2026-03-10',
+    readTime: '9 min read',
+    author: 'Matt Dean',
+    tags: ['Cost Control', 'AI Agents', 'Budget Enforcement'],
+  },
+  {
+    slug: 'ai-agent-api-cost-control',
+    title: 'How to Control AI Agent API Costs: Rate Limiting vs Economic Firewalls',
+    description: 'Rate limiting doesn\'t understand money. Learn how economic firewalls give you real budget enforcement for AI agent API spend — per agent, per tool, in real time.',
+    date: '2026-03-05',
+    readTime: '8 min read',
+    author: 'Matt Dean',
+    tags: ['Cost Control', 'AI Agents', 'Gateway'],
+  },
+  {
+    slug: 'what-is-an-economic-firewall',
+    title: 'What Is an Economic Firewall? The Security Primitive for the Agent Economy',
+    description: 'An economic firewall enforces budget limits on AI agent API calls at the gateway layer. Learn how it differs from traditional API security and why agents need it.',
+    date: '2026-03-05',
+    readTime: '6 min read',
+    author: 'Matt Dean',
+    tags: ['Concepts', 'Economic Firewall', 'Agent Economy'],
+  },
+  {
+    slug: 'mcp-budget-enforcement-guide',
+    title: 'MCP Budget Enforcement: A Practical Guide to Controlling AI Tool Spend',
+    description: 'How to enforce per-tool budgets on MCP servers. Assign costs per tool call, cap agent spending, and attribute costs across teams.',
+    date: '2026-03-05',
+    readTime: '10 min read',
+    author: 'Matt Dean',
+    tags: ['MCP', 'Budget Enforcement', 'Tutorial'],
+  },
+  {
+    slug: 'agent-swarms-cost-governance',
+    title: 'Agent Swarms Are Here. Who\'s Controlling the Spend?',
+    description: 'Multi-agent AI systems multiply API costs exponentially. Without economic governance, agent swarms can burn through budgets in minutes.',
+    date: '2026-03-05',
+    readTime: '7 min read',
+    author: 'Matt Dean',
+    tags: ['Agent Economy', 'Cost Control', 'Multi-Agent'],
+  },
+  {
+    slug: 'security-as-a-profit-center',
+    title: 'Security as a Profit Center: Why Your Economic Firewall Pays for Itself',
+    description: 'Every security tool tells you how many attacks it stopped. SatGate tells you how many dollars it saved. Here\'s the CFO math on why economic governance is a profit center.',
+    date: '2026-02-14',
+    readTime: '12 min read',
+    author: 'Matt Dean',
+    tags: ['ROI', 'Governance', 'Enterprise', 'Cost Management'],
+  },
+  {
+    slug: 'hard-capping-mcp-tool-spend',
+    title: 'Hard-Capping MCP Tool Spend with SatGate Proxy',
+    description: 'Your AI agent burned $500 overnight calling tools in a loop. Here\'s how to enforce real-time budget hard caps at the protocol level.',
+    date: '2026-02-14',
+    readTime: '10 min read',
+    author: 'Matt Dean',
+    tags: ['MCP', 'Budget Control', 'L402', 'Cost Management'],
+  },
+  {
+    slug: 'how-we-built-budget-enforcement-mcp',
+    title: 'How We Built Budget Enforcement for MCP Tool Calls',
+    description: '2,164 lines of Go, 28 tests, and one evening. An open-source MCP proxy that enforces per-tool budgets with cryptographic delegation.',
+    date: '2026-02-13',
+    readTime: '8 min read',
+    author: 'SatGate Team',
+    tags: ['MCP', 'Go', 'Macaroons', 'Engineering'],
+  },
+  {
+    slug: 'beyond-connection-economic-governance-mcp',
+    title: 'Beyond Connection: The Case for Economic Governance in MCP',
+    description: 'The MCP ecosystem talks about capability. Nobody talks about cost. Here\'s why economic policy is the missing layer — and how to enforce it at the protocol level with L402 and macaroons.',
+    date: '2026-02-12',
+    readTime: '12 min read',
+    author: 'SatGate Team',
+    tags: ['MCP', 'L402', 'Macaroons', 'Agent Economy'],
+  },
+  {
+    slug: 'why-routing-isnt-governance',
+    title: 'Why Routing Isn\'t Governance',
+    description: 'AI gateways excel at routing LLM calls. But when agents control spend autonomously, routing isn\'t enough. You need economic governance.',
+    date: '2026-02-06',
+    readTime: '5 min read',
+    author: 'SatGate Team',
+    tags: ['MCP', 'Governance', 'Agent Economy'],
+  },
+];
+
+export default function BlogPage() {
+  return (
+    <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <div className="max-w-4xl mx-auto px-6 py-16">
+        <Link href="/" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
+          <ArrowLeft size={18} /> Back to Home
+        </Link>
+        
+        <div className="mb-12">
+          <h1 className="text-4xl font-bold mb-4">Blog</h1>
+          <p className="text-xl text-gray-400">
+            Insights on API economics, agent governance, and the future of machine-to-machine commerce.
+          </p>
+        </div>
+
+        <div className="space-y-6">
+          {posts.map((post) => (
+            <Link 
+              key={post.slug}
+              href={`/blog/${post.slug}`}
+              className="block bg-gray-900 border border-gray-800 rounded-xl p-6 hover:border-purple-600/50 transition group"
+            >
+              <div className="flex flex-wrap gap-2 mb-3">
+                {post.tags.map((tag) => (
+                  <span 
+                    key={tag}
+                    className="px-2 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              
+              <h2 className="text-xl font-bold mb-2 group-hover:text-purple-400 transition">
+                {post.title}
+              </h2>
+              
+              <p className="text-gray-400 mb-4">
+                {post.description}
+              </p>
+              
+              <div className="flex items-center gap-4 text-sm text-gray-500">
+                <span className="flex items-center gap-1">
+                  <Calendar size={14} />
+                  {new Date(post.date).toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                  })}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Clock size={14} />
+                  {post.readTime}
+                </span>
+              </div>
+              
+              <div className="mt-4 flex items-center text-purple-400 text-sm font-medium group-hover:gap-2 transition-all">
+                Read more <ArrowRight size={16} className="ml-1" />
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Newsletter CTA */}
+        <section className="mt-16 bg-gradient-to-r from-purple-900/20 to-cyan-900/20 border border-purple-800/30 rounded-xl p-8 text-center">
+          <h2 className="text-2xl font-bold mb-3">Stay Updated</h2>
+          <p className="text-gray-400 mb-6">
+            Get insights on API economics and agent governance delivered to your inbox.
+          </p>
+          <a 
+            href="mailto:contact@satgate.io?subject=Newsletter%20Subscription"
+            className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition"
+          >
+            Subscribe to Updates
+          </a>
+        </section>
+      </div>
+    </div>
+  );
+}
