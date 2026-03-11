@@ -9,6 +9,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'deepmind-intelligent-delegation-satgate',
+    title: 'What Google DeepMind Gets Right About Agent Delegation — And What SatGate Already Built',
+    description: 'DeepMind\'s Intelligent AI Delegation paper proposes macaroon-based capability tokens for safe agent delegation. Here\'s how their framework maps to SatGate\'s architecture.',
+    date: '2026-03-11',
+    readTime: '8 min read',
+    author: 'Matt Dean',
+    tags: ['Research', 'Delegation', 'Macaroons'],
+  },
+  {
     slug: 'ai-agent-spending-limits',
     title: 'AI Agent Spending Limits: Why API Keys Aren\'t Enough',
     description: 'API rate limits don\'t control agent costs. Learn how economic firewalls enforce real-time budget limits on autonomous AI spend — per agent, per tool.',

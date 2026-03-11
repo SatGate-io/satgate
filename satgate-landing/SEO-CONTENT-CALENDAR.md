@@ -19,8 +19,8 @@
 - [ ] "Macaroon tokens vs API keys" (own the comparison)
 - [ ] "L402 protocol explained" (own the protocol)
 - [ ] "HTTP 402 Payment Required use cases" (technical SEO)
-- [ ] "AI agent delegation patterns" (architectural content)
-- [ ] "Capability-based security for APIs" (academic SEO)
+- [x] "AI agent delegation patterns" (architectural content) — `/blog/deepmind-intelligent-delegation-satgate` (3/11)
+- [x] "Capability-based security for APIs" (academic SEO) — `/blog/deepmind-intelligent-delegation-satgate` (3/11)
 - [ ] "Zero Trust for AI agents" (Wayne's LinkedIn angle)
 
 ### Long-tail — Tutorial/how-to
