@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock, DollarSign, Bot, GitBranch, Activity, RefreshCw, Menu, X, Eye, SlidersHorizontal, Play } from 'lucide-react';
+import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock, DollarSign, Bot, GitBranch, Activity, RefreshCw, Menu, X, Eye, SlidersHorizontal, Play, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -375,6 +375,55 @@ const LandingPage = () => {
           </div>
           <p className="text-xs text-gray-600 text-center mt-6">
             No identity lookups on the hot path. No per-request auth round-trips. Just cryptographic verification at wire speed.
+          </p>
+        </div>
+      </section>
+
+      {/* Research Alignment — validates architecture */}
+      <section className="py-16 px-6 border-b border-gray-800 bg-gradient-to-b from-gray-900/20 to-black">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-8">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-900/30 border border-blue-500/30 text-blue-300 text-xs font-mono mb-3">
+              <BookOpen size={12} /> RESEARCH VALIDATION
+            </span>
+            <h2 className="text-2xl font-bold mb-3">Built for the agent delegation era</h2>
+            <p className="text-gray-400 text-sm max-w-2xl mx-auto">
+              Google DeepMind&apos;s recent research on intelligent AI delegation concludes that agents need attenuated capability tokens — specifically{' '}
+              <span className="text-blue-300">macaroons</span> — to safely delegate tasks across trust boundaries.
+              They propose Delegation Capability Tokens with cryptographic caveats that restrict what each sub-agent can access.
+            </p>
+            <p className="text-gray-300 text-sm mt-3 font-medium">
+              SatGate already does this.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-4 mb-6">
+            <div className="p-4 rounded-lg bg-gray-800/50 border border-gray-700">
+              <Lock className="text-cyan-400 mb-2" size={20} />
+              <h3 className="font-bold text-sm mb-1">Scoped Authority</h3>
+              <p className="text-gray-400 text-xs">
+                Agents only get the permissions they need, attenuated at each delegation layer.
+              </p>
+            </div>
+            <div className="p-4 rounded-lg bg-gray-800/50 border border-gray-700">
+              <DollarSign className="text-green-400 mb-2" size={20} />
+              <h3 className="font-bold text-sm mb-1">Budget Ceilings</h3>
+              <p className="text-gray-400 text-xs">
+                Per-agent and per-route economic policy, enforced before upstream execution.
+              </p>
+            </div>
+            <div className="p-4 rounded-lg bg-gray-800/50 border border-gray-700">
+              <Zap className="text-yellow-400 mb-2" size={20} />
+              <h3 className="font-bold text-sm mb-1">Immediate Enforcement</h3>
+              <p className="text-gray-400 text-xs">
+                When limits hit, requests stop. Not after billing. Now.
+              </p>
+            </div>
+          </div>
+          <p className="text-gray-500 text-xs text-center">
+            We didn&apos;t build this because of a paper. We built it because it&apos;s how machine-to-machine authorization has to work. The research just confirms the architecture.
+            <span className="text-gray-600 ml-1">
+              — <a href="https://arxiv.org/abs/2602.11865" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400 underline underline-offset-2">Tomasev et al., 2026</a>
+            </span>
           </p>
         </div>
       </section>
