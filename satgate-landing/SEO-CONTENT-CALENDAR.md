@@ -8,7 +8,7 @@
 ## Keyword Targets (prioritized)
 
 ### High Priority — Direct competitors ranking
-- [ ] "API gateway for AI agents" (Solo.io, Gravitee ranking)
+- [x] "API gateway for AI agents" (Solo.io, Gravitee ranking) — `/blog/api-gateway-for-ai-agents` (3/12)
 - [ ] "AI agent spending limits" (TrueFoundry ranking)
 - [ ] "LLM cost management" (Radicalbit, TDS ranking)
 - [ ] "AI governance API teams" (Zuplo ranking)
@@ -50,6 +50,7 @@
 - 2026-03-05: "What Is an Economic Firewall?" (also on dev.to)
 - 2026-03-05: "MCP Budget Enforcement Guide" (also on dev.to)
 - 2026-03-05: "Agent Swarms Cost Governance" (also on dev.to)
+- 2026-03-12: "API Gateway for AI Agents: Why Traditional Gateways Fall Short" (also on dev.to)
 
 ## dev.to Account
 - Handle: @mattdeangit
