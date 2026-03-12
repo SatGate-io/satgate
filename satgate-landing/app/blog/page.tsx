@@ -9,6 +9,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'api-gateway-for-ai-agents',
+    title: 'API Gateway for AI Agents: Why Traditional Gateways Fall Short',
+    description: 'Traditional API gateways route traffic. AI agents need economic governance. Learn why Solo.io, Kong, and Gravitee weren\'t built for autonomous agent workloads.',
+    date: '2026-03-12',
+    readTime: '10 min read',
+    author: 'Matt Dean',
+    tags: ['Gateway', 'AI Agents', 'Architecture'],
+  },
+  {
     slug: 'deepmind-intelligent-delegation-satgate',
     title: 'What Google DeepMind Gets Right About Agent Delegation — And What SatGate Already Built',
     description: 'DeepMind\'s Intelligent AI Delegation paper proposes macaroon-based capability tokens for safe agent delegation. Here\'s how their framework maps to SatGate\'s architecture.',
