@@ -67,6 +67,46 @@ func TestInMemoryBudgetEnforcer_UnlimitedWhenNotInitialized(t *testing.T) {
 	}
 }
 
+func TestInMemoryBudgetEnforcer_SpendWithTask(t *testing.T) {
+	ctx := context.Background()
+	e := NewInMemoryBudgetEnforcer()
+
+	if err := e.Initialize(ctx, "tok1", 100); err != nil {
+		t.Fatal(err)
+	}
+
+	// SpendWithTask should record the task ID
+	r, err := e.SpendWithTask(ctx, "tok1", "tool_a", 20, "req1", "task-abc-123")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !r.Allowed || r.Remaining != 80 {
+		t.Errorf("expected allowed=true remaining=80, got allowed=%v remaining=%d", r.Allowed, r.Remaining)
+	}
+
+	log := e.SpendLog()
+	if len(log) != 1 {
+		t.Fatalf("expected 1 spend record, got %d", len(log))
+	}
+	if log[0].TaskID != "task-abc-123" {
+		t.Errorf("TaskID = %q, want %q", log[0].TaskID, "task-abc-123")
+	}
+
+	// SpendWithTask with empty taskID should still work (backward compat)
+	_, err = e.SpendWithTask(ctx, "tok1", "tool_b", 10, "req2", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	log = e.SpendLog()
+	if len(log) != 2 {
+		t.Fatalf("expected 2 spend records, got %d", len(log))
+	}
+	if log[1].TaskID != "" {
+		t.Errorf("TaskID = %q, want empty", log[1].TaskID)
+	}
+}
+
 func TestStaticCostResolver(t *testing.T) {
 	r := NewStaticCostResolver(map[string]int64{
 		"db_query":       1,

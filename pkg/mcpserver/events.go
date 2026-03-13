@@ -19,6 +19,7 @@ const (
 	EventSessionConnect     EventType = "session_connect"
 	EventSessionClose       EventType = "session_close"
 	EventSessionKeepalive   EventType = "session_keepalive"
+	EventTaskSpend          EventType = "task_spend"
 )
 
 // Event is a structured event emitted by the MCP proxy.

@@ -56,6 +56,7 @@ type Proxy struct {
 	events            EventPublisher
 	revocation        RevocationChecker // optional, checks if token is revoked
 	toolsListEnricher ToolsListEnricher // optional, enriches tools/list with cost metadata
+	taskTracker       *TaskTracker      // MCP task-level cost aggregation (SEP-1686)
 	tokenID           string            // default session token (from config or first auth)
 	rootToken         string            // auto-minted root token (for delegation demos)
 }
@@ -97,13 +98,14 @@ func New(cfg *Config) (*Proxy, error) {
 	upstream := NewUpstreamManager(cfg.Upstreams, cfg.Routing, cfg.DefaultUpstream, cfg.AllowPrivateUpstreams)
 
 	p := &Proxy{
-		config:   cfg,
-		upstream: upstream,
-		router:   &defaultRouter{mgr: upstream},
-		budget:   budget,
-		costs:    costs,
-		auth:     auth,
-		events:   &NoOpPublisher{},
+		config:      cfg,
+		upstream:    upstream,
+		router:      &defaultRouter{mgr: upstream},
+		budget:      budget,
+		costs:       costs,
+		auth:        auth,
+		events:      &NoOpPublisher{},
+		taskTracker: NewTaskTracker(),
 	}
 
 	// If macaroon auth, create delegator
@@ -670,6 +672,42 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		return NewErrorResponse(req.ID, CodeUpstreamError, fmt.Sprintf("upstream error: %v", err)), nil
 	}
 
+	// Check for MCP task ID in upstream response (SEP-1686)
+	if resp.Result != nil {
+		if taskID := extractTaskID(resp.Result); taskID != "" {
+			log.Info().
+				Str("tool", tc.Name).
+				Str("taskId", taskID).
+				Str("budgetId", budgetID).
+				Msg("MCP task detected in upstream response")
+
+			// Extract status from _meta if available
+			var meta struct {
+				Meta struct {
+					Status string `json:"status"`
+				} `json:"_meta"`
+			}
+			if err := json.Unmarshal(resp.Result, &meta); err == nil && meta.Meta.Status != "" {
+				p.taskTracker.UpdateStatus(taskID, meta.Meta.Status)
+			}
+
+			p.taskTracker.RecordSpend(taskID, tokenInfo.TokenID, budgetID, tenantID, tc.Name, cost)
+
+			p.events.Publish(Event{
+				Type:      EventTaskSpend,
+				Timestamp: time.Now(),
+				TokenID:   tokenInfo.TokenID,
+				BudgetID:  budgetID,
+				TenantID:  tenantID,
+				Data: map[string]interface{}{
+					"task_id": taskID,
+					"tool":    tc.Name,
+					"cost":    cost,
+				},
+			})
+		}
+	}
+
 	// Rewrite the response ID to match the client's request ID
 	resp.ID = req.ID
 	return resp, nil
@@ -779,4 +817,24 @@ func TokenInfoFromContext(ctx context.Context) *TokenInfo {
 		return v
 	}
 	return nil
+}
+
+// TaskTracker returns the proxy's task tracker for MCP task-level cost queries.
+func (p *Proxy) TaskTracker() *TaskTracker { return p.taskTracker }
+
+// extractTaskID parses the task ID from an MCP task response.
+// MCP Tasks (SEP-1686) include the task ID in result._meta.taskId.
+func extractTaskID(result json.RawMessage) string {
+	if len(result) == 0 {
+		return ""
+	}
+	var envelope struct {
+		Meta struct {
+			TaskID string `json:"taskId"`
+		} `json:"_meta"`
+	}
+	if err := json.Unmarshal(result, &envelope); err != nil {
+		return ""
+	}
+	return envelope.Meta.TaskID
 }

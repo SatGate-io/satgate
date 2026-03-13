@@ -64,6 +64,7 @@ type SpendRecord struct {
 	Cost      int64  `json:"cost"`
 	Remaining int64  `json:"remaining"`
 	RequestID string `json:"request_id"`
+	TaskID    string `json:"task_id,omitempty"` // MCP task correlation (SEP-1686)
 }
 
 // NewInMemoryBudgetEnforcer creates a new in-memory budget enforcer.
@@ -142,6 +143,26 @@ func (e *InMemoryBudgetEnforcer) Spend(_ context.Context, tokenID string, toolNa
 	})
 
 	return &BudgetResult{Allowed: true, Remaining: remaining, TokenID: tokenID, Cost: cost}, nil
+}
+
+// SpendWithTask is like Spend but also records the MCP task ID for correlation.
+// The budget accounting is identical — the task ID is metadata-only.
+func (e *InMemoryBudgetEnforcer) SpendWithTask(ctx context.Context, tokenID string, toolName string, cost int64, requestID string, taskID string) (*BudgetResult, error) {
+	result, err := e.Spend(ctx, tokenID, toolName, cost, requestID)
+	if err != nil {
+		return result, err
+	}
+
+	// Patch the last spend record with the task ID
+	if taskID != "" {
+		e.mu.Lock()
+		if len(e.spent) > 0 {
+			e.spent[len(e.spent)-1].TaskID = taskID
+		}
+		e.mu.Unlock()
+	}
+
+	return result, nil
 }
 
 func (e *InMemoryBudgetEnforcer) Remaining(_ context.Context, tokenID string) (int64, error) {
