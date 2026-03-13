@@ -69,24 +69,24 @@ func TestInMemoryBudgetEnforcer_UnlimitedWhenNotInitialized(t *testing.T) {
 
 func TestStaticCostResolver(t *testing.T) {
 	r := NewStaticCostResolver(map[string]int64{
-		"db_query":      1,
-		"db_write*":     5,
-		"gpt4*":         10,
+		"db_query":       1,
+		"db_write*":      5,
+		"gpt4*":          10,
 		"dalle_generate": 50,
-		"*":             3,
+		"*":              3,
 	}, 1)
 
 	tests := []struct {
 		tool string
 		want int64
 	}{
-		{"db_query", 1},       // exact match
+		{"db_query", 1},        // exact match
 		{"dalle_generate", 50}, // exact match
-		{"db_write_row", 5},   // wildcard prefix
-		{"db_write", 5},       // wildcard prefix (exact prefix)
+		{"db_write_row", 5},    // wildcard prefix
+		{"db_write", 5},        // wildcard prefix (exact prefix)
 		{"gpt4_summarize", 10}, // wildcard prefix
 		{"gpt4", 10},           // wildcard prefix
-		{"unknown_tool", 3},   // catch-all "*"
+		{"unknown_tool", 3},    // catch-all "*"
 	}
 
 	for _, tt := range tests {

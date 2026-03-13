@@ -58,7 +58,7 @@ func TestExtractIP(t *testing.T) {
 	}{
 		{"no headers", "", "192.168.1.1:12345", "192.168.1.1"},
 		{"fly-client-ip", "10.0.0.1", "192.168.1.1:12345", "10.0.0.1"},
-		{"xff ignored", "", "proxy:8080", "proxy"},  // XFF no longer trusted
+		{"xff ignored", "", "proxy:8080", "proxy"}, // XFF no longer trusted
 		{"no port", "", "192.168.1.1", "192.168.1.1"},
 	}
 

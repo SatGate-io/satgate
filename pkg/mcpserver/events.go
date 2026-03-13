@@ -9,16 +9,16 @@ import (
 type EventType string
 
 const (
-	EventToolCall       EventType = "tool_call"
-	EventBudgetSpend    EventType = "budget_spend"
-	EventBudgetExhaust       EventType = "budget_exhausted"
-	EventBudgetInsufficient  EventType = "insufficient_budget"
-	EventBudgetError    EventType = "budget_error"
-	EventDelegation     EventType = "delegation"
-	EventAuthFailure    EventType = "auth_failure"
-	EventSessionConnect   EventType = "session_connect"
-	EventSessionClose     EventType = "session_close"
-	EventSessionKeepalive EventType = "session_keepalive"
+	EventToolCall           EventType = "tool_call"
+	EventBudgetSpend        EventType = "budget_spend"
+	EventBudgetExhaust      EventType = "budget_exhausted"
+	EventBudgetInsufficient EventType = "insufficient_budget"
+	EventBudgetError        EventType = "budget_error"
+	EventDelegation         EventType = "delegation"
+	EventAuthFailure        EventType = "auth_failure"
+	EventSessionConnect     EventType = "session_connect"
+	EventSessionClose       EventType = "session_close"
+	EventSessionKeepalive   EventType = "session_keepalive"
 )
 
 // Event is a structured event emitted by the MCP proxy.

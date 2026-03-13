@@ -55,9 +55,9 @@ func newTestGateway(t *testing.T, cfg *config.Config) *Gateway {
 func newTestGatewayWithUpstream(t *testing.T, upstream *httptest.Server, policyKind string) (*Gateway, *config.Config) {
 	t.Helper()
 	cfg := &config.Config{
-		Server:   config.ServerConfig{Listen: ":8080"},
-		Admin:    config.AdminConfig{Token: "admin-secret", CORSAllowedOrigins: []string{"https://example.com"}},
-		Cloud: &config.CloudConfig{SSRF: &config.CloudSSRFConfig{AllowPrivateIPs: true}}, // tests use localhost upstreams
+		Server: config.ServerConfig{Listen: ":8080"},
+		Admin:  config.AdminConfig{Token: "admin-secret", CORSAllowedOrigins: []string{"https://example.com"}},
+		Cloud:  &config.CloudConfig{SSRF: &config.CloudSSRFConfig{AllowPrivateIPs: true}}, // tests use localhost upstreams
 		Upstreams: map[string]config.Upstream{
 			"backend": {URL: upstream.URL, Timeout: 10 * time.Second},
 		},

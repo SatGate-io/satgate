@@ -44,20 +44,20 @@ type UpstreamRouter interface {
 // Proxy is the MCP proxy gateway. It sits between an MCP client and one or
 // more upstream MCP servers, enforcing budgets and attributing costs.
 type Proxy struct {
-	config    *Config
-	client    Transport       // client-facing transport
-	upstream  *UpstreamManager
-	router    UpstreamRouter  // per-tenant routing (nil = use shared upstream)
-	budget    BudgetEnforcer
-	costs       CostResolver
-	tenantCosts TenantCostResolver // optional, per-tenant cost resolution
-	auth      Authenticator
-	delegator *Delegator
-	events    EventPublisher
-	revocation RevocationChecker // optional, checks if token is revoked
+	config            *Config
+	client            Transport // client-facing transport
+	upstream          *UpstreamManager
+	router            UpstreamRouter // per-tenant routing (nil = use shared upstream)
+	budget            BudgetEnforcer
+	costs             CostResolver
+	tenantCosts       TenantCostResolver // optional, per-tenant cost resolution
+	auth              Authenticator
+	delegator         *Delegator
+	events            EventPublisher
+	revocation        RevocationChecker // optional, checks if token is revoked
 	toolsListEnricher ToolsListEnricher // optional, enriches tools/list with cost metadata
-	tokenID   string // default session token (from config or first auth)
-	rootToken string // auto-minted root token (for delegation demos)
+	tokenID           string            // default session token (from config or first auth)
+	rootToken         string            // auto-minted root token (for delegation demos)
 }
 
 // defaultRouter wraps the shared UpstreamManager for non-multi-tenant use.
@@ -223,7 +223,6 @@ type ToolsListEnricher func(ctx context.Context, tenantID string, tools []json.R
 func (p *Proxy) SetToolsListEnricher(e ToolsListEnricher) {
 	p.toolsListEnricher = e
 }
-
 
 // ReloadUpstreams adds, removes, or replaces upstreams at runtime without restart.
 // It compares the new config against current upstreams and applies the diff.

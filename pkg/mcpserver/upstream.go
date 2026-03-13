@@ -16,9 +16,9 @@ import (
 
 // UpstreamManager manages connections to upstream MCP servers.
 type UpstreamManager struct {
-	config              map[string]UpstreamConfig
-	routing             []RoutingRule
-	defaultUp           string
+	config                map[string]UpstreamConfig
+	routing               []RoutingRule
+	defaultUp             string
 	allowPrivateUpstreams bool
 
 	mu        sync.Mutex
