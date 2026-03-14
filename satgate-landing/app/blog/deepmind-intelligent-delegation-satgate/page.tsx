@@ -28,7 +28,7 @@ export default function DeepMindDelegationPage() {
           <p className="text-xl text-gray-400 mb-4">And what SatGate already built</p>
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <span className="flex items-center gap-1"><Calendar size={14} /> March 11, 2026</span>
-            <span className="flex items-center gap-1"><Clock size={14} /> 8 min read</span>
+            <span className="flex items-center gap-1"><Clock size={14} /> 12 min read</span>
           </div>
         </header>
 
@@ -176,12 +176,107 @@ export default function DeepMindDelegationPage() {
                 </div>
                 <div>
                   <p className="text-white font-semibold mb-1">Authority Thresholds &amp; Kill Switches</p>
-                  <p className="text-gray-500 text-sm mb-2">Paper: Human-in-the-loop intervention when risk exceeds tolerance</p>
+                  <p className="text-gray-500 text-sm mb-2">Paper: Human-in-the-loop intervention when risk exceeds tolerance (pp. 18–19)</p>
                   <p className="text-gray-300 text-sm">
                     <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Enforcement modes (Observe → Control → Charge) 
                     let operators graduate trust incrementally. Budget alerts trigger before limits hit. 
                     Token revocation is immediate — one API call kills an agent&apos;s access across the 
                     entire delegation tree.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 6 */}
+            <div className="bg-gray-900 border border-gray-800 rounded-lg p-5">
+              <div className="flex items-start gap-4">
+                <div className="bg-orange-900/30 rounded-lg p-2.5 shrink-0 mt-0.5">
+                  <Zap className="text-orange-400" size={20} />
+                </div>
+                <div>
+                  <p className="text-white font-semibold mb-1">Smart Contracts for Payment Settlement</p>
+                  <p className="text-gray-500 text-sm mb-2">Paper: Blockchain escrow, staking, and automated payment release (pp. 20–22, 26–28)</p>
+                  <p className="text-gray-300 text-sm">
+                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> L402 — Lightning Network micropayment settlement.
+                    Instant, autonomous, no intermediary, no gas fees. Where the paper proposes heavyweight smart contracts,
+                    SatGate uses Lightning for sub-cent machine-to-machine payments that settle in milliseconds.
+                    For enterprises not ready for crypto, Fiat402 provides the same budget controls over fiat rails.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 7 */}
+            <div className="bg-gray-900 border border-gray-800 rounded-lg p-5">
+              <div className="flex items-start gap-4">
+                <div className="bg-teal-900/30 rounded-lg p-2.5 shrink-0 mt-0.5">
+                  <DollarSign className="text-teal-400" size={20} />
+                </div>
+                <div>
+                  <p className="text-white font-semibold mb-1">Escrow + Staking + Slashing</p>
+                  <p className="text-gray-500 text-sm mb-2">Paper: Economic penalties and bonds to incentivize correct behavior (pp. 19–21)</p>
+                  <p className="text-gray-300 text-sm">
+                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Budget enforcement with auto-revocation.
+                    When a token exhausts its budget, it&apos;s immediately invalid — no request reaches the upstream.
+                    On revoke, unspent child credits atomically return to the parent via a Lua-scripted Redis cascade.
+                    The economic incentive is structural: agents that overspend lose access.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 8 */}
+            <div className="bg-gray-900 border border-gray-800 rounded-lg p-5">
+              <div className="flex items-start gap-4">
+                <div className="bg-indigo-900/30 rounded-lg p-2.5 shrink-0 mt-0.5">
+                  <Activity className="text-indigo-400" size={20} />
+                </div>
+                <div>
+                  <p className="text-white font-semibold mb-1">Continuous Monitoring &amp; Signed Attestations</p>
+                  <p className="text-gray-500 text-sm mb-2">Paper: Real-time observability and tamper-proof audit records (pp. 13, 16–17)</p>
+                  <p className="text-gray-300 text-sm">
+                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Event streaming — every tool call, budget spend,
+                    session lifecycle, and task correlation is published as a structured event in real-time.
+                    The token spend ledger provides a complete audit trail: which agent called what tool, at what cost,
+                    under which delegation chain.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 9 */}
+            <div className="bg-gray-900 border border-gray-800 rounded-lg p-5">
+              <div className="flex items-start gap-4">
+                <div className="bg-pink-900/30 rounded-lg p-2.5 shrink-0 mt-0.5">
+                  <Shield className="text-pink-400" size={20} />
+                </div>
+                <div>
+                  <p className="text-white font-semibold mb-1">Circuit Breakers &amp; Automated Revocation</p>
+                  <p className="text-gray-500 text-sm mb-2">Paper: Algorithmic circuit breakers that invalidate tokens across delegation chains (pp. 18–19)</p>
+                  <p className="text-gray-300 text-sm">
+                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Governance service with cascade revocation.
+                    Banning a parent token instantly invalidates every child and grandchild in the delegation tree.
+                    Rate limiting acts as an additional circuit breaker — runaway agents hit throttling before they can
+                    cause economic damage.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 10 */}
+            <div className="bg-gray-900 border border-gray-800 rounded-lg p-5">
+              <div className="flex items-start gap-4">
+                <div className="bg-cyan-900/30 rounded-lg p-2.5 shrink-0 mt-0.5">
+                  <Activity className="text-cyan-400" size={20} />
+                </div>
+                <div>
+                  <p className="text-white font-semibold mb-1">Task-Level Cost Tracking</p>
+                  <p className="text-gray-500 text-sm mb-2">Paper: Multi-objective optimization across cost, quality, and latency (pp. 8–9, 12)</p>
+                  <p className="text-gray-300 text-sm">
+                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Task-aware budget tracking correlates spend
+                    by task ID across multi-step agent workflows. When an MCP task spawns retries or subtasks,
+                    SatGate tracks cumulative cost per task — not just per request. This enables the cost dimension
+                    of the multi-objective optimization the paper describes.
                   </p>
                 </div>
               </div>
@@ -272,6 +367,25 @@ export default function DeepMindDelegationPage() {
                 paper discusses trust establishment. In practice, operators want to observe first, then control, then 
                 charge. SatGate&apos;s three-mode progression (Observe → Control → Charge) lets teams build confidence 
                 incrementally without rearchitecting.
+              </p>
+            </div>
+            <div className="flex items-start gap-3">
+              <ArrowRight className="text-gray-500 shrink-0 mt-1" size={16} />
+              <p className="text-gray-300 text-sm m-0">
+                <strong className="text-white">Blockchain is the wrong settlement layer for agents.</strong> The paper 
+                proposes smart contracts and escrow bonds (pp. 20–22). In practice, on-chain settlement adds latency, gas 
+                costs, and complexity that machine-to-machine micropayments can&apos;t tolerate. SatGate uses L402 — 
+                Lightning Network payments that settle in milliseconds with sub-cent fees. For enterprises, Fiat402 
+                provides the same architecture over fiat budget rails. No blockchain required.
+              </p>
+            </div>
+            <div className="flex items-start gap-3">
+              <ArrowRight className="text-gray-500 shrink-0 mt-1" size={16} />
+              <p className="text-gray-300 text-sm m-0">
+                <strong className="text-white">Multi-tenant isolation is a deployment reality.</strong> The paper 
+                discusses market coordination between agents, but doesn&apos;t address the infrastructure question: 
+                how do you run this for multiple organizations simultaneously? SatGate&apos;s enterprise tier provides 
+                per-tenant isolation with independent budgets, delegation trees, and cost profiles — all on shared infrastructure.
               </p>
             </div>
           </div>
