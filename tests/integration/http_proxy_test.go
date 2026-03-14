@@ -263,8 +263,6 @@ func TestHTTPProxy_AuthLifecycle(t *testing.T) {
 
 // ---------- 2. L402 payment flow ----------
 
-
-
 // accessibleMockProvider wraps lightning.MockProvider to expose invoices.
 type accessibleMockProvider struct {
 	*lightning.MockProvider
