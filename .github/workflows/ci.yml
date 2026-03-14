@@ -32,6 +32,9 @@ jobs:
       - name: Test
         run: go test -race -coverprofile=coverage.out ./...
 
+      - name: Integration Tests
+        run: go test -race -v -count=1 ./tests/integration/...
+
       - name: Security - govulncheck
         run: |
           go install golang.org/x/vuln/cmd/govulncheck@latest
