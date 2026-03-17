@@ -27,6 +27,19 @@
 
 ---
 
+<div align="center">
+
+### ☁️ Don't want to self-host? Try SatGate Cloud
+
+**Managed SaaS — zero setup, multi-tenant isolation, enterprise dashboard.**<br/>
+Free Observe tier. No credit card required.
+
+<a href="https://cloud.satgate.io"><img src="https://img.shields.io/badge/🚀_Try_SatGate_Cloud-Free-blue?style=for-the-badge" alt="Try SatGate Cloud"></a>
+
+</div>
+
+---
+
 ## The Problem
 
 AI agents are making API calls autonomously. They spawn sub-agents, call MCP tools, and run overnight while you sleep.
@@ -241,9 +254,11 @@ See [`pkg/mcpserver/README.md`](pkg/mcpserver/README.md) for full documentation.
 - [LangChain Integration](docs/guides/langchain-integration.md)
 - [MCP Gateway Guide](docs/guides/mcp-gateway.md)
 
-## SatGate Cloud & Enterprise
+## ☁️ SatGate Cloud & Enterprise
 
-The open-source gateway handles protection and payments. [SatGate Cloud](https://cloud.satgate.io) adds the control plane:
+> **Self-hosting not your thing?** [SatGate Cloud](https://cloud.satgate.io) is the fully managed version — same gateway, zero ops.
+
+The open-source gateway handles protection and payments. SatGate Cloud adds the control plane:
 
 - 📊 **Observe** — Real-time dashboards, usage attribution, cost center tagging
 - 🎚️ **Control** — Budget enforcement with Fiat402 (enterprise credits)
@@ -251,7 +266,7 @@ The open-source gateway handles protection and payments. [SatGate Cloud](https:/
 - 🏢 **Multi-tenant** — Team isolation, RBAC, SSO/SCIM
 - 📝 **Audit** — Tamper-evident logging, compliance exports
 
-**[Start Free →](https://cloud.satgate.io)** (Observe mode is free, unlimited, forever)
+<a href="https://cloud.satgate.io"><strong>Start Free →</strong></a> (Observe mode is free, unlimited, forever)
 
 ## Contributing
 
