@@ -9,8 +9,8 @@
 
 ### High Priority — Direct competitors ranking
 - [x] "API gateway for AI agents" (Solo.io, Gravitee ranking) — `/blog/api-gateway-for-ai-agents` (3/12)
-- [ ] "AI agent spending limits" (TrueFoundry ranking)
-- [ ] "LLM cost management" (Radicalbit, TDS ranking)
+- [x] "AI agent spending limits" (TrueFoundry ranking) — `/blog/ai-agent-spending-limits` (3/10)
+- [x] "LLM cost management" (Radicalbit, TDS ranking) — `/blog/llm-cost-management` (3/17)
 - [ ] "AI governance API teams" (Zuplo ranking)
 - [ ] "MCP gateway guide" (Composio ranking)
 - [ ] "API monetization AI" (general gap)
@@ -51,6 +51,7 @@
 - 2026-03-05: "MCP Budget Enforcement Guide" (also on dev.to)
 - 2026-03-05: "Agent Swarms Cost Governance" (also on dev.to)
 - 2026-03-12: "API Gateway for AI Agents: Why Traditional Gateways Fall Short" (also on dev.to)
+- 2026-03-17: "LLM Cost Management: From Monitoring Dashboards to Real-Time Enforcement" (also on dev.to)
 
 ## dev.to Account
 - Handle: @mattdeangit
