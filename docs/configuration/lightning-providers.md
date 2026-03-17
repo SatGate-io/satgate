@@ -1,157 +1,97 @@
 # Lightning Provider Configuration
 
-SatGate Gateway supports multiple Lightning Network backends for L402 payments.
+SatGate supports multiple Lightning backends for L402 payments.
 
-## Implemented Providers
+## Supported Providers
 
-| Provider | Type | Status | Recommended For |
-|----------|------|--------|-----------------|
-| **Phoenixd** | Self-hosted | ✅ Implemented | Development, Small scale |
-| **LND** | Self-hosted | ✅ Implemented | Production, High volume |
-| **Mock** | Testing | ✅ Implemented | Development only |
+| Provider | Status | Description |
+|----------|--------|-------------|
+| `nwc` | ✅ Supported | Nostr Wallet Connect — works with Alby Hub and any NWC-compatible wallet |
+| `alby` | ✅ Supported | Alby API (legacy, prefer NWC) |
+| `phoenixd` | ✅ Supported | Phoenix daemon — lightweight, auto-managed channels |
+| `lnd` | ✅ Supported | LND — full Lightning node |
+| `lnbits` | ✅ Supported | LNbits — custodial or self-hosted |
+| `mock` | ✅ Supported | Mock provider for development/testing |
+| `disabled` | ✅ Supported | Explicitly disable Lightning |
 
-## Planned Providers (Not Yet Implemented)
+## Configuration
 
-| Provider | Type | Status | Notes |
-|----------|------|--------|-------|
-| Core Lightning | Self-hosted | 🔜 Planned | PR welcome |
-| Alby Hub | Hosted | 🔜 Planned | NWC support |
-| LNbits | Hosted/Self | 🔜 Planned | |
-| BTCPay Server | Self-hosted | 🔜 Planned | |
-| Voltage | Hosted | 🔜 Planned | Uses LND under the hood |
-| Strike API | Hosted | 🔜 Planned | Custodial, fiat integration |
-
----
-
-## Phoenixd
-
-Self-custodial Lightning node with minimal setup. Recommended for development and small-scale deployments.
+Set the provider via config file or environment variables:
 
 ```yaml
 lightning:
-  provider: "phoenixd"
+  provider: nwc
+  config:
+    connectionString: "${NWC_CONNECTION_STRING}"
+```
+
+**Environment variables:** Set `LIGHTNING_BACKEND` or `LIGHTNING_PROVIDER` to choose the provider. Defaults to `mock` if neither is set.
+
+### NWC (Nostr Wallet Connect) — Recommended
+
+Best option for most setups. Works with Alby Hub, Mutiny, and other NWC wallets.
+
+```yaml
+lightning:
+  provider: nwc
+  config:
+    connectionString: "nostr+walletconnect://..."
+```
+
+Get your connection string from Alby Hub: **Settings → Wallet Connections → Add Connection**.
+
+### Phoenixd
+
+Lightweight Lightning daemon with auto-managed channels.
+
+```yaml
+lightning:
+  provider: phoenixd
   config:
     apiUrl: "http://localhost:9740"
     apiPassword: "${PHOENIXD_PASSWORD}"
 ```
 
-### Setup
+### LND
 
-1. Download Phoenixd:
-```bash
-curl -L https://github.com/acinq/phoenixd/releases/latest/download/phoenixd-linux-amd64.tar.gz | tar xz
-```
-
-2. Start Phoenixd:
-```bash
-./phoenixd --network=mainnet
-```
-
-3. Get the API password:
-```bash
-cat ~/.phoenix/phoenix.conf | grep http-password
-```
-
----
-
-## LND
-
-Production-grade Lightning node. Recommended for high-volume production deployments.
+Full Lightning Network Daemon. Works with Start9, Umbrel, or standalone LND.
 
 ```yaml
 lightning:
-  provider: "lnd"
+  provider: lnd
   config:
-    restUrl: "https://localhost:8080"
-    macaroon: "0201036c6e640245..."  # Base64-encoded admin macaroon
-    tlsCert: "LS0tLS1CRUdJ..."       # Base64-encoded TLS cert (optional)
-    insecureSkipVerify: false        # Set to true only for development
+    restUrl: "https://your-lnd:8080"
+    macaroon: "${LND_MACAROON}"
+    tlsCert: "${LND_TLS_CERT}"
+    insecureSkipVerify: false
 ```
 
-### Getting Credentials
-
-```bash
-# Get macaroon
-base64 ~/.lnd/data/chain/bitcoin/mainnet/admin.macaroon
-
-# Get TLS cert
-base64 ~/.lnd/tls.cert
-```
-
-### Security Notes
-
-- Use a restricted macaroon with only `invoices:read` and `invoices:write` permissions
-- Always use TLS in production
-- Set `insecureSkipVerify: false` (the default) in production
-
----
-
-## Mock Provider
-
-For development and testing without real payments. Invoices are automatically marked as "paid".
+### LNbits
 
 ```yaml
 lightning:
-  provider: "mock"
-```
-
-⚠️ **Never use mock in production!** All payments will be auto-confirmed.
-
----
-
-## Testing Your Configuration
-
-### Check Gateway Health
-
-```bash
-curl http://localhost:8080/healthz
-```
-
-Expected response:
-```json
-{"status":"ok"}
-```
-
-### Test L402 Challenge
-
-```bash
-# Without token - should return 402 Payment Required
-curl -i http://localhost:8080/v1/premium/
-```
-
-Expected: `HTTP/1.1 402 Payment Required` with `WWW-Authenticate: L402 ...` header
-
----
-
-## Security Best Practices
-
-1. **Use environment variables for secrets**
-```yaml
-lightning:
+  provider: lnbits
   config:
-    apiPassword: "${PHOENIXD_PASSWORD}"
+    url: "https://your-lnbits-instance.com"
+    apiKey: "${LNBITS_API_KEY}"
 ```
 
-2. **Limit macaroon permissions** (LND)
-   - Only grant `invoices:read` and `invoices:write`
-   - Don't use admin macaroons
+### Mock (Development)
 
-3. **Use TLS for all connections**
+Auto-accepts all payments. Use for testing only.
 
-4. **Rotate credentials regularly**
+```yaml
+lightning:
+  provider: mock
+```
 
-5. **Monitor balance and set alerts**
+## L402 Security
 
----
+```yaml
+lightning:
+  l402RootKey: "${L402_ROOT_KEY}"          # REQUIRED: 32+ byte random key (base64)
+  requireInvoiceRecord: true               # Fail-closed: require invoice in store
+  verifyWithNode: false                    # Check node if no local record
+```
 
-## Contributing New Providers
-
-To add support for a new Lightning provider:
-
-1. Implement the `lightning.Provider` interface in `gateway/internal/lightning/`
-2. Add configuration struct in `gateway/internal/config/config.go`
-3. Register the provider in `gateway/internal/lightning/interface.go`
-4. Add documentation here
-5. Submit a PR
-
-See `gateway/internal/lightning/phoenixd.go` as a reference implementation.
+**Critical:** Set `L402_ROOT_KEY` to a cryptographically random value. Never derive it from provider names or predictable inputs.

@@ -1,258 +1,63 @@
 # Core Concepts
 
-Understanding SatGate Gateway's architecture and terminology.
+## The Three Layers
 
-## Capability Tokens
+SatGate operates in three layers:
 
-SatGate uses **capability tokens** (based on Google's Macaroons) for authentication.
+### Layer 0 — Protection (Default)
+Every request through SatGate can be verified using **macaroon tokens** — cryptographic bearer tokens that are verified locally in sub-millisecond time. No external auth service required.
 
-### What Makes Them Special?
+### Layer 1 — Economic Policy (Per Route)
+Each route gets one of three economic policies:
 
-| Feature | Traditional API Keys | Capability Tokens |
-|---------|---------------------|-------------------|
-| Delegation | Requires server call | Offline (cryptographic) |
-| Attenuation | Not possible | Add restrictions without server |
-| Revocation | Per-key | Hierarchical (revoke parent = revoke children) |
-| Audit | Limited | Full lineage tracking |
+| Policy | What It Does | Use Case |
+|--------|-------------|----------|
+| **Observe** (`chargeback`) | Verify → allow → meter/log | "Show me what agents are spending" |
+| **Control** (`fiat402`) | Verify → check budget → allow/deny | "Cap each team at $500/month" |
+| **Charge** (`l402`) | Verify → require payment → allow | "Charge 10 sats per API call" |
 
-### Token Structure
+### Layer 2 — MCP Awareness
+SatGate can parse MCP (Model Context Protocol) JSON-RPC payloads to attribute costs at the **tool level**, not just the endpoint level. See the [MCP Gateway Guide](../guides/mcp-gateway.md).
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                   Capability Token                       │
-├─────────────────────────────────────────────────────────┤
-│  Location:  https://satgate.io                          │
-│  Identifier: token-id-abc123                            │
-│  Caveats:                                               │
-│    - scope = api:read                                   │
-│    - expires = 2024-01-01T12:00:00Z                     │
-│    - rate_limit = 100/minute                            │
-│  Signature: cryptographic-signature                     │
-└─────────────────────────────────────────────────────────┘
-```
+## Macaroon Tokens
 
-### Offline Delegation
+Unlike API keys, macaroon tokens are:
+- **Cryptographically verifiable** — no database lookup needed
+- **Delegatable** — Agent A can give Agent B a token with reduced permissions
+- **Caveat-bearing** — embed expiry, scope, budget, IP binding directly in the token
+- **Unforgeable** — built on HMAC chains; can't escalate permissions
 
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Admin     │     │   Agent     │     │   Worker    │
-│   Token     │────▶│   Token     │────▶│   Token     │
-│ (all perms) │     │ (api:read)  │     │ (api:read,  │
-│             │     │             │     │  1 hour)    │
-└─────────────┘     └─────────────┘     └─────────────┘
-       │                  │                   │
-       │   No server      │   No server       │
-       │   call needed    │   call needed     │
-       ▼                  ▼                   ▼
-    Mint              Delegate            Use API
-```
+## Upstreams
 
-## Routes and Upstreams
-
-### Upstreams
-
-An **upstream** is a backend API that the gateway proxies to:
+Upstreams are the backend services SatGate proxies to. Each upstream is a named HTTP(S) endpoint:
 
 ```yaml
 upstreams:
-  my_api:
+  my-api:
     url: "https://api.example.com"
     timeout: 30s
-    healthCheck:
-      path: "/health"
-      interval: 10s
 ```
 
-### Routes
+## Routes
 
-A **route** matches requests and applies policies:
+Routes match incoming requests and apply policies. Routes are evaluated in order — first match wins.
 
 ```yaml
 routes:
-  - name: protected-api
-    path: /api/*
-    upstream: my_api
+  - name: my-route
+    match:
+      pathPrefix: /api/
+    upstream: my-api
     policy:
-      kind: observe    # or: control, charge, public
-      scope: api:read
+      kind: capability
 ```
 
-### Policy Modes
+## API Endpoints
 
-| Mode | Description | Use Case |
-|------|-------------|----------|
-| `public` | No authentication | Health checks, public APIs |
-| `observe` | Authentication + metering | Monitor before enforcing |
-| `control` | Authentication + budget enforcement | Enterprise FinOps, quotas |
-| `charge` | Authentication + payment required | API monetization |
-| `deny` | Always reject | Deprecated endpoints |
+SatGate exposes management APIs on the same port as the proxy:
 
-> **"Protection by default. Payments optional."** — Start with `observe` to monitor, graduate to `control` for budgets, add `charge` when ready to monetize.
-
-## Tenant Isolation
-
-For multi-tenant deployments, SatGate enforces isolation:
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                    SatGate Gateway                       │
-├─────────────────────────────────────────────────────────┤
-│  Tenant A                    │  Tenant B                │
-│  ─────────                   │  ─────────               │
-│  Quota: 10,000 req/day       │  Quota: 50,000 req/day   │
-│  Domains: api.tenant-a.com   │  Domains: api.tenant-b.com│
-│  Tokens: isolated            │  Tokens: isolated        │
-│  Audit: tenant-scoped        │  Audit: tenant-scoped    │
-└─────────────────────────────────────────────────────────┘
-```
-
-### Single-Tenant Default
-
-For enterprise self-hosted deployments, set a default tenant:
-
-```yaml
-server:
-  defaultTenantId: "my-company"
-```
-
-All requests are attributed to this tenant without client changes.
-
-## Governance
-
-### Token Lifecycle
-
-```
-Mint → Active → [Delegated] → Revoked/Expired
-  │       │          │             │
-  │       │          │             └── Kill Switch (instant)
-  │       │          └── Child tokens inherit parent state
-  │       └── Used for API access
-  └── Created by admin
-```
-
-### Kill Switch
-
-Revoke a token and all its descendants instantly:
-
-```bash
-curl -X POST /api/v1/governance/ban \
-  -d '{"signature": "token-to-ban"}'
-```
-
-### Audit Trail
-
-Every action is logged with tamper-evident hash chain:
-
-```json
-{
-  "event": "token.mint",
-  "timestamp": "2024-01-01T12:00:00Z",
-  "userId": "admin@example.com",
-  "resourceId": "token-abc123",
-  "previousHash": "sha256:...",
-  "eventHash": "sha256:..."
-}
-```
-
-## Data Plane vs Admin Plane
-
-| Plane | Port | Purpose | Access |
-|-------|------|---------|--------|
-| **Data** | 8080 | API traffic | Public (via ingress) |
-| **Admin** | 9090 | Management | Internal only |
-
-**Security**: The admin plane should NEVER be exposed publicly.
-
-## Policy Modes Deep Dive
-
-### Observe Mode (Default Starting Point)
-
-- Capability tokens for access control
-- Metering without enforcement
-- No Lightning/Bitcoin required
-
-```yaml
-routes:
-  - name: observed-api
-    policy:
-      kind: observe
-      scope: api:read
-```
-
-### Control Mode (Budget Enforcement)
-
-Meter usage and enforce budgets without 402 challenges:
-
-- Works with capability tokens (no client changes)
-- No 402 challenges — enforcement is via 429
-- Budget enforcement with soft/hard limits
-- Export to finance systems (SAP, NetSuite)
-
-```yaml
-routes:
-  - name: controlled-api
-    policy:
-      kind: control
-      scope: api:read
-      budget:
-        default: 10000
-        period: monthly
-        hardLimit: true
-```
-
-### Charge Mode (Payment Required)
-
-SatGate supports two payment rails:
-
-| Rail | Description | 402 Challenge? | License |
-|------|-------------|----------------|---------|
-| **L402** | Lightning micropayments | Yes | OSS |
-| **Fiat402** | Fiat invoice gating | Yes | Enterprise |
-
-#### L402 (Lightning Payments)
-
-Pay-per-request using the Lightning Network:
-
-```yaml
-lightning:
-  provider: "phoenixd"
-  l402RootKey: "${L402_ROOT_KEY}"
-
-routes:
-  - name: premium
-    policy:
-      kind: charge
-      rail: l402
-      priceSats: 50
-```
-
-Use cases:
-- Public API monetization
-- Micropayments for AI/ML inference
-- Anonymous paid access
-
-#### Fiat402 Mode (Enterprise)
-
-402-style gating with fiat invoices:
-
-```yaml
-routes:
-  - name: paid
-    policy:
-      kind: charge
-      rail: fiat402
-      priceUsd: 0.10
-```
-
-Use cases:
-- Pre-paid credits
-- Stripe/invoice integration
-- Enterprise service agreements
-
-See [Policy Modes](../POLICY_MODES.md) for complete documentation.
-
-## Next Steps
-
-- [Your First Route](first-route.md) — Protect your API
-- [Token Management](../guides/tokens.md) — Mint and delegate
-- [Production Deployment](../guides/kubernetes.md) — Kubernetes setup
+- `/api/capability/mint` — Create tokens (admin)
+- `/api/capability/validate` — Validate tokens
+- `/api/capability/delegate` — Delegate tokens with reduced permissions
+- `/api/governance/ban` — Revoke tokens
+- `/api/governance/graph` — Token lineage visualization

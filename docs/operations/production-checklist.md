@@ -1,145 +1,48 @@
 # Production Checklist
 
-Complete this checklist before going live.
+Before deploying SatGate to production, verify each item.
 
-## Security
+## Security (Critical)
 
-### Authentication
+- [ ] Set `ADMIN_TOKEN` to a strong random value (`openssl rand -hex 32`)
+- [ ] Set `CAPABILITY_ROOT_KEY` to a cryptographically random 32+ byte value
+- [ ] Set `L402_ROOT_KEY` if using L402 payments (separate from capability key)
+- [ ] `admin.enableDevLogin` is `false`
+- [ ] `admin.enableSwaggerUI` is `false` (or restricted by IP)
+- [ ] `server.trustTenantHeaderInDev` is `false`
+- [ ] No credentials in upstream URLs (use `headers` instead)
+- [ ] CORS origins are explicit (no wildcards in `corsAllowedOrigins`)
+- [ ] `admin.separateListener` set to internal-only address if using separate admin port
+- [ ] `admin.allowedIps` restricts admin API access
 
-- [ ] **Admin token** — Generated with `openssl rand -hex 32`
-- [ ] **JWT secret** — Separate from admin token
-- [ ] **Audit hash chain key** — Generated with `openssl rand -base64 48`
-- [ ] **Secrets in Kubernetes** — Using `existingSecret`, not values
+## TLS
 
-```bash
-# Verify secrets are not in values
-helm get values my-gateway -n satgate | grep -i token
-# Should return empty or reference to secret name
-```
+- [ ] Run SatGate behind a TLS-terminating reverse proxy (nginx, Caddy, cloud LB)
+- [ ] Or use upstream TLS with proper CA verification (`tls.caCertFile`)
 
-### Network
+## Lightning (if using L402)
 
-- [ ] **Admin plane private** — Not exposed via ingress
-- [ ] **NetworkPolicy enabled** — `adminPlane.networkPolicy.enabled: true`
-- [ ] **TLS enabled** — cert-manager configured
-- [ ] **Host allowlist** — `server.allowedHosts` configured
-
-```bash
-# Verify admin not exposed
-kubectl get ingress -n satgate -o yaml | grep admin
-# Should return nothing
-```
-
-### Tenant Isolation
-
-- [ ] **Default tenant set** — `global.tenantId` configured
-- [ ] **Validation mode** — `tenantIsolation.enabled: true`
-- [ ] **Strict mode ready** — Preflight green before enabling
-
-## High Availability
-
-### Replicas
-
-- [ ] **Multiple replicas** — `dataPlane.replicaCount >= 2`
-- [ ] **PDB configured** — `podDisruptionBudget.enabled: true`
-- [ ] **Pod anti-affinity** — Spread across nodes
-
-```bash
-# Verify replicas
-kubectl get pods -n satgate -l app.kubernetes.io/name=satgate-gateway
-# Should show multiple pods on different nodes
-```
-
-### Dependencies
-
-- [ ] **PostgreSQL HA** — Managed database or replica set
-- [ ] **Redis HA** — Sentinel or cluster mode
-- [ ] **External secrets** — Not bundled with chart
+- [ ] Real Lightning provider configured (not `mock`)
+- [ ] `lightning.requireInvoiceRecord: true` (fail-closed)
+- [ ] L402 root key is separate from capability root key
+- [ ] Test payment flow end-to-end
 
 ## Monitoring
 
-### Metrics
+- [ ] Health check available at `/health` or `/healthz`
+- [ ] OpenTelemetry tracing configured if needed
+- [ ] Notification webhooks configured for budget alerts
 
-- [ ] **Prometheus scraping** — `metrics.serviceMonitor.enabled: true`
-- [ ] **Grafana dashboards** — Imported from `monitoring/grafana/`
-- [ ] **Alerting rules** — Configured for error rates
+## High Availability (Enterprise)
 
-```bash
-# Verify metrics
-curl -s http://localhost:9090/metrics | grep satgate_requests_total
-```
+- [ ] Redis configured for distributed budget state
+- [ ] PostgreSQL configured for persistent storage
+- [ ] Multiple instances behind a load balancer
+- [ ] Circuit breakers configured on upstreams
 
-### Logging
+## Configuration
 
-- [ ] **JSON logs** — `--json-logs` flag enabled
-- [ ] **Log aggregation** — Shipped to central logging
-- [ ] **Audit logs** — Persisted to PostgreSQL
-
-## Backup & Recovery
-
-### Database
-
-- [ ] **Automated backups** — Daily snapshots
-- [ ] **Point-in-time recovery** — WAL archiving enabled
-- [ ] **Tested restore** — Verified restore procedure
-
-### Configuration
-
-- [ ] **GitOps** — Values in version control
-- [ ] **Helm release history** — `helm history my-gateway`
-- [ ] **Rollback tested** — `helm rollback my-gateway`
-
-## Performance
-
-### Resources
-
-- [ ] **Resource requests** — CPU and memory set
-- [ ] **Resource limits** — Prevent runaway usage
-- [ ] **HPA configured** — `autoscaling.enabled: true`
-
-### Load Testing
-
-- [ ] **Baseline established** — Normal traffic patterns
-- [ ] **Stress tested** — 2x expected load
-- [ ] **Latency SLOs** — p95 < 100ms
-
-```bash
-# Run load test
-cd gateway/tests/load
-k6 run k6_load_test.js
-```
-
-## Operational Readiness
-
-### Runbooks
-
-- [ ] **Production cutover** — [Runbook](production-cutover.md)
-- [ ] **Incident response** — Escalation path defined
-- [ ] **Rollback procedure** — Documented and tested
-
-### Access
-
-- [ ] **Break-glass access** — Admin token stored securely
-- [ ] **RBAC configured** — Operator/viewer roles assigned
-- [ ] **Audit trail** — All actions logged
-
-## Final Verification
-
-```bash
-# Run preflight check
-curl -s http://localhost:9090/api/v1/system/preflight \
-  -H "X-Admin-Token: $ADMIN_TOKEN" | jq .
-
-# All checks should be green
-```
-
-## Go Live
-
-Once all items are checked:
-
-1. Enable strict tenant isolation (see [Production Cutover](production-cutover.md))
-2. Monitor for 24 hours
-3. Declare production ready
-
-
-
+- [ ] All secrets via environment variables, not config files
+- [ ] Config validated: `./satgate --config gateway.yaml --validate`
+- [ ] Rate limits set on admin API
+- [ ] Upstream timeouts configured

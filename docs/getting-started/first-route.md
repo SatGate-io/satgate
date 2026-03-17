@@ -1,201 +1,128 @@
-# Your First Protected Route
+# Your First Route
 
-Add SatGate protection to your existing API.
+This guide walks through configuring your first SatGate route step by step.
 
-## Prerequisites
-
-- SatGate Gateway running (see [Quick Start](quickstart.md))
-- Your backend API accessible from the gateway
-
-## Step 1: Add Your Upstream
-
-Edit `gateway.yaml`:
+## 1. Start Simple — Public Route
 
 ```yaml
+version: 1
+
+server:
+  listen: ":8080"
+
+admin:
+  token: "my-admin-token"
+
+lightning:
+  provider: mock
+
 upstreams:
-  my_backend:
-    url: "http://your-api.internal:8080"
-    timeout: 30s
-    healthCheck:
-      path: "/health"
-      interval: 10s
-```
+  backend:
+    url: "https://httpbin.org"
 
-## Step 2: Add a Protected Route
-
-```yaml
 routes:
-  # Public health check (optional)
-  - name: my-health
-    path: /my-api/health
-    upstream: my_backend
+  - name: public-api
+    match:
+      pathPrefix: /
+    upstream: backend
     policy:
       kind: public
+```
 
-  # Protected API endpoints
-  - name: my-api
-    path: /my-api/*
-    upstream: my_backend
+```bash
+./satgate --config gateway.yaml
+curl http://localhost:8080/anything  # Proxied to httpbin, no auth
+```
+
+## 2. Add Protection — Capability Route
+
+Add a protected route above the public one (routes match in order):
+
+```yaml
+routes:
+  - name: protected-api
+    match:
+      pathPrefix: /api/
+    upstream: backend
     policy:
-      kind: observe
-      scope: myapi:access
+      kind: capability
+
+  - name: public-fallback
+    match:
+      pathPrefix: /
+    upstream: backend
+    policy:
+      kind: public
 ```
 
-## Step 3: Restart Gateway
+Now `/api/*` requires a valid macaroon token:
 
 ```bash
-# Docker Compose
-docker compose restart gateway
+# This fails with 401
+curl http://localhost:8080/api/anything
 
-# Kubernetes
-kubectl rollout restart deployment/satgate-gateway -n satgate
-```
-
-## Step 4: Mint a Token
-
-```bash
-curl -X POST http://localhost:9090/api/v1/tokens \
-  -H "X-Admin-Token: $ADMIN_TOKEN" \
+# Mint a token
+TOKEN=$(curl -s -X POST http://localhost:8080/api/capability/mint \
+  -H "Authorization: Bearer my-admin-token" \
   -H "Content-Type: application/json" \
-  -d '{
-    "scope": "myapi:access",
-    "expiresIn": 86400,
-    "metadata": {
-      "client": "my-first-client"
-    }
-  }'
+  -d '{}' | jq -r '.token')
+
+# This works
+curl http://localhost:8080/api/anything \
+  -H "Authorization: Bearer $TOKEN"
 ```
 
-Save the token from the response.
-
-## Step 5: Test Access
-
-**Without token:**
-```bash
-curl http://localhost:8080/my-api/users
-# → 401 Unauthorized
-```
-
-**With token:**
-```bash
-curl http://localhost:8080/my-api/users \
-  -H "Authorization: Bearer YOUR_TOKEN"
-# → Your API response
-```
-
-## Step 6: Distribute Token to Clients
-
-### Option A: Direct Token
-
-Give the token directly to trusted clients:
-
-```bash
-# Client uses the token
-curl https://api.example.com/my-api/users \
-  -H "Authorization: Bearer eyJ..."
-```
-
-### Option B: Delegated Token
-
-Create a restricted token for less-trusted clients:
-
-```bash
-# Delegate with restrictions
-curl -X POST http://localhost:9090/api/v1/tokens/SIGNATURE/delegate \
-  -H "X-Admin-Token: $ADMIN_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "caveats": [
-      {"type": "expires", "value": "1h"},
-      {"type": "rate_limit", "value": "100/minute"}
-    ]
-  }'
-```
-
-## Adding Rate Limiting
-
-Protect against abuse:
+## 3. Add Payments — L402 Route
 
 ```yaml
 routes:
-  - name: my-api
-    path: /my-api/*
-    upstream: my_backend
+  - name: premium-api
+    match:
+      pathPrefix: /premium/
+    upstream: backend
     policy:
-      kind: observe
-      scope: myapi:access
-    rateLimit:
-      requestsPerMinute: 100
-      burstSize: 20
+      kind: l402
+      priceSats: 10
+
+  - name: protected-api
+    match:
+      pathPrefix: /api/
+    upstream: backend
+    policy:
+      kind: capability
+
+  - name: public-fallback
+    match:
+      pathPrefix: /
+    upstream: backend
+    policy:
+      kind: public
 ```
 
-## Monitoring Your Route
+Now `/premium/*` returns HTTP 402 with a Lightning invoice. Pay the invoice to get access.
 
-### Check Stats
-
-```bash
-curl http://localhost:9090/api/v1/stats/routes \
-  -H "X-Admin-Token: $ADMIN_TOKEN" | jq '.routes["my-api"]'
-```
-
-### View Metrics
-
-```bash
-curl http://localhost:8080/metrics | grep 'satgate_route_requests.*my-api'
-```
-
-## Common Patterns
-
-### Read-Only vs Write Access
+## 4. Add Budget Enforcement — Fiat402 Route
 
 ```yaml
-routes:
-  # Read-only access
-  - name: my-api-read
-    path: /my-api/*
-    methods: [GET, HEAD]
-    upstream: my_backend
+  - name: budget-api
+    match:
+      pathPrefix: /controlled/
+    upstream: backend
     policy:
-      kind: observe
-      scope: myapi:read
-
-  # Write access
-  - name: my-api-write
-    path: /my-api/*
-    methods: [POST, PUT, DELETE]
-    upstream: my_backend
-    policy:
-      kind: observe
-      scope: myapi:write
+      kind: fiat402
+      costCredits: 5
+      pay:
+        mode: fiat402
+        price: 0.05
+        unit: USD
+        enforceBudget: true
+        costCenterHeader: X-Cost-Center
 ```
 
-### Internal vs External
-
-```yaml
-routes:
-  # External (public internet)
-  - name: public-api
-    path: /api/v1/*
-    upstream: my_backend
-    policy:
-      kind: observe
-      scope: api:external
-
-  # Internal (service-to-service)
-  - name: internal-api
-    path: /internal/*
-    upstream: my_backend
-    policy:
-      kind: observe
-      scope: api:internal
-    # Only from trusted proxies
-```
+Agents are stopped when their budget is spent. No alerts — blocked.
 
 ## Next Steps
 
-- [Token Management](../guides/tokens.md) — Lifecycle and delegation
-- [Rate Limiting](../guides/rate-limiting.md) — Protect against abuse
-- [Production Deployment](kubernetes.md) — Go to production
-
-
-
+- [Route Configuration](../configuration/routes.md) — full route matching options
+- [Policy & Scope](../configuration/policy-scope.md) — policy details
+- [Lightning Providers](../configuration/lightning-providers.md) — configure real payments

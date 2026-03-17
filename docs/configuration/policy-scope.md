@@ -1,167 +1,92 @@
-# Policy Scope Configuration
+# Policy & Scope Configuration
 
-## Overview
+## Policy Kinds
 
-SatGate Gateway supports fine-grained access control through **policy scopes**. When a route is configured with `policy.kind: observe`, `control`, or `charge`, you can optionally require a specific scope in the capability token.
+SatGate supports six policy kinds organized in two layers:
 
-## Scope Format
+### Layer 0 — Protection (No Economics)
+- **`public`** — No auth required. Use for health checks, docs, public endpoints.
+- **`deny`** — Block all requests. Use for deprecated or disabled routes.
+- **`capability`** (aliases: `protected`, `protect`) — Requires a valid macaroon token. Verifies cryptographically, sub-millisecond, no external auth calls.
 
-Scopes follow a hierarchical pattern:
+### Layer 1 — Economic Policies
+- **`chargeback`** (aliases: `observe`, `audit`) — Verify token → allow request → meter and log usage. Non-blocking. Good for initial rollout.
+- **`fiat402`** (aliases: `control`, `budget`) — Verify token → check budget → allow or block. Hard enforcement.
+- **`control`** requires a `pay` block in the route config.
+- **`l402`** (aliases: `charge`, `monetize`) — Verify token → require Lightning payment proof → allow. Requires `priceSats` or `pay` configuration.
 
-```
-<resource>:<action>
-<resource>:<sub-resource>:<action>
-<resource>:*
-```
+## Scopes
 
-### Examples
-
-| Scope | Description |
-|-------|-------------|
-| `api:read` | Read access to API |
-| `api:write` | Write access to API |
-| `api:*` | All API permissions |
-| `admin:users:read` | Read access to admin user management |
-| `admin:*` | All admin permissions |
-| `*` | Full access (all scopes) |
-
-## Route Configuration
-
-### Gateway YAML
+Macaroon tokens can carry scope caveats. When a route specifies `scope`, the token must include that scope:
 
 ```yaml
 routes:
-  - name: "public-api"
-    upstream: "backend"
+  - name: read-api
     match:
-      pathPrefix: "/api/v1/public"
+      pathPrefix: /api/read
+    upstream: backend
     policy:
-      kind: "public"  # No auth required
+      kind: capability
+      scope: read
 
-  - name: "read-api"
-    upstream: "backend"
+  - name: admin-api
     match:
-      pathPrefix: "/api/v1/data"
+      pathPrefix: /api/admin
+    upstream: backend
     policy:
-      kind: "observe"   # Monitor and meter
-      scope: "api:read" # Requires api:read scope
-
-  - name: "controlled-api"
-    upstream: "backend"
-    match:
-      pathPrefix: "/api/v1/internal"
-    policy:
-      kind: "control"   # Budget enforcement
-      scope: "api:internal"
-      budget:
-        default: 10000
-        period: monthly
-
-  - name: "admin-api"
-    upstream: "backend"
-    match:
-      pathPrefix: "/api/v1/admin"
-    policy:
-      kind: "observe"
-      scope: "admin:*"  # Requires any admin scope
+      kind: capability
+      scope: admin
 ```
 
-### Cloud Dashboard
+Scopes are enforced via macaroon caveats — agents cannot escalate their own scope.
 
-In the Cloud Dashboard, when configuring a route:
+## Cost Credits
 
-1. Select **Policy Mode**: `observe`, `control`, or `charge`
-2. Enter **Required Scope**: e.g., `api:read`
-3. Configure additional options based on mode (budgets for Control, pricing for Charge)
+For `fiat402`/`control` mode, you can assign different credit costs per route:
 
-## Scope Matching Rules
+```yaml
+routes:
+  - name: expensive-endpoint
+    match:
+      pathPrefix: /api/generate
+    upstream: backend
+    policy:
+      kind: fiat402
+      costCredits: 50
+      pay:
+        mode: fiat402
+        price: 0.50
+        unit: USD
+        enforceBudget: true
+        costCenterHeader: X-Cost-Center
 
-| Token Scope | Required Scope | Match? |
-|-------------|----------------|--------|
-| `api:read` | `api:read` | ✅ Yes |
-| `api:*` | `api:read` | ✅ Yes (wildcard) |
-| `*` | `api:read` | ✅ Yes (full access) |
-| `api:write` | `api:read` | ❌ No |
-| `admin:read` | `api:read` | ❌ No |
-| `api:read` | (empty) | ✅ Yes (any valid token) |
-
-## Default Behavior
-
-- **Empty scope**: Any valid capability token is accepted
-- **Non-empty scope**: Token must include the required scope or a parent scope
-
-## Security Considerations
-
-1. **Principle of Least Privilege**: Issue tokens with minimal required scopes
-2. **Wildcard Caution**: Use `*` scopes sparingly (typically for admin tokens only)
-3. **Scope Hierarchy**: Design your scope hierarchy before deploying
-4. **Token Revocation**: Use the governance API to ban compromised tokens
-
-## Minting Tokens with Scopes
-
-### Admin API
-
-```bash
-curl -X POST https://gateway/api/v1/tokens \
-  -H "X-Admin-Token: $ADMIN_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "scope": "api:read",
-    "expires_in": "24h"
-  }'
+  - name: cheap-endpoint
+    match:
+      pathPrefix: /api/search
+    upstream: backend
+    policy:
+      kind: fiat402
+      costCredits: 1
+      pay:
+        mode: fiat402
+        price: 0.01
+        unit: USD
+        enforceBudget: true
 ```
 
-### Delegation
+## Pay Policy
 
-Tokens can be delegated with narrower scope:
+Routes with economic policies (`chargeback`, `fiat402`, `l402`) can include a `pay` block:
 
-```bash
-# Original token has scope: api:*
-# Delegated token will have scope: api:read
-curl -X POST https://gateway/api/v1/tokens/delegate \
-  -H "Authorization: Capability $ORIGINAL_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "scope": "api:read",
-    "expires_in": "1h"
-  }'
-```
-
-## Policy Mode + Scope Summary
-
-| Policy Mode | Scope Required | What Happens |
-|-------------|----------------|--------------|
-| `public` | N/A | No token needed |
-| `observe` | Optional | Token verified, usage metered |
-| `control` | Optional | Token verified, budget enforced |
-| `charge` | Optional | Token verified, payment required |
-
-## Audit Logging
-
-Scope enforcement is logged:
-
-```json
-{
-  "level": "info",
-  "msg": "Capability token authorized",
-  "route": "read-api",
-  "scope_required": "api:read",
-  "scope_granted": "api:*",
-  "policy_mode": "observe",
-  "tenant_id": "..."
-}
-```
-
-Failed scope checks:
-
-```json
-{
-  "level": "warn",
-  "msg": "Scope check failed",
-  "route": "admin-api",
-  "scope_required": "admin:*",
-  "scope_granted": "api:read",
-  "policy_mode": "observe",
-  "error": "insufficient scope"
-}
+```yaml
+policy:
+  kind: l402
+  pay:
+    mode: l402              # chargeback, fiat402, or l402
+    price: 10.0             # Price per request
+    unit: sats              # sats, USD, or credits
+    scope: read             # Required scope
+    costCenterHeader: X-Cost-Center  # Header for cost attribution
+    enforceBudget: true     # Enforce tenant budgets
+    creditsPerSat: 1        # L402 → credits conversion rate
 ```
