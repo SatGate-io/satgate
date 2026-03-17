@@ -1,118 +1,40 @@
-# SDK Documentation
+# SDKs & Client Libraries
 
-Client libraries for integrating with SatGate Gateway.
+SatGate provides official SDKs for Python and Node.js/TypeScript.
 
 ## Available SDKs
 
-### Admin/Operator SDKs
+| SDK | Package | Status |
+|-----|---------|--------|
+| [Python](python.md) | `pip install satgate` | ✅ v2.0.0 |
+| [Node.js/TypeScript](nodejs.md) | `npm install @satgate/sdk` | ✅ |
+| [Go](go.md) | Import `pkg/` directly | ✅ Native |
 
-For managing the gateway (tokens, governance, configuration):
+## Agent SDKs
 
-| Language | Package | Status |
-|----------|---------|--------|
-| [Go](go.md) | `github.com/satgate-io/satgate-go` | ✅ Stable |
-| [Python](python.md) | `satgate` | ✅ Stable |
-| [Node.js](nodejs.md) | `satgate-sdk` | ✅ Stable |
+Built on top of the base SDKs, these provide automatic token management and L402 payment handling for AI agents:
 
-### Agent SDKs
+| SDK | Included In | Description |
+|-----|------------|-------------|
+| [Python Agent Client](agent-python.md) | `satgate` package | `SatGateAgentClient` — auto-mint, cache, L402 |
+| [Node.js Agent Client](agent-nodejs.md) | `@satgate/sdk` | `SatGateAgentClient` — auto-mint, cache, L402 |
 
-For AI agents calling SatGate-protected APIs (auto-402 handling, badge-in, payments):
+## Integrations
 
-| Language | Package | Status |
-|----------|---------|--------|
-| [Python Agent](agent-python.md) | `satgate` (`SatGateAgentClient`) | ✅ Stable |
-| [Node.js Agent](agent-nodejs.md) | `@satgate/sdk` (`SatGateAgentClient`) | ✅ Stable |
+| Integration | Included In | Description |
+|-------------|------------|-------------|
+| [LangChain](../guides/langchain-integration.md) | `satgate` Python package | `SatGateTool`, `SatGateToolkit` for LangChain agents |
 
-**Agent SDKs provide:**
-- Automatic 402 Payment Required handling (L402 + Fiat402)
-- Identity-based token minting via Mint (K8s, AWS, OIDC)
-- Token delegation for sub-agents
-- LangChain/LangGraph integration
+## Architecture
 
-## Quick Comparison
+Each SDK provides two clients:
 
-### Authentication
+- **`SatGateClient`** — Admin operations (mint tokens, ban, governance). Uses `X-Admin-Token` header.
+- **`SatGateAgentClient`** — Agent operations (make API calls with automatic token & payment handling). Uses Bearer tokens.
 
-All SDKs support the same authentication methods:
-
-```go
-// Go
-client := satgate.NewClient("https://api.example.com",
-    satgate.WithAdminToken("your-token"))
-
-// Python
-client = SatGateClient("https://api.example.com",
-    admin_token="your-token")
-
-// Node.js
-const client = new SatGateClient("https://api.example.com", {
-    adminToken: "your-token"
-});
-```
-
-### Token Minting
-
-```go
-// Go
-token, err := client.Tokens.Mint(ctx, &satgate.MintRequest{
-    Scope:     "api:read",
-    ExpiresIn: 3600,
-})
-
-// Python
-token = client.tokens.mint(scope="api:read", expires_in=3600)
-
-// Node.js
-const token = await client.tokens.mint({
-    scope: "api:read",
-    expiresIn: 3600
-});
-```
-
-### Making Protected Requests
-
-```go
-// Go
-resp, err := client.Request(ctx, "GET", "/api/users",
-    satgate.WithToken(token))
-
-// Python
-resp = client.request("GET", "/api/users", token=token)
-
-// Node.js
-const resp = await client.request("GET", "/api/users", { token });
-```
-
-## Common Features
-
-All SDKs provide:
-
-- **Token Management** — Mint, delegate, revoke tokens
-- **Governance** — Ban/unban tokens, view lineage
-- **Configuration** — Get/update gateway config
-- **Statistics** — Query metrics and usage
-- **WebSocket Telemetry** — Real-time event streaming
-
-## Error Handling
-
-All SDKs use consistent error types:
-
-| Error | Description |
-|-------|-------------|
-| `AuthenticationError` | Invalid or missing credentials |
-| `AuthorizationError` | Insufficient permissions |
-| `NotFoundError` | Resource not found |
-| `RateLimitError` | Rate limit exceeded |
-| `ValidationError` | Invalid request parameters |
-| `ServerError` | Gateway internal error |
-
-## Best Practices
-
-1. **Reuse clients** — Create one client instance and reuse it
-2. **Handle rate limits** — Implement exponential backoff
-3. **Use timeouts** — Set appropriate request timeouts
-4. **Secure tokens** — Never log or expose tokens
-5. **Delegate tokens** — Use delegated tokens for downstream services
-
-
-
+Both clients talk to the same gateway endpoints:
+- `/api/capability/mint` — Create tokens
+- `/api/capability/validate` — Validate tokens
+- `/api/capability/delegate` — Delegate tokens
+- `/api/governance/ban` — Ban tokens
+- `/api/governance/graph` — Token lineage

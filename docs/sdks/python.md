@@ -8,255 +8,290 @@ Official Python client for SatGate Gateway.
 pip install satgate
 ```
 
-## Quick Start
+## Two Clients
+
+SatGate provides two clients for different use cases:
+
+| Client | For | Auth |
+|--------|-----|------|
+| `SatGateClient` | **Operators** — mint tokens, ban tokens, manage governance | `X-Admin-Token` header |
+| `SatGateAgentClient` | **AI Agents** — make API calls with automatic token & payment handling | Auto-mints tokens, handles L402 |
+
+---
+
+## Admin Client (`SatGateClient`)
+
+For operators managing tokens and governance.
 
 ```python
 from satgate import SatGateClient
 
-# Create client
 client = SatGateClient(
-    "https://api.example.com",
-    admin_token="your-admin-token"
+    base_url="http://localhost:8080",
+    admin_token="your-admin-token",
+    timeout=30  # optional, default 30s
 )
+```
 
-# Mint a token
+### Mint a Token
+
+```python
 token = client.tokens.mint(
-    scope="api:read",
-    expires_in=3600,  # 1 hour
-    metadata={"user": "agent-1"}
+    scope="api:*",      # scope string (default: "api:*")
+    duration="1h"       # Go duration string: "30m", "1h", "24h"
 )
 
 print(f"Token: {token.token}")
+print(f"Signature: {token.signature}")
 print(f"Expires: {token.expires_at}")
 ```
 
-## Client Configuration
+### Validate a Token
 
 ```python
-from satgate import SatGateClient
+result = client.tokens.validate("token-string-here")
+# Returns dict with: valid, identifier, caveats
+```
 
-# Basic configuration
-client = SatGateClient(
-    "https://api.example.com",
-    admin_token="your-admin-token"
+### Delegate a Token
+
+Create a child token with reduced permissions — no server roundtrip needed for verification:
+
+```python
+child = client.tokens.delegate(
+    parent_token="parent-token-string",
+    caveats=["scope = api:read", "expires = 1800"]
 )
-
-# Full configuration
-client = SatGateClient(
-    "https://api.example.com",
-    admin_token="your-admin-token",
-    timeout=30,
-    retries=3,
-    verify_ssl=True
-)
-
-# With JWT authentication
-client = SatGateClient(
-    "https://api.example.com",
-    jwt="your-jwt-token"
-)
+print(f"Child token: {child.token}")
 ```
 
-## Async Support
+### Governance
 
 ```python
-from satgate import AsyncSatGateClient
-import asyncio
-
-async def main():
-    client = AsyncSatGateClient(
-        "https://api.example.com",
-        admin_token="your-admin-token"
-    )
-
-    token = await client.tokens.mint(
-        scope="api:read",
-        expires_in=3600
-    )
-    print(f"Token: {token.token}")
-
-asyncio.run(main())
-```
-
-## Token Management
-
-### Mint Token
-
-```python
-token = client.tokens.mint(
-    scope="api:read,api:write",
-    expires_in=86400,  # 24 hours
-    metadata={
-        "user": "agent-1",
-        "purpose": "data-pipeline"
-    }
-)
-```
-
-### List Tokens
-
-```python
-tokens = client.tokens.list(limit=100, offset=0)
-
-for t in tokens.items:
-    print(f"Token: {t.signature[:8]}, Scope: {t.scope}")
-```
-
-### Get Token Details
-
-```python
-token = client.tokens.get("token-signature")
-```
-
-### Revoke Token
-
-```python
-client.tokens.revoke("token-signature")
-```
-
-### Delegate Token
-
-```python
-delegated = client.tokens.delegate(
-    "parent-signature",
-    caveats=[
-        {"type": "expires", "value": "1h"},
-        {"type": "rate_limit", "value": "100/minute"},
-        {"type": "scope", "value": "api:read"}
-    ]
-)
-```
-
-## Governance
-
-### Ban Token
-
-```python
+# Ban a token
 client.governance.ban(
-    signature="token-to-ban",
-    reason="Compromised credentials"
+    signature="hex-token-signature",
+    reason="Compromised"
+)
+
+# Get token lineage graph (nodes, edges, stats)
+graph = client.governance.get_graph()
+
+# Reset all governance data
+client.governance.reset()
+```
+
+### Health Check
+
+```python
+is_healthy = client.health()  # Returns bool
+
+# Ping with a specific token
+result = client.ping("capability-token")
+```
+
+---
+
+## Agent Client (`SatGateAgentClient`)
+
+For AI agents making API calls. Handles token minting, caching, refresh, and L402 payments automatically.
+
+```python
+from satgate import SatGateAgentClient
+
+# With admin token (auto-mints capability tokens)
+client = SatGateAgentClient(
+    gateway_url="http://localhost:8080",
+    admin_token="your-admin-token",
+    scope="api:*",      # default scope for minted tokens
+    duration="1h",      # default token duration
+)
+
+# Or with a pre-existing token
+client = SatGateAgentClient(
+    gateway_url="http://localhost:8080",
+    token="your-capability-token",
+)
+
+# Or via environment variables
+# SATGATE_ADMIN_TOKEN or SATGATE_TOKEN
+client = SatGateAgentClient(gateway_url="http://localhost:8080")
+```
+
+### Making Requests
+
+```python
+# Simple HTTP methods
+response = client.get("/api/data")
+response = client.post("/api/data", json={"key": "value"})
+response = client.put("/api/data/1", json={"key": "updated"})
+response = client.delete("/api/data/1")
+
+# Response is an AgentResponse
+data = response.json()
+text = response.text()
+print(f"Status: {response.status_code}")
+print(f"Cost: {response.cost}")
+print(f"Budget remaining: {response.budget_remaining}")
+```
+
+### L402 Payments (Lightning)
+
+Add a wallet to automatically pay L402 challenges:
+
+```python
+from satgate import SatGateAgentClient, LNDWallet, AlbyWallet
+
+# With LND
+client = SatGateAgentClient(
+    gateway_url="http://localhost:8080",
+    admin_token="your-admin-token",
+    wallet=LNDWallet(
+        host="localhost:10009",
+        macaroon_path="~/.lnd/admin.macaroon",
+        cert_path="~/.lnd/tls.cert",
+    ),
+)
+
+# With Alby
+client = SatGateAgentClient(
+    gateway_url="http://localhost:8080",
+    admin_token="your-admin-token",
+    wallet=AlbyWallet(
+        access_token="your-alby-token",
+        # Or: nwc_url="nostr+walletconnect://..."
+    ),
+)
+
+# L402 endpoints are handled automatically
+response = client.get("/premium/data")  # Pays Lightning invoice if needed
+```
+
+### Token Delegation
+
+Create restricted tokens for worker agents:
+
+```python
+# Delegate from the current token
+child_token = client.delegate(
+    caveats=["scope = api:read", "expires = 3600"]
+)
+
+# Give the child token to a worker agent
+worker = SatGateAgentClient(
+    gateway_url="http://localhost:8080",
+    token=child_token,
 )
 ```
 
-### Unban Token
+### Budget Tracking
 
 ```python
-client.governance.unban("token-signature")
-```
-
-### Get Ban List
-
-```python
-banned = client.governance.ban_list()
-
-for sig in banned.signatures:
-    print(f"Banned: {sig}")
-```
-
-### Get Token Lineage
-
-```python
-graph = client.governance.graph()
-
-for node in graph.nodes:
-    print(f"Token: {node.signature}, Parent: {node.parent}")
-```
-
-## Configuration
-
-### Get Config
-
-```python
-config = client.config.get()
-
-print(f"Routes: {len(config.routes)}")
-```
-
-### Update Config
-
-```python
-client.config.update({
-    "routes": [
-        {
-            "name": "new-api",
-            "path": "/v2/*",
-            "upstream": "backend",
-            "policy": {
-                "kind": "observe",
-                "scope": "api:v2"
-            }
-        }
-    ]
-})
-```
-
-### Validate Config
-
-```python
-result = client.config.validate(config_yaml)
-
-if not result.valid:
-    for error in result.errors:
-        print(f"Error at line {error.line}: {error.message}")
-```
-
-## Statistics
-
-### Get Gateway Stats
-
-```python
-stats = client.stats.get()
-
-print(f"Total Requests: {stats.total_requests}")
-print(f"Active Tokens: {stats.active_tokens}")
-```
-
-### Get Route Stats
-
-```python
-routes = client.stats.routes()
-
-for name, stats in routes.items():
-    print(f"{name}: {stats.requests} requests, p99: {stats.latency_p99}ms")
-```
-
-## Making Protected Requests
-
-```python
-# Using a capability token
-response = client.request(
-    "GET",
-    "/api/users",
-    token=token.token
+client = SatGateAgentClient(
+    gateway_url="http://localhost:8080",
+    admin_token="...",
+    budget_limit=100.0,
+    on_budget_alert=lambda used, limit: print(f"Budget alert: ${used}/{limit}"),
 )
 
-users = response.json()
+print(f"Total cost: {client.total_cost}")
+print(f"Remaining: {client.budget_remaining}")
+print(f"Current token: {client.current_token}")
 ```
 
-## WebSocket Telemetry
+---
+
+## Delegation Helpers
+
+Rich helpers for common delegation patterns:
 
 ```python
-from satgate import SatGateClient, EventType
+from satgate import delegate, Caveats, DelegationPatterns
 
-client = SatGateClient("https://api.example.com", admin_token="...")
+# Fluent builder
+token = (delegate(parent_token)
+    .with_scope("api:read")
+    .with_expiry(seconds=3600)
+    .for_team("engineering")
+    .with_budget(50.0, "USD")
+    .with_rate_limit(100, period_seconds=60)
+    .delegate(client))
 
-# Sync version
-for event in client.telemetry.subscribe():
-    if event.type == EventType.TOKEN_MINT:
-        print(f"Token minted: {event.signature}")
-    elif event.type == EventType.TOKEN_BAN:
-        print(f"Token banned: {event.signature}")
-    elif event.type == EventType.REQUEST:
-        print(f"Request: {event.method} {event.path} ({event.status})")
+# Common patterns
+read_only = DelegationPatterns.read_only(parent_token).delegate(client)
+temp_token = DelegationPatterns.temporary(parent_token, hours=24).delegate(client)
+team_token = DelegationPatterns.team_budget(parent_token, "eng", 500.0).delegate(client)
+api_client = DelegationPatterns.api_client(parent_token, "client-1", 100).delegate(client)
+webhook = DelegationPatterns.webhook(parent_token, "/callback", expiry_minutes=30).delegate(client)
+agent_swarm = DelegationPatterns.agent_swarm(parent_token, "swarm-1", budget=100.0).delegate(client)
+
+# Individual caveat builders
+Caveats.scope("api:read")
+Caveats.expires(seconds=3600)
+Caveats.routes(["/api/v1/*", "/health"])
+Caveats.rate_limit(100, period=60)
+Caveats.budget(50.0, "USD")
+Caveats.source_ip(["10.0.0.0/8"])
+Caveats.methods(["GET", "POST"])
+Caveats.team("engineering")
 ```
 
-### Async WebSocket
+---
+
+## LangChain Integration
+
+Use SatGate-protected APIs as LangChain tools:
 
 ```python
-async def watch_events():
-    async for event in client.telemetry.subscribe_async():
-        print(f"Event: {event.type}")
+from satgate.langchain import SatGateTool, SatGateToolkit, create_satgate_tool
+from langchain.agents import initialize_agent, AgentType
+from langchain.chat_models import ChatOpenAI
+
+# Single tool
+tool = SatGateTool(
+    name="api_query",
+    description="Query the protected API endpoint",
+    gateway_url="http://localhost:8080",
+    admin_token="your-admin-token",
+    endpoint="/api/data/query",
+    cost_per_call=0.01,
+    budget_limit=10.0,
+)
+
+# Or use a toolkit for multiple tools sharing config
+toolkit = SatGateToolkit(
+    gateway_url="http://localhost:8080",
+    admin_token="your-admin-token",
+    budget_limit=100.0,
+)
+
+data_tool = toolkit.create_tool(
+    name="data_query",
+    description="Query the data API",
+    endpoint="/api/data/query",
+)
+
+analytics_tool = toolkit.create_tool(
+    name="analytics",
+    description="Run analytics queries",
+    endpoint="/api/analytics",
+)
+
+# Use with a LangChain agent
+llm = ChatOpenAI(temperature=0)
+agent = initialize_agent(
+    tools=toolkit.get_tools(),
+    llm=llm,
+    agent=AgentType.OPENAI_FUNCTIONS,
+    verbose=True,
+)
+
+result = agent.run("Get the latest data and run analytics")
 ```
+
+Tools automatically return structured JSON with `success`, `data`, `cost`, and `budget_remaining` — giving the LLM economic awareness.
+
+---
 
 ## Error Handling
 
@@ -264,86 +299,42 @@ async def watch_events():
 from satgate import (
     SatGateError,
     AuthenticationError,
-    AuthorizationError,
-    RateLimitError,
+    PaymentRequiredError,
+    PaymentFailedError,
+    BudgetExceededError,
+    TokenExpiredError,
+    DelegationError,
     NotFoundError,
-    ValidationError
 )
 
 try:
-    token = client.tokens.mint(scope="api:read")
-except RateLimitError as e:
-    print(f"Rate limited. Retry after {e.retry_after} seconds")
-    time.sleep(e.retry_after)
+    response = client.get("/api/data")
+except PaymentRequiredError as e:
+    print(f"Payment needed: {e.amount} {e.unit}")
+    print(f"Invoice: {e.invoice}")
+except BudgetExceededError as e:
+    print(f"Over budget: used ${e.used}, limit ${e.limit}")
 except AuthenticationError:
     print("Invalid credentials")
-except ValidationError as e:
-    print(f"Validation error: {e.message}")
 except SatGateError as e:
-    print(f"API error: {e.code} - {e.message}")
+    print(f"API error: {e}")
 ```
 
-## Context Manager
+## Data Models
 
 ```python
-from satgate import SatGateClient
+from satgate import Token, TokenInfo, BanRecord, Stats, GraphData
 
-with SatGateClient("https://api.example.com", admin_token="...") as client:
-    token = client.tokens.mint(scope="api:read")
-    # Client is automatically closed when exiting the context
+# Token — returned from mint/delegate
+token.token       # str: the bearer token string
+token.signature   # str: hex signature
+token.scope       # Optional[str]
+token.expires_at  # Optional[datetime]
+token.caveats     # Optional[List[str]]
+
+# GraphData — from governance.get_graph()
+graph = GraphData.from_dict(data)
+graph.nodes  # List[Dict] — token nodes
+graph.edges  # List[Dict] — delegation edges
+graph.stats  # Stats — active/banned/blocked counts
 ```
-
-## Testing
-
-Use the mock client for testing:
-
-```python
-from satgate.testing import MockSatGateClient, MockToken
-
-def test_my_service():
-    mock_client = MockSatGateClient()
-    mock_client.tokens.mint_returns(MockToken(
-        token="mock-token",
-        signature="mock-sig"
-    ))
-
-    service = MyService(mock_client)
-    result = service.do_something()
-
-    assert mock_client.tokens.mint_called
-    assert result == expected
-```
-
-## Type Hints
-
-The SDK is fully typed for IDE support:
-
-```python
-from satgate import SatGateClient, Token, MintRequest
-
-def mint_token(client: SatGateClient) -> Token:
-    request: MintRequest = {
-        "scope": "api:read",
-        "expires_in": 3600
-    }
-    return client.tokens.mint(**request)
-```
-
-## Logging
-
-```python
-import logging
-
-# Enable debug logging
-logging.getLogger("satgate").setLevel(logging.DEBUG)
-
-# Custom handler
-handler = logging.StreamHandler()
-handler.setFormatter(logging.Formatter(
-    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-))
-logging.getLogger("satgate").addHandler(handler)
-```
-
-
-

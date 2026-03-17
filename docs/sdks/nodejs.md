@@ -5,254 +5,146 @@ Official Node.js/TypeScript client for SatGate Gateway.
 ## Installation
 
 ```bash
-npm install satgate-sdk
-# or
-yarn add satgate-sdk
-# or
-pnpm add satgate-sdk
+npm install @satgate/sdk
 ```
 
-## Quick Start
+## Two Clients
+
+| Client | For | Auth |
+|--------|-----|------|
+| `SatGateClient` | **Operators** — mint tokens, ban tokens, manage governance | `X-Admin-Token` header |
+| `SatGateAgentClient` | **AI Agents** — make API calls with automatic token & payment handling | Auto-mints tokens, handles L402 |
+
+---
+
+## Admin Client (`SatGateClient`)
 
 ```typescript
-import { SatGateClient } from 'satgate-sdk';
+import { SatGateClient } from '@satgate/sdk';
 
-// Create client
-const client = new SatGateClient('https://api.example.com', {
-  adminToken: 'your-admin-token'
+const client = new SatGateClient({
+  url: 'http://localhost:8080',
+  token: 'your-admin-token',
+  timeout: 30000,  // optional, default 30s
 });
+```
 
-// Mint a token
+### Mint a Token
+
+```typescript
 const token = await client.tokens.mint({
-  scope: 'api:read',
-  expiresIn: 3600, // 1 hour
-  metadata: { user: 'agent-1' }
+  scope: 'api:*',   // default: "api:*"
+  duration: '1h',   // Go duration string, default: "1h"
 });
 
 console.log(`Token: ${token.token}`);
+console.log(`Signature: ${token.signature}`);
 console.log(`Expires: ${token.expiresAt}`);
 ```
 
-## Client Configuration
+### Validate a Token
 
 ```typescript
-import { SatGateClient } from 'satgate-sdk';
+const result = await client.tokens.validate('token-string-here');
+// { valid: boolean, identifier?: string, caveats?: string[] }
+```
 
-// Basic configuration
-const client = new SatGateClient('https://api.example.com', {
-  adminToken: 'your-admin-token'
+### Delegate a Token
+
+```typescript
+const child = await client.tokens.delegate({
+  parentToken: 'parent-token-string',
+  caveats: ['scope = api:read', 'expires = 1800'],
 });
+```
 
-// Full configuration
-const client = new SatGateClient('https://api.example.com', {
+### Governance
+
+```typescript
+// Ban a token
+await client.governance.ban('hex-signature', 'Compromised');
+
+// Get token lineage graph
+const graph = await client.governance.getGraph();
+// { nodes: TokenInfo[], edges: [...], stats: GraphStats }
+
+// Reset governance data
+await client.governance.reset();
+```
+
+### Health & Ping
+
+```typescript
+const healthy = await client.health();  // boolean
+
+const result = await client.ping('capability-token');
+```
+
+---
+
+## Agent Client (`SatGateAgentClient`)
+
+For AI agents. Handles token minting, caching, refresh, and L402 payments automatically.
+
+```typescript
+import { SatGateAgentClient, LNDWallet, AlbyWallet } from '@satgate/sdk';
+
+// With admin token (auto-mints capability tokens)
+const client = new SatGateAgentClient({
+  gatewayUrl: 'http://localhost:8080',
   adminToken: 'your-admin-token',
-  timeout: 30000,
-  retries: 3,
-  retryDelay: 1000,
-  headers: {
-    'X-Custom-Header': 'value'
-  }
 });
 
-// With JWT authentication
-const client = new SatGateClient('https://api.example.com', {
-  jwt: 'your-jwt-token'
+// Or with pre-existing token
+const client = new SatGateAgentClient({
+  gatewayUrl: 'http://localhost:8080',
+  token: 'your-capability-token',
 });
-```
 
-## Token Management
-
-### Mint Token
-
-```typescript
-const token = await client.tokens.mint({
-  scope: 'api:read,api:write',
-  expiresIn: 86400, // 24 hours
-  metadata: {
-    user: 'agent-1',
-    purpose: 'data-pipeline'
-  }
+// With Lightning wallet for L402
+const client = new SatGateAgentClient({
+  gatewayUrl: 'http://localhost:8080',
+  adminToken: 'your-admin-token',
+  wallet: new LNDWallet({
+    host: 'localhost:10009',
+    macaroonPath: '~/.lnd/admin.macaroon',
+  }),
 });
 ```
 
-### List Tokens
+### Making Requests
 
 ```typescript
-const tokens = await client.tokens.list({ limit: 100, offset: 0 });
+const response = await client.get('/api/data');
+const response = await client.post('/api/data', { key: 'value' });
 
-for (const t of tokens.items) {
-  console.log(`Token: ${t.signature.slice(0, 8)}, Scope: ${t.scope}`);
-}
+console.log(response.data);
+console.log(`Cost: ${response.cost}`);
+console.log(`Budget remaining: ${response.budgetRemaining}`);
 ```
 
-### Get Token Details
+---
+
+## Delegation Helpers
 
 ```typescript
-const token = await client.tokens.get('token-signature');
+import { delegate, Caveats, DelegationPatterns } from '@satgate/sdk';
+
+// Fluent builder
+const token = await delegate(parentToken)
+  .withScope('api:read')
+  .withExpiry(3600)
+  .forTeam('engineering')
+  .withBudget(50.0, 'USD')
+  .delegate(client);
+
+// Common patterns
+const readOnly = await DelegationPatterns.readOnly(parentToken).delegate(client);
+const temp = await DelegationPatterns.temporary(parentToken, 24).delegate(client);
+const team = await DelegationPatterns.teamBudget(parentToken, 'eng', 500).delegate(client);
 ```
 
-### Revoke Token
-
-```typescript
-await client.tokens.revoke('token-signature');
-```
-
-### Delegate Token
-
-```typescript
-const delegated = await client.tokens.delegate('parent-signature', {
-  caveats: [
-    { type: 'expires', value: '1h' },
-    { type: 'rate_limit', value: '100/minute' },
-    { type: 'scope', value: 'api:read' }
-  ]
-});
-```
-
-## Governance
-
-### Ban Token
-
-```typescript
-await client.governance.ban({
-  signature: 'token-to-ban',
-  reason: 'Compromised credentials'
-});
-```
-
-### Unban Token
-
-```typescript
-await client.governance.unban('token-signature');
-```
-
-### Get Ban List
-
-```typescript
-const banned = await client.governance.banList();
-
-for (const sig of banned.signatures) {
-  console.log(`Banned: ${sig}`);
-}
-```
-
-### Get Token Lineage
-
-```typescript
-const graph = await client.governance.graph();
-
-for (const node of graph.nodes) {
-  console.log(`Token: ${node.signature}, Parent: ${node.parent}`);
-}
-```
-
-## Configuration
-
-### Get Config
-
-```typescript
-const config = await client.config.get();
-
-console.log(`Routes: ${config.routes.length}`);
-```
-
-### Update Config
-
-```typescript
-await client.config.update({
-  routes: [
-    {
-      name: 'new-api',
-      path: '/v2/*',
-      upstream: 'backend',
-      policy: {
-        kind: 'observe',
-        scope: 'api:v2'
-      }
-    }
-  ]
-});
-```
-
-### Validate Config
-
-```typescript
-const result = await client.config.validate(configYaml);
-
-if (!result.valid) {
-  for (const error of result.errors) {
-    console.log(`Error at line ${error.line}: ${error.message}`);
-  }
-}
-```
-
-## Statistics
-
-### Get Gateway Stats
-
-```typescript
-const stats = await client.stats.get();
-
-console.log(`Total Requests: ${stats.totalRequests}`);
-console.log(`Active Tokens: ${stats.activeTokens}`);
-```
-
-### Get Route Stats
-
-```typescript
-const routes = await client.stats.routes();
-
-for (const [name, stats] of Object.entries(routes)) {
-  console.log(`${name}: ${stats.requests} requests, p99: ${stats.latencyP99}ms`);
-}
-```
-
-## Making Protected Requests
-
-```typescript
-// Using a capability token
-const response = await client.request('GET', '/api/users', {
-  token: token.token
-});
-
-const users = await response.json();
-```
-
-## WebSocket Telemetry
-
-```typescript
-import { SatGateClient, EventType } from 'satgate-sdk';
-
-const client = new SatGateClient('https://api.example.com', {
-  adminToken: '...'
-});
-
-// Subscribe to events
-const unsubscribe = client.telemetry.subscribe((event) => {
-  switch (event.type) {
-    case EventType.TokenMint:
-      console.log(`Token minted: ${event.signature}`);
-      break;
-    case EventType.TokenBan:
-      console.log(`Token banned: ${event.signature}`);
-      break;
-    case EventType.Request:
-      console.log(`Request: ${event.method} ${event.path} (${event.status})`);
-      break;
-  }
-});
-
-// Later: unsubscribe
-unsubscribe();
-```
-
-### Async Iterator
-
-```typescript
-for await (const event of client.telemetry.events()) {
-  console.log(`Event: ${event.type}`);
-}
-```
+---
 
 ## Error Handling
 
@@ -260,112 +152,35 @@ for await (const event of client.telemetry.events()) {
 import {
   SatGateError,
   AuthenticationError,
-  AuthorizationError,
-  RateLimitError,
-  NotFoundError,
-  ValidationError
-} from 'satgate-sdk';
+  PaymentRequiredError,
+  BudgetExceededError,
+} from '@satgate/sdk';
 
 try {
-  const token = await client.tokens.mint({ scope: 'api:read' });
-} catch (error) {
-  if (error instanceof RateLimitError) {
-    console.log(`Rate limited. Retry after ${error.retryAfter} seconds`);
-    await sleep(error.retryAfter * 1000);
-  } else if (error instanceof AuthenticationError) {
+  const response = await client.get('/api/data');
+} catch (err) {
+  if (err instanceof PaymentRequiredError) {
+    console.log(`Payment needed: ${err.amount} ${err.unit}`);
+  } else if (err instanceof BudgetExceededError) {
+    console.log(`Over budget: ${err.used}/${err.limit}`);
+  } else if (err instanceof AuthenticationError) {
     console.log('Invalid credentials');
-  } else if (error instanceof ValidationError) {
-    console.log(`Validation error: ${error.message}`);
-  } else if (error instanceof SatGateError) {
-    console.log(`API error: ${error.code} - ${error.message}`);
   }
 }
 ```
 
-## TypeScript Types
+## Types
 
-Full TypeScript support with exported types:
+All types are fully exported for TypeScript:
 
 ```typescript
 import type {
   Token,
-  MintRequest,
+  TokenInfo,
+  GraphData,
+  GraphStats,
   DelegateRequest,
-  Caveat,
-  Route,
-  Policy,
-  GatewayStats,
-  TelemetryEvent
-} from 'satgate-sdk';
-
-function mintToken(client: SatGateClient, request: MintRequest): Promise<Token> {
-  return client.tokens.mint(request);
-}
+  PolicyKind,
+  RouteConfig,
+} from '@satgate/sdk';
 ```
-
-## Testing
-
-Use the mock client for testing:
-
-```typescript
-import { MockSatGateClient } from 'satgate-sdk/testing';
-
-describe('MyService', () => {
-  it('should mint token', async () => {
-    const mockClient = new MockSatGateClient();
-    mockClient.tokens.mint.mockResolvedValue({
-      token: 'mock-token',
-      signature: 'mock-sig',
-      expiresAt: new Date()
-    });
-
-    const service = new MyService(mockClient);
-    const result = await service.doSomething();
-
-    expect(mockClient.tokens.mint).toHaveBeenCalled();
-    expect(result).toBe(expected);
-  });
-});
-```
-
-## Browser Usage
-
-The SDK works in browsers with bundlers:
-
-```typescript
-// Works with Vite, webpack, etc.
-import { SatGateClient } from 'satgate-sdk';
-
-const client = new SatGateClient('https://api.example.com', {
-  adminToken: 'your-token'
-});
-```
-
-**Note**: Never expose admin tokens in client-side code. Use delegated tokens with appropriate restrictions.
-
-## CommonJS
-
-```javascript
-const { SatGateClient } = require('satgate-sdk');
-
-const client = new SatGateClient('https://api.example.com', {
-  adminToken: 'your-admin-token'
-});
-```
-
-## Logging
-
-```typescript
-import { SatGateClient, LogLevel } from 'satgate-sdk';
-
-const client = new SatGateClient('https://api.example.com', {
-  adminToken: 'your-token',
-  logLevel: LogLevel.Debug,
-  logger: (level, message, data) => {
-    console.log(`[${level}] ${message}`, data);
-  }
-});
-```
-
-
-
