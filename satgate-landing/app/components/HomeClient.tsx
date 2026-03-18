@@ -277,11 +277,12 @@ const LandingPage = () => {
                 verify → allow → meter/log
               </p>
               <p className="text-xs text-cyan-400/80 mb-3 italic">
-                Start here. See what agents spend before changing anything.
+                Start here. No workflow changes. No budget enforcement yet. Just visibility.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
-                <li>✓ Usage attribution by team</li>
-                <li>✓ Cost center tagging</li>
+                <li>✓ Audit mode — zero disruption to existing agents</li>
+                <li>✓ Usage attribution by team and cost center</li>
+                <li>✓ See exactly where money is going before you change anything</li>
                 <li>✓ Zero latency impact</li>
               </ul>
             </div>
