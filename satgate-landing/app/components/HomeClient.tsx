@@ -225,8 +225,8 @@ const LandingPage = () => {
       <section className="py-20 px-6 border-b border-gray-800 bg-gradient-to-b from-gray-900/30 to-black">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3">Default Protection + Economic Policies</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">Protection is the foundation. Choose your economic policy per route.</p>
+            <h2 className="text-3xl font-bold mb-3">From Observation to Autonomy</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">Start by seeing what agents spend. Then enforce budgets. Then let them pay for themselves. Your path, your pace.</p>
           </div>
 
           {/* Default Protection - Foundation */}
@@ -273,7 +273,7 @@ const LandingPage = () => {
                 verify → allow → meter/log
               </p>
               <p className="text-xs text-cyan-400/80 mb-3 italic">
-                Perfect for audit logs and FinOps visibility.
+                Start here. See what agents spend before changing anything.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ Usage attribution by team</li>
@@ -298,7 +298,7 @@ const LandingPage = () => {
                 verify → enforce budget → allow
               </p>
               <p className="text-xs text-purple-400/80 mb-3 italic">
-                Enforce strict budgets and spending caps.
+                Now enforce it. Hard budget caps — when it hits zero, agents stop.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ Real-time budget enforcement</li>
@@ -323,7 +323,7 @@ const LandingPage = () => {
                 verify → payment proof → allow
               </p>
               <p className="text-xs text-yellow-400/80 mb-3 italic">
-                Monetize via L402 Lightning payments.
+                Full autonomy. Agents discover, negotiate, and pay for API access.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ Bitcoin Lightning (instant)</li>
