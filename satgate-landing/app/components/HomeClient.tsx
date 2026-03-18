@@ -226,7 +226,7 @@ const LandingPage = () => {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-3">From Observation to Autonomy</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">Start by seeing what agents spend. Then enforce budgets. Then let them pay for themselves. Your path, your pace.</p>
+            <p className="text-gray-400 max-w-2xl mx-auto">First, govern your own house. Then open the gates — on your terms.</p>
           </div>
 
           {/* Default Protection - Foundation */}
@@ -255,8 +255,11 @@ const LandingPage = () => {
             </div>
           </div>
 
-          {/* Economic Policy Cards with Pricing Tiers */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          {/* Phase 1: Your Agents */}
+          <div className="mb-4">
+            <p className="text-sm font-mono text-cyan-400 mb-4 uppercase tracking-wider">Phase 1 — Your Agents</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Observe — Free */}
             <div className="p-6 rounded-xl bg-black border border-cyan-800/30 hover:border-cyan-600/50 transition relative">
               <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-cyan-900/50 border border-cyan-700/50 text-cyan-300 text-xs font-bold">
@@ -307,6 +310,13 @@ const LandingPage = () => {
               </ul>
             </div>
 
+          </div>
+
+          {/* Phase 2: Their Agents */}
+          <div className="mb-4">
+            <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">Phase 2 — Their Agents</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6 max-w-lg">
             {/* Charge — included in Pro */}
             <div className="p-6 rounded-xl bg-black border border-yellow-800/30 hover:border-yellow-600/50 transition relative">
               <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-purple-900/50 border border-purple-700/50 text-purple-300 text-xs font-bold">
@@ -323,12 +333,13 @@ const LandingPage = () => {
                 verify → payment proof → allow
               </p>
               <p className="text-xs text-yellow-400/80 mb-3 italic">
-                Full autonomy. Agents discover, negotiate, and pay for API access.
+                Open your API to the autonomous agent swarm — on your terms.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
-                <li>✓ Bitcoin Lightning (instant)</li>
-                <li>✓ Per-request pricing</li>
-                <li>✓ Agent-native payments</li>
+                <li>✓ No registration, no API key — just pay and go</li>
+                <li>✓ Bitcoin Lightning micropayments (instant)</li>
+                <li>✓ Per-request pricing at sub-cent granularity</li>
+                <li>✓ Autonomous agents discover and pay for access</li>
               </ul>
             </div>
           </div>
