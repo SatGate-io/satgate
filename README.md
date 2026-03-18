@@ -29,6 +29,18 @@
 
 <div align="center">
 
+### 🎬 See SatGate in Action
+
+**30-second explainer — the problem, the solution, the economic firewall.**
+
+<a href="https://satgate.io#explainer"><img src="https://img.shields.io/badge/▶_Watch_Explainer-30s-purple?style=for-the-badge" alt="Watch Explainer"></a>
+
+</div>
+
+---
+
+<div align="center">
+
 ### ☁️ Don't want to self-host? Try SatGate Cloud
 
 **Managed SaaS — zero setup, multi-tenant isolation, enterprise dashboard.**<br/>
