@@ -255,9 +255,9 @@ const LandingPage = () => {
             </div>
           </div>
 
-          {/* Phase 1: Your Agents */}
+          {/* Your Agents */}
           <div className="mb-4">
-            <p className="text-sm font-mono text-cyan-400 mb-4 uppercase tracking-wider">Phase 1 — Your Agents</p>
+            <p className="text-sm font-mono text-cyan-400 mb-4 uppercase tracking-wider">Your Agents</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Observe — Free */}
@@ -312,9 +312,9 @@ const LandingPage = () => {
 
           </div>
 
-          {/* Phase 2: Their Agents */}
+          {/* Their Agents */}
           <div className="mb-4">
-            <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">Phase 2 — Their Agents</p>
+            <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">Their Agents</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6 max-w-lg">
             {/* Charge — included in Pro */}
