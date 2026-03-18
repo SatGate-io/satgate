@@ -201,6 +201,26 @@ const LandingPage = () => {
         </div>
       </header>
 
+      {/* Explainer Video Section */}
+      <section className="py-16 px-6 border-b border-gray-800">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-3">See SatGate in Action</h2>
+          <p className="text-gray-400 mb-8 max-w-2xl mx-auto">30 seconds. The problem, the solution, the economic firewall.</p>
+          <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
+            <video 
+              controls
+              preload="metadata"
+              poster="/satgate-explainer-poster.jpg"
+              className="w-full"
+              playsInline
+            >
+              <source src="/satgate-explainer.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+      </section>
+
       {/* Default Protection + Economic Policies */}
       <section className="py-20 px-6 border-b border-gray-800 bg-gradient-to-b from-gray-900/30 to-black">
         <div className="max-w-5xl mx-auto">
