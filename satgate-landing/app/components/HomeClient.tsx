@@ -270,7 +270,7 @@ const LandingPage = () => {
                 <div className="p-2.5 bg-cyan-900/50 rounded-lg">
                   <Eye className="text-cyan-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Observe</h3>
+                <h3 className="font-bold text-lg">Observe <span className="text-xs font-normal text-gray-500">(Fiat)</span></h3>
               </div>
               <p className="text-gray-400 text-sm mb-3">
                 verify → allow → meter/log
@@ -295,7 +295,7 @@ const LandingPage = () => {
                 <div className="p-2.5 bg-purple-900/50 rounded-lg">
                   <SlidersHorizontal className="text-purple-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Control</h3>
+                <h3 className="font-bold text-lg">Control <span className="text-xs font-normal text-gray-500">(Fiat402)</span></h3>
               </div>
               <p className="text-gray-400 text-sm mb-3">
                 verify → enforce budget → allow
@@ -327,7 +327,7 @@ const LandingPage = () => {
                 <div className="p-2.5 bg-yellow-900/50 rounded-lg">
                   <DollarSign className="text-yellow-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Charge</h3>
+                <h3 className="font-bold text-lg">Charge <span className="text-xs font-normal text-gray-500">(L402)</span></h3>
               </div>
               <p className="text-gray-400 text-sm mb-3">
                 verify → payment proof → allow
