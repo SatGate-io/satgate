@@ -344,6 +344,26 @@ const LandingPage = () => {
             </div>
           </div>
 
+          {/* Token Delegation Video */}
+          <div className="mt-12 mb-8">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold mb-2">Token Delegation</h3>
+              <p className="text-gray-400 max-w-xl mx-auto text-sm">Agents can&apos;t escalate. The cryptographic structure prevents it. Trust flows down — never up.</p>
+            </div>
+            <div className="max-w-3xl mx-auto relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
+              <video 
+                controls
+                preload="metadata"
+                poster="/satgate-delegation-poster.jpg"
+                className="w-full"
+                playsInline
+              >
+                <source src="/satgate-delegation.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+
           {/* PUBLIC callout */}
           <div className="p-4 rounded-lg bg-green-950/20 border border-green-900/30">
             <p className="text-sm text-gray-400">
