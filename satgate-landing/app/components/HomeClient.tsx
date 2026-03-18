@@ -129,19 +129,19 @@ const LandingPage = () => {
           {/* Left: Copy */}
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-6">
-              <Zap size={12} /> Economic Access Control — the security primitive for the agent economy
+              <Zap size={12} /> The Economic Firewall for AI Agents
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-              Know what your AI agents<br/>
+              Control what agents<br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-                are spending.
+                can spend.
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              Control agent spend at the request layer. Every API call is verified, attributed, and governed — before it hits your upstream.
+              SatGate is the economic control plane for AI agents. Observe, budget, and charge for every request — before it touches your API.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
-              Not &ldquo;who are you?&rdquo; — <b>&ldquo;what can you afford?&rdquo;</b> Drop-in gateway. Connect in ~5 minutes.
+              Drop-in gateway. Sub-ms overhead. Start in Observe mode — enforce when ready.
             </p>
             <div className="flex flex-wrap gap-4">
               <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
@@ -152,12 +152,13 @@ const LandingPage = () => {
               </Link>
             </div>
 
-            {/* Proof anchors */}
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-6 text-xs text-gray-500">
-              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Open source — <a href="https://github.com/SatGate-io/satgate" className="text-gray-400 hover:text-white transition underline underline-offset-2">GitHub</a></span>
-              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Sub-ms verification overhead</span>
-              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Design partners in pilot</span>
-              <span className="flex items-center gap-1.5"><Shield size={12} className="text-purple-400" /> <Link href="/security" className="text-gray-400 hover:text-white transition underline underline-offset-2">Security model →</Link></span>
+            {/* Proof strip */}
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-6 text-xs text-gray-500">
+              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> REST · GraphQL · MCP</span>
+              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Gateway · Sidecar · MCP Proxy</span>
+              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Sub-ms verification</span>
+              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Stripe / ERP + Lightning</span>
+              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> <a href="https://github.com/SatGate-io/satgate" className="text-gray-400 hover:text-white transition underline underline-offset-2">Open source</a></span>
             </div>
           </div>
 
@@ -205,7 +206,7 @@ const LandingPage = () => {
       <section className="py-16 px-6 border-b border-gray-800">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-3">See SatGate in Action</h2>
-          <p className="text-gray-400 mb-8 max-w-2xl mx-auto">30 seconds. The problem, the solution, the economic firewall.</p>
+          <p className="text-gray-400 mb-8 max-w-2xl mx-auto">Agents spend without limits. SatGate stops that. 30 seconds.</p>
           <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
             <video 
               controls
@@ -314,7 +315,7 @@ const LandingPage = () => {
 
           {/* Their Agents */}
           <div className="mb-4">
-            <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">Their Agents</p>
+            <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">Their Agents — when you&apos;re ready</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6 max-w-lg">
             {/* Charge — included in Pro */}
@@ -347,8 +348,8 @@ const LandingPage = () => {
           {/* Token Delegation Video */}
           <div className="mt-12 mb-8">
             <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold mb-2">Token Delegation</h3>
-              <p className="text-gray-400 max-w-xl mx-auto text-sm">Agents can&apos;t escalate. The cryptographic structure prevents it. Trust flows down — never up.</p>
+              <h3 className="text-2xl font-bold mb-2">Why API Keys Break in Agent Chains</h3>
+              <p className="text-gray-400 max-w-xl mx-auto text-sm">API keys are all-or-nothing. Delegated capability tokens let Agent A give Agent B a $50 read-only token — and B can&apos;t escalate. Trust flows down, never up.</p>
             </div>
             <div className="max-w-3xl mx-auto relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
               <video 
@@ -386,7 +387,7 @@ const LandingPage = () => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-2">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-3">
-              🚗💨 THE EZ PASS FOR API TRAFFIC
+              🚗💨 HOW IT WORKS
             </span>
             <h2 className="text-2xl font-bold mb-2">Badge in once. Fly through every gate.</h2>
             <p className="text-gray-400 text-sm max-w-xl mx-auto">
@@ -605,7 +606,7 @@ const LandingPage = () => {
       <footer className="py-20 border-t border-gray-800">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-6">Ready to see what your agents are spending?</h2>
+            <h2 className="text-3xl font-bold mb-6">Ready to control what your agents can spend?</h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
               <a href="mailto:contact@satgate.io" className="inline-block bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-10 py-4 rounded-full font-bold text-lg hover:opacity-90 transition shadow-lg shadow-purple-500/20">
                 Get in Touch
