@@ -350,7 +350,7 @@ const LandingPage = () => {
           <div className="mt-12 mb-8">
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold mb-2">Why API Keys Break in Agent Chains</h3>
-              <p className="text-gray-400 max-w-xl mx-auto text-sm">API keys are all-or-nothing. Delegated capability tokens let Agent A give Agent B a $50 read-only token — and B can&apos;t escalate. Trust flows down, never up.</p>
+              <p className="text-gray-400 max-w-xl mx-auto text-sm">API keys are all-or-nothing. Delegated capability tokens let you set any budget, scope, and expiry per agent — and agents can&apos;t escalate beyond what they&apos;re given. Trust flows down, never up.</p>
             </div>
             <div className="max-w-3xl mx-auto relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
               <video 
