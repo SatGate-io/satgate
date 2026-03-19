@@ -9,6 +9,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'ai-governance-api-teams',
+    title: 'AI Governance for API Teams: Why Your Gateway Needs Policy, Not Just Routing',
+    description: 'API teams need AI governance that enforces budgets, permissions, and audit trails — not just traffic routing. Learn why traditional API management falls short.',
+    date: '2026-03-19',
+    readTime: '10 min read',
+    author: 'Matt Dean',
+    tags: ['Governance', 'API Teams', 'Policy Enforcement'],
+  },
+  {
     slug: 'llm-cost-management',
     title: 'LLM Cost Management: From Monitoring Dashboards to Real-Time Enforcement',
     description: 'LLM cost dashboards show you what you spent. Economic firewalls control what you spend. Learn why observability alone fails when AI agents control the budget.',
