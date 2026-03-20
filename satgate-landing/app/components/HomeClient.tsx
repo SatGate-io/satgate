@@ -33,6 +33,7 @@ const LandingPage = () => {
             <Link href="/pay" className="hover:text-white transition">Charge Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
+            <Link href="/blog" className="hover:text-white transition">Blog</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
             <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a>
             <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 transition">Cloud →</a>
@@ -90,6 +91,13 @@ const LandingPage = () => {
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Pricing
+            </Link>
+            <Link 
+              href="/blog" 
+              onClick={() => setMobileMenuOpen(false)} 
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              Blog
             </Link>
             <a 
               href="https://cloud.satgate.io/docs" 
