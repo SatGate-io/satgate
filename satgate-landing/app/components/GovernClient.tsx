@@ -114,11 +114,11 @@ export default function GovernPage() {
                 <span className="text-red-300 font-medium">The problem:</span> A compromised AI agent gets inside the perimeter and spams a sensitive database at machine speed, bypassing traditional rate limits.
               </p>
               <p className="text-gray-300 text-sm leading-relaxed mb-4 border-l-2 border-red-800 pl-3">
-                &ldquo;SatGate provides a deterministic, cryptographic kill-switch. We don&apos;t just alert you — we instantly bankrupt the adversary&apos;s budget before the blast radius expands.&rdquo;
+                &ldquo;SatGate provides a deterministic, cryptographic kill-switch. We don&apos;t just alert you — we hard-cap agent spend before the blast radius expands.&rdquo;
               </p>
               <div className="pt-3 border-t border-red-900/30">
                 <p className="text-xs text-red-400 font-medium mb-2">Metrics that matter:</p>
-                <p className="text-xs text-gray-400">Zero unauthorized data exfiltration via runaway agent loops</p>
+                <p className="text-xs text-gray-400">Reduce risk of runaway agent misuse and unauthorized spend</p>
               </div>
               <div className="mt-4">
                 <Link href="https://cloud.satgate.io/cloud/observe/setup" className="text-xs text-red-400 hover:text-red-300 transition">See it in action →</Link>
@@ -144,7 +144,7 @@ export default function GovernPage() {
               </p>
               <div className="pt-3 border-t border-cyan-900/30">
                 <p className="text-xs text-cyan-400 font-medium mb-2">Metrics that matter:</p>
-                <p className="text-xs text-gray-400">100% elimination of &ldquo;Ghost Spend&rdquo; and AI bill shock</p>
+                <p className="text-xs text-gray-400">Eliminate a major class of unbounded agent spend and AI bill shock</p>
               </div>
               <div className="mt-4">
                 <Link href="https://cloud.satgate.io/cloud/ez-pass/setup" className="text-xs text-cyan-400 hover:text-cyan-300 transition">Stop the ghost spend →</Link>
@@ -388,7 +388,7 @@ export default function GovernPage() {
 
           <div className="text-center mt-12">
             <div className="inline-block bg-gradient-to-r from-green-900/20 to-cyan-900/20 border border-green-800/30 rounded-xl px-6 py-4">
-              <p className="text-white font-semibold">$47,000 saved. 2 minutes to resolution. Zero code changes.</p>
+              <p className="text-white font-semibold">Can turn a $47,000 weekend incident into a $50 policy event. 2 minutes to resolution.</p>
               <p className="text-gray-500 text-sm mt-1">SatGate Observe mode would have caught this for free.</p>
             </div>
           </div>
@@ -611,7 +611,7 @@ export default function GovernPage() {
               </h3>
               <ul className="space-y-3 text-sm text-gray-400">
                 <li>• Every agent gets a budget — hard cap, no exceptions</li>
-                <li>• High-risk actions cost more, loops bankrupt themselves</li>
+                <li>• High-risk actions cost more, loops hit budget ceiling and stop</li>
                 <li>• Agents naturally optimize for efficiency</li>
                 <li>• Platform teams become measurable <span className="text-green-400">profit centers</span></li>
                 <li className="text-green-400 font-medium">• You can&apos;t out-smart an AI swarm, but you can hard-cap its wallet</li>
