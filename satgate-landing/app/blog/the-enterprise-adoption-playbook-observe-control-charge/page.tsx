@@ -8,7 +8,7 @@ export const metadata = {
     title: 'The Enterprise Adoption Playbook: Observe, Control, Charge',
     description: 'A three-stage framework for adopting economic governance for AI agents — without breaking anything along the way.',
     type: 'article',
-    authors: ['Matt Dean'],
+
     publishedTime: '2026-03-20T00:00:00Z',
   },
   twitter: {
@@ -45,7 +45,6 @@ export default function EnterpriseAdoptionPlaybookPage() {
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <span className="flex items-center gap-1"><Calendar size={14} /> March 20, 2026</span>
             <span className="flex items-center gap-1"><Clock size={14} /> 11 min read</span>
-            <span>Matt Dean</span>
           </div>
         </header>
 

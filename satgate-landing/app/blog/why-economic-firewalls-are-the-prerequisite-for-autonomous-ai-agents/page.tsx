@@ -8,7 +8,7 @@ export const metadata = {
     title: 'Why Economic Firewalls Are the Prerequisite for Autonomous AI Agents',
     description: 'Economic firewalls aren\'t safety tools. They\'re the enablers that unlock fully autonomous AI agents by solving the unbounded cost problem.',
     type: 'article',
-    authors: ['Matt Dean'],
+
     publishedTime: '2026-03-20T00:00:00Z',
   },
   twitter: {
@@ -44,7 +44,6 @@ export default function WhyEconomicFirewallsPrerequisitePage() {
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <span className="flex items-center gap-1"><Calendar size={14} /> March 20, 2026</span>
             <span className="flex items-center gap-1"><Clock size={14} /> 11 min read</span>
-            <span>Matt Dean</span>
           </div>
         </header>
 
