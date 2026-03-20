@@ -9,6 +9,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'why-economic-firewalls-are-the-prerequisite-for-autonomous-ai-agents',
+    title: 'Why Economic Firewalls Are the Prerequisite for Autonomous AI Agents',
+    description: 'Economic firewalls aren\'t just safety tools — they\'re the enablers that unlock fully autonomous AI agents. By solving unbounded cost, they create the trust infrastructure for agents to make independent purchasing decisions.',
+    date: '2026-03-20',
+    readTime: '11 min read',
+    author: 'Matt Dean',
+    tags: ['Agent Economy', 'Economic Firewall', 'Autonomous Agents'],
+  },
+  {
     slug: 'ai-governance-api-teams',
     title: 'AI Governance for API Teams: Why Your Gateway Needs Policy, Not Just Routing',
     description: 'API teams need AI governance that enforces budgets, permissions, and audit trails — not just traffic routing. Learn why traditional API management falls short.',
