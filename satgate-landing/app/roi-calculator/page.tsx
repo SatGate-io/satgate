@@ -147,7 +147,7 @@ export default function ROICalculatorPage() {
           <div className="space-y-6">
             {/* Metrics */}
             <div className="p-6 md:p-8 rounded-2xl bg-gray-900 border border-gray-800">
-              <h2 className="text-lg font-bold text-white mb-6">The Shock Value</h2>
+              <h2 className="text-lg font-bold text-white mb-6">Unmanaged Cost Exposure</h2>
               <div className="space-y-4">
                 <div className="flex justify-between items-baseline">
                   <span className="text-gray-400 text-sm">Monthly Tool Spend</span>
