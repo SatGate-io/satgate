@@ -9,6 +9,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'can-adversaries-game-your-economic-firewall',
+    title: 'Can Adversaries Game Your Economic Firewall?',
+    description: 'Economic firewalls protect against runaway AI agent costs — but what happens when attackers deliberately try to exploit them? We examine four adversarial attack vectors and the cryptographic defenses that stop them.',
+    date: '2026-03-23',
+    readTime: '14 min read',
+    author: 'Wayne Mattadeen',
+    tags: ['Security', 'Economic Firewall', 'Adversarial AI', 'Macaroons'],
+  },
+  {
     slug: 'the-enterprise-adoption-playbook-observe-control-charge',
     title: 'The Enterprise Adoption Playbook: Observe, Control, Charge',
     description: 'Observe, Control, Charge isn\'t just a product taxonomy — it\'s an enterprise change management strategy for adopting economic governance incrementally, building trust at each stage.',
