@@ -9,6 +9,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'mcp-gateway-guide',
+    title: 'MCP Gateway Guide: From Traffic Routing to Economic Governance',
+    description: 'A complete MCP gateway guide covering architecture, auth, tool aggregation, and the economic governance layer most guides miss. Deploy with budget enforcement.',
+    date: '2026-03-24',
+    readTime: '11 min read',
+    author: 'Matt Dean',
+    tags: ['MCP', 'Gateway', 'Guide', 'Economic Governance'],
+  },
+  {
     slug: 'can-adversaries-game-your-economic-firewall',
     title: 'Can Adversaries Game Your Economic Firewall?',
     description: 'Economic firewalls protect against runaway AI agent costs — but what happens when attackers deliberately try to exploit them? We examine four adversarial attack vectors and the cryptographic defenses that stop them.',
