@@ -13,7 +13,7 @@
 - [x] "LLM cost management" (Radicalbit, TDS ranking) — `/blog/llm-cost-management` (3/17)
 - [x] "AI governance API teams" (Zuplo ranking) — `/blog/ai-governance-api-teams` (3/19)
 - [x] "MCP gateway guide" (Composio ranking) — `/blog/mcp-gateway-guide` (3/24)
-- [ ] "API monetization AI" (general gap)
+- [x] "API monetization AI" (general gap) — `/blog/api-monetization-ai` (3/26)
 
 ### Medium Priority — Category creation
 - [ ] "Macaroon tokens vs API keys" (own the comparison)
@@ -54,6 +54,7 @@
 - 2026-03-17: "LLM Cost Management: From Monitoring Dashboards to Real-Time Enforcement" (also on dev.to)
 - 2026-03-19: "AI Governance for API Teams: Why Your Gateway Needs Policy, Not Just Routing" (also on dev.to)
 - 2026-03-24: "MCP Gateway Guide: From Traffic Routing to Economic Governance" (also on dev.to)
+- 2026-03-26: "API Monetization for AI: How to Charge Agents, Not Just Developers" (also on dev.to)
 
 ## dev.to Account
 - Handle: @mattdeangit
