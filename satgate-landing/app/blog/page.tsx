@@ -9,6 +9,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'api-monetization-ai',
+    title: 'API Monetization for AI: How to Charge Agents, Not Just Developers',
+    description: 'AI agents are your next API customers. Traditional API monetization fails for autonomous workloads. Learn how to price, meter, and collect from machine consumers.',
+    date: '2026-03-26',
+    readTime: '10 min read',
+    author: 'Matt Dean',
+    tags: ['Monetization', 'AI Agents', 'API Economics'],
+  },
+  {
     slug: 'mcp-gateway-guide',
     title: 'MCP Gateway Guide: From Traffic Routing to Economic Governance',
     description: 'A complete MCP gateway guide covering architecture, auth, tool aggregation, and the economic governance layer most guides miss. Deploy with budget enforcement.',
