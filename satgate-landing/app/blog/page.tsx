@@ -9,6 +9,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'why-process-wont-scale-for-ai-agent-costs',
+    title: "InformationWeek Says Control AI Agent Costs With Process. Here's Why That Won't Scale.",
+    description: "InformationWeek's 9 recommendations for AI agent cost control are solid for 2025. But when agents make 1,500 calls per prompt and operate 24/7, process can't keep pace. 7 of 9 are automatable at the infrastructure layer.",
+    date: '2026-03-28',
+    readTime: '10 min read',
+    author: 'SatGate Team',
+    tags: ['Cost Control', 'AI Agents', 'Thought Leadership'],
+  },
+  {
     slug: 'api-monetization-ai',
     title: 'API Monetization for AI: How to Charge Agents, Not Just Developers',
     description: 'AI agents are your next API customers. Traditional API monetization fails for autonomous workloads. Learn how to price, meter, and collect from machine consumers.',
