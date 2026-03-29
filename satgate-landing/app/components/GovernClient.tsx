@@ -94,7 +94,7 @@ export default function GovernPage() {
       {/* One Token, Two Threats */}
       <section className="py-16 px-6 border-t border-gray-800 bg-gradient-to-b from-gray-900/20 to-black">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-3">Two Problems. One Token. Same Architecture.</h2>
+          <h2 className="text-3xl font-bold text-center mb-3">Two Problems. One Token.</h2>
           <p className="text-gray-500 text-center mb-10 max-w-2xl mx-auto">
             SatGate uses capability tokens to prevent unauthorized spend from your agents and unauthorized access from theirs.
           </p>
