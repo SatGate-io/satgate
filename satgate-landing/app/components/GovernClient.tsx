@@ -91,6 +91,61 @@ export default function GovernPage() {
         </div>
       </header>
 
+      {/* One Token, Two Threats */}
+      <section className="py-16 px-6 border-t border-gray-800 bg-gradient-to-b from-gray-900/20 to-black">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-3">One Token. Two Threats. Same Architecture.</h2>
+          <p className="text-gray-500 text-center mb-10 max-w-2xl mx-auto">
+            SatGate uses capability tokens to prevent unauthorized spend from your agents and unauthorized access from theirs.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            {/* Internal */}
+            <div className="p-6 rounded-xl bg-black border-2 border-cyan-500/40 hover:border-cyan-400/60 transition">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="p-2 bg-cyan-900/50 rounded-lg">
+                  <DollarSign className="text-cyan-400" size={20} />
+                </div>
+                <div>
+                  <p className="text-xs font-mono text-cyan-400 uppercase tracking-wider">Your Agents (Internal)</p>
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Prevent Unauthorized <span className="text-cyan-400">Spend</span></h3>
+              <p className="text-gray-400 text-sm mb-3">No token → no spend. Budget enforcement via Fiat402 ensures agents can&apos;t exceed their allocation.</p>
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <Shield size={12} className="text-cyan-400" />
+                <span>Observe → Control policy ratchet</span>
+              </div>
+            </div>
+
+            {/* External */}
+            <div className="p-6 rounded-xl bg-black border-2 border-yellow-500/40 hover:border-yellow-400/60 transition">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="p-2 bg-yellow-900/50 rounded-lg">
+                  <Lock className="text-yellow-400" size={20} />
+                </div>
+                <div>
+                  <p className="text-xs font-mono text-yellow-400 uppercase tracking-wider">Their Agents (External)</p>
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Prevent Unauthorized <span className="text-yellow-400">Access</span></h3>
+              <p className="text-gray-400 text-sm mb-3">No token → no access. Monetization via L402 ensures external agents pay per request.</p>
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <Zap size={12} className="text-yellow-400" />
+                <span>Charge policy with Lightning settlement</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-8">
+            <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-gray-900 border border-gray-800 rounded-full text-sm">
+              <Key size={16} className="text-purple-400" />
+              <span className="text-gray-400">Same <span className="text-white font-semibold">macaroon token</span> — same architecture — two problems solved</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Three Personas */}
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-5xl mx-auto">
