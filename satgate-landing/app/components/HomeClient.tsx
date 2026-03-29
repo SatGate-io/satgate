@@ -266,7 +266,7 @@ const LandingPage = () => {
 
           {/* Your Agents */}
           <div className="mb-4">
-            <p className="text-sm font-mono text-cyan-400 mb-4 uppercase tracking-wider">Your Agents</p>
+            <p className="text-sm font-mono text-cyan-400 mb-4 uppercase tracking-wider">Your Agents — Prevent Unauthorized Spend</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Observe — Free */}
@@ -324,7 +324,7 @@ const LandingPage = () => {
 
           {/* Their Agents */}
           <div className="mb-4">
-            <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">Their Agents — when you&apos;re ready</p>
+            <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">Their Agents — Prevent Unauthorized Access</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6 max-w-lg">
             {/* Charge — included in Pro */}
