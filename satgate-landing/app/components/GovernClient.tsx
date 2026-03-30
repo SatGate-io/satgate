@@ -176,7 +176,7 @@ export default function GovernPage() {
                 <p className="text-xs text-gray-400">Reduce risk of runaway agent misuse and unauthorized spend</p>
               </div>
               <div className="mt-4">
-                <Link href="https://cloud.satgate.io/cloud/observe/setup" className="text-xs text-red-400 hover:text-red-300 transition">See it in action →</Link>
+                <Link href="/protect" className="text-xs text-red-400 hover:text-red-300 transition">See it in action →</Link>
               </div>
             </div>
 
@@ -202,7 +202,7 @@ export default function GovernPage() {
                 <p className="text-xs text-gray-400">Eliminate a major class of unbounded agent spend and AI bill shock</p>
               </div>
               <div className="mt-4">
-                <Link href="https://cloud.satgate.io/cloud/ez-pass/setup" className="text-xs text-cyan-400 hover:text-cyan-300 transition">Stop the ghost spend →</Link>
+                <Link href="/sandbox" className="text-xs text-cyan-400 hover:text-cyan-300 transition">Stop the ghost spend →</Link>
               </div>
             </div>
 
@@ -228,7 +228,7 @@ export default function GovernPage() {
                 <p className="text-xs text-gray-400">Net-new revenue from machine-to-machine API transactions</p>
               </div>
               <div className="mt-4">
-                <Link href="https://cloud.satgate.io/cloud/l402" className="text-xs text-yellow-400 hover:text-yellow-300 transition">Start earning →</Link>
+                <Link href="/pay" className="text-xs text-yellow-400 hover:text-yellow-300 transition">Start earning →</Link>
               </div>
             </div>
           </div>
