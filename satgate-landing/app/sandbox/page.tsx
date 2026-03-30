@@ -317,7 +317,7 @@ export default function SandboxPage() {
           <h1 className="text-lg sm:text-xl font-bold flex items-center gap-2">
             <Shield className="text-purple-400" size={24} />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
-              Live Sandbox
+              Cost Control Demo
             </span>
           </h1>
           <Link
@@ -334,12 +334,12 @@ export default function SandboxPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold mb-4">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400">
-              See SatGate Block a Request
+              Watch SatGate Stop Unauthorized Spend
             </span>
           </h2>
           <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
-            No signup required. Watch two AI agents hit a real API gateway — one gets revoked, 
-            one burns through its budget. Both get stopped cold.
+            Two scenarios CFOs care about: a rogue agent gets cut off instantly, and an agent
+            hits its budget ceiling and stops — before the bill arrives.
           </p>
         </div>
       </div>
