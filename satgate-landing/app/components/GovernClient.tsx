@@ -244,7 +244,6 @@ export default function GovernPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Observe */}
             <div className="relative p-6 rounded-xl bg-gray-900 border-2 border-purple-500/60 hover:border-purple-400/80 transition">
-              <div className="absolute -top-3 left-4 px-3 py-0.5 bg-purple-600 text-white text-xs font-bold rounded-full">FREE</div>
               <div className="flex items-center gap-3 mb-4 mt-2">
                 <div className="p-2.5 bg-purple-900/50 rounded-lg">
                   <Eye className="text-purple-400" size={22} />

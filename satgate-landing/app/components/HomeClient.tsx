@@ -28,8 +28,8 @@ const LandingPage = () => {
           
           {/* Desktop menu */}
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
-            <Link href="/mint-demo" className="hover:text-white transition">Mint Demo</Link>
-            <Link href="/protect" className="hover:text-white transition">Control Demo</Link>
+            <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
+            <Link href="/protect" className="hover:text-white transition">Live Demo</Link>
             <Link href="/pay" className="hover:text-white transition">Charge Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
@@ -58,18 +58,18 @@ const LandingPage = () => {
         >
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
             <Link 
-              href="/mint-demo" 
+              href="/govern" 
               onClick={() => setMobileMenuOpen(false)} 
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
-              Mint Demo
+              Enterprise
             </Link>
             <Link 
               href="/protect" 
               onClick={() => setMobileMenuOpen(false)} 
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
-              Control Demo
+              Live Demo
             </Link>
             <Link 
               href="/pay" 
@@ -156,7 +156,7 @@ const LandingPage = () => {
                 Start Free <ArrowRight size={16} />
               </a>
               <Link href="/sandbox" className="border border-purple-700/50 bg-purple-900/20 px-8 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition flex items-center gap-2 text-purple-300">
-                <Play size={16} /> Try the Sandbox
+                <Play size={16} /> See a Demo
               </Link>
             </div>
 
@@ -271,9 +271,6 @@ const LandingPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Observe — Free */}
             <div className="p-6 rounded-xl bg-black border border-cyan-800/30 hover:border-cyan-600/50 transition relative">
-              <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-cyan-900/50 border border-cyan-700/50 text-cyan-300 text-xs font-bold">
-                FREE
-              </div>
               <div className="text-xs text-purple-400 mb-2">Protected by default →</div>
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2.5 bg-cyan-900/50 rounded-lg">
@@ -297,9 +294,6 @@ const LandingPage = () => {
 
             {/* Control — included in Pro */}
             <div className="p-6 rounded-xl bg-black border-2 border-purple-500/50 hover:border-purple-400/70 transition relative">
-              <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-purple-900/50 border border-purple-700/50 text-purple-300 text-xs font-bold">
-                PRO
-              </div>
               <div className="text-xs text-purple-400 mb-2">Protected by default →</div>
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2.5 bg-purple-900/50 rounded-lg">
@@ -329,9 +323,6 @@ const LandingPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6 max-w-lg">
             {/* Charge — included in Pro */}
             <div className="p-6 rounded-xl bg-black border border-yellow-800/30 hover:border-yellow-600/50 transition relative">
-              <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-purple-900/50 border border-purple-700/50 text-purple-300 text-xs font-bold">
-                PRO
-              </div>
               <div className="text-xs text-purple-400 mb-2">Protected by default →</div>
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2.5 bg-yellow-900/50 rounded-lg">
