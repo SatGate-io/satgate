@@ -1436,7 +1436,7 @@ export default function ProtectDemoPage() {
                         href="/pay"
                         className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-xl font-bold hover:opacity-90 transition flex items-center justify-center gap-2"
                       >
-                        Try Pay Mode <ChevronRight size={18} />
+                        Try Charge Mode <ChevronRight size={18} />
                       </Link>
                     </div>
                     {!useSimulation && adminToken && (
@@ -1730,7 +1730,7 @@ export default function ProtectDemoPage() {
               href="/pay"
               className="text-cyan-400 hover:text-cyan-300 text-sm underline underline-offset-4 transition"
             >
-              Try Pay Mode →
+              Try Charge Mode →
             </Link>
           </div>
         </div>
