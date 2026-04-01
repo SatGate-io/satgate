@@ -672,9 +672,19 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		return NewErrorResponse(req.ID, CodeUpstreamError, fmt.Sprintf("upstream error: %v", err)), nil
 	}
 
-	// Check for MCP task ID in upstream response (SEP-1686)
-	if resp.Result != nil {
-		if taskID := extractTaskID(resp.Result); taskID != "" {
+	// Track every tool call as a task
+	// Use upstream task ID if available (SEP-1686), otherwise generate one per tool name
+	{
+		taskID := ""
+		if resp.Result != nil {
+			taskID = extractTaskID(resp.Result)
+		}
+		if taskID == "" {
+			// Generate a stable task ID per tool — groups all calls to the same tool
+			taskID = fmt.Sprintf("tool-%s-%x", tc.Name, fnv32(budgetID+tc.Name))
+		}
+
+		if resp.Result != nil {
 			log.Info().
 				Str("tool", tc.Name).
 				Str("taskId", taskID).
@@ -690,35 +700,35 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			if err := json.Unmarshal(resp.Result, &meta); err == nil && meta.Meta.Status != "" {
 				p.taskTracker.UpdateStatus(taskID, meta.Meta.Status)
 			}
-
-			p.taskTracker.RecordSpend(taskID, tokenInfo.TokenID, budgetID, tenantID, tc.Name, cost)
-
-			// Get accumulated task state for the event (includes total_cost, attempts, timestamps)
-			taskState := p.taskTracker.GetTaskSpend(taskID)
-			taskData := map[string]interface{}{
-				"task_id": taskID,
-				"tool":    tc.Name,
-				"cost":    cost, // This call's cost
-			}
-			if taskState != nil {
-				taskData["tool_name"] = taskState.ToolName
-				taskData["total_cost"] = taskState.TotalCost
-				taskData["attempts"] = taskState.Attempts
-				taskData["first_seen"] = taskState.FirstSeen.UTC().Format(time.RFC3339)
-				taskData["last_seen"] = taskState.LastSeen.UTC().Format(time.RFC3339)
-				taskData["status"] = taskState.Status
-				taskData["token_id"] = taskState.TokenID
-			}
-
-			p.events.Publish(Event{
-				Type:      EventTaskSpend,
-				Timestamp: time.Now(),
-				TokenID:   tokenInfo.TokenID,
-				BudgetID:  budgetID,
-				TenantID:  tenantID,
-				Data:      taskData,
-			})
 		}
+
+		p.taskTracker.RecordSpend(taskID, tokenInfo.TokenID, budgetID, tenantID, tc.Name, cost)
+
+		// Get accumulated task state for the event (includes total_cost, attempts, timestamps)
+		taskState := p.taskTracker.GetTaskSpend(taskID)
+		taskData := map[string]interface{}{
+			"task_id": taskID,
+			"tool":    tc.Name,
+			"cost":    cost, // This call's cost
+		}
+		if taskState != nil {
+			taskData["tool_name"] = taskState.ToolName
+			taskData["total_cost"] = taskState.TotalCost
+			taskData["attempts"] = taskState.Attempts
+			taskData["first_seen"] = taskState.FirstSeen.UTC().Format(time.RFC3339)
+			taskData["last_seen"] = taskState.LastSeen.UTC().Format(time.RFC3339)
+			taskData["status"] = taskState.Status
+			taskData["token_id"] = taskState.TokenID
+		}
+
+		p.events.Publish(Event{
+			Type:      EventTaskSpend,
+			Timestamp: time.Now(),
+			TokenID:   tokenInfo.TokenID,
+			BudgetID:  budgetID,
+			TenantID:  tenantID,
+			Data:      taskData,
+		})
 	}
 
 	// Rewrite the response ID to match the client's request ID
@@ -850,4 +860,14 @@ func extractTaskID(result json.RawMessage) string {
 		return ""
 	}
 	return envelope.Meta.TaskID
+}
+
+// fnv32 generates a simple 32-bit hash for creating stable synthetic IDs.
+func fnv32(s string) uint32 {
+	var h uint32 = 2166136261
+	for i := 0; i < len(s); i++ {
+		h ^= uint32(s[i])
+		h *= 16777619
+	}
+	return h
 }
