@@ -693,17 +693,30 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 
 			p.taskTracker.RecordSpend(taskID, tokenInfo.TokenID, budgetID, tenantID, tc.Name, cost)
 
+			// Get accumulated task state for the event (includes total_cost, attempts, timestamps)
+			taskState := p.taskTracker.GetTaskSpend(taskID)
+			taskData := map[string]interface{}{
+				"task_id": taskID,
+				"tool":    tc.Name,
+				"cost":    cost, // This call's cost
+			}
+			if taskState != nil {
+				taskData["tool_name"] = taskState.ToolName
+				taskData["total_cost"] = taskState.TotalCost
+				taskData["attempts"] = taskState.Attempts
+				taskData["first_seen"] = taskState.FirstSeen.UTC().Format(time.RFC3339)
+				taskData["last_seen"] = taskState.LastSeen.UTC().Format(time.RFC3339)
+				taskData["status"] = taskState.Status
+				taskData["token_id"] = taskState.TokenID
+			}
+
 			p.events.Publish(Event{
 				Type:      EventTaskSpend,
 				Timestamp: time.Now(),
 				TokenID:   tokenInfo.TokenID,
 				BudgetID:  budgetID,
 				TenantID:  tenantID,
-				Data: map[string]interface{}{
-					"task_id": taskID,
-					"tool":    tc.Name,
-					"cost":    cost,
-				},
+				Data:      taskData,
 			})
 		}
 	}
