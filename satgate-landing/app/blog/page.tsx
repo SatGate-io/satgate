@@ -9,6 +9,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'l402-protocol-explained',
+    title: 'L402 Protocol Explained: How HTTP 402 Enables Machine-Native API Payments',
+    description: 'L402 combines HTTP 402 Payment Required with Lightning Network micropayments and macaroon tokens. Learn how this protocol enables AI agents to pay for API access in real time.',
+    date: '2026-04-02',
+    readTime: '11 min read',
+    author: 'Matt Dean',
+    tags: ['L402', 'Payments', 'API Economics'],
+  },
+  {
     slug: 'macaroon-tokens-vs-api-keys',
     title: 'Macaroon Tokens vs API Keys: Why Capability-Based Auth Beats Identity-Based Auth for AI Agents',
     description: 'API keys tie identity to unlimited access. Macaroon tokens embed capabilities and constraints. For AI agents that need delegation and budget limits, the difference is everything.',
