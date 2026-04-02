@@ -9,6 +9,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'http-402-payment-required-use-cases',
+    title: 'HTTP 402 Payment Required: The Dormant Status Code That Powers the Agent Economy',
+    description: 'HTTP 402 Payment Required has been "reserved for future use" since 1997. AI agents finally make it essential. Here are the real-world use cases unlocking it.',
+    date: '2026-04-02',
+    readTime: '11 min read',
+    author: 'Matt Dean',
+    tags: ['HTTP', 'Payments', 'AI Agents'],
+  },
+  {
     slug: 'l402-protocol-explained',
     title: 'L402 Protocol Explained: How HTTP 402 Enables Machine-Native API Payments',
     description: 'L402 combines HTTP 402 Payment Required with Lightning Network micropayments and macaroon tokens. Learn how this protocol enables AI agents to pay for API access in real time.',

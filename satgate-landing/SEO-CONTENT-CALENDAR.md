@@ -16,9 +16,9 @@
 - [x] "API monetization AI" (general gap) — `/blog/api-monetization-ai` (3/26)
 
 ### Medium Priority — Category creation
-- [ ] "Macaroon tokens vs API keys" (own the comparison)
-- [ ] "L402 protocol explained" (own the protocol)
-- [ ] "HTTP 402 Payment Required use cases" (technical SEO)
+- [x] "Macaroon tokens vs API keys" (own the comparison) — `/blog/macaroon-tokens-vs-api-keys` (3/31)
+- [x] "L402 protocol explained" (own the protocol) — `/blog/l402-protocol-explained` (4/2)
+- [x] "HTTP 402 Payment Required use cases" (technical SEO) — `/blog/http-402-payment-required-use-cases` (4/2)
 - [x] "AI agent delegation patterns" (architectural content) — `/blog/deepmind-intelligent-delegation-satgate` (3/11)
 - [x] "Capability-based security for APIs" (academic SEO) — `/blog/deepmind-intelligent-delegation-satgate` (3/11)
 - [ ] "Zero Trust for AI agents" (Wayne's LinkedIn angle)
@@ -55,6 +55,9 @@
 - 2026-03-19: "AI Governance for API Teams: Why Your Gateway Needs Policy, Not Just Routing" (also on dev.to)
 - 2026-03-24: "MCP Gateway Guide: From Traffic Routing to Economic Governance" (also on dev.to)
 - 2026-03-26: "API Monetization for AI: How to Charge Agents, Not Just Developers" (also on dev.to)
+- 2026-03-31: "Macaroon Tokens vs API Keys" 
+- 2026-04-02: "L402 Protocol Explained"
+- 2026-04-02: "HTTP 402 Payment Required: The Dormant Status Code That Powers the Agent Economy" (also on dev.to)
 
 ## dev.to Account
 - Handle: @mattdeangit
