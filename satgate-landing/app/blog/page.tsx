@@ -9,6 +9,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'zero-trust-for-ai-agents',
+    title: 'Zero Trust for AI Agents: Why Identity-Based Security Collapses When Machines Call the Shots',
+    description: 'Zero Trust was built for human users and managed devices. AI agents break every assumption it makes. Here\'s how capability-based security fixes what Zero Trust can\'t.',
+    date: '2026-04-03',
+    readTime: '12 min read',
+    author: 'Matt Dean',
+    tags: ['Zero Trust', 'Security', 'AI Agents'],
+  },
+  {
     slug: 'http-402-payment-required-use-cases',
     title: 'HTTP 402 Payment Required: The Dormant Status Code That Powers the Agent Economy',
     description: 'HTTP 402 Payment Required has been "reserved for future use" since 1997. AI agents finally make it essential. Here are the real-world use cases unlocking it.',

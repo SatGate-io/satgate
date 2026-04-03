@@ -21,7 +21,7 @@
 - [x] "HTTP 402 Payment Required use cases" (technical SEO) — `/blog/http-402-payment-required-use-cases` (4/2)
 - [x] "AI agent delegation patterns" (architectural content) — `/blog/deepmind-intelligent-delegation-satgate` (3/11)
 - [x] "Capability-based security for APIs" (academic SEO) — `/blog/deepmind-intelligent-delegation-satgate` (3/11)
-- [ ] "Zero Trust for AI agents" (Wayne's LinkedIn angle)
+- [x] "Zero Trust for AI agents" (Wayne's LinkedIn angle) — `/blog/zero-trust-for-ai-agents` (4/3)
 
 ### Long-tail — Tutorial/how-to
 - [ ] "How to add budget limits to OpenAI API calls"
@@ -58,6 +58,7 @@
 - 2026-03-31: "Macaroon Tokens vs API Keys" 
 - 2026-04-02: "L402 Protocol Explained"
 - 2026-04-02: "HTTP 402 Payment Required: The Dormant Status Code That Powers the Agent Economy" (also on dev.to)
+- 2026-04-03: "Zero Trust for AI Agents: Why Identity-Based Security Collapses When Machines Call the Shots" (also on dev.to)
 
 ## dev.to Account
 - Handle: @mattdeangit
