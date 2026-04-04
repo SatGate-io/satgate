@@ -544,7 +544,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		Msg("tool call intercepted")
 
 	// Enforce budget (unless shadow mode)
-	if p.config.Enforcement.Mode != "shadow" && budgetID != "" && cost > 0 {
+	if p.config.Enforcement.Mode != "shadow" && p.config.Enforcement.Mode != "observe" && budgetID != "" && cost > 0 {
 		// Auto-initialize budget from macaroon caveat if not yet initialized
 		if tokenInfo.BudgetLimit > 0 {
 			_ = p.budget.Initialize(ctx, budgetID, tokenInfo.BudgetLimit)
