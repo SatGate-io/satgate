@@ -577,9 +577,10 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 					BudgetID:  budgetID,
 					TenantID:  tenantID,
 					Data: map[string]interface{}{
-						"tool":      tc.Name,
-						"cost":      cost,
-						"remaining": remaining,
+						"tool":         tc.Name,
+						"cost":         cost,
+						"remaining":    remaining,
+						"budget_limit": tokenInfo.BudgetLimit,
 					},
 				})
 
@@ -634,9 +635,10 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				BudgetID:  budgetID,
 				TenantID:  tenantID,
 				Data: map[string]interface{}{
-					"tool":      tc.Name,
-					"cost":      cost,
-					"remaining": result.Remaining,
+					"tool":         tc.Name,
+					"cost":         cost,
+					"remaining":    result.Remaining,
+					"budget_limit": tokenInfo.BudgetLimit,
 				},
 			})
 		}
