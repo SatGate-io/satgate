@@ -257,10 +257,10 @@ func (c *Config) validate() error {
 	}
 
 	switch c.Enforcement.Mode {
-	case "hard", "soft", "shadow":
-		// ok
+	case "hard", "soft", "shadow", "observe", "control":
+		// ok — accepts both legacy (hard/soft/shadow) and canonical (observe/control) names
 	default:
-		return fmt.Errorf("enforcement.mode must be hard, soft, or shadow (got %q)", c.Enforcement.Mode)
+		return fmt.Errorf("enforcement.mode must be observe, control, shadow, soft, or hard (got %q)", c.Enforcement.Mode)
 	}
 
 	switch c.Budget.FailMode {
