@@ -67,6 +67,12 @@ func (s *SSEServer) Handle(pattern string, handler http.Handler) {
 	s.mux.Handle(pattern, handler)
 }
 
+// Handler returns the SSE server's HTTP handler (mux) without starting a listener.
+// This is useful for embedding the SSE server in another HTTP server.
+func (s *SSEServer) Handler() http.Handler {
+	return s.mux
+}
+
 // HandleFunc registers an additional handler function on the SSE server's mux.
 func (s *SSEServer) HandleFunc(pattern string, handler http.HandlerFunc) {
 	s.mux.HandleFunc(pattern, handler)
