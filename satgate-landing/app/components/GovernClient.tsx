@@ -154,33 +154,7 @@ export default function GovernPage() {
           <p className="text-xs text-gray-600 text-center mb-12">One platform, three perspectives. SatGate aligns security, finance, and growth under a single pane of glass.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* CISO — Risk */}
-            <div className="p-6 rounded-xl bg-gradient-to-br from-red-950/30 to-red-900/10 border border-red-800/30 hover:border-red-600/50 transition group">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2.5 bg-red-900/50 rounded-lg group-hover:bg-red-900/70 transition">
-                  <Shield className="text-red-400" size={22} />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg">CISO</h3>
-                  <span className="text-xs text-red-400 font-medium">Economic Access Control</span>
-                </div>
-              </div>
-              <p className="text-gray-400 text-sm leading-relaxed mb-3">
-                <span className="text-red-300 font-medium">The problem:</span> A compromised AI agent gets inside the perimeter and spams a sensitive database at machine speed, bypassing traditional rate limits.
-              </p>
-              <p className="text-gray-300 text-sm leading-relaxed mb-4 border-l-2 border-red-800 pl-3">
-                &ldquo;SatGate provides a deterministic, cryptographic kill-switch. We don&apos;t just alert you — we hard-cap agent spend before the blast radius expands.&rdquo;
-              </p>
-              <div className="pt-3 border-t border-red-900/30">
-                <p className="text-xs text-red-400 font-medium mb-2">Metrics that matter:</p>
-                <p className="text-xs text-gray-400">Reduce risk of runaway agent misuse and unauthorized spend</p>
-              </div>
-              <div className="mt-4">
-                <Link href="/protect" className="text-xs text-red-400 hover:text-red-300 transition">See it in action →</Link>
-              </div>
-            </div>
-
-            {/* CFO — Margins */}
+            {/* CFO — Margins (Observe) */}
             <div className="p-6 rounded-xl bg-gradient-to-br from-cyan-950/30 to-cyan-900/10 border-2 border-cyan-500/50 hover:border-cyan-400/70 transition group">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2.5 bg-cyan-900/50 rounded-lg group-hover:bg-cyan-900/70 transition">
@@ -206,7 +180,33 @@ export default function GovernPage() {
               </div>
             </div>
 
-            {/* CEO/CRO — Growth */}
+            {/* CISO — Risk (Control) */}
+            <div className="p-6 rounded-xl bg-gradient-to-br from-red-950/30 to-red-900/10 border border-red-800/30 hover:border-red-600/50 transition group">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 bg-red-900/50 rounded-lg group-hover:bg-red-900/70 transition">
+                  <Shield className="text-red-400" size={22} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">CISO</h3>
+                  <span className="text-xs text-red-400 font-medium">Economic Access Control</span>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed mb-3">
+                <span className="text-red-300 font-medium">The problem:</span> A compromised AI agent gets inside the perimeter and spams a sensitive database at machine speed, bypassing traditional rate limits.
+              </p>
+              <p className="text-gray-300 text-sm leading-relaxed mb-4 border-l-2 border-red-800 pl-3">
+                &ldquo;SatGate provides a deterministic, cryptographic kill-switch. We don&apos;t just alert you — we hard-cap agent spend before the blast radius expands.&rdquo;
+              </p>
+              <div className="pt-3 border-t border-red-900/30">
+                <p className="text-xs text-red-400 font-medium mb-2">Metrics that matter:</p>
+                <p className="text-xs text-gray-400">Reduce risk of runaway agent misuse and unauthorized spend</p>
+              </div>
+              <div className="mt-4">
+                <Link href="/protect" className="text-xs text-red-400 hover:text-red-300 transition">See it in action →</Link>
+              </div>
+            </div>
+
+            {/* CEO/CRO — Growth (Charge) */}
             <div className="p-6 rounded-xl bg-gradient-to-br from-yellow-950/30 to-yellow-900/10 border border-yellow-800/30 hover:border-yellow-600/50 transition group">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2.5 bg-yellow-900/50 rounded-lg group-hover:bg-yellow-900/70 transition">
