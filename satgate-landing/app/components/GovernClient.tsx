@@ -150,8 +150,8 @@ export default function GovernPage() {
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">Built for the C-Suite</h2>
-          <p className="text-gray-500 text-center mb-4">Margins. Risk. Growth. One platform.</p>
-          <p className="text-xs text-gray-600 text-center mb-12">One platform, three perspectives. SatGate aligns security, finance, and growth under a single pane of glass.</p>
+          <p className="text-gray-500 text-center mb-4">Margins. Risk. Growth.</p>
+          <p className="text-xs text-gray-600 text-center mb-12">Predictable AI costs. Cryptographic access control. Net-new machine-to-machine revenue.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* CFO — Margins (Observe) */}
