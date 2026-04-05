@@ -182,7 +182,7 @@ func (p *Proxy) SetTenantCostResolver(r TenantCostResolver) {
 	p.tenantCosts = r
 }
 
-// SetEnforcementMode changes the enforcement mode at runtime (shadow, soft, hard).
+// SetEnforcementMode changes the enforcement mode at runtime (observe, control).
 func (p *Proxy) SetEnforcementMode(mode string) {
 	p.config.Enforcement.Mode = mode
 	log.Info().Str("mode", mode).Msg("enforcement mode updated")
@@ -543,15 +543,20 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		Str("tokenId", tokenInfo.TokenID).
 		Msg("tool call intercepted")
 
-	// Enforce budget (unless shadow mode)
-	if p.config.Enforcement.Mode != "shadow" && p.config.Enforcement.Mode != "observe" && budgetID != "" && cost > 0 {
+	// Budget tracking and enforcement — two modes:
+	//   observe = deduct budget, never block (real spend tracking, allows overspend)
+	//   control = deduct budget, enforce limits (block on exhaustion)
+	// Both modes always call Spend(). The only difference is what happens when budget runs out.
+	isObserve := p.config.Enforcement.Mode == "observe" || p.config.Enforcement.Mode == "shadow"
+	isControl := p.config.Enforcement.Mode == "control" || p.config.Enforcement.Mode == "hard" || p.config.Enforcement.Mode == "soft"
+
+	if (isObserve || isControl) && budgetID != "" && cost > 0 {
 		// Auto-initialize budget from macaroon caveat if not yet initialized
 		if tokenInfo.BudgetLimit > 0 {
 			_ = p.budget.Initialize(ctx, budgetID, tokenInfo.BudgetLimit)
 		}
 		result, err := p.budget.Spend(ctx, budgetID, tc.Name, cost, requestID)
 		if err != nil {
-			// Distinguish budget exhaustion (result has ErrorCode) from backend failures.
 			isBudgetExhausted := result != nil && (result.ErrorCode == "budget_exhausted" || result.ErrorCode == "insufficient_budget")
 
 			if isBudgetExhausted {
@@ -564,6 +569,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 					Int64("cost", cost).
 					Int64("remaining", remaining).
 					Str("budgetId", budgetID).
+					Str("mode", p.config.Enforcement.Mode).
 					Msg("budget exhausted")
 
 				eventType := EventBudgetExhaust
@@ -584,7 +590,12 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 					},
 				})
 
-				if p.config.Enforcement.Mode == "hard" {
+				if isObserve {
+					// Observe: deducted but never blocks — allows overspend for real usage tracking
+					log.Info().Str("tool", tc.Name).Int64("remaining", remaining).
+						Msg("observe mode: allowing overspend")
+				} else {
+					// Control: block the request
 					errMsg := "Budget exhausted"
 					errCode := result.ErrorCode
 					if errCode == "insufficient_budget" {
@@ -599,8 +610,6 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 						"budget_id":         budgetID,
 					}), nil
 				}
-				// Soft mode: warn but continue
-				log.Warn().Str("tool", tc.Name).Msg("soft enforcement: allowing despite budget exhaustion")
 			} else {
 				// Backend failure (Redis down, network error, etc.)
 				log.Error().Err(err).
@@ -609,16 +618,17 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 					Str("failMode", p.config.Budget.FailMode).
 					Msg("budget backend error")
 
-				if p.config.Budget.FailMode != "open" {
-					// fail-closed (default): deny on backend error
+				if isObserve || p.config.Budget.FailMode == "open" {
+					// Observe always fails open; Control respects failMode config
+					log.Warn().Str("tool", tc.Name).Str("mode", p.config.Enforcement.Mode).
+						Msg("allowing despite budget backend error")
+				} else {
 					return NewErrorResponseWithData(req.ID, CodeInternalError, "Budget service unavailable", map[string]interface{}{
 						"error":    "budget_backend_error",
 						"tool":     tc.Name,
 						"failMode": "closed",
 					}), nil
 				}
-				// fail-open: log and allow through
-				log.Warn().Str("tool", tc.Name).Msg("fail-open: allowing despite budget backend error")
 			}
 		} else if result != nil {
 			log.Info().
@@ -626,6 +636,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				Int64("cost", cost).
 				Int64("remaining", result.Remaining).
 				Str("budgetId", budgetID).
+				Str("mode", p.config.Enforcement.Mode).
 				Msg("budget spent")
 
 			p.events.Publish(Event{
@@ -642,11 +653,6 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				},
 			})
 		}
-	} else if p.config.Enforcement.Mode == "shadow" && cost > 0 {
-		log.Info().
-			Str("tool", tc.Name).
-			Int64("cost", cost).
-			Msg("shadow mode: would have charged")
 	}
 
 	// Publish tool call event

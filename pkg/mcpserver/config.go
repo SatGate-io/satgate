@@ -142,7 +142,7 @@ type ToolsConfig struct {
 
 // EnforcementConfig controls the enforcement mode.
 type EnforcementConfig struct {
-	// Mode: "hard" (deny on exhaustion, default), "soft" (warn only), "shadow" (observe only)
+	// Mode: "observe" (deduct, never block — default), "control" (deduct and enforce limits)
 	Mode string `yaml:"mode"`
 }
 
@@ -201,7 +201,7 @@ func (c *Config) applyDefaults() {
 		c.Budget.FailMode = "closed"
 	}
 	if c.Enforcement.Mode == "" {
-		c.Enforcement.Mode = "hard"
+		c.Enforcement.Mode = "observe"
 	}
 	if c.Logging.Level == "" {
 		c.Logging.Level = "info"
@@ -257,10 +257,12 @@ func (c *Config) validate() error {
 	}
 
 	switch c.Enforcement.Mode {
-	case "hard", "soft", "shadow", "observe", "control":
-		// ok — accepts both legacy (hard/soft/shadow) and canonical (observe/control) names
+	case "observe", "control":
+		// Canonical mode names
+	case "hard", "soft", "shadow":
+		// Legacy aliases accepted for backward compatibility
 	default:
-		return fmt.Errorf("enforcement.mode must be observe, control, shadow, soft, or hard (got %q)", c.Enforcement.Mode)
+		return fmt.Errorf("enforcement.mode must be observe or control (got %q)", c.Enforcement.Mode)
 	}
 
 	switch c.Budget.FailMode {
