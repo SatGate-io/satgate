@@ -112,6 +112,9 @@ func (a *MacaroonAuthenticator) Verify(_ context.Context, token string) (*TokenI
 
 	mac, err := a.Service.Verify(token)
 	if err != nil {
+		if strings.Contains(err.Error(), "invalid signature") {
+			return nil, fmt.Errorf("invalid macaroon (possible root key mismatch — if using a hybrid gateway, ensure the gateway's capability root key matches the control plane): %w", err)
+		}
 		return nil, fmt.Errorf("invalid macaroon: %w", err)
 	}
 

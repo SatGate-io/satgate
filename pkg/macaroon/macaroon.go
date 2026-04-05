@@ -92,7 +92,7 @@ func (s *Service) Verify(token string) (*Macaroon, error) {
 	// Reconstruct the chained signature from root key
 	expectedSig := s.chainedSignature(mac)
 	if !hmac.Equal([]byte(mac.Signature), []byte(expectedSig)) {
-		return nil, fmt.Errorf("invalid signature")
+		return nil, fmt.Errorf("invalid signature: token was signed with a different root key. If using a hybrid gateway, ensure the gateway's capability root key matches the control plane")
 	}
 
 	// Check caveats
