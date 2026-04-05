@@ -97,6 +97,9 @@ func New(cfg *Config) (*Proxy, error) {
 	// Build upstream manager
 	upstream := NewUpstreamManager(cfg.Upstreams, cfg.Routing, cfg.DefaultUpstream, cfg.AllowPrivateUpstreams)
 
+	// Normalize enforcement mode to canonical names on startup
+	cfg.Enforcement.Mode = normalizeEnforcementMode(cfg.Enforcement.Mode)
+
 	p := &Proxy{
 		config:      cfg,
 		upstream:    upstream,
@@ -182,10 +185,26 @@ func (p *Proxy) SetTenantCostResolver(r TenantCostResolver) {
 	p.tenantCosts = r
 }
 
-// SetEnforcementMode changes the enforcement mode at runtime (observe, control).
+// SetEnforcementMode changes the enforcement mode at runtime (observe, control, charge).
+// Accepts legacy aliases: shadow→observe, soft/hard→control, l402→charge.
 func (p *Proxy) SetEnforcementMode(mode string) {
-	p.config.Enforcement.Mode = mode
-	log.Info().Str("mode", mode).Msg("enforcement mode updated")
+	canonical := normalizeEnforcementMode(mode)
+	p.config.Enforcement.Mode = canonical
+	log.Info().Str("mode", canonical).Str("raw", mode).Msg("enforcement mode updated")
+}
+
+// normalizeEnforcementMode maps legacy mode names to canonical (observe/control/charge).
+func normalizeEnforcementMode(mode string) string {
+	switch mode {
+	case "shadow", "chargeback":
+		return "observe"
+	case "soft", "hard", "fiat402":
+		return "control"
+	case "l402":
+		return "charge"
+	default:
+		return mode
+	}
 }
 
 // GetEnforcementMode returns the current enforcement mode.
@@ -543,12 +562,15 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		Str("tokenId", tokenInfo.TokenID).
 		Msg("tool call intercepted")
 
-	// Budget tracking and enforcement — two modes:
+	// Budget tracking and enforcement — three canonical modes:
 	//   observe = deduct budget, never block (real spend tracking, allows overspend)
 	//   control = deduct budget, enforce limits (block on exhaustion)
-	// Both modes always call Spend(). The only difference is what happens when budget runs out.
-	isObserve := p.config.Enforcement.Mode == "observe" || p.config.Enforcement.Mode == "shadow"
-	isControl := p.config.Enforcement.Mode == "control" || p.config.Enforcement.Mode == "hard" || p.config.Enforcement.Mode == "soft"
+	//   charge  = L402 Lightning payments (handled separately)
+	// Both observe and control always call Spend(). The only difference is what happens when budget runs out.
+	// Legacy aliases (shadow→observe, soft/hard→control) accepted for backward compatibility.
+	mode := p.config.Enforcement.Mode
+	isObserve := mode == "observe" || mode == "shadow" || mode == "chargeback"
+	isControl := mode == "control" || mode == "hard" || mode == "soft" || mode == "fiat402"
 
 	if (isObserve || isControl) && budgetID != "" && cost > 0 {
 		// Auto-initialize budget from macaroon caveat if not yet initialized
