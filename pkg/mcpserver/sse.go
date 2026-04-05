@@ -19,9 +19,10 @@ import (
 // Each client connects via GET /sse (event stream) and sends messages via POST /message.
 // This enables multiple agents to connect to a single MCP proxy over HTTP.
 type SSEServer struct {
-	proxy  *Proxy
-	mux    *http.ServeMux
-	server *http.Server
+	proxy    *Proxy
+	mux      *http.ServeMux
+	server   *http.Server
+	basePath string // mount prefix for endpoint URLs (e.g. "/mcp")
 
 	mu       sync.Mutex
 	sessions map[string]*sseSession
@@ -38,11 +39,26 @@ type sseSession struct {
 	budgetID string // from auth at connect time (may be empty)
 }
 
+// SSEOption configures optional SSEServer settings.
+type SSEOption func(*SSEServer)
+
+// WithBasePath sets a URL prefix for endpoint URLs returned to clients.
+// Use when the SSE server is mounted behind a path-stripping reverse proxy.
+// Example: WithBasePath("/mcp") causes endpoint events to return /mcp/message?sessionId=...
+func WithBasePath(path string) SSEOption {
+	return func(s *SSEServer) {
+		s.basePath = strings.TrimRight(path, "/")
+	}
+}
+
 // NewSSEServer creates an SSE transport server for the given proxy.
-func NewSSEServer(proxy *Proxy, addr string) *SSEServer {
+func NewSSEServer(proxy *Proxy, addr string, opts ...SSEOption) *SSEServer {
 	s := &SSEServer{
 		proxy:    proxy,
 		sessions: make(map[string]*sseSession),
+	}
+	for _, opt := range opts {
+		opt(s)
 	}
 
 	mux := http.NewServeMux()
@@ -161,7 +177,7 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	// Send endpoint event — tells the client where to POST messages
-	messageURL := fmt.Sprintf("/message?sessionId=%s", sessionID)
+	messageURL := fmt.Sprintf("%s/message?sessionId=%s", s.basePath, sessionID)
 	fmt.Fprintf(w, "event: endpoint\ndata: %s\n\n", messageURL)
 	flusher.Flush()
 
