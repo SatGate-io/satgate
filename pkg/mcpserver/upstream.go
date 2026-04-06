@@ -419,7 +419,7 @@ func (m *UpstreamManager) initializeUpstream(ctx context.Context, client *Upstre
 		},
 	})
 
-	resp, err := m.sendRequest(ctx, client, MethodInitialize, params, 10*time.Second)
+	resp, err := m.sendRequest(ctx, client, MethodInitialize, params, 30*time.Second)
 	if err != nil {
 		return err
 	}
@@ -437,7 +437,7 @@ func (m *UpstreamManager) initializeUpstream(ctx context.Context, client *Upstre
 }
 
 func (m *UpstreamManager) discoverTools(ctx context.Context, client *UpstreamClient) error {
-	resp, err := m.sendRequest(ctx, client, MethodToolsList, nil, 10*time.Second)
+	resp, err := m.sendRequest(ctx, client, MethodToolsList, nil, 30*time.Second)
 	if err != nil {
 		return err
 	}
