@@ -145,8 +145,24 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Capture auth token from header before writing response.
-	// Verification happens after SSE stream is established to avoid blocking.
 	authToken := extractAuthToken(r)
+
+	// Pre-connect auth check: reject tokens that fail hard verification
+	// (e.g., enterprise tokens hitting the SaaS proxy).
+	// Soft failures (unknown key, fallback extraction) are deferred to post-connect.
+	if authToken != "" && s.proxy.auth != nil {
+		if _, err := s.proxy.auth.Verify(ctx, authToken); err != nil {
+			errMsg := err.Error()
+			// Only reject on definitive errors (enterprise misrouting, revocation)
+			// NOT on key-mismatch (multi-tenant SaaS where key lookup is deferred)
+			if strings.Contains(errMsg, "enterprise deployment") || strings.Contains(errMsg, "token revoked") {
+				log.Warn().Str("error", errMsg).Msg("SSE connection rejected at pre-connect")
+				http.Error(w, errMsg, http.StatusForbidden)
+				cancel()
+				return
+			}
+		}
+	}
 
 	s.mu.Lock()
 	s.sessions[sessionID] = session
