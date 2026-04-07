@@ -24,7 +24,7 @@
 - [x] "Zero Trust for AI agents" (Wayne's LinkedIn angle) — `/blog/zero-trust-for-ai-agents` (4/3)
 
 ### Long-tail — Tutorial/how-to
-- [ ] "How to add budget limits to OpenAI API calls"
+- [x] "How to add budget limits to OpenAI API calls" — `/blog/how-to-add-budget-limits-to-openai-api-calls` (4/7)
 - [ ] "Cursor MCP proxy setup guide"
 - [ ] "Multi-agent cost tracking with SatGate"
 - [ ] "API cost attribution by team and department"

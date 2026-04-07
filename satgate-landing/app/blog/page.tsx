@@ -9,6 +9,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'start-at-1-credit-economic-policy',
+    title: 'Start at 1 Credit: A Smarter Way to Price AI Agent Tools',
+    description: 'Stop guessing tool costs on day one. Start everything at 1 credit in Observe mode, measure real usage, then use that data to shape behavior with intentional pricing.',
+    date: '2026-04-07',
+    readTime: '5 min read',
+    author: 'Wayne Mattadeen',
+    tags: ['Economic Policy', 'Best Practices', 'AI Agents'],
+  },
+  {
     slug: 'how-to-add-budget-limits-to-openai-api-calls',
     title: 'How to Add Budget Limits to OpenAI API Calls',
     description: 'Learn how to implement hard budget limits for OpenAI API calls. Prevent runaway costs with request-level enforcement, not just monitoring.',
