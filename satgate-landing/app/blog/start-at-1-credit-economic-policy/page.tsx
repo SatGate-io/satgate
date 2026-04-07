@@ -87,26 +87,32 @@ export default function StartAt1CreditBlogPage() {
 
           <h2 className="text-2xl font-bold text-white mt-8 mb-4">Example</h2>
 
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 my-8 font-mono text-sm overflow-x-auto">
-            <p className="text-green-400 mb-4"># Week 1: Observe Mode (everything = 1 credit)</p>
-            <pre className="text-gray-300 leading-relaxed">web_search:       7,234 calls (38%)
-file_read:        4,521 calls (24%) 
-llm_completion:   3,812 calls (20%)
-image_generate:     765 calls (4%)
-code_execute:     2,644 calls (14%)</pre>
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 my-8">
+            <h3 className="text-green-400 font-bold mb-4">Week 1: Observe Mode (everything = 1 credit)</h3>
+            <ul className="text-gray-300 space-y-1 mb-6">
+              <li><strong className="text-white">web_search:</strong> 7,234 calls (38%)</li>
+              <li><strong className="text-white">file_read:</strong> 4,521 calls (24%)</li>
+              <li><strong className="text-white">llm_completion:</strong> 3,812 calls (20%)</li>
+              <li><strong className="text-white">image_generate:</strong> 765 calls (4%)</li>
+              <li><strong className="text-white">code_execute:</strong> 2,644 calls (14%)</li>
+            </ul>
             
-            <p className="text-yellow-400 mt-6 mb-4"># Provider invoices show:</p>
-            <pre className="text-gray-300 leading-relaxed">Image API:     $426 (48% of cost for 4% of usage!)
-LLM API:       $312 (35%)
-Search API:     $89 (10%)
-Compute:        $62 (7%)</pre>
+            <h3 className="text-yellow-400 font-bold mb-4">Provider invoices show:</h3>
+            <ul className="text-gray-300 space-y-1 mb-6">
+              <li><strong className="text-white">Image API:</strong> $426 (48% of cost for 4% of usage!)</li>
+              <li><strong className="text-white">LLM API:</strong> $312 (35%)</li>
+              <li><strong className="text-white">Search API:</strong> $89 (10%)</li>
+              <li><strong className="text-white">Compute:</strong> $62 (7%)</li>
+            </ul>
             
-            <p className="text-cyan-400 mt-6 mb-4"># Week 2: Control Mode (data-driven pricing)</p>
-            <pre className="text-gray-300 leading-relaxed">web_search:      1 credit  (high volume, low cost)
-file_read:       1 credit  (internal, free)
-llm_completion:  3 credits (moderate cost)
-image_generate: 15 credits (expensive!)
-code_execute:    2 credits (compute cost)</pre>
+            <h3 className="text-cyan-400 font-bold mb-4">Week 2: Control Mode (data-driven pricing)</h3>
+            <ul className="text-gray-300 space-y-1">
+              <li><strong className="text-white">web_search:</strong> 1 credit (high volume, low cost)</li>
+              <li><strong className="text-white">file_read:</strong> 1 credit (internal, free)</li>
+              <li><strong className="text-white">llm_completion:</strong> 3 credits (moderate cost)</li>
+              <li><strong className="text-white">image_generate:</strong> 15 credits (expensive!)</li>
+              <li><strong className="text-white">code_execute:</strong> 2 credits (compute cost)</li>
+            </ul>
           </div>
 
           <p className="text-gray-300 leading-relaxed">
