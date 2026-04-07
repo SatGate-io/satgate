@@ -26,7 +26,7 @@ export default function StartAt1CreditBlogPage() {
           <h1 className="text-4xl font-bold mb-4">Start at 1 Credit: A Smarter Way to Price AI Agent Tools</h1>
           
           <p className="text-xl text-gray-400 mb-6 italic">
-            Most teams guess wrong when pricing AI tools upfront. Here's a better way: start everything at 1 credit, measure real usage patterns, then let data—not assumptions—guide your economic policy.
+            Most teams guess wrong when pricing AI tools upfront. Here's a better way: start everything at 1 credit, measure real usage patterns, then let data, not assumptions, guide your economic policy.
           </p>
           
           <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -52,7 +52,7 @@ export default function StartAt1CreditBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            Even worse, you might accidentally incentivize inefficient behavior. Maybe you made file reads cheap and web searches expensive, so agents start downloading entire websites instead of searching for specific information. Congratulations—you just 10x'd your bandwidth costs to save a few credits.
+            Even worse, you might accidentally incentivize inefficient behavior. Maybe you made file reads cheap and web searches expensive, so agents start downloading entire websites instead of searching for specific information. Congratulations, you just 10x'd your bandwidth costs to save a few credits.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-8 mb-4">The 1-Credit Baseline Strategy</h2>
@@ -62,7 +62,7 @@ export default function StartAt1CreditBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            This creates a level playing field where you can see what agents actually do when price isn't a factor. You get pure usage data—which tools agents reach for most, which routes handle the most traffic, which operations cluster together.
+            This creates a level playing field where you can see what agents actually do when price isn't a factor. You get pure usage data: which tools agents reach for most, which routes handle the most traffic, which operations cluster together.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -85,27 +85,24 @@ export default function StartAt1CreditBlogPage() {
             Now switch to Control mode and assign budgets. The magic happens automatically: agents start optimizing their behavior to stretch budgets further. They batch operations, cache results, and find creative alternatives to expensive tools.
           </p>
 
-          <h2 className="text-2xl font-bold text-white mt-8 mb-4">Real Example from Production</h2>
+          <h2 className="text-2xl font-bold text-white mt-8 mb-4">Example</h2>
 
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 my-8 font-mono text-sm">
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 my-8 font-mono text-sm overflow-x-auto">
             <p className="text-green-400 mb-4"># Week 1: Observe Mode (everything = 1 credit)</p>
-            <pre className="text-gray-300 leading-relaxed">
-web_search:       7,234 calls (38%)
+            <pre className="text-gray-300 leading-relaxed">web_search:       7,234 calls (38%)
 file_read:        4,521 calls (24%) 
 llm_completion:   3,812 calls (20%)
 image_generate:     765 calls (4%)
 code_execute:     2,644 calls (14%)</pre>
             
             <p className="text-yellow-400 mt-6 mb-4"># Provider invoices show:</p>
-            <pre className="text-gray-300 leading-relaxed">
-Image API:     $426 (48% of cost for 4% of usage!)
+            <pre className="text-gray-300 leading-relaxed">Image API:     $426 (48% of cost for 4% of usage!)
 LLM API:       $312 (35%)
 Search API:     $89 (10%)
 Compute:        $62 (7%)</pre>
             
             <p className="text-cyan-400 mt-6 mb-4"># Week 2: Control Mode (data-driven pricing)</p>
-            <pre className="text-gray-300 leading-relaxed">
-web_search:      1 credit  (high volume, low cost)
+            <pre className="text-gray-300 leading-relaxed">web_search:      1 credit  (high volume, low cost)
 file_read:       1 credit  (internal, free)
 llm_completion:  3 credits (moderate cost)
 image_generate: 15 credits (expensive!)
@@ -123,7 +120,7 @@ code_execute:    2 credits (compute cost)</pre>
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            More importantly, it turns cost management from a blunt hammer (block when budget exhausted) into a sophisticated steering mechanism. You're not preventing agents from using expensive tools—you're making them think twice about whether they really need that high-resolution image or if a description would suffice.
+            More importantly, it turns cost management from a blunt hammer (block when budget exhausted) into a sophisticated steering mechanism. You're not preventing agents from using expensive tools; you're making them think twice about whether they really need that high-resolution image or if a description would suffice.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-8 mb-4">Your First Week with SatGate</h2>
@@ -138,7 +135,7 @@ code_execute:    2 credits (compute cost)</pre>
           </ol>
 
           <p className="text-gray-300 leading-relaxed mt-8">
-            This is economic policy done right—data-driven, iterative, and grounded in actual usage patterns rather than guesswork. Start simple, measure everything, then use prices to shape the behavior you want.
+            This is economic policy done right: data-driven, iterative, and grounded in actual usage patterns rather than guesswork. Start simple, measure everything, then use prices to shape the behavior you want.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
