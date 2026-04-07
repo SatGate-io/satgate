@@ -9,6 +9,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'how-to-add-budget-limits-to-openai-api-calls',
+    title: 'How to Add Budget Limits to OpenAI API Calls',
+    description: 'Learn how to implement hard budget limits for OpenAI API calls. Prevent runaway costs with request-level enforcement, not just monitoring.',
+    date: '2026-04-07',
+    readTime: '8 min read',
+    author: 'Matt Dean',
+    tags: ['OpenAI', 'Cost Control', 'Tutorial', 'API Gateway'],
+  },
+  {
     slug: 'zero-trust-for-ai-agents',
     title: 'Zero Trust for AI Agents: Why Identity-Based Security Collapses When Machines Call the Shots',
     description: 'Zero Trust was built for human users and managed devices. AI agents break every assumption it makes. Here\'s how capability-based security fixes what Zero Trust can\'t.',
