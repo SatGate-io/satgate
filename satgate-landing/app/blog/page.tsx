@@ -9,6 +9,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'cursor-mcp-proxy-setup-guide',
+    title: 'Cursor MCP Proxy Setup Guide: Add Budget Controls and Audit Trails to Your Tools',
+    description: 'Learn how to set up a Cursor MCP proxy with SatGate to enforce budgets, meter tool usage, and add audit trails without changing your MCP servers.',
+    date: '2026-04-09',
+    readTime: '10 min read',
+    author: 'Matt Dean',
+    tags: ['Cursor', 'MCP', 'Tutorial', 'Governance'],
+  },
+  {
     slug: 'start-at-1-credit-economic-policy',
     title: 'Start at 1 Credit: A Smarter Way to Price AI Agent Tools',
     description: 'Stop guessing tool costs on day one. Start everything at 1 credit in Observe mode, measure real usage, then use that data to shape behavior with intentional pricing.',

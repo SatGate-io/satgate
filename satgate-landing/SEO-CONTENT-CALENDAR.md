@@ -25,7 +25,7 @@
 
 ### Long-tail — Tutorial/how-to
 - [x] "How to add budget limits to OpenAI API calls" — `/blog/how-to-add-budget-limits-to-openai-api-calls` (4/7)
-- [ ] "Cursor MCP proxy setup guide"
+- [x] "Cursor MCP proxy setup guide" — `/blog/cursor-mcp-proxy-setup-guide` (4/9)
 - [ ] "Multi-agent cost tracking with SatGate"
 - [ ] "API cost attribution by team and department"
 - [ ] "How to monetize your API with Lightning payments"
@@ -59,6 +59,7 @@
 - 2026-04-02: "L402 Protocol Explained"
 - 2026-04-02: "HTTP 402 Payment Required: The Dormant Status Code That Powers the Agent Economy" (also on dev.to)
 - 2026-04-03: "Zero Trust for AI Agents: Why Identity-Based Security Collapses When Machines Call the Shots" (also on dev.to)
+- 2026-04-09: "Cursor MCP Proxy Setup Guide: Add Budget Controls and Audit Trails to Your Tools"
 
 ## dev.to Account
 - Handle: @mattdeangit
