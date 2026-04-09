@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "Start at 1 Credit: A Smarter Way to Price AI Agent Tools - SatGate Blog",
-  description: "Stop guessing tool costs on day one. Start everything at 1 credit in Observe mode, measure real usage, then use that data to shape behavior with intentional pricing.",
+  description: "Stop guessing tool costs on day one. Start everything at 1 credit in Observe mode, measure real usage, refine policy from evidence, then move to Control with confidence.",
   alternates: { canonical: 'https://satgate.io/blog/start-at-1-credit-economic-policy' },
   keywords: ['AI agent economics', 'tool pricing strategy', 'cost management AI', 'economic policy agents', 'SatGate observe mode', 'AI cost optimization', 'agent budget management']
 };
@@ -26,7 +26,7 @@ export default function StartAt1CreditBlogPage() {
           <h1 className="text-4xl font-bold mb-4">Start at 1 Credit: A Smarter Way to Price AI Agent Tools</h1>
           
           <p className="text-xl text-gray-400 mb-6 italic">
-            Most teams guess wrong when pricing AI tools upfront. Here's a better way: start everything at 1 credit, measure real usage patterns, then let data, not assumptions, guide your economic policy.
+            Most teams guess wrong when pricing AI tools upfront. Here's a better way: start everything at 1 credit, measure real usage patterns, refine policy from evidence in Observe mode, then let data, not assumptions, guide Control.
           </p>
           
           <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -69,20 +69,25 @@ export default function StartAt1CreditBlogPage() {
             After a week of observation, compare your SatGate usage data to your actual provider invoices. That image generation tool that's only 5% of requests? It might be driving 60% of your OpenAI bill. The web search that's 40% of requests? Maybe it's costing pennies through a bulk API deal.
           </p>
 
-          <h2 className="text-2xl font-bold text-white mt-8 mb-4">From Observation to Control</h2>
+          <h2 className="text-2xl font-bold text-white mt-8 mb-4">From Observation to Policy Refinement to Control</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            Once you have real data, the path forward is clear:
+            Once you have real data, don&apos;t jump straight from passive observation to hard enforcement. There&apos;s an important middle step: <strong className="text-white">policy refinement inside Observe mode.</strong>
           </p>
 
           <ul className="list-disc list-inside space-y-2 text-gray-300">
             <li><strong className="text-white">Expensive operations get higher prices.</strong> If image generation costs 12x more than text, price it at 12 credits.</li>
             <li><strong className="text-white">Risky operations get premium pricing.</strong> External API calls might warrant 5x pricing just for the security exposure.</li>
-            <li><strong className="text-white">Bulk operations get volume discounts.</strong> Batch processing 100 items? Maybe that's 50 credits, not 100.</li>
+            <li><strong className="text-white">Agent behavior gets tuned before enforcement.</strong> Adjust prompts, routing, batching, caching, and workflow design while still in Observe.</li>
+            <li><strong className="text-white">Bulk operations get volume discounts.</strong> Batch processing 100 items? Maybe that&apos;s 50 credits, not 100.</li>
           </ul>
 
           <p className="text-gray-300 leading-relaxed">
-            Now switch to Control mode and assign budgets. The magic happens automatically: agents start optimizing their behavior to stretch budgets further. They batch operations, cache results, and find creative alternatives to expensive tools.
+            This is where SatGate becomes more than a meter. You use observed usage plus provider cost analysis to shape economic policy while the system is still non-blocking. Teams can start changing behavior before budgets are enforced.
+          </p>
+
+          <p className="text-gray-300 leading-relaxed">
+            Then switch to Control mode and assign budgets. The magic happens automatically: agents start optimizing their behavior to stretch budgets further. They batch operations, cache results, and find creative alternatives to expensive tools.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-8 mb-4">Example</h2>
@@ -105,18 +110,31 @@ export default function StartAt1CreditBlogPage() {
               <li><strong className="text-white">Compute:</strong> $62 (7%)</li>
             </ul>
             
-            <h3 className="text-cyan-400 font-bold mb-4">Week 2: Control Mode (data-driven pricing)</h3>
+            <h3 className="text-cyan-400 font-bold mb-4">Week 2: Observe Mode, refined from real data</h3>
+            <ul className="text-gray-300 space-y-1 mb-6">
+              <li><strong className="text-white">web_search:</strong> stays at 1 credit (high volume, low cost)</li>
+              <li><strong className="text-white">file_read:</strong> stays at 1 credit (internal, free)</li>
+              <li><strong className="text-white">llm_completion:</strong> moves to 3 credits (moderate cost)</li>
+              <li><strong className="text-white">image_generate:</strong> moves to 15 credits (expensive)</li>
+              <li><strong className="text-white">code_execute:</strong> moves to 2 credits (compute cost)</li>
+            </ul>
+
+            <h3 className="text-purple-400 font-bold mb-4">Behavior changes before Control</h3>
+            <ul className="text-gray-300 space-y-1 mb-6">
+              <li>Agents batch LLM calls instead of firing one-off requests</li>
+              <li>Teams cache common lookups and route cheap work to cheaper tools</li>
+              <li>Image generation becomes intentional instead of casual</li>
+            </ul>
+
+            <h3 className="text-green-400 font-bold mb-4">Week 3: Control Mode</h3>
             <ul className="text-gray-300 space-y-1">
-              <li><strong className="text-white">web_search:</strong> 1 credit (high volume, low cost)</li>
-              <li><strong className="text-white">file_read:</strong> 1 credit (internal, free)</li>
-              <li><strong className="text-white">llm_completion:</strong> 3 credits (moderate cost)</li>
-              <li><strong className="text-white">image_generate:</strong> 15 credits (expensive!)</li>
-              <li><strong className="text-white">code_execute:</strong> 2 credits (compute cost)</li>
+              <li>Budgets are now enforced against a policy already shaped by real usage</li>
+              <li>Control becomes a confident rollout, not a blind jump</li>
             </ul>
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            The result? Without changing any agent code, image generation dropped to emergency-use-only, teams started batching LLM calls, and the monthly bill dropped 34% while productivity stayed constant.
+            The result? Before hard enforcement even started, image generation dropped to emergency-use-only, teams started batching LLM calls, and the monthly bill dropped 34% while productivity stayed constant. Control then locked in a behavior pattern that had already been proven in Observe.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-8 mb-4">Why This Works</h2>
@@ -126,7 +144,7 @@ export default function StartAt1CreditBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            More importantly, it turns cost management from a blunt hammer (block when budget exhausted) into a sophisticated steering mechanism. You're not preventing agents from using expensive tools; you're making them think twice about whether they really need that high-resolution image or if a description would suffice.
+            More importantly, it turns cost management from a blunt hammer into a steering mechanism. You're not just blocking when budgets run out. You're using Observe mode to surface real cost drivers, refine policy, and push better agent behavior before enforcement ever starts.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-8 mb-4">Your First Week with SatGate</h2>
@@ -137,11 +155,12 @@ export default function StartAt1CreditBlogPage() {
             <li><strong className="text-white">Pull your SatGate usage report</strong> and your provider invoices.</li>
             <li><strong className="text-white">Map usage to actual costs.</strong> Find the expensive outliers.</li>
             <li><strong className="text-white">Reprice based on reality,</strong> not assumptions.</li>
-            <li><strong className="text-white">Switch to Control mode</strong> and watch behavior adapt.</li>
+            <li><strong className="text-white">Refine agent behavior in Observe mode,</strong> using the new signal to tune prompts, workflows, and tool use.</li>
+            <li><strong className="text-white">Switch to Control mode</strong> once the policy already reflects real-world behavior.</li>
           </ol>
 
           <p className="text-gray-300 leading-relaxed mt-8">
-            This is economic policy done right: data-driven, iterative, and grounded in actual usage patterns rather than guesswork. Start simple, measure everything, then use prices to shape the behavior you want.
+            This is economic policy done right: data-driven, iterative, and grounded in actual usage patterns rather than guesswork. Start simple, measure everything, refine policy while still in Observe, then use Control to enforce what the data already taught you.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
