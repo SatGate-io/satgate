@@ -84,7 +84,7 @@ export default function GovernPage() {
             <Link href="/design-partners" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center justify-center gap-2">
               Become a Design Partner <ArrowRight size={18} />
             </Link>
-            <Link href="#observe" className="border border-gray-700 px-8 py-3 rounded-lg font-bold hover:border-gray-500 transition flex items-center justify-center gap-2">
+            <Link href="https://cloud.satgate.io/cloud/login" className="border border-gray-700 px-8 py-3 rounded-lg font-bold hover:border-gray-500 transition flex items-center justify-center gap-2">
               Start Free <Eye size={18} />
             </Link>
           </div>
