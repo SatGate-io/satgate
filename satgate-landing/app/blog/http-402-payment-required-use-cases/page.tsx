@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "HTTP 402 Payment Required: The Dormant Status Code That Powers the Agent Economy - SatGate Blog",
-  description: "HTTP 402 Payment Required has been 'reserved for future use' since 1997. AI agents finally make it essential. Here are the real-world use cases unlocking it.",
+  title: "What Is HTTP 402 Payment Required? Use Cases for AI Agents",
+  description: "HTTP 402 Payment Required lets APIs ask agents to pay before access. See practical AI agent, L402, and pay-per-call API use cases.",
   alternates: { canonical: 'https://satgate.io/blog/http-402-payment-required-use-cases' },
   keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API']
 };

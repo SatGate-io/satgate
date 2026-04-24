@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock, ArrowRight, CheckCircle, Shield, DollarSign, Zap } from 'lucide-react';
 
 export const metadata = {
@@ -267,6 +268,11 @@ curl -X POST http://localhost:9090/admin/mint \\
               </a>
             </div>
           </div>
+          <RoiCta
+            title="Put MCP tool budgets into dollars"
+            body="Use the calculator to translate per-tool calls, loop frequency, and agent volume into monthly savings."
+          />
+
         </article>
 
         <footer className="mt-16 pt-8 border-t border-gray-800">

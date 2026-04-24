@@ -1,9 +1,10 @@
 import Link from 'next/link';
+import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "How to Add Budget Limits to OpenAI API Calls - SatGate Blog",
-  description: "Learn how to implement hard budget limits for OpenAI API calls. Prevent runaway costs with request-level enforcement, not just monitoring.",
+  title: "OpenAI API Budget Limits: Stop Runaway GPT Spend Before It Happens",
+  description: "Enforce OpenAI API budget limits before each request, prevent runaway GPT spend, and quantify avoided agent-loop costs with the SatGate ROI calculator.",
   alternates: { canonical: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls' },
   keywords: ['OpenAI API budget limits', 'OpenAI cost control', 'API gateway OpenAI', 'GPT-4 spending limits', 'OpenAI API costs', 'prevent OpenAI overspending']
 };
@@ -439,6 +440,11 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
             </div>
           </div>
           
+          <RoiCta
+            title="OpenAI API budget limits are easier to sell with numbers"
+            body="Model the cost of runaway OpenAI calls, retries, and agent loops before they hit the invoice."
+          />
+
         </article>
       </div>
     </div>

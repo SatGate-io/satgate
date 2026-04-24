@@ -221,6 +221,32 @@ export default function ROICalculatorPage() {
         </div>
       </section>
 
+      {/* Buyer Intent Links */}
+      <section className="pb-20 px-6">
+        <div className="max-w-5xl mx-auto rounded-2xl border border-gray-800 bg-gray-900/60 p-6 md:p-8">
+          <div className="mb-6 max-w-3xl">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Go deeper</p>
+            <h2 className="mb-3 text-2xl md:text-3xl font-bold text-white">Turn the ROI model into enforceable policy</h2>
+            <p className="text-gray-400">
+              The calculator shows the exposure. These guides show how to enforce budget limits before agents spend the money.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { href: '/blog/how-to-add-budget-limits-to-openai-api-calls', title: 'OpenAI API budget limits', body: 'Stop runaway GPT spend before requests reach OpenAI.' },
+              { href: '/blog/llm-cost-management', title: 'LLM cost dashboard vs enforcement', body: 'Why alerts and dashboards are not enough for autonomous agents.' },
+              { href: '/blog/mcp-budget-enforcement-guide', title: 'MCP budget enforcement', body: 'Assign per-tool costs and cap MCP tool spend in real time.' },
+              { href: '/blog/api-gateway-for-ai-agents', title: 'API gateway for AI agents', body: 'Budget enforcement, capability tokens, delegation, and audit trails.' },
+            ].map((item) => (
+              <Link key={item.href} href={item.href} className="block rounded-xl border border-gray-800 bg-black/40 p-5 transition hover:border-cyan-500/40 hover:bg-cyan-950/20">
+                <h3 className="mb-2 font-bold text-white">{item.title}</h3>
+                <p className="text-sm text-gray-400">{item.body}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-4xl mx-auto text-center">

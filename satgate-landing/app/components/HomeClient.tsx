@@ -125,7 +125,7 @@ const LandingPage = () => {
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
               Control what agents<br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
+              <span className="sr-only"> </span><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
                 can spend.
               </span>
             </h1>

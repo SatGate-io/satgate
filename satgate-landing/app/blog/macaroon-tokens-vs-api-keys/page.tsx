@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "Macaroon Tokens vs API Keys: Why Capability-Based Auth Beats Identity-Based Auth for AI Agents - SatGate Blog",
-  description: "API keys tie identity to unlimited access. Macaroon tokens embed capabilities and constraints. For AI agents that need delegation and budget limits, the difference is everything.",
+  title: "Macaroon Tokens vs API Keys for AI Agent Authentication",
+  description: "Macaroon tokens beat API keys for AI agents by embedding scoped capabilities, budget limits, expiry, and safe delegation into each credential.",
   alternates: { canonical: 'https://satgate.io/blog/macaroon-tokens-vs-api-keys' },
   keywords: ['macaroon tokens vs API keys', 'capability-based authentication', 'API authentication AI agents', 'delegated authority tokens', 'macaroon authentication', 'AI agent security', 'capability tokens']
 };

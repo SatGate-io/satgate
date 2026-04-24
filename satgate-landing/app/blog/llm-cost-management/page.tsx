@@ -1,9 +1,10 @@
 import Link from 'next/link';
+import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "LLM Cost Management: From Monitoring Dashboards to Real-Time Enforcement - SatGate Blog",
-  description: "LLM cost dashboards show you what you spent. Economic firewalls control what you spend. Learn why observability alone fails when AI agents control the budget.",
+  title: "LLM Cost Management: Dashboards vs Real-Time Budget Enforcement",
+  description: "LLM cost management needs more than dashboards. Learn how real-time budget enforcement stops runaway AI agent spend before the bill arrives.",
   alternates: { canonical: 'https://satgate.io/blog/llm-cost-management' },
   keywords: ['LLM cost management', 'LLM cost control', 'AI cost optimization', 'LLM spending limits', 'AI budget enforcement', 'LLM cost monitoring']
 };
@@ -283,6 +284,11 @@ satgate mint \\
               <a href="https://satgate.io/pricing" className="text-cyan-400 hover:text-cyan-300">Enterprise →</a>
             </p>
           </div>
+
+          <RoiCta
+            title="LLM cost dashboards need a dollar case"
+            body="Estimate what delayed alerts and post-hoc dashboards leave exposed when agents control the spend."
+          />
 
         </article>
 

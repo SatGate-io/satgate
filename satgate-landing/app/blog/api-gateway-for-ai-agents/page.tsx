@@ -1,9 +1,10 @@
 import Link from 'next/link';
+import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "API Gateway for AI Agents: Why Traditional Gateways Fall Short - SatGate Blog",
-  description: "Traditional API gateways route traffic. AI agents need economic governance. Learn why Solo.io, Kong, and Gravitee weren't built for autonomous agent workloads.",
+  title: "API Gateway for AI Agents: Budgets, Auth, and Governance",
+  description: "AI agent API gateways need budget enforcement, capability tokens, delegation, and audit trails — not just routing and rate limits.",
   alternates: { canonical: 'https://satgate.io/blog/api-gateway-for-ai-agents' },
   keywords: ['API gateway for AI agents', 'AI agent gateway', 'API gateway comparison', 'agent economy gateway', 'AI API management', 'economic firewall gateway']
 };
@@ -287,6 +288,11 @@ satgate mint \\
               <a href="https://satgate.io/compare" className="text-cyan-400 hover:text-cyan-300">Gateway Comparison →</a>
             </p>
           </div>
+
+          <RoiCta
+            title="Quantify agent gateway ROI"
+            body="Show the difference between routing traffic and enforcing spend before each autonomous API request."
+          />
 
         </article>
 

@@ -28,8 +28,8 @@ const posts = [
   },
   {
     slug: 'how-to-add-budget-limits-to-openai-api-calls',
-    title: 'How to Add Budget Limits to OpenAI API Calls',
-    description: 'Learn how to implement hard budget limits for OpenAI API calls. Prevent runaway costs with request-level enforcement, not just monitoring.',
+    title: 'OpenAI API Budget Limits: Stop Runaway GPT Spend Before It Happens',
+    description: 'Learn how to enforce OpenAI API budget limits before each request, then use the ROI calculator to quantify avoided agent-loop spend.',
     date: '2026-04-07',
     readTime: '8 min read',
     author: 'Matt Dean',
@@ -136,8 +136,8 @@ const posts = [
   },
   {
     slug: 'llm-cost-management',
-    title: 'LLM Cost Management: From Monitoring Dashboards to Real-Time Enforcement',
-    description: 'LLM cost dashboards show you what you spent. Economic firewalls control what you spend. Learn why observability alone fails when AI agents control the budget.',
+    title: 'LLM Cost Management: Dashboards vs Real-Time Budget Enforcement',
+    description: 'LLM cost dashboards show what happened. Real-time enforcement controls what agents can spend before the bill arrives.',
     date: '2026-03-17',
     readTime: '10 min read',
     author: 'Matt Dean',
