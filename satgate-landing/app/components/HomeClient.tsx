@@ -676,6 +676,7 @@ const LandingPage = () => {
                 <li><Link href="/mcp-governance" className="hover:text-white transition">MCP Governance</Link></li>
                 <li><Link href="/mcp-budget-enforcement" className="hover:text-white transition">MCP Budget Enforcement</Link></li>
                 <li><Link href="/mcp-cost-control" className="hover:text-white transition">MCP Cost Control</Link></li>
+                <li><Link href="/mcp-proxy-config-generator" className="hover:text-white transition">MCP Proxy Config Generator</Link></li>
                 <li><Link href="/agent-api-governance" className="hover:text-white transition">Agent API Governance</Link></li>
                 <li><Link href="/agent-api-key-risk-assessment" className="hover:text-white transition">Agent API Key Risk Assessment</Link></li>
                 <li><Link href="/revocable-agent-credentials" className="hover:text-white transition">Revocable Agent Credentials</Link></li>

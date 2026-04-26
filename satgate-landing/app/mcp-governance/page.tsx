@@ -302,6 +302,7 @@ audit:
               ['/mcp-budget-enforcement', 'MCP budget enforcement', 'Hard caps, per-tool prices, and request-path budget decisions for MCP servers.'],
               ['/mcp-cost-control', 'MCP cost control', 'Control paid tool calls, retries, SaaS actions, cloud tasks, and data lookups before MCP tools execute.'],
               ['/mcp-tool-cost-policy-generator', 'MCP tool cost policy generator', 'Generate practical policy for Cursor, Claude Desktop, Claude Code, OpenClaw, and custom clients.'],
+              ['/mcp-proxy-config-generator', 'MCP proxy config generator', 'Generate proxy config for Cursor, Claude Desktop, Claude Code, OpenClaw, and custom clients.'],
               ['/agent-capability-tokens', 'Agent capability tokens', 'Constrain MCP authority with scope, budget, expiry, delegation, and revocation.'],
               ['/satgate-for-cursor', 'SatGate for Cursor', 'Govern Cursor MCP/tool workflows with budgets and audit.'],
               ['/satgate-for-openclaw', 'SatGate for OpenClaw', 'Apply economic policy to proactive agents, sub-agents, and tools.'],

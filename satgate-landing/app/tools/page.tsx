@@ -81,6 +81,12 @@ const tools = [
     description: 'Generate copyable YAML and JSON policy for budgets, MCP tool costs, delegation, revocation, and audit fields.',
     icon: ClipboardList,
   },
+  {
+    href: '/mcp-proxy-config-generator',
+    title: 'MCP Proxy Config Generator',
+    description: 'Generate MCP proxy config for Cursor, Claude Desktop, Claude Code, OpenClaw, and custom clients.',
+    icon: Wrench,
+  },
 ];
 
 export default function ToolsPage() {
