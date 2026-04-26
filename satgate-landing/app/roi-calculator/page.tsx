@@ -69,8 +69,53 @@ export default function ROICalculatorPage() {
   const withSatgate = calc.monthlyToolSpend + (calc.monthlyLoopWaste * 0.02);
   const barMax = Math.max(withoutSatgate, 1);
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'AI Agent ROI Calculator',
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
+    url: 'https://satgate.io/roi-calculator',
+    description: 'Estimate ghost spend, runaway agent loop exposure, payback period, and ROI from request-path AI agent budget enforcement.',
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do you calculate AI agent ghost spend?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Ghost spend is estimated from active agents, tool calls per day, average cost per tool call, loop frequency, and the number of calls wasted before a loop is detected.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why do agent loops create API cost risk?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Autonomous agents can retry, delegate, and call paid tools faster than humans can notice. Without inline budget enforcement, dashboards and alerts usually detect the cost after it has already happened.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How does SatGate reduce runaway AI agent spend?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'SatGate enforces per-agent, per-tool, per-route, and per-request budget policy before upstream API calls execute, blocking or routing requests that exceed economic policy.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-purple-500 selection:text-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {/* Navigation */}
       <nav className="border-b border-gray-800 backdrop-blur-md fixed w-full z-50 bg-black/50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
@@ -233,16 +278,40 @@ export default function ROICalculatorPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
-              { href: '/blog/how-to-add-budget-limits-to-openai-api-calls', title: 'OpenAI API budget limits', body: 'Stop runaway GPT spend before requests reach OpenAI.' },
-              { href: '/blog/llm-cost-management', title: 'LLM cost dashboard vs enforcement', body: 'Why alerts and dashboards are not enough for autonomous agents.' },
-              { href: '/blog/mcp-budget-enforcement-guide', title: 'MCP budget enforcement', body: 'Assign per-tool costs and cap MCP tool spend in real time.' },
-              { href: '/blog/api-gateway-for-ai-agents', title: 'API gateway for AI agents', body: 'Budget enforcement, capability tokens, delegation, and audit trails.' },
+              { href: '/ai-agent-cost-control', title: 'AI agent cost control', body: 'Control API spend before autonomous agents create runaway bills.' },
+              { href: '/economic-firewall', title: 'Economic firewall', body: 'The request-path control layer for Observe, Control, and Charge.' },
+              { href: '/mcp-governance', title: 'MCP budget enforcement', body: 'Assign per-tool costs and cap MCP tool spend in real time.' },
+              { href: '/agent-api-governance', title: 'Agent API governance', body: 'Replace unlimited API keys with scoped, revocable capabilities.' },
             ].map((item) => (
               <Link key={item.href} href={item.href} className="block rounded-xl border border-gray-800 bg-black/40 p-5 transition hover:border-cyan-500/40 hover:bg-cyan-950/20">
                 <h3 className="mb-2 font-bold text-white">{item.title}</h3>
                 <p className="text-sm text-gray-400">{item.body}</p>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SEO explainer */}
+      <section className="pb-20 px-6">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-6 md:p-8">
+            <h2 className="text-2xl font-bold text-white mb-4">What this AI agent cost calculator measures</h2>
+            <p className="text-gray-400 leading-relaxed mb-4">
+              Most LLM cost dashboards measure known spend: tokens, requests, and invoices after the fact. This calculator focuses on avoidable agent-loop exposure: the API and tool spend created when autonomous agents retry, delegate, call MCP tools, or continue a task after the economics no longer make sense.
+            </p>
+            <p className="text-gray-400 leading-relaxed">
+              The model is intentionally simple: agent count × daily tool calls × cost per call × loop frequency × loop duration. It gives finance, platform, and security teams a shared number for the cost of missing inline budget enforcement.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-6 md:p-8">
+            <h2 className="text-2xl font-bold text-white mb-4">How SatGate changes the result</h2>
+            <p className="text-gray-400 leading-relaxed mb-4">
+              SatGate does not wait for a billing export. It checks agent identity, route, tool, request cost, remaining budget, and policy before forwarding the call. That is why the savings estimate assumes most loop waste is prevented rather than merely reported.
+            </p>
+            <p className="text-gray-400 leading-relaxed">
+              Start in Observe mode to measure real spend, then move high-risk routes to Control mode when you are ready to enforce hard budget limits.
+            </p>
           </div>
         </div>
       </section>
