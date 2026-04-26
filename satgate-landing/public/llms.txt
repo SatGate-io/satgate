@@ -65,8 +65,11 @@ Macaroons and capability tokens can constrain agent authority:
 ## Category Pages
 - Economic Firewall: https://satgate.io/economic-firewall
 - AI Agent Cost Control: https://satgate.io/ai-agent-cost-control
+- AI API Budget Enforcement: https://satgate.io/ai-api-budget-enforcement
+- Agent Spending Limits: https://satgate.io/agent-spending-limits
 - MCP Governance: https://satgate.io/mcp-governance
 - MCP Budget Enforcement: https://satgate.io/mcp-budget-enforcement
+- MCP Cost Control: https://satgate.io/mcp-cost-control
 - Agent API Governance: https://satgate.io/agent-api-governance
 - Revocable Agent Credentials: https://satgate.io/revocable-agent-credentials
 - Agent Capability Tokens: https://satgate.io/agent-capability-tokens

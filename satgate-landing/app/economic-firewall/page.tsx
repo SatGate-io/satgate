@@ -282,10 +282,10 @@ export default function EconomicFirewallPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               ['/ai-agent-cost-control', 'AI agent cost control', 'Commercial controls for runaway agent spend and budget enforcement.'],
-              ['/ai-agent-runaway-spend-benchmark', 'Runaway spend benchmark', 'Original benchmark data for loops, retry storms, fanout, and avoidable agent spend.'],
-              ['/mcp-governance', 'MCP governance', 'Budget, audit, and policy controls for tool-calling agents.'],
+              ['/ai-api-budget-enforcement', 'AI API budget enforcement', 'Hard budget checks before model, tool, or API calls leave the request path.'],
+              ['/agent-spending-limits', 'Agent spending limits', 'Spend caps by task, workflow, delegated sub-agent, route, model, and tool.'],
+              ['/mcp-cost-control', 'MCP cost control', 'Control paid tool calls, retries, SaaS actions, cloud tasks, and data lookups.'],
               ['/agent-api-governance', 'Agent API governance', 'Identity, delegation, revocation, and audit for autonomous API calls.'],
-              ['/revocable-agent-credentials', 'Revocable agent credentials', 'Scoped, expiring credentials and kill switches for autonomous API access.'],
               ['/l402-agent-payments', 'L402 agent payments', 'Charge robot customers before unlocking protected API access.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
