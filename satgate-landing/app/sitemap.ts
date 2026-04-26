@@ -18,6 +18,8 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/mcp-governance', lastModified: '2026-04-26', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/mcp-budget-enforcement', lastModified: '2026-04-26', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/agent-api-governance', lastModified: '2026-04-26', changeFrequency: 'weekly', priority: 0.9 },
+  { path: '/revocable-agent-credentials', lastModified: '2026-04-26', changeFrequency: 'monthly', priority: 0.85 },
+  { path: '/agent-capability-tokens', lastModified: '2026-04-26', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/l402-agent-payments', lastModified: '2026-04-26', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/robot-customer-payments', lastModified: '2026-04-26', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/satgate-for-cursor', lastModified: '2026-04-26', changeFrequency: 'monthly', priority: 0.8 },
