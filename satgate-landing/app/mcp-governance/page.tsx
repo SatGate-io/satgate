@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, Cable, Eye, Gauge, KeyRound, ShieldAlert, Wrench } from 'lucide-react';
 
 export const metadata = {
-  title: 'MCP Governance: Budget Enforcement, Audit, and Policy | SatGate',
+  title: 'MCP Governance: Budget Enforcement, Audit, and Policy',
   description: 'Govern Model Context Protocol tools with SatGate. Enforce MCP budgets, audit tool calls, revoke agent access, and control spend before tools execute.',
   alternates: { canonical: 'https://satgate.io/mcp-governance' },
   keywords: [

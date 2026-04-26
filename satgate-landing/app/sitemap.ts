@@ -16,6 +16,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/ai-agent-cost-control', lastModified: '2026-04-25', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/mcp-governance', lastModified: '2026-04-25', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/agent-api-governance', lastModified: '2026-04-25', changeFrequency: 'weekly', priority: 0.9 },
+  { path: '/l402-agent-payments', lastModified: '2026-04-25', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/pricing', lastModified: '2026-04-12', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/security', lastModified: '2026-04-12', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog', lastModified: '2026-04-24', changeFrequency: 'weekly', priority: 0.8 },

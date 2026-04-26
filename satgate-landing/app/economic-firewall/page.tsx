@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, CheckCircle2, Shield, Gauge, WalletCards, Activity, KeyRound } from 'lucide-react';
 
 export const metadata = {
-  title: 'Economic Firewall for AI Agents | SatGate',
+  title: 'Economic Firewall for AI Agents',
   description: 'An economic firewall controls what AI agents can access and spend before each API request. Learn the category, architecture, and SatGate implementation model.',
   alternates: { canonical: 'https://satgate.io/economic-firewall' },
   keywords: [

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, Bot, DollarSign, Gauge, ShieldCheck, Workflow, BarChart3 } from 'lucide-react';
 
 export const metadata = {
-  title: 'AI Agent Cost Control Software | SatGate',
+  title: 'AI Agent Cost Control Software',
   description: 'Control AI agent API spend before it happens. SatGate enforces budgets, revocation, routing, and audit trails in the request path.',
   alternates: { canonical: 'https://satgate.io/ai-agent-cost-control' },
   keywords: [

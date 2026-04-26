@@ -3,7 +3,7 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: 'AI Agent API Cost Control: Rate Limits vs Economic Firewalls | SatGate',
+  title: 'AI Agent API Cost Control: Rate Limits vs Economic Firewalls',
   description: 'Learn why API rate limits cannot control autonomous AI agent spend, and how economic firewalls enforce real-time budgets per agent, tool, and request.',
   alternates: { canonical: 'https://satgate.io/blog/ai-agent-api-cost-control' },
   keywords: [
