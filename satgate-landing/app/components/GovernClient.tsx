@@ -841,6 +841,11 @@ export SATGATE_TOKEN=$TOKEN
             <div>
               <h4 className="font-bold text-white mb-4">Resources</h4>
               <ul className="space-y-2 text-sm text-gray-500">
+                <li><Link href="/economic-firewall" className="hover:text-white transition">Economic Firewall</Link></li>
+                <li><Link href="/ai-agent-cost-control" className="hover:text-white transition">AI Agent Cost Control</Link></li>
+                <li><Link href="/mcp-governance" className="hover:text-white transition">MCP Governance</Link></li>
+                <li><Link href="/agent-api-governance" className="hover:text-white transition">Agent API Governance</Link></li>
+                <li><Link href="/l402-agent-payments" className="hover:text-white transition">L402 Agent Payments</Link></li>
                 <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
                 <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud Dashboard</a></li>
               </ul>

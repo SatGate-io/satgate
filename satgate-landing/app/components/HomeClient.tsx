@@ -619,6 +619,11 @@ const LandingPage = () => {
                 <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
                 <li><a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Documentation</a></li>
                 <li><Link href="/govern" className="hover:text-white transition">Enterprise</Link></li>
+                <li><Link href="/economic-firewall" className="hover:text-white transition">Economic Firewall</Link></li>
+                <li><Link href="/ai-agent-cost-control" className="hover:text-white transition">AI Agent Cost Control</Link></li>
+                <li><Link href="/mcp-governance" className="hover:text-white transition">MCP Governance</Link></li>
+                <li><Link href="/agent-api-governance" className="hover:text-white transition">Agent API Governance</Link></li>
+                <li><Link href="/l402-agent-payments" className="hover:text-white transition">L402 Agent Payments</Link></li>
                 <li><Link href="/design-partners" className="hover:text-white transition">Design Partners</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
                 <li><Link href="/compare" className="hover:text-white transition">Compare</Link></li>
