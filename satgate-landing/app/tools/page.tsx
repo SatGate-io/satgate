@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Calculator, ClipboardList, Gauge, ShieldCheck, Wrench } from 'lucide-react';
+import { ArrowRight, BarChart3, Calculator, ClipboardList, Gauge, ShieldCheck, Wrench } from 'lucide-react';
 
 export const metadata = {
   title: 'AI Agent Cost Control Tools',
@@ -33,6 +33,12 @@ const tools = [
     title: 'Runaway Agent Cost Calculator',
     description: 'Model loop duration, paid call velocity, sub-agent fanout, and monthly exposure before detection.',
     icon: Gauge,
+  },
+  {
+    href: '/ai-agent-runaway-spend-benchmark',
+    title: 'AI Agent Runaway Spend Benchmark',
+    description: 'Original benchmark scenarios for agent loops, MCP retry storms, fanout, detection delay, and avoided spend.',
+    icon: BarChart3,
   },
   {
     href: '/openai-budget-policy-generator',

@@ -55,6 +55,7 @@ Macaroons and capability tokens can constrain agent authority:
 - AI Agent Cost Control Tools Hub: https://satgate.io/tools
 - AI Agent ROI Calculator: https://satgate.io/roi-calculator
 - Runaway Agent Cost Calculator: https://satgate.io/runaway-agent-cost-calculator
+- AI Agent Runaway Spend Benchmark: https://satgate.io/ai-agent-runaway-spend-benchmark
 - OpenAI API Budget Limit Generator: https://satgate.io/openai-budget-policy-generator
 - MCP Tool Cost Policy Generator: https://satgate.io/mcp-tool-cost-policy-generator
 - Economic Firewall Readiness Grader: https://satgate.io/economic-firewall-readiness-grader

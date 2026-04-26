@@ -664,6 +664,7 @@ const LandingPage = () => {
                 <li><Link href="/govern" className="hover:text-white transition">Enterprise</Link></li>
                 <li><Link href="/economic-firewall" className="hover:text-white transition">Economic Firewall</Link></li>
                 <li><Link href="/ai-agent-cost-control" className="hover:text-white transition">AI Agent Cost Control</Link></li>
+                <li><Link href="/ai-agent-runaway-spend-benchmark" className="hover:text-white transition">Runaway Spend Benchmark</Link></li>
                 <li><Link href="/mcp-governance" className="hover:text-white transition">MCP Governance</Link></li>
                 <li><Link href="/mcp-budget-enforcement" className="hover:text-white transition">MCP Budget Enforcement</Link></li>
                 <li><Link href="/agent-api-governance" className="hover:text-white transition">Agent API Governance</Link></li>
