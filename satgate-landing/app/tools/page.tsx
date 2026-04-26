@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { ArrowRight, BarChart3, Calculator, ClipboardList, Gauge, KeyRound, ShieldCheck, Wrench, Zap } from 'lucide-react';
+import { ArrowRight, BarChart3, Calculator, ClipboardList, Gauge, KeyRound, Megaphone, ShieldCheck, Wrench, Zap } from 'lucide-react';
+import ToolLeadCaptureCta from '../components/ToolLeadCaptureCta';
 
 export const metadata = {
   title: 'AI Agent Cost Control Tools',
@@ -8,6 +9,7 @@ export const metadata = {
   keywords: [
     'AI agent cost control tools',
     'AI agent spend calculator',
+    'AI agent runaway spend index',
     'OpenAI budget policy generator',
     'MCP tool cost policy generator',
     'economic firewall readiness grader',
@@ -15,14 +17,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'AI Agent Cost Control Tools',
-    description: 'Calculators and generators for agent spend, runaway loops, OpenAI budgets, MCP tool costs, and economic firewall readiness.',
+    description: 'Calculators, benchmarks, policy templates, and generators for agent spend, runaway loops, OpenAI budgets, MCP tool costs, and economic firewall readiness.',
     url: 'https://satgate.io/tools',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'AI Agent Cost Control Tools',
-    description: 'Free calculators and policy generators for AI agent spend control, MCP governance, and economic firewall readiness.',
+    description: 'Free calculators, benchmarks, and policy generators for AI agent spend control, MCP governance, and economic firewall readiness.',
   },
 };
 
@@ -43,6 +45,12 @@ const tools = [
     href: '/ai-agent-runaway-spend-benchmark',
     title: 'AI Agent Runaway Spend Benchmark',
     description: 'Original benchmark scenarios for agent loops, MCP retry storms, fanout, detection delay, and avoided spend.',
+    icon: BarChart3,
+  },
+  {
+    href: '/ai-agent-runaway-spend-index',
+    title: 'AI Agent Runaway Spend Index',
+    description: 'Track monthly modeled runaway spend exposure, MCP tool cost failures, fanout risk, and avoided cost from request-path controls.',
     icon: BarChart3,
   },
   {
@@ -74,6 +82,12 @@ const tools = [
     title: 'L402 API Pricing Calculator',
     description: 'Estimate per-request robot-customer pricing, gross margin, paid demand, and Lightning sats per API request.',
     icon: Zap,
+  },
+  {
+    href: '/seo-distribution-kit',
+    title: 'SEO Distribution Kit',
+    description: 'Launch copy, social snippets, and backlink targets for distributing SatGate cost-control tools and data assets.',
+    icon: Megaphone,
   },
   {
     href: '/agent-spend-policy-template',
@@ -199,6 +213,10 @@ export default function ToolsPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-4">
+        <ToolLeadCaptureCta />
       </section>
 
       <section className="mx-auto max-w-4xl px-6 py-20">

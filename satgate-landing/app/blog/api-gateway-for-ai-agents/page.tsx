@@ -3,8 +3,8 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "API Gateway for AI Agents: Budgets, Auth, and Governance",
-  description: "AI agent API gateways need budget enforcement, capability tokens, delegation, and audit trails — not just routing and rate limits.",
+  title: "API Gateway for AI Agents: Routing Is Not Economic Governance",
+  description: "AI agents need more than routing. Compare API gateways with request-path economic governance for budgets, MCP tools, capability tokens, and L402 Charge.",
   alternates: { canonical: 'https://satgate.io/blog/api-gateway-for-ai-agents' },
   keywords: ['API gateway for AI agents', 'AI agent gateway', 'API gateway comparison', 'agent economy gateway', 'AI API management', 'economic firewall gateway']
 };
@@ -233,9 +233,9 @@ satgate mint \\
           </p>
 
           <ul className="text-gray-300 space-y-3">
-            <li><strong className="text-white">Observe (Fiat):</strong> Deploy in audit mode. See what your agents are spending. No enforcement, just visibility. "We had no idea GPT-4 calls were 80% of our agent costs."</li>
-            <li><strong className="text-white">Control (Fiat402):</strong> Enable budget enforcement. Set dollar-denominated limits per agent, per team, per department. "Engineering gets $5,000/month for agent API spend."</li>
-            <li><strong className="text-white">Charge (L402):</strong> Enable Lightning-based micropayments. Every API call is economically settled in real time. No invoices, no reconciliation, no 60-day payment terms. "The agent pays per call, and we get paid per call."</li>
+            <li><strong className="text-white">Observe:</strong> Deploy in audit mode. See what your agents are spending. No enforcement, just visibility. "We had no idea GPT-4 calls were 80% of our agent costs."</li>
+            <li><strong className="text-white">Control:</strong> Enable request-path budget enforcement. Set dollar-denominated limits per agent, per team, per route, and per MCP tool. "Engineering gets $5,000/month for agent API spend."</li>
+            <li><strong className="text-white">Charge (L402):</strong> Enable Lightning-based micropayments. SatGate Charge uses L402 for robot customers that pay per API request before access. Fiat402 is separate and should not be conflated with Charge.</li>
           </ul>
 
           <p className="text-gray-300 leading-relaxed">
@@ -287,6 +287,16 @@ satgate mint \\
               {' · '}
               <a href="https://satgate.io/compare" className="text-cyan-400 hover:text-cyan-300">Gateway Comparison →</a>
             </p>
+          </div>
+
+          <div className="my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
+            <h3 className="mb-3 text-xl font-bold text-white">Compare routing gateways against economic control</h3>
+            <p className="mb-4 text-gray-300">Use the comparison hub and MCP proxy generator to map where existing gateways stop and SatGate&apos;s request-path controls begin.</p>
+            <div className="flex flex-wrap gap-3 text-sm font-semibold">
+              <Link href="/compare" className="text-cyan-300 hover:text-cyan-200">Comparison hub →</Link>
+              <Link href="/mcp-proxy-config-generator" className="text-cyan-300 hover:text-cyan-200">MCP proxy config generator →</Link>
+              <Link href="/economic-firewall" className="text-cyan-300 hover:text-cyan-200">Economic firewall →</Link>
+            </div>
           </div>
 
           <RoiCta

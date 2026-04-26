@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "Macaroon Tokens vs API Keys for AI Agent Authentication",
-  description: "Macaroon tokens beat API keys for AI agents by embedding scoped capabilities, budget limits, expiry, and safe delegation into each credential.",
+  title: "Macaroon Tokens vs API Keys: Revocable Agent Capabilities",
+  description: "Compare macaroon tokens and API keys for AI agents. Learn how revocable, scoped, budget-aware capabilities reduce autonomous API risk.",
   alternates: { canonical: 'https://satgate.io/blog/macaroon-tokens-vs-api-keys' },
   keywords: ['macaroon tokens vs API keys', 'capability-based authentication', 'API authentication AI agents', 'delegated authority tokens', 'macaroon authentication', 'AI agent security', 'capability tokens']
 };
@@ -485,6 +485,16 @@ attenuated_token = agent_a_token.add_caveats([
           <p className="text-gray-300 leading-relaxed">
             Choose capability-based authentication. Choose macaroons. Choose an auth model that scales with autonomous systems instead of fighting them.
           </p>
+
+          <div className="my-10 rounded-2xl border border-blue-900/60 bg-blue-950/20 p-6">
+            <h3 className="mb-3 text-xl font-bold text-white">Score your API key risk before agents inherit it</h3>
+            <p className="mb-4 text-gray-300">Static API keys become dangerous when autonomous agents can spend, delegate, and retry. Start with a risk assessment, then move to revocable capabilities.</p>
+            <div className="flex flex-wrap gap-3 text-sm font-semibold">
+              <Link href="/agent-api-key-risk-assessment" className="text-cyan-300 hover:text-cyan-200">API key risk assessment →</Link>
+              <Link href="/revocable-agent-credentials" className="text-cyan-300 hover:text-cyan-200">Revocable credentials →</Link>
+              <Link href="/agent-capability-tokens" className="text-cyan-300 hover:text-cyan-200">Capability tokens →</Link>
+            </div>
+          </div>
 
           {/* CTA Section */}
           <div className="mt-16 bg-gradient-to-r from-blue-900/20 to-cyan-900/20 border border-blue-800/30 rounded-xl p-8">

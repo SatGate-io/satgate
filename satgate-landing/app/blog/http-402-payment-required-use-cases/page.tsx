@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "What Is HTTP 402 Payment Required? Use Cases for AI Agents",
-  description: "HTTP 402 Payment Required lets APIs ask agents to pay before access. See practical AI agent, L402, and pay-per-call API use cases.",
+  title: "HTTP 402 Payment Required: AI Agent API Payment Use Cases",
+  description: "See how HTTP 402 Payment Required, L402 Lightning payments, and robot-customer APIs let AI agents pay per request before access.",
   alternates: { canonical: 'https://satgate.io/blog/http-402-payment-required-use-cases' },
   keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API']
 };
@@ -338,6 +338,16 @@ Parent Agent ($50 macaroon)
           <p className="text-gray-300 leading-relaxed">
             HTTP 402 was reserved for future use in 1997. The future is here, and it looks like AI agents paying for API calls with Lightning micropayments, governed by macaroon tokens, settled in milliseconds. The dormant status code just woke up.
           </p>
+
+          <div className="my-10 rounded-2xl border border-yellow-900/60 bg-yellow-950/20 p-6">
+            <h3 className="mb-3 text-xl font-bold text-white">Model robot-customer pricing before enabling 402</h3>
+            <p className="mb-4 text-gray-300">HTTP 402 gets powerful when pricing, margin, free allowances, and L402 settlement are explicit before agents call the API.</p>
+            <div className="flex flex-wrap gap-3 text-sm font-semibold">
+              <Link href="/l402-api-pricing-calculator" className="text-cyan-300 hover:text-cyan-200">L402 pricing calculator →</Link>
+              <Link href="/robot-customer-payments" className="text-cyan-300 hover:text-cyan-200">Robot customer payments →</Link>
+              <Link href="/l402-agent-payments" className="text-cyan-300 hover:text-cyan-200">L402 agent payments →</Link>
+            </div>
+          </div>
 
           {/* CTA Section */}
           <div className="mt-16 bg-gradient-to-r from-blue-900/20 to-cyan-900/20 border border-blue-800/30 rounded-xl p-8">

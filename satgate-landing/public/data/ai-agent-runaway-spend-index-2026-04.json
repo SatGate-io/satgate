@@ -1,0 +1,29 @@
+{
+  "name": "SatGate AI Agent Runaway Spend Index",
+  "month": "2026-04",
+  "published": "2026-04-26",
+  "methodology": "Modeled runaway spend exposure for autonomous AI agents, MCP tools, retry loops, and delegated sub-agent fanout. Values are scenario estimates for category benchmarking, not customer telemetry.",
+  "summary": {
+    "medianUncontrolledIncident": 1840,
+    "p90UncontrolledIncident": 18480,
+    "largestModeledIncident": 134400,
+    "medianAvoidedWithRequestPathControls": 94.2,
+    "topFailureMode": "retry storms against paid MCP tools and model APIs"
+  },
+  "scenarios": [
+    { "failureMode": "OpenAI retry loop", "uncontrolledCostUsd": 7200, "controlledCostUsd": 250, "avoidedPercent": 96.5 },
+    { "failureMode": "MCP browser automation loop", "uncontrolledCostUsd": 1840, "controlledCostUsd": 120, "avoidedPercent": 93.5 },
+    { "failureMode": "sub-agent research fanout", "uncontrolledCostUsd": 18480, "controlledCostUsd": 900, "avoidedPercent": 95.1 },
+    { "failureMode": "paid data API polling loop", "uncontrolledCostUsd": 9600, "controlledCostUsd": 600, "avoidedPercent": 93.8 },
+    { "failureMode": "multi-tenant agent swarm", "uncontrolledCostUsd": 134400, "controlledCostUsd": 6000, "avoidedPercent": 95.5 }
+  ],
+  "recommendedControls": [
+    "per-agent daily and session budgets",
+    "per-request maximum cost",
+    "MCP tool price registry",
+    "delegation and sub-agent fanout caps",
+    "revocable capability tokens",
+    "budget exhaustion errors agents can reason about",
+    "request-path enforcement before upstream calls execute"
+  ]
+}

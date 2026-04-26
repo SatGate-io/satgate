@@ -1,0 +1,6 @@
+failure_mode,uncontrolled_cost_usd,controlled_cost_usd,avoided_percent
+OpenAI retry loop,7200,250,96.5
+MCP browser automation loop,1840,120,93.5
+sub-agent research fanout,18480,900,95.1
+paid data API polling loop,9600,600,93.8
+multi-tenant agent swarm,134400,6000,95.5

@@ -3,8 +3,8 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "LLM Cost Management: Dashboards vs Real-Time Budget Enforcement",
-  description: "LLM cost management needs more than dashboards. Learn how real-time budget enforcement stops runaway AI agent spend before the bill arrives.",
+  title: "LLM Cost Management: Stop Spend with Real-Time Enforcement",
+  description: "LLM cost management needs request-path budget enforcement, not delayed dashboards. Stop runaway AI agent spend before the bill arrives.",
   alternates: { canonical: 'https://satgate.io/blog/llm-cost-management' },
   keywords: ['LLM cost management', 'LLM cost control', 'AI cost optimization', 'LLM spending limits', 'AI budget enforcement', 'LLM cost monitoring']
 };
@@ -283,6 +283,16 @@ satgate mint \\
               {' · '}
               <a href="https://satgate.io/pricing" className="text-cyan-400 hover:text-cyan-300">Enterprise →</a>
             </p>
+          </div>
+
+          <div className="my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
+            <h3 className="mb-3 text-xl font-bold text-white">From dashboard to control plane</h3>
+            <p className="mb-4 text-gray-300">If a page is already earning LLM cost management impressions, route that intent into the pages that convert: tools, policy templates, and comparison pages.</p>
+            <div className="flex flex-wrap gap-3 text-sm font-semibold">
+              <Link href="/tools" className="text-cyan-300 hover:text-cyan-200">AI agent cost tools →</Link>
+              <Link href="/agent-spend-policy-template" className="text-cyan-300 hover:text-cyan-200">Spend policy template →</Link>
+              <Link href="/compare" className="text-cyan-300 hover:text-cyan-200">Compare gateways →</Link>
+            </div>
           </div>
 
           <RoiCta

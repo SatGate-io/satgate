@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import ToolLeadCaptureCta from '../components/ToolLeadCaptureCta';
 import { ArrowRight, BarChart3, Bot, Clock, DollarSign, Download, Gauge, ShieldCheck, Workflow, Zap } from 'lucide-react';
 
 export const metadata = {
@@ -206,6 +207,13 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Gauge className="mb-4 text-cyan-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Control</h2><p className="leading-relaxed text-gray-400">Enforce per-agent budgets, per-tool caps, route policy, revocation, expiry, and kill switches before upstream API calls execute.</p></div>
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Bot className="mb-4 text-purple-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Charge</h2><p className="leading-relaxed text-gray-400">When external agents become API customers, use SatGate Charge with L402 Lightning payments to collect before access is granted.</p></div>
         </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-10">
+        <ToolLeadCaptureCta
+          title="Benchmark your own runaway agent spend exposure"
+          body="Use the benchmark data as a baseline, export your internal policy, then have SatGate review whether your MCP tools, agent budgets, credential scopes, and kill switches would stop these incidents before spend lands."
+        />
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20">

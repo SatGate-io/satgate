@@ -3,8 +3,8 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "OpenAI API Budget Limits: Stop Runaway GPT Spend Before It Happens",
-  description: "Enforce OpenAI API budget limits before each request, prevent runaway GPT spend, and quantify avoided agent-loop costs with the SatGate ROI calculator.",
+  title: "OpenAI API Budget Limits: Enforce Hard Spend Caps Before GPT Calls",
+  description: "Learn how to enforce OpenAI API budget limits before GPT calls execute, prevent runaway retry loops, and generate request-path spend policies.",
   alternates: { canonical: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls' },
   keywords: ['OpenAI API budget limits', 'OpenAI cost control', 'API gateway OpenAI', 'GPT-4 spending limits', 'OpenAI API costs', 'prevent OpenAI overspending']
 };
@@ -440,6 +440,16 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
             </div>
           </div>
           
+          <div className="my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
+            <h3 className="mb-3 text-xl font-bold text-white">Turn OpenAI limits into enforceable policy</h3>
+            <p className="mb-4 text-gray-300">Use the policy generator and spend template to convert this guide into per-agent, per-session, per-request, and model-route controls.</p>
+            <div className="flex flex-wrap gap-3 text-sm font-semibold">
+              <Link href="/openai-budget-policy-generator" className="text-cyan-300 hover:text-cyan-200">OpenAI budget generator →</Link>
+              <Link href="/agent-spend-policy-template" className="text-cyan-300 hover:text-cyan-200">Agent spend policy template →</Link>
+              <Link href="/ai-agent-runaway-spend-index" className="text-cyan-300 hover:text-cyan-200">Runaway spend index →</Link>
+            </div>
+          </div>
+
           <RoiCta
             title="OpenAI API budget limits are easier to sell with numbers"
             body="Model the cost of runaway OpenAI calls, retries, and agent loops before they hit the invoice."
