@@ -76,6 +76,7 @@ Macaroons and capability tokens can constrain agent authority:
 - AI Agent Cost Control: https://satgate.io/ai-agent-cost-control
 - AI API Budget Enforcement: https://satgate.io/ai-api-budget-enforcement
 - Agent Spending Limits: https://satgate.io/agent-spending-limits
+- MCP Governance Hub: https://satgate.io/mcp
 - MCP Governance: https://satgate.io/mcp-governance
 - MCP Budget Enforcement: https://satgate.io/mcp-budget-enforcement
 - MCP Cost Control: https://satgate.io/mcp-cost-control
@@ -91,6 +92,7 @@ Macaroons and capability tokens can constrain agent authority:
 - SatGate for Claude Code: https://satgate.io/satgate-for-claude-code
 - SatGate for Claude Desktop MCP: https://satgate.io/satgate-for-claude-desktop
 - SatGate for OpenClaw Agents: https://satgate.io/satgate-for-openclaw
+- SatGate for Hermes Agent: https://satgate.io/satgate-for-hermes-agent
 
 ## Comparison Pages
 - SatGate vs LiteLLM: https://satgate.io/compare/litellm

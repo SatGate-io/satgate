@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Bot, Code2, Monitor, MousePointer2, Workflow } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bot, BrainCircuit, Code2, Monitor, MousePointer2, Workflow } from 'lucide-react';
 
 export const metadata = {
   title: 'SatGate Integrations for AI Agent Tools',
-  description: 'Deploy SatGate economic governance with Cursor, Claude Code, Claude Desktop, OpenClaw, and MCP-based AI agent workflows.',
+  description: 'Deploy SatGate economic governance with Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP-based AI agent workflows.',
   alternates: { canonical: 'https://satgate.io/integrations' },
   keywords: [
     'SatGate integrations',
@@ -11,19 +11,20 @@ export const metadata = {
     'SatGate for Claude Code',
     'SatGate for Claude Desktop',
     'SatGate for OpenClaw',
+    'SatGate for Hermes Agent',
     'MCP budget enforcement integrations',
     'AI agent cost control integrations',
   ],
   openGraph: {
     title: 'SatGate Integrations for AI Agent Tools',
-    description: 'Connect SatGate to Cursor, Claude Code, Claude Desktop, OpenClaw, and MCP agent workflows for request-path spend control.',
+    description: 'Connect SatGate to Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP agent workflows for request-path spend control.',
     url: 'https://satgate.io/integrations',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate Integrations for AI Agent Tools',
-    description: 'Economic governance guides for Cursor, Claude Code, Claude Desktop, OpenClaw, and MCP agent workflows.',
+    description: 'Economic governance guides for Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP agent workflows.',
   },
 };
 
@@ -51,6 +52,12 @@ const integrations = [
     title: 'SatGate for OpenClaw',
     description: 'Control autonomous OpenClaw agent spend, MCP calls, and delegated workflows with economic policy.',
     icon: Bot,
+  },
+  {
+    href: '/satgate-for-hermes-agent',
+    title: 'SatGate for Hermes Agent',
+    description: 'Add budgets, scoped capabilities, revocation, and MCP tool cost policy to persistent Hermes Agent workflows.',
+    icon: BrainCircuit,
   },
 ];
 
@@ -87,7 +94,7 @@ export default function IntegrationsPage() {
         name: 'What SatGate integrations are available for AI agent tools?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate has integration guides for Cursor, Claude Code, Claude Desktop, OpenClaw, and MCP-based workflows so teams can add request-path economic governance to agent tools.',
+          text: 'SatGate has integration guides for Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP-based workflows so teams can add request-path economic governance to agent tools.',
         },
       },
       {
@@ -126,7 +133,7 @@ export default function IntegrationsPage() {
           </div>
           <h1 className="mb-6 text-5xl font-extrabold tracking-tight md:text-7xl">SatGate Integrations</h1>
           <p className="text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Bring economic firewall controls to the tools where agents already work: Cursor, Claude Code, Claude Desktop, OpenClaw, and MCP-based automation.
+            Bring economic firewall controls to the tools where agents already work: Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP-based automation.
           </p>
         </div>
 
@@ -154,7 +161,7 @@ export default function IntegrationsPage() {
             {[
               [
                 'What SatGate integrations are available for AI agent tools?',
-                'SatGate has integration guides for Cursor, Claude Code, Claude Desktop, OpenClaw, and MCP-based workflows so teams can add economic governance where agents already operate.',
+                'SatGate has integration guides for Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP-based workflows so teams can add economic governance where agents already operate.',
               ],
               [
                 'How does SatGate govern MCP integrations?',

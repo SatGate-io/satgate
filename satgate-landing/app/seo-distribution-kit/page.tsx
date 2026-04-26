@@ -6,6 +6,17 @@ export const metadata = {
   description: 'Distribution copy, social snippets, backlink targets, and launch positioning for SatGate AI agent cost control tools and runaway spend data assets.',
   alternates: { canonical: 'https://satgate.io/seo-distribution-kit' },
   keywords: ['AI agent cost control distribution', 'SatGate launch kit', 'AI agent spend control social copy', 'economic firewall distribution'],
+  openGraph: {
+    title: 'SatGate SEO Distribution Kit',
+    description: 'Launch copy, promotion angles, and backlink targets for AI agent cost control tools and runaway spend data assets.',
+    url: 'https://satgate.io/seo-distribution-kit',
+    type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SatGate SEO Distribution Kit',
+    description: 'Distribution copy and backlink targets for AI agent cost control and economic firewall assets.',
+  },
 };
 
 const assets = [
@@ -17,8 +28,32 @@ const assets = [
 ];
 
 export default function SeoDistributionKitPage() {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'SatGate SEO Distribution Kit: AI Agent Cost Control Launch Copy',
+    description: metadata.description,
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    datePublished: '2026-04-26',
+    dateModified: '2026-04-26',
+    mainEntityOfPage: 'https://satgate.io/seo-distribution-kit',
+    about: assets.map(([name, url]) => ({ '@type': 'WebPage', name, url: `https://satgate.io${url}` })),
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'SEO Distribution Kit', item: 'https://satgate.io/seo-distribution-kit' },
+    ],
+  };
+
   return (
     <main className="min-h-screen bg-black text-gray-100">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(168,85,247,0.18),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(34,211,238,0.14),transparent_32%)]" />
         <div className="relative mx-auto max-w-6xl px-6 py-24">

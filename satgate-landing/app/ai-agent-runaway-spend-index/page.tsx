@@ -48,10 +48,52 @@ const jsonLd = {
   ],
 };
 
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+    { '@type': 'ListItem', position: 2, name: 'AI Agent Runaway Spend Index', item: 'https://satgate.io/ai-agent-runaway-spend-index' },
+  ],
+};
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What is the AI Agent Runaway Spend Index?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The AI Agent Runaway Spend Index is a recurring benchmark of modeled autonomous agent cost failures, including retry loops, MCP tool storms, delegated fanout, paid API polling, and avoided spend from request-path controls.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Why do runaway AI agents create cost risk?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Agents can loop, retry, delegate, and call paid tools or APIs much faster than humans. Without request-path budgets and kill switches, small mistakes can become expensive incidents before dashboards report the damage.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How does SatGate reduce runaway agent spend?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'SatGate reduces runaway agent spend by enforcing per-request budgets, MCP tool cost policy, revocable capabilities, delegation caps, audit requirements, and kill switches before upstream calls execute.',
+      },
+    },
+  ],
+};
+
 export default function AiAgentRunawaySpendIndexPage() {
   return (
     <main className="min-h-screen bg-black text-gray-100">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(249,115,22,0.18),transparent_30%),radial-gradient(circle_at_80%_0%,rgba(34,211,238,0.16),transparent_28%)]" />
@@ -113,6 +155,22 @@ export default function AiAgentRunawaySpendIndexPage() {
               </tbody>
             </table>
           </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-4xl px-6 py-20">
+        <h2 className="mb-8 text-3xl font-bold text-white">Runaway spend index FAQ</h2>
+        <div className="space-y-5">
+          {[
+            ['What is the AI Agent Runaway Spend Index?', 'A recurring benchmark of modeled autonomous agent cost failures, including retry loops, MCP tool storms, delegated fanout, paid API polling, and avoided spend from request-path controls.'],
+            ['Why do runaway AI agents create cost risk?', 'Agents can loop, retry, delegate, and call paid tools or APIs much faster than humans. Without request-path budgets and kill switches, small mistakes can become expensive incidents before dashboards report the damage.'],
+            ['How does SatGate reduce runaway agent spend?', 'SatGate enforces per-request budgets, MCP tool cost policy, revocable capabilities, delegation caps, audit requirements, and kill switches before upstream calls execute.'],
+          ].map(([question, answer]) => (
+            <div key={question} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-3 text-xl font-bold text-white">{question}</h3>
+              <p className="leading-relaxed text-gray-400">{answer}</p>
+            </div>
+          ))}
         </div>
       </section>
 
