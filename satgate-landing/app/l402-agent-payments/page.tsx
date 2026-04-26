@@ -276,9 +276,11 @@ HTTP/1.1 200 OK
       <section className="border-t border-gray-900 bg-black">
         <div className="max-w-6xl mx-auto px-6 py-20">
           <h2 className="text-3xl font-bold text-white mb-8">Related robot-payment guides</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               ['/robot-customer-payments', 'Robot customer payments', 'How autonomous agents become paying API customers in the request path.'],
+              ['/agent-capability-tokens', 'Agent capability tokens', 'Scope paid access with route, budget, expiry, delegation, and revocation caveats.'],
+              ['/revocable-agent-credentials', 'Revocable agent credentials', 'Revoke or narrow paid agent access before the next request.'],
               ['/blog/l402-protocol-explained', 'L402 protocol explained', 'How HTTP 402, Lightning, and macaroons enable API payments.'],
               ['/blog/api-monetization-ai', 'API monetization for AI', 'How to price, meter, and collect from machine consumers.'],
               ['/economic-firewall', 'Economic firewall', 'Observe, Control, and Charge in one request-path control plane.'],

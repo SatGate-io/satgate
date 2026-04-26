@@ -280,8 +280,10 @@ audit: required`}</code></pre>
       <section className="border-t border-gray-900 bg-black">
         <div className="max-w-6xl mx-auto px-6 py-20">
           <h2 className="text-3xl font-bold text-white mb-8">Related governance guides</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
+              ['/revocable-agent-credentials', 'Revocable agent credentials', 'Scoped credentials, expiry, and kill switches for autonomous access.'],
+              ['/agent-capability-tokens', 'Agent capability tokens', 'Encode scope, budget, route, delegation, and revocation into agent authority.'],
               ['/blog/macaroon-tokens-vs-api-keys', 'Macaroons vs API keys', 'Why attenuated capability tokens fit autonomous agent delegation.'],
               ['/blog/zero-trust-for-ai-agents', 'Zero trust for AI agents', 'How agent credentials break human-centric identity assumptions.'],
               ['/economic-firewall', 'Economic firewall', 'The request-path control layer for agent access and spend.'],

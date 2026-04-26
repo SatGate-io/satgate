@@ -294,6 +294,27 @@ audit:
         </div>
       </section>
 
+      <section className="border-t border-gray-900 bg-black">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <h2 className="text-3xl font-bold text-white mb-8">Related MCP governance topics</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              ['/mcp-budget-enforcement', 'MCP budget enforcement', 'Hard caps, per-tool prices, and request-path budget decisions for MCP servers.'],
+              ['/mcp-tool-cost-policy-generator', 'MCP tool cost policy generator', 'Generate practical policy for Cursor, Claude Desktop, Claude Code, OpenClaw, and custom clients.'],
+              ['/revocable-agent-credentials', 'Revocable agent credentials', 'Kill switches and scoped credentials for tool-calling agents.'],
+              ['/agent-capability-tokens', 'Agent capability tokens', 'Constrain MCP authority with scope, budget, expiry, delegation, and revocation.'],
+              ['/satgate-for-cursor', 'SatGate for Cursor', 'Govern Cursor MCP/tool workflows with budgets and audit.'],
+              ['/satgate-for-openclaw', 'SatGate for OpenClaw', 'Apply economic policy to proactive agents, sub-agents, and tools.'],
+            ].map(([href, title, body]) => (
+              <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-purple-500/50 hover:bg-purple-950/10">
+                <h3 className="font-bold text-white mb-2">{title}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{body}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="max-w-6xl mx-auto px-6 py-20">
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-purple-950/30 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">Make MCP tools safe enough for autonomous agents</h2>

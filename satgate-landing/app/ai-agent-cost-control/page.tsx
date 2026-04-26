@@ -227,10 +227,12 @@ export default function AiAgentCostControlPage() {
           <h2 className="text-3xl font-bold text-white mb-8">High-intent use cases</h2>
           <div className="grid md:grid-cols-2 gap-5">
             {[
+              ['Runaway agent spend benchmark', 'Use original benchmark scenarios to show how loops, retries, fanout, and detection delay create avoidable cost.', '/ai-agent-runaway-spend-benchmark'],
               ['OpenAI API budget limits', 'Set per-agent and per-workflow spend caps before OpenAI requests leave your environment.', '/openai-budget-policy-generator'],
-              ['MCP tool spend control', 'Attach cost to tool calls and stop runaway Cursor, Claude Desktop, Claude Code, or OpenClaw workflows.', '/blog/mcp-budget-enforcement-guide'],
+              ['MCP tool spend control', 'Attach cost to tool calls and stop runaway Cursor, Claude Desktop, Claude Code, or OpenClaw workflows.', '/mcp-budget-enforcement'],
+              ['Revocable agent credentials', 'Replace broad static keys with scoped, expiring credentials and kill switches for autonomous workers.', '/revocable-agent-credentials'],
               ['LLM cost management', 'Move from post-hoc cost dashboards to real-time budget enforcement.', '/blog/llm-cost-management'],
-              ['Robot customer payments', 'Let external agents pay for protected APIs through a governed request path.', '/blog/l402-protocol-explained'],
+              ['Robot customer payments', 'Let external agents pay for protected APIs through a governed request path.', '/robot-customer-payments'],
             ].map(([title, body, href]) => (
               <Link key={title} href={href} className="rounded-xl border border-gray-800 bg-black p-6 hover:border-cyan-800/70 transition block">
                 <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
