@@ -124,9 +124,51 @@ export default function ComparePage() {
     })),
   };
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'Compare SatGate', item: 'https://satgate.io/compare' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How is SatGate different from AI gateways?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Most AI gateways focus on routing, provider abstraction, caching, rate limits, observability, or prompt operations. SatGate focuses on request-path economic governance: hard budgets, scoped agent authority, MCP tool cost policy, audit evidence, revocation, and L402 payments before upstream access.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Does SatGate replace LiteLLM, Portkey, Helicone, or Cloudflare AI Gateway?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Not always. SatGate can sit in front of those systems as the economic firewall. Existing gateways can still handle routing, observability, traces, or provider access while SatGate decides whether an autonomous agent is allowed to spend, access, delegate, or pay.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'When should teams use SatGate?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Use SatGate when the core problem is autonomous agent risk: runaway spend, MCP tool costs, delegated authority, static API keys, missing revocation, audit gaps, or machine customers that need to pay for API access at request time.',
+        },
+      },
+    ],
+  };
+
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <section className="mx-auto max-w-6xl px-6 py-16">
         <Link href="/" className="mb-8 flex items-center gap-2 text-gray-500 transition hover:text-white">
@@ -170,6 +212,31 @@ export default function ComparePage() {
           <p className="max-w-4xl leading-relaxed text-gray-300">
             LiteLLM, Portkey, Helicone, Cloudflare AI Gateway, Kong AI Gateway, Apigee, Tyk, Langfuse, Bifrost, and Zuplo are useful infrastructure. The difference is category: SatGate is the economic firewall — the request-path layer that decides what autonomous agents can spend, access, delegate, revoke, audit, or pay for before the next call executes.
           </p>
+        </section>
+
+        <section className="mt-12 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+          <h2 className="mb-6 text-2xl font-bold text-white">Comparison FAQ</h2>
+          <div className="space-y-5">
+            {[
+              [
+                'How is SatGate different from AI gateways?',
+                'AI gateways usually handle routing, provider access, caching, rate limits, observability, or prompt operations. SatGate handles economic governance: budgets, scoped authority, MCP tool policy, audit evidence, revocation, and payments before upstream access.',
+              ],
+              [
+                'Does SatGate replace existing gateways?',
+                'Not necessarily. SatGate can sit in front of LiteLLM, Portkey, Helicone, Cloudflare AI Gateway, Kong, Apigee, Tyk, Bifrost, Zuplo, or custom APIs as the economic firewall layer.',
+              ],
+              [
+                'When is SatGate the better fit?',
+                'SatGate is the better fit when autonomous agents create spend, MCP tool-call, delegation, revocation, audit, or machine-payment risk that must be controlled in the request path.',
+              ],
+            ].map(([question, answer]) => (
+              <div key={question}>
+                <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                <p className="leading-relaxed text-gray-400">{answer}</p>
+              </div>
+            ))}
+          </div>
         </section>
       </section>
     </main>

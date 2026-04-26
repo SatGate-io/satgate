@@ -73,10 +73,42 @@ export default function IntegrationsPage() {
     ],
   };
 
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What SatGate integrations are available for AI agent tools?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'SatGate has integration guides for Cursor, Claude Code, Claude Desktop, OpenClaw, and MCP-based workflows so teams can add request-path economic governance to agent tools.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How does SatGate govern MCP integrations?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'SatGate can sit between agent clients and MCP servers to enforce per-tool budgets, scoped capabilities, revocation, risk actions, and audit trails before expensive tool calls execute.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Do teams need to replace Cursor, Claude, or OpenClaw to use SatGate?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No. SatGate is designed to sit in the request path around existing agent tools, APIs, and MCP servers, adding Observe, Control, and Charge modes without replacing the client workflow.',
+        },
+      },
+    ],
+  };
+
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <section className="mx-auto max-w-6xl px-6 py-16">
         <Link href="/" className="mb-10 inline-flex items-center gap-2 text-gray-500 transition hover:text-white">
@@ -109,6 +141,31 @@ export default function IntegrationsPage() {
           <p className="max-w-4xl text-lg leading-relaxed text-gray-300">
             Agent governance is adopted inside real workflows. SatGate sits between agent clients and upstream APIs, MCP servers, and paid tools so teams can observe, control, and charge before autonomous requests create cost or risk.
           </p>
+        </section>
+
+        <section className="mt-14 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+          <h2 className="mb-6 text-3xl font-bold text-white">SatGate integration FAQ</h2>
+          <div className="space-y-5">
+            {[
+              [
+                'What SatGate integrations are available for AI agent tools?',
+                'SatGate has integration guides for Cursor, Claude Code, Claude Desktop, OpenClaw, and MCP-based workflows so teams can add economic governance where agents already operate.',
+              ],
+              [
+                'How does SatGate govern MCP integrations?',
+                'SatGate can sit between agent clients and MCP servers to enforce per-tool budgets, scoped capabilities, revocation, risk actions, and audit trails before expensive tool calls execute.',
+              ],
+              [
+                'Do teams need to replace their agent tools?',
+                'No. SatGate is designed to wrap existing tools, APIs, and MCP servers with Observe, Control, and Charge modes instead of replacing the client workflow.',
+              ],
+            ].map(([question, answer]) => (
+              <div key={question}>
+                <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                <p className="leading-relaxed text-gray-400">{answer}</p>
+              </div>
+            ))}
+          </div>
         </section>
       </section>
     </main>
