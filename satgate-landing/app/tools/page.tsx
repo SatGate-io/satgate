@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, BarChart3, Calculator, ClipboardList, Gauge, KeyRound, ShieldCheck, Wrench } from 'lucide-react';
+import { ArrowRight, BarChart3, Calculator, ClipboardList, Gauge, KeyRound, ShieldCheck, Wrench, Zap } from 'lucide-react';
 
 export const metadata = {
   title: 'AI Agent Cost Control Tools',
@@ -18,6 +18,11 @@ export const metadata = {
     description: 'Calculators and generators for agent spend, runaway loops, OpenAI budgets, MCP tool costs, and economic firewall readiness.',
     url: 'https://satgate.io/tools',
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Agent Cost Control Tools',
+    description: 'Free calculators and policy generators for AI agent spend control, MCP governance, and economic firewall readiness.',
   },
 };
 
@@ -63,6 +68,12 @@ const tools = [
     title: 'Agent API Key Risk Assessment',
     description: 'Score static API key risk across scope, budget, expiry, revocation, delegation, and audit gaps for autonomous agents.',
     icon: KeyRound,
+  },
+  {
+    href: '/l402-api-pricing-calculator',
+    title: 'L402 API Pricing Calculator',
+    description: 'Estimate per-request robot-customer pricing, gross margin, paid demand, and Lightning sats per API request.',
+    icon: Zap,
   },
 ];
 

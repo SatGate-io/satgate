@@ -680,6 +680,7 @@ const LandingPage = () => {
                 <li><Link href="/revocable-agent-credentials" className="hover:text-white transition">Revocable Agent Credentials</Link></li>
                 <li><Link href="/agent-capability-tokens" className="hover:text-white transition">Agent Capability Tokens</Link></li>
                 <li><Link href="/l402-agent-payments" className="hover:text-white transition">L402 Agent Payments</Link></li>
+                <li><Link href="/l402-api-pricing-calculator" className="hover:text-white transition">L402 API Pricing Calculator</Link></li>
                 <li><Link href="/robot-customer-payments" className="hover:text-white transition">Robot Customer Payments</Link></li>
                 <li><Link href="/satgate-for-cursor" className="hover:text-white transition">SatGate for Cursor</Link></li>
                 <li><Link href="/satgate-for-claude-code" className="hover:text-white transition">SatGate for Claude Code</Link></li>

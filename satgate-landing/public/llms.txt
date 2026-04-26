@@ -62,6 +62,7 @@ Macaroons and capability tokens can constrain agent authority:
 - MCP Tool Cost Policy Generator: https://satgate.io/mcp-tool-cost-policy-generator
 - Economic Firewall Readiness Grader: https://satgate.io/economic-firewall-readiness-grader
 - Agent API Key Risk Assessment: https://satgate.io/agent-api-key-risk-assessment
+- L402 API Pricing Calculator: https://satgate.io/l402-api-pricing-calculator
 
 ## Category Pages
 - Economic Firewall: https://satgate.io/economic-firewall
