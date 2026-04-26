@@ -50,6 +50,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/mint-demo', lastModified: '2026-04-12', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/sandbox', lastModified: '2026-04-12', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/roi-calculator', lastModified: '2026-04-26', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/agent-api-key-risk-assessment', lastModified: '2026-04-26', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/runaway-agent-cost-calculator', lastModified: '2026-04-26', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/openai-budget-policy-generator', lastModified: '2026-04-26', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/mcp-tool-cost-policy-generator', lastModified: '2026-04-26', changeFrequency: 'monthly', priority: 0.8 },

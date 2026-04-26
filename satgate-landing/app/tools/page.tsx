@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, BarChart3, Calculator, ClipboardList, Gauge, ShieldCheck, Wrench } from 'lucide-react';
+import { ArrowRight, BarChart3, Calculator, ClipboardList, Gauge, KeyRound, ShieldCheck, Wrench } from 'lucide-react';
 
 export const metadata = {
   title: 'AI Agent Cost Control Tools',
@@ -57,6 +57,12 @@ const tools = [
     title: 'Economic Firewall Readiness Grader',
     description: 'Score readiness across identity, budgets, MCP tools, revocation, delegation, audit, routing, and L402 payments.',
     icon: ShieldCheck,
+  },
+  {
+    href: '/agent-api-key-risk-assessment',
+    title: 'Agent API Key Risk Assessment',
+    description: 'Score static API key risk across scope, budget, expiry, revocation, delegation, and audit gaps for autonomous agents.',
+    icon: KeyRound,
   },
 ];
 
