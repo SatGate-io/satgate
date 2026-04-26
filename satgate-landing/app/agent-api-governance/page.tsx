@@ -1,0 +1,224 @@
+import Link from 'next/link';
+import { ArrowRight, BadgeCheck, Ban, Clock, Fingerprint, GitBranch, KeyRound, ShieldCheck } from 'lucide-react';
+
+export const metadata = {
+  title: 'Agent API Governance | Identity, Revocation, Budgets, Audit',
+  description: 'Govern AI agent API access with scoped capabilities, revocation, delegated budgets, and audit trails. Replace unlimited API keys with request-path policy.',
+  alternates: { canonical: 'https://satgate.io/agent-api-governance' },
+  keywords: [
+    'agent API governance',
+    'AI agent API governance',
+    'agent-scoped API keys',
+    'revocable agent credentials',
+    'capability tokens for AI agents',
+    'delegated API access',
+    'AI agent access control',
+  ],
+};
+
+const principles = [
+  {
+    icon: Fingerprint,
+    title: 'Identity is not enough',
+    body: 'Knowing which agent called is useful. Governing what that agent can do, spend, delegate, and access is the actual control point.',
+  },
+  {
+    icon: KeyRound,
+    title: 'Capabilities beat static keys',
+    body: 'Replace broad API keys with scoped, expiring, attenuated capabilities that carry policy with the request.',
+  },
+  {
+    icon: Ban,
+    title: 'Revocation must be immediate',
+    body: 'A misbehaving agent needs a kill switch that works on the next request, not after a deploy or manual key rotation.',
+  },
+  {
+    icon: GitBranch,
+    title: 'Delegation must shrink authority',
+    body: 'Sub-agents should inherit less power than their parent: smaller budgets, narrower routes, shorter expiry, tighter tools.',
+  },
+  {
+    icon: Clock,
+    title: 'Expiry is a safety primitive',
+    body: 'Agent credentials should expire with the task, session, customer, or workflow they were created for.',
+  },
+  {
+    icon: BadgeCheck,
+    title: 'Audit should explain decisions',
+    body: 'A governance trail must show identity, capability, policy, budget, route, decision, and outcome for every important call.',
+  },
+];
+
+export default function AgentApiGovernancePage() {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'Agent API Governance',
+    description: metadata.description,
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    datePublished: '2026-04-25',
+    dateModified: '2026-04-25',
+    mainEntityOfPage: 'https://satgate.io/agent-api-governance',
+  };
+
+  return (
+    <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+
+      <section className="relative overflow-hidden border-b border-gray-900">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(34,211,238,0.17),transparent_32%),radial-gradient(circle_at_80%_20%,rgba(245,158,11,0.14),transparent_30%)]" />
+        <div className="relative max-w-6xl mx-auto px-6 py-24">
+          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-950/30 px-4 py-2 text-sm text-cyan-200 mb-8">
+            <ShieldCheck size={16} /> Access governance for autonomous agents
+          </div>
+
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight max-w-5xl mb-8">
+            Agent API Governance Starts Where API Keys Fail
+          </h1>
+
+          <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-10">
+            AI agents need more than static API keys. They need scoped capabilities, delegated budgets, expiry, revocation, and audit trails enforced before every API request.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link href="/blog/macaroon-tokens-vs-api-keys" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
+              Macaroons vs API keys <ArrowRight size={18} />
+            </Link>
+            <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              Economic firewall overview
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-[1fr_0.9fr] gap-12 items-start">
+        <div>
+          <h2 className="text-3xl font-bold text-white mb-6">The API key model was built for apps, not autonomous workers</h2>
+          <div className="space-y-5 text-gray-300 text-lg leading-relaxed">
+            <p>
+              Traditional API keys assume the caller is an application, service, or human-operated integration. Once issued, the key often carries broad authority until someone rotates it, revokes it, or discovers it leaked.
+            </p>
+            <p>
+              AI agents change the risk model. They can receive goals, create sub-tasks, delegate work, retry operations, and use tools without a human approving each request. A single broad key becomes too much authority in too little context.
+            </p>
+            <p>
+              Agent API governance means every call is constrained by identity, capability, policy, budget, route, and time. The request itself carries or references the rules that make it safe.
+            </p>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-6">
+          <h3 className="text-xl font-bold text-white mb-4">A governed agent credential should answer</h3>
+          <ul className="space-y-3 text-gray-300">
+            <li className="rounded-lg border border-gray-800 bg-black/50 p-3">Which agent, task, tenant, or workflow is using it?</li>
+            <li className="rounded-lg border border-gray-800 bg-black/50 p-3">Which routes and tools are allowed?</li>
+            <li className="rounded-lg border border-gray-800 bg-black/50 p-3">What spend budget remains?</li>
+            <li className="rounded-lg border border-gray-800 bg-black/50 p-3">Can authority be delegated, and how far?</li>
+            <li className="rounded-lg border border-gray-800 bg-black/50 p-3">When does it expire or become invalid?</li>
+            <li className="rounded-lg border border-gray-800 bg-black/50 p-3">What audit event proves the decision?</li>
+          </ul>
+        </div>
+      </section>
+
+      <section className="border-y border-gray-900 bg-gray-950/60">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <h2 className="text-3xl font-bold text-white mb-4">Agent API governance principles</h2>
+          <p className="text-gray-400 max-w-3xl mb-10 text-lg">
+            Governance is not a login screen. It is a request-path policy system for agent identity, authority, spend, and evidence.
+          </p>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {principles.map(({ icon: Icon, title, body }) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black p-6 hover:border-yellow-900/70 transition">
+                <Icon className="text-yellow-300 mb-4" size={28} />
+                <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+                <p className="text-gray-400 leading-relaxed">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold text-white mb-8">Static API key vs agent capability</h2>
+        <div className="overflow-hidden rounded-2xl border border-gray-800">
+          <div className="grid md:grid-cols-3 bg-gray-900/70 text-sm font-bold text-white">
+            <div className="p-4">Dimension</div>
+            <div className="p-4">Static API key</div>
+            <div className="p-4">Agent capability</div>
+          </div>
+          {[
+            ['Authority', 'Usually broad and long-lived', 'Scoped to route, task, tenant, or tool'],
+            ['Budget', 'External or manual', 'Embedded or enforced inline'],
+            ['Delegation', 'Copied or shared', 'Attenuated: sub-agents get less authority'],
+            ['Revocation', 'Rotate key or change config', 'Revoke/expire capability before next request'],
+            ['Audit', 'Often aggregate usage only', 'Decision trail per agent/tool/request'],
+          ].map(([a, b, c]) => (
+            <div key={a} className="grid md:grid-cols-3 border-t border-gray-800 text-gray-300">
+              <div className="p-4 font-semibold text-white">{a}</div>
+              <div className="p-4">{b}</div>
+              <div className="p-4">{c}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y border-gray-900 bg-gray-950/60">
+        <div className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-8">
+          <div>
+            <h2 className="text-3xl font-bold text-white mb-6">Governance loop</h2>
+            <div className="space-y-4">
+              {[
+                ['Mint', 'Issue a scoped capability for one agent, task, route, or workflow.'],
+                ['Observe', 'Attribute calls and learn real access/spend patterns.'],
+                ['Control', 'Enforce budgets, route policy, tool limits, and revocation.'],
+                ['Delegate', 'Allow sub-agents to receive narrower authority than the parent.'],
+                ['Audit', 'Record policy decisions, spend, outcomes, and revocation events.'],
+              ].map(([title, body]) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black p-5">
+                  <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+                  <p className="text-gray-400 leading-relaxed">{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <h2 className="text-2xl font-bold text-white mb-4">Example capability policy</h2>
+            <pre className="bg-black border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm text-gray-300"><code>{`agent: research-bot
+scope:
+  routes: [/v1/responses, /tools/search]
+  models: [gpt-5.5, venice/deepseek]
+budget:
+  daily: 25.00 USD
+  per_request: 0.50 USD
+delegation:
+  allowed: true
+  child_budget_max: 5.00 USD
+expiry: 2026-04-26T00:00:00Z
+revocation: immediate
+audit: required`}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-6 py-20">
+        <div className="rounded-3xl border border-yellow-900/60 bg-gradient-to-br from-yellow-950/20 to-cyan-950/30 p-8 md:p-12">
+          <h2 className="text-3xl font-bold text-white mb-4">SatGate makes agent API access governable</h2>
+          <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
+            Put SatGate in the request path to move from unlimited API keys to scoped, revocable, budget-aware agent capabilities with audit trails.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
+              See SatGate governance <ArrowRight size={18} />
+            </Link>
+            <Link href="/blog/zero-trust-for-ai-agents" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              Zero trust for AI agents
+            </Link>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
