@@ -74,6 +74,7 @@ Macaroons and capability tokens can constrain agent authority:
 - Robot Customer Payments: https://satgate.io/robot-customer-payments
 
 ## Integration Pages
+- SatGate Integrations Hub: https://satgate.io/integrations
 - SatGate for Cursor: https://satgate.io/satgate-for-cursor
 - SatGate for Claude Code: https://satgate.io/satgate-for-claude-code
 - SatGate for Claude Desktop MCP: https://satgate.io/satgate-for-claude-desktop
@@ -84,6 +85,10 @@ Macaroons and capability tokens can constrain agent authority:
 - SatGate vs Portkey: https://satgate.io/compare/portkey
 - SatGate vs Helicone: https://satgate.io/compare/helicone
 - SatGate vs Cloudflare AI Gateway: https://satgate.io/compare/cloudflare-ai-gateway
+- SatGate vs Kong AI Gateway: https://satgate.io/compare/kong-ai-gateway
+- SatGate vs Apigee: https://satgate.io/compare/apigee
+- SatGate vs Tyk: https://satgate.io/compare/tyk
+- SatGate vs Langfuse: https://satgate.io/compare/langfuse
 - SatGate vs Bifrost: https://satgate.io/compare/bifrost
 - SatGate vs Zuplo: https://satgate.io/compare/zuplo
 - SatGate vs Cloud-Native API Gateways: https://satgate.io/compare/cloud-native
@@ -140,6 +145,7 @@ curl -H "Authorization: L402 <macaroon>:<preimage>" \
 - Website: https://satgate.io
 - Blog: https://satgate.io/blog
 - Tools: https://satgate.io/tools
+- Integrations: https://satgate.io/integrations
 - Pricing: https://satgate.io/pricing
 - Security: https://satgate.io/security
 - Documentation: https://cloud.satgate.io/docs

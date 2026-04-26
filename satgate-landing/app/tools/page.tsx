@@ -75,9 +75,51 @@ export default function ToolsPage() {
     })),
   };
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'AI Agent Cost Control Tools', item: 'https://satgate.io/tools' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What are AI agent cost control tools?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AI agent cost control tools help teams estimate autonomous agent spend risk, model runaway loops, generate enforceable budget policy, and evaluate whether an economic firewall can stop expensive requests before they execute.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Which SatGate tool should I start with?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Start with the AI Agent ROI Calculator if you need a business case, the Runaway Agent Cost Calculator if you need incident exposure, the OpenAI or MCP policy generators if you need enforceable policy, and the Economic Firewall Readiness Grader if you need a gap assessment.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do these tools relate to an economic firewall?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The calculators quantify economic risk. The policy generators turn that risk into budget, routing, revocation, and audit controls. SatGate enforces those controls in the request path as an economic firewall for AI agents.',
+        },
+      },
+    ],
+  };
+
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(34,211,238,0.18),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(168,85,247,0.14),transparent_32%)]" />
@@ -125,6 +167,31 @@ export default function ToolsPage() {
             <div key={title} className="rounded-2xl border border-gray-800 bg-black p-6">
               <h2 className="mb-3 text-2xl font-bold text-white">{title}</h2>
               <p className="leading-relaxed text-gray-400">{body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-4xl px-6 py-20">
+        <h2 className="mb-8 text-3xl font-bold text-white">AI agent cost control tools FAQ</h2>
+        <div className="space-y-5">
+          {[
+            [
+              'What are AI agent cost control tools?',
+              'They quantify autonomous agent spend risk, model runaway loops, generate enforceable budget policy, and assess whether economic controls can stop expensive requests before execution.',
+            ],
+            [
+              'Which tool should I start with?',
+              'Use the ROI calculator for the business case, the runaway spend calculator for incident exposure, the OpenAI and MCP generators for policy, and the readiness grader for governance gaps.',
+            ],
+            [
+              'How do these connect to an economic firewall?',
+              'The tools produce risk estimates and policy inputs. SatGate enforces those budgets, capabilities, revocation rules, audit requirements, and payment controls in the request path.',
+            ],
+          ].map(([question, answer]) => (
+            <div key={question} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-3 text-xl font-bold text-white">{question}</h3>
+              <p className="leading-relaxed text-gray-400">{answer}</p>
             </div>
           ))}
         </div>

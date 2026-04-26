@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, BarChart3, Cloud, Eye, Route, Shield, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BarChart3, Cloud, Eye, KeyRound, Route, Shield, Workflow, Zap } from 'lucide-react';
 
 export const metadata = {
   title: 'Compare SatGate - AI Gateway and Economic Firewall Comparisons',
-  description: 'Compare SatGate with LiteLLM, Portkey, Helicone, Cloudflare AI Gateway, Bifrost, Zuplo, and other AI infrastructure. Routing is not economic governance.',
+  description: 'Compare SatGate with LiteLLM, Portkey, Helicone, Cloudflare AI Gateway, Kong AI Gateway, Apigee, Tyk, Langfuse, Bifrost, Zuplo, and other AI infrastructure. Routing is not economic governance.',
   alternates: { canonical: 'https://satgate.io/compare' },
   keywords: [
     'SatGate comparisons',
@@ -11,6 +11,10 @@ export const metadata = {
     'SatGate vs Portkey',
     'SatGate vs Helicone',
     'SatGate vs Cloudflare AI Gateway',
+    'SatGate vs Kong AI Gateway',
+    'SatGate vs Apigee',
+    'SatGate vs Tyk',
+    'SatGate vs Langfuse',
     'AI gateway comparison',
     'economic firewall comparison',
   ],
@@ -50,6 +54,35 @@ const comparisons = [
     description: 'AI traffic gateway vs agent economic governance. Cloudflare brings analytics, caching, rate limits, and fallback; SatGate controls spend and authority.',
     icon: Cloud,
     color: 'yellow',
+  },
+
+  {
+    href: '/compare/kong-ai-gateway',
+    title: 'SatGate vs Kong AI Gateway',
+    description: 'API/AI gateway platform vs economic firewall. Kong is strong gateway infrastructure; SatGate governs autonomous agent economics.',
+    icon: Workflow,
+    color: 'cyan',
+  },
+  {
+    href: '/compare/apigee',
+    title: 'SatGate vs Apigee',
+    description: 'Enterprise API management vs agent economic governance. Apigee manages APIs; SatGate enforces spend, authority, and payments.',
+    icon: Shield,
+    color: 'blue',
+  },
+  {
+    href: '/compare/tyk',
+    title: 'SatGate vs Tyk',
+    description: 'API management vs request-path agent economics. Tyk operates APIs; SatGate controls what agents can spend or access.',
+    icon: KeyRound,
+    color: 'green',
+  },
+  {
+    href: '/compare/langfuse',
+    title: 'SatGate vs Langfuse',
+    description: 'LLM observability vs economic firewall. Langfuse traces and evaluates; SatGate blocks over-budget agent requests before execution.',
+    icon: Eye,
+    color: 'orange',
   },
   {
     href: '/compare/bifrost',
@@ -135,7 +168,7 @@ export default function ComparePage() {
         <section className="mt-12 rounded-2xl border border-cyan-800/30 bg-gradient-to-r from-cyan-950/20 to-purple-950/20 p-8">
           <h2 className="mb-4 text-2xl font-bold text-white">The short version</h2>
           <p className="max-w-4xl leading-relaxed text-gray-300">
-            LiteLLM, Portkey, Helicone, Cloudflare AI Gateway, Bifrost, and Zuplo are useful infrastructure. The difference is category: SatGate is the economic firewall — the request-path layer that decides what autonomous agents can spend, access, delegate, revoke, audit, or pay for before the next call executes.
+            LiteLLM, Portkey, Helicone, Cloudflare AI Gateway, Kong AI Gateway, Apigee, Tyk, Langfuse, Bifrost, and Zuplo are useful infrastructure. The difference is category: SatGate is the economic firewall — the request-path layer that decides what autonomous agents can spend, access, delegate, revoke, audit, or pay for before the next call executes.
           </p>
         </section>
       </section>
