@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, BarChart3, Bot, Clock, DollarSign, Gauge, ShieldCheck, Workflow, Zap } from 'lucide-react';
+import { ArrowRight, BarChart3, Bot, Clock, DollarSign, Download, Gauge, ShieldCheck, Workflow, Zap } from 'lucide-react';
 
 export const metadata = {
   title: 'AI Agent Runaway Spend Benchmark',
@@ -64,6 +64,18 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
     creator: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     license: 'https://satgate.io/terms',
     variableMeasured: ['agents', 'calls per minute', 'fanout', 'cost per call', 'detection delay', 'uncontrolled cost', 'controlled cost'],
+    distribution: [
+      {
+        '@type': 'DataDownload',
+        encodingFormat: 'application/json',
+        contentUrl: 'https://satgate.io/data/ai-agent-runaway-spend-benchmark.json',
+      },
+      {
+        '@type': 'DataDownload',
+        encodingFormat: 'text/csv',
+        contentUrl: 'https://satgate.io/data/ai-agent-runaway-spend-benchmark.csv',
+      },
+    ],
   };
 
   const faqJsonLd = {
@@ -139,6 +151,14 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
               <p className="max-w-3xl text-gray-400">Representative agent failure modes, modeled with and without request-path budget enforcement.</p>
             </div>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center gap-2 font-semibold text-cyan-300 hover:text-cyan-200">See AI agent cost control <ArrowRight size={16} /></Link>
+          </div>
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row">
+            <a href="/data/ai-agent-runaway-spend-benchmark.json" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-white transition hover:border-orange-500">
+              <Download size={16} /> Download JSON
+            </a>
+            <a href="/data/ai-agent-runaway-spend-benchmark.csv" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-white transition hover:border-orange-500">
+              <Download size={16} /> Download CSV
+            </a>
           </div>
           <div className="overflow-hidden rounded-2xl border border-gray-800">
             <div className="overflow-x-auto">

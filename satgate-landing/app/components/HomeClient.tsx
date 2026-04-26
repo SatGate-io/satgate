@@ -674,9 +674,11 @@ const LandingPage = () => {
                 <li><Link href="/robot-customer-payments" className="hover:text-white transition">Robot Customer Payments</Link></li>
                 <li><Link href="/satgate-for-cursor" className="hover:text-white transition">SatGate for Cursor</Link></li>
                 <li><Link href="/satgate-for-claude-code" className="hover:text-white transition">SatGate for Claude Code</Link></li>
+                <li><Link href="/satgate-for-claude-desktop" className="hover:text-white transition">SatGate for Claude Desktop</Link></li>
                 <li><Link href="/satgate-for-openclaw" className="hover:text-white transition">SatGate for OpenClaw</Link></li>
                 <li><Link href="/design-partners" className="hover:text-white transition">Design Partners</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
+                <li><Link href="/tools" className="hover:text-white transition">AI Agent Cost Tools</Link></li>
                 <li><Link href="/compare" className="hover:text-white transition">Compare</Link></li>
                 <li><Link href="/blog" className="hover:text-white transition">Blog</Link></li>
                 <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud Dashboard</a></li>

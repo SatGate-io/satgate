@@ -1,0 +1,6 @@
+scenario,agents,calls_per_minute,fanout,cost_per_call_usd,detection_delay_minutes,uncontrolled_cost_usd,controlled_cost_usd,avoided_cost_percent
+Single coding agent loop,1,18,1,0.06,45,48.60,5.40,88.89
+MCP tool retry storm,12,8,3,0.12,60,2073.60,172.80,91.67
+Support-agent swarm,50,6,4,0.04,90,4320.00,240.00,94.44
+Premium research workflow,20,10,5,0.25,30,7500.00,1250.00,83.33
+Enterprise background agents,200,4,2,0.03,120,5760.00,240.00,95.83
