@@ -12,7 +12,20 @@ export const metadata = {
     'LLM cost control',
     'OpenAI API budget limits',
     'MCP budget enforcement',
+    'runaway agent spend',
+    'AI cost governance',
   ],
+  openGraph: {
+    title: 'AI Agent Cost Control Software',
+    description: 'Enforce per-agent budgets, spend caps, revocation, routing, and audit trails before autonomous API calls execute.',
+    url: 'https://satgate.io/ai-agent-cost-control',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Agent Cost Control Software',
+    description: 'Stop runaway AI agent spend with request-path budget enforcement, revocation, routing, and audit trails.',
+  },
 };
 
 const controls = [
@@ -59,11 +72,61 @@ export default function AiAgentCostControlPage() {
     url: 'https://satgate.io/ai-agent-cost-control',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     offers: { '@type': 'Offer', url: 'https://satgate.io/pricing' },
+    featureList: [
+      'Per-agent budget enforcement',
+      'Per-tool cost attribution',
+      'MCP budget enforcement',
+      'Revocable agent credentials',
+      'Request-path audit trails',
+      'L402 API monetization',
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is AI agent cost control?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AI agent cost control is the practice of attributing, budgeting, limiting, and auditing autonomous agent API and tool spend before requests execute.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why are provider dashboards not enough for AI agent spend control?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Dashboards report spend after the fact. Autonomous agents can retry, loop, and delegate fast enough that budget enforcement must happen inline before upstream API calls complete.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How does SatGate enforce AI agent budgets?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'SatGate sits in the request path and checks agent identity, route, tool cost, remaining budget, revocation status, and policy before forwarding each request.',
+        },
+      },
+    ],
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'AI Agent Cost Control', item: 'https://satgate.io/ai-agent-cost-control' },
+    ],
   };
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(168,85,247,0.18),transparent_32%),radial-gradient(circle_at_80%_10%,rgba(34,211,238,0.16),transparent_30%)]" />
@@ -164,7 +227,7 @@ export default function AiAgentCostControlPage() {
           <h2 className="text-3xl font-bold text-white mb-8">High-intent use cases</h2>
           <div className="grid md:grid-cols-2 gap-5">
             {[
-              ['OpenAI API budget limits', 'Set per-agent and per-workflow spend caps before OpenAI requests leave your environment.', '/blog/how-to-add-budget-limits-to-openai-api-calls'],
+              ['OpenAI API budget limits', 'Set per-agent and per-workflow spend caps before OpenAI requests leave your environment.', '/openai-budget-policy-generator'],
               ['MCP tool spend control', 'Attach cost to tool calls and stop runaway Cursor, Claude Desktop, Claude Code, or OpenClaw workflows.', '/blog/mcp-budget-enforcement-guide'],
               ['LLM cost management', 'Move from post-hoc cost dashboards to real-time budget enforcement.', '/blog/llm-cost-management'],
               ['Robot customer payments', 'Let external agents pay for protected APIs through a governed request path.', '/blog/l402-protocol-explained'],
@@ -174,6 +237,25 @@ export default function AiAgentCostControlPage() {
                 <p className="text-gray-400 leading-relaxed mb-4">{body}</p>
                 <span className="text-cyan-300 font-semibold inline-flex items-center gap-2">Read guide <ArrowRight size={16} /></span>
               </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <h2 className="text-3xl font-bold text-white mb-8">AI agent cost-control requirements</h2>
+          <div className="grid md:grid-cols-2 gap-5">
+            {[
+              ['Attribute spend before optimizing it', 'Every request should carry tenant, agent, workflow, token, route, model, and tool context so finance and platform teams can see who created the cost.'],
+              ['Enforce budgets before API calls execute', 'Budget policy belongs in the request path. Alerts, dashboards, and billing exports are useful, but they are too late to stop runaway loops.'],
+              ['Use scoped, revocable credentials', 'Autonomous agents should not hold unlimited API keys. Capabilities need expiry, caveats, spend ceilings, route limits, and emergency revocation.'],
+              ['Treat MCP tools as economic resources', 'MCP tool calls can trigger paid APIs, searches, code agents, or data lookups. Cost policy has to follow the tool call, not just the LLM token bill.'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+                <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+                <p className="text-gray-400 leading-relaxed">{body}</p>
+              </div>
             ))}
           </div>
         </div>

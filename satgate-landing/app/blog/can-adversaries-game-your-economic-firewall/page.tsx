@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Clock, Shield, AlertTriangle, Lock, Eye, Target, L
 
 export const metadata = {
   title: 'Can Adversaries Game Your Economic Firewall? - SatGate Blog',
-  description: 'Economic firewalls protect against runaway AI agent costs — but what happens when attackers deliberately try to exploit them? We examine four adversarial attack vectors and the cryptographic defenses that stop them.',
+  description: 'Can attackers game an economic firewall? See four adversarial cost-control attacks and the cryptographic defenses that stop them.',
   openGraph: {
     title: 'Can Adversaries Game Your Economic Firewall?',
     description: 'The emerging threat landscape for AI agent cost governance — four attack vectors and the cryptographic defenses that stop them.',

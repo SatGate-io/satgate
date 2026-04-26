@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "L402 Protocol Explained: How HTTP 402 Enables Machine-Native API Payments - SatGate Blog",
-  description: "L402 combines HTTP 402 Payment Required with Lightning Network micropayments and macaroon tokens. Learn how this protocol enables AI agents to pay for API access in real time.",
+  description: "L402 combines HTTP 402, Lightning micropayments, and macaroon tokens so AI agents can pay for API access in real time.",
   alternates: { canonical: 'https://satgate.io/blog/l402-protocol-explained' },
   keywords: ['L402 protocol explained', 'L402 protocol', 'HTTP 402 Payment Required', 'Lightning API payments', 'machine-to-machine payments', 'L402 macaroons', 'API micropayments']
 };

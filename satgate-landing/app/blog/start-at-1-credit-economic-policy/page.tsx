@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "Start at 1 Credit: A Smarter Way to Price AI Agent Tools - SatGate Blog",
-  description: "Stop guessing tool costs on day one. Start everything at 1 credit in Observe mode, measure real usage, refine policy from evidence, then move to Control with confidence.",
+  description: "Stop guessing tool costs. Start at 1 credit in Observe mode, measure real usage, then refine policy and enforce with confidence.",
   alternates: { canonical: 'https://satgate.io/blog/start-at-1-credit-economic-policy' },
   keywords: ['AI agent economics', 'tool pricing strategy', 'cost management AI', 'economic policy agents', 'SatGate observe mode', 'AI cost optimization', 'agent budget management']
 };

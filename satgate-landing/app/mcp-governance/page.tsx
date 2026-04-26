@@ -13,7 +13,20 @@ export const metadata = {
     'Cursor MCP budget control',
     'Claude Desktop MCP governance',
     'Model Context Protocol governance',
+    'MCP proxy',
+    'MCP tool spend limits',
   ],
+  openGraph: {
+    title: 'MCP Governance: Budget Enforcement, Audit, and Policy',
+    description: 'Control Model Context Protocol tool calls with per-agent budgets, access policy, revocation, audit trails, and spend attribution.',
+    url: 'https://satgate.io/mcp-governance',
+    type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MCP Governance for AI Agents',
+    description: 'Enforce budgets, policy, revocation, and audit around MCP tool calls before agents execute expensive work.',
+  },
 };
 
 const controls = [
@@ -90,6 +103,38 @@ export default function McpGovernancePage() {
           text: 'Yes. A proxy/control-plane approach can wrap existing MCP tool traffic so governance is enforced before tool calls reach the server.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'Which MCP clients can use budget enforcement?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Any MCP-capable client can be routed through a governance proxy, including Cursor, Claude Desktop, Claude Code, OpenClaw, and custom agent runtimes.',
+        },
+      },
+    ],
+  };
+
+  const howToJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to add MCP budget enforcement',
+    description: 'Route MCP tool calls through SatGate so each call can be identified, priced, checked against policy, executed or blocked, and audited.',
+    totalTime: 'PT15M',
+    step: [
+      { '@type': 'HowToStep', name: 'Proxy MCP traffic', text: 'Place SatGate between the agent runtime and MCP servers so tool calls pass through the economic control plane.' },
+      { '@type': 'HowToStep', name: 'Identify agents and tools', text: 'Attach tenant, agent, session, token, server, and tool metadata to each MCP call.' },
+      { '@type': 'HowToStep', name: 'Assign tool costs', text: 'Set cost and risk values for expensive MCP tools, paid APIs, searches, browser sessions, code agents, or cloud tasks.' },
+      { '@type': 'HowToStep', name: 'Enforce budget policy', text: 'Block, route, allow, or revoke MCP calls based on remaining budget, per-tool limits, and capability policy.' },
+      { '@type': 'HowToStep', name: 'Audit outcomes', text: 'Record the decision, estimated cost, tool, route, policy, and outcome for finance, security, and platform teams.' },
+    ],
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'MCP Governance', item: 'https://satgate.io/mcp-governance' },
     ],
   };
 
@@ -97,6 +142,8 @@ export default function McpGovernancePage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_0%,rgba(34,211,238,0.18),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(168,85,247,0.16),transparent_30%)]" />
@@ -114,11 +161,11 @@ export default function McpGovernancePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/blog/mcp-budget-enforcement-guide" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              Read the MCP budget guide <ArrowRight size={18} />
+            <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
+              See MCP budget enforcement <ArrowRight size={18} />
             </Link>
-            <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
-              See agent cost control
+            <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              Generate MCP tool policy
             </Link>
           </div>
         </div>
@@ -191,6 +238,25 @@ export default function McpGovernancePage() {
       </section>
 
       <section className="border-y border-gray-900 bg-gray-950/60">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <h2 className="text-3xl font-bold text-white mb-8">MCP governance by runtime</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              ['Cursor', 'Budget code-search, issue, repo, browser, and shell-adjacent tools so coding agents cannot quietly burn spend.'],
+              ['Claude Desktop', 'Give local desktop agents governed tool access with revocable capabilities and auditable decisions.'],
+              ['Claude Code', 'Cap expensive build, test, search, and deployment-adjacent tool calls during delegated coding sessions.'],
+              ['OpenClaw', 'Apply policy to proactive workflows, cron-like tasks, delegated sub-agents, and autonomous MCP tool use.'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black p-5">
+                <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-8">
           <div>
             <h2 className="text-3xl font-bold text-white mb-6">Use cases</h2>
@@ -235,8 +301,8 @@ audit:
             Connect tools quickly with MCP. Govern them with SatGate. Observe every call, control spend and access, revoke risky capabilities, and charge when tools become products for external agents.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/blog/cursor-mcp-proxy-setup-guide" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              Cursor MCP setup guide <ArrowRight size={18} />
+            <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
+              MCP budget enforcement <ArrowRight size={18} />
             </Link>
             <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               Economic firewall category

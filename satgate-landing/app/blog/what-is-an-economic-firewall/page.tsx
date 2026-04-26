@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Clock, Shield, DollarSign, ArrowRight, AlertTriang
 
 export const metadata = {
   title: 'What Is an Economic Firewall? | SatGate',
-  description: 'An economic firewall enforces real-time budget limits on AI agent API calls. Learn why rate limiting fails for autonomous agents, how macaroon delegation works, and why economic governance is the missing security primitive.',
+  description: 'An economic firewall enforces AI agent budget limits in real time. Learn why rate limits fail and how SatGate governs autonomous API spend.',
   alternates: { canonical: 'https://satgate.io/blog/what-is-an-economic-firewall' },
   keywords: ['economic firewall', 'AI agent security', 'API budget enforcement', 'macaroon delegation', 'agent economy', 'MCP cost control', 'L402', 'API gateway AI'],
 };

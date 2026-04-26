@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "MCP Gateway Guide: From Traffic Routing to Economic Governance - SatGate Blog",
-  description: "A complete MCP gateway guide covering architecture, auth, tool aggregation, and the economic governance layer most guides miss. Deploy with budget enforcement.",
+  description: "A complete MCP gateway guide covering architecture, auth, tool aggregation, and budget enforcement for AI agent tool calls.",
   alternates: { canonical: 'https://satgate.io/blog/mcp-gateway-guide' },
   keywords: ['MCP gateway guide', 'MCP gateway', 'Model Context Protocol gateway', 'MCP proxy', 'MCP server gateway', 'MCP budget enforcement', 'MCP gateway setup']
 };

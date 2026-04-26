@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: "Pricing",
   alternates: { canonical: "https://satgate.io/pricing" },
   description:
-    "SatGate pricing — free Observe tier for audit and attribution. Pro tier for real-time budget enforcement, per-agent spending caps, and L402 Lightning monetization.",
+    "SatGate pricing: free Observe audits, Pro budget enforcement, per-agent spend caps, and L402 Lightning monetization.",
 };
 
 export default function PricingLayout({ children }: { children: React.ReactNode }) {

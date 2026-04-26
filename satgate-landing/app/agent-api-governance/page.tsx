@@ -13,7 +13,20 @@ export const metadata = {
     'capability tokens for AI agents',
     'delegated API access',
     'AI agent access control',
+    'macaroons vs API keys',
+    'zero trust for AI agents',
   ],
+  openGraph: {
+    title: 'Agent API Governance',
+    description: 'Replace unlimited API keys with scoped, revocable, budget-aware agent capabilities enforced in the request path.',
+    url: 'https://satgate.io/agent-api-governance',
+    type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Agent API Governance',
+    description: 'Govern AI agent identity, delegated access, revocation, budgets, and audit trails before API calls execute.',
+  },
 };
 
 const principles = [
@@ -58,13 +71,55 @@ export default function AgentApiGovernancePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-04-25',
+    dateModified: '2026-04-26',
     mainEntityOfPage: 'https://satgate.io/agent-api-governance',
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is agent API governance?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Agent API governance is the request-path policy layer for AI agent identity, delegated authority, budgets, revocation, routing, and audit trails.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why are static API keys risky for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Static API keys are often broad, long-lived, and easy to copy. Autonomous agents need scoped, expiring, revocable capabilities that limit access and spend per task or workflow.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How should sub-agent delegation be controlled?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Delegated sub-agents should receive less authority than their parent: smaller budgets, narrower tools, shorter expiry, route limits, and separate audit records.',
+        },
+      },
+    ],
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'Agent API Governance', item: 'https://satgate.io/agent-api-governance' },
+    ],
   };
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(34,211,238,0.17),transparent_32%),radial-gradient(circle_at_80%_20%,rgba(245,158,11,0.14),transparent_30%)]" />
@@ -140,6 +195,25 @@ export default function AgentApiGovernancePage() {
         </div>
       </section>
 
+      <section className="border-y border-gray-900 bg-black">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <h2 className="text-3xl font-bold text-white mb-8">Agent API governance requirements</h2>
+          <div className="grid md:grid-cols-2 gap-5">
+            {[
+              ['Agent-scoped identity', 'Every request should identify the tenant, agent, task, workflow, parent agent, delegated sub-agent, token, route, and tool behind the call.'],
+              ['Budget-aware authority', 'Access policy should include spend limits, per-request ceilings, daily caps, tool limits, and remaining budget checks before forwarding traffic.'],
+              ['Revocation before the next request', 'When an agent loops, leaks a token, or finishes a task, access should be narrowed, expired, or revoked immediately without rotating global keys.'],
+              ['Delegation with attenuation', 'Sub-agents should never inherit full parent authority. Each delegation should shrink scope, budget, lifetime, and allowed tools.'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+                <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+                <p className="text-gray-400 leading-relaxed">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="max-w-6xl mx-auto px-6 py-20">
         <h2 className="text-3xl font-bold text-white mb-8">Static API key vs agent capability</h2>
         <div className="overflow-hidden rounded-2xl border border-gray-800">
@@ -199,6 +273,25 @@ delegation:
 expiry: 2026-04-26T00:00:00Z
 revocation: immediate
 audit: required`}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <h2 className="text-3xl font-bold text-white mb-8">Related governance guides</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              ['/blog/macaroon-tokens-vs-api-keys', 'Macaroons vs API keys', 'Why attenuated capability tokens fit autonomous agent delegation.'],
+              ['/blog/zero-trust-for-ai-agents', 'Zero trust for AI agents', 'How agent credentials break human-centric identity assumptions.'],
+              ['/economic-firewall', 'Economic firewall', 'The request-path control layer for agent access and spend.'],
+              ['/mcp-governance', 'MCP governance', 'Apply budgets, revocation, and audit to agent tool calls.'],
+            ].map(([href, title, body]) => (
+              <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">
+                <h3 className="font-bold text-white mb-2">{title}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{body}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'SatGate vs AWS Bedrock vs Azure AI Foundry — Cloud-Native AI Governance Comparison',
   description:
-    'Compare SatGate MCP Proxy with AWS Bedrock and Azure AI Foundry for AI agent governance. See why cloud-native tools fall short on budget enforcement, multi-cloud visibility, and agent-to-agent commerce.',
+    'Compare SatGate with AWS Bedrock and Azure AI Foundry for AI agent governance, budget enforcement, multi-cloud visibility, and L402 commerce.',
   keywords: [
     'SatGate vs AWS Bedrock',
     'SatGate vs Azure AI Foundry',

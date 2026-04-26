@@ -3,12 +3,12 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "InformationWeek Says Control AI Agent Costs With Process. Here's Why That Won't Scale. - SatGate Blog",
-  description: "InformationWeek's 9 recommendations for AI agent cost control are solid for 2025. But when agents make 1,500 calls per prompt and operate 24/7, process can't keep pace. 7 of 9 are automatable by an economic firewall.",
+  description: "InformationWeek's AI agent cost-control advice is useful, but process won't scale. See which controls an economic firewall can automate.",
   alternates: { canonical: 'https://satgate.io/blog/why-process-wont-scale-for-ai-agent-costs' },
   keywords: ['AI agent cost control', 'AI agent spending', 'economic firewall', 'agent budget enforcement', 'AI cost management', 'autonomous agent costs', 'macaroon caveats'],
   openGraph: {
     title: "InformationWeek Says Control AI Agent Costs With Process. Here's Why That Won't Scale.",
-    description: "InformationWeek's 9 recommendations for AI agent cost control are solid for 2025. But when agents operate 24/7, process can't keep pace. 7 of 9 are automatable at the infrastructure layer.",
+    description: "InformationWeek's AI agent cost-control advice is useful, but 24/7 agents need infrastructure controls, not manual process.",
     url: 'https://satgate.io/blog/why-process-wont-scale-for-ai-agent-costs',
     type: 'article',
     publishedTime: '2026-03-28T12:00:00Z',

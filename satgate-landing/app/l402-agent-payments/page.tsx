@@ -13,7 +13,21 @@ export const metadata = {
     'HTTP 402 agent payments',
     'API monetization for AI agents',
     'autonomous agent payments',
+    'AI agents paying APIs',
+    'machine customer payments',
+    'L402 API monetization',
   ],
+  openGraph: {
+    title: 'L402 Agent Payments for APIs',
+    description: 'Let robot customers pay for protected APIs with L402 Lightning challenges, proof verification, and request-path access control.',
+    url: 'https://satgate.io/l402-agent-payments',
+    type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'L402 Agent Payments for APIs',
+    description: 'Use SatGate Charge to let autonomous agents pay for APIs with L402 Lightning before access is unlocked.',
+  },
 };
 
 const steps = [
@@ -90,6 +104,38 @@ export default function L402AgentPaymentsPage() {
           text: 'No. SatGate Charge is L402 Lightning for request-path agent/API payments. Fiat402 is a separate concept and should not be conflated with Charge.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'What APIs are good candidates for robot-customer payments?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Premium search, data enrichment, research APIs, MCP tools, datasets, model endpoints, and agent-native services are good L402 candidates when value is tied to each request.',
+        },
+      },
+    ],
+  };
+
+  const howToJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to monetize APIs with L402 agent payments',
+    description: 'Use SatGate Charge to issue an HTTP 402 payment challenge, verify Lightning payment proof, and unlock API access for autonomous agents.',
+    totalTime: 'PT20M',
+    step: [
+      { '@type': 'HowToStep', name: 'Protect the API route', text: 'Put SatGate in front of the API, tool, dataset, or premium endpoint that autonomous agents should pay to access.' },
+      { '@type': 'HowToStep', name: 'Set a request price', text: 'Define per-request, per-tool, dataset, or premium capability pricing for robot customers.' },
+      { '@type': 'HowToStep', name: 'Return an L402 challenge', text: 'When an unpaid agent requests the resource, return an HTTP 402 challenge with a Lightning invoice and access credential.' },
+      { '@type': 'HowToStep', name: 'Verify payment proof', text: 'Accept the agent response only after SatGate validates the payment proof and request policy.' },
+      { '@type': 'HowToStep', name: 'Forward and audit access', text: 'Unlock the approved request and record agent identity, route, price, proof, and policy outcome.' },
+    ],
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'L402 Agent Payments', item: 'https://satgate.io/l402-agent-payments' },
     ],
   };
 
@@ -97,6 +143,8 @@ export default function L402AgentPaymentsPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(250,204,21,0.17),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(34,211,238,0.15),transparent_32%)]" />
@@ -172,6 +220,21 @@ export default function L402AgentPaymentsPage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold text-white mb-8">Robot-customer payment requirements</h2>
+        <div className="grid md:grid-cols-2 gap-5 mb-16">
+          {[
+            ['Machine-readable price', 'Agents need a price and payment challenge in the protocol flow, not a human checkout page or sales form.'],
+            ['Payment before access', 'SatGate verifies L402 Lightning payment proof before forwarding the protected API request upstream.'],
+            ['Scoped unlocks', 'Payment should unlock the requested route, tool, dataset, or capability — not a broad reusable API key.'],
+            ['Revenue audit trail', 'Every paid request should record agent identity, route, price, proof, settlement evidence, and access decision.'],
+          ].map(([title, body]) => (
+            <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+              <p className="text-gray-400 leading-relaxed">{body}</p>
+            </div>
+          ))}
+        </div>
+
         <h2 className="text-3xl font-bold text-white mb-8">A robot-customer request flow</h2>
         <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6 overflow-x-auto">
           <pre className="text-sm text-gray-300"><code>{`# Agent attempts a protected API call
@@ -206,6 +269,25 @@ HTTP/1.1 200 OK
             <div className="text-yellow-300 font-mono text-sm mb-3">CHARGE</div>
             <h3 className="text-xl font-bold text-white mb-3">Collect per request</h3>
             <p className="text-gray-400 leading-relaxed">Use L402 Lightning payments to charge autonomous agents for API access at the moment of demand.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <h2 className="text-3xl font-bold text-white mb-8">Related robot-payment guides</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              ['/robot-customer-payments', 'Robot customer payments', 'How autonomous agents become paying API customers in the request path.'],
+              ['/blog/l402-protocol-explained', 'L402 protocol explained', 'How HTTP 402, Lightning, and macaroons enable API payments.'],
+              ['/blog/api-monetization-ai', 'API monetization for AI', 'How to price, meter, and collect from machine consumers.'],
+              ['/economic-firewall', 'Economic firewall', 'Observe, Control, and Charge in one request-path control plane.'],
+            ].map(([href, title, body]) => (
+              <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">
+                <h3 className="font-bold text-white mb-2">{title}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{body}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

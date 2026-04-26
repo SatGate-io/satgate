@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "API Monetization for AI: How to Charge Agents, Not Just Developers - SatGate Blog",
-  description: "AI agents are your next API customers. Traditional API monetization fails for autonomous workloads. Learn how to price, meter, and collect from machine consumers.",
+  description: "AI agents are your next API customers. Learn how to price, meter, and collect from autonomous workloads with SatGate and L402.",
   alternates: { canonical: 'https://satgate.io/blog/api-monetization-ai' },
   keywords: ['API monetization AI', 'API monetization for AI agents', 'monetize API AI', 'AI agent billing', 'machine-to-machine payments', 'API pricing AI agents', 'L402 API monetization']
 };

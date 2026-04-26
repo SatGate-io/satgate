@@ -109,6 +109,54 @@ export default function ROICalculatorPage() {
           text: 'SatGate enforces per-agent, per-tool, per-route, and per-request budget policy before upstream API calls execute, blocking or routing requests that exceed economic policy.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'What inputs do I need for the AI agent ROI calculator?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'You need the number of active agents, average cost per tool call, calls per agent per day, expected loop or error frequency, and average loop duration before discovery.',
+        },
+      },
+    ],
+  };
+
+  const howToJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to estimate AI agent budget enforcement ROI',
+    description: 'Use the SatGate ROI calculator to estimate unmanaged AI agent spend, runaway loop exposure, monthly savings, payback period, and annual ROI.',
+    totalTime: 'PT3M',
+    tool: [{ '@type': 'HowToTool', name: 'SatGate AI Agent ROI Calculator' }],
+    step: [
+      {
+        '@type': 'HowToStep',
+        name: 'Enter active agents',
+        text: 'Set the number of autonomous agents, workflows, or delegated sub-agents that can call paid tools or APIs.',
+      },
+      {
+        '@type': 'HowToStep',
+        name: 'Set request economics',
+        text: 'Enter average tool-call cost and daily calls per agent to estimate normal monthly tool spend.',
+      },
+      {
+        '@type': 'HowToStep',
+        name: 'Model loop exposure',
+        text: 'Estimate loop frequency and average calls wasted before discovery to calculate ghost spend and annual risk exposure.',
+      },
+      {
+        '@type': 'HowToStep',
+        name: 'Review enforcement savings',
+        text: 'Compare unmanaged cost exposure with SatGate request-path budget enforcement to estimate savings, payback period, and annual ROI.',
+      },
+    ],
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'AI Agent ROI Calculator', item: 'https://satgate.io/roi-calculator' },
     ],
   };
 
@@ -116,6 +164,8 @@ export default function ROICalculatorPage() {
     <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-purple-500 selection:text-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       {/* Navigation */}
       <nav className="border-b border-gray-800 backdrop-blur-md fixed w-full z-50 bg-black/50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
@@ -282,6 +332,7 @@ export default function ROICalculatorPage() {
               { href: '/economic-firewall', title: 'Economic firewall', body: 'The request-path control layer for Observe, Control, and Charge.' },
               { href: '/mcp-governance', title: 'MCP budget enforcement', body: 'Assign per-tool costs and cap MCP tool spend in real time.' },
               { href: '/agent-api-governance', title: 'Agent API governance', body: 'Replace unlimited API keys with scoped, revocable capabilities.' },
+              { href: '/runaway-agent-cost-calculator', title: 'Runaway agent cost calculator', body: 'Model loop, retry, fanout, and MCP tool-call exposure.' },
             ].map((item) => (
               <Link key={item.href} href={item.href} className="block rounded-xl border border-gray-800 bg-black/40 p-5 transition hover:border-cyan-500/40 hover:bg-cyan-950/20">
                 <h3 className="mb-2 font-bold text-white">{item.title}</h3>

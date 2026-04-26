@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle2, Shield, Gauge, WalletCards, Activity, KeyRoun
 
 export const metadata = {
   title: 'Economic Firewall for AI Agents',
-  description: 'An economic firewall controls what AI agents can access and spend before each API request. Learn the category, architecture, and SatGate implementation model.',
+  description: 'Learn what an economic firewall is and how SatGate controls AI agent access, spend, budgets, and payments before each API request.',
   alternates: { canonical: 'https://satgate.io/economic-firewall' },
   keywords: [
     'economic firewall',
@@ -12,7 +12,20 @@ export const metadata = {
     'AI agent budget enforcement',
     'economic control plane for AI agents',
     'request-layer cost control',
+    'API budget enforcement',
+    'agent API governance',
   ],
+  openGraph: {
+    title: 'Economic Firewall for AI Agents',
+    description: 'The request-path control layer for AI agent identity, access, budgets, routing, audit, and L402 payments.',
+    url: 'https://satgate.io/economic-firewall',
+    type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Economic Firewall for AI Agents',
+    description: 'Define the economic firewall category: request-path control for AI agent access, spend, budgets, routing, and payments.',
+  },
 };
 
 const capabilities = [
@@ -84,6 +97,32 @@ export default function EconomicFirewallPage() {
           text: 'Autonomous agents can loop, delegate, retry, and call paid tools without a human approving each request. Economic firewalls prevent runaway spend and create auditable governance.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'Is an economic firewall the same as an API gateway?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No. An API gateway can route and secure traffic, but an economic firewall adds per-agent cost attribution, budget enforcement, delegated credentials, policy decisions, and optional payment before requests execute.',
+        },
+      },
+    ],
+  };
+
+  const definedTermJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'DefinedTerm',
+    name: 'Economic firewall',
+    description: 'A request-path control layer that governs AI agent access, spend, budgets, routing, audit, and payment before upstream API calls execute.',
+    inDefinedTermSet: 'https://satgate.io/economic-firewall',
+    url: 'https://satgate.io/economic-firewall',
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'Economic Firewall', item: 'https://satgate.io/economic-firewall' },
     ],
   };
 
@@ -91,6 +130,8 @@ export default function EconomicFirewallPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.18),transparent_32%),radial-gradient(circle_at_80%_20%,rgba(168,85,247,0.16),transparent_28%)]" />
@@ -108,12 +149,26 @@ export default function EconomicFirewallPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/roi-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              Calculate avoided agent spend <ArrowRight size={18} />
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
+              Grade your readiness <ArrowRight size={18} />
             </Link>
             <Link href="/blog/what-is-an-economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               Read the deep-dive
             </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-gray-900 bg-gray-950/40">
+        <div className="max-w-6xl mx-auto px-6 py-12">
+          <p className="text-sm font-mono uppercase tracking-wide text-cyan-300 mb-3">Definition</p>
+          <div className="rounded-2xl border border-cyan-900/50 bg-black/60 p-6 md:p-8">
+            <p className="text-2xl md:text-3xl font-bold leading-snug text-white">
+              An economic firewall is the request-path control layer that decides whether an AI agent may access, spend, route, or pay before an upstream API call executes.
+            </p>
+            <p className="mt-5 text-gray-400 text-lg leading-relaxed">
+              It extends the API gateway pattern with agent identity, cost attribution, budget enforcement, revocation, audit trails, and payment policy — the pieces autonomous agent traffic needs and traditional routing does not provide.
+            </p>
           </div>
         </div>
       </section>
@@ -216,6 +271,25 @@ export default function EconomicFirewallPage() {
                 <div className="p-4">{b}</div>
                 <div className="p-4">{c}</div>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <h2 className="text-3xl font-bold text-white mb-8">Related economic control-plane topics</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              ['/ai-agent-cost-control', 'AI agent cost control', 'Commercial controls for runaway agent spend and budget enforcement.'],
+              ['/mcp-governance', 'MCP governance', 'Budget, audit, and policy controls for tool-calling agents.'],
+              ['/agent-api-governance', 'Agent API governance', 'Identity, delegation, revocation, and audit for autonomous API calls.'],
+              ['/l402-agent-payments', 'L402 agent payments', 'Charge robot customers before unlocking protected API access.'],
+            ].map(([href, title, body]) => (
+              <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
+                <h3 className="font-bold text-white mb-2">{title}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{body}</p>
+              </Link>
             ))}
           </div>
         </div>

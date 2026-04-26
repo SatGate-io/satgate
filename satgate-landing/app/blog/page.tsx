@@ -268,6 +268,31 @@ export default function BlogPage() {
           </p>
         </div>
 
+        <section className="mb-12 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+          <div className="mb-5">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Free tools</p>
+            <h2 className="mb-2 text-2xl font-bold text-white">Turn the guides into enforceable agent policy</h2>
+            <p className="text-gray-400">
+              Use these calculators and generators to quantify AI agent spend risk, create budget policies, and assess economic firewall readiness.
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {[
+              ['/roi-calculator', 'AI Agent ROI Calculator', 'Estimate ghost spend, loop waste, payback period, and enforcement ROI.'],
+              ['/runaway-agent-cost-calculator', 'Runaway Agent Cost Calculator', 'Model loop, retry, fanout, and paid tool-call exposure.'],
+              ['/openai-budget-policy-generator', 'OpenAI Budget Policy Generator', 'Generate OpenAI spend caps, routing, revocation, and audit policy.'],
+              ['/mcp-tool-cost-policy-generator', 'MCP Tool Cost Policy Generator', 'Create per-tool MCP budgets, risk actions, and audit rules.'],
+              ['/economic-firewall-readiness-grader', 'Economic Firewall Readiness Grader', 'Score identity, budgets, MCP tools, revocation, audit, routing, and Charge.'],
+              ['/economic-firewall', 'Economic Firewall Definition', 'Learn the request-path category for AI agent economic governance.'],
+            ].map(([href, title, body]) => (
+              <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black/60 p-4 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
+                <h3 className="mb-1 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         <div className="space-y-6">
           {posts.map((post) => (
             <Link 

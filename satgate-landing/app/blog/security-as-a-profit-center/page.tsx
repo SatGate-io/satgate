@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Clock, ExternalLink } from 'lucide-react';
 
 export const metadata = {
   title: 'Security as a Profit Center: Why Your Economic Firewall Pays for Itself - SatGate Blog',
-  description: 'Every security tool tells you how many attacks it stopped. SatGate tells you how many dollars it saved. Discover why economic governance is a profit center, not a cost center.',
+  description: 'SatGate shows how many dollars security saved, not just attacks blocked. Learn why economic governance can become a profit center.',
   openGraph: {
     title: 'Security as a Profit Center: Why Your Economic Firewall Pays for Itself',
     description: 'Your security stack is a cost center. Your economic firewall is a profit center. Here\'s the CFO math.',

@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "Zero Trust for AI Agents: Why Identity-Based Security Collapses When Machines Call the Shots - SatGate Blog",
-  description: "Zero Trust was built for human users and managed devices. AI agents break every assumption it makes. Here's how capability-based security fixes what Zero Trust can't.",
+  description: "Zero Trust was built for humans and managed devices. AI agents need capability-based security, revocable credentials, and budget enforcement.",
   alternates: { canonical: 'https://satgate.io/blog/zero-trust-for-ai-agents' },
   keywords: ['Zero Trust AI agents', 'Zero Trust for AI', 'AI agent security', 'capability-based security', 'API security AI agents', 'macaroon tokens', 'agent delegation security']
 };

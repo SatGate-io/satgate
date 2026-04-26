@@ -17,7 +17,7 @@ const LandingPage = () => {
   };
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-purple-500 selection:text-white">
-      
+
       {/* Navigation */}
       <nav className="border-b border-gray-800 backdrop-blur-md fixed w-full z-50 bg-black/50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
@@ -25,20 +25,21 @@ const LandingPage = () => {
             <Image src="/logo_white_transparent.png" alt="SatGate" width={32} height={32} className="w-7 h-7 sm:w-8 sm:h-8" />
             <span className="text-lg sm:text-xl font-bold text-white whitespace-nowrap">SatGate<sup className="text-xs font-normal">™</sup></span>
           </Link>
-          
+
           {/* Desktop menu */}
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
             <Link href="/protect" className="hover:text-white transition">Live Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
+            <Link href="/tools" className="hover:text-white transition">Tools</Link>
             <Link href="/blog" className="hover:text-white transition">Blog</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
             <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a>
             <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 transition">Cloud →</a>
           </div>
-          
+
           {/* Mobile menu button */}
-          <button 
+          <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="flex md:hidden items-center justify-center w-10 h-10 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 text-gray-400 hover:text-white transition"
             aria-label="Toggle menu"
@@ -47,65 +48,72 @@ const LandingPage = () => {
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
-        
+
         {/* Mobile menu dropdown */}
-        <div 
+        <div
           className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
             mobileMenuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'
           }`}
         >
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
-            <Link 
-              href="/protect" 
-              onClick={() => setMobileMenuOpen(false)} 
+            <Link
+              href="/protect"
+              onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Live Demo
             </Link>
-            <Link 
-              href="/govern" 
-              onClick={() => setMobileMenuOpen(false)} 
+            <Link
+              href="/govern"
+              onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Enterprise
             </Link>
-            <Link 
-              href="/pricing" 
-              onClick={() => setMobileMenuOpen(false)} 
+            <Link
+              href="/pricing"
+              onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Pricing
             </Link>
-            <Link 
-              href="/blog" 
-              onClick={() => setMobileMenuOpen(false)} 
+            <Link
+              href="/tools"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              Tools
+            </Link>
+            <Link
+              href="/blog"
+              onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Blog
             </Link>
-            <a 
-              href="https://cloud.satgate.io/docs" 
-              target="_blank" 
+            <a
+              href="https://cloud.satgate.io/docs"
+              target="_blank"
               rel="noopener noreferrer"
-              onClick={() => setMobileMenuOpen(false)} 
+              onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Docs
             </a>
-            <a 
-              href="https://github.com/SatGate-io/satgate" 
-              target="_blank" 
+            <a
+              href="https://github.com/SatGate-io/satgate"
+              target="_blank"
               rel="noopener noreferrer"
-              onClick={() => setMobileMenuOpen(false)} 
+              onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               GitHub
             </a>
-            <a 
-              href="https://cloud.satgate.io/cloud/login" 
-              target="_blank" 
+            <a
+              href="https://cloud.satgate.io/cloud/login"
+              target="_blank"
               rel="noopener noreferrer"
-              onClick={() => setMobileMenuOpen(false)} 
+              onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Cloud
@@ -117,7 +125,7 @@ const LandingPage = () => {
       {/* Hero Section */}
       <header className="pt-32 pb-20 px-6">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          
+
           {/* Left: Copy */}
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-6">
@@ -164,10 +172,10 @@ const LandingPage = () => {
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
                 <div className="text-xs text-gray-500 ml-2 font-mono">hero_demo.py — Live Demo</div>
               </div>
-              <video 
-                autoPlay 
-                loop 
-                muted 
+              <video
+                autoPlay
+                loop
+                muted
                 playsInline
                 className="w-full"
               >
@@ -183,8 +191,8 @@ const LandingPage = () => {
               <p className="text-sm text-gray-500 mb-3">
                 Agents badge in once. Every request — verified, metered, budget-enforced.
               </p>
-              <Link 
-                href="/protect" 
+              <Link
+                href="/protect"
                 className="inline-flex items-center gap-2 text-sm font-medium text-purple-400 hover:text-purple-300 transition"
               >
                 See how it works <ArrowRight size={14} />
@@ -200,7 +208,7 @@ const LandingPage = () => {
           <h2 className="text-3xl font-bold mb-3">See SatGate in Action</h2>
           <p className="text-gray-400 mb-8 max-w-2xl mx-auto">Agents spend without limits. SatGate stops that. 30 seconds.</p>
           <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
-            <video 
+            <video
               controls
               preload="metadata"
               poster="/satgate-explainer-poster.jpg"
@@ -210,6 +218,41 @@ const LandingPage = () => {
               <source src="/satgate-explainer.mp4" type="video/mp4" />
               Your browser does not support the video tag.
             </video>
+          </div>
+        </div>
+      </section>
+
+      {/* Free SEO Tools */}
+      <section className="py-20 px-6 border-b border-gray-800 bg-black">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-10 max-w-3xl">
+            <p className="mb-3 text-sm font-mono uppercase tracking-wide text-cyan-300">Free agent cost tools</p>
+            <h2 className="mb-4 text-3xl md:text-4xl font-bold text-white">Measure the economic risk before agents run wild</h2>
+            <p className="text-gray-400 text-lg leading-relaxed">
+              Calculators and policy generators for AI agent spend control, MCP governance, OpenAI budget limits, and economic firewall readiness.
+            </p>
+          </div>
+          <div className="mb-6">
+            <Link href="/tools" className="inline-flex items-center gap-2 text-cyan-300 hover:text-cyan-200 font-semibold transition">
+              View all AI agent cost control tools <ArrowRight size={16} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              { href: '/roi-calculator', title: 'AI Agent ROI Calculator', body: 'Estimate ghost spend, loop waste, payback period, and budget-enforcement ROI.', icon: DollarSign },
+              { href: '/runaway-agent-cost-calculator', title: 'Runaway Agent Cost Calculator', body: 'Model loop, retry, fanout, and paid tool-call exposure before detection.', icon: Activity },
+              { href: '/openai-budget-policy-generator', title: 'OpenAI Budget Policy Generator', body: 'Generate per-agent OpenAI API budgets, model routing, revocation, and audit policy.', icon: SlidersHorizontal },
+              { href: '/mcp-tool-cost-policy-generator', title: 'MCP Tool Cost Policy Generator', body: 'Create per-tool prices, session caps, risk actions, and MCP audit rules.', icon: Terminal },
+              { href: '/economic-firewall-readiness-grader', title: 'Economic Firewall Readiness Grader', body: 'Score your posture across identity, budgets, MCP tools, revocation, audit, routing, and Charge.', icon: Shield },
+              { href: '/economic-firewall', title: 'What is an Economic Firewall?', body: 'Learn the request-path category for agent access, spend, audit, routing, and payments.', icon: BookOpen },
+            ].map(({ href, title, body, icon: Icon }) => (
+              <Link key={href} href={href} className="group rounded-xl border border-gray-800 bg-gray-950 p-6 transition hover:border-cyan-500/50 hover:bg-cyan-950/10">
+                <Icon className="mb-4 text-cyan-300 transition group-hover:text-cyan-200" size={28} />
+                <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                <p className="mb-4 text-sm leading-relaxed text-gray-400">{body}</p>
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-300">Open tool <ArrowRight size={14} /></span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -237,7 +280,7 @@ const LandingPage = () => {
               </div>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              Every protected route requires valid credentials (Macaroons). Capabilities, caveats, 
+              Every protected route requires valid credentials (Macaroons). Capabilities, caveats,
               delegation, and revocation—built into the protocol, not bolted on.
             </p>
             <div className="flex flex-wrap gap-4 text-sm text-gray-500">
@@ -336,7 +379,7 @@ const LandingPage = () => {
               <p className="text-gray-400 max-w-xl mx-auto text-sm">API keys are all-or-nothing. Delegated capability tokens let you set any budget, scope, and expiry per agent — and agents can&apos;t escalate beyond what they&apos;re given. Trust flows down, never up.</p>
             </div>
             <div className="max-w-3xl mx-auto relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
-              <video 
+              <video
                 controls
                 preload="metadata"
                 poster="/satgate-delegation-poster.jpg"
@@ -352,8 +395,8 @@ const LandingPage = () => {
           {/* PUBLIC callout */}
           <div className="p-4 rounded-lg bg-green-950/20 border border-green-900/30">
             <p className="text-sm text-gray-400">
-              <span className="text-green-400 font-medium">PUBLIC</span> is the explicit opt-out for 
-              probes (<code className="bg-gray-800 px-1 rounded text-gray-300">/healthz</code>), docs, and webhooks. 
+              <span className="text-green-400 font-medium">PUBLIC</span> is the explicit opt-out for
+              probes (<code className="bg-gray-800 px-1 rounded text-gray-300">/healthz</code>), docs, and webhooks.
               Everything else is protected by default.
             </p>
           </div>
@@ -538,7 +581,7 @@ const LandingPage = () => {
               Four steps to protect your API. No code changes required.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {[
               {
@@ -603,7 +646,7 @@ const LandingPage = () => {
               Or <Link href="/govern" className="text-purple-400 hover:text-purple-300 transition underline underline-offset-4">learn how enterprises are controlling AI agent spend →</Link>
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 py-12 border-t border-gray-800">
             <div>
               <div className="flex items-center gap-2 mb-4">
@@ -622,8 +665,10 @@ const LandingPage = () => {
                 <li><Link href="/economic-firewall" className="hover:text-white transition">Economic Firewall</Link></li>
                 <li><Link href="/ai-agent-cost-control" className="hover:text-white transition">AI Agent Cost Control</Link></li>
                 <li><Link href="/mcp-governance" className="hover:text-white transition">MCP Governance</Link></li>
+                <li><Link href="/mcp-budget-enforcement" className="hover:text-white transition">MCP Budget Enforcement</Link></li>
                 <li><Link href="/agent-api-governance" className="hover:text-white transition">Agent API Governance</Link></li>
                 <li><Link href="/l402-agent-payments" className="hover:text-white transition">L402 Agent Payments</Link></li>
+                <li><Link href="/robot-customer-payments" className="hover:text-white transition">Robot Customer Payments</Link></li>
                 <li><Link href="/design-partners" className="hover:text-white transition">Design Partners</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
                 <li><Link href="/compare" className="hover:text-white transition">Compare</Link></li>
@@ -646,7 +691,7 @@ const LandingPage = () => {
               </ul>
             </div>
           </div>
-          
+
           <div className="pt-8 border-t border-gray-800 text-center text-gray-600 text-sm">
             © 2025–2026 SatGate Inc. All rights reserved. SatGate™ is a trademark of SatGate Inc. Patent Pending.
           </div>

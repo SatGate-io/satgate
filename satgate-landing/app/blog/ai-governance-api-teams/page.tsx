@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "AI Governance for API Teams: Why Your Gateway Needs Policy, Not Just Routing - SatGate Blog",
-  description: "API teams need AI governance that enforces budgets, permissions, and audit trails — not just traffic routing. Learn why traditional API management falls short.",
+  description: "API teams need AI governance for budgets, permissions, and audit trails — not just routing. Learn where traditional API management falls short.",
   alternates: { canonical: 'https://satgate.io/blog/ai-governance-api-teams' },
   keywords: ['AI governance API teams', 'API governance AI agents', 'AI API management', 'API team governance', 'AI agent policy enforcement', 'API governance framework']
 };
