@@ -68,6 +68,12 @@ Macaroons and capability tokens can constrain agent authority:
 - L402 Agent Payments: https://satgate.io/l402-agent-payments
 - Robot Customer Payments: https://satgate.io/robot-customer-payments
 
+## Integration Pages
+- SatGate for Cursor: https://satgate.io/satgate-for-cursor
+- SatGate for Claude Code: https://satgate.io/satgate-for-claude-code
+- SatGate for Claude Desktop MCP: https://satgate.io/satgate-for-claude-desktop
+- SatGate for OpenClaw Agents: https://satgate.io/satgate-for-openclaw
+
 ## Comparison Pages
 - SatGate vs LiteLLM: https://satgate.io/compare/litellm
 - SatGate vs Portkey: https://satgate.io/compare/portkey
