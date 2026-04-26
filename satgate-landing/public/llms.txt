@@ -70,6 +70,9 @@ Macaroons and capability tokens can constrain agent authority:
 
 ## Comparison Pages
 - SatGate vs LiteLLM: https://satgate.io/compare/litellm
+- SatGate vs Portkey: https://satgate.io/compare/portkey
+- SatGate vs Helicone: https://satgate.io/compare/helicone
+- SatGate vs Cloudflare AI Gateway: https://satgate.io/compare/cloudflare-ai-gateway
 - SatGate vs Bifrost: https://satgate.io/compare/bifrost
 - SatGate vs Zuplo: https://satgate.io/compare/zuplo
 - SatGate vs Cloud-Native API Gateways: https://satgate.io/compare/cloud-native

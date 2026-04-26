@@ -1,122 +1,144 @@
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Route, Server, Shield, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BarChart3, Cloud, Eye, Route, Shield, Zap } from 'lucide-react';
 
 export const metadata = {
   title: 'Compare SatGate - AI Gateway and Economic Firewall Comparisons',
-  description: 'Compare SatGate with LiteLLM, Bifrost, Zuplo, cloud-native API gateways, and other AI infrastructure. Routing is not economic governance.',
+  description: 'Compare SatGate with LiteLLM, Portkey, Helicone, Cloudflare AI Gateway, Bifrost, Zuplo, and other AI infrastructure. Routing is not economic governance.',
   alternates: { canonical: 'https://satgate.io/compare' },
+  keywords: [
+    'SatGate comparisons',
+    'SatGate vs LiteLLM',
+    'SatGate vs Portkey',
+    'SatGate vs Helicone',
+    'SatGate vs Cloudflare AI Gateway',
+    'AI gateway comparison',
+    'economic firewall comparison',
+  ],
+  openGraph: {
+    title: 'Compare SatGate - AI Gateway and Economic Firewall Comparisons',
+    description: 'Routing, observability, and API gateways are useful. SatGate focuses on request-path economic governance for autonomous agents.',
+    url: 'https://satgate.io/compare',
+    type: 'website',
+  },
+};
+
+const comparisons = [
+  {
+    href: '/compare/litellm',
+    title: 'SatGate vs LiteLLM',
+    description: 'LLM gateway vs economic firewall. LiteLLM routes model access; SatGate governs agent/API spend, MCP tools, and payments.',
+    icon: Route,
+    color: 'green',
+  },
+  {
+    href: '/compare/portkey',
+    title: 'SatGate vs Portkey',
+    description: 'GenAI production stack vs economic control plane. Portkey covers gateway, observability, guardrails, and prompts; SatGate governs agent economics.',
+    icon: BarChart3,
+    color: 'orange',
+  },
+  {
+    href: '/compare/helicone',
+    title: 'SatGate vs Helicone',
+    description: 'LLM observability vs economic firewall. Helicone helps debug and analyze AI apps; SatGate enforces budgets before agents spend.',
+    icon: Eye,
+    color: 'blue',
+  },
+  {
+    href: '/compare/cloudflare-ai-gateway',
+    title: 'SatGate vs Cloudflare AI Gateway',
+    description: 'AI traffic gateway vs agent economic governance. Cloudflare brings analytics, caching, rate limits, and fallback; SatGate controls spend and authority.',
+    icon: Cloud,
+    color: 'yellow',
+  },
+  {
+    href: '/compare/bifrost',
+    title: 'SatGate vs Bifrost',
+    description: 'LLM routing vs economic governance. Both have MCP — only one enforces per-tool budgets on agent tool calls.',
+    icon: Zap,
+    color: 'purple',
+  },
+  {
+    href: '/compare/zuplo',
+    title: 'SatGate vs Zuplo',
+    description: 'API gateway vs economic firewall. Zuplo exposes APIs — SatGate governs spend.',
+    icon: Shield,
+    color: 'cyan',
+  },
+];
+
+const colorClasses: Record<string, { border: string; bg: string; text: string }> = {
+  green: { border: 'hover:border-green-600/50', bg: 'bg-green-900/30', text: 'text-green-400' },
+  orange: { border: 'hover:border-orange-600/50', bg: 'bg-orange-900/30', text: 'text-orange-400' },
+  blue: { border: 'hover:border-blue-600/50', bg: 'bg-blue-900/30', text: 'text-blue-400' },
+  yellow: { border: 'hover:border-yellow-600/50', bg: 'bg-yellow-900/30', text: 'text-yellow-400' },
+  purple: { border: 'hover:border-purple-600/50', bg: 'bg-purple-900/30', text: 'text-purple-400' },
+  cyan: { border: 'hover:border-cyan-600/50', bg: 'bg-cyan-900/30', text: 'text-cyan-400' },
 };
 
 export default function ComparePage() {
+  const itemListJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'SatGate comparison pages',
+    description: metadata.description,
+    itemListElement: comparisons.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.title,
+      url: `https://satgate.io${item.href}`,
+      description: item.description,
+    })),
+  };
+
   return (
-    <div className="min-h-screen bg-black text-gray-100 font-sans">
-      <div className="max-w-4xl mx-auto px-6 py-16">
-        <Link href="/" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
+    <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
+
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <Link href="/" className="mb-8 flex items-center gap-2 text-gray-500 transition hover:text-white">
           <ArrowLeft size={18} /> Back to Home
         </Link>
-        
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold mb-4">Compare SatGate</h1>
-          <p className="text-xl text-gray-400">
-            See how the Economic Firewall stacks up against other solutions.
+
+        <div className="mb-12 max-w-4xl">
+          <div className="mb-6 inline-flex rounded-full border border-cyan-500/30 bg-cyan-950/25 px-4 py-2 text-sm text-cyan-200">
+            AI gateway comparisons
+          </div>
+          <h1 className="mb-5 text-5xl font-extrabold tracking-tight md:text-7xl">Compare SatGate</h1>
+          <p className="text-xl leading-relaxed text-gray-300 md:text-2xl">
+            Most AI gateways help route, observe, or expose model/API traffic. SatGate focuses on economic governance: hard budgets, MCP tool cost attribution, scoped agent authority, audit trails, and L402 payments before upstream access.
           </p>
         </div>
 
-        <div className="grid gap-6">
-
-          <Link
-            href="/compare/litellm"
-            className="block bg-gray-900 border border-gray-800 rounded-xl p-6 hover:border-green-600/50 transition group"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-green-900/30 rounded-lg">
-                    <Route className="text-green-400" size={20} />
+        <div className="grid gap-5 md:grid-cols-2">
+          {comparisons.map(({ href, title, description, icon: Icon, color }) => {
+            const classes = colorClasses[color];
+            return (
+              <Link key={href} href={href} className={`group block rounded-xl border border-gray-800 bg-gray-900 p-6 transition ${classes.border}`}>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="mb-3 flex items-center gap-3">
+                      <div className={`rounded-lg p-2 ${classes.bg}`}>
+                        <Icon className={classes.text} size={20} />
+                      </div>
+                      <h2 className="text-xl font-bold text-white">{title}</h2>
+                    </div>
+                    <p className="leading-relaxed text-gray-400">{description}</p>
                   </div>
-                  <h2 className="text-xl font-bold">SatGate vs LiteLLM</h2>
+                  <ArrowRight className={`mt-2 shrink-0 text-gray-600 transition group-hover:${classes.text}`} size={24} />
                 </div>
-                <p className="text-gray-400">
-                  LLM gateway vs economic firewall. LiteLLM routes model access; SatGate governs agent/API spend, MCP tools, and payments.
-                </p>
-              </div>
-              <ArrowRight className="text-gray-600 group-hover:text-green-400 transition" size={24} />
-            </div>
-          </Link>
-
-          {/* Bifrost */}
-          <Link 
-            href="/compare/bifrost"
-            className="block bg-gray-900 border border-gray-800 rounded-xl p-6 hover:border-purple-600/50 transition group"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-purple-900/30 rounded-lg">
-                    <Zap className="text-purple-400" size={20} />
-                  </div>
-                  <h2 className="text-xl font-bold">SatGate vs Bifrost</h2>
-                </div>
-                <p className="text-gray-400">
-                  LLM routing vs economic governance. Both have MCP — only one enforces per-tool budgets on agent tool calls.
-                </p>
-              </div>
-              <ArrowRight className="text-gray-600 group-hover:text-purple-400 transition" size={24} />
-            </div>
-          </Link>
-
-          {/* Zuplo */}
-          <Link 
-            href="/compare/zuplo"
-            className="block bg-gray-900 border border-gray-800 rounded-xl p-6 hover:border-cyan-600/50 transition group"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-cyan-900/30 rounded-lg">
-                    <Shield className="text-cyan-400" size={20} />
-                  </div>
-                  <h2 className="text-xl font-bold">SatGate vs Zuplo</h2>
-                </div>
-                <p className="text-gray-400">
-                  API gateway vs economic firewall. Zuplo exposes APIs — SatGate governs spend.
-                </p>
-              </div>
-              <ArrowRight className="text-gray-600 group-hover:text-cyan-400 transition" size={24} />
-            </div>
-          </Link>
-
-          {/* Coming Soon */}
-          <div className="bg-gray-900/50 border border-gray-800/50 rounded-xl p-6 opacity-60">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-gray-800 rounded-lg">
-                    <Server className="text-gray-500" size={20} />
-                  </div>
-                  <h2 className="text-xl font-bold text-gray-500">More comparisons coming</h2>
-                </div>
-                <p className="text-gray-600">
-                  Portkey, Helicone, Cloudflare AI Gateway, Kong, AWS API Gateway, Aperture, and more.
-                </p>
-              </div>
-            </div>
-          </div>
+              </Link>
+            );
+          })}
         </div>
 
-        {/* Summary */}
-        <section className="mt-12 bg-gradient-to-r from-cyan-900/20 to-purple-900/20 border border-cyan-800/30 rounded-xl p-6">
-          <h2 className="text-lg font-bold text-white mb-3">The Short Version</h2>
-          <p className="text-gray-400 leading-relaxed">
-            Most AI gateways focus on <strong className="text-white">routing/model access</strong> (LiteLLM, Bifrost) or{' '}
-            <strong className="text-white">API management</strong> (Zuplo, Kong). SatGate focuses on{' '}
-            <strong className="text-cyan-400">economic governance</strong> — hard budget enforcement, 
-            per-tool cost attribution via MCP proxy, delegation hierarchies for sub-agents, and API monetization. 
-            Different problem, different solution.
+        <section className="mt-12 rounded-2xl border border-cyan-800/30 bg-gradient-to-r from-cyan-950/20 to-purple-950/20 p-8">
+          <h2 className="mb-4 text-2xl font-bold text-white">The short version</h2>
+          <p className="max-w-4xl leading-relaxed text-gray-300">
+            LiteLLM, Portkey, Helicone, Cloudflare AI Gateway, Bifrost, and Zuplo are useful infrastructure. The difference is category: SatGate is the economic firewall — the request-path layer that decides what autonomous agents can spend, access, delegate, revoke, audit, or pay for before the next call executes.
           </p>
         </section>
-
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
