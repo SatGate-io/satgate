@@ -64,7 +64,7 @@ export default function CompareZuploPage() {
                   <td className="py-4 text-center"><X className="inline text-red-400" size={18} /></td>
                 </tr>
                 <tr className="border-b border-gray-800">
-                  <td className="py-4 font-medium text-gray-300">Fiat billing (Fiat402)</td>
+                  <td className="py-4 font-medium text-gray-300">Fiat-denominated budget control</td>
                   <td className="py-4 text-center"><Check className="inline text-green-400" size={18} /></td>
                   <td className="py-4 text-center"><X className="inline text-red-400" size={18} /></td>
                 </tr>
@@ -125,7 +125,7 @@ export default function CompareZuploPage() {
                   <p className="text-cyan-400 font-medium text-sm mb-2">SatGate</p>
                   <p className="text-gray-400 text-sm">
                     <strong className="text-white">Purpose-built for agent economics.</strong> Hard budget caps, 
-                    per-tool cost profiles, spend governance, API monetization with L402/Fiat402.
+                    per-tool cost profiles, spend governance, fiat-denominated budget governance, and API monetization with L402.
                   </p>
                 </div>
                 <div className="bg-gray-800/50 rounded-lg p-4">

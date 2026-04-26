@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Zap, Shield, Server } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Route, Server, Shield, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'Compare SatGate - vs Bifrost, Zuplo, and more',
-  description: 'See how SatGate compares to other AI gateways. Economic controls vs routing vs API management.',
+  title: 'Compare SatGate - AI Gateway and Economic Firewall Comparisons',
+  description: 'Compare SatGate with LiteLLM, Bifrost, Zuplo, cloud-native API gateways, and other AI infrastructure. Routing is not economic governance.',
   alternates: { canonical: 'https://satgate.io/compare' },
 };
 
@@ -23,6 +23,27 @@ export default function ComparePage() {
         </div>
 
         <div className="grid gap-6">
+
+          <Link
+            href="/compare/litellm"
+            className="block bg-gray-900 border border-gray-800 rounded-xl p-6 hover:border-green-600/50 transition group"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-green-900/30 rounded-lg">
+                    <Route className="text-green-400" size={20} />
+                  </div>
+                  <h2 className="text-xl font-bold">SatGate vs LiteLLM</h2>
+                </div>
+                <p className="text-gray-400">
+                  LLM gateway vs economic firewall. LiteLLM routes model access; SatGate governs agent/API spend, MCP tools, and payments.
+                </p>
+              </div>
+              <ArrowRight className="text-gray-600 group-hover:text-green-400 transition" size={24} />
+            </div>
+          </Link>
+
           {/* Bifrost */}
           <Link 
             href="/compare/bifrost"
@@ -76,7 +97,7 @@ export default function ComparePage() {
                   <h2 className="text-xl font-bold text-gray-500">More comparisons coming</h2>
                 </div>
                 <p className="text-gray-600">
-                  Kong, AWS API Gateway, Aperture, LiteLLM, and more.
+                  Portkey, Helicone, Cloudflare AI Gateway, Kong, AWS API Gateway, Aperture, and more.
                 </p>
               </div>
             </div>
@@ -87,7 +108,7 @@ export default function ComparePage() {
         <section className="mt-12 bg-gradient-to-r from-cyan-900/20 to-purple-900/20 border border-cyan-800/30 rounded-xl p-6">
           <h2 className="text-lg font-bold text-white mb-3">The Short Version</h2>
           <p className="text-gray-400 leading-relaxed">
-            Most AI gateways focus on <strong className="text-white">routing</strong> (Bifrost) or{' '}
+            Most AI gateways focus on <strong className="text-white">routing/model access</strong> (LiteLLM, Bifrost) or{' '}
             <strong className="text-white">API management</strong> (Zuplo, Kong). SatGate focuses on{' '}
             <strong className="text-cyan-400">economic governance</strong> — hard budget enforcement, 
             per-tool cost attribution via MCP proxy, delegation hierarchies for sub-agents, and API monetization. 

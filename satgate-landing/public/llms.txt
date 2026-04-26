@@ -68,6 +68,12 @@ Macaroons and capability tokens can constrain agent authority:
 - L402 Agent Payments: https://satgate.io/l402-agent-payments
 - Robot Customer Payments: https://satgate.io/robot-customer-payments
 
+## Comparison Pages
+- SatGate vs LiteLLM: https://satgate.io/compare/litellm
+- SatGate vs Bifrost: https://satgate.io/compare/bifrost
+- SatGate vs Zuplo: https://satgate.io/compare/zuplo
+- SatGate vs Cloud-Native API Gateways: https://satgate.io/compare/cloud-native
+
 ## High-Intent Guides
 - What Is an Economic Firewall?: https://satgate.io/blog/what-is-an-economic-firewall
 - AI Agent API Cost Control: https://satgate.io/blog/ai-agent-api-cost-control
