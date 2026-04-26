@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock, DollarSign, Bot, GitBranch, Activity, RefreshCw, Menu, X, Eye, SlidersHorizontal, Play, BookOpen } from 'lucide-react';
+import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock, DollarSign, Bot, GitBranch, Activity, RefreshCw, Menu, X, Eye, SlidersHorizontal, Play, BookOpen, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -237,22 +237,19 @@ const LandingPage = () => {
             <p className="mb-3 text-sm font-mono uppercase tracking-wide text-cyan-300">Free agent cost tools</p>
             <h2 className="mb-4 text-3xl md:text-4xl font-bold text-white">Measure the economic risk before agents run wild</h2>
             <p className="text-gray-400 text-lg leading-relaxed">
-              Calculators and policy generators for AI agent spend control, MCP governance, OpenAI budget limits, and economic firewall readiness.
+              Start with the flagship tools and benchmark. The full tools hub has the calculators, policy generators, and readiness checks for deeper planning.
             </p>
           </div>
           <div className="mb-6">
             <Link href="/tools" className="inline-flex items-center gap-2 text-cyan-300 hover:text-cyan-200 font-semibold transition">
-              View all AI agent cost control tools <ArrowRight size={16} />
+              View all free AI agent cost tools <ArrowRight size={16} />
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
-              { href: '/roi-calculator', title: 'AI Agent ROI Calculator', body: 'Estimate ghost spend, loop waste, payback period, and budget-enforcement ROI.', icon: DollarSign },
               { href: '/runaway-agent-cost-calculator', title: 'Runaway Agent Cost Calculator', body: 'Model loop, retry, fanout, and paid tool-call exposure before detection.', icon: Activity },
-              { href: '/openai-budget-policy-generator', title: 'OpenAI Budget Policy Generator', body: 'Generate per-agent OpenAI API budgets, model routing, revocation, and audit policy.', icon: SlidersHorizontal },
-              { href: '/mcp-tool-cost-policy-generator', title: 'MCP Tool Cost Policy Generator', body: 'Create per-tool prices, session caps, risk actions, and MCP audit rules.', icon: Terminal },
+              { href: '/ai-agent-runaway-spend-benchmark', title: 'AI Agent Runaway Spend Benchmark', body: 'Use original JSON/CSV benchmark data to quantify agent loops, retry storms, and avoidable spend.', icon: BarChart3 },
               { href: '/economic-firewall-readiness-grader', title: 'Economic Firewall Readiness Grader', body: 'Score your posture across identity, budgets, MCP tools, revocation, audit, routing, and Charge.', icon: Shield },
-              { href: '/economic-firewall', title: 'What is an Economic Firewall?', body: 'Learn the request-path category for agent access, spend, audit, routing, and payments.', icon: BookOpen },
             ].map(({ href, title, body, icon: Icon }) => (
               <Link key={href} href={href} className="group rounded-xl border border-gray-800 bg-gray-950 p-6 transition hover:border-cyan-500/50 hover:bg-cyan-950/10">
                 <Icon className="mb-4 text-cyan-300 transition group-hover:text-cyan-200" size={28} />
