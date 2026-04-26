@@ -75,6 +75,12 @@ const tools = [
     description: 'Estimate per-request robot-customer pricing, gross margin, paid demand, and Lightning sats per API request.',
     icon: Zap,
   },
+  {
+    href: '/agent-spend-policy-template',
+    title: 'Agent Spend Policy Template',
+    description: 'Generate copyable YAML and JSON policy for budgets, MCP tool costs, delegation, revocation, and audit fields.',
+    icon: ClipboardList,
+  },
 ];
 
 export default function ToolsPage() {

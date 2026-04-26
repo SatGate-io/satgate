@@ -229,7 +229,7 @@ export default function AiAgentCostControlPage() {
             {[
               ['AI API budget enforcement', 'Enforce per-agent and per-workflow spend caps before OpenAI, Claude, MCP, or paid API requests leave your environment.', '/ai-api-budget-enforcement'],
               ['Agent spending limits', 'Set hard caps by task, route, model, tool, tenant, session, and delegated sub-agent.', '/agent-spending-limits'],
-              ['Runaway agent spend benchmark', 'Use original benchmark scenarios to show how loops, retries, fanout, and detection delay create avoidable cost.', '/ai-agent-runaway-spend-benchmark'],
+              ['Agent spend policy template', 'Generate copyable YAML/JSON policy for budgets, tools, delegation, revocation, and audit fields.', '/agent-spend-policy-template'],
               ['MCP tool spend control', 'Attach cost to tool calls and stop runaway Cursor, Claude Desktop, Claude Code, or OpenClaw workflows.', '/mcp-cost-control'],
               ['Revocable agent credentials', 'Replace broad static keys with scoped, expiring credentials and kill switches for autonomous workers.', '/revocable-agent-credentials'],
               ['Robot customer payments', 'Let external agents pay for protected APIs through a governed request path.', '/robot-customer-payments'],
