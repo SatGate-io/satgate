@@ -24,6 +24,11 @@ export const metadata = {
     url: 'https://satgate.io/compare',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Compare SatGate - AI Gateway and Economic Firewall Comparisons',
+    description: 'Compare AI gateways, observability tools, and API management platforms against SatGate’s economic firewall category.',
+  },
 };
 
 const comparisons = [

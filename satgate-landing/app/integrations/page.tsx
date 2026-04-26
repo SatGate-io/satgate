@@ -20,6 +20,11 @@ export const metadata = {
     url: 'https://satgate.io/integrations',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SatGate Integrations for AI Agent Tools',
+    description: 'Economic governance guides for Cursor, Claude Code, Claude Desktop, OpenClaw, and MCP agent workflows.',
+  },
 };
 
 const integrations = [
