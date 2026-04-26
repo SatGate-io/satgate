@@ -12,6 +12,8 @@ const baseUrl = 'https://satgate.io';
 const staticRoutes: SitemapEntry[] = [
   { path: '', lastModified: '2026-04-24', changeFrequency: 'weekly', priority: 1.0 },
   { path: '/govern', lastModified: '2026-04-24', changeFrequency: 'weekly', priority: 0.9 },
+  { path: '/economic-firewall', lastModified: '2026-04-25', changeFrequency: 'weekly', priority: 0.9 },
+  { path: '/ai-agent-cost-control', lastModified: '2026-04-25', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/pricing', lastModified: '2026-04-12', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/security', lastModified: '2026-04-12', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog', lastModified: '2026-04-24', changeFrequency: 'weekly', priority: 0.8 },
