@@ -61,76 +61,76 @@ export const metadata: Metadata = {
 const proofPoints = [
   {
     icon: KeyRound,
-    title: "No standing authority",
-    body: "The local agent starts with no reusable keys and no pre-granted provider access.",
+    title: "No permanent keys",
+    body: "Agents get temporary authority for the job, not reusable secrets that linger after the work is done.",
   },
   {
     icon: ShieldCheck,
-    title: "Scoped capability",
-    body: "SatGate issues short-lived authority with route scope, spend budget, expiry, and delegation depth.",
+    title: "Business limits built in",
+    body: "Each agent works inside the scope, budget, customer boundary, and expiration you set.",
   },
   {
     icon: GitBranch,
-    title: "Delegation controlled",
-    body: "The parent can delegate only narrower authority. The scoped worker cannot pass broader power onward.",
+    title: "Delegation you can prove",
+    body: "When an agent hands work to another agent, SatGate shows who delegated what — and where the limits held.",
   },
   {
     icon: CircleDollarSign,
-    title: "Metered and revocable",
-    body: "Every action goes through the gateway, appears in usage/audit, hits spend limits, and can be killed immediately.",
+    title: "Spend visible and stoppable",
+    body: "Every action is measured before cost gets out of hand, with revocation ready when risk changes.",
   },
 ];
 
-const statusCodes = [
-  ["200", "Gateway-approved action", "Allowed only through SatGate"],
-  ["402", "Budget cap enforced", "Spend limit stops the agent"],
-  ["401", "Kill switch enforced", "Revocation cuts access immediately"],
-  ["403", "Customer isolation denied", "Tenant boundary holds"],
-  ["400", "Further delegation denied", "Delegation depth is exhausted"],
+const enforcementOutcomes = [
+  ["Approved work", "The agent completes authorized tasks through SatGate, with policy and tenant context attached."],
+  ["Budget protected", "Spend caps stop runaway loops before the next expensive call leaves the request path."],
+  ["Access revoked", "A kill switch cuts off a risky agent or delegated worker immediately."],
+  ["Tenant isolated", "Customer boundaries stay intact even when agents call shared tools or APIs."],
+  ["Delegation contained", "A worker can only receive the narrower authority the parent was allowed to hand off."],
 ];
 
 const controlPlaneCapabilities = [
   [
-    "Identity and check-in",
-    "The runtime starts with no reusable provider key. It checks in to receive a bounded capability for a specific route, tenant, workflow, and time window.",
+    "Start with zero standing access",
+    "Agents do not wake up holding broad, reusable keys. They earn temporary authority for the job in front of them.",
   ],
   [
-    "Capability-scoped authority",
-    "Authority is encoded as policy: allowed routes, spend budget, expiry, delegation depth, tenant boundary, and revocation state.",
+    "Give every agent a bounded mandate",
+    "Each capability carries the business limits that matter: scope, budget, tenant, expiry, delegation, and revocation.",
   ],
   [
-    "Delegation lineage",
-    "Parent agents can hand narrower authority to workers, but cannot create broader power or unlimited redelegation chains.",
+    "Control delegated work",
+    "When an agent spins up a worker, SatGate keeps the worker narrower than the parent and proves the handoff later.",
   ],
   [
-    "Request-path enforcement",
-    "Every model, API, MCP tool, or paid action crosses SatGate before upstream access, so policy is enforced before money or data leaves.",
+    "Stop spend before it happens",
+    "Budget checks run before model, API, SaaS, or MCP tool calls turn into real cost.",
   ],
   [
-    "Metering and audit",
-    "The control plane records who acted, which capability authorized it, what it cost, and why a request was allowed, charged, or denied.",
+    "Show proof buyers can trust",
+    "Security and finance get a clear record of who acted, what was allowed, what was denied, and what it cost.",
   ],
   [
-    "Kill switch and revocation",
-    "Operators can revoke an agent, parent capability, delegated worker, route, tenant, or budget immediately without rotating every upstream secret.",
+    "Revoke without drama",
+    "Shut down an agent, worker, route, tenant, or budget without rotating every upstream provider secret.",
   ],
 ];
 
 const comparisons = [
-  ["API gateway", "Routes and protects API traffic", "Usually controls services, not autonomous agent authority, delegated capability, lineage, and per-agent economic limits."],
-  ["MCP gateway", "Connects agents to tools", "Connection is not governance unless tool calls are metered, scoped, budgeted, revocable, and audited in the request path."],
-  ["Agent observability", "Shows traces after execution", "Post-hoc visibility does not stop runaway spend, overbroad delegation, or revoked authority before the next call."],
-  ["Agent control plane", "Controls runtime authority", "Defines what each agent can access, spend, delegate, prove, and lose before each upstream action is allowed."],
+  ["Connection", "Agents can reach models, APIs, and MCP tools."],
+  ["Control", "SatGate decides what authority, budget, and delegation each agent receives."],
+  ["Proof", "Every allowed, denied, charged, or revoked action leaves a buyer-ready audit trail."],
+  ["Revenue", "The same request path can charge robot customers when agent traffic becomes monetizable."],
 ];
 
 const faqs = [
   [
     "What is an agent control plane?",
-    "An agent control plane is the governance layer that decides what an AI agent is allowed to access, spend, delegate, and continue doing at runtime. For SatGate, that control happens in the request path using scoped capabilities, budget policy, audit, metering, and revocation.",
+    "An agent control plane gives teams a live way to govern AI agents: what they can access, how much they can spend, what they can delegate, and when their authority should end. SatGate puts that control in the path of each agent action.",
   ],
   [
     "How is an agent control plane different from an API gateway?",
-    "An API gateway usually manages routes, authentication, rate limits, and service protection. An agent control plane governs autonomous authority: no standing keys, delegated capability, budget enforcement, lineage proof, tenant isolation, and kill-switch revocation for agents and sub-agents.",
+    "An API gateway protects services. An agent control plane governs the agents using those services: their budget, customer boundary, delegation rights, audit trail, and ability to be revoked instantly.",
   ],
   [
     "Why do local AI agents need no standing authority?",
@@ -138,7 +138,7 @@ const faqs = [
   ],
   [
     "How does SatGate control agent delegation?",
-    "SatGate attaches delegation depth, route scope, spend budget, expiry, and tenant caveats to agent capabilities. A parent can delegate narrower authority to a worker, but the worker cannot exceed the parent, inflate budget, cross tenants, or keep delegating after depth is exhausted.",
+    "SatGate lets a parent agent hand off only the authority it is allowed to share. The worker gets narrower limits, the handoff is visible, and attempts to exceed policy are blocked before they become spend or risk.",
   ],
 ];
 
@@ -252,16 +252,16 @@ export default function AgentControlPlanePage() {
           <div>
             <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-200">
               <Bot size={16} />
-              Agent Control Plane demo
+              Governed AI agents
             </div>
             <h1 className="max-w-4xl text-5xl font-black leading-[0.95] tracking-[-0.055em] text-white sm:text-6xl lg:text-7xl">
               SatGate Agent Control Plane
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-slate-300">
-              A local AI agent has no standing authority. It checks in, receives scoped capability, delegates only within policy, gets metered, appears in audit, and can be shut down instantly.
+              Govern local AI agents before they touch expensive models, sensitive APIs, paid tools, or customer data. SatGate gives every agent bounded authority, visible spend, controlled delegation, and instant revocation.
             </p>
             <p className="mt-5 max-w-2xl text-lg font-semibold text-cyan-200">
-              Control the agent. Control delegation. Prove the lineage. Meter spend. Shut it down instantly.
+              Let agents work — without giving them blank checks, permanent keys, or invisible authority.
             </p>
             <div className="mt-9 flex flex-col gap-4 sm:flex-row">
               <a
@@ -319,16 +319,16 @@ export default function AgentControlPlanePage() {
           <div>
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-sm font-semibold text-cyan-200">
               <ShieldCheck size={15} />
-              AI agent control plane
+              Built for enterprise autonomy
             </div>
             <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
-              What is an agent control plane?
+              Run autonomous agents with authority you can explain.
             </h2>
             <p className="mt-5 text-lg leading-8 text-slate-300">
-              An agent control plane is the runtime governance layer for autonomous AI agents. It decides what each agent can access, spend, delegate, prove, and continue doing before the next model, API, SaaS, or MCP tool call leaves the request path.
+              AI agents are starting to call APIs, use paid tools, delegate work, and act across customer environments. A production team needs more than connection and logs — it needs a way to decide what each agent is allowed to do before the action happens.
             </p>
             <p className="mt-4 text-lg leading-8 text-slate-300">
-              SatGate makes that control economic: authority carries scope, budget, expiry, delegation depth, tenant boundary, audit context, and revocation state. That is why the agent starts with no standing API key.
+              SatGate turns agent authority into a governed business object: scoped, budgeted, delegated, metered, audited, and revocable. The agent can move fast, but it never gets unlimited power.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -347,13 +347,13 @@ export default function AgentControlPlanePage() {
           <div className="mb-9 max-w-3xl">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-purple-400/30 bg-purple-400/10 px-3 py-1 text-sm font-semibold text-purple-200">
               <Bot size={15} />
-              Not another gateway page
+              Why this is different
             </div>
             <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
-              Agent control plane vs API gateway vs MCP gateway
+              From connected agents to governed agents.
             </h2>
             <p className="mt-5 text-lg leading-8 text-slate-300">
-              Gateways connect and route. Observability records what happened. A control plane governs live authority, spend, delegation, and revocation while the agent is acting.
+              Most agent stacks focus on getting tools connected. SatGate focuses on whether the agent should be allowed to act, spend, delegate, or continue — and proving that decision afterward.
             </p>
           </div>
           <div className="grid gap-4 lg:grid-cols-4">
@@ -373,29 +373,29 @@ export default function AgentControlPlanePage() {
           <div>
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-purple-400/30 bg-purple-400/10 px-3 py-1 text-sm font-semibold text-purple-200">
               <LockKeyhole size={15} />
-              Govern what power can be handed onward
+              Delegation without runaway authority
             </div>
             <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
-              The proof is delegation lineage, not another chat demo.
+              See exactly how agent authority moves.
             </h2>
             <p className="mt-5 text-lg leading-8 text-slate-300">
-              The governed parent agent receives a bounded capability. The scoped worker gets less scope, less budget, and zero remaining delegation depth. When it tries to delegate again, policy stops it and the audit trail records the denial.
+              When one agent delegates work to another, SatGate keeps the child narrower than the parent. Security teams can see the chain of authority, the budget attached to it, and where policy stopped the handoff.
             </p>
           </div>
           <div className="rounded-3xl border border-white/10 bg-[#061120] p-6">
             <div className="mb-5 flex items-center gap-3 text-cyan-200">
               <GitBranch size={20} />
-              <span className="text-sm font-bold uppercase tracking-[0.22em]">Lineage shape</span>
+              <span className="text-sm font-bold uppercase tracking-[0.22em]">Authority chain</span>
             </div>
             <div className="space-y-4 font-mono text-sm">
               <div className="rounded-2xl border border-cyan-400/35 bg-cyan-400/10 p-4">
-                local-agent-parent <span className="text-slate-400">scope + budget + depth=1</span>
+                Parent agent <span className="text-slate-400">approved scope and budget</span>
               </div>
               <div className="ml-8 rounded-2xl border border-purple-400/40 bg-purple-400/10 p-4">
-                ↳ scoped-worker <span className="text-slate-400">narrower scope + depth=0</span>
+                ↳ Worker agent <span className="text-slate-400">narrower authority</span>
               </div>
               <div className="ml-16 rounded-2xl border border-red-400/40 bg-red-400/10 p-4 text-red-200">
-                ↳ further delegation denied
+                ↳ Further handoff blocked by policy
               </div>
             </div>
           </div>
@@ -408,20 +408,20 @@ export default function AgentControlPlanePage() {
             <div>
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-sm font-semibold text-cyan-200">
                 <Siren size={15} />
-                Runtime enforcement
+                Clear policy outcomes
               </div>
               <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
-                200 / 402 / 401 / 403 / 400
+                Buyers see control, not console noise.
               </h2>
             </div>
             <p className="max-w-2xl text-slate-300">
-              Buyers see policy outcomes, not raw verifier logs: allowed calls, hard budget stops, kill switch enforcement, customer isolation, and denied delegation.
+              The dashboard should tell a CISO or CFO what happened in plain English: approved work, protected budget, revoked access, tenant isolation, and contained delegation.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-5">
-            {statusCodes.map(([code, title, body]) => (
-              <div key={code} className="rounded-3xl border border-white/10 bg-white/[0.035] p-5">
-                <div className="text-4xl font-black text-cyan-200">{code}</div>
+            {enforcementOutcomes.map(([title, body]) => (
+              <div key={title} className="rounded-3xl border border-white/10 bg-white/[0.035] p-5">
+                <div className="text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">Outcome</div>
                 <h3 className="mt-4 text-base font-bold text-white">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-400">{body}</p>
               </div>
@@ -440,11 +440,11 @@ export default function AgentControlPlanePage() {
           <div className="flex flex-col justify-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-sm font-semibold text-cyan-200 w-fit">
               <TimerReset size={15} />
-              Meeting walkthrough
+              Buyer walkthrough
             </div>
-            <h2 className="text-4xl font-black tracking-[-0.04em] text-white">Use the 73-second version live.</h2>
+            <h2 className="text-4xl font-black tracking-[-0.04em] text-white">Show the control loop in 73 seconds.</h2>
             <p className="mt-5 text-lg leading-8 text-slate-300">
-              The short video opens the door. The walkthrough shows the full operator view: lineage proof, local runtime check-in, enforcement timeline, audit, spend, and revocation.
+              The walkthrough shows the buyer story end to end: an agent receives bounded authority, delegates safely, hits real policy checks, leaves an audit trail, and can be shut down immediately.
             </p>
             {/* Use a plain img here; Next's dev image optimizer rejects this local PNG in some environments. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -462,7 +462,7 @@ export default function AgentControlPlanePage() {
           <div>
             <h2 className="text-4xl font-black tracking-[-0.04em] text-white">Agent control-plane FAQ</h2>
             <p className="mt-5 text-lg leading-8 text-slate-300">
-              Short answers for buyers comparing SatGate against API gateways, MCP gateways, agent frameworks, and observability tools.
+              SatGate is for teams that want autonomous agents in production without handing them permanent keys, unmanaged delegation, or uncontrolled spend.
             </p>
           </div>
           <div className="space-y-4">
