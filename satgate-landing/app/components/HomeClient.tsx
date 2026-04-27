@@ -30,6 +30,7 @@ const LandingPage = () => {
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
             <Link href="/protect" className="hover:text-white transition">Live Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
+            <Link href="/agent-control-plane" className="hover:text-white transition">Control Plane</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
             <Link href="/tools" className="hover:text-white transition">Tools</Link>
             <Link href="/integrations" className="hover:text-white transition">Integrations</Link>
@@ -70,6 +71,13 @@ const LandingPage = () => {
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Enterprise
+            </Link>
+            <Link
+              href="/agent-control-plane"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              Agent Control Plane
             </Link>
             <Link
               href="/pricing"
@@ -157,6 +165,9 @@ const LandingPage = () => {
               </a>
               <Link href="/sandbox" className="border border-purple-700/50 bg-purple-900/20 px-8 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition flex items-center gap-2 text-purple-300">
                 <Play size={16} /> See a Demo
+              </Link>
+              <Link href="/agent-control-plane" className="border border-cyan-700/50 bg-cyan-900/15 px-8 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition flex items-center gap-2 text-cyan-300">
+                Agent Control Plane <ArrowRight size={16} />
               </Link>
             </div>
 

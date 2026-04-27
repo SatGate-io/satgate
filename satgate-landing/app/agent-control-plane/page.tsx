@@ -265,7 +265,7 @@ export default function AgentControlPlanePage() {
             </p>
             <div className="mt-9 flex flex-col gap-4 sm:flex-row">
               <a
-                href="https://cloud.satgate.io/cloud/login"
+                href="mailto:contact@satgate.io?subject=SatGate%20Agent%20Control%20Plane%20demo"
                 className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-cyan-500 px-6 py-4 text-base font-bold text-white shadow-2xl shadow-cyan-500/20 transition hover:scale-[1.01]"
               >
                 Book a demo <ArrowRight size={18} />
@@ -500,7 +500,7 @@ export default function AgentControlPlanePage() {
             No standing API keys. No unmanaged delegation. No invisible spend.
           </p>
           <a
-            href="https://cloud.satgate.io/cloud/login"
+            href="mailto:contact@satgate.io?subject=SatGate%20Agent%20Control%20Plane%20demo"
             className="mt-8 inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 text-base font-black text-slate-950 transition hover:bg-cyan-100"
           >
             Book a demo <ArrowRight size={18} />
