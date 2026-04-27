@@ -70,9 +70,6 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  alternates: {
-    canonical: "https://satgate.io",
-  },
   icons: {
     icon: "/logo.png",
     apple: "/logo.png",
