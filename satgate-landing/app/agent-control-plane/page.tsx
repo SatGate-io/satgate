@@ -289,9 +289,9 @@ export default function AgentControlPlanePage() {
               <source src="/acp-demo/satgate-acp-first-touch.mp4" type="video/mp4" />
             </video>
             <div className="flex items-center justify-between gap-4 px-3 py-4 text-sm text-slate-300">
-              <span>40s first-touch teaser</span>
+              <span>Agent Control Plane overview</span>
               <a href="/acp-demo/satgate-acp-walkthrough.mp4" className="text-cyan-200 hover:text-cyan-100">
-                Watch 73s walkthrough →
+                Watch the full walkthrough →
               </a>
             </div>
           </div>
@@ -442,7 +442,7 @@ export default function AgentControlPlanePage() {
               <TimerReset size={15} />
               Product walkthrough
             </div>
-            <h2 className="text-4xl font-black tracking-[-0.04em] text-white">Show the control loop in 73 seconds.</h2>
+            <h2 className="text-4xl font-black tracking-[-0.04em] text-white">See the control loop end to end.</h2>
             <p className="mt-5 text-lg leading-8 text-slate-300">
               The walkthrough shows the control loop end to end: an agent receives bounded authority, delegates safely, hits real policy checks, leaves an audit trail, and can be shut down immediately.
             </p>
