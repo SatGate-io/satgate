@@ -271,7 +271,7 @@ export default function AgentControlPlanePage() {
                 Book a demo <ArrowRight size={18} />
               </a>
               <a
-                href="/acp-demo/satgate-acp-ciso-proof-card.pdf"
+                href="/acp-demo/satgate-acp-security-proof-card.pdf"
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-6 py-4 text-base font-bold text-slate-100 transition hover:bg-white/10"
               >
                 Download proof card <FileText size={18} />
@@ -462,21 +462,21 @@ export default function AgentControlPlanePage() {
               Use the proof card to explain the Agent Control Plane in a security review: no permanent keys, bounded authority, controlled delegation, visible spend, and instant revocation.
             </p>
             <a
-              href="/acp-demo/satgate-acp-ciso-proof-card.pdf"
+              href="/acp-demo/satgate-acp-security-proof-card.pdf"
               className="mt-8 inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 text-base font-black text-slate-950 transition hover:bg-cyan-100"
             >
               Download proof card <ArrowRight size={18} />
             </a>
           </div>
           <a
-            href="/acp-demo/satgate-acp-ciso-proof-card.pdf"
+            href="/acp-demo/satgate-acp-security-proof-card.pdf"
             className="block rounded-[2rem] border border-white/10 bg-white p-2 shadow-2xl shadow-black/40 transition hover:border-cyan-300/50"
             aria-label="Download SatGate Agent Control Plane proof card"
           >
             {/* Use a plain img here; Next's dev image optimizer rejects this local PNG in some environments. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/acp-demo/satgate-acp-ciso-proof-card.png"
+              src="/acp-demo/satgate-acp-security-proof-card.png"
               alt="SatGate Agent Control Plane proof card preview"
               className="aspect-video w-full rounded-[1.4rem] object-contain"
             />
