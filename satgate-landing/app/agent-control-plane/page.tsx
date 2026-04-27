@@ -18,14 +18,26 @@ import {
 export const metadata: Metadata = {
   title: "SatGate Agent Control Plane | Govern Local AI Agents",
   description:
-    "See how SatGate gives local AI agents scoped capability, delegation controls, metered spend, audit proof, and instant revocation without standing API keys.",
+    "SatGate is an agent control plane for local AI agents: scoped capabilities, delegation lineage, request-path budget enforcement, audit trails, and instant revocation without standing API keys.",
+  keywords: [
+    "agent control plane",
+    "AI agent control plane",
+    "local AI agent governance",
+    "AI agent delegation control",
+    "agent capability management",
+    "revocable agent credentials",
+    "agent kill switch",
+    "agent audit trail",
+    "AI agent spend governance",
+    "economic control plane for AI agents",
+  ],
   alternates: {
     canonical: "https://satgate.io/agent-control-plane",
   },
   openGraph: {
     title: "SatGate Agent Control Plane | Govern Local AI Agents",
     description:
-      "A local AI agent has no standing authority. It checks in, receives scoped capability, delegates only within policy, gets metered, appears in audit, and can be shut down instantly.",
+      "Govern local AI agents with scoped capabilities, delegation lineage, request-path budget enforcement, audit trails, and instant revocation — no standing API keys.",
     url: "https://satgate.io/agent-control-plane",
     type: "website",
     images: [
@@ -77,9 +89,136 @@ const statusCodes = [
   ["400", "Further delegation denied", "Delegation depth is exhausted"],
 ];
 
+const controlPlaneCapabilities = [
+  [
+    "Identity and check-in",
+    "The runtime starts with no reusable provider key. It checks in to receive a bounded capability for a specific route, tenant, workflow, and time window.",
+  ],
+  [
+    "Capability-scoped authority",
+    "Authority is encoded as policy: allowed routes, spend budget, expiry, delegation depth, tenant boundary, and revocation state.",
+  ],
+  [
+    "Delegation lineage",
+    "Parent agents can hand narrower authority to workers, but cannot create broader power or unlimited redelegation chains.",
+  ],
+  [
+    "Request-path enforcement",
+    "Every model, API, MCP tool, or paid action crosses SatGate before upstream access, so policy is enforced before money or data leaves.",
+  ],
+  [
+    "Metering and audit",
+    "The control plane records who acted, which capability authorized it, what it cost, and why a request was allowed, charged, or denied.",
+  ],
+  [
+    "Kill switch and revocation",
+    "Operators can revoke an agent, parent capability, delegated worker, route, tenant, or budget immediately without rotating every upstream secret.",
+  ],
+];
+
+const comparisons = [
+  ["API gateway", "Routes and protects API traffic", "Usually controls services, not autonomous agent authority, delegated capability, lineage, and per-agent economic limits."],
+  ["MCP gateway", "Connects agents to tools", "Connection is not governance unless tool calls are metered, scoped, budgeted, revocable, and audited in the request path."],
+  ["Agent observability", "Shows traces after execution", "Post-hoc visibility does not stop runaway spend, overbroad delegation, or revoked authority before the next call."],
+  ["Agent control plane", "Controls runtime authority", "Defines what each agent can access, spend, delegate, prove, and lose before each upstream action is allowed."],
+];
+
+const faqs = [
+  [
+    "What is an agent control plane?",
+    "An agent control plane is the governance layer that decides what an AI agent is allowed to access, spend, delegate, and continue doing at runtime. For SatGate, that control happens in the request path using scoped capabilities, budget policy, audit, metering, and revocation.",
+  ],
+  [
+    "How is an agent control plane different from an API gateway?",
+    "An API gateway usually manages routes, authentication, rate limits, and service protection. An agent control plane governs autonomous authority: no standing keys, delegated capability, budget enforcement, lineage proof, tenant isolation, and kill-switch revocation for agents and sub-agents.",
+  ],
+  [
+    "Why do local AI agents need no standing authority?",
+    "Standing API keys give an agent reusable power even after the task, budget, tenant, or policy context changes. SatGate keeps local agents untrusted by default; they check in, receive short-lived scoped authority, and lose that authority when policy, budget, expiry, or revocation says stop.",
+  ],
+  [
+    "How does SatGate control agent delegation?",
+    "SatGate attaches delegation depth, route scope, spend budget, expiry, and tenant caveats to agent capabilities. A parent can delegate narrower authority to a worker, but the worker cannot exceed the parent, inflate budget, cross tenants, or keep delegating after depth is exhausted.",
+  ],
+];
+
+const relatedTopics = [
+  ["/economic-firewall", "Economic firewall", "The request-path enforcement layer for agent access, spend, and Charge."],
+  ["/agent-api-governance", "Agent API governance", "Replace broad API keys with policy-bound, auditable agent authority."],
+  ["/agent-capability-tokens", "Agent capability tokens", "Encode route, budget, expiry, delegation, and revocation into agent access."],
+  ["/revocable-agent-credentials", "Revocable agent credentials", "Kill agent access without rotating every upstream provider secret."],
+  ["/mcp-governance", "MCP governance", "Apply budget, revocation, and audit controls to agent tool calls."],
+  ["/satgate-for-hermes-agent", "SatGate for Hermes Agent", "Govern local Hermes/Open WebUI agent workflows with SatGate in the request path."],
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      name: "SatGate Agent Control Plane",
+      url: "https://satgate.io/agent-control-plane",
+      description:
+        "An agent control plane for local AI agents: scoped capabilities, delegation lineage, request-path budget enforcement, audit trails, and revocation without standing API keys.",
+      isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
+      about: [
+        { "@type": "Thing", name: "AI agent control plane" },
+        { "@type": "Thing", name: "AI agent delegation control" },
+        { "@type": "Thing", name: "agent capability management" },
+        { "@type": "Thing", name: "request-path budget enforcement" },
+      ],
+    },
+    {
+      "@type": "DefinedTerm",
+      name: "Agent control plane",
+      termCode: "agent-control-plane",
+      url: "https://satgate.io/agent-control-plane",
+      description:
+        "A governance layer that controls what AI agents can access, spend, delegate, prove, and continue doing at runtime.",
+      inDefinedTermSet: "https://satgate.io/agent-control-plane",
+    },
+    {
+      "@type": "SoftwareApplication",
+      name: "SatGate Agent Control Plane",
+      applicationCategory: "SecurityApplication",
+      operatingSystem: "Any",
+      url: "https://satgate.io/agent-control-plane",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      featureList: [
+        "No standing API keys for local AI agents",
+        "Scoped agent capabilities",
+        "Delegation lineage proof",
+        "Request-path budget enforcement",
+        "MCP tool governance",
+        "Agent audit trails",
+        "Instant revocation and kill switch",
+      ],
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: faqs.map(([question, answer]) => ({
+        "@type": "Question",
+        name: question,
+        acceptedAnswer: { "@type": "Answer", text: answer },
+      })),
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://satgate.io" },
+        { "@type": "ListItem", position: 2, name: "Agent Control Plane", item: "https://satgate.io/agent-control-plane" },
+      ],
+    },
+  ],
+};
+
 export default function AgentControlPlanePage() {
   return (
     <main className="min-h-screen bg-[#030711] text-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <nav className="border-b border-white/10 bg-black/35 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
           <Link href="/" className="flex items-center gap-3">
@@ -176,6 +315,60 @@ export default function AgentControlPlanePage() {
       </section>
 
       <section className="border-y border-white/10 bg-white/[0.025] px-5 py-16 sm:px-8 lg:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.85fr_1.15fr]">
+          <div>
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-sm font-semibold text-cyan-200">
+              <ShieldCheck size={15} />
+              AI agent control plane
+            </div>
+            <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
+              What is an agent control plane?
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-slate-300">
+              An agent control plane is the runtime governance layer for autonomous AI agents. It decides what each agent can access, spend, delegate, prove, and continue doing before the next model, API, SaaS, or MCP tool call leaves the request path.
+            </p>
+            <p className="mt-4 text-lg leading-8 text-slate-300">
+              SatGate makes that control economic: authority carries scope, budget, expiry, delegation depth, tenant boundary, audit context, and revocation state. That is why the agent starts with no standing API key.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {controlPlaneCapabilities.map(([title, body]) => (
+              <div key={title} className="rounded-3xl border border-white/10 bg-[#07111f] p-5">
+                <h3 className="font-bold text-white">{title}</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-400">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-5 py-16 sm:px-8 lg:py-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-9 max-w-3xl">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-purple-400/30 bg-purple-400/10 px-3 py-1 text-sm font-semibold text-purple-200">
+              <Bot size={15} />
+              Not another gateway page
+            </div>
+            <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
+              Agent control plane vs API gateway vs MCP gateway
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-slate-300">
+              Gateways connect and route. Observability records what happened. A control plane governs live authority, spend, delegation, and revocation while the agent is acting.
+            </p>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-4">
+            {comparisons.map(([title, role, gap]) => (
+              <div key={title} className="rounded-3xl border border-white/10 bg-white/[0.035] p-5">
+                <h3 className="text-lg font-bold text-white">{title}</h3>
+                <p className="mt-3 text-sm font-semibold text-cyan-200">{role}</p>
+                <p className="mt-3 text-sm leading-6 text-slate-400">{gap}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-white/10 bg-white/[0.025] px-5 py-16 sm:px-8 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.92fr_1.08fr]">
           <div>
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-purple-400/30 bg-purple-400/10 px-3 py-1 text-sm font-semibold text-purple-200">
@@ -260,6 +453,39 @@ export default function AgentControlPlanePage() {
               alt="SatGate Agent Control Plane CISO proof card"
               className="mt-8 w-full rounded-2xl border border-white/10"
             />
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-white/10 px-5 py-16 sm:px-8 lg:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <h2 className="text-4xl font-black tracking-[-0.04em] text-white">Agent control-plane FAQ</h2>
+            <p className="mt-5 text-lg leading-8 text-slate-300">
+              Short answers for buyers comparing SatGate against API gateways, MCP gateways, agent frameworks, and observability tools.
+            </p>
+          </div>
+          <div className="space-y-4">
+            {faqs.map(([question, answer]) => (
+              <div key={question} className="rounded-3xl border border-white/10 bg-white/[0.035] p-6">
+                <h3 className="text-lg font-bold text-white">{question}</h3>
+                <p className="mt-3 leading-7 text-slate-400">{answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-white/10 bg-white/[0.025] px-5 py-16 sm:px-8 lg:py-24">
+        <div className="mx-auto max-w-7xl">
+          <h2 className="text-3xl font-black tracking-[-0.04em] text-white">Related economic control-plane topics</h2>
+          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {relatedTopics.map(([href, title, body]) => (
+              <Link key={href} href={href} className="rounded-3xl border border-white/10 bg-[#07111f] p-5 transition hover:border-cyan-400/50 hover:bg-cyan-400/10">
+                <h3 className="font-bold text-white">{title}</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-400">{body}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

@@ -81,6 +81,7 @@ Macaroons and capability tokens can constrain agent authority:
 - MCP Budget Enforcement: https://satgate.io/mcp-budget-enforcement
 - MCP Cost Control: https://satgate.io/mcp-cost-control
 - Agent API Governance: https://satgate.io/agent-api-governance
+- Agent Control Plane: https://satgate.io/agent-control-plane
 - Revocable Agent Credentials: https://satgate.io/revocable-agent-credentials
 - Agent Capability Tokens: https://satgate.io/agent-capability-tokens
 - L402 Agent Payments: https://satgate.io/l402-agent-payments
@@ -154,6 +155,17 @@ curl -i https://api.example.com/api/premium
 curl -H "Authorization: L402 <macaroon>:<preimage>" \
   https://api.example.com/api/premium
 ```
+
+## Product and Demo Pages
+- Enterprise AI Agent Governance: https://satgate.io/govern
+- AI Agent Management: https://satgate.io/agents
+- SatGate Control Demo: https://satgate.io/protect
+- SatGate Charge / L402 Payment Demo: https://satgate.io/pay
+- SatGate Mint / Capability Token Demo: https://satgate.io/mint-demo
+- SatGate Sandbox: https://satgate.io/sandbox
+- SatGate Design Partners: https://satgate.io/design-partners
+- Pricing: https://satgate.io/pricing
+- Security: https://satgate.io/security
 
 ## Links
 - Website: https://satgate.io

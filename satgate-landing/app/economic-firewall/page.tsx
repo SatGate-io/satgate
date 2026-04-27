@@ -286,6 +286,7 @@ export default function EconomicFirewallPage() {
               ['/agent-spending-limits', 'Agent spending limits', 'Spend caps by task, workflow, delegated sub-agent, route, model, and tool.'],
               ['/mcp-cost-control', 'MCP cost control', 'Control paid tool calls, retries, SaaS actions, cloud tasks, and data lookups.'],
               ['/agent-api-governance', 'Agent API governance', 'Identity, delegation, revocation, and audit for autonomous API calls.'],
+              ['/agent-control-plane', 'Agent control plane', 'Govern local agent authority, delegation lineage, spend, audit, and revocation.'],
               ['/l402-agent-payments', 'L402 agent payments', 'Charge robot customers before unlocking protected API access.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
