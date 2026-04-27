@@ -446,14 +446,41 @@ export default function AgentControlPlanePage() {
             <p className="mt-5 text-lg leading-8 text-slate-300">
               The walkthrough shows the control loop end to end: an agent receives bounded authority, delegates safely, hits real policy checks, leaves an audit trail, and can be shut down immediately.
             </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-white/10 bg-white/[0.025] px-5 py-16 sm:px-8 lg:py-24">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-purple-400/30 bg-purple-400/10 px-3 py-1 text-sm font-semibold text-purple-200 w-fit">
+              <FileText size={15} />
+              Security proof card
+            </div>
+            <h2 className="text-4xl font-black tracking-[-0.04em] text-white">A one-page view of the control model.</h2>
+            <p className="mt-5 text-lg leading-8 text-slate-300">
+              Use the proof card to explain the Agent Control Plane in a security review: no permanent keys, bounded authority, controlled delegation, visible spend, and instant revocation.
+            </p>
+            <a
+              href="/acp-demo/satgate-acp-ciso-proof-card.pdf"
+              className="mt-8 inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 text-base font-black text-slate-950 transition hover:bg-cyan-100"
+            >
+              Download proof card <ArrowRight size={18} />
+            </a>
+          </div>
+          <a
+            href="/acp-demo/satgate-acp-ciso-proof-card.pdf"
+            className="block rounded-[2rem] border border-white/10 bg-white p-2 shadow-2xl shadow-black/40 transition hover:border-cyan-300/50"
+            aria-label="Download SatGate Agent Control Plane proof card"
+          >
             {/* Use a plain img here; Next's dev image optimizer rejects this local PNG in some environments. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/acp-demo/satgate-acp-ciso-proof-card.png"
-              alt="SatGate Agent Control Plane CISO proof card"
-              className="mt-8 w-full rounded-2xl border border-white/10"
+              alt="SatGate Agent Control Plane proof card preview"
+              className="aspect-video w-full rounded-[1.4rem] object-contain"
             />
-          </div>
+          </a>
         </div>
       </section>
 
