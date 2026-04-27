@@ -107,7 +107,7 @@ const controlPlaneCapabilities = [
     "Budget checks run before model, API, SaaS, or MCP tool calls turn into real cost.",
   ],
   [
-    "Show proof buyers can trust",
+    "Show proof teams can trust",
     "Security and finance get a clear record of who acted, what was allowed, what was denied, and what it cost.",
   ],
   [
@@ -119,7 +119,7 @@ const controlPlaneCapabilities = [
 const comparisons = [
   ["Connection", "Agents can reach models, APIs, and MCP tools."],
   ["Control", "SatGate decides what authority, budget, and delegation each agent receives."],
-  ["Proof", "Every allowed, denied, charged, or revoked action leaves a buyer-ready audit trail."],
+  ["Proof", "Every allowed, denied, charged, or revoked action leaves a clear audit trail."],
   ["Revenue", "The same request path can charge robot customers when agent traffic becomes monetizable."],
 ];
 
@@ -411,11 +411,11 @@ export default function AgentControlPlanePage() {
                 Clear policy outcomes
               </div>
               <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
-                Buyers see control, not console noise.
+                Clear outcomes, not raw logs.
               </h2>
             </div>
             <p className="max-w-2xl text-slate-300">
-              The dashboard should tell a CISO or CFO what happened in plain English: approved work, protected budget, revoked access, tenant isolation, and contained delegation.
+              SatGate shows what happened in plain English: approved work, protected budget, revoked access, tenant isolation, and contained delegation.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-5">
@@ -440,11 +440,11 @@ export default function AgentControlPlanePage() {
           <div className="flex flex-col justify-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-sm font-semibold text-cyan-200 w-fit">
               <TimerReset size={15} />
-              Buyer walkthrough
+              Product walkthrough
             </div>
             <h2 className="text-4xl font-black tracking-[-0.04em] text-white">Show the control loop in 73 seconds.</h2>
             <p className="mt-5 text-lg leading-8 text-slate-300">
-              The walkthrough shows the buyer story end to end: an agent receives bounded authority, delegates safely, hits real policy checks, leaves an audit trail, and can be shut down immediately.
+              The walkthrough shows the control loop end to end: an agent receives bounded authority, delegates safely, hits real policy checks, leaves an audit trail, and can be shut down immediately.
             </p>
             {/* Use a plain img here; Next's dev image optimizer rejects this local PNG in some environments. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
