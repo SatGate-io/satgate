@@ -445,6 +445,8 @@ export default function ROICalculatorPage() {
                 <li><Link href="/design-partners" className="hover:text-white transition">Design Partners</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
                 <li><Link href="/roi-calculator" className="hover:text-white transition">ROI Calculator</Link></li>
+                <li><Link href="/llm-cost-dashboard" className="hover:text-white transition">LLM Cost Dashboard</Link></li>
+                <li><Link href="/llm-cost-monitoring" className="hover:text-white transition">LLM Cost Monitoring</Link></li>
                 <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud Dashboard</a></li>
               </ul>
             </div>

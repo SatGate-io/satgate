@@ -299,6 +299,16 @@ satgate mint \\
             </div>
           </div>
 
+          <div className="my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
+            <h3 className="mb-3 text-xl font-bold text-white">Turn monitoring into a dashboard and policy loop</h3>
+            <p className="mb-4 text-gray-300">If you are comparing LLM cost dashboards or monitoring tools, start with the visibility checklist — then turn the risky signals into request-path controls.</p>
+            <div className="flex flex-wrap gap-3 text-sm font-semibold">
+              <Link href="/llm-cost-dashboard" className="text-cyan-300 hover:text-cyan-200">LLM cost dashboard checklist →</Link>
+              <Link href="/llm-cost-monitoring" className="text-cyan-300 hover:text-cyan-200">LLM cost monitoring guide →</Link>
+              <Link href="/agent-spend-policy-template" className="text-cyan-300 hover:text-cyan-200">Agent spend policy template →</Link>
+            </div>
+          </div>
+
           <RoiCta
             title="LLM cost dashboards need a dollar case"
             body="Estimate what delayed alerts and post-hoc dashboards leave exposed when agents control the spend."

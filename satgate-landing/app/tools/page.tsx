@@ -10,6 +10,8 @@ export const metadata = {
     'AI agent cost control tools',
     'AI agent spend calculator',
     'AI agent runaway spend index',
+    'LLM cost dashboard',
+    'LLM cost monitoring',
     'OpenAI budget policy generator',
     'MCP tool cost policy generator',
     'MCP proxy config generator',
@@ -34,6 +36,18 @@ export const metadata = {
 };
 
 const tools = [
+  {
+    href: '/llm-cost-dashboard',
+    title: 'LLM Cost Dashboard Checklist',
+    description: 'Track token cost, latency, model spend, agent attribution, MCP tools, and budget enforcement gaps.',
+    icon: BarChart3,
+  },
+  {
+    href: '/llm-cost-monitoring',
+    title: 'LLM Cost Monitoring Guide',
+    description: 'Compare dashboards, alerts, budget policy, routing, revocation, and request-path enforcement.',
+    icon: BarChart3,
+  },
   {
     href: '/roi-calculator',
     title: 'AI Agent ROI Calculator',

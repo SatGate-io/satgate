@@ -150,6 +150,9 @@ export default function AiAgentCostControlPage() {
             <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               Learn economic firewalls
             </Link>
+            <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              LLM cost dashboard checklist
+            </Link>
           </div>
         </div>
       </section>

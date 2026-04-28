@@ -842,6 +842,8 @@ export SATGATE_TOKEN=$TOKEN
               <h4 className="font-bold text-white mb-4">Resources</h4>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><Link href="/economic-firewall" className="hover:text-white transition">Economic Firewall</Link></li>
+                <li><Link href="/llm-cost-dashboard" className="hover:text-white transition">LLM Cost Dashboard</Link></li>
+                <li><Link href="/llm-cost-monitoring" className="hover:text-white transition">LLM Cost Monitoring</Link></li>
                 <li><Link href="/ai-agent-cost-control" className="hover:text-white transition">AI Agent Cost Control</Link></li>
                 <li><Link href="/mcp-governance" className="hover:text-white transition">MCP Governance</Link></li>
                 <li><Link href="/agent-api-governance" className="hover:text-white transition">Agent API Governance</Link></li>
