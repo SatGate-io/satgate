@@ -40,8 +40,62 @@ const PricingPage = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'Pricing', item: 'https://satgate.io/pricing' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.q,
+      acceptedAnswer: { '@type': 'Answer', text: faq.a },
+    })),
+  };
+
+  const offerCatalogJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'OfferCatalog',
+    name: 'SatGate Pricing',
+    url: 'https://satgate.io/pricing',
+    description: 'Pricing for SatGate Observe, Control, and Charge modes for AI agent economic governance.',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        name: 'Builder / Observe',
+        price: '0',
+        priceCurrency: 'USD',
+        description: 'Free Observe-mode visibility for AI agent API traffic and cost attribution.',
+        itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate Observe' },
+      },
+      {
+        '@type': 'Offer',
+        name: 'Pro / Control',
+        priceCurrency: 'USD',
+        description: 'Request-path budget enforcement, per-agent caps, MCP tool controls, alerts, and revocation for AI agent spend.',
+        itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate Control' },
+      },
+      {
+        '@type': 'Offer',
+        name: 'Enterprise / Charge',
+        priceCurrency: 'USD',
+        description: 'Enterprise deployment, hybrid/on-prem options, advanced governance, and L402 Charge for robot-customer API monetization.',
+        itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate Charge' },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-purple-500 selection:text-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(offerCatalogJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {/* Navigation */}
       <nav className="border-b border-gray-800 backdrop-blur-md fixed w-full z-50 bg-black/50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">

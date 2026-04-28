@@ -91,10 +91,21 @@ export default function RunawayAgentCostCalculatorPage() {
     ],
   };
 
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'AI Agent Cost Control', item: 'https://satgate.io/ai-agent-cost-control' },
+      { '@type': 'ListItem', position: 3, name: 'Runaway Agent Cost Calculator', item: 'https://satgate.io/runaway-agent-cost-calculator' },
+    ],
+  };
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(249,115,22,0.18),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(250,204,21,0.15),transparent_32%)]" />

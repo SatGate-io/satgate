@@ -67,6 +67,16 @@ export default function AgentApiKeyRiskAssessmentPage() {
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'Agent API Governance', item: 'https://satgate.io/agent-api-governance' },
+      { '@type': 'ListItem', position: 3, name: 'Agent API Key Risk Assessment', item: 'https://satgate.io/agent-api-key-risk-assessment' },
+    ],
+  };
+
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -101,6 +111,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -119,6 +130,9 @@ export default function AgentApiKeyRiskAssessmentPage() {
             <a href="#assessment" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Run assessment <ArrowRight size={18} />
             </a>
+            <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">
+              Generate token policy
+            </Link>
             <Link href="/agent-api-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">
               Agent API governance
             </Link>
@@ -188,8 +202,11 @@ export default function AgentApiKeyRiskAssessmentPage() {
             SatGate turns agent access into request-path policy: scoped authority, spend limits, revocation, audit, and payment controls before upstream access.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-              Agent capability tokens <ArrowRight size={18} />
+            <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+              Generate token policy <ArrowRight size={18} />
+            </Link>
+            <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Agent capability tokens
             </Link>
             <Link href="/revocable-agent-credentials" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Revocable credentials

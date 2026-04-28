@@ -66,7 +66,8 @@ export default function Page() {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
-      { '@type': 'ListItem', position: 2, name: 'MCP Cost Control', item: 'https://satgate.io/mcp-cost-control' },
+      { '@type': 'ListItem', position: 2, name: 'MCP Governance', item: 'https://satgate.io/mcp' },
+      { '@type': 'ListItem', position: 3, name: 'MCP Cost Control', item: 'https://satgate.io/mcp-cost-control' },
     ],
   };
 

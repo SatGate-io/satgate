@@ -3,8 +3,8 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock, ArrowRight, CheckCircle, Shield, DollarSign, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'MCP Budget Enforcement: A Practical Guide to Controlling AI Tool Spend',
-  description: 'How to enforce per-tool budgets on MCP (Model Context Protocol) servers. Assign costs per tool call, cap agent spending, and attribute costs across teams.',
+  title: 'MCP Budget Enforcement: Set Per-Tool Costs and Stop Runaway Agent Spend',
+  description: 'A practical MCP budget enforcement guide: assign per-tool costs, cap agent spending, delegate budgets, and block expensive tool calls in real time.',
   alternates: { canonical: 'https://satgate.io/blog/mcp-budget-enforcement-guide' },
   keywords: ['MCP budget enforcement', 'MCP proxy', 'Model Context Protocol budget', 'AI tool cost control', 'MCP gateway', 'per-tool cost attribution'],
 };
@@ -24,8 +24,12 @@ export default function McpBudgetEnforcementGuidePage() {
             <span className="px-2 py-1 rounded-full bg-green-900/30 border border-green-500/30 text-green-300 text-xs font-mono">Tutorial</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
-            MCP Budget Enforcement: A Practical Guide
+            MCP Budget Enforcement: Set Per-Tool Costs and Stop Runaway Agent Spend
           </h1>
+          <div className="mb-6 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-5">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-purple-300">Practical answer</p>
+            <p className="text-gray-300">MCP budget enforcement means pricing every tool call, giving each agent a spend allowance, checking budget before the MCP server executes, and returning a structured error when a tool would exceed the limit.</p>
+          </div>
           <p className="text-xl text-gray-400 mb-4">Per-tool costs, spending caps, and real-time enforcement for MCP servers</p>
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <span className="flex items-center gap-1"><Calendar size={14} /> March 5, 2026</span>
@@ -236,9 +240,9 @@ routes:
     upstream: http://your-mcp-server:3000
     policy:
       kind: control
-      pay:
-        mode: fiat402
+      control:
         enforceBudget: true
+        budgetMode: request_path
 mcp:
   costProfile:
     defaultCostCredits: 1
@@ -266,6 +270,15 @@ curl -X POST http://localhost:9090/admin/mint \\
               <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="border border-purple-700/50 bg-purple-900/20 px-6 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition text-purple-300">
                 View on GitHub
               </a>
+            </div>
+          </div>
+          <div className="my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
+            <h3 className="mb-3 text-xl font-bold text-white">Generate an MCP budget policy</h3>
+            <p className="mb-4 text-gray-300">Turn this guide into copyable policy: price MCP tools, set per-agent budgets, and generate proxy config for Cursor, Claude, OpenClaw, or custom clients.</p>
+            <div className="flex flex-wrap gap-3 text-sm font-semibold">
+              <Link href="/mcp-tool-cost-policy-generator" className="text-cyan-300 hover:text-cyan-200">MCP tool cost policy generator →</Link>
+              <Link href="/mcp-proxy-config-generator" className="text-cyan-300 hover:text-cyan-200">MCP proxy config generator →</Link>
+              <Link href="/mcp-cost-control" className="text-cyan-300 hover:text-cyan-200">MCP cost control →</Link>
             </div>
           </div>
           <RoiCta

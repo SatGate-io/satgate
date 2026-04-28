@@ -82,7 +82,8 @@ export default function Page() {
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Revocable agent credentials are the missing kill switch for AI autonomy</h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">AI agents should not hold broad, long-lived API keys. They need task-scoped credentials that can be narrowed, expired, or revoked before the next API, model, or MCP tool call executes.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/agent-api-governance" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Agent API governance <ArrowRight size={18} /></Link>
+            <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Generate token policy <ArrowRight size={18} /></Link>
+            <Link href="/agent-api-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Agent API governance</Link>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">AI agent cost control</Link>
           </div>
         </div>
@@ -125,7 +126,12 @@ export default function Page() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20">
-        <h2 className="mb-8 text-3xl font-bold text-white">Credential policy example</h2>
+        <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+          <h2 className="text-3xl font-bold text-white">Credential policy example</h2>
+          <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center gap-2 font-semibold text-cyan-300 transition hover:text-cyan-200">
+            Generate a revocable token policy <ArrowRight size={16} />
+          </Link>
+        </div>
         <pre className="overflow-x-auto rounded-2xl border border-gray-800 bg-gray-950 p-6 text-sm text-green-300"><code>{`agent: research-agent-17
 scope:
   routes: [/api/research/*]

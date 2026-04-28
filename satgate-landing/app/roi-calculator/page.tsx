@@ -117,6 +117,14 @@ export default function ROICalculatorPage() {
           text: 'You need the number of active agents, average cost per tool call, calls per agent per day, expected loop or error frequency, and average loop duration before discovery.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'What should I do after estimating runaway agent spend?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Turn the exposure model into enforceable policy: generate budget limits, MCP tool caps, scoped capability-token policy, and request-path controls that block over-budget calls before cost is created.',
+        },
+      },
     ],
   };
 
@@ -156,7 +164,8 @@ export default function ROICalculatorPage() {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
-      { '@type': 'ListItem', position: 2, name: 'AI Agent ROI Calculator', item: 'https://satgate.io/roi-calculator' },
+      { '@type': 'ListItem', position: 2, name: 'AI Agent Cost Control', item: 'https://satgate.io/ai-agent-cost-control' },
+      { '@type': 'ListItem', position: 3, name: 'AI Agent ROI Calculator', item: 'https://satgate.io/roi-calculator' },
     ],
   };
 
@@ -332,6 +341,8 @@ export default function ROICalculatorPage() {
               { href: '/economic-firewall', title: 'Economic firewall', body: 'The request-path control layer for Observe, Control, and Charge.' },
               { href: '/mcp-governance', title: 'MCP budget enforcement', body: 'Assign per-tool costs and cap MCP tool spend in real time.' },
               { href: '/agent-api-governance', title: 'Agent API governance', body: 'Replace unlimited API keys with scoped, revocable capabilities.' },
+              { href: '/revocable-capability-token-policy-template', title: 'Capability-token policy template', body: 'Generate scoped, expiring, revocable agent authority with budgets and audit fields.' },
+              { href: '/agent-spend-policy-template', title: 'Agent spend policy template', body: 'Convert ROI exposure into copyable YAML and JSON budget enforcement policy.' },
               { href: '/runaway-agent-cost-calculator', title: 'Runaway agent cost calculator', body: 'Model loop, retry, fanout, and MCP tool-call exposure.' },
             ].map((item) => (
               <Link key={item.href} href={item.href} className="block rounded-xl border border-gray-800 bg-black/40 p-5 transition hover:border-cyan-500/40 hover:bg-cyan-950/20">
@@ -339,6 +350,28 @@ export default function ROICalculatorPage() {
                 <p className="text-sm text-gray-400">{item.body}</p>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ROI assumptions */}
+      <section className="pb-20 px-6">
+        <div className="max-w-5xl mx-auto rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6 md:p-8">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">ROI assumptions</p>
+          <h2 className="mb-4 text-2xl md:text-3xl font-bold text-white">How the calculator turns agent activity into budget-enforcement ROI</h2>
+          <div className="grid gap-5 md:grid-cols-3">
+            <div className="rounded-xl border border-gray-800 bg-black/40 p-5">
+              <h3 className="mb-2 font-bold text-white">Normal monthly spend</h3>
+              <p className="text-sm leading-relaxed text-gray-400">Agents × calls per day × average cost per call × 30 days.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-black/40 p-5">
+              <h3 className="mb-2 font-bold text-white">Ghost spend exposure</h3>
+              <p className="text-sm leading-relaxed text-gray-400">Normal call volume × loop/error frequency × wasted calls before discovery.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-black/40 p-5">
+              <h3 className="mb-2 font-bold text-white">SatGate savings model</h3>
+              <p className="text-sm leading-relaxed text-gray-400">Request-path budget enforcement blocks most loop waste before upstream APIs or MCP tools execute.</p>
+            </div>
           </div>
         </div>
       </section>

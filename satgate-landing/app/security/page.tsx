@@ -2,13 +2,68 @@ import Link from 'next/link';
 import { ArrowLeft, Shield, Lock, Eye, Key, Zap, CheckCircle, Code, GitBranch, Bot, Activity, Server, FileText } from 'lucide-react';
 
 export const metadata = {
-  title: 'Security - SatGate™',
+  title: 'SatGate Security | Capability Tokens for AI Agent Governance',
+  description: 'SatGate security model for AI agent API governance: capability tokens, macaroons, scoped budgets, delegation limits, revocation, audit, and request-path policy enforcement.',
   alternates: { canonical: 'https://satgate.io/security' },
+  keywords: [
+    'SatGate security',
+    'AI agent security',
+    'agent capability tokens',
+    'macaroons for AI agents',
+    'revocable agent credentials',
+    'AI agent API governance',
+    'economic access control',
+    'request-path policy enforcement',
+  ],
+  openGraph: {
+    title: 'SatGate Security | Capability Tokens for AI Agent Governance',
+    description: 'Capability tokens, macaroons, scoped budgets, delegation limits, revocation, audit, and request-path enforcement for AI agent APIs.',
+    url: 'https://satgate.io/security',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SatGate Security | Capability Tokens for AI Agent Governance',
+    description: 'Security model for scoped, budget-aware, revocable AI agent API access.',
+  },
 };
 
 export default function SecurityPage() {
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'Security', item: 'https://satgate.io/security' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How does SatGate secure AI agent API access?',
+        acceptedAnswer: { '@type': 'Answer', text: 'SatGate secures AI agent API access with request-path policy enforcement, capability tokens, macaroon caveats, scoped budgets, expiry, delegation limits, revocation, and audit evidence before upstream access.' },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why use capability tokens instead of static API keys for agents?',
+        acceptedAnswer: { '@type': 'Answer', text: 'Capability tokens can constrain route, budget, calls, expiry, delegation, and revocation for one agent task. Static API keys are usually broad, long-lived, copyable, and disconnected from economic policy.' },
+      },
+      {
+        '@type': 'Question',
+        name: 'What role do macaroons play in SatGate?',
+        acceptedAnswer: { '@type': 'Answer', text: 'Macaroons let SatGate attach cryptographic caveats to agent authority so delegated credentials can only become narrower, shorter-lived, or lower-budget as they move through agent workflows.' },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Home

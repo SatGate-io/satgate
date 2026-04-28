@@ -74,8 +74,41 @@ export default function DesignPartnersPage() {
     { q: 'Is this production-ready?', a: 'Yes. 60+ dashboard pages, full deployment options (Docker, K8s, Terraform, SaaS), and a battle-tested Go binary with zero dependencies.' },
   ];
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'Design Partners', item: 'https://satgate.io/design-partners' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.q,
+      acceptedAnswer: { '@type': 'Answer', text: faq.a },
+    })),
+  };
+
+  const programJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: 'SatGate Design Partners Program',
+    serviceType: 'AI agent economic governance design partner program',
+    url: 'https://satgate.io/design-partners',
+    provider: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    description: 'Early access program for teams shaping SatGate economic firewall capabilities across AI agent budget enforcement, MCP governance, agent API controls, and L402 Charge.',
+    areaServed: 'Global',
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-purple-500 selection:text-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(programJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       {/* Navigation */}
       <nav className="border-b border-gray-800 backdrop-blur-md fixed w-full z-50 bg-black/50">

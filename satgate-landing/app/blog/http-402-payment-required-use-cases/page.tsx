@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "HTTP 402 Payment Required: AI Agent API Payment Use Cases",
-  description: "See how HTTP 402 Payment Required, L402 Lightning payments, and robot-customer APIs let AI agents pay per request before access.",
+  title: "HTTP 402 Payment Required: Meaning, Use Cases, and L402 Agent Payments",
+  description: "What HTTP 402 Payment Required means, why it was reserved, and how L402 Lightning lets AI agents pay APIs per request.",
   alternates: { canonical: 'https://satgate.io/blog/http-402-payment-required-use-cases' },
   keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API']
 };
@@ -23,7 +23,11 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
             <span className="px-2 py-1 rounded-full bg-green-900/30 border border-green-500/30 text-green-300 text-xs font-mono">AI Agents</span>
           </div>
           
-          <h1 className="text-4xl font-bold mb-4">HTTP 402 Payment Required: The Dormant Status Code That Powers the Agent Economy</h1>
+          <h1 className="text-4xl font-bold mb-4">HTTP 402 Payment Required: Meaning, Use Cases, and AI Agent Payments</h1>
+          <div className="mb-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-5">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Quick answer</p>
+            <p className="text-gray-300">HTTP 402 means payment is required before access. For AI agents, the practical version is L402: an API returns a payment challenge, the agent pays over Lightning, and the gateway enforces budget before serving the request.</p>
+          </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
             For nearly thirty years, HTTP 402 has been &ldquo;reserved for future use.&rdquo; AI agents are the future it was reserved for. Here are the real-world use cases finally bringing it to life.

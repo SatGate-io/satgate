@@ -101,10 +101,21 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
     ],
   };
 
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'AI Agent Cost Control', item: 'https://satgate.io/ai-agent-cost-control' },
+      { '@type': 'ListItem', position: 3, name: 'AI Agent Runaway Spend Benchmark', item: 'https://satgate.io/ai-agent-runaway-spend-benchmark' },
+    ],
+  };
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">

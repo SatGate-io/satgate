@@ -2,8 +2,30 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Calendar, Clock, User } from 'lucide-react';
 
 export const metadata = {
-  title: 'Blog - SatGate',
-  description: 'Insights on API economics, agent governance, and the future of machine-to-machine commerce.',
+  title: 'SatGate Blog | AI Agent Governance, Cost Control, and API Economics',
+  description: 'Insights on economic firewalls, AI agent cost control, MCP governance, L402 payments, capability tokens, and API economics for autonomous agents.',
+  alternates: { canonical: 'https://satgate.io/blog' },
+  keywords: [
+    'AI agent governance blog',
+    'AI agent cost control',
+    'economic firewall',
+    'MCP governance',
+    'L402 payments',
+    'agent API governance',
+    'machine-to-machine commerce',
+    'API economics',
+  ],
+  openGraph: {
+    title: 'SatGate Blog | AI Agent Governance, Cost Control, and API Economics',
+    description: 'Guides and analysis on economic firewalls, AI agent cost control, MCP governance, L402 payments, capability tokens, and API economics.',
+    url: 'https://satgate.io/blog',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SatGate Blog | AI Agent Governance, Cost Control, and API Economics',
+    description: 'Economic firewall, MCP governance, agent cost control, L402 payments, and API economics for autonomous agents.',
+  },
 };
 
 // Blog post data - in a real setup this would come from a CMS or markdown files

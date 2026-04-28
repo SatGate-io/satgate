@@ -79,7 +79,7 @@ export default function L402ApiPricingCalculatorPage() {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
-      { '@type': 'ListItem', position: 2, name: 'AI Agent Cost Control Tools', item: 'https://satgate.io/tools' },
+      { '@type': 'ListItem', position: 2, name: 'L402 Agent Payments', item: 'https://satgate.io/l402-agent-payments' },
       { '@type': 'ListItem', position: 3, name: 'L402 API Pricing Calculator', item: 'https://satgate.io/l402-api-pricing-calculator' },
     ],
   };

@@ -69,6 +69,16 @@ export default function McpProxyConfigGeneratorPage() {
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'MCP Governance', item: 'https://satgate.io/mcp' },
+      { '@type': 'ListItem', position: 3, name: 'MCP Proxy Config Generator', item: 'https://satgate.io/mcp-proxy-config-generator' },
+    ],
+  };
+
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -103,6 +113,7 @@ export default function McpProxyConfigGeneratorPage() {
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">

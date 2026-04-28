@@ -83,7 +83,7 @@ export default function AgentSpendPolicyTemplatePage() {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
-      { '@type': 'ListItem', position: 2, name: 'AI Agent Cost Control Tools', item: 'https://satgate.io/tools' },
+      { '@type': 'ListItem', position: 2, name: 'AI Agent Cost Control', item: 'https://satgate.io/ai-agent-cost-control' },
       { '@type': 'ListItem', position: 3, name: 'Agent Spend Policy Template', item: 'https://satgate.io/agent-spend-policy-template' },
     ],
   };

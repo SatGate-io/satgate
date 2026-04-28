@@ -110,8 +110,54 @@ export default function MintDemoPage() {
     setShowRaw(false);
   };
 
+  const softwareJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'SatGate Mint Demo',
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'Web',
+    url: 'https://satgate.io/mint-demo',
+    description: 'Interactive demo for minting budget-aware capability tokens and macaroons for AI agents with scopes, expiry, delegation limits, and revocation policy.',
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'Security', item: 'https://satgate.io/security' },
+      { '@type': 'ListItem', position: 3, name: 'SatGate Mint Demo', item: 'https://satgate.io/mint-demo' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What does the SatGate Mint demo show?',
+        acceptedAnswer: { '@type': 'Answer', text: 'The demo shows an AI agent exchanging workload identity for a scoped macaroon capability token with budget, expiry, policy, and verification data.' },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why mint capability tokens for AI agents?',
+        acceptedAnswer: { '@type': 'Answer', text: 'Capability tokens let teams give agents narrow, revocable, budget-aware API authority instead of broad static API keys.' },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do macaroons help with agent delegation?',
+        acceptedAnswer: { '@type': 'Answer', text: 'Macaroon caveats let delegated agent credentials become more constrained by route, budget, expiry, call count, and delegation policy while preserving cryptographic verification.' },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {/* Header */}
       <div className="border-b border-gray-800 bg-black/80 backdrop-blur-sm sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">

@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "Macaroon Tokens vs API Keys: Revocable Agent Capabilities",
-  description: "Compare macaroon tokens and API keys for AI agents. Learn how revocable, scoped, budget-aware capabilities reduce autonomous API risk.",
+  title: "Macaroon Tokens vs API Keys for AI Agents: Scoped, Revocable Access",
+  description: "API keys are static bearer secrets. Macaroon tokens add scope, expiry, delegation, revocation, and budget caveats for AI agents.",
   alternates: { canonical: 'https://satgate.io/blog/macaroon-tokens-vs-api-keys' },
   keywords: ['macaroon tokens vs API keys', 'capability-based authentication', 'API authentication AI agents', 'delegated authority tokens', 'macaroon authentication', 'AI agent security', 'capability tokens']
 };
@@ -23,7 +23,11 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
             <span className="px-2 py-1 rounded-full bg-green-900/30 border border-green-500/30 text-green-300 text-xs font-mono">Security</span>
           </div>
           
-          <h1 className="text-4xl font-bold mb-4">Macaroon Tokens vs API Keys: Why Capability-Based Auth Beats Identity-Based Auth for AI Agents</h1>
+          <h1 className="text-4xl font-bold mb-4">Macaroon Tokens vs API Keys for AI Agents</h1>
+          <div className="mb-6 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-5">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-purple-300">Quick comparison</p>
+            <p className="text-gray-300">API keys identify an account and usually grant broad access until manually rotated. Macaroons act like attenuable capabilities: each delegated token can carry caveats for scope, expiry, tool access, spend budget, revocation, and audit.</p>
+          </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
             API keys answer "who are you?" Macaroon tokens answer "what can you do?" When autonomous agents need to delegate tasks and respect budget limits, the difference between identity and capability determines success or failure.
@@ -491,6 +495,7 @@ attenuated_token = agent_a_token.add_caveats([
             <p className="mb-4 text-gray-300">Static API keys become dangerous when autonomous agents can spend, delegate, and retry. Start with a risk assessment, then move to revocable capabilities.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/agent-api-key-risk-assessment" className="text-cyan-300 hover:text-cyan-200">API key risk assessment →</Link>
+              <Link href="/revocable-capability-token-policy-template" className="text-cyan-300 hover:text-cyan-200">Generate capability-token policy →</Link>
               <Link href="/revocable-agent-credentials" className="text-cyan-300 hover:text-cyan-200">Revocable credentials →</Link>
               <Link href="/agent-capability-tokens" className="text-cyan-300 hover:text-cyan-200">Capability tokens →</Link>
             </div>
@@ -503,7 +508,10 @@ attenuated_token = agent_a_token.add_caveats([
               SatGate implements macaroon authentication with budget enforcement and delegation support. Deploy in minutes, test with your first AI agent, and scale to autonomous workloads.
             </p>
             <div className="flex flex-wrap gap-3">
-              <a href="https://github.com/satgate/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
+              <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
+                Generate Token Policy
+              </Link>
+              <a href="https://github.com/satgate/satgate" className="inline-flex items-center gap-2 border border-blue-500 text-blue-300 px-6 py-3 rounded-lg font-bold hover:bg-blue-900/30 transition text-sm">
                 View on GitHub
               </a>
               <Link href="/design-partners" className="inline-flex items-center gap-2 border border-blue-500 text-blue-300 px-6 py-3 rounded-lg font-bold hover:bg-blue-900/30 transition text-sm">

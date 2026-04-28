@@ -3,8 +3,8 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "API Gateway for AI Agents: Routing Is Not Economic Governance",
-  description: "AI agents need more than routing. Compare API gateways with request-path economic governance for budgets, MCP tools, capability tokens, and L402 Charge.",
+  title: "API Gateway for AI Agents: Budgets, MCP Tools, and Economic Control",
+  description: "What an API gateway for AI agents must do beyond routing: enforce budgets, price MCP tools, revoke capability tokens, and support L402 Charge.",
   alternates: { canonical: 'https://satgate.io/blog/api-gateway-for-ai-agents' },
   keywords: ['API gateway for AI agents', 'AI agent gateway', 'API gateway comparison', 'agent economy gateway', 'AI API management', 'economic firewall gateway']
 };
@@ -24,7 +24,11 @@ export default function ApiGatewayForAiAgentsBlogPage() {
             <span className="px-2 py-1 rounded-full bg-yellow-900/30 border border-yellow-500/30 text-yellow-300 text-xs font-mono">Architecture</span>
           </div>
           
-          <h1 className="text-4xl font-bold mb-4">API Gateway for AI Agents: Why Traditional Gateways Fall Short</h1>
+          <h1 className="text-4xl font-bold mb-4">API Gateway for AI Agents: Budgets, MCP Tools, and Economic Control</h1>
+          <div className="mb-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-5">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Search answer</p>
+            <p className="text-gray-300">An API gateway for AI agents must do more than authenticate and route. It needs request-path budget checks, agent-scoped capability tokens, MCP tool pricing, spend attribution, revocation, and payment flows for robot customers.</p>
+          </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
             Kong, Solo.io, and Gravitee were built for humans clicking buttons. Autonomous agents need something fundamentally different.

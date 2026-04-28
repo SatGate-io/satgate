@@ -3,10 +3,10 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "OpenAI API Budget Limits: Enforce Hard Spend Caps Before GPT Calls",
-  description: "Learn how to enforce OpenAI API budget limits before GPT calls execute, prevent runaway retry loops, and generate request-path spend policies.",
+  title: "How to Set Budget Limits on OpenAI API Calls (Hard Caps, Not Just Alerts)",
+  description: "Stop runaway OpenAI bills before they happen. Set hard spend caps per agent, per session, and per team — enforced at the request layer, not the dashboard.",
   alternates: { canonical: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls' },
-  keywords: ['OpenAI API budget limits', 'OpenAI cost control', 'API gateway OpenAI', 'GPT-4 spending limits', 'OpenAI API costs', 'prevent OpenAI overspending']
+  keywords: ['OpenAI API budget limits', 'OpenAI cost control', 'API gateway OpenAI', 'GPT-4 spending limits', 'OpenAI API costs', 'prevent OpenAI overspending', 'hard cap OpenAI spend', 'per-agent OpenAI budget']
 };
 
 export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
@@ -25,7 +25,11 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
             <span className="px-2 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono">API Gateway</span>
           </div>
           
-          <h1 className="text-4xl font-bold mb-4">How to Add Budget Limits to OpenAI API Calls</h1>
+          <h1 className="text-4xl font-bold mb-4">How to Set Hard Budget Limits on OpenAI API Calls</h1>
+          <div className="mb-6 rounded-2xl border border-green-900/60 bg-green-950/20 p-5">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-green-300">Direct answer</p>
+            <p className="text-gray-300">The safest way to set OpenAI API budget limits is to enforce spend before each request reaches OpenAI. Put a gateway in the request path, assign budgets per agent/team/session, estimate the call cost, and block or downgrade requests before runaway loops burn budget.</p>
+          </div>
           
           <p className="text-xl text-gray-400 mb-6">
             OpenAI&apos;s dashboard shows you costs after they happen. By then, it&apos;s too late. Learn how to enforce hard budget limits that block requests before they overspend.
@@ -440,6 +444,23 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
             </div>
           </div>
           
+          <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Frequently Asked Questions</h2>
+
+          <h3 className="text-xl font-semibold mt-6 mb-3 text-white">Does OpenAI have built-in spending limits?</h3>
+          <p className="text-gray-300 leading-relaxed">
+            Yes, but they&apos;re monthly account-level caps with delayed enforcement. They don&apos;t support per-agent, per-user, or per-session granularity, and &ldquo;hard limits&rdquo; can still overshoot by 10–20% because usage data is cached. When your account limit is hit, all API access stops — not just the offending agent.
+          </p>
+
+          <h3 className="text-xl font-semibold mt-6 mb-3 text-white">What&apos;s the difference between a rate limit and a budget limit?</h3>
+          <p className="text-gray-300 leading-relaxed">
+            Rate limits cap requests-per-minute. Budget limits cap dollar spend. For AI agents, budget limits are the meaningful control — one GPT-4o call with a large context can cost 1,000× more than a cached lookup. Counting requests tells you nothing about cost exposure.
+          </p>
+
+          <h3 className="text-xl font-semibold mt-6 mb-3 text-white">How do I set a per-agent budget without changing my application code?</h3>
+          <p className="text-gray-300 leading-relaxed">
+            Route API calls through a request-path gateway. The gateway checks budget before forwarding each request — your agent code only changes the <code className="text-green-300 bg-black/50 px-1 rounded">baseURL</code> and token. Budget policy lives in the gateway config, not in the agent.
+          </p>
+
           <div className="my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">Turn OpenAI limits into enforceable policy</h3>
             <p className="mb-4 text-gray-300">Use the policy generator and spend template to convert this guide into per-agent, per-session, per-request, and model-route controls.</p>
@@ -447,6 +468,8 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
               <Link href="/openai-budget-policy-generator" className="text-cyan-300 hover:text-cyan-200">OpenAI budget generator →</Link>
               <Link href="/agent-spend-policy-template" className="text-cyan-300 hover:text-cyan-200">Agent spend policy template →</Link>
               <Link href="/ai-agent-runaway-spend-index" className="text-cyan-300 hover:text-cyan-200">Runaway spend index →</Link>
+              <Link href="/blog/llm-cost-management" className="text-cyan-300 hover:text-cyan-200">LLM cost management →</Link>
+              <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">Enterprise governance →</Link>
             </div>
           </div>
 

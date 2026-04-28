@@ -65,7 +65,7 @@ export default function EconomicFirewallPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-04-25',
+    dateModified: '2026-04-28',
     mainEntityOfPage: 'https://satgate.io/economic-firewall',
   };
 
@@ -103,6 +103,14 @@ export default function EconomicFirewallPage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'No. An API gateway can route and secure traffic, but an economic firewall adds per-agent cost attribution, budget enforcement, delegated credentials, policy decisions, and optional payment before requests execute.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do I know whether I need an economic firewall?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'You need an economic firewall when agents can call paid models, APIs, MCP tools, or delegated workflows faster than humans can review spend. Start by estimating runaway exposure, grading readiness, and generating request-path policy for budgets, credentials, and audit.',
         },
       },
     ],
@@ -271,6 +279,29 @@ export default function EconomicFirewallPage() {
                 <div className="p-4">{b}</div>
                 <div className="p-4">{c}</div>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-gray-900 bg-gray-950/60">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Free tools</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">Test your economic firewall posture</h2>
+          <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+            Category definitions are useful, but teams need numbers and enforceable policy. Use these tools to move from risk awareness to request-path controls.
+          </p>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['/economic-firewall-readiness-grader', 'Readiness grader', 'Score identity, budgets, revocation, audit, routing, MCP, and Charge controls.'],
+              ['/roi-calculator', 'ROI calculator', 'Estimate runaway agent spend, ghost cost, payback period, and annual ROI.'],
+              ['/agent-spend-policy-template', 'Spend policy template', 'Generate budget, MCP tool, delegation, revocation, and audit policy.'],
+              ['/revocable-capability-token-policy-template', 'Capability-token policy', 'Generate scoped, expiring, revocable agent authority with budget caveats.'],
+            ].map(([href, title, body]) => (
+              <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </Link>
             ))}
           </div>
         </div>

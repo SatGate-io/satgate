@@ -306,8 +306,61 @@ export default function SandboxPage() {
     );
   };
 
+  const softwareJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'SatGate Sandbox',
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'Web',
+    url: 'https://satgate.io/sandbox',
+    description: 'Interactive sandbox showing SatGate request-path enforcement for AI agent spend controls, scoped macaroons, kill switches, budget exhaustion, and API policy decisions.',
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    featureList: [
+      'AI agent budget enforcement demo',
+      'Request-path economic policy decisions',
+      'Macaroon capability token verification',
+      'Agent kill-switch revocation',
+      'Runaway spend blocking simulation',
+    ],
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'AI Agent Cost Control', item: 'https://satgate.io/ai-agent-cost-control' },
+      { '@type': 'ListItem', position: 3, name: 'SatGate Sandbox', item: 'https://satgate.io/sandbox' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What does the SatGate sandbox demonstrate?',
+        acceptedAnswer: { '@type': 'Answer', text: 'The sandbox demonstrates SatGate enforcing economic policy in the request path: minting scoped credentials, verifying macaroons, revoking a rogue agent, and blocking runaway API spend when a budget is exhausted.' },
+      },
+      {
+        '@type': 'Question',
+        name: 'How does SatGate stop unauthorized agent spend?',
+        acceptedAnswer: { '@type': 'Answer', text: 'SatGate checks each agent request against identity, capability-token caveats, budget, policy, and revocation state before forwarding the request upstream.' },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is the sandbox for AI agent cost control or security?',
+        acceptedAnswer: { '@type': 'Answer', text: 'Both. SatGate treats spend as an enforceable security boundary, combining scoped authority, revocation, audit, and budget limits into an economic firewall for AI agents.' },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {/* Header */}
       <div className="border-b border-gray-800 bg-black/80 backdrop-blur-sm sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
