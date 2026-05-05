@@ -2,6 +2,7 @@ package integration
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 
@@ -269,27 +270,33 @@ func TestTaskCost_EventEmission(t *testing.T) {
 	}
 }
 
-// TestTaskCost_NoTaskID verifies that tool calls without task_id in the response
-// do NOT create task tracker entries.
+// TestTaskCost_NoTaskID verifies that tool calls without an upstream task_id
+// still create a generated per-tool task tracker entry.
 func TestTaskCost_NoTaskID(t *testing.T) {
 	env := NewTestEnv(t, WithBudget(1000))
 	defer env.Close()
 
-	// Default mock response has no task_id
+	// Default mock response has no task_id.
 	env.ToolCall(t, 1, "search", env.RootToken)
 
 	tracker := env.Proxy.TaskTracker()
 
-	// Should have no task_spend events
+	// The proxy should generate a task_spend event for cost tracking.
 	taskEvents := env.Events.ByType(mcpserver.EventTaskSpend)
-	if len(taskEvents) != 0 {
-		t.Errorf("expected 0 task_spend events for non-task response, got %d", len(taskEvents))
+	if len(taskEvents) != 1 {
+		t.Fatalf("expected 1 generated task_spend event for non-task response, got %d", len(taskEvents))
+	}
+	if taskID, ok := taskEvents[0].Data["task_id"].(string); !ok || !strings.HasPrefix(taskID, "tool-search-") {
+		t.Errorf("expected generated tool-search task_id, got %v", taskEvents[0].Data["task_id"])
 	}
 
-	// GetTasksByToken should return empty
+	// GetTasksByToken should include the generated task.
 	tasks := tracker.GetTasksByToken(env.RootTokenID)
-	if len(tasks) != 0 {
-		t.Errorf("expected 0 tasks, got %d", len(tasks))
+	if len(tasks) != 1 {
+		t.Fatalf("expected 1 generated task, got %d", len(tasks))
+	}
+	if tasks[0].ToolName != "search" {
+		t.Errorf("expected generated task for search, got %q", tasks[0].ToolName)
 	}
 }
 
