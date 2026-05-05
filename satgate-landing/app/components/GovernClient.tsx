@@ -111,7 +111,7 @@ export default function GovernPage() {
                 </div>
               </div>
               <h3 className="text-xl font-bold text-white mb-2">Prevent Unauthorized <span className="text-cyan-400">Spend</span></h3>
-              <p className="text-gray-400 text-sm mb-3">No token → no spend. Budget enforcement via Fiat402 ensures agents can&apos;t exceed their allocation.</p>
+              <p className="text-gray-400 text-sm mb-3">No token → no spend. Request-path budget enforcement ensures agents can&apos;t exceed their allocation.</p>
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <Shield size={12} className="text-cyan-400" />
                 <span>Observe → Control policy ratchet</span>
@@ -798,6 +798,49 @@ export SATGATE_TOKEN=$TOKEN
         </div>
       </section>
 
+      <section className="py-20 px-6 border-t border-gray-800 bg-black">
+        <div className="max-w-5xl mx-auto rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-8 md:p-10">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Governance rollout kit</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">Turn enterprise governance into request-path controls</h2>
+          <p className="mb-8 max-w-3xl text-gray-400 leading-relaxed">
+            High-level AI governance only matters when it becomes enforceable policy: identity, budgets, scoped credentials, MCP tool limits, audit, and revocation before agents spend.
+          </p>
+          <div className="grid gap-4 md:grid-cols-2">
+            {[
+              ['/economic-firewall-readiness-grader', 'Economic firewall readiness grader', 'Score identity, budgets, MCP governance, revocation, delegation, audit, routing, and Charge readiness.'],
+              ['/agent-api-key-risk-assessment', 'Agent API key risk assessment', 'Find static-key blast radius before autonomous agents inherit unlimited API access.'],
+              ['/agent-spend-policy-template', 'Agent spend policy template', 'Generate YAML/JSON policy for per-agent budgets, MCP caps, delegation, revocation, and audit.'],
+              ['/mcp-cost-control', 'MCP cost control', 'Treat MCP tool calls as billable economic events with per-tool prices, caps, and deny decisions.'],
+            ].map(([href, title, body]) => (
+              <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black/50 p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 px-6 border-t border-gray-800 bg-black">
+        <div className="max-w-4xl mx-auto rounded-2xl border border-gray-800 bg-gray-950 p-8 md:p-10">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">AI agent governance questions</h2>
+          <div className="space-y-6">
+            {[
+              ['What is AI agent governance?', 'AI agent governance is the set of controls that determines which agents can call which APIs, tools, and models; how much they can spend; what authority they can delegate; and when access must be revoked. For autonomous agents, governance needs request-path enforcement, not just logs and dashboards.'],
+              ['What is an economic control plane for AI agents?', 'An economic control plane for AI agents sits in the request path and applies budgets, prices, delegation rules, revocation, and audit before an agent reaches an upstream API, model, or MCP tool. It turns agent activity into observable, controllable, and chargeable economic events.'],
+              ['How should enterprises govern MCP tool usage?', 'Enterprises should govern MCP tools with per-tool budgets, scoped capability tokens, task and tenant attribution, audit trails, revocation, and hard request-path policy decisions. Rate limits and dashboards are useful, but they do not replace enforcement before tool calls execute.'],
+              ['What is the difference between AI governance and AI agent governance?', 'AI governance usually covers model risk, data policy, compliance, and human review. AI agent governance adds request-path controls for autonomous actions: budgets, tool scopes, delegated authority, revocation, cost attribution, and payment before APIs or MCP tools execute.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="border-t border-gray-800 pt-6 first:border-t-0 first:pt-0">
+                <h3 className="mb-2 text-xl font-bold text-white">{question}</h3>
+                <p className="leading-relaxed text-gray-400">{answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="py-20 px-6 border-t border-gray-800 bg-gradient-to-b from-purple-950/20 to-black">
         <div className="max-w-3xl mx-auto text-center">
@@ -841,6 +884,13 @@ export SATGATE_TOKEN=$TOKEN
             <div>
               <h4 className="font-bold text-white mb-4">Resources</h4>
               <ul className="space-y-2 text-sm text-gray-500">
+                <li><Link href="/economic-firewall" className="hover:text-white transition">Economic Firewall</Link></li>
+                <li><Link href="/llm-cost-dashboard" className="hover:text-white transition">LLM Cost Dashboard</Link></li>
+                <li><Link href="/llm-cost-monitoring" className="hover:text-white transition">LLM Cost Monitoring</Link></li>
+                <li><Link href="/ai-agent-cost-control" className="hover:text-white transition">AI Agent Cost Control</Link></li>
+                <li><Link href="/mcp-governance" className="hover:text-white transition">MCP Governance</Link></li>
+                <li><Link href="/agent-api-governance" className="hover:text-white transition">Agent API Governance</Link></li>
+                <li><Link href="/l402-agent-payments" className="hover:text-white transition">L402 Agent Payments</Link></li>
                 <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
                 <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud Dashboard</a></li>
               </ul>

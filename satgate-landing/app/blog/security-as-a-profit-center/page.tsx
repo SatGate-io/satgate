@@ -2,18 +2,19 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock, ExternalLink } from 'lucide-react';
 
 export const metadata = {
-  title: 'Security as a Profit Center: Why Your Economic Firewall Pays for Itself - SatGate Blog',
-  description: 'Every security tool tells you how many attacks it stopped. SatGate tells you how many dollars it saved. Discover why economic governance is a profit center, not a cost center.',
+  title: 'Security as a Profit Center: Economic Firewall ROI',
+  description: 'SatGate shows how many dollars security saved, not just attacks blocked. Learn why economic governance can become a profit center.',
   openGraph: {
-    title: 'Security as a Profit Center: Why Your Economic Firewall Pays for Itself',
+    title: 'Security as a Profit Center: Economic Firewall ROI',
     description: 'Your security stack is a cost center. Your economic firewall is a profit center. Here\'s the CFO math.',
+    url: 'https://satgate.io/blog/security-as-a-profit-center',
     type: 'article',
     authors: ['Matt Dean'],
     publishedTime: '2026-02-14T00:00:00Z',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Security as a Profit Center: Why Your Economic Firewall Pays for Itself',
+    title: 'Security as a Profit Center: Economic Firewall ROI',
     description: 'Your security stack is a cost center. Your economic firewall is a profit center. Here\'s the CFO math.',
   },
   keywords: ['AI security ROI', 'AI agent governance', 'AI cost management enterprise', 'economic firewall', 'AI agent cost control', 'MCP governance', 'AI budget enforcement'],
@@ -21,8 +22,59 @@ export const metadata = {
 };
 
 export default function SecurityAsAProfitCenterPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'Security as a Profit Center: Economic Firewall ROI',
+    description: 'SatGate shows how many dollars security saved, not just attacks blocked. Learn why economic governance can become a profit center.',
+    url: 'https://satgate.io/blog/security-as-a-profit-center',
+    datePublished: '2026-02-14',
+    dateModified: '2026-05-02',
+    author: { '@type': 'Person', name: 'Matt Dean' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'AI security ROI' },
+      { '@type': 'Thing', name: 'economic firewall ROI' },
+      { '@type': 'Thing', name: 'AI agent governance savings' },
+      { '@type': 'Thing', name: 'security as a profit center' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How can an economic firewall turn security into a profit center?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An economic firewall turns security into a measurable business asset by preventing runaway agent spend, reducing wasted tool calls, attributing costs, and enabling controlled paid access for robot customers.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What ROI should teams measure for AI agent governance?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Teams should measure avoided loop spend, reduced retries, optimized tool/model routing, reclaimed engineering time, chargeback accuracy, and new revenue from governed API monetization.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why start with Observe mode before enforcing budgets?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Observe mode shows real agent usage, waste, loop patterns, and cost attribution without blocking production workloads, giving finance and engineering evidence before switching to Control.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -36,7 +88,7 @@ export default function SecurityAsAProfitCenterPage() {
             <span className="px-2 py-1 rounded-full bg-green-900/30 border border-green-500/30 text-green-300 text-xs font-mono">Cost Management</span>
           </div>
           
-          <h1 className="text-4xl font-bold mb-4">Security as a Profit Center: Why Your Economic Firewall Pays for Itself</h1>
+          <h1 className="text-4xl font-bold mb-4">Security as a Profit Center: Economic Firewall ROI</h1>
           
           <p className="text-xl text-gray-400 mb-6 italic">
             Every security tool you own tells you how many attacks it stopped. What if one told you how many dollars it saved you?
@@ -249,6 +301,23 @@ Example:
           <p className="text-gray-300 leading-relaxed">
             The enterprises that win the AI agent era won&apos;t be the ones that deploy the most agents. They&apos;ll be the ones that govern them best. Economic governance isn&apos;t the brake pedal. It&apos;s the steering wheel.
           </p>
+
+          <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-green-300">FAQ</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">Economic firewall ROI questions</h2>
+            <div className="space-y-5">
+              {[
+                ['How can an economic firewall turn security into a profit center?', 'It prevents runaway agent spend, reduces wasted tool calls, attributes costs, and enables controlled paid access for robot customers.'],
+                ['What ROI should teams measure for AI agent governance?', 'Measure avoided loop spend, reduced retries, optimized tool/model routing, reclaimed engineering time, chargeback accuracy, and new revenue from governed API monetization.'],
+                ['Why start with Observe mode before enforcing budgets?', 'Observe mode shows real agent usage, waste, loop patterns, and cost attribution without blocking production workloads, giving finance and engineering evidence before switching to Control.'],
+              ].map(([question, answer]) => (
+                <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                  <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                  <p className="leading-relaxed text-gray-400">{answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
         </article>
 

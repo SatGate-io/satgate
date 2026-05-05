@@ -2,15 +2,78 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "AI Governance for API Teams: Why Your Gateway Needs Policy, Not Just Routing - SatGate Blog",
-  description: "API teams need AI governance that enforces budgets, permissions, and audit trails — not just traffic routing. Learn why traditional API management falls short.",
+  title: "AI Governance for API Teams: Gateway Policy, Not Just Routing",
+  description: "API teams need AI governance for budgets, permissions, and audit trails — not just routing. Learn where traditional API management falls short.",
   alternates: { canonical: 'https://satgate.io/blog/ai-governance-api-teams' },
-  keywords: ['AI governance API teams', 'API governance AI agents', 'AI API management', 'API team governance', 'AI agent policy enforcement', 'API governance framework']
+  keywords: ['AI governance API teams', 'API governance AI agents', 'AI API management', 'API team governance', 'AI agent policy enforcement', 'API governance framework'],
+  openGraph: {
+    title: 'AI Governance for API Teams: Gateway Policy, Not Just Routing',
+    description: 'API teams need AI governance for budgets, permissions, revocation, and audit trails — not just gateway routing.',
+    url: 'https://satgate.io/blog/ai-governance-api-teams',
+    type: 'article',
+    publishedTime: '2026-03-19T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Governance for API Teams: Gateway Policy, Not Just Routing',
+    description: 'Learn how API teams can enforce AI agent budgets, permissions, audit, revocation, and request-path policy.',
+  },
 };
 
 export default function AiGovernanceApiTeamsBlogPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'AI Governance for API Teams: Why Your Gateway Needs Policy, Not Just Routing',
+    description: 'API teams need AI governance for budgets, permissions, and audit trails — not just routing. Learn where traditional API management falls short.',
+    url: 'https://satgate.io/blog/ai-governance-api-teams',
+    datePublished: '2026-03-19',
+    dateModified: '2026-05-04',
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'AI governance for API teams' },
+      { '@type': 'Thing', name: 'AI API management' },
+      { '@type': 'Thing', name: 'agent policy enforcement' },
+      { '@type': 'Thing', name: 'request-path API governance' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What does AI governance mean for API teams?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'For API teams, AI governance means enforcing who can call an API, what each agent can spend, which tools or routes are allowed, when access should be revoked, and how every autonomous request is audited.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why is routing not enough for AI API governance?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Routing moves traffic to the right upstream service, but it does not decide whether an autonomous agent is allowed to spend money, use a high-risk tool, exceed a workflow budget, or delegate access to a sub-agent.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Where should API teams enforce AI agent policy?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'API teams should enforce AI agent policy in the request path at an economic firewall, gateway, or MCP proxy so budget, permission, revocation, and audit checks happen before upstream work executes.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -341,6 +404,23 @@ export API_BASE_URL=https://gateway.satgate.io/v1
           <p className="text-gray-300 leading-relaxed">
             If you answered "no" to more than two of these, your API platform has a governance gap. The good news: it's fixable without rearchitecting your stack. Economic governance layers on top of your existing infrastructure.
           </p>
+
+          <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">FAQ</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">AI governance for API teams questions</h2>
+            <div className="space-y-5">
+              {[
+                ['What does AI governance mean for API teams?', 'For API teams, AI governance means enforcing who can call an API, what each agent can spend, which tools or routes are allowed, when access should be revoked, and how every autonomous request is audited.'],
+                ['Why is routing not enough for AI API governance?', 'Routing moves traffic to the right upstream service, but it does not decide whether an autonomous agent is allowed to spend money, use a high-risk tool, exceed a workflow budget, or delegate access to a sub-agent.'],
+                ['Where should API teams enforce AI agent policy?', 'Enforce AI agent policy in the request path at an economic firewall, gateway, or MCP proxy so budget, permission, revocation, and audit checks happen before upstream work executes.'],
+              ].map(([question, answer]) => (
+                <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                  <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                  <p className="leading-relaxed text-gray-400">{answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
           <div className="mt-12 p-6 bg-gray-900/50 border border-gray-800 rounded-lg">
             <p className="text-gray-300 mb-4">

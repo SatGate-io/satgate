@@ -10,9 +10,59 @@ import {
   Fingerprint, Key, Ban, Globe, Server
 } from 'lucide-react';
 
+const webPageJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'Economic Firewall for AI Agents',
+  description: 'Protect HTTP APIs and MCP tools that AI agents call with request-path budget enforcement, revocation, audit, and delegated capability controls.',
+  url: 'https://satgate.io/agents',
+  dateModified: '2026-05-04',
+  isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+  about: [
+    { '@type': 'Thing', name: 'economic firewall for AI agents' },
+    { '@type': 'Thing', name: 'HTTP API protection for agents' },
+    { '@type': 'Thing', name: 'MCP tool governance' },
+    { '@type': 'Thing', name: 'per-agent budget enforcement' },
+    { '@type': 'Thing', name: 'delegation hierarchy controls' },
+  ],
+};
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What is an economic firewall for AI agents?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'An economic firewall for AI agents sits in the request path to observe, control, and audit every API or MCP tool call before autonomous agents create cost or access risk.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Can SatGate protect both HTTP APIs and MCP tools?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. SatGate protects HTTP APIs and MCP tool servers with the same request-path policies for identity, budgets, revocation, audit, and tool-cost enforcement.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How does SatGate stop runaway agent spend?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'SatGate stops runaway agent spend by enforcing per-agent budgets, per-tool caps, request attribution, delegation limits, and revocable capabilities before the next upstream call executes.',
+      },
+    },
+  ],
+};
+
 export default function AgentsLandingPage() {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-purple-500 selection:text-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       {/* Navigation */}
       <nav className="border-b border-gray-800 backdrop-blur-md fixed w-full z-50 bg-black/50">
@@ -184,7 +234,7 @@ export default function AgentsLandingPage() {
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-cyan-400 shrink-0" /> Per-agent credit budgets</li>
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-cyan-400 shrink-0" /> Budget exhaustion alerts</li>
-                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-cyan-400 shrink-0" /> Fiat402 enforcement</li>
+                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-cyan-400 shrink-0" /> Request-path budget enforcement</li>
               </ul>
             </div>
 
@@ -310,6 +360,26 @@ export default function AgentsLandingPage() {
                   <h3 className="text-white font-semibold mb-1">{item.title}</h3>
                   <p className="text-gray-400 text-sm">{item.desc}</p>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-20 px-4 border-t border-gray-800/50 bg-black">
+        <div className="max-w-4xl mx-auto">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300 text-center">FAQ</p>
+          <h2 className="text-3xl font-bold text-center text-white mb-10">AI agent economic firewall questions</h2>
+          <div className="grid gap-5 md:grid-cols-3">
+            {[
+              ['What is an economic firewall for AI agents?', 'An economic firewall for AI agents sits in the request path to observe, control, and audit every API or MCP tool call before autonomous agents create cost or access risk.'],
+              ['Can SatGate protect both HTTP APIs and MCP tools?', 'Yes. SatGate protects HTTP APIs and MCP tool servers with the same request-path policies for identity, budgets, revocation, audit, and tool-cost enforcement.'],
+              ['How does SatGate stop runaway agent spend?', 'SatGate enforces per-agent budgets, per-tool caps, request attribution, delegation limits, and revocable capabilities before the next upstream call executes.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="rounded-2xl border border-gray-800 bg-gray-900/50 p-6">
+                <h3 className="mb-3 text-lg font-bold text-white">{question}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{answer}</p>
               </div>
             ))}
           </div>

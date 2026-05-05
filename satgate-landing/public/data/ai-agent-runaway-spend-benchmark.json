@@ -1,0 +1,70 @@
+{
+  "name": "AI Agent Runaway Spend Benchmark Scenarios",
+  "description": "Modeled benchmark scenarios estimating uncontrolled and request-path controlled spend for autonomous AI agent loops, MCP retry storms, and agent swarms.",
+  "publisher": "SatGate",
+  "url": "https://satgate.io/ai-agent-runaway-spend-benchmark",
+  "datePublished": "2026-04-26",
+  "methodology": {
+    "formula": "cost = agents * calls_per_minute * fanout * minutes * cost_per_call_usd",
+    "uncontrolled_minutes": "detection_delay_minutes",
+    "controlled_minutes": 5,
+    "controlled_assumption": "A request-path economic firewall stops new paid calls after five minutes through budget, per-tool cap, route policy, expiry, or revocation."
+  },
+  "scenarios": [
+    {
+      "scenario": "Single coding agent loop",
+      "agents": 1,
+      "calls_per_minute": 18,
+      "fanout": 1,
+      "cost_per_call_usd": 0.06,
+      "detection_delay_minutes": 45,
+      "uncontrolled_cost_usd": 48.60,
+      "controlled_cost_usd": 5.40,
+      "avoided_cost_percent": 88.89
+    },
+    {
+      "scenario": "MCP tool retry storm",
+      "agents": 12,
+      "calls_per_minute": 8,
+      "fanout": 3,
+      "cost_per_call_usd": 0.12,
+      "detection_delay_minutes": 60,
+      "uncontrolled_cost_usd": 2073.60,
+      "controlled_cost_usd": 172.80,
+      "avoided_cost_percent": 91.67
+    },
+    {
+      "scenario": "Support-agent swarm",
+      "agents": 50,
+      "calls_per_minute": 6,
+      "fanout": 4,
+      "cost_per_call_usd": 0.04,
+      "detection_delay_minutes": 90,
+      "uncontrolled_cost_usd": 4320.00,
+      "controlled_cost_usd": 240.00,
+      "avoided_cost_percent": 94.44
+    },
+    {
+      "scenario": "Premium research workflow",
+      "agents": 20,
+      "calls_per_minute": 10,
+      "fanout": 5,
+      "cost_per_call_usd": 0.25,
+      "detection_delay_minutes": 30,
+      "uncontrolled_cost_usd": 7500.00,
+      "controlled_cost_usd": 1250.00,
+      "avoided_cost_percent": 83.33
+    },
+    {
+      "scenario": "Enterprise background agents",
+      "agents": 200,
+      "calls_per_minute": 4,
+      "fanout": 2,
+      "cost_per_call_usd": 0.03,
+      "detection_delay_minutes": 120,
+      "uncontrolled_cost_usd": 5760.00,
+      "controlled_cost_usd": 240.00,
+      "avoided_cost_percent": 95.83
+    }
+  ]
+}

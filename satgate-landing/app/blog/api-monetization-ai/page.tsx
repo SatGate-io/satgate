@@ -2,15 +2,87 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "API Monetization for AI: How to Charge Agents, Not Just Developers - SatGate Blog",
-  description: "AI agents are your next API customers. Traditional API monetization fails for autonomous workloads. Learn how to price, meter, and collect from machine consumers.",
+  title: "API Monetization for AI Agents: Pricing, Billing, L402, and Metering",
+  description: "How to monetize APIs for AI agents with machine-readable pricing, request-path metering, budget enforcement, and L402 payments.",
   alternates: { canonical: 'https://satgate.io/blog/api-monetization-ai' },
-  keywords: ['API monetization AI', 'API monetization for AI agents', 'monetize API AI', 'AI agent billing', 'machine-to-machine payments', 'API pricing AI agents', 'L402 API monetization']
+  keywords: ['API monetization AI', 'API monetization for AI agents', 'monetize API AI', 'AI agent billing', 'machine-to-machine payments', 'API pricing AI agents', 'L402 API monetization'],
+  openGraph: {
+    title: 'API Monetization for AI Agents: Pricing, Billing, and L402',
+    description: 'Monetize APIs for AI agents with machine-readable pricing, request-path metering, budget enforcement, and L402 payments.',
+    url: 'https://satgate.io/blog/api-monetization-ai',
+    type: 'article',
+    publishedTime: '2026-03-26T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'API Monetization for AI Agents: Pricing, Billing, and L402',
+    description: 'Turn APIs into robot-customer products with machine-readable prices, request-path metering, and L402 payment flows.',
+  },
 };
 
 export default function ApiMonetizationAiBlogPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'API Monetization for AI Agents: Pricing, Billing, L402, and Metering',
+    description: metadata.description,
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    datePublished: '2026-03-26',
+    dateModified: '2026-05-04',
+    mainEntityOfPage: 'https://satgate.io/blog/api-monetization-ai',
+    about: [
+      { '@type': 'Thing', name: 'API monetization for AI agents' },
+      { '@type': 'Thing', name: 'machine-readable API pricing' },
+      { '@type': 'Thing', name: 'request-path API metering' },
+      { '@type': 'Thing', name: 'L402 API payments' },
+      { '@type': 'Thing', name: 'robot customer billing' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do you monetize an API for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Monetize APIs for AI agents by exposing machine-readable prices, enforcing per-call budgets in the request path, and accepting machine-native payment flows such as L402 instead of relying only on monthly subscriptions and static API keys.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why do traditional API pricing models break for AI workloads?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Traditional API pricing assumes a human signs up, manages an account, and reviews invoices. AI agents discover tools dynamically, call APIs at machine speed, delegate work to sub-agents, and can create large bills before monthly billing catches up.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What role does L402 play in AI API monetization?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'L402 lets APIs return HTTP 402 Payment Required with a Lightning invoice and macaroon so an agent can pay per request and receive proof-of-payment access without human signup or credit-card billing.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is API monetization for AI agents the same as usage-based SaaS billing?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No. Usage-based SaaS billing usually measures consumption after the fact and invoices a human account later. AI agent monetization needs machine-readable prices, request-path authorization, real-time budget checks, and machine-native payment or proof-of-payment before access is granted.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -327,6 +399,24 @@ sub_agent_token = attenuate(agent_a_token, [
             Your API's next million customers are already being built. They just need a way to pay.
           </p>
 
+          <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">FAQ</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">AI API monetization questions</h2>
+            <div className="space-y-5">
+              {[
+                ['How do you monetize an API for AI agents?', 'Expose machine-readable prices, enforce per-call budgets in the request path, and accept machine-native payment flows such as L402 instead of relying only on monthly subscriptions and static API keys.'],
+                ['Why do traditional API pricing models break for AI workloads?', 'They assume a human signs up, manages an account, and reviews invoices. AI agents discover tools dynamically, call APIs at machine speed, delegate work to sub-agents, and can create large bills before monthly billing catches up.'],
+                ['What role does L402 play in AI API monetization?', 'L402 lets APIs return HTTP 402 Payment Required with a Lightning invoice and macaroon so an agent can pay per request and receive proof-of-payment access without human signup or credit-card billing.'],
+                ['Is API monetization for AI agents the same as usage-based SaaS billing?', 'No. Usage-based SaaS billing measures consumption after the fact and invoices a human account later. AI agent monetization needs machine-readable prices, request-path authorization, real-time budget checks, and machine-native payment or proof-of-payment before access is granted.'],
+              ].map(([question, answer]) => (
+                <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                  <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                  <p className="leading-relaxed text-gray-400">{answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
           {/* CTA Section */}
           <div className="mt-16 bg-gradient-to-r from-purple-900/20 to-cyan-900/20 border border-purple-800/30 rounded-xl p-8">
             <h3 className="text-xl font-bold text-white mb-3">Ready to Monetize Your API for AI?</h3>
@@ -334,7 +424,7 @@ sub_agent_token = attenuate(agent_a_token, [
               SatGate adds economic governance — pricing, budgets, and machine-readable payments — to any API in minutes. Start with observe mode and go live when you're ready.
             </p>
             <div className="flex flex-wrap gap-3">
-              <a href="https://github.com/satgate/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
+              <a href="https://github.com/SatGate-io/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
                 View on GitHub
               </a>
               <Link href="/design-partners" className="inline-flex items-center gap-2 border border-purple-500 text-purple-300 px-6 py-3 rounded-lg font-bold hover:bg-purple-900/30 transition text-sm">

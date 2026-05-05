@@ -2,15 +2,87 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock, ArrowRight, AlertTriangle, CheckCircle, Bot, Users, DollarSign } from 'lucide-react';
 
 export const metadata = {
-  title: 'Agent Swarms Are Here. Who\'s Controlling the Spend?',
-  description: 'Multi-agent AI systems multiply API costs exponentially. Without economic governance, agent swarms can burn through budgets in minutes. Here\'s how to fix it.',
+  title: 'Agent Swarm Cost Control: Hierarchical Budgets for Multi-Agent Systems',
+  description: 'Control agent swarm costs with hierarchical budgets, scoped delegation tokens, cascade revocation, and request-path enforcement for multi-agent systems.',
   alternates: { canonical: 'https://satgate.io/blog/agent-swarms-cost-governance' },
   keywords: ['AI agent swarm cost control', 'multi-agent API governance', 'agent orchestration budget', 'AI agent delegation', 'autonomous agent spend'],
+  openGraph: {
+    title: 'Agent Swarm Cost Control: Hierarchical Budgets for Agents',
+    description: 'Control agent swarm costs with hierarchical budgets, scoped delegation tokens, cascade revocation, and request-path enforcement.',
+    url: 'https://satgate.io/blog/agent-swarms-cost-governance',
+    type: 'article',
+    publishedTime: '2026-03-05T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Agent Swarm Cost Control: Hierarchical Budgets for Agents',
+    description: 'Govern multi-agent systems with parent budgets, scoped sub-agent delegation, cascade revocation, and hard spend caps.',
+  },
 };
 
 export default function AgentSwarmsCostGovernancePage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'Agent Swarm Cost Control: Hierarchical Budgets for Multi-Agent Systems',
+    description: metadata.description,
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    datePublished: '2026-03-05',
+    dateModified: '2026-05-04',
+    mainEntityOfPage: 'https://satgate.io/blog/agent-swarms-cost-governance',
+    about: [
+      { '@type': 'Thing', name: 'agent swarm cost control' },
+      { '@type': 'Thing', name: 'hierarchical budgets for multi-agent systems' },
+      { '@type': 'Thing', name: 'scoped delegation tokens' },
+      { '@type': 'Thing', name: 'cascade revocation for agent swarms' },
+      { '@type': 'Thing', name: 'request-path multi-agent spend enforcement' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Why do agent swarms create runaway spend risk?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Agent swarms multiply cost because a coordinator can spawn sub-agents, each with its own tools, retries, fanout, and API calls. One user task can become thousands of paid calls unless budgets roll up across the delegation tree.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How should teams control multi-agent spending?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Teams should use hierarchical budgets, scoped delegation tokens, cascade revocation, and request-path enforcement so each sub-agent can spend only within the parent agent’s authority.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why is gateway-level enforcement better than framework callbacks?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Gateway-level enforcement works across frameworks and blocks costly calls before they execute. Framework callbacks often observe spend after the request and only cover agents built with that framework.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do hierarchical budgets work for agent swarms?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A parent agent receives a total budget, then delegates smaller scoped budgets to sub-agents. Child agents can spend only inside their delegated allowance, and the whole swarm cannot exceed the parent ceiling.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -191,6 +263,24 @@ satgate delegate --from <coder-token> \\
             An economic firewall gives every stakeholder what they need: Finance gets budget enforcement, 
             Security gets scope attenuation, Engineering gets attribution, Compliance gets an immutable audit trail.
           </p>
+
+          <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">FAQ</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">Agent swarm cost governance questions</h2>
+            <div className="space-y-5">
+              {[
+                ['Why do agent swarms create runaway spend risk?', 'Agent swarms multiply cost because a coordinator can spawn sub-agents, each with its own tools, retries, fanout, and API calls. One user task can become thousands of paid calls unless budgets roll up across the delegation tree.'],
+                ['How should teams control multi-agent spending?', 'Use hierarchical budgets, scoped delegation tokens, cascade revocation, and request-path enforcement so each sub-agent can spend only within the parent agent’s authority.'],
+                ['Why is gateway-level enforcement better than framework callbacks?', 'Gateway-level enforcement works across frameworks and blocks costly calls before they execute. Framework callbacks often observe spend after the request and only cover agents built with that framework.'],
+                ['How do hierarchical budgets work for agent swarms?', 'A parent agent receives a total budget, then delegates smaller scoped budgets to sub-agents. Child agents can spend only inside their delegated allowance, and the whole swarm cannot exceed the parent ceiling.'],
+              ].map(([question, answer]) => (
+                <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                  <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                  <p className="leading-relaxed text-gray-400">{answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
           <div className="bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-purple-500/20 rounded-xl p-8 mt-12 text-center">
             <h3 className="text-xl font-bold text-white mb-3">Control your agent swarm&apos;s spend</h3>

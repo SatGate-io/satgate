@@ -5,11 +5,80 @@ export const metadata = {
   title: 'Why Routing Isn\'t Governance - SatGate Blog',
   description: 'AI gateways excel at routing LLM calls. But when agents control spend autonomously, routing isn\'t enough. You need economic governance.',
   alternates: { canonical: 'https://satgate.io/blog/why-routing-isnt-governance' },
+  openGraph: {
+    title: "Why Routing Isn't Governance for AI Agents",
+    description: "AI gateways route LLM calls. Agent governance enforces budgets, scoped authority, delegation, and payment policy before spend.",
+    url: 'https://satgate.io/blog/why-routing-isnt-governance',
+    type: 'article',
+    publishedTime: '2026-02-06T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Why Routing Isn't Governance for AI Agents",
+    description: "Routing chooses providers. Governance decides whether AI agents can spend, delegate, call tools, or pay in the first place.",
+  },
 };
 
 export default function WhyRoutingIsntGovernancePage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: "Why Routing Isn't Governance",
+    description: "AI gateways excel at routing LLM calls. But when agents control spend autonomously, routing isn't enough. You need economic governance.",
+    url: 'https://satgate.io/blog/why-routing-isnt-governance',
+    datePublished: '2026-02-06',
+    dateModified: '2026-05-04',
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'AI gateway routing' },
+      { '@type': 'Thing', name: 'economic governance for AI agents' },
+      { '@type': 'Thing', name: 'agent spend control' },
+      { '@type': 'Thing', name: 'request-path policy enforcement' },
+    ],
+  };
+
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Why is routing not governance for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Routing decides where a request should go. Governance decides whether an autonomous agent is allowed to make the request, what it may spend, which tools it may use, and when access should stop or be revoked.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the difference between an AI gateway and an economic gateway?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An AI gateway usually focuses on model routing, failover, caching, and observability. An economic gateway sits in the request path to enforce budgets, scoped authority, delegation rules, spend attribution, and payment policy before agent spend occurs.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can routing gateways and economic governance work together?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. The economic governance layer can check policy and budget first, then pass approved requests to a routing gateway for provider selection, failover, or caching. They solve different layers of the agent infrastructure problem.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -227,6 +296,30 @@ export default function WhyRoutingIsntGovernancePage() {
               The agent economy needs both. But right now, almost everyone has routing. 
               Almost no one has governance.
             </p>
+
+            <div className="my-8 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
+              <h2 className="text-2xl font-bold text-white mb-4">Routing vs Governance FAQ</h2>
+              <div className="space-y-5">
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-2">Why is routing not governance for AI agents?</h3>
+                  <p className="text-gray-300 leading-relaxed mb-0">
+                    Routing decides where a request should go. Governance decides whether an autonomous agent is allowed to make the request, what it may spend, which tools it may use, and when access should stop or be revoked.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-2">What is the difference between an AI gateway and an economic gateway?</h3>
+                  <p className="text-gray-300 leading-relaxed mb-0">
+                    An AI gateway usually focuses on model routing, failover, caching, and observability. An economic gateway sits in the request path to enforce budgets, scoped authority, delegation rules, spend attribution, and payment policy before agent spend occurs.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-2">Can routing gateways and economic governance work together?</h3>
+                  <p className="text-gray-300 leading-relaxed mb-0">
+                    Yes. The economic governance layer can check policy and budget first, then pass approved requests to a routing gateway for provider selection, failover, or caching. They solve different layers of the agent infrastructure problem.
+                  </p>
+                </div>
+              </div>
+            </div>
 
             <p className="text-gray-500 mt-12">
               That's the gap we're building SatGate to fill.

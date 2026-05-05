@@ -2,15 +2,87 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock, Shield, Lock, DollarSign, ArrowRight, CheckCircle, Zap, GitBranch, Eye, Activity, BookOpen } from 'lucide-react';
 
 export const metadata = {
-  title: 'What Google DeepMind Gets Right About Agent Delegation — And What SatGate Already Built',
-  description: 'DeepMind\'s Intelligent AI Delegation paper proposes macaroon-based capability tokens for safe agent delegation. SatGate already implements this architecture. Here\'s how they map.',
+  title: 'Intelligent AI Delegation: Macaroons, Capability Tokens, and SatGate',
+  description: 'DeepMind\'s Intelligent AI Delegation points to macaroon capability tokens for safe AI agent delegation. SatGate implements request-path delegation controls.',
   alternates: { canonical: 'https://satgate.io/blog/deepmind-intelligent-delegation-satgate' },
   keywords: ['AI agent delegation', 'macaroon tokens', 'capability-based security', 'Google DeepMind', 'delegation capability tokens', 'agent economy', 'economic access control', 'SatGate', 'privilege attenuation', 'agentic web'],
+  openGraph: {
+    title: 'Intelligent AI Delegation: Macaroons and Capability Tokens',
+    description: 'DeepMind-style AI delegation needs macaroon capability tokens, scoped budgets, revocation, and request-path controls.',
+    url: 'https://satgate.io/blog/deepmind-intelligent-delegation-satgate',
+    type: 'article',
+    publishedTime: '2026-03-11T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Intelligent AI Delegation: Macaroons and Capability Tokens',
+    description: 'AI agent delegation needs attenuated authority, budget caveats, revocation, and request-path enforcement.',
+  },
 };
 
 export default function DeepMindDelegationPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'Intelligent AI Delegation: Macaroons, Capability Tokens, and SatGate',
+    description: metadata.description,
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    datePublished: '2026-03-11',
+    dateModified: '2026-05-04',
+    mainEntityOfPage: 'https://satgate.io/blog/deepmind-intelligent-delegation-satgate',
+    about: [
+      { '@type': 'Thing', name: 'intelligent AI delegation' },
+      { '@type': 'Thing', name: 'delegation capability tokens' },
+      { '@type': 'Thing', name: 'macaroons for AI agents' },
+      { '@type': 'Thing', name: 'privilege attenuation for agent chains' },
+      { '@type': 'Thing', name: 'request-path delegation controls' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What are Delegation Capability Tokens for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Delegation Capability Tokens are scoped credentials that let an agent pass limited authority to another agent. The useful form is attenuated: each delegation can only narrow permissions, budgets, routes, tools, or time windows.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why are macaroons a strong primitive for AI agent delegation?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Macaroons support cryptographic caveats, local verification, and privilege attenuation. A parent token can mint child tokens with stricter constraints, but a child token cannot expand authority beyond its parent.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How does SatGate implement intelligent agent delegation?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'SatGate uses macaroon-based capability tokens with caveats for route scope, MCP tool scope, budgets, expiry, and delegation chains, then enforces those constraints in the request path before upstream APIs execute.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What does Intelligent AI Delegation require beyond task routing?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Intelligent AI delegation needs explicit authority transfer, attenuated permissions, resource budgets, accountability across delegation chains, revocation, and enforcement before delegated agents can call APIs, MCP tools, or paid services.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -405,6 +477,24 @@ export default function DeepMindDelegationPage() {
               Start Free on Cloud <ArrowRight size={16} />
             </Link>
           </div>
+
+          <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-blue-300">FAQ</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">AI agent delegation questions</h2>
+            <div className="space-y-5">
+              {[
+                ['What are Delegation Capability Tokens for AI agents?', 'Delegation Capability Tokens are scoped credentials that let an agent pass limited authority to another agent. The useful form is attenuated: each delegation can only narrow permissions, budgets, routes, tools, or time windows.'],
+                ['Why are macaroons a strong primitive for AI agent delegation?', 'Macaroons support cryptographic caveats, local verification, and privilege attenuation. A parent token can mint child tokens with stricter constraints, but a child token cannot expand authority beyond its parent.'],
+                ['How does SatGate implement intelligent agent delegation?', 'SatGate uses macaroon-based capability tokens with caveats for route scope, MCP tool scope, budgets, expiry, and delegation chains, then enforces those constraints in the request path before upstream APIs execute.'],
+                ['What does Intelligent AI Delegation require beyond task routing?', 'Intelligent AI delegation needs explicit authority transfer, attenuated permissions, resource budgets, accountability across delegation chains, revocation, and enforcement before delegated agents can call APIs, MCP tools, or paid services.'],
+              ].map(([question, answer]) => (
+                <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                  <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                  <p className="leading-relaxed text-gray-400">{answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* Reference */}
           <div className="border-t border-gray-800 pt-6 mt-12">

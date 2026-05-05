@@ -3,14 +3,83 @@ import { ArrowLeft, Calendar, Clock, Shield, DollarSign, ArrowRight, AlertTriang
 
 export const metadata = {
   title: 'What Is an Economic Firewall? | SatGate',
-  description: 'An economic firewall enforces real-time budget limits on AI agent API calls. Learn why rate limiting fails for autonomous agents, how macaroon delegation works, and why economic governance is the missing security primitive.',
+  description: 'An economic firewall enforces AI agent budget limits in real time. Learn why rate limits fail and how SatGate governs autonomous API spend.',
   alternates: { canonical: 'https://satgate.io/blog/what-is-an-economic-firewall' },
   keywords: ['economic firewall', 'AI agent security', 'API budget enforcement', 'macaroon delegation', 'agent economy', 'MCP cost control', 'L402', 'API gateway AI'],
+  openGraph: {
+    title: 'What Is an Economic Firewall for AI Agents?',
+    description: 'An economic firewall enforces AI agent budgets, tool prices, scopes, revocation, and audit before costly calls execute.',
+    url: 'https://satgate.io/blog/what-is-an-economic-firewall',
+    type: 'article',
+    publishedTime: '2026-03-18T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'What Is an Economic Firewall for AI Agents?',
+    description: 'Learn how economic firewalls govern autonomous API, model, and MCP tool spend before AI agents run up costs.',
+  },
 };
 
 export default function WhatIsEconomicFirewallPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'What Is an Economic Firewall?',
+    description: 'An economic firewall enforces AI agent budget limits in real time before autonomous API, model, or MCP tool calls execute.',
+    url: 'https://satgate.io/blog/what-is-an-economic-firewall',
+    datePublished: '2026-03-18',
+    dateModified: '2026-05-04',
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'economic firewall for AI agents' },
+      { '@type': 'Thing', name: 'AI agent budget limits' },
+      { '@type': 'Thing', name: 'request-path cost enforcement' },
+      { '@type': 'Thing', name: 'MCP cost control' },
+    ],
+  };
+
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is an economic firewall?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An economic firewall is a request-path control layer that decides whether an autonomous AI agent can afford an API, model, or MCP tool call before that call executes. It enforces budgets, tool prices, scopes, delegation rules, revocation, and audit requirements.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How is an economic firewall different from an API gateway?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A traditional API gateway authenticates, routes, rate-limits, and observes traffic. An economic firewall adds spend governance: it checks cost, budget, authority, and payment policy before forwarding agent requests upstream.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why do AI agents need economic firewalls?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AI agents can call tools, retry, delegate, and spend autonomously at machine speed. Dashboards and alerts show costs after the fact, while an economic firewall blocks or downgrades spend before runaway loops or expensive tool calls hit the bill.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -231,6 +300,30 @@ const agentBToken = attenuate(agentAToken, {
           <p className="text-gray-300 leading-relaxed">
             Economic governance is becoming a prerequisite for safe agentic AI deployment. Not a nice-to-have. Not a future concern. A prerequisite &mdash; the same way you wouldn&rsquo;t deploy a web application without authentication, or expose an API without rate limiting. The cost dimension is now a first-class security concern.
           </p>
+
+          <div className="my-8 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-6">
+            <h2 className="text-2xl font-bold text-white mb-4">Economic Firewall FAQ</h2>
+            <div className="space-y-5">
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">What is an economic firewall?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  An economic firewall is a request-path control layer that decides whether an autonomous AI agent can afford an API, model, or MCP tool call before that call executes. It enforces budgets, tool prices, scopes, delegation rules, revocation, and audit requirements.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">How is an economic firewall different from an API gateway?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  A traditional API gateway authenticates, routes, rate-limits, and observes traffic. An economic firewall adds spend governance: it checks cost, budget, authority, and payment policy before forwarding agent requests upstream.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">Why do AI agents need economic firewalls?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  AI agents can call tools, retry, delegate, and spend autonomously at machine speed. Dashboards and alerts show costs after the fact, while an economic firewall blocks or downgrades spend before runaway loops or expensive tool calls hit the bill.
+                </p>
+              </div>
+            </div>
+          </div>
 
           <div className="bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-purple-500/20 rounded-xl p-8 mt-12 text-center">
             <h3 className="text-xl font-bold text-white mb-3">SatGate is an open-source economic firewall</h3>

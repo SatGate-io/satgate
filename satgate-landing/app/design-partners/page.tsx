@@ -74,8 +74,59 @@ export default function DesignPartnersPage() {
     { q: 'Is this production-ready?', a: 'Yes. 60+ dashboard pages, full deployment options (Docker, K8s, Terraform, SaaS), and a battle-tested Go binary with zero dependencies.' },
   ];
 
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'SatGate Design Partners Program',
+    url: 'https://satgate.io/design-partners',
+    description: 'Early access for teams shaping SatGate economic firewall capabilities for AI agent budget enforcement, MCP governance, API controls, and L402 Charge.',
+    datePublished: '2026-04-27',
+    dateModified: '2026-05-02',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'AI agent economic governance' },
+      { '@type': 'Thing', name: 'economic firewall design partners' },
+      { '@type': 'Thing', name: 'MCP governance' },
+      { '@type': 'Thing', name: 'L402 Charge' },
+    ],
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'Design Partners', item: 'https://satgate.io/design-partners' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.q,
+      acceptedAnswer: { '@type': 'Answer', text: faq.a },
+    })),
+  };
+
+  const programJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: 'SatGate Design Partners Program',
+    serviceType: 'AI agent economic governance design partner program',
+    url: 'https://satgate.io/design-partners',
+    provider: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    description: 'Early access for teams shaping SatGate economic firewall capabilities across AI agent budget enforcement, MCP governance, agent API controls, and L402 Charge.',
+    areaServed: 'Global',
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-purple-500 selection:text-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(programJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       {/* Navigation */}
       <nav className="border-b border-gray-800 backdrop-blur-md fixed w-full z-50 bg-black/50">
@@ -90,7 +141,7 @@ export default function DesignPartnersPage() {
             <Link href="/protect" className="hover:text-white transition">Control Demo</Link>
             <Link href="/pay" className="hover:text-white transition">Charge Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
-            <Link href="#" className="hover:text-white transition">Pricing</Link>
+            <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
             <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud</a>
           </div>
@@ -112,7 +163,7 @@ export default function DesignPartnersPage() {
               { href: '/protect', label: 'Control Demo' },
               { href: '/pay', label: 'Charge Demo' },
               { href: '/govern', label: 'Enterprise' },
-              { href: '#', label: 'Pricing' },
+              { href: '/pricing', label: 'Pricing' },
             ].map(item => (
               <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">
                 {item.label}

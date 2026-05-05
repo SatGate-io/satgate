@@ -17,7 +17,7 @@ const comparisonRows = [
     feature: 'Budget Enforcement',
     icon: <DollarSign size={16} className="text-gray-400" />,
     cloud: 'Reactive — throttling/alerts after spend occurs',
-    satgate: 'Proactive — real-time hard-caps at tool-call level via L402',
+    satgate: 'Proactive — real-time hard-caps at tool-call level via request-path policy',
   },
   {
     feature: 'Governance Scope',
@@ -59,9 +59,58 @@ const comparisonRows = [
 
 const CloudNativeComparisonPage = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'SatGate vs Cloud-Native AI Governance',
+    url: 'https://satgate.io/compare/cloud-native',
+    description: 'Compare SatGate with cloud-native AI governance for provider-neutral agent spend control, MCP tool governance, and request-path enforcement.',
+    datePublished: '2026-04-30',
+    dateModified: '2026-05-02',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'cloud-native AI governance alternative' },
+      { '@type': 'Thing', name: 'provider-neutral agent spend control' },
+      { '@type': 'Thing', name: 'request-path budget enforcement' },
+      { '@type': 'Thing', name: 'MCP tool governance across clouds' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Why are cloud-native AI governance tools not enough for autonomous agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Cloud-native tools are usually siloed to one provider and built around IAM, logs, and after-the-fact billing. Autonomous agents need request-path controls that follow tool calls across clouds, APIs, and MCP servers.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How is SatGate different from AWS, Azure, or GCP AI governance?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'SatGate is provider-neutral and enforces economic policy before upstream calls execute. It can cap per-agent, per-tool, and per-task spend across clouds instead of relying on one cloud billing system.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can SatGate work alongside cloud-native AI platforms?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. SatGate can sit between agents and cloud-hosted models or tools, adding budget enforcement, cost attribution, and policy controls while the cloud platform continues to provide compute and model hosting.',
+        },
+      },
+    ],
+  };
 
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-purple-500 selection:text-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {/* Navigation */}
       <nav className="border-b border-gray-800 backdrop-blur-md fixed w-full z-50 bg-black/50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
@@ -241,6 +290,25 @@ const CloudNativeComparisonPage = () => {
                 Azure doesn&apos;t know if a search tool costs $0.01 or $1.00 until the bill arrives. SatGate lets you set a budget on the &lsquo;hands&rsquo; directly.&rdquo;
               </p>
             </blockquote>
+          </div>
+        </div>
+      </section>
+
+      <section className="pb-20 px-6">
+        <div className="max-w-3xl mx-auto rounded-xl border border-gray-800 bg-gray-950 p-6 sm:p-8">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">FAQ</p>
+          <h2 className="mb-6 text-2xl font-bold text-white">Cloud-native AI governance questions</h2>
+          <div className="space-y-5">
+            {[
+              ['Why are cloud-native AI governance tools not enough for autonomous agents?', 'Cloud-native tools are usually siloed to one provider and built around IAM, logs, and after-the-fact billing. Autonomous agents need request-path controls that follow tool calls across clouds, APIs, and MCP servers.'],
+              ['How is SatGate different from AWS, Azure, or GCP AI governance?', 'SatGate is provider-neutral and enforces economic policy before upstream calls execute. It can cap per-agent, per-tool, and per-task spend across clouds instead of relying on one cloud billing system.'],
+              ['Can SatGate work alongside cloud-native AI platforms?', 'Yes. SatGate can sit between agents and cloud-hosted models or tools, adding budget enforcement, cost attribution, and policy controls while the cloud platform continues to provide compute and model hosting.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                <p className="leading-relaxed text-gray-400">{answer}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

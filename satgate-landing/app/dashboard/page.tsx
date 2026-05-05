@@ -8,6 +8,68 @@ import Image from 'next/image';
 // API endpoint - Railway backend
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://satgate-production-9354.up.railway.app';
 
+const webPageJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'SatGate Governance Dashboard',
+  url: 'https://satgate.io/dashboard',
+  description: 'Live governance dashboard for AI agent tokens, delegation depth, caveats, blocked requests, revocation hits, and economic firewall telemetry.',
+  datePublished: '2026-04-12',
+  dateModified: '2026-05-03',
+  isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+  about: [
+    { '@type': 'Thing', name: 'AI agent governance dashboard' },
+    { '@type': 'Thing', name: 'economic firewall telemetry' },
+    { '@type': 'Thing', name: 'agent token delegation graph' },
+    { '@type': 'Thing', name: 'macaroon caveat visibility' },
+    { '@type': 'Thing', name: 'request-path revocation evidence' },
+  ],
+};
+
+const softwareJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'SatGate Governance Dashboard',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'Web',
+  url: 'https://satgate.io/dashboard',
+  description: webPageJsonLd.description,
+  publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+  dateModified: '2026-05-03',
+  featureList: ['Agent token graph telemetry', 'Delegation depth visibility', 'Macaroon caveat inspection', 'Revocation hit tracking', 'Blocked request counters'],
+};
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What does the SatGate governance dashboard show?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The SatGate governance dashboard shows active agent tokens, delegation depth, caveats, blocked requests, banned tokens, revocation hits, and economic firewall telemetry for agent activity.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Why do AI agent teams need live governance telemetry?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Live governance telemetry helps teams see which agents hold authority, what scopes and budgets apply, whether tokens are delegated, and when request-path controls block risky or over-budget activity.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How does dashboard telemetry connect to request-path control?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Dashboard telemetry explains decisions after SatGate enforces them in the request path. The dashboard is evidence; the gateway is where budgets, revocation, scopes, and policy are applied before upstream access.',
+      },
+    },
+  ],
+};
+
 // Token type from API
 interface TokenData {
   id: string;
@@ -196,6 +258,9 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {/* Navigation */}
       <nav className="border-b border-gray-800 backdrop-blur-md fixed w-full z-50 bg-black/80">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -472,6 +537,23 @@ export default function DashboardPage() {
               )}
             </div>
           </div>
+
+          <section className="mt-8 border-t border-gray-800 pt-8">
+            <p className="mb-2 text-center text-xs font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+            <h2 className="mb-8 text-center text-2xl font-bold text-white">Governance dashboard questions</h2>
+            <div className="grid gap-4 md:grid-cols-3">
+              {[
+                ['What does the SatGate governance dashboard show?', 'The SatGate governance dashboard shows active agent tokens, delegation depth, caveats, blocked requests, banned tokens, revocation hits, and economic firewall telemetry for agent activity.'],
+                ['Why do AI agent teams need live governance telemetry?', 'Live governance telemetry helps teams see which agents hold authority, what scopes and budgets apply, whether tokens are delegated, and when request-path controls block risky or over-budget activity.'],
+                ['How does dashboard telemetry connect to request-path control?', 'Dashboard telemetry explains decisions after SatGate enforces them in the request path. The dashboard is evidence; the gateway is where budgets, revocation, scopes, and policy are applied before upstream access.'],
+              ].map(([question, answer]) => (
+                <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
+                  <h3 className="mb-2 font-bold text-white">{question}</h3>
+                  <p className="text-sm leading-relaxed text-gray-400">{answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* Connection Status */}
           <div className={`mt-8 p-4 rounded-xl text-center ${isConnected ? 'bg-green-900/20 border border-green-800/30' : 'bg-purple-900/20 border border-purple-800/30'}`}>

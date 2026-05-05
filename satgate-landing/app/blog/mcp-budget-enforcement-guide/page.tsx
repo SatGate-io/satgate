@@ -1,16 +1,95 @@
 import Link from 'next/link';
+import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock, ArrowRight, CheckCircle, Shield, DollarSign, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'MCP Budget Enforcement: A Practical Guide to Controlling AI Tool Spend',
-  description: 'How to enforce per-tool budgets on MCP (Model Context Protocol) servers. Assign costs per tool call, cap agent spending, and attribute costs across teams.',
+  title: 'MCP Budget Enforcement Guide: Per-Tool Costs and Hard Agent Spend Caps',
+  description: 'Practical MCP budget enforcement guide: set per-tool costs, cap agent spend, delegate budgets, and block runaway MCP tool calls before execution.',
   alternates: { canonical: 'https://satgate.io/blog/mcp-budget-enforcement-guide' },
   keywords: ['MCP budget enforcement', 'MCP proxy', 'Model Context Protocol budget', 'AI tool cost control', 'MCP gateway', 'per-tool cost attribution'],
+  openGraph: {
+    title: 'MCP Budget Enforcement: Per-Tool Costs and Hard Spend Caps',
+    description: 'Set MCP per-tool costs, cap agent spend, delegate budgets, and block runaway tool calls before execution.',
+    url: 'https://satgate.io/blog/mcp-budget-enforcement-guide',
+    type: 'article',
+    publishedTime: '2026-03-05T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MCP Budget Enforcement: Per-Tool Costs and Hard Spend Caps',
+    description: 'Practical MCP budget enforcement for per-tool pricing, delegated spend caps, and request-path blocks.',
+  },
 };
 
 export default function McpBudgetEnforcementGuidePage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'MCP Budget Enforcement: Set Per-Tool Costs and Stop Runaway Agent Spend',
+    description: metadata.description,
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    datePublished: '2026-03-05',
+    dateModified: '2026-05-04',
+    mainEntityOfPage: 'https://satgate.io/blog/mcp-budget-enforcement-guide',
+    about: [
+      { '@type': 'Thing', name: 'MCP budget enforcement' },
+      { '@type': 'Thing', name: 'per-tool MCP costs' },
+      { '@type': 'Thing', name: 'request-path budget checks' },
+      { '@type': 'Thing', name: 'runaway agent spend control' },
+      { '@type': 'Thing', name: 'MCP gateway economic governance' },
+    ],
+  };
+
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is MCP budget enforcement?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'MCP budget enforcement prices each MCP tool call, assigns an agent or workflow budget, checks remaining budget before the tool executes, and blocks or downgrades calls that would exceed the limit.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do you set per-tool MCP costs?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Set a default cost for ordinary MCP tools, then override expensive tools with explicit prices or wildcard rules. The gateway resolves the tool cost before each tools/call request and deducts it from the agent budget atomically.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Where should MCP budget checks happen?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Budget checks should happen in the request path, before the MCP server executes the tool. Post-hoc dashboards and alerts are useful for reporting, but they cannot stop runaway tool calls once an autonomous agent has already spent the money.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can MCP budget enforcement hard-cap specific expensive tools?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. MCP budget enforcement can assign higher prices, stricter daily caps, approval requirements, or deny rules to expensive tools such as code execution, web search, database queries, or deployment actions.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -23,8 +102,12 @@ export default function McpBudgetEnforcementGuidePage() {
             <span className="px-2 py-1 rounded-full bg-green-900/30 border border-green-500/30 text-green-300 text-xs font-mono">Tutorial</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
-            MCP Budget Enforcement: A Practical Guide
+            MCP Budget Enforcement: Set Per-Tool Costs and Stop Runaway Agent Spend
           </h1>
+          <div className="mb-6 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-5">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-purple-300">Practical answer</p>
+            <p className="text-gray-300">MCP budget enforcement means pricing every tool call, giving each agent a spend allowance, checking budget before the MCP server executes, and returning a structured error when a tool would exceed the limit.</p>
+          </div>
           <p className="text-xl text-gray-400 mb-4">Per-tool costs, spending caps, and real-time enforcement for MCP servers</p>
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <span className="flex items-center gap-1"><Calendar size={14} /> March 5, 2026</span>
@@ -217,6 +300,36 @@ satgate delegate \\
             when you&apos;re ready to enforce.
           </p>
 
+          <div className="my-8 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-6">
+            <h2 className="text-2xl font-bold text-white mb-4">MCP Budget Enforcement FAQ</h2>
+            <div className="space-y-5">
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">What is MCP budget enforcement?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  MCP budget enforcement prices each MCP tool call, assigns an agent or workflow budget, checks remaining budget before the tool executes, and blocks or downgrades calls that would exceed the limit.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">How do you set per-tool MCP costs?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  Set a default cost for ordinary MCP tools, then override expensive tools with explicit prices or wildcard rules. The gateway resolves the tool cost before each tools/call request and deducts it from the agent budget atomically.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">Where should MCP budget checks happen?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  Budget checks should happen in the request path, before the MCP server executes the tool. Dashboards and alerts are useful for reporting, but they cannot stop runaway tool calls after an autonomous agent has already spent the money.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">Can MCP budget enforcement hard-cap specific expensive tools?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  Yes. MCP budget enforcement can assign higher prices, stricter daily caps, approval requirements, or deny rules to expensive tools such as code execution, web search, database queries, or deployment actions.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">Quick Start</h2>
           <p className="text-gray-300 leading-relaxed">
             Get MCP budget enforcement running in 5 minutes:
@@ -235,9 +348,9 @@ routes:
     upstream: http://your-mcp-server:3000
     policy:
       kind: control
-      pay:
-        mode: fiat402
+      control:
         enforceBudget: true
+        budgetMode: request_path
 mcp:
   costProfile:
     defaultCostCredits: 1
@@ -267,6 +380,20 @@ curl -X POST http://localhost:9090/admin/mint \\
               </a>
             </div>
           </div>
+          <div className="my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
+            <h3 className="mb-3 text-xl font-bold text-white">Generate an MCP budget policy</h3>
+            <p className="mb-4 text-gray-300">Turn this guide into copyable policy: price MCP tools, set per-agent budgets, and generate proxy config for Cursor, Claude, OpenClaw, or custom clients.</p>
+            <div className="flex flex-wrap gap-3 text-sm font-semibold">
+              <Link href="/mcp-tool-cost-policy-generator" className="text-cyan-300 hover:text-cyan-200">MCP tool cost policy generator →</Link>
+              <Link href="/mcp-proxy-config-generator" className="text-cyan-300 hover:text-cyan-200">MCP proxy config generator →</Link>
+              <Link href="/mcp-cost-control" className="text-cyan-300 hover:text-cyan-200">MCP cost control →</Link>
+            </div>
+          </div>
+          <RoiCta
+            title="Put MCP tool budgets into dollars"
+            body="Use the calculator to translate per-tool calls, loop frequency, and agent volume into monthly savings."
+          />
+
         </article>
 
         <footer className="mt-16 pt-8 border-t border-gray-800">

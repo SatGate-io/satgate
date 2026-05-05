@@ -2,15 +2,87 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "AI Agent Spending Limits: Why API Keys Aren't Enough - SatGate Blog",
-  description: "API rate limits don't control agent costs. Learn how economic firewalls enforce real-time budget limits on autonomous AI spend — per agent, per tool.",
+  title: 'AI Agent Spending Limits: Hard Budgets by Agent, Tool, and Workflow',
+  description: 'Set AI agent spending limits with hard budgets by agent, tool, model, workflow, and time window before API or MCP calls execute.',
   alternates: { canonical: 'https://satgate.io/blog/ai-agent-spending-limits' },
-  keywords: ['AI agent spending limits', 'API budget control', 'agent cost management', 'economic firewall', 'API key vs budget', 'autonomous agent costs']
+  keywords: ['AI agent spending limits', 'API budget control', 'agent cost management', 'economic firewall', 'API key vs budget', 'autonomous agent costs'],
+  openGraph: {
+    title: 'AI Agent Spending Limits: Hard Budgets by Agent and Tool',
+    description: 'Set AI agent spending limits with hard budgets by agent, tool, model, workflow, and time window before calls execute.',
+    url: 'https://satgate.io/blog/ai-agent-spending-limits',
+    type: 'article',
+    publishedTime: '2026-03-10T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Agent Spending Limits: Hard Budgets by Agent and Tool',
+    description: 'Enforce AI agent spend caps by agent, MCP tool, model, workflow, and time window before API calls execute.',
+  },
 };
 
 export default function AiAgentSpendingLimitsBlogPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'AI Agent Spending Limits: Hard Budgets by Agent, Tool, and Workflow',
+    description: metadata.description,
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    datePublished: '2026-03-10',
+    dateModified: '2026-05-04',
+    mainEntityOfPage: 'https://satgate.io/blog/ai-agent-spending-limits',
+    about: [
+      { '@type': 'Thing', name: 'AI agent spending limits' },
+      { '@type': 'Thing', name: 'hard budgets by agent and workflow' },
+      { '@type': 'Thing', name: 'API budget control' },
+      { '@type': 'Thing', name: 'MCP tool spending caps' },
+      { '@type': 'Thing', name: 'economic firewall budget enforcement' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What are AI agent spending limits?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AI agent spending limits are request-path policies that cap how much an autonomous agent can spend by agent, tool, model, route, workflow, or time window before upstream API or MCP tool calls execute.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why are rate limits not enough for AI agent cost control?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Rate limits control request volume, not money. AI agents can still choose expensive tools, retry costly calls, or fan out across subtasks while staying under a request-per-minute limit.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Where should teams enforce AI agent spend limits?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Teams should enforce spending limits in the request path at an economic firewall or MCP proxy so budget, revocation, routing, and audit policy are checked before a costly call executes.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can AI agent spending limits be set per workflow or time window?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. AI agent spending limits can be scoped by workflow, task, agent, sub-agent, model, MCP tool, route, customer, environment, day, week, or token expiry window so each workload receives a precise hard budget.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -125,8 +197,26 @@ export default function AiAgentSpendingLimitsBlogPage() {
           <ul className="text-gray-300 space-y-2">
             <li><strong className="text-white">_RedisBudgetEnforcer_</strong>: Atomic spend tracking across replicas</li>
             <li><strong className="text-white">_Postgres audit trail_</strong>: Spend attribution for chargebacks</li>
-            <li><strong className="text-white">_Fiat402_</strong>: Lightning micropayments (L402) for real spend control</li>
+            <li><strong className="text-white">_L402 Charge_</strong>: Lightning micropayments for external agent/API monetization</li>
           </ul>
+
+          <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">FAQ</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">AI agent spending limit questions</h2>
+            <div className="space-y-5">
+              {[
+                ['What are AI agent spending limits?', 'AI agent spending limits are request-path policies that cap how much an autonomous agent can spend by agent, tool, model, route, workflow, or time window before upstream API or MCP tool calls execute.'],
+                ['Why are rate limits not enough for AI agent cost control?', 'Rate limits control request volume, not money. AI agents can still choose expensive tools, retry costly calls, or fan out across subtasks while staying under a request-per-minute limit.'],
+                ['Where should teams enforce AI agent spend limits?', 'Enforce spending limits in the request path at an economic firewall or MCP proxy so budget, revocation, routing, and audit policy are checked before a costly call executes.'],
+                ['Can AI agent spending limits be set per workflow or time window?', 'Yes. AI agent spending limits can be scoped by workflow, task, agent, sub-agent, model, MCP tool, route, customer, environment, day, week, or token expiry window so each workload receives a precise hard budget.'],
+              ].map(([question, answer]) => (
+                <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                  <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                  <p className="leading-relaxed text-gray-400">{answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
           <div className="mt-12 p-6 bg-gray-900/50 border border-gray-800 rounded-lg">
             <p className="text-gray-300 mb-4">

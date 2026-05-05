@@ -5,11 +5,72 @@ export const metadata = {
   title: 'SatGate vs Zuplo - Comparison',
   description: 'Compare SatGate and Zuplo API gateways. See why economic controls matter for the agent economy.',
   alternates: { canonical: 'https://satgate.io/compare/zuplo' },
+  openGraph: {
+    title: 'SatGate vs Zuplo: API Gateway vs Economic Governance',
+    description: 'Compare Zuplo API gateway controls with SatGate economic governance for AI agent budgets, MCP tool costs, and L402 monetization.',
+    url: 'https://satgate.io/compare/zuplo',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SatGate vs Zuplo: API Gateway vs Economic Governance',
+    description: 'Zuplo exposes APIs to agents. SatGate enforces budgets, MCP tool costs, scoped delegation, and L402 payments.',
+  },
 };
 
 export default function CompareZuploPage() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'SatGate vs Zuplo',
+    url: 'https://satgate.io/compare/zuplo',
+    description: 'Compare SatGate and Zuplo API gateways for AI agent traffic, MCP exposure, budget enforcement, and L402 API monetization.',
+    datePublished: '2026-04-30',
+    dateModified: '2026-05-04',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'Zuplo alternative for AI agents' },
+      { '@type': 'Thing', name: 'AI agent API gateway comparison' },
+      { '@type': 'Thing', name: 'economic controls for API gateways' },
+      { '@type': 'Thing', name: 'MCP budget enforcement' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is the main difference between SatGate and Zuplo?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Zuplo is a traditional API gateway with MCP support for exposing APIs to agents. SatGate adds economic governance: per-tool cost attribution, hard budget enforcement, scoped delegation, and L402 monetization.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Does rate limiting replace economic controls for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No. Rate limits control request volume, not business cost. AI agents need dollar-denominated, per-agent, and per-tool controls so expensive calls can be capped before spend occurs.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can SatGate work with an existing API gateway like Zuplo?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. SatGate can be deployed as the economic policy layer in front of, behind, or alongside an existing API gateway so teams can keep API management while adding agent spend governance.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-4xl mx-auto px-6 py-16">
         <Link href="/" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Home
@@ -64,7 +125,7 @@ export default function CompareZuploPage() {
                   <td className="py-4 text-center"><X className="inline text-red-400" size={18} /></td>
                 </tr>
                 <tr className="border-b border-gray-800">
-                  <td className="py-4 font-medium text-gray-300">Fiat billing (Fiat402)</td>
+                  <td className="py-4 font-medium text-gray-300">Fiat-denominated budget control</td>
                   <td className="py-4 text-center"><Check className="inline text-green-400" size={18} /></td>
                   <td className="py-4 text-center"><X className="inline text-red-400" size={18} /></td>
                 </tr>
@@ -125,7 +186,7 @@ export default function CompareZuploPage() {
                   <p className="text-cyan-400 font-medium text-sm mb-2">SatGate</p>
                   <p className="text-gray-400 text-sm">
                     <strong className="text-white">Purpose-built for agent economics.</strong> Hard budget caps, 
-                    per-tool cost profiles, spend governance, API monetization with L402/Fiat402.
+                    per-tool cost profiles, spend governance, fiat-denominated budget governance, and API monetization with L402.
                   </p>
                 </div>
                 <div className="bg-gray-800/50 rounded-lg p-4">
@@ -261,6 +322,23 @@ export default function CompareZuploPage() {
             Economic controls tell you "how many dollars per agent." 
             That's the layer SatGate adds.
           </p>
+        </section>
+
+        <section className="bg-gray-950 border border-gray-800 rounded-xl p-6 mb-12">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+          <h2 className="text-xl font-bold mb-6">SatGate vs Zuplo questions</h2>
+          <div className="space-y-5">
+            {[
+              ['What is the main difference between SatGate and Zuplo?', 'Zuplo is a traditional API gateway with MCP support for exposing APIs to agents. SatGate adds economic governance: per-tool cost attribution, hard budget enforcement, scoped delegation, and L402 monetization.'],
+              ['Does rate limiting replace economic controls for AI agents?', 'No. Rate limits control request volume, not business cost. AI agents need dollar-denominated, per-agent, and per-tool controls so expensive calls can be capped before spend occurs.'],
+              ['Can SatGate work with an existing API gateway like Zuplo?', 'Yes. SatGate can be deployed as the economic policy layer in front of, behind, or alongside an existing API gateway so teams can keep API management while adding agent spend governance.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                <p className="leading-relaxed text-gray-400">{answer}</p>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* CTA */}

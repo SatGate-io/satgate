@@ -2,11 +2,12 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock, Eye, Shield, Zap, CheckCircle, ArrowRight } from 'lucide-react';
 
 export const metadata = {
-  title: 'The Enterprise Adoption Playbook: Observe, Control, Charge - SatGate Blog',
+  title: 'Enterprise Adoption Playbook: Observe, Control, Charge',
   description: 'Observe, Control, Charge isn\'t just a product taxonomy — it\'s an enterprise change management strategy. Learn how to adopt economic governance for AI agents incrementally, building trust at each stage.',
   openGraph: {
     title: 'The Enterprise Adoption Playbook: Observe, Control, Charge',
     description: 'A three-stage framework for adopting economic governance for AI agents — without breaking anything along the way.',
+    url: 'https://satgate.io/blog/the-enterprise-adoption-playbook-observe-control-charge',
     type: 'article',
 
     publishedTime: '2026-03-20T00:00:00Z',
@@ -21,8 +22,59 @@ export const metadata = {
 };
 
 export default function EnterpriseAdoptionPlaybookPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'The Enterprise Adoption Playbook: Observe, Control, Charge',
+    description: 'A three-stage framework for adopting economic governance for AI agents: observe spend, control internal agent budgets, then charge external robot customers.',
+    url: 'https://satgate.io/blog/the-enterprise-adoption-playbook-observe-control-charge',
+    datePublished: '2026-03-20',
+    dateModified: '2026-05-02',
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'economic governance for AI agents' },
+      { '@type': 'Thing', name: 'Observe Control Charge' },
+      { '@type': 'Thing', name: 'AI agent budget enforcement' },
+      { '@type': 'Thing', name: 'robot-customer API monetization' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What are Observe, Control, and Charge in AI agent governance?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Charge monetizes external agent access with L402 Lightning payments.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why should enterprises start AI agent governance in Observe mode?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Observe mode gives teams real baseline data on agent spend, tool usage, retry loops, and cost outliers before hard caps are introduced, making later enforcement safer and easier to justify.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is Charge the same as internal budget enforcement?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No. Internal budget enforcement controls spend for agents you own. Charge is the L402-based monetization path for external agents and robot customers paying to use your APIs.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -280,6 +332,23 @@ export default function EnterpriseAdoptionPlaybookPage() {
             Just a clear path from visibility to control to revenue — at whatever pace your organization is ready for.
           </p>
 
+          <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">Observe, Control, Charge adoption questions</h2>
+            <div className="space-y-5">
+              {[
+                ['What are Observe, Control, and Charge in AI agent governance?', 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Charge monetizes external agent access with L402 Lightning payments.'],
+                ['Why should enterprises start AI agent governance in Observe mode?', 'Observe mode gives teams real baseline data on agent spend, tool usage, retry loops, and cost outliers before hard caps are introduced, making later enforcement safer and easier to justify.'],
+                ['Is Charge the same as internal budget enforcement?', 'No. Internal budget enforcement controls spend for agents you own. Charge is the L402-based monetization path for external agents and robot customers paying to use your APIs.'],
+              ].map(([question, answer]) => (
+                <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                  <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                  <p className="leading-relaxed text-gray-400">{answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
           {/* CTA */}
           <div className="mt-12 p-8 bg-gradient-to-r from-purple-900/20 to-cyan-900/20 border border-purple-800/30 rounded-xl text-center">
             <h3 className="text-2xl font-bold text-white mb-3">Ready to Start with Stage 1?</h3>
@@ -288,7 +357,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <a 
-                href="https://github.com/satgate/satgate"
+                href="https://github.com/SatGate-io/satgate"
                 className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition no-underline"
               >
                 View on GitHub

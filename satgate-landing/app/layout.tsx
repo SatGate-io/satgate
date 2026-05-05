@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     template: "%s | SatGate",
   },
   description:
-    "SatGate is an open-source API gateway that adds economic governance to AI agent traffic. Per-agent budgets, per-tool cost attribution, delegation hierarchies, and MCP proxy support. Sub-ms overhead.",
+    "SatGate is the economic firewall for AI agent traffic: per-agent budgets, cost attribution, delegated access, MCP governance, and L402 payments.",
   keywords: [
     "AI agent gateway",
     "API cost control",
@@ -69,9 +69,6 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-  },
-  alternates: {
-    canonical: "https://satgate.io",
   },
   icons: {
     icon: "/logo.png",

@@ -76,6 +76,68 @@ interface LogEntry {
 
 type DemoScene = 'intro' | 'mint' | 'use' | 'delegate' | 'enforce' | 'revoke' | 'summary';
 
+const webPageJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'SatGate Protect Demo',
+  url: 'https://satgate.io/crawl',
+  description: 'Interactive Protect mode demo for scoped AI agent capability tokens, delegation, policy enforcement, revocation, and audit before API access.',
+  datePublished: '2026-04-12',
+  dateModified: '2026-05-03',
+  isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+  about: [
+    { '@type': 'Thing', name: 'SatGate Protect' },
+    { '@type': 'Thing', name: 'scoped AI agent capability tokens' },
+    { '@type': 'Thing', name: 'crawler and agent access governance' },
+    { '@type': 'Thing', name: 'token delegation enforcement' },
+    { '@type': 'Thing', name: 'request-path credential revocation' },
+  ],
+};
+
+const softwareJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'SatGate Protect Demo',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'Web',
+  url: 'https://satgate.io/crawl',
+  description: webPageJsonLd.description,
+  publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+  dateModified: '2026-05-03',
+  featureList: ['Capability token minting', 'Agent credential delegation', 'Policy enforcement simulation', 'Credential revocation flow', 'Request audit trail'],
+};
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What does Protect mode demonstrate?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Protect mode demonstrates request-path control for AI agent access: scoped capability tokens, delegation, policy enforcement, revocation, and audit before protected APIs or tools execute.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Why should crawler or agent traffic use scoped credentials?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Crawler and agent traffic should use scoped credentials so each workflow has bounded authority, expiry, budget limits, traceability, and immediate revocation instead of broad shared API keys.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How does Protect mode reduce AI agent blast radius?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Protect mode reduces blast radius by narrowing scope, shortening lifetime, attenuating delegated tokens, blocking policy violations, and revoking compromised credentials before the next request.',
+      },
+    },
+  ],
+};
+
 export default function ProtectDemoPage() {
   const [currentScene, setCurrentScene] = useState<DemoScene>('intro');
   const [isLoading, setIsLoading] = useState(false);
@@ -639,6 +701,9 @@ export default function ProtectDemoPage() {
 
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       
       {/* Header */}
       <div className="border-b border-gray-800 bg-black/80 backdrop-blur-sm sticky top-0 z-40">
@@ -1654,6 +1719,23 @@ export default function ProtectDemoPage() {
             </div>
           </div>
         )}
+
+        <section className="mt-12 border-t border-gray-800 pt-10">
+          <p className="mb-2 text-center text-xs font-mono uppercase tracking-wide text-purple-300">FAQ</p>
+          <h2 className="mb-8 text-center text-2xl font-bold text-white">Protect-mode questions</h2>
+          <div className="grid gap-4 md:grid-cols-3">
+            {[
+              ['What does Protect mode demonstrate?', 'Protect mode demonstrates request-path control for AI agent access: scoped capability tokens, delegation, policy enforcement, revocation, and audit before protected APIs or tools execute.'],
+              ['Why should crawler or agent traffic use scoped credentials?', 'Crawler and agent traffic should use scoped credentials so each workflow has bounded authority, expiry, budget limits, traceability, and immediate revocation instead of broad shared API keys.'],
+              ['How does Protect mode reduce AI agent blast radius?', 'Protect mode reduces blast radius by narrowing scope, shortening lifetime, attenuating delegated tokens, blocking policy violations, and revoking compromised credentials before the next request.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
+                <h3 className="mb-2 font-bold text-white">{question}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{answer}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* Footer CTA */}
         <div className="mt-12 text-center">

@@ -110,8 +110,85 @@ export default function MintDemoPage() {
     setShowRaw(false);
   };
 
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'SatGate Mint Demo',
+    url: 'https://satgate.io/mint-demo',
+    description: 'Interactive demo for minting budget-aware capability tokens and macaroons for AI agents with scopes, expiry, delegation limits, and revocation policy.',
+    datePublished: '2026-04-12',
+    dateModified: '2026-05-03',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'SatGate Mint' },
+      { '@type': 'Thing', name: 'budget-aware capability tokens' },
+      { '@type': 'Thing', name: 'macaroons for AI agents' },
+      { '@type': 'Thing', name: 'workload identity exchange' },
+      { '@type': 'Thing', name: 'scoped agent credentials' },
+    ],
+  };
+
+  const softwareJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'SatGate Mint Demo',
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'Web',
+    url: 'https://satgate.io/mint-demo',
+    description: 'Interactive demo for minting budget-aware capability tokens and macaroons for AI agents with scopes, expiry, delegation limits, and revocation policy.',
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-03',
+    featureList: ['Workload identity exchange', 'Macaroon capability minting', 'Budget caveat preview', 'Policy verification', 'Scoped agent credential demo'],
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
+      { '@type': 'ListItem', position: 2, name: 'Security', item: 'https://satgate.io/security' },
+      { '@type': 'ListItem', position: 3, name: 'SatGate Mint Demo', item: 'https://satgate.io/mint-demo' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What does the SatGate Mint demo show?',
+        acceptedAnswer: { '@type': 'Answer', text: 'The demo shows an AI agent exchanging workload identity for a scoped macaroon capability token with budget, expiry, policy, and verification data.' },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why mint capability tokens for AI agents?',
+        acceptedAnswer: { '@type': 'Answer', text: 'Capability tokens let teams give agents narrow, revocable, budget-aware API authority instead of broad static API keys.' },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do macaroons help with agent delegation?',
+        acceptedAnswer: { '@type': 'Answer', text: 'Macaroon caveats let delegated agent credentials become more constrained by route, budget, expiry, call count, and delegation policy while preserving cryptographic verification.' },
+      },
+      {
+        '@type': 'Question',
+        name: 'How is SatGate Mint different from issuing static API keys?',
+        acceptedAnswer: { '@type': 'Answer', text: 'SatGate Mint exchanges workload identity for scoped, expiring, budget-aware capability tokens instead of handing agents broad static API keys that must be manually rotated.' },
+      },
+      {
+        '@type': 'Question',
+        name: 'What should a minted agent credential include?',
+        acceptedAnswer: { '@type': 'Answer', text: 'A minted agent credential should include workload identity, tenant, agent, task or workflow, route scope, budget caveats, expiry, delegation limits, audit fields, and revocation policy.' },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {/* Header */}
       <div className="border-b border-gray-800 bg-black/80 backdrop-blur-sm sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
@@ -379,6 +456,25 @@ export default function MintDemoPage() {
             </div>
           </div>
         )}
+
+        <section className="mt-16 border-t border-gray-800 pt-12">
+          <p className="mb-2 text-center text-xs font-mono uppercase tracking-wide text-purple-300">FAQ</p>
+          <h2 className="mb-8 text-center text-2xl font-bold text-white">Agent credential minting questions</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            {[
+              ['What does the SatGate Mint demo show?', 'The demo shows an AI agent exchanging workload identity for a scoped macaroon capability token with budget, expiry, policy, and verification data.'],
+              ['Why mint capability tokens for AI agents?', 'Capability tokens let teams give agents narrow, revocable, budget-aware API authority instead of broad static API keys.'],
+              ['How do macaroons help with agent delegation?', 'Macaroon caveats let delegated agent credentials become more constrained by route, budget, expiry, call count, and delegation policy while preserving cryptographic verification.'],
+              ['How is SatGate Mint different from issuing static API keys?', 'SatGate Mint exchanges workload identity for scoped, expiring, budget-aware capability tokens instead of handing agents broad static API keys that must be manually rotated.'],
+              ['What should a minted agent credential include?', 'A minted agent credential should include workload identity, tenant, agent, task or workflow, route scope, budget caveats, expiry, delegation limits, audit fields, and revocation policy.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="rounded-xl border border-gray-800 bg-[#12121a] p-5">
+                <h3 className="mb-2 font-bold text-white">{question}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{answer}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* API Reference */}
         <div className="mt-16 border-t border-gray-800 pt-12">

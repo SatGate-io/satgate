@@ -173,18 +173,18 @@ func TestProxy_SequentialBudgetConsistency(t *testing.T) {
 	}
 }
 
-// TestProxy_SoftEnforcement verifies soft mode allows calls even when budget is exhausted.
-func TestProxy_SoftEnforcement(t *testing.T) {
+// TestProxy_ObserveEnforcement verifies observe mode allows calls even when budget is exhausted.
+func TestProxy_ObserveEnforcement(t *testing.T) {
 	env := NewTestEnv(t,
 		WithBudget(5), // Less than one search call (10)
-		WithEnforcement("soft"),
+		WithEnforcement("observe"),
 	)
 	defer env.Close()
 
-	// Should succeed despite insufficient budget (soft mode)
+	// Should succeed despite insufficient budget (observe mode)
 	resp := env.ToolCall(t, 1, "search", env.RootToken)
 	if _, ok := resp["result"]; !ok {
-		t.Fatalf("soft mode should allow call, got: %v", resp)
+		t.Fatalf("observe mode should allow call, got: %v", resp)
 	}
 }
 

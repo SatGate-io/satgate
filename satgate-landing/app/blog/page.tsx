@@ -2,8 +2,30 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Calendar, Clock, User } from 'lucide-react';
 
 export const metadata = {
-  title: 'Blog - SatGate',
-  description: 'Insights on API economics, agent governance, and the future of machine-to-machine commerce.',
+  title: 'AI Agent Governance Blog: Cost Control, MCP, L402, Economic Firewalls',
+  description: 'Guides on AI agent governance, economic firewalls, MCP budget enforcement, L402 payments, capability tokens, API monetization, and cost control.',
+  alternates: { canonical: 'https://satgate.io/blog' },
+  keywords: [
+    'AI agent governance blog',
+    'AI agent cost control',
+    'economic firewall',
+    'MCP governance',
+    'L402 payments',
+    'agent API governance',
+    'machine-to-machine commerce',
+    'API economics',
+  ],
+  openGraph: {
+    title: 'AI Agent Governance Blog: Cost Control, MCP, L402, Economic Firewalls',
+    description: 'Guides on AI agent governance, economic firewalls, MCP budget enforcement, L402 payments, capability tokens, API monetization, and cost control.',
+    url: 'https://satgate.io/blog',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Agent Governance Blog: Cost Control, MCP, L402, Economic Firewalls',
+    description: 'AI agent governance, economic firewalls, MCP budget enforcement, L402 payments, capability tokens, API monetization, and cost control.',
+  },
 };
 
 // Blog post data - in a real setup this would come from a CMS or markdown files
@@ -28,8 +50,8 @@ const posts = [
   },
   {
     slug: 'how-to-add-budget-limits-to-openai-api-calls',
-    title: 'How to Add Budget Limits to OpenAI API Calls',
-    description: 'Learn how to implement hard budget limits for OpenAI API calls. Prevent runaway costs with request-level enforcement, not just monitoring.',
+    title: 'OpenAI API Budget Limits: Stop Runaway GPT Spend Before It Happens',
+    description: 'Learn how to enforce OpenAI API budget limits before each request, then use the ROI calculator to quantify avoided agent-loop spend.',
     date: '2026-04-07',
     readTime: '8 min read',
     author: 'Matt Dean',
@@ -37,8 +59,8 @@ const posts = [
   },
   {
     slug: 'zero-trust-for-ai-agents',
-    title: 'Zero Trust for AI Agents: Why Identity-Based Security Collapses When Machines Call the Shots',
-    description: 'Zero Trust was built for human users and managed devices. AI agents break every assumption it makes. Here\'s how capability-based security fixes what Zero Trust can\'t.',
+    title: 'Zero Trust for AI Agents: Capability Tokens, Revocation, and Budgets',
+    description: 'Zero Trust for AI agents needs scoped capability tokens, revocation, delegation limits, and request-path budget enforcement.',
     date: '2026-04-03',
     readTime: '12 min read',
     author: 'Matt Dean',
@@ -82,8 +104,8 @@ const posts = [
   },
   {
     slug: 'api-monetization-ai',
-    title: 'API Monetization for AI: How to Charge Agents, Not Just Developers',
-    description: 'AI agents are your next API customers. Traditional API monetization fails for autonomous workloads. Learn how to price, meter, and collect from machine consumers.',
+    title: 'API Monetization for AI Agents: Pricing, Billing, L402, and Metering',
+    description: 'Monetize APIs for AI agents with machine-readable pricing, request-path metering, budget enforcement, and L402 payments.',
     date: '2026-03-26',
     readTime: '10 min read',
     author: 'Matt Dean',
@@ -118,8 +140,8 @@ const posts = [
   },
   {
     slug: 'why-economic-firewalls-are-the-prerequisite-for-autonomous-ai-agents',
-    title: 'Why Economic Firewalls Are the Prerequisite for Autonomous AI Agents',
-    description: 'Economic firewalls aren\'t just safety tools — they\'re the enablers that unlock fully autonomous AI agents. By solving unbounded cost, they create the trust infrastructure for agents to make independent purchasing decisions.',
+    title: 'Economic Firewalls for Autonomous AI Agents: Hard Budgets and Authority',
+    description: 'Why autonomous AI agents need economic firewalls: hard spend ceilings, bounded authority, revocation, audit trails, and request-path enforcement.',
     date: '2026-03-20',
     readTime: '11 min read',
     author: 'Matt Dean',
@@ -136,8 +158,8 @@ const posts = [
   },
   {
     slug: 'llm-cost-management',
-    title: 'LLM Cost Management: From Monitoring Dashboards to Real-Time Enforcement',
-    description: 'LLM cost dashboards show you what you spent. Economic firewalls control what you spend. Learn why observability alone fails when AI agents control the budget.',
+    title: 'LLM Cost Management: Dashboards vs Real-Time Budget Enforcement',
+    description: 'LLM cost dashboards show what happened. Real-time enforcement controls what agents can spend before the bill arrives.',
     date: '2026-03-17',
     readTime: '10 min read',
     author: 'Matt Dean',
@@ -145,8 +167,8 @@ const posts = [
   },
   {
     slug: 'api-gateway-for-ai-agents',
-    title: 'API Gateway for AI Agents: Why Traditional Gateways Fall Short',
-    description: 'Traditional API gateways route traffic. AI agents need economic governance. Learn why Solo.io, Kong, and Gravitee weren\'t built for autonomous agent workloads.',
+    title: 'API Gateway for AI Agents: Budget Enforcement, MCP, and Tool Cost Control',
+    description: 'AI agent gateways need budget enforcement, MCP tool cost control, scoped tokens, revocation, and L402 beyond routing.',
     date: '2026-03-12',
     readTime: '10 min read',
     author: 'Matt Dean',
@@ -154,8 +176,8 @@ const posts = [
   },
   {
     slug: 'deepmind-intelligent-delegation-satgate',
-    title: 'What Google DeepMind Gets Right About Agent Delegation — And What SatGate Already Built',
-    description: 'DeepMind\'s Intelligent AI Delegation paper proposes macaroon-based capability tokens for safe agent delegation. Here\'s how their framework maps to SatGate\'s architecture.',
+    title: 'Intelligent AI Delegation: Macaroons, Capability Tokens, and SatGate',
+    description: 'DeepMind\'s Intelligent AI Delegation points to macaroon capability tokens and request-path delegation controls.',
     date: '2026-03-11',
     readTime: '8 min read',
     author: 'Matt Dean',
@@ -163,8 +185,8 @@ const posts = [
   },
   {
     slug: 'ai-agent-spending-limits',
-    title: 'AI Agent Spending Limits: Why API Keys Aren\'t Enough',
-    description: 'API rate limits don\'t control agent costs. Learn how economic firewalls enforce real-time budget limits on autonomous AI spend — per agent, per tool.',
+    title: 'AI Agent Spending Limits: Hard Budgets by Agent, Tool, and Workflow',
+    description: 'Set AI agent spending limits with hard budgets by agent, tool, model, workflow, and time window before API or MCP calls execute.',
     date: '2026-03-10',
     readTime: '9 min read',
     author: 'Matt Dean',
@@ -172,8 +194,8 @@ const posts = [
   },
   {
     slug: 'ai-agent-api-cost-control',
-    title: 'How to Control AI Agent API Costs: Rate Limiting vs Economic Firewalls',
-    description: 'Rate limiting doesn\'t understand money. Learn how economic firewalls give you real budget enforcement for AI agent API spend — per agent, per tool, in real time.',
+    title: 'AI Agent API Cost Control: Stop Runaway Spend Before API Calls Execute',
+    description: 'Control AI agent API costs with request-path budget checks, tool pricing, delegated spend limits, revocation, and economic firewalls.',
     date: '2026-03-05',
     readTime: '8 min read',
     author: 'Matt Dean',
@@ -190,8 +212,8 @@ const posts = [
   },
   {
     slug: 'mcp-budget-enforcement-guide',
-    title: 'MCP Budget Enforcement: A Practical Guide to Controlling AI Tool Spend',
-    description: 'How to enforce per-tool budgets on MCP servers. Assign costs per tool call, cap agent spending, and attribute costs across teams.',
+    title: 'MCP Budget Enforcement Guide: Per-Tool Costs and Hard Agent Spend Caps',
+    description: 'Set per-tool MCP costs, cap agent spend, delegate budgets, and block runaway MCP tool calls before execution.',
     date: '2026-03-05',
     readTime: '10 min read',
     author: 'Matt Dean',
@@ -199,8 +221,8 @@ const posts = [
   },
   {
     slug: 'agent-swarms-cost-governance',
-    title: 'Agent Swarms Are Here. Who\'s Controlling the Spend?',
-    description: 'Multi-agent AI systems multiply API costs exponentially. Without economic governance, agent swarms can burn through budgets in minutes.',
+    title: 'Agent Swarm Cost Control: Hierarchical Budgets for Multi-Agent Systems',
+    description: 'Control agent swarm costs with hierarchical budgets, scoped delegation tokens, cascade revocation, and request-path enforcement.',
     date: '2026-03-05',
     readTime: '7 min read',
     author: 'Matt Dean',
@@ -217,8 +239,8 @@ const posts = [
   },
   {
     slug: 'hard-capping-mcp-tool-spend',
-    title: 'Hard-Capping MCP Tool Spend with SatGate Proxy',
-    description: 'Your AI agent burned $500 overnight calling tools in a loop. Here\'s how to enforce real-time budget hard caps at the protocol level.',
+    title: 'Hard-Cap MCP Tool Spend: Stop Runaway Claude Code and Cursor Agents',
+    description: 'Hard-cap MCP tool spend for Claude Code, Cursor, and agent loops with request-path budget enforcement.',
     date: '2026-02-14',
     readTime: '10 min read',
     author: 'Matt Dean',
@@ -254,8 +276,76 @@ const posts = [
 ];
 
 export default function BlogPage() {
+  const blogCollectionJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: 'SatGate AI Agent Governance Blog',
+    description: metadata.description,
+    url: 'https://satgate.io/blog',
+    dateModified: '2026-05-04',
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'AI agent governance' },
+      { '@type': 'Thing', name: 'economic firewalls' },
+      { '@type': 'Thing', name: 'MCP budget enforcement' },
+      { '@type': 'Thing', name: 'L402 payments' },
+      { '@type': 'Thing', name: 'revocable capability tokens' },
+      { '@type': 'Thing', name: 'AI agent cost control' },
+    ],
+  };
+
+  const blogItemListJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'SatGate AI agent governance blog posts',
+    description: metadata.description,
+    dateModified: '2026-05-04',
+    about: blogCollectionJsonLd.about,
+    itemListElement: posts.map((post, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: post.title,
+      url: `https://satgate.io/blog/${post.slug}`,
+      description: post.description,
+    })),
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What does the SatGate blog cover?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The SatGate blog covers AI agent governance, economic firewalls, AI agent cost control, MCP budget enforcement, revocable capability tokens, L402 payments, and API economics for autonomous agents.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Where should I start if I need to control AI agent spend?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Start with the AI agent cost control guide, the economic firewall definition, the ROI calculator, and the MCP budget enforcement guide to understand the request-path controls needed before agents spend.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How is SatGate different from an LLM dashboard or API gateway?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'LLM dashboards report spend after it happens and traditional API gateways mainly route traffic. SatGate sits in the request path to observe, control, and charge agent/API activity before upstream access.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogCollectionJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogItemListJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-4xl mx-auto px-6 py-16">
         <Link href="/" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Home
@@ -267,6 +357,31 @@ export default function BlogPage() {
             Insights on API economics, agent governance, and the future of machine-to-machine commerce.
           </p>
         </div>
+
+        <section className="mb-12 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+          <div className="mb-5">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Free tools</p>
+            <h2 className="mb-2 text-2xl font-bold text-white">Turn the guides into enforceable agent policy</h2>
+            <p className="text-gray-400">
+              Use these calculators and generators to quantify AI agent spend risk, create budget policies, and assess economic firewall readiness.
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {[
+              ['/roi-calculator', 'AI Agent ROI Calculator', 'Estimate ghost spend, loop waste, payback period, and enforcement ROI.'],
+              ['/runaway-agent-cost-calculator', 'Runaway Agent Cost Calculator', 'Model loop, retry, fanout, and paid tool-call exposure.'],
+              ['/openai-budget-policy-generator', 'OpenAI Budget Policy Generator', 'Generate OpenAI spend caps, routing, revocation, and audit policy.'],
+              ['/mcp-tool-cost-policy-generator', 'MCP Tool Cost Policy Generator', 'Create per-tool MCP budgets, risk actions, and audit rules.'],
+              ['/economic-firewall-readiness-grader', 'Economic Firewall Readiness Grader', 'Score identity, budgets, MCP tools, revocation, audit, routing, and Charge.'],
+              ['/economic-firewall', 'Economic Firewall Definition', 'Learn the request-path category for AI agent economic governance.'],
+            ].map(([href, title, body]) => (
+              <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black/60 p-4 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
+                <h3 className="mb-1 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <div className="space-y-6">
           {posts.map((post) => (
@@ -315,6 +430,23 @@ export default function BlogPage() {
             </Link>
           ))}
         </div>
+
+        <section className="mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">FAQ</p>
+          <h2 className="mb-6 text-2xl font-bold text-white">SatGate blog questions</h2>
+          <div className="space-y-5">
+            {[
+              ['What does the SatGate blog cover?', 'The SatGate blog covers AI agent governance, economic firewalls, AI agent cost control, MCP budget enforcement, revocable capability tokens, L402 payments, and API economics for autonomous agents.'],
+              ['Where should I start if I need to control AI agent spend?', 'Start with the AI agent cost control guide, the economic firewall definition, the ROI calculator, and the MCP budget enforcement guide to understand the request-path controls needed before agents spend.'],
+              ['How is SatGate different from an LLM dashboard or API gateway?', 'LLM dashboards report spend after it happens and traditional API gateways mainly route traffic. SatGate sits in the request path to observe, control, and charge agent/API activity before upstream access.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                <p className="leading-relaxed text-gray-400">{answer}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* Newsletter CTA */}
         <section className="mt-16 bg-gradient-to-r from-purple-900/20 to-cyan-900/20 border border-purple-800/30 rounded-xl p-8 text-center">

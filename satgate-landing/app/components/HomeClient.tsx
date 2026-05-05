@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock, DollarSign, Bot, GitBranch, Activity, RefreshCw, Menu, X, Eye, SlidersHorizontal, Play, BookOpen } from 'lucide-react';
+import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock, DollarSign, Bot, GitBranch, Activity, RefreshCw, Menu, X, Eye, SlidersHorizontal, Play, BookOpen, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -17,28 +17,31 @@ const LandingPage = () => {
   };
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-purple-500 selection:text-white">
-      
+
       {/* Navigation */}
       <nav className="border-b border-gray-800 backdrop-blur-md fixed w-full z-50 bg-black/50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <Image src="/logo_white_transparent.png" alt="SatGate" width={32} height={32} className="w-7 h-7 sm:w-8 sm:h-8" />
-            <span className="text-lg sm:text-xl font-bold text-white whitespace-nowrap">SatGate<sup className="text-xs font-normal">™</sup></span>
+            <span className="text-lg sm:text-xl font-bold text-white whitespace-nowrap">SatGate<sup className="text-xs font-normal">TM</sup></span>
           </Link>
-          
+
           {/* Desktop menu */}
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
             <Link href="/protect" className="hover:text-white transition">Live Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
+            <Link href="/agent-control-plane" className="hover:text-white transition">Control Plane</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
+            <Link href="/tools" className="hover:text-white transition">Tools</Link>
+            <Link href="/integrations" className="hover:text-white transition">Integrations</Link>
             <Link href="/blog" className="hover:text-white transition">Blog</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
             <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a>
             <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 transition">Cloud →</a>
           </div>
-          
+
           {/* Mobile menu button */}
-          <button 
+          <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="flex md:hidden items-center justify-center w-10 h-10 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 text-gray-400 hover:text-white transition"
             aria-label="Toggle menu"
@@ -47,65 +50,86 @@ const LandingPage = () => {
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
-        
+
         {/* Mobile menu dropdown */}
-        <div 
+        <div
           className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
             mobileMenuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'
           }`}
         >
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
-            <Link 
-              href="/protect" 
-              onClick={() => setMobileMenuOpen(false)} 
+            <Link
+              href="/protect"
+              onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Live Demo
             </Link>
-            <Link 
-              href="/govern" 
-              onClick={() => setMobileMenuOpen(false)} 
+            <Link
+              href="/govern"
+              onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Enterprise
             </Link>
-            <Link 
-              href="/pricing" 
-              onClick={() => setMobileMenuOpen(false)} 
+            <Link
+              href="/agent-control-plane"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              Agent Control Plane
+            </Link>
+            <Link
+              href="/pricing"
+              onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Pricing
             </Link>
-            <Link 
-              href="/blog" 
-              onClick={() => setMobileMenuOpen(false)} 
+            <Link
+              href="/tools"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              Tools
+            </Link>
+            <Link
+              href="/integrations"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              Integrations
+            </Link>
+            <Link
+              href="/blog"
+              onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Blog
             </Link>
-            <a 
-              href="https://cloud.satgate.io/docs" 
-              target="_blank" 
+            <a
+              href="https://cloud.satgate.io/docs"
+              target="_blank"
               rel="noopener noreferrer"
-              onClick={() => setMobileMenuOpen(false)} 
+              onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Docs
             </a>
-            <a 
-              href="https://github.com/SatGate-io/satgate" 
-              target="_blank" 
+            <a
+              href="https://github.com/SatGate-io/satgate"
+              target="_blank"
               rel="noopener noreferrer"
-              onClick={() => setMobileMenuOpen(false)} 
+              onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               GitHub
             </a>
-            <a 
-              href="https://cloud.satgate.io/cloud/login" 
-              target="_blank" 
+            <a
+              href="https://cloud.satgate.io/cloud/login"
+              target="_blank"
               rel="noopener noreferrer"
-              onClick={() => setMobileMenuOpen(false)} 
+              onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Cloud
@@ -117,7 +141,7 @@ const LandingPage = () => {
       {/* Hero Section */}
       <header className="pt-32 pb-20 px-6">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          
+
           {/* Left: Copy */}
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-6">
@@ -125,15 +149,15 @@ const LandingPage = () => {
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
               Control what agents<br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
+              <span className="sr-only"> </span><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
                 can spend.
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              SatGate is the economic control plane for AI agents. Observe, budget, and charge for every request — before it touches your API.
+              SatGate is the economic control plane for AI agents. Observe, budget, and charge for every request - before it touches your API.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
-              Drop-in gateway. Sub-ms overhead. Start in Observe mode — enforce when ready.
+              Drop-in gateway. Sub-ms overhead. Start in Observe mode - enforce when ready.
             </p>
             <div className="flex flex-wrap gap-4">
               <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
@@ -141,6 +165,9 @@ const LandingPage = () => {
               </a>
               <Link href="/sandbox" className="border border-purple-700/50 bg-purple-900/20 px-8 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition flex items-center gap-2 text-purple-300">
                 <Play size={16} /> See a Demo
+              </Link>
+              <Link href="/agent-control-plane" className="border border-cyan-700/50 bg-cyan-900/15 px-8 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition flex items-center gap-2 text-cyan-300">
+                Agent Control Plane <ArrowRight size={16} />
               </Link>
             </div>
 
@@ -162,12 +189,12 @@ const LandingPage = () => {
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <div className="text-xs text-gray-500 ml-2 font-mono">hero_demo.py — Live Demo</div>
+                <div className="text-xs text-gray-500 ml-2 font-mono">hero_demo.py - Live Demo</div>
               </div>
-              <video 
-                autoPlay 
-                loop 
-                muted 
+              <video
+                autoPlay
+                loop
+                muted
                 playsInline
                 className="w-full"
               >
@@ -176,15 +203,15 @@ const LandingPage = () => {
                 <img src="/satgate-hero-demo.gif" alt="SatGate Demo" className="w-full" />
               </video>
               <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-gray-300 font-mono">
-                🚗💨 EZ Pass — live metering
+                🚗💨 EZ Pass - live metering
               </div>
             </div>
             <div className="text-center mt-4">
               <p className="text-sm text-gray-500 mb-3">
-                Agents badge in once. Every request — verified, metered, budget-enforced.
+                Agents badge in once. Every request - verified, metered, budget-enforced.
               </p>
-              <Link 
-                href="/protect" 
+              <Link
+                href="/protect"
                 className="inline-flex items-center gap-2 text-sm font-medium text-purple-400 hover:text-purple-300 transition"
               >
                 See how it works <ArrowRight size={14} />
@@ -200,7 +227,7 @@ const LandingPage = () => {
           <h2 className="text-3xl font-bold mb-3">See SatGate in Action</h2>
           <p className="text-gray-400 mb-8 max-w-2xl mx-auto">Agents spend without limits. SatGate stops that. 30 seconds.</p>
           <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
-            <video 
+            <video
               controls
               preload="metadata"
               poster="/satgate-explainer-poster.jpg"
@@ -214,12 +241,44 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Free SEO Tools */}
+      <section className="py-20 px-6 border-b border-gray-800 bg-black">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-10 max-w-3xl">
+            <p className="mb-3 text-sm font-mono uppercase tracking-wide text-cyan-300">Free agent cost tools</p>
+            <h2 className="mb-4 text-3xl md:text-4xl font-bold text-white">Measure the economic risk before agents run wild</h2>
+            <p className="text-gray-400 text-lg leading-relaxed">
+              Start with the flagship tools and benchmark. The full tools hub has the calculators, policy generators, and readiness checks for deeper planning.
+            </p>
+          </div>
+          <div className="mb-6">
+            <Link href="/tools" className="inline-flex items-center gap-2 text-cyan-300 hover:text-cyan-200 font-semibold transition">
+              View all free AI agent cost tools <ArrowRight size={16} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {[
+              { href: '/runaway-agent-cost-calculator', title: 'Runaway Agent Cost Calculator', body: 'Model loop, retry, fanout, and paid tool-call exposure before detection.', icon: Activity },
+              { href: '/ai-agent-runaway-spend-benchmark', title: 'AI Agent Runaway Spend Benchmark', body: 'Use original JSON/CSV benchmark data to quantify agent loops, retry storms, and avoidable spend.', icon: BarChart3 },
+              { href: '/economic-firewall-readiness-grader', title: 'Economic Firewall Readiness Grader', body: 'Score your posture across identity, budgets, MCP tools, revocation, audit, routing, and Charge.', icon: Shield },
+            ].map(({ href, title, body, icon: Icon }) => (
+              <Link key={href} href={href} className="group rounded-xl border border-gray-800 bg-gray-950 p-6 transition hover:border-cyan-500/50 hover:bg-cyan-950/10">
+                <Icon className="mb-4 text-cyan-300 transition group-hover:text-cyan-200" size={28} />
+                <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                <p className="mb-4 text-sm leading-relaxed text-gray-400">{body}</p>
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-300">Open tool <ArrowRight size={14} /></span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Default Protection + Economic Policies */}
       <section className="py-20 px-6 border-b border-gray-800 bg-gradient-to-b from-gray-900/30 to-black">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-3">From Observation to Autonomy</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">First, govern your own house. Then open the gates — on your terms.</p>
+            <p className="text-gray-400 max-w-2xl mx-auto">First, govern your own house. Then open the gates - on your terms.</p>
           </div>
 
           {/* Default Protection - Foundation */}
@@ -237,8 +296,8 @@ const LandingPage = () => {
               </div>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              Every protected route requires valid credentials (Macaroons). Capabilities, caveats, 
-              delegation, and revocation—built into the protocol, not bolted on.
+              Every protected route requires valid credentials (Macaroons). Capabilities, caveats,
+              delegation, and revocation-built into the protocol, not bolted on.
             </p>
             <div className="flex flex-wrap gap-4 text-sm text-gray-500">
               <span>✓ Capabilities + Caveats</span>
@@ -250,10 +309,10 @@ const LandingPage = () => {
 
           {/* Your Agents */}
           <div className="mb-4">
-            <p className="text-sm font-mono text-cyan-400 mb-4 uppercase tracking-wider">Your Agents — Prevent Unauthorized Spend</p>
+            <p className="text-sm font-mono text-cyan-400 mb-4 uppercase tracking-wider">Your Agents - Prevent Unauthorized Spend</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {/* Observe — Free */}
+            {/* Observe - Free */}
             <div className="p-6 rounded-xl bg-black border border-cyan-800/30 hover:border-cyan-600/50 transition relative">
               <div className="text-xs text-purple-400 mb-2">Protected by default →</div>
               <div className="flex items-center gap-3 mb-3">
@@ -269,14 +328,14 @@ const LandingPage = () => {
                 Start here. No workflow changes. No budget enforcement yet. Just visibility.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
-                <li>✓ Audit mode — zero disruption to existing agents</li>
+                <li>✓ Audit mode - zero disruption to existing agents</li>
                 <li>✓ Usage attribution by team and cost center</li>
                 <li>✓ See exactly where money is going before you change anything</li>
                 <li>✓ Zero latency impact</li>
               </ul>
             </div>
 
-            {/* Control — included in Pro */}
+            {/* Control - included in Pro */}
             <div className="p-6 rounded-xl bg-black border-2 border-purple-500/50 hover:border-purple-400/70 transition relative">
               <div className="text-xs text-purple-400 mb-2">Protected by default →</div>
               <div className="flex items-center gap-3 mb-3">
@@ -289,11 +348,11 @@ const LandingPage = () => {
                 verify → enforce budget → allow
               </p>
               <p className="text-xs text-purple-400/80 mb-3 italic">
-                Now enforce it. Hard budget caps — when it hits zero, agents stop.
+                Now enforce it. Hard budget caps - when it hits zero, agents stop.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ Real-time budget enforcement</li>
-                <li>✓ Works with Stripe, ERP — no crypto required</li>
+                <li>✓ Works with Stripe, ERP - no crypto required</li>
                 <li>✓ Per-agent spending caps</li>
               </ul>
             </div>
@@ -302,10 +361,10 @@ const LandingPage = () => {
 
           {/* Their Agents */}
           <div className="mb-4">
-            <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">Their Agents — Prevent Unauthorized Access</p>
+            <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">Their Agents - Prevent Unauthorized Access</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6 max-w-lg">
-            {/* Charge — included in Pro */}
+            {/* Charge - included in Pro */}
             <div className="p-6 rounded-xl bg-black border border-yellow-800/30 hover:border-yellow-600/50 transition relative">
               <div className="text-xs text-purple-400 mb-2">Protected by default →</div>
               <div className="flex items-center gap-3 mb-3">
@@ -318,10 +377,10 @@ const LandingPage = () => {
                 verify → payment proof → allow
               </p>
               <p className="text-xs text-yellow-400/80 mb-3 italic">
-                Open your API to the autonomous agent swarm — on your terms.
+                Open your API to the autonomous agent swarm - on your terms.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
-                <li>✓ No registration, no API key — just pay and go</li>
+                <li>✓ No registration, no API key - just pay and go</li>
                 <li>✓ Bitcoin Lightning micropayments (instant)</li>
                 <li>✓ Per-request pricing at sub-cent granularity</li>
                 <li>✓ Autonomous agents discover and pay for access</li>
@@ -333,10 +392,10 @@ const LandingPage = () => {
           <div className="mt-12 mb-8">
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold mb-2">Why API Keys Break in Agent Chains</h3>
-              <p className="text-gray-400 max-w-xl mx-auto text-sm">API keys are all-or-nothing. Delegated capability tokens let you set any budget, scope, and expiry per agent — and agents can&apos;t escalate beyond what they&apos;re given. Trust flows down, never up.</p>
+              <p className="text-gray-400 max-w-xl mx-auto text-sm">API keys are all-or-nothing. Delegated capability tokens let you set any budget, scope, and expiry per agent - and agents can&apos;t escalate beyond what they&apos;re given. Trust flows down, never up.</p>
             </div>
             <div className="max-w-3xl mx-auto relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
-              <video 
+              <video
                 controls
                 preload="metadata"
                 poster="/satgate-delegation-poster.jpg"
@@ -352,8 +411,8 @@ const LandingPage = () => {
           {/* PUBLIC callout */}
           <div className="p-4 rounded-lg bg-green-950/20 border border-green-900/30">
             <p className="text-sm text-gray-400">
-              <span className="text-green-400 font-medium">PUBLIC</span> is the explicit opt-out for 
-              probes (<code className="bg-gray-800 px-1 rounded text-gray-300">/healthz</code>), docs, and webhooks. 
+              <span className="text-green-400 font-medium">PUBLIC</span> is the explicit opt-out for
+              probes (<code className="bg-gray-800 px-1 rounded text-gray-300">/healthz</code>), docs, and webhooks.
               Everything else is protected by default.
             </p>
           </div>
@@ -366,7 +425,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* EZ Pass — Agent Token Flow (pulled up per feedback) */}
+      {/* EZ Pass - Agent Token Flow (pulled up per feedback) */}
       <section className="py-16 px-6 border-b border-gray-800 bg-gradient-to-b from-purple-950/10 to-black">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-2">
@@ -375,7 +434,7 @@ const LandingPage = () => {
             </span>
             <h2 className="text-2xl font-bold mb-2">Badge in once. Fly through every gate.</h2>
             <p className="text-gray-400 text-sm max-w-xl mx-auto">
-              Agents get a credential at startup — like mounting an EZ Pass. Every request after that flows through the gateway: verified, metered, no slowdowns.
+              Agents get a credential at startup - like mounting an EZ Pass. Every request after that flows through the gateway: verified, metered, no slowdowns.
             </p>
           </div>
           <div className="flex items-center justify-center gap-2 md:gap-4 flex-wrap text-sm mt-8">
@@ -415,7 +474,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Research Alignment — validates architecture */}
+      {/* Research Alignment - validates architecture */}
       <section className="py-16 px-6 border-b border-gray-800 bg-gradient-to-b from-gray-900/20 to-black">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
@@ -424,8 +483,8 @@ const LandingPage = () => {
             </span>
             <h2 className="text-2xl font-bold mb-3">Built for the agent delegation era</h2>
             <p className="text-gray-400 text-sm max-w-2xl mx-auto">
-              Google DeepMind&apos;s recent research on intelligent AI delegation concludes that agents need attenuated capability tokens — specifically{' '}
-              <span className="text-blue-300">macaroons</span> — to safely delegate tasks across trust boundaries.
+              Google DeepMind&apos;s recent research on intelligent AI delegation concludes that agents need attenuated capability tokens - specifically{' '}
+              <span className="text-blue-300">macaroons</span> - to safely delegate tasks across trust boundaries.
               They propose Delegation Capability Tokens with cryptographic caveats that restrict what each sub-agent can access.
             </p>
             <p className="text-gray-300 text-sm mt-3 font-medium">
@@ -458,13 +517,13 @@ const LandingPage = () => {
           <p className="text-gray-500 text-xs text-center">
             We didn&apos;t build this because of a paper. We built it because it&apos;s how machine-to-machine authorization has to work. The research just confirms the architecture.
             <span className="text-gray-600 ml-1">
-              — <a href="https://arxiv.org/abs/2602.11865" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400 underline underline-offset-2">Tomasev et al., 2026</a>
+              - <a href="https://arxiv.org/abs/2602.11865" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400 underline underline-offset-2">Tomasev et al., 2026</a>
             </span>
           </p>
         </div>
       </section>
 
-      {/* Where It Fits Section — Clean diagrams */}
+      {/* Where It Fits Section - Clean diagrams */}
       <section className="py-16 px-6 border-b border-gray-800">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-bold text-center mb-3">Where It Fits</h2>
@@ -538,7 +597,7 @@ const LandingPage = () => {
               Four steps to protect your API. No code changes required.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {[
               {
@@ -586,6 +645,25 @@ const LandingPage = () => {
       </section>
 
       {/* Code Integration Section */}
+      <section className="py-20 px-6 border-t border-gray-900 bg-gray-950/40">
+        <div className="max-w-4xl mx-auto rounded-2xl border border-gray-800 bg-black p-8 md:p-10">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">Economic firewall questions</h2>
+          <div className="space-y-6">
+            {[
+              ['What is SatGate?', 'SatGate is an economic firewall and economic control plane for AI agents. It sits in the request path to observe usage, enforce budgets, attribute spend, and charge external agents before upstream APIs execute.'],
+              ['How does SatGate control AI agent spend?', 'SatGate applies per-agent, per-tool, per-team, and per-task budgets before each request reaches an API or MCP tool, so runaway loops and expensive calls can be blocked before spend occurs.'],
+              ['What are Observe, Control, and Charge?', 'Observe tracks agent traffic and cost without blocking. Control enforces budgets and scoped policy for internal agents. Charge uses L402 Lightning payments to monetize external agent and robot-customer API access.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="border-t border-gray-800 pt-6 first:border-t-0 first:pt-0">
+                <h3 className="mb-2 text-xl font-bold text-white">{question}</h3>
+                <p className="leading-relaxed text-gray-400">{answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA / Footer */}
       <footer className="py-20 border-t border-gray-800">
         <div className="max-w-6xl mx-auto px-6">
@@ -603,7 +681,7 @@ const LandingPage = () => {
               Or <Link href="/govern" className="text-purple-400 hover:text-purple-300 transition underline underline-offset-4">learn how enterprises are controlling AI agent spend →</Link>
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 py-12 border-t border-gray-800">
             <div>
               <div className="flex items-center gap-2 mb-4">
@@ -619,8 +697,34 @@ const LandingPage = () => {
                 <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
                 <li><a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Documentation</a></li>
                 <li><Link href="/govern" className="hover:text-white transition">Enterprise</Link></li>
+                <li><Link href="/economic-firewall" className="hover:text-white transition">Economic Firewall</Link></li>
+                <li><Link href="/ai-agent-cost-control" className="hover:text-white transition">AI Agent Cost Control</Link></li>
+                <li><Link href="/ai-api-budget-enforcement" className="hover:text-white transition">AI API Budget Enforcement</Link></li>
+                <li><Link href="/agent-spending-limits" className="hover:text-white transition">Agent Spending Limits</Link></li>
+                <li><Link href="/agent-spend-policy-template" className="hover:text-white transition">Agent Spend Policy Template</Link></li>
+                <li><Link href="/ai-agent-runaway-spend-benchmark" className="hover:text-white transition">Runaway Spend Benchmark</Link></li>
+                <li><Link href="/mcp" className="hover:text-white transition">MCP Governance Hub</Link></li>
+                <li><Link href="/mcp-governance" className="hover:text-white transition">MCP Governance</Link></li>
+                <li><Link href="/mcp-budget-enforcement" className="hover:text-white transition">MCP Budget Enforcement</Link></li>
+                <li><Link href="/mcp-cost-control" className="hover:text-white transition">MCP Cost Control</Link></li>
+                <li><Link href="/mcp-proxy-config-generator" className="hover:text-white transition">MCP Proxy Config Generator</Link></li>
+                <li><Link href="/agent-api-governance" className="hover:text-white transition">Agent API Governance</Link></li>
+                <li><Link href="/agent-control-plane" className="hover:text-white transition">Agent Control Plane</Link></li>
+                <li><Link href="/agent-api-key-risk-assessment" className="hover:text-white transition">Agent API Key Risk Assessment</Link></li>
+                <li><Link href="/revocable-agent-credentials" className="hover:text-white transition">Revocable Agent Credentials</Link></li>
+                <li><Link href="/agent-capability-tokens" className="hover:text-white transition">Agent Capability Tokens</Link></li>
+                <li><Link href="/l402-agent-payments" className="hover:text-white transition">L402 Agent Payments</Link></li>
+                <li><Link href="/l402-api-pricing-calculator" className="hover:text-white transition">L402 API Pricing Calculator</Link></li>
+                <li><Link href="/robot-customer-payments" className="hover:text-white transition">Robot Customer Payments</Link></li>
+                <li><Link href="/satgate-for-cursor" className="hover:text-white transition">SatGate for Cursor</Link></li>
+                <li><Link href="/satgate-for-claude-code" className="hover:text-white transition">SatGate for Claude Code</Link></li>
+                <li><Link href="/satgate-for-claude-desktop" className="hover:text-white transition">SatGate for Claude Desktop</Link></li>
+                <li><Link href="/satgate-for-openclaw" className="hover:text-white transition">SatGate for OpenClaw</Link></li>
+                <li><Link href="/satgate-for-hermes-agent" className="hover:text-white transition">SatGate for Hermes Agent</Link></li>
                 <li><Link href="/design-partners" className="hover:text-white transition">Design Partners</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
+                <li><Link href="/tools" className="hover:text-white transition">AI Agent Cost Tools</Link></li>
+                <li><Link href="/integrations" className="hover:text-white transition">Integrations</Link></li>
                 <li><Link href="/compare" className="hover:text-white transition">Compare</Link></li>
                 <li><Link href="/blog" className="hover:text-white transition">Blog</Link></li>
                 <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud Dashboard</a></li>
@@ -641,9 +745,9 @@ const LandingPage = () => {
               </ul>
             </div>
           </div>
-          
+
           <div className="pt-8 border-t border-gray-800 text-center text-gray-600 text-sm">
-            © 2025–2026 SatGate Inc. All rights reserved. SatGate™ is a trademark of SatGate Inc. Patent Pending.
+            © 2025-2026 SatGate Inc. All rights reserved. SatGateTM is a trademark of SatGate Inc. Patent Pending.
           </div>
         </div>
       </footer>
