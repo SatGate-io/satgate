@@ -424,7 +424,7 @@ sub_agent_token = attenuate(agent_a_token, [
               SatGate adds economic governance — pricing, budgets, and machine-readable payments — to any API in minutes. Start with observe mode and go live when you're ready.
             </p>
             <div className="flex flex-wrap gap-3">
-              <a href="https://github.com/satgate/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
+              <a href="https://github.com/SatGate-io/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
                 View on GitHub
               </a>
               <Link href="/design-partners" className="inline-flex items-center gap-2 border border-purple-500 text-purple-300 px-6 py-3 rounded-lg font-bold hover:bg-purple-900/30 transition text-sm">

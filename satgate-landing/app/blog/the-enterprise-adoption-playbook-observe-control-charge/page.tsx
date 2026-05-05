@@ -357,7 +357,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <a 
-                href="https://github.com/satgate/satgate"
+                href="https://github.com/SatGate-io/satgate"
                 className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition no-underline"
               >
                 View on GitHub

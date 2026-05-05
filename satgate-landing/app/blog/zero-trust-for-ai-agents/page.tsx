@@ -414,7 +414,7 @@ Token: search-worker-12
               SatGate adds capability-based security and budget enforcement to any API — without replacing your existing identity stack. Deploy in observe mode today, enforce tomorrow.
             </p>
             <div className="flex flex-wrap gap-3">
-              <a href="https://github.com/satgate/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
+              <a href="https://github.com/SatGate-io/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
                 View on GitHub
               </a>
               <Link href="/design-partners" className="inline-flex items-center gap-2 border border-red-500 text-red-300 px-6 py-3 rounded-lg font-bold hover:bg-red-900/30 transition text-sm">

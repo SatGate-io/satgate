@@ -424,7 +424,7 @@ routes:
               SatGate implements L402 as a gateway policy — deploy in front of any API to enable machine-native micropayments with zero changes to your backend. Open source. Production ready.
             </p>
             <div className="flex flex-wrap gap-3">
-              <a href="https://github.com/satgate/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
+              <a href="https://github.com/SatGate-io/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
                 View on GitHub
               </a>
               <Link href="/design-partners" className="inline-flex items-center gap-2 border border-yellow-500 text-yellow-300 px-6 py-3 rounded-lg font-bold hover:bg-yellow-900/30 transition text-sm">

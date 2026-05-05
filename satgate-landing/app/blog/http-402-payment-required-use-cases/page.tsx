@@ -493,7 +493,7 @@ Parent Agent ($50 macaroon)
               SatGate is an economic gateway that adds L402 payment support, budget enforcement, and macaroon authentication to any API. Deploy in front of your existing infrastructure and start monetizing agent traffic today.
             </p>
             <div className="flex flex-wrap gap-3">
-              <a href="https://github.com/satgate/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
+              <a href="https://github.com/SatGate-io/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
                 View on GitHub
               </a>
               <Link href="/blog/l402-protocol-explained" className="inline-flex items-center gap-2 border border-blue-500 text-blue-300 px-6 py-3 rounded-lg font-bold hover:bg-blue-900/30 transition text-sm">

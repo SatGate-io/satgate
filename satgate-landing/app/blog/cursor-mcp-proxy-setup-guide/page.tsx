@@ -389,7 +389,7 @@ satgate-gateway --config ./satgate.yaml`}</code>
               SatGate adds budget enforcement, per-tool pricing, and audit trails to MCP traffic, without requiring you to rebuild your tools.
             </p>
             <div className="flex gap-4">
-              <a href="https://github.com/satgatelabs/satgate" className="inline-flex items-center px-4 py-2 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition">
+              <a href="https://github.com/SatGate-io/satgate" className="inline-flex items-center px-4 py-2 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition">
                 Explore SatGate →
               </a>
               <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-900 transition">
