@@ -40,6 +40,24 @@ const PricingPage = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'SatGate Pricing',
+    url: 'https://satgate.io/pricing',
+    description: 'Pricing for SatGate Observe, Control, and Charge modes for AI agent economic governance.',
+    datePublished: '2026-04-27',
+    dateModified: '2026-05-03',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'economic control plane for AI agents' },
+      { '@type': 'Thing', name: 'AI agent budget enforcement' },
+      { '@type': 'Thing', name: 'SatGate Observe Control Charge' },
+      { '@type': 'Thing', name: 'request-path spend governance' },
+      { '@type': 'Thing', name: 'L402 API monetization' },
+    ],
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -65,6 +83,7 @@ const PricingPage = () => {
     name: 'SatGate Pricing',
     url: 'https://satgate.io/pricing',
     description: 'Pricing for SatGate Observe, Control, and Charge modes for AI agent economic governance.',
+    dateModified: '2026-05-03',
     itemListElement: [
       {
         '@type': 'Offer',
@@ -72,27 +91,31 @@ const PricingPage = () => {
         price: '0',
         priceCurrency: 'USD',
         description: 'Free Observe-mode visibility for AI agent API traffic and cost attribution.',
-        itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate Observe' },
+        availability: 'https://schema.org/InStock',
+        itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate Observe', applicationCategory: 'DeveloperApplication' },
       },
       {
         '@type': 'Offer',
         name: 'Pro / Control',
         priceCurrency: 'USD',
         description: 'Request-path budget enforcement, per-agent caps, MCP tool controls, alerts, and revocation for AI agent spend.',
-        itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate Control' },
+        availability: 'https://schema.org/InStock',
+        itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate Control', applicationCategory: 'DeveloperApplication' },
       },
       {
         '@type': 'Offer',
         name: 'Enterprise / Charge',
         priceCurrency: 'USD',
         description: 'Enterprise deployment, hybrid/on-prem options, advanced governance, and L402 Charge for robot-customer API monetization.',
-        itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate Charge' },
+        availability: 'https://schema.org/InStock',
+        itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate Charge', applicationCategory: 'DeveloperApplication' },
       },
     ],
   };
 
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-purple-500 selection:text-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(offerCatalogJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />

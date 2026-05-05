@@ -47,7 +47,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-05-01',
-    dateModified: '2026-05-01',
+    dateModified: '2026-05-02',
     mainEntityOfPage: 'https://satgate.io/stripe-link-agents-vs-satgate',
   };
 
@@ -206,10 +206,10 @@ export default function StripeLinkAgentsVsSatGatePage() {
         <h2 className="mb-8 text-3xl font-bold text-white">Stripe Link for Agents and SatGate questions</h2>
         <div className="grid md:grid-cols-2 gap-5">
           {[
-            ['Is Stripe Link for Agents a competitor to SatGate?', 'It overlaps only at the broad “agents spend money” narrative layer. Link is a payment-credential layer. SatGate is a request-path economic control plane.'],
-            ['Can teams use both?', 'Yes. Link can help an agent pay. SatGate can govern which APIs, tools, routes, and budgets the agent is allowed to use.'],
-            ['Does SatGate Charge use Stripe shared payment tokens?', 'No. SatGate Charge is L402 Lightning-native API monetization. Stripe shared payment tokens are a separate flow.'],
-            ['What should API companies build first?', 'Put policy, metering, budget enforcement, and audit in the request path. Payment credentials matter after you know what behavior is allowed.'],
+            ['Is Stripe Link for Agents a competitor to SatGate?', 'Stripe Link for Agents and SatGate operate at different layers. Link gives agents payment credentials and approval flows. SatGate governs request-path access, budgets, metering, revocation, audit, and API monetization.'],
+            ['What is the difference between an agent wallet and an economic firewall?', 'An agent wallet authorizes payment. An economic firewall authorizes behavior: whether an agent may access an API, spend budget, call an MCP tool, delegate authority, or unlock paid access.'],
+            ['Does SatGate Charge use Stripe shared payment tokens?', 'No. SatGate Charge is L402 Lightning-native API monetization. Stripe shared payment tokens are a separate payment-credential flow.'],
+            ['Can companies need both Link and SatGate?', 'Yes. A wallet can help an agent pay at checkout. SatGate helps API providers and enterprises control what agents can access, meter usage, enforce budgets, and charge for API or MCP activity.'],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="text-xl font-bold text-white mb-2">{question}</h3>

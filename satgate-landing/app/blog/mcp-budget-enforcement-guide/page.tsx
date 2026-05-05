@@ -3,15 +3,93 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock, ArrowRight, CheckCircle, Shield, DollarSign, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'MCP Budget Enforcement: Set Per-Tool Costs and Stop Runaway Agent Spend',
-  description: 'A practical MCP budget enforcement guide: assign per-tool costs, cap agent spending, delegate budgets, and block expensive tool calls in real time.',
+  title: 'MCP Budget Enforcement Guide: Per-Tool Costs and Hard Agent Spend Caps',
+  description: 'Practical MCP budget enforcement guide: set per-tool costs, cap agent spend, delegate budgets, and block runaway MCP tool calls before execution.',
   alternates: { canonical: 'https://satgate.io/blog/mcp-budget-enforcement-guide' },
   keywords: ['MCP budget enforcement', 'MCP proxy', 'Model Context Protocol budget', 'AI tool cost control', 'MCP gateway', 'per-tool cost attribution'],
+  openGraph: {
+    title: 'MCP Budget Enforcement: Per-Tool Costs and Hard Spend Caps',
+    description: 'Set MCP per-tool costs, cap agent spend, delegate budgets, and block runaway tool calls before execution.',
+    url: 'https://satgate.io/blog/mcp-budget-enforcement-guide',
+    type: 'article',
+    publishedTime: '2026-03-05T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MCP Budget Enforcement: Per-Tool Costs and Hard Spend Caps',
+    description: 'Practical MCP budget enforcement for per-tool pricing, delegated spend caps, and request-path blocks.',
+  },
 };
 
 export default function McpBudgetEnforcementGuidePage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'MCP Budget Enforcement: Set Per-Tool Costs and Stop Runaway Agent Spend',
+    description: metadata.description,
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    datePublished: '2026-03-05',
+    dateModified: '2026-05-04',
+    mainEntityOfPage: 'https://satgate.io/blog/mcp-budget-enforcement-guide',
+    about: [
+      { '@type': 'Thing', name: 'MCP budget enforcement' },
+      { '@type': 'Thing', name: 'per-tool MCP costs' },
+      { '@type': 'Thing', name: 'request-path budget checks' },
+      { '@type': 'Thing', name: 'runaway agent spend control' },
+      { '@type': 'Thing', name: 'MCP gateway economic governance' },
+    ],
+  };
+
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is MCP budget enforcement?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'MCP budget enforcement prices each MCP tool call, assigns an agent or workflow budget, checks remaining budget before the tool executes, and blocks or downgrades calls that would exceed the limit.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do you set per-tool MCP costs?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Set a default cost for ordinary MCP tools, then override expensive tools with explicit prices or wildcard rules. The gateway resolves the tool cost before each tools/call request and deducts it from the agent budget atomically.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Where should MCP budget checks happen?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Budget checks should happen in the request path, before the MCP server executes the tool. Post-hoc dashboards and alerts are useful for reporting, but they cannot stop runaway tool calls once an autonomous agent has already spent the money.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can MCP budget enforcement hard-cap specific expensive tools?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. MCP budget enforcement can assign higher prices, stricter daily caps, approval requirements, or deny rules to expensive tools such as code execution, web search, database queries, or deployment actions.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -221,6 +299,36 @@ satgate delegate \\
             by team, with trends over time. Start in Observe mode to see the data, then switch to Control 
             when you&apos;re ready to enforce.
           </p>
+
+          <div className="my-8 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-6">
+            <h2 className="text-2xl font-bold text-white mb-4">MCP Budget Enforcement FAQ</h2>
+            <div className="space-y-5">
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">What is MCP budget enforcement?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  MCP budget enforcement prices each MCP tool call, assigns an agent or workflow budget, checks remaining budget before the tool executes, and blocks or downgrades calls that would exceed the limit.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">How do you set per-tool MCP costs?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  Set a default cost for ordinary MCP tools, then override expensive tools with explicit prices or wildcard rules. The gateway resolves the tool cost before each tools/call request and deducts it from the agent budget atomically.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">Where should MCP budget checks happen?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  Budget checks should happen in the request path, before the MCP server executes the tool. Dashboards and alerts are useful for reporting, but they cannot stop runaway tool calls after an autonomous agent has already spent the money.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">Can MCP budget enforcement hard-cap specific expensive tools?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  Yes. MCP budget enforcement can assign higher prices, stricter daily caps, approval requirements, or deny rules to expensive tools such as code execution, web search, database queries, or deployment actions.
+                </p>
+              </div>
+            </div>
+          </div>
 
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">Quick Start</h2>
           <p className="text-gray-300 leading-relaxed">

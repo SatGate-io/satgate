@@ -78,6 +78,25 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
     return { yaml, json };
   }, [profile, task, tenant]);
 
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Revocable Capability Token Policy Template',
+    url: 'https://satgate.io/revocable-capability-token-policy-template',
+    description: 'Generate scoped, expiring, revocable capability-token policy for AI agents, sub-agents, MCP tools, budgets, and audit trails.',
+    datePublished: '2026-04-12',
+    dateModified: '2026-05-05',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'revocable capability token policy template' },
+      { '@type': 'Thing', name: 'scoped AI agent credentials' },
+      { '@type': 'Thing', name: 'agent token attenuation' },
+      { '@type': 'Thing', name: 'macaroon-style caveats for agents' },
+      { '@type': 'Thing', name: 'budget-aware credential revocation' },
+    ],
+    audience: { '@type': 'Audience', audienceType: 'Security, platform, API, and AI engineering teams' },
+  };
+
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -87,7 +106,30 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
     url: 'https://satgate.io/revocable-capability-token-policy-template',
     description: 'Generate scoped, expiring, revocable capability-token policy for AI agents, sub-agents, MCP tools, budgets, and audit trails.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-05',
+    audience: webPageJsonLd.audience,
+    featureList: ['YAML capability-token policy generation', 'JSON capability-token policy generation', 'Delegation attenuation controls', 'Budget exhaustion revocation rules', 'Audit field templates'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  };
+
+  const checklistJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Capability-token policy checklist for AI agents',
+    description: 'Required fields for scoped, expiring, revocable, budget-aware AI agent capability tokens.',
+    itemListElement: [
+      ['Scope', 'Bind authority to tenant, agent, task, audience, route, and MCP tool permissions.'],
+      ['Expiry', 'Use short token lifetimes and shorter child-token TTLs for delegated sub-agents.'],
+      ['Revocation', 'Revoke on budget exhaustion, loops, parent revocation, policy violation, or kill switch.'],
+      ['Delegation', 'Require child capabilities to be strict subsets with attenuated budgets and scopes.'],
+      ['Audit', 'Log token id, parent id, cost, remaining budget, scope, revocation state, and decision.'],
+      ['Economic control', 'Pair identity with budgets so authentication and spend governance happen together.'],
+    ].map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const breadcrumbJsonLd = {
@@ -133,7 +175,9 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(checklistJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
@@ -231,6 +275,27 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
         </div>
       </section>
 
+      <section className="border-b border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">Revocable capability token questions</h2>
+          <div className="grid gap-5 md:grid-cols-3">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is a revocable capability token for AI agents?</h3>
+              <p className="leading-relaxed text-gray-400">A revocable capability token gives an agent narrowly scoped authority for a tenant, task, tool, budget, and time window. Unlike a static API key, it can expire, be attenuated for sub-agents, and be revoked when policy fails.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Why are capability tokens better than shared API keys for agents?</h3>
+              <p className="leading-relaxed text-gray-400">Shared API keys are broad, long-lived, and hard to revoke safely. Capability tokens bind authority to a specific agent task with spend limits, expiry, delegation rules, and audit fields.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How does SatGate enforce these token policies?</h3>
+              <p className="leading-relaxed text-gray-400">SatGate sits in the request path as an economic firewall, checking token scope, budget, delegation, revocation state, and audit requirements before upstream model, API, MCP, or L402 Charge access.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-3xl border border-purple-900/60 bg-gradient-to-br from-purple-950/30 to-cyan-950/25 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Turn agent authority into an enforceable budget.</h2>
@@ -243,6 +308,9 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
             </Link>
             <Link href="/agent-api-key-risk-assessment" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Assess API key risk
+            </Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Grade economic firewall readiness
             </Link>
           </div>
         </div>

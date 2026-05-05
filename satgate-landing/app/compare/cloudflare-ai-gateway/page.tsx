@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Check, Gauge, KeyRound, Minus, ShieldCheck, Zap 
 
 export const metadata = {
   title: 'SatGate vs Cloudflare AI Gateway - AI Gateway vs Economic Firewall',
-  description: 'Compare SatGate and Cloudflare AI Gateway. Cloudflare AI Gateway provides analytics, logging, caching, rate limiting, retries, and model fallback; SatGate focuses on economic governance for agents, APIs, MCP tools, scoped capabilities, and L402 payments.',
+  description: 'Compare SatGate and Cloudflare AI Gateway. Cloudflare handles AI analytics, caching, rate limits, and fallback; SatGate governs agent spend and L402 payments.',
   alternates: { canonical: 'https://satgate.io/compare/cloudflare-ai-gateway' },
   keywords: [
     'SatGate vs Cloudflare AI Gateway',
@@ -14,9 +14,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate vs Cloudflare AI Gateway - AI Gateway vs Economic Firewall',
-    description: 'Compare SatGate and Cloudflare AI Gateway. Cloudflare AI Gateway provides analytics, logging, caching, rate limiting, retries, and model fallback; SatGate focuses on economic governance for agents, APIs, MCP tools, scoped capabilities, and L402 payments.',
+    description: 'Compare Cloudflare AI Gateway and SatGate across analytics, caching, rate limits, agent economics, MCP controls, and L402 payments.',
     url: 'https://satgate.io/compare/cloudflare-ai-gateway',
     type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SatGate vs Cloudflare AI Gateway - Gateway vs Economic Firewall',
+    description: 'Cloudflare manages AI traffic. SatGate enforces agent budgets, MCP tool costs, scoped authority, audit, and L402 payments.',
   },
 };
 
@@ -54,7 +59,7 @@ export default function CompareCloudflareAiGatewayPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-04-26',
+    dateModified: '2026-05-04',
     mainEntityOfPage: 'https://satgate.io/compare/cloudflare-ai-gateway',
   };
 
@@ -160,6 +165,22 @@ export default function CompareCloudflareAiGatewayPage() {
                   <h3 className="font-bold text-white">{label}</h3>
                 </div>
                 <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+          <h2 className="mb-6 text-3xl font-bold text-white">SatGate vs Cloudflare AI Gateway FAQ</h2>
+          <div className="grid gap-5 md:grid-cols-3">
+            {[
+              ['Is SatGate a Cloudflare AI Gateway replacement?', 'Not directly. Cloudflare AI Gateway and SatGate solve overlapping but different problems. SatGate is focused on economic governance for AI agents, APIs, MCP tools, scoped authority, and request-time payments.'],
+              ['Can SatGate and Cloudflare AI Gateway work together?', 'Yes. SatGate can enforce agent, workflow, budget, route, MCP tool, and capability policy before requests reach an upstream AI gateway or observability layer.'],
+              ['When should I choose SatGate?', 'Choose SatGate when autonomous agents need hard budget enforcement, MCP tool spend controls, scoped revocation, delegation policy, economic audit trails, or L402 payments for robot customers.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">
+                <h3 className="mb-2 font-bold text-white">{question}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{answer}</p>
               </div>
             ))}
           </div>

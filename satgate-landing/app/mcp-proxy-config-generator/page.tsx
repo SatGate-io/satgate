@@ -57,6 +57,25 @@ export default function McpProxyConfigGeneratorPage() {
     return { json, yaml, c };
   }, [budgetUsd, client, expensiveToolUsd, mode, serverName]);
 
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'MCP Proxy Config Generator',
+    url: 'https://satgate.io/mcp-proxy-config-generator',
+    description: 'Generate MCP proxy configs for Cursor, Claude, OpenClaw, and custom MCP clients with budgets, audit, revocation, and L402 Charge options.',
+    datePublished: '2026-04-12',
+    dateModified: '2026-05-03',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'MCP proxy config generator' },
+      { '@type': 'Thing', name: 'SatGate MCP proxy' },
+      { '@type': 'Thing', name: 'Cursor and Claude MCP governance' },
+      { '@type': 'Thing', name: 'MCP request-path budget enforcement' },
+      { '@type': 'Thing', name: 'L402 Charge for MCP tools' },
+    ],
+    audience: { '@type': 'Audience', audienceType: 'AI engineering, platform, API, and security teams using MCP clients' },
+  };
+
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -64,8 +83,11 @@ export default function McpProxyConfigGeneratorPage() {
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/mcp-proxy-config-generator',
-    description: 'Generate MCP proxy configuration for Cursor, Claude Desktop, Claude Code, OpenClaw, and custom MCP clients with budgets, audit, revocation, and L402 charge options.',
+    description: 'Generate MCP proxy configs for Cursor, Claude, OpenClaw, and custom MCP clients with budgets, audit, revocation, and L402 Charge options.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-03',
+    audience: webPageJsonLd.audience,
+    featureList: ['Cursor MCP config generation', 'Claude MCP config generation', 'OpenClaw MCP config generation', 'Budget and audit policy generation', 'Optional L402 Charge config'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
@@ -107,11 +129,28 @@ export default function McpProxyConfigGeneratorPage() {
           text: 'The proxy pattern applies to Cursor, Claude Desktop, Claude Code, OpenClaw, and custom MCP-capable clients that can route tool calls through an MCP server command or proxy.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'Should an MCP proxy start in Observe or Control mode?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Start an MCP proxy in Observe mode when mapping normal tool use, then move expensive, sensitive, external, or high-volume tools into Control mode with hard budgets and revocation.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What policy should an MCP proxy enforce?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An MCP proxy should enforce agent and task identity, session budgets, per-tool cost caps, unknown-tool behavior, revocation triggers, audit fields, and optional L402 payment before tool execution.',
+        },
+      },
     ],
   };
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -210,6 +249,45 @@ export default function McpProxyConfigGeneratorPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">MCP proxy config questions</h2>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is an MCP proxy?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                An MCP proxy sits between an AI agent client and MCP servers so tool calls can be observed, audited, budgeted, denied, revoked, or charged before expensive actions execute.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Why put SatGate in front of MCP servers?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                MCP tools can trigger paid APIs, cloud work, searches, code agents, or sensitive data access. SatGate adds request-path economic governance around those tool calls.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Which MCP clients can use this pattern?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                The proxy pattern applies to Cursor, Claude Desktop, Claude Code, OpenClaw, and custom MCP-capable clients that can route tool calls through an MCP server command or proxy.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Should an MCP proxy start in Observe or Control mode?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Start an MCP proxy in Observe mode when mapping normal tool use, then move expensive, sensitive, external, or high-volume tools into Control mode with hard budgets and revocation.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What policy should an MCP proxy enforce?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                An MCP proxy should enforce agent and task identity, session budgets, per-tool cost caps, unknown-tool behavior, revocation triggers, audit fields, and optional L402 payment before tool execution.
+              </p>
+            </div>
           </div>
         </div>
       </section>

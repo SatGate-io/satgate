@@ -3,7 +3,7 @@ import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptTe
 
 export const metadata = {
   title: 'MCP Cost Control | Budget Enforcement for Tool-Calling Agents',
-  description: 'Control MCP tool costs with per-tool budgets, risk tiers, scoped credentials, revocation, audit trails, and request-path enforcement for Cursor, Claude, OpenClaw, and other agents.',
+  description: 'Control MCP tool costs with per-tool budgets, scoped credentials, revocation, audit trails, and request-path enforcement for Cursor, Claude, and OpenClaw.',
   alternates: { canonical: 'https://satgate.io/mcp-cost-control' },
   keywords: [
     'MCP cost control',
@@ -18,14 +18,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'MCP Cost Control | Budget Enforcement for Tool-Calling Agents',
-    description: 'Control MCP tool costs with per-tool budgets, risk tiers, scoped credentials, revocation, audit trails, and request-path enforcement for Cursor, Claude, OpenClaw, and other agents.',
+    description: 'Control MCP tool costs with per-tool budgets, risk tiers, scoped credentials, revocation, audit trails, and request-path enforcement.',
     url: 'https://satgate.io/mcp-cost-control',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'MCP Cost Control | Budget Enforcement for Tool-Calling Agents',
-    description: 'Control MCP tool costs with per-tool budgets, risk tiers, scoped credentials, revocation, audit trails, and request-path enforcement for Cursor, Claude, OpenClaw, and other agents.',
+    description: 'Control MCP tool costs with per-tool budgets, risk tiers, scoped credentials, revocation, audit trails, and request-path enforcement.',
   },
 };
 
@@ -39,6 +39,24 @@ const controls = [
 ];
 
 export default function Page() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'MCP Cost Control | Budget Enforcement for Tool-Calling Agents',
+    url: 'https://satgate.io/mcp-cost-control',
+    description: metadata.description,
+    datePublished: '2026-05-01',
+    dateModified: '2026-05-03',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'MCP cost control' },
+      { '@type': 'Thing', name: 'MCP tool cost control' },
+      { '@type': 'Thing', name: 'tool-calling budget enforcement' },
+      { '@type': 'Thing', name: 'AI agent tool cost control' },
+      { '@type': 'Thing', name: 'request-path MCP policy' },
+    ],
+  };
+
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -48,7 +66,9 @@ export default function Page() {
     description: metadata.description,
     url: 'https://satgate.io/mcp-cost-control',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-03',
     featureList: ['Request-path budget enforcement', 'AI agent spend caps', 'MCP tool cost control', 'Revocable credentials', 'Audit trails'],
+    audience: { '@type': 'Audience', audienceType: 'AI platform, MCP, finance, and security teams' },
   };
 
   const faqJsonLd = {
@@ -58,6 +78,8 @@ export default function Page() {
       { '@type': 'Question', name: 'What is MCP cost control?', acceptedAnswer: { '@type': 'Answer', text: 'MCP cost control is the practice of pricing, limiting, attributing, and auditing Model Context Protocol tool calls before they execute so agents cannot create hidden API, SaaS, cloud, search, or data spend.' } },
       { '@type': 'Question', name: 'Why are dashboards not enough?', acceptedAnswer: { '@type': 'Answer', text: 'Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced before upstream access.' } },
       { '@type': 'Question', name: 'How does SatGate help?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate sits in the request path and checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before forwarding the request.' } },
+      { '@type': 'Question', name: 'How is MCP cost control different from LLM cost control?', acceptedAnswer: { '@type': 'Answer', text: 'LLM cost control focuses on model and token usage. MCP cost control covers tool calls that can trigger paid search, browser automation, cloud actions, SaaS APIs, data lookups, code execution, or delegated workflows outside the LLM bill.' } },
+      { '@type': 'Question', name: 'Where should MCP tool cost policy be enforced?', acceptedAnswer: { '@type': 'Answer', text: 'MCP tool cost policy should be enforced in the request path before the MCP server executes the tool, so expensive calls can be blocked, downgraded, routed, approved, revoked, or charged before cost is created.' } },
     ],
   };
 
@@ -73,6 +95,7 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
@@ -122,6 +145,45 @@ export default function Page() {
                 <p className="leading-relaxed text-gray-400">{body}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">MCP cost control questions</h2>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is MCP cost control?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                MCP cost control is the practice of pricing, limiting, attributing, and auditing Model Context Protocol tool calls before they execute so agents cannot create hidden API, SaaS, cloud, search, or data spend.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Why are dashboards not enough?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced before upstream access.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How does SatGate help?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                SatGate sits in the request path and checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before forwarding the request.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How is MCP cost control different from LLM cost control?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                LLM cost control focuses on model and token usage. MCP cost control covers tool calls that can trigger paid search, browser automation, cloud actions, SaaS APIs, data lookups, code execution, or delegated workflows outside the LLM bill.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Where should MCP tool cost policy be enforced?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                MCP tool cost policy should be enforced in the request path before the MCP server executes the tool, so expensive calls can be blocked, downgraded, routed, approved, revoked, or charged before cost is created.
+              </p>
+            </div>
           </div>
         </div>
       </section>

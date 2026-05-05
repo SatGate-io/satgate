@@ -2,15 +2,78 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: 'Cursor MCP Proxy Setup Guide: Add Budget Controls and Audit Trails to Your Tools - SatGate Blog',
+  title: 'Cursor MCP Proxy Setup Guide: Budgets and Audit Trails',
   description: 'Learn how to set up a Cursor MCP proxy with SatGate to enforce budgets, meter tool usage, and add audit trails without changing your MCP servers.',
   alternates: { canonical: 'https://satgate.io/blog/cursor-mcp-proxy-setup-guide' },
-  keywords: ['Cursor MCP proxy setup guide', 'Cursor MCP proxy', 'MCP budget control', 'Cursor tool audit trail', 'SatGate MCP proxy', 'Cursor MCP security']
+  keywords: ['Cursor MCP proxy setup guide', 'Cursor MCP proxy', 'MCP budget control', 'Cursor tool audit trail', 'SatGate MCP proxy', 'Cursor MCP security'],
+  openGraph: {
+    title: 'Cursor MCP Proxy Setup Guide: Budgets and Audit Trails',
+    description: 'Set up a Cursor MCP proxy to enforce budgets, meter tool usage, and add audit trails without changing MCP servers.',
+    url: 'https://satgate.io/blog/cursor-mcp-proxy-setup-guide',
+    type: 'article',
+    publishedTime: '2026-04-09T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Cursor MCP Proxy Setup Guide: Budgets and Audit Trails',
+    description: 'Add request-path budget controls and audit trails to Cursor MCP tools through a SatGate proxy.',
+  },
 };
 
 export default function CursorMCPProxySetupGuidePage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'Cursor MCP Proxy Setup Guide: Add Budget Controls and Audit Trails to Your Tools',
+    description: 'Learn how to set up a Cursor MCP proxy with SatGate to enforce budgets, meter tool usage, and add audit trails without changing your MCP servers.',
+    url: 'https://satgate.io/blog/cursor-mcp-proxy-setup-guide',
+    datePublished: '2026-04-09',
+    dateModified: '2026-05-04',
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'Cursor MCP proxy' },
+      { '@type': 'Thing', name: 'MCP budget control' },
+      { '@type': 'Thing', name: 'Cursor tool audit trails' },
+      { '@type': 'Thing', name: 'AI coding agent governance' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Why use an MCP proxy with Cursor?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An MCP proxy gives Cursor a governance point between the editor and downstream tools, letting teams enforce budgets, add audit trails, and apply per-tool policy without rewriting every MCP server.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can a Cursor MCP proxy stop runaway tool spend?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. A request-path proxy can price tool calls, track spend, and block calls when budgets are exhausted before expensive APIs or infrastructure actions execute.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Should Cursor MCP tools use the same policy in development and production?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No. Development, staging, and production-adjacent workflows should use separate tokens, budgets, and tool scopes so one environment cannot accidentally inherit another environment’s authority.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -303,6 +366,23 @@ satgate-gateway --config ./satgate.yaml`}</code>
             If you want Cursor to use MCP tools safely at team scale, put SatGate in the middle and make policy explicit.
           </p>
 
+          <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">FAQ</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">Cursor MCP proxy questions</h2>
+            <div className="space-y-5">
+              {[
+                ['Why use an MCP proxy with Cursor?', 'An MCP proxy gives Cursor a governance point between the editor and downstream tools, letting teams enforce budgets, add audit trails, and apply per-tool policy without rewriting every MCP server.'],
+                ['Can a Cursor MCP proxy stop runaway tool spend?', 'Yes. A request-path proxy can price tool calls, track spend, and block calls when budgets are exhausted before expensive APIs or infrastructure actions execute.'],
+                ['Should Cursor MCP tools use the same policy in development and production?', 'No. Development, staging, and production-adjacent workflows should use separate tokens, budgets, and tool scopes so one environment cannot accidentally inherit another environment’s authority.'],
+              ].map(([question, answer]) => (
+                <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                  <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                  <p className="leading-relaxed text-gray-400">{answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
           <div className="bg-gray-900 border border-gray-800 p-6 rounded-lg mt-8">
             <h3 className="text-xl font-semibold mb-4">Want to govern Cursor MCP usage instead of just trusting it?</h3>
             <p className="mb-4 text-gray-300">
@@ -312,7 +392,7 @@ satgate-gateway --config ./satgate.yaml`}</code>
               <a href="https://github.com/satgatelabs/satgate" className="inline-flex items-center px-4 py-2 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition">
                 Explore SatGate →
               </a>
-              <a href="/docs" className="inline-flex items-center px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-900 transition">
+              <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-900 transition">
                 Read the Docs
               </a>
             </div>

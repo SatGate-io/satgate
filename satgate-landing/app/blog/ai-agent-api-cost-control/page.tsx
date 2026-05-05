@@ -3,8 +3,8 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: 'AI Agent API Cost Control: Rate Limits vs Economic Firewalls',
-  description: 'Learn why API rate limits cannot control autonomous AI agent spend, and how economic firewalls enforce real-time budgets per agent, tool, and request.',
+  title: 'AI Agent API Cost Control: Stop Runaway Spend Before API Calls Execute',
+  description: 'Control AI agent API costs with request-path budget checks, tool pricing, delegated spend limits, revocation, and economic firewalls before calls execute.',
   alternates: { canonical: 'https://satgate.io/blog/ai-agent-api-cost-control' },
   keywords: [
     'AI agent API cost control',
@@ -13,24 +13,83 @@ export const metadata = {
     'rate limiting vs budget control',
     'AI agent spending caps',
   ],
+  openGraph: {
+    title: 'AI Agent API Cost Control: Stop Runaway Spend Before Calls',
+    description: 'Control AI agent API costs with request-path budget checks, tool pricing, spend limits, revocation, and economic firewalls.',
+    url: 'https://satgate.io/blog/ai-agent-api-cost-control',
+    type: 'article',
+    publishedTime: '2026-03-05T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Agent API Cost Control: Stop Runaway Spend Before Calls',
+    description: 'Stop runaway AI agent API spend with budget checks, tool pricing, spend caps, revocation, and economic firewalls.',
+  },
 };
 
 export default function AiAgentApiCostControlPage() {
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: 'How to Control AI Agent API Costs: Rate Limiting vs Economic Firewalls',
+    '@type': 'TechArticle',
+    headline: 'AI Agent API Cost Control: Stop Runaway Spend Before API Calls Execute',
     description: metadata.description,
-    author: { '@type': 'Person', name: 'Matt Dean' },
+    author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-05',
-    dateModified: '2026-04-25',
+    dateModified: '2026-05-04',
     mainEntityOfPage: 'https://satgate.io/blog/ai-agent-api-cost-control',
+    about: [
+      { '@type': 'Thing', name: 'AI agent API cost control' },
+      { '@type': 'Thing', name: 'request-path budget checks' },
+      { '@type': 'Thing', name: 'rate limiting versus budget enforcement' },
+      { '@type': 'Thing', name: 'delegated agent spend limits' },
+      { '@type': 'Thing', name: 'economic firewalls for API calls' },
+    ],
+  };
+
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do you control AI agent API costs?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Control AI agent API costs by putting an enforcement layer in the request path. The layer should identify the agent, price the API or tool call, check remaining budget, apply route/model policy, and block or downgrade requests before upstream spend occurs.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why are API rate limits not enough for AI agent cost control?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Rate limits count requests, but AI agent costs depend on models, tools, routes, retries, delegation, and token volume. Ten cheap requests may cost less than one premium model call, so spend needs budget enforcement instead of request-count throttling alone.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the difference between an economic firewall and a rate limit?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A rate limit controls traffic volume. An economic firewall controls spend and authority. It checks budgets, prices, capability scopes, revocation, and audit requirements before an autonomous agent reaches an API, model, or MCP tool.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'When should AI agent API cost controls block a request?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AI agent API cost controls should block a request before execution when the estimated cost exceeds the remaining budget, the tool or route is outside scope, the credential is revoked or expired, or a delegated sub-agent would exceed its parent allowance.',
+        },
+      },
+    ],
   };
 
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -163,6 +222,36 @@ audit:
           <p className="text-gray-300 leading-relaxed">
             That is the difference between watching AI agent costs and governing them.
           </p>
+
+          <div className="my-8 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-6">
+            <h2 className="text-2xl font-bold text-white mb-4">AI Agent API Cost Control FAQ</h2>
+            <div className="space-y-5">
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">How do you control AI agent API costs?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  Put an enforcement layer in the request path. It should identify the agent, price the API or tool call, check remaining budget, apply route/model policy, and block or downgrade requests before upstream spend occurs.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">Why are API rate limits not enough for AI agent cost control?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  Rate limits count requests, but agent costs depend on models, tools, routes, retries, delegation, and token volume. Ten cheap requests may cost less than one premium model call, so spend needs budget enforcement rather than request-count throttling alone.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">What is the difference between an economic firewall and a rate limit?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  A rate limit controls traffic volume. An economic firewall controls spend and authority by checking budgets, prices, capability scopes, revocation, and audit requirements before an agent reaches an API, model, or MCP tool.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">When should AI agent API cost controls block a request?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  They should block before execution when the estimated cost exceeds remaining budget, the tool or route is outside scope, the credential is revoked or expired, or a delegated sub-agent would exceed its parent allowance.
+                </p>
+              </div>
+            </div>
+          </div>
 
           <RoiCta />
 

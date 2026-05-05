@@ -76,6 +76,68 @@ interface LogEntry {
 
 type DemoScene = 'intro' | 'mint' | 'use' | 'delegate' | 'enforce' | 'revoke' | 'summary';
 
+const webPageJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'SatGate Control Demo',
+  url: 'https://satgate.io/protect',
+  description: 'Interactive SatGate Control demo showing scoped capability tokens, budgets, delegation limits, revocation, and request-path policy for AI agents.',
+  datePublished: '2026-04-12',
+  dateModified: '2026-05-03',
+  isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+  about: [
+    { '@type': 'Thing', name: 'SatGate Control' },
+    { '@type': 'Thing', name: 'revocable capability tokens' },
+    { '@type': 'Thing', name: 'AI agent budget enforcement' },
+    { '@type': 'Thing', name: 'delegated agent authority' },
+    { '@type': 'Thing', name: 'request-path policy enforcement' },
+  ],
+};
+
+const softwareJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'SatGate Control Demo',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'Web',
+  url: 'https://satgate.io/protect',
+  description: webPageJsonLd.description,
+  publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+  dateModified: '2026-05-03',
+  featureList: ['Scoped capability token minting', 'Budget enforcement simulation', 'Delegated token limits', 'Revocation testing', 'Policy audit trail'],
+};
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What does SatGate Control protect?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'SatGate Control protects agent API and MCP tool calls by enforcing scoped capability tokens, budgets, delegation limits, revocation, and audit policy before requests reach upstream services.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Why use revocable capability tokens for agents?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Revocable capability tokens give agents narrow, expiring authority that can be delegated safely and killed instantly without rotating global API keys or service-account credentials.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How does Control differ from Charge?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Control enforces access, budget, scope, and revocation policy for agent activity. Charge uses L402 Lightning payments when external agents or robot customers should pay before API access is unlocked.',
+      },
+    },
+  ],
+};
+
 export default function ProtectDemoPage() {
   const [currentScene, setCurrentScene] = useState<DemoScene>('intro');
   const [isLoading, setIsLoading] = useState(false);
@@ -666,6 +728,9 @@ export default function ProtectDemoPage() {
 
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       
       {/* Header */}
       <div className="border-b border-gray-800 bg-black/80 backdrop-blur-sm sticky top-0 z-40">
@@ -1711,6 +1776,23 @@ export default function ProtectDemoPage() {
             </div>
           </div>
         )}
+
+        <section className="mt-12 border-t border-gray-800 pt-10">
+          <p className="mb-2 text-center text-xs font-mono uppercase tracking-wide text-blue-300">FAQ</p>
+          <h2 className="mb-8 text-center text-2xl font-bold text-white">Control-mode questions</h2>
+          <div className="grid gap-4 md:grid-cols-3">
+            {[
+              ['What does SatGate Control protect?', 'SatGate Control protects agent API and MCP tool calls by enforcing scoped capability tokens, budgets, delegation limits, revocation, and audit policy before requests reach upstream services.'],
+              ['Why use revocable capability tokens for agents?', 'Revocable capability tokens give agents narrow, expiring authority that can be delegated safely and killed instantly without rotating global API keys or service-account credentials.'],
+              ['How does Control differ from Charge?', 'Control enforces access, budget, scope, and revocation policy for agent activity. Charge uses L402 Lightning payments when external agents or robot customers should pay before API access is unlocked.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
+                <h3 className="mb-2 font-bold text-white">{question}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{answer}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* Footer CTA */}
         <div className="mt-12 text-center">

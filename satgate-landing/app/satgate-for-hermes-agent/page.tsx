@@ -35,6 +35,23 @@ const controls = [
 ];
 
 export default function SatGateForHermesAgentPage() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'SatGate for Hermes Agent MCP Workflows',
+    description: metadata.description,
+    url: 'https://satgate.io/satgate-for-hermes-agent',
+    dateModified: '2026-05-04',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'Hermes Agent MCP budget enforcement' },
+      { '@type': 'Thing', name: 'Hermes Agent spend control' },
+      { '@type': 'Thing', name: 'persistent agent economic governance' },
+      { '@type': 'Thing', name: 'MCP tool cost policy' },
+      { '@type': 'Thing', name: 'revocable agent credentials' },
+    ],
+  };
+
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -44,6 +61,8 @@ export default function SatGateForHermesAgentPage() {
     description: metadata.description,
     url: 'https://satgate.io/satgate-for-hermes-agent',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-04',
+    about: webPageJsonLd.about,
     featureList: ['Hermes Agent MCP budget enforcement', 'AI agent spend control', 'MCP tool cost policy', 'Revocable capability tokens', 'Request-path audit trails'],
   };
 
@@ -81,6 +100,7 @@ export default function SatGateForHermesAgentPage() {
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
@@ -144,6 +164,24 @@ export default function SatGateForHermesAgentPage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20">
+        <div className="rounded-2xl border border-gray-800 bg-gray-950 p-8">
+          <h2 className="mb-6 text-3xl font-bold text-white">Hermes Agent governance FAQ</h2>
+          <div className="grid gap-5 md:grid-cols-3">
+            {[
+              ['Can SatGate govern Hermes Agent MCP tools?', 'Yes. SatGate can sit between Hermes Agent workflows and MCP servers or upstream APIs to enforce budgets, allowed tools, scoped credentials, revocation, and audit trails before tool calls execute.'],
+              ['Why does a self-improving agent need economic governance?', 'Persistent or learning agents can reuse skills, retry workflows, call tools, and delegate work over time. SatGate adds request-path economic policy so those actions have budgets, scopes, expiry, and kill switches.'],
+              ['Does SatGate replace Hermes Agent?', 'No. Hermes Agent remains the agent workflow. SatGate adds the economic control plane around MCP tools, APIs, model routes, paid data sources, and credentials.'],
+            ].map(([question, answer]) => (
+              <div key={question}>
+                <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                <p className="leading-relaxed text-gray-400">{answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-20">
         <div className="rounded-3xl border border-purple-900/60 bg-gradient-to-br from-purple-950/40 to-cyan-950/20 p-8 md:p-12">
           <Bot className="mb-5 text-purple-300" size={32} />
           <h2 className="mb-4 text-3xl font-bold text-white">Hermes Agent can use MCP. SatGate makes MCP economically safe.</h2>

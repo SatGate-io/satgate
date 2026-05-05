@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seo:gsc": "python3 scripts/gsc_telemetry.py"
+    "seo:gsc": "python3 scripts/gsc_telemetry.py",
+    "seo:links": "python3 scripts/internal_link_audit.py"
   },
   "dependencies": {
     "lucide-react": "^0.555.0",

@@ -33,6 +33,23 @@ const scenarios = [
   ['Multi-tenant agent swarm', '$134,400', '$6,000', '95.5%'],
 ];
 
+const webPageJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'AI Agent Runaway Spend Index',
+  description: metadata.description,
+  url: 'https://satgate.io/ai-agent-runaway-spend-index',
+  dateModified: '2026-05-04',
+  isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+  about: [
+    { '@type': 'Thing', name: 'AI agent runaway spend' },
+    { '@type': 'Thing', name: 'AI agent cost benchmark' },
+    { '@type': 'Thing', name: 'MCP tool cost failures' },
+    { '@type': 'Thing', name: 'request-path cost controls' },
+    { '@type': 'Thing', name: 'delegated sub-agent fanout risk' },
+  ],
+};
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Dataset',
@@ -41,6 +58,8 @@ const jsonLd = {
   url: 'https://satgate.io/ai-agent-runaway-spend-index',
   creator: { '@type': 'Organization', name: 'SatGate' },
   datePublished: '2026-04-26',
+  dateModified: '2026-05-04',
+  about: webPageJsonLd.about,
   keywords: ['AI agent spend control', 'MCP cost control', 'runaway AI spend', 'economic firewall'],
   distribution: [
     { '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: 'https://satgate.io/data/ai-agent-runaway-spend-index-2026-04.json' },
@@ -85,12 +104,29 @@ const faqJsonLd = {
         text: 'SatGate reduces runaway agent spend by enforcing per-request budgets, MCP tool cost policy, revocable capabilities, delegation caps, audit requirements, and kill switches before upstream calls execute.',
       },
     },
+    {
+      '@type': 'Question',
+      name: 'Which failure modes does the index track?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The index tracks OpenAI retry loops, MCP browser automation loops, sub-agent research fanout, paid data API polling loops, and multi-tenant agent swarms.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How should teams use the index?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Teams should use the index as a control-plan checklist: price expensive tools, set per-request and session budgets, cap delegation, require revocable capabilities, and block loops in the request path.',
+      },
+    },
   ],
 };
 
 export default function AiAgentRunawaySpendIndexPage() {
   return (
     <main className="min-h-screen bg-black text-gray-100">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -162,9 +198,11 @@ export default function AiAgentRunawaySpendIndexPage() {
         <h2 className="mb-8 text-3xl font-bold text-white">Runaway spend index FAQ</h2>
         <div className="space-y-5">
           {[
-            ['What is the AI Agent Runaway Spend Index?', 'A recurring benchmark of modeled autonomous agent cost failures, including retry loops, MCP tool storms, delegated fanout, paid API polling, and avoided spend from request-path controls.'],
+            ['What is the AI Agent Runaway Spend Index?', 'The AI Agent Runaway Spend Index is a recurring benchmark of modeled autonomous agent cost failures, including retry loops, MCP tool storms, delegated fanout, paid API polling, and avoided spend from request-path controls.'],
             ['Why do runaway AI agents create cost risk?', 'Agents can loop, retry, delegate, and call paid tools or APIs much faster than humans. Without request-path budgets and kill switches, small mistakes can become expensive incidents before dashboards report the damage.'],
-            ['How does SatGate reduce runaway agent spend?', 'SatGate enforces per-request budgets, MCP tool cost policy, revocable capabilities, delegation caps, audit requirements, and kill switches before upstream calls execute.'],
+            ['How does SatGate reduce runaway agent spend?', 'SatGate reduces runaway agent spend by enforcing per-request budgets, MCP tool cost policy, revocable capabilities, delegation caps, audit requirements, and kill switches before upstream calls execute.'],
+            ['Which failure modes does the index track?', 'The index tracks OpenAI retry loops, MCP browser automation loops, sub-agent research fanout, paid data API polling loops, and multi-tenant agent swarms.'],
+            ['How should teams use the index?', 'Teams should use the index as a control-plan checklist: price expensive tools, set per-request and session budgets, cap delegation, require revocable capabilities, and block loops in the request path.'],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-3 text-xl font-bold text-white">{question}</h3>

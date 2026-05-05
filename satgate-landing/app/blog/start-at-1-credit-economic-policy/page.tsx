@@ -2,15 +2,78 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "Start at 1 Credit: A Smarter Way to Price AI Agent Tools - SatGate Blog",
+  title: "Start at 1 Credit: Smarter AI Agent Tool Pricing",
   description: "Stop guessing tool costs. Start at 1 credit in Observe mode, measure real usage, then refine policy and enforce with confidence.",
   alternates: { canonical: 'https://satgate.io/blog/start-at-1-credit-economic-policy' },
-  keywords: ['AI agent economics', 'tool pricing strategy', 'cost management AI', 'economic policy agents', 'SatGate observe mode', 'AI cost optimization', 'agent budget management']
+  keywords: ['AI agent economics', 'tool pricing strategy', 'cost management AI', 'economic policy agents', 'SatGate observe mode', 'AI cost optimization', 'agent budget management'],
+  openGraph: {
+    title: 'Start at 1 Credit: Smarter AI Agent Tool Pricing',
+    description: 'Start AI agent tools at 1 credit in Observe mode, measure real usage, then refine pricing policy before enforcement.',
+    url: 'https://satgate.io/blog/start-at-1-credit-economic-policy',
+    type: 'article',
+    publishedTime: '2026-04-07T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Start at 1 Credit: Smarter AI Agent Tool Pricing',
+    description: 'Use Observe mode to price AI agent tools from real usage before moving to Control and Charge.',
+  },
 };
 
 export default function StartAt1CreditBlogPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'Start at 1 Credit: A Smarter Way to Price AI Agent Tools',
+    description: 'Stop guessing tool costs. Start at 1 credit in Observe mode, measure real usage, then refine policy and enforce with confidence.',
+    url: 'https://satgate.io/blog/start-at-1-credit-economic-policy',
+    datePublished: '2026-04-07',
+    dateModified: '2026-05-04',
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'AI agent economics' },
+      { '@type': 'Thing', name: 'Observe mode' },
+      { '@type': 'Thing', name: 'tool pricing policy' },
+      { '@type': 'Thing', name: 'AI agent cost optimization' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Why start AI agent tool pricing at 1 credit?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Starting every tool at 1 credit in Observe mode avoids guessing and lets teams see real agent behavior before price signals distort tool choice.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'When should teams move from Observe mode to Control mode?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Teams should move to Control mode after comparing observed usage with provider invoices, repricing tools based on real cost, and tuning agent behavior while enforcement is still non-blocking.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How does tool pricing change AI agent behavior?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Tool pricing gives agents and teams an economic signal. Expensive tools become intentional, cheap tools handle routine work, and budgets encourage batching, caching, routing, and safer delegation.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -166,6 +229,23 @@ export default function StartAt1CreditBlogPage() {
           <p className="text-gray-300 leading-relaxed">
             Your agents will thank you. Your CFO definitely will.
           </p>
+
+          <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-green-300">FAQ</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">AI agent tool pricing questions</h2>
+            <div className="space-y-5">
+              {[
+                ['Why start AI agent tool pricing at 1 credit?', 'Starting every tool at 1 credit in Observe mode avoids guessing and lets teams see real agent behavior before price signals distort tool choice.'],
+                ['When should teams move from Observe mode to Control mode?', 'Move to Control mode after comparing observed usage with provider invoices, repricing tools based on real cost, and tuning agent behavior while enforcement is still non-blocking.'],
+                ['How does tool pricing change AI agent behavior?', 'Tool pricing gives agents and teams an economic signal. Expensive tools become intentional, cheap tools handle routine work, and budgets encourage batching, caching, routing, and safer delegation.'],
+              ].map(([question, answer]) => (
+                <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                  <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                  <p className="leading-relaxed text-gray-400">{answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
           <div className="mt-16 p-6 bg-gradient-to-br from-purple-900/20 to-cyan-900/20 border border-purple-500/30 rounded-xl">
             <p className="text-lg font-semibold text-white mb-3">Ready to implement smarter economic policy?</p>

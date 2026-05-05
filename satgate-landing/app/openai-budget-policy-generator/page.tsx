@@ -69,6 +69,22 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
     audit: ['tenant', 'agent', 'workflow', 'model', 'estimated_cost', 'remaining_budget', 'policy_decision', 'upstream_status'],
   }), [dailyBudget, mode, perRequest, premiumModelPct, risk, sessionBudget, workflow]);
 
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'OpenAI API Budget Limit Generator',
+    url: 'https://satgate.io/openai-budget-policy-generator',
+    description: 'Generate request-path OpenAI API budget policy for autonomous agents, model routing, spend caps, revocation, and audit controls.',
+    datePublished: '2026-04-29',
+    dateModified: '2026-05-02',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'OpenAI API budget limits' },
+      { '@type': 'Thing', name: 'AI agent cost control' },
+      { '@type': 'Thing', name: 'request-path budget enforcement' },
+    ],
+  };
+
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -79,6 +95,14 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
     description: 'Generate OpenAI API budget policy for autonomous agents, workflows, model routes, per-request caps, daily budgets, and audit controls.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    featureList: [
+      'OpenAI per-request budget caps',
+      'Daily and session spend limits',
+      'Premium model routing policy',
+      'Agent revocation triggers',
+      'YAML and JSON policy output',
+    ],
+    audience: { '@type': 'Audience', audienceType: 'AI platform, security, and FinOps teams' },
   };
 
   const howToJsonLd = {
@@ -95,6 +119,36 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
     ],
   };
 
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What OpenAI API budget limits should AI agents have?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AI agents should have OpenAI API limits by workflow, tenant, agent, model, session, day, and per request, plus premium-model routing rules, revocation triggers, and audit fields.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can OpenAI spend alerts stop runaway agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Spend alerts notify teams after usage has happened. Request-path OpenAI budget policy checks estimated cost, remaining budget, model route, and agent identity before each call executes.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Should OpenAI budget policy route to cheaper models?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. A practical policy should route routine work to economy models, reserve premium models for justified tasks, and block or revoke access when budget or risk limits are exceeded.',
+        },
+      },
+    ],
+  };
 
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
@@ -107,8 +161,10 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
   };
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -190,6 +246,33 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">OpenAI budget policy questions</h2>
+          <div className="grid gap-5 md:grid-cols-3">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What OpenAI API budget limits should AI agents have?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                AI agents should have OpenAI API limits by workflow, tenant, agent, model, session, day, and per request, plus premium-model routing rules, revocation triggers, and audit fields.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Can OpenAI spend alerts stop runaway agents?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Spend alerts notify teams after usage has happened. Request-path OpenAI budget policy checks estimated cost, remaining budget, model route, and agent identity before each call executes.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Should OpenAI budget policy route to cheaper models?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Yes. A practical policy should route routine work to economy models, reserve premium models for justified tasks, and block or revoke access when budget or risk limits are exceeded.
+              </p>
+            </div>
           </div>
         </div>
       </section>

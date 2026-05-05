@@ -2,15 +2,87 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "Zero Trust for AI Agents: Why Identity-Based Security Collapses When Machines Call the Shots - SatGate Blog",
-  description: "Zero Trust was built for humans and managed devices. AI agents need capability-based security, revocable credentials, and budget enforcement.",
+  title: "Zero Trust for AI Agents: Capability Tokens, Revocation, and Budgets",
+  description: "Zero Trust for AI agents needs more than identity: scoped capability tokens, revocation, delegation limits, and request-path budget enforcement.",
   alternates: { canonical: 'https://satgate.io/blog/zero-trust-for-ai-agents' },
-  keywords: ['Zero Trust AI agents', 'Zero Trust for AI', 'AI agent security', 'capability-based security', 'API security AI agents', 'macaroon tokens', 'agent delegation security']
+  keywords: ['Zero Trust AI agents', 'Zero Trust for AI', 'AI agent security', 'capability-based security', 'API security AI agents', 'macaroon tokens', 'agent delegation security'],
+  openGraph: {
+    title: 'Zero Trust for AI Agents: Tokens, Revocation, and Budgets',
+    description: 'Zero Trust for AI agents needs scoped capability tokens, revocation, delegation limits, and request-path budget enforcement.',
+    url: 'https://satgate.io/blog/zero-trust-for-ai-agents',
+    type: 'article',
+    publishedTime: '2026-04-03T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Zero Trust for AI Agents: Tokens, Revocation, and Budgets',
+    description: 'Extend Zero Trust for AI agents with capability tokens, delegated budgets, revocation, and economic firewalls.',
+  },
 };
 
 export default function ZeroTrustForAIAgentsBlogPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'Zero Trust for AI Agents: Capability Tokens, Revocation, and Budgets',
+    description: metadata.description,
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    datePublished: '2026-04-03',
+    dateModified: '2026-05-04',
+    mainEntityOfPage: 'https://satgate.io/blog/zero-trust-for-ai-agents',
+    about: [
+      { '@type': 'Thing', name: 'Zero Trust for AI agents' },
+      { '@type': 'Thing', name: 'capability-based agent security' },
+      { '@type': 'Thing', name: 'scoped and revocable agent tokens' },
+      { '@type': 'Thing', name: 'delegation limits for autonomous agents' },
+      { '@type': 'Thing', name: 'budget-aware authorization' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Why does traditional Zero Trust break down for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Traditional Zero Trust assumes stable human identities, managed devices, and predictable access patterns. AI agents are ephemeral, delegate to sub-agents, and can generate thousands of API calls from one task.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What replaces identity-based security for autonomous agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Autonomous agents need capability-based security: scoped, revocable tokens that encode what the agent can do, how much it can spend, where it can call, and when authority expires.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How does an economic firewall extend Zero Trust for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An economic firewall enforces cost, scope, and delegation in the request path before upstream APIs execute, giving teams budget-aware authorization that identity systems alone cannot provide.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can Zero Trust policies express agent budgets and delegated authority?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Most Zero Trust policies can express identity, device posture, location, and application access, but they usually cannot express per-agent spend limits, delegated budget attenuation, MCP tool costs, or proof-of-payment requirements before each request.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -316,6 +388,24 @@ Token: search-worker-12
           <p className="text-gray-300 leading-relaxed">
             Zero Trust got us here. Capability-based security takes us where we&apos;re going.
           </p>
+
+          <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-red-300">FAQ</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">Zero Trust for AI agents questions</h2>
+            <div className="space-y-5">
+              {[
+                ['Why does traditional Zero Trust break down for AI agents?', 'Traditional Zero Trust assumes stable human identities, managed devices, and predictable access patterns. AI agents are ephemeral, delegate to sub-agents, and can generate thousands of API calls from one task.'],
+                ['What replaces identity-based security for autonomous agents?', 'Autonomous agents need capability-based security: scoped, revocable tokens that encode what the agent can do, how much it can spend, where it can call, and when authority expires.'],
+                ['How does an economic firewall extend Zero Trust for AI agents?', 'An economic firewall enforces cost, scope, and delegation in the request path before upstream APIs execute, giving teams budget-aware authorization that identity systems alone cannot provide.'],
+                ['Can Zero Trust policies express agent budgets and delegated authority?', 'Most Zero Trust policies can express identity, device posture, location, and application access, but they usually cannot express per-agent spend limits, delegated budget attenuation, MCP tool costs, or proof-of-payment requirements before each request.'],
+              ].map(([question, answer]) => (
+                <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                  <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                  <p className="leading-relaxed text-gray-400">{answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* CTA Section */}
           <div className="mt-16 bg-gradient-to-r from-red-900/20 to-blue-900/20 border border-red-800/30 rounded-xl p-8">

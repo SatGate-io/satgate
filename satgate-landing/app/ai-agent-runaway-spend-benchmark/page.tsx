@@ -53,8 +53,14 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-04-26',
-    about: ['AI agent cost control', 'MCP budget enforcement', 'Economic firewall', 'Runaway agent spend'],
+    dateModified: '2026-05-03',
+    about: [
+      { '@type': 'Thing', name: 'AI agent runaway spend benchmark' },
+      { '@type': 'Thing', name: 'agent loop cost benchmark' },
+      { '@type': 'Thing', name: 'MCP tool spend benchmark' },
+      { '@type': 'Thing', name: 'economic firewall benchmark' },
+      { '@type': 'Thing', name: 'request-path budget enforcement' },
+    ],
   };
 
   const datasetJsonLd = {
@@ -63,6 +69,7 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
     name: 'AI Agent Runaway Spend Benchmark Scenarios',
     description: 'Modeled benchmark scenarios estimating uncontrolled and request-path controlled spend for autonomous AI agent loops, MCP retry storms, and agent swarms.',
     creator: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-03',
     license: 'https://satgate.io/terms',
     variableMeasured: ['agents', 'calls per minute', 'fanout', 'cost per call', 'detection delay', 'uncontrolled cost', 'controlled cost'],
     distribution: [
@@ -97,6 +104,16 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
         '@type': 'Question',
         name: 'How does an economic firewall reduce runaway spend?',
         acceptedAnswer: { '@type': 'Answer', text: 'An economic firewall checks identity, budget, route, tool scope, request cost, expiry, and revocation before upstream access, blocking the next expensive request when policy says stop.' },
+      },
+      {
+        '@type': 'Question',
+        name: 'Which benchmark variable is most dangerous for AI agent cost?',
+        acceptedAnswer: { '@type': 'Answer', text: 'Detection delay is usually the most dangerous variable because agents can create paid calls at machine speed while dashboards, billing alerts, and humans react after spend has already happened.' },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why include MCP tools in runaway spend benchmarks?',
+        acceptedAnswer: { '@type': 'Answer', text: 'MCP tools can trigger paid APIs, browser automation, cloud jobs, data exports, or code agents. A low model cost can still become expensive when tool calls fan out without per-tool budgets.' },
       },
     ],
   };
@@ -217,6 +234,27 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Zap className="mb-4 text-yellow-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Observe</h2><p className="leading-relaxed text-gray-400">Route agent traffic through SatGate to attribute cost by agent, workflow, route, tool, tenant, and MCP server before enforcing hard limits.</p></div>
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Gauge className="mb-4 text-cyan-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Control</h2><p className="leading-relaxed text-gray-400">Enforce per-agent budgets, per-tool caps, route policy, revocation, expiry, and kill switches before upstream API calls execute.</p></div>
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Bot className="mb-4 text-purple-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Charge</h2><p className="leading-relaxed text-gray-400">When external agents become API customers, use SatGate Charge with L402 Lightning payments to collect before access is granted.</p></div>
+        </div>
+      </section>
+
+      <section className="border-y border-gray-900 bg-black">
+        <div className="mx-auto max-w-4xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-orange-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">Runaway spend benchmark questions</h2>
+          <div className="space-y-5">
+            {[
+              ['What is AI agent runaway spend?', 'AI agent runaway spend is cost created when autonomous agents loop, retry, delegate, or continue calling paid APIs and MCP tools after the work is no longer economically justified.'],
+              ['Why do dashboards fail to control runaway agent cost?', 'Dashboards report spend after requests complete. Autonomous agents can generate hundreds or thousands of paid calls before a human sees an alert, so enforcement has to happen before forwarding each request.'],
+              ['How does an economic firewall reduce runaway spend?', 'An economic firewall checks identity, budget, route, tool scope, request cost, expiry, and revocation before upstream access, blocking the next expensive request when policy says stop.'],
+              ['Which benchmark variable is most dangerous for AI agent cost?', 'Detection delay is usually the most dangerous variable because agents can create paid calls at machine speed while dashboards, billing alerts, and humans react after spend has already happened.'],
+              ['Why include MCP tools in runaway spend benchmarks?', 'MCP tools can trigger paid APIs, browser automation, cloud jobs, data exports, or code agents. A low model cost can still become expensive when tool calls fan out without per-tool budgets.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
+                <h3 className="mb-3 text-xl font-bold text-white">{question}</h3>
+                <p className="leading-relaxed text-gray-400">{answer}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

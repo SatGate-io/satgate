@@ -79,8 +79,15 @@ export default function RobotCustomerPaymentsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-04-26',
+    dateModified: '2026-05-03',
     mainEntityOfPage: 'https://satgate.io/robot-customer-payments',
+    about: [
+      { '@type': 'Thing', name: 'robot customer payments' },
+      { '@type': 'Thing', name: 'machine customer payments' },
+      { '@type': 'Thing', name: 'autonomous agent API payments' },
+      { '@type': 'Thing', name: 'HTTP 402 API payments' },
+      { '@type': 'Thing', name: 'Lightning API monetization' },
+    ],
   };
 
   const faqJsonLd = {
@@ -117,6 +124,22 @@ export default function RobotCustomerPaymentsPage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'No. Payments need governance around identity, budgets, scoped access, revocation, routing, and audit. SatGate combines Observe, Control, and Charge in the request path.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the difference between robot customers and human API customers?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Human API customers can choose plans, enter cards, and manage accounts. Robot customers need machine-readable pricing, L402 payment challenges, scoped access, budget limits, and audit evidence inside the request path.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Does SatGate Charge use L402?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. SatGate Charge is based on L402 Lightning payments for external agent and API monetization. Payment proof unlocks only the scoped capability, route, quota, or expiry allowed by policy.',
         },
       },
     ],
@@ -201,6 +224,37 @@ export default function RobotCustomerPaymentsPage() {
         </div>
       </section>
 
+      <section className="border-y border-gray-900 bg-gray-950/60">
+        <div className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-[1fr_0.9fr] gap-8 items-start">
+          <div>
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-yellow-300">Agent wallets are one layer</p>
+            <h2 className="text-3xl font-bold text-white mb-5">Wallets help agents pay. SatGate helps APIs govern robot customers.</h2>
+            <div className="space-y-4 text-gray-300 text-lg leading-relaxed">
+              <p>
+                Agent wallets and payment credentials make it easier for autonomous software to complete purchases. API companies still need the control plane around those payments: identity, budgets, scoped access, revocation, metering, and audit.
+              </p>
+              <p>
+                SatGate Charge is L402 Lightning-native API monetization. Stripe-style shared payment tokens and card credentials are separate payment rails; SatGate's durable role is governing agent economic behavior before access.
+              </p>
+            </div>
+          </div>
+          <div className="rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-6">
+            <h3 className="text-xl font-bold text-white mb-4">Payment landscape</h3>
+            <div className="space-y-3">
+              {[
+                ['/stripe-link-agents-vs-satgate', 'Stripe Link for Agents vs SatGate'],
+                ['/agent-payment-controls', 'Agent payment controls'],
+                ['/http-402-for-ai-agents', 'HTTP 402 for AI agents'],
+              ].map(([href, title]) => (
+                <Link key={href} href={href} className="flex items-center justify-between rounded-lg border border-gray-800 bg-black/50 p-4 text-white transition hover:border-yellow-500/50">
+                  <span>{title}</span><ArrowRight size={16} />
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-8">
         <div className="rounded-2xl border border-gray-800 bg-gray-950 p-8">
           <Network className="text-cyan-300 mb-5" size={34} />
@@ -228,9 +282,53 @@ export default function RobotCustomerPaymentsPage() {
 
       <section className="border-t border-gray-900 bg-black">
         <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-yellow-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">Robot customer payment questions</h2>
+          <div className="grid gap-5 md:grid-cols-2 mb-16">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is a robot customer?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                A robot customer is autonomous software, usually an AI agent, that can discover an API, evaluate its usefulness, pay for access, and call it without a human checkout step.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How do robot customers pay for APIs?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                SatGate Charge uses L402 Lightning payments: an API returns an HTTP 402 payment challenge, the agent pays the invoice, and SatGate verifies proof before forwarding or unlocking access.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Why are subscriptions a bad fit for robot customers?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Subscriptions assume humans pick plans, enter cards, and manage keys. Robot customers need request-native pricing, payment, scope, revocation, and audit evidence at machine speed.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Is robot customer monetization only about payments?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                No. Payments need governance around identity, budgets, scoped access, revocation, routing, and audit. SatGate combines Observe, Control, and Charge in the request path.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is the difference between robot customers and human API customers?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Human API customers can choose plans, enter cards, and manage accounts. Robot customers need machine-readable pricing, L402 payment challenges, scoped access, budget limits, and audit evidence inside the request path.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Does SatGate Charge use L402?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Yes. SatGate Charge is based on L402 Lightning payments for external agent and API monetization. Payment proof unlocks only the scoped capability, route, quota, or expiry allowed by policy.
+              </p>
+            </div>
+          </div>
+
           <h2 className="text-3xl font-bold text-white mb-8">Related robot-customer controls</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
+              ['/stripe-link-agents-vs-satgate', 'Stripe Link for Agents vs SatGate', 'Compare agent wallets with request-path economic governance.'],
+              ['/agent-payment-controls', 'Agent payment controls', 'Govern approval, budget, audit, payment rails, and access policy.'],
+              ['/http-402-for-ai-agents', 'HTTP 402 for AI agents', 'Understand payment challenges for robot customers.'],
               ['/l402-agent-payments', 'L402 agent payments', 'Collect Lightning payment before protected API access.'],
               ['/agent-capability-tokens', 'Agent capability tokens', 'Give paid agents scoped, budgeted, expiring access after proof.'],
               ['/revocable-agent-credentials', 'Revocable agent credentials', 'Revoke paid robot-customer access when policy, budget, or risk changes.'],

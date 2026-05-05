@@ -3,7 +3,7 @@ import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptTe
 
 export const metadata = {
   title: 'Agent Spending Limits | Spend Caps for Autonomous AI Agents',
-  description: 'Set spending limits for autonomous AI agents by task, route, tool, model, tenant, workflow, session, and day. SatGate blocks over-budget requests before spend occurs.',
+  description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day. Block over-budget requests before spend occurs.',
   alternates: { canonical: 'https://satgate.io/agent-spending-limits' },
   keywords: [
     'agent spending limits',
@@ -18,14 +18,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Agent Spending Limits | Spend Caps for Autonomous AI Agents',
-    description: 'Set spending limits for autonomous AI agents by task, route, tool, model, tenant, workflow, session, and day. SatGate blocks over-budget requests before spend occurs.',
+    description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day before spend occurs.',
     url: 'https://satgate.io/agent-spending-limits',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Agent Spending Limits | Spend Caps for Autonomous AI Agents',
-    description: 'Set spending limits for autonomous AI agents by task, route, tool, model, tenant, workflow, session, and day. SatGate blocks over-budget requests before spend occurs.',
+    description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day before spend occurs.',
   },
 };
 
@@ -39,6 +39,24 @@ const controls = [
 ];
 
 export default function Page() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Agent Spending Limits | Spend Caps for Autonomous AI Agents',
+    url: 'https://satgate.io/agent-spending-limits',
+    description: metadata.description,
+    datePublished: '2026-05-01',
+    dateModified: '2026-05-03',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'AI agent spending limits' },
+      { '@type': 'Thing', name: 'autonomous agent budget caps' },
+      { '@type': 'Thing', name: 'delegated sub-agent limits' },
+      { '@type': 'Thing', name: 'economic firewall controls' },
+      { '@type': 'Thing', name: 'request-path spend enforcement' },
+    ],
+  };
+
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -48,7 +66,9 @@ export default function Page() {
     description: metadata.description,
     url: 'https://satgate.io/agent-spending-limits',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-03',
     featureList: ['Request-path budget enforcement', 'AI agent spend caps', 'MCP tool cost control', 'Revocable credentials', 'Audit trails'],
+    audience: { '@type': 'Audience', audienceType: 'AI platform, API, finance, and security teams' },
   };
 
   const faqJsonLd = {
@@ -58,6 +78,8 @@ export default function Page() {
       { '@type': 'Question', name: 'What are agent spending limits?', acceptedAnswer: { '@type': 'Answer', text: 'Agent spending limits are request-path budgets and caps that constrain what autonomous AI agents can spend by task, route, tool, model, workflow, tenant, session, or day before requests execute.' } },
       { '@type': 'Question', name: 'Why are dashboards not enough?', acceptedAnswer: { '@type': 'Answer', text: 'Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced before upstream access.' } },
       { '@type': 'Question', name: 'How does SatGate help?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate sits in the request path and checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before forwarding the request.' } },
+      { '@type': 'Question', name: 'What spending limits should AI agents have?', acceptedAnswer: { '@type': 'Answer', text: 'AI agents should have spending limits by tenant, agent, task, workflow, session, model, tool, route, delegated sub-agent, and time window, with per-request ceilings and emergency revocation.' } },
+      { '@type': 'Question', name: 'Are spending limits better than rate limits for AI agents?', acceptedAnswer: { '@type': 'Answer', text: 'They solve different problems. Rate limits control frequency, while spending limits control economic exposure by checking request price, remaining budget, scope, and policy before cost is created.' } },
     ],
   };
 
@@ -73,6 +95,7 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
@@ -122,6 +145,45 @@ export default function Page() {
                 <p className="leading-relaxed text-gray-400">{body}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">Agent spending limit questions</h2>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What are agent spending limits?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Agent spending limits are request-path budgets and caps that constrain what autonomous AI agents can spend by task, route, tool, model, workflow, tenant, session, or day before requests execute.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Why are dashboards not enough?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced before upstream access.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How does SatGate help?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                SatGate sits in the request path and checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before forwarding the request.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What spending limits should AI agents have?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                AI agents should have spending limits by tenant, agent, task, workflow, session, model, tool, route, delegated sub-agent, and time window, with per-request ceilings and emergency revocation.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Are spending limits better than rate limits for AI agents?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                They solve different problems. Rate limits control frequency, while spending limits control economic exposure by checking request price, remaining budget, scope, and policy before cost is created.
+              </p>
+            </div>
           </div>
         </div>
       </section>

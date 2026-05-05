@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, BarChart3, Cloud, Eye, KeyRound, Route, Shield, Workflow, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'Compare SatGate - AI Gateway and Economic Firewall Comparisons',
-  description: 'Compare SatGate with LiteLLM, Portkey, Helicone, Cloudflare AI Gateway, Kong AI Gateway, Apigee, Tyk, Langfuse, Bifrost, Zuplo, and other AI infrastructure. Routing is not economic governance.',
+  title: 'AI Gateway Comparison: SatGate vs LiteLLM, Portkey, Kong, Apigee',
+  description: 'Compare AI gateways, API gateways, and observability tools against SatGate\'s economic firewall for agent spend, MCP tool policy, revocation, and L402.',
   alternates: { canonical: 'https://satgate.io/compare' },
   keywords: [
     'SatGate comparisons',
@@ -103,6 +103,13 @@ const comparisons = [
     icon: Shield,
     color: 'cyan',
   },
+  {
+    href: '/compare/cloud-native',
+    title: 'SatGate vs Cloud-Native AI Governance',
+    description: 'Cloud IAM and billing tools vs provider-neutral economic control. SatGate governs agent spend across clouds, MCP tools, and APIs.',
+    icon: Cloud,
+    color: 'purple',
+  },
 ];
 
 const colorClasses: Record<string, { border: string; bg: string; text: string }> = {
@@ -115,11 +122,30 @@ const colorClasses: Record<string, { border: string; bg: string; text: string }>
 };
 
 export default function ComparePage() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Compare SatGate',
+    description: metadata.description,
+    url: 'https://satgate.io/compare',
+    dateModified: '2026-05-04',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'AI gateway comparison' },
+      { '@type': 'Thing', name: 'economic firewall comparison' },
+      { '@type': 'Thing', name: 'request-path economic governance' },
+      { '@type': 'Thing', name: 'MCP tool cost policy' },
+      { '@type': 'Thing', name: 'L402 API payments' },
+    ],
+  };
+
   const itemListJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: 'SatGate comparison pages',
     description: metadata.description,
+    dateModified: '2026-05-04',
+    about: webPageJsonLd.about,
     itemListElement: comparisons.map((item, index) => ({
       '@type': 'ListItem',
       position: index + 1,
@@ -166,11 +192,20 @@ export default function ComparePage() {
           text: 'Use SatGate when the core problem is autonomous agent risk: runaway spend, MCP tool costs, delegated authority, static API keys, missing revocation, audit gaps, or machine customers that need to pay for API access at request time.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'What should teams look for in an AI gateway comparison?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Teams should compare routing, provider coverage, observability, caching, rate limits, policy enforcement, budget controls, MCP tool governance, revocation, audit evidence, and whether decisions happen before or after an agent spends money.',
+        },
+      },
     ],
   };
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -225,15 +260,19 @@ export default function ComparePage() {
             {[
               [
                 'How is SatGate different from AI gateways?',
-                'AI gateways usually handle routing, provider access, caching, rate limits, observability, or prompt operations. SatGate handles economic governance: budgets, scoped authority, MCP tool policy, audit evidence, revocation, and payments before upstream access.',
+                'Most AI gateways focus on routing, provider abstraction, caching, rate limits, observability, or prompt operations. SatGate focuses on request-path economic governance: hard budgets, scoped agent authority, MCP tool cost policy, audit evidence, revocation, and L402 payments before upstream access.',
               ],
               [
-                'Does SatGate replace existing gateways?',
-                'Not necessarily. SatGate can sit in front of LiteLLM, Portkey, Helicone, Cloudflare AI Gateway, Kong, Apigee, Tyk, Bifrost, Zuplo, or custom APIs as the economic firewall layer.',
+                'Does SatGate replace LiteLLM, Portkey, Helicone, or Cloudflare AI Gateway?',
+                'Not always. SatGate can sit in front of those systems as the economic firewall. Existing gateways can still handle routing, observability, traces, or provider access while SatGate decides whether an autonomous agent is allowed to spend, access, delegate, or pay.',
               ],
               [
-                'When is SatGate the better fit?',
-                'SatGate is the better fit when autonomous agents create spend, MCP tool-call, delegation, revocation, audit, or machine-payment risk that must be controlled in the request path.',
+                'When should teams use SatGate?',
+                'Use SatGate when the core problem is autonomous agent risk: runaway spend, MCP tool costs, delegated authority, static API keys, missing revocation, audit gaps, or machine customers that need to pay for API access at request time.',
+              ],
+              [
+                'What should teams look for in an AI gateway comparison?',
+                'Teams should compare routing, provider coverage, observability, caching, rate limits, policy enforcement, budget controls, MCP tool governance, revocation, audit evidence, and whether decisions happen before or after an agent spends money.',
               ],
             ].map(([question, answer]) => (
               <div key={question}>

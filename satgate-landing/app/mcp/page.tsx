@@ -3,7 +3,7 @@ import { ArrowRight, Bot, Gauge, KeyRound, ShieldCheck, Terminal, Wrench } from 
 
 export const metadata = {
   title: 'MCP Governance for AI Agents',
-  description: 'Govern MCP tool calls with SatGate: per-tool budgets, scoped capabilities, revocation, audit trails, and economic firewall controls for Cursor, Claude, and OpenClaw agents.',
+  description: 'Govern MCP tool calls with per-tool budgets, scoped capabilities, revocation, audit trails, and economic firewall controls for Cursor, Claude, and OpenClaw.',
   alternates: { canonical: 'https://satgate.io/mcp' },
   keywords: [
     'MCP governance',
@@ -56,6 +56,24 @@ const cards = [
 ];
 
 export default function MCPPage() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'MCP Governance for AI Agents',
+    url: 'https://satgate.io/mcp',
+    description: metadata.description,
+    datePublished: '2026-05-01',
+    dateModified: '2026-05-03',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'MCP governance' },
+      { '@type': 'Thing', name: 'MCP budget enforcement' },
+      { '@type': 'Thing', name: 'MCP tool spend control' },
+      { '@type': 'Thing', name: 'economic firewall for MCP' },
+      { '@type': 'Thing', name: 'scoped capabilities for AI agents' },
+    ],
+  };
+
   const itemListJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -112,6 +130,7 @@ export default function MCPPage() {
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -171,9 +190,9 @@ export default function MCPPage() {
         <h2 className="mb-8 text-3xl font-bold text-white">MCP governance FAQ</h2>
         <div className="space-y-5">
           {[
-            ['What is MCP governance?', 'MCP governance is the control layer around agent tool calls: budgets, scoped authority, revocation, audit trails, and risk actions before tools execute.'],
-            ['Why do MCP tools need budget enforcement?', 'Agents can loop, retry, delegate, or call paid tools repeatedly. Budget enforcement stops the spend in the request path instead of reporting it after the fact.'],
-            ['How does SatGate control MCP spend?', 'SatGate proxies MCP traffic and enforces per-tool prices, session caps, workflow budgets, capability caveats, revocation, and audit requirements before upstream tool access.'],
+            ['What is MCP governance?', 'MCP governance is the control layer around Model Context Protocol tool calls: budgets, scoped authority, revocation, audit trails, and risk actions before agents execute tools.'],
+            ['Why do MCP tools need budget enforcement?', 'Autonomous agents can call paid or risky tools repeatedly, delegate work, or loop. MCP budget enforcement stops over-budget tool calls in the request path instead of discovering spend after the fact.'],
+            ['How does SatGate control MCP spend?', 'SatGate can proxy MCP traffic and enforce per-tool prices, session caps, workflow budgets, capability caveats, revocation, and audit requirements before tool calls reach the upstream MCP server.'],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-3 text-xl font-bold text-white">{question}</h3>

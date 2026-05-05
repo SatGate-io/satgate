@@ -3,7 +3,7 @@ import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptTe
 
 export const metadata = {
   title: 'AI API Budget Enforcement | Hard Caps for Agent API Spend',
-  description: 'Enforce AI API budgets before autonomous agents call OpenAI, Claude, MCP tools, paid APIs, or internal services. SatGate adds request-path budget decisions, revocation, and audit.',
+  description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with request-path controls and audit.',
   alternates: { canonical: 'https://satgate.io/ai-api-budget-enforcement' },
   keywords: [
     'AI API budget enforcement',
@@ -18,14 +18,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'AI API Budget Enforcement | Hard Caps for Agent API Spend',
-    description: 'Enforce AI API budgets before autonomous agents call OpenAI, Claude, MCP tools, paid APIs, or internal services. SatGate adds request-path budget decisions, revocation, and audit.',
+    description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services.',
     url: 'https://satgate.io/ai-api-budget-enforcement',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'AI API Budget Enforcement | Hard Caps for Agent API Spend',
-    description: 'Enforce AI API budgets before autonomous agents call OpenAI, Claude, MCP tools, paid APIs, or internal services. SatGate adds request-path budget decisions, revocation, and audit.',
+    description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services.',
   },
 };
 
@@ -39,6 +39,24 @@ const controls = [
 ];
 
 export default function Page() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'AI API Budget Enforcement | Hard Caps for Agent API Spend',
+    url: 'https://satgate.io/ai-api-budget-enforcement',
+    description: metadata.description,
+    datePublished: '2026-05-01',
+    dateModified: '2026-05-03',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'AI API budget enforcement' },
+      { '@type': 'Thing', name: 'agent API spend caps' },
+      { '@type': 'Thing', name: 'OpenAI API budget enforcement' },
+      { '@type': 'Thing', name: 'MCP tool cost control' },
+      { '@type': 'Thing', name: 'request-path economic policy' },
+    ],
+  };
+
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -48,7 +66,9 @@ export default function Page() {
     description: metadata.description,
     url: 'https://satgate.io/ai-api-budget-enforcement',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-03',
     featureList: ['Request-path budget enforcement', 'AI agent spend caps', 'MCP tool cost control', 'Revocable credentials', 'Audit trails'],
+    audience: { '@type': 'Audience', audienceType: 'AI platform, API, finance, and security teams' },
   };
 
   const faqJsonLd = {
@@ -58,6 +78,8 @@ export default function Page() {
       { '@type': 'Question', name: 'What is AI API budget enforcement?', acceptedAnswer: { '@type': 'Answer', text: 'AI API budget enforcement is the request-path control that checks budgets, per-request cost, route policy, tool scope, expiry, and revocation before an autonomous agent can spend against an API or model provider.' } },
       { '@type': 'Question', name: 'Why are dashboards not enough?', acceptedAnswer: { '@type': 'Answer', text: 'Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced before upstream access.' } },
       { '@type': 'Question', name: 'How does SatGate help?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate sits in the request path and checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before forwarding the request.' } },
+      { '@type': 'Question', name: 'How is AI API budget enforcement different from provider spend alerts?', acceptedAnswer: { '@type': 'Answer', text: 'Provider spend alerts notify teams after usage crosses a threshold. AI API budget enforcement checks request cost, remaining budget, identity, route, and policy before the API call executes.' } },
+      { '@type': 'Question', name: 'What should happen when an AI agent exceeds its API budget?', acceptedAnswer: { '@type': 'Answer', text: 'The request should be blocked, downgraded, routed to a cheaper provider, sent for approval, or challenged for payment depending on policy, with an audit record explaining the decision.' } },
     ],
   };
 
@@ -73,6 +95,7 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
@@ -122,6 +145,45 @@ export default function Page() {
                 <p className="leading-relaxed text-gray-400">{body}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">AI API budget enforcement questions</h2>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is AI API budget enforcement?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                AI API budget enforcement is the request-path control that checks budgets, per-request cost, route policy, tool scope, expiry, and revocation before an autonomous agent can spend against an API or model provider.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Why are dashboards not enough?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced before upstream access.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How does SatGate help?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                SatGate sits in the request path and checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before forwarding the request.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How is AI API budget enforcement different from provider spend alerts?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Provider spend alerts notify teams after usage crosses a threshold. AI API budget enforcement checks request cost, remaining budget, identity, route, and policy before the API call executes.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What should happen when an AI agent exceeds its API budget?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                The request should be blocked, downgraded, routed to a cheaper provider, sent for approval, or challenged for payment depending on policy, with an audit record explaining the decision.
+              </p>
+            </div>
           </div>
         </div>
       </section>

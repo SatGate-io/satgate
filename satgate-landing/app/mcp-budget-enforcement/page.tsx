@@ -80,8 +80,15 @@ export default function McpBudgetEnforcementPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-04-26',
+    dateModified: '2026-05-03',
     mainEntityOfPage: 'https://satgate.io/mcp-budget-enforcement',
+    about: [
+      { '@type': 'Thing', name: 'MCP budget enforcement' },
+      { '@type': 'Thing', name: 'MCP spend limits' },
+      { '@type': 'Thing', name: 'AI agent tool budgets' },
+      { '@type': 'Thing', name: 'per-tool pricing policy' },
+      { '@type': 'Thing', name: 'L402 paid MCP tool access' },
+    ],
   };
 
   const faqJsonLd = {
@@ -118,6 +125,22 @@ export default function McpBudgetEnforcementPage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'SatGate acts as an economic control plane or MCP proxy that observes tool calls, applies Control policies, enforces budgets, records audit evidence, and can use Charge/L402 for paid external access.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What should an MCP tool budget include?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An MCP tool budget should include tool identity, price per call or minute, agent and tenant scope, session and daily caps, risk tier, enforcement action, revocation behavior, and audit fields.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can MCP budget enforcement stop runaway tool loops?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. Request-path MCP budget enforcement can block or downgrade tool calls once a session, agent, tool, or tenant budget is exhausted, before additional paid work executes.',
         },
       },
     ],
@@ -227,6 +250,47 @@ export default function McpBudgetEnforcementPage() {
 
       <section className="border-t border-gray-900 bg-black">
         <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">MCP budget enforcement questions</h2>
+          <div className="grid gap-5 md:grid-cols-2 mb-16">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is MCP budget enforcement?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                MCP budget enforcement means assigning prices, limits, policy, and audit trails to Model Context Protocol tool calls before an AI agent executes the tool.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Why do MCP tools need budget limits?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Autonomous agents can call tools repeatedly, delegate to sub-agents, or trigger expensive external APIs. Budget limits prevent MCP tools from becoming an unbounded spend surface.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Can dashboards enforce MCP spend?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Dashboards can report spend after the fact. MCP budget enforcement needs to sit in the request path so policy can block, route, approve, or charge before the tool executes.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How does SatGate enforce MCP budgets?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                SatGate acts as an economic control plane or MCP proxy that observes tool calls, applies Control policies, enforces budgets, records audit evidence, and can use Charge/L402 for paid external access.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What should an MCP tool budget include?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                An MCP tool budget should include tool identity, price per call or minute, agent and tenant scope, session and daily caps, risk tier, enforcement action, revocation behavior, and audit fields.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Can MCP budget enforcement stop runaway tool loops?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Yes. Request-path MCP budget enforcement can block or downgrade tool calls once a session, agent, tool, or tenant budget is exhausted, before additional paid work executes.
+              </p>
+            </div>
+          </div>
+
           <h2 className="text-3xl font-bold text-white mb-8">Related MCP governance resources</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[

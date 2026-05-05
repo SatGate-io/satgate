@@ -89,6 +89,23 @@ export default function EconomicFirewallReadinessGraderPage() {
     return { score, grade: grade(score), missing };
   }, [answers]);
 
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Economic Firewall Readiness Grader',
+    url: 'https://satgate.io/economic-firewall-readiness-grader',
+    description: 'Grade AI agent economic governance readiness across identity, request-path budgets, MCP tools, revocation, delegation, audit, routing, and L402 robot payments.',
+    dateModified: '2026-05-05',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'economic firewall readiness' },
+      { '@type': 'Thing', name: 'AI agent economic governance' },
+      { '@type': 'Thing', name: 'request-path budget controls' },
+      { '@type': 'Thing', name: 'MCP governance assessment' },
+      { '@type': 'Thing', name: 'L402 robot payment readiness' },
+    ],
+  };
+
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -98,6 +115,9 @@ export default function EconomicFirewallReadinessGraderPage() {
     url: 'https://satgate.io/economic-firewall-readiness-grader',
     description: 'Grade AI agent economic governance readiness across identity, budgets, MCP tools, revocation, delegation, audit, routing, and payments.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-05',
+    about: webPageJsonLd.about,
+    featureList: ['Agent identity attribution scoring', 'Request-path budget readiness scoring', 'MCP tool cost governance checks', 'Revocation and delegation readiness checks', 'Audit, routing, and L402 payment readiness checks'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
@@ -108,9 +128,23 @@ export default function EconomicFirewallReadinessGraderPage() {
       { '@type': 'Question', name: 'What is economic firewall readiness?', acceptedAnswer: { '@type': 'Answer', text: 'Economic firewall readiness measures whether an organization can observe, control, audit, revoke, route, budget, and optionally charge AI agent/API activity before requests execute.' } },
       { '@type': 'Question', name: 'What score means we are ready for autonomous agents?', acceptedAnswer: { '@type': 'Answer', text: 'A score above 85 means most core request-path controls are in place. Lower scores indicate gaps in identity, budget enforcement, MCP governance, revocation, audit, routing, or payment.' } },
       { '@type': 'Question', name: 'How does SatGate improve readiness?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate sits in the request path to observe agent/API spend, enforce budget and access policy, revoke scoped capabilities, audit decisions, route economically, and use L402 Charge when agents become customers.' } },
+      { '@type': 'Question', name: 'Which gaps should teams fix first?', acceptedAnswer: { '@type': 'Answer', text: 'Teams should fix request attribution, hard budget enforcement, MCP tool cost policy, scoped revocable credentials, and audit evidence first because those controls stop spend before it becomes an invoice.' } },
+      { '@type': 'Question', name: 'Is a dashboard enough for economic firewall readiness?', acceptedAnswer: { '@type': 'Answer', text: 'No. Dashboards help explain spend after it happens, but economic firewall readiness requires request-path controls that can block, route, revoke, or charge before agents execute paid work.' } },
     ],
   };
 
+  const readinessCriteriaJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Economic firewall readiness criteria',
+    description: 'Eight readiness checks for governing AI agent spend, MCP tools, scoped authority, audit, routing, and L402 robot payments before requests execute.',
+    itemListElement: questions.map((question, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: question.category,
+      description: `${question.prompt} Recommended fix: ${question.fix}`,
+    })),
+  };
 
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
@@ -123,8 +157,10 @@ export default function EconomicFirewallReadinessGraderPage() {
   };
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(readinessCriteriaJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -221,6 +257,27 @@ export default function EconomicFirewallReadinessGraderPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">Economic firewall readiness questions</h2>
+          <div className="grid gap-5 md:grid-cols-2">
+            {[
+              ['What is economic firewall readiness?', 'Economic firewall readiness measures whether an organization can observe, control, audit, revoke, route, budget, and optionally charge AI agent/API activity before requests execute.'],
+              ['What score means we are ready for autonomous agents?', 'A score above 85 means most core request-path controls are in place. Lower scores indicate gaps in identity, budget enforcement, MCP governance, revocation, audit, routing, or payment.'],
+              ['How does SatGate improve readiness?', 'SatGate sits in the request path to observe agent/API spend, enforce budget and access policy, revoke scoped capabilities, audit decisions, route economically, and use L402 Charge when agents become customers.'],
+              ['Which gaps should teams fix first?', 'Teams should fix request attribution, hard budget enforcement, MCP tool cost policy, scoped revocable credentials, and audit evidence first because those controls stop spend before it becomes an invoice.'],
+              ['Is a dashboard enough for economic firewall readiness?', 'No. Dashboards help explain spend after it happens, but economic firewall readiness requires request-path controls that can block, route, revoke, or charge before agents execute paid work.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+                <h3 className="mb-2 text-xl font-bold text-white">{question}</h3>
+                <p className="text-gray-400 leading-relaxed">{answer}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

@@ -3,15 +3,93 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "API Gateway for AI Agents: Budgets, MCP Tools, and Economic Control",
-  description: "What an API gateway for AI agents must do beyond routing: enforce budgets, price MCP tools, revoke capability tokens, and support L402 Charge.",
+  title: "API Gateway for AI Agents: Budgets, MCP, and Tool Cost Control",
+  description: "Learn what API gateway solutions for AI agents need beyond routing: budget enforcement, MCP tool cost control, scoped tokens, revocation, and L402.",
   alternates: { canonical: 'https://satgate.io/blog/api-gateway-for-ai-agents' },
-  keywords: ['API gateway for AI agents', 'AI agent gateway', 'API gateway comparison', 'agent economy gateway', 'AI API management', 'economic firewall gateway']
+  keywords: ['API gateway for AI agents', 'AI agent gateway', 'API gateway comparison', 'agent economy gateway', 'AI API management', 'economic firewall gateway'],
+  openGraph: {
+    title: 'API Gateway for AI Agents: Budgets, MCP, and Tool Costs',
+    description: 'Agent-aware API gateways need budget enforcement, MCP tool controls, scoped tokens, revocation, attribution, and L402.',
+    url: 'https://satgate.io/blog/api-gateway-for-ai-agents',
+    type: 'article',
+    publishedTime: '2026-03-12T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'API Gateway for AI Agents: Budgets, MCP, and Tool Costs',
+    description: 'Traditional gateways route traffic. AI agent gateways must enforce budgets, MCP tool scope, revocation, and payments.',
+  },
 };
 
 export default function ApiGatewayForAiAgentsBlogPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'API Gateway for AI Agents: Budgets, MCP, and Tool Cost Control',
+    description: metadata.description,
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    datePublished: '2026-03-12',
+    dateModified: '2026-05-04',
+    mainEntityOfPage: 'https://satgate.io/blog/api-gateway-for-ai-agents',
+    about: [
+      { '@type': 'Thing', name: 'API gateway for AI agents' },
+      { '@type': 'Thing', name: 'agent-aware budget enforcement' },
+      { '@type': 'Thing', name: 'MCP tool cost control' },
+      { '@type': 'Thing', name: 'scoped capability tokens for APIs' },
+      { '@type': 'Thing', name: 'L402 robot customer payments' },
+    ],
+  };
+
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is an API gateway for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An API gateway for AI agents sits between autonomous agents and upstream APIs, models, or MCP tools. Unlike a traditional gateway, it must enforce budgets, verify scoped capability tokens, attribute spend, support delegation, and return structured errors before expensive calls execute.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why are traditional API gateways not enough for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Traditional API gateways are built around authentication, routing, and rate limits. AI agents need economic controls because one request may have a very different cost from another, agents can retry or chain calls autonomously, and delegated sub-agents need scoped authority and shared budget attribution.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What should an agent-aware API gateway enforce?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An agent-aware gateway should enforce per-agent and per-tool budgets, atomic spend checks, scoped and revocable capability tokens, delegation-chain attribution, economic audit trails, and optional L402 payments for robot customers.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can an AI agent API gateway work with existing gateways like Kong or Apigee?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. An AI agent API gateway can sit in front of, behind, or alongside existing gateways like Kong, Apigee, Tyk, or Cloudflare. The existing gateway can keep routing traffic while the agent-aware layer enforces budgets, tool scope, delegation, and payment policy.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -272,6 +350,36 @@ satgate mint \\
           <p className="text-gray-300 leading-relaxed">
             You don't need to replace your gateway. You need to add an economic governance layer that understands budgets, delegation, and variable costs. That's the difference between an API gateway that routes traffic and one that governs autonomous economic activity.
           </p>
+
+          <div className="my-8 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
+            <h2 className="text-2xl font-bold text-white mb-4">API Gateway for AI Agents FAQ</h2>
+            <div className="space-y-5">
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">What is an API gateway for AI agents?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  An API gateway for AI agents sits between autonomous agents and upstream APIs, models, or MCP tools. It needs to enforce budgets, verify scoped capability tokens, attribute spend, support delegation, and return structured errors before expensive calls execute.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">Why are traditional API gateways not enough for AI agents?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  Traditional gateways are built around authentication, routing, and rate limits. AI agents need economic controls because one request can cost far more than another, agents can retry or chain calls autonomously, and delegated sub-agents need scoped authority and shared budget attribution.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">What should an agent-aware API gateway enforce?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  It should enforce per-agent and per-tool budgets, atomic spend checks, scoped and revocable capability tokens, delegation-chain attribution, economic audit trails, and optional L402 payments for robot customers.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">Can an AI agent API gateway work with existing gateways like Kong or Apigee?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  Yes. An AI agent API gateway can sit in front of, behind, or alongside existing gateways like Kong, Apigee, Tyk, or Cloudflare. The existing gateway can keep routing traffic while the agent-aware layer enforces budgets, tool scope, delegation, and payment policy.
+                </p>
+              </div>
+            </div>
+          </div>
 
           <p className="text-gray-300 leading-relaxed">
             The agents are already here. The question is whether your infrastructure can govern them — or just watch them spend.

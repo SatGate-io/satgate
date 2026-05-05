@@ -71,8 +71,15 @@ export default function AgentApiGovernancePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-04-26',
+    dateModified: '2026-05-05',
     mainEntityOfPage: 'https://satgate.io/agent-api-governance',
+    about: [
+      { '@type': 'Thing', name: 'agent API governance' },
+      { '@type': 'Thing', name: 'revocable agent credentials' },
+      { '@type': 'Thing', name: 'capability tokens for AI agents' },
+      { '@type': 'Thing', name: 'delegated API access control' },
+      { '@type': 'Thing', name: 'request-path API policy' },
+    ],
   };
 
   const faqJsonLd = {
@@ -103,6 +110,55 @@ export default function AgentApiGovernancePage() {
           text: 'Delegated sub-agents should receive less authority than their parent: smaller budgets, narrower tools, shorter expiry, route limits, and separate audit records.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'What should replace static API keys for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AI agents should use scoped, expiring, revocable capability tokens or credentials that bind authority to an agent, tenant, task, route, tool, budget, expiry, and audit policy.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How does agent API governance reduce blast radius?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Agent API governance reduces blast radius by narrowing each credential to the minimum routes, tools, budget, delegation depth, and lifetime needed for the task, with revocation before the next request.',
+        },
+      },
+    ],
+  };
+
+  const requirementsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Agent API governance requirements',
+    description: 'Core request-path controls required to govern AI agent API access without broad static keys.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Agent-scoped identity',
+        description: 'Every request identifies the tenant, agent, task, workflow, parent agent, delegated sub-agent, token, route, and tool behind the call.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Budget-aware authority',
+        description: 'Access policy includes spend limits, per-request ceilings, daily caps, tool limits, and remaining budget checks before forwarding traffic.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Revocation before the next request',
+        description: 'When an agent loops, leaks a token, or finishes a task, access can be narrowed, expired, or revoked immediately without rotating global keys.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Delegation with attenuation',
+        description: 'Sub-agents never inherit full parent authority; each delegation shrinks scope, budget, lifetime, and allowed tools.',
+      },
     ],
   };
 
@@ -119,6 +175,7 @@ export default function AgentApiGovernancePage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(requirementsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -279,6 +336,41 @@ audit: required`}</code></pre>
 
       <section className="border-t border-gray-900 bg-black">
         <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-yellow-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">Agent API governance questions</h2>
+          <div className="grid gap-5 md:grid-cols-2 mb-16">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is agent API governance?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Agent API governance is the request-path policy layer for AI agent identity, delegated authority, budgets, revocation, routing, and audit trails.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Why are static API keys risky for AI agents?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Static API keys are often broad, long-lived, and easy to copy. Autonomous agents need scoped, expiring, revocable capabilities that limit access and spend per task or workflow.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How should sub-agent delegation be controlled?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Delegated sub-agents should receive less authority than their parent: smaller budgets, narrower tools, shorter expiry, route limits, and separate audit records.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What should replace static API keys for AI agents?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                AI agents should use scoped, expiring, revocable capability tokens or credentials that bind authority to an agent, tenant, task, route, tool, budget, expiry, and audit policy.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How does agent API governance reduce blast radius?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Agent API governance reduces blast radius by narrowing each credential to the minimum routes, tools, budget, delegation depth, and lifetime needed for the task, with revocation before the next request.
+              </p>
+            </div>
+          </div>
+
           <h2 className="text-3xl font-bold text-white mb-8">Related governance guides</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
@@ -286,7 +378,9 @@ audit: required`}</code></pre>
               ['/revocable-agent-credentials', 'Revocable agent credentials', 'Scoped credentials, expiry, and kill switches for autonomous access.'],
               ['/agent-capability-tokens', 'Agent capability tokens', 'Encode scope, budget, route, delegation, and revocation into agent authority.'],
               ['/blog/zero-trust-for-ai-agents', 'Zero trust for AI agents', 'How agent credentials break human-centric identity assumptions.'],
+              ['/agent-control-plane', 'Agent control plane', 'Govern local agent authority, delegation lineage, spend, audit, and revocation.'],
               ['/economic-firewall', 'Economic firewall', 'The request-path control layer for agent access and spend.'],
+              ['/economic-firewall-readiness-grader', 'Economic firewall readiness grader', 'Score identity, budgets, revocation, audit, routing, MCP, and Charge readiness.'],
               ['/mcp-governance', 'MCP governance', 'Apply budgets, revocation, and audit to agent tool calls.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">

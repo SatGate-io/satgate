@@ -44,8 +44,14 @@ export default function Http402ForAiAgentsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-05-01',
-    dateModified: '2026-05-01',
+    dateModified: '2026-05-02',
     mainEntityOfPage: 'https://satgate.io/http-402-for-ai-agents',
+    about: [
+      { '@type': 'Thing', name: 'HTTP 402 for AI agents' },
+      { '@type': 'Thing', name: 'robot customer payments' },
+      { '@type': 'Thing', name: 'L402 Lightning API monetization' },
+      { '@type': 'Thing', name: 'AI agent payment policy' },
+    ],
   };
 
   const faqJsonLd = {

@@ -67,6 +67,25 @@ export default function McpToolCostPolicyGeneratorPage() {
     },
   }), [client, expensiveTool, expensiveToolCap, mode, perToolCall, risk, server, sessionBudget]);
 
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'MCP Tool Cost Policy Generator',
+    url: 'https://satgate.io/mcp-tool-cost-policy-generator',
+    description: 'Generate MCP tool cost policy for per-tool budgets, session caps, risk actions, revocation, and audit trails.',
+    datePublished: '2026-04-12',
+    dateModified: '2026-05-03',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'MCP tool cost policy generator' },
+      { '@type': 'Thing', name: 'per-tool MCP budgets' },
+      { '@type': 'Thing', name: 'MCP session budget enforcement' },
+      { '@type': 'Thing', name: 'unknown tool cost risk actions' },
+      { '@type': 'Thing', name: 'request-path MCP audit trails' },
+    ],
+    audience: { '@type': 'Audience', audienceType: 'AI engineering, platform, API, security, and FinOps teams using MCP' },
+  };
+
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -76,6 +95,9 @@ export default function McpToolCostPolicyGeneratorPage() {
     url: 'https://satgate.io/mcp-tool-cost-policy-generator',
     description: 'Generate MCP tool cost policy for per-tool budgets, session caps, risk actions, revocation, and audit trails.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-03',
+    audience: webPageJsonLd.audience,
+    featureList: ['MCP policy YAML generation', 'MCP policy JSON generation', 'Per-tool budget controls', 'Unknown cost risk actions', 'Revocation and audit policy templates'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
@@ -86,6 +108,8 @@ export default function McpToolCostPolicyGeneratorPage() {
       { '@type': 'Question', name: 'What is an MCP tool cost policy?', acceptedAnswer: { '@type': 'Answer', text: 'An MCP tool cost policy assigns spend limits, allowed actions, risk rules, revocation behavior, and audit fields to tool calls made through Model Context Protocol.' } },
       { '@type': 'Question', name: 'Why do MCP tools need per-tool prices?', acceptedAnswer: { '@type': 'Answer', text: 'MCP tools can hide paid APIs, searches, browser sessions, compute jobs, or data calls. Pricing each tool lets budget enforcement happen before expensive work executes.' } },
       { '@type': 'Question', name: 'Can SatGate govern Cursor or Claude MCP tool use?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit around MCP-capable clients such as Cursor, Claude Desktop, Claude Code, OpenClaw, and custom agents to enforce budgets and audit tool calls.' } },
+      { '@type': 'Question', name: 'What should happen when an MCP tool cost is unknown?', acceptedAnswer: { '@type': 'Answer', text: 'Unknown MCP tool costs should trigger a conservative policy action such as observe-only logging, explicit budget review, blocking, or revoking the session capability depending on risk tier.' } },
+      { '@type': 'Question', name: 'Which MCP tools should be marked high risk?', acceptedAnswer: { '@type': 'Answer', text: 'High-risk MCP tools include browser automation, paid search, code execution, cloud write actions, data export, production deploys, premium APIs, and any tool that can spend money or change state.' } },
     ],
   };
 
@@ -101,6 +125,7 @@ export default function McpToolCostPolicyGeneratorPage() {
   };
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
@@ -169,6 +194,45 @@ export default function McpToolCostPolicyGeneratorPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">MCP tool policy questions</h2>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is an MCP tool cost policy?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                An MCP tool cost policy assigns spend limits, allowed actions, risk rules, revocation behavior, and audit fields to tool calls made through Model Context Protocol.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Why do MCP tools need per-tool prices?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                MCP tools can hide paid APIs, searches, browser sessions, compute jobs, or data calls. Pricing each tool lets budget enforcement happen before expensive work executes.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Can SatGate govern Cursor or Claude MCP tool use?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Yes. SatGate can sit around MCP-capable clients such as Cursor, Claude Desktop, Claude Code, OpenClaw, and custom agents to enforce budgets and audit tool calls.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What should happen when an MCP tool cost is unknown?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Unknown MCP tool costs should trigger a conservative policy action such as observe-only logging, explicit budget review, blocking, or revoking the session capability depending on risk tier.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Which MCP tools should be marked high risk?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                High-risk MCP tools include browser automation, paid search, code execution, cloud write actions, data export, production deploys, premium APIs, and any tool that can spend money or change state.
+              </p>
+            </div>
           </div>
         </div>
       </section>

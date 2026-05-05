@@ -34,6 +34,25 @@ const controls = [
 ];
 
 export default function SatGateIntegrationPage() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'SatGate for Claude Desktop MCP',
+    url: 'https://satgate.io/satgate-for-claude-desktop',
+    description: metadata.description,
+    datePublished: '2026-04-12',
+    dateModified: '2026-05-03',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'Claude Desktop MCP budget enforcement' },
+      { '@type': 'Thing', name: 'SatGate for Claude Desktop' },
+      { '@type': 'Thing', name: 'MCP tool spend governance' },
+      { '@type': 'Thing', name: 'request-path economic firewall' },
+      { '@type': 'Thing', name: 'revocable agent credentials for MCP' },
+    ],
+    audience: { '@type': 'Audience', audienceType: 'AI engineering, platform, API, and security teams using Claude Desktop' },
+  };
+
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -43,6 +62,8 @@ export default function SatGateIntegrationPage() {
     description: metadata.description,
     url: 'https://satgate.io/satgate-for-claude-desktop',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-03',
+    audience: webPageJsonLd.audience,
     featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'Request-path audit trails', 'L402 API monetization'],
   };
 
@@ -79,6 +100,7 @@ export default function SatGateIntegrationPage() {
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
@@ -152,7 +174,28 @@ export default function SatGateIntegrationPage() {
         </ol>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 pb-24">
+      <section className="border-y border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">Claude Desktop MCP governance questions</h2>
+          <div className="grid gap-5 md:grid-cols-3">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Does SatGate replace MCP?</h3>
+              <p className="leading-relaxed text-gray-400">No. MCP connects assistants to tools. SatGate governs the economic and access policy around those tool calls so MCP usage can be budgeted, revoked, and audited.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Is SatGate just another observability dashboard?</h3>
+              <p className="leading-relaxed text-gray-400">No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, audit, and L402 payment before upstream access.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Can SatGate start in observe-only mode?</h3>
+              <p className="leading-relaxed text-gray-400">Yes. Teams can start with Observe to map agent and tool spend, then graduate to Control policies once safe limits are clear.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-3xl border border-purple-900/40 bg-gradient-to-br from-purple-950/40 to-cyan-950/20 p-8 md:p-10">
           <div className="mb-4 flex items-center gap-3 text-purple-200"><Bot size={24} /><span className="font-semibold">Observe → Control → Charge</span></div>
           <h2 className="mb-4 text-3xl font-bold text-white">Make Claude Desktop agent activity governable.</h2>

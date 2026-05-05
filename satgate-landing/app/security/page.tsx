@@ -3,7 +3,7 @@ import { ArrowLeft, Shield, Lock, Eye, Key, Zap, CheckCircle, Code, GitBranch, B
 
 export const metadata = {
   title: 'SatGate Security | Capability Tokens for AI Agent Governance',
-  description: 'SatGate security model for AI agent API governance: capability tokens, macaroons, scoped budgets, delegation limits, revocation, audit, and request-path policy enforcement.',
+  description: 'SatGate security model for AI agent API governance: capability tokens, scoped budgets, delegation limits, revocation, audit, and request-path policy.',
   alternates: { canonical: 'https://satgate.io/security' },
   keywords: [
     'SatGate security',
@@ -29,6 +29,24 @@ export const metadata = {
 };
 
 export default function SecurityPage() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'SatGate Security | Capability Tokens for AI Agent Governance',
+    url: 'https://satgate.io/security',
+    description: metadata.description,
+    datePublished: '2026-04-12',
+    dateModified: '2026-05-03',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'AI agent security' },
+      { '@type': 'Thing', name: 'capability tokens for AI agents' },
+      { '@type': 'Thing', name: 'macaroons for AI agents' },
+      { '@type': 'Thing', name: 'revocable agent credentials' },
+      { '@type': 'Thing', name: 'request-path policy enforcement' },
+    ],
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -62,6 +80,7 @@ export default function SecurityPage() {
 
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
@@ -289,6 +308,31 @@ export default function SecurityPage() {
                   </ul>
                 </div>
               ))}
+            </div>
+          </section>
+
+          {/* FAQ */}
+          <section>
+            <h2 className="text-xl font-bold text-white mb-4">SatGate security FAQ</h2>
+            <div className="space-y-3">
+              <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
+                <h3 className="text-white text-sm font-bold mb-2">How does SatGate secure AI agent API access?</h3>
+                <p className="text-gray-500 text-xs mb-0">
+                  SatGate secures AI agent API access with request-path policy enforcement, capability tokens, macaroon caveats, scoped budgets, expiry, delegation limits, revocation, and audit evidence before upstream access.
+                </p>
+              </div>
+              <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
+                <h3 className="text-white text-sm font-bold mb-2">Why use capability tokens instead of static API keys for agents?</h3>
+                <p className="text-gray-500 text-xs mb-0">
+                  Capability tokens can constrain route, budget, calls, expiry, delegation, and revocation for one agent task. Static API keys are usually broad, long-lived, copyable, and disconnected from economic policy.
+                </p>
+              </div>
+              <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
+                <h3 className="text-white text-sm font-bold mb-2">What role do macaroons play in SatGate?</h3>
+                <p className="text-gray-500 text-xs mb-0">
+                  Macaroons let SatGate attach cryptographic caveats to agent authority so delegated credentials can only become narrower, shorter-lived, or lower-budget as they move through agent workflows.
+                </p>
+              </div>
             </div>
           </section>
 

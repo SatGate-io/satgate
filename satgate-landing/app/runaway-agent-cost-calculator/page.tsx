@@ -57,6 +57,24 @@ export default function RunawayAgentCostCalculatorPage() {
     return { callsPerIncident, incidentCost, monthlyExposure, annualExposure, blockedAtFiveMinutes, savingsPerIncident };
   }, [agents, callsPerMinute, costPerCallCents, fanout, incidentsPerMonth, loopMinutes]);
 
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Runaway Agent Cost Calculator',
+    url: 'https://satgate.io/runaway-agent-cost-calculator',
+    description: 'Estimate runaway AI agent loop costs from agent count, calls per minute, tool-call cost, loop duration, delegation fanout, and incident frequency.',
+    datePublished: '2026-05-01',
+    dateModified: '2026-05-04',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'runaway agent spend' },
+      { '@type': 'Thing', name: 'AI agent loop cost' },
+      { '@type': 'Thing', name: 'delegated sub-agent fanout' },
+      { '@type': 'Thing', name: 'MCP tool budget exposure' },
+      { '@type': 'Thing', name: 'request-path budget enforcement ROI' },
+    ],
+  };
+
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -66,6 +84,9 @@ export default function RunawayAgentCostCalculatorPage() {
     url: 'https://satgate.io/runaway-agent-cost-calculator',
     description: 'Estimate runaway AI agent loop costs from agent count, calls per minute, tool-call cost, loop duration, delegation fanout, and incident frequency.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-04',
+    about: webPageJsonLd.about,
+    featureList: ['Agent loop cost modeling', 'Delegation fanout exposure', 'Monthly and annual exposure estimates', 'Budget enforcement savings estimate'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
@@ -88,9 +109,34 @@ export default function RunawayAgentCostCalculatorPage() {
         name: 'How does SatGate reduce runaway agent costs?',
         acceptedAnswer: { '@type': 'Answer', text: 'SatGate enforces request-path budgets, per-tool spend caps, revocation, and route policy before upstream API or MCP tool calls execute.' },
       },
+      {
+        '@type': 'Question',
+        name: 'What inputs matter most for runaway agent cost?',
+        acceptedAnswer: { '@type': 'Answer', text: 'The biggest cost drivers are active agent count, paid calls per minute, average cost per API or tool call, minutes before discovery, delegation fanout, and incident frequency.' },
+      },
+      {
+        '@type': 'Question',
+        name: 'How soon should runaway agent loops be blocked?',
+        acceptedAnswer: { '@type': 'Answer', text: 'Runaway loops should be blocked at the first budget, per-tool cap, route policy, or revocation trigger. Waiting for dashboards or monthly invoices means the cost has already been created.' },
+      },
     ],
   };
 
+
+  const howToJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to estimate runaway AI agent loop cost',
+    description: 'Use active agents, paid calls per minute, call cost, loop duration, delegation fanout, and incident frequency to estimate runaway AI agent spend exposure.',
+    totalTime: 'PT3M',
+    tool: [{ '@type': 'HowToTool', name: 'SatGate Runaway Agent Cost Calculator' }],
+    step: [
+      { '@type': 'HowToStep', name: 'Enter active agents', text: 'Set the number of autonomous agents or delegated sub-agents that could participate in a runaway loop.' },
+      { '@type': 'HowToStep', name: 'Set paid call velocity', text: 'Enter paid calls per agent per minute and the average API, model, or MCP tool-call cost.' },
+      { '@type': 'HowToStep', name: 'Model detection lag and fanout', text: 'Estimate minutes before discovery, delegation fanout, and incident frequency to calculate monthly and annual exposure.' },
+      { '@type': 'HowToStep', name: 'Compare enforcement savings', text: 'Compare unmanaged loop cost against request-path budget enforcement that blocks or revokes over-budget calls early.' },
+    ],
+  };
 
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
@@ -103,8 +149,10 @@ export default function RunawayAgentCostCalculatorPage() {
   };
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -190,6 +238,45 @@ export default function RunawayAgentCostCalculatorPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-orange-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">Runaway agent cost questions</h2>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is runaway agent spend?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Runaway agent spend is API, model, or tool cost created when autonomous agents loop, retry, delegate, or keep calling paid resources after the work is no longer economically justified.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Why can AI agent loops get expensive so quickly?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Agents can call tools at machine speed, fan out work to sub-agents, and retry failed steps without waiting for a human to approve each paid request.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How does SatGate reduce runaway agent costs?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                SatGate enforces request-path budgets, per-tool spend caps, revocation, and route policy before upstream API or MCP tool calls execute.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What inputs matter most for runaway agent cost?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                The biggest cost drivers are active agent count, paid calls per minute, average cost per API or tool call, minutes before discovery, delegation fanout, and incident frequency.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How soon should runaway agent loops be blocked?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Runaway loops should be blocked at the first budget, per-tool cap, route policy, or revocation trigger. Waiting for dashboards or monthly invoices means the cost has already been created.
+              </p>
+            </div>
           </div>
         </div>
       </section>

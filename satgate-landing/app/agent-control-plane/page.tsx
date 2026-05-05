@@ -18,7 +18,7 @@ import {
 export const metadata: Metadata = {
   title: "SatGate Agent Control Plane | Govern Local AI Agents",
   description:
-    "SatGate is an agent control plane for local AI agents: scoped capabilities, delegation lineage, request-path budget enforcement, audit trails, and instant revocation without standing API keys.",
+    "SatGate is an agent control plane for local AI agents: scoped capabilities, delegation lineage, request-path budget enforcement, audit, and instant revocation.",
   keywords: [
     "agent control plane",
     "AI agent control plane",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SatGate Agent Control Plane | Govern Local AI Agents",
     description:
-      "Govern local AI agents with scoped capabilities, delegation lineage, request-path budget enforcement, audit trails, and instant revocation — no standing API keys.",
+      "Govern local AI agents with scoped capabilities, delegation lineage, request-path budgets, audit trails, and instant revocation.",
     url: "https://satgate.io/agent-control-plane",
     type: "website",
     images: [
@@ -148,6 +148,8 @@ const relatedTopics = [
   ["/agent-capability-tokens", "Agent capability tokens", "Encode route, budget, expiry, delegation, and revocation into agent access."],
   ["/revocable-agent-credentials", "Revocable agent credentials", "Kill agent access without rotating every upstream provider secret."],
   ["/mcp-governance", "MCP governance", "Apply budget, revocation, and audit controls to agent tool calls."],
+  ["/ai-agent-cost-control", "AI agent cost control", "Control model, API, MCP, and delegated sub-agent spend before cost is created."],
+  ["/economic-firewall-readiness-grader", "Economic firewall readiness grader", "Score identity, budgets, revocation, audit, routing, MCP, and Charge readiness."],
   ["/satgate-for-hermes-agent", "SatGate for Hermes Agent", "Govern local Hermes/Open WebUI agent workflows with SatGate in the request path."],
 ];
 
@@ -160,6 +162,8 @@ const jsonLd = {
       url: "https://satgate.io/agent-control-plane",
       description:
         "An agent control plane for local AI agents: scoped capabilities, delegation lineage, request-path budget enforcement, audit trails, and revocation without standing API keys.",
+      datePublished: "2026-04-27",
+      dateModified: "2026-05-05",
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
       about: [
         { "@type": "Thing", name: "AI agent control plane" },
@@ -193,6 +197,18 @@ const jsonLd = {
         "Agent audit trails",
         "Instant revocation and kill switch",
       ],
+    },
+    {
+      "@type": "ItemList",
+      name: "Agent control-plane capabilities",
+      description:
+        "Core controls required to govern local AI agents without standing keys, unmanaged delegation, or invisible spend.",
+      itemListElement: controlPlaneCapabilities.map(([name, description], index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name,
+        description,
+      })),
     },
     {
       "@type": "FAQPage",

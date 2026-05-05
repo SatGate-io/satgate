@@ -5,11 +5,74 @@ export const metadata = {
   title: 'How We Built Budget Enforcement for MCP Tool Calls - SatGate Blog',
   description: 'We shipped an open-source MCP proxy that enforces per-tool budgets with cryptographic delegation. Here\'s how we built it and what we learned.',
   alternates: { canonical: 'https://satgate.io/blog/how-we-built-budget-enforcement-mcp' },
+  openGraph: {
+    title: 'How We Built Budget Enforcement for MCP Tool Calls',
+    description: 'Inside SatGate’s MCP proxy architecture for per-tool budgets, cryptographic delegation, and request-path enforcement.',
+    url: 'https://satgate.io/blog/how-we-built-budget-enforcement-mcp',
+    type: 'article',
+    publishedTime: '2026-02-13T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'How We Built Budget Enforcement for MCP Tool Calls',
+    description: 'A technical look at MCP budget checks, macaroon delegation, structured errors, and per-tool cost attribution.',
+  },
 };
 
 export default function McpProxyBlogPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'How We Built Budget Enforcement for MCP Tool Calls',
+    description: 'We shipped an open-source MCP proxy that enforces per-tool budgets with cryptographic delegation for AI agent tool calls.',
+    url: 'https://satgate.io/blog/how-we-built-budget-enforcement-mcp',
+    datePublished: '2026-02-13',
+    dateModified: '2026-05-04',
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'MCP budget enforcement' },
+      { '@type': 'Thing', name: 'MCP proxy architecture' },
+      { '@type': 'Thing', name: 'per-tool cost attribution' },
+      { '@type': 'Thing', name: 'macaroon delegation for AI agents' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How does MCP budget enforcement work?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'MCP budget enforcement works by intercepting tools/call messages, resolving the tool cost, checking the agent or token budget, and only forwarding the request to the upstream MCP server when budget remains.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why use macaroons for MCP delegation?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Macaroons support attenuated delegation: each child token can add stricter caveats for budget, scope, expiry, and tools, but cannot remove parent constraints or expand authority.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What happens when an MCP agent exhausts its budget?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The proxy returns a structured budget_exhausted error instead of forwarding the tool call, giving the agent a clear failure it can handle without creating an infinite retry or surprise bill.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -167,6 +230,23 @@ Result:
             <li><strong className="text-white">28</strong> tests: budget, auth, delegation, config, JSON-RPC, SSE, integration</li>
             <li><strong className="text-white">63%</strong> test-to-source ratio</li>
           </ul>
+
+          <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">MCP budget enforcement engineering questions</h2>
+            <div className="space-y-5">
+              {[
+                ['How does MCP budget enforcement work?', 'It intercepts tools/call messages, resolves the tool cost, checks the agent or token budget, and only forwards the request to the upstream MCP server when budget remains.'],
+                ['Why use macaroons for MCP delegation?', 'Macaroons support attenuated delegation: each child token can add stricter caveats for budget, scope, expiry, and tools, but cannot remove parent constraints or expand authority.'],
+                ['What happens when an MCP agent exhausts its budget?', 'The proxy returns a structured budget_exhausted error instead of forwarding the tool call, giving the agent a clear failure it can handle without creating an infinite retry or surprise bill.'],
+              ].map(([question, answer]) => (
+                <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                  <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                  <p className="leading-relaxed text-gray-400">{answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
           <div className="mt-12 p-6 bg-gray-900/50 border border-gray-800 rounded-lg">
             <p className="text-gray-300 mb-4">

@@ -62,6 +62,23 @@ const controls = [
 ];
 
 export default function AiAgentCostControlPage() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'AI Agent Cost Control Software',
+    description: metadata.description,
+    url: 'https://satgate.io/ai-agent-cost-control',
+    dateModified: '2026-05-05',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'AI agent cost control' },
+      { '@type': 'Thing', name: 'AI agent spend control' },
+      { '@type': 'Thing', name: 'request-path budget enforcement' },
+      { '@type': 'Thing', name: 'MCP budget enforcement' },
+      { '@type': 'Thing', name: 'runaway AI agent spend prevention' },
+    ],
+  };
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -71,6 +88,8 @@ export default function AiAgentCostControlPage() {
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-cost-control',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-05',
+    about: webPageJsonLd.about,
     offers: { '@type': 'Offer', url: 'https://satgate.io/pricing' },
     featureList: [
       'Per-agent budget enforcement',
@@ -110,6 +129,104 @@ export default function AiAgentCostControlPage() {
           text: 'SatGate sits in the request path and checks agent identity, route, tool cost, remaining budget, revocation status, and policy before forwarding each request.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'What is the difference between AI agent cost control and LLM cost management?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'LLM cost management usually tracks model and token spend after usage occurs. AI agent cost control adds request-path enforcement across agents, MCP tools, paid APIs, delegated sub-agents, budgets, revocation, and audit before cost is created.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Which policies should AI agent cost control include?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A practical policy should include tenant and agent identity, route and tool scope, per-request and session budgets, MCP tool caps, delegated sub-agent limits, expiry, revocation triggers, kill switches, and audit fields.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can rate limits control AI agent costs?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Rate limits control request frequency, not economic exposure. AI agent cost control needs per-request pricing, remaining-budget checks, tool-level caps, and request-path decisions that account for expensive model or MCP tool calls.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'When should a team add AI agent budget enforcement?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Add budget enforcement before agents receive access to paid APIs, premium models, MCP tools, data providers, or external services where retries, loops, or delegation can create real cost.',
+        },
+      },
+    ],
+  };
+
+  const buyingChecklistJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent cost-control software buying checklist',
+    description: 'Required capabilities for AI agent cost-control software that enforces spend before autonomous agents call paid APIs, models, or MCP tools.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Inline enforcement',
+        description: 'Budget policy runs before model, API, or MCP tool execution, not after a billing export.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Agent-level attribution',
+        description: 'Every request maps to tenant, workflow, agent, delegated sub-agent, token, route, and tool.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Revocable authority',
+        description: 'Credentials can expire, narrow, delegate safely, or be killed without rotating shared API keys.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Economic audit trail',
+        description: 'Allowed, denied, charged, routed, and revoked requests leave evidence finance and security can review.',
+      },
+    ],
+  };
+
+  const rolloutJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: '90-day AI agent cost-control rollout plan',
+    description: 'A practical rollout path for moving AI agent spend from visibility to request-path budget enforcement.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Inventory agent spend exposure',
+        description: 'Map agents, shared API keys, MCP tools, paid APIs, premium models, and workflows that can create cost.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Start in Observe mode',
+        description: 'Route traffic through SatGate to attribute spend by tenant, agent, workflow, route, model, and tool before blocking anything.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Enforce scoped budgets',
+        description: 'Apply per-agent budgets, MCP tool caps, route ceilings, expiry, delegation limits, and revocation policies in the request path.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Add Charge for robot customers',
+        description: 'When external agents call high-value APIs, require L402 payment before granting access.',
+      },
     ],
   };
 
@@ -124,8 +241,11 @@ export default function AiAgentCostControlPage() {
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(buyingChecklistJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(rolloutJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -235,6 +355,7 @@ export default function AiAgentCostControlPage() {
               ['Agent spend policy template', 'Generate copyable YAML/JSON policy for budgets, tools, delegation, revocation, and audit fields.', '/agent-spend-policy-template'],
               ['MCP tool spend control', 'Attach cost to tool calls and stop runaway Cursor, Claude Desktop, Claude Code, or OpenClaw workflows.', '/mcp-cost-control'],
               ['Revocable agent credentials', 'Replace broad static keys with scoped, expiring credentials and kill switches for autonomous workers.', '/revocable-agent-credentials'],
+              ['Capability-token policy template', 'Generate scoped, expiring, revocable capability-token policy with budget, delegation, and audit caveats.', '/revocable-capability-token-policy-template'],
               ['Robot customer payments', 'Let external agents pay for protected APIs through a governed request path.', '/robot-customer-payments'],
             ].map(([title, body, href]) => (
               <Link key={title} href={href} className="rounded-xl border border-gray-800 bg-black p-6 hover:border-cyan-800/70 transition block">
@@ -242,6 +363,29 @@ export default function AiAgentCostControlPage() {
                 <p className="text-gray-400 leading-relaxed mb-4">{body}</p>
                 <span className="text-cyan-300 font-semibold inline-flex items-center gap-2">Read guide <ArrowRight size={16} /></span>
               </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Buying checklist</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">What to demand from AI agent cost-control software</h2>
+          <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+            If the product only reports spend after the fact, it is observability — not cost control. AI agent cost-control software should make a deny/allow/reroute decision before every expensive call.
+          </p>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['Inline enforcement', 'Budget policy runs before model, API, or MCP tool execution — not after a billing export.'],
+              ['Agent-level attribution', 'Every request maps to tenant, workflow, agent, delegated sub-agent, token, route, and tool.'],
+              ['Revocable authority', 'Credentials can expire, narrow, delegate safely, or be killed without rotating shared API keys.'],
+              ['Economic audit trail', 'Allowed, denied, charged, routed, and revoked requests leave evidence finance and security can review.'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-5">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
             ))}
           </div>
         </div>
@@ -262,6 +406,109 @@ export default function AiAgentCostControlPage() {
                 <p className="text-gray-400 leading-relaxed">{body}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">90-day rollout</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">Move from visibility to hard budget enforcement</h2>
+          <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+            The safest path is not a big-bang control rollout. Start by attributing spend, then tighten policies until every agent call has a budget, scope, expiry, and revocation path.
+          </p>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['Inventory exposure', 'Map agents, shared API keys, MCP tools, paid APIs, premium models, and workflows that can create cost.', '/agent-api-key-risk-assessment'],
+              ['Observe first', 'Route traffic through SatGate to attribute spend by tenant, agent, workflow, route, model, and tool before blocking.', '/llm-cost-monitoring'],
+              ['Enforce budgets', 'Apply per-agent budgets, MCP caps, route ceilings, expiry, delegation limits, and revocation policy in the request path.', '/agent-spend-policy-template'],
+              ['Charge robot customers', 'When external agents call high-value APIs, require L402 payment before granting access.', '/robot-customer-payments'],
+            ].map(([title, body, href]) => (
+              <Link key={title} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="mb-4 text-sm leading-relaxed text-gray-400">{body}</p>
+                <span className="text-sm font-semibold text-cyan-300">Open step →</span>
+              </Link>
+            ))}
+          </div>
+          <div className="mt-8 rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6">
+            <h3 className="mb-2 text-xl font-bold text-white">Need a readiness score first?</h3>
+            <p className="mb-4 text-gray-400">Use the grader to see whether identity, budget policy, MCP governance, revocation, audit, routing, and Charge are ready for autonomous agents.</p>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center gap-2 font-semibold text-purple-300 hover:text-purple-200">Run the economic firewall readiness grader <ArrowRight size={16} /></Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-gray-950/60">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Cost-control toolkit</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">Turn spend exposure into enforceable controls</h2>
+          <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+            The commercial page should lead buyers from awareness to action: estimate the risk, generate the policy, then enforce it in the request path.
+          </p>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['/roi-calculator', 'ROI calculator', 'Estimate ghost spend, loop waste, payback period, and annual ROI.'],
+              ['/runaway-agent-cost-calculator', 'Runaway cost calculator', 'Model retry storms, fanout, MCP tool calls, and detection delay.'],
+              ['/agent-spend-policy-template', 'Spend policy template', 'Generate YAML/JSON budgets, MCP caps, revocation, and audit policy.'],
+              ['/openai-budget-policy-generator', 'OpenAI budget policy', 'Create per-model, per-route, per-agent, and per-session OpenAI limits.'],
+            ].map(([href, title, body]) => (
+              <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-purple-500/50 hover:bg-purple-950/20">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">AI agent cost control questions</h2>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is AI agent cost control?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                AI agent cost control is the practice of attributing, budgeting, limiting, and auditing autonomous agent API and tool spend before requests execute.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Why are provider dashboards not enough for AI agent spend control?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Dashboards report spend after the fact. Autonomous agents can retry, loop, and delegate fast enough that budget enforcement must happen inline before upstream API calls complete.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How does SatGate enforce AI agent budgets?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                SatGate checks agent identity, route, tool cost, remaining budget, revocation status, and policy in the request path before forwarding each request.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is the difference between AI agent cost control and LLM cost management?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                LLM cost management usually tracks model and token spend after usage occurs. AI agent cost control adds request-path enforcement across agents, MCP tools, paid APIs, delegated sub-agents, budgets, revocation, and audit before cost is created.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Can rate limits control AI agent costs?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Rate limits control request frequency, not economic exposure. AI agent cost control needs per-request pricing, remaining-budget checks, tool-level caps, and request-path decisions that account for expensive model or MCP tool calls.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Which policies should AI agent cost control include?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                A practical policy should include tenant and agent identity, route and tool scope, per-request and session budgets, MCP tool caps, delegated sub-agent limits, expiry, revocation triggers, kill switches, and audit fields.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">When should a team add AI agent budget enforcement?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Add budget enforcement before agents receive access to paid APIs, premium models, MCP tools, data providers, or external services where retries, loops, or delegation can create real cost.
+              </p>
+            </div>
           </div>
         </div>
       </section>

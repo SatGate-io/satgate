@@ -46,7 +46,7 @@ export default function AgentPaymentControlsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-05-01',
-    dateModified: '2026-05-01',
+    dateModified: '2026-05-02',
     mainEntityOfPage: 'https://satgate.io/agent-payment-controls',
   };
 
@@ -182,6 +182,23 @@ export default function AgentPaymentControlsPage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-6 py-20">
+        <div className="mb-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+          <h2 className="mb-6 text-3xl font-bold text-white">Agent payment controls FAQ</h2>
+          <div className="grid gap-5 md:grid-cols-2">
+            {[
+              ['What are agent payment controls?', 'Agent payment controls are the policies, budgets, approvals, audit trails, and request-path enforcement that govern how AI agents spend money or unlock paid API access.'],
+              ['Is wallet approval enough for AI agent payments?', 'No. Wallet approval can authorize a purchase, but teams also need identity, budgets, scoped access, revocation, API metering, and audit before agent requests execute.'],
+              ['How does SatGate help with agent payment controls?', 'SatGate sits in the request path to observe agent activity, control budgets and policy, and charge for API access with L402 Lightning when APIs become agent-native products.'],
+              ['How are HTTP 402 and L402 related to agent payment controls?', 'HTTP 402 gives APIs a protocol-level way to request payment. L402 adds Lightning payment and proof. SatGate Charge uses L402 Lightning, while other 402 methods such as shared payment tokens are separate rails.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">
+                <h3 className="mb-2 font-bold text-white">{question}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className="rounded-3xl border border-yellow-900/60 bg-gradient-to-br from-yellow-950/20 to-cyan-950/30 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">Put policy before payment</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">

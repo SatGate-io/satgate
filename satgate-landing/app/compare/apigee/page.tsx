@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Check, DollarSign, Gauge, KeyRound, Minus, Shiel
 
 export const metadata = {
   title: 'SatGate vs Apigee - API Management vs Economic Firewall',
-  description: 'Compare SatGate and Google Apigee. Apigee is enterprise API management; SatGate adds request-path economic governance for AI agents, MCP budgets, revocable credentials, and L402 payments.',
+  description: 'Compare SatGate and Google Apigee. Apigee is enterprise API management; SatGate adds economic governance for AI agents, MCP budgets, and L402 payments.',
   alternates: { canonical: 'https://satgate.io/compare/apigee' },
   keywords: [
     'SatGate vs Apigee',
@@ -18,9 +18,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate vs Apigee - API Management vs Economic Firewall',
-    description: 'Compare SatGate and Google Apigee. Apigee is enterprise API management; SatGate adds request-path economic governance for AI agents, MCP budgets, revocable credentials, and L402 payments.',
+    description: 'Compare SatGate and Google Apigee for API management, AI agent economic governance, MCP budgets, revocation, and L402 payments.',
     url: 'https://satgate.io/compare/apigee',
     type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SatGate vs Apigee - API Management vs Economic Firewall',
+    description: 'Apigee manages APIs. SatGate enforces AI agent budgets, MCP tool costs, scoped credentials, revocation, and L402 payments.',
   },
 };
 
@@ -56,7 +61,7 @@ export default function ComparePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-04-26',
+    dateModified: '2026-05-04',
     mainEntityOfPage: 'https://satgate.io/compare/apigee',
   };
 
@@ -94,6 +99,23 @@ export default function ComparePage() {
         <section className="grid gap-8 lg:grid-cols-2">
           <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6"><h2 className="mb-5 text-2xl font-bold text-white">Where SatGate wins</h2><div className="space-y-4">{satgateWins.map(({ icon: Icon, title, body }) => (<div key={title} className="rounded-xl border border-gray-800 bg-black p-5"><Icon className="mb-3 text-cyan-300" size={24} /><h3 className="mb-2 font-bold text-white">{title}</h3><p className="text-sm leading-relaxed text-gray-400">{body}</p></div>))}</div></div>
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><h2 className="mb-5 text-2xl font-bold text-white">Where Google Apigee wins</h2><div className="space-y-4">{competitorWins.map(({ icon: Icon, title, body }) => (<div key={title} className="rounded-xl border border-gray-800 bg-black p-5"><Icon className="mb-3 text-green-300" size={24} /><h3 className="mb-2 font-bold text-white">{title}</h3><p className="text-sm leading-relaxed text-gray-400">{body}</p></div>))}</div></div>
+        </section>
+
+        <section className="mt-14 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+          <h2 className="mb-6 text-3xl font-bold text-white">SatGate vs Apigee FAQ</h2>
+          <div className="grid gap-5 md:grid-cols-2">
+            {[
+              ['Is SatGate a Google Apigee replacement?', 'Not directly. Apigee is a full enterprise API management platform. SatGate is an economic firewall for AI agents, API spend, MCP tools, scoped capabilities, revocation, audit, and L402 payments.'],
+              ['Can SatGate and Google Apigee work together?', 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics before upstream access.'],
+              ['When should I choose SatGate?', 'Choose SatGate when the core problem is autonomous agent economic governance: hard budgets, MCP tool spend, revocable credentials, delegated authority, audit trails, and robot-customer payment.'],
+              ['When should I choose Google Apigee?', 'Choose Apigee when the primary need is broad enterprise API management across human and application consumers.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">
+                <h3 className="mb-2 font-bold text-white">{question}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{answer}</p>
+              </div>
+            ))}
+          </div>
         </section>
 
         <section className="mt-14 rounded-3xl border border-purple-900/60 bg-gradient-to-br from-purple-950/35 to-cyan-950/20 p-8 md:p-12">

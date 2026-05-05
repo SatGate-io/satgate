@@ -2,15 +2,78 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "MCP Gateway Guide: From Traffic Routing to Economic Governance - SatGate Blog",
+  title: "MCP Gateway Guide: From Routing to Economic Governance",
   description: "A complete MCP gateway guide covering architecture, auth, tool aggregation, and budget enforcement for AI agent tool calls.",
   alternates: { canonical: 'https://satgate.io/blog/mcp-gateway-guide' },
-  keywords: ['MCP gateway guide', 'MCP gateway', 'Model Context Protocol gateway', 'MCP proxy', 'MCP server gateway', 'MCP budget enforcement', 'MCP gateway setup']
+  keywords: ['MCP gateway guide', 'MCP gateway', 'Model Context Protocol gateway', 'MCP proxy', 'MCP server gateway', 'MCP budget enforcement', 'MCP gateway setup'],
+  openGraph: {
+    title: 'MCP Gateway Guide: From Routing to Economic Governance',
+    description: 'A practical MCP gateway guide for routing, auth, tool aggregation, observability, and request-path budget enforcement.',
+    url: 'https://satgate.io/blog/mcp-gateway-guide',
+    type: 'article',
+    publishedTime: '2026-03-24T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MCP Gateway Guide: From Routing to Economic Governance',
+    description: 'Learn why MCP gateways need more than routing: per-tool budgets, revocation, delegation, and audit controls.',
+  },
 };
 
 export default function McpGatewayGuideBlogPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'MCP Gateway Guide: From Traffic Routing to Economic Governance',
+    description: 'A complete MCP gateway guide covering architecture, authentication, tool aggregation, observability, and request-path budget enforcement for AI agent tool calls.',
+    url: 'https://satgate.io/blog/mcp-gateway-guide',
+    datePublished: '2026-03-24',
+    dateModified: '2026-05-04',
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'MCP gateway' },
+      { '@type': 'Thing', name: 'MCP budget enforcement' },
+      { '@type': 'Thing', name: 'economic governance for AI agents' },
+      { '@type': 'Thing', name: 'request-path policy enforcement' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is an MCP gateway?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An MCP gateway sits between AI agents and MCP servers to centralize routing, authentication, tool discovery, policy enforcement, observability, and economic governance for tool calls.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why does an MCP gateway need budget enforcement?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'MCP tools can trigger paid APIs, model calls, database queries, or external services. Budget enforcement stops runaway loops and tool fanout before expensive calls execute, instead of reporting the spend after the fact.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How is an economic MCP gateway different from a routing gateway?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A routing gateway connects agents to tools. An economic MCP gateway also applies per-agent, per-tool, per-workflow budgets, revocation, delegation, and audit controls in the request path.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -576,6 +639,23 @@ Orchestrator (10,000 credits)
           <p className="text-gray-300 leading-relaxed">
             Economic governance isn't about distrust — it's about enabling autonomy safely. Agents with clear budget boundaries can operate more independently, because the organization knows the blast radius is contained. The gateway doesn't slow agents down. It lets you give them a longer leash.
           </p>
+
+          <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">MCP gateway questions</h2>
+            <div className="space-y-5">
+              {[
+                ['What is an MCP gateway?', 'An MCP gateway sits between AI agents and MCP servers to centralize routing, authentication, tool discovery, policy enforcement, observability, and economic governance for tool calls.'],
+                ['Why does an MCP gateway need budget enforcement?', 'MCP tools can trigger paid APIs, model calls, database queries, or external services. Budget enforcement stops runaway loops and tool fanout before expensive calls execute, instead of reporting the spend after the fact.'],
+                ['How is an economic MCP gateway different from a routing gateway?', 'A routing gateway connects agents to tools. An economic MCP gateway also applies per-agent, per-tool, per-workflow budgets, revocation, delegation, and audit controls in the request path.'],
+              ].map(([question, answer]) => (
+                <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                  <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                  <p className="leading-relaxed text-gray-400">{answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
           <div className="mt-12 p-6 bg-gray-900/50 border border-gray-800 rounded-lg">
             <p className="text-gray-300 mb-4">

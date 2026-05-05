@@ -2,15 +2,93 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "Macaroon Tokens vs API Keys for AI Agents: Scoped, Revocable Access",
-  description: "API keys are static bearer secrets. Macaroon tokens add scope, expiry, delegation, revocation, and budget caveats for AI agents.",
+  title: "Macaroon Authentication vs API Keys: Scoped Tokens for AI Agents",
+  description: "Compare macaroon authentication and API keys for AI agents. Learn scoped capability tokens with expiry, delegation, revocation, and budget caveats.",
   alternates: { canonical: 'https://satgate.io/blog/macaroon-tokens-vs-api-keys' },
-  keywords: ['macaroon tokens vs API keys', 'capability-based authentication', 'API authentication AI agents', 'delegated authority tokens', 'macaroon authentication', 'AI agent security', 'capability tokens']
+  keywords: ['macaroon tokens vs API keys', 'capability-based authentication', 'API authentication AI agents', 'delegated authority tokens', 'macaroon authentication', 'AI agent security', 'capability tokens'],
+  openGraph: {
+    title: 'Macaroon Tokens vs API Keys for AI Agents',
+    description: 'Compare macaroon authentication and API keys for scoped AI agent credentials, revocation, delegation, and budget limits.',
+    url: 'https://satgate.io/blog/macaroon-tokens-vs-api-keys',
+    type: 'article',
+    publishedTime: '2026-03-31T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Macaroon Tokens vs API Keys for AI Agents',
+    description: 'Macaroon authentication gives AI agents scoped credentials with expiry, delegation, revocation, and budget caveats.',
+  },
 };
 
 export default function MacaroonTokensVsApiKeysBlogPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'Macaroon Authentication vs API Keys: Scoped Tokens for AI Agents',
+    description: metadata.description,
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    datePublished: '2026-03-31',
+    dateModified: '2026-05-04',
+    mainEntityOfPage: 'https://satgate.io/blog/macaroon-tokens-vs-api-keys',
+    about: [
+      { '@type': 'Thing', name: 'macaroon tokens versus API keys' },
+      { '@type': 'Thing', name: 'capability-based authentication for AI agents' },
+      { '@type': 'Thing', name: 'scoped agent credentials' },
+      { '@type': 'Thing', name: 'budget caveats for agent tokens' },
+      { '@type': 'Thing', name: 'revocable delegated authority' },
+    ],
+  };
+
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is the difference between macaroon tokens and API keys?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'API keys are static bearer secrets that usually identify an account and grant broad access. Macaroon tokens are capability tokens that can carry caveats for scope, expiry, budget, delegation, revocation, and audit, making them safer for autonomous AI agents.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why are macaroons better for AI agents than API keys?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AI agents delegate work, call tools autonomously, and can spend money quickly. Macaroons let teams issue scoped and attenuated authority so each agent or sub-agent can only use specific APIs, within explicit budgets and time windows.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can macaroon tokens enforce AI agent spending limits?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. Budget caveats can bind a macaroon to a spending limit, task, tool, route, or customer account. A gateway can verify those caveats before each request and block or downgrade calls that exceed policy.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How does macaroon authentication support revocation?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Macaroon authentication supports revocation by combining short expirations, caveats, revocation identifiers, and gateway-side deny lists. A compromised agent token can be invalidated without rotating every account-level API key.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -174,6 +252,36 @@ agent_c_macaroon = attenuate(agent_b_macaroon, [
           <p className="text-gray-300 leading-relaxed">
             This solves the delegation problem elegantly. Any agent can safely create more restrictive tokens for sub-agents without involving the original API provider. The math is guaranteed by cryptography: attenuated tokens can only have fewer permissions, never more.
           </p>
+
+          <div className="my-8 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-6">
+            <h2 className="text-2xl font-bold text-white mb-4">Macaroon Tokens vs API Keys FAQ</h2>
+            <div className="space-y-5">
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">What is the difference between macaroon tokens and API keys?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  API keys are static bearer secrets that usually identify an account and grant broad access. Macaroon tokens are capability tokens that carry caveats for scope, expiry, budget, delegation, revocation, and audit.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">Why are macaroons better for AI agents than API keys?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  AI agents delegate work, call tools autonomously, and can spend money quickly. Macaroons let teams issue scoped and attenuated authority so each agent or sub-agent can only use specific APIs within explicit budgets and time windows.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">Can macaroon tokens enforce AI agent spending limits?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  Yes. Budget caveats can bind a macaroon to a spending limit, task, tool, route, or customer account. A gateway verifies those caveats before each request and blocks or downgrades calls that exceed policy.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">How does macaroon authentication support revocation?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  Macaroon authentication supports revocation by combining short expirations, caveats, revocation identifiers, and gateway-side deny lists. A compromised agent token can be invalidated without rotating every account-level API key.
+                </p>
+              </div>
+            </div>
+          </div>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Side-by-Side Comparison: API Keys vs Macaroons</h2>
 
@@ -498,6 +606,8 @@ attenuated_token = agent_a_token.add_caveats([
               <Link href="/revocable-capability-token-policy-template" className="text-cyan-300 hover:text-cyan-200">Generate capability-token policy →</Link>
               <Link href="/revocable-agent-credentials" className="text-cyan-300 hover:text-cyan-200">Revocable credentials →</Link>
               <Link href="/agent-capability-tokens" className="text-cyan-300 hover:text-cyan-200">Capability tokens →</Link>
+              <Link href="/agent-control-plane" className="text-cyan-300 hover:text-cyan-200">Agent control plane →</Link>
+              <Link href="/economic-firewall-readiness-grader" className="text-cyan-300 hover:text-cyan-200">Readiness grader →</Link>
             </div>
           </div>
 

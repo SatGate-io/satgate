@@ -62,6 +62,25 @@ const integrations = [
 ];
 
 export default function IntegrationsPage() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'SatGate Integrations for AI Agent Tools',
+    url: 'https://satgate.io/integrations',
+    description: metadata.description,
+    datePublished: '2026-04-12',
+    dateModified: '2026-05-03',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'SatGate integrations' },
+      { '@type': 'Thing', name: 'AI agent tool governance' },
+      { '@type': 'Thing', name: 'MCP budget enforcement integrations' },
+      { '@type': 'Thing', name: 'request-path economic governance' },
+      { '@type': 'Thing', name: 'Cursor and Claude agent workflows' },
+    ],
+    audience: { '@type': 'Audience', audienceType: 'AI engineering, platform, API, and security teams' },
+  };
+
   const itemListJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -118,6 +137,7 @@ export default function IntegrationsPage() {
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -161,15 +181,15 @@ export default function IntegrationsPage() {
             {[
               [
                 'What SatGate integrations are available for AI agent tools?',
-                'SatGate has integration guides for Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP-based workflows so teams can add economic governance where agents already operate.',
+                'SatGate has integration guides for Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP-based workflows so teams can add request-path economic governance to agent tools.',
               ],
               [
                 'How does SatGate govern MCP integrations?',
                 'SatGate can sit between agent clients and MCP servers to enforce per-tool budgets, scoped capabilities, revocation, risk actions, and audit trails before expensive tool calls execute.',
               ],
               [
-                'Do teams need to replace their agent tools?',
-                'No. SatGate is designed to wrap existing tools, APIs, and MCP servers with Observe, Control, and Charge modes instead of replacing the client workflow.',
+                'Do teams need to replace Cursor, Claude, or OpenClaw to use SatGate?',
+                'No. SatGate is designed to sit in the request path around existing agent tools, APIs, and MCP servers, adding Observe, Control, and Charge modes without replacing the client workflow.',
               ],
             ].map(([question, answer]) => (
               <div key={question}>

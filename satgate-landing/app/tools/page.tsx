@@ -129,6 +129,25 @@ const tools = [
 ];
 
 export default function ToolsPage() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'AI Agent Cost Control Tools',
+    url: 'https://satgate.io/tools',
+    description: metadata.description,
+    datePublished: '2026-04-12',
+    dateModified: '2026-05-03',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'AI agent cost control tools' },
+      { '@type': 'Thing', name: 'economic firewall readiness' },
+      { '@type': 'Thing', name: 'MCP governance policy generators' },
+      { '@type': 'Thing', name: 'OpenAI budget limits' },
+      { '@type': 'Thing', name: 'runaway agent spend calculators' },
+    ],
+    audience: { '@type': 'Audience', audienceType: 'API, platform, security, and AI engineering teams' },
+  };
+
   const itemListJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -185,6 +204,7 @@ export default function ToolsPage() {
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -253,12 +273,12 @@ export default function ToolsPage() {
               'They quantify autonomous agent spend risk, model runaway loops, generate enforceable budget policy, and assess whether economic controls can stop expensive requests before execution.',
             ],
             [
-              'Which tool should I start with?',
-              'Use the ROI calculator for the business case, the runaway spend calculator for incident exposure, the OpenAI and MCP generators for policy, and the readiness grader for governance gaps.',
+              'Which SatGate tool should I start with?',
+              'Start with the AI Agent ROI Calculator if you need a business case, the Runaway Agent Cost Calculator if you need incident exposure, the OpenAI or MCP policy generators if you need enforceable policy, and the Economic Firewall Readiness Grader if you need a gap assessment.',
             ],
             [
-              'How do these connect to an economic firewall?',
-              'The tools produce risk estimates and policy inputs. SatGate enforces those budgets, capabilities, revocation rules, audit requirements, and payment controls in the request path.',
+              'How do these tools relate to an economic firewall?',
+              'The calculators quantify economic risk. The policy generators turn that risk into budget, routing, revocation, and audit controls. SatGate enforces those controls in the request path as an economic firewall for AI agents.',
             ],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">

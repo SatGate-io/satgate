@@ -67,16 +67,19 @@ Macaroons and capability tokens can constrain agent authority:
 - Economic Firewall Readiness Grader: https://satgate.io/economic-firewall-readiness-grader
 - Agent API Key Risk Assessment: https://satgate.io/agent-api-key-risk-assessment
 - Agent Spend Policy Template: https://satgate.io/agent-spend-policy-template
+- Revocable Capability Token Policy Template: https://satgate.io/revocable-capability-token-policy-template
 - SEO Distribution Kit: https://satgate.io/seo-distribution-kit
 - Distribution Markdown Kit: https://satgate.io/distribution/satgate-seo-machine-launch-kit.md
 - L402 API Pricing Calculator: https://satgate.io/l402-api-pricing-calculator
 
 ## Category Pages
 - Economic Firewall: https://satgate.io/economic-firewall
-- AI Agent Cost Control: https://satgate.io/ai-agent-cost-control
 - Stripe Link for Agents vs SatGate: https://satgate.io/stripe-link-agents-vs-satgate
 - Agent Payment Controls: https://satgate.io/agent-payment-controls
 - HTTP 402 for AI Agents: https://satgate.io/http-402-for-ai-agents
+- AI Agent Cost Control: https://satgate.io/ai-agent-cost-control
+- LLM Cost Dashboard: https://satgate.io/llm-cost-dashboard
+- LLM Cost Monitoring: https://satgate.io/llm-cost-monitoring
 - AI API Budget Enforcement: https://satgate.io/ai-api-budget-enforcement
 - Agent Spending Limits: https://satgate.io/agent-spending-limits
 - MCP Governance Hub: https://satgate.io/mcp
@@ -116,11 +119,23 @@ Macaroons and capability tokens can constrain agent authority:
 - AI Agent API Cost Control: https://satgate.io/blog/ai-agent-api-cost-control
 - OpenAI API Budget Limits: https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls
 - MCP Budget Enforcement Guide: https://satgate.io/blog/mcp-budget-enforcement-guide
+- Hard-Cap MCP Tool Spend: https://satgate.io/blog/hard-capping-mcp-tool-spend
 - API Gateway for AI Agents: https://satgate.io/blog/api-gateway-for-ai-agents
+- API Monetization for AI Agents: https://satgate.io/blog/api-monetization-ai
 - LLM Cost Management: https://satgate.io/blog/llm-cost-management
+- LLM cost dashboard checklist: https://satgate.io/llm-cost-dashboard
+- LLM cost monitoring vs enforcement: https://satgate.io/llm-cost-monitoring
 - Macaroon Tokens vs API Keys: https://satgate.io/blog/macaroon-tokens-vs-api-keys
+- Zero Trust for AI Agents: https://satgate.io/blog/zero-trust-for-ai-agents
+- Intelligent AI Delegation and Capability Tokens: https://satgate.io/blog/deepmind-intelligent-delegation-satgate
+- Agent Swarm Cost Control: https://satgate.io/blog/agent-swarms-cost-governance
 - L402 Protocol Explained: https://satgate.io/blog/l402-protocol-explained
 - HTTP 402 Use Cases: https://satgate.io/blog/http-402-payment-required-use-cases
+- Why Routing Is Not Governance: https://satgate.io/blog/why-routing-isnt-governance
+- Why Economic Firewalls Enable Autonomous Agents: https://satgate.io/blog/why-economic-firewalls-are-the-prerequisite-for-autonomous-ai-agents
+- AI Agent Spending Limits: https://satgate.io/blog/ai-agent-spending-limits
+- MCP Gateway Guide: https://satgate.io/blog/mcp-gateway-guide
+- Beyond Connection: Economic Governance in MCP: https://satgate.io/blog/beyond-connection-economic-governance-mcp
 
 ## Architecture
 ```
@@ -162,8 +177,11 @@ curl -H "Authorization: L402 <macaroon>:<preimage>" \
 ## Product and Demo Pages
 - Enterprise AI Agent Governance: https://satgate.io/govern
 - AI Agent Management: https://satgate.io/agents
+- SatGate Governance Dashboard: https://satgate.io/dashboard
 - SatGate Control Demo: https://satgate.io/protect
+- SatGate Protect / Scoped Agent Credential Demo: https://satgate.io/crawl
 - SatGate Charge / L402 Payment Demo: https://satgate.io/pay
+- SatGate Monetize / L402 API Demo: https://satgate.io/monetize
 - SatGate Mint / Capability Token Demo: https://satgate.io/mint-demo
 - SatGate Sandbox: https://satgate.io/sandbox
 - SatGate Design Partners: https://satgate.io/design-partners

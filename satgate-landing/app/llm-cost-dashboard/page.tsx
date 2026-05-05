@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, BarChart3, Bell, Bot, DollarSign, Gauge, ShieldCheck, Workflow } from 'lucide-react';
 
 export const metadata = {
-  title: 'LLM Cost Dashboard: Track Spend, Latency, Tokens, and Agent Budget Risk',
+  title: 'LLM Cost Dashboard: Spend, Latency, Tokens, and Budget Risk',
   description: 'What an LLM cost dashboard should track: token cost, latency, model spend, user attribution, agent loops, MCP tools, and budget enforcement gaps.',
   alternates: { canonical: 'https://satgate.io/llm-cost-dashboard' },
   keywords: [
@@ -16,14 +16,14 @@ export const metadata = {
     'AI agent budget dashboard',
   ],
   openGraph: {
-    title: 'LLM Cost Dashboard: Track Spend, Latency, Tokens, and Agent Budget Risk',
+    title: 'LLM Cost Dashboard: Spend, Latency, Tokens, and Budget Risk',
     description: 'A practical checklist for LLM cost dashboards — and why dashboards still need request-path budget enforcement for AI agents.',
     url: 'https://satgate.io/llm-cost-dashboard',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'LLM Cost Dashboard: Track Spend, Latency, Tokens, and Agent Budget Risk',
+    title: 'LLM Cost Dashboard: Spend, Latency, Tokens, and Budget Risk',
     description: 'Track model spend, token usage, latency, user attribution, MCP tool cost, and enforcement gaps before agents run away.',
   },
 };
@@ -38,6 +38,23 @@ const dashboardMetrics = [
 ];
 
 export default function LlmCostDashboardPage() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'LLM Cost Dashboard: Spend, Latency, Tokens, and Budget Risk',
+    url: 'https://satgate.io/llm-cost-dashboard',
+    description: metadata.description,
+    datePublished: '2026-05-01',
+    dateModified: '2026-05-03',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'LLM cost dashboard' },
+      { '@type': 'Thing', name: 'AI agent cost attribution' },
+      { '@type': 'Thing', name: 'MCP tool spend' },
+      { '@type': 'Thing', name: 'request-path budget enforcement' },
+    ],
+  };
+
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -47,6 +64,7 @@ export default function LlmCostDashboardPage() {
     url: 'https://satgate.io/llm-cost-dashboard',
     description: metadata.description,
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-03',
     featureList: dashboardMetrics.map((m) => m.title),
   };
 
@@ -78,6 +96,14 @@ export default function LlmCostDashboardPage() {
           text: 'SatGate observes agent/API spend, attributes it by agent and route, then enforces budgets, revocation, routing, and MCP tool policy in the request path before upstream calls execute.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'What should teams do after finding LLM spend risk?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Turn the dashboard finding into enforceable policy: set per-agent budgets, MCP tool caps, model-routing rules, scoped token authority, revocation triggers, and audit fields in the request path.',
+        },
+      },
     ],
   };
 
@@ -92,6 +118,7 @@ export default function LlmCostDashboardPage() {
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
@@ -179,6 +206,54 @@ export default function LlmCostDashboardPage() {
             <div className="mb-3 font-mono text-sm text-green-300">03 / CONTROL</div>
             <h3 className="mb-3 text-xl font-bold text-white">Block overspend inline</h3>
             <p className="leading-relaxed text-gray-400">Turn dashboard findings into budgets, route policy, revocation, model ceilings, and structured denial responses.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-gray-950/60">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">From dashboard to control</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">Convert cost visibility into policy</h2>
+          <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+            A dashboard should not be a dead end. Once it exposes spend risk, generate the policy objects that let SatGate block, route, revoke, or audit the next request.
+          </p>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['/agent-spend-policy-template', 'Agent spend policy', 'Budgets, MCP caps, delegation, revocation, and audit fields.'],
+              ['/mcp-tool-cost-policy-generator', 'MCP tool cost policy', 'Per-tool prices, risk tiers, limits, and deny behavior.'],
+              ['/revocable-capability-token-policy-template', 'Capability-token policy', 'Scoped, expiring, revocable authority for agents and sub-agents.'],
+              ['/openai-budget-policy-generator', 'OpenAI budget policy', 'Model, route, session, daily, and per-request budget limits.'],
+            ].map(([href, title, body]) => (
+              <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">LLM cost dashboard questions</h2>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What should an LLM cost dashboard track?</h3>
+              <p className="leading-relaxed text-gray-400">An LLM cost dashboard should track spend by model, route, user, team, agent, workflow, tenant, token, MCP tool, latency, error rate, retry behavior, and remaining budget.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Is an LLM cost dashboard enough to stop runaway spend?</h3>
+              <p className="leading-relaxed text-gray-400">No. Dashboards and alerts show spend after or during usage. Autonomous agents need request-path budget enforcement that can block, downgrade, route, or revoke requests before expensive calls execute.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How does SatGate turn LLM cost dashboards into enforcement?</h3>
+              <p className="leading-relaxed text-gray-400">SatGate observes agent/API spend, attributes it by agent and route, then enforces budgets, revocation, routing, and MCP tool policy in the request path before upstream calls execute.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What should teams do after finding LLM spend risk?</h3>
+              <p className="leading-relaxed text-gray-400">Turn the dashboard finding into enforceable policy: set per-agent budgets, MCP tool caps, model-routing rules, scoped token authority, revocation triggers, and audit fields in the request path.</p>
+            </div>
           </div>
         </div>
       </section>

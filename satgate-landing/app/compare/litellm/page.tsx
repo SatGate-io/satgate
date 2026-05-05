@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Check, DollarSign, Gauge, KeyRound, Minus, Route
 
 export const metadata = {
   title: 'SatGate vs LiteLLM - AI Gateway vs Economic Firewall',
-  description: 'Compare SatGate and LiteLLM. LiteLLM is strong for model access, routing, fallbacks, budgets, and spend tracking; SatGate adds request-path economic governance for agents, MCP tools, scoped capabilities, and L402 payments.',
+  description: 'Compare SatGate and LiteLLM. LiteLLM handles model routing, budgets, and spend tracking; SatGate governs agent spend, MCP tools, and L402 payments.',
   alternates: { canonical: 'https://satgate.io/compare/litellm' },
   keywords: [
     'SatGate vs LiteLLM',
@@ -20,6 +20,11 @@ export const metadata = {
     description: 'LiteLLM gives teams model access, routing, fallbacks, budgets, and spend tracking. SatGate governs agent/API economics in the request path.',
     url: 'https://satgate.io/compare/litellm',
     type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SatGate vs LiteLLM - LLM Gateway vs Economic Firewall',
+    description: 'LiteLLM routes model calls. SatGate enforces agent budgets, MCP tool costs, scoped authority, audit, and L402 payments.',
   },
 };
 
@@ -81,7 +86,7 @@ export default function CompareLiteLLMPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-04-26',
+    dateModified: '2026-05-04',
     mainEntityOfPage: 'https://satgate.io/compare/litellm',
   };
 
@@ -218,6 +223,23 @@ export default function CompareLiteLLMPage() {
                   <h3 className="font-bold text-white">{label}</h3>
                 </div>
                 <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+          <h2 className="mb-6 text-3xl font-bold text-white">SatGate vs LiteLLM FAQ</h2>
+          <div className="grid gap-5 md:grid-cols-2">
+            {[
+              ['Is SatGate a LiteLLM replacement?', 'Not directly. LiteLLM is primarily an LLM gateway and OpenAI-compatible proxy for model access, routing, fallbacks, budgets, and spend tracking. SatGate is an economic firewall for AI agents, APIs, MCP tools, scoped capabilities, and L402 payments.'],
+              ['Can SatGate and LiteLLM work together?', 'Yes. LiteLLM can sit behind SatGate as an upstream LLM gateway. SatGate can enforce agent, workflow, route, MCP tool, and budget policy before requests reach LiteLLM or other upstream services.'],
+              ['When should I choose SatGate over LiteLLM?', 'Choose SatGate when the problem is economic governance across autonomous agent/API activity: hard budget enforcement, MCP tool spend, scoped revocation, delegation, audit trails, and request-time monetization.'],
+              ['When should I choose LiteLLM?', 'Choose LiteLLM when the main problem is developer model access: one interface across many LLM providers, model routing, load balancing, fallbacks, virtual keys, and LLM spend tracking.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">
+                <h3 className="mb-2 font-bold text-white">{question}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{answer}</p>
               </div>
             ))}
           </div>

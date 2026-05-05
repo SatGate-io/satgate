@@ -2,15 +2,78 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "L402 Protocol Explained: How HTTP 402 Enables Machine-Native API Payments - SatGate Blog",
+  title: "L402 Protocol Explained: HTTP 402 for Machine API Payments",
   description: "L402 combines HTTP 402, Lightning micropayments, and macaroon tokens so AI agents can pay for API access in real time.",
   alternates: { canonical: 'https://satgate.io/blog/l402-protocol-explained' },
-  keywords: ['L402 protocol explained', 'L402 protocol', 'HTTP 402 Payment Required', 'Lightning API payments', 'machine-to-machine payments', 'L402 macaroons', 'API micropayments']
+  keywords: ['L402 protocol explained', 'L402 protocol', 'HTTP 402 Payment Required', 'Lightning API payments', 'machine-to-machine payments', 'L402 macaroons', 'API micropayments'],
+  openGraph: {
+    title: 'L402 Protocol Explained: HTTP 402 for Machine API Payments',
+    description: 'L402 combines HTTP 402, Lightning invoices, and macaroon tokens so AI agents can pay for API access in real time.',
+    url: 'https://satgate.io/blog/l402-protocol-explained',
+    type: 'article',
+    publishedTime: '2026-04-02T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'L402 Protocol Explained: HTTP 402 for Machine API Payments',
+    description: 'Learn how L402 turns HTTP 402, Lightning invoices, and macaroons into machine-native paid API access.',
+  },
 };
 
 export default function L402ProtocolExplainedBlogPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'L402 Protocol Explained: How HTTP 402 Enables Machine-Native API Payments',
+    description: 'L402 combines HTTP 402, Lightning micropayments, and macaroon tokens so AI agents can pay for API access in real time.',
+    url: 'https://satgate.io/blog/l402-protocol-explained',
+    datePublished: '2026-04-02',
+    dateModified: '2026-05-04',
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'L402 protocol' },
+      { '@type': 'Thing', name: 'HTTP 402 Payment Required' },
+      { '@type': 'Thing', name: 'Lightning API payments' },
+      { '@type': 'Thing', name: 'machine-native API monetization' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is the L402 protocol?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'L402 is a machine-native API payment protocol that combines HTTP 402 Payment Required, Lightning invoices, and macaroon tokens so software agents can pay for API access without a human signup or credit-card flow.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How does an AI agent use L402 to pay for an API?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The agent requests a protected API, receives a 402 response with a Lightning invoice and macaroon, pays the invoice, then retries with Authorization: L402 <macaroon>:<preimage> as proof of payment.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is L402 the same as enterprise budget enforcement?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No. L402 is per-request Lightning payment for external API monetization. Enterprise budget enforcement controls internal agent spend with policies, caps, revocation, and audit before upstream requests execute.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -336,6 +399,23 @@ routes:
           <p className="text-gray-300 leading-relaxed">
             <strong className="text-white">For enterprises:</strong> L402 and budget enforcement aren&apos;t mutually exclusive. Use L402 for external API monetization and SatGate&apos;s enterprise budget policies for internal cost control. The gateway handles both.
           </p>
+
+          <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-yellow-300">FAQ</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">L402 protocol questions</h2>
+            <div className="space-y-5">
+              {[
+                ['What is the L402 protocol?', 'L402 is a machine-native API payment protocol that combines HTTP 402 Payment Required, Lightning invoices, and macaroon tokens so software agents can pay for API access without a human signup or credit-card flow.'],
+                ['How does an AI agent use L402 to pay for an API?', 'The agent requests a protected API, receives a 402 response with a Lightning invoice and macaroon, pays the invoice, then retries with Authorization: L402 <macaroon>:<preimage> as proof of payment.'],
+                ['Is L402 the same as enterprise budget enforcement?', 'No. L402 is per-request Lightning payment for external API monetization. Enterprise budget enforcement controls internal agent spend with policies, caps, revocation, and audit before upstream requests execute.'],
+              ].map(([question, answer]) => (
+                <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                  <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                  <p className="leading-relaxed text-gray-400">{answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* CTA Section */}
           <div className="mt-16 bg-gradient-to-r from-yellow-900/20 to-green-900/20 border border-yellow-800/30 rounded-xl p-8">

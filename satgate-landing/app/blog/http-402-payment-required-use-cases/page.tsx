@@ -2,15 +2,101 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "HTTP 402 Payment Required: Meaning, Use Cases, and L402 Agent Payments",
-  description: "What HTTP 402 Payment Required means, why it was reserved, and how L402 Lightning lets AI agents pay APIs per request.",
+  title: "HTTP 402 Payment Required: Meaning, Reserved Use & Agent Flow",
+  description: "HTTP 402 Payment Required means payment is needed before access. Learn why it was reserved and how L402 enables AI agent payments.",
   alternates: { canonical: 'https://satgate.io/blog/http-402-payment-required-use-cases' },
-  keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API']
+  keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API'],
+  openGraph: {
+    title: 'HTTP 402 Payment Required: Meaning, Reserved Use & Agents',
+    description: 'Learn what HTTP 402 Payment Required means, why it was reserved, and how L402 enables paid API access for AI agents.',
+    url: 'https://satgate.io/blog/http-402-payment-required-use-cases',
+    type: 'article',
+    publishedTime: '2026-04-02T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'HTTP 402 Payment Required: Meaning, Reserved Use & Agents',
+    description: 'HTTP 402 explained: reserved status code history, L402 payment challenges, and paid API access for AI agents.',
+  },
 };
 
 export default function Http402PaymentRequiredUseCasesBlogPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'HTTP 402 Payment Required: Meaning, Reserved Use & Agent Flow',
+    description: metadata.description,
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    datePublished: '2026-04-02',
+    dateModified: '2026-05-05',
+    mainEntityOfPage: 'https://satgate.io/blog/http-402-payment-required-use-cases',
+    about: [
+      { '@type': 'Thing', name: 'HTTP 402 Payment Required' },
+      { '@type': 'Thing', name: 'L402 protocol for API payments' },
+      { '@type': 'Thing', name: 'AI agent payments' },
+      { '@type': 'Thing', name: 'machine-to-machine micropayments' },
+      { '@type': 'Thing', name: 'Lightning-backed API monetization' },
+    ],
+  };
+
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What does HTTP 402 Payment Required mean?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'HTTP 402 Payment Required means the requested resource requires payment before access. The status code was reserved for future use in early HTTP specs, but L402 makes it practical for APIs by returning a machine-readable payment challenge and granting access after payment proof is presented.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why was HTTP 402 reserved for future use?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'HTTP 402 was reserved because the web did not yet have a standard, low-friction payment rail for small digital transactions. Credit cards were too expensive for micropayments, and clients were human-operated. Lightning payments, macaroon tokens, and autonomous agents make the original intent usable.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How is L402 different from ordinary HTTP 402?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'HTTP 402 is the status code. L402 is the practical protocol pattern that combines HTTP 402, Lightning invoices, and macaroon capability tokens so an API can ask for payment and then verify paid access at request time.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'When should an API return HTTP 402 instead of 401 or 403?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An API should return HTTP 402 when access is allowed after payment. Use 401 when authentication is missing, 403 when access is forbidden, and 402 when the resource is available but requires payment or proof of payment first.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How does an AI agent implement HTTP 402 Payment Required?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An AI agent handles HTTP 402 by reading the payment challenge, checking its budget policy, paying the invoice when allowed, receiving or presenting payment proof, and retrying the API request with the L402 credential.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -53,6 +139,13 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
             Twenty-nine years later, three things have converged to make 402 not just useful, but essential: <strong className="text-white">AI agents</strong> that consume APIs autonomously, <strong className="text-white">Lightning Network</strong> micropayments that settle in milliseconds, and <strong className="text-white">macaroon tokens</strong> that embed payment proofs with capability constraints. Together, they form the L402 protocol &mdash; and it turns HTTP 402 from a placeholder into infrastructure.
           </p>
 
+          <div className="my-8 rounded-2xl border border-blue-900/60 bg-blue-950/20 p-6">
+            <h2 className="text-2xl font-bold text-white mb-4">HTTP 402 Payment Required Agent Implementation</h2>
+            <p className="text-gray-300 leading-relaxed">
+              The agent implementation path is compact: receive <code>402 Payment Required</code>, parse the L402 challenge, check budget policy, pay if allowed, then retry with proof. That turns a previously reserved status code into a machine-readable API purchase flow.
+            </p>
+          </div>
+
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">What HTTP 402 Actually Means</h2>
 
           <p className="text-gray-300 leading-relaxed">
@@ -80,6 +173,42 @@ Content-Type: application/json
           <p className="text-gray-300 leading-relaxed">
             The response includes everything a client needs to complete payment: a macaroon (the capability token that will grant access after payment), a Lightning invoice (the payment mechanism), and metadata about what&apos;s being purchased. A human client would need custom UI to handle this. An AI agent processes it natively.
           </p>
+
+          <div className="my-8 rounded-2xl border border-blue-900/60 bg-blue-950/20 p-6">
+            <h2 className="text-2xl font-bold text-white mb-4">HTTP 402 Payment Required FAQ</h2>
+            <div className="space-y-5">
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">What does HTTP 402 Payment Required mean?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  HTTP 402 means the requested resource requires payment before access. In modern API use, that usually means the server returns a payment challenge instead of a normal response, and the client retries with proof of payment.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">Why was HTTP 402 reserved for future use?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  HTTP 402 was reserved because the web lacked a low-friction payment rail for tiny digital transactions. Credit cards were too expensive for micropayments, and browsers were designed around human checkout flows rather than machine-readable payment negotiation.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">How is L402 different from ordinary HTTP 402?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  HTTP 402 is the status code. L402 is the practical protocol pattern: HTTP 402 carries a Lightning invoice and macaroon capability token so agents can pay, receive proof, and access the API under explicit constraints.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">How does an AI agent implement HTTP 402 Payment Required?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  The agent receives a 402 challenge, checks whether policy allows the payment, pays the Lightning invoice, attaches the L402 credential or payment proof, and retries the request. The gateway should still enforce budgets so the agent cannot buy unlimited API calls.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">When should an API return HTTP 402 instead of 401 or 403?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  Return HTTP 402 when access is allowed after payment. Use 401 when authentication is missing, 403 when access is forbidden, and 402 when the resource is available but requires payment or proof of payment first.
+                </p>
+              </div>
+            </div>
+          </div>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Why 402 Stayed Dormant for Decades</h2>
 
@@ -348,8 +477,12 @@ Parent Agent ($50 macaroon)
             <p className="mb-4 text-gray-300">HTTP 402 gets powerful when pricing, margin, free allowances, and L402 settlement are explicit before agents call the API.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/l402-api-pricing-calculator" className="text-cyan-300 hover:text-cyan-200">L402 pricing calculator →</Link>
+              <Link href="/tools" className="text-cyan-300 hover:text-cyan-200">Agent payment tools →</Link>
               <Link href="/robot-customer-payments" className="text-cyan-300 hover:text-cyan-200">Robot customer payments →</Link>
               <Link href="/l402-agent-payments" className="text-cyan-300 hover:text-cyan-200">L402 agent payments →</Link>
+              <Link href="/http-402-for-ai-agents" className="text-cyan-300 hover:text-cyan-200">HTTP 402 for AI agents →</Link>
+              <Link href="/agent-payment-controls" className="text-cyan-300 hover:text-cyan-200">Agent payment controls →</Link>
+              <Link href="/economic-firewall" className="text-cyan-300 hover:text-cyan-200">Economic firewall →</Link>
             </div>
           </div>
 

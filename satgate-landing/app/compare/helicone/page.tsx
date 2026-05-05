@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Check, Gauge, KeyRound, Minus, ShieldCheck, Zap 
 
 export const metadata = {
   title: 'SatGate vs Helicone - LLM Observability vs Economic Firewall',
-  description: 'Compare SatGate and Helicone. Helicone helps teams route, debug, and analyze AI applications; SatGate adds request-path economic governance for AI agents, MCP tool budgets, scoped capabilities, and L402 payments.',
+  description: 'Compare SatGate and Helicone. Helicone helps teams debug and analyze AI apps; SatGate adds economic governance for agents, MCP budgets, and L402 payments.',
   alternates: { canonical: 'https://satgate.io/compare/helicone' },
   keywords: [
     'SatGate vs Helicone',
@@ -14,9 +14,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate vs Helicone - LLM Observability vs Economic Firewall',
-    description: 'Compare SatGate and Helicone. Helicone helps teams route, debug, and analyze AI applications; SatGate adds request-path economic governance for AI agents, MCP tool budgets, scoped capabilities, and L402 payments.',
+    description: 'Compare SatGate and Helicone for LLM observability, AI agent economic governance, MCP budgets, capabilities, and L402 payments.',
     url: 'https://satgate.io/compare/helicone',
     type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SatGate vs Helicone - Observability vs Economic Firewall',
+    description: 'Helicone observes LLM apps. SatGate enforces AI agent budgets, MCP tool costs, scoped authority, audit, and L402 payments.',
   },
 };
 
@@ -54,7 +59,7 @@ export default function CompareHeliconePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-04-26',
+    dateModified: '2026-05-04',
     mainEntityOfPage: 'https://satgate.io/compare/helicone',
   };
 
@@ -160,6 +165,22 @@ export default function CompareHeliconePage() {
                   <h3 className="font-bold text-white">{label}</h3>
                 </div>
                 <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+          <h2 className="mb-6 text-3xl font-bold text-white">SatGate vs Helicone FAQ</h2>
+          <div className="grid gap-5 md:grid-cols-3">
+            {[
+              ['Is SatGate a Helicone replacement?', 'Not directly. Helicone and SatGate solve overlapping but different problems. SatGate is focused on economic governance for AI agents, APIs, MCP tools, scoped authority, and request-time payments.'],
+              ['Can SatGate and Helicone work together?', 'Yes. SatGate can enforce agent, workflow, budget, route, MCP tool, and capability policy before requests reach an upstream AI gateway or observability layer.'],
+              ['When should I choose SatGate?', 'Choose SatGate when autonomous agents need hard budget enforcement, MCP tool spend controls, scoped revocation, delegation policy, economic audit trails, or L402 payments for robot customers.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">
+                <h3 className="mb-2 font-bold text-white">{question}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{answer}</p>
               </div>
             ))}
           </div>

@@ -71,8 +71,15 @@ export default function McpGovernancePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-04-25',
+    dateModified: '2026-05-03',
     mainEntityOfPage: 'https://satgate.io/mcp-governance',
+    about: [
+      { '@type': 'Thing', name: 'MCP governance' },
+      { '@type': 'Thing', name: 'MCP budget enforcement' },
+      { '@type': 'Thing', name: 'Model Context Protocol audit trails' },
+      { '@type': 'Thing', name: 'MCP proxy policy' },
+      { '@type': 'Thing', name: 'agent tool spend limits' },
+    ],
   };
 
   const faqJsonLd = {
@@ -109,6 +116,22 @@ export default function McpGovernancePage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'Any MCP-capable client can be routed through a governance proxy, including Cursor, Claude Desktop, Claude Code, OpenClaw, and custom agent runtimes.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How is MCP governance different from MCP security?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'MCP security focuses on safe tool access, secrets, permissions, and malicious behavior. MCP governance adds economics: who can call which tool, what each call costs, what budget remains, and whether policy allows the request before execution.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Do I need an MCP proxy for budget enforcement?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A proxy is the cleanest way to enforce MCP budgets because it places policy in the request path between agents and tools. That lets teams identify, price, allow, block, revoke, and audit tool calls without rewriting every MCP server.',
         },
       },
     ],
@@ -296,6 +319,47 @@ audit:
 
       <section className="border-t border-gray-900 bg-black">
         <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">MCP governance questions</h2>
+          <div className="grid gap-5 md:grid-cols-2 mb-16">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is MCP governance?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                MCP governance is the policy, budget, access-control, revocation, and audit layer around Model Context Protocol tool calls made by AI agents.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Why do MCP tools need budget enforcement?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Agents can call MCP tools repeatedly, delegate work, and trigger paid APIs or compute-heavy operations. Budget enforcement stops expensive tool calls before they execute.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Can MCP governance work without changing existing MCP servers?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Yes. A proxy or control-plane approach can wrap existing MCP tool traffic so governance is enforced before tool calls reach the server.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Which MCP clients can use budget enforcement?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Any MCP-capable client can be routed through a governance proxy, including Cursor, Claude Desktop, Claude Code, OpenClaw, and custom agent runtimes.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How is MCP governance different from MCP security?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                MCP security focuses on safe tool access, secrets, permissions, and malicious behavior. MCP governance adds economics: who can call which tool, what each call costs, what budget remains, and whether policy allows the request before execution.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Do I need an MCP proxy for budget enforcement?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                A proxy is the cleanest way to enforce MCP budgets because it places policy in the request path between agents and tools. That lets teams identify, price, allow, block, revoke, and audit tool calls without rewriting every MCP server.
+              </p>
+            </div>
+          </div>
+
           <h2 className="text-3xl font-bold text-white mb-8">Related MCP governance topics</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[

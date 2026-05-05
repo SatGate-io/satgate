@@ -34,6 +34,23 @@ const controls = [
 ];
 
 export default function SatGateIntegrationPage() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'SatGate for OpenClaw Agents',
+    description: metadata.description,
+    url: 'https://satgate.io/satgate-for-openclaw',
+    dateModified: '2026-05-04',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'OpenClaw agent spend control' },
+      { '@type': 'Thing', name: 'OpenClaw MCP budget enforcement' },
+      { '@type': 'Thing', name: 'economic control plane for OpenClaw agents' },
+      { '@type': 'Thing', name: 'sub-agent budget attribution' },
+      { '@type': 'Thing', name: 'L402 robot customer payments' },
+    ],
+  };
+
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -43,6 +60,8 @@ export default function SatGateIntegrationPage() {
     description: metadata.description,
     url: 'https://satgate.io/satgate-for-openclaw',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-04',
+    about: webPageJsonLd.about,
     featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'Request-path audit trails', 'L402 API monetization'],
   };
 
@@ -79,6 +98,7 @@ export default function SatGateIntegrationPage() {
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
@@ -150,6 +170,24 @@ export default function SatGateIntegrationPage() {
               <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">3</span><span>Apply Observe first, then Control budgets, revocation, and kill switches.</span></li>
               <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">4</span><span>Use Charge/L402 for external robot-customer access to protected APIs.</span></li>
         </ol>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-20">
+        <div className="rounded-2xl border border-gray-800 bg-gray-950 p-8">
+          <h2 className="mb-6 text-3xl font-bold text-white">OpenClaw governance FAQ</h2>
+          <div className="grid gap-5 md:grid-cols-3">
+            {[
+              ['How does SatGate fit with OpenClaw?', 'OpenClaw coordinates agents and tools. SatGate governs the economics of those requests: who can spend, on what, under which budget, and with which audit trail.'],
+              ['Is SatGate just another observability dashboard?', 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, audit, and L402 payment before upstream access.'],
+              ['Can SatGate start in observe-only mode?', 'Yes. Teams can start with Observe to map agent and tool spend, then graduate to Control policies once safe limits are clear.'],
+            ].map(([question, answer]) => (
+              <div key={question}>
+                <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                <p className="leading-relaxed text-gray-400">{answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-6 pb-24">

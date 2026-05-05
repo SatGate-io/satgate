@@ -46,7 +46,7 @@ export default function Page() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-04-26',
+    dateModified: '2026-05-02',
     about: ['AI agent security', 'Agent API governance', 'Capability-based security', 'Economic firewall'],
   };
 
@@ -148,6 +148,24 @@ revocation:
   check: before_each_request
 audit:
   fields: [agent, route, tool, budget_remaining, decision]`}</code></pre>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <div className="rounded-2xl border border-gray-800 bg-gray-950 p-8">
+          <h2 className="mb-6 text-3xl font-bold text-white">Revocable agent credentials FAQ</h2>
+          <div className="grid gap-5 md:grid-cols-3">
+            {[
+              ['What is a revocable agent credential?', 'A revocable agent credential is a scoped, expiring capability issued to an autonomous agent for a specific task, workflow, route, tool, budget, or time window. It can be invalidated before the next request without rotating global API keys.'],
+              ['Why are static API keys risky for AI agents?', 'Static API keys are broad, long-lived, and hard to delegate safely. Autonomous agents need credentials with scoped authority, budget limits, expiry, revocation, and audit context.'],
+              ['How does SatGate enforce agent credentials?', 'SatGate sits in the request path and checks identity, token scope, route, tool, budget, expiry, delegation rules, and revocation state before forwarding upstream access.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">
+                <h3 className="mb-2 font-bold text-white">{question}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-6 pb-24">

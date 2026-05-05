@@ -66,6 +66,25 @@ export default function AgentSpendPolicyTemplatePage() {
     return { yaml, json };
   }, [agentName, tier, workload]);
 
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Agent Spend Policy Template',
+    url: 'https://satgate.io/agent-spend-policy-template',
+    description: 'Generate copyable YAML and JSON policy templates for AI agent budgets, MCP tool costs, delegation, revocation, and audit fields.',
+    datePublished: '2026-04-12',
+    dateModified: '2026-05-03',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'AI agent spend policy template' },
+      { '@type': 'Thing', name: 'request-path budget enforcement' },
+      { '@type': 'Thing', name: 'MCP tool cost policy' },
+      { '@type': 'Thing', name: 'agent delegation limits' },
+      { '@type': 'Thing', name: 'revocation and audit policy' },
+    ],
+    audience: { '@type': 'Audience', audienceType: 'AI engineering, platform, API, security, and FinOps teams' },
+  };
+
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -75,6 +94,9 @@ export default function AgentSpendPolicyTemplatePage() {
     url: 'https://satgate.io/agent-spend-policy-template',
     description: 'Generate copyable YAML and JSON policy templates for AI agent budgets, MCP tool costs, delegation, revocation, and audit fields.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-03',
+    audience: webPageJsonLd.audience,
+    featureList: ['YAML spend policy generation', 'JSON spend policy generation', 'MCP tool cost caps', 'Delegation limit templates', 'Revocation and audit field templates'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
@@ -116,11 +138,28 @@ export default function AgentSpendPolicyTemplatePage() {
           text: 'SatGate is the economic firewall that can enforce spend policy in the request path across model calls, APIs, MCP tools, revocable credentials, delegation, audit, and L402 payments.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'What fields should every AI agent spend policy include?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Every AI agent spend policy should include tenant, agent, task, route, model, tool, per-request cap, session budget, daily budget, delegation limits, credential expiry, revocation triggers, and audit fields.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Should agent spend policy start in Observe or Control mode?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Most teams should start in Observe to learn normal spend patterns, then move high-risk agents, expensive tools, and external-facing workflows into Control mode with hard caps and revocation.',
+        },
+      },
     ],
   };
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -219,6 +258,45 @@ export default function AgentSpendPolicyTemplatePage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">Agent spend policy questions</h2>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is an agent spend policy?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                An agent spend policy defines the budgets, per-request limits, route rules, MCP tool caps, delegation limits, revocation behavior, and audit fields that should be checked before autonomous agent requests execute.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Why should spend policy be enforced in the request path?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Autonomous agents can loop, retry, delegate, and call expensive tools faster than dashboards or alerts can react. Request-path enforcement blocks over-budget activity before cost is created.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How does this template relate to SatGate?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                SatGate is the economic firewall that can enforce spend policy in the request path across model calls, APIs, MCP tools, revocable credentials, delegation, audit, and L402 payments.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What fields should every AI agent spend policy include?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Every AI agent spend policy should include tenant, agent, task, route, model, tool, per-request cap, session budget, daily budget, delegation limits, credential expiry, revocation triggers, and audit fields.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Should agent spend policy start in Observe or Control mode?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Most teams should start in Observe to learn normal spend patterns, then move high-risk agents, expensive tools, and external-facing workflows into Control mode with hard caps and revocation.
+              </p>
+            </div>
           </div>
         </div>
       </section>

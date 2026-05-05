@@ -38,6 +38,23 @@ const stages = [
 ];
 
 export default function LlmCostMonitoringPage() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'LLM Cost Monitoring: Dashboards, Alerts, and Real-Time Enforcement',
+    url: 'https://satgate.io/llm-cost-monitoring',
+    description: metadata.description,
+    datePublished: '2026-05-01',
+    dateModified: '2026-05-03',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'LLM cost monitoring' },
+      { '@type': 'Thing', name: 'AI agent cost control' },
+      { '@type': 'Thing', name: 'spend velocity alerts' },
+      { '@type': 'Thing', name: 'request-path enforcement' },
+    ],
+  };
+
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -66,6 +83,14 @@ export default function LlmCostMonitoringPage() {
           text: 'AI agents can retry, loop, call tools, and delegate faster than humans can react to alerts. They need budget enforcement in the request path, not only dashboards after spend is created.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'How do you turn LLM cost monitoring signals into controls?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Convert monitoring signals into policy objects: per-agent and per-route budgets, MCP tool caps, model-routing rules, scoped capability tokens, revocation triggers, and audit requirements enforced before upstream calls execute.',
+        },
+      },
     ],
   };
 
@@ -80,6 +105,7 @@ export default function LlmCostMonitoringPage() {
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
@@ -170,6 +196,54 @@ export default function LlmCostMonitoringPage() {
               <div className="border-l border-gray-800 p-4">{enforcement}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-gray-950/60">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Policy generators</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">Make monitoring actionable</h2>
+          <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+            When monitoring exposes a risky agent, model route, or MCP tool, the next step is not another chart. Generate the request-path policy that can stop the next bad call.
+          </p>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['/agent-spend-policy-template', 'Agent spend policy', 'Budgets, delegation, revocation, MCP tool caps, and audit fields.'],
+              ['/mcp-tool-cost-policy-generator', 'MCP tool cost policy', 'Per-tool prices, risk tiers, limits, and deny behavior.'],
+              ['/revocable-capability-token-policy-template', 'Capability-token policy', 'Scoped, expiring, revocable agent authority with budget caveats.'],
+              ['/economic-firewall-readiness-grader', 'Readiness grader', 'Find gaps across identity, budgets, routing, revocation, audit, and Charge.'],
+            ].map(([href, title, body]) => (
+              <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-purple-500/50 hover:bg-purple-950/20">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">LLM cost monitoring questions</h2>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is LLM cost monitoring?</h3>
+              <p className="leading-relaxed text-gray-400">LLM cost monitoring tracks token usage, model spend, latency, errors, retries, users, teams, agents, workflows, MCP tools, and API routes so teams can understand where AI spend is created.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is the difference between LLM cost monitoring and LLM cost control?</h3>
+              <p className="leading-relaxed text-gray-400">Monitoring observes and alerts on spend. Cost control enforces budget policy before requests execute by blocking, routing, revoking, downgrading, or requiring payment in the request path.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Why do AI agents need more than cost monitoring?</h3>
+              <p className="leading-relaxed text-gray-400">AI agents can retry, loop, call tools, and delegate faster than humans can react to alerts. They need budget enforcement in the request path, not only dashboards after spend is created.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How do you turn LLM cost monitoring signals into controls?</h3>
+              <p className="leading-relaxed text-gray-400">Convert monitoring signals into policy objects: per-agent and per-route budgets, MCP tool caps, model-routing rules, scoped capability tokens, revocation triggers, and audit requirements enforced before upstream calls execute.</p>
+            </div>
+          </div>
         </div>
       </section>
 

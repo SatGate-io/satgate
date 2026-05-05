@@ -65,7 +65,7 @@ export default function EconomicFirewallPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-04-28',
+    dateModified: '2026-05-05',
     mainEntityOfPage: 'https://satgate.io/economic-firewall',
   };
 
@@ -113,6 +113,14 @@ export default function EconomicFirewallPage() {
           text: 'You need an economic firewall when agents can call paid models, APIs, MCP tools, or delegated workflows faster than humans can review spend. Start by estimating runaway exposure, grading readiness, and generating request-path policy for budgets, credentials, and audit.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'What is the first economic firewall control to implement?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Start with Observe mode: attribute every request to an agent, workflow, route, tool, and tenant. Then move high-risk routes into Control mode with hard budgets, scoped credentials, revocation, and audit before enabling Charge for external robot customers.',
+        },
+      },
     ],
   };
 
@@ -123,6 +131,33 @@ export default function EconomicFirewallPage() {
     description: 'A request-path control layer that governs AI agent access, spend, budgets, routing, audit, and payment before upstream API calls execute.',
     inDefinedTermSet: 'https://satgate.io/economic-firewall',
     url: 'https://satgate.io/economic-firewall',
+  };
+
+  const implementationPathJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Economic firewall implementation path',
+    description: 'A progressive rollout path for moving AI agent traffic from spend visibility to request-path budget enforcement and L402 Charge.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Map agent spend',
+        description: 'Identify agents, tenants, workflows, routes, models, MCP tools, and delegated sub-agents before changing behavior.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Enforce hard budgets',
+        description: 'Move risky routes into request-path Control mode with spend caps, scoped credentials, expiry, revocation, and deny decisions.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Charge robot customers',
+        description: 'Require L402 payment proof before external agents unlock protected APIs, datasets, tools, or premium capabilities.',
+      },
+    ],
   };
 
   const breadcrumbJsonLd = {
@@ -139,6 +174,7 @@ export default function EconomicFirewallPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(implementationPathJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -236,6 +272,40 @@ export default function EconomicFirewallPage() {
         </div>
       </section>
 
+      <section className="border-y border-gray-900 bg-gray-950/60">
+        <div className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-[1fr_0.9fr] gap-8 items-start">
+          <div>
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Agent wallets validate the category</p>
+            <h2 className="text-3xl font-bold text-white mb-5">Why agent wallets need economic firewalls</h2>
+            <div className="space-y-4 text-gray-300 text-lg leading-relaxed">
+              <p>
+                Wallets such as Stripe Link for Agents can help an agent get payment credentials or ask a human to approve a purchase. That is useful, but it is not the same as governing agent behavior.
+              </p>
+              <p>
+                An economic firewall sits earlier in the path. It decides whether an agent may access an API, consume budget, call an MCP tool, delegate authority, or unlock a paid resource before upstream work happens.
+              </p>
+              <p className="font-semibold text-white">
+                Wallets authorize payment. Economic firewalls authorize behavior.
+              </p>
+            </div>
+          </div>
+          <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <h3 className="text-xl font-bold text-white mb-4">Related agent-payment guides</h3>
+            <div className="space-y-3">
+              {[
+                ['/stripe-link-agents-vs-satgate', 'Stripe Link for Agents vs SatGate'],
+                ['/agent-payment-controls', 'Agent payment controls'],
+                ['/http-402-for-ai-agents', 'HTTP 402 for AI agents'],
+              ].map(([href, title]) => (
+                <Link key={href} href={href} className="flex items-center justify-between rounded-lg border border-gray-800 bg-black/50 p-4 text-white transition hover:border-cyan-500/50">
+                  <span>{title}</span><ArrowRight size={16} />
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="max-w-6xl mx-auto px-6 py-20">
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6">
@@ -284,6 +354,28 @@ export default function EconomicFirewallPage() {
         </div>
       </section>
 
+      <section className="max-w-6xl mx-auto px-6 py-20">
+        <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Implementation path</p>
+        <h2 className="mb-4 text-3xl font-bold text-white">How to roll out an economic firewall</h2>
+        <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+          The safe path is progressive: observe real traffic first, enforce budgets on risky routes next, then monetize external agent access only after identity, audit, and revocation are working.
+        </p>
+        <div className="grid gap-5 md:grid-cols-3">
+          {[
+            ['1', 'Map agent spend', 'Identify agents, tenants, workflows, routes, models, MCP tools, and delegated sub-agents. Attribute cost before changing behavior.', '/llm-cost-monitoring'],
+            ['2', 'Enforce hard budgets', 'Move risky routes into request-path Control mode with spend caps, scoped credentials, expiry, revocation, and deny decisions.', '/agent-spend-policy-template'],
+            ['3', 'Charge robot customers', 'For external agents, require L402 payment proof before unlocking protected APIs, datasets, tools, or premium capabilities.', '/l402-agent-payments'],
+          ].map(([step, title, body, href]) => (
+            <Link key={step} href={href} className="rounded-2xl border border-gray-800 bg-gray-950 p-6 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
+              <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500/15 font-mono text-cyan-200">{step}</div>
+              <h3 className="mb-3 text-xl font-bold text-white">{title}</h3>
+              <p className="mb-4 leading-relaxed text-gray-400">{body}</p>
+              <span className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-300">Open implementation step <ArrowRight size={16} /></span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="max-w-6xl mx-auto px-6 py-20">
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Free tools</p>
@@ -318,12 +410,37 @@ export default function EconomicFirewallPage() {
               ['/mcp-cost-control', 'MCP cost control', 'Control paid tool calls, retries, SaaS actions, cloud tasks, and data lookups.'],
               ['/agent-api-governance', 'Agent API governance', 'Identity, delegation, revocation, and audit for autonomous API calls.'],
               ['/agent-control-plane', 'Agent control plane', 'Govern local agent authority, delegation lineage, spend, audit, and revocation.'],
+              ['/stripe-link-agents-vs-satgate', 'Stripe Link for Agents vs SatGate', 'How agent wallets differ from economic firewalls.'],
+              ['/agent-payment-controls', 'Agent payment controls', 'Govern wallet approval, budgets, 402 challenges, and L402 Charge.'],
+              ['/http-402-for-ai-agents', 'HTTP 402 for AI agents', 'Understand payment challenges, shared payment tokens, and L402.'],
               ['/l402-agent-payments', 'L402 agent payments', 'Charge robot customers before unlocking protected API access.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
                 <h3 className="font-bold text-white mb-2">{title}</h3>
                 <p className="text-sm text-gray-400 leading-relaxed">{body}</p>
               </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">Economic firewall questions</h2>
+          <div className="grid gap-5 md:grid-cols-2">
+            {[
+              ['What is an economic firewall?', 'An economic firewall is an inline control layer that governs what AI agents can access and spend before each API request reaches the upstream provider.'],
+              ['How is an economic firewall different from rate limiting?', 'Rate limiting counts requests. An economic firewall enforces budgets, costs, revocation, agent identity, tool policy, and payment decisions in the request path.'],
+              ['Why do AI agents need economic firewalls?', 'Autonomous agents can loop, delegate, retry, and call paid tools without a human approving each request. Economic firewalls prevent runaway spend and create auditable governance.'],
+              ['Is an economic firewall the same as an API gateway?', 'No. An API gateway can route and secure traffic, but an economic firewall adds per-agent cost attribution, budget enforcement, delegated credentials, policy decisions, and optional payment before requests execute.'],
+              ['How do I know whether I need an economic firewall?', 'You need an economic firewall when agents can call paid models, APIs, MCP tools, or delegated workflows faster than humans can review spend. Start by estimating runaway exposure, grading readiness, and generating request-path policy for budgets, credentials, and audit.'],
+              ['What is the first economic firewall control to implement?', 'Start with Observe mode: attribute every request to an agent, workflow, route, tool, and tenant. Then move high-risk routes into Control mode with hard budgets, scoped credentials, revocation, and audit before enabling Charge for external robot customers.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+                <h3 className="mb-2 text-xl font-bold text-white">{question}</h3>
+                <p className="leading-relaxed text-gray-400">{answer}</p>
+              </div>
             ))}
           </div>
         </div>

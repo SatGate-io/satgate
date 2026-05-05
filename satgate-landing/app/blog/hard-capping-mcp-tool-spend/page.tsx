@@ -2,27 +2,88 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock, ExternalLink } from 'lucide-react';
 
 export const metadata = {
-  title: 'Hard-Capping MCP Tool Spend with SatGate Proxy - SatGate Blog',
-  description: 'Your AI agent burned $500 overnight calling tools in a loop. SatGate MCP Proxy enforces real-time budget hard caps so it never happens again.',
+  title: 'Hard-Cap MCP Tool Spend: Stop Runaway Claude Code and Cursor Agents',
+  description: 'Hard-cap MCP tool spend for Claude Code, Cursor, and agent loops with request-path budget enforcement, per-tool costs, L402, and macaroons.',
   openGraph: {
-    title: 'Hard-Capping MCP Tool Spend with SatGate Proxy',
-    description: 'Real-time budget enforcement for MCP tool calls. Stop agent spend spirals before they start.',
+    title: 'Hard-Cap MCP Tool Spend: Stop Runaway Claude Code and Cursor Agents',
+    description: 'Hard-cap MCP tool spend for Claude Code, Cursor, and agent loops with request-path budget enforcement.',
+    url: 'https://satgate.io/blog/hard-capping-mcp-tool-spend',
     type: 'article',
     authors: ['Matt Dean'],
     publishedTime: '2026-02-14T00:00:00Z',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Hard-Capping MCP Tool Spend with SatGate Proxy',
-    description: 'Real-time budget enforcement for MCP tool calls. Stop agent spend spirals before they start.',
+    title: 'Hard-Cap MCP Tool Spend: Stop Runaway Claude Code and Cursor Agents',
+    description: 'Hard-cap MCP tool spend for Claude Code, Cursor, and agent loops with request-path budget enforcement.',
   },
   keywords: ['MCP tool cost', 'Claude Code spending limit', 'MCP budget control', 'AI agent cost management', 'MCP proxy', 'L402', 'macaroons'],
   alternates: { canonical: 'https://satgate.io/blog/hard-capping-mcp-tool-spend' },
 };
 
 export default function HardCappingMcpToolSpendPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'Hard-Cap MCP Tool Spend: Stop Runaway Claude Code and Cursor Agents',
+    description: metadata.description,
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    datePublished: '2026-02-14',
+    dateModified: '2026-05-03',
+    mainEntityOfPage: 'https://satgate.io/blog/hard-capping-mcp-tool-spend',
+    about: [
+      { '@type': 'Thing', name: 'hard-capping MCP tool spend' },
+      { '@type': 'Thing', name: 'Claude Code spending limits' },
+      { '@type': 'Thing', name: 'Cursor MCP budget control' },
+      { '@type': 'Thing', name: 'request-path MCP proxy enforcement' },
+      { '@type': 'Thing', name: 'L402 and macaroons for MCP tools' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do you hard-cap MCP tool spend?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Hard-cap MCP tool spend by putting an MCP proxy or economic firewall in the request path, assigning costs to tools, and blocking tools/call requests when the agent, workflow, or token budget is exhausted.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why are alerts not enough for MCP cost control?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Alerts fire after spend has already happened. Hard caps prevent the expensive MCP tool call from reaching the upstream server once the budget is exhausted.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can MCP budgets be scoped per tool or agent?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. MCP budgets can be scoped by agent, delegated sub-agent, tool, route, workflow, time window, and token caveat so each agent receives only the spend authority it needs.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do you stop Claude Code or Cursor from running up MCP tool bills?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Put a budget-aware MCP proxy between Claude Code, Cursor, or another MCP client and the upstream tool servers. The proxy prices each tool call, deducts from the agent budget, and blocks requests once the cap is exhausted.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -269,6 +330,24 @@ satgate token attenuate <root-token> \\
               </div>
             </Link>
           </div>
+
+          <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">FAQ</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">MCP hard-cap questions</h2>
+            <div className="space-y-5">
+              {[
+                ['How do you hard-cap MCP tool spend?', 'Put an MCP proxy or economic firewall in the request path, assign costs to tools, and block tools/call requests when the agent, workflow, or token budget is exhausted.'],
+                ['Why are alerts not enough for MCP cost control?', 'Alerts fire after spend has already happened. Hard caps prevent the expensive MCP tool call from reaching the upstream server once the budget is exhausted.'],
+                ['Can MCP budgets be scoped per tool or agent?', 'Yes. MCP budgets can be scoped by agent, delegated sub-agent, tool, route, workflow, time window, and token caveat so each agent receives only the spend authority it needs.'],
+                ['How do you stop Claude Code or Cursor from running up MCP tool bills?', 'Put a budget-aware MCP proxy between Claude Code, Cursor, or another MCP client and the upstream tool servers. The proxy prices each tool call, deducts from the agent budget, and blocks requests once the cap is exhausted.'],
+              ].map(([question, answer]) => (
+                <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                  <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                  <p className="leading-relaxed text-gray-400">{answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* Close */}
           <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-8 my-12">

@@ -2,14 +2,77 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: 'Beyond Connection: The Case for Economic Governance in MCP - SatGate Blog',
+  title: 'Economic Governance in MCP: Beyond Tool Connection',
   description: 'The MCP ecosystem talks about capability. Nobody talks about cost. Here\'s why economic policy is the missing layer — and how to enforce it at the protocol level.',
   alternates: { canonical: 'https://satgate.io/blog/beyond-connection-economic-governance-mcp' },
+  openGraph: {
+    title: 'Economic Governance in MCP: Beyond Tool Connection',
+    description: 'MCP agents need more than connection: enforce cost, budget, revocation, delegation, and audit policy before tool calls.',
+    url: 'https://satgate.io/blog/beyond-connection-economic-governance-mcp',
+    type: 'article',
+    publishedTime: '2026-02-12T00:00:00Z',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Economic Governance in MCP: Beyond Tool Connection',
+    description: 'Move MCP from tool connection to economic governance with per-tool costs, scoped budgets, revocation, and audit.',
+  },
 };
 
 export default function BeyondConnectionPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'Beyond Connection: The Case for Economic Governance in MCP',
+    description: 'The MCP ecosystem talks about capability. Economic governance adds cost, budget, revocation, delegation, and audit policy to MCP tool calls.',
+    url: 'https://satgate.io/blog/beyond-connection-economic-governance-mcp',
+    datePublished: '2026-02-12',
+    dateModified: '2026-05-04',
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'MCP economic governance' },
+      { '@type': 'Thing', name: 'MCP tool cost policy' },
+      { '@type': 'Thing', name: 'economic firewall for MCP' },
+      { '@type': 'Thing', name: 'AI agent tool spend control' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is economic governance in MCP?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Economic governance in MCP means assigning cost, budget, revocation, delegation, and audit policy to MCP tool calls so agents can use tools safely without unbounded spend.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why is MCP connection not enough for production agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Connection only tells an agent which tools exist and how to call them. Production teams also need to know what each call costs, which agent is responsible, and when to block or revoke expensive behavior.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Where should MCP economic policy be enforced?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'MCP economic policy should be enforced in the request path at an MCP proxy or economic firewall before the tool call reaches the upstream server or paid API.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -515,6 +578,23 @@ satgate spend`}</pre>
             <p className="text-xl font-medium text-white mt-8">
               Don&apos;t wait for the bill to learn how your agents behave.
             </p>
+
+            <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+              <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">FAQ</p>
+              <h2 className="mb-6 text-2xl font-bold text-white">MCP economic governance questions</h2>
+              <div className="space-y-5">
+                {[
+                  ['What is economic governance in MCP?', 'Economic governance in MCP means assigning cost, budget, revocation, delegation, and audit policy to MCP tool calls so agents can use tools safely without unbounded spend.'],
+                  ['Why is MCP connection not enough for production agents?', 'Connection only tells an agent which tools exist and how to call them. Production teams also need to know what each call costs, which agent is responsible, and when to block or revoke expensive behavior.'],
+                  ['Where should MCP economic policy be enforced?', 'MCP economic policy should be enforced in the request path at an MCP proxy or economic firewall before the tool call reaches the upstream server or paid API.'],
+                ].map(([question, answer]) => (
+                  <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                    <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                    <p className="leading-relaxed text-gray-400">{answer}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
 
           </div>
         </article>

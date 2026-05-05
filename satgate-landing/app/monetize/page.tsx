@@ -13,6 +13,68 @@ const ENDPOINTS = [
   { path: '/api/premium/insights', price: 1000, label: '/api/premium/insights (1000 sats)' },
 ];
 
+const webPageJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'SatGate API Monetization Demo',
+  url: 'https://satgate.io/monetize',
+  description: 'Interactive SatGate Charge demo for monetizing APIs with L402 Lightning payments, HTTP 402 challenges, robot-customer access, and request-path proof verification.',
+  datePublished: '2026-04-12',
+  dateModified: '2026-05-03',
+  isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+  about: [
+    { '@type': 'Thing', name: 'API monetization for AI agents' },
+    { '@type': 'Thing', name: 'SatGate Charge' },
+    { '@type': 'Thing', name: 'L402 Lightning payments' },
+    { '@type': 'Thing', name: 'robot customer workflows' },
+    { '@type': 'Thing', name: 'request-path payment proof verification' },
+  ],
+};
+
+const softwareJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'SatGate API Monetization Demo',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'Web',
+  url: 'https://satgate.io/monetize',
+  description: webPageJsonLd.description,
+  publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+  dateModified: '2026-05-03',
+  featureList: ['HTTP 402 challenge simulation', 'Per-request Lightning pricing', 'L402 payment proof retry', 'Robot-customer monetization flow', 'Manual preimage entry'],
+};
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What is SatGate Charge?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'SatGate Charge uses L402 and Lightning payments to let robot customers and AI agents pay for API access in the request path before protected data or tools are unlocked.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How is L402 different from a subscription API key?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A subscription API key grants ongoing access and bills later. L402 lets each agent request receive a payment challenge, pay the invoice, and retry with proof before access is granted.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'When should an API use per-request Lightning payments?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Per-request Lightning payments fit API products used by autonomous agents, paid tools, data endpoints, premium insights, and robot-customer workflows where access and payment should clear instantly.',
+      },
+    },
+  ],
+};
+
 // --- 1. MOCK CLIENT (Simulation) ---
 class MockSatGateClient {
   async get() {
@@ -297,6 +359,9 @@ export default function MonetizeDemoPage() {
 
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans flex flex-col items-center py-12 px-4">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       
       {/* Header */}
       <div className="w-full max-w-3xl mb-4 grid grid-cols-3 items-center">
@@ -415,6 +480,23 @@ export default function MonetizeDemoPage() {
         <StatusStep active={status === 'paying'} completed={status === 'success'} icon={<Zap size={20} />} label="2. Lightning Payment" />
         <StatusStep active={status === 'success'} completed={status === 'success'} icon={<CheckCircle size={20} />} label="3. Data Unlocked" />
       </div>
+
+      <section className="w-full max-w-3xl mt-12 border-t border-gray-800 pt-10">
+        <p className="mb-2 text-center text-xs font-mono uppercase tracking-wide text-yellow-300">FAQ</p>
+        <h2 className="mb-8 text-center text-2xl font-bold text-white">L402 API monetization questions</h2>
+        <div className="grid gap-4 md:grid-cols-3">
+          {[
+            ['What is SatGate Charge?', 'SatGate Charge uses L402 and Lightning payments to let robot customers and AI agents pay for API access in the request path before protected data or tools are unlocked.'],
+            ['How is L402 different from a subscription API key?', 'A subscription API key grants ongoing access and bills later. L402 lets each agent request receive a payment challenge, pay the invoice, and retry with proof before access is granted.'],
+            ['When should an API use per-request Lightning payments?', 'Per-request Lightning payments fit API products used by autonomous agents, paid tools, data endpoints, premium insights, and robot-customer workflows where access and payment should clear instantly.'],
+          ].map(([question, answer]) => (
+            <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
+              <h3 className="mb-2 font-bold text-white">{question}</h3>
+              <p className="text-sm leading-relaxed text-gray-400">{answer}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* Invoice Panel Modal */}
       {showInvoice && (

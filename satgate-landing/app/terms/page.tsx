@@ -3,12 +3,42 @@ import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
   title: 'Terms of Service - SatGate',
+  description: 'SatGate terms of service for cloud, self-hosted, and hybrid deployments, including economic access control, L402 payments, licensing, and prohibited uses.',
   alternates: { canonical: 'https://satgate.io/terms' },
+  openGraph: {
+    title: 'Terms of Service - SatGate',
+    description: 'SatGate terms for cloud, self-hosted, and hybrid economic-control-plane deployments, L402 payments, and licensing.',
+    url: 'https://satgate.io/terms',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Terms of Service - SatGate',
+    description: 'SatGate terms for cloud, self-hosted, and hybrid economic-control-plane deployments, L402 payments, and licensing.',
+  },
 };
 
 export default function TermsPage() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Terms of Service - SatGate',
+    description: metadata.description,
+    url: 'https://satgate.io/terms',
+    dateModified: '2026-05-05',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'SatGate terms of service' },
+      { '@type': 'Thing', name: 'economic access control' },
+      { '@type': 'Thing', name: 'L402 Lightning payments' },
+      { '@type': 'Thing', name: 'self-hosted economic control plane' },
+      { '@type': 'Thing', name: 'Apache 2.0 open source license' },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Home

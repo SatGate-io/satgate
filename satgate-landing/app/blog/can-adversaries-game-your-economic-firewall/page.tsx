@@ -7,6 +7,7 @@ export const metadata = {
   openGraph: {
     title: 'Can Adversaries Game Your Economic Firewall?',
     description: 'The emerging threat landscape for AI agent cost governance — four attack vectors and the cryptographic defenses that stop them.',
+    url: 'https://satgate.io/blog/can-adversaries-game-your-economic-firewall',
     type: 'article',
     publishedTime: '2026-03-23T00:00:00Z',
   },
@@ -20,8 +21,59 @@ export const metadata = {
 };
 
 export default function AdversarialBlogPage() {
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: 'Can Adversaries Game Your Economic Firewall?',
+    description: 'Four adversarial cost-control attacks against AI agent economic firewalls and the cryptographic defenses that stop them.',
+    url: 'https://satgate.io/blog/can-adversaries-game-your-economic-firewall',
+    datePublished: '2026-03-23',
+    dateModified: '2026-05-02',
+    author: { '@type': 'Organization', name: 'SatGate' },
+    publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'economic firewall security' },
+      { '@type': 'Thing', name: 'adversarial AI agent attacks' },
+      { '@type': 'Thing', name: 'cryptographic budget enforcement' },
+      { '@type': 'Thing', name: 'macaroon capability tokens' },
+    ],
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Can attackers game an economic firewall?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Attackers can try to game weak economic controls through prompt injection, tool confusion, budget spreading, or token misuse. A well-designed economic firewall resists this by enforcing policy below the agent layer in the request path.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What makes an economic firewall resistant to adversarial AI?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Adversarial resistance comes from per-tool cost attribution, cryptographic capability tokens, non-escalatable caveats, revocation, audit trails, and fail-closed enforcement before upstream calls execute.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Why are macaroons useful for economic firewall security?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Macaroons let teams encode scope, expiry, budget, delegation, and revocation constraints directly into credentials. Child tokens can only add stricter caveats, never expand authority.',
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -308,6 +360,23 @@ export default function AdversarialBlogPage() {
               Build the firewall that works when someone&apos;s trying to break it. That&apos;s the only kind worth having.
             </p>
           </div>
+
+          <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-red-300">FAQ</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">Economic firewall adversarial security questions</h2>
+            <div className="space-y-5">
+              {[
+                ['Can attackers game an economic firewall?', 'Attackers can try to game weak economic controls through prompt injection, tool confusion, budget spreading, or token misuse. A well-designed economic firewall resists this by enforcing policy below the agent layer in the request path.'],
+                ['What makes an economic firewall resistant to adversarial AI?', 'Adversarial resistance comes from per-tool cost attribution, cryptographic capability tokens, non-escalatable caveats, revocation, audit trails, and fail-closed enforcement before upstream calls execute.'],
+                ['Why are macaroons useful for economic firewall security?', 'Macaroons let teams encode scope, expiry, budget, delegation, and revocation constraints directly into credentials. Child tokens can only add stricter caveats, never expand authority.'],
+              ].map(([question, answer]) => (
+                <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
+                  <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
+                  <p className="leading-relaxed text-gray-400">{answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
         </article>
 
         {/* CTA */}

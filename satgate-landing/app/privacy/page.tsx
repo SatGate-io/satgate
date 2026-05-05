@@ -3,12 +3,41 @@ import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
   title: 'Privacy Policy - SatGate',
+  description: 'SatGate privacy policy for cloud, self-hosted, and hybrid deployments, including request metadata, telemetry, cookies, retention, and third-party services.',
   alternates: { canonical: 'https://satgate.io/privacy' },
+  openGraph: {
+    title: 'Privacy Policy - SatGate',
+    description: 'How SatGate handles privacy across cloud, self-hosted, and hybrid economic-control-plane deployments.',
+    url: 'https://satgate.io/privacy',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Privacy Policy - SatGate',
+    description: 'How SatGate handles privacy across cloud, self-hosted, and hybrid economic-control-plane deployments.',
+  },
 };
 
 export default function PrivacyPage() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Privacy Policy - SatGate',
+    description: metadata.description,
+    url: 'https://satgate.io/privacy',
+    dateModified: '2026-05-05',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'SatGate Cloud privacy' },
+      { '@type': 'Thing', name: 'self-hosted economic control plane privacy' },
+      { '@type': 'Thing', name: 'API request metadata privacy' },
+      { '@type': 'Thing', name: 'hybrid gateway telemetry' },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Home

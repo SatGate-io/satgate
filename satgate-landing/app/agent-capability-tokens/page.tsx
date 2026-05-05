@@ -46,8 +46,14 @@ export default function Page() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-04-26',
-    about: ['AI agent security', 'Agent API governance', 'Capability-based security', 'Economic firewall'],
+    dateModified: '2026-05-03',
+    about: [
+      { '@type': 'Thing', name: 'agent capability tokens' },
+      { '@type': 'Thing', name: 'capability tokens for AI agents' },
+      { '@type': 'Thing', name: 'budget-aware credentials' },
+      { '@type': 'Thing', name: 'attenuated delegation' },
+      { '@type': 'Thing', name: 'revocable request-path authority' },
+    ],
   };
 
   const faqJsonLd = {
@@ -150,7 +156,34 @@ audit:
   fields: [agent, route, tool, budget_remaining, decision]`}</code></pre>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 pb-24">
+      <section className="border-t border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">Agent capability token questions</h2>
+          <div className="grid gap-5 md:grid-cols-3">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is an agent capability token?</h3>
+              <p className="leading-relaxed text-gray-400">
+                An agent capability token is a credential that carries constrained authority for an autonomous agent, such as allowed routes, tools, budget, expiry, delegation, and revocation behavior. Macaroons are one implementation pattern.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Why are static API keys risky for AI agents?</h3>
+              <p className="leading-relaxed text-gray-400">
+                Static API keys are broad, long-lived, and hard to delegate safely. Autonomous agents need credentials with scoped authority, budget limits, expiry, revocation, and audit context.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How does SatGate enforce agent credentials?</h3>
+              <p className="leading-relaxed text-gray-400">
+                SatGate sits in the request path and checks identity, token scope, route, tool, budget, expiry, delegation rules, and revocation state before forwarding upstream access.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-24 pt-20">
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/35 to-yellow-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Agent autonomy needs scoped authority, not bigger secrets.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate provides the economic firewall underneath agent credentials: observe who is calling, control what they can spend and access, and revoke authority before the next request.</p>

@@ -62,6 +62,24 @@ export default function L402ApiPricingCalculatorPage() {
     return { paidRequestsPerDay, pricePerRequest, dailyRevenue, monthlyRevenue, monthlyCost, monthlyGrossProfit, nextQuarterMonthlyRevenue, satsPerRequest };
   }, [agentGrowthPct, conversionPct, costPerRequestCents, freeAllowancePct, marginPct, requestsPerDay]);
 
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'L402 API Pricing Calculator',
+    url: 'https://satgate.io/l402-api-pricing-calculator',
+    description: 'Estimate per-request L402 API pricing, robot-customer revenue, gross margin, free allowance, and Lightning sats per request for AI agent API monetization.',
+    datePublished: '2026-05-01',
+    dateModified: '2026-05-03',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'L402 API pricing' },
+      { '@type': 'Thing', name: 'robot-customer revenue' },
+      { '@type': 'Thing', name: 'Lightning sats per request' },
+      { '@type': 'Thing', name: 'AI agent API monetization' },
+      { '@type': 'Thing', name: 'request-path paid access' },
+    ],
+  };
+
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -71,6 +89,8 @@ export default function L402ApiPricingCalculatorPage() {
     url: 'https://satgate.io/l402-api-pricing-calculator',
     description: 'Estimate per-request L402 API pricing, robot-customer revenue, gross margin, free allowance, and Lightning sats per request for AI agent API monetization.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-03',
+    featureList: ['Per-request L402 pricing', 'Robot-customer revenue estimate', 'Gross margin modeling', 'Free allowance planning', 'Sats per request conversion'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
@@ -112,11 +132,28 @@ export default function L402ApiPricingCalculatorPage() {
           text: 'No. SatGate Charge is L402 Lightning-based payment for API access. Fiat402 is separate and should not be conflated with SatGate Charge.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'How do you calculate sats per API request?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Start with the target USD price per request, then convert that value into sats using the current BTC/USD reference rate. Teams should refresh the exchange-rate assumption before publishing production prices.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Should robot-customer pricing include free allowances?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Usually yes. Free allowances help agents test value before paying, but paid access should still be enforced with request-path pricing, budget checks, scoped access, and audit records.',
+        },
+      },
     ],
   };
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -194,6 +231,45 @@ export default function L402ApiPricingCalculatorPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-yellow-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">L402 API pricing questions</h2>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is L402 API pricing?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                L402 API pricing is per-request API pricing where access is unlocked through an HTTP 402 challenge and Lightning payment proof. It lets autonomous agents pay for protected API resources at request time.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How should APIs price robot customers?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Start from marginal cost per request, add target gross margin, account for free allowances or trial traffic, and enforce payment or budget policy before upstream access. SatGate Charge uses L402 Lightning payments for this flow.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Is SatGate Charge Fiat402?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                No. SatGate Charge is L402 Lightning-based payment for API access. Fiat402 is separate and should not be conflated with SatGate Charge.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How do you calculate sats per API request?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Start with the target USD price per request, then convert that value into sats using the current BTC/USD reference rate. Teams should refresh the exchange-rate assumption before publishing production prices.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Should robot-customer pricing include free allowances?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Usually yes. Free allowances help agents test value before paying, but paid access should still be enforced with request-path pricing, budget checks, scoped access, and audit records.
+              </p>
+            </div>
           </div>
         </div>
       </section>

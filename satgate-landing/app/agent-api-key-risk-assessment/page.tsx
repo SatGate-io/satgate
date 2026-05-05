@@ -55,6 +55,25 @@ export default function AgentApiKeyRiskAssessmentPage() {
     return { score, grade, summary };
   }, [answers]);
 
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Agent API Key Risk Assessment',
+    url: 'https://satgate.io/agent-api-key-risk-assessment',
+    description: 'Free assessment for API key risk in autonomous AI agent workflows, including scope, budget, revocation, delegation, and audit gaps.',
+    datePublished: '2026-04-12',
+    dateModified: '2026-05-05',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'AI agent API key risk assessment' },
+      { '@type': 'Thing', name: 'static API key blast radius' },
+      { '@type': 'Thing', name: 'revocable agent credentials' },
+      { '@type': 'Thing', name: 'budget-aware capability tokens' },
+      { '@type': 'Thing', name: 'request-path agent API governance' },
+    ],
+    audience: { '@type': 'Audience', audienceType: 'Security, API, platform, and AI engineering teams' },
+  };
+
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -64,7 +83,23 @@ export default function AgentApiKeyRiskAssessmentPage() {
     url: 'https://satgate.io/agent-api-key-risk-assessment',
     description: 'Free assessment for API key risk in autonomous AI agent workflows, including scope, budget, revocation, delegation, and audit gaps.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-05',
+    audience: webPageJsonLd.audience,
+    featureList: ['Static API key risk scoring', 'Scope gap assessment', 'Budget control checklist', 'Revocation gap assessment', 'Delegation and audit risk scoring'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  };
+
+  const riskFactorsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent API key risk factors',
+    description: 'Risk factors that make static API keys dangerous when autonomous AI agents, MCP tools, and delegated sub-agents can access paid APIs.',
+    itemListElement: risks.map((risk, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: risk.label,
+      description: `${risk.weight} risk points in the SatGate Agent API Key Risk Assessment.`,
+    })),
   };
 
   const breadcrumbJsonLd = {
@@ -110,7 +145,9 @@ export default function AgentApiKeyRiskAssessmentPage() {
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(riskFactorsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
@@ -195,6 +232,27 @@ export default function AgentApiKeyRiskAssessmentPage() {
         </div>
       </section>
 
+      <section className="border-b border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-orange-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">Agent API key risk questions</h2>
+          <div className="grid gap-5 md:grid-cols-3">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Why are static API keys risky for AI agents?</h3>
+              <p className="leading-relaxed text-gray-400">Static API keys are usually broad, long-lived, copyable, and disconnected from task-level budgets. Autonomous agents can loop, retry, delegate, or call paid tools quickly, so key authority needs scope, expiry, revocation, budget, and audit controls.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What should replace broad API keys for agents?</h3>
+              <p className="leading-relaxed text-gray-400">Use scoped, revocable, budget-aware agent capabilities enforced in the request path. Each capability should limit route, tool, spend, delegation, expiry, and audit requirements for one task or workflow.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How does SatGate reduce API key risk?</h3>
+              <p className="leading-relaxed text-gray-400">SatGate sits in the request path and checks identity, budget, route, scope, expiry, revocation, and policy before upstream API or MCP tool access.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-orange-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Move from API keys to economic capabilities.</h2>
@@ -210,6 +268,9 @@ export default function AgentApiKeyRiskAssessmentPage() {
             </Link>
             <Link href="/revocable-agent-credentials" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Revocable credentials
+            </Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Economic firewall readiness
             </Link>
           </div>
         </div>

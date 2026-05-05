@@ -645,6 +645,25 @@ const LandingPage = () => {
       </section>
 
       {/* Code Integration Section */}
+      <section className="py-20 px-6 border-t border-gray-900 bg-gray-950/40">
+        <div className="max-w-4xl mx-auto rounded-2xl border border-gray-800 bg-black p-8 md:p-10">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">FAQ</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">Economic firewall questions</h2>
+          <div className="space-y-6">
+            {[
+              ['What is SatGate?', 'SatGate is an economic firewall and economic control plane for AI agents. It sits in the request path to observe usage, enforce budgets, attribute spend, and charge external agents before upstream APIs execute.'],
+              ['How does SatGate control AI agent spend?', 'SatGate applies per-agent, per-tool, per-team, and per-task budgets before each request reaches an API or MCP tool, so runaway loops and expensive calls can be blocked before spend occurs.'],
+              ['What are Observe, Control, and Charge?', 'Observe tracks agent traffic and cost without blocking. Control enforces budgets and scoped policy for internal agents. Charge uses L402 Lightning payments to monetize external agent and robot-customer API access.'],
+            ].map(([question, answer]) => (
+              <div key={question} className="border-t border-gray-800 pt-6 first:border-t-0 first:pt-0">
+                <h3 className="mb-2 text-xl font-bold text-white">{question}</h3>
+                <p className="leading-relaxed text-gray-400">{answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA / Footer */}
       <footer className="py-20 border-t border-gray-800">
         <div className="max-w-6xl mx-auto px-6">
