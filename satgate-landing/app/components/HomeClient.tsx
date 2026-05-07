@@ -474,21 +474,21 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Research Alignment - validates architecture */}
+      {/* Research Alignment */}
       <section className="py-16 px-6 border-b border-gray-800 bg-gradient-to-b from-gray-900/20 to-black">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-900/30 border border-blue-500/30 text-blue-300 text-xs font-mono mb-3">
-              <BookOpen size={12} /> RESEARCH VALIDATION
+              <BookOpen size={12} /> RESEARCH ALIGNMENT
             </span>
             <h2 className="text-2xl font-bold mb-3">Built for the agent delegation era</h2>
             <p className="text-gray-400 text-sm max-w-2xl mx-auto">
-              Google DeepMind&apos;s recent research on intelligent AI delegation concludes that agents need attenuated capability tokens - specifically{' '}
-              <span className="text-blue-300">macaroons</span> - to safely delegate tasks across trust boundaries.
-              They propose Delegation Capability Tokens with cryptographic caveats that restrict what each sub-agent can access.
+              Recent research on intelligent AI delegation points to a control problem we see in practice: agents need bounded authority,
+              clear caveats, and safe ways to delegate across trust boundaries. One proposed path is attenuated capability tokens,
+              including <span className="text-blue-300">macaroons</span>, that restrict what each sub-agent can access.
             </p>
             <p className="text-gray-300 text-sm mt-3 font-medium">
-              SatGate already does this.
+              SatGate implements one version of that control layer.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-4 mb-6">
@@ -515,7 +515,7 @@ const LandingPage = () => {
             </div>
           </div>
           <p className="text-gray-500 text-xs text-center">
-            We didn&apos;t build this because of a paper. We built it because it&apos;s how machine-to-machine authorization has to work. The research just confirms the architecture.
+            We built SatGate because standing API keys and after-the-fact alerts are a bad fit for autonomous systems. The research gives useful language for a problem we were already seeing in deployed agent workflows.{' '}
             <span className="text-gray-600 ml-1">
               - <a href="https://arxiv.org/abs/2602.11865" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400 underline underline-offset-2">Tomasev et al., 2026</a>
             </span>
