@@ -78,10 +78,12 @@ func (m *UpstreamManager) Start(ctx context.Context) error {
 			}
 			go m.readLoop(ctx, client)
 			if err := m.initializeUpstream(ctx, client); err != nil {
+				_ = client.transport.Close()
 				results <- result{n, nil, fmt.Errorf("upstream %q initialize: %w", n, err)}
 				return
 			}
 			if err := m.discoverTools(ctx, client); err != nil {
+				_ = client.transport.Close()
 				results <- result{n, nil, fmt.Errorf("upstream %q tools/list: %w", n, err)}
 				return
 			}
@@ -122,9 +124,11 @@ func (m *UpstreamManager) startOne(ctx context.Context, name string, cfg Upstrea
 	go m.readLoop(ctx, client)
 
 	if err := m.initializeUpstream(ctx, client); err != nil {
+		_ = client.transport.Close()
 		return fmt.Errorf("upstream %q initialize: %w", name, err)
 	}
 	if err := m.discoverTools(ctx, client); err != nil {
+		_ = client.transport.Close()
 		return fmt.Errorf("upstream %q tools/list: %w", name, err)
 	}
 
@@ -263,23 +267,33 @@ func (m *UpstreamManager) readLoop(ctx context.Context, client *UpstreamClient) 
 						continue
 					}
 
-					// Re-initialize and discover tools
+					// Re-initialize and discover tools. If either step fails, close the
+					// newly spawned process transport immediately; otherwise failed
+					// respawn attempts leave child processes behind until systemd hits
+					// TasksMax on long-running hybrid gateways.
 					if err := m.initializeUpstream(ctx, newClient); err != nil {
+						_ = newClient.transport.Close()
 						log.Error().Err(err).Str("upstream", client.name).Msg("respawn initialize failed")
 						continue
 					}
 					if err := m.discoverTools(ctx, newClient); err != nil {
+						_ = newClient.transport.Close()
 						log.Error().Err(err).Str("upstream", client.name).Msg("respawn discover failed")
 						continue
 					}
 
-					// Swap client in place
+					// Swap client in place and close the old transport so the replaced
+					// subprocess is reaped instead of lingering as a zombie.
+					oldTransport := client.transport
 					m.mu.Lock()
 					client.transport = newClient.transport
 					client.tools = newClient.tools
 					client.toolNames = newClient.toolNames
 					client.ready = true
 					m.mu.Unlock()
+					if oldTransport != nil {
+						_ = oldTransport.Close()
+					}
 
 					log.Info().Str("upstream", client.name).Int("tools", len(newClient.toolNames)).
 						Msg("upstream respawned successfully")
@@ -303,20 +317,26 @@ func (m *UpstreamManager) readLoop(ctx context.Context, client *UpstreamClient) 
 					}
 
 					if err := m.initializeUpstream(ctx, newClient); err != nil {
+						_ = newClient.transport.Close()
 						log.Error().Err(err).Str("upstream", client.name).Msg("reconnect initialize failed")
 						continue
 					}
 					if err := m.discoverTools(ctx, newClient); err != nil {
+						_ = newClient.transport.Close()
 						log.Error().Err(err).Str("upstream", client.name).Msg("reconnect discover failed")
 						continue
 					}
 
+					oldTransport := client.transport
 					m.mu.Lock()
 					client.transport = newClient.transport
 					client.tools = newClient.tools
 					client.toolNames = newClient.toolNames
 					client.ready = true
 					m.mu.Unlock()
+					if oldTransport != nil {
+						_ = oldTransport.Close()
+					}
 
 					log.Info().Str("upstream", client.name).Int("tools", len(newClient.toolNames)).
 						Msg("upstream reconnected successfully")
