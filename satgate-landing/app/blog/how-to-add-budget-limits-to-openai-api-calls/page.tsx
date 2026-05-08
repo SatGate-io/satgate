@@ -3,20 +3,20 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "OpenAI API Budget Limit: Hard Caps Before GPT Calls Run",
-  description: "Set an OpenAI API budget limit per agent, team, or session. Stop runaway GPT spend before requests execute — not after dashboard alerts.",
+  title: "OpenAI API Budget Limits: Control Spend Before Calls",
+  description: "Learn how to add OpenAI API budget limits, prevent runaway agent spend, and enforce usage controls before calls execute.",
   alternates: { canonical: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls' },
   keywords: ['OpenAI API budget limits', 'OpenAI cost control', 'API gateway OpenAI', 'GPT-4 spending limits', 'OpenAI API costs', 'prevent OpenAI overspending', 'hard cap OpenAI spend', 'per-agent OpenAI budget'],
   openGraph: {
-    title: 'OpenAI API Budget Limit: Hard Caps Before GPT Calls Run',
-    description: 'Set an OpenAI API budget limit per agent, team, and session. Stop runaway GPT spend before requests execute.',
+    title: 'OpenAI API Budget Limits: Control Spend Before Calls',
+    description: 'Learn how to add OpenAI API budget limits, prevent runaway agent spend, and enforce usage controls before calls execute.',
     url: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls',
     type: 'article',
     publishedTime: '2026-04-07T00:00:00Z',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OpenAI API Budget Limit: Hard Caps Before GPT Calls Run',
+    title: 'OpenAI API Budget Limits: Control Spend Before Calls',
     description: 'Control OpenAI API costs with per-agent budgets, hard spend caps, and request-path enforcement before calls execute.',
   },
 };
@@ -25,7 +25,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'OpenAI API Budget Limit: Hard Caps Before GPT Calls Run',
+    headline: 'OpenAI API Budget Limits: Control Spend Before Calls',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
@@ -582,6 +582,19 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
               <Link href="/ai-agent-runaway-spend-index" className="text-cyan-300 hover:text-cyan-200">Runaway spend index →</Link>
               <Link href="/blog/llm-cost-management" className="text-cyan-300 hover:text-cyan-200">LLM cost management →</Link>
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">Enterprise governance →</Link>
+            </div>
+          </div>
+
+
+          <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <h3 className="mb-3 text-xl font-bold text-white">SatGate growth path: Observe → Control → Charge</h3>
+            <p className="mb-4 text-gray-300">
+              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or robot-customer revenue.
+            </p>
+            <div className="flex flex-wrap gap-3 text-sm font-semibold">
+              <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway →</Link>
+              <Link href="/capability-auth" className="text-cyan-300 hover:text-cyan-200">Capability auth →</Link>
+              <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>
           </div>
 

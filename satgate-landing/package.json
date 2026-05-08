@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "seo:gsc": "python3 scripts/gsc_telemetry.py",
-    "seo:links": "python3 scripts/internal_link_audit.py"
+    "seo:links": "python3 scripts/internal_link_audit.py",
+    "seo:machine": "python3 scripts/seo_machine.py",
+    "seo:check": "python3 scripts/seo_machine.py --check"
   },
   "dependencies": {
     "lucide-react": "^0.555.0",

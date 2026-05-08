@@ -1,0 +1,425 @@
+{
+  "generatedAt": "2026-05-08T20:01:06.564514Z",
+  "items": [
+    {
+      "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
+      "exists": true,
+      "title": "OpenAI API Budget Limits: Control Spend Before Calls",
+      "titleLength": 52,
+      "metaDescription": "Learn how to add OpenAI API budget limits, prevent runaway agent spend, and enforce usage controls before calls execute.",
+      "metaDescriptionLength": 120,
+      "canonical": "/blog/how-to-add-budget-limits-to-openai-api-calls",
+      "h1": [
+        "How to Set Hard Budget Limits on OpenAI API Calls"
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "The $72,000 Lesson",
+        "Why Traditional Solutions Fail",
+        "The Solution: Request-Level Budget Enforcement",
+        "Step 1: Install the Gateway",
+        "Step 2: Create Budget-Limited Tokens",
+        "Step 3: Update Your Code",
+        "Step 4: Configure Team Budgets",
+        "Real-World Example: Preventing Retry Storms",
+        "Advanced: Per-User Budgets for AI Apps",
+        "Monitoring and Alerts",
+        "The Results",
+        "Common Questions"
+      ],
+      "internalLinks": [
+        "/agent-api-key-risk-assessment",
+        "/agent-spend-policy-template",
+        "/ai-agent-cost-control",
+        "/ai-agent-runaway-spend-index",
+        "/blog",
+        "/blog/llm-cost-management",
+        "/capability-auth",
+        "/economic-firewall-readiness-grader",
+        "/govern",
+        "/llm-cost-dashboard",
+        "/mcp-gateway",
+        "/openai-budget-policy-generator",
+        "/tools"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "FAQPage",
+        "ItemList",
+        "ListItem",
+        "Organization",
+        "Question",
+        "TechArticle",
+        "Thing"
+      ],
+      "wordCount": 1424,
+      "hasObserveControlCharge": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
+    {
+      "path": "/blog/llm-cost-management",
+      "exists": true,
+      "title": "LLM Cost Management: Control AI Spend Before It Happens",
+      "titleLength": 55,
+      "metaDescription": "A practical guide to LLM cost management using usage observability, budget controls, and chargeback workflows for AI agents.",
+      "metaDescriptionLength": 124,
+      "canonical": "/blog/llm-cost-management",
+      "h1": [
+        "LLM Cost Management: Real-Time Budget Enforcement for AI Agents"
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "LLM Cost Dashboard Design Pattern: Cost, Latency, Traces, Budget",
+        "What the LLM cost dashboard should drive next",
+        "If You Need an LLM Cost Dashboard for Finance",
+        "The LLM Cost Management Landscape Today",
+        "Why Monitoring Fails When Agents Hold the Wallet",
+        "What Real LLM Cost Management Looks Like",
+        "The Economic Firewall Approach",
+        "Monitoring + Enforcement: Not Either/Or",
+        "LLM Cost Dashboard FAQ",
+        "Getting Started"
+      ],
+      "internalLinks": [
+        "/agent-spend-policy-template",
+        "/ai-agent-runaway-spend-index",
+        "/blog",
+        "/capability-auth",
+        "/compare",
+        "/economic-firewall",
+        "/economic-firewall-readiness-grader",
+        "/govern",
+        "/llm-cost-dashboard",
+        "/llm-cost-monitoring",
+        "/mcp-cost-control",
+        "/mcp-gateway",
+        "/mcp-proxy-config-generator",
+        "/tools"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "FAQPage",
+        "ItemList",
+        "ListItem",
+        "Organization",
+        "Question",
+        "TechArticle",
+        "Thing"
+      ],
+      "wordCount": 2270,
+      "hasObserveControlCharge": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
+    {
+      "path": "/blog/http-402-payment-required-use-cases",
+      "exists": true,
+      "title": "HTTP 402 Payment Required: API and Agent Use Cases",
+      "titleLength": 50,
+      "metaDescription": "See how HTTP 402 can support paid API access, metered MCP tools, and agent transactions using SatGate.",
+      "metaDescriptionLength": 102,
+      "canonical": "/blog/http-402-payment-required-use-cases",
+      "h1": [
+        "HTTP 402 Payment Required: Meaning, Use Cases, and AI Agent Payments"
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "HTTP 402 Payment Required Agent Implementation",
+        "What HTTP 402 Actually Means",
+        "HTTP 402 Payment Required FAQ",
+        "Why 402 Stayed Dormant for Decades",
+        "Seven Real-World Use Cases for HTTP 402",
+        "The L402 Protocol: Making 402 Practical",
+        "How an AI agent should handle HTTP 402",
+        "Implementation Considerations",
+        "402 in the Wild: Early Adopters",
+        "The Future: 402 as Default Commerce Layer"
+      ],
+      "internalLinks": [
+        "/agent-payment-controls",
+        "/blog",
+        "/blog/l402-protocol-explained",
+        "/capability-auth",
+        "/economic-firewall",
+        "/govern",
+        "/http-402-for-ai-agents",
+        "/l402-agent-payments",
+        "/l402-api-pricing-calculator",
+        "/llm-cost-dashboard",
+        "/mcp-gateway",
+        "/robot-customer-payments",
+        "/tools"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "FAQPage",
+        "ItemList",
+        "ListItem",
+        "Organization",
+        "Question",
+        "TechArticle",
+        "Thing"
+      ],
+      "wordCount": 2728,
+      "hasObserveControlCharge": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
+    {
+      "path": "/blog/macaroon-tokens-vs-api-keys",
+      "exists": true,
+      "title": "Macaroon Tokens vs API Keys for Agent Access",
+      "titleLength": 44,
+      "metaDescription": "Compare macaroon tokens and API keys for scoped authorization, delegated access, and safer AI agent permissions.",
+      "metaDescriptionLength": 112,
+      "canonical": "/blog/macaroon-tokens-vs-api-keys",
+      "h1": [
+        "Macaroon Tokens vs API Keys for AI Agents"
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "The API Key Model: Identity Without Constraints",
+        "The Macaroon Model: Capabilities With Built-In Constraints",
+        "Macaroon Tokens vs API Keys FAQ",
+        "Side-by-Side Comparison: API Keys vs Macaroons",
+        "Security Implications: Why Capability-Based Auth is Safer",
+        "When to Use Each Approach",
+        "Implementation: Adding Macaroon Support to Your API",
+        "Real-World Impact: The Numbers",
+        "The Strategic Advantage",
+        "Getting Started Today",
+        "The Bottom Line"
+      ],
+      "internalLinks": [
+        "/agent-api-key-risk-assessment",
+        "/agent-capability-tokens",
+        "/agent-control-plane",
+        "/blog",
+        "/capability-auth",
+        "/design-partners",
+        "/economic-firewall-readiness-grader",
+        "/govern",
+        "/mcp-gateway",
+        "/revocable-agent-credentials",
+        "/revocable-capability-token-policy-template"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "FAQPage",
+        "Organization",
+        "Question",
+        "TechArticle",
+        "Thing"
+      ],
+      "wordCount": 2649,
+      "hasObserveControlCharge": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
+    {
+      "path": "/govern",
+      "exists": true,
+      "title": "AI Agent Governance: Observe, Control, and Charge",
+      "titleLength": 49,
+      "metaDescription": "Govern AI agents with SatGate: observe tool usage, control access and budgets, and charge for API or MCP consumption.",
+      "metaDescriptionLength": 117,
+      "canonical": "/govern",
+      "h1": [
+        "Economic Access Control. Not &ldquo;Who Are You?&rdquo; \u2014 &ldquo;What Can You Afford?&rdquo;"
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "Two Problems. One Token.",
+        "Built for the C-Suite",
+        "Three Modes. One Gateway.",
+        "The Rogue Intern Story",
+        "60+ Dashboard Pages. Day One.",
+        "Hierarchical Token Delegation",
+        "Single Go Binary. Zero Dependencies.",
+        "The Tragedy of the Commons \u2014 Inside Your Company",
+        "Your Internal APIs Are an Untapped Market",
+        "See It Work \u2014 Right Now",
+        "From Demo to Thousands of Agents",
+        "Turn enterprise governance into request-path controls"
+      ],
+      "internalLinks": [
+        "/agent-api-governance",
+        "/ai-agent-cost-control",
+        "/design-partners",
+        "/economic-firewall",
+        "/govern",
+        "/l402-agent-payments",
+        "/llm-cost-dashboard",
+        "/llm-cost-monitoring",
+        "/mcp-governance",
+        "/mint-demo",
+        "/pay",
+        "/pricing",
+        "/privacy",
+        "/protect",
+        "/sandbox",
+        "/terms"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "FAQPage",
+        "Question",
+        "Thing",
+        "WebPage",
+        "WebSite"
+      ],
+      "wordCount": 1542,
+      "hasObserveControlCharge": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
+    {
+      "path": "/blog/api-gateway-for-ai-agents",
+      "exists": true,
+      "title": "API Gateway for AI Agents: Control Tool and API Access",
+      "titleLength": 54,
+      "metaDescription": "Learn how an API gateway for AI agents can enforce access, budgets, observability, and monetization across APIs and MCP tools.",
+      "metaDescriptionLength": 126,
+      "canonical": "/blog/api-gateway-for-ai-agents",
+      "h1": [
+        "API Gateway for AI Agents: Budgets, MCP Tools, and Economic Control"
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "The Old Model: Human-Driven API Traffic",
+        "The New Model: Autonomous Agent Traffic",
+        "What Traditional Gateways Actually Do",
+        "The Missing Layer: Economic Governance",
+        "Why Not Just Add Plugins?",
+        "How SatGate Approaches It",
+        "The Enterprise Path: Observe \u2192 Control \u2192 Charge",
+        "What an AI agent gateway must decide before routing",
+        "What to Look For in an Agent-Aware Gateway",
+        "The Bottom Line",
+        "API Gateway for AI Agents FAQ"
+      ],
+      "internalLinks": [
+        "/agent-api-governance",
+        "/agent-capability-tokens",
+        "/agent-control-plane",
+        "/blog",
+        "/capability-auth",
+        "/compare",
+        "/economic-firewall",
+        "/govern",
+        "/llm-cost-dashboard",
+        "/mcp-gateway",
+        "/mcp-proxy-config-generator"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "FAQPage",
+        "ItemList",
+        "ListItem",
+        "Organization",
+        "Question",
+        "TechArticle",
+        "Thing"
+      ],
+      "wordCount": 1484,
+      "hasObserveControlCharge": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
+    {
+      "path": "/mcp-gateway",
+      "exists": true,
+      "title": "MCP Gateway for Governed Agent Tool Access",
+      "titleLength": 42,
+      "metaDescription": "Use SatGate as an MCP gateway to observe, control, and charge for agent tool access across SaaS and hybrid deployments.",
+      "metaDescriptionLength": 119,
+      "canonical": "/mcp-gateway",
+      "h1": [
+        "MCP Gateway for Governed Agent Tool Access"
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "What is an MCP gateway?",
+        "Observe, Control, Charge for MCP tools",
+        "SaaS MCP vs Hybrid MCP",
+        "MCP gateway questions",
+        "Related MCP gateway resources",
+        "Launch an MCP gateway agents can safely use."
+      ],
+      "internalLinks": [
+        "/design-partners",
+        "/govern",
+        "/mcp-tool-cost-policy-generator"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "BreadcrumbList",
+        "FAQPage",
+        "ListItem",
+        "Organization",
+        "Question",
+        "SoftwareApplication"
+      ],
+      "wordCount": 539,
+      "hasObserveControlCharge": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
+    {
+      "path": "/capability-auth",
+      "exists": true,
+      "title": "Capability-Based Authorization for AI Agents",
+      "titleLength": 44,
+      "metaDescription": "Replace broad API keys with scoped, revocable, budget-aware capabilities for AI agents using SatGate.",
+      "metaDescriptionLength": 101,
+      "canonical": "/capability-auth",
+      "h1": [
+        "Capability-Based Authorization for AI Agents"
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "Why identity auth is too blunt for agents",
+        "What a capability should carry",
+        "Capabilities vs API keys, OAuth, and macaroons",
+        "Capability auth questions",
+        "Related authorization resources",
+        "Stop handing agents broad API keys."
+      ],
+      "internalLinks": [
+        "/blog/macaroon-tokens-vs-api-keys",
+        "/design-partners",
+        "/revocable-capability-token-policy-template"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "BreadcrumbList",
+        "FAQPage",
+        "ListItem",
+        "Organization",
+        "Question",
+        "SoftwareApplication"
+      ],
+      "wordCount": 496,
+      "hasObserveControlCharge": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    }
+  ]
+}

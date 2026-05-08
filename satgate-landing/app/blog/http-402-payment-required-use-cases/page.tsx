@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "HTTP 402 Payment Required: Meaning, Reserved Use & Agent Flow",
-  description: "HTTP 402 Payment Required means payment is needed before access. Learn why it was reserved and how L402 enables AI agent payments.",
+  title: "HTTP 402 Payment Required: API and Agent Use Cases",
+  description: "See how HTTP 402 can support paid API access, metered MCP tools, and agent transactions using SatGate.",
   alternates: { canonical: 'https://satgate.io/blog/http-402-payment-required-use-cases' },
   keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API'],
   openGraph: {
@@ -24,7 +24,7 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'HTTP 402 Payment Required: Meaning, Reserved Use & Agent Flow',
+    headline: 'HTTP 402 Payment Required: API and Agent Use Cases',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
@@ -483,6 +483,19 @@ Parent Agent ($50 macaroon)
               <Link href="/http-402-for-ai-agents" className="text-cyan-300 hover:text-cyan-200">HTTP 402 for AI agents →</Link>
               <Link href="/agent-payment-controls" className="text-cyan-300 hover:text-cyan-200">Agent payment controls →</Link>
               <Link href="/economic-firewall" className="text-cyan-300 hover:text-cyan-200">Economic firewall →</Link>
+            </div>
+          </div>
+
+
+          <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <h3 className="mb-3 text-xl font-bold text-white">SatGate growth path: Observe → Control → Charge</h3>
+            <p className="mb-4 text-gray-300">
+              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or robot-customer revenue.
+            </p>
+            <div className="flex flex-wrap gap-3 text-sm font-semibold">
+              <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway →</Link>
+              <Link href="/capability-auth" className="text-cyan-300 hover:text-cyan-200">Capability auth →</Link>
+              <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>
           </div>
 

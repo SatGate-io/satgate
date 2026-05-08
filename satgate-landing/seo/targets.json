@@ -1,0 +1,130 @@
+[
+  {
+    "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
+    "cluster": "openai-budget-limits",
+    "primaryKeyword": "openai api budget limit",
+    "secondaryKeywords": [
+      "openai api spending limit",
+      "openai api cost control",
+      "limit openai api usage",
+      "openai api rate limit vs budget limit"
+    ],
+    "intent": "how-to",
+    "funnelStage": "problem-aware",
+    "productAngle": "SatGate adds enforceable per-agent and per-tool budget limits before calls reach OpenAI.",
+    "cta": "Generate an OpenAI budget policy",
+    "status": "existing"
+  },
+  {
+    "path": "/blog/llm-cost-management",
+    "cluster": "llm-cost-management",
+    "primaryKeyword": "llm cost management",
+    "secondaryKeywords": [
+      "llm cost dashboard",
+      "llm cost control",
+      "llm monitoring dashboard",
+      "llm tracing dashboard"
+    ],
+    "intent": "commercial-investigation",
+    "funnelStage": "solution-aware",
+    "productAngle": "SatGate connects LLM cost visibility to request-path enforcement with Observe, Control, and Charge.",
+    "cta": "Turn cost visibility into control",
+    "status": "existing"
+  },
+  {
+    "path": "/blog/http-402-payment-required-use-cases",
+    "cluster": "http-402",
+    "primaryKeyword": "http 402 payment required",
+    "secondaryKeywords": [
+      "http 402 api monetization",
+      "402 payment required use cases",
+      "agent payments",
+      "l402 api monetization"
+    ],
+    "intent": "informational-commercial",
+    "funnelStage": "problem-aware",
+    "productAngle": "SatGate turns agent/API access decisions into meterable and chargeable events.",
+    "cta": "See SatGate Charge",
+    "status": "existing"
+  },
+  {
+    "path": "/blog/macaroon-tokens-vs-api-keys",
+    "cluster": "capability-auth",
+    "primaryKeyword": "macaroon tokens vs api keys",
+    "secondaryKeywords": [
+      "capability tokens",
+      "capability auth",
+      "macaroons authentication",
+      "agent authorization"
+    ],
+    "intent": "comparison",
+    "funnelStage": "solution-aware",
+    "productAngle": "SatGate uses scoped capability-style authorization for delegated, budget-aware agent access.",
+    "cta": "Use capability auth for agents",
+    "status": "existing"
+  },
+  {
+    "path": "/govern",
+    "cluster": "ai-agent-governance",
+    "primaryKeyword": "ai agent governance",
+    "secondaryKeywords": [
+      "agent governance",
+      "mcp governance",
+      "ai access control",
+      "agent control plane"
+    ],
+    "intent": "commercial",
+    "funnelStage": "solution-aware",
+    "productAngle": "SatGate is the control plane for observing, controlling, and charging agent actions.",
+    "cta": "Govern agent access",
+    "status": "existing"
+  },
+  {
+    "path": "/blog/api-gateway-for-ai-agents",
+    "cluster": "agent-api-gateway",
+    "primaryKeyword": "api gateway for ai agents",
+    "secondaryKeywords": [
+      "ai agent gateway",
+      "llm api gateway",
+      "mcp api gateway",
+      "agent access gateway"
+    ],
+    "intent": "commercial-investigation",
+    "funnelStage": "solution-aware",
+    "productAngle": "SatGate acts as an economic firewall and gateway for agent API and MCP access.",
+    "cta": "Route agents through SatGate",
+    "status": "existing"
+  },
+  {
+    "path": "/mcp-gateway",
+    "cluster": "mcp-gateway",
+    "primaryKeyword": "mcp gateway",
+    "secondaryKeywords": [
+      "model context protocol gateway",
+      "mcp server gateway",
+      "mcp access control",
+      "hosted mcp gateway"
+    ],
+    "intent": "commercial",
+    "funnelStage": "solution-aware",
+    "productAngle": "SatGate provides SaaS MCP on Fly and Hybrid MCP on Hetzner for governed tool access.",
+    "cta": "Launch an MCP gateway",
+    "status": "new"
+  },
+  {
+    "path": "/capability-auth",
+    "cluster": "capability-auth",
+    "primaryKeyword": "capability based authorization",
+    "secondaryKeywords": [
+      "capability auth",
+      "agent authorization",
+      "delegated authorization",
+      "macaroon tokens"
+    ],
+    "intent": "commercial-investigation",
+    "funnelStage": "solution-aware",
+    "productAngle": "SatGate gives agents scoped, revocable, budget-aware capabilities instead of broad API keys.",
+    "cta": "Issue capability-based agent access",
+    "status": "new"
+  }
+]
