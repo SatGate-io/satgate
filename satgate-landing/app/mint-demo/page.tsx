@@ -110,6 +110,13 @@ export default function MintDemoPage() {
     setShowRaw(false);
   };
 
+  const mintControlPath = [
+    ['Verify workload identity', 'SatGate Mint starts from an external identity token rather than a copied static API key.'],
+    ['Attach policy caveats', 'The minted macaroon carries tenant, agent, route, budget, expiry, delegation, and revocation constraints.'],
+    ['Enforce at the gateway', 'The gateway verifies the capability token before each upstream API or MCP tool request.'],
+    ['Revoke without rotation drama', 'Security teams can invalidate scoped credentials without hunting down shared secrets across agents.'],
+  ];
+
   const webPageJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
@@ -117,7 +124,7 @@ export default function MintDemoPage() {
     url: 'https://satgate.io/mint-demo',
     description: 'Interactive demo for minting budget-aware capability tokens and macaroons for AI agents with scopes, expiry, delegation limits, and revocation policy.',
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'SatGate Mint' },
@@ -137,8 +144,21 @@ export default function MintDemoPage() {
     url: 'https://satgate.io/mint-demo',
     description: 'Interactive demo for minting budget-aware capability tokens and macaroons for AI agents with scopes, expiry, delegation limits, and revocation policy.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-06',
     featureList: ['Workload identity exchange', 'Macaroon capability minting', 'Budget caveat preview', 'Policy verification', 'Scoped agent credential demo'],
+  };
+
+  const mintControlPathJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'SatGate Mint agent credential control path',
+    description: 'How SatGate Mint turns workload identity into a scoped, revocable, budget-aware capability token for AI agents.',
+    itemListElement: mintControlPath.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const breadcrumbJsonLd = {
@@ -187,6 +207,7 @@ export default function MintDemoPage() {
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(mintControlPathJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {/* Header */}
@@ -448,14 +469,36 @@ export default function MintDemoPage() {
                 Read the Guide <ArrowRight size={14} />
               </Link>
               <Link
-                href="https://cloud.satgate.io/docs/guides/sdk"
+                href="/agent-api-key-risk-assessment"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-medium transition"
               >
-                SDK Docs <ArrowRight size={14} />
+                Assess API Key Risk <ArrowRight size={14} />
               </Link>
             </div>
           </div>
         )}
+
+        <section className="mt-16 border-t border-gray-800 pt-12">
+          <p className="mb-2 text-center text-xs font-mono uppercase tracking-wide text-purple-300">Control path</p>
+          <h2 className="mb-8 text-center text-2xl font-bold text-white">From identity to enforceable agent authority</h2>
+          <div className="grid gap-4 md:grid-cols-4">
+            {mintControlPath.map(([title, body], index) => (
+              <div key={title} className="rounded-xl border border-purple-900/40 bg-purple-950/10 p-5">
+                <p className="mb-3 text-xs font-mono text-purple-300">0{index + 1}</p>
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link href="/agent-capability-tokens" className="inline-flex items-center gap-2 rounded-lg border border-gray-700 px-5 py-2.5 text-sm font-semibold text-gray-300 hover:border-purple-500 hover:text-white transition">
+              Learn capability tokens
+            </Link>
+            <Link href="/revocable-agent-credentials" className="inline-flex items-center gap-2 rounded-lg border border-gray-700 px-5 py-2.5 text-sm font-semibold text-gray-300 hover:border-cyan-500 hover:text-white transition">
+              See revocable credentials
+            </Link>
+          </div>
+        </section>
 
         <section className="mt-16 border-t border-gray-800 pt-12">
           <p className="mb-2 text-center text-xs font-mono uppercase tracking-wide text-purple-300">FAQ</p>

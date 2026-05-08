@@ -8,6 +8,15 @@ const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD',
 const usd0 = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 
+const pricingControls = [
+  [Bot, 'Identify the agent', 'Know which agent, tenant, route, resource, and workflow is asking to spend.'],
+  [Coins, 'Price the resource', 'Attach a per-request price or pricing tier to the protected API route.'],
+  [ReceiptText, 'Verify proof', 'Accept L402 Lightning payment proof before forwarding the paid API request.'],
+  [Gauge, 'Respect budget', 'Check remaining budget and policy so an agent cannot spend beyond its allowed task.'],
+  [Zap, 'Unlock instantly', 'Let software customers pay and proceed without account setup or invoice friction.'],
+  [Calculator, 'Audit economics', 'Record route, price, payment proof, budget, and outcome for analysis.'],
+] as const;
+
 function Slider({ label, value, min, max, step, suffix = '', prefix = '', onChange }: {
   label: string;
   value: number;
@@ -69,7 +78,7 @@ export default function L402ApiPricingCalculatorPage() {
     url: 'https://satgate.io/l402-api-pricing-calculator',
     description: 'Estimate per-request L402 API pricing, robot-customer revenue, gross margin, free allowance, and Lightning sats per request for AI agent API monetization.',
     datePublished: '2026-05-01',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'L402 API pricing' },
@@ -89,9 +98,22 @@ export default function L402ApiPricingCalculatorPage() {
     url: 'https://satgate.io/l402-api-pricing-calculator',
     description: 'Estimate per-request L402 API pricing, robot-customer revenue, gross margin, free allowance, and Lightning sats per request for AI agent API monetization.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     featureList: ['Per-request L402 pricing', 'Robot-customer revenue estimate', 'Gross margin modeling', 'Free allowance planning', 'Sats per request conversion'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  };
+
+  const pricingControlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'L402 API pricing controls',
+    description: 'Request-path controls required to price, challenge, verify, unlock, budget, and audit L402 paid API access for autonomous agents.',
+    itemListElement: pricingControls.map(([, title, body], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: title,
+      description: body,
+    })),
   };
 
   const breadcrumbJsonLd = {
@@ -155,6 +177,7 @@ export default function L402ApiPricingCalculatorPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingControlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
@@ -176,6 +199,9 @@ export default function L402ApiPricingCalculatorPage() {
             </a>
             <Link href="/l402-agent-payments" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-yellow-500">
               L402 agent payments
+            </Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-yellow-500">
+              Grade readiness
             </Link>
           </div>
         </div>
@@ -214,14 +240,7 @@ export default function L402ApiPricingCalculatorPage() {
             Robot-customer pricing cannot be just a billing table. Autonomous agents need a challenge, proof, budget, scope, and audit decision before each protected resource unlocks.
           </p>
           <div className="grid gap-5 md:grid-cols-3">
-            {[
-              [Bot, 'Identify the agent', 'Know which agent, tenant, route, resource, and workflow is asking to spend.'],
-              [Coins, 'Price the resource', 'Attach a per-request price or pricing tier to the protected API route.'],
-              [ReceiptText, 'Verify proof', 'Accept L402 Lightning payment proof before forwarding the paid API request.'],
-              [Gauge, 'Respect budget', 'Check remaining budget and policy so an agent cannot spend beyond its allowed task.'],
-              [Zap, 'Unlock instantly', 'Let software customers pay and proceed without account setup or invoice friction.'],
-              [Calculator, 'Audit economics', 'Record route, price, payment proof, budget, and outcome for analysis.'],
-            ].map(([Icon, title, body]) => {
+            {pricingControls.map(([Icon, title, body]) => {
               const CardIcon = Icon as typeof Bot;
               return (
                 <div key={String(title)} className="rounded-2xl border border-gray-800 bg-black p-6">
@@ -286,6 +305,9 @@ export default function L402ApiPricingCalculatorPage() {
             </Link>
             <Link href="/blog/l402-protocol-explained" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-yellow-500">
               L402 protocol explained
+            </Link>
+            <Link href="/agent-payment-controls" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-yellow-500">
+              Agent payment controls
             </Link>
           </div>
         </div>

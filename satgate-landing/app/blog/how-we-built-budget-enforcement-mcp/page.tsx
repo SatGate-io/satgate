@@ -1,6 +1,14 @@
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
+const mcpBudgetEnforcementPipeline = [
+  ['Parse the MCP call', 'Read JSON-RPC tools/call messages, batch requests, tool names, arguments, and request IDs without changing the agent.'],
+  ['Resolve tool cost', 'Apply exact matches, wildcard prefixes, tenant overrides, and default prices so each tool call has an economic value.'],
+  ['Verify token caveats', 'Check macaroon budget, scope, expiry, tool allowlists, parent delegation, and revocation before spend.'],
+  ['Spend atomically', 'Check and decrement budget as one operation so concurrent agents cannot race past a hard cap.'],
+  ['Return agent-readable state', 'Forward approved calls or return structured budget_exhausted, scope_denied, and remaining-budget data.'],
+];
+
 export const metadata = {
   title: 'How We Built Budget Enforcement for MCP Tool Calls - SatGate Blog',
   description: 'We shipped an open-source MCP proxy that enforces per-tool budgets with cryptographic delegation. Here\'s how we built it and what we learned.',
@@ -27,7 +35,7 @@ export default function McpProxyBlogPage() {
     description: 'We shipped an open-source MCP proxy that enforces per-tool budgets with cryptographic delegation for AI agent tool calls.',
     url: 'https://satgate.io/blog/how-we-built-budget-enforcement-mcp',
     datePublished: '2026-02-13',
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -36,6 +44,19 @@ export default function McpProxyBlogPage() {
       { '@type': 'Thing', name: 'per-tool cost attribution' },
       { '@type': 'Thing', name: 'macaroon delegation for AI agents' },
     ],
+  };
+
+  const pipelineJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP budget enforcement pipeline',
+    description: 'How SatGate enforces MCP tool budgets in the request path before upstream execution.',
+    itemListElement: mcpBudgetEnforcementPipeline.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
@@ -72,6 +93,7 @@ export default function McpProxyBlogPage() {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pipelineJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -184,6 +206,25 @@ export default function McpProxyBlogPage() {
             The agent gets a structured error it can handle gracefully — not a crashed process or an infinite retry.
           </p>
 
+          <div className="not-prose my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Request-path pipeline</p>
+            <h2 className="text-2xl font-bold text-white mt-0 mb-5">How MCP budget enforcement actually runs</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {mcpBudgetEnforcementPipeline.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-cyan-300">0{index + 1}</p>
+                  <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                  <p className="mb-0 text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-cyan-500 hover:text-white">MCP budget enforcement</Link>
+              <Link href="/mcp-proxy-config-generator" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-purple-500 hover:text-white">Proxy config generator</Link>
+              <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-green-500 hover:text-white">Capability tokens</Link>
+            </div>
+          </div>
+
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Delegation: The Hard Part</h2>
           <p className="text-gray-300 leading-relaxed">
             When an orchestrator agent spawns sub-agents, each needs its own budget. The parent carves credits from its own allocation:
@@ -256,9 +297,9 @@ Result:
               <code className="text-green-300">{`go install github.com/satgate-io/satgate/cmd/satgate-mcp@latest`}</code>
             </pre>
             <p className="text-gray-400 text-sm mt-3">
-              <a href="https://github.com/SatGate-io/satgate/tree/main/pkg/mcpserver" className="text-cyan-400 hover:text-cyan-300">GitHub →</a>
+              <Link href="/mcp-budget-enforcement" className="text-cyan-400 hover:text-cyan-300">MCP budget enforcement →</Link>
               {' · '}
-              <a href="https://satgate.io/pricing" className="text-cyan-400 hover:text-cyan-300">Enterprise →</a>
+              <Link href="/mcp-tool-cost-policy-generator" className="text-cyan-400 hover:text-cyan-300">Tool cost policy →</Link>
             </p>
           </div>
 

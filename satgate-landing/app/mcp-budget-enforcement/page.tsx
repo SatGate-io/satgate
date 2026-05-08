@@ -80,7 +80,7 @@ export default function McpBudgetEnforcementPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     mainEntityOfPage: 'https://satgate.io/mcp-budget-enforcement',
     about: [
       { '@type': 'Thing', name: 'MCP budget enforcement' },
@@ -146,6 +146,19 @@ export default function McpBudgetEnforcementPage() {
     ],
   };
 
+  const controlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP budget enforcement controls',
+    description: 'Controls every MCP proxy needs to keep AI agent tool calls budgeted, scoped, auditable, revocable, and chargeable.',
+    itemListElement: controls.map(({ title, body }, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: title,
+      description: body,
+    })),
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -159,6 +172,7 @@ export default function McpBudgetEnforcementPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(controlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -297,6 +311,7 @@ export default function McpBudgetEnforcementPage() {
               ['/mcp-governance', 'MCP governance', 'Control, audit, and revoke MCP tool activity.'],
               ['/mcp-tool-cost-policy-generator', 'MCP policy generator', 'Generate a concrete tool-cost policy.'],
               ['/blog/mcp-budget-enforcement-guide', 'Budget enforcement guide', 'Deep dive on MCP budgets and spend controls.'],
+              ['/economic-firewall-readiness-grader', 'Economic firewall readiness', 'Score MCP, budget, revocation, audit, routing, and Charge readiness.'],
               ['/blog/hard-capping-mcp-tool-spend', 'Hard-cap MCP spend', 'How to stop runaway tool loops.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/10">

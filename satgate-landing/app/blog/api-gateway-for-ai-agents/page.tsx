@@ -2,6 +2,14 @@ import Link from 'next/link';
 import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
+const agentGatewayDecisionChecks = [
+  ['Identity and delegation', 'Verify the agent, tenant, workflow, parent token, child token, caveats, expiry, and revocation state before routing.'],
+  ['Tool and route pricing', 'Resolve cost for the API route, model, MCP tool, token volume, premium data source, or L402-protected resource.'],
+  ['Budget and policy', 'Check per-agent, per-tool, per-workflow, customer, and time-window budgets atomically before forwarding.'],
+  ['Structured denial', 'Return budget_exhausted, scope_denied, payment_required, or downgrade guidance that an agent can reason about.'],
+  ['Economic telemetry', 'Emit spend, avoided spend, remaining budget, delegation chain, and charge/payment state for dashboards and audit.'],
+];
+
 export const metadata = {
   title: "API Gateway for AI Agents: Budgets, MCP, and Tool Cost Control",
   description: "Learn what API gateway solutions for AI agents need beyond routing: budget enforcement, MCP tool cost control, scoped tokens, revocation, and L402.",
@@ -30,7 +38,7 @@ export default function ApiGatewayForAiAgentsBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-12',
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     mainEntityOfPage: 'https://satgate.io/blog/api-gateway-for-ai-agents',
     about: [
       { '@type': 'Thing', name: 'API gateway for AI agents' },
@@ -39,6 +47,19 @@ export default function ApiGatewayForAiAgentsBlogPage() {
       { '@type': 'Thing', name: 'scoped capability tokens for APIs' },
       { '@type': 'Thing', name: 'L402 robot customer payments' },
     ],
+  };
+
+  const agentGatewayDecisionChecksSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Agent-aware API gateway decision checks',
+    description: 'The request-path checks an API gateway for AI agents should perform before routing to upstream APIs, models, MCP tools, or L402 resources.',
+    itemListElement: agentGatewayDecisionChecks.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqSchema = {
@@ -85,6 +106,10 @@ export default function ApiGatewayForAiAgentsBlogPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(agentGatewayDecisionChecksSchema) }}
       />
       <script
         type="application/ld+json"
@@ -324,6 +349,25 @@ satgate mint \\
             Each stage builds on the last. By the time you're at L402, you have a fully autonomous economic system — agents that can discover, negotiate, and pay for API services without human intervention.
           </p>
 
+          <div className="not-prose my-10 rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Request-path gateway checks</p>
+            <h2 className="text-2xl font-bold text-white mt-0 mb-5">What an AI agent gateway must decide before routing</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {agentGatewayDecisionChecks.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-purple-300">0{index + 1}</p>
+                  <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                  <p className="mb-0 text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/agent-api-governance" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-purple-500 hover:text-white">Agent API governance</Link>
+              <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-cyan-500 hover:text-white">Cost telemetry</Link>
+              <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-green-500 hover:text-white">Capability tokens</Link>
+            </div>
+          </div>
+
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">What to Look For in an Agent-Aware Gateway</h2>
           
           <p className="text-gray-300 leading-relaxed">
@@ -393,11 +437,11 @@ satgate mint \\
               <code className="text-green-300">{`go install github.com/satgate-io/satgate/cmd/satgate-mcp@latest`}</code>
             </pre>
             <p className="text-gray-400 text-sm mt-3">
-              <a href="https://github.com/SatGate-io/satgate" className="text-cyan-400 hover:text-cyan-300">GitHub →</a>
+              <Link href="/compare" className="text-cyan-400 hover:text-cyan-300">Gateway comparison →</Link>
               {' · '}
-              <a href="https://satgate.io/pricing" className="text-cyan-400 hover:text-cyan-300">Enterprise →</a>
+              <Link href="/agent-control-plane" className="text-cyan-400 hover:text-cyan-300">Agent control plane →</Link>
               {' · '}
-              <a href="https://satgate.io/compare" className="text-cyan-400 hover:text-cyan-300">Gateway Comparison →</a>
+              <Link href="/economic-firewall" className="text-cyan-400 hover:text-cyan-300">Economic firewall →</Link>
             </p>
           </div>
 

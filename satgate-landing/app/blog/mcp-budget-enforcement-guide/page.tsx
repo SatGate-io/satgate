@@ -2,6 +2,14 @@ import Link from 'next/link';
 import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock, ArrowRight, CheckCircle, Shield, DollarSign, Zap } from 'lucide-react';
 
+const mcpEnforcementLoop = [
+  ['Price every tool', 'Assign default, explicit, wildcard, and risk-tier costs to MCP tools before agents can call them.'],
+  ['Bind budget to identity', 'Attach budget, scope, expiry, cost center, team, workflow, and delegation chain to the agent capability.'],
+  ['Check before tools/call', 'Intercept each MCP tools/call request, resolve tool cost, and compare it with remaining agent and parent budget.'],
+  ['Return a useful denial', 'When budget is insufficient, return remaining credits, required credits, reset time, and cheaper alternatives instead of letting the tool execute.'],
+  ['Report avoided tool spend', 'Feed allowed, denied, delegated, and avoided-cost events into dashboards and ROI models for finance and security review.'],
+];
+
 export const metadata = {
   title: 'MCP Budget Enforcement Guide: Per-Tool Costs and Hard Agent Spend Caps',
   description: 'Practical MCP budget enforcement guide: set per-tool costs, cap agent spend, delegate budgets, and block runaway MCP tool calls before execution.',
@@ -30,7 +38,7 @@ export default function McpBudgetEnforcementGuidePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-05',
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     mainEntityOfPage: 'https://satgate.io/blog/mcp-budget-enforcement-guide',
     about: [
       { '@type': 'Thing', name: 'MCP budget enforcement' },
@@ -39,6 +47,19 @@ export default function McpBudgetEnforcementGuidePage() {
       { '@type': 'Thing', name: 'runaway agent spend control' },
       { '@type': 'Thing', name: 'MCP gateway economic governance' },
     ],
+  };
+
+  const enforcementLoopSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP budget enforcement loop',
+    description: 'Request-path steps for pricing MCP tools, checking agent budgets, denying unsafe calls, and reporting avoided tool spend.',
+    itemListElement: mcpEnforcementLoop.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqSchema = {
@@ -85,6 +106,10 @@ export default function McpBudgetEnforcementGuidePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(enforcementLoopSchema) }}
       />
       <script
         type="application/ld+json"
@@ -251,6 +276,25 @@ satgate mint \\
             don&apos;t need any changes.
           </p>
 
+          <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Request-path enforcement loop</p>
+            <h2 className="text-2xl font-bold text-white mt-0 mb-5">What an MCP gateway must decide before tool execution</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {mcpEnforcementLoop.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-cyan-300">0{index + 1}</p>
+                  <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                  <p className="mb-0 text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-cyan-500 hover:text-white">See tool spend telemetry</Link>
+              <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-purple-500 hover:text-white">Generate tool policy</Link>
+              <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-green-500 hover:text-white">Grade readiness</Link>
+            </div>
+          </div>
+
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">Step 5: Delegation Trees</h2>
           <p className="text-gray-300 leading-relaxed">
             In multi-agent systems, a coordinator agent often delegates tasks to specialist agents. 
@@ -385,6 +429,7 @@ curl -X POST http://localhost:9090/admin/mint \\
             <p className="mb-4 text-gray-300">Turn this guide into copyable policy: price MCP tools, set per-agent budgets, and generate proxy config for Cursor, Claude, OpenClaw, or custom clients.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/mcp-tool-cost-policy-generator" className="text-cyan-300 hover:text-cyan-200">MCP tool cost policy generator →</Link>
+              <Link href="/llm-cost-dashboard" className="text-cyan-300 hover:text-cyan-200">Tool spend dashboard →</Link>
               <Link href="/mcp-proxy-config-generator" className="text-cyan-300 hover:text-cyan-200">MCP proxy config generator →</Link>
               <Link href="/mcp-cost-control" className="text-cyan-300 hover:text-cyan-200">MCP cost control →</Link>
             </div>

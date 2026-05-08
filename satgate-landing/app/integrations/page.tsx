@@ -28,6 +28,13 @@ export const metadata = {
   },
 };
 
+const integrationControls = [
+  ['Budget before tool use', 'Attach per-agent, per-session, and per-MCP-tool budgets before Cursor, Claude, OpenClaw, or Hermes workflows execute paid actions.'],
+  ['Scope every capability', 'Limit agent credentials by tool, route, model, tenant, expiry, delegation depth, and revocation status.'],
+  ['Audit workflow decisions', 'Record agent identity, integration client, MCP server, policy, spend estimate, allow/deny action, and proof for every governed request.'],
+  ['Charge robot customers', 'Use L402 Lightning through SatGate Charge when external agents need paid API or tool access.'],
+];
+
 const integrations = [
   {
     href: '/satgate-for-cursor',
@@ -69,7 +76,7 @@ export default function IntegrationsPage() {
     url: 'https://satgate.io/integrations',
     description: metadata.description,
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'SatGate integrations' },
@@ -79,6 +86,19 @@ export default function IntegrationsPage() {
       { '@type': 'Thing', name: 'Cursor and Claude agent workflows' },
     ],
     audience: { '@type': 'Audience', audienceType: 'AI engineering, platform, API, and security teams' },
+  };
+
+  const controlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'SatGate integration control requirements',
+    description: 'Request-path controls teams should add when connecting SatGate to AI agent tools, MCP clients, and paid API workflows.',
+    itemListElement: integrationControls.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const itemListJsonLd = {
@@ -138,6 +158,7 @@ export default function IntegrationsPage() {
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(controlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -155,6 +176,14 @@ export default function IntegrationsPage() {
           <p className="text-xl leading-relaxed text-gray-300 md:text-2xl">
             Bring economic firewall controls to the tools where agents already work: Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP-based automation.
           </p>
+          <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+              Grade integration readiness <ArrowRight size={18} />
+            </Link>
+            <Link href="/mcp-proxy-config-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Generate MCP proxy config
+            </Link>
+          </div>
         </div>
 
         <div className="grid gap-5 md:grid-cols-2">
@@ -167,6 +196,18 @@ export default function IntegrationsPage() {
             </Link>
           ))}
         </div>
+
+        <section className="mt-14 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-8">
+          <h2 className="mb-6 text-3xl font-bold text-white">Integration control checklist</h2>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {integrationControls.map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-5">
+                <h3 className="mb-3 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
         <section className="mt-14 rounded-3xl border border-purple-900/50 bg-gradient-to-br from-purple-950/25 to-cyan-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Why integration pages matter</h2>

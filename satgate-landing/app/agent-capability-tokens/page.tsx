@@ -46,7 +46,7 @@ export default function Page() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     about: [
       { '@type': 'Thing', name: 'agent capability tokens' },
       { '@type': 'Thing', name: 'capability tokens for AI agents' },
@@ -66,6 +66,19 @@ export default function Page() {
     ],
   };
 
+  const controlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Agent capability-token controls',
+    description: 'Request-path checks SatGate performs before forwarding AI agent access with scoped capability tokens.',
+    itemListElement: controls.map(({ title, body }, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: title,
+      description: body,
+    })),
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -79,6 +92,7 @@ export default function Page() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(controlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -190,6 +204,7 @@ audit:
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Grade readiness <ArrowRight size={18} /></Link>
             <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">MCP budget enforcement</Link>
+            <Link href="/agent-api-key-risk-assessment" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Assess API key risk</Link>
           </div>
         </div>
       </section>

@@ -71,7 +71,14 @@ export default function DesignPartnersPage() {
     { q: 'Is it really free?', a: 'Yes. Observe mode is completely free—no credit card, no commitment. You get full visibility into your AI agent traffic at zero cost.' },
     { q: 'Do I need to change my code?', a: 'No. One DNS change points your AI agent traffic through SatGate. Zero code modifications. Takes about 5 minutes.' },
     { q: 'Where does my data go?', a: 'Your infrastructure in hybrid mode. The SatGate gateway runs in your VPC. We never see your API payloads or sensitive data.' },
-    { q: 'Is this production-ready?', a: 'Yes. 60+ dashboard pages, full deployment options (Docker, K8s, Terraform, SaaS), and a battle-tested Go binary with zero dependencies.' },
+    { q: 'What deployment options can we evaluate?', a: 'Design partners can evaluate SaaS, Docker, Kubernetes, Terraform, hybrid, and self-hosted gateway paths depending on security and infrastructure requirements.' },
+  ];
+
+  const partnerFit = [
+    ['Autonomous agent traffic', 'You have coding agents, support agents, MCP tools, browser agents, or workflow agents making API calls that need attribution.'],
+    ['Economic risk is visible', 'You already see unpredictable model, API, MCP, cloud, or tool spend and need request-path budgets before scale.'],
+    ['Security wants proof', 'You need audit evidence for identity, scope, delegation, revocation, and policy decisions before agents reach upstream systems.'],
+    ['Charge is strategic', 'You expect external agents or robot customers to pay for API, data, or tool access through L402/HTTP 402 flows.'],
   ];
 
   const webPageJsonLd = {
@@ -81,7 +88,7 @@ export default function DesignPartnersPage() {
     url: 'https://satgate.io/design-partners',
     description: 'Early access for teams shaping SatGate economic firewall capabilities for AI agent budget enforcement, MCP governance, API controls, and L402 Charge.',
     datePublished: '2026-04-27',
-    dateModified: '2026-05-02',
+    dateModified: '2026-05-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent economic governance' },
@@ -110,6 +117,19 @@ export default function DesignPartnersPage() {
     })),
   };
 
+  const partnerFitJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'SatGate design partner fit criteria',
+    description: 'Signals that a team is a strong fit for the SatGate economic firewall design partner program.',
+    itemListElement: partnerFit.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
+  };
+
   const programJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Service',
@@ -125,6 +145,7 @@ export default function DesignPartnersPage() {
     <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-purple-500 selection:text-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(programJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(partnerFitJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
@@ -195,11 +216,31 @@ export default function DesignPartnersPage() {
             We're working with <strong className="text-white">10 enterprises</strong> to deploy the Economic Firewall
             that enforces Economic Access Control for AI agent requests. Gate your MCP tool servers, REST APIs, and LLM endpoints — see what each agent spends per call. Get free access, direct engineering support, and a product shaped by your needs.
           </p>
-          <a href="#apply" className="inline-flex items-center gap-2 bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
-            Apply Now <ArrowRight size={18} />
-          </a>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="#apply" className="inline-flex items-center gap-2 bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
+              Apply Now <ArrowRight size={18} />
+            </a>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center gap-2 border border-gray-700 text-white px-8 py-3 rounded-lg font-bold hover:border-cyan-500 transition">
+              Grade readiness
+            </Link>
+          </div>
         </div>
       </header>
+
+      <section className="py-16 px-6 border-t border-gray-800 bg-gray-950/40">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-4">Who should apply</h2>
+          <p className="text-gray-500 text-center mb-10">Best-fit design partners have real agent traffic and a clear economic-control problem.</p>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {partnerFit.map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-cyan-900/40 bg-cyan-950/10 p-5">
+                <h3 className="font-bold text-white mb-2">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* What You Get */}
       <section className="py-20 px-6 border-t border-gray-800">

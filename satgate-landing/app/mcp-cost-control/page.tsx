@@ -46,7 +46,7 @@ export default function Page() {
     url: 'https://satgate.io/mcp-cost-control',
     description: metadata.description,
     datePublished: '2026-05-01',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'MCP cost control' },
@@ -66,7 +66,7 @@ export default function Page() {
     description: metadata.description,
     url: 'https://satgate.io/mcp-cost-control',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     featureList: ['Request-path budget enforcement', 'AI agent spend caps', 'MCP tool cost control', 'Revocable credentials', 'Audit trails'],
     audience: { '@type': 'Audience', audienceType: 'AI platform, MCP, finance, and security teams' },
   };
@@ -81,6 +81,19 @@ export default function Page() {
       { '@type': 'Question', name: 'How is MCP cost control different from LLM cost control?', acceptedAnswer: { '@type': 'Answer', text: 'LLM cost control focuses on model and token usage. MCP cost control covers tool calls that can trigger paid search, browser automation, cloud actions, SaaS APIs, data lookups, code execution, or delegated workflows outside the LLM bill.' } },
       { '@type': 'Question', name: 'Where should MCP tool cost policy be enforced?', acceptedAnswer: { '@type': 'Answer', text: 'MCP tool cost policy should be enforced in the request path before the MCP server executes the tool, so expensive calls can be blocked, downgraded, routed, approved, revoked, or charged before cost is created.' } },
     ],
+  };
+
+  const controlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP cost-control enforcement checks',
+    description: 'Request-path controls for pricing, limiting, revoking, auditing, and benchmarking MCP tool calls before agents create spend.',
+    itemListElement: controls.map(({ title, body }, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: title,
+      description: body,
+    })),
   };
 
   const breadcrumbJsonLd = {
@@ -98,6 +111,7 @@ export default function Page() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(controlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -195,6 +209,7 @@ export default function Page() {
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/tools" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Open free tools <ArrowRight size={18} /></Link>
             <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Economic firewall</Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Grade readiness</Link>
           </div>
         </div>
       </section>

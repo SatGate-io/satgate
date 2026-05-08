@@ -20,6 +20,14 @@ export const metadata = {
   alternates: { canonical: 'https://satgate.io/blog/can-adversaries-game-your-economic-firewall' },
 };
 
+const adversarialDefenses = [
+  ['Tool-level pricing', 'Price and enforce the actual MCP/API tool call rather than trusting the agent\'s description of its action.'],
+  ['Non-escalatable caveats', 'Use macaroon or capability-token caveats so delegated agents can only receive narrower authority, never more budget.'],
+  ['Fleet-level correlation', 'Detect budget spreading by correlating spend across agents, siblings, tenants, tools, and delegation branches.'],
+  ['Temporal spend windows', 'Limit slow-drain attacks with hourly or daily refresh windows instead of lifetime budgets.'],
+  ['Fail-closed revocation', 'Deny ambiguous requests and keep kill switches available when tokens, budgets, or policy checks cannot be verified.'],
+];
+
 export default function AdversarialBlogPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
@@ -28,7 +36,7 @@ export default function AdversarialBlogPage() {
     description: 'Four adversarial cost-control attacks against AI agent economic firewalls and the cryptographic defenses that stop them.',
     url: 'https://satgate.io/blog/can-adversaries-game-your-economic-firewall',
     datePublished: '2026-03-23',
-    dateModified: '2026-05-02',
+    dateModified: '2026-05-06',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -37,6 +45,19 @@ export default function AdversarialBlogPage() {
       { '@type': 'Thing', name: 'cryptographic budget enforcement' },
       { '@type': 'Thing', name: 'macaroon capability tokens' },
     ],
+  };
+
+  const adversarialDefensesJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Economic firewall adversarial defenses',
+    description: 'Defensive controls that make AI agent economic firewalls resistant to prompt injection, budget spreading, token misuse, and slow-drain attacks.',
+    itemListElement: adversarialDefenses.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
@@ -73,6 +94,7 @@ export default function AdversarialBlogPage() {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(adversarialDefensesJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -290,6 +312,28 @@ export default function AdversarialBlogPage() {
             For the CISO evaluating these systems: if the budget enforcement can be bypassed by compromising the agent, it&apos;s not security infrastructure. It&apos;s accounting software with aspirations.
           </p>
 
+          <section className="not-prose mt-12 rounded-2xl border border-red-900/40 bg-red-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-red-300">Adversarial defenses</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">Controls that keep economic firewalls from becoming accounting theater</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {adversarialDefenses.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-red-300">0{index + 1}</p>
+                  <h3 className="mb-2 font-bold text-white">{title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:border-purple-500 hover:text-white">
+                Capability-token controls
+              </Link>
+              <Link href="/agent-api-key-risk-assessment" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:border-red-500 hover:text-white">
+                Assess API-key risk
+              </Link>
+            </div>
+          </section>
+
           {/* The Defensive Playbook */}
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Defensive Playbook</h2>
 
@@ -387,16 +431,22 @@ export default function AdversarialBlogPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/govern"
+              href="/security"
               className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition"
             >
-              See How It Works
+              Security Controls
             </Link>
             <Link
-              href="/design-partners"
+              href="/revocable-agent-credentials"
               className="inline-flex items-center gap-2 bg-transparent text-white border border-gray-600 px-6 py-3 rounded-lg font-bold hover:border-purple-500 transition"
             >
-              Become a Design Partner
+              Revocable Credentials
+            </Link>
+            <Link
+              href="/economic-firewall-readiness-grader"
+              className="inline-flex items-center gap-2 bg-transparent text-white border border-gray-600 px-6 py-3 rounded-lg font-bold hover:border-cyan-500 transition"
+            >
+              Grade Readiness
             </Link>
           </div>
         </section>

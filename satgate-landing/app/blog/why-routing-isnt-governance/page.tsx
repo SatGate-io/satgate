@@ -1,6 +1,14 @@
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock, User } from 'lucide-react';
 
+const routingGovernanceDifferences = [
+  ['Routing chooses a provider', 'Governance decides whether the agent has authority and budget before any provider is selected.'],
+  ['Routing optimizes performance', 'Governance enforces spend, scope, delegation, revocation, and payment policy in the request path.'],
+  ['Routing counts traffic', 'Governance attributes cost by agent, tool, workflow, tenant, delegation chain, and remaining budget.'],
+  ['Routing reacts to failures', 'Governance returns structured denials such as budget_exhausted, scope_denied, or payment_required.'],
+  ['Routing improves delivery', 'Governance prevents autonomous agents from turning provider access into uncontrolled economic exposure.'],
+];
+
 export const metadata = {
   title: 'Why Routing Isn\'t Governance - SatGate Blog',
   description: 'AI gateways excel at routing LLM calls. But when agents control spend autonomously, routing isn\'t enough. You need economic governance.',
@@ -27,7 +35,7 @@ export default function WhyRoutingIsntGovernancePage() {
     description: "AI gateways excel at routing LLM calls. But when agents control spend autonomously, routing isn't enough. You need economic governance.",
     url: 'https://satgate.io/blog/why-routing-isnt-governance',
     datePublished: '2026-02-06',
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -36,6 +44,19 @@ export default function WhyRoutingIsntGovernancePage() {
       { '@type': 'Thing', name: 'agent spend control' },
       { '@type': 'Thing', name: 'request-path policy enforcement' },
     ],
+  };
+
+  const routingGovernanceSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Routing versus economic governance for AI agents',
+    description: 'How routing gateways differ from request-path economic governance for autonomous AI agents.',
+    itemListElement: routingGovernanceDifferences.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqSchema = {
@@ -74,6 +95,10 @@ export default function WhyRoutingIsntGovernancePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(routingGovernanceSchema) }}
       />
       <script
         type="application/ld+json"
@@ -256,6 +281,25 @@ export default function WhyRoutingIsntGovernancePage() {
               </div>
             </div>
 
+            <div className="not-prose my-10 rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6">
+              <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Routing vs governance</p>
+              <h2 className="text-2xl font-bold text-white mt-0 mb-5">The control plane difference</h2>
+              <div className="grid gap-4 md:grid-cols-2">
+                {routingGovernanceDifferences.map(([title, body], index) => (
+                  <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                    <p className="mb-2 text-xs font-mono text-purple-300">0{index + 1}</p>
+                    <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                    <p className="mb-0 text-sm leading-relaxed text-gray-400">{body}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <Link href="/agent-control-plane" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-purple-500 hover:text-white">Agent control plane</Link>
+                <Link href="/agent-api-governance" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-cyan-500 hover:text-white">Agent API governance</Link>
+                <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-green-500 hover:text-white">Economic telemetry</Link>
+              </div>
+            </div>
+
             <h2 className="text-2xl font-bold text-white mt-12 mb-4">Routing + Governance</h2>
 
             <p>
@@ -335,17 +379,17 @@ export default function WhyRoutingIsntGovernancePage() {
             Start with free Observe mode. See what your agents are actually spending.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              href="/design-partners" 
+            <Link
+              href="/economic-firewall"
               className="inline-flex items-center justify-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition"
             >
-              Apply for Design Partner Program
+              Explore Economic Firewall
             </Link>
-            <Link 
-              href="/compare" 
+            <Link
+              href="/compare"
               className="inline-flex items-center justify-center gap-2 bg-gray-800 text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-700 transition"
             >
-              See How We Compare
+              See Gateway Comparisons
             </Link>
           </div>
         </section>

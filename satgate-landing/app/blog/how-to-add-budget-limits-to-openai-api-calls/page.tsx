@@ -2,6 +2,14 @@ import Link from 'next/link';
 import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
+const openaiBudgetEnforcementSteps = [
+  ['Tag the caller', 'Attach agent, team, customer, session, workflow, environment, and parent delegation to every OpenAI request.'],
+  ['Estimate model cost', 'Price GPT calls from model, context size, expected output, tool use, retries, and route policy before forwarding.'],
+  ['Check remaining budget', 'Compare the estimated cost against per-agent, per-team, per-session, per-customer, and delegated parent limits.'],
+  ['Choose the enforcement action', 'Allow, block, downgrade to a cheaper model, queue for approval, revoke the token, or return a structured budget error.'],
+  ['Feed the dashboard', 'Record allowed, blocked, downgraded, and avoided-cost events so finance sees prevention, not just usage graphs.'],
+];
+
 export const metadata = {
   title: "OpenAI API Budget Limit: Hard Caps Before GPT Calls Run",
   description: "Set an OpenAI API budget limit per agent, team, or session. Stop runaway GPT spend before requests execute — not after dashboard alerts.",
@@ -30,7 +38,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-07',
-    dateModified: '2026-05-05',
+    dateModified: '2026-05-06',
     mainEntityOfPage: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls',
     about: [
       { '@type': 'Thing', name: 'OpenAI API budget limits' },
@@ -39,6 +47,19 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
       { '@type': 'Thing', name: 'request-path budget enforcement' },
       { '@type': 'Thing', name: 'runaway LLM spend prevention' },
     ],
+  };
+
+  const enforcementStepsSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'OpenAI API budget enforcement steps',
+    description: 'Request-path steps for enforcing OpenAI API budget limits before GPT calls run.',
+    itemListElement: openaiBudgetEnforcementSteps.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqSchema = {
@@ -93,6 +114,10 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(enforcementStepsSchema) }}
       />
       <script
         type="application/ld+json"
@@ -526,6 +551,25 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
               <li>Block, downgrade, queue, or require approval when the remaining budget is not enough.</li>
             </ol>
           </div>
+
+          <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Request-path budget loop</p>
+            <h2 className="text-2xl font-bold text-white mt-0 mb-5">How hard OpenAI budget limits should execute</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {openaiBudgetEnforcementSteps.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-cyan-300">0{index + 1}</p>
+                  <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                  <p className="mb-0 text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-cyan-500 hover:text-white">See cost telemetry</Link>
+              <Link href="/openai-budget-policy-generator" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-green-500 hover:text-white">Generate OpenAI policy</Link>
+              <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-purple-500 hover:text-white">Grade readiness</Link>
+            </div>
+          </div>
           
           <div className="bg-gray-900 border border-gray-800 p-6 rounded-lg mt-8">
             <h3 className="text-xl font-semibold mb-4">Ready to Protect Your OpenAI Spending?</h3>
@@ -574,6 +618,7 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
             <p className="mb-4 text-gray-300">Use the policy generator and spend template to convert this guide into per-agent, per-session, per-request, and model-route controls.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/openai-budget-policy-generator" className="text-cyan-300 hover:text-cyan-200">OpenAI budget generator →</Link>
+              <Link href="/llm-cost-dashboard" className="text-cyan-300 hover:text-cyan-200">LLM cost dashboard →</Link>
               <Link href="/ai-agent-cost-control" className="text-cyan-300 hover:text-cyan-200">AI agent cost control →</Link>
               <Link href="/tools" className="text-cyan-300 hover:text-cyan-200">Cost-control tools →</Link>
               <Link href="/agent-spend-policy-template" className="text-cyan-300 hover:text-cyan-200">Agent spend policy template →</Link>

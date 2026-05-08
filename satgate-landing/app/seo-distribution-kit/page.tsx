@@ -33,6 +33,15 @@ const assets = [
   ['Governance dashboard demo', '/dashboard'],
   ['Protect / scoped credential demo', '/protect'],
   ['L402 monetization demo', '/monetize'],
+  ['Economic firewall readiness grader', '/economic-firewall-readiness-grader'],
+  ['L402 API pricing calculator', '/l402-api-pricing-calculator'],
+];
+
+const distributionMotions = [
+  ['Category definition', 'Lead with “economic control plane for AI agents” and explain why routing, logs, and IAM are not enough for autonomous spend.'],
+  ['Problem proof', 'Point cost-control traffic to runaway spend benchmarks, dashboard pages, calculators, and policy generators that show the risk in operational terms.'],
+  ['Security bridge', 'Route security audiences toward revocable credentials, capability-token caveats, API-key risk, and request-path authorization controls.'],
+  ['Monetization bridge', 'Route API and data-product audiences toward L402, HTTP 402, robot-customer payments, and pricing calculator assets.'],
 ];
 
 export default function SeoDistributionKitPage() {
@@ -43,7 +52,7 @@ export default function SeoDistributionKitPage() {
     url: 'https://satgate.io/seo-distribution-kit',
     description: metadata.description,
     datePublished: '2026-04-26',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent cost control distribution' },
@@ -63,11 +72,24 @@ export default function SeoDistributionKitPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-06',
     mainEntityOfPage: 'https://satgate.io/seo-distribution-kit',
     about: assets.map(([name, url]) => ({ '@type': 'WebPage', name, url: `https://satgate.io${url}` })),
     mentions: webPageJsonLd.about,
     audience: webPageJsonLd.audience,
+  };
+
+  const distributionMotionsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'SatGate SEO distribution motions',
+    description: 'Reusable promotion motions for category definition, problem proof, security routing, and L402 monetization routing.',
+    itemListElement: distributionMotions.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const breadcrumbJsonLd = {
@@ -114,6 +136,7 @@ export default function SeoDistributionKitPage() {
     <main className="min-h-screen bg-black text-gray-100">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(distributionMotionsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -148,6 +171,16 @@ export default function SeoDistributionKitPage() {
 
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className="mb-8 text-3xl font-bold text-white">Distribution motions</h2>
+          <div className="mb-12 grid gap-4 md:grid-cols-4">
+            {distributionMotions.map(([title, body], index) => (
+              <div key={title} className="rounded-2xl border border-purple-900/40 bg-purple-950/10 p-5">
+                <p className="mb-3 text-xs font-mono text-purple-300">0{index + 1}</p>
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
           <h2 className="mb-8 text-3xl font-bold text-white">Promote these pages first</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {assets.map(([label, href]) => (

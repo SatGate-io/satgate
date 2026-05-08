@@ -1,6 +1,14 @@
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock, ArrowRight, AlertTriangle, CheckCircle, Bot, Users, DollarSign } from 'lucide-react';
 
+const swarmGovernanceLoop = [
+  ['Set the root budget', 'Give the coordinator a total spend ceiling tied to a task, tenant, department, or workflow before it can spawn workers.'],
+  ['Carve child budgets', 'Delegate smaller scoped budgets to sub-agents so the swarm total can never exceed the parent allowance.'],
+  ['Constrain each scope', 'Attach route, MCP tool, model, expiry, call-count, and risk-tier caveats so children can only narrow authority.'],
+  ['Enforce before calls', 'Check the full delegation chain before HTTP, model, API, or MCP tool calls execute upstream.'],
+  ['Revoke the tree', 'Use cascade revocation to kill the coordinator and every child token when a swarm loops, drifts, or becomes compromised.'],
+];
+
 export const metadata = {
   title: 'Agent Swarm Cost Control: Hierarchical Budgets for Multi-Agent Systems',
   description: 'Control agent swarm costs with hierarchical budgets, scoped delegation tokens, cascade revocation, and request-path enforcement for multi-agent systems.',
@@ -29,7 +37,7 @@ export default function AgentSwarmsCostGovernancePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-05',
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     mainEntityOfPage: 'https://satgate.io/blog/agent-swarms-cost-governance',
     about: [
       { '@type': 'Thing', name: 'agent swarm cost control' },
@@ -38,6 +46,19 @@ export default function AgentSwarmsCostGovernancePage() {
       { '@type': 'Thing', name: 'cascade revocation for agent swarms' },
       { '@type': 'Thing', name: 'request-path multi-agent spend enforcement' },
     ],
+  };
+
+  const swarmGovernanceLoopJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Agent swarm economic governance loop',
+    description: 'How teams should control multi-agent swarm spend with hierarchical budgets, scoped delegation, request-path checks, and cascade revocation.',
+    itemListElement: swarmGovernanceLoop.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
@@ -82,6 +103,7 @@ export default function AgentSwarmsCostGovernancePage() {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(swarmGovernanceLoopJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -227,6 +249,25 @@ export default function AgentSwarmsCostGovernancePage() {
             </div>
           </div>
 
+          <div className="not-prose my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Swarm governance loop</p>
+            <h2 className="text-2xl font-bold text-white mt-0 mb-5">How to keep multi-agent spend inside the parent budget</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {swarmGovernanceLoop.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-cyan-300">0{index + 1}</p>
+                  <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                  <p className="mb-0 text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-purple-500 hover:text-white">Design delegated capabilities</Link>
+              <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-cyan-500 hover:text-white">See swarm spend telemetry</Link>
+              <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-green-500 hover:text-white">Grade readiness</Link>
+            </div>
+          </div>
+
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">What This Looks Like in Practice</h2>
 
           <pre className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-sm font-mono text-gray-300 overflow-x-auto my-6">
@@ -286,8 +327,8 @@ satgate delegate --from <coder-token> \\
             <h3 className="text-xl font-bold text-white mb-3">Control your agent swarm&apos;s spend</h3>
             <p className="text-gray-400 mb-6">SatGate is open source. Deploy in 5 minutes. See the delegation demo live.</p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/protect" className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-6 py-3 rounded-lg font-bold hover:opacity-90 transition flex items-center gap-2">
-                See Demo <ArrowRight size={16} />
+              <Link href="/agent-capability-tokens" className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-6 py-3 rounded-lg font-bold hover:opacity-90 transition flex items-center gap-2">
+                Delegated Capabilities <ArrowRight size={16} />
               </Link>
               <Link href="/govern" className="border border-purple-700/50 bg-purple-900/20 px-6 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition text-purple-300">
                 Enterprise Governance

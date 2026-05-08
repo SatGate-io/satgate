@@ -45,7 +45,7 @@ export default function LlmCostMonitoringPage() {
     url: 'https://satgate.io/llm-cost-monitoring',
     description: metadata.description,
     datePublished: '2026-05-01',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'LLM cost monitoring' },
@@ -94,6 +94,19 @@ export default function LlmCostMonitoringPage() {
     ],
   };
 
+  const stagesJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'LLM cost monitoring to economic control stages',
+    description: 'The stages for turning LLM cost monitoring into request-path economic control for AI agents.',
+    itemListElement: stages.map(({ title, body }, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: title,
+      description: body,
+    })),
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -107,6 +120,7 @@ export default function LlmCostMonitoringPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(stagesJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -249,7 +263,7 @@ export default function LlmCostMonitoringPage() {
 
       <section className="border-t border-gray-900 bg-gradient-to-r from-purple-950/30 to-cyan-950/20">
         <div className="mx-auto max-w-6xl px-6 py-16">
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-4">
             <Link href="/llm-cost-dashboard" className="rounded-2xl border border-gray-800 bg-black/70 p-6 transition hover:border-purple-600">
               <h3 className="mb-2 text-lg font-bold text-white">LLM cost dashboard →</h3>
               <p className="text-gray-400">The dashboard checklist for model, agent, and MCP spend.</p>
@@ -261,6 +275,10 @@ export default function LlmCostMonitoringPage() {
             <Link href="/agent-spend-policy-template" className="rounded-2xl border border-gray-800 bg-black/70 p-6 transition hover:border-purple-600">
               <h3 className="mb-2 text-lg font-bold text-white">Agent spend policy →</h3>
               <p className="text-gray-400">Turn monitoring signals into budget, revocation, and audit policy.</p>
+            </Link>
+            <Link href="/economic-firewall-readiness-grader" className="rounded-2xl border border-gray-800 bg-black/70 p-6 transition hover:border-purple-600">
+              <h3 className="mb-2 text-lg font-bold text-white">Readiness grader →</h3>
+              <p className="text-gray-400">Score the gaps between monitoring, budgets, revocation, routing, audit, and Charge.</p>
             </Link>
           </div>
         </div>

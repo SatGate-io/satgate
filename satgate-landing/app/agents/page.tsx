@@ -10,13 +10,20 @@ import {
   Fingerprint, Key, Ban, Globe, Server
 } from 'lucide-react';
 
+const agentControlPath = [
+  ['Identify the agent', 'Bind each request to workload identity, team, tenant, workflow, and delegation context before the tool or API is reached.'],
+  ['Attach spend authority', 'Mint scoped capability tokens with route, tool, expiry, budget, call-count, and revocation caveats.'],
+  ['Decide in the request path', 'Check cost, policy, budget, scope, and revocation before forwarding HTTP API or MCP tool calls upstream.'],
+  ['Close the loop', 'Send telemetry into dashboards, readiness checks, ROI models, and Charge/L402 pricing when robot customers should pay.'],
+];
+
 const webPageJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
   name: 'Economic Firewall for AI Agents',
   description: 'Protect HTTP APIs and MCP tools that AI agents call with request-path budget enforcement, revocation, audit, and delegated capability controls.',
   url: 'https://satgate.io/agents',
-  dateModified: '2026-05-04',
+  dateModified: '2026-05-06',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
     { '@type': 'Thing', name: 'economic firewall for AI agents' },
@@ -25,6 +32,19 @@ const webPageJsonLd = {
     { '@type': 'Thing', name: 'per-agent budget enforcement' },
     { '@type': 'Thing', name: 'delegation hierarchy controls' },
   ],
+};
+
+const agentControlPathJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'SatGate AI agent economic control path',
+  description: 'How SatGate turns AI agent API and MCP tool calls into governed, budgeted, revocable, auditable economic activity.',
+  itemListElement: agentControlPath.map(([name, description], index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name,
+    description,
+  })),
 };
 
 const faqJsonLd = {
@@ -62,6 +82,7 @@ export default function AgentsLandingPage() {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-purple-500 selection:text-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(agentControlPathJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       {/* Navigation */}
@@ -366,6 +387,33 @@ export default function AgentsLandingPage() {
         </div>
       </section>
 
+      <section className="py-20 px-4 border-t border-gray-800/50 bg-black">
+        <div className="max-w-5xl mx-auto">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300 text-center">Request path</p>
+          <h2 className="text-3xl font-bold text-center text-white mb-10">How SatGate governs agent activity</h2>
+          <div className="grid gap-5 md:grid-cols-4">
+            {agentControlPath.map(([title, body], index) => (
+              <div key={title} className="rounded-2xl border border-cyan-900/40 bg-cyan-950/10 p-5">
+                <p className="mb-3 text-xs font-mono text-cyan-300">0{index + 1}</p>
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-300 transition hover:border-cyan-500 hover:text-white">
+              See cost telemetry
+            </Link>
+            <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-300 transition hover:border-purple-500 hover:text-white">
+              Learn capability tokens
+            </Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-300 transition hover:border-green-500 hover:text-white">
+              Grade readiness
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="py-20 px-4 border-t border-gray-800/50 bg-black">
         <div className="max-w-4xl mx-auto">
@@ -403,11 +451,11 @@ export default function AgentsLandingPage() {
               Start Free <ArrowRight size={20} />
             </a>
             <Link
-              href="/protect"
+              href="/llm-cost-dashboard"
               className="inline-flex items-center gap-2 px-8 py-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-gray-200 font-semibold text-lg transition"
             >
               <Bot size={20} />
-              Try Live Demo
+              See Cost Telemetry
             </Link>
           </div>
         </div>

@@ -53,7 +53,7 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     about: [
       { '@type': 'Thing', name: 'AI agent runaway spend benchmark' },
       { '@type': 'Thing', name: 'agent loop cost benchmark' },
@@ -69,7 +69,7 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
     name: 'AI Agent Runaway Spend Benchmark Scenarios',
     description: 'Modeled benchmark scenarios estimating uncontrolled and request-path controlled spend for autonomous AI agent loops, MCP retry storms, and agent swarms.',
     creator: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     license: 'https://satgate.io/terms',
     variableMeasured: ['agents', 'calls per minute', 'fanout', 'cost per call', 'detection delay', 'uncontrolled cost', 'controlled cost'],
     distribution: [
@@ -84,6 +84,19 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
         contentUrl: 'https://satgate.io/data/ai-agent-runaway-spend-benchmark.csv',
       },
     ],
+  };
+
+  const scenariosJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent runaway spend benchmark scenarios',
+    description: 'Modeled autonomous-agent failure scenarios comparing uncontrolled cost with request-path economic firewall enforcement.',
+    itemListElement: scenarios.map((scenario, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: scenario.name,
+      description: `${scenario.agents} agents at ${scenario.callsPerMinute} calls per minute with ${scenario.fanout}x fanout and ${scenario.costPerCall} per call create ${scenario.uncontrolledCost} of uncontrolled cost after ${scenario.detectionDelay}; request-path control reduces it to ${scenario.controlledCost}, avoiding ${scenario.avoided}.`,
+    })),
   };
 
   const faqJsonLd = {
@@ -132,6 +145,7 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(scenariosJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
@@ -148,6 +162,7 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/runaway-agent-cost-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Model your exposure <ArrowRight size={18} /></Link>
             <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">Learn economic firewalls</Link>
+            <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Compare dashboards</Link>
           </div>
         </div>
       </section>

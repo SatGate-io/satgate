@@ -33,13 +33,21 @@ const scenarios = [
   ['Multi-tenant agent swarm', '$134,400', '$6,000', '95.5%'],
 ];
 
+const controlChecklist = [
+  ['Price expensive tools', 'Assign explicit costs to model calls, MCP tools, browser automation, paid data APIs, and fanout workflows.'],
+  ['Cap each session', 'Set per-agent and per-session budgets so retry loops and browser storms hit a hard stop.'],
+  ['Constrain delegation', 'Carve sub-agent budgets from parent budgets so fanout cannot multiply spend authority.'],
+  ['Require revocation', 'Keep kill switches and expiring capability tokens in place for compromised or inefficient agents.'],
+  ['Monitor avoided spend', 'Track controlled-vs-uncontrolled deltas so finance sees dollars avoided, not just alerts fired.'],
+];
+
 const webPageJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
   name: 'AI Agent Runaway Spend Index',
   description: metadata.description,
   url: 'https://satgate.io/ai-agent-runaway-spend-index',
-  dateModified: '2026-05-04',
+  dateModified: '2026-05-06',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
     { '@type': 'Thing', name: 'AI agent runaway spend' },
@@ -58,13 +66,26 @@ const jsonLd = {
   url: 'https://satgate.io/ai-agent-runaway-spend-index',
   creator: { '@type': 'Organization', name: 'SatGate' },
   datePublished: '2026-04-26',
-  dateModified: '2026-05-04',
+  dateModified: '2026-05-06',
   about: webPageJsonLd.about,
   keywords: ['AI agent spend control', 'MCP cost control', 'runaway AI spend', 'economic firewall'],
   distribution: [
     { '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: 'https://satgate.io/data/ai-agent-runaway-spend-index-2026-04.json' },
     { '@type': 'DataDownload', encodingFormat: 'text/csv', contentUrl: 'https://satgate.io/data/ai-agent-runaway-spend-index-2026-04.csv' },
   ],
+};
+
+const controlChecklistJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'AI agent runaway spend control checklist',
+  description: 'Controls teams should apply after reviewing runaway AI agent spend benchmark scenarios.',
+  itemListElement: controlChecklist.map(([name, description], index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name,
+    description,
+  })),
 };
 
 const breadcrumbJsonLd = {
@@ -128,6 +149,7 @@ export default function AiAgentRunawaySpendIndexPage() {
     <main className="min-h-screen bg-black text-gray-100">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(controlChecklistJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
@@ -194,6 +216,25 @@ export default function AiAgentRunawaySpendIndexPage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <p className="mb-2 text-sm font-mono uppercase tracking-wide text-orange-300">Control checklist</p>
+        <h2 className="mb-8 text-3xl font-bold text-white">Turn the index into request-path controls</h2>
+        <div className="grid gap-4 md:grid-cols-5">
+          {controlChecklist.map(([title, body], index) => (
+            <div key={title} className="rounded-2xl border border-orange-900/40 bg-orange-950/10 p-5">
+              <p className="mb-3 text-xs font-mono text-orange-300">0{index + 1}</p>
+              <h3 className="mb-2 font-bold text-white">{title}</h3>
+              <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-300 transition hover:border-cyan-500 hover:text-white">See cost telemetry</Link>
+          <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-300 transition hover:border-orange-500 hover:text-white">Generate MCP tool policy</Link>
+          <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-300 transition hover:border-green-500 hover:text-white">Grade readiness</Link>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-4xl px-6 py-20">
         <h2 className="mb-8 text-3xl font-bold text-white">Runaway spend index FAQ</h2>
         <div className="space-y-5">
@@ -220,6 +261,7 @@ export default function AiAgentRunawaySpendIndexPage() {
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/agent-spend-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Generate spend policy <ArrowRight size={18} /></Link>
+            <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">See cost dashboard</Link>
             <Link href="/ai-agent-runaway-spend-benchmark" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">Read benchmark methodology</Link>
           </div>
         </div>

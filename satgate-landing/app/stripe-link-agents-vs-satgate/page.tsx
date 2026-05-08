@@ -47,7 +47,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-05-01',
-    dateModified: '2026-05-02',
+    dateModified: '2026-05-05',
     mainEntityOfPage: 'https://satgate.io/stripe-link-agents-vs-satgate',
   };
 
@@ -78,6 +78,19 @@ export default function StripeLinkAgentsVsSatGatePage() {
     ],
   };
 
+  const comparisonJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Stripe Link for Agents vs SatGate comparison',
+    description: 'Layer-by-layer comparison of agent wallet/payment credentials and SatGate request-path economic governance for AI agents.',
+    itemListElement: comparison.map(([layer, link, satgate], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: layer,
+      description: `Stripe Link for Agents: ${link}. SatGate: ${satgate}.`,
+    })),
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -91,6 +104,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(comparisonJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -114,6 +128,9 @@ export default function StripeLinkAgentsVsSatGatePage() {
             </Link>
             <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               Learn the economic firewall
+            </Link>
+            <Link href="/l402-api-pricing-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
+              Price L402 access
             </Link>
           </div>
         </div>

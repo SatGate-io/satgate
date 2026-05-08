@@ -13,6 +13,13 @@ const ENDPOINTS = [
   { path: '/api/premium/insights', price: 1000, label: '/api/premium/insights (1000 sats)' },
 ];
 
+const monetizationFlow = [
+  ['Request paid API', 'An AI agent or robot customer calls a protected endpoint with no payment proof.'],
+  ['Return HTTP 402', 'SatGate Charge returns a machine-readable L402 Lightning invoice and macaroon challenge.'],
+  ['Verify payment proof', 'The agent retries with payment proof before SatGate unlocks scoped upstream access.'],
+  ['Meter and audit', 'SatGate records endpoint, price, proof, policy, and customer evidence for revenue operations.'],
+];
+
 const webPageJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
@@ -20,7 +27,7 @@ const webPageJsonLd = {
   url: 'https://satgate.io/monetize',
   description: 'Interactive SatGate Charge demo for monetizing APIs with L402 Lightning payments, HTTP 402 challenges, robot-customer access, and request-path proof verification.',
   datePublished: '2026-04-12',
-  dateModified: '2026-05-03',
+  dateModified: '2026-05-06',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
     { '@type': 'Thing', name: 'API monetization for AI agents' },
@@ -40,8 +47,21 @@ const softwareJsonLd = {
   url: 'https://satgate.io/monetize',
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-  dateModified: '2026-05-03',
-  featureList: ['HTTP 402 challenge simulation', 'Per-request Lightning pricing', 'L402 payment proof retry', 'Robot-customer monetization flow', 'Manual preimage entry'],
+  dateModified: '2026-05-06',
+  featureList: ['HTTP 402 challenge simulation', 'Per-request Lightning pricing', 'L402 payment proof retry', 'Robot-customer monetization flow', 'Manual preimage entry', 'Request-path payment proof verification'],
+};
+
+const monetizationFlowJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'SatGate Charge L402 monetization flow',
+  description: 'The request-path sequence for monetizing APIs with HTTP 402 challenges, L402 Lightning invoices, payment proof, and robot-customer audit evidence.',
+  itemListElement: monetizationFlow.map(([name, description], index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name,
+    description,
+  })),
 };
 
 const faqJsonLd = {
@@ -361,6 +381,7 @@ export default function MonetizeDemoPage() {
     <div className="min-h-screen bg-black text-gray-100 font-sans flex flex-col items-center py-12 px-4">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(monetizationFlowJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       
       {/* Header */}
@@ -474,6 +495,26 @@ export default function MonetizeDemoPage() {
         </div>
       </div>
       
+      <section className="w-full max-w-3xl mt-8 rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-6">
+        <h2 className="mb-5 text-2xl font-bold text-white">L402 robot-customer monetization flow</h2>
+        <div className="grid gap-4 md:grid-cols-4">
+          {monetizationFlow.map(([title, body]) => (
+            <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-4">
+              <h3 className="mb-2 font-bold text-white">{title}</h3>
+              <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <Link href="/l402-api-pricing-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-black transition hover:bg-gray-200">
+            Price L402 access <Zap size={18} />
+          </Link>
+          <Link href="/robot-customer-payments" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 font-bold text-white transition hover:border-yellow-500">
+            Robot customer payments
+          </Link>
+        </div>
+      </section>
+
       {/* Visual Status Pipeline */}
       <div className="w-full max-w-3xl mt-8 grid grid-cols-3 gap-4">
         <StatusStep active={status === 'blocked'} completed={status === 'paying' || status === 'success'} icon={<ShieldAlert size={20} />} label="1. 402 Blocked" />

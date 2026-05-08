@@ -33,6 +33,13 @@ const controls = [
   { icon: Workflow, title: 'MCP and API governance', body: 'Apply the same economic policy across MCP servers, internal APIs, model providers, and paid tools.' },
 ];
 
+const cursorControlSequence = [
+  ['Discover agent traffic', 'Run Cursor MCP and API calls through Observe mode to identify tools, routes, model calls, repo tasks, and spend patterns.'],
+  ['Scope task authority', 'Mint a capability per workspace, developer, task, or agent run instead of sharing one long-lived API key.'],
+  ['Enforce spend and tool limits', 'Set per-run budgets, max calls, allowed MCP tools, route limits, and expiry before upstream execution.'],
+  ['Review and tighten policy', 'Use denied/allowed telemetry to tune budgets, revoke risky sessions, and graduate external access into L402 Charge flows when needed.'],
+];
+
 export default function SatGateIntegrationPage() {
   const webPageJsonLd = {
     '@context': 'https://schema.org',
@@ -40,7 +47,7 @@ export default function SatGateIntegrationPage() {
     name: 'SatGate for Cursor AI Agents',
     description: metadata.description,
     url: 'https://satgate.io/satgate-for-cursor',
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'Cursor agent spend control' },
@@ -60,9 +67,22 @@ export default function SatGateIntegrationPage() {
     description: metadata.description,
     url: 'https://satgate.io/satgate-for-cursor',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     about: webPageJsonLd.about,
     featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'Request-path audit trails', 'L402 API monetization'],
+  };
+
+  const cursorControlSequenceJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Cursor agent economic control sequence',
+    description: 'How SatGate wraps Cursor MCP tools and coding-agent API calls with Observe, Control, revocation, and Charge-ready policy.',
+    itemListElement: cursorControlSequence.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
@@ -100,6 +120,7 @@ export default function SatGateIntegrationPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(cursorControlSequenceJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
@@ -163,12 +184,18 @@ export default function SatGateIntegrationPage() {
         <div>
           <h2 className="mb-5 text-3xl font-bold text-white">Implementation pattern</h2>
           <p className="text-lg leading-relaxed text-gray-300">You do not need to rewrite every tool. Put SatGate at the gateway, proxy, sidecar, or MCP boundary where economic decisions matter.</p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row lg:flex-col">
+            <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-300 transition hover:border-cyan-500 hover:text-white">See cost telemetry</Link>
+            <Link href="/mcp-proxy-config-generator" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-300 transition hover:border-purple-500 hover:text-white">Generate MCP proxy config</Link>
+          </div>
         </div>
         <ol className="space-y-5 text-gray-300">
-              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">1</span><span>Route Cursor MCP/tool traffic through SatGate or a SatGate-protected proxy.</span></li>
-              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">2</span><span>Mint a scoped capability for the workspace, task, model route, or developer.</span></li>
-              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">3</span><span>Set per-run budgets, max calls, allowed tools, and expiry.</span></li>
-              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">4</span><span>Observe denied/allowed requests with agent, route, tool, and spend attribution.</span></li>
+          {cursorControlSequence.map(([title, body], index) => (
+            <li key={title} className="flex gap-4">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">{index + 1}</span>
+              <span><strong className="text-white">{title}:</strong> {body}</span>
+            </li>
+          ))}
         </ol>
       </section>
 
@@ -199,8 +226,8 @@ export default function SatGateIntegrationPage() {
             <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-300 px-6 py-3 font-bold text-black transition hover:bg-cyan-200">
               MCP budget enforcement <Gauge size={18} />
             </Link>
-            <Link href="/robot-customer-payments" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
-              Robot customer payments
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
+              Grade readiness
             </Link>
           </div>
         </div>

@@ -9,6 +9,13 @@ type Risk = 'low' | 'medium' | 'high';
 
 type SelectOption<T extends string> = { label: string; value: T };
 
+const budgetControls = [
+  [Gauge, 'Spend ceilings', 'Daily, session, per-request, and premium-model limits by agent or workflow.'],
+  [Route, 'Model routing', 'Route routine calls to economy models and require justification for premium models.'],
+  [KeyRound, 'Scoped capability', 'Expire and revoke agent credentials without rotating broad provider keys.'],
+  [ShieldCheck, 'Inline enforcement', 'Block, route, revoke, or audit before OpenAI API calls execute.'],
+] as const;
+
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block rounded-xl border border-gray-800 bg-black/50 p-5">
@@ -76,7 +83,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
     url: 'https://satgate.io/openai-budget-policy-generator',
     description: 'Generate request-path OpenAI API budget policy for autonomous agents, model routing, spend caps, revocation, and audit controls.',
     datePublished: '2026-04-29',
-    dateModified: '2026-05-02',
+    dateModified: '2026-05-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'OpenAI API budget limits' },
@@ -94,6 +101,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
     url: 'https://satgate.io/openai-budget-policy-generator',
     description: 'Generate OpenAI API budget policy for autonomous agents, workflows, model routes, per-request caps, daily budgets, and audit controls.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-05-05',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     featureList: [
       'OpenAI per-request budget caps',
@@ -150,6 +158,19 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
     ],
   };
 
+  const budgetControlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'OpenAI API budget policy controls',
+    description: 'Controls that OpenAI API budget policies need to cap spend, route models, scope authority, and enforce decisions before AI agents create cost.',
+    itemListElement: budgetControls.map(([, title, body], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: title,
+      description: body,
+    })),
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -165,6 +186,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(budgetControlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -185,6 +207,9 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
             </Link>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               See agent cost control
+            </Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Grade readiness
             </Link>
           </div>
         </div>
@@ -231,12 +256,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-8 text-3xl font-bold text-white">What good OpenAI budget policy controls</h2>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-            {[
-              [Gauge, 'Spend ceilings', 'Daily, session, per-request, and premium-model limits by agent or workflow.'],
-              [Route, 'Model routing', 'Route routine calls to economy models and require justification for premium models.'],
-              [KeyRound, 'Scoped capability', 'Expire and revoke agent credentials without rotating broad provider keys.'],
-              [ShieldCheck, 'Inline enforcement', 'Block, route, revoke, or audit before OpenAI API calls execute.'],
-            ].map(([Icon, title, body]) => {
+            {budgetControls.map(([Icon, title, body]) => {
               const TypedIcon = Icon as typeof Gauge;
               return (
                 <div key={title as string} className="rounded-xl border border-gray-800 bg-black p-6">
@@ -289,6 +309,9 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
             </Link>
             <Link href="/runaway-agent-cost-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Calculate runaway cost
+            </Link>
+            <Link href="/ai-api-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              AI API budget enforcement
             </Link>
           </div>
         </div>

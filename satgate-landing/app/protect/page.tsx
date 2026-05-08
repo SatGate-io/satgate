@@ -76,6 +76,13 @@ interface LogEntry {
 
 type DemoScene = 'intro' | 'mint' | 'use' | 'delegate' | 'enforce' | 'revoke' | 'summary';
 
+const controlFlow = [
+  ['Mint scoped authority', 'Issue a narrow, expiring capability token for an agent instead of handing it a static API key.'],
+  ['Use in the request path', 'Evaluate scope, expiry, route, and budget before the upstream API or MCP tool executes.'],
+  ['Delegate with caveats', 'Let sub-agents inherit only attenuated authority with stricter tool, time, and delegation limits.'],
+  ['Enforce and revoke', 'Block over-scope or over-budget calls and kill compromised authority without rotating every credential.'],
+];
+
 const webPageJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
@@ -83,7 +90,7 @@ const webPageJsonLd = {
   url: 'https://satgate.io/protect',
   description: 'Interactive SatGate Control demo showing scoped capability tokens, budgets, delegation limits, revocation, and request-path policy for AI agents.',
   datePublished: '2026-04-12',
-  dateModified: '2026-05-03',
+  dateModified: '2026-05-06',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
     { '@type': 'Thing', name: 'SatGate Control' },
@@ -103,8 +110,21 @@ const softwareJsonLd = {
   url: 'https://satgate.io/protect',
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-  dateModified: '2026-05-03',
-  featureList: ['Scoped capability token minting', 'Budget enforcement simulation', 'Delegated token limits', 'Revocation testing', 'Policy audit trail'],
+  dateModified: '2026-05-06',
+  featureList: ['Scoped capability token minting', 'Budget enforcement simulation', 'Delegated token limits', 'Revocation testing', 'Policy audit trail', 'Request-path control flow'],
+};
+
+const controlFlowJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'SatGate Control request-path flow',
+  description: 'The Control-mode sequence for AI agent scoped authority, request-path policy, delegated caveats, budget enforcement, and revocation.',
+  itemListElement: controlFlow.map(([name, description], index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name,
+    description,
+  })),
 };
 
 const faqJsonLd = {
@@ -730,6 +750,7 @@ export default function ProtectDemoPage() {
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(controlFlowJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       
       {/* Header */}
@@ -1776,6 +1797,26 @@ export default function ProtectDemoPage() {
             </div>
           </div>
         )}
+
+        <section className="mt-12 rounded-2xl border border-blue-900/50 bg-blue-950/10 p-6">
+          <h2 className="mb-5 text-2xl font-bold text-white">Control-mode request path</h2>
+          <div className="grid gap-4 md:grid-cols-4">
+            {controlFlow.map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-4">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 font-bold text-black transition hover:bg-gray-200">
+              Learn capability tokens
+            </Link>
+            <Link href="/revocable-agent-credentials" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 font-bold text-white transition hover:border-blue-500">
+              See revocable credentials
+            </Link>
+          </div>
+        </section>
 
         <section className="mt-12 border-t border-gray-800 pt-10">
           <p className="mb-2 text-center text-xs font-mono uppercase tracking-wide text-blue-300">FAQ</p>

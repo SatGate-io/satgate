@@ -76,6 +76,13 @@ interface LogEntry {
 
 type DemoScene = 'intro' | 'mint' | 'use' | 'delegate' | 'enforce' | 'revoke' | 'summary';
 
+const protectFlow = [
+  ['Issue scoped crawler access', 'Mint an expiring capability token for a crawler, agent, or data workflow instead of sharing a broad API key.'],
+  ['Constrain delegation', 'Allow sub-agents or workers to inherit only attenuated authority with stricter scope, time, route, and depth limits.'],
+  ['Enforce before crawl', 'Check scope, expiry, budget, and route policy before the protected API, data endpoint, or MCP tool executes.'],
+  ['Revoke compromised access', 'Ban a token signature and block the next request without rotating every upstream credential.'],
+];
+
 const webPageJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
@@ -83,7 +90,7 @@ const webPageJsonLd = {
   url: 'https://satgate.io/crawl',
   description: 'Interactive Protect mode demo for scoped AI agent capability tokens, delegation, policy enforcement, revocation, and audit before API access.',
   datePublished: '2026-04-12',
-  dateModified: '2026-05-03',
+  dateModified: '2026-05-06',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
     { '@type': 'Thing', name: 'SatGate Protect' },
@@ -103,8 +110,21 @@ const softwareJsonLd = {
   url: 'https://satgate.io/crawl',
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-  dateModified: '2026-05-03',
-  featureList: ['Capability token minting', 'Agent credential delegation', 'Policy enforcement simulation', 'Credential revocation flow', 'Request audit trail'],
+  dateModified: '2026-05-06',
+  featureList: ['Capability token minting', 'Agent credential delegation', 'Policy enforcement simulation', 'Credential revocation flow', 'Request audit trail', 'Crawler access governance flow'],
+};
+
+const protectFlowJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'SatGate Protect crawler and agent governance flow',
+  description: 'The request-path sequence for scoped crawler and AI agent access, delegated authority, enforcement, and revocation.',
+  itemListElement: protectFlow.map(([name, description], index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name,
+    description,
+  })),
 };
 
 const faqJsonLd = {
@@ -703,6 +723,7 @@ export default function ProtectDemoPage() {
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(protectFlowJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       
       {/* Header */}
@@ -1719,6 +1740,26 @@ export default function ProtectDemoPage() {
             </div>
           </div>
         )}
+
+        <section className="mt-12 rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6">
+          <h2 className="mb-5 text-2xl font-bold text-white">Protect-mode access path</h2>
+          <div className="grid gap-4 md:grid-cols-4">
+            {protectFlow.map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-4">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Link href="/agent-api-key-risk-assessment" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 font-bold text-black transition hover:bg-gray-200">
+              Assess API key risk
+            </Link>
+            <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 font-bold text-white transition hover:border-purple-500">
+              Generate capability policy
+            </Link>
+          </div>
+        </section>
 
         <section className="mt-12 border-t border-gray-800 pt-10">
           <p className="mb-2 text-center text-xs font-mono uppercase tracking-wide text-purple-300">FAQ</p>

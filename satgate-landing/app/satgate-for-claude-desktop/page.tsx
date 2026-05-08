@@ -33,6 +33,13 @@ const controls = [
   { icon: Workflow, title: 'MCP and API governance', body: 'Apply the same economic policy across MCP servers, internal APIs, model providers, and paid tools.' },
 ];
 
+const claudeDesktopPath = [
+  ['Observe local MCP tool calls', 'Capture which Claude Desktop workflows call which tools, routes, providers, and paid APIs.'],
+  ['Set per-workflow budgets', 'Attach max calls, max spend, route allowlists, expiry, and revocation caveats to each workflow.'],
+  ['Enforce before forwarding', 'SatGate decides whether the MCP/API request is allowed before the upstream provider can incur cost.'],
+  ['Escalate to Charge when needed', 'When external agents or robot customers need access, expose the same protected API behind L402 payment.'],
+];
+
 export default function SatGateIntegrationPage() {
   const webPageJsonLd = {
     '@context': 'https://schema.org',
@@ -41,7 +48,7 @@ export default function SatGateIntegrationPage() {
     url: 'https://satgate.io/satgate-for-claude-desktop',
     description: metadata.description,
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'Claude Desktop MCP budget enforcement' },
@@ -62,9 +69,22 @@ export default function SatGateIntegrationPage() {
     description: metadata.description,
     url: 'https://satgate.io/satgate-for-claude-desktop',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-06',
     audience: webPageJsonLd.audience,
     featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'Request-path audit trails', 'L402 API monetization'],
+  };
+
+  const claudeDesktopPathJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'SatGate Claude Desktop MCP governance path',
+    description: 'How SatGate turns Claude Desktop MCP tool use into observable, budgeted, request-path controlled, and optionally chargeable agent activity.',
+    itemListElement: claudeDesktopPath.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
@@ -102,6 +122,7 @@ export default function SatGateIntegrationPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(claudeDesktopPathJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
@@ -165,6 +186,14 @@ export default function SatGateIntegrationPage() {
         <div>
           <h2 className="mb-5 text-3xl font-bold text-white">Implementation pattern</h2>
           <p className="text-lg leading-relaxed text-gray-300">You do not need to rewrite every tool. Put SatGate at the gateway, proxy, sidecar, or MCP boundary where economic decisions matter.</p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:border-cyan-500 hover:text-white">
+              See cost telemetry
+            </Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:border-purple-500 hover:text-white">
+              Grade readiness
+            </Link>
+          </div>
         </div>
         <ol className="space-y-5 text-gray-300">
               <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">1</span><span>Proxy sensitive MCP servers or downstream APIs through SatGate.</span></li>
@@ -176,6 +205,17 @@ export default function SatGateIntegrationPage() {
 
       <section className="border-y border-gray-900 bg-black">
         <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Control path</p>
+          <h2 className="mb-8 text-3xl font-bold text-white">From Claude Desktop tool calls to economic control</h2>
+          <div className="mb-14 grid gap-5 md:grid-cols-4">
+            {claudeDesktopPath.map(([title, body], index) => (
+              <div key={title} className="rounded-xl border border-cyan-900/40 bg-cyan-950/10 p-5">
+                <p className="mb-3 text-xs font-mono text-cyan-300">0{index + 1}</p>
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
           <h2 className="mb-8 text-3xl font-bold text-white">Claude Desktop MCP governance questions</h2>
           <div className="grid gap-5 md:grid-cols-3">

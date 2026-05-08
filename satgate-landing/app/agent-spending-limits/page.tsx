@@ -46,7 +46,7 @@ export default function Page() {
     url: 'https://satgate.io/agent-spending-limits',
     description: metadata.description,
     datePublished: '2026-05-01',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent spending limits' },
@@ -66,7 +66,7 @@ export default function Page() {
     description: metadata.description,
     url: 'https://satgate.io/agent-spending-limits',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     featureList: ['Request-path budget enforcement', 'AI agent spend caps', 'MCP tool cost control', 'Revocable credentials', 'Audit trails'],
     audience: { '@type': 'Audience', audienceType: 'AI platform, API, finance, and security teams' },
   };
@@ -81,6 +81,19 @@ export default function Page() {
       { '@type': 'Question', name: 'What spending limits should AI agents have?', acceptedAnswer: { '@type': 'Answer', text: 'AI agents should have spending limits by tenant, agent, task, workflow, session, model, tool, route, delegated sub-agent, and time window, with per-request ceilings and emergency revocation.' } },
       { '@type': 'Question', name: 'Are spending limits better than rate limits for AI agents?', acceptedAnswer: { '@type': 'Answer', text: 'They solve different problems. Rate limits control frequency, while spending limits control economic exposure by checking request price, remaining budget, scope, and policy before cost is created.' } },
     ],
+  };
+
+  const controlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Agent spending limit controls',
+    description: 'Request-path controls for setting and enforcing autonomous AI agent spend caps before model, API, and MCP tool requests execute.',
+    itemListElement: controls.map(({ title, body }, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: title,
+      description: body,
+    })),
   };
 
   const breadcrumbJsonLd = {
@@ -98,6 +111,7 @@ export default function Page() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(controlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -109,6 +123,7 @@ export default function Page() {
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/runaway-agent-cost-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Model runaway spend <ArrowRight size={18} /></Link>
             <Link href="/ai-agent-runaway-spend-benchmark" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">See benchmark data</Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Grade readiness</Link>
           </div>
         </div>
       </section>
@@ -195,6 +210,7 @@ export default function Page() {
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/tools" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Open free tools <ArrowRight size={18} /></Link>
             <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Economic firewall</Link>
+            <Link href="/agent-spend-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Policy template</Link>
           </div>
         </div>
       </section>

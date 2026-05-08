@@ -1,6 +1,14 @@
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
+const mcpGatewayReadinessChecks = [
+  ['Centralize tool access', 'Route agent MCP traffic through one gateway so auth, tool discovery, observability, and policy are enforceable in one place.'],
+  ['Price every tool call', 'Assign costs to MCP tools, wildcard tool families, paid APIs, model-backed calls, and high-risk actions before agents use them.'],
+  ['Scope caller authority', 'Use capability tokens that bind agent, workflow, tenant, budget, tool scope, expiry, and delegation chain to each request.'],
+  ['Enforce before upstream', 'Check budget, revocation, scope, and payment policy before the MCP server or paid backend receives the call.'],
+  ['Close the audit loop', 'Emit tool cost, avoided spend, remaining budget, structured denial, and delegation lineage for operations and finance.'],
+];
+
 export const metadata = {
   title: "MCP Gateway Guide: From Routing to Economic Governance",
   description: "A complete MCP gateway guide covering architecture, auth, tool aggregation, and budget enforcement for AI agent tool calls.",
@@ -28,7 +36,7 @@ export default function McpGatewayGuideBlogPage() {
     description: 'A complete MCP gateway guide covering architecture, authentication, tool aggregation, observability, and request-path budget enforcement for AI agent tool calls.',
     url: 'https://satgate.io/blog/mcp-gateway-guide',
     datePublished: '2026-03-24',
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -37,6 +45,19 @@ export default function McpGatewayGuideBlogPage() {
       { '@type': 'Thing', name: 'economic governance for AI agents' },
       { '@type': 'Thing', name: 'request-path policy enforcement' },
     ],
+  };
+
+  const mcpGatewayReadinessChecksJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP gateway production readiness checks',
+    description: 'The checks production MCP gateways need to move from routing to economic governance for AI agents.',
+    itemListElement: mcpGatewayReadinessChecks.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
@@ -73,6 +94,7 @@ export default function McpGatewayGuideBlogPage() {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(mcpGatewayReadinessChecksJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -265,6 +287,25 @@ policies:
           <p className="text-gray-300 leading-relaxed">
             Structured logging, metrics export (Prometheus, DataDog), and trace correlation are standard gateway capabilities. They tell you <em>what happened</em>. Which brings us to the gap.
           </p>
+
+          <div className="not-prose my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Production readiness checks</p>
+            <h2 className="text-2xl font-bold text-white mt-0 mb-5">What an MCP gateway needs before agent scale</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {mcpGatewayReadinessChecks.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-cyan-300">0{index + 1}</p>
+                  <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                  <p className="mb-0 text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/mcp-governance" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-cyan-500 hover:text-white">MCP governance</Link>
+              <Link href="/mcp-proxy-config-generator" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-purple-500 hover:text-white">Proxy config generator</Link>
+              <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-green-500 hover:text-white">Budget enforcement</Link>
+            </div>
+          </div>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Gap: What Standard MCP Gateways Miss</h2>
 
@@ -665,11 +706,11 @@ Orchestrator (10,000 credits)
               <code className="text-green-300">{`go install github.com/satgate-io/satgate/cmd/satgate-mcp@latest`}</code>
             </pre>
             <p className="text-gray-400 text-sm mt-3">
-              <a href="https://github.com/SatGate-io/satgate" className="text-cyan-400 hover:text-cyan-300">GitHub →</a>
+              <Link href="/mcp-governance" className="text-cyan-400 hover:text-cyan-300">MCP governance →</Link>
               {' · '}
-              <a href="https://satgate.io/blog/mcp-budget-enforcement-guide" className="text-cyan-400 hover:text-cyan-300">MCP Budget Enforcement Guide →</a>
+              <Link href="/mcp-budget-enforcement" className="text-cyan-400 hover:text-cyan-300">MCP budget enforcement →</Link>
               {' · '}
-              <a href="https://satgate.io/pricing" className="text-cyan-400 hover:text-cyan-300">Enterprise →</a>
+              <Link href="/economic-firewall-readiness-grader" className="text-cyan-400 hover:text-cyan-300">Readiness grader →</Link>
             </p>
           </div>
 

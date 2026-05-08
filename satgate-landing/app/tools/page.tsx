@@ -35,6 +35,13 @@ export const metadata = {
   },
 };
 
+const toolPaths = [
+  ['Diagnose cost exposure', 'Start with the ROI calculator, runaway spend calculator, benchmark, and LLM cost dashboard to quantify where autonomous agents can create cost before humans notice.'],
+  ['Generate enforceable policy', 'Use the OpenAI budget generator, MCP tool policy generator, agent spend template, capability-token policy template, and MCP proxy config generator to turn findings into request-path rules.'],
+  ['Score governance readiness', 'Use the economic firewall readiness grader and API key risk assessment to prioritize identity, budget, revocation, audit, routing, and Charge/L402 gaps.'],
+  ['Monetize robot customers', 'Use the L402 API pricing calculator and payment-control guides when external agents become paying API customers.'],
+];
+
 const tools = [
   {
     href: '/llm-cost-dashboard',
@@ -136,7 +143,7 @@ export default function ToolsPage() {
     url: 'https://satgate.io/tools',
     description: metadata.description,
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent cost control tools' },
@@ -146,6 +153,19 @@ export default function ToolsPage() {
       { '@type': 'Thing', name: 'runaway agent spend calculators' },
     ],
     audience: { '@type': 'Audience', audienceType: 'API, platform, security, and AI engineering teams' },
+  };
+
+  const toolPathsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent cost control tool paths',
+    description: 'Recommended workflow paths for using SatGate calculators, policy generators, readiness graders, and L402 pricing tools.',
+    itemListElement: toolPaths.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const itemListJsonLd = {
@@ -205,6 +225,7 @@ export default function ToolsPage() {
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(toolPathsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -228,6 +249,9 @@ export default function ToolsPage() {
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               See agent cost control
             </Link>
+            <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
+              Audit LLM spend
+            </Link>
           </div>
         </div>
       </section>
@@ -246,6 +270,23 @@ export default function ToolsPage() {
       </section>
 
       <section className="border-y border-gray-900 bg-gray-950/60">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="mb-8 max-w-3xl">
+            <h2 className="mb-3 text-3xl font-bold text-white">Choose the right tool path</h2>
+            <p className="text-gray-400">SatGate tools work best as a sequence: quantify exposure, generate policy, score gaps, then govern or charge in the request path.</p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {toolPaths.map(([title, body]) => (
+              <div key={title} className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-5">
+                <h3 className="mb-3 text-lg font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-gray-900 bg-black">
         <div className="mx-auto grid max-w-6xl gap-8 px-6 py-20 lg:grid-cols-3">
           {[
             ['Measure', 'Start with calculators to estimate ghost spend, runaway loop exposure, and payback period.'],

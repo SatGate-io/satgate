@@ -1,6 +1,14 @@
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
+const l402AgentPaymentFlow = [
+  ['Receive the 402 challenge', 'The API returns HTTP 402 with an L402 payment challenge, price, invoice, macaroon, expiry, and purchased-resource metadata.'],
+  ['Check payment policy', 'The agent verifies that the endpoint, price, budget, tenant, and workflow are allowed before spending.'],
+  ['Pay and bind proof', 'The agent pays the Lightning invoice and receives payment proof or a macaroon capability constrained to the purchased API action.'],
+  ['Retry with authority', 'The agent retries the original request with the L402 credential so the gateway can verify payment before forwarding.'],
+  ['Record and enforce limits', 'The gateway logs payment, budget, policy, and remaining allowance so Charge does not become an unlimited blank check.'],
+];
+
 export const metadata = {
   title: "HTTP 402 Payment Required: Meaning, Reserved Use & Agent Flow",
   description: "HTTP 402 Payment Required means payment is needed before access. Learn why it was reserved and how L402 enables AI agent payments.",
@@ -29,7 +37,7 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-02',
-    dateModified: '2026-05-05',
+    dateModified: '2026-05-06',
     mainEntityOfPage: 'https://satgate.io/blog/http-402-payment-required-use-cases',
     about: [
       { '@type': 'Thing', name: 'HTTP 402 Payment Required' },
@@ -38,6 +46,19 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
       { '@type': 'Thing', name: 'machine-to-machine micropayments' },
       { '@type': 'Thing', name: 'Lightning-backed API monetization' },
     ],
+  };
+
+  const agentPaymentFlowSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'HTTP 402 AI agent payment flow',
+    description: 'How an AI agent should handle HTTP 402 Payment Required with L402 payment challenges, budget policy, Lightning payment, and request-path enforcement.',
+    itemListElement: l402AgentPaymentFlow.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqSchema = {
@@ -92,6 +113,10 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(agentPaymentFlowSchema) }}
       />
       <script
         type="application/ld+json"
@@ -410,6 +435,25 @@ Parent Agent ($50 macaroon)
 └──────────┘                    └──────────────┘`}</code>
           </pre>
 
+          <div className="my-10 rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-yellow-300">Agent payment flow</p>
+            <h2 className="text-2xl font-bold text-white mt-0 mb-5">How an AI agent should handle HTTP 402</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {l402AgentPaymentFlow.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-yellow-300">0{index + 1}</p>
+                  <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                  <p className="mb-0 text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/l402-agent-payments" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-yellow-500 hover:text-white">Plan L402 agent payments</Link>
+              <Link href="/agent-payment-controls" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-cyan-500 hover:text-white">Set payment controls</Link>
+              <Link href="/l402-api-pricing-calculator" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-green-500 hover:text-white">Calculate API pricing</Link>
+            </div>
+          </div>
+
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Implementation Considerations</h2>
 
           <p className="text-gray-300 leading-relaxed">
@@ -477,6 +521,7 @@ Parent Agent ($50 macaroon)
             <p className="mb-4 text-gray-300">HTTP 402 gets powerful when pricing, margin, free allowances, and L402 settlement are explicit before agents call the API.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/l402-api-pricing-calculator" className="text-cyan-300 hover:text-cyan-200">L402 pricing calculator →</Link>
+              <Link href="/llm-cost-dashboard" className="text-cyan-300 hover:text-cyan-200">Agent payment telemetry →</Link>
               <Link href="/tools" className="text-cyan-300 hover:text-cyan-200">Agent payment tools →</Link>
               <Link href="/robot-customer-payments" className="text-cyan-300 hover:text-cyan-200">Robot customer payments →</Link>
               <Link href="/l402-agent-payments" className="text-cyan-300 hover:text-cyan-200">L402 agent payments →</Link>

@@ -10,6 +10,13 @@ type Risk = 'low' | 'medium' | 'high';
 
 type SelectOption<T extends string> = { label: string; value: T };
 
+const policyControls = [
+  [DollarSign, 'Per-tool economics', 'Attach cost to searches, browser sessions, cloud tasks, code agents, and paid APIs.'],
+  [ShieldAlert, 'Risk actions', 'Block, route, revoke, or require explicit policy when unknown or sensitive tools appear.'],
+  [Eye, 'Audit evidence', 'Record agent, MCP server, tool, cost, remaining budget, policy decision, and outcome.'],
+  [Wrench, 'Server unchanged', 'Wrap governance around existing MCP servers without rewriting every tool implementation.'],
+] as const;
+
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block rounded-xl border border-gray-800 bg-black/50 p-5">
@@ -74,7 +81,7 @@ export default function McpToolCostPolicyGeneratorPage() {
     url: 'https://satgate.io/mcp-tool-cost-policy-generator',
     description: 'Generate MCP tool cost policy for per-tool budgets, session caps, risk actions, revocation, and audit trails.',
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'MCP tool cost policy generator' },
@@ -95,7 +102,7 @@ export default function McpToolCostPolicyGeneratorPage() {
     url: 'https://satgate.io/mcp-tool-cost-policy-generator',
     description: 'Generate MCP tool cost policy for per-tool budgets, session caps, risk actions, revocation, and audit trails.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     audience: webPageJsonLd.audience,
     featureList: ['MCP policy YAML generation', 'MCP policy JSON generation', 'Per-tool budget controls', 'Unknown cost risk actions', 'Revocation and audit policy templates'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -114,6 +121,19 @@ export default function McpToolCostPolicyGeneratorPage() {
   };
 
 
+  const policyControlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP tool cost policy controls',
+    description: 'Controls that MCP tool cost policies need to price, limit, audit, and govern paid or risky tool calls before execution.',
+    itemListElement: policyControls.map(([, title, body], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: title,
+      description: body,
+    })),
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -128,6 +148,7 @@ export default function McpToolCostPolicyGeneratorPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(policyControlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -146,6 +167,9 @@ export default function McpToolCostPolicyGeneratorPage() {
             </Link>
             <Link href="/blog/mcp-budget-enforcement-guide" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Read budget guide
+            </Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Grade readiness
             </Link>
           </div>
         </div>
@@ -179,12 +203,7 @@ export default function McpToolCostPolicyGeneratorPage() {
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-8 text-3xl font-bold text-white">What the policy should control</h2>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-            {[
-              [DollarSign, 'Per-tool economics', 'Attach cost to searches, browser sessions, cloud tasks, code agents, and paid APIs.'],
-              [ShieldAlert, 'Risk actions', 'Block, route, revoke, or require explicit policy when unknown or sensitive tools appear.'],
-              [Eye, 'Audit evidence', 'Record agent, MCP server, tool, cost, remaining budget, policy decision, and outcome.'],
-              [Wrench, 'Server unchanged', 'Wrap governance around existing MCP servers without rewriting every tool implementation.'],
-            ].map(([Icon, title, body]) => {
+            {policyControls.map(([Icon, title, body]) => {
               const TypedIcon = Icon as typeof DollarSign;
               return (
                 <div key={title as string} className="rounded-xl border border-gray-800 bg-black p-6">
@@ -249,6 +268,9 @@ export default function McpToolCostPolicyGeneratorPage() {
             </Link>
             <Link href="/openai-budget-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Generate OpenAI budget policy
+            </Link>
+            <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              MCP budget enforcement
             </Link>
           </div>
         </div>

@@ -21,6 +21,13 @@ export const metadata = {
   alternates: { canonical: 'https://satgate.io/blog/the-enterprise-adoption-playbook-observe-control-charge' },
 };
 
+const adoptionStages = [
+  ['Observe', 'Capture agent, tool, team, tenant, and cost telemetry without blocking production requests.'],
+  ['Control', 'Turn observed baselines into request-path budgets, scoped credentials, revocation, and hard deny decisions.'],
+  ['Charge', 'Expose APIs, data, and tools to external agents through L402 payment flows for robot-customer monetization.'],
+  ['Review', 'Use telemetry, denials, and payment data to tune budgets, pricing, and policy before expanding autonomy.'],
+];
+
 export default function EnterpriseAdoptionPlaybookPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
@@ -29,7 +36,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
     description: 'A three-stage framework for adopting economic governance for AI agents: observe spend, control internal agent budgets, then charge external robot customers.',
     url: 'https://satgate.io/blog/the-enterprise-adoption-playbook-observe-control-charge',
     datePublished: '2026-03-20',
-    dateModified: '2026-05-02',
+    dateModified: '2026-05-06',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -38,6 +45,19 @@ export default function EnterpriseAdoptionPlaybookPage() {
       { '@type': 'Thing', name: 'AI agent budget enforcement' },
       { '@type': 'Thing', name: 'robot-customer API monetization' },
     ],
+  };
+
+  const adoptionStagesJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'SatGate Observe Control Charge adoption stages',
+    description: 'Progressive enterprise adoption stages for AI agent economic governance, from telemetry to internal enforcement to L402 robot-customer monetization.',
+    itemListElement: adoptionStages.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
@@ -74,6 +94,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(adoptionStagesJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -311,6 +332,28 @@ export default function EnterpriseAdoptionPlaybookPage() {
             Organizations that try to monetize externally before they&apos;ve governed internally are building on a shaky foundation. If you don&apos;t know what your own agents cost, you can&apos;t price your APIs accurately. If you haven&apos;t stress-tested your budget enforcement, you can&apos;t trust it to protect your margins when external traffic scales.
           </p>
 
+          <section className="not-prose mt-12 rounded-2xl border border-cyan-900/40 bg-cyan-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Adoption sequence</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">The durable path from telemetry to revenue</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {adoptionStages.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-cyan-300">0{index + 1}</p>
+                  <h3 className="mb-2 font-bold text-white">{title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:border-cyan-500 hover:text-white">
+                Start with telemetry
+              </Link>
+              <Link href="/l402-agent-payments" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:border-yellow-500 hover:text-white">
+                Plan Charge flows
+              </Link>
+            </div>
+          </section>
+
           {/* Getting Started */}
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Getting Started</h2>
           
@@ -356,18 +399,18 @@ export default function EnterpriseAdoptionPlaybookPage() {
               Deploy SatGate in Observe mode in 15 minutes. No commitments, no enforcement, no risk — just visibility into what your agents actually cost.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <a 
-                href="https://github.com/satgate/satgate"
+              <Link
+                href="/llm-cost-dashboard"
                 className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition no-underline"
               >
-                View on GitHub
-              </a>
-              <a 
-                href="/playground"
+                See Cost Telemetry
+              </Link>
+              <Link
+                href="/economic-firewall-readiness-grader"
                 className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-purple-500 transition no-underline"
               >
-                Try the Playground
-              </a>
+                Grade Readiness
+              </Link>
             </div>
           </div>
 

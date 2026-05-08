@@ -21,6 +21,14 @@ export const metadata = {
   alternates: { canonical: 'https://satgate.io/blog/why-economic-firewalls-are-the-prerequisite-for-autonomous-ai-agents' },
 };
 
+const autonomyPrerequisites = [
+  ['Hard spend ceilings', 'Every autonomous agent needs a non-negotiable maximum loss before it can spend, call paid APIs, or delegate work.'],
+  ['Bounded authority', 'Agent credentials should encode route, tool, tenant, task, expiry, and delegation scope instead of broad standing access.'],
+  ['Request-path denial', 'Budget and policy decisions must happen before upstream services execute, not after invoices or dashboards update.'],
+  ['Revocation and audit', 'Humans need instant kill switches and durable evidence for who authorized which agent to spend on which resource.'],
+  ['Charge-ready payments', 'Agent-to-agent commerce needs L402/HTTP 402 flows so robot customers can pay per call without unlimited trust.'],
+];
+
 export default function WhyEconomicFirewallsPrerequisitePage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
@@ -30,7 +38,7 @@ export default function WhyEconomicFirewallsPrerequisitePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-20',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-06',
     mainEntityOfPage: 'https://satgate.io/blog/why-economic-firewalls-are-the-prerequisite-for-autonomous-ai-agents',
     about: [
       { '@type': 'Thing', name: 'economic firewalls for autonomous AI agents' },
@@ -39,6 +47,19 @@ export default function WhyEconomicFirewallsPrerequisitePage() {
       { '@type': 'Thing', name: 'agent economy financial controls' },
       { '@type': 'Thing', name: 'request-path budget enforcement' },
     ],
+  };
+
+  const autonomyPrerequisitesJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Economic firewall prerequisites for autonomous AI agents',
+    description: 'The economic controls required before enterprises can safely grant AI agents real autonomy.',
+    itemListElement: autonomyPrerequisites.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
@@ -83,6 +104,7 @@ export default function WhyEconomicFirewallsPrerequisitePage() {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(autonomyPrerequisitesJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -251,6 +273,28 @@ export default function WhyEconomicFirewallsPrerequisitePage() {
             And just like network firewalls, economic firewalls will become invisible infrastructure — the layer you don&apos;t think about because it&apos;s always there, enforcing the rules that make everything else possible.
           </p>
 
+          <section className="not-prose mt-12 rounded-2xl border border-purple-900/40 bg-purple-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Autonomy requirements</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">What has to exist before autonomous agents can spend</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {autonomyPrerequisites.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-purple-300">0{index + 1}</p>
+                  <h3 className="mb-2 font-bold text-white">{title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/economic-firewall" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:border-purple-500 hover:text-white">
+                Economic firewall guide
+              </Link>
+              <Link href="/agent-payment-controls" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:border-cyan-500 hover:text-white">
+                Agent payment controls
+              </Link>
+            </div>
+          </section>
+
           {/* Conclusion */}
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Bottom Line</h2>
 
@@ -312,14 +356,14 @@ export default function WhyEconomicFirewallsPrerequisitePage() {
 
         {/* CTA */}
         <div className="mt-12 flex flex-wrap gap-4">
-          <Link href="/design-partners" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
-            Become a Design Partner
+          <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
+            Grade Readiness
           </Link>
           <Link href="/roi-calculator" className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-6 py-3 rounded-lg font-bold hover:border-purple-600/50 transition">
             Calculate Your ROI
           </Link>
-          <Link href="/pricing" className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-6 py-3 rounded-lg font-bold hover:border-purple-600/50 transition">
-            View Pricing
+          <Link href="/l402-agent-payments" className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-6 py-3 rounded-lg font-bold hover:border-cyan-600/50 transition">
+            L402 Agent Payments
           </Link>
         </div>
       </div>

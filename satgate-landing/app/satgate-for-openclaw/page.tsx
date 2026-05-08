@@ -33,6 +33,13 @@ const controls = [
   { icon: Workflow, title: 'MCP and API governance', body: 'Apply the same economic policy across MCP servers, internal APIs, model providers, and paid tools.' },
 ];
 
+const openClawControlSequence = [
+  ['Attribute every run', 'Bind OpenClaw requests to agent, sub-agent, task, tool, model route, tenant, and workflow so spend rolls up cleanly.'],
+  ['Delegate bounded authority', 'Mint child capabilities with carved-out budgets, allowed tools, expiry, and revocation instead of inherited ambient access.'],
+  ['Enforce at tool boundaries', 'Apply budgets, scopes, call ceilings, and kill switches before MCP, model, API, or paid-tool requests execute.'],
+  ['Convert external access to Charge', 'Use L402 when autonomous agents or robot customers should pay for protected APIs rather than receive blanket keys.'],
+];
+
 export default function SatGateIntegrationPage() {
   const webPageJsonLd = {
     '@context': 'https://schema.org',
@@ -40,7 +47,7 @@ export default function SatGateIntegrationPage() {
     name: 'SatGate for OpenClaw Agents',
     description: metadata.description,
     url: 'https://satgate.io/satgate-for-openclaw',
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'OpenClaw agent spend control' },
@@ -60,9 +67,22 @@ export default function SatGateIntegrationPage() {
     description: metadata.description,
     url: 'https://satgate.io/satgate-for-openclaw',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     about: webPageJsonLd.about,
     featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'Request-path audit trails', 'L402 API monetization'],
+  };
+
+  const openClawControlSequenceJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'OpenClaw agent economic control sequence',
+    description: 'How SatGate wraps OpenClaw agents, sub-agents, MCP tools, model routes, and API calls with economic control-plane policy.',
+    itemListElement: openClawControlSequence.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
@@ -100,6 +120,7 @@ export default function SatGateIntegrationPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(openClawControlSequenceJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
@@ -163,12 +184,18 @@ export default function SatGateIntegrationPage() {
         <div>
           <h2 className="mb-5 text-3xl font-bold text-white">Implementation pattern</h2>
           <p className="text-lg leading-relaxed text-gray-300">You do not need to rewrite every tool. Put SatGate at the gateway, proxy, sidecar, or MCP boundary where economic decisions matter.</p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row lg:flex-col">
+            <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-300 transition hover:border-cyan-500 hover:text-white">See cost telemetry</Link>
+            <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-300 transition hover:border-purple-500 hover:text-white">Design delegated capabilities</Link>
+          </div>
         </div>
         <ol className="space-y-5 text-gray-300">
-              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">1</span><span>Route OpenClaw tool/API/model traffic through SatGate where spend or access matters.</span></li>
-              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">2</span><span>Mint scoped capabilities per agent, session, task, route, or MCP server.</span></li>
-              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">3</span><span>Apply Observe first, then Control budgets, revocation, and kill switches.</span></li>
-              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">4</span><span>Use Charge/L402 for external robot-customer access to protected APIs.</span></li>
+          {openClawControlSequence.map(([title, body], index) => (
+            <li key={title} className="flex gap-4">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">{index + 1}</span>
+              <span><strong className="text-white">{title}:</strong> {body}</span>
+            </li>
+          ))}
         </ol>
       </section>
 
@@ -199,8 +226,8 @@ export default function SatGateIntegrationPage() {
             <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-300 px-6 py-3 font-bold text-black transition hover:bg-cyan-200">
               MCP budget enforcement <Gauge size={18} />
             </Link>
-            <Link href="/robot-customer-payments" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
-              Robot customer payments
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
+              Grade readiness
             </Link>
           </div>
         </div>

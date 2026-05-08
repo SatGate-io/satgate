@@ -73,7 +73,7 @@ export default function AgentSpendPolicyTemplatePage() {
     url: 'https://satgate.io/agent-spend-policy-template',
     description: 'Generate copyable YAML and JSON policy templates for AI agent budgets, MCP tool costs, delegation, revocation, and audit fields.',
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent spend policy template' },
@@ -94,10 +94,30 @@ export default function AgentSpendPolicyTemplatePage() {
     url: 'https://satgate.io/agent-spend-policy-template',
     description: 'Generate copyable YAML and JSON policy templates for AI agent budgets, MCP tool costs, delegation, revocation, and audit fields.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     audience: webPageJsonLd.audience,
     featureList: ['YAML spend policy generation', 'JSON spend policy generation', 'MCP tool cost caps', 'Delegation limit templates', 'Revocation and audit field templates'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  };
+
+  const checklistJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Agent spend policy checklist',
+    description: 'Required controls for an enforceable AI agent spend policy across budgets, MCP tools, credentials, delegation, audit, and operating mode.',
+    itemListElement: [
+      ['Budgets', 'Daily, session, per-request, route, model, and MCP tool caps.'],
+      ['Tools', 'Per-tool price, risk tier, deny behavior, and audit fields for MCP servers.'],
+      ['Credentials', 'Scoped capabilities with expiry, revocation, and loop-kill behavior.'],
+      ['Delegation', 'Sub-agent budget percentages, shorter expiry, and attenuated authority.'],
+      ['Audit', 'Tenant, agent, task, route, model, tool, cost, budget, and decision fields.'],
+      ['Mode', 'Observe first, Control when trusted thresholds are clear, Charge when robot customers pay.'],
+    ].map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const breadcrumbJsonLd = {
@@ -161,6 +181,7 @@ export default function AgentSpendPolicyTemplatePage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(checklistJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
@@ -313,6 +334,9 @@ export default function AgentSpendPolicyTemplatePage() {
             </Link>
             <Link href="/mcp-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               MCP cost control
+            </Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Grade readiness
             </Link>
           </div>
         </div>

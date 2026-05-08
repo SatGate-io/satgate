@@ -79,7 +79,7 @@ export default function RobotCustomerPaymentsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     mainEntityOfPage: 'https://satgate.io/robot-customer-payments',
     about: [
       { '@type': 'Thing', name: 'robot customer payments' },
@@ -145,6 +145,19 @@ export default function RobotCustomerPaymentsPage() {
     ],
   };
 
+  const paymentFlowJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Robot customer payment flow',
+    description: 'The request-path flow for pricing, accepting payment, scoping access, enforcing policy, and auditing robot-customer API payments.',
+    itemListElement: paymentFlow.map(({ title, body }, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: title,
+      description: body,
+    })),
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -158,6 +171,7 @@ export default function RobotCustomerPaymentsPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(paymentFlowJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -178,6 +192,9 @@ export default function RobotCustomerPaymentsPage() {
             </Link>
             <Link href="/blog/api-monetization-ai" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
               API monetization guide
+            </Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
+              Grade readiness
             </Link>
           </div>
         </div>
@@ -335,6 +352,7 @@ export default function RobotCustomerPaymentsPage() {
               ['/economic-firewall', 'Economic firewall', 'Observe, Control, and Charge robot-customer requests in one request path.'],
               ['/mcp-budget-enforcement', 'MCP budget enforcement', 'Apply the same budget logic to paid tools and MCP servers.'],
               ['/ai-agent-cost-control', 'AI agent cost control', 'Stop agent overspend before upstream requests execute.'],
+              ['/economic-firewall-readiness-grader', 'Economic firewall readiness', 'Score whether robot-customer payment controls are enforceable before access.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">
                 <h3 className="font-bold text-white mb-2">{title}</h3>
@@ -357,6 +375,9 @@ export default function RobotCustomerPaymentsPage() {
             </Link>
             <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               Learn the economic firewall
+            </Link>
+            <Link href="/l402-api-pricing-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
+              Price L402 access
             </Link>
           </div>
         </div>

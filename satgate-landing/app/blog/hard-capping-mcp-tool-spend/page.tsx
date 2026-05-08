@@ -21,6 +21,13 @@ export const metadata = {
   alternates: { canonical: 'https://satgate.io/blog/hard-capping-mcp-tool-spend' },
 };
 
+const mcpHardCapFlow = [
+  ['Price every MCP tool', 'Assign a cost to search, database, browser, code execution, and paid API tools before agents can call them.'],
+  ['Mint a scoped budget', 'Give Claude Code, Cursor, or Claude Desktop a token with tool, route, spend, expiry, and delegation caveats.'],
+  ['Check before forwarding', 'SatGate verifies the remaining budget before each tools/call request reaches the upstream MCP server.'],
+  ['Return 402 on exhaustion', 'When the cap is exhausted, the proxy returns a clean budget-exceeded error instead of letting the loop keep spending.'],
+];
+
 export default function HardCappingMcpToolSpendPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
@@ -30,7 +37,7 @@ export default function HardCappingMcpToolSpendPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-02-14',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-06',
     mainEntityOfPage: 'https://satgate.io/blog/hard-capping-mcp-tool-spend',
     about: [
       { '@type': 'Thing', name: 'hard-capping MCP tool spend' },
@@ -39,6 +46,19 @@ export default function HardCappingMcpToolSpendPage() {
       { '@type': 'Thing', name: 'request-path MCP proxy enforcement' },
       { '@type': 'Thing', name: 'L402 and macaroons for MCP tools' },
     ],
+  };
+
+  const mcpHardCapFlowJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP tool spend hard-cap flow',
+    description: 'How SatGate hard-caps MCP tool spend for Claude Code, Cursor, Claude Desktop, and other agent clients.',
+    itemListElement: mcpHardCapFlow.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
@@ -83,6 +103,7 @@ export default function HardCappingMcpToolSpendPage() {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(mcpHardCapFlowJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -250,6 +271,28 @@ export default function HardCappingMcpToolSpendPage() {
             That&apos;s it. Your agent now has a hard cap of 500 sats per hour on search calls. No code changes. No agent modifications.
           </p>
 
+          <section className="not-prose my-10 rounded-2xl border border-purple-900/40 bg-purple-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Hard-cap flow</p>
+            <h3 className="mb-6 text-2xl font-bold text-white">From MCP access to enforceable spend control</h3>
+            <div className="grid gap-4 md:grid-cols-2">
+              {mcpHardCapFlow.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-purple-300">0{index + 1}</p>
+                  <h4 className="mb-2 font-bold text-white">{title}</h4>
+                  <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:border-purple-500 hover:text-white">
+                MCP budget enforcement
+              </Link>
+              <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:border-cyan-500 hover:text-white">
+                Generate tool cost policy
+              </Link>
+            </div>
+          </section>
+
           <h3 className="text-xl font-bold text-white mt-8 mb-3">What Happens on Each Tool Call</h3>
           <ol className="text-gray-300 space-y-2">
             <li><strong className="text-white">Intercept</strong> — Proxy receives the <code className="text-purple-300">tools/call</code> JSON-RPC request</li>
@@ -383,11 +426,14 @@ satgate token attenuate <root-token> \\
 
         {/* CTA */}
         <div className="mt-12 flex flex-wrap gap-4">
-          <Link href="/pricing" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
-            View Pricing
+          <Link href="/llm-cost-dashboard" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
+            See Cost Telemetry
           </Link>
           <Link href="/roi-calculator" className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-6 py-3 rounded-lg font-bold hover:border-purple-600/50 transition">
             Calculate Your ROI
+          </Link>
+          <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-6 py-3 rounded-lg font-bold hover:border-cyan-600/50 transition">
+            Grade Readiness
           </Link>
         </div>
       </div>

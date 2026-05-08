@@ -1,6 +1,14 @@
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock, Shield, DollarSign, ArrowRight, AlertTriangle, Eye, Lock, Zap } from 'lucide-react';
 
+const economicFirewallControlLoop = [
+  ['Identify the agent', 'Bind each request to agent, tenant, task, workflow, credential, and delegation chain before policy evaluation.'],
+  ['Price the action', 'Resolve cost for API route, model call, MCP tool, token volume, paid data source, or L402-protected resource.'],
+  ['Check authority and budget', 'Verify scope, expiry, revocation, per-tool limits, remaining spend, and parent budget before forwarding.'],
+  ['Decide in the request path', 'Allow, block, downgrade, route, require payment, or return HTTP 402 before upstream cost or access risk occurs.'],
+  ['Emit audit and feedback', 'Record policy decision, spend, avoided cost, remaining budget, and payment state for dashboards and governance review.'],
+];
+
 export const metadata = {
   title: 'What Is an Economic Firewall? | SatGate',
   description: 'An economic firewall enforces AI agent budget limits in real time. Learn why rate limits fail and how SatGate governs autonomous API spend.',
@@ -28,7 +36,7 @@ export default function WhatIsEconomicFirewallPage() {
     description: 'An economic firewall enforces AI agent budget limits in real time before autonomous API, model, or MCP tool calls execute.',
     url: 'https://satgate.io/blog/what-is-an-economic-firewall',
     datePublished: '2026-03-18',
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -37,6 +45,19 @@ export default function WhatIsEconomicFirewallPage() {
       { '@type': 'Thing', name: 'request-path cost enforcement' },
       { '@type': 'Thing', name: 'MCP cost control' },
     ],
+  };
+
+  const controlLoopSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Economic firewall request-path control loop',
+    description: 'How an economic firewall governs AI agent API, model, MCP tool, and L402 payment requests before upstream access.',
+    itemListElement: economicFirewallControlLoop.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqSchema = {
@@ -75,6 +96,10 @@ export default function WhatIsEconomicFirewallPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(controlLoopSchema) }}
       />
       <script
         type="application/ld+json"
@@ -182,6 +207,25 @@ export default function WhatIsEconomicFirewallPage() {
           <p className="text-gray-300 leading-relaxed">
             The key shift: the credential itself carries economic constraints. Not just &ldquo;you have access&rdquo; but &ldquo;you have $200 of access, and you&rsquo;ve used $147.30 so far.&rdquo; The enforcement happens at the gateway, in real time, before the request ever reaches your backend.
           </p>
+
+          <div className="not-prose my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Request-path control loop</p>
+            <h2 className="text-2xl font-bold text-white mt-0 mb-5">What an economic firewall decides before upstream access</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {economicFirewallControlLoop.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-cyan-300">0{index + 1}</p>
+                  <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                  <p className="mb-0 text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-cyan-500 hover:text-white">See cost telemetry</Link>
+              <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-purple-500 hover:text-white">Design capabilities</Link>
+              <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-green-500 hover:text-white">Grade readiness</Link>
+            </div>
+          </div>
 
           {/* --- Hard Caps --- */}
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">Hard Caps, Not Soft Alerts</h2>
@@ -329,11 +373,11 @@ const agentBToken = attenuate(agentAToken, {
             <h3 className="text-xl font-bold text-white mb-3">SatGate is an open-source economic firewall</h3>
             <p className="text-gray-400 mb-6">Per-agent budgets, per-tool cost attribution, macaroon delegation. Deploy in minutes.</p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-6 py-3 rounded-lg font-bold hover:opacity-90 transition flex items-center gap-2">
-                GitHub <ArrowRight size={16} />
-              </a>
-              <Link href="/sandbox" className="border border-purple-700/50 bg-purple-900/20 px-6 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition text-purple-300">
-                Try the Sandbox
+              <Link href="/economic-firewall" className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-6 py-3 rounded-lg font-bold hover:opacity-90 transition flex items-center gap-2">
+                Economic Firewall Hub <ArrowRight size={16} />
+              </Link>
+              <Link href="/ai-agent-cost-control" className="border border-purple-700/50 bg-purple-900/20 px-6 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition text-purple-300">
+                AI Agent Cost Control
               </Link>
             </div>
           </div>

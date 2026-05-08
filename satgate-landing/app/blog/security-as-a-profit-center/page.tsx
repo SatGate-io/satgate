@@ -21,6 +21,13 @@ export const metadata = {
   alternates: { canonical: 'https://satgate.io/blog/security-as-a-profit-center' },
 };
 
+const roiLevers = [
+  ['Avoided loop spend', 'Hard caps stop hallucination loops, runaway retries, and zombie agents before they turn into invoices.'],
+  ['Operational time reclaimed', 'Engineering and FinOps teams stop manually reconciling agent bills, tool usage, and chargeback disputes.'],
+  ['Better routing decisions', 'Per-tool and per-model attribution shows where cheaper models, cached tools, or stricter policies save money.'],
+  ['Robot-customer revenue', 'Governed L402 and HTTP 402 access lets external agents pay for APIs, data, and tools per request.'],
+];
+
 export default function SecurityAsAProfitCenterPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
@@ -29,7 +36,7 @@ export default function SecurityAsAProfitCenterPage() {
     description: 'SatGate shows how many dollars security saved, not just attacks blocked. Learn why economic governance can become a profit center.',
     url: 'https://satgate.io/blog/security-as-a-profit-center',
     datePublished: '2026-02-14',
-    dateModified: '2026-05-02',
+    dateModified: '2026-05-06',
     author: { '@type': 'Person', name: 'Matt Dean' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -38,6 +45,19 @@ export default function SecurityAsAProfitCenterPage() {
       { '@type': 'Thing', name: 'AI agent governance savings' },
       { '@type': 'Thing', name: 'security as a profit center' },
     ],
+  };
+
+  const roiLeversJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Economic firewall ROI levers',
+    description: 'Ways economic governance turns AI agent security from a cost center into measurable savings and revenue enablement.',
+    itemListElement: roiLevers.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
@@ -74,6 +94,7 @@ export default function SecurityAsAProfitCenterPage() {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(roiLeversJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -207,6 +228,28 @@ export default function SecurityAsAProfitCenterPage() {
             <li><strong className="text-white">Trust-as-a-Service</strong> — Enterprise buyers won&apos;t deploy third-party agents without governance guarantees. Governed agents — with provable budget constraints and audit trails — close deals that ungoverned agents can&apos;t.</li>
             <li><strong className="text-white">Faster deployment velocity</strong> — Lower blast radius means lower risk. Lower risk means faster approval. Faster approval means faster time-to-revenue. The governance layer becomes an accelerator, not a gate.</li>
           </ul>
+
+          <section className="not-prose mt-12 rounded-2xl border border-green-900/40 bg-green-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-green-300">ROI levers</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">Where economic governance shows up on the P&amp;L</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {roiLevers.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-green-300">0{index + 1}</p>
+                  <h3 className="mb-2 font-bold text-white">{title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:border-cyan-500 hover:text-white">
+                See cost telemetry
+              </Link>
+              <Link href="/l402-api-pricing-calculator" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:border-green-500 hover:text-white">
+                Price robot-customer access
+              </Link>
+            </div>
+          </section>
 
           {/* The CFO Math */}
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The CFO Math</h2>
@@ -346,14 +389,14 @@ Example:
 
         {/* CTA */}
         <div className="mt-12 flex flex-wrap gap-4">
-          <Link href="/design-partners" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
-            Become a Design Partner
-          </Link>
-          <Link href="/roi-calculator" className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-6 py-3 rounded-lg font-bold hover:border-purple-600/50 transition">
+          <Link href="/roi-calculator" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
             Calculate Your ROI
           </Link>
-          <Link href="/pricing" className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-6 py-3 rounded-lg font-bold hover:border-purple-600/50 transition">
-            View Pricing
+          <Link href="/llm-cost-dashboard" className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-6 py-3 rounded-lg font-bold hover:border-cyan-600/50 transition">
+            LLM Cost Dashboard
+          </Link>
+          <Link href="/robot-customer-payments" className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-6 py-3 rounded-lg font-bold hover:border-green-600/50 transition">
+            Robot Customer Revenue
           </Link>
         </div>
       </div>

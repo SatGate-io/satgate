@@ -71,7 +71,7 @@ export default function McpGovernancePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     mainEntityOfPage: 'https://satgate.io/mcp-governance',
     about: [
       { '@type': 'Thing', name: 'MCP governance' },
@@ -137,6 +137,19 @@ export default function McpGovernancePage() {
     ],
   };
 
+  const controlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP governance controls',
+    description: 'The request-path MCP governance controls SatGate adds around AI agent tool calls: proxying, budgets, scoped capabilities, revocation, audit, and server compatibility.',
+    itemListElement: controls.map(({ title, body }, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: title,
+      description: body,
+    })),
+  };
+
   const howToJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
@@ -165,6 +178,7 @@ export default function McpGovernancePage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(controlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
@@ -368,6 +382,7 @@ audit:
               ['/mcp-tool-cost-policy-generator', 'MCP tool cost policy generator', 'Generate practical policy for Cursor, Claude Desktop, Claude Code, OpenClaw, and custom clients.'],
               ['/mcp-proxy-config-generator', 'MCP proxy config generator', 'Generate proxy config for Cursor, Claude Desktop, Claude Code, OpenClaw, and custom clients.'],
               ['/agent-capability-tokens', 'Agent capability tokens', 'Constrain MCP authority with scope, budget, expiry, delegation, and revocation.'],
+              ['/economic-firewall-readiness-grader', 'Economic firewall readiness', 'Score MCP, budget, revocation, audit, routing, and Charge readiness.'],
               ['/satgate-for-cursor', 'SatGate for Cursor', 'Govern Cursor MCP/tool workflows with budgets and audit.'],
               ['/satgate-for-openclaw', 'SatGate for OpenClaw', 'Apply economic policy to proactive agents, sub-agents, and tools.'],
             ].map(([href, title, body]) => (

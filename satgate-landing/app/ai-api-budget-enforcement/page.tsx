@@ -46,7 +46,7 @@ export default function Page() {
     url: 'https://satgate.io/ai-api-budget-enforcement',
     description: metadata.description,
     datePublished: '2026-05-01',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI API budget enforcement' },
@@ -66,7 +66,7 @@ export default function Page() {
     description: metadata.description,
     url: 'https://satgate.io/ai-api-budget-enforcement',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     featureList: ['Request-path budget enforcement', 'AI agent spend caps', 'MCP tool cost control', 'Revocable credentials', 'Audit trails'],
     audience: { '@type': 'Audience', audienceType: 'AI platform, API, finance, and security teams' },
   };
@@ -81,6 +81,19 @@ export default function Page() {
       { '@type': 'Question', name: 'How is AI API budget enforcement different from provider spend alerts?', acceptedAnswer: { '@type': 'Answer', text: 'Provider spend alerts notify teams after usage crosses a threshold. AI API budget enforcement checks request cost, remaining budget, identity, route, and policy before the API call executes.' } },
       { '@type': 'Question', name: 'What should happen when an AI agent exceeds its API budget?', acceptedAnswer: { '@type': 'Answer', text: 'The request should be blocked, downgraded, routed to a cheaper provider, sent for approval, or challenged for payment depending on policy, with an audit record explaining the decision.' } },
     ],
+  };
+
+  const controlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI API budget enforcement controls',
+    description: 'Request-path controls for enforcing AI API budgets before autonomous agents call models, paid APIs, MCP tools, or internal services.',
+    itemListElement: controls.map(({ title, body }, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: title,
+      description: body,
+    })),
   };
 
   const breadcrumbJsonLd = {
@@ -98,6 +111,7 @@ export default function Page() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(controlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -109,6 +123,7 @@ export default function Page() {
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">AI agent cost control <ArrowRight size={18} /></Link>
             <Link href="/openai-budget-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Generate OpenAI policy</Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Grade readiness</Link>
           </div>
         </div>
       </section>
@@ -195,6 +210,7 @@ export default function Page() {
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/tools" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Open free tools <ArrowRight size={18} /></Link>
             <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Economic firewall</Link>
+            <Link href="/agent-spend-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Policy template</Link>
           </div>
         </div>
       </section>

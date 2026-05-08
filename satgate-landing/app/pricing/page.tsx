@@ -5,6 +5,12 @@ import { Check, Zap, ArrowRight, ChevronDown, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
+const planPaths = [
+  ['Observe', 'Start free when teams need visibility: attribute agent, route, model, MCP tool, and tenant cost before enforcing policy.'],
+  ['Control', 'Upgrade when budgets must stop requests before execution: enforce per-agent caps, alerts, revocation, and audit evidence in the request path.'],
+  ['Charge', 'Use Enterprise when external agents become robot customers: combine governance with L402 Lightning API monetization and hybrid deployment controls.'],
+];
+
 const faqs = [
   {
     q: 'What counts as a request?',
@@ -47,7 +53,7 @@ const PricingPage = () => {
     url: 'https://satgate.io/pricing',
     description: 'Pricing for SatGate Observe, Control, and Charge modes for AI agent economic governance.',
     datePublished: '2026-04-27',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'economic control plane for AI agents' },
@@ -56,6 +62,19 @@ const PricingPage = () => {
       { '@type': 'Thing', name: 'request-path spend governance' },
       { '@type': 'Thing', name: 'L402 API monetization' },
     ],
+  };
+
+  const planPathsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'SatGate pricing plan path',
+    description: 'How teams choose between SatGate Observe, Control, and Charge based on AI agent economic governance maturity.',
+    itemListElement: planPaths.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const breadcrumbJsonLd = {
@@ -83,7 +102,7 @@ const PricingPage = () => {
     name: 'SatGate Pricing',
     url: 'https://satgate.io/pricing',
     description: 'Pricing for SatGate Observe, Control, and Charge modes for AI agent economic governance.',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-06',
     itemListElement: [
       {
         '@type': 'Offer',
@@ -117,6 +136,7 @@ const PricingPage = () => {
     <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-purple-500 selection:text-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(offerCatalogJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(planPathsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {/* Navigation */}
@@ -204,6 +224,28 @@ const PricingPage = () => {
               <span className="text-yellow-400 font-bold text-sm">⚡ Charge</span>
               <span className="text-gray-500 text-xs">Monetize your APIs</span>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="pb-12 px-6">
+        <div className="max-w-5xl mx-auto rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6 md:p-8">
+          <h2 className="text-2xl font-bold text-white mb-4">Choose pricing by control maturity</h2>
+          <div className="grid gap-4 md:grid-cols-3">
+            {planPaths.map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-5">
+                <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Link href="/roi-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-black transition hover:bg-gray-200">
+              Calculate ROI <ArrowRight size={18} />
+            </Link>
+            <Link href="/l402-api-pricing-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 font-bold text-white transition hover:border-yellow-500">
+              Model L402 pricing
+            </Link>
           </div>
         </div>
       </section>

@@ -44,7 +44,7 @@ export default function Http402ForAiAgentsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-05-01',
-    dateModified: '2026-05-02',
+    dateModified: '2026-05-05',
     mainEntityOfPage: 'https://satgate.io/http-402-for-ai-agents',
     about: [
       { '@type': 'Thing', name: 'HTTP 402 for AI agents' },
@@ -65,6 +65,19 @@ export default function Http402ForAiAgentsPage() {
     ],
   };
 
+  const flowsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'HTTP 402 flow types for AI agents',
+    description: 'Payment challenge patterns AI agents may encounter and the SatGate governance implication for each rail.',
+    itemListElement: flows.map(([flow, how, implication], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: flow,
+      description: `${how} ${implication}`,
+    })),
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -78,6 +91,7 @@ export default function Http402ForAiAgentsPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(flowsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -98,6 +112,9 @@ export default function Http402ForAiAgentsPage() {
             </Link>
             <Link href="/agent-payment-controls" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
               Agent payment controls
+            </Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
+              Grade readiness
             </Link>
           </div>
         </div>
@@ -220,6 +237,7 @@ export default function Http402ForAiAgentsPage() {
             ['/robot-customer-payments', 'Robot customer payments', 'Turn autonomous agents into paying API customers.'],
             ['/economic-firewall', 'Economic firewall', 'Control agent access and spend before upstream API calls execute.'],
             ['/l402-api-pricing-calculator', 'L402 API pricing calculator', 'Estimate request-native pricing for agent/API monetization.'],
+            ['/economic-firewall-readiness-grader', 'Economic firewall readiness', 'Score whether 402, budget, revocation, audit, and Charge controls are enforceable.'],
           ].map(([href, title, body]) => (
             <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">
               <h3 className="font-bold text-white mb-2">{title}</h3>

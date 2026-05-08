@@ -21,6 +21,14 @@ export const metadata = {
   },
 };
 
+const automatableControls = [
+  ['Model routing', 'Route low-risk tasks to cheaper models and reserve expensive models for high-value reasoning.'],
+  ['Pre-execution budget checks', 'Deny requests before upstream APIs or MCP tools execute when the workflow budget is exhausted.'],
+  ['Per-tool attribution', 'Attribute spend to agent, workflow, tool, team, tenant, and route in real time.'],
+  ['Reusable policy templates', 'Turn cost-effective workflows into reusable, versioned policies instead of tribal knowledge.'],
+  ['Credential caveats', 'Encode spend, route, expiry, call-count, and delegation limits into the agent credential itself.'],
+];
+
 export default function WhyProcessWontScaleBlogPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
@@ -29,7 +37,7 @@ export default function WhyProcessWontScaleBlogPage() {
     description: "InformationWeek's AI agent cost-control advice is useful, but process won't scale. See which controls an economic firewall can automate.",
     url: 'https://satgate.io/blog/why-process-wont-scale-for-ai-agent-costs',
     datePublished: '2026-03-28',
-    dateModified: '2026-05-02',
+    dateModified: '2026-05-06',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -38,6 +46,19 @@ export default function WhyProcessWontScaleBlogPage() {
       { '@type': 'Thing', name: 'agent budget enforcement' },
       { '@type': 'Thing', name: 'AI cost management automation' },
     ],
+  };
+
+  const automatableControlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Automatable AI agent cost controls',
+    description: 'AI agent cost-control practices that should move from manual process into request-path infrastructure.',
+    itemListElement: automatableControls.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
@@ -74,6 +95,7 @@ export default function WhyProcessWontScaleBlogPage() {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(automatableControlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -211,6 +233,27 @@ export default function WhyProcessWontScaleBlogPage() {
             Like #1, this is sound architectural hygiene — a <strong>one-time decision</strong> about what to deploy and when. It&apos;s not an ongoing control that needs real-time enforcement. Good governance, not automation.
           </p>
 
+          <section className="not-prose mt-12 rounded-2xl border border-cyan-900/40 bg-cyan-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Infrastructure controls</p>
+            <h2 className="mb-6 text-2xl font-bold text-white">What should leave manual process first</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {automatableControls.map(([title, body]) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <h3 className="mb-2 font-bold text-white">{title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:border-cyan-500 hover:text-white">
+                See the LLM cost dashboard
+              </Link>
+              <Link href="/openai-budget-policy-generator" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:border-purple-500 hover:text-white">
+                Generate a budget policy
+              </Link>
+            </div>
+          </section>
+
           {/* Scorecard */}
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Scorecard</h2>
           <p className="text-gray-300 leading-relaxed">
@@ -295,11 +338,11 @@ export default function WhyProcessWontScaleBlogPage() {
               No code changes. No agent modifications. Just deploy the gateway and watch.
             </p>
             <p className="text-gray-400 text-sm mt-4">
-              <a href="https://satgate.io" className="text-cyan-400 hover:text-cyan-300">satgate.io →</a>
+              <Link href="/ai-agent-cost-control" className="text-cyan-400 hover:text-cyan-300">AI agent cost control →</Link>
               {' · '}
-              <a href="https://satgate.io/pricing" className="text-cyan-400 hover:text-cyan-300">Pricing →</a>
+              <Link href="/roi-calculator" className="text-cyan-400 hover:text-cyan-300">ROI Calculator →</Link>
               {' · '}
-              <a href="https://github.com/nicewook/satgate" className="text-cyan-400 hover:text-cyan-300">GitHub →</a>
+              <Link href="/economic-firewall-readiness-grader" className="text-cyan-400 hover:text-cyan-300">Readiness grader →</Link>
             </p>
           </div>
 

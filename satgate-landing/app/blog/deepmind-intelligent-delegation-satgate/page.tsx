@@ -1,6 +1,14 @@
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock, Shield, Lock, DollarSign, ArrowRight, CheckCircle, Zap, GitBranch, Eye, Activity, BookOpen } from 'lucide-react';
 
+const delegationControlRequirements = [
+  ['Constrain authority transfer', 'Delegated agents should receive explicit caveats for routes, MCP tools, time windows, budget, and purpose.'],
+  ['Preserve attenuation', 'Every child token can narrow authority but cannot widen parent scope, spend, duration, or delegation rights.'],
+  ['Bind spend to lineage', 'Budgets should follow the delegation tree so sub-agent spend remains attributable to the parent workflow.'],
+  ['Revoke cascades quickly', 'Revoking a parent token should invalidate every child and grandchild before the next upstream call executes.'],
+  ['Enforce in the request path', 'Capability checks, budget checks, and revocation checks must happen before API, model, MCP, or payment access.'],
+];
+
 export const metadata = {
   title: 'Intelligent AI Delegation: Macaroons, Capability Tokens, and SatGate',
   description: 'DeepMind\'s Intelligent AI Delegation points to macaroon capability tokens for safe AI agent delegation. SatGate implements request-path delegation controls.',
@@ -29,7 +37,7 @@ export default function DeepMindDelegationPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-11',
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     mainEntityOfPage: 'https://satgate.io/blog/deepmind-intelligent-delegation-satgate',
     about: [
       { '@type': 'Thing', name: 'intelligent AI delegation' },
@@ -38,6 +46,19 @@ export default function DeepMindDelegationPage() {
       { '@type': 'Thing', name: 'privilege attenuation for agent chains' },
       { '@type': 'Thing', name: 'request-path delegation controls' },
     ],
+  };
+
+  const delegationControlRequirementsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent delegation control requirements',
+    description: 'The request-path controls intelligent AI delegation needs beyond task routing.',
+    itemListElement: delegationControlRequirements.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
@@ -82,6 +103,7 @@ export default function DeepMindDelegationPage() {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(delegationControlRequirementsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -157,6 +179,25 @@ export default function DeepMindDelegationPage() {
             If you&apos;ve used SatGate, this should sound familiar. That&apos;s a macaroon with two 
             first-party caveats — exactly what SatGate tokens are.
           </p>
+
+          <div className="not-prose my-10 rounded-2xl border border-blue-900/50 bg-blue-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-blue-300">Delegation control requirements</p>
+            <h2 className="text-2xl font-bold text-white mt-0 mb-5">What intelligent delegation needs before agents act</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {delegationControlRequirements.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-blue-300">0{index + 1}</p>
+                  <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                  <p className="mb-0 text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-blue-500 hover:text-white">Capability tokens</Link>
+              <Link href="/revocable-agent-credentials" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-purple-500 hover:text-white">Revocable credentials</Link>
+              <Link href="/agent-spend-policy-template" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-green-500 hover:text-white">Spend policy template</Link>
+            </div>
+          </div>
 
           {/* The Mapping */}
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">Framework ↔ Implementation</h2>
@@ -470,11 +511,11 @@ export default function DeepMindDelegationPage() {
           </p>
 
           <div className="flex flex-wrap gap-3 mt-6 mb-8">
-            <Link href="https://github.com/SatGate-io/satgate" target="_blank" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black font-semibold text-sm hover:bg-gray-200 transition no-underline">
-              View on GitHub <ArrowRight size={16} />
+            <Link href="/agent-capability-tokens" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black font-semibold text-sm hover:bg-gray-200 transition no-underline">
+              Design Capability Tokens <ArrowRight size={16} />
             </Link>
-            <Link href="https://cloud.satgate.io/cloud/signup" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 text-white font-semibold text-sm hover:bg-purple-500 transition no-underline">
-              Start Free on Cloud <ArrowRight size={16} />
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 text-white font-semibold text-sm hover:bg-purple-500 transition no-underline">
+              Grade Delegation Readiness <ArrowRight size={16} />
             </Link>
           </div>
 

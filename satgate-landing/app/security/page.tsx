@@ -28,6 +28,13 @@ export const metadata = {
   },
 };
 
+const securityControls = [
+  ['Workload identity exchange', 'Agents use existing OIDC, Kubernetes, AWS, or workload identity; SatGate Mint exchanges identity for scoped capability tokens.'],
+  ['Capability caveats', 'Macaroons carry route, method, budget, expiry, delegation, tenant, and revocation constraints that can only become narrower.'],
+  ['Request-path enforcement', 'SatGate verifies tokens, budgets, scope, and policy before upstream APIs, models, or MCP tools execute.'],
+  ['Revocation and audit', 'Revocation status and audit evidence are checked on every request so compromised authority stops before the next call.'],
+];
+
 export default function SecurityPage() {
   const webPageJsonLd = {
     '@context': 'https://schema.org',
@@ -36,7 +43,7 @@ export default function SecurityPage() {
     url: 'https://satgate.io/security',
     description: metadata.description,
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent security' },
@@ -45,6 +52,19 @@ export default function SecurityPage() {
       { '@type': 'Thing', name: 'revocable agent credentials' },
       { '@type': 'Thing', name: 'request-path policy enforcement' },
     ],
+  };
+
+  const securityControlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'SatGate AI agent security controls',
+    description: 'Core security controls for AI agent API governance: workload identity exchange, capability caveats, request-path enforcement, revocation, and audit.',
+    itemListElement: securityControls.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const breadcrumbJsonLd = {
@@ -81,6 +101,7 @@ export default function SecurityPage() {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(securityControlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
@@ -109,6 +130,26 @@ export default function SecurityPage() {
               The gateway operates as a <strong className="text-white">Policy Enforcement Point (PEP)</strong>. 
               No request reaches your upstream without passing cryptographic verification.
             </p>
+          </section>
+
+          <section className="bg-blue-950/10 border border-blue-900/40 rounded-xl p-6">
+            <h2 className="text-xl font-bold text-white mb-4">AI agent security control path</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+              {securityControls.map(([title, body]) => (
+                <div key={title} className="bg-black/40 border border-gray-800 rounded-lg p-4">
+                  <h3 className="text-white text-sm font-bold mb-2">{title}</h3>
+                  <p className="text-gray-500 text-xs mb-0 leading-relaxed">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link href="/agent-api-key-risk-assessment" className="inline-flex items-center justify-center px-5 py-3 bg-white text-black rounded-lg text-sm font-bold transition hover:bg-gray-200">
+                Assess API key risk
+              </Link>
+              <Link href="/revocable-agent-credentials" className="inline-flex items-center justify-center px-5 py-3 border border-gray-700 text-white rounded-lg text-sm font-bold transition hover:border-blue-500">
+                See revocable credentials
+              </Link>
+            </div>
           </section>
 
           {/* Mint — Identity Exchange */}

@@ -306,6 +306,13 @@ export default function SandboxPage() {
     );
   };
 
+  const enforcementFlow = [
+    ['Workload identity', 'An AI agent presents a workload identity before it can receive spend authority.'],
+    ['Scoped credential minting', 'SatGate exchanges identity for a macaroon with budget, tool, and revocation caveats.'],
+    ['Request-path decision', 'Every API or MCP call is checked against budget, policy, capability scope, and revocation state before forwarding.'],
+    ['Instant block', 'Revoked or over-budget requests stop at SatGate with 401 or 402 before upstream cost is incurred.'],
+  ];
+
   const webPageJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
@@ -313,7 +320,7 @@ export default function SandboxPage() {
     url: 'https://satgate.io/sandbox',
     description: 'Interactive sandbox for SatGate request-path enforcement: AI agent spend controls, scoped macaroons, kill switches, budgets, and API policy.',
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent spend control sandbox' },
@@ -333,7 +340,7 @@ export default function SandboxPage() {
     url: 'https://satgate.io/sandbox',
     description: 'Interactive sandbox for SatGate request-path enforcement: AI agent spend controls, scoped macaroons, kill switches, budgets, and API policy.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-06',
     featureList: [
       'AI agent budget enforcement demo',
       'Request-path economic policy decisions',
@@ -341,6 +348,19 @@ export default function SandboxPage() {
       'Agent kill-switch revocation',
       'Runaway spend blocking simulation',
     ],
+  };
+
+  const enforcementFlowJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'SatGate sandbox request-path enforcement flow',
+    description: 'How the SatGate sandbox demonstrates workload identity, scoped credential minting, request-path policy, and instant spend blocking.',
+    itemListElement: enforcementFlow.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const breadcrumbJsonLd = {
@@ -379,6 +399,7 @@ export default function SandboxPage() {
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(enforcementFlowJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {/* Header */}
@@ -553,6 +574,28 @@ export default function SandboxPage() {
         </div>
 
         <section className="mt-12 border-t border-gray-800 pt-10">
+          <p className="mb-2 text-center text-xs font-mono uppercase tracking-wide text-purple-300">Request path</p>
+          <h2 className="mb-8 text-center text-2xl font-bold text-white">What the sandbox proves</h2>
+          <div className="grid gap-4 md:grid-cols-4">
+            {enforcementFlow.map(([title, body], index) => (
+              <div key={title} className="rounded-xl border border-purple-900/40 bg-purple-950/10 p-5">
+                <p className="mb-3 text-xs font-mono text-purple-300">0{index + 1}</p>
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link href="/llm-cost-dashboard" className="inline-flex items-center gap-2 rounded-lg border border-gray-700 px-5 py-2.5 text-sm font-semibold text-gray-300 hover:border-cyan-500 hover:text-white transition">
+              See cost telemetry
+            </Link>
+            <Link href="/agent-capability-tokens" className="inline-flex items-center gap-2 rounded-lg border border-gray-700 px-5 py-2.5 text-sm font-semibold text-gray-300 hover:border-purple-500 hover:text-white transition">
+              Learn capability tokens
+            </Link>
+          </div>
+        </section>
+
+        <section className="mt-12 border-t border-gray-800 pt-10">
           <p className="mb-2 text-center text-xs font-mono uppercase tracking-wide text-purple-300">FAQ</p>
           <h2 className="mb-8 text-center text-2xl font-bold text-white">SatGate sandbox questions</h2>
           <div className="grid gap-4 md:grid-cols-3">
@@ -582,10 +625,10 @@ export default function SandboxPage() {
               Start Free — No Credit Card <ArrowRight size={16} />
             </Link>
             <Link
-              href="https://github.com/SatGate-io/satgate"
+              href="/economic-firewall-readiness-grader"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-sm font-medium text-gray-300 transition"
             >
-              View on GitHub
+              Grade Your Controls
             </Link>
           </div>
         </div>

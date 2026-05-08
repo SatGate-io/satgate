@@ -2,6 +2,14 @@ import Link from 'next/link';
 import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
+const dashboardDecisionLoop = [
+  ['Measure each request', 'Capture token cost, latency, model route, trace ID, customer account, agent, tool, workflow, and tenant on every call.'],
+  ['Explain the variance', 'Separate normal usage growth from retry loops, premium-model drift, MCP tool storms, and delegated sub-agent fanout.'],
+  ['Set policy from telemetry', 'Turn high-cost traces into per-agent budgets, per-tool prices, model downgrade rules, and workflow-level spend ceilings.'],
+  ['Enforce before spend', 'Allow, block, downgrade, route, revoke, or charge the next request before OpenAI, Anthropic, MCP, or paid APIs execute.'],
+  ['Report avoided cost', 'Show finance the controlled-vs-uncontrolled delta so the dashboard proves prevention, not just post-mortem visibility.'],
+];
+
 export const metadata = {
   title: "LLM Cost Dashboard: Monitor Cost, Latency & Budgets per Request",
   description: "Design an LLM cost dashboard for token cost, latency, traces, and customer accounts — then enforce budgets before agents spend.",
@@ -30,7 +38,7 @@ export default function LlmCostManagementBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-17',
-    dateModified: '2026-05-05',
+    dateModified: '2026-05-06',
     mainEntityOfPage: 'https://satgate.io/blog/llm-cost-management',
     about: [
       { '@type': 'Thing', name: 'LLM cost management' },
@@ -41,6 +49,19 @@ export default function LlmCostManagementBlogPage() {
       { '@type': 'Thing', name: 'request-path budget enforcement' },
       { '@type': 'Thing', name: 'runaway token and tool spend control' },
     ],
+  };
+
+  const dashboardDecisionLoopSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'LLM cost dashboard decision loop',
+    description: 'How teams should connect LLM cost dashboards to request-path budget enforcement for AI agents.',
+    itemListElement: dashboardDecisionLoop.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqSchema = {
@@ -87,6 +108,10 @@ export default function LlmCostManagementBlogPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(dashboardDecisionLoopSchema) }}
       />
       <script
         type="application/ld+json"
@@ -164,6 +189,25 @@ export default function LlmCostManagementBlogPage() {
           <p className="text-gray-300 leading-relaxed">
             The dashboard is the visibility layer. The control layer is the gateway that makes the budget decision before the call reaches OpenAI, Anthropic, an MCP server, or any paid API. Without that decision point, the dashboard is just a nicer post-mortem.
           </p>
+
+          <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Dashboard → policy loop</p>
+            <h2 className="text-2xl font-bold text-white mt-0 mb-5">What the LLM cost dashboard should drive next</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {dashboardDecisionLoop.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-cyan-300">0{index + 1}</p>
+                  <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                  <p className="mb-0 text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-cyan-500 hover:text-white">Use the dashboard checklist</Link>
+              <Link href="/ai-agent-runaway-spend-index" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-orange-500 hover:text-white">Benchmark runaway spend</Link>
+              <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-green-500 hover:text-white">Grade readiness</Link>
+            </div>
+          </div>
 
           <div className="my-8 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-6">
             <h2 className="text-2xl font-bold text-white mb-4">If You Need an LLM Cost Dashboard for Finance</h2>

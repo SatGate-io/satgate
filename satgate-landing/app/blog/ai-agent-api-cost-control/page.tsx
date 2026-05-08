@@ -2,6 +2,14 @@ import Link from 'next/link';
 import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
+const costControlChecklist = [
+  ['Attribute the caller', 'Bind every call to an agent, task, tenant, workflow, parent delegation, and credential before pricing the request.'],
+  ['Price the action', 'Assign cost to model routes, MCP tools, paid APIs, retries, token volume, and fanout rather than counting requests alone.'],
+  ['Check spend authority', 'Compare estimated cost against per-agent, per-session, per-tool, per-day, and delegated parent budgets before execution.'],
+  ['Enforce the decision', 'Allow, block, downgrade, route, revoke, or return HTTP 402 in the request path before upstream spend happens.'],
+  ['Record avoided cost', 'Log policy decisions, denied requests, remaining budget, and controlled-vs-uncontrolled spend for finance and security review.'],
+];
+
 export const metadata = {
   title: 'AI Agent API Cost Control: Stop Runaway Spend Before API Calls Execute',
   description: 'Control AI agent API costs with request-path budget checks, tool pricing, delegated spend limits, revocation, and economic firewalls before calls execute.',
@@ -36,7 +44,7 @@ export default function AiAgentApiCostControlPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-05',
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     mainEntityOfPage: 'https://satgate.io/blog/ai-agent-api-cost-control',
     about: [
       { '@type': 'Thing', name: 'AI agent API cost control' },
@@ -45,6 +53,19 @@ export default function AiAgentApiCostControlPage() {
       { '@type': 'Thing', name: 'delegated agent spend limits' },
       { '@type': 'Thing', name: 'economic firewalls for API calls' },
     ],
+  };
+
+  const checklistSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent API cost control checklist',
+    description: 'Request-path controls for stopping runaway AI agent API spend before upstream calls execute.',
+    itemListElement: costControlChecklist.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqSchema = {
@@ -89,6 +110,7 @@ export default function AiAgentApiCostControlPage() {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(checklistSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       <div className="max-w-3xl mx-auto px-6 py-16">
@@ -209,6 +231,25 @@ audit:
             The exact syntax can vary. The important part is the enforcement point. If the policy is only in a spreadsheet, dashboard, or Slack alert, it is advice. If it is checked before the API call, it is control.
           </p>
 
+          <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Control checklist</p>
+            <h2 className="text-2xl font-bold text-white mt-0 mb-5">What the gateway must decide before the call</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {costControlChecklist.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-cyan-300">0{index + 1}</p>
+                  <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                  <p className="mb-0 text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-cyan-500 hover:text-white">See cost telemetry</Link>
+              <Link href="/agent-spend-policy-template" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-purple-500 hover:text-white">Generate spend policy</Link>
+              <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-green-500 hover:text-white">Grade readiness</Link>
+            </div>
+          </div>
+
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Where teams should start</h2>
 
           <p className="text-gray-300 leading-relaxed">
@@ -258,6 +299,7 @@ audit:
           <div className="mt-12 rounded-xl border border-gray-800 bg-gray-950/70 p-6">
             <h2 className="text-xl font-bold text-white mt-0">Related guides</h2>
             <ul className="space-y-2 mb-0">
+              <li><Link href="/llm-cost-dashboard" className="text-cyan-400 hover:text-cyan-300">LLM Cost Dashboard for Agent Spend Telemetry</Link></li>
               <li><Link href="/blog/llm-cost-management" className="text-cyan-400 hover:text-cyan-300">LLM Cost Management: Dashboards vs Real-Time Budget Enforcement</Link></li>
               <li><Link href="/blog/mcp-budget-enforcement-guide" className="text-cyan-400 hover:text-cyan-300">MCP Budget Enforcement: A Practical Guide</Link></li>
               <li><Link href="/blog/how-to-add-budget-limits-to-openai-api-calls" className="text-cyan-400 hover:text-cyan-300">OpenAI API Budget Limits</Link></li>

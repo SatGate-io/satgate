@@ -28,6 +28,14 @@ export const metadata = {
   },
 };
 
+const controlPath = [
+  ['Identify the caller', 'Bind each MCP tool call to an agent, user, workflow, tenant, and MCP server before policy is evaluated.'],
+  ['Price the tool', 'Attach per-call, per-token, per-job, or per-export cost profiles so MCP usage becomes measurable economic activity.'],
+  ['Enforce budget', 'Apply session, workflow, tenant, and per-tool caps before the upstream MCP server receives the request.'],
+  ['Scope authority', 'Use revocable capabilities and caveats so tools cannot exceed route, time, data, or delegation limits.'],
+  ['Audit the decision', 'Record the policy, budget, tool, cost estimate, allow/deny action, and revocation evidence for every call.'],
+];
+
 const cards = [
   {
     href: '/mcp-governance',
@@ -63,7 +71,7 @@ export default function MCPPage() {
     url: 'https://satgate.io/mcp',
     description: metadata.description,
     datePublished: '2026-05-01',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'MCP governance' },
@@ -72,6 +80,19 @@ export default function MCPPage() {
       { '@type': 'Thing', name: 'economic firewall for MCP' },
       { '@type': 'Thing', name: 'scoped capabilities for AI agents' },
     ],
+  };
+
+  const controlPathJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP request-path governance controls',
+    description: 'The control sequence SatGate applies to MCP tool calls before upstream execution.',
+    itemListElement: controlPath.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const itemListJsonLd = {
@@ -131,6 +152,7 @@ export default function MCPPage() {
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(controlPathJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -154,6 +176,9 @@ export default function MCPPage() {
             <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Read the governance guide
             </Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
+              Grade MCP readiness
+            </Link>
           </div>
         </div>
       </section>
@@ -172,6 +197,23 @@ export default function MCPPage() {
       </section>
 
       <section className="border-y border-gray-900 bg-gray-950/60">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="mb-8 max-w-3xl">
+            <h2 className="mb-3 text-3xl font-bold text-white">MCP request-path control sequence</h2>
+            <p className="text-gray-400">A governed MCP call is not just routed. It is identified, priced, budgeted, scoped, and audited before a tool can create cost or risk.</p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-5">
+            {controlPath.map(([title, body]) => (
+              <div key={title} className="rounded-2xl border border-purple-900/50 bg-purple-950/10 p-5">
+                <h3 className="mb-3 text-lg font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-gray-900 bg-black">
         <div className="mx-auto grid max-w-6xl gap-8 px-6 py-20 lg:grid-cols-3">
           {[
             ['Price every tool', 'Assign cost profiles to MCP tools so agents cannot treat expensive operations like free function calls.'],

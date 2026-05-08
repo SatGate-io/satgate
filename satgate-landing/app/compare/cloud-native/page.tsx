@@ -66,7 +66,7 @@ const CloudNativeComparisonPage = () => {
     url: 'https://satgate.io/compare/cloud-native',
     description: 'Compare SatGate with cloud-native AI governance for provider-neutral agent spend control, MCP tool governance, and request-path enforcement.',
     datePublished: '2026-04-30',
-    dateModified: '2026-05-02',
+    dateModified: '2026-05-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'cloud-native AI governance alternative' },
@@ -74,6 +74,19 @@ const CloudNativeComparisonPage = () => {
       { '@type': 'Thing', name: 'request-path budget enforcement' },
       { '@type': 'Thing', name: 'MCP tool governance across clouds' },
     ],
+  };
+
+  const comparisonJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'SatGate vs cloud-native AI governance comparison',
+    description: 'Provider-neutral request-path controls SatGate adds beyond cloud-native AI governance for autonomous agents, MCP tools, budgets, and robot-customer commerce.',
+    itemListElement: comparisonRows.map((row, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: row.feature,
+      description: `Cloud-native: ${row.cloud}. SatGate: ${row.satgate}.`,
+    })),
   };
 
   const faqJsonLd = {
@@ -110,6 +123,7 @@ const CloudNativeComparisonPage = () => {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-purple-500 selection:text-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(comparisonJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {/* Navigation */}
       <nav className="border-b border-gray-800 backdrop-blur-md fixed w-full z-50 bg-black/50">
@@ -331,6 +345,12 @@ const CloudNativeComparisonPage = () => {
               className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold transition shadow-lg shadow-purple-900/30"
             >
               See the Savings <ArrowRight size={16} />
+            </Link>
+            <Link
+              href="/economic-firewall-readiness-grader"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gray-800 hover:bg-gray-700 text-white font-semibold transition border border-gray-700"
+            >
+              Grade readiness <Shield size={16} />
             </Link>
             <a
               href="https://cloud.satgate.io/cloud/login"

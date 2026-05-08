@@ -18,6 +18,15 @@ const modes = {
   charge: { label: 'Control + Charge', block: true, charge: true, audit: 'full' },
 };
 
+const governableItems = [
+  [Wrench, 'Tool cost', 'Attach prices, budgets, and risk tiers to individual MCP tools.'],
+  [Gauge, 'Spend caps', 'Block or observe calls when session, tool, or per-request budgets are exhausted.'],
+  [KeyRound, 'Capabilities', 'Require scoped, revocable, expiring authority instead of broad ambient access.'],
+  [ReceiptText, 'Audit', 'Record agent, task, server, tool, cost, budget, policy, and decision.'],
+  [ShieldCheck, 'Revocation', 'Stop future tool calls when a loop, violation, or risky delegation appears.'],
+  [ClipboardList, 'Modes', 'Start in Observe, enforce in Control, and use Charge/L402 when tools become paid products.'],
+] as const;
+
 type ClientKey = keyof typeof clients;
 type ModeKey = keyof typeof modes;
 
@@ -64,7 +73,7 @@ export default function McpProxyConfigGeneratorPage() {
     url: 'https://satgate.io/mcp-proxy-config-generator',
     description: 'Generate MCP proxy configs for Cursor, Claude, OpenClaw, and custom MCP clients with budgets, audit, revocation, and L402 Charge options.',
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'MCP proxy config generator' },
@@ -85,10 +94,23 @@ export default function McpProxyConfigGeneratorPage() {
     url: 'https://satgate.io/mcp-proxy-config-generator',
     description: 'Generate MCP proxy configs for Cursor, Claude, OpenClaw, and custom MCP clients with budgets, audit, revocation, and L402 Charge options.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     audience: webPageJsonLd.audience,
     featureList: ['Cursor MCP config generation', 'Claude MCP config generation', 'OpenClaw MCP config generation', 'Budget and audit policy generation', 'Optional L402 Charge config'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  };
+
+  const governableItemsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP proxy governance controls',
+    description: 'The MCP proxy controls SatGate makes governable before AI agents execute paid, sensitive, or risky tool calls.',
+    itemListElement: governableItems.map(([, title, body], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: title,
+      description: body,
+    })),
   };
 
   const breadcrumbJsonLd = {
@@ -152,6 +174,7 @@ export default function McpProxyConfigGeneratorPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(governableItemsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
@@ -173,6 +196,9 @@ export default function McpProxyConfigGeneratorPage() {
             </a>
             <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               MCP governance
+            </Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Grade readiness
             </Link>
           </div>
         </div>
@@ -232,14 +258,7 @@ export default function McpProxyConfigGeneratorPage() {
             MCP turns tools into runtime authority. The proxy turns that authority into policy decisions before the tool runs.
           </p>
           <div className="grid gap-5 md:grid-cols-3">
-            {[
-              [Wrench, 'Tool cost', 'Attach prices, budgets, and risk tiers to individual MCP tools.'],
-              [Gauge, 'Spend caps', 'Block or observe calls when session, tool, or per-request budgets are exhausted.'],
-              [KeyRound, 'Capabilities', 'Require scoped, revocable, expiring authority instead of broad ambient access.'],
-              [ReceiptText, 'Audit', 'Record agent, task, server, tool, cost, budget, policy, and decision.'],
-              [ShieldCheck, 'Revocation', 'Stop future tool calls when a loop, violation, or risky delegation appears.'],
-              [ClipboardList, 'Modes', 'Start in Observe, enforce in Control, and use Charge/L402 when tools become paid products.'],
-            ].map(([Icon, title, body]) => {
+            {governableItems.map(([Icon, title, body]) => {
               const CardIcon = Icon as typeof Wrench;
               return (
                 <div key={String(title)} className="rounded-2xl border border-gray-800 bg-black p-6">
@@ -304,6 +323,9 @@ export default function McpProxyConfigGeneratorPage() {
             </Link>
             <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               MCP tool policy generator
+            </Link>
+            <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              MCP budget enforcement
             </Link>
           </div>
         </div>

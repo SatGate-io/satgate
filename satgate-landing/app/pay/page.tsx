@@ -14,6 +14,13 @@ const ENDPOINTS = [
   { path: '/api/premium/insights', price: 1000, label: '/api/premium/insights (1000 sats)' },
 ];
 
+const chargeFlow = [
+  ['Call protected API', 'A robot customer or AI agent requests an endpoint without valid L402 payment proof.'],
+  ['Receive HTTP 402', 'SatGate returns a Payment Required challenge with an invoice and macaroon for scoped access.'],
+  ['Pay Lightning invoice', 'The agent or wallet pays the invoice and receives a cryptographic preimage/payment proof.'],
+  ['Retry with proof', 'SatGate verifies the proof in the request path, unlocks the API response, and records audit evidence.'],
+];
+
 const webPageJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
@@ -21,7 +28,7 @@ const webPageJsonLd = {
   url: 'https://satgate.io/pay',
   description: 'Interactive L402 payment demo showing HTTP 402 challenges, Lightning invoices, payment proof, and request-path API access for robot customers.',
   datePublished: '2026-04-12',
-  dateModified: '2026-05-03',
+  dateModified: '2026-05-06',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
     { '@type': 'Thing', name: 'SatGate Charge' },
@@ -41,8 +48,21 @@ const softwareJsonLd = {
   url: 'https://satgate.io/pay',
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-  dateModified: '2026-05-03',
-  featureList: ['HTTP 402 challenge simulation', 'L402 Lightning invoice flow', 'Payment proof retry', 'Robot-customer API access', 'Manual preimage entry'],
+  dateModified: '2026-05-06',
+  featureList: ['HTTP 402 challenge simulation', 'L402 Lightning invoice flow', 'Payment proof retry', 'Robot-customer API access', 'Manual preimage entry', 'Request-path proof verification'],
+};
+
+const chargeFlowJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'SatGate Charge L402 payment flow',
+  description: 'The request-path sequence for HTTP 402 challenges, Lightning invoices, payment proof, and scoped robot-customer API access.',
+  itemListElement: chargeFlow.map(([name, description], index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name,
+    description,
+  })),
 };
 
 const faqJsonLd = {
@@ -416,6 +436,7 @@ export default function PayDemoPage() {
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(chargeFlowJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       {/* Header */}
@@ -538,6 +559,26 @@ export default function PayDemoPage() {
         </div>
       </div>
       
+      <section className="w-full max-w-3xl mt-8 rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-6">
+        <h2 className="mb-5 text-2xl font-bold text-white">Charge-mode request path</h2>
+        <div className="grid gap-4 md:grid-cols-4">
+          {chargeFlow.map(([title, body]) => (
+            <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-4">
+              <h3 className="mb-2 font-bold text-white">{title}</h3>
+              <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <Link href="/http-402-for-ai-agents" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 font-bold text-black transition hover:bg-gray-200">
+            HTTP 402 for agents
+          </Link>
+          <Link href="/l402-agent-payments" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 font-bold text-white transition hover:border-yellow-500">
+            L402 agent payments
+          </Link>
+        </div>
+      </section>
+
       {/* Visual Status Pipeline */}
       <div className="w-full max-w-3xl mt-8 grid grid-cols-3 gap-4">
         <StatusStep active={status === 'blocked'} completed={status === 'paying' || status === 'success'} icon={<ShieldAlert size={20} />} label="1. 402 Blocked" />

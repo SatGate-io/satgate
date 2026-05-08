@@ -1,6 +1,14 @@
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
+const mcpGovernanceControls = [
+  ['Price each tool', 'Attach explicit costs to MCP tool names, wildcard families, paid APIs, token-heavy model calls, and premium data sources.'],
+  ['Bind agent authority', 'Require scoped capability tokens so each agent, sub-agent, workflow, and tenant carries only the budget and tools it needs.'],
+  ['Enforce before execution', 'Check spend, scope, expiry, revocation, and parent delegation before the MCP server or paid upstream receives the call.'],
+  ['Return useful denials', 'Send structured budget_exhausted, scope_denied, payment_required, or downgrade responses that agents can handle safely.'],
+  ['Audit economic behavior', 'Record tool cost, avoided spend, remaining budget, caller identity, and delegation chain for dashboards and governance reviews.'],
+];
+
 export const metadata = {
   title: 'Economic Governance in MCP: Beyond Tool Connection',
   description: 'The MCP ecosystem talks about capability. Nobody talks about cost. Here\'s why economic policy is the missing layer — and how to enforce it at the protocol level.',
@@ -27,7 +35,7 @@ export default function BeyondConnectionPage() {
     description: 'The MCP ecosystem talks about capability. Economic governance adds cost, budget, revocation, delegation, and audit policy to MCP tool calls.',
     url: 'https://satgate.io/blog/beyond-connection-economic-governance-mcp',
     datePublished: '2026-02-12',
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -36,6 +44,19 @@ export default function BeyondConnectionPage() {
       { '@type': 'Thing', name: 'economic firewall for MCP' },
       { '@type': 'Thing', name: 'AI agent tool spend control' },
     ],
+  };
+
+  const mcpGovernanceControlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP economic governance controls',
+    description: 'The request-path controls production MCP deployments need beyond basic tool connection.',
+    itemListElement: mcpGovernanceControls.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
@@ -72,6 +93,7 @@ export default function BeyondConnectionPage() {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(mcpGovernanceControlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -228,6 +250,25 @@ export default function BeyondConnectionPage() {
               and the MCP server, intercepts every tool call, attributes its cost, and enforces budget policy 
               in real time.
             </p>
+
+            <div className="not-prose my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+              <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">MCP governance controls</p>
+              <h2 className="text-2xl font-bold text-white mt-0 mb-5">What production MCP needs beyond connection</h2>
+              <div className="grid gap-4 md:grid-cols-2">
+                {mcpGovernanceControls.map(([title, body], index) => (
+                  <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                    <p className="mb-2 text-xs font-mono text-cyan-300">0{index + 1}</p>
+                    <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                    <p className="mb-0 text-sm leading-relaxed text-gray-400">{body}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <Link href="/mcp-governance" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-cyan-500 hover:text-white">MCP governance hub</Link>
+                <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-purple-500 hover:text-white">Tool cost policy</Link>
+                <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-green-500 hover:text-white">Cost dashboard</Link>
+              </div>
+            </div>
 
             {/* --- Intercepting MCP --- */}
             <h2 className="text-2xl font-bold text-white mt-12 mb-4">How It Works: Intercepting MCP at the Wire Level</h2>
@@ -565,14 +606,14 @@ satgate spend`}</pre>
 
             <p>
               <strong className="text-white">SatGate Cloud</strong>: Full per-tool cost attribution, delegation 
-              hierarchies, and budget enforcement.{' '}
-              <a href="https://cloud.satgate.io/cloud/login" className="text-purple-400 hover:text-purple-300 underline">
-                Sign up for the beta
-              </a>{' '}
-              or{' '}
-              <a href="https://satgate.io/design-partners" className="text-purple-400 hover:text-purple-300 underline">
-                talk to us about a design partnership
-              </a>.
+              hierarchies, and budget enforcement. Use the{' '}
+              <Link href="/mcp-proxy-config-generator" className="text-purple-400 hover:text-purple-300 underline">
+                MCP proxy config generator
+              </Link>{' '}
+              to map policy, then grade readiness with the{' '}
+              <Link href="/economic-firewall-readiness-grader" className="text-purple-400 hover:text-purple-300 underline">
+                economic firewall readiness grader
+              </Link>.
             </p>
 
             <p className="text-xl font-medium text-white mt-8">
@@ -604,9 +645,9 @@ satgate spend`}</pre>
           <p className="text-gray-500 text-sm italic">
             SatGate is an economic firewall for AI agent traffic. We help enterprises see, control, and 
             monetize what their agents do.{' '}
-            <a href="https://satgate.io" className="text-purple-400 hover:text-purple-300 underline">
-              Learn more at satgate.io
-            </a>.
+            <Link href="/economic-firewall" className="text-purple-400 hover:text-purple-300 underline">
+              Explore the economic firewall hub
+            </Link>.
           </p>
           <div className="mt-6">
             <Link href="/blog" className="text-purple-400 hover:text-purple-300 flex items-center gap-2 transition">

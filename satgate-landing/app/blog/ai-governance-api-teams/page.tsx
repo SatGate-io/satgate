@@ -1,6 +1,14 @@
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
+const apiGovernanceControlLoop = [
+  ['Identify the autonomous caller', 'Bind each request to agent, team, user, workflow, tenant, credential, and delegation chain before policy runs.'],
+  ['Model route economics', 'Assign cost to endpoints, MCP tools, model calls, retries, paid data sources, and premium actions instead of counting requests.'],
+  ['Enforce authority and budget', 'Check scopes, caveats, spend limits, expiry, revocation, and parent delegation before upstream execution.'],
+  ['Return structured policy outcomes', 'Allow, deny, downgrade, require payment, or return HTTP 402 with remaining budget and cheaper alternatives.'],
+  ['Feed audit and finance', 'Emit cost attribution by agent, endpoint, workflow, team, avoided spend, and remaining budget for governance reviews.'],
+];
+
 export const metadata = {
   title: "AI Governance for API Teams: Gateway Policy, Not Just Routing",
   description: "API teams need AI governance for budgets, permissions, and audit trails — not just routing. Learn where traditional API management falls short.",
@@ -28,7 +36,7 @@ export default function AiGovernanceApiTeamsBlogPage() {
     description: 'API teams need AI governance for budgets, permissions, and audit trails — not just routing. Learn where traditional API management falls short.',
     url: 'https://satgate.io/blog/ai-governance-api-teams',
     datePublished: '2026-03-19',
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -37,6 +45,19 @@ export default function AiGovernanceApiTeamsBlogPage() {
       { '@type': 'Thing', name: 'agent policy enforcement' },
       { '@type': 'Thing', name: 'request-path API governance' },
     ],
+  };
+
+  const apiGovernanceControlLoopJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI governance control loop for API teams',
+    description: 'The request-path governance loop API teams need for autonomous AI agents consuming APIs, models, and MCP tools.',
+    itemListElement: apiGovernanceControlLoop.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
@@ -73,6 +94,7 @@ export default function AiGovernanceApiTeamsBlogPage() {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(apiGovernanceControlLoopJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -136,6 +158,25 @@ export default function AiGovernanceApiTeamsBlogPage() {
           <p className="text-gray-300 leading-relaxed">
             Traditional API management tools answer question one (authentication) and partially answer question three (rate limiting). Questions two and four — the economic questions — are completely unaddressed.
           </p>
+
+          <div className="not-prose my-10 rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">API governance control loop</p>
+            <h2 className="text-2xl font-bold text-white mt-0 mb-5">What API teams need before agent requests execute</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {apiGovernanceControlLoop.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-purple-300">0{index + 1}</p>
+                  <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                  <p className="mb-0 text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/agent-api-governance" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-purple-500 hover:text-white">Agent API governance</Link>
+              <Link href="/ai-api-budget-enforcement" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-cyan-500 hover:text-white">API budget enforcement</Link>
+              <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-green-500 hover:text-white">Cost dashboard</Link>
+            </div>
+          </div>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Zuplo Problem: Great DX, Missing Economics</h2>
 
@@ -430,9 +471,9 @@ export API_BASE_URL=https://gateway.satgate.io/v1
               <code className="text-green-300">{`go install github.com/satgate-io/satgate/cmd/satgate-mcp@latest`}</code>
             </pre>
             <p className="text-gray-400 text-sm mt-3">
-              <a href="https://github.com/SatGate-io/satgate" className="text-cyan-400 hover:text-cyan-300">GitHub →</a>
+              <Link href="/agent-api-governance" className="text-cyan-400 hover:text-cyan-300">Agent API governance →</Link>
               {' · '}
-              <a href="https://satgate.io/pricing" className="text-cyan-400 hover:text-cyan-300">Enterprise →</a>
+              <Link href="/economic-firewall-readiness-grader" className="text-cyan-400 hover:text-cyan-300">Readiness grader →</Link>
             </p>
           </div>
 

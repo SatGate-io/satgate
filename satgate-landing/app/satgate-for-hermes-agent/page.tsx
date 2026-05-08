@@ -34,6 +34,13 @@ const controls = [
   { icon: Workflow, title: 'MCP and API governance', body: 'Apply one economic policy across MCP servers, internal APIs, model routes, data tools, and paid resources.' },
 ];
 
+const hermesControlSequence = [
+  ['Map persistent workflows', 'Observe Hermes Agent skills, memory-backed loops, MCP tools, model routes, paid APIs, and delegated calls before enforcement.'],
+  ['Budget each skill boundary', 'Attach per-skill and per-session ceilings so reusable workflows cannot silently accumulate spend over time.'],
+  ['Mint revocable capabilities', 'Replace inherited API keys with scoped tokens constrained by tool, route, calls, expiry, delegation, and spend.'],
+  ['Promote safe autonomy', 'Use audit and denied-request telemetry to tighten policy, keep kill switches live, and Charge external agent access with L402 when needed.'],
+];
+
 export default function SatGateForHermesAgentPage() {
   const webPageJsonLd = {
     '@context': 'https://schema.org',
@@ -41,7 +48,7 @@ export default function SatGateForHermesAgentPage() {
     name: 'SatGate for Hermes Agent MCP Workflows',
     description: metadata.description,
     url: 'https://satgate.io/satgate-for-hermes-agent',
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'Hermes Agent MCP budget enforcement' },
@@ -61,9 +68,22 @@ export default function SatGateForHermesAgentPage() {
     description: metadata.description,
     url: 'https://satgate.io/satgate-for-hermes-agent',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     about: webPageJsonLd.about,
     featureList: ['Hermes Agent MCP budget enforcement', 'AI agent spend control', 'MCP tool cost policy', 'Revocable capability tokens', 'Request-path audit trails'],
+  };
+
+  const hermesControlSequenceJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Hermes Agent economic control sequence',
+    description: 'How SatGate wraps persistent Hermes Agent MCP workflows with budgets, revocable capabilities, request-path controls, telemetry, and Charge-ready policy.',
+    itemListElement: hermesControlSequence.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
@@ -102,6 +122,7 @@ export default function SatGateForHermesAgentPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(hermesControlSequenceJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
@@ -160,6 +181,25 @@ export default function SatGateForHermesAgentPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Persistent-agent control path</p>
+        <h2 className="mb-8 text-3xl font-bold text-white">Make reusable Hermes skills economically bounded</h2>
+        <div className="grid gap-5 md:grid-cols-4">
+          {hermesControlSequence.map(([title, body], index) => (
+            <div key={title} className="rounded-2xl border border-cyan-900/40 bg-cyan-950/10 p-5">
+              <p className="mb-3 text-xs font-mono text-cyan-300">0{index + 1}</p>
+              <h3 className="mb-2 font-bold text-white">{title}</h3>
+              <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-300 transition hover:border-cyan-500 hover:text-white">See cost telemetry</Link>
+          <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-300 transition hover:border-purple-500 hover:text-white">Design capabilities</Link>
+          <Link href="/l402-agent-payments" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-300 transition hover:border-yellow-500 hover:text-white">Plan L402 agent payments</Link>
         </div>
       </section>
 

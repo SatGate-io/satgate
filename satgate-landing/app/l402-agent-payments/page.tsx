@@ -72,7 +72,7 @@ export default function L402AgentPaymentsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     mainEntityOfPage: 'https://satgate.io/l402-agent-payments',
     about: [
       { '@type': 'Thing', name: 'L402 agent payments' },
@@ -138,6 +138,19 @@ export default function L402AgentPaymentsPage() {
     ],
   };
 
+  const stepsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'L402 agent payment flow',
+    description: 'The request-path steps SatGate uses to challenge, verify, unlock, attribute, and monetize API access for autonomous agents with L402 Lightning.',
+    itemListElement: steps.map(({ title, body }, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: title,
+      description: body,
+    })),
+  };
+
   const howToJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
@@ -166,6 +179,7 @@ export default function L402AgentPaymentsPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(stepsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
@@ -190,6 +204,9 @@ export default function L402AgentPaymentsPage() {
             </Link>
             <Link href="/monetize" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
               Monetize APIs
+            </Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
+              Grade readiness
             </Link>
           </div>
         </div>
@@ -382,6 +399,7 @@ HTTP/1.1 200 OK
               ['/blog/l402-protocol-explained', 'L402 protocol explained', 'How HTTP 402, Lightning, and macaroons enable API payments.'],
               ['/blog/api-monetization-ai', 'API monetization for AI', 'How to price, meter, and collect from machine consumers.'],
               ['/economic-firewall', 'Economic firewall', 'Observe, Control, and Charge in one request-path control plane.'],
+              ['/economic-firewall-readiness-grader', 'Economic firewall readiness', 'Score whether identity, budget, routing, revocation, audit, and Charge are enforceable.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">
                 <h3 className="font-bold text-white mb-2">{title}</h3>
@@ -404,6 +422,9 @@ HTTP/1.1 200 OK
             </Link>
             <Link href="/blog/http-402-payment-required-use-cases" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
               HTTP 402 use cases
+            </Link>
+            <Link href="/l402-api-pricing-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
+              Price L402 access
             </Link>
           </div>
         </div>

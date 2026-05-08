@@ -8,6 +8,13 @@ import Image from 'next/image';
 // API endpoint - Railway backend
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://satgate-production-9354.up.railway.app';
 
+const telemetrySignals = [
+  ['Agent identity', 'Which agent, worker, user, workflow, and token lineage produced the request.'],
+  ['Authority scope', 'Which macaroon caveats, capability limits, expiry windows, and delegation depth applied.'],
+  ['Economic outcome', 'Whether SatGate allowed, blocked, revoked, or challenged the request before upstream execution.'],
+  ['Cost attribution', 'How blocked requests, paid requests, budget decisions, and tool activity map to a tenant or workflow.'],
+];
+
 const webPageJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
@@ -15,7 +22,7 @@ const webPageJsonLd = {
   url: 'https://satgate.io/dashboard',
   description: 'Live governance dashboard for AI agent tokens, delegation depth, caveats, blocked requests, revocation hits, and economic firewall telemetry.',
   datePublished: '2026-04-12',
-  dateModified: '2026-05-03',
+  dateModified: '2026-05-05',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
     { '@type': 'Thing', name: 'AI agent governance dashboard' },
@@ -35,8 +42,21 @@ const softwareJsonLd = {
   url: 'https://satgate.io/dashboard',
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-  dateModified: '2026-05-03',
-  featureList: ['Agent token graph telemetry', 'Delegation depth visibility', 'Macaroon caveat inspection', 'Revocation hit tracking', 'Blocked request counters'],
+  dateModified: '2026-05-05',
+  featureList: ['Agent token graph telemetry', 'Delegation depth visibility', 'Macaroon caveat inspection', 'Revocation hit tracking', 'Blocked request counters', 'Economic firewall telemetry signals'],
+};
+
+const telemetrySignalsJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Economic firewall telemetry signals',
+  description: 'Governance dashboard signals that connect AI agent activity to request-path economic control evidence.',
+  itemListElement: telemetrySignals.map(([name, description], index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name,
+    description,
+  })),
 };
 
 const faqJsonLd = {
@@ -260,6 +280,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(telemetrySignalsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {/* Navigation */}
       <nav className="border-b border-gray-800 backdrop-blur-md fixed w-full z-50 bg-black/80">
@@ -296,6 +317,11 @@ export default function DashboardPage() {
               <div>
                 <h1 className="text-3xl font-bold mb-2">Governance Dashboard</h1>
                 <p className="text-gray-500">Real-time visibility into your agent workforce and economic firewall.</p>
+                <div className="mt-3 flex flex-wrap gap-3 text-sm">
+                  <Link href="/llm-cost-dashboard" className="text-cyan-300 hover:text-cyan-200">LLM cost dashboard →</Link>
+                  <Link href="/economic-firewall-readiness-grader" className="text-purple-300 hover:text-purple-200">Grade readiness →</Link>
+                  <Link href="/agent-control-plane" className="text-yellow-300 hover:text-yellow-200">Agent control plane →</Link>
+                </div>
                 {lastFetch && (
                   <p className="text-xs text-gray-600 mt-1">
                     Last updated: {lastFetch.toLocaleTimeString()} 
@@ -537,6 +563,19 @@ export default function DashboardPage() {
               )}
             </div>
           </div>
+
+          <section className="mt-8 rounded-xl border border-cyan-900/40 bg-cyan-950/10 p-6">
+            <p className="mb-2 text-xs font-mono uppercase tracking-wide text-cyan-300">Telemetry model</p>
+            <h2 className="mb-5 text-2xl font-bold text-white">Economic firewall evidence captured in the dashboard</h2>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {telemetrySignals.map(([title, body]) => (
+                <div key={title} className="rounded-lg border border-gray-800 bg-black/50 p-4">
+                  <h3 className="mb-2 font-semibold text-white">{title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
           <section className="mt-8 border-t border-gray-800 pt-8">
             <p className="mb-2 text-center text-xs font-mono uppercase tracking-wide text-cyan-300">FAQ</p>

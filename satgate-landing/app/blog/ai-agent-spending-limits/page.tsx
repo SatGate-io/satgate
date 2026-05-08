@@ -1,6 +1,14 @@
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
+const spendingLimitDimensions = [
+  ['Agent limit', 'Set a hard allowance for each autonomous caller so one agent cannot consume the shared provider account.'],
+  ['Tool and model limit', 'Price MCP tools, model routes, paid APIs, retries, and premium actions differently instead of counting requests equally.'],
+  ['Workflow limit', 'Scope budgets to a task, session, customer, cost center, or workflow so spend matches business value.'],
+  ['Delegation limit', 'Carve child budgets from parent authority so sub-agents and swarms cannot multiply spend beyond the root cap.'],
+  ['Time-window limit', 'Reset daily, weekly, monthly, or token-expiry windows while preserving revocation and audit for every request.'],
+];
+
 export const metadata = {
   title: 'AI Agent Spending Limits: Hard Budgets by Agent, Tool, and Workflow',
   description: 'Set AI agent spending limits with hard budgets by agent, tool, model, workflow, and time window before API or MCP calls execute.',
@@ -29,7 +37,7 @@ export default function AiAgentSpendingLimitsBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-10',
-    dateModified: '2026-05-04',
+    dateModified: '2026-05-06',
     mainEntityOfPage: 'https://satgate.io/blog/ai-agent-spending-limits',
     about: [
       { '@type': 'Thing', name: 'AI agent spending limits' },
@@ -38,6 +46,19 @@ export default function AiAgentSpendingLimitsBlogPage() {
       { '@type': 'Thing', name: 'MCP tool spending caps' },
       { '@type': 'Thing', name: 'economic firewall budget enforcement' },
     ],
+  };
+
+  const spendingLimitDimensionsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent spending limit dimensions',
+    description: 'The dimensions teams should use to enforce hard AI agent spend limits before API, model, and MCP tool calls execute.',
+    itemListElement: spendingLimitDimensions.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
@@ -82,6 +103,7 @@ export default function AiAgentSpendingLimitsBlogPage() {
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(spendingLimitDimensionsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -189,6 +211,25 @@ export default function AiAgentSpendingLimitsBlogPage() {
             Resolution order: exact match → longest wildcard prefix → catch-all <code>*</code> → default.
           </p>
 
+          <div className="not-prose my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Hard-budget dimensions</p>
+            <h2 className="text-2xl font-bold text-white mt-0 mb-5">Where AI agent spending limits need precision</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {spendingLimitDimensions.map(([title, body], index) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/60 p-4">
+                  <p className="mb-2 text-xs font-mono text-cyan-300">0{index + 1}</p>
+                  <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                  <p className="mb-0 text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/agent-spend-policy-template" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-purple-500 hover:text-white">Generate spend policy</Link>
+              <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-cyan-500 hover:text-white">See spend telemetry</Link>
+              <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 no-underline transition hover:border-green-500 hover:text-white">Grade readiness</Link>
+            </div>
+          </div>
+
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">For Production Teams</h2>
           <p className="text-gray-300 leading-relaxed">
             Enterprise features like <code>RedisBudgetEnforcer</code> unlock:
@@ -226,9 +267,9 @@ export default function AiAgentSpendingLimitsBlogPage() {
               <code className="text-green-300">{`go install github.com/satgate-io/satgate/cmd/satgate-mcp@latest`}</code>
             </pre>
             <p className="text-gray-400 text-sm mt-3">
-              <a href="https://github.com/SatGate-io/satgate" className="text-cyan-400 hover:text-cyan-300">GitHub →</a>
+              <Link href="/agent-spending-limits" className="text-cyan-400 hover:text-cyan-300">Spending limits hub →</Link>
               {' · '}
-              <a href="https://satgate.io/pricing" className="text-cyan-400 hover:text-cyan-300">Enterprise →</a>
+              <Link href="/ai-agent-cost-control" className="text-cyan-400 hover:text-cyan-300">AI agent cost control →</Link>
             </p>
           </div>
 

@@ -46,7 +46,7 @@ export default function AgentPaymentControlsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-05-01',
-    dateModified: '2026-05-02',
+    dateModified: '2026-05-05',
     mainEntityOfPage: 'https://satgate.io/agent-payment-controls',
   };
 
@@ -59,6 +59,19 @@ export default function AgentPaymentControlsPage() {
       { '@type': 'Question', name: 'How does SatGate help with agent payment controls?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate sits in the request path to observe agent activity, control budgets and policy, and charge for API access with L402 Lightning when APIs become agent-native products.' } },
       { '@type': 'Question', name: 'How are HTTP 402 and L402 related to agent payment controls?', acceptedAnswer: { '@type': 'Answer', text: 'HTTP 402 gives APIs a protocol-level way to request payment. L402 adds Lightning payment and proof. SatGate Charge uses L402 Lightning, while other 402 methods such as shared payment tokens are separate rails.' } },
     ],
+  };
+
+  const controlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Agent payment control stack',
+    description: 'The request-path controls needed to govern AI agent payments before API, model, MCP, HTTP 402, or L402 access executes.',
+    itemListElement: controls.map(({ title, body }, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: title,
+      description: body,
+    })),
   };
 
   const breadcrumbJsonLd = {
@@ -74,6 +87,7 @@ export default function AgentPaymentControlsPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(controlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -94,6 +108,9 @@ export default function AgentPaymentControlsPage() {
             </Link>
             <Link href="/stripe-link-agents-vs-satgate" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
               Compare Link and SatGate
+            </Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
+              Grade readiness
             </Link>
           </div>
         </div>
@@ -210,6 +227,9 @@ export default function AgentPaymentControlsPage() {
             </Link>
             <Link href="/http-402-for-ai-agents" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
               Read HTTP 402 for agents
+            </Link>
+            <Link href="/l402-api-pricing-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
+              Price L402 access
             </Link>
           </div>
         </div>

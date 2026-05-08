@@ -45,7 +45,7 @@ export default function LlmCostDashboardPage() {
     url: 'https://satgate.io/llm-cost-dashboard',
     description: metadata.description,
     datePublished: '2026-05-01',
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'LLM cost dashboard' },
@@ -64,7 +64,7 @@ export default function LlmCostDashboardPage() {
     url: 'https://satgate.io/llm-cost-dashboard',
     description: metadata.description,
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-05-05',
     featureList: dashboardMetrics.map((m) => m.title),
   };
 
@@ -107,6 +107,19 @@ export default function LlmCostDashboardPage() {
     ],
   };
 
+  const metricsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'LLM cost dashboard metrics',
+    description: 'The dashboard metrics teams need to move from LLM spend visibility to request-path economic control for AI agents.',
+    itemListElement: dashboardMetrics.map(({ title, body }, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: title,
+      description: body,
+    })),
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -121,6 +134,7 @@ export default function LlmCostDashboardPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(metricsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -223,6 +237,7 @@ export default function LlmCostDashboardPage() {
               ['/mcp-tool-cost-policy-generator', 'MCP tool cost policy', 'Per-tool prices, risk tiers, limits, and deny behavior.'],
               ['/revocable-capability-token-policy-template', 'Capability-token policy', 'Scoped, expiring, revocable authority for agents and sub-agents.'],
               ['/openai-budget-policy-generator', 'OpenAI budget policy', 'Model, route, session, daily, and per-request budget limits.'],
+              ['/economic-firewall-readiness-grader', 'Economic firewall readiness', 'Score the gaps between dashboard visibility and request-path control.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
                 <h3 className="mb-2 font-bold text-white">{title}</h3>
@@ -260,7 +275,7 @@ export default function LlmCostDashboardPage() {
 
       <section className="border-t border-gray-900 bg-gradient-to-r from-cyan-950/30 to-purple-950/20">
         <div className="mx-auto max-w-6xl px-6 py-16">
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-4">
             <Link href="/llm-cost-monitoring" className="rounded-2xl border border-gray-800 bg-black/70 p-6 transition hover:border-cyan-600">
               <h3 className="mb-2 text-lg font-bold text-white">LLM cost monitoring →</h3>
               <p className="text-gray-400">Compare dashboards, alerts, and request-path enforcement.</p>
@@ -272,6 +287,10 @@ export default function LlmCostDashboardPage() {
             <Link href="/economic-firewall" className="rounded-2xl border border-gray-800 bg-black/70 p-6 transition hover:border-cyan-600">
               <h3 className="mb-2 text-lg font-bold text-white">Economic firewall →</h3>
               <p className="text-gray-400">Move from observability to request-path economic governance.</p>
+            </Link>
+            <Link href="/economic-firewall-readiness-grader" className="rounded-2xl border border-gray-800 bg-black/70 p-6 transition hover:border-cyan-600">
+              <h3 className="mb-2 text-lg font-bold text-white">Readiness grader →</h3>
+              <p className="text-gray-400">Find which dashboard blind spots need enforceable control first.</p>
             </Link>
           </div>
         </div>
