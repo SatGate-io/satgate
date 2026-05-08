@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import GovernClient from "../components/GovernClient";
 
 export const metadata: Metadata = {
-  title: "AI Agent Governance Platform: Budgets, MCP Controls, and L402 Charge",
+  title: "AI Agent Governance: Observe, Control, and Charge",
   description:
-    "Govern autonomous AI agents with request-path budget enforcement, MCP tool controls, delegation, revocation, cost attribution, and L402 Charge.",
+    "Govern AI agents with SatGate: observe tool usage, control access and budgets, and charge for API or MCP consumption.",
   alternates: {
     canonical: "https://satgate.io/govern",
   },
@@ -19,17 +19,17 @@ export const metadata: Metadata = {
     "Observe Control Charge",
   ],
   openGraph: {
-    title: "AI Agent Governance Platform: Budgets, MCP Controls, and L402 Charge",
+    title: "AI Agent Governance: Observe, Control, and Charge",
     description:
-      "Request-path budget enforcement, MCP governance, delegation controls, revocation, cost attribution, and L402 Charge for AI agents.",
+      "Govern AI agents with SatGate: observe tool usage, control access and budgets, and charge for API or MCP consumption.",
     url: "https://satgate.io/govern",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Agent Governance Platform: Budgets, MCP Controls, and L402 Charge",
+    title: "AI Agent Governance: Observe, Control, and Charge",
     description:
-      "Enterprise AI agent governance for spend, MCP tools, delegation, revocation, attribution, and robot-customer payments.",
+      "Observe tool usage, control access and budgets, and charge for API or MCP consumption with SatGate.",
   },
 };
 

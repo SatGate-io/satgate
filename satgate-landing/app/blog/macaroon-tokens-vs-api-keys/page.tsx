@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "Macaroon Authentication vs API Keys: Scoped Tokens for AI Agents",
-  description: "Compare macaroon authentication and API keys for AI agents. Learn scoped capability tokens with expiry, delegation, revocation, and budget caveats.",
+  title: "Macaroon Tokens vs API Keys for Agent Access",
+  description: "Compare macaroon tokens and API keys for scoped authorization, delegated access, and safer AI agent permissions.",
   alternates: { canonical: 'https://satgate.io/blog/macaroon-tokens-vs-api-keys' },
   keywords: ['macaroon tokens vs API keys', 'capability-based authentication', 'API authentication AI agents', 'delegated authority tokens', 'macaroon authentication', 'AI agent security', 'capability tokens'],
   openGraph: {
@@ -24,7 +24,7 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'Macaroon Authentication vs API Keys: Scoped Tokens for AI Agents',
+    headline: 'Macaroon Tokens vs API Keys for Agent Access',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
@@ -608,6 +608,19 @@ attenuated_token = agent_a_token.add_caveats([
               <Link href="/agent-capability-tokens" className="text-cyan-300 hover:text-cyan-200">Capability tokens →</Link>
               <Link href="/agent-control-plane" className="text-cyan-300 hover:text-cyan-200">Agent control plane →</Link>
               <Link href="/economic-firewall-readiness-grader" className="text-cyan-300 hover:text-cyan-200">Readiness grader →</Link>
+            </div>
+          </div>
+
+
+          <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <h3 className="mb-3 text-xl font-bold text-white">SatGate growth path: Observe → Control → Charge</h3>
+            <p className="mb-4 text-gray-300">
+              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or robot-customer revenue.
+            </p>
+            <div className="flex flex-wrap gap-3 text-sm font-semibold">
+              <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway →</Link>
+              <Link href="/capability-auth" className="text-cyan-300 hover:text-cyan-200">Capability auth →</Link>
+              <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>
           </div>
 

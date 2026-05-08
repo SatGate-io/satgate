@@ -3,8 +3,8 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "API Gateway for AI Agents: Budgets, MCP, and Tool Cost Control",
-  description: "Learn what API gateway solutions for AI agents need beyond routing: budget enforcement, MCP tool cost control, scoped tokens, revocation, and L402.",
+  title: "API Gateway for AI Agents: Control Tool and API Access",
+  description: "Learn how an API gateway for AI agents can enforce access, budgets, observability, and monetization across APIs and MCP tools.",
   alternates: { canonical: 'https://satgate.io/blog/api-gateway-for-ai-agents' },
   keywords: ['API gateway for AI agents', 'AI agent gateway', 'API gateway comparison', 'agent economy gateway', 'AI API management', 'economic firewall gateway'],
   openGraph: {
@@ -25,7 +25,7 @@ export default function ApiGatewayForAiAgentsBlogPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'API Gateway for AI Agents: Budgets, MCP, and Tool Cost Control',
+    headline: 'API Gateway for AI Agents: Control Tool and API Access',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
@@ -408,6 +408,19 @@ satgate mint \\
               <Link href="/compare" className="text-cyan-300 hover:text-cyan-200">Comparison hub →</Link>
               <Link href="/mcp-proxy-config-generator" className="text-cyan-300 hover:text-cyan-200">MCP proxy config generator →</Link>
               <Link href="/economic-firewall" className="text-cyan-300 hover:text-cyan-200">Economic firewall →</Link>
+            </div>
+          </div>
+
+
+          <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <h3 className="mb-3 text-xl font-bold text-white">SatGate growth path: Observe → Control → Charge</h3>
+            <p className="mb-4 text-gray-300">
+              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or robot-customer revenue.
+            </p>
+            <div className="flex flex-wrap gap-3 text-sm font-semibold">
+              <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway →</Link>
+              <Link href="/capability-auth" className="text-cyan-300 hover:text-cyan-200">Capability auth →</Link>
+              <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>
           </div>
 

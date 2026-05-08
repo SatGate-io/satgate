@@ -30,6 +30,8 @@ const LandingPage = () => {
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
             <Link href="/protect" className="hover:text-white transition">Live Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
+            <Link href="/mcp-gateway" className="hover:text-white transition">MCP Gateway</Link>
+            <Link href="/capability-auth" className="hover:text-white transition">Capability Auth</Link>
             <Link href="/agent-control-plane" className="hover:text-white transition">Control Plane</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
             <Link href="/tools" className="hover:text-white transition">Tools</Link>
@@ -704,12 +706,14 @@ const LandingPage = () => {
                 <li><Link href="/agent-spend-policy-template" className="hover:text-white transition">Agent Spend Policy Template</Link></li>
                 <li><Link href="/ai-agent-runaway-spend-benchmark" className="hover:text-white transition">Runaway Spend Benchmark</Link></li>
                 <li><Link href="/mcp" className="hover:text-white transition">MCP Governance Hub</Link></li>
+                <li><Link href="/mcp-gateway" className="hover:text-white transition">MCP Gateway</Link></li>
                 <li><Link href="/mcp-governance" className="hover:text-white transition">MCP Governance</Link></li>
                 <li><Link href="/mcp-budget-enforcement" className="hover:text-white transition">MCP Budget Enforcement</Link></li>
                 <li><Link href="/mcp-cost-control" className="hover:text-white transition">MCP Cost Control</Link></li>
                 <li><Link href="/mcp-proxy-config-generator" className="hover:text-white transition">MCP Proxy Config Generator</Link></li>
                 <li><Link href="/agent-api-governance" className="hover:text-white transition">Agent API Governance</Link></li>
                 <li><Link href="/agent-control-plane" className="hover:text-white transition">Agent Control Plane</Link></li>
+                <li><Link href="/capability-auth" className="hover:text-white transition">Capability Auth</Link></li>
                 <li><Link href="/agent-api-key-risk-assessment" className="hover:text-white transition">Agent API Key Risk Assessment</Link></li>
                 <li><Link href="/revocable-agent-credentials" className="hover:text-white transition">Revocable Agent Credentials</Link></li>
                 <li><Link href="/agent-capability-tokens" className="hover:text-white transition">Agent Capability Tokens</Link></li>

@@ -3,21 +3,21 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "LLM Cost Dashboard: Monitor Cost, Latency & Budgets per Request",
-  description: "Design an LLM cost dashboard for token cost, latency, traces, and customer accounts — then enforce budgets before agents spend.",
+  title: "LLM Cost Management: Control AI Spend Before It Happens",
+  description: "A practical guide to LLM cost management using usage observability, budget controls, and chargeback workflows for AI agents.",
   alternates: { canonical: 'https://satgate.io/blog/llm-cost-management' },
   keywords: ['LLM cost dashboard', 'LLM monitoring dashboard', 'LLM cost management', 'LLM cost control', 'LLM tracing dashboard', 'cost latency per request', 'AI budget enforcement', 'AI agent cost control', 'request-path budget enforcement'],
   openGraph: {
-    title: 'LLM Cost Dashboard: Cost, Latency, Traces, and Budgets',
-    description: 'Design an LLM cost dashboard for token cost, latency, traces, customer accounts, and budget enforcement before agents spend.',
+    title: 'LLM Cost Management: Control AI Spend Before It Happens',
+    description: 'A practical guide to LLM cost management using usage observability, budget controls, and chargeback workflows for AI agents.',
     url: 'https://satgate.io/blog/llm-cost-management',
     type: 'article',
     publishedTime: '2026-03-17T00:00:00Z',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'LLM Cost Dashboard: Cost, Latency, Traces, and Budgets',
-    description: 'Design an LLM cost dashboard for traces, customer cost attribution, and request-path budget enforcement before agents spend.',
+    title: 'LLM Cost Management: Control AI Spend Before It Happens',
+    description: 'A practical guide to LLM cost management using observability, budget controls, and chargeback for agents.',
   },
 };
 
@@ -25,7 +25,7 @@ export default function LlmCostManagementBlogPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'LLM Cost Dashboard: Monitor Cost, Latency & Budgets per Request',
+    headline: 'LLM Cost Management: Control AI Spend Before It Happens',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
@@ -458,6 +458,19 @@ satgate mint \\
               <Link href="/llm-cost-dashboard" className="text-cyan-300 hover:text-cyan-200">LLM cost dashboard checklist →</Link>
               <Link href="/llm-cost-monitoring" className="text-cyan-300 hover:text-cyan-200">LLM cost monitoring guide →</Link>
               <Link href="/agent-spend-policy-template" className="text-cyan-300 hover:text-cyan-200">Agent spend policy template →</Link>
+            </div>
+          </div>
+
+
+          <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <h3 className="mb-3 text-xl font-bold text-white">SatGate growth path: Observe → Control → Charge</h3>
+            <p className="mb-4 text-gray-300">
+              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or robot-customer revenue.
+            </p>
+            <div className="flex flex-wrap gap-3 text-sm font-semibold">
+              <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway →</Link>
+              <Link href="/capability-auth" className="text-cyan-300 hover:text-cyan-200">Capability auth →</Link>
+              <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>
           </div>
 

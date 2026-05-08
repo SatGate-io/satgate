@@ -1,0 +1,189 @@
+{
+  "generatedAt": "2026-05-08T20:45:16.959940Z",
+  "items": [
+    {
+      "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
+      "priority": "P0",
+      "score": 98,
+      "primaryKeyword": "openai api budget limit",
+      "recommendedTitle": "OpenAI API Budget Limits: Control Spend Before Calls",
+      "recommendedMetaDescription": "Learn how to add OpenAI API budget limits, prevent runaway agent spend, and enforce usage controls before calls execute.",
+      "contentChanges": [
+        "Add or tighten the above-the-fold direct-answer block for the primary query.",
+        "Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end."
+      ],
+      "internalLinksToAdd": [
+        "/blog/llm-cost-management",
+        "/govern",
+        "/mcp-gateway",
+        "/capability-auth"
+      ],
+      "schemaToAdd": [
+        "FAQPage",
+        "BreadcrumbList",
+        "TechArticle"
+      ]
+    },
+    {
+      "path": "/blog/http-402-payment-required-use-cases",
+      "priority": "P0",
+      "score": 91,
+      "primaryKeyword": "http 402 payment required",
+      "recommendedTitle": "HTTP 402 Payment Required: API and Agent Use Cases",
+      "recommendedMetaDescription": "See how HTTP 402 can support paid API access, metered MCP tools, and agent transactions using SatGate.",
+      "contentChanges": [
+        "Add or tighten the above-the-fold direct-answer block for the primary query.",
+        "Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end."
+      ],
+      "internalLinksToAdd": [
+        "/pay",
+        "/mcp-gateway",
+        "/capability-auth",
+        "/blog/api-monetization-ai"
+      ],
+      "schemaToAdd": [
+        "FAQPage",
+        "BreadcrumbList",
+        "TechArticle"
+      ]
+    },
+    {
+      "path": "/blog/macaroon-tokens-vs-api-keys",
+      "priority": "P1",
+      "score": 83,
+      "primaryKeyword": "macaroon tokens vs api keys",
+      "recommendedTitle": "Macaroon Tokens vs API Keys for Agent Access",
+      "recommendedMetaDescription": "Compare macaroon tokens and API keys for scoped authorization, delegated access, and safer AI agent permissions.",
+      "contentChanges": [
+        "Add or tighten the above-the-fold direct-answer block for the primary query.",
+        "Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end."
+      ],
+      "internalLinksToAdd": [
+        "/capability-auth",
+        "/agent-capability-tokens",
+        "/revocable-capability-token-policy-template",
+        "/govern"
+      ],
+      "schemaToAdd": [
+        "FAQPage",
+        "BreadcrumbList",
+        "TechArticle"
+      ]
+    },
+    {
+      "path": "/govern",
+      "priority": "P1",
+      "score": 79,
+      "primaryKeyword": "ai agent governance",
+      "recommendedTitle": "AI Agent Governance: Observe, Control, and Charge",
+      "recommendedMetaDescription": "Govern AI agents with SatGate: observe tool usage, control access and budgets, and charge for API or MCP consumption.",
+      "contentChanges": [
+        "Add or tighten the above-the-fold direct-answer block for the primary query.",
+        "Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end."
+      ],
+      "internalLinksToAdd": [
+        "/mcp-gateway",
+        "/capability-auth",
+        "/blog/llm-cost-management",
+        "/blog/api-gateway-for-ai-agents"
+      ],
+      "schemaToAdd": [
+        "FAQPage",
+        "BreadcrumbList",
+        "SoftwareApplication"
+      ]
+    },
+    {
+      "path": "/blog/llm-cost-management",
+      "priority": "P1",
+      "score": 75,
+      "primaryKeyword": "llm cost management",
+      "recommendedTitle": "LLM Cost Management: Control AI Spend Before It Happens",
+      "recommendedMetaDescription": "A practical guide to LLM cost management using usage observability, budget controls, and chargeback workflows for AI agents.",
+      "contentChanges": [
+        "Add or tighten the above-the-fold direct-answer block for the primary query.",
+        "Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end."
+      ],
+      "internalLinksToAdd": [
+        "/blog/how-to-add-budget-limits-to-openai-api-calls",
+        "/govern",
+        "/mcp-gateway",
+        "/blog/api-gateway-for-ai-agents"
+      ],
+      "schemaToAdd": [
+        "FAQPage",
+        "BreadcrumbList",
+        "TechArticle"
+      ]
+    },
+    {
+      "path": "/blog/api-gateway-for-ai-agents",
+      "priority": "P1",
+      "score": 75,
+      "primaryKeyword": "api gateway for ai agents",
+      "recommendedTitle": "API Gateway for AI Agents: Control Tool and API Access",
+      "recommendedMetaDescription": "Learn how an API gateway for AI agents can enforce access, budgets, observability, and monetization across APIs and MCP tools.",
+      "contentChanges": [
+        "Add or tighten the above-the-fold direct-answer block for the primary query.",
+        "Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end."
+      ],
+      "internalLinksToAdd": [
+        "/mcp-gateway",
+        "/govern",
+        "/blog/llm-cost-management",
+        "/blog/http-402-payment-required-use-cases"
+      ],
+      "schemaToAdd": [
+        "FAQPage",
+        "BreadcrumbList",
+        "TechArticle"
+      ]
+    },
+    {
+      "path": "/mcp-gateway",
+      "priority": "P2",
+      "score": 50,
+      "primaryKeyword": "mcp gateway",
+      "recommendedTitle": "MCP Gateway for Governed Agent Tool Access",
+      "recommendedMetaDescription": "Use SatGate as an MCP gateway to observe, control, and charge for agent tool access across SaaS and hybrid deployments.",
+      "contentChanges": [
+        "Make this the commercial MCP gateway hub and link all MCP blog/tool pages into it."
+      ],
+      "internalLinksToAdd": [
+        "/govern",
+        "/capability-auth",
+        "/blog/api-gateway-for-ai-agents",
+        "/blog/mcp-budget-enforcement-guide",
+        "/mcp-tool-cost-policy-generator"
+      ],
+      "schemaToAdd": [
+        "FAQPage",
+        "BreadcrumbList",
+        "SoftwareApplication"
+      ]
+    },
+    {
+      "path": "/capability-auth",
+      "priority": "P2",
+      "score": 50,
+      "primaryKeyword": "capability based authorization",
+      "recommendedTitle": "Capability-Based Authorization for AI Agents",
+      "recommendedMetaDescription": "Replace broad API keys with scoped, revocable, budget-aware capabilities for AI agents using SatGate.",
+      "contentChanges": [
+        "Use identity-vs-capability framing and link macaroon/API-key content into this page."
+      ],
+      "internalLinksToAdd": [
+        "/blog/macaroon-tokens-vs-api-keys",
+        "/agent-capability-tokens",
+        "/govern",
+        "/mcp-gateway",
+        "/revocable-capability-token-policy-template"
+      ],
+      "schemaToAdd": [
+        "FAQPage",
+        "BreadcrumbList",
+        "SoftwareApplication"
+      ]
+    }
+  ]
+}

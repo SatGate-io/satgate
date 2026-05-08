@@ -1,0 +1,52 @@
+{
+  "/mcp-gateway": [
+    "/govern",
+    "/capability-auth",
+    "/blog/api-gateway-for-ai-agents",
+    "/blog/mcp-budget-enforcement-guide",
+    "/mcp-tool-cost-policy-generator"
+  ],
+  "/capability-auth": [
+    "/blog/macaroon-tokens-vs-api-keys",
+    "/agent-capability-tokens",
+    "/govern",
+    "/mcp-gateway",
+    "/revocable-capability-token-policy-template"
+  ],
+  "/govern": [
+    "/mcp-gateway",
+    "/capability-auth",
+    "/blog/llm-cost-management",
+    "/blog/api-gateway-for-ai-agents"
+  ],
+  "/blog/llm-cost-management": [
+    "/blog/how-to-add-budget-limits-to-openai-api-calls",
+    "/govern",
+    "/mcp-gateway",
+    "/blog/api-gateway-for-ai-agents"
+  ],
+  "/blog/how-to-add-budget-limits-to-openai-api-calls": [
+    "/blog/llm-cost-management",
+    "/govern",
+    "/mcp-gateway",
+    "/capability-auth"
+  ],
+  "/blog/http-402-payment-required-use-cases": [
+    "/pay",
+    "/mcp-gateway",
+    "/capability-auth",
+    "/blog/api-monetization-ai"
+  ],
+  "/blog/macaroon-tokens-vs-api-keys": [
+    "/capability-auth",
+    "/agent-capability-tokens",
+    "/revocable-capability-token-policy-template",
+    "/govern"
+  ],
+  "/blog/api-gateway-for-ai-agents": [
+    "/mcp-gateway",
+    "/govern",
+    "/blog/llm-cost-management",
+    "/blog/http-402-payment-required-use-cases"
+  ]
+}

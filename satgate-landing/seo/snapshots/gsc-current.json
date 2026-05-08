@@ -1,0 +1,58 @@
+[
+  {
+    "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
+    "clicks": 3,
+    "impressions": 1899,
+    "ctr": 0.0016,
+    "position": 8.14
+  },
+  {
+    "path": "/blog/llm-cost-management",
+    "clicks": 0,
+    "impressions": 862,
+    "ctr": 0,
+    "position": 10.55
+  },
+  {
+    "path": "/blog/http-402-payment-required-use-cases",
+    "clicks": 1,
+    "impressions": 831,
+    "ctr": 0.0012,
+    "position": 8.29
+  },
+  {
+    "path": "/blog/macaroon-tokens-vs-api-keys",
+    "clicks": 1,
+    "impressions": 296,
+    "ctr": 0.0034,
+    "position": 5.52
+  },
+  {
+    "path": "/govern",
+    "clicks": 0,
+    "impressions": 191,
+    "ctr": 0,
+    "position": 5.16
+  },
+  {
+    "path": "/blog/api-gateway-for-ai-agents",
+    "clicks": 0,
+    "impressions": 128,
+    "ctr": 0,
+    "position": 9.46
+  },
+  {
+    "path": "/mcp-gateway",
+    "clicks": 0,
+    "impressions": 0,
+    "ctr": 0,
+    "position": 100
+  },
+  {
+    "path": "/capability-auth",
+    "clicks": 0,
+    "impressions": 0,
+    "ctr": 0,
+    "position": 100
+  }
+]
