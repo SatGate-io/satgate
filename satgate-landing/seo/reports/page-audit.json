@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-08T20:01:06.564514Z",
+  "generatedAt": "2026-05-08T20:45:16.959746Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -37,7 +37,6 @@
         "/capability-auth",
         "/economic-firewall-readiness-grader",
         "/govern",
-        "/llm-cost-dashboard",
         "/mcp-gateway",
         "/openai-budget-policy-generator",
         "/tools"
@@ -45,14 +44,12 @@
       "schemaTypes": [
         "Answer",
         "FAQPage",
-        "ItemList",
-        "ListItem",
         "Organization",
         "Question",
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1424,
+      "wordCount": 1297,
       "hasObserveControlCharge": true,
       "hasFAQ": true,
       "hasProductCTA": true,
@@ -73,7 +70,6 @@
       "h1Count": 1,
       "h2s": [
         "LLM Cost Dashboard Design Pattern: Cost, Latency, Traces, Budget",
-        "What the LLM cost dashboard should drive next",
         "If You Need an LLM Cost Dashboard for Finance",
         "The LLM Cost Management Landscape Today",
         "Why Monitoring Fails When Agents Hold the Wallet",
@@ -85,7 +81,6 @@
       ],
       "internalLinks": [
         "/agent-spend-policy-template",
-        "/ai-agent-runaway-spend-index",
         "/blog",
         "/capability-auth",
         "/compare",
@@ -102,14 +97,12 @@
       "schemaTypes": [
         "Answer",
         "FAQPage",
-        "ItemList",
-        "ListItem",
         "Organization",
         "Question",
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2270,
+      "wordCount": 2141,
       "hasObserveControlCharge": true,
       "hasFAQ": true,
       "hasProductCTA": true,
@@ -135,7 +128,6 @@
         "Why 402 Stayed Dormant for Decades",
         "Seven Real-World Use Cases for HTTP 402",
         "The L402 Protocol: Making 402 Practical",
-        "How an AI agent should handle HTTP 402",
         "Implementation Considerations",
         "402 in the Wild: Early Adopters",
         "The Future: 402 as Default Commerce Layer"
@@ -150,7 +142,6 @@
         "/http-402-for-ai-agents",
         "/l402-agent-payments",
         "/l402-api-pricing-calculator",
-        "/llm-cost-dashboard",
         "/mcp-gateway",
         "/robot-customer-payments",
         "/tools"
@@ -158,14 +149,12 @@
       "schemaTypes": [
         "Answer",
         "FAQPage",
-        "ItemList",
-        "ListItem",
         "Organization",
         "Question",
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2728,
+      "wordCount": 2586,
       "hasObserveControlCharge": true,
       "hasFAQ": true,
       "hasProductCTA": true,
@@ -304,35 +293,28 @@
         "Why Not Just Add Plugins?",
         "How SatGate Approaches It",
         "The Enterprise Path: Observe \u2192 Control \u2192 Charge",
-        "What an AI agent gateway must decide before routing",
         "What to Look For in an Agent-Aware Gateway",
         "The Bottom Line",
         "API Gateway for AI Agents FAQ"
       ],
       "internalLinks": [
-        "/agent-api-governance",
-        "/agent-capability-tokens",
-        "/agent-control-plane",
         "/blog",
         "/capability-auth",
         "/compare",
         "/economic-firewall",
         "/govern",
-        "/llm-cost-dashboard",
         "/mcp-gateway",
         "/mcp-proxy-config-generator"
       ],
       "schemaTypes": [
         "Answer",
         "FAQPage",
-        "ItemList",
-        "ListItem",
         "Organization",
         "Question",
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1484,
+      "wordCount": 1365,
       "hasObserveControlCharge": true,
       "hasFAQ": true,
       "hasProductCTA": true,
