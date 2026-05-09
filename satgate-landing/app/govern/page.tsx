@@ -2,34 +2,34 @@ import type { Metadata } from "next";
 import GovernClient from "../components/GovernClient";
 
 export const metadata: Metadata = {
-  title: "AI Agent Governance: Observe, Control, and Charge",
+  title: "AI Agent Governance: Govern, Enforce, Prove",
   description:
-    "Govern AI agents with SatGate: observe tool usage, control access and budgets, and charge for API or MCP consumption.",
+    "Govern enterprise AI agents with SatGate: scope authority, enforce request-path policy, and prove every mint, delegation, spend, denial, and revocation.",
   alternates: {
     canonical: "https://satgate.io/govern",
   },
   keywords: [
     "enterprise AI agent governance",
-    "AI agent cost governance",
+    "AI agent authority governance",
     "economic control plane for AI agents",
     "MCP governance for enterprises",
     "AI agent budget enforcement",
     "agent delegation controls",
-    "L402 robot customer payments",
-    "Observe Control Charge",
+    "Policy-to-Proof for AI agents",
+    "Govern Enforce Prove",
   ],
   openGraph: {
-    title: "AI Agent Governance: Observe, Control, and Charge",
+    title: "AI Agent Governance: Govern, Enforce, Prove",
     description:
-      "Govern AI agents with SatGate: observe tool usage, control access and budgets, and charge for API or MCP consumption.",
+      "Govern enterprise AI agents with scoped authority, request-path enforcement, and audit-ready proof for every agent lifecycle.",
     url: "https://satgate.io/govern",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Agent Governance: Observe, Control, and Charge",
+    title: "AI Agent Governance: Govern, Enforce, Prove",
     description:
-      "Observe tool usage, control access and budgets, and charge for API or MCP consumption with SatGate.",
+      "Scope authority, enforce policy, and export Policy-to-Proof evidence for enterprise AI agents with SatGate.",
   },
 };
 
@@ -46,7 +46,7 @@ const webPageSchema = {
     { "@type": "Thing", name: "economic control plane for AI agents" },
     { "@type": "Thing", name: "MCP governance for enterprises" },
     { "@type": "Thing", name: "agent delegation controls" },
-    { "@type": "Thing", name: "L402 robot customer payments" },
+    { "@type": "Thing", name: "Policy-to-Proof for AI agents" },
   ],
 };
 
@@ -67,7 +67,7 @@ const faqSchema = {
       name: "What is an economic control plane for AI agents?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "An economic control plane for AI agents sits in the request path and applies budgets, prices, delegation rules, revocation, and audit before an agent reaches an upstream API, model, or MCP tool. It turns agent activity into observable, controllable, and chargeable economic events.",
+        text: "An economic control plane for AI agents sits in the request path and applies scopes, budgets, delegation rules, revocation, and audit before an agent reaches an upstream API, model, or MCP tool. It turns agent activity into governed decisions with evidence.",
       },
     },
     {
@@ -83,7 +83,7 @@ const faqSchema = {
       name: "What is the difference between AI governance and AI agent governance?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "AI governance usually covers model risk, data policy, compliance, and human review. AI agent governance adds request-path controls for autonomous actions: budgets, tool scopes, delegated authority, revocation, cost attribution, and payment before APIs or MCP tools execute.",
+        text: "AI governance usually covers model risk, data policy, compliance, and human review. AI agent governance adds request-path controls for autonomous actions: scopes, budgets, delegated authority, revocation, denial reasons, spend attribution, and proof before APIs or MCP tools execute.",
       },
     },
   ],
