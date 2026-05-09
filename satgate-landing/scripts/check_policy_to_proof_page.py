@@ -5,6 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PAGE = ROOT / "app" / "policy-to-proof" / "page.tsx"
 
 AGENT_CONTROL_PLANE = ROOT / "app" / "agent-control-plane" / "page.tsx"
+GOVERN_PAGE = ROOT / "app" / "components" / "GovernClient.tsx"
 
 required_phrases = [
     "Every agent action leaves a receipt",
@@ -64,6 +65,31 @@ required_phrases = [
     "Authority-chain entries preserve lineage",
 ]
 
+govern_required_phrases = [
+    "Govern what agents can do",
+    "Prove every decision",
+    "Govern internal agents. Preserve proof across external rails.",
+    "Payment proves value moved. SatGate proves the agent was allowed to move it",
+    "Govern, enforce, prove.",
+    "Evidence Pack exports",
+    "first denied call after revoke",
+    "Stop giving AI agents standing authority",
+    "Export proof after",
+    "Policy-to-Proof",
+]
+
+govern_forbidden_phrases = [
+    "Not &ldquo;Who Are You?&rdquo; — &ldquo;What Can You Afford?&rdquo;",
+    "Two Problems. One Token.",
+    "Built for the C-Suite",
+    "Three Modes. One Gateway.",
+    "Monetize your APIs with L402",
+    "Charge policy with Lightning settlement",
+    "The Rogue Intern Story",
+    "Your Internal APIs Are an Untapped Market",
+    "Stop giving AI agents an all-you-can-eat buffet pass",
+]
+
 
 def main() -> int:
     if not PAGE.exists():
@@ -75,6 +101,13 @@ def main() -> int:
     acp_text = AGENT_CONTROL_PLANE.read_text()
     if "/policy-to-proof" not in acp_text:
         raise SystemExit("agent-control-plane page must link to /policy-to-proof")
+    govern_text = GOVERN_PAGE.read_text()
+    govern_missing = [phrase for phrase in govern_required_phrases if phrase not in govern_text]
+    if govern_missing:
+        raise SystemExit("missing govern policy-to-proof phrases:\n" + "\n".join(govern_missing))
+    govern_stale = [phrase for phrase in govern_forbidden_phrases if phrase in govern_text]
+    if govern_stale:
+        raise SystemExit("stale govern spend/rail-first phrases remain:\n" + "\n".join(govern_stale))
     return 0
 
 
