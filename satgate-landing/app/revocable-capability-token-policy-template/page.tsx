@@ -35,10 +35,10 @@ const profiles = {
     childBudgetPct: 15,
     risk: 'high',
   },
-  payments: {
-    subject: 'agent:robot-customer',
-    audience: 'paid-api-access',
-    scopes: ['api:metered:read', 'charge:l402:pay', 'receipt:audit:write'],
+  externalAccess: {
+    subject: 'agent:external-client',
+    audience: 'governed-api-access',
+    scopes: ['api:metered:read', 'policy:decision:read', 'receipt:audit:write'],
     maxBudgetUsd: 100,
     ttlMinutes: 60,
     delegation: false,
@@ -58,7 +58,7 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
     const p = profiles[profile];
     const tenantSlug = tenant.trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '') || 'tenant';
     const taskSlug = task.trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '') || 'task';
-    const yaml = `capability_token_policy: ${tenantSlug}-${taskSlug}\nmode: enforce\nissuer: satgate-economic-firewall\nsubject: ${p.subject}\naudience: ${p.audience}\ntenant_id: ${tenantSlug}\ntask_id: ${taskSlug}\nrisk_tier: ${p.risk}\nvalidity:\n  ttl_minutes: ${p.ttlMinutes}\n  not_before: now\n  expires_at: now + ${p.ttlMinutes}m\nscopes:\n${p.scopes.map((scope) => `  - ${scope}`).join('\n')}\nbudgets:\n  token_lifetime_usd: ${p.maxBudgetUsd}\n  per_request_usd: ${Math.max(0.25, p.maxBudgetUsd / 50)}\n  on_exhausted: revoke_and_block\ndelegation:\n  allowed: ${p.delegation}\n  child_budget_pct: ${p.childBudgetPct}\n  child_ttl_minutes: ${Math.min(60, p.ttlMinutes)}\n  child_scopes_must_be_subset: true\nrevocation:\n  revoke_on_budget_exhausted: true\n  revoke_on_loop_detected: true\n  revoke_on_policy_violation: true\n  revoke_on_parent_revoked: true\n  kill_switch: tenant:${tenantSlug}:agents\naudit:\n  required_fields:\n    - token_id\n    - parent_token_id\n    - tenant_id\n    - agent_id\n    - task_id\n    - scope\n    - estimated_cost_usd\n    - remaining_budget_usd\n    - revocation_state\n    - policy_decision`;
+    const yaml = `capability_token_policy: ${tenantSlug}-${taskSlug}\nmode: enforce\nissuer: satgate-economic-firewall\nsubject: ${p.subject}\naudience: ${p.audience}\ntenant_id: ${tenantSlug}\ntask_id: ${taskSlug}\nrisk_tier: ${p.risk}\nvalidity:\n  ttl_minutes: ${p.ttlMinutes}\n  not_before: now\n  expires_at: now + ${p.ttlMinutes}m\nscopes:\n${p.scopes.map((scope) => `  - ${scope}`).join('\n')}\nbudgets:\n  token_lifetime_usd: ${p.maxBudgetUsd}\n  per_request_usd: ${Math.max(0.25, p.maxBudgetUsd / 50)}\n  on_exhausted: revoke_and_block\ndelegation:\n  allowed: ${p.delegation}\n  child_budget_pct: ${p.childBudgetPct}\n  child_ttl_minutes: ${Math.min(60, p.ttlMinutes)}\n  child_scopes_must_be_subset: true\nrevocation:\n  revoke_on_budget_exhausted: true\n  revoke_on_loop_detected: true\n  revoke_on_policy_violation: true\n  revoke_on_parent_revoked: true\n  kill_switch: tenant:${tenantSlug}:agents\naudit:\n  required_fields:\n    - token_id\n    - parent_token_id\n    - tenant_id\n    - agent_id\n    - task_id\n    - scope\n    - estimated_cost_usd\n    - remaining_budget_usd\n    - revocation_state\n    - policy_decision\n    - decision_reason\n    - policy_version\n    - receipt_id\n    - evidence_pack_id`;
     const json = JSON.stringify({
       capability_token_policy: `${tenantSlug}-${taskSlug}`,
       mode: 'enforce',
@@ -73,7 +73,7 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
       budgets: { token_lifetime_usd: p.maxBudgetUsd, per_request_usd: Math.max(0.25, p.maxBudgetUsd / 50), on_exhausted: 'revoke_and_block' },
       delegation: { allowed: p.delegation, child_budget_pct: p.childBudgetPct, child_ttl_minutes: Math.min(60, p.ttlMinutes), child_scopes_must_be_subset: true },
       revocation: { revoke_on_budget_exhausted: true, revoke_on_loop_detected: true, revoke_on_policy_violation: true, revoke_on_parent_revoked: true, kill_switch: `tenant:${tenantSlug}:agents` },
-      audit: { required_fields: ['token_id', 'parent_token_id', 'tenant_id', 'agent_id', 'task_id', 'scope', 'estimated_cost_usd', 'remaining_budget_usd', 'revocation_state', 'policy_decision'] },
+      audit: { required_fields: ['token_id', 'parent_token_id', 'tenant_id', 'agent_id', 'task_id', 'scope', 'estimated_cost_usd', 'remaining_budget_usd', 'revocation_state', 'policy_decision', 'decision_reason', 'policy_version', 'receipt_id', 'evidence_pack_id'] },
     }, null, 2);
     return { yaml, json };
   }, [profile, task, tenant]);
@@ -83,7 +83,7 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
     '@type': 'WebPage',
     name: 'Revocable Capability Token Policy Template',
     url: 'https://satgate.io/revocable-capability-token-policy-template',
-    description: 'Generate scoped, expiring, revocable capability-token policy for AI agents, sub-agents, MCP tools, budgets, and audit trails.',
+    description: 'Generate scoped, expiring, revocable capability-token policy for AI agents, sub-agents, MCP tools, budgets, receipts, and Evidence Pack evidence.',
     datePublished: '2026-04-12',
     dateModified: '2026-05-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -104,11 +104,11 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/revocable-capability-token-policy-template',
-    description: 'Generate scoped, expiring, revocable capability-token policy for AI agents, sub-agents, MCP tools, budgets, and audit trails.',
+    description: 'Generate scoped, expiring, revocable capability-token policy for AI agents, sub-agents, MCP tools, budgets, receipts, and Evidence Pack evidence.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-05',
     audience: webPageJsonLd.audience,
-    featureList: ['YAML capability-token policy generation', 'JSON capability-token policy generation', 'Delegation attenuation controls', 'Budget exhaustion revocation rules', 'Audit field templates'],
+    featureList: ['YAML capability-token policy generation', 'JSON capability-token policy generation', 'Delegation attenuation controls', 'Budget exhaustion revocation rules', 'Receipt field templates', 'Evidence Pack export fields'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
@@ -116,14 +116,14 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: 'Capability-token policy checklist for AI agents',
-    description: 'Required fields for scoped, expiring, revocable, budget-aware AI agent capability tokens.',
+    description: 'Required fields for scoped, expiring, revocable, budget-aware AI agent capability tokens that produce receipts and Evidence Pack evidence.',
     itemListElement: [
       ['Scope', 'Bind authority to tenant, agent, task, audience, route, and MCP tool permissions.'],
       ['Expiry', 'Use short token lifetimes and shorter child-token TTLs for delegated sub-agents.'],
       ['Revocation', 'Revoke on budget exhaustion, loops, parent revocation, policy violation, or kill switch.'],
       ['Delegation', 'Require child capabilities to be strict subsets with attenuated budgets and scopes.'],
-      ['Audit', 'Log token id, parent id, cost, remaining budget, scope, revocation state, and decision.'],
-      ['Economic control', 'Pair identity with budgets so authentication and spend governance happen together.'],
+      ['Audit', 'Log token id, parent id, spend context, remaining budget, scope, revocation state, decision, receipt id, and Evidence Pack id.'],
+      ['Economic control', 'Pair identity with budgets so authentication, spend context, and proof capture happen together.'],
     ].map(([name, description], index) => ({
       '@type': 'ListItem',
       position: index + 1,
@@ -159,7 +159,7 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
         name: 'Why are capability tokens better than shared API keys for agents?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Shared API keys are broad, long-lived, and hard to revoke safely. Capability tokens bind authority to a specific agent task with spend limits, expiry, delegation rules, and audit fields.',
+          text: 'Shared API keys are broad, long-lived, and hard to revoke safely. Capability tokens bind authority to a specific agent task with budget limits, expiry, delegation rules, receipts, and Evidence Pack fields.',
         },
       },
       {
@@ -167,7 +167,7 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
         name: 'How does SatGate enforce these token policies?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate sits in the request path as an economic firewall, checking token scope, budget, delegation, revocation state, and audit requirements before upstream model, API, MCP, or L402 Charge access.',
+          text: 'SatGate sits in the request path as an economic firewall, checking token scope, budget, delegation, revocation state, and receipt policy before upstream model, API, MCP, or externally exposed agent access.',
         },
       },
     ],
@@ -191,14 +191,14 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
             Revocable Capability Token Policy Template
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Generate scoped, expiring, revocable token policy for AI agents, sub-agents, MCP tools, request budgets, delegation, kill switches, and audit trails.
+            Generate scoped, expiring, revocable token policy for AI agents, sub-agents, MCP tools, request budgets, delegation, kill switches, receipts, and Evidence Pack evidence.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <a href="#template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Generate policy <ArrowRight size={18} />
             </a>
-            <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
-              Learn capability tokens
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              See Policy-to-Proof
             </Link>
           </div>
         </div>
@@ -221,11 +221,11 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
               <option value="coding">Coding agent</option>
               <option value="support">Support copilot</option>
               <option value="research">Research analyst</option>
-              <option value="payments">Robot customer / L402</option>
+              <option value="externalAccess">External agent access</option>
             </select>
           </label>
           <div className="rounded-xl border border-cyan-900/50 bg-cyan-950/10 p-5 text-sm leading-relaxed text-cyan-100">
-            Static API keys are wrong for autonomous agents. Capabilities should be narrow, priced, time-boxed, auditable, and revocable.
+            Static API keys are wrong for autonomous agents. Capabilities should be narrow, priced, time-boxed, receipt-producing, and revocable.
           </div>
         </div>
 
@@ -251,7 +251,7 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-bold text-white">Capability-token policy checklist</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
-            Agent tokens need economic constraints, not just authentication. These fields make authority governable before spend is created.
+            Agent tokens need economic constraints, not just authentication. These fields make authority governable before execution and proof exportable after the decision.
           </p>
           <div className="grid gap-5 md:grid-cols-3">
             {[
@@ -259,8 +259,8 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
               [TimerReset, 'Expiry', 'Use short token lifetimes and shorter child-token TTLs for delegated sub-agents.'],
               [ShieldCheck, 'Revocation', 'Revoke on budget exhaustion, loops, parent revocation, policy violation, or kill switch.'],
               [ClipboardList, 'Delegation', 'Require child capabilities to be strict subsets with attenuated budgets and scopes.'],
-              [ReceiptText, 'Audit', 'Log token id, parent id, cost, remaining budget, scope, revocation state, and decision.'],
-              [KeyRound, 'Economic control', 'Pair identity with budgets so authentication and spend governance happen together.'],
+              [ReceiptText, 'Audit', 'Log token id, parent id, spend context, remaining budget, scope, revocation state, decision, receipt id, and Evidence Pack id.'],
+              [KeyRound, 'Economic control', 'Pair identity with budgets so authentication, spend context, and proof capture happen together.'],
             ].map(([Icon, title, body]) => {
               const CardIcon = Icon as typeof KeyRound;
               return (
@@ -286,11 +286,11 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Why are capability tokens better than shared API keys for agents?</h3>
-              <p className="leading-relaxed text-gray-400">Shared API keys are broad, long-lived, and hard to revoke safely. Capability tokens bind authority to a specific agent task with spend limits, expiry, delegation rules, and audit fields.</p>
+              <p className="leading-relaxed text-gray-400">Shared API keys are broad, long-lived, and hard to revoke safely. Capability tokens bind authority to a specific agent task with budget limits, expiry, delegation rules, receipts, and Evidence Pack fields.</p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate enforce these token policies?</h3>
-              <p className="leading-relaxed text-gray-400">SatGate sits in the request path as an economic firewall, checking token scope, budget, delegation, revocation state, and audit requirements before upstream model, API, MCP, or L402 Charge access.</p>
+              <p className="leading-relaxed text-gray-400">SatGate sits in the request path as an economic firewall, checking token scope, budget, delegation, revocation state, and receipt policy before upstream model, API, MCP, or externally exposed agent access.</p>
             </div>
           </div>
         </div>
@@ -298,19 +298,16 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-3xl border border-purple-900/60 bg-gradient-to-br from-purple-950/30 to-cyan-950/25 p-8 md:p-12">
-          <h2 className="mb-4 text-3xl font-bold text-white">Turn agent authority into an enforceable budget.</h2>
+          <h2 className="mb-4 text-3xl font-bold text-white">Turn agent authority into Policy-to-Proof evidence.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            SatGate checks capability scope, budget, revocation, delegation, audit, and Charge/L402 payment policy in the request path before agents reach upstream APIs or MCP tools.
+            Every scoped token decision should produce a receipt that can be exported into an Evidence Pack.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/revocable-agent-credentials" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-              Revocable agent credentials <ArrowRight size={18} />
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+              Govern agent authority <ArrowRight size={18} />
             </Link>
-            <Link href="/agent-api-key-risk-assessment" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
-              Assess API key risk
-            </Link>
-            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
-              Grade economic firewall readiness
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Create Evidence Pack trail
             </Link>
           </div>
         </div>

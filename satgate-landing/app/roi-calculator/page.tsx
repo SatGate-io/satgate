@@ -73,14 +73,15 @@ export default function ROICalculatorPage() {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     name: 'AI Agent ROI Calculator',
-    description: 'Estimate runaway AI agent spend exposure, request-path budget enforcement savings, payback period, and annual ROI for autonomous agents using paid APIs and MCP tools.',
+    description: 'Estimate runaway AI agent loop exposure, budget-control ROI, and the receipts needed for Policy-to-Proof evidence across paid APIs and MCP tools.',
     url: 'https://satgate.io/roi-calculator',
     dateModified: '2026-05-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent ROI calculator' },
-      { '@type': 'Thing', name: 'runaway AI agent spend exposure' },
+      { '@type': 'Thing', name: 'runaway AI agent loop exposure' },
       { '@type': 'Thing', name: 'request-path budget enforcement ROI' },
+      { '@type': 'Thing', name: 'Policy-to-Proof receipts' },
       { '@type': 'Thing', name: 'MCP tool spend risk' },
       { '@type': 'Thing', name: 'economic firewall payback period' },
     ],
@@ -93,14 +94,14 @@ export default function ROICalculatorPage() {
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/roi-calculator',
-    description: 'Estimate ghost spend, runaway agent loop exposure, payback period, and ROI from request-path AI agent budget enforcement.',
+    description: 'Estimate runaway agent loop exposure, budget-control ROI, and the receipts needed for Policy-to-Proof evidence.',
     featureList: [
       'Monthly AI agent tool spend estimate',
       'Runaway loop ghost spend exposure',
       'Annual AI agent cost-risk model',
       'Request-path budget enforcement savings estimate',
       'Payback period and annual ROI estimate',
-      'Links from ROI exposure to enforceable spend policy templates',
+      'Links from ROI exposure to Policy-to-Proof controls and Evidence Pack receipts',
     ],
     audience: [
       { '@type': 'Audience', audienceType: 'Platform engineering teams' },
@@ -155,7 +156,7 @@ export default function ROICalculatorPage() {
         name: 'What should I do after estimating runaway agent spend?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Turn the exposure model into enforceable policy: generate budget limits, MCP tool caps, scoped capability-token policy, and request-path controls that block over-budget calls before cost is created.',
+          text: 'Turn the exposure model into Policy-to-Proof controls: define authority, budget limits, MCP tool caps, scoped capability-token policy, receipts, and Evidence Pack exports.',
         },
       },
       {
@@ -164,6 +165,14 @@ export default function ROICalculatorPage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'Yes. A token cost calculator estimates model usage. This ROI calculator estimates autonomous agent spend risk across paid tools, APIs, MCP calls, retries, delegation, and loops that may happen outside a single LLM invoice.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do ROI results become evidence?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Use Policy-to-Proof to connect budget policy, request decisions, receipts, and Evidence Pack exports for audit-ready agent governance.',
         },
       },
       {
@@ -189,7 +198,7 @@ export default function ROICalculatorPage() {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
     name: 'How to estimate AI agent budget enforcement ROI',
-    description: 'Use the SatGate ROI calculator to estimate unmanaged AI agent spend, runaway loop exposure, monthly savings, payback period, and annual ROI.',
+    description: 'Use the SatGate ROI calculator to estimate unmanaged AI agent loop exposure, budget-control ROI, and Policy-to-Proof receipt coverage.',
     totalTime: 'PT3M',
     tool: [{ '@type': 'HowToTool', name: 'SatGate AI Agent ROI Calculator' }],
     step: [
@@ -206,7 +215,7 @@ export default function ROICalculatorPage() {
       {
         '@type': 'HowToStep',
         name: 'Model loop exposure',
-        text: 'Estimate loop frequency and average calls wasted before discovery to calculate ghost spend and annual risk exposure.',
+        text: 'Estimate loop frequency and average calls wasted before enforcement to calculate avoidable spend and annual risk exposure.',
       },
       {
         '@type': 'HowToStep',
@@ -247,7 +256,7 @@ export default function ROICalculatorPage() {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: 'AI agent budget enforcement break-even examples',
-    description: 'Examples that show when request-path budget enforcement can pay for itself by preventing unmanaged autonomous agent spend.',
+    description: 'Examples that show when request-path budget enforcement can pay for itself by enforcing authority, budget, and receipt policy before agent execution.',
     itemListElement: [
       {
         '@type': 'ListItem',
@@ -264,8 +273,8 @@ export default function ROICalculatorPage() {
       {
         '@type': 'ListItem',
         position: 3,
-        name: 'External agent monetization',
-        description: 'APIs exposed to robot customers can offset governance cost by charging with L402 before access is granted.',
+        name: 'External agent access',
+        description: 'APIs exposed to external agents need authority, budget, and receipt policy before access is granted.',
       },
     ],
   };
@@ -297,10 +306,9 @@ export default function ROICalculatorPage() {
             <span className="text-lg sm:text-xl font-bold text-white whitespace-nowrap">SatGate<sup className="text-xs font-normal">™</sup></span>
           </Link>
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
-            <Link href="/mint-demo" className="hover:text-white transition">Mint Demo</Link>
-            <Link href="/protect" className="hover:text-white transition">Control Demo</Link>
-            <Link href="/pay" className="hover:text-white transition">Charge Demo</Link>
-            <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
+            <Link href="/govern" className="hover:text-white transition">Govern</Link>
+            <Link href="/policy-to-proof" className="hover:text-white transition">Policy-to-Proof</Link>
+            <Link href="/tools" className="hover:text-white transition">Tools</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
             <Link href="/roi-calculator" className="text-white transition">ROI Calculator</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
@@ -317,10 +325,9 @@ export default function ROICalculatorPage() {
         <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
             {[
-              { href: '/mint-demo', label: 'Mint Demo' },
-              { href: '/protect', label: 'Control Demo' },
-              { href: '/pay', label: 'Charge Demo' },
-              { href: '/govern', label: 'Enterprise' },
+              { href: '/govern', label: 'Govern' },
+              { href: '/policy-to-proof', label: 'Policy-to-Proof' },
+              { href: '/tools', label: 'Tools' },
               { href: '/pricing', label: 'Pricing' },
               { href: '/roi-calculator', label: 'ROI Calculator' },
             ].map((l) => (
@@ -444,20 +451,16 @@ export default function ROICalculatorPage() {
         <div className="max-w-5xl mx-auto rounded-2xl border border-gray-800 bg-gray-900/60 p-6 md:p-8">
           <div className="mb-6 max-w-3xl">
             <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Go deeper</p>
-            <h2 className="mb-3 text-2xl md:text-3xl font-bold text-white">Turn the ROI model into enforceable policy</h2>
+            <h2 className="mb-3 text-2xl md:text-3xl font-bold text-white">Turn the ROI model into Policy-to-Proof</h2>
             <p className="text-gray-400">
-              The calculator shows the exposure. These guides show how to enforce budget limits before agents spend the money.
+              The calculator shows the exposure. SatGate maps it to enforceable authority checks, receipts, and an Evidence Pack before agents execute.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
-              { href: '/ai-agent-cost-control', title: 'AI agent cost control', body: 'Control API spend before autonomous agents create runaway bills.' },
-              { href: '/economic-firewall', title: 'Economic firewall', body: 'The request-path control layer for Observe, Control, and Charge.' },
-              { href: '/mcp-governance', title: 'MCP budget enforcement', body: 'Assign per-tool costs and cap MCP tool spend in real time.' },
-              { href: '/agent-api-governance', title: 'Agent API governance', body: 'Replace unlimited API keys with scoped, revocable capabilities.' },
-              { href: '/revocable-capability-token-policy-template', title: 'Capability-token policy template', body: 'Generate scoped, expiring, revocable agent authority with budgets and audit fields.' },
-              { href: '/agent-spend-policy-template', title: 'Agent spend policy template', body: 'Convert ROI exposure into copyable YAML and JSON budget enforcement policy.' },
-              { href: '/runaway-agent-cost-calculator', title: 'Runaway agent cost calculator', body: 'Model loop, retry, fanout, and MCP tool-call exposure.' },
+              { href: '/policy-to-proof', title: 'Map ROI to Policy-to-Proof', body: 'Connect exposure to enforceable checks, receipts, and an Evidence Pack.' },
+              { href: '/govern', title: 'Govern agent execution', body: 'Put authority, budget, and audit policy in the request path before execution.' },
+              { href: '/agent-spend-policy-template', title: 'Generate budget policy', body: 'Convert ROI exposure into YAML and JSON budget policy with receipt fields.' },
             ].map((item) => (
               <Link key={item.href} href={item.href} className="block rounded-xl border border-gray-800 bg-black/40 p-5 transition hover:border-cyan-500/40 hover:bg-cyan-950/20">
                 <h3 className="mb-2 font-bold text-white">{item.title}</h3>
@@ -519,18 +522,18 @@ export default function ROICalculatorPage() {
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-green-300">Break-even examples</p>
           <h2 className="mb-4 text-2xl md:text-3xl font-bold text-white">When request-path budget enforcement pays for itself</h2>
           <p className="mb-8 max-w-3xl text-gray-400 leading-relaxed">
-            The calculator is most persuasive when it ties avoided waste to a specific operating model: internal agents, MCP tools, or external robot customers.
+            The calculator is most persuasive when it ties avoided waste to a specific operating model: internal agents, MCP tools, or externally exposed agent access.
           </p>
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              ['Small team with one paid tool loop', 'A few dozen agents using a paid API can justify enforcement when one retry loop would exceed a monthly gateway subscription.', '/runaway-agent-cost-calculator'],
-              ['Enterprise MCP deployment', 'Hundreds of agents calling MCP tools need per-tool caps because provider dashboards miss spend outside LLM token invoices.', '/mcp-cost-control'],
-              ['External agent monetization', 'APIs exposed to robot customers can offset governance cost by charging with L402 before access is granted.', '/l402-api-pricing-calculator'],
+              ['Small team with one paid tool loop', 'A few dozen agents using a paid API can justify enforcement when one retry loop would exceed a monthly gateway subscription.', '/policy-to-proof'],
+              ['Enterprise MCP deployment', 'Hundreds of agents calling MCP tools need per-tool caps because provider dashboards miss spend outside LLM token invoices.', '/govern'],
+              ['External agent access', 'Externally exposed agent access needs scoped authority, budget checks, and receipts before execution.', '/policy-to-proof'],
             ].map(([title, body, href]) => (
               <Link key={title} href={href} className="rounded-xl border border-gray-800 bg-black/40 p-5 transition hover:border-green-500/50 hover:bg-green-950/20">
                 <h3 className="mb-2 font-bold text-white">{title}</h3>
                 <p className="mb-4 text-sm leading-relaxed text-gray-400">{body}</p>
-                <span className="text-sm font-semibold text-green-300">Model this scenario →</span>
+                <span className="text-sm font-semibold text-green-300">Map this to proof →</span>
               </Link>
             ))}
           </div>
@@ -594,7 +597,7 @@ export default function ROICalculatorPage() {
             <div>
               <h3 className="mb-2 text-xl font-bold text-white">What should I do after estimating runaway agent spend?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Turn the exposure model into enforceable policy: generate budget limits, MCP tool caps, scoped capability-token policy, and request-path controls that block over-budget calls before cost is created.
+                Turn the exposure model into Policy-to-Proof controls: define authority, budget limits, MCP tool caps, scoped capability-token policy, receipts, and Evidence Pack exports.
               </p>
             </div>
             <div>
@@ -622,23 +625,23 @@ export default function ROICalculatorPage() {
       {/* CTA */}
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-3">Start your free Shadow Audit</h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-3">Turn this ROI model into proof</h2>
           <p className="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
-            See real numbers from your own infrastructure — not estimates.
+            SatGate checks authority before execution, records every policy decision as a receipt, and packages the evidence for review.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/design-partners"
+              href="/govern"
               className="inline-block bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-10 py-4 rounded-full font-bold text-lg hover:opacity-90 transition shadow-lg shadow-purple-500/20"
             >
-              Start Free Shadow Audit →
+              Govern agent actions →
             </Link>
-            <a
-              href="mailto:contact@satgate.io"
+            <Link
+              href="/policy-to-proof"
               className="inline-block border border-gray-700 text-gray-300 px-10 py-4 rounded-full font-bold text-lg hover:border-gray-500 hover:bg-gray-800 transition"
             >
-              Talk to Sales
-            </a>
+              See Policy-to-Proof
+            </Link>
           </div>
         </div>
       </section>
