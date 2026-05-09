@@ -132,7 +132,7 @@ const evidencePack = {
     { type: "export", ts: "2026-05-09T14:26:31Z", result: "evidence_pack_issued", receipt_hash: "sha256:e1b3..." },
   ],
   chain_root: "sha256:f04ed8430b11c8975cc5ef35919ee078fc4cb166cd8d611ed0d94b7da69df09d",
-  signature: "ed25519:u3o9l6nN4z-demo-signature-redacted-proof-preview",
+  signature: "ed25519:REDACTED_DEMO_SAMPLE_DO_NOT_VERIFY",
 };
 
 const jsonLd = {
@@ -265,7 +265,7 @@ export default function PolicyToProofPage() {
               <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Answer the questions buyers ask after invoice-reconciler acts.</h2>
             </div>
             <p className="max-w-md text-sm leading-6 text-gray-500">
-              The Evidence Pack bundles these artifacts into one export instead of sending teams on a forensics project across logs, invoices, and gateway dashboards.
+              The Evidence Pack bundles these artifacts into one export instead of sending teams on a forensics project across logs, invoices, and gateway dashboards. Authority-chain entries preserve lineage; matching receipts preserve the event log, so auditors can verify both structure and sequence.
             </p>
           </div>
 
@@ -325,7 +325,7 @@ export default function PolicyToProofPage() {
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-purple-300">5-minute demo path</p>
             <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Mint → Delegate → Spend → Deny → Revoke → Export.</h2>
             <p className="mt-5 text-lg leading-8 text-gray-400">
-              The demo ends on the exported Evidence Pack. That is the buyer moment: one artifact proving authority, spend, denial, and revocation across the invoice-reconciler lifecycle.
+              The demo ends on the exported Evidence Pack. That is the buyer moment: one artifact proving authority, spend, denial, and revocation across the invoice-reconciler lifecycle. Even producing the Evidence Pack is itself an auditable event.
             </p>
           </div>
 
