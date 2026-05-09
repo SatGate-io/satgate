@@ -35,6 +35,9 @@ required_phrases = [
     "/acp-demo/satgate-acp-walkthrough.mp4",
     "/evidence-packs/sample-evidence-pack.json",
     "/evidence-packs/sample-evidence-pack.pdf",
+    "REDACTED_DEMO_SAMPLE_DO_NOT_VERIFY",
+    "Even producing the Evidence Pack is itself an auditable event",
+    "Authority-chain entries preserve lineage",
 ]
 
 
