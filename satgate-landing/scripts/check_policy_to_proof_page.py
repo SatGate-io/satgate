@@ -41,7 +41,7 @@ required_phrases = [
     "What the {title} gets",
     "Full hashes, payment rail context, ed25519 signature, and verification block",
     "payment_context",
-    "x402-style",
+    "x402",
     "internal_enterprise_agents",
     "Internal first, rail-aware when needed",
     "Payment proves value moved. SatGate proves the agent was allowed to move it.",

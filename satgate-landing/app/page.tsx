@@ -4,7 +4,7 @@ import HomeClient from "./components/HomeClient";
 export const metadata: Metadata = {
   title: "SatGate — The Economic Firewall for AI Agent Requests",
   description:
-    "Control AI agent API spend before each request. SatGate adds internal-agent authority governance, per-agent budgets, delegation, revocation, and evidence across MCP, API keys, L402, x402-style rails, and enterprise billing.",
+    "Control AI agent API spend before each request. SatGate adds internal-agent authority governance, per-agent budgets, delegation, revocation, and evidence across MCP, API keys, L402, x402-aware flows, and enterprise billing.",
   alternates: {
     canonical: "https://satgate.io",
   },
@@ -44,7 +44,7 @@ export default function HomePage() {
         '@type': 'WebPage',
         name: 'SatGate — The Economic Firewall for AI Agent Requests',
         url: 'https://satgate.io',
-        description: 'Control AI agent API spend before each request with internal-agent governance, per-agent budgets, delegation, revocation, and evidence across MCP, API keys, L402, x402-style rails, and enterprise billing.',
+        description: 'Control AI agent API spend before each request with internal-agent governance, per-agent budgets, delegation, revocation, and evidence across MCP, API keys, L402, x402-aware flows, and enterprise billing.',
         datePublished: '2026-04-30',
         dateModified: '2026-05-05',
         isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -83,7 +83,7 @@ export default function HomePage() {
         name: 'What are Observe, Control, and Charge?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Observe tracks agent traffic and cost without blocking. Control enforces budgets and scoped policy for internal agents. Charge preserves authorization evidence around external paid access across L402, x402-style, API-key, or enterprise billing rails.',
+          text: 'Observe tracks agent traffic and cost without blocking. Control enforces budgets and scoped policy for internal agents. Charge preserves authorization evidence around external paid access across L402, x402, API-key, or enterprise billing rails.',
         },
       },
     ],

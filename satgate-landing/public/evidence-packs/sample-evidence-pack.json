@@ -103,11 +103,11 @@
       "agent": "worker-agent:invoice-reconciler",
       "route": "/v1/invoices/ocr",
       "mcp_tool": "document_ai.ocr",
-      "amount_usd": "1.12",
+      "amount_usd": "0.18",
       "result": "allowed",
       "ledger_entry_id": "led_7f33",
       "receipt_hash": "sha256:deb583596fa15d409aab8e5b3c85a9dac5d970a6690a134074b70e7de042c7d2",
-      "payment_protocol": "x402-style",
+      "payment_protocol": "x402",
       "settlement": {
         "chain": "solana",
         "tx": "REDACTED_DEMO_SAMPLE",
@@ -174,7 +174,7 @@
     "default_market": "internal_enterprise_agents",
     "internal_rail": "existing_iam_service_account_or_api_key_billing",
     "optional_external_rails": [
-      "x402-style",
+      "x402",
       "l402",
       "api_key_billing",
       "enterprise_ledger"
