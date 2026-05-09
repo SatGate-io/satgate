@@ -156,10 +156,10 @@ const LandingPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              SatGate is the economic control plane for internal enterprise agents - with evidence that extends across paid external calls.
+              SatGate is the economic control plane for internal enterprise agents — governing what they can do, what they can spend, and proving every decision across paid external calls.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
-              Govern agent authority before it touches your API. Add budgets, scoped delegation, revocation, and proof across MCP, API keys, L402, x402-aware flows, and enterprise billing.
+              Govern agent authority before it touches your API. Add budgets, scoped delegation, revocation, and proof across MCP, API keys, L402, x402, and enterprise billing.
             </p>
             <div className="flex flex-wrap gap-4">
               <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
@@ -231,7 +231,7 @@ const LandingPage = () => {
       <section className="py-16 px-6 border-b border-gray-800">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-3">See SatGate in Action</h2>
-          <p className="text-gray-400 mb-8 max-w-2xl mx-auto">Agents spend without limits. SatGate stops that. 30 seconds.</p>
+          <p className="text-gray-400 mb-8 max-w-2xl mx-auto">Agents act across tools, APIs, and paid rails. SatGate enforces policy before they act — and leaves evidence after. 30 seconds.</p>
           <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
             <video
               controls
@@ -251,15 +251,15 @@ const LandingPage = () => {
       <section className="py-20 px-6 border-b border-gray-800 bg-black">
         <div className="max-w-6xl mx-auto">
           <div className="mb-10 max-w-3xl">
-            <p className="mb-3 text-sm font-mono uppercase tracking-wide text-cyan-300">Free agent cost tools</p>
-            <h2 className="mb-4 text-3xl md:text-4xl font-bold text-white">Measure the economic risk before agents run wild</h2>
+            <p className="mb-3 text-sm font-mono uppercase tracking-wide text-cyan-300">Free agent governance tools</p>
+            <h2 className="mb-4 text-3xl md:text-4xl font-bold text-white">Measure authority and spend risk before agents run wild</h2>
             <p className="text-gray-400 text-lg leading-relaxed">
               Start with the flagship tools and benchmark. The full tools hub has the calculators, policy generators, and readiness checks for deeper planning.
             </p>
           </div>
           <div className="mb-6">
             <Link href="/tools" className="inline-flex items-center gap-2 text-cyan-300 hover:text-cyan-200 font-semibold transition">
-              View all free AI agent cost tools <ArrowRight size={16} />
+              View all free AI agent governance tools <ArrowRight size={16} />
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -283,8 +283,8 @@ const LandingPage = () => {
       <section className="py-20 px-6 border-b border-gray-800 bg-gradient-to-b from-gray-900/30 to-black">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3">From Observation to Autonomy</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">First, govern your own house. Then open the gates - on your terms.</p>
+            <h2 className="text-3xl font-bold mb-3">Govern, enforce, prove</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">Start with internal agents: scope authority, enforce policy at runtime, and preserve evidence. Then open external rails - on your terms.</p>
           </div>
 
           {/* Default Protection - Foundation */}
@@ -315,7 +315,7 @@ const LandingPage = () => {
 
           {/* Your Agents */}
           <div className="mb-4">
-            <p className="text-sm font-mono text-cyan-400 mb-4 uppercase tracking-wider">Your Agents - Prevent Unauthorized Spend</p>
+            <p className="text-sm font-mono text-cyan-400 mb-4 uppercase tracking-wider">Your Agents - Govern Authority and Spend</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Observe - Free */}
@@ -331,12 +331,12 @@ const LandingPage = () => {
                 verify → allow → meter/log
               </p>
               <p className="text-xs text-cyan-400/80 mb-3 italic">
-                Start here. No workflow changes. No budget enforcement yet. Just visibility.
+                Start here. No workflow changes. Map authority, tools, and spend before enforcing policy.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ Audit mode - zero disruption to existing agents</li>
                 <li>✓ Usage attribution by team and cost center</li>
-                <li>✓ See exactly where money is going before you change anything</li>
+                <li>✓ See exactly which agents, tools, and routes create risk before you change anything</li>
                 <li>✓ Zero latency impact</li>
               </ul>
             </div>
@@ -354,7 +354,7 @@ const LandingPage = () => {
                 verify → enforce budget → allow
               </p>
               <p className="text-xs text-purple-400/80 mb-3 italic">
-                Now enforce it. Hard budget caps - when it hits zero, agents stop.
+                Now enforce it. Policy and budget caps stop agents before unauthorized work executes.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ Real-time budget enforcement</li>
@@ -600,7 +600,7 @@ const LandingPage = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-3">How It Works</h2>
             <p className="text-gray-400 max-w-xl mx-auto">
-              Four steps to protect your API. No code changes required.
+              Four steps to govern agent traffic. No code changes required.
             </p>
           </div>
 
@@ -626,9 +626,9 @@ const LandingPage = () => {
               },
               {
                 step: "4",
-                title: "See Verified Traffic",
-                description: "Real-time: verified vs challenged. Enable Charge policy when ready for revenue.",
-                code: `Verified:   1,203 requests\nChallenged: 12,847 (402s)\nMetered:    $847 usage\n\n→ Enable Charge policy?`
+                title: "Prove What Happened",
+                description: "Real-time verified, denied, and metered decisions with evidence you can export.",
+                code: `Verified:   1,203 requests\nDenied:     12,847 policy hits\nMetered:    $847 usage\n\n→ Export Evidence Pack`
               }
             ].map((item, i) => (
               <div key={i} className="relative">
@@ -654,11 +654,11 @@ const LandingPage = () => {
       <section className="py-20 px-6 border-t border-gray-900 bg-gray-950/40">
         <div className="max-w-4xl mx-auto rounded-2xl border border-gray-800 bg-black p-8 md:p-10">
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">FAQ</p>
-          <h2 className="mb-8 text-3xl font-bold text-white">Economic firewall questions</h2>
+          <h2 className="mb-8 text-3xl font-bold text-white">Agent governance questions</h2>
           <div className="space-y-6">
             {[
-              ['What is SatGate?', 'SatGate is an economic firewall and economic control plane for internal enterprise agents. It sits in the request path to observe usage, enforce budgets, scope delegated authority, prove revocation, and preserve evidence across internal APIs and paid external calls.'],
-              ['How does SatGate control AI agent spend?', 'SatGate applies per-agent, per-tool, per-team, and per-task budgets before each request reaches an API or MCP tool, so runaway loops and expensive calls can be blocked before spend occurs.'],
+              ['What is SatGate?', 'SatGate is an economic control plane for internal enterprise agents. It sits in the request path to scope authority, enforce policy and budgets, prove revocation, and preserve evidence across internal APIs and paid external calls.'],
+              ['How does SatGate govern AI agents?', 'SatGate applies scoped authority, per-agent policy, revocation, and budgets before each request reaches an API or MCP tool, so unauthorized actions and expensive calls can be blocked before they happen.'],
               ['What are Observe, Control, and Charge?', 'Observe tracks agent traffic and cost without blocking. Control enforces budgets and scoped policy for internal agents. Charge preserves authorization evidence around external paid access across L402, x402, API-key, or enterprise billing rails.'],
             ].map(([question, answer]) => (
               <div key={question} className="border-t border-gray-800 pt-6 first:border-t-0 first:pt-0">
@@ -674,7 +674,7 @@ const LandingPage = () => {
       <footer className="py-20 border-t border-gray-800">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-6">Ready to control what your agents can spend?</h2>
+            <h2 className="text-3xl font-bold mb-6">Ready to govern what your agents can do?</h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
               <a href="mailto:contact@satgate.io" className="inline-block bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-10 py-4 rounded-full font-bold text-lg hover:opacity-90 transition shadow-lg shadow-purple-500/20">
                 Get in Touch
@@ -684,7 +684,7 @@ const LandingPage = () => {
               </a>
             </div>
             <p className="text-gray-500 text-sm">
-              Or <Link href="/govern" className="text-purple-400 hover:text-purple-300 transition underline underline-offset-4">learn how enterprises are controlling AI agent spend →</Link>
+              Or <Link href="/policy-to-proof" className="text-purple-400 hover:text-purple-300 transition underline underline-offset-4">see the Policy-to-Proof evidence story →</Link>
             </p>
           </div>
 
@@ -694,7 +694,7 @@ const LandingPage = () => {
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="text-gray-500 text-sm">The Economic Firewall for AI agent requests.</p>
+              <p className="text-gray-500 text-sm">Govern what agents can do — and prove it.</p>
               <p className="text-gray-600 text-xs mt-3">Non-custodial. We never hold your keys.</p>
             </div>
             <div>
