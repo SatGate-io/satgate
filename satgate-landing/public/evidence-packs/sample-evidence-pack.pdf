@@ -4,7 +4,7 @@
 3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >> endobj
 4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj
 5 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> endobj
-6 0 obj << /Length 4987 >> stream
+6 0 obj << /Length 5001 >> stream
 0.025 0.035 0.055 rg
 0 0 612 792 re f
 0.020 0.350 0.420 rg
@@ -205,7 +205,7 @@ ET
 BT
 /F1 7.8 Tf
 88 360 Td
-(Mint receipt) Tj
+(Mint receipt - SOC 2) Tj
 ET
 0.050 0.070 0.100 rg
 BT
@@ -223,7 +223,7 @@ ET
 BT
 /F1 7.8 Tf
 88 334 Td
-(Mint receipt) Tj
+(Mint receipt - ISO) Tj
 ET
 0.050 0.070 0.100 rg
 BT
@@ -365,5 +365,5 @@ xref
 0000000396 00000 n 
 trailer << /Size 7 /Root 1 0 R >>
 startxref
-5435
+5449
 %%EOF
