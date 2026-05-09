@@ -367,21 +367,21 @@ export default function PolicyToProofPage() {
                 preload="metadata"
                 poster="/evidence-packs/evidence-pack-export-poster.svg"
               >
-                <source src="/acp-demo/satgate-acp-walkthrough.mp4" type="video/mp4" />
+                <source src="/evidence-packs/satgate-evidence-pack-walkthrough.mp4" type="video/mp4" />
               </video>
             </div>
             <div className="rounded-3xl border border-cyan-300/20 bg-cyan-300/5 p-7">
               <div className="mb-4 flex items-center gap-2 text-cyan-200">
                 <PlayCircle size={22} />
-                <span className="text-sm font-bold uppercase tracking-[0.2em]">Recorded walkthrough</span>
+                <span className="text-sm font-bold uppercase tracking-[0.2em]">90-second Evidence Pack cut</span>
               </div>
-              <h3 className="text-2xl font-black text-white">Show the control plane, then end on proof.</h3>
+              <h3 className="text-2xl font-black text-white">Show the authority lifecycle, then end on the exported proof.</h3>
               <p className="mt-4 text-sm leading-6 text-gray-400">
-                This uses the existing ACP walkthrough while the focused 90-second Evidence Pack cut is produced.
+                A focused walkthrough of the buyer moment: signed lifecycle export, receipt chain, audit mappings, and the downloadable Evidence Pack.
               </p>
               <div className="mt-6 flex flex-col gap-3 text-sm font-bold sm:flex-row sm:flex-wrap">
-                <a href="/acp-demo/satgate-acp-walkthrough.mp4" className="inline-flex items-center gap-2 text-cyan-200 hover:text-cyan-100">
-                  Watch full walkthrough <ArrowRight size={16} />
+                <a href="/evidence-packs/satgate-evidence-pack-walkthrough.mp4" className="inline-flex items-center gap-2 text-cyan-200 hover:text-cyan-100">
+                  Watch the 90-second cut <ArrowRight size={16} />
                 </a>
                 <Link href="/agent-control-plane" className="inline-flex items-center gap-2 text-gray-300 hover:text-white">
                   See the agent control plane <ArrowRight size={16} />
