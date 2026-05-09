@@ -451,7 +451,7 @@ export default function EconomicFirewallPage() {
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-purple-950/30 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">SatGate governs agent authority before value moves</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            Put SatGate in the request path to observe every agent call, control what agents can access or spend, preserve Evidence Pack proof across mint, delegation, spend, denial, and revocation, and govern paid rails when APIs become products for external agents.
+            Put SatGate in the request path to observe every agent call, control what agents can access or spend, preserve Evidence Pack proof across mint, delegation, spend, denial, and revocation, and govern paid rails when value moves.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
