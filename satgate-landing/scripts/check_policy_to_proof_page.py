@@ -41,6 +41,12 @@ required_phrases = [
     "What the {title} gets",
     "Full hashes, ed25519 signature, and verification block",
     "ISO 27001 A.9.2.1",
+    "Mint receipt — US SOC 2",
+    "Mint receipt — ISO 27001",
+    "Demo path",
+    "Read the six-step lifecycle below, or watch the 90-second cut",
+    "Want this for your stack?",
+    "Book a 15-minute walkthrough",
     "Even producing the Evidence Pack is itself an auditable event",
     "Authority-chain entries preserve lineage",
 ]

@@ -88,8 +88,8 @@ const demoSteps = [
 ];
 
 const standardsMappings = [
-  ["Mint receipt", "SOC 2 CC6.1", "Logical access provisioning tied to identity, policy, issuer, and timestamp."],
-  ["Mint receipt", "ISO 27001 A.9.2.1", "User registration and de-registration evidence for agent authority issuance."],
+  ["Mint receipt — US SOC 2", "SOC 2 CC6.1", "Logical access provisioning tied to identity, policy, issuer, and timestamp."],
+  ["Mint receipt — ISO 27001", "ISO 27001 A.9.2.1", "User registration and de-registration evidence for agent authority issuance."],
   ["Delegation chain", "SOC 2 CC6.3 / NIST AC-3", "Least-privilege attenuation across parent and worker authority."],
   ["Revocation receipt", "SOC 2 CC6.2/CC6.3 / NIST AC-2(3)", "Deprovisioning event plus first post-revoke denial trail."],
   ["Spend ledger", "SOC 2 CC1.4 / FinOps attribution", "Governance evidence for who created spend, on which route/tool, under which token."],
@@ -334,16 +334,36 @@ export default function PolicyToProofPage() {
               </figure>
             ))}
           </div>
+
+          <div className="mt-10 rounded-3xl border border-cyan-300/20 bg-cyan-300/5 p-7">
+            <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-200">Want this for your stack?</p>
+                <p className="mt-3 max-w-2xl text-xl font-black leading-8 text-white">
+                  Bring an API, an agent workflow, and the evidence your auditor already asks for.
+                </p>
+              </div>
+              <a
+                href="mailto:contact@satgate.io?subject=SatGate%20Policy-to-Proof%20walkthrough"
+                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-black transition hover:bg-gray-200"
+              >
+                Book a 15-minute walkthrough <ArrowRight size={18} />
+              </a>
+            </div>
+          </div>
         </div>
       </section>
 
       <section className="px-6 py-20">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-purple-300">5-minute demo path</p>
+            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-purple-300">Demo path</p>
             <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Mint → Delegate → Spend → Deny → Revoke → Export.</h2>
             <p className="mt-5 text-lg leading-8 text-gray-400">
               The demo ends on the exported Evidence Pack. That is the buyer moment: one artifact proving authority, spend, denial, and revocation across the invoice-reconciler lifecycle. Even producing the Evidence Pack is itself an auditable event.
+            </p>
+            <p className="mt-4 text-sm leading-6 text-gray-500">
+              Read the six-step lifecycle below, or watch the 90-second cut.
             </p>
           </div>
 
