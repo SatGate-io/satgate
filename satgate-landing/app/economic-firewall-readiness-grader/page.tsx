@@ -177,8 +177,8 @@ export default function EconomicFirewallReadinessGraderPage() {
             <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Learn economic firewalls <ArrowRight size={18} />
             </Link>
-            <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
-              See agent authority control
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              See SatGate governance
             </Link>
           </div>
         </div>
@@ -222,7 +222,7 @@ export default function EconomicFirewallReadinessGraderPage() {
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
             <h3 className="mb-4 flex items-center gap-2 text-xl font-bold text-white"><CircleAlert className="text-yellow-300" size={22} /> Priority fixes</h3>
             <div className="space-y-3">
-              {result.missing.slice(0, 5).map((q) => (
+              {result.missing.map((q) => (
                 <div key={q.id} className="rounded-xl border border-gray-800 bg-black p-4">
                   <div className="mb-1 font-bold text-white">{q.category}</div>
                   <p className="text-sm leading-relaxed text-gray-400">{q.fix}</p>
@@ -245,7 +245,7 @@ export default function EconomicFirewallReadinessGraderPage() {
             {[
               [KeyRound, 'Authority', 'Agent identity, scoped credentials, expiry, attenuation, and revocation.'],
               [Gauge, 'Budget and authority limits', 'Request-path budgets, scoped authority, per-tool caps, model routing, and loop prevention.'],
-              [ReceiptText, 'Evidence', 'Evidence Pack trails that explain authority, cost, policy decision, denial reason, route, and outcome.'],
+              [ReceiptText, 'Evidence', 'Evidence Pack trails that explain authority, spend context, policy decision, denial reason, route, and outcome.'],
               [BadgeCheck, 'Paid-rail context', 'Observe, Control, and Prove paths for internal agents and rail-aware paid calls.'],
             ].map(([Icon, title, body]) => {
               const TypedIcon = Icon as typeof KeyRound;
@@ -289,11 +289,11 @@ export default function EconomicFirewallReadinessGraderPage() {
             SatGate governs agent authority before execution: Observe every agent call, Control risky requests before they execute, and Prove allowed, denied, delegated, revoked, or paid decisions with an Evidence Pack.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-              Generate MCP tool policy <ArrowRight size={18} />
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+              See SatGate governance <ArrowRight size={18} />
             </Link>
-            <Link href="/openai-budget-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
-              Generate OpenAI budget policy
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              See the Evidence Pack
             </Link>
           </div>
         </div>
