@@ -156,10 +156,10 @@ const LandingPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              SatGate is the economic control plane for AI agents. Observe, budget, and charge for every request - before it touches your API.
+              SatGate is the economic control plane for internal enterprise agents - with evidence that extends across paid external calls.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
-              Drop-in gateway. Sub-ms overhead. Start in Observe mode - enforce when ready.
+              Govern agent authority before it touches your API. Add budgets, scoped delegation, revocation, and proof across MCP, API keys, L402, x402-style rails, and enterprise billing.
             </p>
             <div className="flex flex-wrap gap-4">
               <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
@@ -178,7 +178,7 @@ const LandingPage = () => {
               <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> REST · GraphQL · MCP</span>
               <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Gateway · Sidecar · MCP Proxy</span>
               <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Sub-ms verification</span>
-              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Stripe / ERP + Lightning</span>
+              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> MCP · API keys · x402-style rails</span>
               <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> <a href="https://github.com/SatGate-io/satgate" className="text-gray-400 hover:text-white transition underline underline-offset-2">Open source</a></span>
             </div>
           </div>
@@ -373,19 +373,19 @@ const LandingPage = () => {
                 <div className="p-2.5 bg-yellow-900/50 rounded-lg">
                   <DollarSign className="text-yellow-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Charge <span className="text-xs font-normal text-gray-500">(L402)</span></h3>
+                <h3 className="font-bold text-lg">Charge <span className="text-xs font-normal text-gray-500">(external rails)</span></h3>
               </div>
               <p className="text-gray-400 text-sm mb-3">
                 verify → payment proof → allow
               </p>
               <p className="text-xs text-yellow-400/80 mb-3 italic">
-                Open your API to the autonomous agent swarm - on your terms.
+                Govern external agent access without making payment proof equal authorization proof.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
-                <li>✓ No registration, no API key - just pay and go</li>
-                <li>✓ Bitcoin Lightning micropayments (instant)</li>
-                <li>✓ Per-request pricing at sub-cent granularity</li>
-                <li>✓ Autonomous agents discover and pay for access</li>
+                <li>✓ Let approved agents pay or access without long-lived shared secrets</li>
+                <li>✓ Preserve authority evidence above x402-style, L402, API-key, or enterprise billing rails</li>
+                <li>✓ Per-request pricing and policy before upstream execution</li>
+                <li>✓ Autonomous agents discover, pay, and leave an audit trail</li>
               </ul>
             </div>
           </div>
@@ -653,9 +653,9 @@ const LandingPage = () => {
           <h2 className="mb-8 text-3xl font-bold text-white">Economic firewall questions</h2>
           <div className="space-y-6">
             {[
-              ['What is SatGate?', 'SatGate is an economic firewall and economic control plane for AI agents. It sits in the request path to observe usage, enforce budgets, attribute spend, and charge external agents before upstream APIs execute.'],
+              ['What is SatGate?', 'SatGate is an economic firewall and economic control plane for internal enterprise agents. It sits in the request path to observe usage, enforce budgets, scope delegated authority, prove revocation, and preserve evidence across internal APIs and paid external calls.'],
               ['How does SatGate control AI agent spend?', 'SatGate applies per-agent, per-tool, per-team, and per-task budgets before each request reaches an API or MCP tool, so runaway loops and expensive calls can be blocked before spend occurs.'],
-              ['What are Observe, Control, and Charge?', 'Observe tracks agent traffic and cost without blocking. Control enforces budgets and scoped policy for internal agents. Charge uses L402 Lightning payments to monetize external agent and robot-customer API access.'],
+              ['What are Observe, Control, and Charge?', 'Observe tracks agent traffic and cost without blocking. Control enforces budgets and scoped policy for internal agents. Charge preserves authorization evidence around external paid access across L402, x402-style, API-key, or enterprise billing rails.'],
             ].map(([question, answer]) => (
               <div key={question} className="border-t border-gray-800 pt-6 first:border-t-0 first:pt-0">
                 <h3 className="mb-2 text-xl font-bold text-white">{question}</h3>
@@ -760,7 +760,9 @@ const LandingPage = () => {
 };
 
 // Simple helper component for features
-const FeatureCard = ({ icon, title, desc }: any) => (
+type FeatureCardProps = { icon: React.ReactNode; title: string; desc: string };
+
+const FeatureCard = ({ icon, title, desc }: FeatureCardProps) => (
   <div className="p-6 rounded-xl bg-black border border-gray-800 hover:border-gray-600 transition group">
     <div className="mb-4 p-3 bg-gray-900 rounded-lg w-fit group-hover:bg-gray-800 transition">{icon}</div>
     <h3 className="text-xl font-bold mb-2">{title}</h3>
