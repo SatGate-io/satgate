@@ -7,6 +7,8 @@ PAGE = ROOT / "app" / "policy-to-proof" / "page.tsx"
 AGENT_CONTROL_PLANE = ROOT / "app" / "agent-control-plane" / "page.tsx"
 GOVERN_PAGE = ROOT / "app" / "components" / "GovernClient.tsx"
 ECONOMIC_FIREWALL_PAGE = ROOT / "app" / "economic-firewall" / "page.tsx"
+READINESS_GRADER_PAGE = ROOT / "app" / "economic-firewall-readiness-grader" / "page.tsx"
+READINESS_GRADER_LAYOUT = ROOT / "app" / "economic-firewall-readiness-grader" / "layout.tsx"
 
 required_phrases = [
     "Every agent action leaves a receipt",
@@ -187,6 +189,28 @@ economic_forbidden_phrases = [
     "when APIs become products for external agents",
 ]
 
+readiness_required_phrases = [
+    "Grade whether your agent/API stack can handle autonomous authority",
+    "Evidence Pack capture",
+    "Paid-rail context",
+    "govern paid rails when value moves",
+    "SatGate governs agent authority before execution",
+    "Prove allowed, denied, delegated, revoked, or paid decisions with an Evidence Pack",
+    "Assess whether your agent/API stack is ready for autonomous authority",
+]
+
+readiness_forbidden_phrases = [
+    "autonomous spend",
+    "L402 robot payments",
+    "L402 Charge",
+    "Robot payments",
+    "robot customers",
+    "when APIs become products",
+    "when agents become customers",
+    "Observe what agents spend",
+    "Charge robot customers",
+]
+
 
 def main() -> int:
     if not PAGE.exists():
@@ -218,6 +242,13 @@ def main() -> int:
     economic_stale = [phrase for phrase in economic_forbidden_phrases if phrase in economic_text]
     if economic_stale:
         raise SystemExit("stale economic-firewall Charge/spend-first phrases remain:\n" + "\n".join(economic_stale))
+    readiness_text = READINESS_GRADER_PAGE.read_text() + "\n" + READINESS_GRADER_LAYOUT.read_text()
+    readiness_missing = [phrase for phrase in readiness_required_phrases if phrase not in readiness_text]
+    if readiness_missing:
+        raise SystemExit("missing readiness-grader authority/proof phrases:\n" + "\n".join(readiness_missing))
+    readiness_stale = [phrase for phrase in readiness_forbidden_phrases if phrase in readiness_text]
+    if readiness_stale:
+        raise SystemExit("stale readiness-grader spend/Charge phrases remain:\n" + "\n".join(readiness_stale))
     return 0
 
 
