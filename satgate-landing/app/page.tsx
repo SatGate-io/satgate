@@ -4,14 +4,14 @@ import HomeClient from "./components/HomeClient";
 export const metadata: Metadata = {
   title: "SatGate — The Economic Firewall for AI Agent Requests",
   description:
-    "Control AI agent API spend before each request. SatGate adds internal-agent authority governance, per-agent budgets, delegation, revocation, and evidence across MCP, API keys, L402, x402-aware flows, and enterprise billing.",
+    "Govern internal enterprise agents before each request. SatGate adds scoped authority, per-agent budgets, delegation, revocation, and evidence across MCP, API keys, L402, x402, and enterprise billing.",
   alternates: {
     canonical: "https://satgate.io",
   },
   openGraph: {
     title: "SatGate — The Economic Firewall for AI Agent Requests",
     description:
-      "Control AI agent API spend before each request with budgets, per-tool attribution, delegation controls, and evidence across internal APIs and paid external rails.",
+      "Govern what internal enterprise agents can do with scoped authority, budgets, runtime enforcement, and evidence across internal APIs and paid external rails.",
     url: "https://satgate.io",
     type: "website",
   },
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SatGate — Economic Firewall for AI Agent Requests",
     description:
-      "Control AI agent API spend before each request with budgets, per-tool attribution, delegation controls, and evidence across internal APIs and paid external rails.",
+      "Govern what internal enterprise agents can do with scoped authority, budgets, runtime enforcement, and evidence across internal APIs and paid external rails.",
   },
 };
 
@@ -44,7 +44,7 @@ export default function HomePage() {
         '@type': 'WebPage',
         name: 'SatGate — The Economic Firewall for AI Agent Requests',
         url: 'https://satgate.io',
-        description: 'Control AI agent API spend before each request with internal-agent governance, per-agent budgets, delegation, revocation, and evidence across MCP, API keys, L402, x402-aware flows, and enterprise billing.',
+        description: 'Govern internal enterprise agents before each request with scoped authority, per-agent budgets, delegation, revocation, and evidence across MCP, API keys, L402, x402, and enterprise billing.',
         datePublished: '2026-04-30',
         dateModified: '2026-05-05',
         isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -67,15 +67,15 @@ export default function HomePage() {
         name: 'What is SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate is an economic firewall and economic control plane for internal enterprise agents. It sits in the request path to observe usage, enforce budgets, scope delegated authority, prove revocation, and preserve evidence across internal APIs and paid external calls.',
+          text: 'SatGate is an economic control plane for internal enterprise agents. It sits in the request path to scope authority, enforce policy and budgets, prove revocation, and preserve evidence across internal APIs and paid external calls.',
         },
       },
       {
         '@type': 'Question',
-        name: 'How does SatGate control AI agent spend?',
+        name: 'How does SatGate govern AI agents?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate applies per-agent, per-tool, per-team, and per-task budgets before each request reaches an API or MCP tool, so runaway loops and expensive calls can be blocked before spend occurs.',
+          text: 'SatGate applies scoped authority, per-agent policy, revocation, and budgets before each request reaches an API or MCP tool, so unauthorized actions and expensive calls can be blocked before they happen.',
         },
       },
       {
