@@ -122,7 +122,7 @@ const evidencePack = {
   payment_context: {
     default_market: "internal_enterprise_agents",
     internal_rail: "existing_iam_service_account_or_api_key_billing",
-    optional_external_rails: ["x402-style", "l402", "api_key_billing", "enterprise_ledger"],
+    optional_external_rails: ["x402", "l402", "api_key_billing", "enterprise_ledger"],
     note: "The same authority chain and receipts can cover an internal agent call, or a governed bridge call to an external paid API.",
   },
   authority_chain: [
@@ -146,7 +146,7 @@ const evidencePack = {
     { type: "delegation", ts: "2026-05-09T14:23:04Z", result: "attenuated", receipt_hash: "sha256:95f1..." },
     { type: "spend", ts: "2026-05-09T14:23:18Z", route: "/v1/invoices/search", amount_usd: "0.18", payment_protocol: "internal_api", settlement: { rail: "internal_ledger", cost_center: "FIN-AP-042" }, result: "allowed", receipt_hash: "sha256:01d8..." },
     { type: "spend", ts: "2026-05-09T14:24:02Z", route: "/v1/invoices/compare", amount_usd: "0.42", payment_protocol: "internal_api", settlement: { rail: "internal_ledger", cost_center: "FIN-AP-042" }, result: "allowed", receipt_hash: "sha256:a923..." },
-    { type: "spend", ts: "2026-05-09T14:24:44Z", route: "/v1/invoices/ocr", mcp_tool: "document_ai.ocr", amount_usd: "1.12", payment_protocol: "x402-style", settlement: { chain: "solana", tx: "REDACTED_DEMO_SAMPLE", ms: 187 }, result: "allowed", receipt_hash: "sha256:deb5..." },
+    { type: "spend", ts: "2026-05-09T14:24:44Z", route: "/v1/invoices/ocr", mcp_tool: "document_ai.ocr", amount_usd: "0.18", payment_protocol: "x402", settlement: { chain: "solana", tx: "REDACTED_DEMO_SAMPLE", ms: 187 }, result: "allowed", receipt_hash: "sha256:deb5..." },
     { type: "denial", ts: "2026-05-09T14:25:08Z", reason_code: "scope_violation:no_customer_data_export", result: "blocked", receipt_hash: "sha256:9b0f..." },
     { type: "denial", ts: "2026-05-09T14:25:33Z", reason_code: "budget_exhausted", result: "blocked", receipt_hash: "sha256:c3f6..." },
     { type: "revocation", ts: "2026-05-09T14:26:11Z", revoked_by: "security-admin", result: "revoked", receipt_hash: "sha256:37d1..." },
@@ -251,6 +251,21 @@ export default function PolicyToProofPage() {
         </div>
       </section>
 
+      <section className="border-b border-white/10 bg-white/[0.02] px-6 py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="max-w-3xl">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-cyan-300">Internal first, rail-aware when needed</p>
+            <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Built for internal enterprise agents. Extends across paid external calls.</h2>
+            <p className="mt-5 text-lg leading-8 text-gray-400">
+              Most enterprise agents do not need a wallet to call internal APIs. They need scoped authority, budget controls, revocation, and audit evidence around the credentials they already have.
+            </p>
+            <p className="mt-4 text-base leading-7 text-gray-500">
+              When that same internal workflow crosses into an external paid API, SatGate keeps the proof intact: internal scope and delegation, plus spend attribution above x402 rails, L402, API-key billing, or enterprise ledgers. Payment proves value moved. SatGate proves the agent was allowed to move it.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="border-b border-white/10 px-6 py-20">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
@@ -276,20 +291,7 @@ export default function PolicyToProofPage() {
         </div>
       </section>
 
-      <section className="border-b border-white/10 bg-white/[0.02] px-6 py-20">
-        <div className="mx-auto max-w-6xl">
-          <div className="max-w-3xl">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-cyan-300">Internal first, rail-aware when needed</p>
-            <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Built for internal enterprise agents. Extends across paid external calls.</h2>
-            <p className="mt-5 text-lg leading-8 text-gray-400">
-              Most enterprise agents do not need a wallet to call internal APIs. They need scoped authority, budget controls, revocation, and audit evidence around the credentials they already have.
-            </p>
-            <p className="mt-4 text-base leading-7 text-gray-500">
-              When that same internal workflow crosses into an external paid API, SatGate keeps the proof intact: internal scope and delegation, plus spend attribution above x402-style rails, L402, API-key billing, or enterprise ledgers. Payment proves value moved. SatGate proves the agent was allowed to move it.
-            </p>
-          </div>
-        </div>
-      </section>
+
 
       <section className="border-b border-white/10 bg-white/[0.02] px-6 py-20">
         <div className="mx-auto max-w-6xl">

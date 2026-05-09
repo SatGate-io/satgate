@@ -150,16 +150,16 @@ const LandingPage = () => {
               <Zap size={12} /> The Economic Firewall for AI Agents
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-              Control what agents<br/>
+              Govern what agents<br/>
               <span className="sr-only"> </span><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-                can spend.
+                can do — and prove it.
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
               SatGate is the economic control plane for internal enterprise agents - with evidence that extends across paid external calls.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
-              Govern agent authority before it touches your API. Add budgets, scoped delegation, revocation, and proof across MCP, API keys, L402, x402-style rails, and enterprise billing.
+              Govern agent authority before it touches your API. Add budgets, scoped delegation, revocation, and proof across MCP, API keys, L402, x402-aware flows, and enterprise billing.
             </p>
             <div className="flex flex-wrap gap-4">
               <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
@@ -174,12 +174,16 @@ const LandingPage = () => {
             </div>
 
             {/* Proof strip */}
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-6 text-xs text-gray-500">
-              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> REST · GraphQL · MCP</span>
-              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Gateway · Sidecar · MCP Proxy</span>
-              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Sub-ms verification</span>
-              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> MCP · API keys · x402-style rails</span>
-              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> <a href="https://github.com/SatGate-io/satgate" className="text-gray-400 hover:text-white transition underline underline-offset-2">Open source</a></span>
+            <div className="mt-6 space-y-2 text-xs text-gray-500">
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> REST · GraphQL · MCP</span>
+                <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Gateway · Sidecar · MCP Proxy</span>
+                <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Sub-ms verification</span>
+              </div>
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> MCP · API keys · x402-aware governance</span>
+                <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> <a href="https://github.com/SatGate-io/satgate" className="text-gray-400 hover:text-white transition underline underline-offset-2">Open source</a></span>
+              </div>
             </div>
           </div>
 
@@ -383,7 +387,7 @@ const LandingPage = () => {
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ Let approved agents pay or access without long-lived shared secrets</li>
-                <li>✓ Preserve authority evidence above x402-style, L402, API-key, or enterprise billing rails</li>
+                <li>✓ Preserve authority evidence above x402, L402, API-key, or enterprise billing rails</li>
                 <li>✓ Per-request pricing and policy before upstream execution</li>
                 <li>✓ Autonomous agents discover, pay, and leave an audit trail</li>
               </ul>
@@ -655,7 +659,7 @@ const LandingPage = () => {
             {[
               ['What is SatGate?', 'SatGate is an economic firewall and economic control plane for internal enterprise agents. It sits in the request path to observe usage, enforce budgets, scope delegated authority, prove revocation, and preserve evidence across internal APIs and paid external calls.'],
               ['How does SatGate control AI agent spend?', 'SatGate applies per-agent, per-tool, per-team, and per-task budgets before each request reaches an API or MCP tool, so runaway loops and expensive calls can be blocked before spend occurs.'],
-              ['What are Observe, Control, and Charge?', 'Observe tracks agent traffic and cost without blocking. Control enforces budgets and scoped policy for internal agents. Charge preserves authorization evidence around external paid access across L402, x402-style, API-key, or enterprise billing rails.'],
+              ['What are Observe, Control, and Charge?', 'Observe tracks agent traffic and cost without blocking. Control enforces budgets and scoped policy for internal agents. Charge preserves authorization evidence around external paid access across L402, x402, API-key, or enterprise billing rails.'],
             ].map(([question, answer]) => (
               <div key={question} className="border-t border-gray-800 pt-6 first:border-t-0 first:pt-0">
                 <h3 className="mb-2 text-xl font-bold text-white">{question}</h3>
