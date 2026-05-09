@@ -111,7 +111,7 @@ export default function GovernPage() {
               <p className="text-gray-400 text-sm mb-3">No scoped capability → no action. SatGate decides what each agent can do, spend, delegate, and continue doing before the request reaches your API.</p>
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <Shield size={12} className="text-cyan-400" />
-                <span>Policy enforced in the request path</span>
+                <span>Policy enforced before execution</span>
               </div>
             </div>
 
@@ -129,7 +129,7 @@ export default function GovernPage() {
               <p className="text-gray-400 text-sm mb-3">Payment proves value moved. SatGate proves the agent was allowed to move it across L402, x402, API-key billing, or enterprise ledgers.</p>
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <Zap size={12} className="text-yellow-400" />
-                <span>Rail-aware evidence, payment or not</span>
+                <span>Evidence preserved across rails</span>
               </div>
             </div>
           </div>
@@ -321,7 +321,7 @@ export default function GovernPage() {
             </div>
             <h2 className="text-3xl font-bold mb-4">The runaway agent story</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Friday afternoon, the finance-automation parent agent delegates too much authority to an invoice-reconciler worker. By Monday, the worker has attempted unauthorized customer-data export and paid external calls. SatGate changes the ending by enforcing authority and exporting proof.
+              Friday afternoon, the finance-automation parent agent delegates too much authority to an invoice-reconciler worker. The worker tries to export customer data and call a paid enrichment rail outside its scope. SatGate changes the ending by denying in the request path and exporting proof.
             </p>
           </div>
 
