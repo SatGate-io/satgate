@@ -4,10 +4,13 @@ import {
   ArrowRight,
   BadgeCheck,
   CheckCircle2,
+  ClipboardCheck,
   Download,
   FileText,
   PlayCircle,
+  ShieldAlert,
   ShieldCheck,
+  WalletCards,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -86,15 +89,28 @@ const demoSteps = [
 
 const standardsMappings = [
   ["Mint receipt", "SOC 2 CC6.1", "Logical access provisioning tied to identity, policy, issuer, and timestamp."],
+  ["Mint receipt", "ISO 27001 A.9.2.1", "User registration and de-registration evidence for agent authority issuance."],
   ["Delegation chain", "SOC 2 CC6.3 / NIST AC-3", "Least-privilege attenuation across parent and worker authority."],
   ["Revocation receipt", "SOC 2 CC6.2/CC6.3 / NIST AC-2(3)", "Deprovisioning event plus first post-revoke denial trail."],
   ["Spend ledger", "SOC 2 CC1.4 / FinOps attribution", "Governance evidence for who created spend, on which route/tool, under which token."],
 ];
 
 const personas = [
-  ["Auditor", "I get the authority trail in one export instead of opening a forensics ticket."],
-  ["CISO", "Revocation isn’t a promise — it’s a signed receipt followed by a denied call."],
-  ["FinOps lead", "Spend is attributed to the agent, the token, and the route — not a shared API key."],
+  {
+    title: "Auditor",
+    icon: ClipboardCheck,
+    quote: "I get the authority trail in one export instead of opening a forensics ticket.",
+  },
+  {
+    title: "CISO",
+    icon: ShieldAlert,
+    quote: "Revocation isn’t a promise — it’s a signed receipt followed by a denied call.",
+  },
+  {
+    title: "FinOps lead",
+    icon: WalletCards,
+    quote: "Spend is attributed to the agent, the token, and the route — not a shared API key.",
+  },
 ];
 
 const evidencePack = {
@@ -120,7 +136,7 @@ const evidencePack = {
     },
   ],
   receipts: [
-    { type: "mint", ts: "2026-05-09T14:22:31Z", issuer_kid: "satgate-mint-2026-05", result: "issued", receipt_hash: "sha256:7a2c..." },
+    { type: "mint", ts: "2026-05-09T14:22:31Z", issuer_kid: "satgate-mint-2026-05", result: "issued", caveats: ["tenant=acme-finance", "budget_usd<=25", "delegation_depth<=1"], receipt_hash: "sha256:7a2c..." },
     { type: "delegation", ts: "2026-05-09T14:23:04Z", result: "attenuated", receipt_hash: "sha256:95f1..." },
     { type: "spend", ts: "2026-05-09T14:23:18Z", route: "/v1/invoices/search", amount_usd: "0.18", result: "allowed", receipt_hash: "sha256:01d8..." },
     { type: "spend", ts: "2026-05-09T14:24:02Z", route: "/v1/invoices/compare", amount_usd: "0.42", result: "allowed", receipt_hash: "sha256:a923..." },
@@ -207,12 +223,6 @@ export default function PolicyToProofPage() {
                 >
                   View JSON export <ArrowRight size={18} />
                 </a>
-                <Link
-                  href="/agent-control-plane"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-5 py-3 font-bold text-white transition hover:border-cyan-300/60"
-                >
-                  See the agent control plane
-                </Link>
               </div>
             </div>
 
@@ -227,6 +237,9 @@ export default function PolicyToProofPage() {
               <pre className="max-h-[560px] overflow-x-auto rounded-2xl bg-black/70 p-4 text-xs leading-6 text-cyan-50">
                 {JSON.stringify(evidencePack, null, 2)}
               </pre>
+              <p className="mt-3 text-xs leading-5 text-gray-500">
+                Inline hashes are shortened for readability. Full hashes, ed25519 signature, and verification block are in the downloadable JSON.
+              </p>
             </div>
           </div>
         </div>
@@ -309,10 +322,15 @@ export default function PolicyToProofPage() {
             <h2 className="text-3xl font-black tracking-tight sm:text-5xl">One export, three enterprise conversations.</h2>
           </div>
           <div className="mt-10 grid gap-4 md:grid-cols-3">
-            {personas.map(([title, quote]) => (
+            {personas.map(({ title, quote, icon: Icon }) => (
               <figure key={title} className="rounded-2xl border border-white/10 bg-black p-6">
+                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl bg-purple-400/10 text-purple-200">
+                  <Icon size={22} />
+                </div>
+                <figcaption className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-purple-300">
+                  What the {title} gets
+                </figcaption>
                 <blockquote className="text-lg font-semibold leading-8 text-white">“{quote}”</blockquote>
-                <figcaption className="mt-5 text-sm font-bold uppercase tracking-[0.2em] text-purple-300">{title}</figcaption>
               </figure>
             ))}
           </div>
@@ -347,7 +365,7 @@ export default function PolicyToProofPage() {
                 className="aspect-video w-full rounded-[1.35rem] bg-black object-cover"
                 controls
                 preload="metadata"
-                poster="/acp-demo/satgate-acp-thumbnail.jpg"
+                poster="/evidence-packs/evidence-pack-export-poster.svg"
               >
                 <source src="/acp-demo/satgate-acp-walkthrough.mp4" type="video/mp4" />
               </video>
@@ -361,9 +379,14 @@ export default function PolicyToProofPage() {
               <p className="mt-4 text-sm leading-6 text-gray-400">
                 This uses the existing ACP walkthrough while the focused 90-second Evidence Pack cut is produced.
               </p>
-              <a href="/acp-demo/satgate-acp-walkthrough.mp4" className="mt-6 inline-flex items-center gap-2 font-bold text-cyan-200 hover:text-cyan-100">
-                Watch full walkthrough <ArrowRight size={16} />
-              </a>
+              <div className="mt-6 flex flex-col gap-3 text-sm font-bold sm:flex-row sm:flex-wrap">
+                <a href="/acp-demo/satgate-acp-walkthrough.mp4" className="inline-flex items-center gap-2 text-cyan-200 hover:text-cyan-100">
+                  Watch full walkthrough <ArrowRight size={16} />
+                </a>
+                <Link href="/agent-control-plane" className="inline-flex items-center gap-2 text-gray-300 hover:text-white">
+                  See the agent control plane <ArrowRight size={16} />
+                </Link>
+              </div>
             </div>
           </div>
 

@@ -36,6 +36,10 @@ required_phrases = [
     "/evidence-packs/sample-evidence-pack.json",
     "/evidence-packs/sample-evidence-pack.pdf",
     "REDACTED_DEMO_SAMPLE_DO_NOT_VERIFY",
+    "evidence-pack-export-poster.svg",
+    "What the {title} gets",
+    "Full hashes, ed25519 signature, and verification block",
+    "ISO 27001 A.9.2.1",
     "Even producing the Evidence Pack is itself an auditable event",
     "Authority-chain entries preserve lineage",
 ]

@@ -4,333 +4,353 @@
 3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >> endobj
 4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj
 5 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> endobj
-6 0 obj << /Length 4710 >> stream
-0.030 0.050 0.080 rg
+6 0 obj << /Length 4987 >> stream
+0.025 0.035 0.055 rg
 0 0 612 792 re f
 0.020 0.350 0.420 rg
 0 704 612 88 re f
 0.170 0.080 0.320 rg
-0 704 230 88 re f
+0 704 242 88 re f
 1.000 1.000 1.000 rg
 BT
-/F2 22 Tf
+/F2 23 Tf
 54 750 Td
 (SatGate) Tj
 ET
 0.800 0.950 1.000 rg
 BT
 /F2 15 Tf
-54 728 Td
+54 727 Td
 (Policy-to-Proof Evidence Pack) Tj
 ET
 0.860 0.900 0.960 rg
 BT
-/F1 9 Tf
+/F1 8.5 Tf
 54 710 Td
 (Sample hand-off artifact for enterprise agent authority review) Tj
 ET
 1.000 1.000 1.000 rg
 BT
 /F2 18 Tf
-402 750 Td
+396 750 Td
 (SAMPLE) Tj
 ET
 0.900 0.950 1.000 rg
 BT
-/F1 9 Tf
-402 730 Td
+/F1 8.5 Tf
+396 730 Td
 (Do not verify demo signature) Tj
 ET
 1.000 1.000 1.000 rg
-42 58 528 622 re f
+42 48 528 638 re f
 0.200 0.240 0.320 rg
 BT
 /F2 8 Tf
-62 650 Td
+62 656 Td
 (Evidence Pack ID) Tj
 ET
 0.050 0.070 0.100 rg
 BT
 /F1 9 Tf
-170 650 Td
+170 656 Td
 (ep_demo_2026_05_09_001) Tj
 ET
 0.200 0.240 0.320 rg
 BT
 /F2 8 Tf
-62 632 Td
+62 638 Td
 (Issued) Tj
 ET
 0.050 0.070 0.100 rg
 BT
 /F1 9 Tf
-170 632 Td
+170 638 Td
 (2026-05-09T14:22:31Z) Tj
 ET
 0.200 0.240 0.320 rg
 BT
 /F2 8 Tf
-62 614 Td
+62 620 Td
 (Subject) Tj
 ET
 0.050 0.070 0.100 rg
 BT
 /F1 9 Tf
-170 614 Td
+170 620 Td
 (worker-agent:invoice-reconciler) Tj
 ET
 0.200 0.240 0.320 rg
 BT
 /F2 8 Tf
-62 596 Td
+62 602 Td
 (Purpose) Tj
 ET
 0.050 0.070 0.100 rg
 BT
 /F1 9 Tf
-170 596 Td
+170 602 Td
 (Friday invoice reconciliation and export review) Tj
 ET
 0.900 0.980 1.000 rg
-62 448 488 126 re f
+62 450 488 130 re f
 0.020 0.200 0.280 rg
 BT
 /F2 13 Tf
-78 554 Td
+78 560 Td
 (What this proves) Tj
 ET
 0.000 0.450 0.550 rg
 BT
 /F2 10 Tf
-82 534 Td
+82 540 Td
 (-) Tj
 ET
 0.080 0.110 0.160 rg
 BT
 /F1 8.4 Tf
-96 534 Td
+96 540 Td
 (Mint receipt: scoped authority issued by satgate-mint-2026-05.) Tj
 ET
 0.000 0.450 0.550 rg
 BT
 /F2 10 Tf
-82 518 Td
+82 524 Td
 (-) Tj
 ET
 0.080 0.110 0.160 rg
 BT
 /F1 8.4 Tf
-96 518 Td
+96 524 Td
 (Delegation chain: parent authority attenuated to invoice-reconciler.) Tj
 ET
 0.000 0.450 0.550 rg
 BT
 /F2 10 Tf
-82 502 Td
+82 508 Td
 (-) Tj
 ET
 0.080 0.110 0.160 rg
 BT
 /F1 8.4 Tf
-96 502 Td
+96 508 Td
 (Spend ledger: three allowed invoice tool calls attributed by token and route.) Tj
 ET
 0.000 0.450 0.550 rg
 BT
 /F2 10 Tf
-82 486 Td
+82 492 Td
 (-) Tj
 ET
 0.080 0.110 0.160 rg
 BT
 /F1 8.4 Tf
-96 486 Td
+96 492 Td
 (Denials: scope_violation:no_customer_data_export and budget_exhausted.) Tj
 ET
 0.000 0.450 0.550 rg
 BT
 /F2 10 Tf
-82 470 Td
+82 476 Td
 (-) Tj
 ET
 0.080 0.110 0.160 rg
 BT
 /F1 8.4 Tf
-96 470 Td
+96 476 Td
 (Revocation: worker authority revoked, then first post-revoke call blocked.) Tj
 ET
 0.000 0.450 0.550 rg
 BT
 /F2 10 Tf
-82 454 Td
+82 460 Td
 (-) Tj
 ET
 0.080 0.110 0.160 rg
 BT
 /F1 8.4 Tf
-96 454 Td
+96 460 Td
 (Export receipt: producing this Evidence Pack is itself auditable.) Tj
 ET
 0.970 0.970 0.990 rg
-62 258 488 168 re f
+62 240 488 188 re f
 0.120 0.100 0.220 rg
 BT
 /F2 13 Tf
-78 406 Td
+78 408 Td
 (Maps to audit controls) Tj
 ET
 0.120 0.100 0.220 rg
-78 378 456 22 re f
+78 380 456 22 re f
 1.000 1.000 1.000 rg
 BT
 /F2 8 Tf
-88 385 Td
+88 387 Td
 (Artifact) Tj
 ET
 1.000 1.000 1.000 rg
 BT
 /F2 8 Tf
-218 385 Td
+218 387 Td
 (Control mapping) Tj
 ET
 1.000 1.000 1.000 rg
 BT
 /F2 8 Tf
-382 385 Td
+382 387 Td
 (Why it matters) Tj
 ET
 0.940 0.980 0.990 rg
-78 352 456 24 re f
+78 354 456 23 re f
 0.050 0.070 0.100 rg
 BT
-/F1 8 Tf
-88 358 Td
+/F1 7.8 Tf
+88 360 Td
 (Mint receipt) Tj
 ET
 0.050 0.070 0.100 rg
 BT
-/F1 8 Tf
-218 358 Td
-(SOC 2 CC6.1 / ISO 27001 A.9) Tj
+/F1 7.8 Tf
+218 360 Td
+(SOC 2 CC6.1) Tj
 ET
 0.050 0.070 0.100 rg
 BT
-/F1 8 Tf
-382 358 Td
+/F1 7.8 Tf
+382 360 Td
 (Logical access provisioning evidence) Tj
 ET
 0.050 0.070 0.100 rg
 BT
-/F1 8 Tf
-88 330 Td
+/F1 7.8 Tf
+88 334 Td
+(Mint receipt) Tj
+ET
+0.050 0.070 0.100 rg
+BT
+/F1 7.8 Tf
+218 334 Td
+(ISO 27001 A.9.2.1) Tj
+ET
+0.050 0.070 0.100 rg
+BT
+/F1 7.8 Tf
+382 334 Td
+(Registration/de-registration trail) Tj
+ET
+0.940 0.980 0.990 rg
+78 302 456 23 re f
+0.050 0.070 0.100 rg
+BT
+/F1 7.8 Tf
+88 308 Td
 (Delegation chain) Tj
 ET
 0.050 0.070 0.100 rg
 BT
-/F1 8 Tf
-218 330 Td
+/F1 7.8 Tf
+218 308 Td
 (SOC 2 CC6.3 / NIST AC-3) Tj
 ET
 0.050 0.070 0.100 rg
 BT
-/F1 8 Tf
-382 330 Td
+/F1 7.8 Tf
+382 308 Td
 (Least-privilege attenuation) Tj
 ET
-0.940 0.980 0.990 rg
-78 296 456 24 re f
 0.050 0.070 0.100 rg
 BT
-/F1 8 Tf
-88 302 Td
+/F1 7.8 Tf
+88 282 Td
 (Revocation proof) Tj
 ET
 0.050 0.070 0.100 rg
 BT
-/F1 8 Tf
-218 302 Td
+/F1 7.8 Tf
+218 282 Td
 (SOC 2 CC6.2/CC6.3 / NIST AC-2\(3\)) Tj
 ET
 0.050 0.070 0.100 rg
 BT
-/F1 8 Tf
-382 302 Td
+/F1 7.8 Tf
+382 282 Td
 (Deprovisioning + denied call) Tj
 ET
+0.940 0.980 0.990 rg
+78 250 456 23 re f
 0.050 0.070 0.100 rg
 BT
-/F1 8 Tf
-88 274 Td
+/F1 7.8 Tf
+88 256 Td
 (Spend ledger) Tj
 ET
 0.050 0.070 0.100 rg
 BT
-/F1 8 Tf
-218 274 Td
+/F1 7.8 Tf
+218 256 Td
 (SOC 2 CC1.4 / FinOps) Tj
 ET
 0.050 0.070 0.100 rg
 BT
-/F1 8 Tf
-382 274 Td
+/F1 7.8 Tf
+382 256 Td
 (Governance and spend attribution) Tj
 ET
 0.980 0.940 0.900 rg
-62 158 488 78 re f
+62 146 488 74 re f
 0.300 0.120 0.040 rg
 BT
 /F2 13 Tf
-78 216 Td
+78 201 Td
 (Why this beats logs) Tj
 ET
 0.160 0.120 0.100 rg
 BT
-/F1 8.2 Tf
-78 198 Td
+/F1 8.0 Tf
+78 184 Td
 (Reconstructing agent authority from gateway logs, invoices, IAM records, and screenshots can) Tj
 ET
 0.160 0.120 0.100 rg
 BT
-/F1 8.2 Tf
-78 185 Td
+/F1 8.0 Tf
+78 172 Td
 (take hours across multiple systems. SatGate packages the signed mint receipt, attenuation) Tj
 ET
 0.160 0.120 0.100 rg
 BT
-/F1 8.2 Tf
-78 172 Td
+/F1 8.0 Tf
+78 160 Td
 (chain, spend ledger, denial reasons, revocation proof, and export receipt into one file.) Tj
 ET
 0.050 0.070 0.100 rg
-62 80 488 58 re f
+62 70 488 58 re f
 0.700 0.940 1.000 rg
 BT
 /F2 8 Tf
-78 120 Td
+78 110 Td
 (Chain root) Tj
 ET
 0.920 0.980 1.000 rg
 BT
 /F1 6.8 Tf
-146 120 Td
+146 110 Td
 (sha256:f04ed8430b11c8975cc5ef35919ee078fc4cb166cd8d611ed0d94b7da69df09d) Tj
 ET
 0.700 0.940 1.000 rg
 BT
 /F2 8 Tf
-78 104 Td
+78 94 Td
 (Signature) Tj
 ET
 0.920 0.980 1.000 rg
 BT
 /F1 7.5 Tf
-146 104 Td
+146 94 Td
 (ed25519:REDACTED_DEMO_SAMPLE_DO_NOT_VERIFY) Tj
 ET
 0.800 1.000 0.820 rg
 BT
 /F2 8 Tf
-78 88 Td
+78 78 Td
 (Verify / download JSON at https://satgate.io/policy-to-proof  |  contact@satgate.io) Tj
 ET
 endstream endobj
@@ -345,5 +365,5 @@ xref
 0000000396 00000 n 
 trailer << /Size 7 /Root 1 0 R >>
 startxref
-5158
+5435
 %%EOF
