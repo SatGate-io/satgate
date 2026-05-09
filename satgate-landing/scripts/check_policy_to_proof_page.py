@@ -6,6 +6,7 @@ PAGE = ROOT / "app" / "policy-to-proof" / "page.tsx"
 
 AGENT_CONTROL_PLANE = ROOT / "app" / "agent-control-plane" / "page.tsx"
 GOVERN_PAGE = ROOT / "app" / "components" / "GovernClient.tsx"
+ECONOMIC_FIREWALL_PAGE = ROOT / "app" / "economic-firewall" / "page.tsx"
 
 required_phrases = [
     "Every agent action leaves a receipt",
@@ -137,6 +138,39 @@ acp_forbidden_phrases = [
     "Turn local agents into governed enterprise actors.",
 ]
 
+economic_required_phrases = [
+    "governs AI agent authority, spend, paid rails, and revocation before execution, then exports Evidence Pack proof",
+    "Budget and authority limits",
+    "Evidence capture",
+    "Paid-rail context",
+    "agents exercise authority at machine speed",
+    "is this agent allowed to take this action right now?",
+    "Evidence Pack capture",
+    "Payment rails authorize value movement. Economic firewalls authorize behavior — and preserve the proof.",
+    "Payment proves value moved; SatGate proves the agent was allowed to move it.",
+    "Map agent authority",
+    "Enforce scoped authority",
+    "Preserve proof across paid rails",
+    "Policy-to-Proof",
+    "SatGate governs agent authority before value moves",
+]
+
+economic_forbidden_phrases = [
+    "Charge/L402",
+    "L402 Charge",
+    "SatGate Charge uses L402 Lightning",
+    "Fiat402 is a separate path",
+    "Charge robot customers",
+    "external robot customers",
+    "agents spend money at machine speed",
+    "is this agent allowed to spend this money right now?",
+    "Govern local agent authority",
+    "access, spend, delegate, and prove",
+    "paid-rail proof",
+    "Agent wallets validate the category",
+    "Wallets authorize payment",
+]
+
 
 def main() -> int:
     if not PAGE.exists():
@@ -161,6 +195,13 @@ def main() -> int:
     govern_stale = [phrase for phrase in govern_forbidden_phrases if phrase in govern_text]
     if govern_stale:
         raise SystemExit("stale govern spend/rail-first phrases remain:\n" + "\n".join(govern_stale))
+    economic_text = ECONOMIC_FIREWALL_PAGE.read_text()
+    economic_missing = [phrase for phrase in economic_required_phrases if phrase not in economic_text]
+    if economic_missing:
+        raise SystemExit("missing economic-firewall authority/proof phrases:\n" + "\n".join(economic_missing))
+    economic_stale = [phrase for phrase in economic_forbidden_phrases if phrase in economic_text]
+    if economic_stale:
+        raise SystemExit("stale economic-firewall Charge/spend-first phrases remain:\n" + "\n".join(economic_stale))
     return 0
 
 
