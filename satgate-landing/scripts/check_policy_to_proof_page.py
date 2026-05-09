@@ -197,6 +197,9 @@ readiness_required_phrases = [
     "SatGate governs agent authority before execution",
     "Prove allowed, denied, delegated, revoked, or paid decisions with an Evidence Pack",
     "Assess whether your agent/API stack is ready for autonomous authority",
+    "See SatGate governance",
+    "See the Evidence Pack",
+    "spend context",
 ]
 
 readiness_forbidden_phrases = [
@@ -209,6 +212,11 @@ readiness_forbidden_phrases = [
     "when agents become customers",
     "Observe what agents spend",
     "Charge robot customers",
+    "See agent authority control",
+    "/ai-agent-cost-control",
+    "Generate MCP tool policy",
+    "Generate OpenAI budget policy",
+    "authority, cost, policy decision",
 ]
 
 
