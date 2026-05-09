@@ -22,6 +22,19 @@ required_phrases = [
     "Deny",
     "Revoke",
     "Export",
+    "Download sample Evidence Pack",
+    "chain_root",
+    "signature",
+    "receipt_hash",
+    "Other gateways",
+    "SOC 2 CC6.1",
+    "NIST AC-3",
+    "Auditor",
+    "CISO",
+    "FinOps lead",
+    "/acp-demo/satgate-acp-walkthrough.mp4",
+    "/evidence-packs/sample-evidence-pack.json",
+    "/evidence-packs/sample-evidence-pack.pdf",
 ]
 
 

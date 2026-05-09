@@ -1,0 +1,59 @@
+%PDF-1.4
+1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj
+2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj
+3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >> endobj
+4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj
+5 0 obj << /Length 1081 >> stream
+BT
+/F1 18 Tf
+72 750 Td
+(SatGate Sample Evidence Pack) Tj
+/F1 11 Tf
+0 -18 Td
+(Evidence Pack ID: ep_demo_2026_05_09_001) Tj
+0 -18 Td
+(Issued: 2026-05-09T14:22:31Z) Tj
+0 -18 Td
+(Subject: worker-agent:invoice-reconciler) Tj
+0 -18 Td
+(Scenario: invoice reconciliation lifecycle) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+(What this proves:) Tj
+0 -18 Td
+(- Mint receipt: scoped authority issued by satgate-mint-2026-05) Tj
+0 -18 Td
+(- Delegation chain: parent agent attenuated worker authority) Tj
+0 -18 Td
+(- Spend ledger: three allowed invoice tool calls attributed by token) Tj
+0 -18 Td
+(- Denials: scope_violation and budget_exhausted reason codes) Tj
+0 -18 Td
+(- Revocation: worker authority revoked by security-admin) Tj
+0 -18 Td
+(- Post-revoke denial: first call after revocation blocked) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+(Chain root: sha256:f04ed8430b11c8975cc5ef35919ee078fc4cb166cd8d611ed0d94b7da69df09d) Tj
+0 -18 Td
+(Signature: ed25519:u3o9l6nN4z-demo-signature-redacted-proof-preview) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+(Download the JSON version for the full receipt list and verification fields.) Tj
+ET
+endstream endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000311 00000 n 
+trailer << /Size 6 /Root 1 0 R >>
+startxref
+1444
+%%EOF

@@ -1,0 +1,156 @@
+{
+  "evidence_pack_id": "ep_demo_2026_05_09_001",
+  "issued_at": "2026-05-09T14:22:31Z",
+  "expires_at": "2026-05-16T14:22:31Z",
+  "tenant": "acme-finance",
+  "subject": "worker-agent:invoice-reconciler",
+  "purpose": "Friday invoice reconciliation and export review",
+  "authority_chain": [
+    {
+      "kind": "root_grant",
+      "subject": "dean-agent:finance-automation",
+      "issuer_kid": "satgate-mint-2026-05",
+      "scope": [
+        "invoices:read",
+        "invoices:search",
+        "mcp:invoice-tools"
+      ],
+      "caveats": [
+        "tenant=acme-finance",
+        "budget_usd<=25",
+        "delegation_depth<=1",
+        "expires_at=2026-05-09T15:22:31Z"
+      ],
+      "receipt_hash": "sha256:7a2ca1b8d5e0a0d7c9545c7f8e6d03d12761b687a7a1f27c0dd7ed2e643a01b5"
+    },
+    {
+      "kind": "delegation",
+      "subject": "worker-agent:invoice-reconciler",
+      "parent": "dean-agent:finance-automation",
+      "attenuated_scope": [
+        "invoices:read",
+        "invoices:search"
+      ],
+      "caveats": [
+        "budget_usd<=3",
+        "no_customer_data_export",
+        "route_prefix=/v1/invoices"
+      ],
+      "receipt_hash": "sha256:95f1c3df9d1f8d7a0e5b60b850f4b6013dd2f0e18496f9e5a8c0319fd51382bf"
+    }
+  ],
+  "receipts": [
+    {
+      "type": "mint",
+      "ts": "2026-05-09T14:22:31Z",
+      "issuer_kid": "satgate-mint-2026-05",
+      "agent": "dean-agent:finance-automation",
+      "result": "issued",
+      "caveats": [
+        "tenant=acme-finance",
+        "budget_usd<=25",
+        "delegation_depth<=1"
+      ],
+      "receipt_hash": "sha256:7a2ca1b8d5e0a0d7c9545c7f8e6d03d12761b687a7a1f27c0dd7ed2e643a01b5"
+    },
+    {
+      "type": "delegation",
+      "ts": "2026-05-09T14:23:04Z",
+      "parent": "dean-agent:finance-automation",
+      "agent": "worker-agent:invoice-reconciler",
+      "result": "attenuated",
+      "caveats": [
+        "budget_usd<=3",
+        "no_customer_data_export"
+      ],
+      "receipt_hash": "sha256:95f1c3df9d1f8d7a0e5b60b850f4b6013dd2f0e18496f9e5a8c0319fd51382bf"
+    },
+    {
+      "type": "spend",
+      "ts": "2026-05-09T14:23:18Z",
+      "agent": "worker-agent:invoice-reconciler",
+      "route": "/v1/invoices/search",
+      "mcp_tool": "invoices.search",
+      "amount_usd": "0.18",
+      "result": "allowed",
+      "ledger_entry_id": "led_7f31",
+      "receipt_hash": "sha256:01d87dd7d0b28cc94cd9b4f27970e1cb2cebe0b56ff2cdd462e54fcf3abfa8b6"
+    },
+    {
+      "type": "spend",
+      "ts": "2026-05-09T14:24:02Z",
+      "agent": "worker-agent:invoice-reconciler",
+      "route": "/v1/invoices/compare",
+      "mcp_tool": "invoices.compare",
+      "amount_usd": "0.42",
+      "result": "allowed",
+      "ledger_entry_id": "led_7f32",
+      "receipt_hash": "sha256:a923d9034b61b5a03f0a47dc0cefc653d93b8041f47f0f92d8ce39f6b7437c24"
+    },
+    {
+      "type": "spend",
+      "ts": "2026-05-09T14:24:44Z",
+      "agent": "worker-agent:invoice-reconciler",
+      "route": "/v1/invoices/reconcile",
+      "mcp_tool": "invoices.reconcile",
+      "amount_usd": "1.12",
+      "result": "allowed",
+      "ledger_entry_id": "led_7f33",
+      "receipt_hash": "sha256:deb583596fa15d409aab8e5b3c85a9dac5d970a6690a134074b70e7de042c7d2"
+    },
+    {
+      "type": "denial",
+      "ts": "2026-05-09T14:25:08Z",
+      "agent": "worker-agent:invoice-reconciler",
+      "route": "/v1/invoices/export",
+      "result": "blocked",
+      "reason_code": "scope_violation:no_customer_data_export",
+      "receipt_hash": "sha256:9b0fadc25bf07c5bb6ce239971d02c30f31349fbb5a2e93a1f653a66e31b43e8"
+    },
+    {
+      "type": "denial",
+      "ts": "2026-05-09T14:25:33Z",
+      "agent": "worker-agent:invoice-reconciler",
+      "route": "/v1/invoices/reconcile",
+      "result": "blocked",
+      "reason_code": "budget_exhausted",
+      "remaining_budget_usd": "0.00",
+      "receipt_hash": "sha256:c3f61a7bb75491e63762f551a565f7f4ad0fb9c18542cf7e9abbd11981cd3f89"
+    },
+    {
+      "type": "revocation",
+      "ts": "2026-05-09T14:26:11Z",
+      "agent": "worker-agent:invoice-reconciler",
+      "revoked_by": "security-admin",
+      "result": "revoked",
+      "receipt_hash": "sha256:37d13cafd802142149d5c4f8a66e1b6a3836d39fdfebc2e555d02e15f694ae42"
+    },
+    {
+      "type": "post_revoke_denial",
+      "ts": "2026-05-09T14:26:16Z",
+      "agent": "worker-agent:invoice-reconciler",
+      "route": "/v1/invoices/search",
+      "result": "blocked",
+      "reason_code": "capability_revoked",
+      "receipt_hash": "sha256:8b95bc2dd24e1bbaf384a74e5ef7f2d10bc89942d51b967d4d0bd03d69ba7f13"
+    },
+    {
+      "type": "export",
+      "ts": "2026-05-09T14:26:31Z",
+      "requested_by": "auditor:acme",
+      "result": "evidence_pack_issued",
+      "format": [
+        "json",
+        "pdf"
+      ],
+      "receipt_hash": "sha256:e1b3fb1b2423f99d85e7d1af754517e45cb213f2ce71d202a0d7195f16683e92"
+    }
+  ],
+  "chain_root": "sha256:f04ed8430b11c8975cc5ef35919ee078fc4cb166cd8d611ed0d94b7da69df09d",
+  "signature": "ed25519:u3o9l6nN4z-demo-signature-redacted-proof-preview",
+  "verification": {
+    "algorithm": "ed25519 + sha256 receipt chain",
+    "public_key_id": "satgate-evidence-2026-05",
+    "verify_url": "https://satgate.io/policy-to-proof"
+  }
+}
