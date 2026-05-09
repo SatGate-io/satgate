@@ -111,7 +111,7 @@ export default function GovernPage() {
               <p className="text-gray-400 text-sm mb-3">No scoped capability → no action. SatGate decides what each agent can do, spend, delegate, and continue doing before the request reaches your API.</p>
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <Shield size={12} className="text-cyan-400" />
-                <span>Govern → enforce → prove policy ratchet</span>
+                <span>Policy enforced in the request path</span>
               </div>
             </div>
 
@@ -321,7 +321,7 @@ export default function GovernPage() {
             </div>
             <h2 className="text-3xl font-bold mb-4">The runaway agent story</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Friday afternoon, an agent workflow gets a broad token “just to test something.” By Monday, it has created $47,000 in API calls. SatGate changes the ending by enforcing policy and preserving proof.
+              Friday afternoon, the finance-automation parent agent delegates too much authority to an invoice-reconciler worker. By Monday, the worker has attempted unauthorized customer-data export and paid external calls. SatGate changes the ending by enforcing authority and exporting proof.
             </p>
           </div>
 
@@ -338,10 +338,10 @@ export default function GovernPage() {
                       <span className="text-red-400 font-mono text-xs">FRIDAY 4:47 PM</span>
                     </div>
                     <h4 className="font-semibold text-white mb-1 flex items-center gap-2 md:justify-end">
-                      <Bot size={16} className="text-red-400" /> Workflow Gets Broad Token
+                      <Bot size={16} className="text-red-400" /> Worker Gets Broad Authority
                     </h4>
                     <p className="text-gray-500 text-sm">
-                      &ldquo;Just a quick test.&rdquo; The workflow gets an API token with no budget limit, no scope restriction, no expiry.
+                      &ldquo;Just a quick test.&rdquo; The invoice-reconciler worker gets broad authority: no narrow scope, no expiry, no delegation chain, no customer-data caveat.
                     </p>
                   </div>
                 </div>
@@ -363,10 +363,10 @@ export default function GovernPage() {
                       <span className="text-red-400 font-mono text-xs">SATURDAY — SUNDAY</span>
                     </div>
                     <h4 className="font-semibold text-white mb-1 flex items-center gap-2">
-                      <Zap size={16} className="text-red-400" /> Agent Burns Budget
+                      <Zap size={16} className="text-red-400" /> Worker Attempts Unauthorized Tool
                     </h4>
                     <p className="text-gray-500 text-sm">
-                      The test script runs in a loop. 2.3 million API calls. $47,000 in compute. Nobody notices.
+                      The worker calls an unauthorized MCP export tool and a paid enrichment rail outside its invoice-matching scope. Logs exist, but nobody can prove which authority allowed it.
                     </p>
                   </div>
                 </div>
@@ -380,10 +380,10 @@ export default function GovernPage() {
                       <span className="text-yellow-400 font-mono text-xs">WITH SATGATE: FRIDAY 4:48 PM</span>
                     </div>
                     <h4 className="font-semibold text-white mb-1 flex items-center gap-2 md:justify-end">
-                      <AlertTriangle size={16} className="text-yellow-400" /> CISO Gets Alert
+                      <AlertTriangle size={16} className="text-yellow-400" /> SatGate Denies Before Execution
                     </h4>
                     <p className="text-gray-500 text-sm">
-                      SatGate detects anomalous token creation. Budget threshold hit after $50. Alert fires in 60 seconds.
+                      SatGate checks the macaroon caveats in the request path. The scope and spend checks fail, so the export never executes and the paid call never settles.
                     </p>
                   </div>
                 </div>
@@ -405,10 +405,10 @@ export default function GovernPage() {
                       <span className="text-cyan-400 font-mono text-xs">FRIDAY 4:49 PM</span>
                     </div>
                     <h4 className="font-semibold text-white mb-1 flex items-center gap-2">
-                      <Lock size={16} className="text-cyan-400" /> CTO Revokes Token
+                      <Lock size={16} className="text-cyan-400" /> Parent Authority Revoked
                     </h4>
                     <p className="text-gray-500 text-sm">
-                      One click. Token revoked globally. All child tokens die instantly. Total cost: $50 instead of $47,000.
+                      One click revokes the finance-automation parent. The invoice-reconciler child loses authority immediately, and the first post-revoke retry is denied with a signed reason.
                     </p>
                   </div>
                 </div>
@@ -422,10 +422,10 @@ export default function GovernPage() {
                       <span className="text-green-400 font-mono text-xs">AUTOMATIC</span>
                     </div>
                     <h4 className="font-semibold text-white mb-1 flex items-center gap-2 md:justify-end">
-                      <CheckCircle size={16} className="text-green-400" /> Audit Trail Complete
+                      <CheckCircle size={16} className="text-green-400" /> Evidence Pack Exported
                     </h4>
                     <p className="text-gray-500 text-sm">
-                      Full Evidence Pack: who authorized it, what it could do, what it spent, what was denied, when it was revoked, and the first denied call after revoke.
+                      Full Evidence Pack: who authorized the worker, what it could do, what it spent, what was denied, when authority was revoked, and the first denied call after revoke.
                     </p>
                   </div>
                 </div>
@@ -439,7 +439,7 @@ export default function GovernPage() {
 
           <div className="text-center mt-12">
             <div className="inline-block bg-gradient-to-r from-green-900/20 to-cyan-900/20 border border-green-800/30 rounded-xl px-6 py-4">
-              <p className="text-white font-semibold">Turns a $47,000 weekend incident into a bounded policy event with an audit trail.</p>
+              <p className="text-white font-semibold">Turns a silent authority failure into a blocked action, a revocation receipt, and an Evidence Pack.</p>
               <p className="text-gray-500 text-sm mt-1">Govern first. Enforce before execution. Prove every decision afterward.</p>
             </div>
           </div>
@@ -455,26 +455,26 @@ export default function GovernPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               {
-                title: 'Usage Dashboard',
-                description: 'Real-time API call volume, latency percentiles, error rates. Broken down by agent, team, and endpoint.',
+                title: 'Authority Dashboard',
+                description: 'See every active agent, capability, caveat, tenant, route, and MCP tool before authority becomes runtime risk.',
                 gradient: 'from-purple-600 to-cyan-600',
                 icon: <Activity size={24} className="text-purple-400" />,
               },
               {
-                title: 'CFO Chargeback Report',
-                description: 'Automated spend attribution. See which agent, token, route, and policy created each dollar. Export to finance or the Evidence Pack.', 
+                title: 'Spend Attribution',
+                description: 'Attribute every paid call to agent, token, route, tool, policy, and rail context before finance has to reconstruct it.',
                 gradient: 'from-green-600 to-emerald-600',
                 icon: <DollarSign size={24} className="text-green-400" />,
               },
               {
-                title: 'Security Dashboard',
-                description: 'Active tokens, anomalous behavior, blocked requests, revocation history. CISO-ready at a glance.',
+                title: 'Revocation & Denial',
+                description: 'Track blocked scope violations, budget caveat hits, revocations, and the first denied call after revoke.',
                 gradient: 'from-red-600 to-orange-600',
                 icon: <Shield size={24} className="text-red-400" />,
               },
               {
-                title: 'Compliance Export',
-                description: 'SOC2, GDPR, HIPAA audit trails. Every token lifecycle event, every access decision, timestamped and immutable.',
+                title: 'Audit Evidence Export',
+                description: 'Export mint receipts, delegation chains, spend ledger entries, denial reasons, and revocation proof in one Evidence Pack.',
                 gradient: 'from-cyan-600 to-blue-600',
                 icon: <FileSearch size={24} className="text-cyan-400" />,
               },
@@ -505,7 +505,7 @@ export default function GovernPage() {
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">Delegation that leaves a trail</h2>
           <p className="text-gray-500 text-center mb-12">
-            Tokens flow down. Authority narrows. Every level is scoped, budgeted, time-limited, and preserved for later proof.
+            Reuse the same invoice-reconciler lifecycle from the Evidence Pack: root policy delegates to a parent agent, then to narrower workers. Every level is scoped, budgeted, time-limited, and preserved for later proof.
           </p>
 
           {/* Tree Visualization */}
@@ -515,9 +515,9 @@ export default function GovernPage() {
               <div className="p-4 rounded-xl bg-purple-900/30 border-2 border-purple-500/60 text-center min-w-[220px]">
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <Key size={18} className="text-purple-400" />
-                  <span className="font-bold text-purple-300">Root Token</span>
+                  <span className="font-bold text-purple-300">Root Policy</span>
                 </div>
-                <p className="text-xs text-gray-400">CTO • All scopes • $∞ budget</p>
+                <p className="text-xs text-gray-400">Finance automation • tenant scoped • revocable</p>
               </div>
             </div>
 
@@ -529,9 +529,9 @@ export default function GovernPage() {
             {/* Department Level */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               {[
-                { name: 'Engineering VP', scope: 'api:eng:*', budget: '$10k/mo', color: 'cyan' },
-                { name: 'Data Science VP', scope: 'api:data:*', budget: '$25k/mo', color: 'green' },
-                { name: 'Marketing VP', scope: 'api:mkt:*', budget: '$5k/mo', color: 'yellow' },
+                { name: 'Finance Parent Agent', scope: 'invoice:*', budget: '$10k/mo', color: 'cyan' },
+                { name: 'Approval Agent', scope: 'payment:approve', budget: '$5k/mo', color: 'green' },
+                { name: 'Audit Export Agent', scope: 'evidence:export', budget: 'read-only', color: 'yellow' },
               ].map((dept) => (
                 <div key={dept.name} className={`p-4 rounded-xl bg-gray-900 border border-${dept.color}-800/30 text-center`}>
                   <div className="flex items-center justify-center gap-2 mb-1">
@@ -552,10 +552,10 @@ export default function GovernPage() {
             {/* Agent Level */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {[
-                { name: 'RAG Agent', scope: 'api:data:read', budget: '$500/day', ttl: '24h' },
-                { name: 'Code Agent', scope: 'api:eng:deploy', budget: '$200/day', ttl: '8h' },
-                { name: 'Support Bot', scope: 'api:mkt:chat', budget: '$50/day', ttl: '1h' },
-                { name: 'Analytics', scope: 'api:data:query', budget: '$1k/day', ttl: '12h' },
+                { name: 'Invoice Reconciler', scope: 'invoice:match', budget: '$500/day', ttl: '24h' },
+                { name: 'Vendor Lookup Worker', scope: 'vendor:read', budget: '$100/day', ttl: '8h' },
+                { name: 'OCR Worker', scope: 'document:ocr', budget: '$50/day', ttl: '1h' },
+                { name: 'Exception Reporter', scope: 'evidence:write', budget: 'no-spend', ttl: '12h' },
               ].map((agent) => (
                 <div key={agent.name} className="p-3 rounded-lg bg-gray-900/80 border border-gray-800 text-center">
                   <div className="flex items-center justify-center gap-1.5 mb-1">
@@ -578,7 +578,7 @@ export default function GovernPage() {
               { label: 'Scoped', desc: 'Narrower than parent', icon: <Lock size={16} className="text-cyan-400" /> },
               { label: 'Budgeted', desc: 'Hard spending limits', icon: <Coins size={16} className="text-green-400" /> },
               { label: 'Time-Limited', desc: 'Auto-expire by policy', icon: <Timer size={16} className="text-purple-400" /> },
-              { label: 'Delegatable', desc: 'Agents can sub-delegate', icon: <GitBranch size={16} className="text-yellow-400" /> },
+              { label: 'Policy-limited', desc: 'Sub-delegation stays inside caveats', icon: <GitBranch size={16} className="text-yellow-400" /> },
             ].map((prop) => (
               <div key={prop.label} className="p-4 rounded-xl bg-gray-900 border border-gray-800 text-center">
                 <div className="flex justify-center mb-2">{prop.icon}</div>
@@ -726,7 +726,7 @@ export default function GovernPage() {
             </h2>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
               SatGate Mint exchanges workload identity tokens for capability-bearing macaroons.
-              No secrets to manage. No tokens to rotate. Try it live.
+              The same Mint flow works for internal calls and governed external paid calls — every grant becomes part of the Evidence Pack.
             </p>
           </div>
           <div className="text-center">
@@ -802,10 +802,10 @@ export SATGATE_TOKEN=$TOKEN
           </p>
           <div className="grid gap-4 md:grid-cols-2">
             {[
-              ['/economic-firewall-readiness-grader', 'Economic firewall readiness grader', 'Score identity, budgets, MCP governance, revocation, delegation, audit, routing, and rail-aware readiness.'],
               ['/agent-api-key-risk-assessment', 'Agent API key risk assessment', 'Find static-key blast radius before autonomous agents inherit unlimited API access.'],
+              ['/economic-firewall-readiness-grader', 'Agent governance readiness grader', 'Score identity, budgets, MCP governance, revocation, delegation, audit, routing, and rail-aware readiness.'],
               ['/agent-spend-policy-template', 'Agent spend policy template', 'Generate YAML/JSON policy for per-agent budgets, MCP caps, delegation, revocation, and audit.'],
-              ['/mcp-cost-control', 'MCP cost control', 'Treat MCP tool calls as billable economic events with per-tool prices, caps, and deny decisions.'],
+              ['/mcp-cost-control', 'MCP cost control', 'Treat MCP tool calls as governed events with per-tool prices, caps, denial reasons, and evidence.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black/50 p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
                 <h3 className="mb-2 font-bold text-white">{title}</h3>
@@ -826,6 +826,7 @@ export SATGATE_TOKEN=$TOKEN
               ['What is an economic control plane for AI agents?', 'An economic control plane for AI agents sits in the request path and applies scopes, budgets, delegation rules, revocation, and audit before an agent reaches an upstream API, model, or MCP tool. It turns agent activity into governed decisions with evidence.'],
               ['How should enterprises govern MCP tool usage?', 'Enterprises should govern MCP tools with per-tool budgets, scoped capability tokens, task and tenant attribution, audit trails, revocation, and hard request-path policy decisions. Rate limits and dashboards are useful, but they do not replace enforcement before tool calls execute.'],
               ['What is the difference between AI governance and AI agent governance?', 'AI governance usually covers model risk, data policy, compliance, and human review. AI agent governance adds request-path controls for autonomous actions: scopes, budgets, delegated authority, revocation, denial reasons, spend attribution, and proof before APIs or MCP tools execute.'],
+              ['Is SatGate tied to x402, L402, AgentCore Payments, or Pay.sh?', 'No. x402, L402, AgentCore Payments, Pay.sh, and related rails make it easier for agents to call paid services. SatGate is protocol-independent: it records the requesting agent, allowed action, policy basis, spend context, and evidence needed for audit, review, and control — payment or not.'],
             ].map(([question, answer]) => (
               <div key={question} className="border-t border-gray-800 pt-6 first:border-t-0 first:pt-0">
                 <h3 className="mb-2 text-xl font-bold text-white">{question}</h3>
@@ -871,20 +872,20 @@ export SATGATE_TOKEN=$TOKEN
             <div>
               <h4 className="font-bold text-white mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-gray-500">
+                <li><Link href="/govern" className="hover:text-white transition">Govern</Link></li>
                 <li><Link href="/protect" className="hover:text-white transition">Protect</Link></li>
                 <li><Link href="/pay" className="hover:text-white transition">Pay</Link></li>
-                <li><Link href="/govern" className="hover:text-white transition">Govern</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-bold text-white mb-4">Resources</h4>
               <ul className="space-y-2 text-sm text-gray-500">
-                <li><Link href="/economic-firewall" className="hover:text-white transition">Economic Firewall</Link></li>
-                <li><Link href="/llm-cost-dashboard" className="hover:text-white transition">LLM Cost Dashboard</Link></li>
-                <li><Link href="/llm-cost-monitoring" className="hover:text-white transition">LLM Cost Monitoring</Link></li>
-                <li><Link href="/ai-agent-cost-control" className="hover:text-white transition">AI Agent Cost Control</Link></li>
+                <li><Link href="/policy-to-proof" className="hover:text-white transition">Policy-to-Proof</Link></li>
+                <li><Link href="/agent-control-plane" className="hover:text-white transition">Agent Control Plane</Link></li>
                 <li><Link href="/mcp-governance" className="hover:text-white transition">MCP Governance</Link></li>
                 <li><Link href="/agent-api-governance" className="hover:text-white transition">Agent API Governance</Link></li>
+                <li><Link href="/economic-firewall" className="hover:text-white transition">Economic Firewall</Link></li>
+                <li><Link href="/ai-agent-cost-control" className="hover:text-white transition">AI Agent Cost Control</Link></li>
                 <li><Link href="/l402-agent-payments" className="hover:text-white transition">L402 Agent Payments</Link></li>
                 <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
                 <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud Dashboard</a></li>

@@ -86,6 +86,14 @@ const faqSchema = {
         text: "AI governance usually covers model risk, data policy, compliance, and human review. AI agent governance adds request-path controls for autonomous actions: scopes, budgets, delegated authority, revocation, denial reasons, spend attribution, and proof before APIs or MCP tools execute.",
       },
     },
+    {
+      "@type": "Question",
+      name: "Is SatGate tied to x402, L402, AgentCore Payments, or Pay.sh?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "No. x402, L402, AgentCore Payments, Pay.sh, and related rails make it easier for agents to call paid services. SatGate is protocol-independent: it records the requesting agent, allowed action, policy basis, spend context, and evidence needed for audit, review, and control — payment or not.",
+      },
+    },
   ],
 };
 

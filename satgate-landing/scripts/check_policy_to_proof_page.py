@@ -76,6 +76,17 @@ govern_required_phrases = [
     "Stop giving AI agents standing authority",
     "Export proof after",
     "Policy-to-Proof",
+    "Policy enforced in the request path",
+    "invoice-reconciler worker",
+    "Worker Attempts Unauthorized Tool",
+    "SatGate Denies Before Execution",
+    "Evidence Pack Exported",
+    "Authority Dashboard",
+    "Revocation & Denial",
+    "Root Policy",
+    "Invoice Reconciler",
+    "Agent governance readiness grader",
+    "Is SatGate tied to x402, L402, AgentCore Payments, or Pay.sh?",
 ]
 
 govern_forbidden_phrases = [
@@ -88,6 +99,14 @@ govern_forbidden_phrases = [
     "The Rogue Intern Story",
     "Your Internal APIs Are an Untapped Market",
     "Stop giving AI agents an all-you-can-eat buffet pass",
+    "Govern → enforce → prove policy ratchet",
+    "Agent Burns Budget",
+    "CFO Chargeback Report",
+    "Usage Dashboard",
+    "Root Token",
+    "Engineering VP",
+    "Economic firewall readiness grader",
+    "How does SatGate relate to x402, AgentCore Payments, and Pay.sh?",
 ]
 
 
