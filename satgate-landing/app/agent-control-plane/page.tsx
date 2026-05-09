@@ -143,6 +143,7 @@ const faqs = [
 ];
 
 const relatedTopics = [
+  ["/policy-to-proof", "Policy-to-Proof", "Turn every mint, delegation, spend event, denial, and revocation into exportable evidence."],
   ["/economic-firewall", "Economic firewall", "The request-path enforcement layer for agent access, spend, and Charge."],
   ["/agent-api-governance", "Agent API governance", "Replace broad API keys with policy-bound, auditable agent authority."],
   ["/agent-capability-tokens", "Agent capability tokens", "Encode route, budget, expiry, delegation, and revocation into agent access."],
