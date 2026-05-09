@@ -74,7 +74,12 @@
       "amount_usd": "0.18",
       "result": "allowed",
       "ledger_entry_id": "led_7f31",
-      "receipt_hash": "sha256:01d87dd7d0b28cc94cd9b4f27970e1cb2cebe0b56ff2cdd462e54fcf3abfa8b6"
+      "receipt_hash": "sha256:01d87dd7d0b28cc94cd9b4f27970e1cb2cebe0b56ff2cdd462e54fcf3abfa8b6",
+      "payment_protocol": "internal_api",
+      "settlement": {
+        "rail": "internal_ledger",
+        "cost_center": "FIN-AP-042"
+      }
     },
     {
       "type": "spend",
@@ -85,18 +90,30 @@
       "amount_usd": "0.42",
       "result": "allowed",
       "ledger_entry_id": "led_7f32",
-      "receipt_hash": "sha256:a923d9034b61b5a03f0a47dc0cefc653d93b8041f47f0f92d8ce39f6b7437c24"
+      "receipt_hash": "sha256:a923d9034b61b5a03f0a47dc0cefc653d93b8041f47f0f92d8ce39f6b7437c24",
+      "payment_protocol": "internal_api",
+      "settlement": {
+        "rail": "internal_ledger",
+        "cost_center": "FIN-AP-042"
+      }
     },
     {
       "type": "spend",
       "ts": "2026-05-09T14:24:44Z",
       "agent": "worker-agent:invoice-reconciler",
-      "route": "/v1/invoices/reconcile",
-      "mcp_tool": "invoices.reconcile",
+      "route": "/v1/invoices/ocr",
+      "mcp_tool": "document_ai.ocr",
       "amount_usd": "1.12",
       "result": "allowed",
       "ledger_entry_id": "led_7f33",
-      "receipt_hash": "sha256:deb583596fa15d409aab8e5b3c85a9dac5d970a6690a134074b70e7de042c7d2"
+      "receipt_hash": "sha256:deb583596fa15d409aab8e5b3c85a9dac5d970a6690a134074b70e7de042c7d2",
+      "payment_protocol": "x402-style",
+      "settlement": {
+        "chain": "solana",
+        "tx": "REDACTED_DEMO_SAMPLE",
+        "ms": 187
+      },
+      "policy_context": "internal-agent authority plus external paid API attribution"
     },
     {
       "type": "denial",
@@ -152,5 +169,16 @@
     "algorithm": "ed25519 + sha256 receipt chain",
     "public_key_id": "satgate-evidence-2026-05",
     "verify_url": "https://satgate.io/policy-to-proof"
+  },
+  "payment_context": {
+    "default_market": "internal_enterprise_agents",
+    "internal_rail": "existing_iam_service_account_or_api_key_billing",
+    "optional_external_rails": [
+      "x402-style",
+      "l402",
+      "api_key_billing",
+      "enterprise_ledger"
+    ],
+    "note": "The same authority chain and receipts can cover an internal agent call, or a governed bridge call to an external paid API."
   }
 }
