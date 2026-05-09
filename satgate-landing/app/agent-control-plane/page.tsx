@@ -6,6 +6,7 @@ import {
   Bot,
   CheckCircle2,
   CircleDollarSign,
+  FileSearch,
   FileText,
   GitBranch,
   KeyRound,
@@ -16,13 +17,13 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "SatGate Agent Control Plane | Govern Local AI Agents",
+  title: "SatGate Agent Control Plane | Govern Enterprise AI Agents",
   description:
-    "SatGate is an agent control plane for local AI agents: scoped capabilities, delegation lineage, request-path budget enforcement, audit, and instant revocation.",
+    "SatGate is an agent control plane for enterprise AI agents: scoped capabilities, delegation lineage, request-path budget enforcement, Evidence Pack exports, and instant revocation.",
   keywords: [
     "agent control plane",
     "AI agent control plane",
-    "local AI agent governance",
+    "enterprise AI agent governance",
     "AI agent delegation control",
     "agent capability management",
     "revocable agent credentials",
@@ -35,9 +36,9 @@ export const metadata: Metadata = {
     canonical: "https://satgate.io/agent-control-plane",
   },
   openGraph: {
-    title: "SatGate Agent Control Plane | Govern Local AI Agents",
+    title: "SatGate Agent Control Plane | Govern Enterprise AI Agents",
     description:
-      "Govern local AI agents with scoped capabilities, delegation lineage, request-path budgets, audit trails, and instant revocation.",
+      "Govern enterprise AI agents with scoped capabilities, delegation lineage, request-path budgets, Evidence Pack exports, and instant revocation.",
     url: "https://satgate.io/agent-control-plane",
     type: "website",
     images: [
@@ -119,8 +120,14 @@ const controlPlaneCapabilities = [
 const comparisons = [
   ["Connection", "Agents can reach models, APIs, and MCP tools."],
   ["Control", "SatGate decides what authority, budget, and delegation each agent receives."],
-  ["Proof", "Every allowed, denied, charged, or revoked action leaves a clear audit trail."],
-  ["Revenue", "The same request path can charge robot customers when agent traffic becomes monetizable."],
+  ["Proof", "Every allowed, denied, charged, or revoked action leaves a receipt that feeds the Evidence Pack."],
+  ["Revenue", "The same control path governs paid calls across x402, L402, AgentCore Payments, and Pay.sh while preserving proof of agent authority."],
+];
+
+const personaCards = [
+  ["Platform team", "Gets a control plane for enterprise agents across APIs, MCP tools, models, and paid rails."],
+  ["Security team", "Gets revocation with evidence: the authority chain, denial reason, and first blocked call after revoke."],
+  ["FinOps team", "Gets spend attributed to the agent, token, route, tool, and policy before finance has to reconstruct it."],
 ];
 
 const faqs = [
@@ -133,8 +140,8 @@ const faqs = [
     "An API gateway protects services. An agent control plane governs the agents using those services: their budget, customer boundary, delegation rights, audit trail, and ability to be revoked instantly.",
   ],
   [
-    "Why do local AI agents need no standing authority?",
-    "Standing API keys give an agent reusable power even after the task, budget, tenant, or policy context changes. SatGate keeps local agents untrusted by default; they check in, receive short-lived scoped authority, and lose that authority when policy, budget, expiry, or revocation says stop.",
+    "Why do enterprise AI agents need no standing authority?",
+    "Standing API keys give an agent reusable power even after the task, budget, tenant, or policy context changes. SatGate keeps enterprise agents untrusted by default; they check in, receive short-lived scoped authority, and lose that authority when policy, budget, expiry, or revocation says stop.",
   ],
   [
     "How does SatGate control agent delegation?",
@@ -144,13 +151,13 @@ const faqs = [
 
 const relatedTopics = [
   ["/policy-to-proof", "Policy-to-Proof", "Turn every mint, delegation, spend event, denial, and revocation into exportable evidence."],
-  ["/economic-firewall", "Economic firewall", "The request-path enforcement layer for agent access, spend, and Charge."],
+  ["/mcp-governance", "MCP governance", "Apply budget, revocation, and audit controls to agent tool calls."],
   ["/agent-api-governance", "Agent API governance", "Replace broad API keys with policy-bound, auditable agent authority."],
   ["/agent-capability-tokens", "Agent capability tokens", "Encode route, budget, expiry, delegation, and revocation into agent access."],
   ["/revocable-agent-credentials", "Revocable agent credentials", "Kill agent access without rotating every upstream provider secret."],
-  ["/mcp-governance", "MCP governance", "Apply budget, revocation, and audit controls to agent tool calls."],
+  ["/economic-firewall", "Economic firewall", "The request-path enforcement layer for agent access, spend, and governed paid calls."],
   ["/ai-agent-cost-control", "AI agent cost control", "Control model, API, MCP, and delegated sub-agent spend before cost is created."],
-  ["/economic-firewall-readiness-grader", "Economic firewall readiness grader", "Score identity, budgets, revocation, audit, routing, MCP, and Charge readiness."],
+  ["/economic-firewall-readiness-grader", "Economic firewall readiness grader", "Score identity, budgets, revocation, audit, routing, MCP, and paid-call governance readiness."],
   ["/satgate-for-hermes-agent", "SatGate for Hermes Agent", "Govern local Hermes/Open WebUI agent workflows with SatGate in the request path."],
 ];
 
@@ -162,7 +169,7 @@ const jsonLd = {
       name: "SatGate Agent Control Plane",
       url: "https://satgate.io/agent-control-plane",
       description:
-        "An agent control plane for local AI agents: scoped capabilities, delegation lineage, request-path budget enforcement, audit trails, and revocation without standing API keys.",
+        "An agent control plane for enterprise AI agents: scoped capabilities, delegation lineage, request-path budget enforcement, Evidence Pack exports, and revocation without standing API keys.",
       datePublished: "2026-04-27",
       dateModified: "2026-05-05",
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
@@ -190,7 +197,7 @@ const jsonLd = {
       url: "https://satgate.io/agent-control-plane",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       featureList: [
-        "No standing API keys for local AI agents",
+        "No standing API keys for enterprise AI agents",
         "Scoped agent capabilities",
         "Delegation lineage proof",
         "Request-path budget enforcement",
@@ -203,7 +210,7 @@ const jsonLd = {
       "@type": "ItemList",
       name: "Agent control-plane capabilities",
       description:
-        "Core controls required to govern local AI agents without standing keys, unmanaged delegation, or invisible spend.",
+        "Core controls required to govern enterprise AI agents without standing keys, unmanaged delegation, or invisible spend.",
       itemListElement: controlPlaneCapabilities.map(([name, description], index) => ({
         "@type": "ListItem",
         position: index + 1,
@@ -275,7 +282,7 @@ export default function AgentControlPlanePage() {
               SatGate Agent Control Plane
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-slate-300">
-              Govern local AI agents before they touch expensive models, sensitive APIs, paid tools, or customer data. SatGate gives every agent bounded authority, visible spend, controlled delegation, and instant revocation.
+              Govern enterprise AI agents before they touch expensive models, sensitive APIs, paid tools, or customer data. SatGate gives every agent bounded authority, visible spend, controlled delegation, and instant revocation.
             </p>
             <p className="mt-5 max-w-2xl text-lg font-semibold text-cyan-200">
               Let agents work — without giving them blank checks, permanent keys, or invisible authority.
@@ -332,6 +339,39 @@ export default function AgentControlPlanePage() {
       </section>
 
       <section className="border-y border-white/10 bg-white/[0.025] px-5 py-16 sm:px-8 lg:py-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-10 max-w-3xl">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-3 py-1 text-sm font-semibold text-yellow-200">
+              <FileSearch size={15} />
+              Internal first, rail-aware when needed
+            </div>
+            <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
+              One control plane for internal agents and governed paid calls.
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-slate-300">
+              Internal agent calls and governed external paid calls move through the same authority model — same scoped capability, same delegation chain, one Evidence Pack.
+            </p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-6">
+              <div className="mb-3 text-xs font-bold uppercase tracking-[0.22em] text-cyan-200">Govern Authority</div>
+              <h3 className="text-2xl font-black text-white">Policy enforced before execution</h3>
+              <p className="mt-4 leading-7 text-slate-300">
+                No scoped capability means no action. SatGate decides what each enterprise agent can access, how much it can spend, what it can delegate, and whether it can continue before the request reaches an API, model, or MCP tool.
+              </p>
+            </div>
+            <div className="rounded-3xl border border-yellow-400/30 bg-yellow-400/10 p-6">
+              <div className="mb-3 text-xs font-bold uppercase tracking-[0.22em] text-yellow-200">Preserve Proof</div>
+              <h3 className="text-2xl font-black text-white">Evidence preserved across rails</h3>
+              <p className="mt-4 leading-7 text-slate-300">
+                Payment proves value moved. SatGate proves the agent was allowed to move it across internal APIs, MCP tools, x402, L402, AgentCore Payments, Pay.sh, API-key billing, or enterprise ledgers.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-white/10 bg-white/[0.025] px-5 py-16 sm:px-8 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-sm font-semibold text-cyan-200">
@@ -374,11 +414,10 @@ export default function AgentControlPlanePage() {
             </p>
           </div>
           <div className="grid gap-4 lg:grid-cols-4">
-            {comparisons.map(([title, role, gap]) => (
+            {comparisons.map(([title, body]) => (
               <div key={title} className="rounded-3xl border border-white/10 bg-white/[0.035] p-5">
                 <h3 className="text-lg font-bold text-white">{title}</h3>
-                <p className="mt-3 text-sm font-semibold text-cyan-200">{role}</p>
-                <p className="mt-3 text-sm leading-6 text-slate-400">{gap}</p>
+                <p className="mt-3 text-sm leading-6 text-slate-400">{body}</p>
               </div>
             ))}
           </div>
@@ -406,15 +445,37 @@ export default function AgentControlPlanePage() {
             </div>
             <div className="space-y-4 font-mono text-sm">
               <div className="rounded-2xl border border-cyan-400/35 bg-cyan-400/10 p-4">
-                Parent agent <span className="text-slate-400">approved scope and budget</span>
+                Finance parent agent <span className="text-slate-400">approved scope and budget</span>
               </div>
               <div className="ml-8 rounded-2xl border border-purple-400/40 bg-purple-400/10 p-4">
-                ↳ Worker agent <span className="text-slate-400">narrower authority</span>
+                ↳ Invoice-reconciler worker <span className="text-slate-400">narrower authority</span>
               </div>
               <div className="ml-16 rounded-2xl border border-red-400/40 bg-red-400/10 p-4 text-red-200">
-                ↳ Further handoff blocked by policy
+                ↳ Customer-data export blocked by policy
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-5 py-16 sm:px-8 lg:py-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-9 max-w-3xl">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-sm font-semibold text-cyan-200">
+              <ShieldCheck size={15} />
+              Built for enterprise control owners
+            </div>
+            <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
+              The control plane speaks to platform, security, and finance.
+            </h2>
+          </div>
+          <div className="grid gap-5 md:grid-cols-3">
+            {personaCards.map(([title, body]) => (
+              <div key={title} className="rounded-3xl border border-white/10 bg-[#07111f] p-6">
+                <h3 className="text-xl font-bold text-white">{title}</h3>
+                <p className="mt-4 leading-7 text-slate-400">{body}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -474,10 +535,13 @@ export default function AgentControlPlanePage() {
               <FileText size={15} />
               Security proof card
             </div>
-            <h2 className="text-4xl font-black tracking-[-0.04em] text-white">A one-page view of the control model.</h2>
+            <h2 className="text-4xl font-black tracking-[-0.04em] text-white">A one-page proof card. The full lifecycle exports as an Evidence Pack.</h2>
             <p className="mt-5 text-lg leading-8 text-slate-300">
-              Use the proof card to explain the Agent Control Plane in a security review: no permanent keys, bounded authority, controlled delegation, visible spend, and instant revocation.
+              Use the proof card to explain the Agent Control Plane in a security review: no permanent keys, bounded authority, controlled delegation, visible spend, instant revocation, and an exportable Evidence Pack for the full Policy-to-Proof lifecycle.
             </p>
+            <Link href="/policy-to-proof" className="mt-5 inline-flex text-sm font-bold text-cyan-200 hover:text-cyan-100">
+              See the full Evidence Pack lifecycle →
+            </Link>
             <a
               href="/acp-demo/satgate-acp-security-proof-card.pdf"
               className="mt-8 inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 text-base font-black text-slate-950 transition hover:bg-cyan-100"
@@ -522,7 +586,7 @@ export default function AgentControlPlanePage() {
 
       <section className="border-t border-white/10 bg-white/[0.025] px-5 py-16 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-7xl">
-          <h2 className="text-3xl font-black tracking-[-0.04em] text-white">Related economic control-plane topics</h2>
+          <h2 className="text-3xl font-black tracking-[-0.04em] text-white">Related agent-governance topics</h2>
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {relatedTopics.map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-3xl border border-white/10 bg-[#07111f] p-5 transition hover:border-cyan-400/50 hover:bg-cyan-400/10">
@@ -538,7 +602,7 @@ export default function AgentControlPlanePage() {
         <div className="mx-auto max-w-5xl rounded-[2rem] border border-cyan-400/25 bg-gradient-to-br from-cyan-400/10 to-purple-500/10 p-8 text-center sm:p-12">
           <CheckCircle2 className="mx-auto mb-5 text-cyan-200" size={40} />
           <h2 className="text-3xl font-black tracking-[-0.04em] text-white sm:text-4xl">
-            Turn local agents into governed enterprise actors.
+            Govern enterprise agents end to end.
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-slate-300">
             No standing API keys. No unmanaged delegation. No invisible spend.

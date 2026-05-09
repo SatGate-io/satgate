@@ -76,7 +76,8 @@ govern_required_phrases = [
     "Stop giving AI agents standing authority",
     "Export proof after",
     "Policy-to-Proof",
-    "Policy enforced in the request path",
+    "Policy enforced before execution",
+    "Evidence preserved across rails",
     "invoice-reconciler worker",
     "Worker Attempts Unauthorized Tool",
     "SatGate Denies Before Execution",
@@ -106,7 +107,34 @@ govern_forbidden_phrases = [
     "Root Token",
     "Engineering VP",
     "Economic firewall readiness grader",
+    "By Monday",
     "How does SatGate relate to x402, AgentCore Payments, and Pay.sh?",
+]
+
+acp_required_phrases = [
+    "Govern enterprise AI agents before they touch expensive models",
+    "Internal first, rail-aware when needed",
+    "One control plane for internal agents and governed paid calls.",
+    "Evidence preserved across rails",
+    "Finance parent agent",
+    "Invoice-reconciler worker",
+    "Customer-data export blocked by policy",
+    "Platform team",
+    "Security team",
+    "FinOps team",
+    "A one-page proof card. The full lifecycle exports as an Evidence Pack.",
+    "See the full Evidence Pack lifecycle",
+    "Why do enterprise AI agents need no standing authority?",
+    "Govern enterprise agents end to end.",
+]
+
+acp_forbidden_phrases = [
+    "Govern local AI agents before they touch expensive models",
+    "Govern Local AI Agents",
+    "Why do local AI agents need no standing authority?",
+    "The same request path can charge robot customers",
+    "A one-page view of the control model.",
+    "Turn local agents into governed enterprise actors.",
 ]
 
 
@@ -120,6 +148,12 @@ def main() -> int:
     acp_text = AGENT_CONTROL_PLANE.read_text()
     if "/policy-to-proof" not in acp_text:
         raise SystemExit("agent-control-plane page must link to /policy-to-proof")
+    acp_missing = [phrase for phrase in acp_required_phrases if phrase not in acp_text]
+    if acp_missing:
+        raise SystemExit("missing agent-control-plane policy-to-proof phrases:\n" + "\n".join(acp_missing))
+    acp_stale = [phrase for phrase in acp_forbidden_phrases if phrase in acp_text]
+    if acp_stale:
+        raise SystemExit("stale agent-control-plane local/spend-first phrases remain:\n" + "\n".join(acp_stale))
     govern_text = GOVERN_PAGE.read_text()
     govern_missing = [phrase for phrase in govern_required_phrases if phrase not in govern_text]
     if govern_missing:
