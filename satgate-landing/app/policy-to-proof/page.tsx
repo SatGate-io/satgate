@@ -281,7 +281,7 @@ export default function PolicyToProofPage() {
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-300">Internal agents</p>
               <h3 className="mt-4 text-xl font-black text-white">Leaving the lab.</h3>
               <p className="mt-3 text-sm leading-6 text-gray-400">
-                Teams are giving agents access to tickets, data, tools, approvals, and operational workflows. The new control question is what each agent was authorized to do, by whom, and under which policy.
+                Agents now hold authority that used to require human approval. The control question shifts from whether the API call worked to who authorized what, under which policy, and whether you can prove it.
               </p>
             </article>
             <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
@@ -293,16 +293,16 @@ export default function PolicyToProofPage() {
             </article>
             <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-300">Enterprise scale</p>
-              <h3 className="mt-4 text-xl font-black text-white">Authority has to precede it.</h3>
+              <h3 className="mt-4 text-xl font-black text-white">Authority before scale.</h3>
               <p className="mt-3 text-sm leading-6 text-gray-400">
                 CISOs, platform teams, and FinOps leaders need more than logs after the fact. They need evidence that each action matched policy before agents trigger budget, data access, or external execution.
               </p>
             </article>
             <article className="rounded-2xl border border-emerald-300/20 bg-emerald-300/5 p-6">
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-emerald-200">SatGate</p>
-              <h3 className="mt-4 text-xl font-black text-white">Turns policy into proof.</h3>
+              <h3 className="mt-4 text-xl font-black text-white">Sits above the rails.</h3>
               <p className="mt-3 text-sm leading-6 text-gray-400">
-                SatGate records the decision trail behind agent activity: the requesting agent, allowed action, policy basis, spend context, and evidence needed for audit, review, and control.
+                Every authority decision is recorded — payment or not — so review and audit do not depend on which protocol the agent used.
               </p>
             </article>
           </div>
