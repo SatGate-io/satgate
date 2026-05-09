@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Agent Spend Policy Template',
+  title: 'Agent Budget Policy Template: Policy-to-Proof Controls',
   description:
-    'Generate copyable YAML and JSON policy templates for AI agent budgets, MCP tool costs, delegation, revocation, and audit fields.',
+    'Generate YAML and JSON agent budget policy with authority, MCP tool caps, revocation, receipts, and Evidence Pack fields.',
   alternates: { canonical: 'https://satgate.io/agent-spend-policy-template' },
 };
 

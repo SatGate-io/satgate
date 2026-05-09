@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: "AI Agent ROI Calculator: Budget Enforcement Savings",
   alternates: { canonical: "https://satgate.io/roi-calculator" },
   description:
-    "Estimate AI agent ghost spend, loop waste, budget enforcement savings, payback period, and annual ROI with SatGate.",
+    "Estimate AI agent loop exposure and map budget controls to Policy-to-Proof receipts and Evidence Pack evidence with SatGate.",
   keywords: [
     "AI agent ROI calculator",
     "AI agent cost calculator",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "AI Agent ROI Calculator",
     description:
-      "Estimate ghost spend, runaway agent loop exposure, payback period, and savings from request-path budget enforcement.",
+      "Estimate runaway agent loop exposure, budget-control ROI, and Policy-to-Proof receipt coverage.",
     url: "https://satgate.io/roi-calculator",
     type: "website",
   },
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "AI Agent ROI Calculator",
     description:
-      "Estimate AI agent ghost spend, runaway loop exposure, payback period, and SatGate budget-enforcement savings.",
+      "Estimate AI agent loop exposure, budget-control ROI, and SatGate Policy-to-Proof receipt coverage.",
   },
 };
 

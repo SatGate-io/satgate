@@ -9,6 +9,12 @@ GOVERN_PAGE = ROOT / "app" / "components" / "GovernClient.tsx"
 ECONOMIC_FIREWALL_PAGE = ROOT / "app" / "economic-firewall" / "page.tsx"
 READINESS_GRADER_PAGE = ROOT / "app" / "economic-firewall-readiness-grader" / "page.tsx"
 READINESS_GRADER_LAYOUT = ROOT / "app" / "economic-firewall-readiness-grader" / "layout.tsx"
+ROI_CALCULATOR_PAGE = ROOT / "app" / "roi-calculator" / "page.tsx"
+ROI_CALCULATOR_LAYOUT = ROOT / "app" / "roi-calculator" / "layout.tsx"
+AGENT_BUDGET_POLICY_PAGE = ROOT / "app" / "agent-spend-policy-template" / "page.tsx"
+AGENT_BUDGET_POLICY_LAYOUT = ROOT / "app" / "agent-spend-policy-template" / "layout.tsx"
+CAPABILITY_TOKEN_TEMPLATE_PAGE = ROOT / "app" / "revocable-capability-token-policy-template" / "page.tsx"
+CAPABILITY_TOKEN_TEMPLATE_LAYOUT = ROOT / "app" / "revocable-capability-token-policy-template" / "layout.tsx"
 
 required_phrases = [
     "Every agent action leaves a receipt",
@@ -219,6 +225,70 @@ readiness_forbidden_phrases = [
     "authority, cost, policy decision",
 ]
 
+tool_required_phrases = {
+    "roi-calculator": [
+        "Turn the ROI model into Policy-to-Proof",
+        "Evidence Pack",
+        "See Policy-to-Proof",
+        "Govern agent actions",
+        "Policy-to-Proof receipt coverage",
+        "Map ROI to Policy-to-Proof",
+    ],
+    "agent-budget-policy-template": [
+        "Agent Budget Policy Template",
+        "control_with_receipts",
+        "receipt_id",
+        "evidence_pack_id",
+        "Evidence Pack fields",
+        "See Policy-to-Proof",
+        "Govern agent execution",
+        "Create Evidence Pack trail",
+    ],
+    "revocable-capability-token-policy-template": [
+        "External agent access",
+        "policy:decision:read",
+        "receipt_id",
+        "evidence_pack_id",
+        "Evidence Pack evidence",
+        "See Policy-to-Proof",
+        "Govern agent authority",
+        "Create Evidence Pack trail",
+    ],
+}
+
+tool_forbidden_phrases = {
+    "roi-calculator": [
+        "robot customers",
+        "Charge Demo",
+        "L402 before access is granted",
+        "/pay",
+        "/l402-api-pricing-calculator",
+        "/runaway-agent-cost-calculator",
+        "Observe, Control, and Charge",
+    ],
+    "agent-budget-policy-template": [
+        "control_and_charge",
+        "Charge when robot customers pay",
+        "L402 payments",
+        "/ai-api-budget-enforcement",
+        "/agent-spending-limits",
+        "/mcp-cost-control",
+        "Agent Spend Policy Template",
+    ],
+    "revocable-capability-token-policy-template": [
+        "agent:robot-customer",
+        "paid-api-access",
+        "charge:l402:pay",
+        "Robot customer / L402",
+        "L402 Charge",
+        "Charge/L402",
+        "/agent-capability-tokens",
+        "/revocable-agent-credentials",
+        "/agent-api-key-risk-assessment",
+        "/economic-firewall-readiness-grader",
+    ],
+}
+
 
 def main() -> int:
     if not PAGE.exists():
@@ -257,6 +327,20 @@ def main() -> int:
     readiness_stale = [phrase for phrase in readiness_forbidden_phrases if phrase in readiness_text]
     if readiness_stale:
         raise SystemExit("stale readiness-grader spend/Charge phrases remain:\n" + "\n".join(readiness_stale))
+    tool_texts = {
+        "roi-calculator": ROI_CALCULATOR_PAGE.read_text() + "\n" + ROI_CALCULATOR_LAYOUT.read_text(),
+        "agent-budget-policy-template": AGENT_BUDGET_POLICY_PAGE.read_text() + "\n" + AGENT_BUDGET_POLICY_LAYOUT.read_text(),
+        "revocable-capability-token-policy-template": CAPABILITY_TOKEN_TEMPLATE_PAGE.read_text()
+        + "\n"
+        + CAPABILITY_TOKEN_TEMPLATE_LAYOUT.read_text(),
+    }
+    for name, tool_text in tool_texts.items():
+        tool_missing = [phrase for phrase in tool_required_phrases[name] if phrase not in tool_text]
+        if tool_missing:
+            raise SystemExit(f"missing {name} authority/proof phrases:\n" + "\n".join(tool_missing))
+        tool_stale = [phrase for phrase in tool_forbidden_phrases[name] if phrase in tool_text]
+        if tool_stale:
+            raise SystemExit(f"stale {name} spend/Charge/tool-exit phrases remain:\n" + "\n".join(tool_stale))
     return 0
 
 
