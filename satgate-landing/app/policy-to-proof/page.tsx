@@ -272,7 +272,7 @@ export default function PolicyToProofPage() {
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-purple-300">Why now</p>
             <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Agents are moving from demos to workflows. Spend rails are arriving with them.</h2>
             <p className="mt-5 text-xl leading-8 text-gray-300">
-              Enterprises need proof of authority before those rails scale. Payment proves value moved. SatGate proves the agent was allowed to move it.
+              Enterprises need proof of authority before those rails scale. Payment rails authorize value movement. SatGate authorizes behavior and preserves proof. Payment proves value moved. SatGate proves the agent was allowed to move it.
             </p>
           </div>
 

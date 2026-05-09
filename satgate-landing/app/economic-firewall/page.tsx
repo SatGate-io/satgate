@@ -78,7 +78,7 @@ export default function EconomicFirewallPage() {
         name: 'What is an economic firewall?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An economic firewall is an inline control layer that governs what AI agents can access, how much they can spend, what they can delegate, and what evidence is captured before each API request reaches the upstream provider.',
+          text: 'An economic firewall is an inline control layer that governs what AI agents can access, how much they can spend, what they can delegate, and which Evidence Pack artifacts are captured before each API request reaches the upstream provider.',
         },
       },
       {
@@ -189,7 +189,7 @@ export default function EconomicFirewallPage() {
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-3xl leading-relaxed mb-10">
-            An economic firewall controls what autonomous agents can access, how much they can spend, what they can delegate, and what evidence is captured before each API request reaches the upstream provider.
+            An economic firewall controls what autonomous agents can access, how much they can spend, what they can delegate, and which Evidence Pack artifacts are captured before each API request reaches the upstream provider.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
@@ -228,7 +228,7 @@ export default function EconomicFirewallPage() {
               Rate limits can slow traffic. Dashboards can explain yesterday&apos;s bill. Neither can answer the question that matters before a request happens: <strong className="text-white">is this agent allowed to take this action right now?</strong>
             </p>
             <p>
-              Economic firewalls are the missing control plane between autonomous agents and governed APIs. They combine identity, authority policy, budget enforcement, observability, revocation, provider routing, evidence capture, and optional payment context into one request-path decision.
+              Economic firewalls are the missing control plane between autonomous agents and governed APIs. They combine identity, authority policy, budget enforcement, observability, revocation, provider routing, Evidence Pack capture, and optional payment context into one request-path decision.
             </p>
           </div>
         </div>
@@ -238,11 +238,10 @@ export default function EconomicFirewallPage() {
           <div className="space-y-3 text-sm">
             {[
               'Who is the agent?',
-              'What capability/token is it using?',
-              'Is this route allowed?',
-              'What will this request cost?',
-              'Does budget remain?',
-              'Should the request be allowed, denied, routed, charged, or recorded as evidence?',
+              'What scoped capability is it using?',
+              'Is the requested action allowed under policy?',
+              'Does authority remain — scope, budget, expiry, revocation?',
+              'Should the request be allowed, denied, delegated, paid, or recorded in the Evidence Pack?',
             ].map((item) => (
               <div key={item} className="flex items-start gap-3 rounded-lg border border-gray-800 bg-black/50 p-3">
                 <CheckCircle2 className="text-cyan-300 mt-0.5" size={18} />
@@ -323,7 +322,7 @@ export default function EconomicFirewallPage() {
           <div className="rounded-2xl border border-yellow-800/50 bg-yellow-950/10 p-6">
             <h2 className="text-2xl font-bold text-white mb-4">Prove</h2>
             <p className="text-gray-300 leading-relaxed">
-              When an API becomes a product for external agents, keep payment context tied to the authority chain. Payment proves value moved; SatGate proves the agent was allowed to move it.
+              Every authority decision — allowed, denied, delegated, revoked, or paid — feeds the Evidence Pack. Payment proves value moved; SatGate proves the agent was allowed to move it.
             </p>
           </div>
         </div>
@@ -432,7 +431,7 @@ export default function EconomicFirewallPage() {
           <h2 className="mb-8 text-3xl font-bold text-white">Economic firewall questions</h2>
           <div className="grid gap-5 md:grid-cols-2">
             {[
-              ['What is an economic firewall?', 'An economic firewall is an inline control layer that governs what AI agents can access, how much they can spend, what they can delegate, and what evidence is captured before each API request reaches the upstream provider.'],
+              ['What is an economic firewall?', 'An economic firewall is an inline control layer that governs what AI agents can access, how much they can spend, what they can delegate, and which Evidence Pack artifacts are captured before each API request reaches the upstream provider.'],
               ['How is an economic firewall different from rate limiting?', 'Rate limiting counts requests. An economic firewall enforces scoped authority, budgets, revocation, agent identity, tool policy, denial reasons, and payment context in the request path.'],
               ['Why do AI agents need economic firewalls?', 'Autonomous agents can loop, delegate, retry, and call paid tools without a human approving each request. SatGate denies unauthorized actions before execution and preserves auditable proof afterward.'],
               ['Is an economic firewall the same as an API gateway?', 'No. An API gateway can route and secure traffic, but an economic firewall adds per-agent authority, budget caveats, delegated credentials, denial reasons, revocation proof, and rail-aware payment context before requests execute.'],
