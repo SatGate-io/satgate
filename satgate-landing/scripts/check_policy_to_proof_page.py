@@ -159,6 +159,7 @@ economic_required_phrases = [
     "Preserve proof across paid rails",
     "Policy-to-Proof",
     "SatGate governs agent authority before value moves",
+    "govern paid rails when value moves",
 ]
 
 economic_forbidden_phrases = [
@@ -183,6 +184,7 @@ economic_forbidden_phrases = [
     "When an API becomes a product for external agents",
     "what evidence is captured",
     "evidence capture, and optional payment context",
+    "when APIs become products for external agents",
 ]
 
 
