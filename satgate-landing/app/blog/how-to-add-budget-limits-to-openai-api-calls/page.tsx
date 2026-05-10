@@ -4,12 +4,12 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "OpenAI API Budget Limits: Control Spend Before Calls",
-  description: "Learn how to add OpenAI API budget limits, prevent runaway agent spend, and enforce usage controls before calls execute.",
+  description: "Add OpenAI API budget limits with authority before execution, Observe/Control/Prove controls, and Evidence Pack receipts.",
   alternates: { canonical: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls' },
   keywords: ['OpenAI API budget limits', 'OpenAI cost control', 'API gateway OpenAI', 'GPT-4 spending limits', 'OpenAI API costs', 'prevent OpenAI overspending', 'hard cap OpenAI spend', 'per-agent OpenAI budget'],
   openGraph: {
     title: 'OpenAI API Budget Limits: Control Spend Before Calls',
-    description: 'Learn how to add OpenAI API budget limits, prevent runaway agent spend, and enforce usage controls before calls execute.',
+    description: 'Add OpenAI API budget limits with authority before execution, Observe/Control/Prove controls, and Evidence Pack receipts.',
     url: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls',
     type: 'article',
     publishedTime: '2026-04-07T00:00:00Z',
@@ -38,6 +38,8 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
       { '@type': 'Thing', name: 'per-agent OpenAI budgets' },
       { '@type': 'Thing', name: 'request-path budget enforcement' },
       { '@type': 'Thing', name: 'runaway LLM spend prevention' },
+      { '@type': 'Thing', name: 'Observe Control Prove' },
+      { '@type': 'Thing', name: 'Evidence Pack receipts' },
     ],
   };
 
@@ -114,7 +116,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
           <h1 className="text-4xl font-bold mb-4">How to Set Hard Budget Limits on OpenAI API Calls</h1>
           <div className="mb-6 rounded-2xl border border-green-900/60 bg-green-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-green-300">Direct answer</p>
-            <p className="text-gray-300">The safest way to set OpenAI API budget limits is to enforce spend before each request reaches OpenAI. Put a gateway in the request path, assign budgets per agent/team/session, estimate the call cost, and block or downgrade requests before runaway loops burn budget.</p>
+            <p className="text-gray-300">The safest way to set OpenAI API budget limits is to enforce spend before each request reaches OpenAI: Observe usage, Control authority and budget before execution, and Prove every allowed, denied, or downgraded call with an Evidence Pack receipt.</p>
           </div>
           
           <p className="text-xl text-gray-400 mb-6">
@@ -589,7 +591,7 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">SatGate growth path: Observe → Control → Charge</h3>
             <p className="mb-4 text-gray-300">
-              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or robot-customer revenue.
+              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or paid-agent revenue.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway →</Link>

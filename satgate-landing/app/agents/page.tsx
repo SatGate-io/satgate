@@ -244,10 +244,10 @@ export default function AgentsLandingPage() {
               <h3 className="text-xl font-semibold text-white mb-2">Charge</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Monetize your APIs. Agents pay per request
-                via Lightning micropayments (L402). No API keys, no subscriptions — just pay and go.
+                via paid-rail context (L402). No API keys, no subscriptions — just pay and go.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
-                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> L402 Lightning payments</li>
+                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> paid-rail context</li>
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> Per-request pricing</li>
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> Agent-native monetization</li>
               </ul>

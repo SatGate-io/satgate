@@ -3,7 +3,7 @@ import { ArrowRight, BadgeDollarSign, Bot, Braces, CheckCircle2, Network, Shield
 
 export const metadata = {
   title: 'HTTP 402 for AI Agents',
-  description: 'A practical guide to HTTP 402 for AI agents: payment challenges, Stripe-style shared payment tokens, L402 Lightning, and SatGate economic firewall policy.',
+  description: 'A practical guide to HTTP 402 for AI agents: payment challenges, Stripe-style shared payment tokens, paid-rail context, and SatGate economic firewall policy.',
   alternates: { canonical: 'https://satgate.io/http-402-for-ai-agents' },
   keywords: [
     'HTTP 402 for AI agents',
@@ -32,7 +32,7 @@ const flows = [
   ['Card checkout', 'Agent receives a temporary card credential and fills a merchant checkout.', 'Good for web purchases, but not request-native API monetization.'],
   ['x402', 'API returns a 402 payment challenge for stablecoin settlement across supported chains and clients.', 'x402, AgentCore Payments, and Pay.sh still need SatGate authority checks and Evidence Pack receipts above the rail.'],
   ['Shared payment token', 'Agent receives a payment token for a supported 402 machine-payment flow.', 'Rail-specific; treat it as a subpattern of paid-rail context that still needs governance.'],
-  ['L402 Lightning', 'API returns a Lightning-backed 402 challenge and verifies proof before access.', 'L402 Lightning can support request-native paid API access; SatGate governs the decision and receipt.'],
+  ['paid-rail context', 'API returns a Lightning-backed 402 challenge and verifies proof before access.', 'paid-rail context can support request-native paid API access; SatGate governs the decision and receipt.'],
   ['Policy-only 402 observation', 'SatGate records and evaluates payment challenges even when another rail completes payment.', 'Useful for audit, deny/allow rules, and spend governance.'],
 ];
 
@@ -50,7 +50,7 @@ export default function Http402ForAiAgentsPage() {
     about: [
       { '@type': 'Thing', name: 'HTTP 402 for AI agents' },
       { '@type': 'Thing', name: 'paid-rail agent governance' },
-      { '@type': 'Thing', name: 'L402 Lightning paid rail' },
+      { '@type': 'Thing', name: 'paid-rail context paid rail' },
       { '@type': 'Thing', name: 'AI agent payment policy' },
     ],
   };
@@ -60,7 +60,7 @@ export default function Http402ForAiAgentsPage() {
     '@type': 'FAQPage',
     mainEntity: [
       { '@type': 'Question', name: 'What is HTTP 402 for AI agents?', acceptedAnswer: { '@type': 'Answer', text: 'HTTP 402 lets an API tell an AI agent that payment is required before access. The response can include a machine-readable challenge describing how to pay.' } },
-      { '@type': 'Question', name: 'Is HTTP 402 the same as L402?', acceptedAnswer: { '@type': 'Answer', text: 'No. HTTP 402 is the status code. L402 is a Lightning-based payment and access pattern that uses HTTP 402. L402 Lightning is one rail SatGate can govern in the request path.' } },
+      { '@type': 'Question', name: 'Is HTTP 402 the same as L402?', acceptedAnswer: { '@type': 'Answer', text: 'No. HTTP 402 is the status code. L402 is a Lightning-based payment and access pattern that uses HTTP 402. paid-rail context is one rail SatGate can govern in the request path.' } },
       { '@type': 'Question', name: 'How are Stripe shared payment tokens different from L402?', acceptedAnswer: { '@type': 'Answer', text: 'Stripe-style shared payment tokens are a payment-credential method for supported 402 flows. L402 uses Lightning payment proof to unlock scoped API access. They are separate rails.' } },
       { '@type': 'Question', name: 'Why do 402 payment challenges need policy?', acceptedAnswer: { '@type': 'Answer', text: 'A payment challenge tells the agent how to pay, but it does not decide whether the agent should be allowed to spend, which budget applies, whether the route is in scope, or how the event should feed the Evidence Pack.' } },
     ],
@@ -111,7 +111,7 @@ export default function Http402ForAiAgentsPage() {
             For years, HTTP 402 Payment Required was mostly dormant. AI agents make it useful: a paid API can respond with a machine-readable challenge instead of forcing a human through checkout.
           </p>
           <p>
-            That challenge may point to different rails: card-based credentials, shared payment tokens, L402 Lightning invoices, or future protocols. But the payment challenge is not the governance layer.
+            That challenge may point to different rails: card-based credentials, shared payment tokens, paid-rail context invoices, or future protocols. But the payment challenge is not the governance layer.
           </p>
           <p>
             SatGate sits before upstream access and applies policy: identify the agent, confirm authority, estimate cost, enforce budgets, decide whether the rail is allowed, record the challenge, and unlock only scoped access after proof.
@@ -134,7 +134,7 @@ export default function Http402ForAiAgentsPage() {
         <div className="max-w-6xl mx-auto px-6 py-20">
           <h2 className="text-3xl font-bold text-white mb-4">HTTP 402 flow types</h2>
           <p className="text-gray-400 max-w-3xl mb-10 text-lg">
-            Treat 402 as a protocol surface, not a single payment system. L402 Lightning is one paid rail; x402, AgentCore Payments, Pay.sh, and payment-token flows are separate rails that still need governance.
+            Treat 402 as a protocol surface, not a single payment system. paid-rail context is one paid rail; x402, AgentCore Payments, Pay.sh, and payment-token flows are separate rails that still need governance.
           </p>
           <div className="overflow-hidden rounded-2xl border border-gray-800">
             <div className="grid md:grid-cols-3 bg-gray-900/70 text-sm font-bold text-white">
@@ -173,7 +173,7 @@ export default function Http402ForAiAgentsPage() {
             <Zap className="text-yellow-300 mb-5" size={34} />
             <h2 className="text-2xl font-bold text-white mb-4">L402 is a paid rail, not the governance layer</h2>
             <p className="text-gray-300 leading-relaxed">
-              L402 Lightning can carry payment proof: an API returns a 402 challenge, the agent or wallet client pays a Lightning invoice, and proof unlocks scoped access. SatGate evaluates the action before payment/access and records proof after the decision.
+              paid-rail context can carry payment proof: an API returns a 402 challenge, the agent or wallet client pays a Lightning invoice, and proof unlocks scoped access. SatGate evaluates the action before payment/access and records proof after the decision.
             </p>
           </div>
           <div className="rounded-2xl border border-cyan-900/60 bg-cyan-950/10 p-8">
@@ -197,7 +197,7 @@ export default function Http402ForAiAgentsPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="text-xl font-bold text-white mb-2">Is HTTP 402 the same as L402?</h3>
-              <p className="text-gray-400 leading-relaxed">No. HTTP 402 is the status code. L402 is a Lightning-based payment and access pattern that uses HTTP 402. L402 Lightning is one rail SatGate can govern in the request path.</p>
+              <p className="text-gray-400 leading-relaxed">No. HTTP 402 is the status code. L402 is a Lightning-based payment and access pattern that uses HTTP 402. paid-rail context is one rail SatGate can govern in the request path.</p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="text-xl font-bold text-white mb-2">How are Stripe shared payment tokens different from L402?</h3>
@@ -217,7 +217,7 @@ export default function Http402ForAiAgentsPage() {
           {[
             ['/policy-to-proof', 'Policy-to-Proof', 'See how paid access decisions become Evidence Pack proof.'],
             ['/govern', 'Govern AI agents', 'Govern paid agent actions before execution.'],
-            ['/l402-agent-payments', 'L402 agent payments', 'Understand L402 Lightning as one paid rail for governed agent/API access.'],
+            ['/l402-agent-payments', 'L402 agent payments', 'Understand paid-rail context as one paid rail for governed agent/API access.'],
             ['/agent-payment-controls', 'Agent payment controls', 'Policy, budgets, approval, receipts, and payment rails for AI agents.'],
             ['/economic-firewall', 'Economic firewall', 'Control agent access, spend, and paid-rail context before upstream API calls execute.'],
             ['/l402-api-pricing-calculator', 'L402 API pricing calculator', 'Estimate request-native pricing for agent/API paid-access scenarios.'],

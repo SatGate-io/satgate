@@ -112,31 +112,31 @@ export default function DeepMindDelegationPage() {
             <a href="https://arxiv.org/abs/2602.11865" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
               &ldquo;Intelligent AI Delegation&rdquo;
             </a>
-            {' '}— a framework for how autonomous agents should safely decompose tasks, transfer authority, 
-            and maintain accountability across delegation chains. The paper is dense, thorough, and arrives at 
-            a conclusion we find familiar: <strong>agents need attenuated capability tokens — specifically 
+            {' '}— a framework for how autonomous agents should safely decompose tasks, transfer authority,
+            and maintain accountability across delegation chains. The paper is dense, thorough, and arrives at
+            a conclusion we find familiar: <strong>agents need attenuated capability tokens — specifically
             macaroons — to delegate safely.</strong>
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            We didn&apos;t build SatGate because of this paper. We built it because macaroons are the only 
-            credential primitive that actually works for machine-to-machine delegation: they attenuate, 
+            We didn&apos;t build SatGate because of this paper. We built it because macaroons are the only
+            credential primitive that actually works for machine-to-machine delegation: they attenuate,
             they carry caveats, and they&apos;re cryptographically verifiable without phoning home.
-            But when Google DeepMind independently arrives at the same architecture, it&apos;s worth 
+            But when Google DeepMind independently arrives at the same architecture, it&apos;s worth
             walking through the overlap.
           </p>
 
           {/* The Core Thesis */}
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">The Paper&apos;s Core Thesis</h2>
           <p className="text-gray-300 leading-relaxed">
-            The DeepMind team argues that current delegation approaches — simple task decomposition, 
-            round-robin assignment, prompt chaining — fail when agents need to operate across trust 
-            boundaries. Their framework defines delegation as more than task routing: it requires 
+            The DeepMind team argues that current delegation approaches — simple task decomposition,
+            round-robin assignment, prompt chaining — fail when agents need to operate across trust
+            boundaries. Their framework defines delegation as more than task routing: it requires
             explicit <strong>transfer of authority</strong>, <strong>clear boundaries</strong>,{' '}
             <strong>accountability mechanisms</strong>, and <strong>resource constraints</strong>.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            In Section 6.1, they propose <strong>Delegation Capability Tokens (DCTs)</strong> based on 
+            In Section 6.1, they propose <strong>Delegation Capability Tokens (DCTs)</strong> based on
             macaroons as the cryptographic primitive to make this work. Their example:
           </p>
 
@@ -146,15 +146,15 @@ export default function DeepMindDelegationPage() {
               <span className="text-blue-300 text-sm font-mono">DeepMind, Section 6.1</span>
             </div>
             <p className="text-gray-300 italic text-base m-0">
-              &ldquo;A delegator would mint a DCT that wraps the target resource credentials with 
-              cryptographic caveats. The attenuation could be defined as &lsquo;This token can access 
-              the designated Google Drive MCP server, BUT ONLY for folder Project_X AND ONLY for 
+              &ldquo;A delegator would mint a DCT that wraps the target resource credentials with
+              cryptographic caveats. The attenuation could be defined as &lsquo;This token can access
+              the designated Google Drive MCP server, BUT ONLY for folder Project_X AND ONLY for
               READ operations.&rsquo;&rdquo;
             </p>
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            If you&apos;ve used SatGate, this should sound familiar. That&apos;s a macaroon with two 
+            If you&apos;ve used SatGate, this should sound familiar. That&apos;s a macaroon with two
             first-party caveats — exactly what SatGate tokens are.
           </p>
 
@@ -175,9 +175,9 @@ export default function DeepMindDelegationPage() {
                   <p className="text-white font-semibold mb-1">Delegation Capability Tokens (DCT)</p>
                   <p className="text-gray-500 text-sm mb-2">Paper: Attenuated tokens with cryptographic caveats for scoped authority</p>
                   <p className="text-gray-300 text-sm">
-                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Every token is a macaroon. 
-                    Caveats enforce route restrictions, budget limits, time windows, and MCP tool scopes. 
-                    Tokens are minted with <code className="text-purple-300 bg-gray-800 px-1.5 py-0.5 rounded text-xs">satgate token mint</code> and 
+                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Every token is a macaroon.
+                    Caveats enforce route restrictions, budget limits, time windows, and MCP tool scopes.
+                    Tokens are minted with <code className="text-purple-300 bg-gray-800 px-1.5 py-0.5 rounded text-xs">satgate token mint</code> and
                     carry their constraints cryptographically — no database lookup required for verification.
                   </p>
                 </div>
@@ -194,9 +194,9 @@ export default function DeepMindDelegationPage() {
                   <p className="text-white font-semibold mb-1">Privilege Attenuation</p>
                   <p className="text-gray-500 text-sm mb-2">Paper: Sub-agents receive strictly fewer permissions than their delegator</p>
                   <p className="text-gray-300 text-sm">
-                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Delegation trees. A parent token can 
-                    mint child tokens with additional caveats, but can never grant more authority than it holds. 
-                    Budget allocation flows downward — a $100 parent can create ten $10 children, each scoped to 
+                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Delegation trees. A parent token can
+                    mint child tokens with additional caveats, but can never grant more authority than it holds.
+                    Budget allocation flows downward — a $100 parent can create ten $10 children, each scoped to
                     specific routes or tools.
                   </p>
                 </div>
@@ -213,8 +213,8 @@ export default function DeepMindDelegationPage() {
                   <p className="text-white font-semibold mb-1">Resource Constraints</p>
                   <p className="text-gray-500 text-sm mb-2">Paper: Explicit boundaries on what resources a delegated agent can consume</p>
                   <p className="text-gray-300 text-sm">
-                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Per-agent budget ceilings enforced at the 
-                    request layer. When a token hits its spend limit, the gateway returns HTTP 402 — the request 
+                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Per-agent budget ceilings enforced at the
+                    request layer. When a token hits its spend limit, the gateway returns HTTP 402 — the request
                     never reaches the upstream. Budget enforcement is pre-execution, not post-billing.
                   </p>
                 </div>
@@ -231,9 +231,9 @@ export default function DeepMindDelegationPage() {
                   <p className="text-white font-semibold mb-1">Accountability &amp; Audit</p>
                   <p className="text-gray-500 text-sm mb-2">Paper: Clear chain of responsibility with oversight mechanisms</p>
                   <p className="text-gray-300 text-sm">
-                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Every request is logged with full token 
-                    lineage — which parent minted it, what caveats it carries, what it spent. Token revocation 
-                    cascades: revoking a parent instantly invalidates all children. The audit trail is the 
+                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Every request is logged with full token
+                    lineage — which parent minted it, what caveats it carries, what it spent. Token revocation
+                    cascades: revoking a parent instantly invalidates all children. The Evidence Pack is the
                     accountability mechanism.
                   </p>
                 </div>
@@ -250,9 +250,9 @@ export default function DeepMindDelegationPage() {
                   <p className="text-white font-semibold mb-1">Authority Thresholds &amp; Kill Switches</p>
                   <p className="text-gray-500 text-sm mb-2">Paper: Human-in-the-loop intervention when risk exceeds tolerance (pp. 18–19)</p>
                   <p className="text-gray-300 text-sm">
-                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Enforcement modes (Observe → Control → Charge) 
-                    let operators graduate trust incrementally. Budget alerts trigger before limits hit. 
-                    Token revocation is immediate — one API call kills an agent&apos;s access across the 
+                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Enforcement modes (Observe → Control → Charge)
+                    let operators graduate trust incrementally. Budget alerts trigger before limits hit.
+                    Token revocation is immediate — one API call kills an agent&apos;s access across the
                     entire delegation tree.
                   </p>
                 </div>
@@ -309,7 +309,7 @@ export default function DeepMindDelegationPage() {
                   <p className="text-gray-300 text-sm">
                     <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Event streaming — every tool call, budget spend,
                     session lifecycle, and task correlation is published as a structured event in real-time.
-                    The token spend ledger provides a complete audit trail: which agent called what tool, at what cost,
+                    The token spend ledger provides a complete Evidence Pack: which agent called what tool, at what cost,
                     under which delegation chain.
                   </p>
                 </div>
@@ -369,47 +369,47 @@ export default function DeepMindDelegationPage() {
             <div className="flex items-start gap-3">
               <CheckCircle className="text-green-400 shrink-0 mt-1" size={16} />
               <p className="text-gray-300 text-sm m-0">
-                <strong className="text-white">Attenuation without coordination.</strong> A token holder can add 
-                restrictions (caveats) without contacting the issuer. Agent A can give Agent B a more restricted 
+                <strong className="text-white">Attenuation without coordination.</strong> A token holder can add
+                restrictions (caveats) without contacting the issuer. Agent A can give Agent B a more restricted
                 version of its own token — no round-trip to an auth server.
               </p>
             </div>
             <div className="flex items-start gap-3">
               <CheckCircle className="text-green-400 shrink-0 mt-1" size={16} />
               <p className="text-gray-300 text-sm m-0">
-                <strong className="text-white">Offline verification.</strong> Macaroons are HMAC chains. 
-                The gateway verifies them cryptographically — no database lookup, no token introspection endpoint, 
+                <strong className="text-white">Offline verification.</strong> Macaroons are HMAC chains.
+                The gateway verifies them cryptographically — no database lookup, no token introspection endpoint,
                 no latency penalty.
               </p>
             </div>
             <div className="flex items-start gap-3">
               <CheckCircle className="text-green-400 shrink-0 mt-1" size={16} />
               <p className="text-gray-300 text-sm m-0">
-                <strong className="text-white">Composable constraints.</strong> Stack caveats: route + budget + 
-                time + MCP tool scope. Each caveat narrows the token&apos;s authority. They compose naturally — 
+                <strong className="text-white">Composable constraints.</strong> Stack caveats: route + budget +
+                time + MCP tool scope. Each caveat narrows the token&apos;s authority. They compose naturally —
                 unlike JWT claims, which are fixed at signing time.
               </p>
             </div>
             <div className="flex items-start gap-3">
               <CheckCircle className="text-green-400 shrink-0 mt-1" size={16} />
               <p className="text-gray-300 text-sm m-0">
-                <strong className="text-white">Delegation is a first-class operation.</strong> Minting a child 
-                token isn&apos;t a special API — it&apos;s appending a caveat. The delegation hierarchy is 
+                <strong className="text-white">Delegation is a first-class operation.</strong> Minting a child
+                token isn&apos;t a special API — it&apos;s appending a caveat. The delegation hierarchy is
                 encoded in the token itself.
               </p>
             </div>
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            JWTs can&apos;t do this. API keys can&apos;t do this. OAuth scopes are static at grant time. 
-            Macaroons are the only credential primitive where the <em>holder</em> can reduce their own authority 
+            JWTs can&apos;t do this. API keys can&apos;t do this. OAuth scopes are static at grant time.
+            Macaroons are the only credential primitive where the <em>holder</em> can reduce their own authority
             and pass it downstream — which is exactly what agent delegation requires.
           </p>
 
           {/* What the paper doesn't cover */}
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">What the Paper Doesn&apos;t Cover</h2>
           <p className="text-gray-300 leading-relaxed">
-            The DeepMind framework is strong on the <em>what</em> — the requirements for safe delegation. 
+            The DeepMind framework is strong on the <em>what</em> — the requirements for safe delegation.
             It&apos;s intentionally abstract on the <em>how</em>. A few things we&apos;ve learned from building this in production:
           </p>
 
@@ -417,46 +417,46 @@ export default function DeepMindDelegationPage() {
             <div className="flex items-start gap-3">
               <ArrowRight className="text-gray-500 shrink-0 mt-1" size={16} />
               <p className="text-gray-300 text-sm m-0">
-                <strong className="text-white">Economics is the missing enforcement layer.</strong> The paper 
-                discusses authority and accountability but doesn&apos;t address the economic dimension. In practice, 
-                the most common agent failure mode isn&apos;t unauthorized access — it&apos;s uncontrolled spend. 
+                <strong className="text-white">Economics is the missing enforcement layer.</strong> The paper
+                discusses authority and accountability but doesn&apos;t address the economic dimension. In practice,
+                the most common agent failure mode isn&apos;t unauthorized access — it&apos;s uncontrolled spend.
                 Budget enforcement is where theory meets the real world.
               </p>
             </div>
             <div className="flex items-start gap-3">
               <ArrowRight className="text-gray-500 shrink-0 mt-1" size={16} />
               <p className="text-gray-300 text-sm m-0">
-                <strong className="text-white">MCP changes the surface area.</strong> The paper references MCP 
-                (Model Context Protocol) but doesn&apos;t dig into per-tool cost attribution. When an agent calls 
-                10 MCP tools in a session, you need cost tracking at the tool level, not just the session level. 
+                <strong className="text-white">MCP changes the surface area.</strong> The paper references MCP
+                (Model Context Protocol) but doesn&apos;t dig into per-tool cost attribution. When an agent calls
+                10 MCP tools in a session, you need cost tracking at the tool level, not just the session level.
                 SatGate parses MCP JSON-RPC to attribute spend per tool per agent.
               </p>
             </div>
             <div className="flex items-start gap-3">
               <ArrowRight className="text-gray-500 shrink-0 mt-1" size={16} />
               <p className="text-gray-300 text-sm m-0">
-                <strong className="text-white">Enterprises need a trust gradient, not a binary switch.</strong> The 
-                paper discusses trust establishment. In practice, operators want to observe first, then control, then 
-                charge. SatGate&apos;s three-mode progression (Observe → Control → Charge) lets teams build confidence 
+                <strong className="text-white">Enterprises need a trust gradient, not a binary switch.</strong> The
+                paper discusses trust establishment. In practice, operators want to observe first, then control, then
+                charge. SatGate&apos;s three-mode progression (Observe → Control → Charge) lets teams build confidence
                 incrementally without rearchitecting.
               </p>
             </div>
             <div className="flex items-start gap-3">
               <ArrowRight className="text-gray-500 shrink-0 mt-1" size={16} />
               <p className="text-gray-300 text-sm m-0">
-                <strong className="text-white">Blockchain is the wrong settlement layer for agents.</strong> The paper 
-                proposes smart contracts and escrow bonds (pp. 20–22). In practice, on-chain settlement adds latency, gas 
-                costs, and complexity that machine-to-machine micropayments can&apos;t tolerate. SatGate uses L402 — 
-                Lightning Network payments that settle in milliseconds with sub-cent fees. For enterprises, Fiat402 
+                <strong className="text-white">Blockchain is the wrong settlement layer for agents.</strong> The paper
+                proposes smart contracts and escrow bonds (pp. 20–22). In practice, on-chain settlement adds latency, gas
+                costs, and complexity that machine-to-machine micropayments can&apos;t tolerate. SatGate uses L402 —
+                Lightning Network payments that settle in milliseconds with sub-cent fees. For enterprises, Fiat402
                 provides the same architecture over fiat budget rails. No blockchain required.
               </p>
             </div>
             <div className="flex items-start gap-3">
               <ArrowRight className="text-gray-500 shrink-0 mt-1" size={16} />
               <p className="text-gray-300 text-sm m-0">
-                <strong className="text-white">Multi-tenant isolation is a deployment reality.</strong> The paper 
-                discusses market coordination between agents, but doesn&apos;t address the infrastructure question: 
-                how do you run this for multiple organizations simultaneously? SatGate&apos;s enterprise tier provides 
+                <strong className="text-white">Multi-tenant isolation is a deployment reality.</strong> The paper
+                discusses market coordination between agents, but doesn&apos;t address the infrastructure question:
+                how do you run this for multiple organizations simultaneously? SatGate&apos;s enterprise tier provides
                 per-tenant isolation with independent budgets, delegation trees, and cost profiles — all on shared infrastructure.
               </p>
             </div>
@@ -465,7 +465,7 @@ export default function DeepMindDelegationPage() {
           {/* CTA */}
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">Try It</h2>
           <p className="text-gray-300 leading-relaxed">
-            SatGate is open source (Apache 2.0). The gateway runs as a sidecar or standalone proxy with sub-ms overhead. 
+            SatGate is open source (Apache 2.0). The gateway runs as a sidecar or standalone proxy with sub-ms overhead.
             If the DeepMind delegation framework describes the architecture you want, SatGate is the implementation.
           </p>
 

@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: 'Economic Firewalls for Autonomous AI Agents',
-  description: 'Why autonomous AI agents need economic firewalls: hard spend ceilings, bounded authority, revocation, audit trails, and request-path budget enforcement.',
+  description: 'Why autonomous AI agents need economic firewalls: hard spend ceilings, bounded authority, revocation, Evidence Packs, and request-path budget enforcement.',
   openGraph: {
     title: 'Why Economic Firewalls Are the Prerequisite for Autonomous AI Agents',
     description: 'Economic firewalls aren\'t safety tools. They\'re the enablers that unlock fully autonomous AI agents by solving the unbounded cost problem.',
@@ -74,7 +74,7 @@ export default function WhyEconomicFirewallsPrerequisitePage() {
         name: 'What controls should an economic firewall apply to autonomous agents?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An economic firewall should apply hard spend ceilings, route and tool scope, expiry windows, delegated budget limits, revocation, audit trails, and request-path deny decisions before autonomous agents can spend or call paid services.',
+          text: 'An economic firewall should apply hard spend ceilings, route and tool scope, expiry windows, delegated budget limits, revocation, Evidence Packs, and request-path deny decisions before autonomous agents can spend or call paid services.',
         },
       },
     ],
@@ -194,7 +194,7 @@ export default function WhyEconomicFirewallsPrerequisitePage() {
             Micropayments are the transaction layer of this economy. An agent that needs to geocode 10,000 addresses doesn&apos;t sign an annual contract with a mapping provider — it pays per call, in real time, through protocols like L402 that combine HTTP with payment verification. Each call is individually authorized, individually budgeted, and individually auditable. The economic firewall ensures that 10,000 calls doesn&apos;t silently become 10 million.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            For this to work at scale, agents need to hold assets and transact within legal boundaries. They need the digital equivalent of a corporate purchasing card — limited authority, clear audit trails, and hard stops. Economic firewalls provide exactly this: a framework where agents can participate as economic peers without requiring unlimited trust.
+            For this to work at scale, agents need to hold assets and transact within legal boundaries. They need the digital equivalent of a corporate purchasing card — limited authority, clear Evidence Packs, and hard stops. Economic firewalls provide exactly this: a framework where agents can participate as economic peers without requiring unlimited trust.
           </p>
 
           {/* Section 5 */}
@@ -258,7 +258,7 @@ export default function WhyEconomicFirewallsPrerequisitePage() {
             The conversation about AI agent safety has been dominated by the wrong question. We keep asking &quot;how do we prevent agents from doing harmful things?&quot; when we should be asking &quot;how do we create the conditions under which agents can act independently?&quot;
           </p>
           <p className="text-gray-300 leading-relaxed">
-            Economic firewalls answer the second question. They don&apos;t prevent autonomy — they enable it. They give risk committees a number they can approve, CFOs an audit trail they can trust, and development teams a bounded environment where they can optimize for value instead of defending against catastrophe.
+            Economic firewalls answer the second question. They don&apos;t prevent autonomy — they enable it. They give risk committees a number they can approve, CFOs an Evidence Pack they can trust, and development teams a bounded environment where they can optimize for value instead of defending against catastrophe.
           </p>
           <p className="text-gray-300 leading-relaxed">
             The organizations that deploy autonomous agents first won&apos;t be the ones with the most advanced AI models. They&apos;ll be the ones with the most mature economic governance. Because in the end, the prerequisite for autonomous AI agents isn&apos;t better intelligence.
@@ -275,7 +275,7 @@ export default function WhyEconomicFirewallsPrerequisitePage() {
                 ['Why do autonomous AI agents need economic firewalls?', 'Autonomous AI agents need economic firewalls because they can spend money, call paid APIs, delegate work, and purchase resources faster than humans can approve or monitor. Economic firewalls bound that authority before spend occurs.'],
                 ['How do economic firewalls enable agent autonomy?', 'They let teams grant agents real autonomy inside hard budget, scope, expiry, revocation, and audit boundaries, so risk committees can approve independent action without accepting unbounded liability.'],
                 ['Are economic firewalls only cost-control tools?', 'No. Cost control is one function, but the larger purpose is economic governance: deciding which agents may access, spend, route, delegate, or pay before upstream work executes.'],
-                ['What controls should an economic firewall apply to autonomous agents?', 'An economic firewall should apply hard spend ceilings, route and tool scope, expiry windows, delegated budget limits, revocation, audit trails, and request-path deny decisions before autonomous agents can spend or call paid services.'],
+                ['What controls should an economic firewall apply to autonomous agents?', 'An economic firewall should apply hard spend ceilings, route and tool scope, expiry windows, delegated budget limits, revocation, Evidence Packs, and request-path deny decisions before autonomous agents can spend or call paid services.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

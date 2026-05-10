@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     "agent capability management",
     "revocable agent credentials",
     "agent kill switch",
-    "agent audit trail",
+    "agent Evidence Pack",
     "AI agent spend governance",
     "economic control plane for AI agents",
   ],
@@ -137,7 +137,7 @@ const faqs = [
   ],
   [
     "How is an agent control plane different from an API gateway?",
-    "An API gateway protects services. An agent control plane governs the agents using those services: their budget, customer boundary, delegation rights, audit trail, and ability to be revoked instantly.",
+    "An API gateway protects services. An agent control plane governs the agents using those services: their budget, customer boundary, delegation rights, Evidence Pack, and ability to be revoked instantly.",
   ],
   [
     "Why do enterprise AI agents need no standing authority?",
@@ -202,7 +202,7 @@ const jsonLd = {
         "Delegation lineage proof",
         "Request-path budget enforcement",
         "MCP tool governance",
-        "Agent audit trails",
+        "Agent Evidence Packs",
         "Instant revocation and kill switch",
       ],
     },
@@ -522,7 +522,7 @@ export default function AgentControlPlanePage() {
             </div>
             <h2 className="text-4xl font-black tracking-[-0.04em] text-white">See the control loop end to end.</h2>
             <p className="mt-5 text-lg leading-8 text-slate-300">
-              The walkthrough shows the control loop end to end: an agent receives bounded authority, delegates safely, hits real policy checks, leaves an audit trail, and can be shut down immediately.
+              The walkthrough shows the control loop end to end: an agent receives bounded authority, delegates safely, hits real policy checks, leaves an Evidence Pack, and can be shut down immediately.
             </p>
           </div>
         </div>

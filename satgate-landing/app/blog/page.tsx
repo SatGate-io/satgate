@@ -3,28 +3,28 @@ import { ArrowLeft, ArrowRight, Calendar, Clock, User } from 'lucide-react';
 
 export const metadata = {
   title: 'AI Agent Governance Blog: Cost Control, MCP, L402, Economic Firewalls',
-  description: 'Guides on AI agent governance, economic firewalls, MCP budget enforcement, L402 payments, capability tokens, API monetization, and cost control.',
+  description: 'Guides on AI agent governance, economic firewalls, MCP budget enforcement, paid-rail context, capability tokens, API monetization, and cost control.',
   alternates: { canonical: 'https://satgate.io/blog' },
   keywords: [
     'AI agent governance blog',
     'AI agent cost control',
     'economic firewall',
     'MCP governance',
-    'L402 payments',
+    'paid-rail context',
     'agent API governance',
     'machine-to-machine commerce',
     'API economics',
   ],
   openGraph: {
     title: 'AI Agent Governance Blog: Cost Control, MCP, L402, Economic Firewalls',
-    description: 'Guides on AI agent governance, economic firewalls, MCP budget enforcement, L402 payments, capability tokens, API monetization, and cost control.',
+    description: 'Guides on AI agent governance, economic firewalls, MCP budget enforcement, paid-rail context, capability tokens, API monetization, and cost control.',
     url: 'https://satgate.io/blog',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'AI Agent Governance Blog: Cost Control, MCP, L402, Economic Firewalls',
-    description: 'AI agent governance, economic firewalls, MCP budget enforcement, L402 payments, capability tokens, API monetization, and cost control.',
+    description: 'AI agent governance, economic firewalls, MCP budget enforcement, paid-rail context, capability tokens, API monetization, and cost control.',
   },
 };
 
@@ -32,8 +32,8 @@ export const metadata = {
 const posts = [
   {
     slug: 'cursor-mcp-proxy-setup-guide',
-    title: 'Cursor MCP Proxy Setup Guide: Add Budget Controls and Audit Trails to Your Tools',
-    description: 'Learn how to set up a Cursor MCP proxy with SatGate to enforce budgets, meter tool usage, and add audit trails without changing your MCP servers.',
+    title: 'Cursor MCP Proxy Setup Guide: Add Budget Controls and Evidence Packs to Your Tools',
+    description: 'Learn how to set up a Cursor MCP proxy with SatGate to enforce budgets, meter tool usage, and add Evidence Packs without changing your MCP servers.',
     date: '2026-04-09',
     readTime: '10 min read',
     author: 'Matt Dean',
@@ -105,7 +105,7 @@ const posts = [
   {
     slug: 'api-monetization-ai',
     title: 'API Monetization for AI Agents: Pricing, Billing, L402, and Metering',
-    description: 'Monetize APIs for AI agents with machine-readable pricing, request-path metering, budget enforcement, and L402 payments.',
+    description: 'Monetize APIs for AI agents with machine-readable pricing, request-path metering, budget enforcement, and paid-rail context.',
     date: '2026-03-26',
     readTime: '10 min read',
     author: 'Matt Dean',
@@ -131,8 +131,8 @@ const posts = [
   },
   {
     slug: 'the-enterprise-adoption-playbook-observe-control-charge',
-    title: 'The Enterprise Adoption Playbook: Observe, Control, Charge',
-    description: 'Observe, Control, Charge isn\'t just a product taxonomy — it\'s an enterprise change management strategy for adopting economic governance incrementally, building trust at each stage.',
+    title: 'The Enterprise Adoption Playbook: Observe, Control, Prove',
+    description: 'Observe, Control, Prove isn\'t just a product taxonomy — it\'s an enterprise change management strategy for adopting economic governance incrementally, building trust at each stage.',
     date: '2026-03-20',
     readTime: '11 min read',
     author: 'Matt Dean',
@@ -141,7 +141,7 @@ const posts = [
   {
     slug: 'why-economic-firewalls-are-the-prerequisite-for-autonomous-ai-agents',
     title: 'Economic Firewalls for Autonomous AI Agents: Hard Budgets and Authority',
-    description: 'Why autonomous AI agents need economic firewalls: hard spend ceilings, bounded authority, revocation, audit trails, and request-path enforcement.',
+    description: 'Why autonomous AI agents need economic firewalls: hard spend ceilings, bounded authority, revocation, Evidence Packs, and request-path enforcement.',
     date: '2026-03-20',
     readTime: '11 min read',
     author: 'Matt Dean',
@@ -150,7 +150,7 @@ const posts = [
   {
     slug: 'ai-governance-api-teams',
     title: 'AI Governance for API Teams: Why Your Gateway Needs Policy, Not Just Routing',
-    description: 'API teams need AI governance that enforces budgets, permissions, and audit trails — not just traffic routing. Learn why traditional API management falls short.',
+    description: 'API teams need AI governance that enforces budgets, permissions, and Evidence Packs — not just traffic routing. Learn why traditional API management falls short.',
     date: '2026-03-19',
     readTime: '10 min read',
     author: 'Matt Dean',
@@ -288,7 +288,7 @@ export default function BlogPage() {
       { '@type': 'Thing', name: 'AI agent governance' },
       { '@type': 'Thing', name: 'economic firewalls' },
       { '@type': 'Thing', name: 'MCP budget enforcement' },
-      { '@type': 'Thing', name: 'L402 payments' },
+      { '@type': 'Thing', name: 'paid-rail context' },
       { '@type': 'Thing', name: 'revocable capability tokens' },
       { '@type': 'Thing', name: 'AI agent cost control' },
     ],
@@ -319,7 +319,7 @@ export default function BlogPage() {
         name: 'What does the SatGate blog cover?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'The SatGate blog covers AI agent governance, economic firewalls, AI agent cost control, MCP budget enforcement, revocable capability tokens, L402 payments, and API economics for autonomous agents.',
+          text: 'The SatGate blog covers AI agent governance, economic firewalls, AI agent cost control, MCP budget enforcement, revocable capability tokens, paid-rail context, and API economics for autonomous agents.',
         },
       },
       {
@@ -335,7 +335,7 @@ export default function BlogPage() {
         name: 'How is SatGate different from an LLM dashboard or API gateway?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'LLM dashboards report spend after it happens and traditional API gateways mainly route traffic. SatGate sits in the request path to observe, control, and charge agent/API activity before upstream access.',
+          text: 'LLM dashboards report spend after it happens and traditional API gateways mainly route traffic. SatGate sits in the request path to observe, control, and prove agent/API activity before upstream access.',
         },
       },
     ],
@@ -436,9 +436,9 @@ export default function BlogPage() {
           <h2 className="mb-6 text-2xl font-bold text-white">SatGate blog questions</h2>
           <div className="space-y-5">
             {[
-              ['What does the SatGate blog cover?', 'The SatGate blog covers AI agent governance, economic firewalls, AI agent cost control, MCP budget enforcement, revocable capability tokens, L402 payments, and API economics for autonomous agents.'],
+              ['What does the SatGate blog cover?', 'The SatGate blog covers AI agent governance, economic firewalls, AI agent cost control, MCP budget enforcement, revocable capability tokens, paid-rail context, and API economics for autonomous agents.'],
               ['Where should I start if I need to control AI agent spend?', 'Start with the AI agent cost control guide, the economic firewall definition, the ROI calculator, and the MCP budget enforcement guide to understand the request-path controls needed before agents spend.'],
-              ['How is SatGate different from an LLM dashboard or API gateway?', 'LLM dashboards report spend after it happens and traditional API gateways mainly route traffic. SatGate sits in the request path to observe, control, and charge agent/API activity before upstream access.'],
+              ['How is SatGate different from an LLM dashboard or API gateway?', 'LLM dashboards report spend after it happens and traditional API gateways mainly route traffic. SatGate sits in the request path to observe, control, and prove agent/API activity before upstream access.'],
             ].map(([question, answer]) => (
               <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                 <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

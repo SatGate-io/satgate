@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-08T20:45:16.958936Z",
+  "generatedAt": "2026-05-10T16:34:06.897656Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -37,8 +37,8 @@
       ],
       "intent": "informational-commercial",
       "funnelStage": "problem-aware",
-      "productAngle": "SatGate turns agent/API access decisions into meterable and chargeable events.",
-      "cta": "See SatGate Charge",
+      "productAngle": "SatGate treats HTTP 402 and L402 as paid-rail context around authority decisions and Evidence Pack proof.",
+      "cta": "See SatGate paid-rail governance",
       "status": "existing",
       "clicks": 1,
       "impressions": 831,
@@ -85,7 +85,7 @@
       ],
       "intent": "commercial",
       "funnelStage": "solution-aware",
-      "productAngle": "SatGate is the control plane for observing, controlling, and charging agent actions.",
+      "productAngle": "SatGate is the Policy-to-Proof control plane for authority before execution and Evidence Packs after every agent action.",
       "cta": "Govern agent access",
       "status": "existing",
       "clicks": 0,
@@ -109,7 +109,7 @@
       ],
       "intent": "commercial-investigation",
       "funnelStage": "solution-aware",
-      "productAngle": "SatGate connects LLM cost visibility to request-path enforcement with Observe, Control, and Charge.",
+      "productAngle": "SatGate connects LLM cost visibility to request-path authority before execution and Evidence Pack proof.",
       "cta": "Turn cost visibility into control",
       "status": "existing",
       "clicks": 0,

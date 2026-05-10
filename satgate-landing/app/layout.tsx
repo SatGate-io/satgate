@@ -15,19 +15,24 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://satgate.io"),
   title: {
-    default: "SatGate — The Economic Firewall for AI Agent Requests",
+    default: "SatGate — Policy-to-Proof Governance for AI Agents",
     template: "%s | SatGate",
   },
   description:
-    "SatGate is the economic firewall for AI agent traffic: per-agent budgets, cost attribution, delegated access, MCP governance, and L402 payments.",
+    "SatGate governs AI agent authority before execution across MCP, APIs, API keys, and paid rails, then exports Evidence Packs for every decision.",
   keywords: [
+    "Policy-to-Proof",
+    "Evidence Packs",
+    "authority before execution",
+    "rail-neutral paid-rail governance",
+    "MCP governance",
     "AI agent gateway",
     "API cost control",
     "AI agent budget enforcement",
     "MCP proxy",
     "economic firewall",
     "macaroon tokens",
-    "L402 payments",
+    "paid-rail context",
     "agent spend management",
     "API governance",
     "AI agent API gateway",
@@ -35,7 +40,7 @@ export const metadata: Metadata = {
     "capability tokens",
     "agent delegation",
     "API monetization",
-    "Lightning payments API",
+    "paid-rail context API",
     "AI agent cost control",
     "MCP budget enforcement",
     "agent economy",
@@ -43,9 +48,9 @@ export const metadata: Metadata = {
     "Fiat402",
   ],
   openGraph: {
-    title: "SatGate — The Economic Firewall for AI Agent Requests",
+    title: "SatGate — Policy-to-Proof Governance for AI Agents",
     description:
-      "Control AI agent API spend at the request layer. Per-agent budgets, per-tool cost attribution, delegation hierarchies. Open source with sub-ms overhead.",
+      "Authority before execution. Evidence Packs after every decision across MCP, APIs, API keys, and rail-neutral paid-rail governance.",
     url: "https://satgate.io",
     siteName: "SatGate",
     images: [
@@ -53,7 +58,7 @@ export const metadata: Metadata = {
         url: "/logo.png",
         width: 512,
         height: 512,
-        alt: "SatGate — Economic Firewall for AI Agents",
+        alt: "SatGate — Policy-to-Proof Governance for AI Agents",
       },
     ],
     locale: "en_US",
@@ -61,9 +66,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "SatGate — The Economic Firewall for AI Agent Requests",
+    title: "SatGate — Policy-to-Proof Governance for AI Agents",
     description:
-      "Control AI agent API spend at the request layer. Per-agent budgets, cost attribution, delegation hierarchies. Open source.",
+      "Policy-to-Proof governance for enterprise agents across MCP, APIs, API keys, and paid rails.",
     images: ["/logo.png"],
   },
   robots: {
@@ -85,7 +90,7 @@ const jsonLd = {
       url: "https://satgate.io",
       logo: "https://satgate.io/logo.png",
       description:
-        "Open-source API gateway that adds economic governance to AI agent traffic. Budget enforcement, cost attribution, and monetization for the agent economy.",
+        "Policy-to-Proof governance for AI agent authority. SatGate checks scope, budgets, delegation, MCP access, and paid-rail policy before execution, then exports Evidence Packs.",
       sameAs: ["https://github.com/SatGate-io/satgate"],
       contactPoint: {
         "@type": "ContactPoint",

@@ -14,7 +14,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate vs Zuplo: API Gateway vs Economic Governance',
-    description: 'Zuplo exposes APIs to agents. SatGate enforces budgets, MCP tool costs, scoped delegation, and L402 payments.',
+    description: 'Zuplo exposes APIs to agents. SatGate enforces budgets, MCP tool costs, scoped delegation, and paid-rail context.',
   },
 };
 
@@ -24,7 +24,7 @@ export default function CompareZuploPage() {
     '@type': 'WebPage',
     name: 'SatGate vs Zuplo',
     url: 'https://satgate.io/compare/zuplo',
-    description: 'Compare SatGate and Zuplo API gateways for AI agent traffic, MCP exposure, budget enforcement, and L402 API monetization.',
+    description: 'Compare SatGate and Zuplo API gateways for AI agent traffic, MCP exposure, budget enforcement, and rail-neutral paid-rail governance.',
     datePublished: '2026-04-30',
     dateModified: '2026-05-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },

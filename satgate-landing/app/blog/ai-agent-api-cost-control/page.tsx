@@ -167,7 +167,7 @@ export default function AiAgentApiCostControlPage() {
             <li><strong className="text-white">What will this cost?</strong> Estimate or assign request/tool/provider cost before forwarding.</li>
             <li><strong className="text-white">What budget remains?</strong> Check per-agent, per-tool, per-session, or per-day limits.</li>
             <li><strong className="text-white">Should this route change?</strong> Route cheap tasks to lower-cost providers and reserve premium models for high-value work.</li>
-            <li><strong className="text-white">What should be recorded?</strong> Produce an audit trail with identity, spend, policy decision, and outcome.</li>
+            <li><strong className="text-white">What should be recorded?</strong> Produce an Evidence Pack with identity, spend, policy decision, and outcome.</li>
           </ol>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Economic firewalls: budget enforcement at the gateway layer</h2>
@@ -183,7 +183,7 @@ export default function AiAgentApiCostControlPage() {
           <div className="my-8 rounded-xl border border-cyan-700/50 bg-cyan-950/20 p-6">
             <p className="text-cyan-200 font-semibold mb-2">SatGate pattern:</p>
             <p className="text-gray-300 mb-0">
-              Observe first to learn real cost. Control next with hard caps and revocation. Charge when the API itself becomes a product for external agents or robot customers.
+              Observe first to learn real cost. Control next with hard caps and revocation. Charge when the API itself becomes a product for external agents or paid agents.
             </p>
           </div>
 

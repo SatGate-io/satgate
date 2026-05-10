@@ -3,12 +3,12 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "AI Governance for API Teams: Gateway Policy, Not Just Routing",
-  description: "API teams need AI governance for budgets, permissions, and audit trails — not just routing. Learn where traditional API management falls short.",
+  description: "API teams need AI governance for budgets, permissions, and Evidence Packs — not just routing. Learn where traditional API management falls short.",
   alternates: { canonical: 'https://satgate.io/blog/ai-governance-api-teams' },
   keywords: ['AI governance API teams', 'API governance AI agents', 'AI API management', 'API team governance', 'AI agent policy enforcement', 'API governance framework'],
   openGraph: {
     title: 'AI Governance for API Teams: Gateway Policy, Not Just Routing',
-    description: 'API teams need AI governance for budgets, permissions, revocation, and audit trails — not just gateway routing.',
+    description: 'API teams need AI governance for budgets, permissions, revocation, and Evidence Packs — not just gateway routing.',
     url: 'https://satgate.io/blog/ai-governance-api-teams',
     type: 'article',
     publishedTime: '2026-03-19T00:00:00Z',
@@ -25,7 +25,7 @@ export default function AiGovernanceApiTeamsBlogPage() {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
     headline: 'AI Governance for API Teams: Why Your Gateway Needs Policy, Not Just Routing',
-    description: 'API teams need AI governance for budgets, permissions, and audit trails — not just routing. Learn where traditional API management falls short.',
+    description: 'API teams need AI governance for budgets, permissions, and Evidence Packs — not just routing. Learn where traditional API management falls short.',
     url: 'https://satgate.io/blog/ai-governance-api-teams',
     datePublished: '2026-03-19',
     dateModified: '2026-05-04',
@@ -242,7 +242,7 @@ satgate mint --parent orchestrator_token \\
 
 # Each sub-agent operates within its slice
 # Total delegation ≤ parent budget
-# Full audit trail from leaf to root`}</code>
+# Full Evidence Pack from leaf to root`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
@@ -367,7 +367,7 @@ GET /api/governance/costs?period=2026-03-01..2026-03-19
             <li><strong className="text-white">Per-endpoint cost modeling</strong> so every API call has an economic weight</li>
             <li><strong className="text-white">Real-time budget enforcement</strong> — pre-call checks, not post-hoc billing</li>
             <li><strong className="text-white">HTTP 402 responses</strong> that give agents structured denial with actionable alternatives</li>
-            <li><strong className="text-white">Full audit trails</strong> from agent leaf to orchestrator root</li>
+            <li><strong className="text-white">Full Evidence Packs</strong> from agent leaf to orchestrator root</li>
             <li><strong className="text-white">MCP-native support</strong> for teams building with the Model Context Protocol</li>
           </ul>
 

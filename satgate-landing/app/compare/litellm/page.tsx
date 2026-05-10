@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Check, DollarSign, Gauge, KeyRound, Minus, Route
 
 export const metadata = {
   title: 'SatGate vs LiteLLM - AI Gateway vs Economic Firewall',
-  description: 'Compare SatGate and LiteLLM. LiteLLM handles model routing, budgets, and spend tracking; SatGate governs agent spend, MCP tools, and L402 payments.',
+  description: 'Compare SatGate and LiteLLM. LiteLLM handles model routing, budgets, and spend tracking; SatGate governs agent spend, MCP tools, and paid-rail context.',
   alternates: { canonical: 'https://satgate.io/compare/litellm' },
   keywords: [
     'SatGate vs LiteLLM',
@@ -24,7 +24,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate vs LiteLLM - LLM Gateway vs Economic Firewall',
-    description: 'LiteLLM routes model calls. SatGate enforces agent budgets, MCP tool costs, scoped authority, audit, and L402 payments.',
+    description: 'LiteLLM routes model calls. SatGate enforces agent budgets, MCP tool costs, scoped authority, audit, and paid-rail context.',
   },
 };
 
@@ -35,7 +35,7 @@ const rows: Array<[string, string, string]> = [
   ['MCP tool budget enforcement', 'Yes', 'No native MCP economic firewall focus'],
   ['Per-tool cost attribution beyond LLM calls', 'Yes', 'Primarily LLM/model spend tracking'],
   ['Scoped revocable agent capabilities', 'Yes', 'Virtual keys for LLM gateway access'],
-  ['L402 robot-customer API payments', 'Yes', 'No'],
+  ['L402 paid-agent API payments', 'Yes', 'No'],
   ['100+ LLM provider abstraction', 'No', 'Yes'],
   ['LLM fallbacks/load balancing', 'Partial', 'Yes'],
   ['Open-source/self-hostable', 'Yes', 'Yes'],
@@ -59,8 +59,8 @@ const satgateWins: Array<{ icon: typeof ShieldCheck; title: string; body: string
   },
   {
     icon: Zap,
-    title: 'Charge robot customers',
-    body: 'Use L402 Lightning payments when external agents should pay for APIs, tools, datasets, or premium capabilities at request time.',
+    title: 'Charge paid agents',
+    body: 'Use paid-rail context when external agents should pay for APIs, tools, datasets, or premium capabilities at request time.',
   },
 ];
 
@@ -99,7 +99,7 @@ export default function CompareLiteLLMPage() {
         name: 'Is SatGate a LiteLLM replacement?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Not directly. LiteLLM is primarily an LLM gateway and OpenAI-compatible proxy for model access, routing, fallbacks, budgets, and spend tracking. SatGate is an economic firewall for AI agents, APIs, MCP tools, scoped capabilities, and L402 payments.',
+          text: 'Not directly. LiteLLM is primarily an LLM gateway and OpenAI-compatible proxy for model access, routing, fallbacks, budgets, and spend tracking. SatGate is an economic firewall for AI agents, APIs, MCP tools, scoped capabilities, and paid-rail context.',
         },
       },
       {
@@ -115,7 +115,7 @@ export default function CompareLiteLLMPage() {
         name: 'When should I choose SatGate over LiteLLM?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Choose SatGate when the problem is economic governance across autonomous agent/API activity: hard budget enforcement, MCP tool spend, scoped revocation, delegation, audit trails, and request-time monetization.',
+          text: 'Choose SatGate when the problem is economic governance across autonomous agent/API activity: hard budget enforcement, MCP tool spend, scoped revocation, delegation, Evidence Packs, and request-time monetization.',
         },
       },
       {
@@ -147,7 +147,7 @@ export default function CompareLiteLLMPage() {
             SatGate vs LiteLLM
           </h1>
           <p className="max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            LiteLLM is a strong LLM gateway for model access, routing, fallbacks, budgets, and spend tracking. SatGate is the economic firewall for agent/API activity: budgets, MCP tools, revocation, audit trails, and L402 payments in the request path.
+            LiteLLM is a strong LLM gateway for model access, routing, fallbacks, budgets, and spend tracking. SatGate is the economic firewall for agent/API activity: budgets, MCP tools, revocation, Evidence Packs, and paid-rail context in the request path.
           </p>
         </div>
 
@@ -214,7 +214,7 @@ export default function CompareLiteLLMPage() {
             {([
               ['Hard agent budget enforcement', true, 'Budget decisions before expensive agent/API activity executes.'],
               ['MCP tool cost policy', true, 'Prices, limits, risk tiers, and audit evidence per tool call.'],
-              ['L402 robot payments', true, 'Request-time Lightning payments for external agent/API access.'],
+              ['L402 robot payments', true, 'Request-time paid-rail context for external agent/API access.'],
               ['100+ model provider gateway', false, 'This is LiteLLM territory; SatGate can govern traffic before it reaches that layer.'],
             ] as Array<[string, boolean, string]>).map(([label, yes, body]) => (
               <div key={String(label)} className="rounded-xl border border-gray-800 bg-black p-5">
@@ -232,9 +232,9 @@ export default function CompareLiteLLMPage() {
           <h2 className="mb-6 text-3xl font-bold text-white">SatGate vs LiteLLM FAQ</h2>
           <div className="grid gap-5 md:grid-cols-2">
             {[
-              ['Is SatGate a LiteLLM replacement?', 'Not directly. LiteLLM is primarily an LLM gateway and OpenAI-compatible proxy for model access, routing, fallbacks, budgets, and spend tracking. SatGate is an economic firewall for AI agents, APIs, MCP tools, scoped capabilities, and L402 payments.'],
+              ['Is SatGate a LiteLLM replacement?', 'Not directly. LiteLLM is primarily an LLM gateway and OpenAI-compatible proxy for model access, routing, fallbacks, budgets, and spend tracking. SatGate is an economic firewall for AI agents, APIs, MCP tools, scoped capabilities, and paid-rail context.'],
               ['Can SatGate and LiteLLM work together?', 'Yes. LiteLLM can sit behind SatGate as an upstream LLM gateway. SatGate can enforce agent, workflow, route, MCP tool, and budget policy before requests reach LiteLLM or other upstream services.'],
-              ['When should I choose SatGate over LiteLLM?', 'Choose SatGate when the problem is economic governance across autonomous agent/API activity: hard budget enforcement, MCP tool spend, scoped revocation, delegation, audit trails, and request-time monetization.'],
+              ['When should I choose SatGate over LiteLLM?', 'Choose SatGate when the problem is economic governance across autonomous agent/API activity: hard budget enforcement, MCP tool spend, scoped revocation, delegation, Evidence Packs, and request-time monetization.'],
               ['When should I choose LiteLLM?', 'Choose LiteLLM when the main problem is developer model access: one interface across many LLM providers, model routing, load balancing, fallbacks, virtual keys, and LLM spend tracking.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">

@@ -3,7 +3,7 @@ import { ArrowRight, Bot, Gauge, KeyRound, ShieldCheck, Terminal, Wrench } from 
 
 export const metadata = {
   title: 'MCP Governance for AI Agents',
-  description: 'Govern MCP tool calls with per-tool budgets, scoped capabilities, revocation, audit trails, and economic firewall controls for Cursor, Claude, and OpenClaw.',
+  description: 'Govern MCP tool calls with per-tool budgets, scoped capabilities, revocation, Evidence Packs, and economic firewall controls for Cursor, Claude, and OpenClaw.',
   alternates: { canonical: 'https://satgate.io/mcp' },
   keywords: [
     'MCP governance',
@@ -17,7 +17,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'MCP Governance for AI Agents',
-    description: 'Request-path budgets, scoped capabilities, revocation, and audit trails for MCP tool calls.',
+    description: 'Request-path budgets, scoped capabilities, revocation, and Evidence Packs for MCP tool calls.',
     url: 'https://satgate.io/mcp',
     type: 'website',
   },
@@ -106,7 +106,7 @@ export default function MCPPage() {
         name: 'What is MCP governance?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'MCP governance is the control layer around Model Context Protocol tool calls: budgets, scoped authority, revocation, audit trails, and risk actions before agents execute tools.',
+          text: 'MCP governance is the control layer around Model Context Protocol tool calls: budgets, scoped authority, revocation, Evidence Packs, and risk actions before agents execute tools.',
         },
       },
       {
@@ -145,7 +145,7 @@ export default function MCPPage() {
             MCP Governance for AI Agents
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            MCP gives agents tools. SatGate gives teams the economic firewall around those tools: per-tool budgets, scoped capabilities, revocation, audit trails, and policy before execution.
+            MCP gives agents tools. SatGate gives teams the economic firewall around those tools: per-tool budgets, scoped capabilities, revocation, Evidence Packs, and policy before execution.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -190,7 +190,7 @@ export default function MCPPage() {
         <h2 className="mb-8 text-3xl font-bold text-white">MCP governance FAQ</h2>
         <div className="space-y-5">
           {[
-            ['What is MCP governance?', 'MCP governance is the control layer around Model Context Protocol tool calls: budgets, scoped authority, revocation, audit trails, and risk actions before agents execute tools.'],
+            ['What is MCP governance?', 'MCP governance is the control layer around Model Context Protocol tool calls: budgets, scoped authority, revocation, Evidence Packs, and risk actions before agents execute tools.'],
             ['Why do MCP tools need budget enforcement?', 'Autonomous agents can call paid or risky tools repeatedly, delegate work, or loop. MCP budget enforcement stops over-budget tool calls in the request path instead of discovering spend after the fact.'],
             ['How does SatGate control MCP spend?', 'SatGate can proxy MCP traffic and enforce per-tool prices, session caps, workflow budgets, capability caveats, revocation, and audit requirements before tool calls reach the upstream MCP server.'],
           ].map(([question, answer]) => (

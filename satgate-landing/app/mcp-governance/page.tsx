@@ -3,13 +3,13 @@ import { ArrowRight, Cable, Eye, Gauge, KeyRound, ShieldAlert, Wrench } from 'lu
 
 export const metadata = {
   title: 'MCP Governance: Authority, Policy, and Audit Receipts',
-  description: 'Govern Model Context Protocol tools with SatGate. Check agent authority before MCP calls execute, enforce policy, revoke access, and produce audit receipts for every decision.',
+  description: 'Govern Model Context Protocol tools with SatGate. Check agent authority before MCP calls execute, enforce policy, revoke access, and produce Evidence Pack receipts for every decision.',
   alternates: { canonical: 'https://satgate.io/mcp-governance' },
   keywords: [
     'MCP governance',
     'MCP budget enforcement',
     'MCP security',
-    'MCP audit trail',
+    'MCP Evidence Pack',
     'Cursor MCP budget control',
     'Claude Desktop MCP governance',
     'Model Context Protocol governance',
@@ -18,14 +18,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'MCP Governance: Authority, Policy, and Audit Receipts',
-    description: 'Control Model Context Protocol tool calls with authority policy, scoped budgets, revocation, audit receipts, and Evidence Pack proof.',
+    description: 'Control Model Context Protocol tool calls with authority policy, scoped budgets, revocation, Evidence Pack receipts, and Evidence Pack proof.',
     url: 'https://satgate.io/mcp-governance',
     type: 'article',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'MCP Governance for AI Agents',
-    description: 'Check authority, policy, revocation, and audit receipts around MCP tool calls before agents execute work.',
+    description: 'Check authority, policy, revocation, and Evidence Pack receipts around MCP tool calls before agents execute work.',
   },
 };
 
@@ -52,7 +52,7 @@ const controls = [
   },
   {
     icon: Eye,
-    title: 'Create audit receipts',
+    title: 'Create Evidence Pack receipts',
     body: 'Record who called which tool, why it was allowed or denied, what policy applied, and how the decision feeds the Evidence Pack.',
   },
   {
@@ -76,7 +76,7 @@ export default function McpGovernancePage() {
     about: [
       { '@type': 'Thing', name: 'MCP governance' },
       { '@type': 'Thing', name: 'MCP budget enforcement' },
-      { '@type': 'Thing', name: 'Model Context Protocol audit receipts' },
+      { '@type': 'Thing', name: 'Model Context Protocol Evidence Pack receipts' },
       { '@type': 'Thing', name: 'MCP proxy policy' },
       { '@type': 'Thing', name: 'agent tool spend limits' },
     ],
@@ -148,7 +148,7 @@ export default function McpGovernancePage() {
       { '@type': 'HowToStep', name: 'Identify agents and tools', text: 'Attach tenant, agent, session, token, server, and tool metadata to each MCP call.' },
       { '@type': 'HowToStep', name: 'Map authority and risk', text: 'Set scope, budget, risk, and approval rules for MCP tools, paid APIs, searches, browser sessions, code agents, or cloud tasks.' },
       { '@type': 'HowToStep', name: 'Enforce authority policy', text: 'Block, route, allow, or revoke MCP calls based on scope, budget, per-tool limits, delegation depth, and capability policy.' },
-      { '@type': 'HowToStep', name: 'Create audit receipts', text: 'Record the decision, estimated cost, tool, route, policy, outcome, and receipt ID for finance, security, and platform teams.' },
+      { '@type': 'HowToStep', name: 'Create Evidence Pack receipts', text: 'Record the decision, estimated cost, tool, route, policy, outcome, and receipt ID for finance, security, and platform teams.' },
     ],
   };
 

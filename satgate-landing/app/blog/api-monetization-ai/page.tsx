@@ -3,12 +3,12 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "API Monetization for AI Agents: Pricing, Billing, L402, and Metering",
-  description: "How to monetize APIs for AI agents with machine-readable pricing, request-path metering, budget enforcement, and L402 payments.",
+  description: "How to monetize APIs for AI agents with machine-readable pricing, request-path metering, budget enforcement, and paid-rail context.",
   alternates: { canonical: 'https://satgate.io/blog/api-monetization-ai' },
-  keywords: ['API monetization AI', 'API monetization for AI agents', 'monetize API AI', 'AI agent billing', 'machine-to-machine payments', 'API pricing AI agents', 'L402 API monetization'],
+  keywords: ['API monetization AI', 'API monetization for AI agents', 'monetize API AI', 'AI agent billing', 'machine-to-machine payments', 'API pricing AI agents', 'rail-neutral paid-rail governance'],
   openGraph: {
     title: 'API Monetization for AI Agents: Pricing, Billing, and L402',
-    description: 'Monetize APIs for AI agents with machine-readable pricing, request-path metering, budget enforcement, and L402 payments.',
+    description: 'Monetize APIs for AI agents with machine-readable pricing, request-path metering, budget enforcement, and paid-rail context.',
     url: 'https://satgate.io/blog/api-monetization-ai',
     type: 'article',
     publishedTime: '2026-03-26T00:00:00Z',
@@ -16,7 +16,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'API Monetization for AI Agents: Pricing, Billing, and L402',
-    description: 'Turn APIs into robot-customer products with machine-readable prices, request-path metering, and L402 payment flows.',
+    description: 'Turn APIs into paid-agent products with machine-readable prices, request-path metering, and L402 payment flows.',
   },
 };
 
@@ -36,7 +36,7 @@ export default function ApiMonetizationAiBlogPage() {
       { '@type': 'Thing', name: 'machine-readable API pricing' },
       { '@type': 'Thing', name: 'request-path API metering' },
       { '@type': 'Thing', name: 'L402 API payments' },
-      { '@type': 'Thing', name: 'robot customer billing' },
+      { '@type': 'Thing', name: 'paid agent billing' },
     ],
   };
 

@@ -196,8 +196,8 @@ export default function AiAgentSpendingLimitsBlogPage() {
 
           <ul className="text-gray-300 space-y-2">
             <li><strong className="text-white">_RedisBudgetEnforcer_</strong>: Atomic spend tracking across replicas</li>
-            <li><strong className="text-white">_Postgres audit trail_</strong>: Spend attribution for chargebacks</li>
-            <li><strong className="text-white">_L402 Charge_</strong>: Lightning micropayments for external agent/API monetization</li>
+            <li><strong className="text-white">_Postgres Evidence Pack_</strong>: Spend attribution for chargebacks</li>
+            <li><strong className="text-white">_paid-rail governance_</strong>: paid-rail context for external agent/API monetization</li>
           </ul>
 
           <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">

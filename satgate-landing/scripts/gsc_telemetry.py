@@ -48,7 +48,7 @@ CLUSTERS: list[tuple[str, list[str]]] = [
     ("AI Agent Spend", ["/ai-agent", "/agent-spending", "/ai-api-budget", "/runaway"]),
     ("Economic Firewall", ["/economic-firewall", "what-is-an-economic-firewall"]),
     ("Agent Identity", ["/agent-api", "/agent-capability", "/revocable", "macaroon", "zero-trust"]),
-    ("L402/Robot Payments", ["/l402", "/robot-customer", "http-402", "api-monetization"]),
+    ("Paid-Rail Governance", ["/l402", "/paid-agent", "http-402", "api-monetization"]),
     ("Blog", ["/blog/"]),
 ]
 

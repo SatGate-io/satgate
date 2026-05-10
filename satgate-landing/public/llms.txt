@@ -1,7 +1,7 @@
 # SatGate™ — Economic Firewall for AI Agent Requests
 > SatGate is the economic control plane for AI agents.
-> Observe, Control, and Charge agent/API activity before upstream access.
-> Request-path budget enforcement, MCP governance, scoped capabilities, audit trails, and L402 Lightning payments.
+> Observe, Control, and Prove agent/API activity before upstream access.
+> Request-path budget enforcement, MCP governance, scoped capabilities, Evidence Packs, and paid-rail context.
 
 ## What is SatGate?
 SatGate is an economic firewall for AI agents and APIs. It sits in the request path between autonomous agents and upstream APIs, tools, MCP servers, model providers, or protected resources.
@@ -19,7 +19,7 @@ Measure agent/API traffic without blocking production workloads. Attribute spend
 Enforce budgets, spend caps, route policy, revocation, expiry, per-request ceilings, and kill switches before expensive API or MCP tool calls execute.
 
 ### Charge
-Let robot customers pay for protected APIs at request time. SatGate Charge uses L402 Lightning payments. Fiat402 is separate and should not be conflated with Charge.
+Let paid agents pay for protected APIs at request time. SatGate paid-rail governance uses paid-rail context. Fiat402 is separate and should not be conflated with Charge.
 
 ## Category Definition
 An economic firewall is a request-path control layer that governs AI agent access, spend, budgets, routing, audit, and payment before upstream API calls execute.
@@ -32,8 +32,8 @@ Traditional API gateways route traffic. Dashboards report spend after the fact. 
 - **MCP governance**: Budget, access, revocation, risk, and audit controls around Model Context Protocol tool calls.
 - **Agent API governance**: Scoped, expiring, revocable, budget-aware capabilities instead of broad static API keys.
 - **Capability tokens**: Macaroon-style credentials with caveats for route, expiry, budget, calls, delegation, and revocation.
-- **L402 payments**: HTTP 402 + Lightning invoice + proof + access credential for machine-native API monetization.
-- **Robot customers**: Autonomous agents that discover, evaluate, call, and pay for APIs programmatically.
+- **paid-rail context**: HTTP 402 + Lightning invoice + proof + access credential for machine-native API monetization.
+- **Paid agents**: Autonomous agents that discover, evaluate, call, and pay for APIs programmatically.
 
 ## L402 Flow
 1. Agent requests a protected endpoint.
@@ -93,7 +93,7 @@ Macaroons and capability tokens can constrain agent authority:
 - Capability Auth: https://satgate.io/capability-auth
 - Agent Capability Tokens: https://satgate.io/agent-capability-tokens
 - L402 Agent Payments: https://satgate.io/l402-agent-payments
-- Robot Customer Payments: https://satgate.io/robot-customer-payments
+- Paid Agent Payments: https://satgate.io/paid-agent-payments
 
 ## Integration Pages
 - SatGate Integrations Hub: https://satgate.io/integrations
@@ -182,7 +182,7 @@ curl -H "Authorization: L402 <macaroon>:<preimage>" \
 - SatGate Governance Dashboard: https://satgate.io/dashboard
 - SatGate Control Demo: https://satgate.io/protect
 - SatGate Protect / Scoped Agent Credential Demo: https://satgate.io/crawl
-- SatGate Charge / L402 Payment Demo: https://satgate.io/pay
+- SatGate paid-rail governance / L402 Payment Demo: https://satgate.io/pay
 - SatGate Monetize / L402 API Demo: https://satgate.io/monetize
 - SatGate Mint / Capability Token Demo: https://satgate.io/mint-demo
 - SatGate Sandbox: https://satgate.io/sandbox

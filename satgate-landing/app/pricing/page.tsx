@@ -45,7 +45,7 @@ const PricingPage = () => {
     '@type': 'WebPage',
     name: 'SatGate Pricing',
     url: 'https://satgate.io/pricing',
-    description: 'Pricing for SatGate Observe, Control, and Charge modes for AI agent economic governance.',
+    description: 'Pricing for SatGate Observe, Control, and Prove modes for AI agent economic governance.',
     datePublished: '2026-04-27',
     dateModified: '2026-05-03',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -54,7 +54,7 @@ const PricingPage = () => {
       { '@type': 'Thing', name: 'AI agent budget enforcement' },
       { '@type': 'Thing', name: 'SatGate Observe Control Charge' },
       { '@type': 'Thing', name: 'request-path spend governance' },
-      { '@type': 'Thing', name: 'L402 API monetization' },
+      { '@type': 'Thing', name: 'rail-neutral paid-rail governance' },
     ],
   };
 
@@ -82,7 +82,7 @@ const PricingPage = () => {
     '@type': 'OfferCatalog',
     name: 'SatGate Pricing',
     url: 'https://satgate.io/pricing',
-    description: 'Pricing for SatGate Observe, Control, and Charge modes for AI agent economic governance.',
+    description: 'Pricing for SatGate Observe, Control, and Prove modes for AI agent economic governance.',
     dateModified: '2026-05-03',
     itemListElement: [
       {
@@ -106,9 +106,9 @@ const PricingPage = () => {
         '@type': 'Offer',
         name: 'Enterprise / Charge',
         priceCurrency: 'USD',
-        description: 'Enterprise deployment, hybrid/on-prem options, advanced governance, and L402 Charge for robot-customer API monetization.',
+        description: 'Enterprise deployment, hybrid/on-prem options, advanced governance, and paid-rail governance for paid-agent API monetization.',
         availability: 'https://schema.org/InStock',
-        itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate Charge', applicationCategory: 'DeveloperApplication' },
+        itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate paid-rail governance', applicationCategory: 'DeveloperApplication' },
       },
     ],
   };
@@ -286,7 +286,7 @@ const PricingPage = () => {
               <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" /><span><b className="text-gray-200">Unlimited</b> requests — no metering caps</span></li>
               <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Hybrid / on-prem / air-gapped deployment</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />SSO/SCIM + RBAC</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Full audit trail &amp; retention policies</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Full Evidence Pack &amp; retention policies</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />SOC 2 compliance package</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Dedicated CSM + SLA</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Custom integrations &amp; onboarding</li>

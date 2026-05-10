@@ -87,7 +87,7 @@ const tools = [
   {
     href: '/economic-firewall-readiness-grader',
     title: 'Economic Firewall Readiness Grader',
-    description: 'Score readiness across identity, budgets, MCP tools, revocation, delegation, audit, routing, and L402 payments.',
+    description: 'Score readiness across identity, budgets, MCP tools, revocation, delegation, audit, routing, and paid-rail context.',
     icon: ShieldCheck,
   },
   {
@@ -99,7 +99,7 @@ const tools = [
   {
     href: '/l402-api-pricing-calculator',
     title: 'L402 API Pricing Calculator',
-    description: 'Estimate per-request robot-customer pricing, gross margin, paid demand, and Lightning sats per API request.',
+    description: 'Estimate per-request paid-agent pricing, gross margin, paid demand, and Lightning sats per API request.',
     icon: Zap,
   },
   {
@@ -250,7 +250,7 @@ export default function ToolsPage() {
           {[
             ['Measure', 'Start with calculators to estimate ghost spend, runaway loop exposure, and payback period.'],
             ['Generate', 'Turn risk models into concrete OpenAI and MCP budget policies your control plane can enforce.'],
-            ['Govern', 'Use readiness scoring to prioritize identity, revocation, audit, routing, and Charge/L402 gaps.'],
+            ['Govern', 'Use readiness scoring to prioritize identity, revocation, audit, routing, and paid-rail governance gaps.'],
           ].map(([title, body]) => (
             <div key={title} className="rounded-2xl border border-gray-800 bg-black p-6">
               <h2 className="mb-3 text-2xl font-bold text-white">{title}</h2>

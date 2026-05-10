@@ -3,7 +3,7 @@ import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptTe
 
 export const metadata = {
   title: 'Agent Spending Limits | Spend Caps for Autonomous AI Agents',
-  description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day. Enforce authority, revocation, and audit receipts before spend occurs.',
+  description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day. Enforce authority, revocation, and Evidence Pack receipts before spend occurs.',
   alternates: { canonical: 'https://satgate.io/agent-spending-limits' },
   keywords: [
     'agent spending limits',
@@ -18,14 +18,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Agent Spending Limits | Spend Caps for Autonomous AI Agents',
-    description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day with authority and audit receipts before spend occurs.',
+    description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day with authority and Evidence Pack receipts before spend occurs.',
     url: 'https://satgate.io/agent-spending-limits',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Agent Spending Limits | Spend Caps for Autonomous AI Agents',
-    description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day with authority and audit receipts before spend occurs.',
+    description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day with authority and Evidence Pack receipts before spend occurs.',
   },
 };
 
@@ -127,7 +127,7 @@ export default function Page() {
           <h3 className="mb-4 text-xl font-bold text-white">What good policy includes</h3>
           <div className="space-y-4">
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Per-agent budgets</h3><p className="leading-relaxed text-gray-400">Track and limit spend by agent identity, tenant, task, workflow, route, model, and MCP tool.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Delegated sub-agent limits</h3><p className="leading-relaxed text-gray-400">Give sub-agents smaller budgets, narrower tools, shorter expiry, and separate audit trails than their parent.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Delegated sub-agent limits</h3><p className="leading-relaxed text-gray-400">Give sub-agents smaller budgets, narrower tools, shorter expiry, and separate Evidence Packs than their parent.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Kill switches and revocation</h3><p className="leading-relaxed text-gray-400">Stop future spend by revoking or narrowing credentials before the next API or MCP request.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">From Observe to Control</h3><p className="leading-relaxed text-gray-400">Start by measuring real agent spend, then enforce hard caps where risk, cost, or autonomy justifies it.</p></div>
           </div>

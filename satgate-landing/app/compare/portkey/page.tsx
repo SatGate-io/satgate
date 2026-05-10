@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Check, Gauge, KeyRound, Minus, ShieldCheck, Zap 
 
 export const metadata = {
   title: 'SatGate vs Portkey - AI Gateway vs Economic Firewall',
-  description: 'Compare SatGate and Portkey. Portkey is a GenAI gateway and observability stack; SatGate governs agent spend, MCP tools, and L402 payments.',
+  description: 'Compare SatGate and Portkey. Portkey is a GenAI gateway and observability stack; SatGate governs agent spend, MCP tools, and paid-rail context.',
   alternates: { canonical: 'https://satgate.io/compare/portkey' },
   keywords: [
     'SatGate vs Portkey',
@@ -14,14 +14,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate vs Portkey - AI Gateway vs Economic Firewall',
-    description: 'Compare SatGate and Portkey for AI gateway, observability, guardrails, MCP access, agent economics, and L402 payments.',
+    description: 'Compare SatGate and Portkey for AI gateway, observability, guardrails, MCP access, agent economics, and paid-rail context.',
     url: 'https://satgate.io/compare/portkey',
     type: 'article',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate vs Portkey - GenAI Gateway vs Economic Firewall',
-    description: 'Portkey runs GenAI gateway ops. SatGate enforces agent budgets, MCP tool costs, scoped authority, audit, and L402 payments.',
+    description: 'Portkey runs GenAI gateway ops. SatGate enforces agent budgets, MCP tool costs, scoped authority, audit, and paid-rail context.',
   },
 };
 
@@ -32,7 +32,7 @@ const rows: Array<[string, string, string]> = [
   ['MCP tool budget enforcement', 'Yes', 'Not the primary economic-control focus'],
   ['Per-tool cost attribution beyond LLM calls', 'Yes', 'Primarily LLM/app traffic or gateway telemetry'],
   ['Scoped revocable agent capabilities', 'Yes', 'Adjacent access controls, not SatGate-style attenuated capabilities'],
-  ['L402 robot-customer API payments', 'Yes', 'No native L402 Charge equivalent'],
+  ['L402 paid-agent API payments', 'Yes', 'No native paid-rail governance equivalent'],
   ['AI gateway / model traffic management', 'Partial', 'Yes'],
   ['Observability and analytics', 'Yes, economic audit oriented', 'Yes'],
   ['Open-source/self-hostable posture', 'Yes', 'Varies by product and deployment tier'],
@@ -42,7 +42,7 @@ const satgateWins = [
   { icon: ShieldCheck, title: 'Economic firewall in the request path', body: 'SatGate decides whether an agent should access, spend, route, delegate, or pay before upstream APIs, MCP tools, and model calls execute.' },
   { icon: Gauge, title: 'Hard budgets for autonomous workflows', body: 'Control spend by tenant, agent, workflow, delegated sub-agent, route, model, tool, session, day, and request.' },
   { icon: KeyRound, title: 'Scoped, revocable agent authority', body: 'Issue expiring capabilities constrained by route, tool, budget, call count, expiry, and delegation rules instead of broad static keys.' },
-  { icon: Zap, title: 'Charge robot customers', body: 'Use L402 Lightning payments when external agents should pay for APIs, datasets, tools, or premium capabilities at request time.' },
+  { icon: Zap, title: 'Charge paid agents', body: 'Use paid-rail context when external agents should pay for APIs, datasets, tools, or premium capabilities at request time.' },
 ];
 
 const competitorWins: Array<{ title: string; body: string }> = [
@@ -80,7 +80,7 @@ export default function ComparePortkeyPage() {
       {
         '@type': 'Question',
         name: 'When should I choose SatGate?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when autonomous agents need hard budget enforcement, MCP tool spend controls, scoped revocation, delegation policy, economic audit trails, or L402 payments for robot customers.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when autonomous agents need hard budget enforcement, MCP tool spend controls, scoped revocation, delegation policy, economic Evidence Packs, or paid-rail context for paid agents.' },
       },
     ],
   };
@@ -156,7 +156,7 @@ export default function ComparePortkeyPage() {
             {([
               ['Hard agent budget enforcement', true, 'Policy decisions before expensive agent/API activity executes.'],
               ['MCP tool cost policy', true, 'Prices, limits, risk tiers, and audit evidence per tool call.'],
-              ['L402 robot payments', true, 'Request-time Lightning payments for external agent/API access.'],
+              ['L402 robot payments', true, 'Request-time paid-rail context for external agent/API access.'],
               ['Broad AI gateway/observability suite', false, 'This is where Portkey may be the better fit; SatGate governs the economics around that layer.'],
             ] as Array<[string, boolean, string]>).map(([label, yes, body]) => (
               <div key={label} className="rounded-xl border border-gray-800 bg-black p-5">
@@ -176,7 +176,7 @@ export default function ComparePortkeyPage() {
             {[
               ['Is SatGate a Portkey replacement?', 'Not directly. Portkey and SatGate solve overlapping but different problems. SatGate is focused on economic governance for AI agents, APIs, MCP tools, scoped authority, and request-time payments.'],
               ['Can SatGate and Portkey work together?', 'Yes. SatGate can enforce agent, workflow, budget, route, MCP tool, and capability policy before requests reach an upstream AI gateway or observability layer.'],
-              ['When should I choose SatGate?', 'Choose SatGate when autonomous agents need hard budget enforcement, MCP tool spend controls, scoped revocation, delegation policy, economic audit trails, or L402 payments for robot customers.'],
+              ['When should I choose SatGate?', 'Choose SatGate when autonomous agents need hard budget enforcement, MCP tool spend controls, scoped revocation, delegation policy, economic Evidence Packs, or paid-rail context for paid agents.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">
                 <h3 className="mb-2 font-bold text-white">{question}</h3>

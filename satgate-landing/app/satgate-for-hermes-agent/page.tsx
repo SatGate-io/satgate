@@ -3,7 +3,7 @@ import { ArrowRight, Bot, BrainCircuit, DollarSign, KeyRound, ShieldCheck, Termi
 
 export const metadata = {
   title: 'SatGate for Hermes Agent MCP Workflows',
-  description: 'Add request-path budgets, MCP tool cost policy, scoped capabilities, revocation, and audit trails to Hermes Agent workflows with SatGate.',
+  description: 'Add request-path budgets, MCP tool cost policy, scoped capabilities, revocation, and Evidence Packs to Hermes Agent workflows with SatGate.',
   alternates: { canonical: 'https://satgate.io/satgate-for-hermes-agent' },
   keywords: [
     'SatGate for Hermes Agent',
@@ -16,7 +16,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate for Hermes Agent MCP Workflows',
-    description: 'Give Hermes Agent workflows request-path budgets, MCP tool cost policy, scoped credentials, revocation, and audit trails with SatGate.',
+    description: 'Give Hermes Agent workflows request-path budgets, MCP tool cost policy, scoped credentials, revocation, and Evidence Packs with SatGate.',
     url: 'https://satgate.io/satgate-for-hermes-agent',
     type: 'website',
   },
@@ -63,7 +63,7 @@ export default function SatGateForHermesAgentPage() {
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-04',
     about: webPageJsonLd.about,
-    featureList: ['Hermes Agent MCP budget enforcement', 'AI agent spend control', 'MCP tool cost policy', 'Revocable capability tokens', 'Request-path audit trails'],
+    featureList: ['Hermes Agent MCP budget enforcement', 'AI agent spend control', 'MCP tool cost policy', 'Revocable capability tokens', 'Request-path Evidence Packs'],
   };
 
   const faqJsonLd = {
@@ -73,7 +73,7 @@ export default function SatGateForHermesAgentPage() {
       {
         '@type': 'Question',
         name: 'Can SatGate govern Hermes Agent MCP tools?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit between Hermes Agent workflows and MCP servers or upstream APIs to enforce budgets, allowed tools, scoped credentials, revocation, and audit trails before tool calls execute.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit between Hermes Agent workflows and MCP servers or upstream APIs to enforce budgets, allowed tools, scoped credentials, revocation, and Evidence Packs before tool calls execute.' },
       },
       {
         '@type': 'Question',
@@ -168,7 +168,7 @@ export default function SatGateForHermesAgentPage() {
           <h2 className="mb-6 text-3xl font-bold text-white">Hermes Agent governance FAQ</h2>
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              ['Can SatGate govern Hermes Agent MCP tools?', 'Yes. SatGate can sit between Hermes Agent workflows and MCP servers or upstream APIs to enforce budgets, allowed tools, scoped credentials, revocation, and audit trails before tool calls execute.'],
+              ['Can SatGate govern Hermes Agent MCP tools?', 'Yes. SatGate can sit between Hermes Agent workflows and MCP servers or upstream APIs to enforce budgets, allowed tools, scoped credentials, revocation, and Evidence Packs before tool calls execute.'],
               ['Why does a self-improving agent need economic governance?', 'Persistent or learning agents can reuse skills, retry workflows, call tools, and delegate work over time. SatGate adds request-path economic policy so those actions have budgets, scopes, expiry, and kill switches.'],
               ['Does SatGate replace Hermes Agent?', 'No. Hermes Agent remains the agent workflow. SatGate adds the economic control plane around MCP tools, APIs, model routes, paid data sources, and credentials.'],
             ].map(([question, answer]) => (

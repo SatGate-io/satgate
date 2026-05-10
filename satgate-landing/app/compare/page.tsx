@@ -173,7 +173,7 @@ export default function ComparePage() {
         name: 'How is SatGate different from AI gateways?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Most AI gateways focus on routing, provider abstraction, caching, rate limits, observability, or prompt operations. SatGate focuses on request-path economic governance: hard budgets, scoped agent authority, MCP tool cost policy, audit evidence, revocation, and L402 payments before upstream access.',
+          text: 'Most AI gateways focus on routing, provider abstraction, caching, rate limits, observability, or prompt operations. SatGate focuses on request-path economic governance: hard budgets, scoped agent authority, MCP tool cost policy, audit evidence, revocation, and paid-rail context before upstream access.',
         },
       },
       {
@@ -221,7 +221,7 @@ export default function ComparePage() {
           </div>
           <h1 className="mb-5 text-5xl font-extrabold tracking-tight md:text-7xl">Compare SatGate</h1>
           <p className="text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Most AI gateways help route, observe, or expose model/API traffic. SatGate focuses on economic governance: hard budgets, MCP tool cost attribution, scoped agent authority, audit trails, and L402 payments before upstream access.
+            Most AI gateways help route, observe, or expose model/API traffic. SatGate focuses on economic governance: hard budgets, MCP tool cost attribution, scoped agent authority, Evidence Packs, and paid-rail context before upstream access.
           </p>
         </div>
 
@@ -260,7 +260,7 @@ export default function ComparePage() {
             {[
               [
                 'How is SatGate different from AI gateways?',
-                'Most AI gateways focus on routing, provider abstraction, caching, rate limits, observability, or prompt operations. SatGate focuses on request-path economic governance: hard budgets, scoped agent authority, MCP tool cost policy, audit evidence, revocation, and L402 payments before upstream access.',
+                'Most AI gateways focus on routing, provider abstraction, caching, rate limits, observability, or prompt operations. SatGate focuses on request-path economic governance: hard budgets, scoped agent authority, MCP tool cost policy, audit evidence, revocation, and paid-rail context before upstream access.',
               ],
               [
                 'Does SatGate replace LiteLLM, Portkey, Helicone, or Cloudflare AI Gateway?',

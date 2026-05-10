@@ -17,32 +17,32 @@ const ENDPOINTS = [
 const webPageJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
-  name: 'SatGate Charge Demo',
+  name: 'SatGate paid-rail governance Demo',
   url: 'https://satgate.io/pay',
-  description: 'Interactive L402 payment demo showing HTTP 402 challenges, Lightning invoices, payment proof, and request-path API access for robot customers.',
+  description: 'Interactive L402 payment demo showing HTTP 402 challenges, Lightning invoices, payment proof, and request-path API access for paid agents.',
   datePublished: '2026-04-12',
   dateModified: '2026-05-03',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
-    { '@type': 'Thing', name: 'SatGate Charge' },
+    { '@type': 'Thing', name: 'SatGate paid-rail governance' },
     { '@type': 'Thing', name: 'L402 payment flow' },
     { '@type': 'Thing', name: 'HTTP 402 Payment Required' },
     { '@type': 'Thing', name: 'Lightning invoices for APIs' },
-    { '@type': 'Thing', name: 'robot customer API access' },
+    { '@type': 'Thing', name: 'paid agent API access' },
   ],
 };
 
 const softwareJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'SatGate Charge Demo',
+  name: 'SatGate paid-rail governance Demo',
   applicationCategory: 'DeveloperApplication',
   operatingSystem: 'Web',
   url: 'https://satgate.io/pay',
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
   dateModified: '2026-05-03',
-  featureList: ['HTTP 402 challenge simulation', 'L402 Lightning invoice flow', 'Payment proof retry', 'Robot-customer API access', 'Manual preimage entry'],
+  featureList: ['HTTP 402 challenge simulation', 'paid-rail context invoice flow', 'Payment proof retry', 'Robot-customer API access', 'Manual preimage entry'],
 };
 
 const faqJsonLd = {
@@ -62,12 +62,12 @@ const faqJsonLd = {
       name: 'Why use L402 for agent API access?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'L402 lets autonomous agents pay at request time without subscriptions, credit cards, or long-lived API keys, making API access native to robot customers.',
+        text: 'L402 lets autonomous agents pay at request time without subscriptions, credit cards, or long-lived API keys, making API access native to paid agents.',
       },
     },
     {
       '@type': 'Question',
-      name: 'Can L402 payments be combined with access policy?',
+      name: 'Can paid-rail context be combined with access policy?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Yes. SatGate can combine L402 payment with capability tokens, scoped authorization, budget policy, audit fields, and revocation so payment does not become unrestricted access.',
@@ -551,8 +551,8 @@ export default function PayDemoPage() {
         <div className="grid gap-4 md:grid-cols-3">
           {[
             ['What happens during an L402 payment flow?', 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment to unlock access.'],
-            ['Why use L402 for agent API access?', 'L402 lets autonomous agents pay at request time without subscriptions, credit cards, or long-lived API keys, making API access native to robot customers.'],
-            ['Can L402 payments be combined with access policy?', 'Yes. SatGate can combine L402 payment with capability tokens, scoped authorization, budget policy, audit fields, and revocation so payment does not become unrestricted access.'],
+            ['Why use L402 for agent API access?', 'L402 lets autonomous agents pay at request time without subscriptions, credit cards, or long-lived API keys, making API access native to paid agents.'],
+            ['Can paid-rail context be combined with access policy?', 'Yes. SatGate can combine L402 payment with capability tokens, scoped authorization, budget policy, audit fields, and revocation so payment does not become unrestricted access.'],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
               <h3 className="mb-2 font-bold text-white">{question}</h3>

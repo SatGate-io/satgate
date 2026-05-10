@@ -49,7 +49,7 @@ export default function SecurityAsAProfitCenterPage() {
         name: 'How can an economic firewall turn security into a profit center?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An economic firewall turns security into a measurable business asset by preventing runaway agent spend, reducing wasted tool calls, attributing costs, and enabling controlled paid access for robot customers.',
+          text: 'An economic firewall turns security into a measurable business asset by preventing runaway agent spend, reducing wasted tool calls, attributing costs, and enabling controlled paid access for paid agents.',
         },
       },
       {
@@ -204,7 +204,7 @@ export default function SecurityAsAProfitCenterPage() {
           </p>
           <ul className="text-gray-300 space-y-2">
             <li><strong className="text-white">Micropayment monetization</strong> — L402 enables pay-per-tool-call pricing. Expose your internal APIs to partner agents and charge per request, settled instantly via Lightning Network. Your tools become revenue-generating products.</li>
-            <li><strong className="text-white">Trust-as-a-Service</strong> — Enterprise buyers won&apos;t deploy third-party agents without governance guarantees. Governed agents — with provable budget constraints and audit trails — close deals that ungoverned agents can&apos;t.</li>
+            <li><strong className="text-white">Trust-as-a-Service</strong> — Enterprise buyers won&apos;t deploy third-party agents without governance guarantees. Governed agents — with provable budget constraints and Evidence Packs — close deals that ungoverned agents can&apos;t.</li>
             <li><strong className="text-white">Faster deployment velocity</strong> — Lower blast radius means lower risk. Lower risk means faster approval. Faster approval means faster time-to-revenue. The governance layer becomes an accelerator, not a gate.</li>
           </ul>
 
@@ -307,7 +307,7 @@ Example:
             <h2 className="mb-6 text-2xl font-bold text-white">Economic firewall ROI questions</h2>
             <div className="space-y-5">
               {[
-                ['How can an economic firewall turn security into a profit center?', 'It prevents runaway agent spend, reduces wasted tool calls, attributes costs, and enables controlled paid access for robot customers.'],
+                ['How can an economic firewall turn security into a profit center?', 'It prevents runaway agent spend, reduces wasted tool calls, attributes costs, and enables controlled paid access for paid agents.'],
                 ['What ROI should teams measure for AI agent governance?', 'Measure avoided loop spend, reduced retries, optimized tool/model routing, reclaimed engineering time, chargeback accuracy, and new revenue from governed API monetization.'],
                 ['Why start with Observe mode before enforcing budgets?', 'Observe mode shows real agent usage, waste, loop patterns, and cost attribution without blocking production workloads, giving finance and engineering evidence before switching to Control.'],
               ].map(([question, answer]) => (

@@ -162,7 +162,7 @@ export default function McpProxyBlogPage() {
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            OSS provides <code>InMemoryBudgetEnforcer</code> — a mutex-protected map. Simple, fast, not durable across restarts. Enterprise provides <code>RedisBudgetEnforcer</code> — atomic Lua scripts, idempotent spend tracking, Postgres audit trail.
+            OSS provides <code>InMemoryBudgetEnforcer</code> — a mutex-protected map. Simple, fast, not durable across restarts. Enterprise provides <code>RedisBudgetEnforcer</code> — atomic Lua scripts, idempotent spend tracking, Postgres Evidence Pack.
           </p>
 
           <p className="text-gray-300 leading-relaxed">When budget hits zero:</p>

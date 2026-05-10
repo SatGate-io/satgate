@@ -44,7 +44,7 @@ const integrations = [
   {
     href: '/satgate-for-claude-desktop',
     title: 'SatGate for Claude Desktop',
-    description: 'Add MCP server budgets, scoped capabilities, and audit trails to Claude Desktop workflows.',
+    description: 'Add MCP server budgets, scoped capabilities, and Evidence Packs to Claude Desktop workflows.',
     icon: Monitor,
   },
   {
@@ -121,7 +121,7 @@ export default function IntegrationsPage() {
         name: 'How does SatGate govern MCP integrations?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate can sit between agent clients and MCP servers to enforce per-tool budgets, scoped capabilities, revocation, risk actions, and audit trails before expensive tool calls execute.',
+          text: 'SatGate can sit between agent clients and MCP servers to enforce per-tool budgets, scoped capabilities, revocation, risk actions, and Evidence Packs before expensive tool calls execute.',
         },
       },
       {
@@ -129,7 +129,7 @@ export default function IntegrationsPage() {
         name: 'Do teams need to replace Cursor, Claude, or OpenClaw to use SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. SatGate is designed to sit in the request path around existing agent tools, APIs, and MCP servers, adding Observe, Control, and Charge modes without replacing the client workflow.',
+          text: 'No. SatGate is designed to sit in the request path around existing agent tools, APIs, and MCP servers, adding Observe, Control, and Prove modes without replacing the client workflow.',
         },
       },
     ],
@@ -171,7 +171,7 @@ export default function IntegrationsPage() {
         <section className="mt-14 rounded-3xl border border-purple-900/50 bg-gradient-to-br from-purple-950/25 to-cyan-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Why integration pages matter</h2>
           <p className="max-w-4xl text-lg leading-relaxed text-gray-300">
-            Agent governance is adopted inside real workflows. SatGate sits between agent clients and upstream APIs, MCP servers, and paid tools so teams can observe, control, and charge before autonomous requests create cost or risk.
+            Agent governance is adopted inside real workflows. SatGate sits between agent clients and upstream APIs, MCP servers, and paid tools so teams can observe, control, and prove before autonomous requests create cost or risk.
           </p>
         </section>
 
@@ -185,11 +185,11 @@ export default function IntegrationsPage() {
               ],
               [
                 'How does SatGate govern MCP integrations?',
-                'SatGate can sit between agent clients and MCP servers to enforce per-tool budgets, scoped capabilities, revocation, risk actions, and audit trails before expensive tool calls execute.',
+                'SatGate can sit between agent clients and MCP servers to enforce per-tool budgets, scoped capabilities, revocation, risk actions, and Evidence Packs before expensive tool calls execute.',
               ],
               [
                 'Do teams need to replace Cursor, Claude, or OpenClaw to use SatGate?',
-                'No. SatGate is designed to sit in the request path around existing agent tools, APIs, and MCP servers, adding Observe, Control, and Charge modes without replacing the client workflow.',
+                'No. SatGate is designed to sit in the request path around existing agent tools, APIs, and MCP servers, adding Observe, Control, and Prove modes without replacing the client workflow.',
               ],
             ].map(([question, answer]) => (
               <div key={question}>

@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'MCP Proxy Config Generator',
   description:
-    'Generate MCP proxy configuration for Cursor, Claude Desktop, Claude Code, OpenClaw, and custom MCP clients with scoped authority, budgets, audit receipts, and revocation.',
+    'Generate MCP proxy configuration for Cursor, Claude Desktop, Claude Code, OpenClaw, and custom MCP clients with scoped authority, budgets, Evidence Pack receipts, and revocation.',
   alternates: { canonical: 'https://satgate.io/mcp-proxy-config-generator' },
   keywords: [
     'MCP proxy config generator',
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'MCP Proxy Config Generator',
     description:
-      'Generate MCP proxy configs with scoped authority, budgets, audit receipts, revocation, and Evidence Pack-ready policy fields.',
+      'Generate MCP proxy configs with scoped authority, budgets, Evidence Pack receipts, revocation, and Evidence Pack-ready policy fields.',
     url: 'https://satgate.io/mcp-proxy-config-generator',
     type: 'website',
   },
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'MCP Proxy Config Generator',
     description:
-      'Create MCP proxy configuration for agent tools with scoped authority, budgets, audit receipts, and revocation.',
+      'Create MCP proxy configuration for agent tools with scoped authority, budgets, Evidence Pack receipts, and revocation.',
   },
 };
 

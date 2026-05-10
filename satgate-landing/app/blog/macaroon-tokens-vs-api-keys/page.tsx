@@ -381,7 +381,7 @@ agent_c_macaroon = attenuate(agent_b_macaroon, [
             Macaroons can embed context into the authorization decision. A caveat like <code className="text-green-300 bg-black/50 px-1 rounded">time_of_day = business_hours</code> or <code className="text-green-300 bg-black/50 px-1 rounded">request_rate &lt; 10/min</code> lets you enforce policies that API keys can't express.
           </p>
 
-          <h3 className="text-xl font-bold text-white mt-8 mb-3">4. Cryptographic Audit Trail</h3>
+          <h3 className="text-xl font-bold text-white mt-8 mb-3">4. Cryptographic Evidence Pack</h3>
 
           <p className="text-gray-300 leading-relaxed">
             Every macaroon embeds its delegation history. You can cryptographically verify not just that a request is authorized, but how many delegation steps led to that authorization and what constraints were added at each step.
@@ -615,7 +615,7 @@ attenuated_token = agent_a_token.add_caveats([
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">SatGate growth path: Observe → Control → Charge</h3>
             <p className="mb-4 text-gray-300">
-              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or robot-customer revenue.
+              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or paid-agent revenue.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway →</Link>

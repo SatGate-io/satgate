@@ -18,15 +18,15 @@ const webPageJsonLd = {
   '@type': 'WebPage',
   name: 'SatGate API Monetization Demo',
   url: 'https://satgate.io/monetize',
-  description: 'Interactive SatGate Charge demo for monetizing APIs with L402 Lightning payments, HTTP 402 challenges, robot-customer access, and request-path proof verification.',
+  description: 'Interactive SatGate paid-rail governance demo for monetizing APIs with paid-rail context, HTTP 402 challenges, paid-agent access, and request-path proof verification.',
   datePublished: '2026-04-12',
   dateModified: '2026-05-03',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
     { '@type': 'Thing', name: 'API monetization for AI agents' },
-    { '@type': 'Thing', name: 'SatGate Charge' },
-    { '@type': 'Thing', name: 'L402 Lightning payments' },
-    { '@type': 'Thing', name: 'robot customer workflows' },
+    { '@type': 'Thing', name: 'SatGate paid-rail governance' },
+    { '@type': 'Thing', name: 'paid-rail context' },
+    { '@type': 'Thing', name: 'paid agent workflows' },
     { '@type': 'Thing', name: 'request-path payment proof verification' },
   ],
 };
@@ -50,10 +50,10 @@ const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'What is SatGate Charge?',
+      name: 'What is SatGate paid-rail governance?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'SatGate Charge uses L402 and Lightning payments to let robot customers and AI agents pay for API access in the request path before protected data or tools are unlocked.',
+        text: 'SatGate governs paid-rail context and paid-rail context to let paid agents and AI agents pay for API access in the request path before protected data or tools are unlocked.',
       },
     },
     {
@@ -66,10 +66,10 @@ const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: 'When should an API use per-request Lightning payments?',
+      name: 'When should an API use per-request paid-rail context?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Per-request Lightning payments fit API products used by autonomous agents, paid tools, data endpoints, premium insights, and robot-customer workflows where access and payment should clear instantly.',
+        text: 'Per-request paid-rail context fit API products used by autonomous agents, paid tools, data endpoints, premium insights, and paid-agent workflows where access and payment should clear instantly.',
       },
     },
   ],
@@ -483,12 +483,12 @@ export default function MonetizeDemoPage() {
 
       <section className="w-full max-w-3xl mt-12 border-t border-gray-800 pt-10">
         <p className="mb-2 text-center text-xs font-mono uppercase tracking-wide text-yellow-300">FAQ</p>
-        <h2 className="mb-8 text-center text-2xl font-bold text-white">L402 API monetization questions</h2>
+        <h2 className="mb-8 text-center text-2xl font-bold text-white">rail-neutral paid-rail governance questions</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            ['What is SatGate Charge?', 'SatGate Charge uses L402 and Lightning payments to let robot customers and AI agents pay for API access in the request path before protected data or tools are unlocked.'],
+            ['What is SatGate paid-rail governance?', 'SatGate governs paid-rail context and paid-rail context to let paid agents and AI agents pay for API access in the request path before protected data or tools are unlocked.'],
             ['How is L402 different from a subscription API key?', 'A subscription API key grants ongoing access and bills later. L402 lets each agent request receive a payment challenge, pay the invoice, and retry with proof before access is granted.'],
-            ['When should an API use per-request Lightning payments?', 'Per-request Lightning payments fit API products used by autonomous agents, paid tools, data endpoints, premium insights, and robot-customer workflows where access and payment should clear instantly.'],
+            ['When should an API use per-request paid-rail context?', 'Per-request paid-rail context fit API products used by autonomous agents, paid tools, data endpoints, premium insights, and paid-agent workflows where access and payment should clear instantly.'],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
               <h3 className="mb-2 font-bold text-white">{question}</h3>
