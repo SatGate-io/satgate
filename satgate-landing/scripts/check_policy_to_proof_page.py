@@ -24,6 +24,11 @@ SPEND_LONGTAIL_PAGES = {
     "agent-payment-controls": ROOT / "app" / "agent-payment-controls" / "page.tsx",
 }
 
+L402_RAIL_PAGES = {
+    "http-402-for-ai-agents": ROOT / "app" / "http-402-for-ai-agents" / "page.tsx",
+    "l402-agent-payments": ROOT / "app" / "l402-agent-payments" / "page.tsx",
+}
+
 required_phrases = [
     "Every agent action leaves a receipt",
     "without permanent credentials, unlimited spend, or unobservable authority",
@@ -399,6 +404,49 @@ spend_longtail_forbidden_phrases = {
     ],
 }
 
+l402_rail_required_phrases = {
+    "http-402-for-ai-agents": [
+        "Payment Required, governed before execution",
+        "authority to spend",
+        "Evidence Pack receipt",
+        "Govern paid agent actions",
+        "See Policy-to-Proof",
+        "L402 Lightning is one paid rail",
+        "/govern",
+        "/policy-to-proof",
+        "/l402-agent-payments",
+    ],
+    "l402-agent-payments": [
+        "L402 Agent Payments, Governed Before Access",
+        "SatGate applies Policy-to-Proof before execution",
+        "preserves proof for every paid action",
+        "Evidence Pack receipt",
+        "Govern L402 access",
+        "Govern paid agent actions",
+        "View Policy-to-Proof",
+        "/govern",
+        "/policy-to-proof",
+        "/http-402-for-ai-agents",
+    ],
+}
+
+l402_rail_forbidden_phrases = [
+    "robot customers",
+    "robot-customer",
+    "SatGate Charge",
+    "Charge/L402",
+    "L402 Charge",
+    "Charge is L402",
+    "L402 is SatGate Charge",
+    "when APIs become products",
+    "when APIs become robot-customer products",
+    "Turn protected APIs into robot-customer products",
+    "Try the payment demo",
+    "Monetize APIs",
+    "Price L402 API access",
+    "Grade your readiness",
+]
+
 
 def main() -> int:
     if not PAGE.exists():
@@ -460,6 +508,15 @@ def main() -> int:
         stale_longtail = [phrase for phrase in spend_longtail_forbidden_phrases[name] if phrase in page_text]
         if stale_longtail:
             raise SystemExit(f"stale {name} spend/Charge-first phrases remain:\n" + "\n".join(stale_longtail))
+
+    for name, path in L402_RAIL_PAGES.items():
+        page_text = path.read_text()
+        missing_l402 = [phrase for phrase in l402_rail_required_phrases[name] if phrase not in page_text]
+        if missing_l402:
+            raise SystemExit(f"missing {name} paid-rail authority/proof phrases:\n" + "\n".join(missing_l402))
+        stale_l402 = [phrase for phrase in l402_rail_forbidden_phrases if phrase in page_text]
+        if stale_l402:
+            raise SystemExit(f"stale {name} Charge/robot-customer phrases remain:\n" + "\n".join(stale_l402))
     return 0
 
 

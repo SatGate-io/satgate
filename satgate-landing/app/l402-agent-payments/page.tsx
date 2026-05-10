@@ -3,30 +3,30 @@ import { ArrowRight, Bot, Coins, KeyRound, LockKeyhole, ReceiptText, Zap } from 
 
 export const metadata = {
   title: 'L402 Agent Payments for APIs',
-  description: 'Let autonomous agents pay for APIs with L402 Lightning payments. SatGate verifies payment before access and keeps API monetization in the request path.',
+  description: 'Understand L402 Lightning as a paid rail for AI agent/API access. SatGate applies Policy-to-Proof before execution and preserves receipts after payment.',
   alternates: { canonical: 'https://satgate.io/l402-agent-payments' },
   keywords: [
     'L402 agent payments',
-    'robot customer payments',
+    'paid-rail agent governance',
     'AI agent payments',
     'Lightning API payments',
     'HTTP 402 agent payments',
     'API monetization for AI agents',
     'autonomous agent payments',
     'AI agents paying APIs',
-    'machine customer payments',
-    'L402 API monetization',
+    'machine payment rail governance',
+    'L402 paid rail governance',
   ],
   openGraph: {
     title: 'L402 Agent Payments for APIs',
-    description: 'Let robot customers pay for protected APIs with L402 Lightning challenges, proof verification, and request-path access control.',
+    description: 'Understand L402 Lightning as one paid rail for protected API access, governed by SatGate policy and Evidence Packs.',
     url: 'https://satgate.io/l402-agent-payments',
     type: 'article',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'L402 Agent Payments for APIs',
-    description: 'Use SatGate Charge to let autonomous agents pay for APIs with L402 Lightning before access is unlocked.',
+    description: 'L402 can carry Lightning payment proof for agent/API access. SatGate governs the action, budget, rail, and receipt before upstream execution.',
   },
 };
 
@@ -44,7 +44,7 @@ const steps = [
   {
     icon: Zap,
     title: 'Agent pays with Lightning',
-    body: 'The robot customer pays the invoice through a wallet such as SaturnZap or another L402-capable client.',
+    body: 'The agent or wallet client pays the invoice through a wallet such as SaturnZap or another L402-capable client.',
   },
   {
     icon: KeyRound,
@@ -58,8 +58,8 @@ const steps = [
   },
   {
     icon: Coins,
-    title: 'API revenue becomes native',
-    body: 'APIs can charge autonomous agents per request, per tool, per dataset, or per premium capability.',
+    title: 'Proof becomes request-native',
+    body: 'Each paid request can carry identity, policy, price, payment proof, and access decision.',
   },
 ];
 
@@ -76,10 +76,10 @@ export default function L402AgentPaymentsPage() {
     mainEntityOfPage: 'https://satgate.io/l402-agent-payments',
     about: [
       { '@type': 'Thing', name: 'L402 agent payments' },
-      { '@type': 'Thing', name: 'robot customer payments' },
+      { '@type': 'Thing', name: 'paid-rail agent governance' },
       { '@type': 'Thing', name: 'Lightning API payments' },
       { '@type': 'Thing', name: 'HTTP 402 agent payments' },
-      { '@type': 'Thing', name: 'API monetization for AI agents' },
+      { '@type': 'Thing', name: 'Policy-to-Proof for paid agent access' },
     ],
   };
 
@@ -97,23 +97,23 @@ export default function L402AgentPaymentsPage() {
       },
       {
         '@type': 'Question',
-        name: 'Why use L402 for robot customers?',
+        name: 'Why use L402 for agent/API paid access?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Robot customers need programmatic, low-friction payment. L402 combines HTTP 402, Lightning invoices, and access credentials so agents can pay for APIs without manual checkout.',
+          text: 'Agent/API paid access needs programmatic, low-friction payment. L402 combines HTTP 402, Lightning invoices, and access credentials so agents can pay for APIs without manual checkout.',
         },
       },
       {
         '@type': 'Question',
-        name: 'Is SatGate Charge the same as Fiat402?',
+        name: 'Is L402 enough to govern paid agent access?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. SatGate Charge is L402 Lightning for request-path agent/API payments. Fiat402 is a separate concept and should not be conflated with Charge.',
+          text: 'No. L402 is a payment/access rail. SatGate Policy-to-Proof governs authority, scope, budget, revocation, and Evidence Pack evidence.',
         },
       },
       {
         '@type': 'Question',
-        name: 'What APIs are good candidates for robot-customer payments?',
+        name: 'What APIs are good candidates for agent/API paid access?',
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'Premium search, data enrichment, research APIs, MCP tools, datasets, model endpoints, and agent-native services are good L402 candidates when value is tied to each request.',
@@ -142,11 +142,11 @@ export default function L402AgentPaymentsPage() {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
     name: 'How to monetize APIs with L402 agent payments',
-    description: 'Use SatGate Charge to issue an HTTP 402 payment challenge, verify Lightning payment proof, and unlock API access for autonomous agents.',
+    description: 'Use SatGate to govern an HTTP 402/L402 paid-access flow, verify Lightning payment proof, preserve receipts, and unlock scoped API access for autonomous agents.',
     totalTime: 'PT20M',
     step: [
       { '@type': 'HowToStep', name: 'Protect the API route', text: 'Put SatGate in front of the API, tool, dataset, or premium endpoint that autonomous agents should pay to access.' },
-      { '@type': 'HowToStep', name: 'Set a request price', text: 'Define per-request, per-tool, dataset, or premium capability pricing for robot customers.' },
+      { '@type': 'HowToStep', name: 'Set a request price', text: 'Define per-request, per-tool, dataset, or premium capability pricing for agent/API paid access.' },
       { '@type': 'HowToStep', name: 'Return an L402 challenge', text: 'When an unpaid agent requests the resource, return an HTTP 402 challenge with a Lightning invoice and access credential.' },
       { '@type': 'HowToStep', name: 'Verify payment proof', text: 'Accept the agent response only after SatGate validates the payment proof and request policy.' },
       { '@type': 'HowToStep', name: 'Forward and audit access', text: 'Unlock the approved request and record agent identity, route, price, proof, and policy outcome.' },
@@ -177,19 +177,19 @@ export default function L402AgentPaymentsPage() {
           </div>
 
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight max-w-5xl mb-8">
-            Let AI Agents Pay for APIs Like Customers
+            L402 Agent Payments, Governed Before Access
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-10">
-            SatGate Charge uses L402 Lightning payments to let robot customers unlock protected APIs, tools, datasets, and premium capabilities at request time.
+            L402 Lightning can let agents satisfy HTTP 402 payment challenges. SatGate decides whether the agent is authorized to spend, unlocks only scoped access, and preserves proof for every paid action.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/blog/l402-protocol-explained" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              Read the L402 guide <ArrowRight size={18} />
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
+              Govern L402 access <ArrowRight size={18} />
             </Link>
-            <Link href="/monetize" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
-              Monetize APIs
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
+              See Policy-to-Proof
             </Link>
           </div>
         </div>
@@ -197,16 +197,16 @@ export default function L402AgentPaymentsPage() {
 
       <section className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-[1fr_0.9fr] gap-12 items-start">
         <div>
-          <h2 className="text-3xl font-bold text-white mb-6">The next API customer is not always a human</h2>
+          <h2 className="text-3xl font-bold text-white mb-6">The next API call may be paid by an agent</h2>
           <div className="space-y-5 text-gray-300 text-lg leading-relaxed">
             <p>
               AI agents increasingly discover, evaluate, call, and combine APIs on behalf of people and companies. That creates a new customer type: software that can decide an API is worth paying for right now.
             </p>
             <p>
-              Traditional API monetization assumes a human signs up, enters a card, picks a plan, stores a key, and then integrates. Robot customers need a request-native flow: ask for resource, receive price, pay, unlock access, continue task.
+              Traditional API monetization assumes a human signs up, enters a card, picks a plan, stores a key, and then integrates. Agent/API paid access needs a request-native flow: ask for resource, receive price, pay, unlock scoped access, continue task.
             </p>
             <p>
-              L402 gives that flow an internet-native shape. SatGate puts it in front of APIs as the Charge mode of the economic control plane.
+              L402 gives that flow an internet-native shape. SatGate treats it as paid-rail context governed by request-path policy and proof.
             </p>
           </div>
         </div>
@@ -249,7 +249,7 @@ export default function L402AgentPaymentsPage() {
             <h2 className="text-3xl font-bold text-white mb-5">L402, shared payment tokens, and agent wallets are different layers</h2>
             <div className="space-y-4 text-gray-300 text-lg leading-relaxed">
               <p>
-                HTTP 402 can carry different payment challenges. Some flows use card credentials or shared payment tokens. SatGate Charge uses L402 Lightning for request-native API monetization.
+                HTTP 402 can carry different payment challenges. Some flows use card credentials or shared payment tokens. L402 Lightning is one paid rail for request-native API access.
               </p>
               <p>
                 The important control-plane question is broader than payment: whether the agent has authority, budget, scope, and policy approval before paid access is unlocked.
@@ -274,13 +274,13 @@ export default function L402AgentPaymentsPage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-6 py-20">
-        <h2 className="text-3xl font-bold text-white mb-8">Robot-customer payment requirements</h2>
+        <h2 className="text-3xl font-bold text-white mb-8">Governed L402 payment requirements</h2>
         <div className="grid md:grid-cols-2 gap-5 mb-16">
           {[
             ['Machine-readable price', 'Agents need a price and payment challenge in the protocol flow, not a human checkout page or sales form.'],
             ['Payment before access', 'SatGate verifies L402 Lightning payment proof before forwarding the protected API request upstream.'],
             ['Scoped unlocks', 'Payment should unlock the requested route, tool, dataset, or capability — not a broad reusable API key.'],
-            ['Revenue audit trail', 'Every paid request should record agent identity, route, price, proof, settlement evidence, and access decision.'],
+            ['Evidence Pack receipts', 'Every paid request should record agent identity, route, price, payment proof, policy decision, and Evidence Pack receipt.'],
           ].map(([title, body]) => (
             <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
@@ -289,7 +289,7 @@ export default function L402AgentPaymentsPage() {
           ))}
         </div>
 
-        <h2 className="text-3xl font-bold text-white mb-8">A robot-customer request flow</h2>
+        <h2 className="text-3xl font-bold text-white mb-8">A governed L402 request flow</h2>
         <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6 overflow-x-auto">
           <pre className="text-sm text-gray-300"><code>{`# Agent attempts a protected API call
 sz fetch https://api.example.com/premium-research --max-sats 25
@@ -303,7 +303,7 @@ HTTP/1.1 200 OK
 { "answer": "paid premium result" }`}</code></pre>
         </div>
         <p className="text-gray-400 mt-5 leading-relaxed">
-          In this pattern, the merchant runs SatGate. The robot customer runs a wallet/client. Payment, authorization, and audit happen before upstream access.
+          In this pattern, the merchant runs SatGate. The agent or wallet client presents payment proof. Payment, authorization, receipt capture, and audit happen before upstream access.
         </p>
       </section>
 
@@ -320,9 +320,9 @@ HTTP/1.1 200 OK
             <p className="text-gray-400 leading-relaxed">Limit which agents, routes, prices, budgets, and proofs are accepted before unlocking protected resources.</p>
           </div>
           <div className="rounded-2xl border border-gray-800 bg-black p-6">
-            <div className="text-yellow-300 font-mono text-sm mb-3">CHARGE</div>
-            <h3 className="text-xl font-bold text-white mb-3">Collect per request</h3>
-            <p className="text-gray-400 leading-relaxed">Use L402 Lightning payments to charge autonomous agents for API access at the moment of demand.</p>
+            <div className="text-yellow-300 font-mono text-sm mb-3">PROVE</div>
+            <h3 className="text-xl font-bold text-white mb-3">Preserve the receipt</h3>
+            <p className="text-gray-400 leading-relaxed">Use L402 payment proof as one input to a Policy-to-Proof receipt that records authority, rail, price, and decision.</p>
           </div>
         </div>
       </section>
@@ -339,19 +339,19 @@ HTTP/1.1 200 OK
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
-              <h3 className="mb-2 text-xl font-bold text-white">Why use L402 for robot customers?</h3>
+              <h3 className="mb-2 text-xl font-bold text-white">Why use L402 for agent/API paid access?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Robot customers need programmatic, low-friction payment. L402 combines HTTP 402, Lightning invoices, and access credentials so agents can pay for APIs without manual checkout.
+                Agent/API paid access needs programmatic, low-friction payment. L402 combines HTTP 402, Lightning invoices, and access credentials so agents can pay for APIs without manual checkout.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
-              <h3 className="mb-2 text-xl font-bold text-white">Is SatGate Charge the same as Fiat402?</h3>
+              <h3 className="mb-2 text-xl font-bold text-white">Is L402 enough to govern paid agent access?</h3>
               <p className="text-gray-400 leading-relaxed">
-                No. SatGate Charge is L402 Lightning for request-path agent/API payments. Fiat402 is a separate concept and should not be conflated with Charge.
+                No. L402 is a payment/access rail. SatGate Policy-to-Proof governs authority, scope, budget, revocation, and Evidence Pack evidence.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
-              <h3 className="mb-2 text-xl font-bold text-white">What APIs are good candidates for robot-customer payments?</h3>
+              <h3 className="mb-2 text-xl font-bold text-white">What APIs are good candidates for agent/API paid access?</h3>
               <p className="text-gray-400 leading-relaxed">
                 Premium search, data enrichment, research APIs, MCP tools, datasets, model endpoints, and agent-native services are good L402 candidates when value is tied to each request.
               </p>
@@ -370,18 +370,18 @@ HTTP/1.1 200 OK
             </div>
           </div>
 
-          <h2 className="text-3xl font-bold text-white mb-8">Related robot-payment guides</h2>
+          <h2 className="text-3xl font-bold text-white mb-8">Related paid-agent-access guides</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               ['/http-402-for-ai-agents', 'HTTP 402 for AI agents', 'Compare payment challenges, shared payment tokens, and L402 for autonomous agents.'],
               ['/agent-payment-controls', 'Agent payment controls', 'Govern budgets, approval, payment rails, audit, and access policy.'],
               ['/stripe-link-agents-vs-satgate', 'Stripe Link for Agents vs SatGate', 'See how agent wallets differ from SatGate economic governance.'],
-              ['/l402-api-pricing-calculator', 'L402 API pricing calculator', 'Estimate per-request robot-customer pricing, gross margin, and Lightning sats per API request.'],
-              ['/robot-customer-payments', 'Robot customer payments', 'How autonomous agents become paying API customers in the request path.'],
+              ['/policy-to-proof', 'Policy-to-Proof', 'See how paid access becomes Evidence Pack proof.'],
+              ['/govern', 'Govern AI agents', 'Govern paid agent actions before execution.'],
               ['/agent-capability-tokens', 'Agent capability tokens', 'Scope paid access with route, budget, expiry, delegation, and revocation caveats.'],
               ['/blog/l402-protocol-explained', 'L402 protocol explained', 'How HTTP 402, Lightning, and macaroons enable API payments.'],
-              ['/blog/api-monetization-ai', 'API monetization for AI', 'How to price, meter, and collect from machine consumers.'],
-              ['/economic-firewall', 'Economic firewall', 'Observe, Control, and Charge in one request-path control plane.'],
+              ['/l402-api-pricing-calculator', 'L402 API pricing calculator', 'Estimate per-request agent/API paid-access pricing.'],
+              ['/economic-firewall', 'Economic firewall', 'Observe, Control, and Prove in one request-path control plane.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">
                 <h3 className="font-bold text-white mb-2">{title}</h3>
@@ -394,16 +394,16 @@ HTTP/1.1 200 OK
 
       <section className="max-w-6xl mx-auto px-6 py-20">
         <div className="rounded-3xl border border-yellow-900/60 bg-gradient-to-br from-yellow-950/20 to-cyan-950/30 p-8 md:p-12">
-          <h2 className="text-3xl font-bold text-white mb-4">Turn protected APIs into robot-customer products</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">Govern L402-paid access with Policy-to-Proof</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            SatGate gives API teams a request-path control plane for observing, controlling, and charging AI agents. Charge is L402 Lightning: simple, programmatic, and built for autonomous access.
+            L402 can prove payment. SatGate proves the action was authorized: who acted, what policy applied, which rail was used, what was paid, and why access was allowed or denied.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/pay" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              Try the payment demo <ArrowRight size={18} />
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
+              Govern paid agent actions <ArrowRight size={18} />
             </Link>
-            <Link href="/blog/http-402-payment-required-use-cases" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
-              HTTP 402 use cases
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
+              View Policy-to-Proof
             </Link>
           </div>
         </div>
