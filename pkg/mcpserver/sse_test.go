@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"strings"
 	"testing"
@@ -176,15 +177,24 @@ for line in sys.stdin:
 		t.Fatal(err)
 	}
 
-	// Use port 0 for random available port
-	srv := NewSSEServer(proxy, "127.0.0.1:0")
-
-	// Use a fixed test port
-	addr := "127.0.0.1:19100"
-	srv = NewSSEServer(proxy, addr)
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	addr := ln.Addr().String()
+	srv := NewSSEServer(proxy, addr)
 
 	go func() {
-		if err := srv.ListenAndServe(ctx); err != nil && ctx.Err() == nil {
+		if err := srv.proxy.upstream.Start(ctx); err != nil && ctx.Err() == nil {
+			t.Logf("SSE upstream error: %v", err)
+			_ = ln.Close()
+			return
+		}
+		go func() {
+			<-ctx.Done()
+			_ = srv.server.Shutdown(context.Background())
+		}()
+		if err := srv.server.Serve(ln); err != nil && err != http.ErrServerClosed && ctx.Err() == nil {
 			t.Logf("SSE server error: %v", err)
 		}
 	}()

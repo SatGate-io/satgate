@@ -1,0 +1,105 @@
+apiVersion: satgate.io/policy/v1
+kind: DelegationDepthPolicy
+metadata:
+  name: prod-mcp-delegation-depth
+  policy_id: pol_mcp_delegation_depth_v1
+  version: 1
+  owner: security-governance
+  description: Maximum delegation depth and attenuation requirements for MCP agent capabilities.
+  labels:
+    control_family: [capability-security, delegation-governance, mcp]
+
+scope:
+  tenant_id: ten_example
+  applies_to:
+    principals: ['*']
+    agents: ['agent_*']
+
+delegation:
+  max_depth: 2
+  deny_if_depth_missing: true
+  deny_if_parent_missing_at_depth_gt_zero: true
+  allow_further_delegation_by_default: false
+
+attenuation_required:
+  on_each_delegation: true
+  child_must_not_exceed_parent:
+    - expiry
+    - audience
+    - tenant_id
+    - tool_scope
+    - method_scope
+    - budget_id
+    - max_spend
+    - delegation_depth
+    - approval_requirement
+
+caveats:
+  required:
+    - tenant_id
+    - principal_id
+    - agent_id
+    - audience
+    - expiry
+    - token_id
+    - parent_token_id
+    - budget_id
+    - max_delegation_depth
+    - current_delegation_depth
+    - allowed_tools
+  expiry:
+    max_ttl_seconds: 3600
+    child_ttl_must_be_lte_parent: true
+  audience:
+    require_mcp_server_binding: true
+    require_gateway_binding: true
+  tool_scope:
+    require_explicit_allowed_tools: true
+    prohibit_wildcard_tools_at_depth_gt_zero: true
+
+approval:
+  require_human_approval_at_depth_gte: 2
+  require_human_approval_for_high_risk_tools: true
+  approval_receipt_required: true
+
+revocation:
+  check_token_id_revocation: true
+  check_parent_token_revocation: true
+  revoke_children_when_parent_revoked: true
+  reject_if_parent_expired: true
+
+enforcement:
+  mode: control
+  fail_closed_on_chain_validation_error: true
+  verify_full_delegation_chain: true
+  store_chain_hash_only: true
+
+receipt_requirements:
+  evidence_pack_required: true
+  required_receipt_fields:
+    - receipt_id
+    - timestamp
+    - tenant_id
+    - principal_id
+    - agent_id
+    - parent_agent_id
+    - credential_id_hash
+    - token_signature_hash
+    - parent_token_id_hash
+    - delegation_chain_hash
+    - current_delegation_depth
+    - max_delegation_depth
+    - caveat_hashes
+    - caveat_validation_result
+    - policy_id
+    - policy_version
+    - policy_digest
+    - decision
+    - decision_reason
+    - approval_id
+    - approver_id_hash
+
+security:
+  prohibit_raw_tokens_in_receipts: true
+  prohibit_raw_macaroon_caveats_if_sensitive: true
+  hash_sensitive_caveat_values: true

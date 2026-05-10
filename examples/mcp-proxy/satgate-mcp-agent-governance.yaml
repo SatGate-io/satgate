@@ -1,0 +1,40 @@
+# SatGate MCP Proxy — Agent Governance Verification Config
+#
+# Small, fast budget for local proof that Claude/Ollama/Gemma4-style MCP clients
+# can call an allowed tool through SatGate and receive a request-path denial
+# when the governed budget is exhausted.
+
+server:
+  transport: stdio
+  name: satgate-mcp-governance-proof
+  version: 0.1.0
+
+# Local stdio proof uses no bearer token so Claude/Ollama/Gemma4-style clients can
+# be exercised without test secrets. Production configs should use scoped auth and
+# tenant-bound capabilities; this script verifies request-path allow/deny/budget behavior.
+auth:
+  mode: none
+
+upstreams:
+  mock:
+    transport: stdio
+    command: ["python3", "mock-mcp-server.py"]
+    timeout: 30s
+
+budget:
+  backend: memory
+  limit: 20
+  failMode: closed
+
+tools:
+  defaultCost: 5
+  costs:
+    web_search: 5
+    code_execute: 15
+
+enforcement:
+  mode: control
+
+logging:
+  level: error
+  json: false

@@ -1,0 +1,94 @@
+apiVersion: satgate.io/policy/v1
+kind: SpendCapsPolicy
+metadata:
+  name: prod-mcp-spend-caps
+  policy_id: pol_mcp_spend_caps_v1
+  version: 1
+  owner: security-governance
+  description: Per-tenant, per-agent, per-session, and per-tool MCP budget enforcement.
+  labels:
+    control_family: [cost-governance, blast-radius, mcp]
+
+scope:
+  tenant_id: ten_example
+  applies_to:
+    principals: ['*']
+    agents: ['agent_*']
+    mcp_clients: [claude_desktop, claude_code, cursor, openclaw, ollama_wrapper, gemma4_wrapper]
+    mcp_servers: ['mcp_prod_*']
+    tools: ['*']
+
+currency:
+  unit: credits
+  precision: integer
+
+budgets:
+  default_budget_id: bud_prod_agents_daily
+  require_budget_id_caveat: true
+  deny_if_budget_missing: true
+
+limits:
+  per_request:
+    max_credits: 25
+    action_on_exceed: deny
+  per_tool:
+    - tool: web_search
+      max_credits_per_call: 5
+      max_credits_per_hour: 100
+      action_on_exceed: deny
+    - tool: database_query
+      max_credits_per_call: 10
+      max_credits_per_hour: 250
+      action_on_exceed: deny
+    - tool: code_execute
+      max_credits_per_call: 15
+      max_credits_per_hour: 75
+      action_on_exceed: deny
+  per_agent:
+    max_credits_per_hour: 500
+    max_credits_per_day: 2000
+    action_on_exceed: deny
+  per_tenant:
+    max_credits_per_hour: 5000
+    max_credits_per_day: 25000
+    action_on_exceed: deny
+
+thresholds:
+  warn_at_percent: [50, 80, 95]
+  require_human_approval_at_percent: 95
+
+enforcement:
+  mode: control
+  atomic_decrement_required: true
+  idempotency_key_required: true
+  request_id_required: true
+  fail_closed_on_meter_error: true
+
+receipt_requirements:
+  evidence_pack_required: true
+  required_receipt_fields:
+    - receipt_id
+    - timestamp
+    - tenant_id
+    - principal_id
+    - agent_id
+    - mcp_client_id
+    - mcp_server_id
+    - tool_name
+    - request_id
+    - idempotency_key
+    - policy_id
+    - policy_version
+    - policy_digest
+    - budget_id
+    - cost_credits
+    - remaining_credits
+    - decision
+    - decision_reason
+    - ledger_entry_id
+
+security:
+  prohibit_raw_tokens_in_receipts: true
+  prohibit_raw_tool_arguments_by_default: true
+  store_tool_arguments_hash: true
+  store_response_hash: true

@@ -1,0 +1,96 @@
+apiVersion: satgate.io/policy/v1
+kind: ToolAllowlistPolicy
+metadata:
+  name: prod-mcp-tool-allowlist
+  policy_id: pol_mcp_tool_allowlist_v1
+  version: 1
+  owner: security-governance
+  description: Default-deny MCP tool authority by tenant, principal, agent, server, and risk tier.
+  labels:
+    control_family: [least-privilege, mcp-tool-governance]
+
+scope:
+  tenant_id: ten_example
+  applies_to:
+    principals: ['*']
+    agents: ['agent_*']
+    mcp_servers: ['mcp_prod_*']
+
+default_action: deny
+
+allow:
+  - rule_id: allow_research_search
+    tool: web_search
+    mcp_server_id: mcp_prod_research
+    methods: [call]
+    max_risk: low
+    allowed_principals: ['*']
+    allowed_agents: ['agent_research_*']
+    constraints:
+      require_budget_id_caveat: true
+      require_audience_binding: true
+      require_tool_binding: true
+  - rule_id: allow_readonly_database_query
+    tool: database_query
+    mcp_server_id: mcp_prod_data
+    methods: [call]
+    max_risk: medium
+    allowed_principals: ['user_analytics_*']
+    allowed_agents: ['agent_analytics_*']
+    constraints:
+      require_budget_id_caveat: true
+      require_tenant_match: true
+      prohibit_write_operations: true
+      require_query_classification: readonly
+      max_rows_returned: 1000
+
+deny:
+  - rule_id: deny_shell_exec
+    tool: shell_exec
+    reason: Shell execution prohibited in production MCP policy.
+  - rule_id: deny_prod_deploy
+    tool: deploy_prod
+    reason: Production deploys require separate break-glass approval.
+  - rule_id: deny_secret_read
+    tool: secrets_read
+    reason: Secret material may not be exposed to delegated agents.
+
+risk_controls:
+  high_risk_tools:
+    default_action: deny
+    require_human_approval: true
+    require_step_up_auth: true
+
+enforcement:
+  mode: control
+  match_strategy: exact_tool_name
+  wildcard_allow_requires_review: true
+  fail_closed_on_policy_error: true
+
+receipt_requirements:
+  evidence_pack_required: true
+  required_receipt_fields:
+    - receipt_id
+    - timestamp
+    - tenant_id
+    - principal_id
+    - agent_id
+    - mcp_client_id
+    - mcp_server_id
+    - tool_name
+    - tool_call_id
+    - tool_arguments_hash
+    - policy_id
+    - policy_version
+    - policy_digest
+    - decision
+    - decision_reason
+    - matched_rule_id
+    - credential_id_hash
+    - caveat_hashes
+
+security:
+  prohibit_raw_tokens_in_receipts: true
+  prohibit_raw_secrets_in_tool_args: true
+  redact_tool_arguments_before_logging: true
+  store_tool_arguments_hash: true

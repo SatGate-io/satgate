@@ -1,0 +1,90 @@
+apiVersion: satgate.io/policy/v1
+kind: TenantIsolationPolicy
+metadata:
+  name: prod-mcp-tenant-isolation
+  policy_id: pol_mcp_tenant_isolation_v1
+  version: 1
+  owner: platform-security
+  description: Hard tenant boundary controls for MCP clients, servers, credentials, budgets, ledgers, and Evidence Packs.
+  labels:
+    control_family: [tenant-isolation, data-boundary, mcp]
+
+scope:
+  tenant_id: ten_example
+  isolation_domain: production
+
+identity_binding:
+  require_tenant_id: true
+  accepted_tenant_sources:
+    - authenticated_session
+    - verified_token_caveat
+    - gateway_tenant_context
+  tenant_header:
+    name: X-Tenant-ID
+    trust_client_supplied_header: false
+    overwrite_on_ingress: true
+  require_consistent_tenant_across:
+    - principal
+    - agent
+    - credential
+    - budget
+    - policy
+    - mcp_client
+    - mcp_server
+    - ledger_entry
+    - evidence_pack
+
+credential_controls:
+  require_tenant_id_caveat: true
+  reject_cross_tenant_token: true
+  reject_missing_tenant_binding: true
+  token_storage:
+    allow_raw_token_persistence: false
+    store_token_signature_hash: true
+    store_credential_id_hash: true
+
+budget_controls:
+  require_budget_tenant_match: true
+  reject_cross_tenant_budget_id: true
+
+mcp_controls:
+  require_mcp_server_tenant_match: true
+  require_tool_tenant_match: true
+  reject_cross_tenant_tool_result_cache: true
+
+data_controls:
+  prohibit_cross_tenant_context_injection: true
+  prohibit_cross_tenant_memory_reads: true
+  prohibit_cross_tenant_evidence_pack_reads: true
+  redact_tenant_foreign_identifiers: true
+
+enforcement:
+  mode: control
+  fail_closed_on_tenant_resolution_error: true
+  audit_all_denies: true
+
+receipt_requirements:
+  evidence_pack_required: true
+  required_receipt_fields:
+    - receipt_id
+    - timestamp
+    - tenant_id
+    - tenant_isolation_policy_id
+    - principal_id
+    - agent_id
+    - credential_tenant_id_hash
+    - budget_tenant_id_hash
+    - mcp_server_tenant_id_hash
+    - policy_tenant_id_hash
+    - decision
+    - decision_reason
+    - isolation_check_result
+    - cross_tenant_violation_detected
+    - policy_id
+    - policy_version
+    - policy_digest
+
+security:
+  prohibit_raw_tokens_in_receipts: true
+  prohibit_foreign_tenant_payload_logging: true
+  store_foreign_tenant_ids_as_hashes_only: true
