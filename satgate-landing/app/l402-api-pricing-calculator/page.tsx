@@ -46,6 +46,7 @@ export default function L402ApiPricingCalculatorPage() {
   const [conversionPct, setConversionPct] = useState(12);
   const [agentGrowthPct, setAgentGrowthPct] = useState(25);
   const [freeAllowancePct, setFreeAllowancePct] = useState(20);
+  const [btcReferenceUsd, setBtcReferenceUsd] = useState(100000);
 
   const calc = useMemo(() => {
     const costPerRequest = costPerRequestCents / 100;
@@ -57,10 +58,10 @@ export default function L402ApiPricingCalculatorPage() {
     const monthlyGrossProfit = monthlyRevenue - monthlyCost;
     const nextQuarterRequests = requestsPerDay * Math.pow(1 + agentGrowthPct / 100, 3);
     const nextQuarterMonthlyRevenue = nextQuarterRequests * (conversionPct / 100) * (1 - freeAllowancePct / 100) * pricePerRequest * 30;
-    const satsPerUsd = 100000000 / 65000;
+    const satsPerUsd = 100000000 / btcReferenceUsd;
     const satsPerRequest = pricePerRequest * satsPerUsd;
     return { paidRequestsPerDay, pricePerRequest, dailyRevenue, monthlyRevenue, monthlyCost, monthlyGrossProfit, nextQuarterMonthlyRevenue, satsPerRequest };
-  }, [agentGrowthPct, conversionPct, costPerRequestCents, freeAllowancePct, marginPct, requestsPerDay]);
+  }, [agentGrowthPct, btcReferenceUsd, conversionPct, costPerRequestCents, freeAllowancePct, marginPct, requestsPerDay]);
 
   const webPageJsonLd = {
     '@context': 'https://schema.org',
@@ -90,7 +91,7 @@ export default function L402ApiPricingCalculatorPage() {
     description: 'Estimate per-request L402 API pricing, paid-agent access revenue, gross margin, free allowance, and Lightning sats per request for governed AI agent API access.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-03',
-    featureList: ['Per-request L402 pricing', 'Robot-customer revenue estimate', 'Gross margin modeling', 'Free allowance planning', 'Sats per request conversion'],
+    featureList: ['Per-request L402 pricing', 'Paid-agent access revenue estimate', 'Gross margin modeling', 'Free allowance planning', 'Adjustable sats per request conversion'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
@@ -129,7 +130,7 @@ export default function L402ApiPricingCalculatorPage() {
         name: 'Is L402 the same as Fiat402?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. L402 is Lightning-based payment for API access. Fiat402 is separate. SatGate can preserve paid-rail context without conflating the rails.',
+          text: 'No. L402 is Lightning-based payment for API access. Fiat402 is separate. x402, AgentCore Payments, and Pay.sh are also separate paid rails. SatGate can preserve paid-rail context without conflating the rails.',
         },
       },
       {
@@ -137,7 +138,7 @@ export default function L402ApiPricingCalculatorPage() {
         name: 'How do you calculate sats per API request?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Start with the target USD price per request, then convert that value into sats using the current BTC/USD reference rate. Teams should refresh the exchange-rate assumption before publishing production prices.',
+          text: 'Start with the target USD price per request, then convert that value into sats using the BTC/USD reference assumption in the calculator. Teams should refresh that exchange-rate assumption before publishing production prices.'
         },
       },
       {
@@ -165,7 +166,7 @@ export default function L402ApiPricingCalculatorPage() {
             <Zap size={16} /> Free L402 pricing calculator
           </div>
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">
-            L402 API Pricing Calculator for Robot Customers
+            L402 API Pricing Calculator
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
             Estimate per-request pricing, gross margin, paid agent-access demand, and Lightning sats per request before you expose paid API access to autonomous agents.
@@ -188,16 +189,17 @@ export default function L402ApiPricingCalculatorPage() {
             <Slider label="Agent/API requests per day" value={requestsPerDay} min={100} max={100000} step={100} onChange={setRequestsPerDay} />
             <Slider label="Marginal cost per request" value={costPerRequestCents} min={1} max={250} step={1} prefix="$0." onChange={setCostPerRequestCents} />
             <Slider label="Target gross margin" value={marginPct} min={20} max={95} step={1} suffix="%" onChange={setMarginPct} />
-            <Slider label="Robot-customer conversion" value={conversionPct} min={1} max={80} step={1} suffix="%" onChange={setConversionPct} />
+            <Slider label="Paying agent conversion" value={conversionPct} min={1} max={80} step={1} suffix="%" onChange={setConversionPct} />
             <Slider label="Free/trial allowance" value={freeAllowancePct} min={0} max={90} step={1} suffix="%" onChange={setFreeAllowancePct} />
             <Slider label="Monthly agent demand growth" value={agentGrowthPct} min={0} max={100} step={1} suffix="%" onChange={setAgentGrowthPct} />
+            <Slider label="BTC/USD reference assumption" value={btcReferenceUsd} min={50000} max={200000} step={5000} prefix="$" onChange={setBtcReferenceUsd} />
           </div>
         </div>
 
         <aside className="sticky top-6 h-fit rounded-3xl border border-yellow-900/50 bg-yellow-950/10 p-8">
           <div className="mb-3 flex items-center gap-2 text-yellow-300"><Calculator size={22} /> Suggested pricing</div>
           <div className="mb-2 text-5xl font-extrabold text-white">{usd.format(calc.pricePerRequest)}</div>
-          <div className="mb-6 text-sm text-gray-400">~{number.format(calc.satsPerRequest)} sats/request at a placeholder $65k BTC reference rate</div>
+          <div className="mb-6 text-sm text-gray-400">~{number.format(calc.satsPerRequest)} sats/request using your {usd0.format(btcReferenceUsd)} BTC/USD reference assumption</div>
           <div className="grid gap-4">
             <div className="rounded-xl border border-gray-800 bg-black p-4"><div className="text-sm text-gray-500">Paid requests/day</div><div className="text-2xl font-bold text-white">{number.format(calc.paidRequestsPerDay)}</div></div>
             <div className="rounded-xl border border-gray-800 bg-black p-4"><div className="text-sm text-gray-500">Monthly revenue</div><div className="text-2xl font-bold text-white">{usd0.format(calc.monthlyRevenue)}</div></div>
@@ -211,7 +213,7 @@ export default function L402ApiPricingCalculatorPage() {
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-bold text-white">Pricing is only safe with request-path control</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
-            Robot-customer pricing cannot be just a billing table. Autonomous agents need a challenge, proof, budget, scope, and audit decision before each protected resource unlocks.
+            Paid agent-access pricing cannot be just a billing table. Autonomous agents need a challenge, proof, budget, scope, and audit decision before each protected resource unlocks.
           </p>
           <div className="grid gap-5 md:grid-cols-3">
             {[
@@ -255,13 +257,13 @@ export default function L402ApiPricingCalculatorPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Is L402 the same as Fiat402?</h3>
               <p className="text-gray-400 leading-relaxed">
-                No. L402 is Lightning-based payment for API access. Fiat402 is separate. SatGate can preserve paid-rail context without conflating the rails.
+                No. L402 is Lightning-based payment for API access. Fiat402 is separate. x402, AgentCore Payments, and Pay.sh are also separate paid rails. SatGate can preserve paid-rail context without conflating the rails.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How do you calculate sats per API request?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Start with the target USD price per request, then convert that value into sats using the current BTC/USD reference rate. Teams should refresh the exchange-rate assumption before publishing production prices.
+                Start with the target USD price per request, then convert that value into sats using the BTC/USD reference assumption in the calculator. Teams should refresh that exchange-rate assumption before publishing production prices.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

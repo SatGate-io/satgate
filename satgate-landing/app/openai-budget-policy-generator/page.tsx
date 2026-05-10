@@ -42,7 +42,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
   const policy = useMemo(() => {
     const escalation = risk === 'high' ? 'block_and_revoke' : risk === 'medium' ? 'route_to_economy_model' : 'log_and_allow';
     const auditLevel = mode === 'control' ? 'decision_and_cost' : 'cost_attribution_only';
-    return `agent_policy: ${workflow || 'research-agent'}\nprovider: openai\nmode: ${mode}\nrisk_profile: ${risk}\nbudgets:\n  daily: ${dailyBudget.toFixed(2)} USD\n  per_session: ${sessionBudget.toFixed(2)} USD\n  per_request: ${perRequest.toFixed(2)} USD\nmodel_policy:\n  default_route: economy\n  premium_model_budget_share: ${premiumModelPct}%\n  require_justification_for:\n    - gpt-5.5\n    - gpt-5.5-pro\ncontrols:\n  on_daily_budget_exhausted: block\n  on_per_request_exceeded: ${escalation}\n  on_loop_detected: revoke_session_capability\n  on_unknown_agent: deny\ncapability:\n  expiry: task_or_24h\n  delegation: attenuated_only\n  child_budget_max: ${(sessionBudget * 0.25).toFixed(2)} USD\naudit:\n  level: ${auditLevel}\n  include:\n    - tenant\n    - agent\n    - workflow\n    - model\n    - estimated_cost\n    - remaining_budget\n    - policy_decision\n    - upstream_status`;
+    return `agent_policy: ${workflow || 'research-agent'}\nprovider: openai\nmode: ${mode}\nrisk_profile: ${risk}\nbudgets:\n  daily: ${dailyBudget.toFixed(2)} USD\n  per_session: ${sessionBudget.toFixed(2)} USD\n  per_request: ${perRequest.toFixed(2)} USD\nmodel_policy:\n  default_route: economy\n  premium_model_budget_share: ${premiumModelPct}%\n  require_justification_for:\n    - gpt-5.5\n    - gpt-5.5-pro\ncontrols:\n  on_daily_budget_exhausted: block\n  on_per_request_exceeded: ${escalation}\n  on_loop_detected: revoke_session_capability\n  on_unknown_agent: deny\ncapability:\n  expiry: task_or_24h\n  delegation: attenuated_only\n  child_budget_max: ${(sessionBudget * 0.25).toFixed(2)} USD\nevidence_pack:\n  required: true\n  receipt_id: generated_per_decision\n  include_payment_context: false\naudit:\n  level: ${auditLevel}\n  include:\n    - tenant\n    - agent\n    - workflow\n    - model\n    - estimated_cost\n    - remaining_budget\n    - policy_decision\n    - upstream_status`;
   }, [dailyBudget, mode, perRequest, premiumModelPct, risk, sessionBudget, workflow]);
 
   const jsonPolicy = useMemo(() => ({
@@ -66,6 +66,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
       on_loop_detected: 'revoke_session_capability',
       on_unknown_agent: 'deny',
     },
+    evidence_pack: { required: true, receipt_id: 'generated_per_decision', include_payment_context: false },
     audit: ['tenant', 'agent', 'workflow', 'model', 'estimated_cost', 'remaining_budget', 'policy_decision', 'upstream_status'],
   }), [dailyBudget, mode, perRequest, premiumModelPct, risk, sessionBudget, workflow]);
 
@@ -74,7 +75,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
     '@type': 'WebPage',
     name: 'OpenAI API Budget Limit Generator',
     url: 'https://satgate.io/openai-budget-policy-generator',
-    description: 'Generate request-path OpenAI API budget policy for autonomous agents, model routing, spend caps, revocation, and audit controls.',
+    description: 'Generate request-path OpenAI API budget policy for autonomous agents, model routing, spend caps, revocation, and Evidence Pack receipts.',
     datePublished: '2026-04-29',
     dateModified: '2026-05-02',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -92,7 +93,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/openai-budget-policy-generator',
-    description: 'Generate OpenAI API budget policy for autonomous agents, workflows, model routes, per-request caps, daily budgets, and audit controls.',
+    description: 'Generate OpenAI API budget policy for autonomous agents, workflows, model routes, per-request caps, daily budgets, and Evidence Pack receipts.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     featureList: [
@@ -128,7 +129,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
         name: 'What OpenAI API budget limits should AI agents have?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'AI agents should have OpenAI API limits by workflow, tenant, agent, model, session, day, and per request, plus premium-model routing rules, revocation triggers, and audit fields.',
+          text: 'AI agents should have OpenAI API limits by workflow, tenant, agent, model, session, day, and per request, plus premium-model routing rules, revocation triggers, and Evidence Pack receipt fields.',
         },
       },
       {
@@ -177,7 +178,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
             OpenAI API Budget Limit Generator
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Generate a request-path budget policy for AI agents calling OpenAI: per-request caps, daily spend limits, session budgets, model routing, revocation, and audit rules.
+            Generate a request-path budget policy for AI agents calling OpenAI: per-request caps, daily spend limits, session budgets, model routing, revocation, and Evidence Pack receipts.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/blog/how-to-add-budget-limits-to-openai-api-calls" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -235,7 +236,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
               [Gauge, 'Spend ceilings', 'Daily, session, per-request, and premium-model limits by agent or workflow.'],
               [Route, 'Model routing', 'Route routine calls to economy models and require justification for premium models.'],
               [KeyRound, 'Scoped capability', 'Expire and revoke agent credentials without rotating broad provider keys.'],
-              [ShieldCheck, 'Inline enforcement', 'Block, route, revoke, or audit before OpenAI API calls execute.'],
+              [ShieldCheck, 'Inline enforcement', 'Block, route, revoke, or create Evidence Pack receipts before OpenAI API calls execute.'],
             ].map(([Icon, title, body]) => {
               const TypedIcon = Icon as typeof Gauge;
               return (
@@ -258,7 +259,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What OpenAI API budget limits should AI agents have?</h3>
               <p className="text-gray-400 leading-relaxed">
-                AI agents should have OpenAI API limits by workflow, tenant, agent, model, session, day, and per request, plus premium-model routing rules, revocation triggers, and audit fields.
+                AI agents should have OpenAI API limits by workflow, tenant, agent, model, session, day, and per request, plus premium-model routing rules, revocation triggers, and Evidence Pack receipt fields.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -281,11 +282,11 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-purple-950/30 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Budget policy belongs in the request path</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            Provider dashboards explain the bill after the fact. SatGate checks agent identity, model route, estimated cost, remaining budget, and revocation status before forwarding OpenAI requests.
+            Provider dashboards explain the bill after the fact. SatGate checks agent identity, model route, estimated cost, remaining budget, and revocation status before forwarding OpenAI requests, then preserves the decision in an Evidence Pack receipt.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-              Learn economic firewalls <ArrowRight size={18} />
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+              Govern OpenAI spend <ArrowRight size={18} />
             </Link>
             <Link href="/runaway-agent-cost-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Calculate runaway cost

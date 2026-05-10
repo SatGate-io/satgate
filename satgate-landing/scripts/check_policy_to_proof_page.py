@@ -23,6 +23,11 @@ MCP_PROXY_CONFIG_PAGE = ROOT / "app" / "mcp-proxy-config-generator" / "page.tsx"
 MCP_PROXY_CONFIG_LAYOUT = ROOT / "app" / "mcp-proxy-config-generator" / "layout.tsx"
 L402_API_PRICING_PAGE = ROOT / "app" / "l402-api-pricing-calculator" / "page.tsx"
 L402_API_PRICING_LAYOUT = ROOT / "app" / "l402-api-pricing-calculator" / "layout.tsx"
+OPENAI_GENERATOR_PAGE = ROOT / "app" / "openai-budget-policy-generator" / "page.tsx"
+OPENAI_GENERATOR_LAYOUT = ROOT / "app" / "openai-budget-policy-generator" / "layout.tsx"
+MCP_TOOL_GENERATOR_PAGE = ROOT / "app" / "mcp-tool-cost-policy-generator" / "page.tsx"
+MCP_TOOL_GENERATOR_LAYOUT = ROOT / "app" / "mcp-tool-cost-policy-generator" / "layout.tsx"
+
 
 SPEND_LONGTAIL_PAGES = {
     "ai-agent-cost-control": ROOT / "app" / "ai-agent-cost-control" / "page.tsx",
@@ -824,6 +829,27 @@ def main() -> int:
         stale_mcp = [phrase for phrase in mcp_authority_forbidden_phrases[name] if phrase in page_text]
         if stale_mcp:
             raise SystemExit(f"stale {name} MCP spend/Charge/local-first phrases remain:\n" + "\n".join(stale_mcp))
+
+    generator_policy_texts = {
+        "openai-budget-policy-generator": OPENAI_GENERATOR_PAGE.read_text() + "\n" + OPENAI_GENERATOR_LAYOUT.read_text(),
+        "mcp-tool-cost-policy-generator": MCP_TOOL_GENERATOR_PAGE.read_text() + "\n" + MCP_TOOL_GENERATOR_LAYOUT.read_text(),
+    }
+    generator_policy_forbidden = {
+        "openai-budget-policy-generator": ["audit rules", "audit fields", "audit trails", "robot customers", "economic control plane"],
+        "mcp-tool-cost-policy-generator": ["audit trails", "charged", "Charge robot", "monetize"],
+    }
+    generator_policy_required = {
+        "openai-budget-policy-generator": ["Evidence Pack receipts", "govern OpenAI spend"],
+        "mcp-tool-cost-policy-generator": ["Evidence Pack receipts", "govern MCP tools"],
+    }
+    for name, gen_text in generator_policy_texts.items():
+        missing_gen = [phrase for phrase in generator_policy_required[name] if phrase not in gen_text]
+        if missing_gen:
+            raise SystemExit(f"missing {name} policy generator authority/proof phrases:\n" + "\n".join(missing_gen))
+        stale_gen = [phrase for phrase in generator_policy_forbidden[name] if phrase in gen_text]
+        if stale_gen:
+            raise SystemExit(f"stale {name} policy generator legacy/audit phrases remain:\n" + "\n".join(stale_gen))
+
     return 0
 
 
