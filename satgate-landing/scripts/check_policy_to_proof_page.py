@@ -29,6 +29,12 @@ L402_RAIL_PAGES = {
     "l402-agent-payments": ROOT / "app" / "l402-agent-payments" / "page.tsx",
 }
 
+MCP_AUTHORITY_PAGES = {
+    "mcp-governance": ROOT / "app" / "mcp-governance" / "page.tsx",
+    "mcp-gateway": ROOT / "app" / "mcp-gateway" / "page.tsx",
+    "agent-api-governance": ROOT / "app" / "agent-api-governance" / "page.tsx",
+}
+
 required_phrases = [
     "Every agent action leaves a receipt",
     "without permanent credentials, unlimited spend, or unobservable authority",
@@ -447,6 +453,78 @@ l402_rail_forbidden_phrases = [
     "Grade your readiness",
 ]
 
+mcp_authority_required_phrases = {
+    "mcp-governance": [
+        "MCP Governance for Agents That Need Authority Before Execution",
+        "before execution",
+        "audit receipt",
+        "Evidence Pack",
+        "finance-automation",
+        "invoice-reconciler",
+        "Govern MCP tool calls",
+        "See Policy-to-Proof",
+        "/govern",
+        "/policy-to-proof",
+    ],
+    "mcp-gateway": [
+        "MCP Gateway for Governed Agent Tool Access",
+        "authority before execution",
+        "audit receipt",
+        "Evidence Pack",
+        "SaaS MCP is Fly-hosted",
+        "Hybrid MCP is Hetzner-hosted",
+        "Govern MCP tool access",
+        "See Policy-to-Proof",
+        "/govern",
+        "/policy-to-proof",
+    ],
+    "agent-api-governance": [
+        "Agent API Governance",
+        "static API keys",
+        "scoped capabilities",
+        "before every API request",
+        "audit receipt",
+        "Evidence Pack",
+        "finance-automation",
+        "invoice-reconciler",
+        "See SatGate governance",
+        "See Policy-to-Proof",
+        "/govern",
+        "/policy-to-proof",
+    ],
+}
+
+mcp_authority_forbidden_phrases = {
+    "mcp-governance": [
+        "Agents That Can Actually Spend Money",
+        "charge when tools become products",
+        "robot-customer",
+        "Charge-mode",
+        "Economic firewall category",
+        "Generate MCP tool policy",
+        "control spend and access",
+        "economic control plane",
+    ],
+    "mcp-gateway": [
+        "observe, control, and charge",
+        "Observe, Control, Charge",
+        "Charge for tool access",
+        "robot-customer",
+        "Charge-mode",
+        "chargeable events",
+        "economic activity",
+        "Generate MCP tool policy",
+        "/blog/http-402-payment-required-use-cases",
+    ],
+    "agent-api-governance": [
+        "research-bot",
+        "local agent authority",
+        "Charge readiness",
+        "Economic firewall overview",
+        "Macaroons vs API keys <ArrowRight",
+    ],
+}
+
 
 def main() -> int:
     if not PAGE.exists():
@@ -517,6 +595,16 @@ def main() -> int:
         stale_l402 = [phrase for phrase in l402_rail_forbidden_phrases if phrase in page_text]
         if stale_l402:
             raise SystemExit(f"stale {name} Charge/robot-customer phrases remain:\n" + "\n".join(stale_l402))
+
+
+    for name, path in MCP_AUTHORITY_PAGES.items():
+        page_text = path.read_text()
+        missing_mcp = [phrase for phrase in mcp_authority_required_phrases[name] if phrase not in page_text]
+        if missing_mcp:
+            raise SystemExit(f"missing {name} MCP authority/proof phrases:\n" + "\n".join(missing_mcp))
+        stale_mcp = [phrase for phrase in mcp_authority_forbidden_phrases[name] if phrase in page_text]
+        if stale_mcp:
+            raise SystemExit(f"stale {name} MCP spend/Charge/local-first phrases remain:\n" + "\n".join(stale_mcp))
     return 0
 
 
