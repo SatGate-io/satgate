@@ -3,7 +3,7 @@ import { ArrowRight, BadgeCheck, Ban, Clock, Fingerprint, GitBranch, KeyRound, S
 
 export const metadata = {
   title: 'Agent API Governance | Identity, Revocation, Budgets, Audit',
-  description: 'Govern AI agent API access with scoped capabilities, revocation, delegated budgets, and audit trails. Replace unlimited API keys with request-path policy.',
+  description: 'Govern AI agent API access with scoped capabilities, delegation limits, revocation, policy checks, and audit receipts. Replace unlimited API keys with authority enforced before execution.',
   alternates: { canonical: 'https://satgate.io/agent-api-governance' },
   keywords: [
     'agent API governance',
@@ -25,7 +25,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Agent API Governance',
-    description: 'Govern AI agent identity, delegated access, revocation, budgets, and audit trails before API calls execute.',
+    description: 'Govern AI agent identity, delegated access, revocation, policy checks, and audit receipts before API calls execute.',
   },
 };
 
@@ -58,7 +58,7 @@ const principles = [
   {
     icon: BadgeCheck,
     title: 'Audit should explain decisions',
-    body: 'A governance trail must show identity, capability, policy, budget, route, decision, and outcome for every important call.',
+    body: 'A governance trail must show identity, capability, policy, budget, route, decision, outcome, and Evidence Pack receipt for every important call.',
   },
 ];
 
@@ -91,7 +91,7 @@ export default function AgentApiGovernancePage() {
         name: 'What is agent API governance?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Agent API governance is the request-path policy layer for AI agent identity, delegated authority, budgets, revocation, routing, and audit trails.',
+          text: 'Agent API governance is the request-path policy layer for AI agent identity, delegated authority, budgets, revocation, routing, and audit receipts.',
         },
       },
       {
@@ -133,7 +133,7 @@ export default function AgentApiGovernancePage() {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: 'Agent API governance requirements',
-    description: 'Core request-path controls required to govern AI agent API access without broad static keys.',
+    description: 'Core request-path controls required to govern AI agent API access without broad static keys, then preserve audit receipts for Evidence Pack proof.',
     itemListElement: [
       {
         '@type': 'ListItem',
@@ -190,15 +190,15 @@ export default function AgentApiGovernancePage() {
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-10">
-            AI agents need more than static API keys. They need scoped capabilities, delegated budgets, expiry, revocation, and audit trails enforced before every API request.
+            AI agents need more than static API keys. They need scoped capabilities, delegation limits, expiry, revocation, and policy checks before every API request — with a receipt proving each decision.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/blog/macaroon-tokens-vs-api-keys" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              Macaroons vs API keys <ArrowRight size={18} />
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
+              See SatGate governance <ArrowRight size={18} />
             </Link>
-            <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
-              Economic firewall overview
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              See Policy-to-Proof
             </Link>
           </div>
         </div>
@@ -228,7 +228,7 @@ export default function AgentApiGovernancePage() {
             <li className="rounded-lg border border-gray-800 bg-black/50 p-3">What spend budget remains?</li>
             <li className="rounded-lg border border-gray-800 bg-black/50 p-3">Can authority be delegated, and how far?</li>
             <li className="rounded-lg border border-gray-800 bg-black/50 p-3">When does it expire or become invalid?</li>
-            <li className="rounded-lg border border-gray-800 bg-black/50 p-3">What audit event proves the decision?</li>
+            <li className="rounded-lg border border-gray-800 bg-black/50 p-3">What audit receipt proves the decision and feeds the Evidence Pack?</li>
           </ul>
         </div>
       </section>
@@ -237,7 +237,7 @@ export default function AgentApiGovernancePage() {
         <div className="max-w-6xl mx-auto px-6 py-20">
           <h2 className="text-3xl font-bold text-white mb-4">Agent API governance principles</h2>
           <p className="text-gray-400 max-w-3xl mb-10 text-lg">
-            Governance is not a login screen. It is a request-path policy system for agent identity, authority, spend, and evidence.
+            Governance is not a login screen. It is a request-path policy system that checks authority before execution and turns every decision into evidence.
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -284,7 +284,7 @@ export default function AgentApiGovernancePage() {
             ['Budget', 'External or manual', 'Embedded or enforced inline'],
             ['Delegation', 'Copied or shared', 'Attenuated: sub-agents get less authority'],
             ['Revocation', 'Rotate key or change config', 'Revoke/expire capability before next request'],
-            ['Audit', 'Often aggregate usage only', 'Decision trail per agent/tool/request'],
+            ['Audit', 'Often aggregate usage only', 'Evidence Pack receipt per agent/tool/request'],
           ].map(([a, b, c]) => (
             <div key={a} className="grid md:grid-cols-3 border-t border-gray-800 text-gray-300">
               <div className="p-4 font-semibold text-white">{a}</div>
@@ -305,7 +305,7 @@ export default function AgentApiGovernancePage() {
                 ['Observe', 'Attribute calls and learn real access/spend patterns.'],
                 ['Control', 'Enforce budgets, route policy, tool limits, and revocation.'],
                 ['Delegate', 'Allow sub-agents to receive narrower authority than the parent.'],
-                ['Audit', 'Record policy decisions, spend, outcomes, and revocation events.'],
+                ['Prove', 'Record policy decisions, spend, outcomes, revocation events, and Evidence Pack receipts.'],
               ].map(([title, body]) => (
                 <div key={title} className="rounded-xl border border-gray-800 bg-black p-5">
                   <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
@@ -317,19 +317,26 @@ export default function AgentApiGovernancePage() {
 
           <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h2 className="text-2xl font-bold text-white mb-4">Example capability policy</h2>
-            <pre className="bg-black border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm text-gray-300"><code>{`agent: research-bot
+            <pre className="bg-black border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm text-gray-300"><code>{`parent_agent: finance-automation
+worker_agent: invoice-reconciler
 scope:
-  routes: [/v1/responses, /tools/search]
-  models: [gpt-5.5, venice/deepseek]
+  routes: [/invoices/read, /vendors/match, /payments/schedule]
+  denied_routes: [/payments/release]
+authority:
+  tenant: acme-finance
+  workflow: monthly-close
 budget:
-  daily: 25.00 USD
+  workflow: 25.00 USD
   per_request: 0.50 USD
 delegation:
   allowed: true
+  max_depth: 1
   child_budget_max: 5.00 USD
 expiry: 2026-04-26T00:00:00Z
-revocation: immediate
-audit: required`}</code></pre>
+revocation: before_next_request
+evidence:
+  receipt: required
+  include: [parent_agent, worker_agent, route, policy, decision, outcome]`}</code></pre>
           </div>
         </div>
       </section>
@@ -342,7 +349,7 @@ audit: required`}</code></pre>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is agent API governance?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Agent API governance is the request-path policy layer for AI agent identity, delegated authority, budgets, revocation, routing, and audit trails.
+                Agent API governance is the request-path policy layer for AI agent identity, delegated authority, budgets, revocation, routing, and audit receipts.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -377,11 +384,11 @@ audit: required`}</code></pre>
               ['/agent-api-key-risk-assessment', 'Agent API key risk assessment', 'Score static key risk across scope, budget, expiry, revocation, delegation, and audit gaps.'],
               ['/revocable-agent-credentials', 'Revocable agent credentials', 'Scoped credentials, expiry, and kill switches for autonomous access.'],
               ['/agent-capability-tokens', 'Agent capability tokens', 'Encode scope, budget, route, delegation, and revocation into agent authority.'],
-              ['/blog/zero-trust-for-ai-agents', 'Zero trust for AI agents', 'How agent credentials break human-centric identity assumptions.'],
-              ['/agent-control-plane', 'Agent control plane', 'Govern local agent authority, delegation lineage, spend, audit, and revocation.'],
-              ['/economic-firewall', 'Economic firewall', 'The request-path control layer for agent access and spend.'],
-              ['/economic-firewall-readiness-grader', 'Economic firewall readiness grader', 'Score identity, budgets, revocation, audit, routing, MCP, and Charge readiness.'],
-              ['/mcp-governance', 'MCP governance', 'Apply budgets, revocation, and audit to agent tool calls.'],
+              ['/policy-to-proof', 'Policy-to-Proof', 'See how agent API decisions become Evidence Pack proof.'],
+              ['/blog/macaroon-tokens-vs-api-keys', 'Macaroons vs API keys', 'Why attenuated capabilities beat static API keys for agents.'],
+              ['/agent-control-plane', 'Agent control plane', 'Govern enterprise agent authority, delegation lineage, spend, audit, and revocation.'],
+              ['/economic-firewall', 'Economic firewall', 'The request-path control layer for agent access, spend, and proof.'],
+              ['/mcp-governance', 'MCP governance', 'Apply authority, budgets, revocation, and audit receipts to agent tool calls.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">
                 <h3 className="font-bold text-white mb-2">{title}</h3>
@@ -396,14 +403,14 @@ audit: required`}</code></pre>
         <div className="rounded-3xl border border-yellow-900/60 bg-gradient-to-br from-yellow-950/20 to-cyan-950/30 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">SatGate makes agent API access governable</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            Put SatGate in the request path to move from unlimited API keys to scoped, revocable, budget-aware agent capabilities with audit trails.
+            Put SatGate in the request path to move from unlimited API keys to scoped, revocable agent capabilities. Check authority before execution and produce audit receipts for the Evidence Pack.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
               See SatGate governance <ArrowRight size={18} />
             </Link>
-            <Link href="/blog/zero-trust-for-ai-agents" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
-              Zero trust for AI agents
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              See Policy-to-Proof
             </Link>
           </div>
         </div>

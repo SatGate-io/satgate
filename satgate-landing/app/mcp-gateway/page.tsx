@@ -1,14 +1,14 @@
 import Link from 'next/link';
-import { ArrowRight, Cable, DollarSign, Eye, Gauge, LockKeyhole, ServerCog } from 'lucide-react';
+import { ArrowRight, Cable, Eye, Gauge, LockKeyhole, ReceiptText, ServerCog } from 'lucide-react';
 
 export const metadata = {
   title: 'MCP Gateway for Governed Agent Tool Access',
-  description: 'Use SatGate as an MCP gateway to observe, control, and charge for agent tool access across SaaS and hybrid deployments.',
+  description: 'Use SatGate as an MCP gateway to check agent authority before tool execution, enforce policy across SaaS and Hybrid MCP deployments, and record audit receipts for every decision.',
   alternates: { canonical: 'https://satgate.io/mcp-gateway' },
   keywords: ['MCP gateway', 'Model Context Protocol gateway', 'MCP access control', 'MCP budget enforcement', 'MCP tool metering', 'hosted MCP gateway', 'hybrid MCP gateway'],
   openGraph: {
     title: 'MCP Gateway for Governed Agent Tool Access',
-    description: 'Observe, control, and charge for agent tool access across SaaS MCP and Hybrid MCP deployments with SatGate.',
+    description: 'Check authority before tool execution, enforce policy across SaaS MCP and Hybrid MCP deployments, and preserve Evidence Pack receipts with SatGate.',
     url: 'https://satgate.io/mcp-gateway',
     type: 'website',
   },
@@ -20,18 +20,18 @@ export const metadata = {
 };
 
 const controls = [
-  { icon: Eye, title: 'Observe MCP tool usage', body: 'Attribute each MCP call to tenant, agent, token, server, tool, customer, and workflow before finance or security asks for proof.' },
+  { icon: Eye, title: 'Observe MCP tool usage', body: 'Attribute each MCP call to tenant, agent, token, server, tool, customer, and workflow before finance or security asks for Evidence Pack proof.' },
   { icon: LockKeyhole, title: 'Control access and budgets', body: 'Enforce scoped capabilities, tool allowlists, per-tool prices, spend caps, delegation depth, expiry, and instant revocation.' },
-  { icon: DollarSign, title: 'Charge for tool access', body: 'Turn governed MCP usage into meterable events for chargeback, enterprise billing, or robot-customer monetization.' },
+  { icon: ReceiptText, title: 'Produce audit receipts', body: 'Record the agent, tool, policy, decision, budget state, outcome, and receipt ID so MCP activity can be reviewed in an Evidence Pack.' },
   { icon: ServerCog, title: 'Run SaaS or Hybrid MCP', body: 'Use Fly-hosted SaaS MCP for fast onboarding or Hetzner-hosted Hybrid MCP when buyers need dedicated runtime control.' },
 ];
 
 const faqs = [
-  ['What is an MCP gateway?', 'An MCP gateway sits between AI agents and Model Context Protocol servers. It observes tool calls, applies access policy and budgets, records audit trails, and can turn usage into chargeable events before tools execute.'],
+  ['What is an MCP gateway?', 'An MCP gateway sits between AI agents and Model Context Protocol servers. It observes tool calls, applies access policy and budgets, records audit receipts, and proves decisions before tools execute.'],
   ['Why do MCP tools need access control?', 'MCP makes tools easy for agents to reach, which also makes expensive or sensitive tools easy to overuse. Access control limits which agents can call which tools, for how long, under which budget, and with what delegation.'],
   ['Can SatGate host MCP servers?', 'Yes. SatGate supports SaaS MCP for fast hosted deployment and Hybrid MCP for dedicated enterprise runtime control. The critical split is simple: SaaS MCP is Fly-hosted; Hybrid MCP is Hetzner-hosted.'],
   ['How is an MCP gateway different from an API gateway?', 'A traditional API gateway mostly routes HTTP traffic and checks identity. An MCP gateway also understands agent tool calls, capability scope, per-tool cost, budget policy, delegation lineage, and audit outcomes.'],
-  ['Can MCP usage be monetized?', 'Yes. Once tool usage is identified, priced, and metered, SatGate can support chargeback, invoiceable usage, or Charge-mode payment flows where appropriate.'],
+  ['Can MCP usage produce audit evidence?', 'Yes. Once tool usage is identified, governed, and metered, SatGate can support chargeback or invoiceable usage while preserving policy decisions in the Evidence Pack.'],
 ];
 
 export default function McpGatewayPage() {
@@ -77,14 +77,14 @@ export default function McpGatewayPage() {
             MCP Gateway for Governed Agent Tool Access
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-8">
-            SatGate is an MCP gateway for teams that need to observe, control, and charge for how agents use tools. Put policy in the request path before MCP calls execute.
+            SatGate is an MCP gateway for teams that need authority before execution. Put policy in the request path so every MCP call is allowed or denied before it reaches a tool, then recorded as proof.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
               See SatGate governance <ArrowRight size={18} />
             </Link>
-            <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
-              Generate MCP tool policy
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              See Policy-to-Proof
             </Link>
           </div>
         </div>
@@ -95,16 +95,16 @@ export default function McpGatewayPage() {
           <h2 className="text-3xl font-bold text-white mb-6">What is an MCP gateway?</h2>
           <div className="space-y-5 text-gray-300 text-lg leading-relaxed">
             <p>
-              An MCP gateway is the control point between agent runtimes and Model Context Protocol servers. Instead of letting agents call tools directly, traffic flows through a policy layer that can identify the agent, price the tool, check budget, enforce scope, and record the decision.
+              An MCP gateway is the control point between agent runtimes and Model Context Protocol servers. Instead of letting agents call tools directly, traffic flows through a policy layer that can identify the agent, check authority, price the tool when needed, enforce scope, and record the decision.
             </p>
             <p>
-              That matters because MCP connections are not governance. Agents can trigger searches, code execution, paid APIs, database calls, browser sessions, and cloud tasks. SatGate makes those calls observable, controllable, and chargeable.
+              That matters because MCP connections are not governance. Agents can trigger searches, code execution, paid APIs, database calls, browser sessions, and cloud tasks. SatGate makes those calls observable, governable, and provable.
             </p>
           </div>
         </div>
         <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
           <h3 className="text-xl font-bold text-white mb-4">The request path</h3>
-          {['Agent asks for a tool', 'SatGate checks capability, policy, and budget', 'Allowed calls execute; denied calls stop cleanly', 'Usage is attributed to agent, customer, tool, and tenant', 'Billing, chargeback, or audit events are recorded'].map((step, index) => (
+          {['Agent asks for a tool', 'SatGate checks capability, policy, and budget', 'Allowed calls execute; denied calls stop cleanly', 'Usage is attributed to agent, customer, tool, and tenant', 'An audit receipt is recorded for the Evidence Pack'].map((step, index) => (
             <div key={step} className="flex gap-3 border-b border-gray-800 py-3 last:border-b-0">
               <span className="text-cyan-300 font-bold">{index + 1}</span>
               <span className="text-gray-300">{step}</span>
@@ -115,9 +115,9 @@ export default function McpGatewayPage() {
 
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="max-w-6xl mx-auto px-6 py-20">
-          <h2 className="text-3xl font-bold text-white mb-4">Observe, Control, Charge for MCP tools</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">Check, Govern, Prove MCP tool use</h2>
           <p className="text-gray-400 max-w-3xl mb-10 text-lg">
-            SatGate turns MCP tool calls into governed economic events. The point is not just to connect agents to tools. The point is to prove what happened, stop what should not happen, and meter what should be paid for.
+            SatGate turns MCP tool calls into governed authority decisions. The point is not just to connect agents to tools. The point is to prove what happened, stop what should not happen, and preserve receipts for what was allowed or denied.
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
             {controls.map(({ icon: Icon, title, body }) => (
@@ -166,7 +166,7 @@ export default function McpGatewayPage() {
             ['/capability-auth', 'Capability auth', 'Scope agent authority before tools run.'],
             ['/blog/api-gateway-for-ai-agents', 'API gateway for agents', 'Compare routing with governance.'],
             ['/blog/mcp-budget-enforcement-guide', 'MCP budget enforcement', 'Hard-cap per-tool spend.'],
-            ['/blog/http-402-payment-required-use-cases', 'HTTP 402 use cases', 'Turn access into chargeable events.'],
+            ['/policy-to-proof', 'Policy-to-Proof', 'Turn MCP decisions into Evidence Pack proof.'],
           ].map(([href, title, body]) => (
             <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 hover:border-cyan-700 transition">
               <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
@@ -180,9 +180,9 @@ export default function McpGatewayPage() {
         <div className="max-w-4xl mx-auto px-6 py-20 text-center">
           <Gauge className="mx-auto mb-6 text-cyan-300" size={36} />
           <h2 className="text-3xl font-bold text-white mb-4">Launch an MCP gateway agents can safely use.</h2>
-          <p className="text-gray-300 mb-8">Start with visibility, add budget and capability controls, then charge or bill for usage when tool access becomes economic activity.</p>
-          <Link href="/design-partners" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black hover:bg-gray-200 transition">
-            Work with SatGate <ArrowRight size={18} />
+          <p className="text-gray-300 mb-8">Start with authority checks, enforce policy before execution, and produce audit receipts that prove what each agent was allowed or denied to do.</p>
+          <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black hover:bg-gray-200 transition">
+            Govern MCP tool access <ArrowRight size={18} />
           </Link>
         </div>
       </section>
