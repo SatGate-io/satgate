@@ -68,10 +68,10 @@ export default function DesignPartnersPage() {
 
   const faqs = [
     { q: 'How long is the program?', a: '90 days. After that, you keep everything you built and get priority access to GA pricing.' },
-    { q: 'Is it really free?', a: 'Yes. Observe mode is completely free—no credit card, no commitment. You get full visibility into your AI agent traffic at zero cost.' },
-    { q: 'Do I need to change my code?', a: 'No. One DNS change points your AI agent traffic through SatGate. Zero code modifications. Takes about 5 minutes.' },
+    { q: 'Is it really free?', a: 'Yes. The design-partner path starts with an agreed staging lane and no credit card. You get visibility into agent traffic and help shape the authority, budget, revocation, and Evidence Pack workflows that matter in your environment.' },
+    { q: 'Do I need to change my code?', a: 'Usually no. Most pilots start with a DNS, proxy, or MCP configuration change around one staging endpoint or tool. We verify the path together before expanding.' },
     { q: 'Where does my data go?', a: 'Your infrastructure in hybrid mode. The SatGate gateway runs in your VPC. We never see your API payloads or sensitive data.' },
-    { q: 'Is this production-ready?', a: 'Yes. 60+ dashboard pages, full deployment options (Docker, K8s, Terraform, SaaS), and a battle-tested Go binary with zero dependencies.' },
+    { q: 'Is this for production traffic?', a: 'Design partners usually start in staging or a bounded pilot lane. The goal is to verify request-path policy, revocation, budgets, and Evidence Pack proof before expanding scope.' },
   ];
 
   const webPageJsonLd = {
@@ -79,7 +79,7 @@ export default function DesignPartnersPage() {
     '@type': 'WebPage',
     name: 'SatGate Design Partners Program',
     url: 'https://satgate.io/design-partners',
-    description: 'Early access for teams shaping SatGate economic firewall capabilities for AI agent budget enforcement, MCP governance, API controls, and L402 Charge.',
+    description: 'Early access for teams shaping SatGate Policy-to-Proof capabilities for AI agent budget enforcement, MCP governance, API controls, paid-rail context, and Evidence Pack proof.',
     datePublished: '2026-04-27',
     dateModified: '2026-05-02',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -87,7 +87,7 @@ export default function DesignPartnersPage() {
       { '@type': 'Thing', name: 'AI agent economic governance' },
       { '@type': 'Thing', name: 'economic firewall design partners' },
       { '@type': 'Thing', name: 'MCP governance' },
-      { '@type': 'Thing', name: 'L402 Charge' },
+      { '@type': 'Thing', name: 'Policy-to-Proof Evidence Packs' },
     ],
   };
 
@@ -117,7 +117,7 @@ export default function DesignPartnersPage() {
     serviceType: 'AI agent economic governance design partner program',
     url: 'https://satgate.io/design-partners',
     provider: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    description: 'Early access for teams shaping SatGate economic firewall capabilities across AI agent budget enforcement, MCP governance, agent API controls, and L402 Charge.',
+    description: 'Early access for teams shaping SatGate Policy-to-Proof capabilities across AI agent budget enforcement, MCP governance, agent API controls, paid-rail context, and Evidence Pack proof.',
     areaServed: 'Global',
   };
 
@@ -139,7 +139,7 @@ export default function DesignPartnersPage() {
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
             <Link href="/mint-demo" className="hover:text-white transition">Mint Demo</Link>
             <Link href="/protect" className="hover:text-white transition">Control Demo</Link>
-            <Link href="/pay" className="hover:text-white transition">Charge Demo</Link>
+            <Link href="/policy-to-proof" className="hover:text-white transition">Policy-to-Proof</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
@@ -161,7 +161,7 @@ export default function DesignPartnersPage() {
             {[
               { href: '/mint-demo', label: 'Mint Demo' },
               { href: '/protect', label: 'Control Demo' },
-              { href: '/pay', label: 'Charge Demo' },
+              { href: '/policy-to-proof', label: 'Policy-to-Proof' },
               { href: '/govern', label: 'Enterprise' },
               { href: '/pricing', label: 'Pricing' },
             ].map(item => (
@@ -192,8 +192,7 @@ export default function DesignPartnersPage() {
             </span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            We're working with <strong className="text-white">10 enterprises</strong> to deploy the Economic Firewall
-            that enforces Economic Access Control for AI agent requests. Gate your MCP tool servers, REST APIs, and LLM endpoints — see what each agent spends per call. Get free access, direct engineering support, and a product shaped by your needs.
+            We're working with <strong className="text-white">10 enterprises</strong> to shape SatGate's Policy-to-Proof layer for AI agent requests. Gate one MCP tool, REST API, or LLM endpoint in a bounded lane — see which agent had authority, what it spent, what was denied, and what Evidence Pack proof was preserved. Get direct engineering support and a product shaped by your needs.
           </p>
           <a href="#apply" className="inline-flex items-center gap-2 bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
             Apply Now <ArrowRight size={18} />
@@ -216,7 +215,7 @@ export default function DesignPartnersPage() {
                 <h3 className="font-bold text-lg">Free Observe Mode</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Full visibility into your AI agent traffic on your staging environment. See every API call, every token, every cost—across MCP servers, REST APIs, LLM endpoints—completely free.
+                Full visibility into your AI agent traffic in a bounded staging lane. See every API call, token, cost, policy decision, and Evidence Pack receipt across MCP servers, REST APIs, and LLM endpoints.
               </p>
             </div>
 
@@ -240,7 +239,7 @@ export default function DesignPartnersPage() {
                 <h3 className="font-bold text-lg">Your Feedback Shapes Product</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Design partners get direct influence on the roadmap. The dashboards, alerts, and governance features you need—built with your input.
+                Design partners get direct influence on the roadmap. The authority, revocation, Evidence Pack, dashboard, alert, and governance workflows you need are shaped with your input.
               </p>
             </div>
           </div>
@@ -329,7 +328,7 @@ export default function DesignPartnersPage() {
                 step: '4',
                 title: 'Your Reports',
                 time: 'Week 3+',
-                desc: 'Your data, your dashboards. Cost attribution, security insights, governance reports—all yours.',
+                desc: 'Your data, your dashboards. Cost attribution, authority decisions, revocation proof, and Evidence Pack reports — all yours.',
                 color: 'yellow',
                 icon: <BarChart3 size={20} />,
               },
@@ -538,13 +537,13 @@ export default function DesignPartnersPage() {
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="text-gray-500 text-sm">The Economic Firewall for AI agent requests.</p>
+              <p className="text-gray-500 text-sm">Policy-to-Proof governance for AI agent requests.</p>
             </div>
             <div>
               <h4 className="font-bold text-white mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><Link href="/protect" className="hover:text-white transition">Protect</Link></li>
-                <li><Link href="/pay" className="hover:text-white transition">Pay</Link></li>
+                <li><Link href="/policy-to-proof" className="hover:text-white transition">Policy-to-Proof</Link></li>
                 <li><Link href="/govern" className="hover:text-white transition">Enterprise</Link></li>
               </ul>
             </div>

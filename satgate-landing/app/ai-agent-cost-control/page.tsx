@@ -309,7 +309,7 @@ export default function AiAgentCostControlPage() {
         <div className="max-w-6xl mx-auto px-6 py-20">
           <h2 className="text-3xl font-bold text-white mb-4">What SatGate controls</h2>
           <p className="text-gray-400 max-w-3xl mb-10 text-lg">
-            SatGate is not just an observability dashboard. It is the request-path economic control plane for agent/API activity.
+            SatGate is not just an observability dashboard. It is the request-path authority and proof layer for agent/API activity.
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
