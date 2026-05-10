@@ -13,9 +13,9 @@ const clients = {
 };
 
 const modes = {
-  observe: { label: 'Observe', block: false, charge: false, audit: 'full' },
-  control: { label: 'Control', block: true, charge: false, audit: 'full' },
-  paid: { label: 'Control + Paid Rail', block: true, charge: true, audit: 'full' },
+  observe: { label: 'Observe', block: false, paidRail: false, audit: 'full' },
+  control: { label: 'Control', block: true, paidRail: false, audit: 'full' },
+  paid: { label: 'Control + Paid Rail', block: true, paidRail: true, audit: 'full' },
 };
 
 type ClientKey = keyof typeof clients;
@@ -43,7 +43,7 @@ export default function McpProxyConfigGeneratorPage() {
             '--max-tool-call-usd', String(expensiveToolUsd),
             '--audit', m.audit,
             ...(m.block ? ['--on-budget-exhausted', 'block'] : ['--on-budget-exhausted', 'observe']),
-            ...(m.charge ? ['--charge', 'l402'] : []),
+            ...(m.paidRail ? ['--paid-rail', 'l402'] : []),
           ],
           env: {
             SATGATE_POLICY: `${slug}-mcp-policy`,
@@ -53,7 +53,7 @@ export default function McpProxyConfigGeneratorPage() {
         },
       },
     }, null, 2);
-    const yaml = `mcp_proxy:\n  name: satgate-${slug}\n  client: ${c.label}\n  config_path: ${c.configPath}\n  upstream: stdio://${slug}\n  mode: ${mode}\npolicy:\n  require_agent_id: true\n  require_task_id: true\n  session_budget_usd: ${budgetUsd}\n  max_tool_call_usd: ${expensiveToolUsd}\n  on_budget_exhausted: ${m.block ? 'block' : 'observe'}\n  charge: ${m.charge ? 'l402' : 'disabled'}\ncredentials:\n  type: revocable_capability\n  expiry_minutes: 240\n  allow_delegation: false\naudit:\n  level: ${m.audit}\n  include:\n    - tenant_id\n    - agent_id\n    - task_id\n    - mcp_server\n    - mcp_tool\n    - estimated_cost_usd\n    - remaining_budget_usd\n    - policy_decision\n    - revocation_state`;
+    const yaml = `mcp_proxy:\n  name: satgate-${slug}\n  client: ${c.label}\n  config_path: ${c.configPath}\n  upstream: stdio://${slug}\n  mode: ${mode}\npolicy:\n  require_agent_id: true\n  require_task_id: true\n  session_budget_usd: ${budgetUsd}\n  max_tool_call_usd: ${expensiveToolUsd}\n  on_budget_exhausted: ${m.block ? 'block' : 'observe'}\n  paid_rail: ${m.paidRail ? 'l402' : 'disabled'}\ncredentials:\n  type: revocable_capability\n  expiry_minutes: 240\n  allow_delegation: false\naudit:\n  level: ${m.audit}\n  include:\n    - tenant_id\n    - agent_id\n    - task_id\n    - mcp_server\n    - mcp_tool\n    - estimated_cost_usd\n    - remaining_budget_usd\n    - policy_decision\n    - revocation_state`;
     return { json, yaml, c };
   }, [budgetUsd, client, expensiveToolUsd, mode, serverName]);
 
@@ -110,7 +110,7 @@ export default function McpProxyConfigGeneratorPage() {
         name: 'What is an MCP proxy?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An MCP proxy sits between an AI agent client and MCP servers so tool calls can be observed, audited, budgeted, denied, revoked, or charged before expensive actions execute.',
+          text: 'An MCP proxy sits between an AI agent client and MCP servers so tool calls can be observed, audited, budgeted, denied, revoked, or governed with paid-rail context before expensive actions execute.',
         },
       },
       {
@@ -261,7 +261,7 @@ export default function McpProxyConfigGeneratorPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is an MCP proxy?</h3>
               <p className="text-gray-400 leading-relaxed">
-                An MCP proxy sits between an AI agent client and MCP servers so tool calls can be observed, audited, budgeted, denied, revoked, or charged before expensive actions execute.
+                An MCP proxy sits between an AI agent client and MCP servers so tool calls can be observed, audited, budgeted, denied, revoked, or governed with paid-rail context before expensive actions execute.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -296,7 +296,7 @@ export default function McpProxyConfigGeneratorPage() {
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-purple-950/25 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Put MCP tools behind an economic firewall.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            SatGate lets agent teams observe, control, revoke, audit, and charge MCP tool calls in the request path — before expensive or sensitive work executes.
+            SatGate lets agent teams observe, control, revoke, audit, and govern paid context for MCP tool calls in the request path — before expensive or sensitive work executes.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/mcp-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
