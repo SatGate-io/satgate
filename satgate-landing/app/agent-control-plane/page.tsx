@@ -203,7 +203,7 @@ const jsonLd = {
         "Request-path budget enforcement",
         "MCP tool governance",
         "Agent Evidence Packs",
-        "Instant revocation and kill switch",
+        "Next-request revocation and kill switch",
       ],
     },
     {

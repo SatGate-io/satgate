@@ -308,7 +308,7 @@ const LandingPage = () => {
             <div className="flex flex-wrap gap-4 text-sm text-gray-500">
               <span>✓ Capabilities + Caveats</span>
               <span>✓ Delegation chains</span>
-              <span>✓ Instant revocation</span>
+              <span>✓ Next-request revocation</span>
               <span>✓ Tamper-evident audit</span>
             </div>
           </div>
