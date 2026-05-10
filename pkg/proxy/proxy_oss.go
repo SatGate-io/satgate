@@ -1332,5 +1332,6 @@ func (g *Gateway) handleExportEvidencePack(w http.ResponseWriter, r *http.Reques
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"satgate-evidence-pack-%s.json\"", tenantID))
 	json.NewEncoder(w).Encode(pack)
 }

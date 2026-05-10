@@ -1,0 +1,464 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://satgate.io/evidence-packs/evidence-pack.schema.v1.json",
+  "title": "SatGate Evidence Pack v1",
+  "description": "Canonical Policy-to-Proof artifact proving who authorized what under which policy, budget, delegation, and paid-rail context.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "evidence_pack_id",
+    "environment",
+    "pack_type",
+    "issued_at",
+    "tenant",
+    "subject",
+    "policy_snapshot",
+    "budget_snapshot",
+    "authority_chain",
+    "receipts",
+    "payment_context",
+    "receipt_chain",
+    "redaction",
+    "export",
+    "verification",
+    "chain_root",
+    "signature"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "satgate.evidence_pack.v1"
+    },
+    "evidence_pack_id": {
+      "type": "string",
+      "pattern": "^ep_[A-Za-z0-9_\\-]+$"
+    },
+    "environment": {
+      "enum": [
+        "prod",
+        "staging",
+        "demo",
+        "test"
+      ]
+    },
+    "pack_type": {
+      "enum": [
+        "full",
+        "redacted",
+        "public_demo",
+        "public_demo_redacted",
+        "auditor_export"
+      ]
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "valid_from": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "tenant": {
+      "$ref": "#/$defs/tenant"
+    },
+    "subject": {
+      "$ref": "#/$defs/identity"
+    },
+    "issuer": {
+      "$ref": "#/$defs/identity"
+    },
+    "purpose": {
+      "type": "string"
+    },
+    "policy_snapshot": {
+      "$ref": "#/$defs/policySnapshot"
+    },
+    "budget_snapshot": {
+      "$ref": "#/$defs/budgetSnapshot"
+    },
+    "authority_chain": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/authorityGrant"
+      }
+    },
+    "receipts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/receipt"
+      }
+    },
+    "payment_context": {
+      "$ref": "#/$defs/paymentContext"
+    },
+    "receipt_chain": {
+      "$ref": "#/$defs/receiptChain"
+    },
+    "redaction": {
+      "type": "object"
+    },
+    "export": {
+      "type": "object"
+    },
+    "verification": {
+      "type": "object"
+    },
+    "chain_root": {
+      "type": "string",
+      "pattern": "^sha256:"
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^(ed25519:|REDACTED|demo:)"
+    }
+  },
+  "$defs": {
+    "tenant": {
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "tenant_id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "agent",
+            "human",
+            "service_account",
+            "policy_engine",
+            "gateway",
+            "tool"
+          ]
+        },
+        "tenant_id": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "authn_method": {
+          "type": "string"
+        },
+        "token_fingerprint": {
+          "type": "string"
+        },
+        "issuer_kid": {
+          "type": "string"
+        }
+      }
+    },
+    "policySnapshot": {
+      "type": "object",
+      "required": [
+        "policy_id",
+        "policy_version",
+        "policy_digest",
+        "mode",
+        "decision_model"
+      ],
+      "properties": {
+        "policy_id": {
+          "type": "string"
+        },
+        "policy_version": {
+          "type": "string"
+        },
+        "policy_digest": {
+          "type": "string"
+        },
+        "policy_name": {
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "Observe",
+            "Control",
+            "Prove",
+            "Charge",
+            "control",
+            "observe",
+            "prove",
+            "charge"
+          ]
+        },
+        "decision_model": {
+          "const": "authority_before_execution"
+        },
+        "matched_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "obligations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "budgetSnapshot": {
+      "type": "object",
+      "required": [
+        "budget_id",
+        "currency",
+        "delegated_limit",
+        "spent",
+        "remaining"
+      ],
+      "properties": {
+        "budget_id": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "cost_center": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "unit_precision": {
+          "type": "integer"
+        },
+        "root_limit": {
+          "type": "string"
+        },
+        "delegated_limit": {
+          "type": "string"
+        },
+        "spent": {
+          "type": "string"
+        },
+        "remaining": {
+          "type": "string"
+        },
+        "exhausted": {
+          "type": "boolean"
+        },
+        "ledger_root": {
+          "type": "string"
+        }
+      }
+    },
+    "authorityGrant": {
+      "type": "object",
+      "required": [
+        "grant_id",
+        "kind",
+        "subject",
+        "effective_scope",
+        "receipt_hash"
+      ],
+      "properties": {
+        "grant_id": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "root_grant",
+            "delegation",
+            "attenuation",
+            "revocation"
+          ]
+        },
+        "subject": {
+          "$ref": "#/$defs/identity"
+        },
+        "parent_subject": {
+          "$ref": "#/$defs/identity"
+        },
+        "effective_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "caveats": {
+          "type": "array"
+        },
+        "caveats_added": {
+          "type": "array"
+        },
+        "delegation_depth_current": {
+          "type": "integer"
+        },
+        "delegation_depth_max": {
+          "type": "integer"
+        },
+        "budget_limit": {
+          "type": "string"
+        },
+        "receipt_hash": {
+          "type": "string",
+          "pattern": "^sha256:"
+        }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "required": [
+        "receipt_id",
+        "seq",
+        "type",
+        "ts",
+        "actor",
+        "action",
+        "resource",
+        "result",
+        "receipt_hash"
+      ],
+      "properties": {
+        "receipt_id": {
+          "type": "string"
+        },
+        "seq": {
+          "type": "integer"
+        },
+        "type": {
+          "enum": [
+            "mint",
+            "delegation",
+            "decision",
+            "spend",
+            "denial",
+            "revocation",
+            "post_revoke_denial",
+            "export"
+          ]
+        },
+        "ts": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "actor": {
+          "$ref": "#/$defs/identity"
+        },
+        "action": {
+          "type": "string"
+        },
+        "resource": {
+          "type": "string"
+        },
+        "result": {
+          "type": "string"
+        },
+        "reason_code": {
+          "type": "string"
+        },
+        "policy_decision_ref": {
+          "type": "string"
+        },
+        "budget_ledger_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prev_receipt_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "receipt_hash": {
+          "type": "string",
+          "pattern": "^sha256:"
+        }
+      }
+    },
+    "paymentContext": {
+      "type": "object",
+      "required": [
+        "rail_neutral",
+        "internal_rail",
+        "external_rails",
+        "events"
+      ],
+      "properties": {
+        "rail_neutral": {
+          "type": "boolean"
+        },
+        "internal_rail": {
+          "type": "string"
+        },
+        "external_rails": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "events": {
+          "type": "array"
+        }
+      }
+    },
+    "receiptChain": {
+      "type": "object",
+      "required": [
+        "canonicalization",
+        "hash_algorithm",
+        "chain_type",
+        "first_receipt_hash",
+        "last_receipt_hash",
+        "chain_root",
+        "receipt_count"
+      ],
+      "properties": {
+        "canonicalization": {
+          "type": "string"
+        },
+        "hash_algorithm": {
+          "const": "sha256"
+        },
+        "chain_type": {
+          "enum": [
+            "linear_hash_chain",
+            "merkle_tree"
+          ]
+        },
+        "first_receipt_hash": {
+          "type": "string"
+        },
+        "last_receipt_hash": {
+          "type": "string"
+        },
+        "chain_root": {
+          "type": "string"
+        },
+        "receipt_count": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

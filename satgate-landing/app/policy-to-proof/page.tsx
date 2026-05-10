@@ -217,17 +217,23 @@ export default function PolicyToProofPage() {
                 Run agents without permanent credentials, unlimited spend, or unobservable authority. Then export the proof when your CISO, auditor, board, or incident reviewer asks what happened.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <a
-                  href="/evidence-packs/sample-evidence-pack.pdf"
+                <Link
+                  href="/evidence-pack-demo"
                   className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-black transition hover:bg-gray-200"
                 >
-                  Download sample Evidence Pack <Download size={18} />
-                </a>
+                  Open Evidence Pack viewer <ArrowRight size={18} />
+                </Link>
                 <a
-                  href="/evidence-packs/sample-evidence-pack.json"
+                  href="/evidence-packs/sample-evidence-pack.v1.json"
                   className="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-300/40 bg-cyan-300/10 px-5 py-3 font-bold text-cyan-100 transition hover:border-cyan-200"
                 >
-                  View JSON export <ArrowRight size={18} />
+                  Download JSON export <Download size={18} />
+                </a>
+                <a
+                  href="/evidence-packs/evidence-pack.schema.v1.json"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-5 py-3 font-bold text-white transition hover:border-white/50"
+                >
+                  Schema v1 <ArrowRight size={18} />
                 </a>
               </div>
             </div>
@@ -488,13 +494,13 @@ export default function PolicyToProofPage() {
                 </p>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <a
-                    href="/evidence-packs/sample-evidence-pack.pdf"
+                    href="/evidence-pack-demo"
                     className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-black transition hover:bg-gray-200"
                   >
-                    Download sample Evidence Pack <Download size={18} />
+                    Open Evidence Pack viewer <ArrowRight size={18} />
                   </a>
                   <a
-                    href="/evidence-packs/sample-evidence-pack.json"
+                    href="/evidence-packs/sample-evidence-pack.v1.json"
                     className="inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-300/40 bg-emerald-300/10 px-5 py-3 font-bold text-emerald-100 transition hover:border-emerald-200"
                   >
                     View JSON export <ArrowRight size={18} />

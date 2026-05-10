@@ -23,10 +23,12 @@ Token lifecycle and observability endpoints.
 | `POST` | `/api/governance/ban` | Ban/revoke a token |
 | `GET` | `/api/governance/graph` | Token lineage graph (for dashboard visualization) |
 | `POST` | `/api/governance/reset` | Reset dashboard/governance data |
+| `GET` | `/api/governance/evidence-pack` | Export a canonical Policy-to-Proof Evidence Pack v1 |
 
 ## Authentication
 
-- **Admin endpoints** (mint, ban, reset): Require `Authorization: Bearer <ADMIN_TOKEN>` header
+- **Admin endpoints** (mint, ban, reset): Require `Authorization: Bearer <ADMIN_TOKEN>`
+- **Evidence Pack export**: Require tenant context (`X-Tenant-ID`) and a tenant API key or admin credential on protected deployments
 - **Token endpoints** (validate, delegate, ping): Require a valid capability token (macaroon)
 - **Proxied routes**: Authentication depends on the route's policy (public, capability, or L402)
 

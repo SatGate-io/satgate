@@ -226,3 +226,36 @@ func BenchmarkIsBanned(b *testing.B) {
 		svc.IsBanned("test-token")
 	}
 }
+
+func TestService_ExportEvidencePackCanonicalSchema(t *testing.T) {
+	svc := NewService(nil)
+	svc.RecordUsage("token1234567890", "/v1/invoices/search")
+
+	pack, err := svc.ExportEvidencePack(nil, "tenant_acme_finance")
+	if err != nil {
+		t.Fatalf("ExportEvidencePack returned error: %v", err)
+	}
+
+	if pack.SchemaVersion != "satgate.evidence_pack.v1" {
+		t.Fatalf("expected canonical schema version, got %q", pack.SchemaVersion)
+	}
+	if pack.ID == "" || pack.ChainRoot == "" || pack.Signature == "" {
+		t.Fatalf("expected id, chain root, and signature to be populated: %#v", pack)
+	}
+	if len(pack.Receipts) == 0 {
+		t.Fatal("expected receipts to be populated")
+	}
+	if len(pack.Decisions) != len(pack.Receipts) {
+		t.Fatalf("decisions compatibility alias should match receipts: %d != %d", len(pack.Decisions), len(pack.Receipts))
+	}
+	if pack.PolicySnapshot["decision_model"] != "authority_before_execution" {
+		t.Fatalf("expected authority-before-execution decision model, got %#v", pack.PolicySnapshot)
+	}
+	if pack.PaymentContext["rail_neutral"] != true {
+		t.Fatalf("expected rail-neutral payment context, got %#v", pack.PaymentContext)
+	}
+	chainRoot, ok := pack.ReceiptChain["chain_root"].(string)
+	if !ok || chainRoot != pack.ChainRoot {
+		t.Fatalf("receipt chain root must match pack chain root")
+	}
+}
