@@ -77,7 +77,7 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
             <ArrowLeft size={18} /> Back to comparisons
           </Link>
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-950/20 px-4 py-2 text-sm font-mono text-red-200">
-            <CircleAlert size={16} /> Brutal comparison
+            <CircleAlert size={16} /> Direct comparison
           </div>
           <h1 className="mb-7 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">{config.title}</h1>
           <p className="mb-8 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">{config.description}</p>
@@ -100,7 +100,7 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
           </ul>
         </div>
         <div className="rounded-2xl border border-cyan-900/60 bg-cyan-950/10 p-8">
-          <h2 className="mb-5 text-2xl font-bold text-white">Where SatGate forces the harder question</h2>
+          <h2 className="mb-5 text-2xl font-bold text-white">Where SatGate evaluates agent authority</h2>
           <ul className="space-y-3 text-gray-300">
             {config.satgateGoodAt.map((item) => (
               <li key={item} className="flex gap-3 leading-relaxed">
@@ -124,7 +124,7 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
 
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-16">
-          <h2 className="mb-4 text-3xl font-bold text-white">The comparison that actually matters</h2>
+          <h2 className="mb-4 text-3xl font-bold text-white">What to compare for agent governance</h2>
           <p className="mb-10 max-w-4xl text-lg leading-relaxed text-gray-400">
             Routing, dashboards, billing caps, and rate limits are useful. They are not the same as cross-provider, cross-rail, pre-execution authority for autonomous agents. SatGate makes the operational loop explicit: Observe the request, Control the delegated budget before execution, and Prove the outcome with an Evidence Pack receipt.
           </p>
@@ -148,7 +148,7 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-16">
-        <h2 className="mb-8 text-3xl font-bold text-white">Why this gets brutal in production</h2>
+        <h2 className="mb-8 text-3xl font-bold text-white">Why this matters in production</h2>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
           {config.bullets.map((item, index) => {
             const Icon = iconMap[index % iconMap.length];
@@ -179,7 +179,7 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
 
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-purple-950/30 p-8 md:p-12">
-          <div className="mb-5 flex items-center gap-3 text-cyan-300"><XCircle size={22} /> <span className="font-mono text-sm uppercase tracking-wide">The dangerous gap</span></div>
+          <div className="mb-5 flex items-center gap-3 text-cyan-300"><XCircle size={22} /> <span className="font-mono text-sm uppercase tracking-wide">The governance gap</span></div>
           <h2 className="mb-4 max-w-4xl text-3xl font-bold text-white">Dashboards explain what happened. SatGate controls what agents are allowed to do.</h2>
           <p className="mb-8 max-w-4xl text-lg leading-relaxed text-gray-300">
             Put SatGate before the paid API call, MCP tool invocation, delegated sub-agent, or model spend. Give agents bounded authority, enforce it before execution, and leave an Evidence Pack when finance, security, or compliance asks why it happened.

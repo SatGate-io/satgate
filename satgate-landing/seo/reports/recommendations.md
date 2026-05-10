@@ -1,6 +1,6 @@
 # SatGate SEO Machine Report
 
-Generated: 2026-05-10T22:03:21.108034Z
+Generated: 2026-05-10T22:40:19.920227Z
 
 ## Ranked opportunities
 
@@ -155,37 +155,37 @@ Generated: 2026-05-10T22:03:21.108034Z
 - Links to add: /blog/macaroon-tokens-vs-api-keys, /agent-capability-tokens, /govern, /mcp-gateway, /revocable-capability-token-policy-template
 
 ### /compare/aws-agentcore-payments
-- Title:
-- Meta:
+- Title: 
+- Meta: 
 - Content changes:
-- Links to add:
+- Links to add: 
 
 ### /compare/langsmith-helicone-datadog
-- Title:
-- Meta:
+- Title: 
+- Meta: 
 - Content changes:
-- Links to add:
+- Links to add: 
 
 ### /compare/api-gateway-rate-limits
-- Title:
-- Meta:
+- Title: 
+- Meta: 
 - Content changes:
-- Links to add:
+- Links to add: 
 
 ### /compare/openai-anthropic-budget-controls
-- Title:
-- Meta:
+- Title: 
+- Meta: 
 - Content changes:
-- Links to add:
+- Links to add: 
 
 ### /capability-lifecycle-demo
-- Title:
-- Meta:
+- Title: 
+- Meta: 
 - Content changes:
-- Links to add:
+- Links to add: 
 
 ### /compare/cloudflare-ai-gateway
-- Title:
-- Meta:
+- Title: 
+- Meta: 
 - Content changes:
-- Links to add:
+- Links to add: 

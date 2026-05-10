@@ -1,11 +1,11 @@
 import CapabilityLifecycleDemo from './CapabilityLifecycleDemo';
 
 export const metadata = {
-  title: 'Capability Lifecycle Demo | Issue, Delegate, Revoke, Prove',
-  description: 'Observe/Control/Prove capability lifecycle: issue, delegate, attenuate, revoke, caveats, child spend caps, delegation depth, and Evidence Packs.',
+  title: 'Capability Lifecycle Control | Issue, Delegate, Revoke, Prove',
+  description: 'Observe, control, and prove the capability lifecycle: issue, delegate, attenuate, revoke, enforce caveats, cap child spend, and export Evidence Packs.',
   alternates: { canonical: 'https://satgate.io/capability-lifecycle-demo' },
   keywords: [
-    'capability lifecycle demo',
+    'capability lifecycle control',
     'agent capability delegation',
     'macaroon caveats for AI agents',
     'delegation depth AI agents',
@@ -14,15 +14,15 @@ export const metadata = {
     'Evidence Pack proof',
   ],
   openGraph: {
-    title: 'SatGate Capability Lifecycle Demo',
-    description: 'Issue capability → delegate → attenuate → revoke → prove, with buyer-visible caveats, delegation depth, child spend caps, next-request revocation, and Evidence Pack-style audit records.',
+    title: 'SatGate Capability Lifecycle Control',
+    description: 'Issue capability → delegate → attenuate → revoke → prove, with customer-visible caveats, delegation depth, child spend caps, next-request revocation, and Evidence Pack audit records.',
     url: 'https://satgate.io/capability-lifecycle-demo',
     type: 'article',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SatGate Capability Lifecycle Demo',
-    description: 'Issue capability → delegate → attenuate → revoke → prove, with scoped authority, child spend caps, next-request revocation, and proof.',
+    title: 'SatGate Capability Lifecycle Control',
+    description: 'Issue capability → delegate → attenuate → revoke → prove, with scoped authority, child spend caps, next-request revocation, and Evidence Pack proof.',
   },
 };
 
@@ -30,7 +30,7 @@ export default function CapabilityLifecycleDemoPage() {
   const webPageJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'Capability Lifecycle Demo',
+    name: 'Capability Lifecycle Control',
     url: 'https://satgate.io/capability-lifecycle-demo',
     description: metadata.description,
     datePublished: '2026-05-10',
@@ -60,10 +60,10 @@ export default function CapabilityLifecycleDemoPage() {
       },
       {
         '@type': 'Question',
-        name: 'How do caveats translate into buyer controls?',
+        name: 'How do caveats translate into customer controls?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Caveats are business limits: tenant, task, route, tool, budget, child spend cap, delegation depth, expiry, and revocation rules evaluated before execution.',
+          text: 'Caveats are enforceable limits: tenant, task, route, tool, budget, child spend cap, delegation depth, expiry, and revocation rules evaluated before execution.',
         },
       },
       {
@@ -82,7 +82,7 @@ export default function CapabilityLifecycleDemoPage() {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
-      { '@type': 'ListItem', position: 2, name: 'Capability Lifecycle Demo', item: 'https://satgate.io/capability-lifecycle-demo' },
+      { '@type': 'ListItem', position: 2, name: 'Capability Lifecycle Control', item: 'https://satgate.io/capability-lifecycle-demo' },
     ],
   };
 

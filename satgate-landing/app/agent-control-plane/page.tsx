@@ -19,7 +19,7 @@ import {
 export const metadata: Metadata = {
   title: "SatGate Agent Control Plane | Govern Enterprise AI Agents",
   description:
-    "SatGate is an agent control plane for enterprise AI agents: scoped capabilities, delegation lineage, request-path budget enforcement, Evidence Pack exports, and instant revocation.",
+    "SatGate is an agent control plane for enterprise AI agents: scoped capabilities, delegation lineage, request-path budget enforcement, Evidence Pack exports, and next-request revocation.",
   keywords: [
     "agent control plane",
     "AI agent control plane",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SatGate Agent Control Plane | Govern Enterprise AI Agents",
     description:
-      "Govern enterprise AI agents with scoped capabilities, delegation lineage, request-path budgets, Evidence Pack exports, and instant revocation.",
+      "Govern enterprise AI agents with scoped capabilities, delegation lineage, request-path budgets, Evidence Pack exports, and next-request revocation.",
     url: "https://satgate.io/agent-control-plane",
     type: "website",
     images: [
@@ -282,7 +282,7 @@ export default function AgentControlPlanePage() {
               SatGate Agent Control Plane
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-slate-300">
-              Govern enterprise AI agents before they touch expensive models, sensitive APIs, paid tools, or customer data. SatGate gives every agent bounded authority, visible spend, controlled delegation, and instant revocation.
+              Govern enterprise AI agents before they touch expensive models, sensitive APIs, paid tools, or customer data. SatGate gives every agent bounded authority, visible spend, controlled delegation, and next-request revocation.
             </p>
             <p className="mt-5 max-w-2xl text-lg font-semibold text-cyan-200">
               Let agents work — without giving them blank checks, permanent keys, or invisible authority.
@@ -537,7 +537,7 @@ export default function AgentControlPlanePage() {
             </div>
             <h2 className="text-4xl font-black tracking-[-0.04em] text-white">A one-page proof card. The full lifecycle exports as an Evidence Pack.</h2>
             <p className="mt-5 text-lg leading-8 text-slate-300">
-              Use the proof card to explain the Agent Control Plane in a security review: no permanent keys, bounded authority, controlled delegation, visible spend, instant revocation, and an exportable Evidence Pack for the full Policy-to-Proof lifecycle.
+              Use the proof card to explain the Agent Control Plane in a security review: no permanent keys, bounded authority, controlled delegation, visible spend, next-request revocation, and an exportable Evidence Pack for the full Policy-to-Proof lifecycle.
             </p>
             <Link href="/policy-to-proof" className="mt-5 inline-flex text-sm font-bold text-cyan-200 hover:text-cyan-100">
               See the full Evidence Pack lifecycle →
