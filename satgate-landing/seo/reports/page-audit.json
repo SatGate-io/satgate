@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-10T19:28:50.106530Z",
+  "generatedAt": "2026-05-10T21:27:22.132277Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -409,6 +409,226 @@
         "SoftwareApplication"
       ],
       "wordCount": 498,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
+    {
+      "path": "/compare/aws-agentcore-payments",
+      "exists": true,
+      "title": "SatGate vs AWS AgentCore Payments Control",
+      "titleLength": 41,
+      "metaDescription": "Compare SatGate and AWS AgentCore Payments across cross-provider control, paid rails, MCP proxying, delegated budgets, hybrid deployment, and Evidence Packs.",
+      "metaDescriptionLength": 157,
+      "canonical": "/compare/aws-agentcore-payments",
+      "h1": [
+        ""
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "Where is genuinely useful",
+        "Where SatGate forces the harder question",
+        "The comparison that actually matters",
+        "Why this gets brutal in production",
+        "FAQ",
+        "Dashboards explain what happened. SatGate controls what agents are allowed to do."
+      ],
+      "internalLinks": [
+        "/compare",
+        "/evidence-pack-demo",
+        "/mcp-governance",
+        "/policy-to-proof"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "BreadcrumbList",
+        "FAQPage",
+        "ListItem",
+        "Organization",
+        "Question",
+        "TechArticle",
+        "Thing"
+      ],
+      "wordCount": 412,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
+    {
+      "path": "/compare/cloudflare-ai-gateway",
+      "exists": true,
+      "title": "SatGate vs Cloudflare AI Gateway Control",
+      "titleLength": 40,
+      "metaDescription": "Compare Cloudflare AI Gateway and SatGate across AI routing, rate limits, pre-execution control, MCP proxying, delegated budgets, and Evidence Packs.",
+      "metaDescriptionLength": 149,
+      "canonical": "/compare/cloudflare-ai-gateway",
+      "h1": [
+        ""
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "Where is genuinely useful",
+        "Where SatGate forces the harder question",
+        "The comparison that actually matters",
+        "Why this gets brutal in production",
+        "FAQ",
+        "Dashboards explain what happened. SatGate controls what agents are allowed to do."
+      ],
+      "internalLinks": [
+        "/compare",
+        "/evidence-pack-demo",
+        "/mcp-governance",
+        "/policy-to-proof"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "BreadcrumbList",
+        "FAQPage",
+        "ListItem",
+        "Organization",
+        "Question",
+        "TechArticle",
+        "Thing"
+      ],
+      "wordCount": 410,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
+    {
+      "path": "/compare/langsmith-helicone-datadog",
+      "exists": true,
+      "title": "SatGate vs LangSmith, Helicone, Datadog",
+      "titleLength": 39,
+      "metaDescription": "Compare LLM observability tools with SatGate pre-execution control: delegated budgets, MCP tool policy, paid rails, hybrid enforcement, and Evidence Packs.",
+      "metaDescriptionLength": 155,
+      "canonical": "/compare/langsmith-helicone-datadog",
+      "h1": [
+        ""
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "Where is genuinely useful",
+        "Where SatGate forces the harder question",
+        "The comparison that actually matters",
+        "Why this gets brutal in production",
+        "FAQ",
+        "Dashboards explain what happened. SatGate controls what agents are allowed to do."
+      ],
+      "internalLinks": [
+        "/compare",
+        "/evidence-pack-demo",
+        "/mcp-governance",
+        "/policy-to-proof"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "BreadcrumbList",
+        "FAQPage",
+        "ListItem",
+        "Organization",
+        "Question",
+        "TechArticle",
+        "Thing"
+      ],
+      "wordCount": 409,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
+    {
+      "path": "/compare/api-gateway-rate-limits",
+      "exists": true,
+      "title": "SatGate vs API Gateway Rate Limits for Agents",
+      "titleLength": 45,
+      "metaDescription": "Compare API Gateway rate limits with SatGate agent authority: delegated budgets, MCP tool policy, paid rails, hybrid enforcement, and Evidence Packs.",
+      "metaDescriptionLength": 149,
+      "canonical": "/compare/api-gateway-rate-limits",
+      "h1": [
+        ""
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "Where is genuinely useful",
+        "Where SatGate forces the harder question",
+        "The comparison that actually matters",
+        "Why this gets brutal in production",
+        "FAQ",
+        "Dashboards explain what happened. SatGate controls what agents are allowed to do."
+      ],
+      "internalLinks": [
+        "/compare",
+        "/evidence-pack-demo",
+        "/mcp-governance",
+        "/policy-to-proof"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "BreadcrumbList",
+        "FAQPage",
+        "ListItem",
+        "Organization",
+        "Question",
+        "TechArticle",
+        "Thing"
+      ],
+      "wordCount": 411,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
+    {
+      "path": "/compare/openai-anthropic-budget-controls",
+      "exists": true,
+      "title": "SatGate vs OpenAI / Anthropic Budgets",
+      "titleLength": 37,
+      "metaDescription": "Compare native OpenAI and Anthropic budget controls with SatGate cross-provider agent budgets, MCP policy, paid rails, hybrid control, and Evidence Packs.",
+      "metaDescriptionLength": 154,
+      "canonical": "/compare/openai-anthropic-budget-controls",
+      "h1": [
+        ""
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "Where is genuinely useful",
+        "Where SatGate forces the harder question",
+        "The comparison that actually matters",
+        "Why this gets brutal in production",
+        "FAQ",
+        "Dashboards explain what happened. SatGate controls what agents are allowed to do."
+      ],
+      "internalLinks": [
+        "/compare",
+        "/evidence-pack-demo",
+        "/mcp-governance",
+        "/policy-to-proof"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "BreadcrumbList",
+        "FAQPage",
+        "ListItem",
+        "Organization",
+        "Question",
+        "TechArticle",
+        "Thing"
+      ],
+      "wordCount": 409,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,

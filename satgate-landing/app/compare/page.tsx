@@ -54,11 +54,39 @@ const comparisons = [
     color: 'blue',
   },
   {
-    href: '/compare/cloudflare-ai-gateway',
-    title: 'SatGate vs Cloudflare AI Gateway',
-    description: 'AI traffic gateway vs agent economic governance. Cloudflare brings analytics, caching, rate limits, and fallback; SatGate controls spend and authority.',
+    href: '/compare/aws-agentcore-payments',
+    title: 'SatGate vs AWS AgentCore Payments',
+    description: 'Managed AWS agent payments vs cross-provider economic firewall. SatGate governs authority, spend, MCP tools, paid rails, and Evidence Packs before execution.',
     icon: Cloud,
     color: 'yellow',
+  },
+  {
+    href: '/compare/cloudflare-ai-gateway',
+    title: 'SatGate vs Cloudflare AI Gateway',
+    description: 'AI traffic gateway vs pre-execution economic governance. Cloudflare routes and observes AI traffic; SatGate controls delegated spend and authority.',
+    icon: Cloud,
+    color: 'yellow',
+  },
+  {
+    href: '/compare/langsmith-helicone-datadog',
+    title: 'SatGate vs LangSmith, Helicone, Datadog',
+    description: 'Observability explains what agents did. SatGate controls what they are allowed to do before they spend, call MCP tools, or cross paid rails.',
+    icon: Eye,
+    color: 'blue',
+  },
+  {
+    href: '/compare/api-gateway-rate-limits',
+    title: 'SatGate vs API Gateway Rate Limits',
+    description: 'Rate limits answer how many requests. SatGate answers whether this delegated agent can spend this budget on this resource right now.',
+    icon: Shield,
+    color: 'green',
+  },
+  {
+    href: '/compare/openai-anthropic-budget-controls',
+    title: 'SatGate vs OpenAI / Anthropic Budgets',
+    description: 'Native provider budgets are useful guardrails. SatGate adds one cross-provider control layer for agents, MCP tools, APIs, and paid rails.',
+    icon: KeyRound,
+    color: 'purple',
   },
 
   {

@@ -95,6 +95,13 @@ def audit_page(target: dict[str, Any], sitemap_paths: set[str]) -> dict[str, Any
     if not f.exists():
         return {'path': path, 'exists': False, 'issues': ['missing route file'], 'priority': 'P0' if target.get('status')=='new' else 'P1'}
     text=f.read_text(errors='ignore')
+    if 'BrutalComparisonPage' in text:
+        component = APP / 'compare' / '_components' / 'BrutalComparisonPage.tsx'
+        config = APP / 'compare' / '_components' / 'comparisons.ts'
+        if component.exists():
+            text += '\n' + component.read_text(errors='ignore')
+        if config.exists():
+            text += '\n' + config.read_text(errors='ignore')
     if path == '/govern':
         client = APP / 'components' / 'GovernClient.tsx'
         if client.exists():

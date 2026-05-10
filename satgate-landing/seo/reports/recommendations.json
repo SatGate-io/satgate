@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-10T19:28:50.106771Z",
+  "generatedAt": "2026-05-10T21:27:22.132553Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -179,6 +179,81 @@
         "/mcp-gateway",
         "/revocable-capability-token-policy-template"
       ],
+      "schemaToAdd": [
+        "FAQPage",
+        "BreadcrumbList",
+        "SoftwareApplication"
+      ]
+    },
+    {
+      "path": "/compare/aws-agentcore-payments",
+      "priority": "P3",
+      "score": 26,
+      "primaryKeyword": "SatGate vs AWS AgentCore Payments",
+      "recommendedTitle": "",
+      "recommendedMetaDescription": "",
+      "contentChanges": [],
+      "internalLinksToAdd": [],
+      "schemaToAdd": [
+        "FAQPage",
+        "BreadcrumbList",
+        "SoftwareApplication"
+      ]
+    },
+    {
+      "path": "/compare/langsmith-helicone-datadog",
+      "priority": "P3",
+      "score": 26,
+      "primaryKeyword": "LLM observability vs agent control",
+      "recommendedTitle": "",
+      "recommendedMetaDescription": "",
+      "contentChanges": [],
+      "internalLinksToAdd": [],
+      "schemaToAdd": [
+        "FAQPage",
+        "BreadcrumbList",
+        "SoftwareApplication"
+      ]
+    },
+    {
+      "path": "/compare/api-gateway-rate-limits",
+      "priority": "P3",
+      "score": 26,
+      "primaryKeyword": "API gateway rate limits for AI agents",
+      "recommendedTitle": "",
+      "recommendedMetaDescription": "",
+      "contentChanges": [],
+      "internalLinksToAdd": [],
+      "schemaToAdd": [
+        "FAQPage",
+        "BreadcrumbList",
+        "SoftwareApplication"
+      ]
+    },
+    {
+      "path": "/compare/openai-anthropic-budget-controls",
+      "priority": "P3",
+      "score": 26,
+      "primaryKeyword": "OpenAI Anthropic budget controls alternative",
+      "recommendedTitle": "",
+      "recommendedMetaDescription": "",
+      "contentChanges": [],
+      "internalLinksToAdd": [],
+      "schemaToAdd": [
+        "FAQPage",
+        "BreadcrumbList",
+        "SoftwareApplication"
+      ]
+    },
+    {
+      "path": "/compare/cloudflare-ai-gateway",
+      "priority": "P3",
+      "score": 6,
+      "primaryKeyword": "SatGate vs Cloudflare AI Gateway",
+      "recommendedTitle": "",
+      "recommendedMetaDescription": "",
+      "contentChanges": [],
+      "internalLinksToAdd": [],
       "schemaToAdd": [
         "FAQPage",
         "BreadcrumbList",
