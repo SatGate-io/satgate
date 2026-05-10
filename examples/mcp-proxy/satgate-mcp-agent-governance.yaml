@@ -9,6 +9,9 @@ server:
   name: satgate-mcp-governance-proof
   version: 0.1.0
 
+# Local stdio proof uses no bearer token so Claude/Ollama/Gemma4-style clients can
+# be exercised without test secrets. Production configs should use scoped auth and
+# tenant-bound capabilities; this script verifies request-path allow/deny/budget behavior.
 auth:
   mode: none
 

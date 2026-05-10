@@ -3,24 +3,34 @@ import { ArrowRight, Bot, Cable, CheckCircle2, Download, Eye, FileJson, Gauge, G
 
 const policyTemplates = [
   {
+    name: 'Evidence Pack sample',
+    href: '/policy-templates/mcp-governance/mcp-evidence-pack.sample.v1.json',
+    body: 'Sample MCP Evidence Pack showing the receipt fields buyers expect after allow, deny, budget, tenant, and delegation decisions.',
+    format: 'JSON',
+  },
+  {
     name: 'Spend caps',
     href: '/policy-templates/mcp-governance/spend-caps.v1.yaml',
     body: 'Per-session, per-agent, per-tool, and per-tenant MCP budget enforcement with fail-closed spend controls.',
+    format: 'YAML',
   },
   {
     name: 'Tool allowlists',
     href: '/policy-templates/mcp-governance/tool-allowlist.v1.yaml',
     body: 'Default-deny MCP tool access by tenant, principal, agent, server, risk tier, and explicit tool scope.',
+    format: 'YAML',
   },
   {
     name: 'Tenant isolation',
     href: '/policy-templates/mcp-governance/tenant-isolation.v1.yaml',
     body: 'Tenant-bound credentials, budgets, ledgers, MCP servers, and Evidence Packs without trusting client-supplied tenant headers.',
+    format: 'YAML',
   },
   {
     name: 'Delegation depth',
     href: '/policy-templates/mcp-governance/delegation-depth.v1.yaml',
     body: 'Macaroon-style delegation ceilings, child-budget attenuation, parent revocation, and receipt-ready chain hashes.',
+    format: 'YAML',
   },
 ];
 
@@ -31,9 +41,9 @@ const controls = [
 ];
 
 const proofRows = [
-  ['Claude Desktop / Claude Code', 'MCP stdio config points the client at satgate-mcp before the upstream server.', 'Allowed web_search call, budget-exhausted code_execute denial, Evidence Pack-style receipt transcript.'],
-  ['Ollama agent wrapper', 'Local Ollama agents use an MCP-capable wrapper that speaks stdio or SSE to SatGate.', 'Same MCP request path: list tools, call allowed tool, burn budget, receive denial before upstream execution.'],
-  ['Gemma4 agent wrapper', 'Gemma4 running through an MCP client receives no standing tool authority; SatGate grants scoped calls per policy.', 'Receipt fields bind tenant, agent, tool, policy digest, budget ID, decision reason, and remaining credits.'],
+  ['Claude Desktop / Claude Code', 'MCP stdio config points the client at satgate-mcp before the upstream server.', 'Verified MCP-compatible path: allowed web_search call, budget-exhausted code_execute denial, Evidence Pack-style decision transcript.'],
+  ['Ollama agent wrapper', 'Local Ollama agents use an MCP-capable wrapper that speaks stdio or SSE to SatGate.', 'Same protocol path: list tools, call allowed tool, burn budget, receive denial before upstream execution.'],
+  ['Gemma4 agent wrapper', 'Gemma4 running through an MCP client receives no standing tool authority; SatGate grants scoped calls per policy.', 'The sample Evidence Pack shows the receipt fields that bind tenant, agent, tool, policy digest, budget ID, decision reason, and remaining credits.'],
 ];
 
 const faqs = [
@@ -109,7 +119,7 @@ export default function McpGatewayPage() {
       '@type': 'DataDownload',
       name: template.name,
       contentUrl: `https://satgate.io${template.href}`,
-      encodingFormat: 'application/x-yaml',
+      encodingFormat: template.format === 'JSON' ? 'application/json' : 'application/x-yaml',
     })),
   };
   const breadcrumbJsonLd = {
@@ -144,8 +154,8 @@ export default function McpGatewayPage() {
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
               Govern MCP tool access <ArrowRight size={18} />
             </Link>
-            <Link href="/evidence-pack-demo" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
-              View Evidence Pack demo
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              See Policy-to-Proof
             </Link>
             <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-800 px-6 py-3 font-bold text-gray-200 hover:border-cyan-500 transition">
               MCP budget enforcement
@@ -162,7 +172,7 @@ export default function McpGatewayPage() {
               MCP makes tools reachable. It does not answer whether this agent, tenant, budget, delegation chain, or tool call should be trusted right now. That missing decision point is where runaway spend, cross-tenant mistakes, and unauditable agent actions sneak in.
             </p>
             <p>
-              SatGate turns the MCP gateway into a Zero Trust policy enforcement point for agents: authority before execution, receipt after every action, and Evidence Pack proof when a security, platform, finance, or buyer team asks what happened.
+              SatGate turns the MCP gateway into a Zero Trust policy enforcement point for agents: authority before execution, receipt after every action, and Evidence Pack proof when a security, platform, finance, or buyer team asks what happened. That is Policy-to-Proof applied to MCP.
             </p>
           </div>
         </div>
@@ -205,13 +215,13 @@ export default function McpGatewayPage() {
             <FileJson size={18} /> Policy bundle JSON
           </Link>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-5">
           {policyTemplates.map((template) => (
             <Link key={template.name} href={template.href} className="rounded-xl border border-gray-800 bg-gray-950 p-6 hover:border-cyan-700 transition">
               <Download className="text-cyan-300 mb-4" size={26} />
               <h3 className="text-xl font-bold text-white mb-2">{template.name}</h3>
               <p className="text-gray-400 leading-relaxed mb-4">{template.body}</p>
-              <span className="text-sm font-bold text-cyan-200">Download YAML →</span>
+              <span className="text-sm font-bold text-cyan-200">Download {template.format} →</span>
             </Link>
           ))}
         </div>
@@ -219,10 +229,10 @@ export default function McpGatewayPage() {
 
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="max-w-6xl mx-auto px-6 py-20">
-          <p className="text-sm font-mono uppercase tracking-wide text-cyan-300 mb-2">Verified agent path</p>
+          <p className="text-sm font-mono uppercase tracking-wide text-cyan-300 mb-2">Verified MCP-compatible path</p>
           <h2 className="text-3xl font-bold text-white mb-4">Claude, Ollama, and Gemma4 get scoped MCP authority — not standing authority</h2>
           <p className="text-gray-400 max-w-4xl mb-10 text-lg">
-            SatGate’s verification uses the same MCP protocol path those agents use: initialize, list tools, call an allowed tool, attempt expensive work until the budget blocks, and preserve the decision transcript as proof. Ollama and Gemma4 use an MCP-capable wrapper; the governance boundary is the MCP call path, not the model vendor.
+            SatGate’s verification uses an MCP-compatible stdio client path: initialize, list tools, call an allowed tool, attempt expensive work until the budget blocks, and preserve the decision transcript as proof. Claude, Ollama, and Gemma4 route through MCP clients or wrappers; the governance boundary is the MCP call path, not the model vendor.
           </p>
           <div className="grid lg:grid-cols-3 gap-5">
             {proofRows.map(([agent, path, proof]) => (

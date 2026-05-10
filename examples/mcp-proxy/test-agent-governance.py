@@ -136,7 +136,7 @@ def run_client(client: dict[str, str]) -> dict[str, Any]:
             },
             "proof": {
                 "evidence_pack_type": "mcp_gateway_governance",
-                "receipt_fields_verified": [
+                "receipt_fields_expected_in_evidence_pack": [
                     "mcp_client_id",
                     "tool_name",
                     "decision",
@@ -146,6 +146,7 @@ def run_client(client: dict[str, str]) -> dict[str, Any]:
                     "budget_id",
                 ],
                 "raw_tokens_redacted": True,
+                "note": "This local script verifies MCP-compatible allow and budget-deny behavior; authenticated tenant and signed-receipt checks are covered by runtime policy and server-side regression tests.",
             },
         }
     finally:

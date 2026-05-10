@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-10T18:47:11.863835Z",
+  "generatedAt": "2026-05-10T19:28:50.106530Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -350,10 +350,10 @@
         "Launch an MCP gateway agents can safely use."
       ],
       "internalLinks": [
-        "/evidence-pack-demo",
         "/govern",
         "/mcp-budget-enforcement",
-        "/policy-templates/mcp-governance/mcp-governance-policy-bundle.v1.json"
+        "/policy-templates/mcp-governance/mcp-governance-policy-bundle.v1.json",
+        "/policy-to-proof"
       ],
       "schemaTypes": [
         "Answer",
@@ -366,7 +366,7 @@
         "Question",
         "SoftwareApplication"
       ],
-      "wordCount": 856,
+      "wordCount": 875,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
