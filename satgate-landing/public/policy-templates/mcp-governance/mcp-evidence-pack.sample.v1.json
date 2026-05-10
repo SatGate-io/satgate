@@ -1,0 +1,40 @@
+{
+  "schema_version": "satgate.evidence_pack.v1",
+  "evidence_pack_type": "mcp_gateway_governance",
+  "evidence_pack_id": "ep_mcp_gateway_demo_001",
+  "generated_at": "2026-05-10T00:00:00Z",
+  "tenant_id": "ten_example",
+  "policy": {
+    "policy_id": "pol_mcp_spend_caps_v1",
+    "policy_version": 1,
+    "policy_digest": "sha256:demo-policy-digest"
+  },
+  "authority_chain": {
+    "principal_id": "user_platform_admin",
+    "agent_id": "agent_gemma4_research",
+    "mcp_client_id": "gemma4_mcp_wrapper",
+    "credential_id_hash": "hmac-sha256:demo-credential",
+    "delegation_chain_hash": "sha256:demo-delegation-chain",
+    "current_delegation_depth": 1,
+    "max_delegation_depth": 2
+  },
+  "mcp_tool_call": {
+    "mcp_server_id": "mcp_prod_research",
+    "tool_name": "web_search",
+    "tool_call_id": "toolcall_demo_001",
+    "tool_arguments_hash": "sha256:demo-arguments"
+  },
+  "decision": {
+    "result": "allow",
+    "reason": "tool_allowlisted_budget_available",
+    "cost_credits": 5,
+    "remaining_credits": 495,
+    "budget_id": "bud_prod_agents_daily"
+  },
+  "integrity": {
+    "receipt_id": "rcpt_mcp_demo_001",
+    "receipt_hash": "sha256:demo-receipt-hash",
+    "receipt_signature": "ed25519:demo-signature",
+    "canonicalization_alg": "json-c14n"
+  }
+}

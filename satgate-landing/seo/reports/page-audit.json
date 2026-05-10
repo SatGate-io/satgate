@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-10T16:36:24.216699Z",
+  "generatedAt": "2026-05-10T18:47:11.863835Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -329,38 +329,44 @@
     {
       "path": "/mcp-gateway",
       "exists": true,
-      "title": "MCP Gateway for Governed Agent Tool Access",
-      "titleLength": 42,
-      "metaDescription": "Use SatGate as an MCP gateway to check authority before tool execution and export Evidence Pack receipts.",
-      "metaDescriptionLength": 105,
+      "title": "MCP Gateway for Budget Enforcement and Evidence Packs",
+      "titleLength": 53,
+      "metaDescription": "Use SatGate as the MCP gateway for budget enforcement, tool allowlists, tenant isolation, delegation depth, and MCP Evidence Pack proof.",
+      "metaDescriptionLength": 136,
       "canonical": "/mcp-gateway",
       "h1": [
-        "MCP Gateway for Governed Agent Tool Access"
+        "MCP Gateway for Budget Enforcement and Evidence Packs"
       ],
       "h1Count": 1,
       "h2s": [
-        "What is an MCP gateway?",
+        "MCP connection is not MCP governance",
         "Observe, Control, Prove MCP tool use",
-        "SaaS MCP vs Hybrid MCP",
+        "MCP policy templates teams can start from",
+        "Claude, Ollama, and Gemma4 get scoped MCP authority \u2014 not standing authority",
+        "SaaS MCP is Fly-hosted",
+        "Hybrid MCP is Hetzner-hosted",
         "MCP gateway questions",
-        "Related MCP gateway resources",
+        "Related MCP governance resources",
         "Launch an MCP gateway agents can safely use."
       ],
       "internalLinks": [
+        "/evidence-pack-demo",
         "/govern",
-        "/mcp-governance",
-        "/policy-to-proof"
+        "/mcp-budget-enforcement",
+        "/policy-templates/mcp-governance/mcp-governance-policy-bundle.v1.json"
       ],
       "schemaTypes": [
         "Answer",
         "BreadcrumbList",
+        "DataDownload",
+        "Dataset",
         "FAQPage",
         "ListItem",
         "Organization",
         "Question",
         "SoftwareApplication"
       ],
-      "wordCount": 562,
+      "wordCount": 856,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,

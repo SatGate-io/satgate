@@ -1,0 +1,46 @@
+{
+  "apiVersion": "satgate.io/policy-bundle/v1",
+  "kind": "GovernancePolicyBundle",
+  "metadata": {
+    "name": "prod-mcp-governance-bundle",
+    "bundle_id": "bundle_mcp_governance_v1",
+    "version": 1,
+    "owner": "security-governance",
+    "environment": "production"
+  },
+  "policies": [
+    {
+      "template": "spend-caps.v1.yaml",
+      "policy_id": "pol_mcp_spend_caps_v1",
+      "required": true
+    },
+    {
+      "template": "tool-allowlist.v1.yaml",
+      "policy_id": "pol_mcp_tool_allowlist_v1",
+      "required": true
+    },
+    {
+      "template": "tenant-isolation.v1.yaml",
+      "policy_id": "pol_mcp_tenant_isolation_v1",
+      "required": true
+    },
+    {
+      "template": "delegation-depth.v1.yaml",
+      "policy_id": "pol_mcp_delegation_depth_v1",
+      "required": true
+    }
+  ],
+  "global_security_defaults": {
+    "default_action": "deny",
+    "enforcement_mode": "control",
+    "fail_closed": true,
+    "raw_tokens_in_logs": false,
+    "raw_tokens_in_evidence_packs": false,
+    "raw_tool_arguments_in_evidence_packs": false,
+    "require_policy_digest_on_decision": true,
+    "require_receipt_signature": true,
+    "require_tenant_consistency": true,
+    "require_budget_id_caveat_for_metered_tools": true,
+    "require_explicit_tool_allowlist": true
+  }
+}

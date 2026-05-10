@@ -63,6 +63,11 @@ Macaroons and capability tokens can constrain agent authority:
 - Benchmark CSV Data: https://satgate.io/data/ai-agent-runaway-spend-benchmark.csv
 - OpenAI API Budget Limit Generator: https://satgate.io/openai-budget-policy-generator
 - MCP Tool Cost Policy Generator: https://satgate.io/mcp-tool-cost-policy-generator
+- MCP Governance Policy Bundle: https://satgate.io/policy-templates/mcp-governance/mcp-governance-policy-bundle.v1.json
+- MCP Spend Caps Template: https://satgate.io/policy-templates/mcp-governance/spend-caps.v1.yaml
+- MCP Tool Allowlist Template: https://satgate.io/policy-templates/mcp-governance/tool-allowlist.v1.yaml
+- MCP Tenant Isolation Template: https://satgate.io/policy-templates/mcp-governance/tenant-isolation.v1.yaml
+- MCP Delegation Depth Template: https://satgate.io/policy-templates/mcp-governance/delegation-depth.v1.yaml
 - MCP Proxy Config Generator: https://satgate.io/mcp-proxy-config-generator
 - Economic Firewall Readiness Grader: https://satgate.io/economic-firewall-readiness-grader
 - Agent API Key Risk Assessment: https://satgate.io/agent-api-key-risk-assessment
