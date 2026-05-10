@@ -498,6 +498,8 @@ mcp_authority_required_phrases = {
         "Evidence Pack",
         "finance-automation",
         "invoice-reconciler",
+        "Observe, Control, Prove agent API use",
+        "Issue scoped capabilities, enforce budgets and route policy, attenuate delegation",
         "2026-12-31T00:00:00Z",
         "See SatGate governance",
         "See Policy-to-Proof",
@@ -539,6 +541,9 @@ mcp_authority_forbidden_phrases = {
         "Economic firewall overview",
         "Macaroons vs API keys <ArrowRight",
         "2026-04-26T00:00:00Z",
+        "Governance loop",
+        "['Mint', 'Issue a scoped capability",
+        "['Delegate', 'Allow sub-agents",
     ],
 }
 
