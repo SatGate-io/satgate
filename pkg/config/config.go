@@ -717,7 +717,7 @@ func (c *Config) Validate() error {
 			return fmt.Errorf("route %s has no policy kind", route.Name)
 		}
 
-	// Normalize policy.kind aliases to canonical forms
+		// Normalize policy.kind aliases to canonical forms
 		// This allows users to use strategic names (audit, budget, monetize, protect, policy_to_proof)
 		// which get converted to runtime names (chargeback, fiat402, l402, capability)
 		route.Policy.Kind = NormalizePolicyKind(route.Policy.Kind)
