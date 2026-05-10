@@ -19,7 +19,9 @@ RUNAWAY_COST_CALCULATOR_PAGE = ROOT / "app" / "runaway-agent-cost-calculator" / 
 RUNAWAY_COST_CALCULATOR_LAYOUT = ROOT / "app" / "runaway-agent-cost-calculator" / "layout.tsx"
 DESIGN_PARTNERS_PAGE = ROOT / "app" / "design-partners" / "page.tsx"
 DESIGN_PARTNERS_LAYOUT = ROOT / "app" / "design-partners" / "layout.tsx"
+MCP_PROXY_CONFIG_PAGE = ROOT / "app" / "mcp-proxy-config-generator" / "page.tsx"
 MCP_PROXY_CONFIG_LAYOUT = ROOT / "app" / "mcp-proxy-config-generator" / "layout.tsx"
+L402_API_PRICING_PAGE = ROOT / "app" / "l402-api-pricing-calculator" / "page.tsx"
 L402_API_PRICING_LAYOUT = ROOT / "app" / "l402-api-pricing-calculator" / "layout.tsx"
 
 SPEND_LONGTAIL_PAGES = {
@@ -760,6 +762,49 @@ def main() -> int:
         stale_metadata = [phrase for phrase in tool_metadata_forbidden_phrases[name] if phrase in metadata_text]
         if stale_metadata:
             raise SystemExit(f"stale {name} inherited/stale metadata phrases remain:\n" + "\n".join(stale_metadata))
+
+
+    generator_texts = {
+        "mcp-proxy-config-generator": MCP_PROXY_CONFIG_PAGE.read_text() + "\n" + MCP_PROXY_CONFIG_LAYOUT.read_text(),
+        "l402-api-pricing-calculator": L402_API_PRICING_PAGE.read_text() + "\n" + L402_API_PRICING_LAYOUT.read_text(),
+    }
+    generator_forbidden_phrases = {
+        "mcp-proxy-config-generator": [
+            "L402 Charge",
+            "Charge/L402",
+            "charge options",
+            "robot customers",
+        ],
+        "l402-api-pricing-calculator": [
+            "robot-customer",
+            "robot customer",
+            "robot customers",
+            "SatGate Charge",
+            "Charge robot",
+            "/robot-customer-payments",
+        ],
+    }
+    generator_required_phrases = {
+        "mcp-proxy-config-generator": [
+            "scoped authority",
+            "optional paid-rail context",
+            "preserve paid-rail context",
+        ],
+        "l402-api-pricing-calculator": [
+            "paid-agent access revenue",
+            "paid-rail context",
+            "Evidence Pack receipts",
+            "/http-402-for-ai-agents",
+        ],
+    }
+    for name, generator_text in generator_texts.items():
+        missing_generator = [phrase for phrase in generator_required_phrases[name] if phrase not in generator_text]
+        if missing_generator:
+            raise SystemExit(f"missing {name} generator authority/proof phrases:\n" + "\n".join(missing_generator))
+        stale_generator = [phrase for phrase in generator_forbidden_phrases[name] if phrase in generator_text]
+        if stale_generator:
+            raise SystemExit(f"stale {name} generator Charge/robot phrases remain:\n" + "\n".join(stale_generator))
+
 
     for name, path in L402_RAIL_PAGES.items():
         page_text = path.read_text()

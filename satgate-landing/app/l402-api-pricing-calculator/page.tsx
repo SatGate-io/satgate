@@ -67,15 +67,15 @@ export default function L402ApiPricingCalculatorPage() {
     '@type': 'WebPage',
     name: 'L402 API Pricing Calculator',
     url: 'https://satgate.io/l402-api-pricing-calculator',
-    description: 'Estimate per-request L402 API pricing, robot-customer revenue, gross margin, free allowance, and Lightning sats per request for AI agent API monetization.',
+    description: 'Estimate per-request L402 API pricing, paid-agent access revenue, gross margin, free allowance, and Lightning sats per request for governed AI agent API access.',
     datePublished: '2026-05-01',
     dateModified: '2026-05-03',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'L402 API pricing' },
-      { '@type': 'Thing', name: 'robot-customer revenue' },
+      { '@type': 'Thing', name: 'paid-agent access revenue' },
       { '@type': 'Thing', name: 'Lightning sats per request' },
-      { '@type': 'Thing', name: 'AI agent API monetization' },
+      { '@type': 'Thing', name: 'governed AI agent paid access' },
       { '@type': 'Thing', name: 'request-path paid access' },
     ],
   };
@@ -87,7 +87,7 @@ export default function L402ApiPricingCalculatorPage() {
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/l402-api-pricing-calculator',
-    description: 'Estimate per-request L402 API pricing, robot-customer revenue, gross margin, free allowance, and Lightning sats per request for AI agent API monetization.',
+    description: 'Estimate per-request L402 API pricing, paid-agent access revenue, gross margin, free allowance, and Lightning sats per request for governed AI agent API access.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-03',
     featureList: ['Per-request L402 pricing', 'Robot-customer revenue estimate', 'Gross margin modeling', 'Free allowance planning', 'Sats per request conversion'],
@@ -118,18 +118,18 @@ export default function L402ApiPricingCalculatorPage() {
       },
       {
         '@type': 'Question',
-        name: 'How should APIs price robot customers?',
+        name: 'How should APIs price paid agent access?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Start from marginal cost per request, add target gross margin, account for free allowances or trial traffic, and enforce payment or budget policy before upstream access. SatGate Charge uses L402 Lightning payments for this flow.',
+          text: 'Start from marginal cost per request, add target gross margin, account for free allowances or trial traffic, and enforce payment or budget policy before upstream access. L402 is one paid rail; SatGate preserves the authority and receipt context around access.',
         },
       },
       {
         '@type': 'Question',
-        name: 'Is SatGate Charge Fiat402?',
+        name: 'Is L402 the same as Fiat402?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. SatGate Charge is L402 Lightning-based payment for API access. Fiat402 is separate and should not be conflated with SatGate Charge.',
+          text: 'No. L402 is Lightning-based payment for API access. Fiat402 is separate. SatGate can preserve paid-rail context without conflating the rails.',
         },
       },
       {
@@ -142,7 +142,7 @@ export default function L402ApiPricingCalculatorPage() {
       },
       {
         '@type': 'Question',
-        name: 'Should robot-customer pricing include free allowances?',
+        name: 'Should paid agent access pricing include free allowances?',
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'Usually yes. Free allowances help agents test value before paying, but paid access should still be enforced with request-path pricing, budget checks, scoped access, and audit records.',
@@ -168,7 +168,7 @@ export default function L402ApiPricingCalculatorPage() {
             L402 API Pricing Calculator for Robot Customers
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Estimate per-request pricing, gross margin, paid robot-customer demand, and Lightning sats per request before you expose paid API access to autonomous agents.
+            Estimate per-request pricing, gross margin, paid agent-access demand, and Lightning sats per request before you expose paid API access to autonomous agents.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <a href="#calculator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -247,15 +247,15 @@ export default function L402ApiPricingCalculatorPage() {
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
-              <h3 className="mb-2 text-xl font-bold text-white">How should APIs price robot customers?</h3>
+              <h3 className="mb-2 text-xl font-bold text-white">How should APIs price paid agent access?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Start from marginal cost per request, add target gross margin, account for free allowances or trial traffic, and enforce payment or budget policy before upstream access. SatGate Charge uses L402 Lightning payments for this flow.
+                Start from marginal cost per request, add target gross margin, account for free allowances or trial traffic, and enforce payment or budget policy before upstream access. L402 is one paid rail; SatGate preserves the authority and receipt context around access.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
-              <h3 className="mb-2 text-xl font-bold text-white">Is SatGate Charge Fiat402?</h3>
+              <h3 className="mb-2 text-xl font-bold text-white">Is L402 the same as Fiat402?</h3>
               <p className="text-gray-400 leading-relaxed">
-                No. SatGate Charge is L402 Lightning-based payment for API access. Fiat402 is separate and should not be conflated with SatGate Charge.
+                No. L402 is Lightning-based payment for API access. Fiat402 is separate. SatGate can preserve paid-rail context without conflating the rails.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -265,7 +265,7 @@ export default function L402ApiPricingCalculatorPage() {
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
-              <h3 className="mb-2 text-xl font-bold text-white">Should robot-customer pricing include free allowances?</h3>
+              <h3 className="mb-2 text-xl font-bold text-white">Should paid agent access pricing include free allowances?</h3>
               <p className="text-gray-400 leading-relaxed">
                 Usually yes. Free allowances help agents test value before paying, but paid access should still be enforced with request-path pricing, budget checks, scoped access, and audit records.
               </p>
@@ -276,13 +276,13 @@ export default function L402ApiPricingCalculatorPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-3xl border border-yellow-900/60 bg-gradient-to-br from-yellow-950/25 to-cyan-950/25 p-8 md:p-12">
-          <h2 className="mb-4 text-3xl font-bold text-white">Charge robot customers with L402 Lightning.</h2>
+          <h2 className="mb-4 text-3xl font-bold text-white">Model L402 paid access with policy proof.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            SatGate Charge lets protected APIs challenge, verify, and unlock paid access for autonomous agents in the request path. Observe demand, control spend, then charge when access should be monetized.
+            L402 can challenge and verify payment for protected API access. SatGate keeps authority, budget, revocation, paid-rail context, and Evidence Pack receipts in the request path.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/robot-customer-payments" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-              Robot customer payments <ArrowRight size={18} />
+            <Link href="/http-402-for-ai-agents" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+              Govern HTTP 402 access <ArrowRight size={18} />
             </Link>
             <Link href="/blog/l402-protocol-explained" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-yellow-500">
               L402 protocol explained
