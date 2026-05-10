@@ -230,15 +230,15 @@ export default function CapabilityLifecycleDemo() {
               })}
             </div>
           </div>
-          <div className="overflow-x-auto rounded-2xl border border-gray-800">
-            <div className="grid min-w-[760px] grid-cols-[0.9fr_1fr_1.3fr] bg-gray-900/80 px-4 py-3 text-sm font-bold uppercase tracking-wide text-gray-400">
+          <div className="overflow-hidden rounded-2xl border border-gray-800">
+            <div className="grid grid-cols-[0.85fr_1.05fr_1.45fr] gap-3 bg-gray-900/80 px-4 py-3 text-sm font-bold uppercase tracking-wide text-gray-400">
               <div>Field</div><div>Value</div><div>Buyer proof</div>
             </div>
             {proofRows.map(([field, value, proof]) => (
-              <div key={field} className="grid min-w-[760px] grid-cols-[0.9fr_1fr_1.3fr] border-t border-gray-800 px-4 py-4 text-sm">
-                <div className="font-mono text-cyan-200">{field}</div>
-                <div className="font-mono text-gray-200">{value}</div>
-                <div className="text-gray-400">{proof}</div>
+              <div key={field} className="grid grid-cols-[0.85fr_1.05fr_1.45fr] gap-3 border-t border-gray-800 px-4 py-4 text-sm">
+                <div className="break-words font-mono text-cyan-200">{field}</div>
+                <div className="break-words font-mono text-gray-200">{value}</div>
+                <div className="break-words text-gray-400">{proof}</div>
               </div>
             ))}
           </div>
