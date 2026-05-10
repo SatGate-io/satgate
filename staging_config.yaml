@@ -1,0 +1,20 @@
+version: 1
+server:
+  listen: ":8081"
+  defaultTenantId: "staging-tenant"
+upstreams:
+  mock:
+    url: "http://localhost:8082"
+routes:
+  - name: "v2-audit-test"
+    match:
+      pathPrefix: "/v2"
+    upstream: mock
+    policy:
+      kind: "policy_to_proof"
+      evidence_pack:
+        required: true
+        receipt_id: "generated_per_decision"
+admin:
+  token: "admin-token-123"
+  auditHashChainKey: "c2F0Z2F0ZS1kZW1vLXByb29mLWtleS1mb3ItZXZpZGVuY2U=" # "satgate-demo-proof-key-for-evidence" base64
