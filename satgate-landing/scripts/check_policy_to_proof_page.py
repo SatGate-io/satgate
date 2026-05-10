@@ -22,6 +22,8 @@ SPEND_LONGTAIL_PAGES = {
     "agent-spending-limits": ROOT / "app" / "agent-spending-limits" / "page.tsx",
     "mcp-cost-control": ROOT / "app" / "mcp-cost-control" / "page.tsx",
     "agent-payment-controls": ROOT / "app" / "agent-payment-controls" / "page.tsx",
+    "mcp-budget-enforcement": ROOT / "app" / "mcp-budget-enforcement" / "page.tsx",
+    "ai-agent-runaway-spend-benchmark": ROOT / "app" / "ai-agent-runaway-spend-benchmark" / "page.tsx",
 }
 
 L402_RAIL_PAGES = {
@@ -351,6 +353,24 @@ spend_longtail_required_phrases = {
         "/govern",
         "/policy-to-proof",
     ],
+    "mcp-budget-enforcement": [
+        "authority before execution",
+        "Evidence Pack receipts",
+        "paid-rail context",
+        "Govern MCP tool budgets",
+        "See Policy-to-Proof",
+        "/govern",
+        "/policy-to-proof",
+    ],
+    "ai-agent-runaway-spend-benchmark": [
+        "authority-before-execution controls",
+        "Evidence Pack",
+        "Prove",
+        "Govern agent spend",
+        "See Policy-to-Proof",
+        "/govern",
+        "/policy-to-proof",
+    ],
 }
 
 spend_longtail_forbidden_phrases = {
@@ -407,6 +427,26 @@ spend_longtail_forbidden_phrases = {
         "Compare Link and SatGate",
         "Learn the economic firewall",
         "Read HTTP 402 for agents",
+    ],
+    "mcp-budget-enforcement": [
+        "Charge when external",
+        "robot customers",
+        "Charge/L402",
+        "L402 Charge",
+        "Route to L402 Charge",
+        "economic control plane or MCP proxy",
+        "Open budget tools",
+        "chargeable",
+    ],
+    "ai-agent-runaway-spend-benchmark": [
+        "Charge</h2>",
+        "SatGate Charge",
+        "charge robot customers",
+        "robot customers",
+        "external agents become API customers",
+        "economic control plane for AI agents",
+        "Learn economic firewalls",
+        "How does an economic firewall reduce runaway spend?",
     ],
 }
 

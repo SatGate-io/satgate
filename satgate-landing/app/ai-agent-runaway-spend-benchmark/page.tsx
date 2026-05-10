@@ -24,7 +24,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'AI Agent Runaway Spend Benchmark',
-    description: 'How fast autonomous agents can burn API and MCP tool budget without an economic firewall.',
+    description: 'How fast autonomous agents can burn API and MCP tool budget without authority-before-execution controls.',
   },
 };
 
@@ -102,8 +102,8 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
       },
       {
         '@type': 'Question',
-        name: 'How does an economic firewall reduce runaway spend?',
-        acceptedAnswer: { '@type': 'Answer', text: 'An economic firewall checks identity, budget, route, tool scope, request cost, expiry, and revocation before upstream access, blocking the next expensive request when policy says stop.' },
+        name: 'How does SatGate reduce runaway spend?',
+        acceptedAnswer: { '@type': 'Answer', text: 'SatGate checks identity, budget, route, tool scope, request cost, expiry, and revocation before upstream access, blocking the next expensive request when policy says stop and recording the decision in an Evidence Pack.' },
       },
       {
         '@type': 'Question',
@@ -147,7 +147,7 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/runaway-agent-cost-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Model your exposure <ArrowRight size={18} /></Link>
-            <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">Learn economic firewalls</Link>
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">See Policy-to-Proof</Link>
           </div>
         </div>
       </section>
@@ -157,7 +157,7 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
           <h2 className="mb-5 text-3xl font-bold text-white">Benchmark method</h2>
           <div className="space-y-5 text-lg leading-relaxed text-gray-300">
             <p>This benchmark models common autonomous-agent failure modes using five variables: active agents, paid calls per minute, delegation fanout, cost per call, and detection delay.</p>
-            <p>Uncontrolled cost assumes the loop continues until a human, dashboard alert, or provider billing alarm catches it. Controlled cost assumes a request-path economic firewall stops new paid calls after five minutes through budget, per-tool cap, route policy, expiry, or revocation.</p>
+            <p>Uncontrolled cost assumes the loop continues until a human, dashboard alert, or provider billing alarm catches it. Controlled cost assumes request-path authority checks stop new paid calls after five minutes through budget, per-tool cap, route policy, expiry, or revocation.</p>
             <p>The point is not that every workload has these exact numbers. The point is the curve: once agents can act in parallel, cost grows with time and fanout faster than humans can approve individual requests.</p>
           </div>
         </div>
@@ -233,7 +233,7 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
         <div className="mx-auto grid max-w-6xl gap-8 px-6 py-20 lg:grid-cols-3">
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Zap className="mb-4 text-yellow-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Observe</h2><p className="leading-relaxed text-gray-400">Route agent traffic through SatGate to attribute cost by agent, workflow, route, tool, tenant, and MCP server before enforcing hard limits.</p></div>
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Gauge className="mb-4 text-cyan-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Control</h2><p className="leading-relaxed text-gray-400">Enforce per-agent budgets, per-tool caps, route policy, revocation, expiry, and kill switches before upstream API calls execute.</p></div>
-          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Bot className="mb-4 text-purple-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Charge</h2><p className="leading-relaxed text-gray-400">When external agents become API customers, use SatGate Charge with L402 Lightning payments to collect before access is granted.</p></div>
+          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Bot className="mb-4 text-purple-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Prove</h2><p className="leading-relaxed text-gray-400">Record the policy decision, budget state, paid-rail context, and upstream outcome in an Evidence Pack before anyone argues about the bill.</p></div>
         </div>
       </section>
 
@@ -245,7 +245,7 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
             {[
               ['What is AI agent runaway spend?', 'AI agent runaway spend is cost created when autonomous agents loop, retry, delegate, or continue calling paid APIs and MCP tools after the work is no longer economically justified.'],
               ['Why do dashboards fail to control runaway agent cost?', 'Dashboards report spend after requests complete. Autonomous agents can generate hundreds or thousands of paid calls before a human sees an alert, so enforcement has to happen before forwarding each request.'],
-              ['How does an economic firewall reduce runaway spend?', 'An economic firewall checks identity, budget, route, tool scope, request cost, expiry, and revocation before upstream access, blocking the next expensive request when policy says stop.'],
+              ['How does SatGate reduce runaway spend?', 'SatGate checks identity, budget, route, tool scope, request cost, expiry, and revocation before upstream access, blocking the next expensive request when policy says stop and recording the decision in an Evidence Pack.'],
               ['Which benchmark variable is most dangerous for AI agent cost?', 'Detection delay is usually the most dangerous variable because agents can create paid calls at machine speed while dashboards, billing alerts, and humans react after spend has already happened.'],
               ['Why include MCP tools in runaway spend benchmarks?', 'MCP tools can trigger paid APIs, browser automation, cloud jobs, data exports, or code agents. A low model cost can still become expensive when tool calls fan out without per-tool budgets.'],
             ].map(([question, answer]) => (
@@ -268,10 +268,10 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-3xl border border-orange-900/60 bg-gradient-to-br from-orange-950/40 to-cyan-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">The fix is not a better bill. It is a pre-request decision.</h2>
-          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate is the economic control plane for AI agents: observe cost, control spend before execution, and charge robot customers when autonomous systems need paid API access.</p>
+          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate puts authority before execution for AI agents: observe cost, control spend before execution, and prove every allowed, denied, routed, revoked, or paid decision with an Evidence Pack receipt.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">MCP budget enforcement <ArrowRight size={18} /></Link>
-            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">Grade your readiness</Link>
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Govern agent spend <ArrowRight size={18} /></Link>
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">See Policy-to-Proof</Link>
           </div>
         </div>
       </section>

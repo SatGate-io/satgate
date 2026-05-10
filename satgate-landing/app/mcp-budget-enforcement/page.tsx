@@ -3,7 +3,7 @@ import { ArrowRight, BadgeDollarSign, Bot, ClipboardList, Gauge, KeyRound, Shiel
 
 export const metadata = {
   title: 'MCP Budget Enforcement for AI Agents',
-  description: 'Enforce budgets, prices, risk tiers, revocation, and audit trails before AI agents execute MCP tools. SatGate puts economic control in the MCP request path.',
+  description: 'Enforce budgets, prices, risk tiers, revocation, and Evidence Pack receipts before AI agents execute MCP tools. SatGate puts authority before execution in the MCP request path.',
   alternates: { canonical: 'https://satgate.io/mcp-budget-enforcement' },
   keywords: [
     'MCP budget enforcement',
@@ -15,11 +15,11 @@ export const metadata = {
     'Cursor MCP budget limits',
     'AI agent tool budgets',
     'Model Context Protocol governance',
-    'MCP audit trail',
+    'MCP Evidence Pack receipts',
   ],
   openGraph: {
     title: 'MCP Budget Enforcement for AI Agents',
-    description: 'Set enforceable budgets, prices, risk tiers, and audit trails before autonomous agents execute MCP tools.',
+    description: 'Set enforceable budgets, prices, risk tiers, revocation, and Evidence Pack receipts before autonomous agents execute MCP tools.',
     url: 'https://satgate.io/mcp-budget-enforcement',
     type: 'article',
   },
@@ -58,8 +58,8 @@ const controls = [
   },
   {
     icon: Zap,
-    title: 'Charge when external',
-    body: 'Use L402 payments when external robot customers should pay before accessing premium MCP tools.',
+    title: 'Paid-rail context',
+    body: 'Preserve L402, x402, AgentCore Payments, Pay.sh, or enterprise billing context while SatGate decides authority before tool access.',
   },
 ];
 
@@ -67,7 +67,7 @@ const examples = [
   ['web_search', '$0.01/call', '$2/session', 'Allow until session budget is exhausted'],
   ['browser_automation', '$0.05/min', '$10/day', 'Require justification after 10 minutes'],
   ['code_execution', '$0.03/run', '$5/workflow', 'Block unsafe commands and log artifacts'],
-  ['premium_data_api', '$0.25/call', '$25/tenant/day', 'Route to L402 Charge for external agents'],
+  ['premium_data_api', '$0.25/call', '$25/tenant/day', 'Require paid-rail context and Evidence Pack receipt before access'],
   ['cloud_write_action', '$0.00 + risk', 'approval required', 'Deny unless capability includes write scope'],
 ];
 
@@ -100,7 +100,7 @@ export default function McpBudgetEnforcementPage() {
         name: 'What is MCP budget enforcement?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'MCP budget enforcement means assigning prices, limits, policy, and audit trails to Model Context Protocol tool calls before an AI agent executes the tool.',
+          text: 'MCP budget enforcement means assigning prices, limits, policy, and Evidence Pack receipts to Model Context Protocol tool calls before an AI agent executes the tool.',
         },
       },
       {
@@ -116,7 +116,7 @@ export default function McpBudgetEnforcementPage() {
         name: 'Can dashboards enforce MCP spend?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Dashboards can report spend after the fact. MCP budget enforcement needs to sit in the request path so policy can block, route, approve, or charge before the tool executes.',
+          text: 'Dashboards can report spend after the fact. MCP budget enforcement needs to sit in the request path so policy can allow, deny, route, approve, require paid-rail context, or revoke before the tool executes.',
         },
       },
       {
@@ -124,7 +124,7 @@ export default function McpBudgetEnforcementPage() {
         name: 'How does SatGate enforce MCP budgets?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate acts as an economic control plane or MCP proxy that observes tool calls, applies Control policies, enforces budgets, records audit evidence, and can use Charge/L402 for paid external access.',
+          text: 'SatGate sits around MCP tool calls to observe activity, enforce authority and budget policy, preserve paid-rail context, and record each decision in an Evidence Pack.',
         },
       },
       {
@@ -171,11 +171,11 @@ export default function McpBudgetEnforcementPage() {
             MCP Budget Enforcement for AI Agents
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-10">
-            MCP gives agents tools. SatGate gives those tools prices, budgets, risk tiers, revocation, and audit trails before autonomous agents can spend, loop, delegate, or call paid APIs.
+            MCP gives agents tools. SatGate gives those tools prices, budgets, risk tiers, revocation, and Evidence Pack receipts before autonomous agents can spend, loop, delegate, or call paid APIs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              Generate an MCP cost policy <ArrowRight size={18} />
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
+              Govern MCP tool budgets <ArrowRight size={18} />
             </Link>
             <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               See MCP governance
@@ -191,16 +191,16 @@ export default function McpBudgetEnforcementPage() {
             Model Context Protocol lets AI agents call search, browser, database, code, cloud, SaaS, and internal tools through a common interface. That is powerful — and economically dangerous when every call can trigger paid APIs, infrastructure, human review, or irreversible actions.
           </p>
           <p>
-            Rate limits are too crude. Dashboards are too late. Approval queues do not scale when agents make hundreds of small decisions. MCP budget enforcement belongs in the request path, where each tool call can be priced, evaluated, blocked, routed, approved, or charged before execution.
+            Rate limits are too crude. Dashboards are too late. Approval queues do not scale when agents make hundreds of small decisions. MCP budget enforcement belongs in the request path, where each tool call can be priced, evaluated, allowed, denied, routed, approved, or bound to paid-rail context before execution.
           </p>
           <p>
-            SatGate is the economic firewall for that layer: Observe MCP activity, Control risky spend, and Charge robot customers when paid tool access should unlock on demand.
+            SatGate is the authority layer for that path: observe MCP activity, control risky spend before execution, and prove each budget or paid-rail decision with an Evidence Pack receipt.
           </p>
         </div>
         <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
           <h3 className="text-xl font-bold text-white mb-4">MCP budget policy answers</h3>
           <ul className="space-y-3 text-gray-300">
-            {['What does this tool call cost?', 'Which agent, tenant, workflow, and delegated sub-agent made it?', 'Is the call inside budget right now?', 'Should this route downgrade, block, ask approval, or charge?', 'Can finance and security explain the decision later?'].map((item) => (
+            {['What does this tool call cost?', 'Which agent, tenant, workflow, and delegated sub-agent made it?', 'Is the call inside budget right now?', 'Should this route allow, deny, downgrade, ask approval, or require paid-rail context?', 'Can finance and security explain the decision later?'].map((item) => (
               <li key={item} className="rounded-lg border border-gray-800 bg-black/50 p-3">{item}</li>
             ))}
           </ul>
@@ -211,7 +211,7 @@ export default function McpBudgetEnforcementPage() {
         <div className="max-w-6xl mx-auto px-6 py-20">
           <h2 className="text-3xl font-bold text-white mb-4">Controls every MCP proxy needs</h2>
           <p className="text-gray-400 max-w-3xl mb-10 text-lg">
-            The goal is not to stop agents from using tools. The goal is to let them use tools with bounded economics and explainable authority.
+            The goal is not to stop agents from using tools. The goal is to let them use tools with bounded economics, scoped authority, and proof for every decision.
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {controls.map(({ icon: Icon, title, body }) => (
@@ -228,7 +228,7 @@ export default function McpBudgetEnforcementPage() {
       <section className="max-w-6xl mx-auto px-6 py-20">
         <h2 className="text-3xl font-bold text-white mb-4">Example MCP cost policy</h2>
         <p className="text-gray-400 max-w-3xl mb-8 text-lg">
-          A useful policy starts by pricing tool classes, then setting hard ceilings and enforcement behavior by risk.
+          A useful policy starts by pricing tool classes, then setting hard ceilings, enforcement behavior, revocation rules, and Evidence Pack fields by risk.
         </p>
         <div className="overflow-hidden rounded-2xl border border-gray-800">
           <div className="grid grid-cols-4 bg-gray-950 px-5 py-3 text-sm font-bold uppercase tracking-wide text-gray-400">
@@ -256,7 +256,7 @@ export default function McpBudgetEnforcementPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is MCP budget enforcement?</h3>
               <p className="text-gray-400 leading-relaxed">
-                MCP budget enforcement means assigning prices, limits, policy, and audit trails to Model Context Protocol tool calls before an AI agent executes the tool.
+                MCP budget enforcement means assigning prices, limits, policy, and Evidence Pack receipts to Model Context Protocol tool calls before an AI agent executes the tool.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -268,13 +268,13 @@ export default function McpBudgetEnforcementPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Can dashboards enforce MCP spend?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Dashboards can report spend after the fact. MCP budget enforcement needs to sit in the request path so policy can block, route, approve, or charge before the tool executes.
+                Dashboards can report spend after the fact. MCP budget enforcement needs to sit in the request path so policy can allow, deny, route, approve, require paid-rail context, or revoke before the tool executes.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate enforce MCP budgets?</h3>
               <p className="text-gray-400 leading-relaxed">
-                SatGate acts as an economic control plane or MCP proxy that observes tool calls, applies Control policies, enforces budgets, records audit evidence, and can use Charge/L402 for paid external access.
+                SatGate sits around MCP tool calls to observe activity, enforce authority and budget policy, preserve paid-rail context, and record each decision in an Evidence Pack.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -312,14 +312,14 @@ export default function McpBudgetEnforcementPage() {
         <Bot className="mx-auto mb-6 text-cyan-300" size={42} />
         <h2 className="text-4xl font-bold text-white mb-5">Put budgets before MCP execution</h2>
         <p className="text-xl text-gray-300 leading-relaxed mb-8">
-          If agents can call tools, they can spend. SatGate makes tool spend visible, enforceable, revocable, and chargeable in the request path.
+          If agents can call tools, they can spend. SatGate makes tool spend visible, enforceable, revocable, and provable in the request path.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/tools" className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-300 text-black px-6 py-3 font-bold hover:bg-cyan-200 transition">
-            Open budget tools <ArrowRight size={18} />
+          <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-300 text-black px-6 py-3 font-bold hover:bg-cyan-200 transition">
+            Govern MCP budgets <ArrowRight size={18} />
           </Link>
-          <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
-            Learn economic firewalls
+          <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+            See Policy-to-Proof
           </Link>
         </div>
       </section>
