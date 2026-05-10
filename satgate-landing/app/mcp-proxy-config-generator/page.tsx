@@ -15,7 +15,7 @@ const clients = {
 const modes = {
   observe: { label: 'Observe', block: false, charge: false, audit: 'full' },
   control: { label: 'Control', block: true, charge: false, audit: 'full' },
-  charge: { label: 'Control + Charge', block: true, charge: true, audit: 'full' },
+  paid: { label: 'Control + Paid Rail', block: true, charge: true, audit: 'full' },
 };
 
 type ClientKey = keyof typeof clients;
@@ -62,7 +62,7 @@ export default function McpProxyConfigGeneratorPage() {
     '@type': 'WebPage',
     name: 'MCP Proxy Config Generator',
     url: 'https://satgate.io/mcp-proxy-config-generator',
-    description: 'Generate MCP proxy configs for Cursor, Claude, OpenClaw, and custom MCP clients with budgets, audit, revocation, and L402 Charge options.',
+    description: 'Generate MCP proxy configs for Cursor, Claude, OpenClaw, and custom MCP clients with scoped authority, budgets, audit receipts, revocation, and optional paid-rail context.',
     datePublished: '2026-04-12',
     dateModified: '2026-05-03',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -71,7 +71,7 @@ export default function McpProxyConfigGeneratorPage() {
       { '@type': 'Thing', name: 'SatGate MCP proxy' },
       { '@type': 'Thing', name: 'Cursor and Claude MCP governance' },
       { '@type': 'Thing', name: 'MCP request-path budget enforcement' },
-      { '@type': 'Thing', name: 'L402 Charge for MCP tools' },
+      { '@type': 'Thing', name: 'paid-rail context for MCP tools' },
     ],
     audience: { '@type': 'Audience', audienceType: 'AI engineering, platform, API, and security teams using MCP clients' },
   };
@@ -83,11 +83,11 @@ export default function McpProxyConfigGeneratorPage() {
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/mcp-proxy-config-generator',
-    description: 'Generate MCP proxy configs for Cursor, Claude, OpenClaw, and custom MCP clients with budgets, audit, revocation, and L402 Charge options.',
+    description: 'Generate MCP proxy configs for Cursor, Claude, OpenClaw, and custom MCP clients with scoped authority, budgets, audit receipts, revocation, and optional paid-rail context.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-03',
     audience: webPageJsonLd.audience,
-    featureList: ['Cursor MCP config generation', 'Claude MCP config generation', 'OpenClaw MCP config generation', 'Budget and audit policy generation', 'Optional L402 Charge config'],
+    featureList: ['Cursor MCP config generation', 'Claude MCP config generation', 'OpenClaw MCP config generation', 'Budget and audit policy generation', 'Optional paid-rail context config'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
@@ -142,7 +142,7 @@ export default function McpProxyConfigGeneratorPage() {
         name: 'What policy should an MCP proxy enforce?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An MCP proxy should enforce agent and task identity, session budgets, per-tool cost caps, unknown-tool behavior, revocation triggers, audit fields, and optional L402 payment before tool execution.',
+          text: 'An MCP proxy should enforce agent and task identity, session budgets, per-tool cost caps, unknown-tool behavior, revocation triggers, audit fields, and optional paid-rail context before tool execution.',
         },
       },
     ],
@@ -165,7 +165,7 @@ export default function McpProxyConfigGeneratorPage() {
             MCP Proxy Config Generator
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Generate a starter SatGate MCP proxy config for Cursor, Claude Desktop, Claude Code, OpenClaw, or custom MCP clients with budgets, audit, revocation, and optional L402 Charge.
+            Generate a starter SatGate MCP proxy config for Cursor, Claude Desktop, Claude Code, OpenClaw, or custom MCP clients with budgets, audit, revocation, and optional paid-rail context.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <a href="#generator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -238,7 +238,7 @@ export default function McpProxyConfigGeneratorPage() {
               [KeyRound, 'Capabilities', 'Require scoped, revocable, expiring authority instead of broad ambient access.'],
               [ReceiptText, 'Audit', 'Record agent, task, server, tool, cost, budget, policy, and decision.'],
               [ShieldCheck, 'Revocation', 'Stop future tool calls when a loop, violation, or risky delegation appears.'],
-              [ClipboardList, 'Modes', 'Start in Observe, enforce in Control, and use Charge/L402 when tools become paid products.'],
+              [ClipboardList, 'Modes', 'Start in Observe, enforce in Control, and preserve paid-rail context when tools require payment.'],
             ].map(([Icon, title, body]) => {
               const CardIcon = Icon as typeof Wrench;
               return (
@@ -285,7 +285,7 @@ export default function McpProxyConfigGeneratorPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What policy should an MCP proxy enforce?</h3>
               <p className="text-gray-400 leading-relaxed">
-                An MCP proxy should enforce agent and task identity, session budgets, per-tool cost caps, unknown-tool behavior, revocation triggers, audit fields, and optional L402 payment before tool execution.
+                An MCP proxy should enforce agent and task identity, session budgets, per-tool cost caps, unknown-tool behavior, revocation triggers, audit fields, and optional paid-rail context before tool execution.
               </p>
             </div>
           </div>
