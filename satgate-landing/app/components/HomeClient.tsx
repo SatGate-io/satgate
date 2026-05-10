@@ -27,7 +27,7 @@ const LandingPage = () => {
           </Link>
 
           {/* Desktop menu */}
-          <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
+          <div className="hidden xl:flex gap-6 text-sm font-medium text-gray-400">
             <Link href="/protect" className="hover:text-white transition">Live Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/mcp-gateway" className="hover:text-white transition">MCP Gateway</Link>
@@ -45,7 +45,7 @@ const LandingPage = () => {
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex md:hidden items-center justify-center w-10 h-10 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 text-gray-400 hover:text-white transition"
+            className="flex xl:hidden items-center justify-center w-10 h-10 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 text-gray-400 hover:text-white transition"
             aria-label="Toggle menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -55,8 +55,8 @@ const LandingPage = () => {
 
         {/* Mobile menu dropdown */}
         <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            mobileMenuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'
+          className={`xl:hidden transition-all duration-300 ease-in-out ${
+            mobileMenuOpen ? 'max-h-[calc(100vh-4rem)] overflow-y-auto opacity-100' : 'max-h-0 overflow-hidden opacity-0'
           }`}
         >
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
@@ -73,6 +73,20 @@ const LandingPage = () => {
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Enterprise
+            </Link>
+            <Link
+              href="/mcp-gateway"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              MCP Gateway
+            </Link>
+            <Link
+              href="/capability-auth"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              Capability Auth
             </Link>
             <Link
               href="/agent-control-plane"
