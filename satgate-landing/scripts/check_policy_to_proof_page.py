@@ -16,6 +16,14 @@ AGENT_BUDGET_POLICY_LAYOUT = ROOT / "app" / "agent-spend-policy-template" / "lay
 CAPABILITY_TOKEN_TEMPLATE_PAGE = ROOT / "app" / "revocable-capability-token-policy-template" / "page.tsx"
 CAPABILITY_TOKEN_TEMPLATE_LAYOUT = ROOT / "app" / "revocable-capability-token-policy-template" / "layout.tsx"
 
+SPEND_LONGTAIL_PAGES = {
+    "ai-agent-cost-control": ROOT / "app" / "ai-agent-cost-control" / "page.tsx",
+    "ai-api-budget-enforcement": ROOT / "app" / "ai-api-budget-enforcement" / "page.tsx",
+    "agent-spending-limits": ROOT / "app" / "agent-spending-limits" / "page.tsx",
+    "mcp-cost-control": ROOT / "app" / "mcp-cost-control" / "page.tsx",
+    "agent-payment-controls": ROOT / "app" / "agent-payment-controls" / "page.tsx",
+}
+
 required_phrases = [
     "Every agent action leaves a receipt",
     "without permanent credentials, unlimited spend, or unobservable authority",
@@ -289,6 +297,108 @@ tool_forbidden_phrases = {
     ],
 }
 
+spend_longtail_required_phrases = {
+    "ai-agent-cost-control": [
+        "authority before execution",
+        "audit receipts",
+        "Policy-to-Proof",
+        "Evidence Pack capture",
+        "/govern",
+        "/policy-to-proof",
+        "paid-rail evidence",
+    ],
+    "ai-api-budget-enforcement": [
+        "authority before execution",
+        "audit receipts",
+        "Policy-to-Proof",
+        "Govern AI API budgets",
+        "/govern",
+        "/policy-to-proof",
+    ],
+    "agent-spending-limits": [
+        "authority before execution",
+        "receipt for every budget decision",
+        "Policy-to-Proof",
+        "Govern agent spending limits",
+        "/govern",
+        "/policy-to-proof",
+    ],
+    "mcp-cost-control": [
+        "MCP cost control belongs before tool execution",
+        "authority, budget, revocation, and receipt policy",
+        "Policy-to-Proof",
+        "Govern MCP tool spend",
+        "/govern",
+        "/policy-to-proof",
+    ],
+    "agent-payment-controls": [
+        "Policy Before Agent Payments",
+        "paid-rail context",
+        "Evidence Pack",
+        "Policy-to-Proof evidence",
+        "Govern agent payments",
+        "/govern",
+        "/policy-to-proof",
+    ],
+}
+
+spend_longtail_forbidden_phrases = {
+    "ai-agent-cost-control": [
+        "Charge robot customers",
+        "robot customers",
+        "external robot customers",
+        "Charge/L402",
+        "L402 Charge",
+        "L402 API monetization",
+        "when APIs become products",
+        "when agents become customers",
+        "03 / CHARGE",
+        "/robot-customer-payments",
+    ],
+    "ai-api-budget-enforcement": [
+        "Charge robot customers",
+        "robot customers",
+        "external robot customers",
+        "Charge/L402",
+        "L402 Charge",
+        "L402 API monetization",
+        "when APIs become products",
+        "Open free tools",
+    ],
+    "agent-spending-limits": [
+        "Charge robot customers",
+        "robot customers",
+        "external robot customers",
+        "Charge/L402",
+        "L402 Charge",
+        "L402 API monetization",
+        "when APIs become products",
+        "Open free tools",
+    ],
+    "mcp-cost-control": [
+        "Charge robot customers",
+        "robot customers",
+        "external robot customers",
+        "Charge/L402",
+        "L402 Charge",
+        "L402 API monetization",
+        "when APIs become products",
+        "Open free tools",
+    ],
+    "agent-payment-controls": [
+        "Charge robot customers",
+        "robot customers",
+        "external robot customers",
+        "L402 Charge",
+        "L402 API monetization",
+        "SatGate Charge",
+        "when APIs become agent-native products",
+        "Compare Link and SatGate",
+        "Learn the economic firewall",
+        "Read HTTP 402 for agents",
+    ],
+}
+
 
 def main() -> int:
     if not PAGE.exists():
@@ -341,6 +451,15 @@ def main() -> int:
         tool_stale = [phrase for phrase in tool_forbidden_phrases[name] if phrase in tool_text]
         if tool_stale:
             raise SystemExit(f"stale {name} spend/Charge/tool-exit phrases remain:\n" + "\n".join(tool_stale))
+
+    for name, path in SPEND_LONGTAIL_PAGES.items():
+        page_text = path.read_text()
+        missing_longtail = [phrase for phrase in spend_longtail_required_phrases[name] if phrase not in page_text]
+        if missing_longtail:
+            raise SystemExit(f"missing {name} spend-longtail authority/proof phrases:\n" + "\n".join(missing_longtail))
+        stale_longtail = [phrase for phrase in spend_longtail_forbidden_phrases[name] if phrase in page_text]
+        if stale_longtail:
+            raise SystemExit(f"stale {name} spend/Charge-first phrases remain:\n" + "\n".join(stale_longtail))
     return 0
 
 

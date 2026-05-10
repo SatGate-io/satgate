@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptText, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptText } from 'lucide-react';
 
 export const metadata = {
   title: 'AI API Budget Enforcement | Hard Caps for Agent API Spend',
-  description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with request-path controls and audit.',
+  description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with request-path controls, revocation, and audit receipts.',
   alternates: { canonical: 'https://satgate.io/ai-api-budget-enforcement' },
   keywords: [
     'AI API budget enforcement',
@@ -18,14 +18,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'AI API Budget Enforcement | Hard Caps for Agent API Spend',
-    description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services.',
+    description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with audit receipts.',
     url: 'https://satgate.io/ai-api-budget-enforcement',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'AI API Budget Enforcement | Hard Caps for Agent API Spend',
-    description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services.',
+    description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with audit receipts.',
   },
 };
 
@@ -67,7 +67,7 @@ export default function Page() {
     url: 'https://satgate.io/ai-api-budget-enforcement',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-03',
-    featureList: ['Request-path budget enforcement', 'AI agent spend caps', 'MCP tool cost control', 'Revocable credentials', 'Audit trails'],
+    featureList: ['Request-path budget enforcement', 'AI agent spend caps', 'MCP tool cost control', 'Revocable credentials', 'Audit receipts', 'Policy-to-Proof evidence'],
     audience: { '@type': 'Audience', audienceType: 'AI platform, API, finance, and security teams' },
   };
 
@@ -105,10 +105,10 @@ export default function Page() {
         <div className="relative mx-auto max-w-6xl px-6 py-24">
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-950/30 px-4 py-2 text-sm text-cyan-200"><Gauge size={16} /> Hard caps before API spend happens</div>
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">AI API budget enforcement belongs in the request path</h1>
-          <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">AI agents can call APIs faster than finance, dashboards, or alerts can react. SatGate enforces budgets before upstream API, model, or MCP tool calls execute.</p>
+          <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">AI agents can call APIs faster than finance, dashboards, or alerts can react. SatGate puts authority before execution by enforcing budget, route, scope, revocation, and audit policy before upstream API, model, or MCP tool calls execute.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">AI agent cost control <ArrowRight size={18} /></Link>
-            <Link href="/openai-budget-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Generate OpenAI policy</Link>
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Govern AI API budgets <ArrowRight size={18} /></Link>
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">See Policy-to-Proof</Link>
           </div>
         </div>
       </section>
@@ -118,7 +118,7 @@ export default function Page() {
           <h2 className="mb-6 text-3xl font-bold text-white">The control point is before the call</h2>
           <div className="space-y-5 text-lg leading-relaxed text-gray-300">
             <p>Autonomous agents can generate real costs through model calls, API requests, MCP tools, delegated sub-agents, retries, and background workflows. If the policy check happens after the request, the money is already spent.</p>
-            <p>SatGate enforces economic policy at the gateway boundary. Every important request can be evaluated against budget, scope, identity, revocation, route, tool, and audit rules before upstream access.</p>
+            <p>SatGate enforces economic policy at the gateway boundary. Every important request can be evaluated against budget, scope, identity, revocation, route, tool, receipt, and audit rules before upstream access.</p>
             <p>That is the difference between cost reporting and economic control.</p>
           </div>
         </div>
@@ -191,10 +191,10 @@ export default function Page() {
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-3xl border border-purple-900/60 bg-gradient-to-br from-purple-950/35 to-cyan-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Make agent economics enforceable.</h2>
-          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate is the economic firewall for AI agents: observe every request, control spend before execution, and charge robot customers when paid API access should unlock.</p>
+          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate is the economic firewall for AI agents: observe every request, enforce spend before execution, and preserve Policy-to-Proof receipts when paid access or budget decisions occur.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/tools" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Open free tools <ArrowRight size={18} /></Link>
-            <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Economic firewall</Link>
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Govern AI API spend <ArrowRight size={18} /></Link>
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Review Policy-to-Proof</Link>
           </div>
         </div>
       </section>

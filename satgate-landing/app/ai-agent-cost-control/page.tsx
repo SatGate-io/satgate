@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowRight, Bot, DollarSign, Gauge, ShieldCheck, Workflow, BarChart3 } from 'lucide-react';
 
 export const metadata = {
-  title: 'AI Agent Cost Control Software',
-  description: 'Control AI agent API spend before it happens. SatGate enforces budgets, revocation, routing, and audit trails in the request path.',
+  title: 'AI Agent Cost Control | Request-Path Budget Enforcement',
+  description: 'Control AI agent API spend before it happens. SatGate enforces budgets, revocation, routing, and audit receipts in the request path.',
   alternates: { canonical: 'https://satgate.io/ai-agent-cost-control' },
   keywords: [
     'AI agent cost control',
@@ -16,15 +16,15 @@ export const metadata = {
     'AI cost governance',
   ],
   openGraph: {
-    title: 'AI Agent Cost Control Software',
-    description: 'Enforce per-agent budgets, spend caps, revocation, routing, and audit trails before autonomous API calls execute.',
+    title: 'AI Agent Cost Control | Request-Path Budget Enforcement',
+    description: 'Enforce per-agent budgets, spend caps, revocation, routing, and audit receipts before autonomous API calls execute.',
     url: 'https://satgate.io/ai-agent-cost-control',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AI Agent Cost Control Software',
-    description: 'Stop runaway AI agent spend with request-path budget enforcement, revocation, routing, and audit trails.',
+    title: 'AI Agent Cost Control | Request-Path Budget Enforcement',
+    description: 'Stop runaway AI agent spend with request-path budget enforcement, revocation, routing, and audit receipts.',
   },
 };
 
@@ -65,7 +65,7 @@ export default function AiAgentCostControlPage() {
   const webPageJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'AI Agent Cost Control Software',
+    name: 'AI Agent Cost Control | Request-Path Budget Enforcement',
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-cost-control',
     dateModified: '2026-05-05',
@@ -96,8 +96,8 @@ export default function AiAgentCostControlPage() {
       'Per-tool cost attribution',
       'MCP budget enforcement',
       'Revocable agent credentials',
-      'Request-path audit trails',
-      'L402 API monetization',
+      'Request-path audit receipts',
+      'Policy-to-Proof Evidence Packs',
     ],
   };
 
@@ -110,7 +110,7 @@ export default function AiAgentCostControlPage() {
         name: 'What is AI agent cost control?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'AI agent cost control is the practice of attributing, budgeting, limiting, and auditing autonomous agent API and tool spend before requests execute.',
+          text: 'AI agent cost control is the practice of attributing, budgeting, limiting, and preserving receipts for autonomous agent API and tool spend before requests execute.',
         },
       },
       {
@@ -191,8 +191,8 @@ export default function AiAgentCostControlPage() {
       {
         '@type': 'ListItem',
         position: 4,
-        name: 'Economic audit trail',
-        description: 'Allowed, denied, charged, routed, and revoked requests leave evidence finance and security can review.',
+        name: 'Evidence Pack capture',
+        description: 'Allowed, denied, delegated, routed, paid, and revoked requests leave receipts finance and security can review.',
       },
     ],
   };
@@ -224,8 +224,8 @@ export default function AiAgentCostControlPage() {
       {
         '@type': 'ListItem',
         position: 4,
-        name: 'Add Charge for robot customers',
-        description: 'When external agents call high-value APIs, require L402 payment before granting access.',
+        name: 'Preserve proof for paid access',
+        description: 'When paid access is allowed, preserve the policy decision, payment context, and receipt before granting access.',
       },
     ],
   };
@@ -260,18 +260,18 @@ export default function AiAgentCostControlPage() {
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-10">
-            SatGate puts budget enforcement, revocation, routing, and audit trails in the request path so autonomous agents cannot silently burn through OpenAI, Claude, MCP, or paid API budgets.
+            SatGate puts authority before execution: budget enforcement, revocation, routing, and audit receipts run in the request path before autonomous agents can spend against OpenAI, Claude, MCP, or paid API budgets.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/roi-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              Estimate avoided spend <ArrowRight size={18} />
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
+              Govern agent spend <ArrowRight size={18} />
             </Link>
-            <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
-              Learn economic firewalls
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              See Policy-to-Proof
             </Link>
-            <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
-              LLM cost dashboard checklist
+            <Link href="/roi-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              Estimate avoided spend
             </Link>
           </div>
         </div>
@@ -285,10 +285,10 @@ export default function AiAgentCostControlPage() {
               LLM dashboards, provider billing pages, and token reports are useful after the fact. They tell you what happened. They do not stop an autonomous agent from calling a premium model, retrying a failed tool, or delegating a task into a thousand-dollar loop.
             </p>
             <p>
-              AI agent cost control has to be inline. Every request needs an economic decision before it reaches the upstream provider: who is calling, what route is allowed, what the request costs, whether budget remains, and what should be recorded.
+              AI agent cost control has to be inline. Every request needs an economic decision before it reaches the upstream provider: who is calling, what authority applies, what route is allowed, what the request costs, whether budget remains, and which receipt should be recorded.
             </p>
             <p>
-              SatGate enforces those decisions at the gateway layer across internal agents, MCP tools, hosted APIs, model providers, and external robot customers.
+              SatGate enforces those decisions at the gateway layer across internal agents, MCP tools, hosted APIs, model providers, and paid external-access flows.
             </p>
           </div>
         </div>
@@ -325,7 +325,7 @@ export default function AiAgentCostControlPage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-6 py-20">
-        <h2 className="text-3xl font-bold text-white mb-8">Start with Observe. Graduate to Control. Add Charge when agents become customers.</h2>
+        <h2 className="text-3xl font-bold text-white mb-8">Start with Observe. Graduate to Control. Preserve proof when value moves.</h2>
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
             <div className="text-purple-300 font-mono text-sm mb-3">01 / OBSERVE</div>
@@ -338,9 +338,9 @@ export default function AiAgentCostControlPage() {
             <p className="text-gray-400 leading-relaxed">Apply hard caps, per-request ceilings, route policy, revocation, expiry, and kill switches before the expensive call happens.</p>
           </div>
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
-            <div className="text-yellow-300 font-mono text-sm mb-3">03 / CHARGE</div>
-            <h3 className="text-xl font-bold text-white mb-3">Monetize agent access</h3>
-            <p className="text-gray-400 leading-relaxed">When APIs become products for external autonomous agents, collect payment with Charge/L402 before unlocking the protected resource.</p>
+            <div className="text-yellow-300 font-mono text-sm mb-3">03 / PROOF</div>
+            <h3 className="text-xl font-bold text-white mb-3">Preserve paid-access evidence</h3>
+            <p className="text-gray-400 leading-relaxed">When value moves, record the policy decision, payment context, route, authority, and receipt before unlocking the protected resource.</p>
           </div>
         </div>
       </section>
@@ -356,7 +356,7 @@ export default function AiAgentCostControlPage() {
               ['MCP tool spend control', 'Attach cost to tool calls and stop runaway Cursor, Claude Desktop, Claude Code, or OpenClaw workflows.', '/mcp-cost-control'],
               ['Revocable agent credentials', 'Replace broad static keys with scoped, expiring credentials and kill switches for autonomous workers.', '/revocable-agent-credentials'],
               ['Capability-token policy template', 'Generate scoped, expiring, revocable capability-token policy with budget, delegation, and audit caveats.', '/revocable-capability-token-policy-template'],
-              ['Robot customer payments', 'Let external agents pay for protected APIs through a governed request path.', '/robot-customer-payments'],
+              ['Agent payment controls', 'Govern wallet approval, payment context, budgets, and audit before protected API access.', '/agent-payment-controls'],
             ].map(([title, body, href]) => (
               <Link key={title} href={href} className="rounded-xl border border-gray-800 bg-black p-6 hover:border-cyan-800/70 transition block">
                 <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
@@ -380,7 +380,7 @@ export default function AiAgentCostControlPage() {
               ['Inline enforcement', 'Budget policy runs before model, API, or MCP tool execution — not after a billing export.'],
               ['Agent-level attribution', 'Every request maps to tenant, workflow, agent, delegated sub-agent, token, route, and tool.'],
               ['Revocable authority', 'Credentials can expire, narrow, delegate safely, or be killed without rotating shared API keys.'],
-              ['Economic audit trail', 'Allowed, denied, charged, routed, and revoked requests leave evidence finance and security can review.'],
+              ['Evidence Pack capture', 'Allowed, denied, delegated, routed, paid, and revoked requests leave receipts finance and security can review.'],
             ].map(([title, body]) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-5">
                 <h3 className="mb-2 font-bold text-white">{title}</h3>
@@ -422,7 +422,7 @@ export default function AiAgentCostControlPage() {
               ['Inventory exposure', 'Map agents, shared API keys, MCP tools, paid APIs, premium models, and workflows that can create cost.', '/agent-api-key-risk-assessment'],
               ['Observe first', 'Route traffic through SatGate to attribute spend by tenant, agent, workflow, route, model, and tool before blocking.', '/llm-cost-monitoring'],
               ['Enforce budgets', 'Apply per-agent budgets, MCP caps, route ceilings, expiry, delegation limits, and revocation policy in the request path.', '/agent-spend-policy-template'],
-              ['Charge robot customers', 'When external agents call high-value APIs, require L402 payment before granting access.', '/robot-customer-payments'],
+              ['Preserve paid-access proof', 'Record policy decisions, payment context, and receipts before granting paid external access.', '/policy-to-proof'],
             ].map(([title, body, href]) => (
               <Link key={title} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
                 <h3 className="mb-2 font-bold text-white">{title}</h3>
@@ -433,7 +433,7 @@ export default function AiAgentCostControlPage() {
           </div>
           <div className="mt-8 rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6">
             <h3 className="mb-2 text-xl font-bold text-white">Need a readiness score first?</h3>
-            <p className="mb-4 text-gray-400">Use the grader to see whether identity, budget policy, MCP governance, revocation, audit, routing, and Charge are ready for autonomous agents.</p>
+            <p className="mb-4 text-gray-400">Use the grader to see whether identity, budget policy, MCP governance, revocation, audit, routing, and paid-rail evidence are ready for autonomous agents.</p>
             <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center gap-2 font-semibold text-purple-300 hover:text-purple-200">Run the economic firewall readiness grader <ArrowRight size={16} /></Link>
           </div>
         </div>
@@ -470,7 +470,7 @@ export default function AiAgentCostControlPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is AI agent cost control?</h3>
               <p className="text-gray-400 leading-relaxed">
-                AI agent cost control is the practice of attributing, budgeting, limiting, and auditing autonomous agent API and tool spend before requests execute.
+                AI agent cost control is the practice of attributing, budgeting, limiting, and preserving receipts for autonomous agent API and tool spend before requests execute.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -517,7 +517,7 @@ export default function AiAgentCostControlPage() {
         <div className="rounded-3xl border border-purple-900/60 bg-gradient-to-br from-purple-950/30 to-cyan-950/30 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">Find your avoidable agent spend</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            Use the SatGate ROI calculator to model ghost spend, runaway loops, wasted tool calls, and the payback period for request-path budget enforcement.
+            Use the SatGate ROI calculator to model ghost spend, runaway loops, wasted tool calls, and the payback period for request-path budget enforcement with Policy-to-Proof receipt coverage.
           </p>
           <Link href="/roi-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
             Open the ROI calculator <ArrowRight size={18} />
