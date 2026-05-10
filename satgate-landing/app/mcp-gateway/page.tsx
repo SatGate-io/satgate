@@ -36,7 +36,7 @@ const policyTemplates = [
 
 const controls = [
   { icon: Eye, title: 'Observe MCP tool usage', body: 'Attribute each MCP call to tenant, principal, agent, token, MCP client, MCP server, tool, budget, and workflow before finance or security asks for Evidence Pack proof.' },
-  { icon: LockKeyhole, title: 'Control access and budgets', body: 'Enforce scoped capabilities, tool allowlists, MCP budget enforcement, spend caps, tenant isolation, delegation depth, expiry, and instant revocation before execution.' },
+  { icon: LockKeyhole, title: 'Control access and budgets', body: 'Enforce scoped capabilities, tool allowlists, MCP budget enforcement, spend caps, tenant isolation, delegation depth, expiry, and next-request revocation before execution.' },
   { icon: ReceiptText, title: 'Produce MCP Evidence Packs', body: 'Record the agent, tool, policy version, decision, budget state, delegation chain hash, receipt ID, and outcome so MCP activity can be reviewed as proof.' },
 ];
 
@@ -256,7 +256,7 @@ export default function McpGatewayPage() {
         <div className="rounded-2xl border border-gray-800 bg-gray-950 p-7">
           <ShieldCheck className="text-cyan-300 mb-4" size={30} />
           <h2 className="text-2xl font-bold text-white mb-3">Hybrid MCP is Hetzner-hosted</h2>
-          <p className="text-gray-300 leading-relaxed">Use Hybrid MCP when enterprise buyers need dedicated runtime boundaries, stronger operational control, and deployment evidence separate from the shared SaaS plane.</p>
+          <p className="text-gray-300 leading-relaxed">Use Hybrid MCP when regulated environments need dedicated runtime boundaries, stronger operational control, and deployment evidence separate from the shared SaaS plane.</p>
         </div>
       </section>
 

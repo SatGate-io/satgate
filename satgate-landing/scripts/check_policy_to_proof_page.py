@@ -27,6 +27,10 @@ OPENAI_GENERATOR_PAGE = ROOT / "app" / "openai-budget-policy-generator" / "page.
 OPENAI_GENERATOR_LAYOUT = ROOT / "app" / "openai-budget-policy-generator" / "layout.tsx"
 MCP_TOOL_GENERATOR_PAGE = ROOT / "app" / "mcp-tool-cost-policy-generator" / "page.tsx"
 MCP_TOOL_GENERATOR_LAYOUT = ROOT / "app" / "mcp-tool-cost-policy-generator" / "layout.tsx"
+CAPABILITY_LIFECYCLE_PAGE = ROOT / "app" / "capability-lifecycle-demo" / "page.tsx"
+CAPABILITY_LIFECYCLE_COMPONENT = ROOT / "app" / "capability-lifecycle-demo" / "CapabilityLifecycleDemo.tsx"
+COMPARISON_COMPONENT = ROOT / "app" / "compare" / "_components" / "BrutalComparisonPage.tsx"
+COMPARISON_COPY = ROOT / "app" / "compare" / "_components" / "comparisons.ts"
 
 
 SPEND_LONGTAIL_PAGES = {
@@ -50,6 +54,38 @@ MCP_AUTHORITY_PAGES = {
     "agent-api-governance": ROOT / "app" / "agent-api-governance" / "page.tsx",
 }
 
+capability_lifecycle_required_phrases = [
+    "Capability lifecycle control",
+    "Control the full authority lifecycle: issue, delegate, attenuate, revoke, prove",
+    "Macaroons and caveats, translated into enterprise controls",
+    "Attenuation becomes bounded authority",
+    "A complete lifecycle record does not stop at “token issued.”",
+    "Decision proof",
+    "This is the capability lifecycle enterprises can govern.",
+    "next-request revocation",
+    "Evidence Pack proof",
+]
+
+customer_copy_forbidden_phrases = [
+    "buyer-visible",
+    "translated for buyers",
+    "Buyers need to see",
+    "buyers need to see",
+    "Engineers can talk",
+    "credible lifecycle demo",
+    "Buyer proof",
+    "capability story buyers",
+    "Demo Evidence Pack",
+    "Brutal comparison",
+    "brutal difference",
+    "brutal gap",
+    "brutal in production",
+    "messy multi-provider",
+    "real enterprise sprawl",
+    "raw exhaust",
+    "lose the plot",
+]
+
 required_phrases = [
     "Every agent action leaves a receipt",
     "without permanent credentials, unlimited spend, or unobservable authority",
@@ -66,7 +102,7 @@ required_phrases = [
     "Deny",
     "Revoke",
     "Export",
-    "Download sample Evidence Pack",
+    "Download JSON export",
     "chain_root",
     "signature",
     "receipt_hash",
@@ -76,8 +112,8 @@ required_phrases = [
     "Auditor",
     "CISO",
     "FinOps lead",
-    "/evidence-packs/sample-evidence-pack.json",
-    "/evidence-packs/sample-evidence-pack.pdf",
+    "/evidence-packs/sample-evidence-pack.v1.json",
+    "/evidence-packs/evidence-pack.schema.v1.json",
     "REDACTED_DEMO_SAMPLE_DO_NOT_VERIFY",
     "evidence-pack-export-poster.svg",
     "satgate-evidence-pack-walkthrough.mp4",
@@ -362,7 +398,7 @@ tool_forbidden_phrases = {
 spend_longtail_required_phrases = {
     "ai-agent-cost-control": [
         "authority before execution",
-        "audit receipts",
+        "Evidence Pack receipts",
         "Policy-to-Proof",
         "Evidence Pack capture",
         "/govern",
@@ -374,7 +410,7 @@ spend_longtail_required_phrases = {
     ],
     "ai-api-budget-enforcement": [
         "authority before execution",
-        "audit receipts",
+        "Evidence Pack receipts",
         "Policy-to-Proof",
         "Govern AI API budgets",
         "/govern",
@@ -558,7 +594,7 @@ l402_rail_required_phrases = {
         "Evidence Pack receipt",
         "Govern paid agent actions",
         "See Policy-to-Proof",
-        "L402 Lightning is one paid rail",
+        "paid-rail context is one paid rail",
         "x402",
         "AgentCore Payments",
         "Pay.sh",
@@ -617,9 +653,9 @@ mcp_authority_required_phrases = {
         "/policy-to-proof",
     ],
     "mcp-gateway": [
-        "MCP Gateway for Governed Agent Tool Access",
+        "MCP Gateway for Budget Enforcement and Evidence Packs",
         "authority before execution",
-        "audit receipt",
+        "MCP Evidence Pack receipt",
         "Evidence Pack",
         "SaaS MCP is Fly-hosted",
         "Hybrid MCP is Hetzner-hosted",
@@ -696,6 +732,20 @@ def main() -> int:
     missing = [phrase for phrase in required_phrases if phrase not in text]
     if missing:
         raise SystemExit("missing policy-to-proof phrases:\n" + "\n".join(missing))
+
+    capability_text = CAPABILITY_LIFECYCLE_PAGE.read_text() + "\n" + CAPABILITY_LIFECYCLE_COMPONENT.read_text()
+    capability_missing = [phrase for phrase in capability_lifecycle_required_phrases if phrase not in capability_text]
+    if capability_missing:
+        raise SystemExit("missing capability-lifecycle customer-facing phrases:\n" + "\n".join(capability_missing))
+    customer_copy_text = "\n".join([
+        capability_text,
+        COMPARISON_COMPONENT.read_text(),
+        COMPARISON_COPY.read_text(),
+    ])
+    customer_copy_stale = [phrase for phrase in customer_copy_forbidden_phrases if phrase in customer_copy_text]
+    if customer_copy_stale:
+        raise SystemExit("internal/customer-hostile public copy remains:\n" + "\n".join(customer_copy_stale))
+
     acp_text = AGENT_CONTROL_PLANE.read_text()
     if "/policy-to-proof" not in acp_text:
         raise SystemExit("agent-control-plane page must link to /policy-to-proof")
@@ -839,8 +889,8 @@ def main() -> int:
         "mcp-tool-cost-policy-generator": ["audit trails", "charged", "Charge robot", "monetize"],
     }
     generator_policy_required = {
-        "openai-budget-policy-generator": ["Evidence Pack receipts", "govern OpenAI spend"],
-        "mcp-tool-cost-policy-generator": ["Evidence Pack receipts", "govern MCP tools"],
+        "openai-budget-policy-generator": ["Evidence Pack receipts", "Govern OpenAI spend"],
+        "mcp-tool-cost-policy-generator": ["Evidence Pack receipts", "Govern MCP tools"],
     }
     for name, gen_text in generator_policy_texts.items():
         missing_gen = [phrase for phrase in generator_policy_required[name] if phrase not in gen_text]

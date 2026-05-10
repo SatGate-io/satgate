@@ -221,7 +221,7 @@
     ],
     "intent": "commercial-investigation",
     "funnelStage": "solution-aware",
-    "productAngle": "SatGate demonstrates issue, delegate, attenuate, revoke, and prove as buyer-visible scoped authority with child spend caps, instant revocation, and Evidence Packs.",
+    "productAngle": "SatGate demonstrates issue, delegate, attenuate, revoke, and prove as customer-visible scoped authority with child spend caps, next-request revocation, and Evidence Packs.",
     "cta": "Walk the lifecycle demo",
     "status": "new"
   }

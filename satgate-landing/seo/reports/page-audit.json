@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-10T22:03:21.107591Z",
+  "generatedAt": "2026-05-10T22:40:19.919763Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -430,9 +430,9 @@
       "h1Count": 1,
       "h2s": [
         "Where is genuinely useful",
-        "Where SatGate forces the harder question",
-        "The comparison that actually matters",
-        "Why this gets brutal in production",
+        "Where SatGate evaluates agent authority",
+        "What to compare for agent governance",
+        "Why this matters in production",
         "FAQ",
         "Dashboards explain what happened. SatGate controls what agents are allowed to do."
       ],
@@ -452,7 +452,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 438,
+      "wordCount": 437,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -474,9 +474,9 @@
       "h1Count": 1,
       "h2s": [
         "Where is genuinely useful",
-        "Where SatGate forces the harder question",
-        "The comparison that actually matters",
-        "Why this gets brutal in production",
+        "Where SatGate evaluates agent authority",
+        "What to compare for agent governance",
+        "Why this matters in production",
         "FAQ",
         "Dashboards explain what happened. SatGate controls what agents are allowed to do."
       ],
@@ -496,7 +496,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 436,
+      "wordCount": 435,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -518,9 +518,9 @@
       "h1Count": 1,
       "h2s": [
         "Where is genuinely useful",
-        "Where SatGate forces the harder question",
-        "The comparison that actually matters",
-        "Why this gets brutal in production",
+        "Where SatGate evaluates agent authority",
+        "What to compare for agent governance",
+        "Why this matters in production",
         "FAQ",
         "Dashboards explain what happened. SatGate controls what agents are allowed to do."
       ],
@@ -540,7 +540,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 434,
+      "wordCount": 433,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -562,9 +562,9 @@
       "h1Count": 1,
       "h2s": [
         "Where is genuinely useful",
-        "Where SatGate forces the harder question",
-        "The comparison that actually matters",
-        "Why this gets brutal in production",
+        "Where SatGate evaluates agent authority",
+        "What to compare for agent governance",
+        "Why this matters in production",
         "FAQ",
         "Dashboards explain what happened. SatGate controls what agents are allowed to do."
       ],
@@ -584,7 +584,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 440,
+      "wordCount": 439,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -606,9 +606,9 @@
       "h1Count": 1,
       "h2s": [
         "Where is genuinely useful",
-        "Where SatGate forces the harder question",
-        "The comparison that actually matters",
-        "Why this gets brutal in production",
+        "Where SatGate evaluates agent authority",
+        "What to compare for agent governance",
+        "Why this matters in production",
         "FAQ",
         "Dashboards explain what happened. SatGate controls what agents are allowed to do."
       ],
@@ -628,7 +628,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 436,
+      "wordCount": 435,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -639,21 +639,21 @@
     {
       "path": "/capability-lifecycle-demo",
       "exists": true,
-      "title": "Capability Lifecycle Demo | Issue, Delegate, Revoke, Prove",
-      "titleLength": 58,
-      "metaDescription": "Observe/Control/Prove capability lifecycle: issue, delegate, attenuate, revoke, caveats, child spend caps, delegation depth, and Evidence Packs.",
-      "metaDescriptionLength": 144,
+      "title": "Capability Lifecycle Control | Issue, Delegate, Revoke, Prove",
+      "titleLength": 61,
+      "metaDescription": "Observe, control, and prove the capability lifecycle: issue, delegate, attenuate, revoke, enforce caveats, cap child spend, and export Evidence Packs.",
+      "metaDescriptionLength": 150,
       "canonical": "/capability-lifecycle-demo",
       "h1": [
-        "Show the full authority lifecycle: issue, delegate, attenuate, revoke, prove"
+        "Control the full authority lifecycle: issue, delegate, attenuate, revoke, prove"
       ],
       "h1Count": 1,
       "h2s": [
         "",
         "Visible delegation state",
-        "Macaroons and caveats, translated for buyers",
+        "Macaroons and caveats, translated into enterprise controls",
         "Proof after revocation",
-        "This is the capability story buyers need to see."
+        "This is the capability lifecycle enterprises can govern."
       ],
       "internalLinks": [
         "/agent-capability-tokens",
@@ -671,7 +671,7 @@
         "WebPage",
         "WebSite"
       ],
-      "wordCount": 476,
+      "wordCount": 472,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,

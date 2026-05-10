@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: "AI Agent Budget Enforcement Demo | SatGate Control",
   alternates: { canonical: "https://satgate.io/protect" },
   description:
-    "See request-path AI agent budget enforcement in action. Control API and MCP tool spend with per-agent caps, delegation limits, policy decisions, and instant revocation.",
+    "See request-path AI agent budget enforcement in action. Control API and MCP tool spend with per-agent caps, delegation limits, policy decisions, and next-request revocation.",
   keywords: [
     "AI agent budget enforcement demo",
     "AI agent cost control demo",
