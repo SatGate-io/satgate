@@ -1,6 +1,6 @@
 # SatGate SEO Machine Report
 
-Generated: 2026-05-10T21:27:22.132691Z
+Generated: 2026-05-10T22:03:21.108034Z
 
 ## Ranked opportunities
 
@@ -73,6 +73,12 @@ Generated: 2026-05-10T21:27:22.132691Z
 ### P3 — /compare/openai-anthropic-budget-controls
 - Score: 26
 - Query: `OpenAI Anthropic budget controls alternative`
+- GSC: 0 clicks / 0 impressions / 0.00% CTR / pos 100.00
+- CTR gap: 0.50 pp
+
+### P3 — /capability-lifecycle-demo
+- Score: 26
+- Query: `capability lifecycle demo`
 - GSC: 0 clicks / 0 impressions / 0.00% CTR / pos 100.00
 - CTR gap: 0.50 pp
 
@@ -167,6 +173,12 @@ Generated: 2026-05-10T21:27:22.132691Z
 - Links to add:
 
 ### /compare/openai-anthropic-budget-controls
+- Title:
+- Meta:
+- Content changes:
+- Links to add:
+
+### /capability-lifecycle-demo
 - Title:
 - Meta:
 - Content changes:

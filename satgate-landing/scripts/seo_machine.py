@@ -95,6 +95,10 @@ def audit_page(target: dict[str, Any], sitemap_paths: set[str]) -> dict[str, Any
     if not f.exists():
         return {'path': path, 'exists': False, 'issues': ['missing route file'], 'priority': 'P0' if target.get('status')=='new' else 'P1'}
     text=f.read_text(errors='ignore')
+    if 'CapabilityLifecycleDemo' in text:
+        component = APP / 'capability-lifecycle-demo' / 'CapabilityLifecycleDemo.tsx'
+        if component.exists():
+            text += '\n' + component.read_text(errors='ignore')
     if 'BrutalComparisonPage' in text:
         component = APP / 'compare' / '_components' / 'BrutalComparisonPage.tsx'
         config = APP / 'compare' / '_components' / 'comparisons.ts'
@@ -116,7 +120,7 @@ def audit_page(target: dict[str, Any], sitemap_paths: set[str]) -> dict[str, Any
     h2s=[clean_text(m.group(1)) for m in H2_RE.finditer(text)]
     links=sorted({m.group(2) for m in LINK_RE.finditer(text)})
     schema_types=sorted(set(re.findall(r"['\"]@type['\"]:\s*['\"]([^'\"]+)['\"]", text)))
-    plain=clean_text(text)
+    plain=clean_text(text + '\n' + title + '\n' + desc)
     if not title: issues.append('missing title')
     elif not (35 <= len(title) <= 70): issues.append(f'title length {len(title)} outside 35-70')
     if not desc: issues.append('missing meta description')

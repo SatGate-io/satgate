@@ -133,7 +133,7 @@ export default function AgentApiGovernancePage() {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: 'Agent API governance requirements',
-    description: 'Core request-path controls required to govern AI agent API access without broad static keys, then preserve Evidence Pack receipts for Evidence Pack proof.',
+    description: 'Core request-path controls required to govern AI agent API access without broad static keys, then preserve Evidence Pack receipts for Evidence Pack proof. See the visible capability lifecycle demo for issue, delegate, attenuate, revoke, and prove.',
     itemListElement: [
       {
         '@type': 'ListItem',
@@ -194,8 +194,11 @@ export default function AgentApiGovernancePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              See SatGate governance <ArrowRight size={18} />
+            <Link href="/capability-lifecycle-demo" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
+              Walk capability lifecycle <ArrowRight size={18} />
+            </Link>
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              See SatGate governance
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               See Policy-to-Proof

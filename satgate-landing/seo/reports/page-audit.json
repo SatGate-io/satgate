@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-10T21:27:22.132277Z",
+  "generatedAt": "2026-05-10T22:03:21.107591Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -49,7 +49,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1295,
+      "wordCount": 1318,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -103,7 +103,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2148,
+      "wordCount": 2177,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -156,7 +156,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2586,
+      "wordCount": 2611,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -210,7 +210,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2649,
+      "wordCount": 2673,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -269,7 +269,7 @@
         "WebPage",
         "WebSite"
       ],
-      "wordCount": 1657,
+      "wordCount": 1683,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -318,7 +318,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1364,
+      "wordCount": 1391,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -366,7 +366,7 @@
         "Question",
         "SoftwareApplication"
       ],
-      "wordCount": 875,
+      "wordCount": 903,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -408,7 +408,7 @@
         "Question",
         "SoftwareApplication"
       ],
-      "wordCount": 498,
+      "wordCount": 518,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -452,7 +452,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 412,
+      "wordCount": 438,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -496,7 +496,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 410,
+      "wordCount": 436,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -540,7 +540,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 409,
+      "wordCount": 434,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -584,7 +584,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 411,
+      "wordCount": 440,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -628,7 +628,50 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 409,
+      "wordCount": 436,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
+    {
+      "path": "/capability-lifecycle-demo",
+      "exists": true,
+      "title": "Capability Lifecycle Demo | Issue, Delegate, Revoke, Prove",
+      "titleLength": 58,
+      "metaDescription": "Observe/Control/Prove capability lifecycle: issue, delegate, attenuate, revoke, caveats, child spend caps, delegation depth, and Evidence Packs.",
+      "metaDescriptionLength": 144,
+      "canonical": "/capability-lifecycle-demo",
+      "h1": [
+        "Show the full authority lifecycle: issue, delegate, attenuate, revoke, prove"
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "",
+        "Visible delegation state",
+        "Macaroons and caveats, translated for buyers",
+        "Proof after revocation",
+        "This is the capability story buyers need to see."
+      ],
+      "internalLinks": [
+        "/agent-capability-tokens",
+        "/govern",
+        "/policy-to-proof",
+        "/revocable-capability-token-policy-template"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "BreadcrumbList",
+        "FAQPage",
+        "ListItem",
+        "Question",
+        "Thing",
+        "WebPage",
+        "WebSite"
+      ],
+      "wordCount": 476,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
