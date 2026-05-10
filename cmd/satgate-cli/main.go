@@ -69,6 +69,8 @@ func main() {
 		}
 	case "wrap":
 		cmdWrap()
+	case "proof":
+		cmdEvidencePack()
 	case "version":
 		fmt.Printf("satgate-cli %s (commit: %s, built: %s)\n", Version, Commit, BuildDate)
 	case "help", "--help", "-h":
@@ -81,19 +83,24 @@ func main() {
 }
 
 func printUsage() {
-	fmt.Println(`SatGate CLI — Economic Firewall for APIs
+	fmt.Println(`SatGate CLI — Policy-to-Proof Governance for APIs
 
 Usage:
   satgate-cli <command> [options]
 
 Commands:
   init                         Interactive setup — configure gateway connection
-  status                       Show gateway health, active agents, and spend
+  status                       Show gateway health, active agents, and proof status
   mint --subject <name>        Mint a capability token for an agent
+  proof export                 Export a signed Evidence Pack from the gateway
   wrap --token <tok> -- <cmd>  Run any command through SatGate proxy
   token validate <token>       Validate a macaroon token
   version                      Show version info
   help                         Show this help
+
+Policy-to-Proof:
+  satgate-cli mint --subject my-agent
+  satgate-cli proof export --tenant my-tenant > evidence.json
 
 Get started:
   satgate-cli init
@@ -637,6 +644,45 @@ func mustLoadConfig() *CLIConfig {
 func readLine(reader *bufio.Reader) string {
 	line, _ := reader.ReadString('\n')
 	return strings.TrimSpace(line)
+}
+
+func cmdEvidencePack() {
+	cfg := mustLoadConfig()
+	if len(os.Args) < 3 || os.Args[2] != "export" {
+		fmt.Println("Usage: satgate-cli proof export [--tenant <id>]")
+		os.Exit(1)
+	}
+
+	tenantID := cfg.TenantID
+	for i := 3; i < len(os.Args); i++ {
+		if os.Args[i] == "--tenant" && i+1 < len(os.Args) {
+			tenantID = os.Args[i+1]
+			i++
+		}
+	}
+
+	// Create request manually to include X-Tenant-ID for proof export
+	endpoint := "/api/governance/evidence-pack"
+	u, _ := url.Parse(cfg.CloudURL)
+	u.Path = endpoint
+	req, _ := http.NewRequest("GET", u.String(), nil)
+	req.Header.Set("X-API-Key", cfg.APIKey)
+	req.Header.Set("X-Tenant-ID", tenantID)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		fmt.Printf("❌ %v\n", err)
+		os.Exit(1)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		body, _ := io.ReadAll(resp.Body)
+		fmt.Printf("❌ Failed to export proof (HTTP %d): %s\n", resp.StatusCode, string(body))
+		os.Exit(1)
+	}
+
+	io.Copy(os.Stdout, resp.Body)
 }
 
 func truncate(s string, n int) string {

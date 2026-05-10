@@ -548,8 +548,8 @@ type RoutePolicy struct {
 	//   - "protected" / "protect" / "capability": Macaroon verification
 	//
 	// LAYER 1 - ECONOMIC POLICIES:
-	//   - "observe" / "audit" / "chargeback": verify → allow → meter/log
-	//   - "control" / "budget" / "fiat402": verify → enforce budget → allow
+	//   - "observe" / "audit" / "chargeback" / "policy_to_proof": verify → allow → evidence
+	//   - "control" / "budget" / "fiat402" / "enforce": verify → enforce budget → allow
 	//   - "charge" / "monetize" / "l402": verify → payment proof → allow
 	//
 	// LEGACY:
@@ -558,6 +558,10 @@ type RoutePolicy struct {
 	PriceSats int64  `yaml:"priceSats,omitempty"`
 	Scope     string `yaml:"scope,omitempty"`
 	Tier      string `yaml:"tier,omitempty"`
+
+	// EvidencePack configures policy-to-proof receipt preservation.
+	// When enabled, every policy decision generates a tamper-evident receipt.
+	EvidencePack *EvidencePackConfig `yaml:"evidence_pack,omitempty"`
 
 	// CostCredits specifies the cost in credits for this route (budget enforcement).
 	// Default is 1 credit per request if not specified.
@@ -582,12 +586,12 @@ type RoutePolicy struct {
 //
 // "Default Protection. Choose your economic policy."
 func NormalizePolicyKind(kind string) string {
-	switch kind {
+	switch strings.ToLower(kind) {
 	// Economic Policy: Observe (passive metering)
-	case "observe", "audit":
+	case "observe", "audit", "policy_to_proof":
 		return "chargeback"
 	// Economic Policy: Control (budget enforcement)
-	case "control", "budget":
+	case "control", "budget", "enforce":
 		return "fiat402"
 	// Economic Policy: Charge (Lightning payments)
 	case "charge", "monetize":
@@ -619,6 +623,15 @@ func NormalizePayMode(mode string) string {
 func IsBillingMode(kind string) bool {
 	normalized := NormalizePolicyKind(kind)
 	return normalized == "chargeback" || normalized == "fiat402" || normalized == "l402"
+}
+
+// EvidencePackConfig configures policy-to-proof receipt preservation.
+type EvidencePackConfig struct {
+	Required               bool     `yaml:"required"`
+	ReceiptID              string   `yaml:"receipt_id,omitempty"` // "generated_per_decision", "tenant_scoped"
+	IncludePaymentContext  bool     `yaml:"include_payment_context"`
+	IncludePaidRailContext bool     `yaml:"include_paid_rail_context"`
+	RequiredFields         []string `yaml:"required_fields,omitempty"`
 }
 
 // PayPolicy configures billing for a route
@@ -704,10 +717,15 @@ func (c *Config) Validate() error {
 			return fmt.Errorf("route %s has no policy kind", route.Name)
 		}
 
-		// Normalize policy.kind aliases to canonical forms
-		// This allows users to use strategic names (audit, budget, monetize, protect)
+	// Normalize policy.kind aliases to canonical forms
+		// This allows users to use strategic names (audit, budget, monetize, protect, policy_to_proof)
 		// which get converted to runtime names (chargeback, fiat402, l402, capability)
 		route.Policy.Kind = NormalizePolicyKind(route.Policy.Kind)
+
+		// Auto-enable EvidencePack for policy_to_proof or when explicitly requested
+		if strings.ToLower(route.Policy.Kind) == "chargeback" && route.Policy.EvidencePack == nil && strings.Contains(strings.ToLower(os.Getenv("SATGATE_ENABLE_V2_AUDIT")), "true") {
+			route.Policy.EvidencePack = &EvidencePackConfig{Required: true, ReceiptID: "generated_per_decision"}
+		}
 
 		// For billing modes, synthesize Pay policy if not present
 		switch route.Policy.Kind {
