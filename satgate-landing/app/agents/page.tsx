@@ -101,7 +101,7 @@ export default function AgentsLandingPage() {
 
           <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10">
             HTTP APIs and MCP tool calls — authenticated, logged, cost-tracked, and budget-enforced. 
-            Per-agent budgets. Delegation hierarchies. Instant revocation. Connect in 5 minutes.
+            Per-agent budgets. Delegation hierarchies. Next-request revocation. Connect in 5 minutes.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
