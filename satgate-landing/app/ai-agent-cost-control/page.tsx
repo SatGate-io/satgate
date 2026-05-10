@@ -325,22 +325,22 @@ export default function AiAgentCostControlPage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-6 py-20">
-        <h2 className="text-3xl font-bold text-white mb-8">Start with Observe. Graduate to Control. Preserve proof when value moves.</h2>
+        <h2 className="text-3xl font-bold text-white mb-8">Start with Observe. Graduate to Control. Preserve proof for every decision.</h2>
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
             <div className="text-purple-300 font-mono text-sm mb-3">01 / OBSERVE</div>
-            <h3 className="text-xl font-bold text-white mb-3">Attribute every call</h3>
-            <p className="text-gray-400 leading-relaxed">Route agent traffic through SatGate to see spend by agent, model, route, tool, tenant, and workflow without blocking production workloads.</p>
+            <h3 className="text-xl font-bold text-white mb-3">Attribute every request</h3>
+            <p className="text-gray-400 leading-relaxed">See tenant, workflow, agent, delegated sub-agent, model, route, MCP tool, and spend before turning on enforcement.</p>
           </div>
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
             <div className="text-cyan-300 font-mono text-sm mb-3">02 / CONTROL</div>
-            <h3 className="text-xl font-bold text-white mb-3">Enforce budgets</h3>
+            <h3 className="text-xl font-bold text-white mb-3">Enforce before execution</h3>
             <p className="text-gray-400 leading-relaxed">Apply hard caps, per-request ceilings, route policy, revocation, expiry, and kill switches before the expensive call happens.</p>
           </div>
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
-            <div className="text-yellow-300 font-mono text-sm mb-3">03 / PROOF</div>
-            <h3 className="text-xl font-bold text-white mb-3">Preserve paid-access evidence</h3>
-            <p className="text-gray-400 leading-relaxed">When value moves, record the policy decision, payment context, route, authority, and receipt before unlocking the protected resource.</p>
+            <div className="text-yellow-300 font-mono text-sm mb-3">03 / PROVE</div>
+            <h3 className="text-xl font-bold text-white mb-3">Preserve decision evidence</h3>
+            <p className="text-gray-400 leading-relaxed">Record every authority decision — allowed, denied, delegated, revoked, or paid — in the Evidence Pack. Payment proves value moved; SatGate proves the agent was allowed to move it.</p>
           </div>
         </div>
       </section>
