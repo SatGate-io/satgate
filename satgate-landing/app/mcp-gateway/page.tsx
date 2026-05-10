@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Cable, Eye, Gauge, LockKeyhole, ReceiptText, ServerCog } from 'lucide-react';
+import { ArrowRight, Cable, Eye, Gauge, LockKeyhole, ReceiptText } from 'lucide-react';
 
 export const metadata = {
   title: 'MCP Gateway for Governed Agent Tool Access',
@@ -23,7 +23,6 @@ const controls = [
   { icon: Eye, title: 'Observe MCP tool usage', body: 'Attribute each MCP call to tenant, agent, token, server, tool, customer, and workflow before finance or security asks for Evidence Pack proof.' },
   { icon: LockKeyhole, title: 'Control access and budgets', body: 'Enforce scoped capabilities, tool allowlists, per-tool prices, spend caps, delegation depth, expiry, and instant revocation.' },
   { icon: ReceiptText, title: 'Produce audit receipts', body: 'Record the agent, tool, policy, decision, budget state, outcome, and receipt ID so MCP activity can be reviewed in an Evidence Pack.' },
-  { icon: ServerCog, title: 'Run SaaS or Hybrid MCP', body: 'Use Fly-hosted SaaS MCP for fast onboarding or Hetzner-hosted Hybrid MCP when buyers need dedicated runtime control.' },
 ];
 
 const faqs = [
@@ -31,7 +30,7 @@ const faqs = [
   ['Why do MCP tools need access control?', 'MCP makes tools easy for agents to reach, which also makes expensive or sensitive tools easy to overuse. Access control limits which agents can call which tools, for how long, under which budget, and with what delegation.'],
   ['Can SatGate host MCP servers?', 'Yes. SatGate supports SaaS MCP for fast hosted deployment and Hybrid MCP for dedicated enterprise runtime control. The critical split is simple: SaaS MCP is Fly-hosted; Hybrid MCP is Hetzner-hosted.'],
   ['How is an MCP gateway different from an API gateway?', 'A traditional API gateway mostly routes HTTP traffic and checks identity. An MCP gateway also understands agent tool calls, capability scope, per-tool cost, budget policy, delegation lineage, and audit outcomes.'],
-  ['Can MCP usage produce audit evidence?', 'Yes. Once tool usage is identified, governed, and metered, SatGate can support chargeback or invoiceable usage while preserving policy decisions in the Evidence Pack.'],
+  ['Can MCP usage produce audit evidence?', 'Yes. Every MCP call records identity, policy, decision, budget, and outcome in the Evidence Pack. Once tool usage is identified and metered, the same record can also support chargeback or invoiceable usage.'],
 ];
 
 export default function McpGatewayPage() {
@@ -115,7 +114,7 @@ export default function McpGatewayPage() {
 
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="max-w-6xl mx-auto px-6 py-20">
-          <h2 className="text-3xl font-bold text-white mb-4">Check, Govern, Prove MCP tool use</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">Observe, Control, Prove MCP tool use</h2>
           <p className="text-gray-400 max-w-3xl mb-10 text-lg">
             SatGate turns MCP tool calls into governed authority decisions. The point is not just to connect agents to tools. The point is to prove what happened, stop what should not happen, and preserve receipts for what was allowed or denied.
           </p>
@@ -164,7 +163,7 @@ export default function McpGatewayPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             ['/capability-auth', 'Capability auth', 'Scope agent authority before tools run.'],
-            ['/blog/api-gateway-for-ai-agents', 'API gateway for agents', 'Compare routing with governance.'],
+            ['/mcp-governance', 'MCP governance', 'Govern MCP tool calls with authority, policy, revocation, and audit receipts.'],
             ['/blog/mcp-budget-enforcement-guide', 'MCP budget enforcement', 'Hard-cap per-tool spend.'],
             ['/policy-to-proof', 'Policy-to-Proof', 'Turn MCP decisions into Evidence Pack proof.'],
           ].map(([href, title, body]) => (

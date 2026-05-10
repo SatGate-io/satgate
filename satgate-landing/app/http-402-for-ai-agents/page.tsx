@@ -30,7 +30,8 @@ export const metadata = {
 
 const flows = [
   ['Card checkout', 'Agent receives a temporary card credential and fills a merchant checkout.', 'Good for web purchases, but not request-native API monetization.'],
-  ['Shared payment token', 'Agent receives a payment token for a supported 402 machine-payment flow.', 'Rail-specific; L402 Lightning is one paid rail among several that still need governance.'],
+  ['x402', 'API returns a 402 payment challenge for stablecoin settlement across supported chains and clients.', 'x402, AgentCore Payments, and Pay.sh still need SatGate authority checks and Evidence Pack receipts above the rail.'],
+  ['Shared payment token', 'Agent receives a payment token for a supported 402 machine-payment flow.', 'Rail-specific; treat it as a subpattern of paid-rail context that still needs governance.'],
   ['L402 Lightning', 'API returns a Lightning-backed 402 challenge and verifies proof before access.', 'L402 Lightning can support request-native paid API access; SatGate governs the decision and receipt.'],
   ['Policy-only 402 observation', 'SatGate records and evaluates payment challenges even when another rail completes payment.', 'Useful for audit, deny/allow rules, and spend governance.'],
 ];
@@ -133,7 +134,7 @@ export default function Http402ForAiAgentsPage() {
         <div className="max-w-6xl mx-auto px-6 py-20">
           <h2 className="text-3xl font-bold text-white mb-4">HTTP 402 flow types</h2>
           <p className="text-gray-400 max-w-3xl mb-10 text-lg">
-            Treat 402 as a protocol surface, not a single payment system. L402 Lightning is one paid rail; other payment-token flows are separate rails that still need governance.
+            Treat 402 as a protocol surface, not a single payment system. L402 Lightning is one paid rail; x402, AgentCore Payments, Pay.sh, and payment-token flows are separate rails that still need governance.
           </p>
           <div className="overflow-hidden rounded-2xl border border-gray-800">
             <div className="grid md:grid-cols-3 bg-gray-900/70 text-sm font-bold text-white">

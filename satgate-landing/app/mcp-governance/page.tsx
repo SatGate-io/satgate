@@ -213,7 +213,7 @@ export default function McpGovernancePage() {
         <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
           <h3 className="text-xl font-bold text-white mb-4">Without MCP authority governance</h3>
           <ul className="space-y-3 text-gray-300">
-            <li className="rounded-lg border border-gray-800 bg-black/50 p-3">Agents call tools without per-tool spend caps.</li>
+            <li className="rounded-lg border border-gray-800 bg-black/50 p-3">Agents call tools without scoped authority.</li>
             <li className="rounded-lg border border-gray-800 bg-black/50 p-3">Expensive tools look identical to cheap tools.</li>
             <li className="rounded-lg border border-gray-800 bg-black/50 p-3">Revocation requires changing configs or killing whole agents.</li>
             <li className="rounded-lg border border-gray-800 bg-black/50 p-3">Finance sees a bill, not the tool or workflow that caused it.</li>
@@ -226,7 +226,7 @@ export default function McpGovernancePage() {
         <div className="max-w-6xl mx-auto px-6 py-20">
           <h2 className="text-3xl font-bold text-white mb-4">What SatGate adds around MCP</h2>
           <p className="text-gray-400 max-w-3xl mb-10 text-lg">
-            SatGate acts as the request-path governance layer around MCP tool traffic, so agent authority becomes measurable, enforceable, and provable without rewriting every tool.
+            SatGate acts as the request-path governance layer around MCP tool traffic, so agent authority becomes measurable, enforceable, and provable without rewriting every tool. When MCP calls cross paid rails like x402, AgentCore Payments, or Pay.sh, SatGate keeps the same policy decision and Evidence Pack receipt above the rail.
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -280,24 +280,7 @@ export default function McpGovernancePage() {
       </section>
 
       <section className="border-y border-gray-900 bg-gray-950/60">
-        <div className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-8">
-          <div>
-            <h2 className="text-3xl font-bold text-white mb-6">Use cases</h2>
-            <div className="space-y-4">
-              {[
-                ['Cursor MCP proxy', 'Give coding agents budgeted tool access without handing them unlimited API authority.'],
-                ['Claude Desktop governance', 'Let desktop agents call tools while preserving per-agent policy and auditability.'],
-                ['Claude Code tool spend', 'Cap expensive build, search, browser, or cloud actions during coding sessions.'],
-                ['OpenClaw autonomous workflows', 'Govern proactive agent tasks, recurring jobs, and delegated sub-agents.'],
-              ].map(([title, body]) => (
-                <div key={title} className="rounded-xl border border-gray-800 bg-black p-5">
-                  <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
-                  <p className="text-gray-400 leading-relaxed">{body}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
+        <div className="max-w-4xl mx-auto px-6 py-20">
           <div className="rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6">
             <h2 className="text-2xl font-bold text-white mb-4">MCP authority policy example</h2>
             <pre className="bg-black border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm text-gray-300"><code>{`parent_agent: finance-automation

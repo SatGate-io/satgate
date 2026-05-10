@@ -332,7 +332,7 @@ delegation:
   allowed: true
   max_depth: 1
   child_budget_max: 5.00 USD
-expiry: 2026-04-26T00:00:00Z
+expiry: 2026-12-31T00:00:00Z
 revocation: before_next_request
 evidence:
   receipt: required

@@ -249,7 +249,7 @@ export default function L402AgentPaymentsPage() {
             <h2 className="text-3xl font-bold text-white mb-5">L402, shared payment tokens, and agent wallets are different layers</h2>
             <div className="space-y-4 text-gray-300 text-lg leading-relaxed">
               <p>
-                HTTP 402 can carry different payment challenges. Some flows use card credentials or shared payment tokens. L402 Lightning is one paid rail for request-native API access.
+                HTTP 402 can carry different payment challenges. Some flows use card credentials or shared payment tokens. L402 Lightning is one paid rail for request-native API access. Other paid rails — x402, AgentCore Payments, and Pay.sh — also use HTTP 402 as their surface but settle differently.
               </p>
               <p>
                 The important control-plane question is broader than payment: whether the agent has authority, budget, scope, and policy approval before paid access is unlocked.
@@ -291,7 +291,7 @@ export default function L402AgentPaymentsPage() {
 
         <h2 className="text-3xl font-bold text-white mb-8">A governed L402 request flow</h2>
         <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6 overflow-x-auto">
-          <pre className="text-sm text-gray-300"><code>{`# Agent attempts a protected API call
+          <pre className="text-sm text-gray-300"><code>{`# Saturnzap CLI; any L402-capable client can present proof
 sz fetch https://api.example.com/premium-research --max-sats 25
 
 # SatGate replies with an L402 challenge
