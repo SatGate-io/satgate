@@ -2,10 +2,10 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock, Eye, Shield, Zap, CheckCircle, ArrowRight } from 'lucide-react';
 
 export const metadata = {
-  title: 'Enterprise Adoption Playbook: Observe, Control, Charge',
-  description: 'Observe, Control, Charge isn\'t just a product taxonomy — it\'s an enterprise change management strategy. Learn how to adopt economic governance for AI agents incrementally, building trust at each stage.',
+  title: 'Enterprise Adoption Playbook: Observe, Control, Prove',
+  description: 'Observe, Control, Prove isn\'t just a product taxonomy — it\'s an enterprise change management strategy. Learn how to adopt economic governance for AI agents incrementally, building trust at each stage.',
   openGraph: {
-    title: 'The Enterprise Adoption Playbook: Observe, Control, Charge',
+    title: 'The Enterprise Adoption Playbook: Observe, Control, Prove',
     description: 'A three-stage framework for adopting economic governance for AI agents — without breaking anything along the way.',
     url: 'https://satgate.io/blog/the-enterprise-adoption-playbook-observe-control-charge',
     type: 'article',
@@ -14,7 +14,7 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'The Enterprise Adoption Playbook: Observe, Control, Charge',
+    title: 'The Enterprise Adoption Playbook: Observe, Control, Prove',
     description: 'A three-stage framework for adopting economic governance for AI agents — without breaking anything along the way.',
   },
   keywords: ['AI agent governance', 'enterprise AI adoption', 'economic firewall', 'AI cost control', 'AI agent budget enforcement', 'L402', 'macaroons', 'MCP governance', 'agent economy', 'AI change management'],
@@ -25,8 +25,8 @@ export default function EnterpriseAdoptionPlaybookPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'The Enterprise Adoption Playbook: Observe, Control, Charge',
-    description: 'A three-stage framework for adopting economic governance for AI agents: observe spend, control internal agent budgets, then charge external robot customers.',
+    headline: 'The Enterprise Adoption Playbook: Observe, Control, Prove',
+    description: 'A three-stage framework for adopting economic governance for AI agents: observe spend, control internal agent budgets, then charge external paid agents.',
     url: 'https://satgate.io/blog/the-enterprise-adoption-playbook-observe-control-charge',
     datePublished: '2026-03-20',
     dateModified: '2026-05-02',
@@ -36,7 +36,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
       { '@type': 'Thing', name: 'economic governance for AI agents' },
       { '@type': 'Thing', name: 'Observe Control Charge' },
       { '@type': 'Thing', name: 'AI agent budget enforcement' },
-      { '@type': 'Thing', name: 'robot-customer API monetization' },
+      { '@type': 'Thing', name: 'paid-agent API monetization' },
     ],
   };
 
@@ -46,10 +46,10 @@ export default function EnterpriseAdoptionPlaybookPage() {
     mainEntity: [
       {
         '@type': 'Question',
-        name: 'What are Observe, Control, and Charge in AI agent governance?',
+        name: 'What are Observe, Control, and Prove in AI agent governance?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Charge monetizes external agent access with L402 Lightning payments.',
+          text: 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Charge monetizes external agent access with paid-rail context.',
         },
       },
       {
@@ -65,7 +65,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
         name: 'Is Charge the same as internal budget enforcement?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. Internal budget enforcement controls spend for agents you own. Charge is the L402-based monetization path for external agents and robot customers paying to use your APIs.',
+          text: 'No. Internal budget enforcement controls spend for agents you own. Charge is the L402-based monetization path for external agents and paid agents paying to use your APIs.',
         },
       },
     ],
@@ -88,7 +88,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
             <span className="px-2 py-1 rounded-full bg-green-900/30 border border-green-500/30 text-green-300 text-xs font-mono">Strategy</span>
           </div>
           
-          <h1 className="text-4xl font-bold mb-4">The Enterprise Adoption Playbook: Observe, Control, Charge</h1>
+          <h1 className="text-4xl font-bold mb-4">The Enterprise Adoption Playbook: Observe, Control, Prove</h1>
           
           <p className="text-xl text-gray-400 mb-6 italic">
             You wouldn&apos;t deploy a firewall in enforcement mode on day one. Why would you do that with economic governance?
@@ -113,7 +113,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
             The problem isn&apos;t technical. It&apos;s organizational. And the solution isn&apos;t a product — it&apos;s a strategy.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            At SatGate, we built three distinct modes — <strong>Fiat</strong>, <strong>Fiat402</strong>, and <strong>L402</strong> — not because we couldn&apos;t pick one architecture. We built them because enterprise adoption doesn&apos;t happen in a single step. <strong>Observe, Control, Charge</strong> is a change management framework disguised as a product taxonomy.
+            At SatGate, we built three distinct modes — <strong>Fiat</strong>, <strong>Fiat402</strong>, and <strong>L402</strong> — not because we couldn&apos;t pick one architecture. We built them because enterprise adoption doesn&apos;t happen in a single step. <strong>Observe, Control, Prove</strong> is a change management framework disguised as a product taxonomy.
           </p>
 
           {/* Why Big Bang Fails */}
@@ -256,7 +256,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
                 <CheckCircle className="text-green-400" size={18} />
                 <h4 className="font-bold text-white m-0">Policy Refinement from Real Data</h4>
               </div>
-              <p className="text-gray-400 text-sm m-0">Budgets set from Observe-mode data are defensible. They&apos;re based on measured consumption, not vendor benchmarks or educated guesses. When an agent owner pushes back on a limit, you have the audit trail to show why it was set where it was.</p>
+              <p className="text-gray-400 text-sm m-0">Budgets set from Observe-mode data are defensible. They&apos;re based on measured consumption, not vendor benchmarks or educated guesses. When an agent owner pushes back on a limit, you have the Evidence Pack to show why it was set where it was.</p>
             </div>
             <div className="p-4 bg-gray-900 border border-gray-800 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
@@ -334,12 +334,12 @@ export default function EnterpriseAdoptionPlaybookPage() {
 
           <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
             <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
-            <h2 className="mb-6 text-2xl font-bold text-white">Observe, Control, Charge adoption questions</h2>
+            <h2 className="mb-6 text-2xl font-bold text-white">Observe, Control, Prove adoption questions</h2>
             <div className="space-y-5">
               {[
-                ['What are Observe, Control, and Charge in AI agent governance?', 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Charge monetizes external agent access with L402 Lightning payments.'],
+                ['What are Observe, Control, and Prove in AI agent governance?', 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Charge monetizes external agent access with paid-rail context.'],
                 ['Why should enterprises start AI agent governance in Observe mode?', 'Observe mode gives teams real baseline data on agent spend, tool usage, retry loops, and cost outliers before hard caps are introduced, making later enforcement safer and easier to justify.'],
-                ['Is Charge the same as internal budget enforcement?', 'No. Internal budget enforcement controls spend for agents you own. Charge is the L402-based monetization path for external agents and robot customers paying to use your APIs.'],
+                ['Is Charge the same as internal budget enforcement?', 'No. Internal budget enforcement controls spend for agents you own. Charge is the L402-based monetization path for external agents and paid agents paying to use your APIs.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-05-08T20:45:16.959746Z",
+  "generatedAt": "2026-05-10T16:36:24.216699Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
       "exists": true,
       "title": "OpenAI API Budget Limits: Control Spend Before Calls",
       "titleLength": 52,
-      "metaDescription": "Learn how to add OpenAI API budget limits, prevent runaway agent spend, and enforce usage controls before calls execute.",
-      "metaDescriptionLength": 120,
+      "metaDescription": "Add OpenAI API budget limits with authority before execution, Observe/Control/Prove controls, and Evidence Pack receipts.",
+      "metaDescriptionLength": 121,
       "canonical": "/blog/how-to-add-budget-limits-to-openai-api-calls",
       "h1": [
         "How to Set Hard Budget Limits on OpenAI API Calls"
@@ -49,8 +49,9 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1297,
-      "hasObserveControlCharge": true,
+      "wordCount": 1295,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
       "hasFAQ": true,
       "hasProductCTA": true,
       "inSitemap": true,
@@ -61,8 +62,8 @@
       "exists": true,
       "title": "LLM Cost Management: Control AI Spend Before It Happens",
       "titleLength": 55,
-      "metaDescription": "A practical guide to LLM cost management using usage observability, budget controls, and chargeback workflows for AI agents.",
-      "metaDescriptionLength": 124,
+      "metaDescription": "A practical guide to LLM cost management using authority before execution, budget controls, and Evidence Pack receipts for AI agents.",
+      "metaDescriptionLength": 133,
       "canonical": "/blog/llm-cost-management",
       "h1": [
         "LLM Cost Management: Real-Time Budget Enforcement for AI Agents"
@@ -102,8 +103,9 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2141,
-      "hasObserveControlCharge": true,
+      "wordCount": 2148,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
       "hasFAQ": true,
       "hasProductCTA": true,
       "inSitemap": true,
@@ -114,8 +116,8 @@
       "exists": true,
       "title": "HTTP 402 Payment Required: API and Agent Use Cases",
       "titleLength": 50,
-      "metaDescription": "See how HTTP 402 can support paid API access, metered MCP tools, and agent transactions using SatGate.",
-      "metaDescriptionLength": 102,
+      "metaDescription": "HTTP 402 and L402 are paid-rail context. SatGate governs authority before execution and preserves Evidence Packs.",
+      "metaDescriptionLength": 113,
       "canonical": "/blog/http-402-payment-required-use-cases",
       "h1": [
         "HTTP 402 Payment Required: Meaning, Use Cases, and AI Agent Payments"
@@ -143,7 +145,7 @@
         "/l402-agent-payments",
         "/l402-api-pricing-calculator",
         "/mcp-gateway",
-        "/robot-customer-payments",
+        "/paid-agent-payments",
         "/tools"
       ],
       "schemaTypes": [
@@ -155,7 +157,8 @@
         "Thing"
       ],
       "wordCount": 2586,
-      "hasObserveControlCharge": true,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
       "hasFAQ": true,
       "hasProductCTA": true,
       "inSitemap": true,
@@ -208,7 +211,8 @@
         "Thing"
       ],
       "wordCount": 2649,
-      "hasObserveControlCharge": true,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
       "hasFAQ": true,
       "hasProductCTA": true,
       "inSitemap": true,
@@ -217,45 +221,44 @@
     {
       "path": "/govern",
       "exists": true,
-      "title": "AI Agent Governance: Observe, Control, and Charge",
-      "titleLength": 49,
-      "metaDescription": "Govern AI agents with SatGate: observe tool usage, control access and budgets, and charge for API or MCP consumption.",
-      "metaDescriptionLength": 117,
+      "title": "AI Agent Governance: Govern, Enforce, Prove",
+      "titleLength": 43,
+      "metaDescription": "Govern enterprise AI agents with SatGate: scope authority, enforce request-path policy, and prove every mint, delegation, spend, denial, and revocation.",
+      "metaDescriptionLength": 152,
       "canonical": "/govern",
       "h1": [
-        "Economic Access Control. Not &ldquo;Who Are You?&rdquo; \u2014 &ldquo;What Can You Afford?&rdquo;"
+        "Govern what agents can do. Prove every decision."
       ],
       "h1Count": 1,
       "h2s": [
-        "Two Problems. One Token.",
-        "Built for the C-Suite",
-        "Three Modes. One Gateway.",
-        "The Rogue Intern Story",
-        "60+ Dashboard Pages. Day One.",
-        "Hierarchical Token Delegation",
+        "Govern internal agents. Preserve proof across external rails.",
+        "Built for enterprise control owners",
+        "Govern, enforce, prove.",
+        "The runaway agent story",
+        "Dashboards that end in evidence.",
+        "Delegation that leaves a trail",
         "Single Go Binary. Zero Dependencies.",
-        "The Tragedy of the Commons \u2014 Inside Your Company",
-        "Your Internal APIs Are an Untapped Market",
-        "See It Work \u2014 Right Now",
+        "The authority commons \u2014 inside your company",
+        "Your internal APIs are authority surfaces",
+        "See authority minted \u2014 then prove the lifecycle",
         "From Demo to Thousands of Agents",
         "Turn enterprise governance into request-path controls"
       ],
       "internalLinks": [
         "/agent-api-governance",
+        "/agent-control-plane",
         "/ai-agent-cost-control",
         "/design-partners",
         "/economic-firewall",
         "/govern",
         "/l402-agent-payments",
-        "/llm-cost-dashboard",
-        "/llm-cost-monitoring",
         "/mcp-governance",
         "/mint-demo",
         "/pay",
+        "/policy-to-proof",
         "/pricing",
         "/privacy",
         "/protect",
-        "/sandbox",
         "/terms"
       ],
       "schemaTypes": [
@@ -266,8 +269,9 @@
         "WebPage",
         "WebSite"
       ],
-      "wordCount": 1542,
-      "hasObserveControlCharge": true,
+      "wordCount": 1657,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
       "hasFAQ": true,
       "hasProductCTA": true,
       "inSitemap": true,
@@ -278,8 +282,8 @@
       "exists": true,
       "title": "API Gateway for AI Agents: Control Tool and API Access",
       "titleLength": 54,
-      "metaDescription": "Learn how an API gateway for AI agents can enforce access, budgets, observability, and monetization across APIs and MCP tools.",
-      "metaDescriptionLength": 126,
+      "metaDescription": "Learn how AI agent gateways enforce authority before execution with Observe/Control/Prove, budgets, MCP governance, and Evidence Packs.",
+      "metaDescriptionLength": 135,
       "canonical": "/blog/api-gateway-for-ai-agents",
       "h1": [
         "API Gateway for AI Agents: Budgets, MCP Tools, and Economic Control"
@@ -314,8 +318,9 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1365,
-      "hasObserveControlCharge": true,
+      "wordCount": 1364,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
       "hasFAQ": true,
       "hasProductCTA": true,
       "inSitemap": true,
@@ -326,8 +331,8 @@
       "exists": true,
       "title": "MCP Gateway for Governed Agent Tool Access",
       "titleLength": 42,
-      "metaDescription": "Use SatGate as an MCP gateway to observe, control, and charge for agent tool access across SaaS and hybrid deployments.",
-      "metaDescriptionLength": 119,
+      "metaDescription": "Use SatGate as an MCP gateway to check authority before tool execution and export Evidence Pack receipts.",
+      "metaDescriptionLength": 105,
       "canonical": "/mcp-gateway",
       "h1": [
         "MCP Gateway for Governed Agent Tool Access"
@@ -335,16 +340,16 @@
       "h1Count": 1,
       "h2s": [
         "What is an MCP gateway?",
-        "Observe, Control, Charge for MCP tools",
+        "Observe, Control, Prove MCP tool use",
         "SaaS MCP vs Hybrid MCP",
         "MCP gateway questions",
         "Related MCP gateway resources",
         "Launch an MCP gateway agents can safely use."
       ],
       "internalLinks": [
-        "/design-partners",
         "/govern",
-        "/mcp-tool-cost-policy-generator"
+        "/mcp-governance",
+        "/policy-to-proof"
       ],
       "schemaTypes": [
         "Answer",
@@ -355,8 +360,9 @@
         "Question",
         "SoftwareApplication"
       ],
-      "wordCount": 539,
-      "hasObserveControlCharge": true,
+      "wordCount": 562,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
       "hasFAQ": true,
       "hasProductCTA": true,
       "inSitemap": true,
@@ -367,8 +373,8 @@
       "exists": true,
       "title": "Capability-Based Authorization for AI Agents",
       "titleLength": 44,
-      "metaDescription": "Replace broad API keys with scoped, revocable, budget-aware capabilities for AI agents using SatGate.",
-      "metaDescriptionLength": 101,
+      "metaDescription": "Replace broad API keys with scoped, revocable capabilities, authority before execution, and Evidence Pack proof.",
+      "metaDescriptionLength": 112,
       "canonical": "/capability-auth",
       "h1": [
         "Capability-Based Authorization for AI Agents"
@@ -396,8 +402,9 @@
         "Question",
         "SoftwareApplication"
       ],
-      "wordCount": 496,
-      "hasObserveControlCharge": true,
+      "wordCount": 498,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
       "hasFAQ": true,
       "hasProductCTA": true,
       "inSitemap": true,

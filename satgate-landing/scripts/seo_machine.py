@@ -40,14 +40,14 @@ RECOMMENDED_META = {
    'title': 'Macaroon Tokens vs API Keys for Agent Access',
    'description': 'Compare macaroon tokens and API keys for scoped authorization, delegated access, and safer AI agent permissions.'},
  '/govern': {
-   'title': 'AI Agent Governance: Observe, Control, and Charge',
-   'description': 'Govern AI agents with SatGate: observe tool usage, control access and budgets, and charge for API or MCP consumption.'},
+   'title': 'AI Agent Governance: Policy-to-Proof',
+   'description': 'Govern AI agents with SatGate: authority before execution, Observe/Control/Prove, MCP governance, paid-rail context, and Evidence Packs.'},
  '/blog/api-gateway-for-ai-agents': {
    'title': 'API Gateway for AI Agents: Control Tool and API Access',
    'description': 'Learn how an API gateway for AI agents can enforce access, budgets, observability, and monetization across APIs and MCP tools.'},
  '/mcp-gateway': {
    'title': 'MCP Gateway for Governed Agent Tool Access',
-   'description': 'Use SatGate as an MCP gateway to observe, control, and charge for agent tool access across SaaS and hybrid deployments.'},
+   'description': 'Use SatGate as an MCP gateway to check authority before tool execution, enforce policy, and export Evidence Packs.'},
  '/capability-auth': {
    'title': 'Capability-Based Authorization for AI Agents',
    'description': 'Replace broad API keys with scoped, revocable, budget-aware capabilities for AI agents using SatGate.'},
@@ -121,12 +121,14 @@ def audit_page(target: dict[str, Any], sitemap_paths: set[str]) -> dict[str, Any
     if path not in sitemap_paths: issues.append('missing from sitemap')
     if 'FAQPage' not in schema_types: issues.append('missing FAQPage schema')
     if not any(t in schema_types for t in ['TechArticle','Article','WebPage','SoftwareApplication']): issues.append('missing primary structured data')
-    if not all(word.lower() in plain.lower() for word in ['Observe','Control','Charge']): issues.append('missing Observe/Control/Charge language')
+    if not all(word.lower() in plain.lower() for word in ['Observe','Control','Prove']): issues.append('missing Observe/Control/Prove language')
+    if not any(term.lower() in plain.lower() for term in ['Evidence Pack', 'Evidence Packs', 'receipt']): issues.append('missing Evidence Pack/receipt language')
     if not re.search(r'Get Started|Start Free|See SatGate|Generate|Book|Contact|Launch|Use SatGate|Design Partner|Work with SatGate|Learn how|Try', plain, re.I): issues.append('missing product CTA language')
     return {'path': path, 'exists': True, 'title': title, 'titleLength': len(title), 'metaDescription': desc,
             'metaDescriptionLength': len(desc), 'canonical': canonical, 'h1': h1s, 'h1Count': len(h1s),
             'h2s': h2s[:12], 'internalLinks': links, 'schemaTypes': schema_types, 'wordCount': len(plain.split()),
-            'hasObserveControlCharge': all(word.lower() in plain.lower() for word in ['Observe','Control','Charge']),
+            'hasObserveControlProve': all(word.lower() in plain.lower() for word in ['Observe','Control','Prove']),
+            'hasEvidencePack': any(term.lower() in plain.lower() for term in ['Evidence Pack', 'Evidence Packs', 'receipt']),
             'hasFAQ': 'FAQPage' in schema_types, 'hasProductCTA': bool(re.search(r'Get Started|Start Free|See SatGate|Generate|Book|Contact|Launch|Use SatGate|Design Partner|Work with SatGate|Learn how|Try', plain, re.I)),
             'inSitemap': path in sitemap_paths, 'issues': issues}
 

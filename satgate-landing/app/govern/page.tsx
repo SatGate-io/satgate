@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "AI Agent Governance: Govern, Enforce, Prove",
     description:
-      "Govern enterprise AI agents with scoped authority, request-path enforcement, and audit-ready proof for every agent lifecycle.",
+      "Govern enterprise AI agents with scoped authority, request-path enforcement, and Evidence Pack proof for every agent lifecycle.",
     url: "https://satgate.io/govern",
     type: "website",
   },
@@ -75,7 +75,7 @@ const faqSchema = {
       name: "How should enterprises govern MCP tool usage?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Enterprises should govern MCP tools with per-tool budgets, scoped capability tokens, task and tenant attribution, audit trails, revocation, and hard request-path policy decisions. Rate limits and dashboards are useful, but they do not replace enforcement before tool calls execute.",
+        text: "Enterprises should govern MCP tools with per-tool budgets, scoped capability tokens, task and tenant attribution, Evidence Packs, revocation, and hard request-path policy decisions. Rate limits and dashboards are useful, but they do not replace enforcement before tool calls execute.",
       },
     },
     {

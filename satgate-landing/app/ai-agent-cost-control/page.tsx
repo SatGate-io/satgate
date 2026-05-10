@@ -3,7 +3,7 @@ import { ArrowRight, Bot, DollarSign, Gauge, ShieldCheck, Workflow, BarChart3 } 
 
 export const metadata = {
   title: 'AI Agent Cost Control | Request-Path Budget Enforcement',
-  description: 'Control AI agent API spend before it happens. SatGate enforces budgets, revocation, routing, and audit receipts in the request path.',
+  description: 'Control AI agent API spend before it happens. SatGate enforces budgets, revocation, routing, and Evidence Pack receipts in the request path.',
   alternates: { canonical: 'https://satgate.io/ai-agent-cost-control' },
   keywords: [
     'AI agent cost control',
@@ -17,14 +17,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'AI Agent Cost Control | Request-Path Budget Enforcement',
-    description: 'Enforce per-agent budgets, spend caps, revocation, routing, and audit receipts before autonomous API calls execute.',
+    description: 'Enforce per-agent budgets, spend caps, revocation, routing, and Evidence Pack receipts before autonomous API calls execute.',
     url: 'https://satgate.io/ai-agent-cost-control',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'AI Agent Cost Control | Request-Path Budget Enforcement',
-    description: 'Stop runaway AI agent spend with request-path budget enforcement, revocation, routing, and audit receipts.',
+    description: 'Stop runaway AI agent spend with request-path budget enforcement, revocation, routing, and Evidence Pack receipts.',
   },
 };
 
@@ -96,7 +96,7 @@ export default function AiAgentCostControlPage() {
       'Per-tool cost attribution',
       'MCP budget enforcement',
       'Revocable agent credentials',
-      'Request-path audit receipts',
+      'Request-path Evidence Pack receipts',
       'Policy-to-Proof Evidence Packs',
     ],
   };
@@ -260,7 +260,7 @@ export default function AiAgentCostControlPage() {
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-10">
-            SatGate puts authority before execution: budget enforcement, revocation, routing, and audit receipts run in the request path before autonomous agents can spend against OpenAI, Claude, MCP, or paid API budgets.
+            SatGate puts authority before execution: budget enforcement, revocation, routing, and Evidence Pack receipts run in the request path before autonomous agents can spend against OpenAI, Claude, MCP, or paid API budgets.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">

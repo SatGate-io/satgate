@@ -320,7 +320,7 @@ Token: search-worker-12
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Audit the chain, not the session.</strong> Traditional audit trails track user sessions. Agent audit trails need to track delegation chains — who minted the token, who attenuated it, what was spent at each level, and which specific API calls were made.
+            <strong className="text-white">Audit the chain, not the session.</strong> Traditional Evidence Packs track user sessions. Agent Evidence Packs need to track delegation chains — who minted the token, who attenuated it, what was spent at each level, and which specific API calls were made.
           </p>
 
           <p className="text-gray-300 leading-relaxed">

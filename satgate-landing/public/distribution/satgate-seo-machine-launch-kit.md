@@ -82,4 +82,4 @@ Start here: https://satgate.io/tools
 - L402 API pricing calculator
 - AI agent governance dashboard
 - scoped agent credential demo
-- L402 API monetization demo
+- rail-neutral paid-rail governance demo

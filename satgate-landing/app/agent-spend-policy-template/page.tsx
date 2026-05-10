@@ -135,7 +135,7 @@ export default function AgentSpendPolicyTemplatePage() {
         name: 'How does this template relate to SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate is the economic firewall that can enforce authority and budget policy in the request path across model calls, APIs, MCP tools, revocable credentials, delegation, audit receipts, and Evidence Pack exports.',
+          text: 'SatGate is the economic firewall that can enforce authority and budget policy in the request path across model calls, APIs, MCP tools, revocable credentials, delegation, Evidence Pack receipts, and Evidence Pack exports.',
         },
       },
       {
@@ -282,7 +282,7 @@ export default function AgentSpendPolicyTemplatePage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does this template relate to SatGate?</h3>
               <p className="text-gray-400 leading-relaxed">
-                SatGate is the economic firewall that can enforce authority and budget policy in the request path across model calls, APIs, MCP tools, revocable credentials, delegation, audit receipts, and Evidence Pack exports.
+                SatGate is the economic firewall that can enforce authority and budget policy in the request path across model calls, APIs, MCP tools, revocable credentials, delegation, Evidence Pack receipts, and Evidence Pack exports.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

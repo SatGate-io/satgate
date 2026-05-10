@@ -104,7 +104,7 @@ const softwareJsonLd = {
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
   dateModified: '2026-05-03',
-  featureList: ['Capability token minting', 'Agent credential delegation', 'Policy enforcement simulation', 'Credential revocation flow', 'Request audit trail'],
+  featureList: ['Capability token minting', 'Agent credential delegation', 'Policy enforcement simulation', 'Credential revocation flow', 'Request Evidence Pack'],
 };
 
 const faqJsonLd = {

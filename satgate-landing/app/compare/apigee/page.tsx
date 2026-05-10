@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Check, DollarSign, Gauge, KeyRound, Minus, Shiel
 
 export const metadata = {
   title: 'SatGate vs Apigee - API Management vs Economic Firewall',
-  description: 'Compare SatGate and Google Apigee. Apigee is enterprise API management; SatGate adds economic governance for AI agents, MCP budgets, and L402 payments.',
+  description: 'Compare SatGate and Google Apigee. Apigee is enterprise API management; SatGate adds economic governance for AI agents, MCP budgets, and paid-rail context.',
   alternates: { canonical: 'https://satgate.io/compare/apigee' },
   keywords: [
     'SatGate vs Apigee',
@@ -18,25 +18,25 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate vs Apigee - API Management vs Economic Firewall',
-    description: 'Compare SatGate and Google Apigee for API management, AI agent economic governance, MCP budgets, revocation, and L402 payments.',
+    description: 'Compare SatGate and Google Apigee for API management, AI agent economic governance, MCP budgets, revocation, and paid-rail context.',
     url: 'https://satgate.io/compare/apigee',
     type: 'article',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate vs Apigee - API Management vs Economic Firewall',
-    description: 'Apigee manages APIs. SatGate enforces AI agent budgets, MCP tool costs, scoped credentials, revocation, and L402 payments.',
+    description: 'Apigee manages APIs. SatGate enforces AI agent budgets, MCP tool costs, scoped credentials, revocation, and paid-rail context.',
   },
 };
 
 const rows: Array<[string, string, string]> = [
   ['Primary job', 'Economic control plane for AI agents', 'Enterprise API management, API products, developer portals, analytics, policy, monetization, and Google Cloud integration'],
-  ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped credentials, revocation, audit, and L402 payments', 'Enterprise API management, API products, developer portals, analytics, policy, monetization, and Google Cloud integration'],
+  ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped credentials, revocation, audit, and paid-rail context', 'Enterprise API management, API products, developer portals, analytics, policy, monetization, and Google Cloud integration'],
   ['Request-path hard budget enforcement', 'Yes: before upstream API, model, or MCP tool access', 'Partial / depends on gateway policy and traffic type'],
   ['MCP tool budget enforcement', 'Yes: per-tool budgets, cost attribution, and deny decisions', 'Not the primary category focus'],
   ['Scoped revocable agent capabilities', 'Yes: route, tool, call, budget, expiry, delegation, and revocation caveats', 'Typically API keys, policies, tokens, or platform auth primitives'],
   ['Runaway agent spend benchmark/data', 'Yes: benchmark page plus JSON/CSV dataset', 'No direct equivalent'],
-  ['L402 robot-customer API payments', 'Yes: Charge uses L402 Lightning payment before access', 'No native SatGate-style L402 Charge focus'],
+  ['L402 paid-agent API payments', 'Yes: Charge uses paid-rail context payment before access', 'No native SatGate-style paid-rail governance focus'],
   ['Broad API/AI platform management', 'Focused on economic governance layer', 'Yes / stronger fit'],
 ];
 
@@ -44,7 +44,7 @@ const satgateWins = [
   { icon: ShieldCheck, title: 'Economic firewall for agents', body: 'SatGate decides whether an autonomous agent can spend, access, delegate, route, revoke, or pay before the next request executes.' },
   { icon: Gauge, title: 'Budgets beyond LLM tokens', body: 'Enforce cost controls across APIs, MCP tools, models, routes, workflows, tenants, agents, and delegated sub-agents.' },
   { icon: KeyRound, title: 'Scoped, revocable authority', body: 'Replace broad static keys with expiring capabilities constrained by route, tool, budget, calls, expiry, and delegation.' },
-  { icon: Zap, title: 'Charge robot customers', body: 'Use L402 Lightning payments when external agents should pay for APIs, tools, datasets, or premium capabilities at request time.' },
+  { icon: Zap, title: 'Charge paid agents', body: 'Use paid-rail context when external agents should pay for APIs, tools, datasets, or premium capabilities at request time.' },
 ];
 
 const competitorWins = [
@@ -69,9 +69,9 @@ export default function ComparePage() {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
-      { '@type': 'Question', name: 'Is SatGate a Google Apigee replacement?', acceptedAnswer: { '@type': 'Answer', text: 'Not directly. Apigee is a full enterprise API management platform. SatGate is an economic firewall for AI agents, API spend, MCP tools, scoped capabilities, revocation, audit, and L402 payments.' } },
+      { '@type': 'Question', name: 'Is SatGate a Google Apigee replacement?', acceptedAnswer: { '@type': 'Answer', text: 'Not directly. Apigee is a full enterprise API management platform. SatGate is an economic firewall for AI agents, API spend, MCP tools, scoped capabilities, revocation, audit, and paid-rail context.' } },
       { '@type': 'Question', name: 'Can SatGate and Google Apigee work together?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics before upstream access.' } },
-      { '@type': 'Question', name: 'When should I choose SatGate?', acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when the core problem is autonomous agent economic governance: hard budgets, MCP tool spend, revocable credentials, delegated authority, audit trails, and robot-customer payment.' } },
+      { '@type': 'Question', name: 'When should I choose SatGate?', acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when the core problem is autonomous agent economic governance: hard budgets, MCP tool spend, revocable credentials, delegated authority, Evidence Packs, and paid-agent payment.' } },
       { '@type': 'Question', name: 'When should I choose Google Apigee?', acceptedAnswer: { '@type': 'Answer', text: 'Choose Apigee when the primary need is broad enterprise API management across human and application consumers.' } },
     ],
   };
@@ -86,7 +86,7 @@ export default function ComparePage() {
         <div className="mb-12 max-w-4xl">
           <div className="mb-6 inline-flex rounded-full border border-cyan-500/30 bg-cyan-950/25 px-4 py-2 text-sm text-cyan-200">Comparison</div>
           <h1 className="mb-5 text-5xl font-extrabold tracking-tight md:text-7xl">SatGate vs Google Apigee</h1>
-          <p className="text-xl leading-relaxed text-gray-300 md:text-2xl">Apigee is a full enterprise API management platform. SatGate is different: it is the request-path economic control plane for autonomous agents, API spend, MCP tools, scoped credentials, audit, and L402 robot-customer payments.</p>
+          <p className="text-xl leading-relaxed text-gray-300 md:text-2xl">Apigee is a full enterprise API management platform. SatGate is different: it is the request-path economic control plane for autonomous agents, API spend, MCP tools, scoped credentials, audit, and L402 paid-agent payments.</p>
         </div>
 
         <section className="mb-14 overflow-hidden rounded-2xl border border-gray-800">
@@ -105,9 +105,9 @@ export default function ComparePage() {
           <h2 className="mb-6 text-3xl font-bold text-white">SatGate vs Apigee FAQ</h2>
           <div className="grid gap-5 md:grid-cols-2">
             {[
-              ['Is SatGate a Google Apigee replacement?', 'Not directly. Apigee is a full enterprise API management platform. SatGate is an economic firewall for AI agents, API spend, MCP tools, scoped capabilities, revocation, audit, and L402 payments.'],
+              ['Is SatGate a Google Apigee replacement?', 'Not directly. Apigee is a full enterprise API management platform. SatGate is an economic firewall for AI agents, API spend, MCP tools, scoped capabilities, revocation, audit, and paid-rail context.'],
               ['Can SatGate and Google Apigee work together?', 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics before upstream access.'],
-              ['When should I choose SatGate?', 'Choose SatGate when the core problem is autonomous agent economic governance: hard budgets, MCP tool spend, revocable credentials, delegated authority, audit trails, and robot-customer payment.'],
+              ['When should I choose SatGate?', 'Choose SatGate when the core problem is autonomous agent economic governance: hard budgets, MCP tool spend, revocable credentials, delegated authority, Evidence Packs, and paid-agent payment.'],
               ['When should I choose Google Apigee?', 'Choose Apigee when the primary need is broad enterprise API management across human and application consumers.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">

@@ -3,7 +3,7 @@ import { ArrowRight, BadgeCheck, Ban, Clock, Fingerprint, GitBranch, KeyRound, S
 
 export const metadata = {
   title: 'Agent API Governance | Identity, Revocation, Budgets, Audit',
-  description: 'Govern AI agent API access with scoped capabilities, delegation limits, revocation, policy checks, and audit receipts. Replace unlimited API keys with authority enforced before execution.',
+  description: 'Govern AI agent API access with scoped capabilities, delegation limits, revocation, policy checks, and Evidence Pack receipts. Replace unlimited API keys with authority enforced before execution.',
   alternates: { canonical: 'https://satgate.io/agent-api-governance' },
   keywords: [
     'agent API governance',
@@ -25,7 +25,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Agent API Governance',
-    description: 'Govern AI agent identity, delegated access, revocation, policy checks, and audit receipts before API calls execute.',
+    description: 'Govern AI agent identity, delegated access, revocation, policy checks, and Evidence Pack receipts before API calls execute.',
   },
 };
 
@@ -91,7 +91,7 @@ export default function AgentApiGovernancePage() {
         name: 'What is agent API governance?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Agent API governance is the request-path policy layer for AI agent identity, delegated authority, budgets, revocation, routing, and audit receipts.',
+          text: 'Agent API governance is the request-path policy layer for AI agent identity, delegated authority, budgets, revocation, routing, and Evidence Pack receipts.',
         },
       },
       {
@@ -133,7 +133,7 @@ export default function AgentApiGovernancePage() {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: 'Agent API governance requirements',
-    description: 'Core request-path controls required to govern AI agent API access without broad static keys, then preserve audit receipts for Evidence Pack proof.',
+    description: 'Core request-path controls required to govern AI agent API access without broad static keys, then preserve Evidence Pack receipts for Evidence Pack proof.',
     itemListElement: [
       {
         '@type': 'ListItem',
@@ -347,7 +347,7 @@ evidence:
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is agent API governance?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Agent API governance is the request-path policy layer for AI agent identity, delegated authority, budgets, revocation, routing, and audit receipts.
+                Agent API governance is the request-path policy layer for AI agent identity, delegated authority, budgets, revocation, routing, and Evidence Pack receipts.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -386,7 +386,7 @@ evidence:
               ['/blog/macaroon-tokens-vs-api-keys', 'Macaroons vs API keys', 'Why attenuated capabilities beat static API keys for agents.'],
               ['/agent-control-plane', 'Agent control plane', 'Govern enterprise agent authority, delegation lineage, spend, audit, and revocation.'],
               ['/economic-firewall', 'Economic firewall', 'The request-path control layer for agent access, spend, and proof.'],
-              ['/mcp-governance', 'MCP governance', 'Apply authority, budgets, revocation, and audit receipts to agent tool calls.'],
+              ['/mcp-governance', 'MCP governance', 'Apply authority, budgets, revocation, and Evidence Pack receipts to agent tool calls.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">
                 <h3 className="font-bold text-white mb-2">{title}</h3>
@@ -401,7 +401,7 @@ evidence:
         <div className="rounded-3xl border border-yellow-900/60 bg-gradient-to-br from-yellow-950/20 to-cyan-950/30 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">SatGate makes agent API access governable</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            Put SatGate in the request path to move from unlimited API keys to scoped, revocable agent capabilities. Check authority before execution and produce audit receipts for the Evidence Pack.
+            Put SatGate in the request path to move from unlimited API keys to scoped, revocable agent capabilities. Check authority before execution and produce Evidence Pack receipts for the Evidence Pack.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">

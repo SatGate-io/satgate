@@ -147,19 +147,19 @@ const LandingPage = () => {
           {/* Left: Copy */}
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-6">
-              <Zap size={12} /> The Economic Firewall for AI Agents
+              <Zap size={12} /> Policy-to-Proof for AI Agents
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-              Govern what agents<br/>
+              Govern agent authority<br/>
               <span className="sr-only"> </span><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-                can do — and prove it.
+                before execution.
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              SatGate is the economic control plane for internal enterprise agents — governing what they can do, what they can spend, and proving every decision across paid external calls.
+              SatGate checks scoped authority, budgets, delegation, MCP tool access, and paid-rail policy before execution — then exports Evidence Packs proving every decision.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
-              Govern agent authority before it touches your API. Add budgets, scoped delegation, revocation, and proof across MCP, API keys, L402, x402, and enterprise billing.
+              Authority before execution. Evidence after every approval, denial, spend event, delegation, and revocation.
             </p>
             <div className="flex flex-wrap gap-4">
               <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
@@ -266,7 +266,7 @@ const LandingPage = () => {
             {[
               { href: '/runaway-agent-cost-calculator', title: 'Runaway Agent Cost Calculator', body: 'Model loop, retry, fanout, and paid tool-call exposure before detection.', icon: Activity },
               { href: '/ai-agent-runaway-spend-benchmark', title: 'AI Agent Runaway Spend Benchmark', body: 'Use original JSON/CSV benchmark data to quantify agent loops, retry storms, and avoidable spend.', icon: BarChart3 },
-              { href: '/economic-firewall-readiness-grader', title: 'Economic Firewall Readiness Grader', body: 'Score your posture across identity, budgets, MCP tools, revocation, audit, routing, and Charge.', icon: Shield },
+              { href: '/economic-firewall-readiness-grader', title: 'Economic Firewall Readiness Grader', body: 'Score identity, budgets, MCP tools, revocation, Evidence Packs, routing, and paid-rail governance.', icon: Shield },
             ].map(({ href, title, body, icon: Icon }) => (
               <Link key={href} href={href} className="group rounded-xl border border-gray-800 bg-gray-950 p-6 transition hover:border-cyan-500/50 hover:bg-cyan-950/10">
                 <Icon className="mb-4 text-cyan-300 transition group-hover:text-cyan-200" size={28} />
@@ -389,7 +389,7 @@ const LandingPage = () => {
                 <li>✓ Let approved agents pay or access without long-lived shared secrets</li>
                 <li>✓ Preserve authority evidence above x402, L402, API-key, or enterprise billing rails</li>
                 <li>✓ Per-request pricing and policy before upstream execution</li>
-                <li>✓ Autonomous agents discover, pay, and leave an audit trail</li>
+                <li>✓ Autonomous agents discover, pay, and leave an Evidence Pack</li>
               </ul>
             </div>
           </div>
@@ -659,7 +659,7 @@ const LandingPage = () => {
             {[
               ['What is SatGate?', 'SatGate is an economic control plane for internal enterprise agents. It sits in the request path to scope authority, enforce policy and budgets, prove revocation, and preserve evidence across internal APIs and paid external calls.'],
               ['How does SatGate govern AI agents?', 'SatGate applies scoped authority, per-agent policy, revocation, and budgets before each request reaches an API or MCP tool, so unauthorized actions and expensive calls can be blocked before they happen.'],
-              ['What are Observe, Control, and Charge?', 'Observe tracks agent traffic and cost without blocking. Control enforces budgets and scoped policy for internal agents. Charge preserves authorization evidence around external paid access across L402, x402, API-key, or enterprise billing rails.'],
+              ['What are Observe, Control, and Prove?', 'Observe tracks agent traffic and cost without blocking. Control enforces budgets and scoped policy for internal agents. Charge preserves authorization evidence around external paid access across L402, x402, API-key, or enterprise billing rails.'],
             ].map(([question, answer]) => (
               <div key={question} className="border-t border-gray-800 pt-6 first:border-t-0 first:pt-0">
                 <h3 className="mb-2 text-xl font-bold text-white">{question}</h3>
@@ -694,7 +694,7 @@ const LandingPage = () => {
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="text-gray-500 text-sm">Govern what agents can do — and prove it.</p>
+              <p className="text-gray-500 text-sm">Govern agent authority before execution.</p>
               <p className="text-gray-600 text-xs mt-3">Non-custodial. We never hold your keys.</p>
             </div>
             <div>
@@ -723,7 +723,7 @@ const LandingPage = () => {
                 <li><Link href="/agent-capability-tokens" className="hover:text-white transition">Agent Capability Tokens</Link></li>
                 <li><Link href="/l402-agent-payments" className="hover:text-white transition">L402 Agent Payments</Link></li>
                 <li><Link href="/l402-api-pricing-calculator" className="hover:text-white transition">L402 API Pricing Calculator</Link></li>
-                <li><Link href="/robot-customer-payments" className="hover:text-white transition">Robot Customer Payments</Link></li>
+                <li><Link href="/paid-agent-payments" className="hover:text-white transition">Paid Agent Payments</Link></li>
                 <li><Link href="/satgate-for-cursor" className="hover:text-white transition">SatGate for Cursor</Link></li>
                 <li><Link href="/satgate-for-claude-code" className="hover:text-white transition">SatGate for Claude Code</Link></li>
                 <li><Link href="/satgate-for-claude-desktop" className="hover:text-white transition">SatGate for Claude Desktop</Link></li>

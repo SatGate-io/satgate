@@ -589,7 +589,7 @@ Orchestrator (10,000 credits)
 # Total delegated: 9,000 ≤ 10,000 ✓
 # Each sub-token is cryptographically derived
 # Gateway enforces each agent's ceiling independently
-# Full audit trail traces back to orchestrator`}</code>
+# Full Evidence Pack traces back to orchestrator`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">

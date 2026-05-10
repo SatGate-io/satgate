@@ -3,12 +3,12 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "HTTP 402 Payment Required: API and Agent Use Cases",
-  description: "See how HTTP 402 can support paid API access, metered MCP tools, and agent transactions using SatGate.",
+  description: "HTTP 402 and L402 are paid-rail context. SatGate governs authority before execution and preserves Evidence Packs.",
   alternates: { canonical: 'https://satgate.io/blog/http-402-payment-required-use-cases' },
   keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API'],
   openGraph: {
     title: 'HTTP 402 Payment Required: Meaning, Reserved Use & Agents',
-    description: 'Learn what HTTP 402 Payment Required means, why it was reserved, and how L402 enables paid API access for AI agents.',
+    description: 'Learn HTTP 402 history, L402 payment challenges, and how SatGate governs paid-rail access with Evidence Packs.',
     url: 'https://satgate.io/blog/http-402-payment-required-use-cases',
     type: 'article',
     publishedTime: '2026-04-02T00:00:00Z',
@@ -16,7 +16,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'HTTP 402 Payment Required: Meaning, Reserved Use & Agents',
-    description: 'HTTP 402 explained: reserved status code history, L402 payment challenges, and paid API access for AI agents.',
+    description: 'HTTP 402 explained: reserved status code history, L402 payment challenges, paid-rail governance, and Evidence Packs.',
   },
 };
 
@@ -57,7 +57,7 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
         name: 'Why was HTTP 402 reserved for future use?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'HTTP 402 was reserved because the web did not yet have a standard, low-friction payment rail for small digital transactions. Credit cards were too expensive for micropayments, and clients were human-operated. Lightning payments, macaroon tokens, and autonomous agents make the original intent usable.',
+          text: 'HTTP 402 was reserved because the web did not yet have a standard, low-friction payment rail for small digital transactions. Credit cards were too expensive for micropayments, and clients were human-operated. paid-rail context, macaroon tokens, and autonomous agents make the original intent usable.',
         },
       },
       {
@@ -469,16 +469,16 @@ Parent Agent ($50 macaroon)
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            HTTP 402 was reserved for future use in 1997. The future is here, and it looks like AI agents paying for API calls with Lightning micropayments, governed by macaroon tokens, settled in milliseconds. The dormant status code just woke up.
+            HTTP 402 was reserved for future use in 1997. The future is here, and it looks like AI agents paying for API calls with paid-rail context, governed by macaroon tokens, settled in milliseconds. The dormant status code just woke up.
           </p>
 
           <div className="my-10 rounded-2xl border border-yellow-900/60 bg-yellow-950/20 p-6">
-            <h3 className="mb-3 text-xl font-bold text-white">Model robot-customer pricing before enabling 402</h3>
+            <h3 className="mb-3 text-xl font-bold text-white">Model paid-agent pricing before enabling 402</h3>
             <p className="mb-4 text-gray-300">HTTP 402 gets powerful when pricing, margin, free allowances, and L402 settlement are explicit before agents call the API.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/l402-api-pricing-calculator" className="text-cyan-300 hover:text-cyan-200">L402 pricing calculator →</Link>
               <Link href="/tools" className="text-cyan-300 hover:text-cyan-200">Agent payment tools →</Link>
-              <Link href="/robot-customer-payments" className="text-cyan-300 hover:text-cyan-200">Robot customer payments →</Link>
+              <Link href="/paid-agent-payments" className="text-cyan-300 hover:text-cyan-200">Paid agent payments →</Link>
               <Link href="/l402-agent-payments" className="text-cyan-300 hover:text-cyan-200">L402 agent payments →</Link>
               <Link href="/http-402-for-ai-agents" className="text-cyan-300 hover:text-cyan-200">HTTP 402 for AI agents →</Link>
               <Link href="/agent-payment-controls" className="text-cyan-300 hover:text-cyan-200">Agent payment controls →</Link>
@@ -490,7 +490,7 @@ Parent Agent ($50 macaroon)
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">SatGate growth path: Observe → Control → Charge</h3>
             <p className="mb-4 text-gray-300">
-              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or robot-customer revenue.
+              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or paid-agent revenue.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway →</Link>

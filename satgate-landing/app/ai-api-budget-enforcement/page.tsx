@@ -3,7 +3,7 @@ import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptTe
 
 export const metadata = {
   title: 'AI API Budget Enforcement | Hard Caps for Agent API Spend',
-  description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with request-path controls, revocation, and audit receipts.',
+  description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with request-path controls, revocation, and Evidence Pack receipts.',
   alternates: { canonical: 'https://satgate.io/ai-api-budget-enforcement' },
   keywords: [
     'AI API budget enforcement',
@@ -18,14 +18,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'AI API Budget Enforcement | Hard Caps for Agent API Spend',
-    description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with audit receipts.',
+    description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with Evidence Pack receipts.',
     url: 'https://satgate.io/ai-api-budget-enforcement',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'AI API Budget Enforcement | Hard Caps for Agent API Spend',
-    description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with audit receipts.',
+    description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with Evidence Pack receipts.',
   },
 };
 

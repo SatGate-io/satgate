@@ -3,7 +3,7 @@ import { ArrowRight, Cable, Eye, Gauge, LockKeyhole, ReceiptText } from 'lucide-
 
 export const metadata = {
   title: 'MCP Gateway for Governed Agent Tool Access',
-  description: 'Use SatGate as an MCP gateway to check agent authority before tool execution, enforce policy across SaaS and Hybrid MCP deployments, and record audit receipts for every decision.',
+  description: 'Use SatGate as an MCP gateway to check authority before tool execution and export Evidence Pack receipts.',
   alternates: { canonical: 'https://satgate.io/mcp-gateway' },
   keywords: ['MCP gateway', 'Model Context Protocol gateway', 'MCP access control', 'MCP budget enforcement', 'MCP tool metering', 'hosted MCP gateway', 'hybrid MCP gateway'],
   openGraph: {
@@ -15,18 +15,18 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'MCP Gateway for Governed Agent Tool Access',
-    description: 'Put SatGate in the MCP request path so every agent tool call can be metered, governed, and audited.',
+    description: 'Put SatGate in the MCP request path so every tool call is governed and recorded in an Evidence Pack.',
   },
 };
 
 const controls = [
   { icon: Eye, title: 'Observe MCP tool usage', body: 'Attribute each MCP call to tenant, agent, token, server, tool, customer, and workflow before finance or security asks for Evidence Pack proof.' },
   { icon: LockKeyhole, title: 'Control access and budgets', body: 'Enforce scoped capabilities, tool allowlists, per-tool prices, spend caps, delegation depth, expiry, and instant revocation.' },
-  { icon: ReceiptText, title: 'Produce audit receipts', body: 'Record the agent, tool, policy, decision, budget state, outcome, and receipt ID so MCP activity can be reviewed in an Evidence Pack.' },
+  { icon: ReceiptText, title: 'Produce Evidence Pack receipts', body: 'Record the agent, tool, policy, decision, budget state, outcome, and receipt ID so MCP activity can be reviewed in an Evidence Pack.' },
 ];
 
 const faqs = [
-  ['What is an MCP gateway?', 'An MCP gateway sits between AI agents and Model Context Protocol servers. It observes tool calls, applies access policy and budgets, records audit receipts, and proves decisions before tools execute.'],
+  ['What is an MCP gateway?', 'An MCP gateway sits between AI agents and Model Context Protocol servers. It observes tool calls, applies access policy and budgets, records Evidence Pack receipts, and proves decisions before tools execute.'],
   ['Why do MCP tools need access control?', 'MCP makes tools easy for agents to reach, which also makes expensive or sensitive tools easy to overuse. Access control limits which agents can call which tools, for how long, under which budget, and with what delegation.'],
   ['Can SatGate host MCP servers?', 'Yes. SatGate supports SaaS MCP for fast hosted deployment and Hybrid MCP for dedicated enterprise runtime control. The critical split is simple: SaaS MCP is Fly-hosted; Hybrid MCP is Hetzner-hosted.'],
   ['How is an MCP gateway different from an API gateway?', 'A traditional API gateway mostly routes HTTP traffic and checks identity. An MCP gateway also understands agent tool calls, capability scope, per-tool cost, budget policy, delegation lineage, and audit outcomes.'],
@@ -85,6 +85,9 @@ export default function McpGatewayPage() {
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               See Policy-to-Proof
             </Link>
+            <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-800 px-6 py-3 font-bold text-gray-200 hover:border-cyan-500 transition">
+              MCP governance
+            </Link>
           </div>
         </div>
       </section>
@@ -103,7 +106,7 @@ export default function McpGatewayPage() {
         </div>
         <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
           <h3 className="text-xl font-bold text-white mb-4">The request path</h3>
-          {['Agent asks for a tool', 'SatGate checks capability, policy, and budget', 'Allowed calls execute; denied calls stop cleanly', 'Usage is attributed to agent, customer, tool, and tenant', 'An audit receipt is recorded for the Evidence Pack'].map((step, index) => (
+          {['Agent asks for a tool', 'SatGate checks capability, policy, and budget', 'Allowed calls execute; denied calls stop cleanly', 'Usage is attributed to agent, customer, tool, and tenant', 'An Evidence Pack receipt is recorded for proof'].map((step, index) => (
             <div key={step} className="flex gap-3 border-b border-gray-800 py-3 last:border-b-0">
               <span className="text-cyan-300 font-bold">{index + 1}</span>
               <span className="text-gray-300">{step}</span>
@@ -163,7 +166,7 @@ export default function McpGatewayPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             ['/capability-auth', 'Capability auth', 'Scope agent authority before tools run.'],
-            ['/mcp-governance', 'MCP governance', 'Govern MCP tool calls with authority, policy, revocation, and audit receipts.'],
+            ['/mcp-governance', 'MCP governance', 'Govern MCP tool calls with authority, policy, revocation, and Evidence Pack receipts.'],
             ['/blog/mcp-budget-enforcement-guide', 'MCP budget enforcement', 'Hard-cap per-tool spend.'],
             ['/policy-to-proof', 'Policy-to-Proof', 'Turn MCP decisions into Evidence Pack proof.'],
           ].map(([href, title, body]) => (
@@ -179,7 +182,7 @@ export default function McpGatewayPage() {
         <div className="max-w-4xl mx-auto px-6 py-20 text-center">
           <Gauge className="mx-auto mb-6 text-cyan-300" size={36} />
           <h2 className="text-3xl font-bold text-white mb-4">Launch an MCP gateway agents can safely use.</h2>
-          <p className="text-gray-300 mb-8">Start with authority checks, enforce policy before execution, and produce audit receipts that prove what each agent was allowed or denied to do.</p>
+          <p className="text-gray-300 mb-8">Start with authority checks, enforce policy before execution, and produce Evidence Pack receipts that prove what each agent was allowed or denied to do.</p>
           <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black hover:bg-gray-200 transition">
             Govern MCP tool access <ArrowRight size={18} />
           </Link>

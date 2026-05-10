@@ -218,7 +218,7 @@ export default function SecurityPage() {
                 <Zap size={20} className="text-yellow-400 mt-1 flex-shrink-0" />
                 <div>
                   <h4 className="text-white text-sm font-bold">Charge</h4>
-                  <p className="text-gray-500 text-xs mb-0">Verify → Payment Proof → Allow. L402 Lightning micropayments. Per-request pricing. Instant settlement, no invoices, no chargebacks.</p>
+                  <p className="text-gray-500 text-xs mb-0">Verify → Payment Proof → Allow. paid-rail context micropayments. Per-request pricing. Instant settlement, no invoices, no chargebacks.</p>
                 </div>
               </div>
             </div>
@@ -234,7 +234,7 @@ export default function SecurityPage() {
               <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Never stores upstream credentials.</strong> SatGate verifies tokens at the gateway. Your API keys, secrets, and upstream credentials stay in your infrastructure.</span></li>
               <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">No request body inspection.</strong> Gateway inspects only token and routing metadata. Request payloads pass through opaque (MCP proxy reads method/tool name for cost attribution only).</span></li>
               <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Tenant-isolated data.</strong> All data scoped by tenant_id. Cross-tenant access is architecturally impossible.</span></li>
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Lightning payments settle directly.</strong> In Charge mode, payments go from payer to your Lightning node. SatGate never touches funds.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">paid-rail context settle directly.</strong> In Charge mode, payments go from payer to your Lightning node. SatGate never touches funds.</span></li>
             </ul>
           </section>
 

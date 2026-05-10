@@ -3,19 +3,19 @@ import { ArrowRight, BadgeCheck, KeyRound, Layers3, ShieldCheck, TimerReset, Wal
 
 export const metadata = {
   title: 'Capability-Based Authorization for AI Agents',
-  description: 'Replace broad API keys with scoped, revocable, budget-aware capabilities for AI agents using SatGate.',
+  description: 'Replace broad API keys with scoped, revocable capabilities, authority before execution, and Evidence Pack proof.',
   alternates: { canonical: 'https://satgate.io/capability-auth' },
   keywords: ['capability based authorization', 'capability auth', 'agent authorization', 'capability tokens', 'macaroon tokens', 'delegated authorization', 'AI agent permissions'],
   openGraph: {
     title: 'Capability-Based Authorization for AI Agents',
-    description: 'Give agents scoped, revocable, budget-aware capabilities instead of broad static API keys.',
+    description: 'Give agents scoped, revocable capabilities and Evidence Pack proof instead of broad static API keys.',
     url: 'https://satgate.io/capability-auth',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Capability-Based Authorization for AI Agents',
-    description: 'Use SatGate to scope what agents can access, spend, delegate, and revoke before each request.',
+    description: 'Use SatGate to scope agent authority before execution and prove decisions with Evidence Packs.',
   },
 };
 
@@ -97,7 +97,7 @@ export default function CapabilityAuthPage() {
               Traditional identity-based auth asks, “who is this?” That works for humans and stable apps, but autonomous agents need narrower authority. They need credentials that say which tool is allowed, what task it is for, how much it can spend, how long it lasts, and whether it can delegate.
             </p>
             <p>
-              SatGate puts that capability check in the request path. The result is not just authentication. It is economic access control: Observe the call, Control the authority and budget, and Charge or bill for usage when access has economic value.
+              SatGate puts that capability check in the request path. The result is not just authentication. It is Policy-to-Proof governance: Observe the call, Control authority and budget before execution, and Prove each decision with an Evidence Pack receipt.
             </p>
           </div>
         </div>
@@ -170,7 +170,7 @@ export default function CapabilityAuthPage() {
           {[
             ['/mcp-gateway', 'MCP gateway', 'Apply capabilities to tool calls.'],
             ['/agent-capability-tokens', 'Agent capability tokens', 'See how scoped authority is encoded.'],
-            ['/govern', 'AI agent governance', 'Observe, Control, and Charge agent actions.'],
+            ['/govern', 'AI agent governance', 'Observe, Control, and Prove agent actions.'],
             ['/blog/how-to-add-budget-limits-to-openai-api-calls', 'Budget limits', 'Attach spend policy to access.'],
           ].map(([href, title, body]) => (
             <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 hover:border-emerald-700 transition">
@@ -185,7 +185,7 @@ export default function CapabilityAuthPage() {
         <div className="max-w-4xl mx-auto px-6 py-20 text-center">
           <BadgeCheck className="mx-auto mb-6 text-emerald-300" size={36} />
           <h2 className="text-3xl font-bold text-white mb-4">Stop handing agents broad API keys.</h2>
-          <p className="text-gray-300 mb-8">Use capabilities that expire, attenuate, meter, delegate safely, and stop spend before the next request.</p>
+          <p className="text-gray-300 mb-8">Use capabilities that expire, attenuate, meter, delegate safely, stop spend before the next request, and leave Evidence Pack proof.</p>
           <Link href="/design-partners" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black hover:bg-gray-200 transition">
             Work with SatGate <ArrowRight size={18} />
           </Link>

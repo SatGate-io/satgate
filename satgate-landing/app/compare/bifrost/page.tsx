@@ -14,7 +14,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate vs Bifrost: LLM Routing vs Economic Governance',
-    description: 'Bifrost routes LLM traffic. SatGate enforces AI agent budgets, MCP tool costs, scoped credentials, and L402 payments.',
+    description: 'Bifrost routes LLM traffic. SatGate enforces AI agent budgets, MCP tool costs, scoped credentials, and paid-rail context.',
   },
 };
 
@@ -24,7 +24,7 @@ export default function CompareBifrostPage() {
     '@type': 'WebPage',
     name: 'SatGate vs Bifrost',
     url: 'https://satgate.io/compare/bifrost',
-    description: 'Compare SatGate and Bifrost AI gateways for LLM routing, agent spend governance, per-tool budgets, and L402 API monetization.',
+    description: 'Compare SatGate and Bifrost AI gateways for LLM routing, agent spend governance, per-tool budgets, and rail-neutral paid-rail governance.',
     datePublished: '2026-04-30',
     dateModified: '2026-05-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -45,7 +45,7 @@ export default function CompareBifrostPage() {
         name: 'What is the main difference between SatGate and Bifrost?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Bifrost focuses on routing LLM traffic across providers. SatGate focuses on economic governance: hard budget enforcement, per-tool cost attribution, scoped agent credentials, and L402 API monetization.',
+          text: 'Bifrost focuses on routing LLM traffic across providers. SatGate focuses on economic governance: hard budget enforcement, per-tool cost attribution, scoped agent credentials, and rail-neutral paid-rail governance.',
         },
       },
       {
@@ -340,7 +340,7 @@ export default function CompareBifrostPage() {
           <h2 className="text-xl font-bold mb-6">SatGate vs Bifrost questions</h2>
           <div className="space-y-5">
             {[
-              ['What is the main difference between SatGate and Bifrost?', 'Bifrost focuses on routing LLM traffic across providers. SatGate focuses on economic governance: hard budget enforcement, per-tool cost attribution, scoped agent credentials, and L402 API monetization.'],
+              ['What is the main difference between SatGate and Bifrost?', 'Bifrost focuses on routing LLM traffic across providers. SatGate focuses on economic governance: hard budget enforcement, per-tool cost attribution, scoped agent credentials, and rail-neutral paid-rail governance.'],
               ['Can SatGate and Bifrost be used together?', 'Yes. SatGate can sit before Bifrost to enforce budget and policy controls, while Bifrost handles downstream LLM routing, failover, and provider optimization.'],
               ['When should teams choose SatGate over an LLM router?', 'Choose SatGate when the priority is preventing runaway agent spend, enforcing per-agent or per-tool budgets, attributing costs to teams, or charging external agents for API access.'],
             ].map(([question, answer]) => (

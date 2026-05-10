@@ -2,24 +2,24 @@ import type { Metadata } from "next";
 import HomeClient from "./components/HomeClient";
 
 export const metadata: Metadata = {
-  title: "SatGate — The Economic Firewall for AI Agent Requests",
+  title: "SatGate — Policy-to-Proof Governance for AI Agents",
   description:
-    "Govern internal enterprise agents before each request. SatGate adds scoped authority, per-agent budgets, delegation, revocation, and evidence across MCP, API keys, L402, x402, and enterprise billing.",
+    "Authority before execution. Evidence Packs after every decision across MCP, APIs, API keys, L402, x402, AgentCore Payments, Pay.sh, and enterprise billing.",
   alternates: {
     canonical: "https://satgate.io",
   },
   openGraph: {
-    title: "SatGate — The Economic Firewall for AI Agent Requests",
+    title: "SatGate — Policy-to-Proof Governance for AI Agents",
     description:
-      "Govern what internal enterprise agents can do with scoped authority, budgets, runtime enforcement, and evidence across internal APIs and paid external rails.",
+      "Policy-to-Proof governance for enterprise agents: scoped authority before execution and Evidence Packs across APIs, MCP tools, and paid rails.",
     url: "https://satgate.io",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "SatGate — Economic Firewall for AI Agent Requests",
+    title: "SatGate — Policy-to-Proof Governance for AI Agents",
     description:
-      "Govern what internal enterprise agents can do with scoped authority, budgets, runtime enforcement, and evidence across internal APIs and paid external rails.",
+      "Policy-to-Proof governance for enterprise agents: scoped authority before execution and Evidence Packs across APIs, MCP tools, and paid rails.",
   },
 };
 
@@ -32,7 +32,7 @@ export default function HomePage() {
         name: 'SatGate',
         url: 'https://satgate.io',
         logo: 'https://satgate.io/logo_white_transparent.png',
-        description: 'SatGate is the economic firewall and economic control plane for AI agent requests.',
+        description: 'SatGate is Policy-to-Proof governance for AI agent authority: decisions before execution and Evidence Packs after every action.',
       },
       {
         '@type': 'WebSite',
@@ -42,17 +42,18 @@ export default function HomePage() {
       },
       {
         '@type': 'WebPage',
-        name: 'SatGate — The Economic Firewall for AI Agent Requests',
+        name: 'SatGate — Policy-to-Proof Governance for AI Agents',
         url: 'https://satgate.io',
-        description: 'Govern internal enterprise agents before each request with scoped authority, per-agent budgets, delegation, revocation, and evidence across MCP, API keys, L402, x402, and enterprise billing.',
+        description: 'Authority before execution. Evidence Packs after every decision across MCP, APIs, API keys, L402, x402, AgentCore Payments, Pay.sh, and enterprise billing.',
         datePublished: '2026-04-30',
         dateModified: '2026-05-05',
         isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
         about: [
-          { '@type': 'Thing', name: 'economic control plane for AI agents' },
-          { '@type': 'Thing', name: 'economic firewall for AI agents' },
-          { '@type': 'Thing', name: 'request-path budget enforcement' },
-          { '@type': 'Thing', name: 'L402 API monetization' },
+          { '@type': 'Thing', name: 'Policy-to-Proof governance' },
+          { '@type': 'Thing', name: 'Evidence Packs' },
+          { '@type': 'Thing', name: 'authority before execution' },
+          { '@type': 'Thing', name: 'MCP governance' },
+          { '@type': 'Thing', name: 'rail-neutral paid-rail governance' },
         ],
       },
     ],
@@ -67,7 +68,7 @@ export default function HomePage() {
         name: 'What is SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate is an economic control plane for internal enterprise agents. It sits in the request path to scope authority, enforce policy and budgets, prove revocation, and preserve evidence across internal APIs and paid external calls.',
+          text: 'SatGate is Policy-to-Proof governance for enterprise agents. It sits in the request path to check authority, enforce policy and budgets, and preserve Evidence Packs across APIs, MCP tools, and paid rails.',
         },
       },
       {
@@ -80,10 +81,10 @@ export default function HomePage() {
       },
       {
         '@type': 'Question',
-        name: 'What are Observe, Control, and Charge?',
+        name: 'What are Observe, Control, and Prove?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Observe tracks agent traffic and cost without blocking. Control enforces budgets and scoped policy for internal agents. Charge preserves authorization evidence around external paid access across L402, x402, API-key, or enterprise billing rails.',
+          text: 'Observe tracks agent traffic and cost without blocking. Control enforces budgets and scoped authority before execution. Prove preserves Evidence Packs across APIs, MCP tools, delegation, and paid-rail access including L402, x402, AgentCore Payments, Pay.sh, Fiat402, and enterprise billing.',
         },
       },
     ],

@@ -3,7 +3,7 @@ import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptTe
 
 export const metadata = {
   title: 'MCP Cost Control | Budget Enforcement for Tool-Calling Agents',
-  description: 'Control MCP tool costs with per-tool budgets, scoped credentials, revocation, audit receipts, and request-path enforcement for Cursor, Claude, and OpenClaw.',
+  description: 'Control MCP tool costs with per-tool budgets, scoped credentials, revocation, Evidence Pack receipts, and request-path enforcement for Cursor, Claude, and OpenClaw.',
   alternates: { canonical: 'https://satgate.io/mcp-cost-control' },
   keywords: [
     'MCP cost control',
@@ -18,14 +18,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'MCP Cost Control | Budget Enforcement for Tool-Calling Agents',
-    description: 'Control MCP tool costs with per-tool budgets, risk tiers, scoped credentials, revocation, audit receipts, and request-path enforcement.',
+    description: 'Control MCP tool costs with per-tool budgets, risk tiers, scoped credentials, revocation, Evidence Pack receipts, and request-path enforcement.',
     url: 'https://satgate.io/mcp-cost-control',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'MCP Cost Control | Budget Enforcement for Tool-Calling Agents',
-    description: 'Control MCP tool costs with per-tool budgets, risk tiers, scoped credentials, revocation, audit receipts, and request-path enforcement.',
+    description: 'Control MCP tool costs with per-tool budgets, risk tiers, scoped credentials, revocation, Evidence Pack receipts, and request-path enforcement.',
   },
 };
 

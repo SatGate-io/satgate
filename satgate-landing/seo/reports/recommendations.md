@@ -1,6 +1,6 @@
 # SatGate SEO Machine Report
 
-Generated: 2026-05-08T20:45:16.960056Z
+Generated: 2026-05-10T16:36:24.217042Z
 
 ## Ranked opportunities
 
@@ -81,8 +81,8 @@ Generated: 2026-05-08T20:45:16.960056Z
 - Links to add: /capability-auth, /agent-capability-tokens, /revocable-capability-token-policy-template, /govern
 
 ### /govern
-- Title: AI Agent Governance: Observe, Control, and Charge
-- Meta: Govern AI agents with SatGate: observe tool usage, control access and budgets, and charge for API or MCP consumption.
+- Title: AI Agent Governance: Policy-to-Proof
+- Meta: Govern AI agents with SatGate: authority before execution, Observe/Control/Prove, MCP governance, paid-rail context, and Evidence Packs.
 - Content changes:
   - Add or tighten the above-the-fold direct-answer block for the primary query.
   - Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end.
@@ -106,7 +106,7 @@ Generated: 2026-05-08T20:45:16.960056Z
 
 ### /mcp-gateway
 - Title: MCP Gateway for Governed Agent Tool Access
-- Meta: Use SatGate as an MCP gateway to observe, control, and charge for agent tool access across SaaS and hybrid deployments.
+- Meta: Use SatGate as an MCP gateway to check authority before tool execution, enforce policy, and export Evidence Packs.
 - Content changes:
   - Make this the commercial MCP gateway hub and link all MCP blog/tool pages into it.
 - Links to add: /govern, /capability-auth, /blog/api-gateway-for-ai-agents, /blog/mcp-budget-enforcement-guide, /mcp-tool-cost-policy-generator

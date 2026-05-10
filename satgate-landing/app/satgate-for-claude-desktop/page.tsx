@@ -3,7 +3,7 @@ import { ArrowRight, Bot, DollarSign, Gauge, KeyRound, ShieldCheck, Terminal, Wo
 
 export const metadata = {
   title: 'SatGate for Claude Desktop MCP',
-  description: 'Govern Claude Desktop MCP tool calls with SatGate budgets, scoped capabilities, revocation, and request-path audit trails.',
+  description: 'Govern Claude Desktop MCP tool calls with SatGate budgets, scoped capabilities, revocation, and request-path Evidence Packs.',
   alternates: { canonical: 'https://satgate.io/satgate-for-claude-desktop' },
   keywords: [
     'SatGate for Claude Desktop',
@@ -15,14 +15,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate for Claude Desktop MCP',
-    description: 'Govern Claude Desktop MCP tool calls with SatGate budgets, scoped capabilities, revocation, and request-path audit trails.',
+    description: 'Govern Claude Desktop MCP tool calls with SatGate budgets, scoped capabilities, revocation, and request-path Evidence Packs.',
     url: 'https://satgate.io/satgate-for-claude-desktop',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate for Claude Desktop MCP',
-    description: 'Govern Claude Desktop MCP tool calls with SatGate budgets, scoped capabilities, revocation, and request-path audit trails.',
+    description: 'Govern Claude Desktop MCP tool calls with SatGate budgets, scoped capabilities, revocation, and request-path Evidence Packs.',
   },
 };
 
@@ -64,7 +64,7 @@ export default function SatGateIntegrationPage() {
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-03',
     audience: webPageJsonLd.audience,
-    featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'Request-path audit trails', 'L402 API monetization'],
+    featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'Request-path Evidence Packs', 'rail-neutral paid-rail governance'],
   };
 
   const faqJsonLd = {
@@ -199,13 +199,13 @@ export default function SatGateIntegrationPage() {
         <div className="rounded-3xl border border-purple-900/40 bg-gradient-to-br from-purple-950/40 to-cyan-950/20 p-8 md:p-10">
           <div className="mb-4 flex items-center gap-3 text-purple-200"><Bot size={24} /><span className="font-semibold">Observe → Control → Charge</span></div>
           <h2 className="mb-4 text-3xl font-bold text-white">Make Claude Desktop agent activity governable.</h2>
-          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate gives agent teams the missing economic layer: budgets, scoped authority, revocation, audit, and L402 payments where machine customers need to pay for APIs.</p>
+          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate gives agent teams the missing economic layer: budgets, scoped authority, revocation, audit, and paid-rail context where machine customers need to pay for APIs.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-300 px-6 py-3 font-bold text-black transition hover:bg-cyan-200">
               MCP budget enforcement <Gauge size={18} />
             </Link>
-            <Link href="/robot-customer-payments" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
-              Robot customer payments
+            <Link href="/paid-agent-payments" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
+              Paid agent payments
             </Link>
           </div>
         </div>

@@ -4,12 +4,12 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "LLM Cost Management: Control AI Spend Before It Happens",
-  description: "A practical guide to LLM cost management using usage observability, budget controls, and chargeback workflows for AI agents.",
+  description: "A practical guide to LLM cost management using authority before execution, budget controls, and Evidence Pack receipts for AI agents.",
   alternates: { canonical: 'https://satgate.io/blog/llm-cost-management' },
   keywords: ['LLM cost dashboard', 'LLM monitoring dashboard', 'LLM cost management', 'LLM cost control', 'LLM tracing dashboard', 'cost latency per request', 'AI budget enforcement', 'AI agent cost control', 'request-path budget enforcement'],
   openGraph: {
     title: 'LLM Cost Management: Control AI Spend Before It Happens',
-    description: 'A practical guide to LLM cost management using usage observability, budget controls, and chargeback workflows for AI agents.',
+    description: 'A practical guide to LLM cost management using authority before execution, budget controls, and Evidence Pack receipts for AI agents.',
     url: 'https://satgate.io/blog/llm-cost-management',
     type: 'article',
     publishedTime: '2026-03-17T00:00:00Z',
@@ -17,7 +17,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'LLM Cost Management: Control AI Spend Before It Happens',
-    description: 'A practical guide to LLM cost management using observability, budget controls, and chargeback for agents.',
+    description: 'LLM cost management with authority before execution, budget controls, and Evidence Pack receipts for agents.',
   },
 };
 
@@ -107,7 +107,7 @@ export default function LlmCostManagementBlogPage() {
           <h1 className="text-4xl font-bold mb-4">LLM Cost Management: Real-Time Budget Enforcement for AI Agents</h1>
           <div className="mb-6 rounded-2xl border border-yellow-900/60 bg-yellow-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-yellow-300">Short answer</p>
-            <p className="text-gray-300">LLM cost management is not just dashboards and alerts. For autonomous agents, it needs request-path enforcement: per-agent budgets, model/tool prices, attribution, and hard blocks before expensive calls execute.</p>
+            <p className="text-gray-300">LLM cost management is not just dashboards and alerts. For autonomous agents, it needs Observe, Control, Prove: per-agent budgets, authority before execution, model/tool prices, attribution, hard blocks, and Evidence Pack receipts for every important decision.</p>
           </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
@@ -465,7 +465,7 @@ satgate mint \\
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">SatGate growth path: Observe → Control → Charge</h3>
             <p className="mb-4 text-gray-300">
-              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or robot-customer revenue.
+              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or paid-agent revenue.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway →</Link>

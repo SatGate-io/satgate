@@ -243,7 +243,7 @@ const agentBToken = attenuate(agentAToken, {
           </p>
 
           {/* --- Three-Layer Model --- */}
-          <h2 className="text-2xl font-bold mt-12 mb-4 text-white">The Three-Layer Model: Observe, Control, Charge</h2>
+          <h2 className="text-2xl font-bold mt-12 mb-4 text-white">The Three-Layer Model: Observe, Control, Prove</h2>
           <p className="text-gray-300 leading-relaxed">
             An economic firewall operates across three functional layers:
           </p>
@@ -273,7 +273,7 @@ const agentBToken = attenuate(agentAToken, {
               </div>
               <div>
                 <p className="text-white font-semibold text-lg">Charge</p>
-                <p className="text-gray-400">Monetize API access via L402 payments. Agents pay per call using cryptographic payment proofs &mdash; no accounts, no invoices, no billing portals.</p>
+                <p className="text-gray-400">Monetize API access via paid-rail context. Agents pay per call using cryptographic payment proofs &mdash; no accounts, no invoices, no billing portals.</p>
               </div>
             </div>
           </div>

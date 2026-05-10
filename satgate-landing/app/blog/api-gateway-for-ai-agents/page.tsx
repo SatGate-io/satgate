@@ -4,12 +4,12 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "API Gateway for AI Agents: Control Tool and API Access",
-  description: "Learn how an API gateway for AI agents can enforce access, budgets, observability, and monetization across APIs and MCP tools.",
+  description: "Learn how AI agent gateways enforce authority before execution with Observe/Control/Prove, budgets, MCP governance, and Evidence Packs.",
   alternates: { canonical: 'https://satgate.io/blog/api-gateway-for-ai-agents' },
   keywords: ['API gateway for AI agents', 'AI agent gateway', 'API gateway comparison', 'agent economy gateway', 'AI API management', 'economic firewall gateway'],
   openGraph: {
     title: 'API Gateway for AI Agents: Budgets, MCP, and Tool Costs',
-    description: 'Agent-aware API gateways need budget enforcement, MCP tool controls, scoped tokens, revocation, attribution, and L402.',
+    description: 'Agent-aware API gateways need Observe/Control/Prove, budgets, MCP tool controls, scoped tokens, revocation, and Evidence Packs.',
     url: 'https://satgate.io/blog/api-gateway-for-ai-agents',
     type: 'article',
     publishedTime: '2026-03-12T00:00:00Z',
@@ -17,7 +17,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'API Gateway for AI Agents: Budgets, MCP, and Tool Costs',
-    description: 'Traditional gateways route traffic. AI agent gateways must enforce budgets, MCP tool scope, revocation, and payments.',
+    description: 'Traditional gateways route traffic. AI agent gateways must Observe, Control, and Prove authority, MCP tool scope, revocation, and paid-rail context.',
   },
 };
 
@@ -37,7 +37,9 @@ export default function ApiGatewayForAiAgentsBlogPage() {
       { '@type': 'Thing', name: 'agent-aware budget enforcement' },
       { '@type': 'Thing', name: 'MCP tool cost control' },
       { '@type': 'Thing', name: 'scoped capability tokens for APIs' },
-      { '@type': 'Thing', name: 'L402 robot customer payments' },
+      { '@type': 'Thing', name: 'rail-neutral paid-rail governance' },
+      { '@type': 'Thing', name: 'Observe Control Prove' },
+      { '@type': 'Thing', name: 'Evidence Packs' },
     ],
   };
 
@@ -66,7 +68,7 @@ export default function ApiGatewayForAiAgentsBlogPage() {
         name: 'What should an agent-aware API gateway enforce?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An agent-aware gateway should enforce per-agent and per-tool budgets, atomic spend checks, scoped and revocable capability tokens, delegation-chain attribution, economic audit trails, and optional L402 payments for robot customers.',
+          text: 'An agent-aware gateway should enforce per-agent and per-tool budgets, atomic spend checks, scoped and revocable capability tokens, delegation-chain attribution, economic Evidence Packs, and optional paid-rail context for paid agents.',
         },
       },
       {
@@ -105,7 +107,7 @@ export default function ApiGatewayForAiAgentsBlogPage() {
           <h1 className="text-4xl font-bold mb-4">API Gateway for AI Agents: Budgets, MCP Tools, and Economic Control</h1>
           <div className="mb-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Search answer</p>
-            <p className="text-gray-300">An API gateway for AI agents must do more than authenticate and route. It needs request-path budget checks, agent-scoped capability tokens, MCP tool pricing, spend attribution, revocation, and payment flows for robot customers.</p>
+            <p className="text-gray-300">An API gateway for AI agents must do more than authenticate and route. It needs Observe/Control/Prove: request-path authority checks, agent-scoped capability tokens, MCP governance, revocation, paid-rail context, and Evidence Packs.</p>
           </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
@@ -186,7 +188,7 @@ Rate Limiting         RPM/RPS                 Budget (dollar-denominated)
 Cost Tracking         None (just counters)    Per-call cost attribution
 Delegation            N/A                     Cryptographic trust chains
 Spend Enforcement     N/A                     Real-time budget hard caps
-Audit Trail           Request logs            Economic audit (who spent what)
+Evidence Pack           Request logs            Economic audit (who spent what)
 Monetization          Subscription tiers      Per-call micropayments (L402)`}</code>
             </pre>
           </div>
@@ -317,7 +319,7 @@ satgate mint \\
           <ul className="text-gray-300 space-y-3">
             <li><strong className="text-white">Observe:</strong> Deploy in audit mode. See what your agents are spending. No enforcement, just visibility. "We had no idea GPT-4 calls were 80% of our agent costs."</li>
             <li><strong className="text-white">Control:</strong> Enable request-path budget enforcement. Set dollar-denominated limits per agent, per team, per route, and per MCP tool. "Engineering gets $5,000/month for agent API spend."</li>
-            <li><strong className="text-white">Charge (L402):</strong> Enable Lightning-based micropayments. SatGate Charge uses L402 for robot customers that pay per API request before access. Fiat402 is separate and should not be conflated with Charge.</li>
+            <li><strong className="text-white">Charge (L402):</strong> Enable Lightning-based micropayments. SatGate governs paid-rail context for paid agents that pay per API request before access. Fiat402 is separate and should not be conflated with Charge.</li>
           </ul>
 
           <p className="text-gray-300 leading-relaxed">
@@ -336,7 +338,7 @@ satgate mint \\
             <li>✅ <strong className="text-white">Atomic budget enforcement</strong> (no race conditions at scale)</li>
             <li>✅ <strong className="text-white">Capability-based tokens</strong> (attenuated delegation, not all-or-nothing keys)</li>
             <li>✅ <strong className="text-white">Delegation chain tracking</strong> (who delegated to whom, and whose budget pays)</li>
-            <li>✅ <strong className="text-white">Economic audit trail</strong> (spend attribution by agent, tool, team)</li>
+            <li>✅ <strong className="text-white">Economic Evidence Pack</strong> (spend attribution by agent, tool, team)</li>
             <li>✅ <strong className="text-white">Structured budget exhaustion errors</strong> (agents need to reason about limits)</li>
             <li>✅ <strong className="text-white">Progressive adoption</strong> (observe → control → charge)</li>
           </ul>
@@ -369,7 +371,7 @@ satgate mint \\
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">What should an agent-aware API gateway enforce?</h3>
                 <p className="text-gray-300 leading-relaxed mb-0">
-                  It should enforce per-agent and per-tool budgets, atomic spend checks, scoped and revocable capability tokens, delegation-chain attribution, economic audit trails, and optional L402 payments for robot customers.
+                  It should enforce per-agent and per-tool budgets, atomic spend checks, scoped and revocable capability tokens, delegation-chain attribution, economic Evidence Packs, and optional paid-rail context for paid agents.
                 </p>
               </div>
               <div>
@@ -415,7 +417,7 @@ satgate mint \\
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">SatGate growth path: Observe → Control → Charge</h3>
             <p className="mb-4 text-gray-300">
-              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or robot-customer revenue.
+              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or paid-agent revenue.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway →</Link>
