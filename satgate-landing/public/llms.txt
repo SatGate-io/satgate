@@ -101,6 +101,7 @@ Macaroons and capability tokens can constrain agent authority:
 - Revocable Agent Credentials: https://satgate.io/revocable-agent-credentials
 - Capability Auth: https://satgate.io/capability-auth
 - Agent Capability Tokens: https://satgate.io/agent-capability-tokens
+- Capability Lifecycle Demo: https://satgate.io/capability-lifecycle-demo
 - L402 Agent Payments: https://satgate.io/l402-agent-payments
 - Paid Agent Payments: https://satgate.io/paid-agent-payments
 

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-10T21:27:22.132553Z",
+  "generatedAt": "2026-05-10T22:03:21.107880Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -235,6 +235,21 @@
       "priority": "P3",
       "score": 26,
       "primaryKeyword": "OpenAI Anthropic budget controls alternative",
+      "recommendedTitle": "",
+      "recommendedMetaDescription": "",
+      "contentChanges": [],
+      "internalLinksToAdd": [],
+      "schemaToAdd": [
+        "FAQPage",
+        "BreadcrumbList",
+        "SoftwareApplication"
+      ]
+    },
+    {
+      "path": "/capability-lifecycle-demo",
+      "priority": "P3",
+      "score": 26,
+      "primaryKeyword": "capability lifecycle demo",
       "recommendedTitle": "",
       "recommendedMetaDescription": "",
       "contentChanges": [],

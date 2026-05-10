@@ -206,5 +206,23 @@
     "productAngle": "SatGate gives one cross-provider agent budget layer across OpenAI, Anthropic, MCP tools, APIs, and paid rails.",
     "cta": "Enforce AI API budgets",
     "status": "new"
+  },
+  {
+    "path": "/capability-lifecycle-demo",
+    "cluster": "capability-auth",
+    "primaryKeyword": "capability lifecycle demo",
+    "secondaryKeywords": [
+      "agent capability delegation",
+      "macaroon caveats for AI agents",
+      "delegation depth AI agents",
+      "child spend caps",
+      "revocable agent capability",
+      "Evidence Pack proof"
+    ],
+    "intent": "commercial-investigation",
+    "funnelStage": "solution-aware",
+    "productAngle": "SatGate demonstrates issue, delegate, attenuate, revoke, and prove as buyer-visible scoped authority with child spend caps, instant revocation, and Evidence Packs.",
+    "cta": "Walk the lifecycle demo",
+    "status": "new"
   }
 ]

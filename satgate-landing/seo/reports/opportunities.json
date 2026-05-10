@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-10T21:27:22.131887Z",
+  "generatedAt": "2026-05-10T22:03:21.107109Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -279,6 +279,32 @@
       "funnelStage": "solution-aware",
       "productAngle": "SatGate gives one cross-provider agent budget layer across OpenAI, Anthropic, MCP tools, APIs, and paid rails.",
       "cta": "Enforce AI API budgets",
+      "status": "new",
+      "clicks": 0,
+      "impressions": 0,
+      "ctr": 0.0,
+      "position": 100.0,
+      "expectedCtr": 0.005,
+      "ctrGap": 0.005,
+      "score": 26,
+      "priority": "P3"
+    },
+    {
+      "path": "/capability-lifecycle-demo",
+      "cluster": "capability-auth",
+      "primaryKeyword": "capability lifecycle demo",
+      "secondaryKeywords": [
+        "agent capability delegation",
+        "macaroon caveats for AI agents",
+        "delegation depth AI agents",
+        "child spend caps",
+        "revocable agent capability",
+        "Evidence Pack proof"
+      ],
+      "intent": "commercial-investigation",
+      "funnelStage": "solution-aware",
+      "productAngle": "SatGate demonstrates issue, delegate, attenuate, revoke, and prove as buyer-visible scoped authority with child spend caps, instant revocation, and Evidence Packs.",
+      "cta": "Walk the lifecycle demo",
       "status": "new",
       "clicks": 0,
       "impressions": 0,

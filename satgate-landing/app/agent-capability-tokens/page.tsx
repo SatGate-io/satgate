@@ -88,9 +88,9 @@ export default function Page() {
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Agent capability tokens say what an agent can do — not just who it is</h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">Identity proves the caller. Capability proves authority. For autonomous agents, the token should encode routes, tools, budgets, expiry, delegation limits, and revocation checks before access is granted.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Generate token policy <ArrowRight size={18} /></Link>
+            <Link href="/capability-lifecycle-demo" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Walk lifecycle demo <ArrowRight size={18} /></Link>
+            <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Generate token policy</Link>
             <Link href="/blog/macaroon-tokens-vs-api-keys" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Macaroons vs API keys</Link>
-            <Link href="/agent-api-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Agent API governance</Link>
           </div>
         </div>
       </section>
@@ -112,6 +112,32 @@ export default function Page() {
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Delegation should attenuate</h3><p className="leading-relaxed text-gray-400">A parent agent should be able to create a narrower child token, never a broader one.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Audit needs token context</h3><p className="leading-relaxed text-gray-400">Every decision should record identity, capability, caveats, remaining budget, route, and outcome.</p></div>
           </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+          <div>
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Lifecycle demo</p>
+            <h2 className="text-3xl font-bold text-white">Issue → delegate → attenuate → revoke → prove</h2>
+          </div>
+          <Link href="/capability-lifecycle-demo" className="inline-flex items-center gap-2 font-semibold text-cyan-300 transition hover:text-cyan-200">
+            Walk the visible lifecycle <ArrowRight size={16} />
+          </Link>
+        </div>
+        <div className="grid gap-4 md:grid-cols-5">
+          {[
+            ['Issue', 'Parent gets scoped authority for one tenant, task, budget, and tool set.'],
+            ['Delegate', 'A child worker receives linked authority from the parent.'],
+            ['Attenuate', 'Child authority shrinks: lower spend cap, fewer tools, shorter TTL, visible depth.'],
+            ['Revoke', 'SatGate blocks the next request before upstream execution.'],
+            ['Prove', 'Evidence Pack shows lineage, caveats, decision, spend, and receipt IDs.'],
+          ].map(([title, body]) => (
+            <Link key={title} href="/capability-lifecycle-demo" className="rounded-2xl border border-gray-800 bg-gray-950 p-5 transition hover:border-cyan-500/60 hover:bg-cyan-950/10">
+              <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+              <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+            </Link>
+          ))}
         </div>
       </section>
 
