@@ -32,6 +32,11 @@ export const metadata = {
 
 const controls = [
   {
+    icon: KeyRound,
+    title: 'Scoped capabilities',
+    body: 'Replace broad static access with expiring, revocable capabilities constrained by tool, route, budget, and calls.',
+  },
+  {
     icon: BadgeDollarSign,
     title: 'Per-tool pricing',
     body: 'Assign cost to search, browser, code, data, cloud, enrichment, and premium API tools before execution.',
@@ -45,11 +50,6 @@ const controls = [
     icon: ShieldCheck,
     title: 'Risk tiers',
     body: 'Treat harmless local tools differently from expensive external APIs, write actions, or privileged cloud tools.',
-  },
-  {
-    icon: KeyRound,
-    title: 'Scoped capabilities',
-    body: 'Replace broad static access with expiring, revocable capabilities constrained by tool, route, budget, and calls.',
   },
   {
     icon: ClipboardList,
@@ -200,7 +200,7 @@ export default function McpBudgetEnforcementPage() {
         <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
           <h3 className="text-xl font-bold text-white mb-4">MCP budget policy answers</h3>
           <ul className="space-y-3 text-gray-300">
-            {['What does this tool call cost?', 'Which agent, tenant, workflow, and delegated sub-agent made it?', 'Is the call inside budget right now?', 'Should this route allow, deny, downgrade, ask approval, or require paid-rail context?', 'Can finance and security explain the decision later?'].map((item) => (
+            {['Which agent, tenant, workflow, and delegated sub-agent made it?', 'What scoped authority does it have?', 'What does this tool call cost?', 'Is the call inside budget right now?', 'Should this route allow, deny, downgrade, ask approval, or require paid-rail context?', 'Can finance and security explain the decision later?'].map((item) => (
               <li key={item} className="rounded-lg border border-gray-800 bg-black/50 p-3">{item}</li>
             ))}
           </ul>

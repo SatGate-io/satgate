@@ -15,6 +15,10 @@ AGENT_BUDGET_POLICY_PAGE = ROOT / "app" / "agent-spend-policy-template" / "page.
 AGENT_BUDGET_POLICY_LAYOUT = ROOT / "app" / "agent-spend-policy-template" / "layout.tsx"
 CAPABILITY_TOKEN_TEMPLATE_PAGE = ROOT / "app" / "revocable-capability-token-policy-template" / "page.tsx"
 CAPABILITY_TOKEN_TEMPLATE_LAYOUT = ROOT / "app" / "revocable-capability-token-policy-template" / "layout.tsx"
+RUNAWAY_COST_CALCULATOR_PAGE = ROOT / "app" / "runaway-agent-cost-calculator" / "page.tsx"
+RUNAWAY_COST_CALCULATOR_LAYOUT = ROOT / "app" / "runaway-agent-cost-calculator" / "layout.tsx"
+DESIGN_PARTNERS_PAGE = ROOT / "app" / "design-partners" / "page.tsx"
+DESIGN_PARTNERS_LAYOUT = ROOT / "app" / "design-partners" / "layout.tsx"
 
 SPEND_LONGTAIL_PAGES = {
     "ai-agent-cost-control": ROOT / "app" / "ai-agent-cost-control" / "page.tsx",
@@ -255,6 +259,23 @@ tool_required_phrases = {
         "Policy-to-Proof receipt coverage",
         "Map ROI to Policy-to-Proof",
     ],
+    "runaway-agent-cost-calculator": [
+        "SatGate puts authority before execution",
+        "Evidence Pack receipts",
+        "Govern runaway spend",
+        "See Policy-to-Proof",
+        "/govern",
+        "/policy-to-proof",
+    ],
+    "design-partners": [
+        "Policy-to-Proof layer",
+        "Evidence Pack proof",
+        "bounded lane",
+        "policy decision",
+        "Policy-to-Proof governance for AI agent requests",
+        "/policy-to-proof",
+        "/govern",
+    ],
     "agent-budget-policy-template": [
         "Agent Budget Policy Template",
         "control_with_receipts",
@@ -286,6 +307,25 @@ tool_forbidden_phrases = {
         "/l402-api-pricing-calculator",
         "/runaway-agent-cost-calculator",
         "Observe, Control, and Charge",
+    ],
+    "runaway-agent-cost-calculator": [
+        "robot customers",
+        "Charge Demo",
+        "L402 Charge",
+        "Charge/L402",
+        "when APIs become agent-native products",
+        "Learn economic firewalls",
+        "A request-path economic firewall",
+        "/economic-firewall",
+    ],
+    "design-partners": [
+        "Charge Demo",
+        "L402 Charge",
+        "Charge/L402",
+        "production-ready",
+        "Is this production-ready?",
+        "The Economic Firewall for AI agent requests",
+        "/pay",
     ],
     "agent-budget-policy-template": [
         "control_and_charge",
@@ -385,6 +425,7 @@ spend_longtail_forbidden_phrases = {
         "when agents become customers",
         "03 / CHARGE",
         "/robot-customer-payments",
+        "economic control plane",
     ],
     "ai-api-budget-enforcement": [
         "Charge robot customers",
@@ -631,6 +672,10 @@ def main() -> int:
         "revocable-capability-token-policy-template": CAPABILITY_TOKEN_TEMPLATE_PAGE.read_text()
         + "\n"
         + CAPABILITY_TOKEN_TEMPLATE_LAYOUT.read_text(),
+        "runaway-agent-cost-calculator": RUNAWAY_COST_CALCULATOR_PAGE.read_text()
+        + "\n"
+        + RUNAWAY_COST_CALCULATOR_LAYOUT.read_text(),
+        "design-partners": DESIGN_PARTNERS_PAGE.read_text() + "\n" + DESIGN_PARTNERS_LAYOUT.read_text(),
     }
     for name, tool_text in tool_texts.items():
         tool_missing = [phrase for phrase in tool_required_phrases[name] if phrase not in tool_text]

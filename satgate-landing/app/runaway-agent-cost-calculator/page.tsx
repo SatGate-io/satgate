@@ -107,7 +107,7 @@ export default function RunawayAgentCostCalculatorPage() {
       {
         '@type': 'Question',
         name: 'How does SatGate reduce runaway agent costs?',
-        acceptedAnswer: { '@type': 'Answer', text: 'SatGate enforces request-path budgets, per-tool spend caps, revocation, and route policy before upstream API or MCP tool calls execute.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'SatGate enforces request-path budgets, scoped authority, per-tool spend caps, revocation, and route policy before upstream API or MCP tool calls execute, then records the decision in the Evidence Pack.' },
       },
       {
         '@type': 'Question',
@@ -209,7 +209,7 @@ export default function RunawayAgentCostCalculatorPage() {
           <div className="rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-6 md:p-8">
             <h2 className="mb-4 text-2xl font-bold text-white">If enforcement stops the loop at 5 minutes</h2>
             <p className="mb-6 leading-relaxed text-gray-300">
-              A request-path economic firewall can block new calls once a budget, per-tool cap, route policy, or revocation rule is hit. In this model, stopping the loop at five minutes reduces each incident from <strong className="text-white">{money.format(calc.incidentCost)}</strong> to <strong className="text-white">{money.format(calc.blockedAtFiveMinutes)}</strong>.
+              Request-path authority checks can block new calls once a budget, per-tool cap, route policy, or revocation rule is hit. In this model, stopping the loop at five minutes reduces each incident from <strong className="text-white">{money.format(calc.incidentCost)}</strong> to <strong className="text-white">{money.format(calc.blockedAtFiveMinutes)}</strong>.
             </p>
             <div className="rounded-xl border border-gray-800 bg-black p-5">
               <div className="mb-2 text-sm text-gray-400">Avoidable cost per incident</div>
@@ -262,7 +262,7 @@ export default function RunawayAgentCostCalculatorPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate reduce runaway agent costs?</h3>
               <p className="text-gray-400 leading-relaxed">
-                SatGate enforces request-path budgets, per-tool spend caps, revocation, and route policy before upstream API or MCP tool calls execute.
+                SatGate enforces request-path budgets, scoped authority, per-tool spend caps, revocation, and route policy before upstream API or MCP tool calls execute, then records the decision in the Evidence Pack.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -285,14 +285,14 @@ export default function RunawayAgentCostCalculatorPage() {
         <div className="rounded-3xl border border-orange-900/60 bg-gradient-to-br from-orange-950/30 to-yellow-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Stop runaway spend in the request path</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            SatGate observes agent/API spend, controls budgets before paid calls execute, and can charge robot customers with L402 when APIs become agent-native products.
+            SatGate puts authority before execution for agent/API spend: control budgets before paid calls execute, revoke unsafe authority, and preserve Evidence Pack receipts for every allowed, denied, routed, or paid decision.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-              Learn economic firewalls <ArrowRight size={18} />
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+              Govern runaway spend <ArrowRight size={18} />
             </Link>
-            <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">
-              Govern MCP tool spend
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">
+              See Policy-to-Proof
             </Link>
           </div>
         </div>
