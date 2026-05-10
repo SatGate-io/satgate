@@ -298,14 +298,12 @@ export default function AgentApiGovernancePage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-8">
           <div>
-            <h2 className="text-3xl font-bold text-white mb-6">Governance loop</h2>
+            <h2 className="text-3xl font-bold text-white mb-6">Observe, Control, Prove agent API use</h2>
             <div className="space-y-4">
               {[
-                ['Mint', 'Issue a scoped capability for one agent, task, route, or workflow.'],
-                ['Observe', 'Attribute calls and learn real access/spend patterns.'],
-                ['Control', 'Enforce budgets, route policy, tool limits, and revocation.'],
-                ['Delegate', 'Allow sub-agents to receive narrower authority than the parent.'],
-                ['Prove', 'Record policy decisions, spend, outcomes, revocation events, and Evidence Pack receipts.'],
+                ['Observe', 'Attribute calls by agent, worker, route, tenant, and workflow so real access and spend patterns are visible before policy tightens.'],
+                ['Control', 'Issue scoped capabilities, enforce budgets and route policy, attenuate delegation, and revoke authority before the next request.'],
+                ['Prove', 'Record policy decisions, spend, outcomes, revocation events, and Evidence Pack receipts for each governed API action.'],
               ].map(([title, body]) => (
                 <div key={title} className="rounded-xl border border-gray-800 bg-black p-5">
                   <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
