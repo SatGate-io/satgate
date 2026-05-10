@@ -126,5 +126,85 @@
     "productAngle": "SatGate gives agents scoped, revocable, budget-aware capabilities instead of broad API keys.",
     "cta": "Issue capability-based agent access",
     "status": "new"
+  },
+  {
+    "path": "/compare/aws-agentcore-payments",
+    "cluster": "brutal-comparisons",
+    "primaryKeyword": "SatGate vs AWS AgentCore Payments",
+    "secondaryKeywords": [
+      "AWS AgentCore Payments alternative",
+      "agent payments governance",
+      "x402 agent payments",
+      "MCP agent policy"
+    ],
+    "intent": "comparison",
+    "funnelStage": "solution-aware",
+    "productAngle": "SatGate is the provider-neutral economic firewall for delegated agent spend across clouds, MCP tools, APIs, and paid rails.",
+    "cta": "See Policy-to-Proof",
+    "status": "new"
+  },
+  {
+    "path": "/compare/cloudflare-ai-gateway",
+    "cluster": "brutal-comparisons",
+    "primaryKeyword": "SatGate vs Cloudflare AI Gateway",
+    "secondaryKeywords": [
+      "Cloudflare AI Gateway alternative",
+      "AI gateway budget enforcement",
+      "MCP tool governance",
+      "agent economic firewall"
+    ],
+    "intent": "comparison",
+    "funnelStage": "solution-aware",
+    "productAngle": "SatGate adds pre-execution delegated spend authority, cross-rail governance, MCP-native proxying, and Evidence Packs around AI gateway traffic.",
+    "cta": "Govern MCP tools",
+    "status": "existing"
+  },
+  {
+    "path": "/compare/langsmith-helicone-datadog",
+    "cluster": "brutal-comparisons",
+    "primaryKeyword": "LLM observability vs agent control",
+    "secondaryKeywords": [
+      "SatGate vs LangSmith",
+      "SatGate vs Helicone",
+      "SatGate vs Datadog LLM Observability",
+      "agent Evidence Packs"
+    ],
+    "intent": "comparison",
+    "funnelStage": "solution-aware",
+    "productAngle": "SatGate complements LLM observability by enforcing authority before execution and producing Evidence Packs after decisions.",
+    "cta": "See Evidence Packs",
+    "status": "new"
+  },
+  {
+    "path": "/compare/api-gateway-rate-limits",
+    "cluster": "brutal-comparisons",
+    "primaryKeyword": "API gateway rate limits for AI agents",
+    "secondaryKeywords": [
+      "SatGate vs API Gateway rate limits",
+      "agent API rate limits",
+      "MCP rate limits",
+      "agent spend policy"
+    ],
+    "intent": "comparison",
+    "funnelStage": "solution-aware",
+    "productAngle": "SatGate turns blunt request quotas into delegated, budget-aware, evidence-producing agent authority controls.",
+    "cta": "Use capability tokens",
+    "status": "new"
+  },
+  {
+    "path": "/compare/openai-anthropic-budget-controls",
+    "cluster": "brutal-comparisons",
+    "primaryKeyword": "OpenAI Anthropic budget controls alternative",
+    "secondaryKeywords": [
+      "cross-provider AI budgets",
+      "agent budget enforcement",
+      "SatGate vs OpenAI budgets",
+      "Anthropic budget controls alternative"
+    ],
+    "intent": "comparison",
+    "funnelStage": "solution-aware",
+    "productAngle": "SatGate gives one cross-provider agent budget layer across OpenAI, Anthropic, MCP tools, APIs, and paid rails.",
+    "cta": "Enforce AI API budgets",
+    "status": "new"
   }
 ]

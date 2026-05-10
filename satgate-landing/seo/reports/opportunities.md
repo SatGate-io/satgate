@@ -1,6 +1,6 @@
 # SatGate SEO Machine Report
 
-Generated: 2026-05-10T19:28:50.106928Z
+Generated: 2026-05-10T21:27:22.132691Z
 
 ## Ranked opportunities
 
@@ -49,6 +49,36 @@ Generated: 2026-05-10T19:28:50.106928Z
 ### P2 — /capability-auth
 - Score: 50
 - Query: `capability based authorization`
+- GSC: 0 clicks / 0 impressions / 0.00% CTR / pos 100.00
+- CTR gap: 0.50 pp
+
+### P3 — /compare/aws-agentcore-payments
+- Score: 26
+- Query: `SatGate vs AWS AgentCore Payments`
+- GSC: 0 clicks / 0 impressions / 0.00% CTR / pos 100.00
+- CTR gap: 0.50 pp
+
+### P3 — /compare/langsmith-helicone-datadog
+- Score: 26
+- Query: `LLM observability vs agent control`
+- GSC: 0 clicks / 0 impressions / 0.00% CTR / pos 100.00
+- CTR gap: 0.50 pp
+
+### P3 — /compare/api-gateway-rate-limits
+- Score: 26
+- Query: `API gateway rate limits for AI agents`
+- GSC: 0 clicks / 0 impressions / 0.00% CTR / pos 100.00
+- CTR gap: 0.50 pp
+
+### P3 — /compare/openai-anthropic-budget-controls
+- Score: 26
+- Query: `OpenAI Anthropic budget controls alternative`
+- GSC: 0 clicks / 0 impressions / 0.00% CTR / pos 100.00
+- CTR gap: 0.50 pp
+
+### P3 — /compare/cloudflare-ai-gateway
+- Score: 6
+- Query: `SatGate vs Cloudflare AI Gateway`
 - GSC: 0 clicks / 0 impressions / 0.00% CTR / pos 100.00
 - CTR gap: 0.50 pp
 
@@ -117,3 +147,33 @@ Generated: 2026-05-10T19:28:50.106928Z
 - Content changes:
   - Use identity-vs-capability framing and link macaroon/API-key content into this page.
 - Links to add: /blog/macaroon-tokens-vs-api-keys, /agent-capability-tokens, /govern, /mcp-gateway, /revocable-capability-token-policy-template
+
+### /compare/aws-agentcore-payments
+- Title:
+- Meta:
+- Content changes:
+- Links to add:
+
+### /compare/langsmith-helicone-datadog
+- Title:
+- Meta:
+- Content changes:
+- Links to add:
+
+### /compare/api-gateway-rate-limits
+- Title:
+- Meta:
+- Content changes:
+- Links to add:
+
+### /compare/openai-anthropic-budget-controls
+- Title:
+- Meta:
+- Content changes:
+- Links to add:
+
+### /compare/cloudflare-ai-gateway
+- Title:
+- Meta:
+- Content changes:
+- Links to add:
