@@ -19,6 +19,8 @@ RUNAWAY_COST_CALCULATOR_PAGE = ROOT / "app" / "runaway-agent-cost-calculator" / 
 RUNAWAY_COST_CALCULATOR_LAYOUT = ROOT / "app" / "runaway-agent-cost-calculator" / "layout.tsx"
 DESIGN_PARTNERS_PAGE = ROOT / "app" / "design-partners" / "page.tsx"
 DESIGN_PARTNERS_LAYOUT = ROOT / "app" / "design-partners" / "layout.tsx"
+MCP_PROXY_CONFIG_LAYOUT = ROOT / "app" / "mcp-proxy-config-generator" / "layout.tsx"
+L402_API_PRICING_LAYOUT = ROOT / "app" / "l402-api-pricing-calculator" / "layout.tsx"
 
 SPEND_LONGTAIL_PAGES = {
     "ai-agent-cost-control": ROOT / "app" / "ai-agent-cost-control" / "page.tsx",
@@ -359,6 +361,9 @@ spend_longtail_required_phrases = {
         "/govern",
         "/policy-to-proof",
         "paid-rail evidence",
+        "Preserve proof for every decision",
+        "03 / PROVE",
+        "Record every authority decision",
     ],
     "ai-api-budget-enforcement": [
         "authority before execution",
@@ -426,6 +431,10 @@ spend_longtail_forbidden_phrases = {
         "03 / CHARGE",
         "/robot-customer-payments",
         "economic control plane",
+        "Preserve proof when value moves",
+        "03 / PROOF",
+        "Preserve paid-access evidence",
+        "When value moves",
     ],
     "ai-api-budget-enforcement": [
         "Charge robot customers",
@@ -488,6 +497,50 @@ spend_longtail_forbidden_phrases = {
         "economic control plane for AI agents",
         "Learn economic firewalls",
         "How does an economic firewall reduce runaway spend?",
+    ],
+}
+
+
+tool_metadata_required_phrases = {
+    "agent-spend-policy-template": [
+        "keywords",
+        "openGraph",
+        "twitter",
+        "https://satgate.io/agent-spend-policy-template",
+        "Agent Budget Policy Template: Policy-to-Proof Controls",
+    ],
+    "mcp-proxy-config-generator": [
+        "keywords",
+        "openGraph",
+        "twitter",
+        "https://satgate.io/mcp-proxy-config-generator",
+        "MCP Proxy Config Generator",
+    ],
+    "l402-api-pricing-calculator": [
+        "keywords",
+        "openGraph",
+        "twitter",
+        "https://satgate.io/l402-api-pricing-calculator",
+        "L402 API Pricing Calculator",
+    ],
+}
+
+tool_metadata_forbidden_phrases = {
+    "agent-spend-policy-template": [
+        "url: 'https://satgate.io'",
+        "The Economic Firewall for AI Agent Requests",
+        "Control AI agent API spend at the request layer",
+    ],
+    "mcp-proxy-config-generator": [
+        "url: 'https://satgate.io'",
+        "L402 charge options",
+        "L402 Charge",
+    ],
+    "l402-api-pricing-calculator": [
+        "url: 'https://satgate.io'",
+        "robot-customer revenue",
+        "robot-customer products",
+        "robot customers",
     ],
 }
 
@@ -693,6 +746,20 @@ def main() -> int:
         stale_longtail = [phrase for phrase in spend_longtail_forbidden_phrases[name] if phrase in page_text]
         if stale_longtail:
             raise SystemExit(f"stale {name} spend/Charge-first phrases remain:\n" + "\n".join(stale_longtail))
+
+
+    metadata_texts = {
+        "agent-spend-policy-template": AGENT_BUDGET_POLICY_LAYOUT.read_text(),
+        "mcp-proxy-config-generator": MCP_PROXY_CONFIG_LAYOUT.read_text(),
+        "l402-api-pricing-calculator": L402_API_PRICING_LAYOUT.read_text(),
+    }
+    for name, metadata_text in metadata_texts.items():
+        missing_metadata = [phrase for phrase in tool_metadata_required_phrases[name] if phrase not in metadata_text]
+        if missing_metadata:
+            raise SystemExit(f"missing {name} OpenGraph/Twitter metadata phrases:\n" + "\n".join(missing_metadata))
+        stale_metadata = [phrase for phrase in tool_metadata_forbidden_phrases[name] if phrase in metadata_text]
+        if stale_metadata:
+            raise SystemExit(f"stale {name} inherited/stale metadata phrases remain:\n" + "\n".join(stale_metadata))
 
     for name, path in L402_RAIL_PAGES.items():
         page_text = path.read_text()
