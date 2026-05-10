@@ -89,6 +89,9 @@ Macaroons and capability tokens can constrain agent authority:
 - MCP Cost Control: https://satgate.io/mcp-cost-control
 - Agent API Governance: https://satgate.io/agent-api-governance
 - Agent Control Plane: https://satgate.io/agent-control-plane
+- Evidence Pack Demo: https://satgate.io/evidence-pack-demo
+- Evidence Pack JSON v1: https://satgate.io/evidence-packs/sample-evidence-pack.v1.json
+- Evidence Pack Schema v1: https://satgate.io/evidence-packs/evidence-pack.schema.v1.json
 - Revocable Agent Credentials: https://satgate.io/revocable-agent-credentials
 - Capability Auth: https://satgate.io/capability-auth
 - Agent Capability Tokens: https://satgate.io/agent-capability-tokens
