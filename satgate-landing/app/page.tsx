@@ -81,10 +81,10 @@ export default function HomePage() {
       },
       {
         '@type': 'Question',
-        name: 'What are Observe, Control, and Prove?',
+        name: 'What are Observe, Control, and Charge?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Observe tracks agent traffic and cost without blocking. Control enforces budgets and scoped authority before execution. Prove preserves Evidence Packs across APIs, MCP tools, delegation, and paid-rail access including L402, x402, AgentCore Payments, Pay.sh, Fiat402, and enterprise billing.',
+          text: 'Observe tracks agent traffic and cost without blocking. Control enforces budgets and scoped policy for internal agents. Charge preserves authorization evidence around external paid access across L402, x402, API-key, or enterprise billing rails.',
         },
       },
     ],

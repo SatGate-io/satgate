@@ -123,7 +123,7 @@ export default function RobotCustomerPaymentsPage() {
         name: 'Is paid agent monetization only about payments?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. Payments need governance around identity, budgets, scoped access, revocation, routing, and audit. SatGate combines Observe, Control, and Prove in the request path.',
+          text: 'No. Payments need governance around identity, budgets, scoped access, revocation, routing, and audit. SatGate combines Observe, Control, and Charge in the request path.',
         },
       },
       {
@@ -306,7 +306,7 @@ export default function RobotCustomerPaymentsPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Is paid agent monetization only about payments?</h3>
               <p className="text-gray-400 leading-relaxed">
-                No. Payments need governance around identity, budgets, scoped access, revocation, routing, and audit. SatGate combines Observe, Control, and Prove in the request path.
+                No. Payments need governance around identity, budgets, scoped access, revocation, routing, and audit. SatGate combines Observe, Control, and Charge in the request path.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -332,7 +332,7 @@ export default function RobotCustomerPaymentsPage() {
               ['/l402-agent-payments', 'L402 agent payments', 'Collect Lightning payment before protected API access.'],
               ['/agent-capability-tokens', 'Agent capability tokens', 'Give paid agents scoped, budgeted, expiring access after proof.'],
               ['/revocable-agent-credentials', 'Revocable agent credentials', 'Revoke paid-agent access when policy, budget, or risk changes.'],
-              ['/economic-firewall', 'Economic firewall', 'Observe, Control, and Prove paid-agent requests in one request path.'],
+              ['/economic-firewall', 'Economic firewall', 'Observe, Control, and Charge paid-agent requests in one request path.'],
               ['/mcp-budget-enforcement', 'MCP budget enforcement', 'Apply the same budget logic to paid tools and MCP servers.'],
               ['/ai-agent-cost-control', 'AI agent cost control', 'Stop agent overspend before upstream requests execute.'],
             ].map(([href, title, body]) => (

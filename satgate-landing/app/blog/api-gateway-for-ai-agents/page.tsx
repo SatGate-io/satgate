@@ -17,7 +17,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'API Gateway for AI Agents: Budgets, MCP, and Tool Costs',
-    description: 'Traditional gateways route traffic. AI agent gateways must Observe, Control, and Prove authority, MCP tool scope, revocation, and paid-rail context.',
+    description: 'Traditional gateways route traffic. AI agent gateways must Observe, Control, and Charge authority, MCP tool scope, revocation, and paid-rail context.',
   },
 };
 
@@ -38,7 +38,7 @@ export default function ApiGatewayForAiAgentsBlogPage() {
       { '@type': 'Thing', name: 'MCP tool cost control' },
       { '@type': 'Thing', name: 'scoped capability tokens for APIs' },
       { '@type': 'Thing', name: 'rail-neutral paid-rail governance' },
-      { '@type': 'Thing', name: 'Observe Control Prove' },
+      { '@type': 'Thing', name: 'Observe Control Charge' },
       { '@type': 'Thing', name: 'Evidence Packs' },
     ],
   };
