@@ -347,7 +347,7 @@ export default function PolicyToProofPage() {
           <div className="mb-10 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
             <div className="max-w-3xl">
               <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-cyan-300">Six-question evidence framework</p>
-              <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Answer the questions buyers ask after invoice-reconciler acts.</h2>
+              <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Answer the audit questions after the invoice-reconciler acts.</h2>
             </div>
             <p className="max-w-md text-sm leading-6 text-gray-500">
               The Evidence Pack bundles these artifacts into one export instead of sending teams on a forensics project across logs, invoices, and gateway dashboards. Authority-chain entries preserve lineage; matching receipts preserve the event log, so auditors can verify both structure and sequence.
@@ -432,7 +432,7 @@ export default function PolicyToProofPage() {
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-purple-300">Demo path</p>
             <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Mint → Delegate → Spend → Deny → Revoke → Export.</h2>
             <p className="mt-5 text-lg leading-8 text-gray-400">
-              The demo ends on the exported Evidence Pack. That is the buyer moment: one artifact proving authority, spend, denial, and revocation across the invoice-reconciler lifecycle. Even producing the Evidence Pack is itself an auditable event.
+              The demo ends on the exported Evidence Pack: one artifact proving authority, spend, denial, and revocation across the invoice-reconciler lifecycle. Even producing the Evidence Pack is itself an auditable event.
             </p>
             <p className="mt-4 text-sm leading-6 text-gray-500">
               Read the six-step lifecycle below, or watch the 90-second cut.
@@ -465,15 +465,15 @@ export default function PolicyToProofPage() {
             <div className="rounded-3xl border border-cyan-300/20 bg-cyan-300/5 p-7">
               <div className="mb-4 flex items-center gap-2 text-cyan-200">
                 <PlayCircle size={22} />
-                <span className="text-sm font-bold uppercase tracking-[0.2em]">90-second Evidence Pack cut</span>
+                <span className="text-sm font-bold uppercase tracking-[0.2em]">Evidence Pack walkthrough</span>
               </div>
-              <h3 className="text-2xl font-black text-white">Show the authority lifecycle, then end on the exported proof.</h3>
+              <h3 className="text-2xl font-black text-white">See how agent authority becomes audit-ready proof.</h3>
               <p className="mt-4 text-sm leading-6 text-gray-400">
-                A focused walkthrough of the buyer moment: signed lifecycle export, receipt chain, audit mappings, and the downloadable Evidence Pack.
+                Watch a governed agent receive scoped authority, delegate work, hit policy decisions, and export a signed Evidence Pack your security and audit teams can review.
               </p>
               <div className="mt-6 flex flex-col gap-3 text-sm font-bold sm:flex-row sm:flex-wrap">
                 <a href="/evidence-packs/satgate-evidence-pack-walkthrough-audio.mp4" className="inline-flex items-center gap-2 text-cyan-200 hover:text-cyan-100">
-                  Watch the 90-second cut <ArrowRight size={16} />
+                  Watch the walkthrough <ArrowRight size={16} />
                 </a>
                 <Link href="/agent-control-plane" className="inline-flex items-center gap-2 text-gray-300 hover:text-white">
                   See the agent control plane <ArrowRight size={16} />
