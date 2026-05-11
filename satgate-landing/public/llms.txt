@@ -1,6 +1,6 @@
 # SatGate™ — Economic Firewall for AI Agent Requests
 > SatGate is the economic control plane for AI agents.
-> Observe, Control, and Prove agent/API activity before upstream access.
+> Observe, Control, and Charge agent/API activity before upstream access.
 > Request-path budget enforcement, MCP governance, scoped capabilities, Evidence Packs, and paid-rail context.
 
 ## What is SatGate?

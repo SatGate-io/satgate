@@ -38,7 +38,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
       { '@type': 'Thing', name: 'per-agent OpenAI budgets' },
       { '@type': 'Thing', name: 'request-path budget enforcement' },
       { '@type': 'Thing', name: 'runaway LLM spend prevention' },
-      { '@type': 'Thing', name: 'Observe Control Prove' },
+      { '@type': 'Thing', name: 'Observe Control Charge' },
       { '@type': 'Thing', name: 'Evidence Pack receipts' },
     ],
   };

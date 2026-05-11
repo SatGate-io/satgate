@@ -45,7 +45,7 @@ const PricingPage = () => {
     '@type': 'WebPage',
     name: 'SatGate Pricing',
     url: 'https://satgate.io/pricing',
-    description: 'Pricing for SatGate Observe, Control, and Prove modes for AI agent economic governance.',
+    description: 'Pricing for SatGate Observe, Control, and Charge modes for AI agent economic governance.',
     datePublished: '2026-04-27',
     dateModified: '2026-05-03',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -82,7 +82,7 @@ const PricingPage = () => {
     '@type': 'OfferCatalog',
     name: 'SatGate Pricing',
     url: 'https://satgate.io/pricing',
-    description: 'Pricing for SatGate Observe, Control, and Prove modes for AI agent economic governance.',
+    description: 'Pricing for SatGate Observe, Control, and Charge modes for AI agent economic governance.',
     dateModified: '2026-05-03',
     itemListElement: [
       {

@@ -189,7 +189,7 @@ export default function McpGatewayPage() {
 
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="max-w-6xl mx-auto px-6 py-20">
-          <h2 className="text-3xl font-bold text-white mb-4">Observe, Control, Prove MCP tool use</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">Observe, Control, Charge MCP tool use</h2>
           <p className="text-gray-400 max-w-3xl mb-10 text-lg">
             The point is not just to connect agents to tools. The point is to prove what happened, stop what should not happen, and preserve receipts for what was allowed or denied.
           </p>

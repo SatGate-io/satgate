@@ -131,8 +131,8 @@ const posts = [
   },
   {
     slug: 'the-enterprise-adoption-playbook-observe-control-charge',
-    title: 'The Enterprise Adoption Playbook: Observe, Control, Prove',
-    description: 'Observe, Control, Prove isn\'t just a product taxonomy — it\'s an enterprise change management strategy for adopting economic governance incrementally, building trust at each stage.',
+    title: 'The Enterprise Adoption Playbook: Observe, Control, Charge',
+    description: 'Observe, Control, Charge isn\'t just a product taxonomy — it\'s an enterprise change management strategy for adopting economic governance incrementally, building trust at each stage.',
     date: '2026-03-20',
     readTime: '11 min read',
     author: 'Matt Dean',

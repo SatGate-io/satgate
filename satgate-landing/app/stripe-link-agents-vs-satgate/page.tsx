@@ -223,7 +223,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-yellow-950/20 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">Control agent economics before payment becomes risk</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            SatGate gives API teams the request-path layer for Observe, Control, and Prove: meter every agent call, enforce budgets, revoke authority, and monetize with L402 when APIs expose paid-rail access for paid agents.
+            SatGate gives API teams the request-path layer for Observe, Control, and Charge: meter every agent call, enforce budgets, revoke authority, and monetize with L402 when APIs expose paid-rail access for paid agents.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
