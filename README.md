@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>The Economic Firewall for AI Agents</strong><br/>
-  <em>Hard budget enforcement · Per-tool cost attribution · L402 micropayments</em>
+  <em>Hard budget enforcement · Per-tool cost attribution · Rail-neutral paid-rail governance</em>
 </p>
 
 <p align="center">
@@ -56,21 +56,21 @@ AI agents are making API calls autonomously. They spawn sub-agents, call MCP too
 
 Your existing stack answers: *"Is this request authenticated?"*
 
-Nobody answers: **"Should this agent spend this?"**
+Nobody answers: **"Should this agent have authority to spend, delegate, or invoke this paid resource?"**
 
 ```
 ✓ Network Firewall    → "Can this packet enter?"
 ✓ Application Firewall → "Is this request safe?"
-? Economic Firewall    → "Should this agent spend this?"
+? Economic Firewall    → "Should this agent act, spend, or pay?"
 ```
 
 That's the gap. SatGate fills it.
 
 ## What is SatGate?
 
-SatGate is an **Economic Firewall** that enforces **Economic Access Control** for AI agent requests. Drop it in front of your APIs — it handles authentication, budget enforcement, cost attribution, and optional micropayments.
+SatGate is an **Economic Firewall** for AI agent requests. Drop it in front of your APIs and MCP tools to enforce scoped authority, budgets, paid-rail context, and Evidence Pack receipts before agents act.
 
-**Not another routing layer.** Routing gateways (Bifrost, LiteLLM, Portkey) optimize *which provider* handles a call. SatGate governs *whether the call should happen at all* based on budgets, policies, and cost.
+**Not another routing layer.** Routing gateways (Bifrost, LiteLLM, Portkey) optimize *which provider* handles a call. SatGate governs *whether the call should happen at all* based on authority, policy, budget, and paid-rail context.
 
 Use them together:
 
@@ -80,10 +80,10 @@ Agent → SatGate (economic governance) → Routing Gateway → LLM Providers
 
 ## Features
 
-- 🛡️ **Capability Tokens (Macaroons)** — Cryptographic credentials with built-in caveats, delegation, and instant revocation. Not API keys — tokens that agents can safely sub-delegate.
+- 🛡️ **Capability Tokens (Macaroons)** — Cryptographic credentials with built-in caveats, delegation, and next-request revocation. Not API keys — tokens that agents can safely sub-delegate.
 - 🎯 **MCP-Aware** — Parses MCP JSON-RPC tool calls. Know that Agent X spent $47 on `search_database` and $12 on `send_email` — not just "1,000 requests."
 - 💰 **Budget Enforcement** — Hard stops per agent, team, or API. When the budget hits zero, requests are *blocked*. Not logged. Not alerted. Blocked.
-- ⚡ **L402 Protocol** — Native Bitcoin Lightning micropayments for API monetization. Sub-cent pricing that's uneconomical on card rails.
+- ⚡ **Paid-Rail Governance** — Govern paid API access across L402, x402, API-key billing, and enterprise ledgers without making any one rail the control plane.
 - 🔒 **Default-Deny** — All routes require valid credentials unless explicitly public. Zero Trust by design.
 - 🚀 **<50ms Overhead** — Lightweight Go proxy. Adds governance without adding latency.
 - 📦 **Self-Hosted** — Your infrastructure, your rules. Single binary, Docker, or Kubernetes.
@@ -120,11 +120,11 @@ curl -X POST http://localhost:8080/api/capability/mint \
 curl -H "Authorization: Bearer <your-token>" \
   http://localhost:8080/api/capability/ping
 
-# 3. Paid — get an L402 challenge (HTTP 402 + Lightning invoice)
+# 3. Paid — get a payment challenge (L402 today; x402/other rails as governed context)
 curl http://localhost:8080/api/micro
 ```
 
-Public → Protected → Paid. Three policies, one gateway.
+Public → Protected → Paid. Three policies, one gateway; paid rails are governed context, not the product boundary.
 
 📖 **[Full Quick Start Guide →](docs/getting-started/quickstart.md)**
 
@@ -182,7 +182,7 @@ routes:
       pathPrefix: /premium/
     upstream: api
     policy:
-      kind: l402
+      kind: l402  # paid-rail policy; use payment_context to preserve L402/x402/ledger evidence
       priceSats: 100
 ```
 
@@ -192,7 +192,7 @@ routes:
 |--------|-------------|----------|
 | `public` | No authentication | Health checks, docs, webhooks |
 | `capability` | Requires valid Macaroon | Protected API endpoints |
-| `l402` | Requires Lightning payment | Monetized endpoints |
+| `l402` | Requires Lightning payment and records paid-rail context | Monetized endpoints; x402/ledger context can be preserved in Evidence Packs |
 
 ## How It's Different
 
@@ -203,7 +203,7 @@ routes:
 | **MCP cost attribution** | Per-tool granularity | ❌ | ❌ |
 | **Credential model** | Macaroons (delegatable) | API keys | API keys / OAuth |
 | **Agent delegation** | Sub-tokens with reduced budgets | ❌ | ❌ |
-| **Micropayments** | L402 Lightning-native | ❌ | ❌ |
+| **Paid-rail governance** | L402, x402, API-key billing, enterprise ledgers | ❌ | ❌ |
 | **Works alongside** | — | ✅ Use together | ✅ Use together |
 
 ## Architecture
@@ -216,10 +216,10 @@ routes:
 │                             │                     │
 │              ┌──────────────┼──────────────┐     │
 │              │              │              │      │
-│          [public]    [capability]      [l402]     │
+│          [public]    [capability]   [paid rail]  │
 │          pass        verify token     verify     │
 │                      check budget     payment    │
-│                      log MCP tool     + token    │
+│                      log MCP tool     context    │
 └──────────────────────────────────────────────────┘
 ```
 
@@ -228,7 +228,7 @@ routes:
 - **Macaroons**: Bearer tokens with embedded caveats (expiry, scope, budget, IP). Not API keys — they support *delegation* without server roundtrips.
 - **Delegation**: Agent A gives Agent B a sub-token with reduced permissions and a $50 budget cap. B can't escalate.
 - **MCP Parsing**: SatGate reads MCP JSON-RPC payloads to attribute costs to specific tool calls, not just HTTP endpoints.
-- **L402**: HTTP 402 + Lightning invoice for machine-to-machine payments. The protocol for the agent economy.
+- **Paid-rail context**: SatGate treats L402, x402, API-key billing, and enterprise ledgers as rails to govern around. Evidence Packs preserve which rail was involved without making the rail the product.
 
 ## SDKs
 
@@ -268,10 +268,10 @@ See [`pkg/mcpserver/README.md`](pkg/mcpserver/README.md) for full documentation.
 
 > **Self-hosting not your thing?** [SatGate Cloud](https://cloud.satgate.io) is the fully managed version — same gateway, zero ops.
 
-The open-source gateway handles protection and payments. SatGate Cloud adds the control plane:
+The open-source gateway handles protection, budgets, and paid-rail enforcement. SatGate Cloud adds the control plane:
 
 - 📊 **Observe** — Real-time dashboards, usage attribution, cost center tagging
-- 🎚️ **Control** — Budget enforcement with Fiat402 (enterprise credits)
+- 🎚️ **Control** — Budget and policy enforcement before agent requests execute
 - 🤖 **SatGate Mint** — Zero-touch agent provisioning (K8s, AWS, OIDC)
 - 🏢 **Multi-tenant** — Team isolation, RBAC, SSO/SCIM
 - 📝 **Audit** — Tamper-evident logging, compliance exports
