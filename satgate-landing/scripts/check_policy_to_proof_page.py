@@ -116,7 +116,7 @@ required_phrases = [
     "/evidence-packs/evidence-pack.schema.v1.json",
     "REDACTED_DEMO_SAMPLE_DO_NOT_VERIFY",
     "evidence-pack-export-poster.svg",
-    "satgate-evidence-pack-walkthrough.mp4",
+    "satgate-evidence-pack-walkthrough-audio.mp4",
     "90-second Evidence Pack cut",
     "What the {title} gets",
     "Full hashes, payment rail context, ed25519 signature, and verification block",
