@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://satgate.io"),
   title: {
-    default: "SatGate — Policy-to-Proof Governance for AI Agents",
+    default: "SatGate — Economic Firewall for AI Agents",
     template: "%s | SatGate",
   },
   description:
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     "Fiat402",
   ],
   openGraph: {
-    title: "SatGate — Policy-to-Proof Governance for AI Agents",
+    title: "SatGate — Economic Firewall for AI Agents",
     description:
       "Authority before execution. Evidence Packs after every decision across MCP, APIs, API keys, and rail-neutral paid-rail governance.",
     url: "https://satgate.io",
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
         url: "/logo.png",
         width: 512,
         height: 512,
-        alt: "SatGate — Policy-to-Proof Governance for AI Agents",
+        alt: "SatGate — Economic Firewall for AI Agents",
       },
     ],
     locale: "en_US",
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "SatGate — Policy-to-Proof Governance for AI Agents",
+    title: "SatGate — Economic Firewall for AI Agents",
     description:
       "Policy-to-Proof governance for enterprise agents across MCP, APIs, API keys, and paid rails.",
     images: ["/logo.png"],

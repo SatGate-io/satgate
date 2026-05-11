@@ -161,7 +161,7 @@ const LandingPage = () => {
           {/* Left: Copy */}
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-6">
-              <Zap size={12} /> Policy-to-Proof for AI Agents
+              <Zap size={12} /> Economic Firewall for AI Agents
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
               Govern agent authority<br/>

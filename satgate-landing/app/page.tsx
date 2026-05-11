@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import HomeClient from "./components/HomeClient";
 
 export const metadata: Metadata = {
-  title: "SatGate — Policy-to-Proof Governance for AI Agents",
+  title: "SatGate — Economic Firewall for AI Agents",
   description:
     "Authority before execution. Evidence Packs after every decision across MCP, APIs, API keys, L402, x402, AgentCore Payments, Pay.sh, and enterprise billing.",
   alternates: {
     canonical: "https://satgate.io",
   },
   openGraph: {
-    title: "SatGate — Policy-to-Proof Governance for AI Agents",
+    title: "SatGate — Economic Firewall for AI Agents",
     description:
       "Policy-to-Proof governance for enterprise agents: scoped authority before execution and Evidence Packs across APIs, MCP tools, and paid rails.",
     url: "https://satgate.io",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "SatGate — Policy-to-Proof Governance for AI Agents",
+    title: "SatGate — Economic Firewall for AI Agents",
     description:
       "Policy-to-Proof governance for enterprise agents: scoped authority before execution and Evidence Packs across APIs, MCP tools, and paid rails.",
   },
@@ -42,7 +42,7 @@ export default function HomePage() {
       },
       {
         '@type': 'WebPage',
-        name: 'SatGate — Policy-to-Proof Governance for AI Agents',
+        name: 'SatGate — Economic Firewall for AI Agents',
         url: 'https://satgate.io',
         description: 'Authority before execution. Evidence Packs after every decision across MCP, APIs, API keys, L402, x402, AgentCore Payments, Pay.sh, and enterprise billing.',
         datePublished: '2026-04-30',
