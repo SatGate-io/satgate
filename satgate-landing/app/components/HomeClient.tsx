@@ -702,67 +702,52 @@ const LandingPage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 py-12 border-t border-gray-800">
-            <div>
+          <div className="grid grid-cols-1 gap-8 border-t border-gray-800 py-12 sm:grid-cols-2 lg:grid-cols-6">
+            <div className="lg:col-span-2">
               <div className="flex items-center gap-2 mb-4">
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="text-gray-500 text-sm">Govern agent authority before execution.</p>
+              <p className="max-w-xs text-sm text-gray-500">Govern agent authority before execution.</p>
               <p className="text-gray-600 text-xs mt-3">Non-custodial. We never hold your keys.</p>
             </div>
             <div>
-              <h4 className="font-bold text-white mb-4">Resources</h4>
+              <h4 className="mb-4 font-bold text-white">Start here</h4>
               <ul className="space-y-2 text-sm text-gray-500">
-                <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
-                <li><a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Documentation</a></li>
-                <li><Link href="/govern" className="hover:text-white transition">Enterprise</Link></li>
                 <li><Link href="/economic-firewall" className="hover:text-white transition">Economic Firewall</Link></li>
-                <li><Link href="/ai-agent-cost-control" className="hover:text-white transition">AI Agent Cost Control</Link></li>
-                <li><Link href="/ai-api-budget-enforcement" className="hover:text-white transition">AI API Budget Enforcement</Link></li>
-                <li><Link href="/agent-spending-limits" className="hover:text-white transition">Agent Spending Limits</Link></li>
-                <li><Link href="/agent-spend-policy-template" className="hover:text-white transition">Agent Spend Policy Template</Link></li>
-                <li><Link href="/ai-agent-runaway-spend-benchmark" className="hover:text-white transition">Runaway Spend Benchmark</Link></li>
-                <li><Link href="/mcp" className="hover:text-white transition">MCP Governance Hub</Link></li>
-                <li><Link href="/mcp-gateway" className="hover:text-white transition">MCP Gateway</Link></li>
-                <li><Link href="/mcp-governance" className="hover:text-white transition">MCP Governance</Link></li>
-                <li><Link href="/mcp-budget-enforcement" className="hover:text-white transition">MCP Budget Enforcement</Link></li>
-                <li><Link href="/mcp-cost-control" className="hover:text-white transition">MCP Cost Control</Link></li>
-                <li><Link href="/mcp-proxy-config-generator" className="hover:text-white transition">MCP Proxy Config Generator</Link></li>
-                <li><Link href="/agent-api-governance" className="hover:text-white transition">Agent API Governance</Link></li>
-                <li><Link href="/agent-control-plane" className="hover:text-white transition">Agent Control Plane</Link></li>
-                <li><Link href="/capability-auth" className="hover:text-white transition">Capability Auth</Link></li>
-                <li><Link href="/agent-api-key-risk-assessment" className="hover:text-white transition">Agent API Key Risk Assessment</Link></li>
-                <li><Link href="/revocable-agent-credentials" className="hover:text-white transition">Revocable Agent Credentials</Link></li>
-                <li><Link href="/agent-capability-tokens" className="hover:text-white transition">Agent Capability Tokens</Link></li>
-                <li><Link href="/l402-agent-payments" className="hover:text-white transition">L402 Agent Payments</Link></li>
-                <li><Link href="/l402-api-pricing-calculator" className="hover:text-white transition">L402 API Pricing Calculator</Link></li>
-                <li><Link href="/paid-agent-payments" className="hover:text-white transition">Paid Agent Payments</Link></li>
-                <li><Link href="/satgate-for-cursor" className="hover:text-white transition">SatGate for Cursor</Link></li>
-                <li><Link href="/satgate-for-claude-code" className="hover:text-white transition">SatGate for Claude Code</Link></li>
-                <li><Link href="/satgate-for-claude-desktop" className="hover:text-white transition">SatGate for Claude Desktop</Link></li>
-                <li><Link href="/satgate-for-openclaw" className="hover:text-white transition">SatGate for OpenClaw</Link></li>
-                <li><Link href="/satgate-for-hermes-agent" className="hover:text-white transition">SatGate for Hermes Agent</Link></li>
-                <li><Link href="/design-partners" className="hover:text-white transition">Design Partners</Link></li>
+                <li><Link href="/govern" className="hover:text-white transition">Enterprise</Link></li>
+                <li><Link href="/policy-to-proof" className="hover:text-white transition">Policy-to-Proof</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
-                <li><Link href="/tools" className="hover:text-white transition">AI Agent Cost Tools</Link></li>
-                <li><Link href="/integrations" className="hover:text-white transition">Integrations</Link></li>
-                <li><Link href="/compare" className="hover:text-white transition">Compare</Link></li>
-                <li><Link href="/blog" className="hover:text-white transition">Blog</Link></li>
                 <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud Dashboard</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold text-white mb-4">Legal</h4>
+              <h4 className="mb-4 font-bold text-white">Developers</h4>
               <ul className="space-y-2 text-sm text-gray-500">
-                <li><Link href="/terms" className="hover:text-white transition">Terms of Service</Link></li>
-                <li><Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link></li>
-                <li><Link href="/security" className="hover:text-white transition">Security</Link></li>
+                <li><a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Documentation</a></li>
+                <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
+                <li><Link href="/mcp" className="hover:text-white transition">MCP Governance Hub</Link></li>
+                <li><Link href="/mcp-gateway" className="hover:text-white transition">MCP Gateway</Link></li>
+                <li><Link href="/integrations" className="hover:text-white transition">Integrations</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold text-white mb-4">Contact</h4>
+              <h4 className="mb-4 font-bold text-white">Resources</h4>
               <ul className="space-y-2 text-sm text-gray-500">
+                <li><Link href="/tools" className="hover:text-white transition">Tools</Link></li>
+                <li><Link href="/compare" className="hover:text-white transition">Compare</Link></li>
+                <li><Link href="/blog" className="hover:text-white transition">Blog</Link></li>
+                <li><Link href="/ai-agent-cost-control" className="hover:text-white transition">Cost Control</Link></li>
+                <li><Link href="/capability-auth" className="hover:text-white transition">Capability Auth</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="mb-4 font-bold text-white">Company</h4>
+              <ul className="space-y-2 text-sm text-gray-500">
+                <li><Link href="/design-partners" className="hover:text-white transition">Design Partners</Link></li>
+                <li><Link href="/security" className="hover:text-white transition">Security</Link></li>
+                <li><Link href="/terms" className="hover:text-white transition">Terms</Link></li>
+                <li><Link href="/privacy" className="hover:text-white transition">Privacy</Link></li>
                 <li><a href="mailto:contact@satgate.io" className="hover:text-white transition">contact@satgate.io</a></li>
               </ul>
             </div>
