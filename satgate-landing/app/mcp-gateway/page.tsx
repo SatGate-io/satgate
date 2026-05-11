@@ -43,14 +43,14 @@ const controls = [
 const proofRows = [
   ['Claude Desktop / Claude Code', 'MCP stdio config points the client at satgate-mcp before the upstream server.', 'Verified MCP-compatible path: allowed web_search call, budget-exhausted code_execute denial, Evidence Pack-style decision transcript.'],
   ['Ollama agent wrapper', 'Local Ollama agents use an MCP-capable wrapper that speaks stdio or SSE to SatGate.', 'Same protocol path: list tools, call allowed tool, burn budget, receive denial before upstream execution.'],
-  ['Gemma4 agent wrapper', 'Gemma4 running through an MCP client receives no standing tool authority; SatGate grants scoped calls per policy.', 'The sample Evidence Pack shows the receipt fields that bind tenant, agent, tool, policy digest, budget ID, decision reason, and remaining credits.'],
+  ['Hermes agent runtime', 'Hermes agents running through an MCP client receive no standing tool authority; SatGate grants scoped calls per policy.', 'The sample Evidence Pack shows the receipt fields that bind tenant, agent, tool, policy digest, budget ID, decision reason, and remaining credits.'],
 ];
 
 const faqs = [
   ['What is an MCP gateway?', 'An MCP gateway sits between AI agents and Model Context Protocol servers. SatGate observes tool calls, applies access policy and MCP budget enforcement, records MCP Evidence Pack receipts, and proves decisions before tools execute.'],
   ['What is MCP budget enforcement?', 'MCP budget enforcement checks the cost of a requested tool call against a tenant, agent, session, delegation, or tool budget before the call reaches the upstream MCP server. If the budget is missing or exhausted, SatGate denies the call in the request path.'],
   ['What is an MCP Evidence Pack?', 'An MCP Evidence Pack is the proof artifact for governed tool activity: who called which MCP tool, through which client and server, under which policy and budget, with which allow or deny decision, and what receipt proves it.'],
-  ['Can SatGate govern Claude, Ollama, or Gemma4 MCP agents?', 'Yes. Claude Desktop, Claude Code, Ollama wrappers, Gemma4 wrappers, Cursor, OpenClaw, and custom MCP-capable clients can route tool calls through SatGate. The model gets no standing authority; SatGate grants or denies each tool call.'],
+  ['Can SatGate govern Claude, Hermes, or Ollama MCP agents?', 'Yes. Claude Desktop, Claude Code, Hermes, Ollama wrappers, Cursor, OpenClaw, and custom MCP-capable clients can route tool calls through SatGate. The agent gets no standing authority; SatGate grants or denies each tool call.'],
   ['How is an MCP gateway different from an API gateway?', 'A traditional API gateway mostly routes HTTP traffic and checks identity. An MCP gateway also understands agent tool calls, capability scope, per-tool cost, budget policy, tenant isolation, delegation lineage, and Evidence Pack outcomes.'],
   ['Can SatGate host MCP servers?', 'Yes. SatGate supports SaaS MCP for fast hosted deployment and Hybrid MCP for dedicated enterprise runtime control. The split is deliberate: SaaS MCP is Fly-hosted; Hybrid MCP is Hetzner-hosted.'],
 ];
@@ -70,7 +70,7 @@ export const metadata = {
     'MCP delegation depth',
     'Claude MCP budget enforcement',
     'Ollama MCP budget enforcement',
-    'Gemma4 MCP governance',
+    'Hermes MCP governance',
   ],
   openGraph: {
     title: 'MCP Gateway for Budget Enforcement and Evidence Packs',
@@ -81,7 +81,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'MCP Gateway for Budget Enforcement and Evidence Packs',
-    description: 'Govern Claude, Ollama, Gemma4, Cursor, and custom MCP agents with budget enforcement and Evidence Pack proof.',
+    description: 'Govern Claude, Hermes, Ollama, Cursor, and custom MCP agents with budget enforcement and Evidence Pack proof.',
   },
 };
 
@@ -148,7 +148,7 @@ export default function McpGatewayPage() {
             MCP Gateway for Budget Enforcement and Evidence Packs
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-8">
-            SatGate sits between Claude, Ollama, Gemma4, Cursor, OpenClaw, or custom MCP agents and the tools they want to call. Every MCP request is checked for authority, budget, tenant, tool scope, and delegation before execution — then recorded as proof.
+            SatGate sits between AI agents — Claude, Hermes, Ollama, Cursor, OpenClaw, or custom MCP clients — and the tools they want to call. Every MCP request is checked for authority, budget, tenant, tool scope, and delegation before execution — then recorded as proof.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
@@ -230,9 +230,9 @@ export default function McpGatewayPage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="max-w-6xl mx-auto px-6 py-20">
           <p className="text-sm font-mono uppercase tracking-wide text-cyan-300 mb-2">Verified MCP-compatible path</p>
-          <h2 className="text-3xl font-bold text-white mb-4">Claude, Ollama, and Gemma4 get scoped MCP authority — not standing authority</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">Claude, Hermes, and Ollama get scoped MCP authority — not standing authority</h2>
           <p className="text-gray-400 max-w-4xl mb-10 text-lg">
-            SatGate’s verification uses an MCP-compatible stdio client path: initialize, list tools, call an allowed tool, attempt expensive work until the budget blocks, and preserve the decision transcript as proof. Claude, Ollama, and Gemma4 route through MCP clients or wrappers; the governance boundary is the MCP call path, not the model vendor.
+            SatGate’s verification uses an MCP-compatible stdio client path: initialize, list tools, call an allowed tool, attempt expensive work until the budget blocks, and preserve the decision transcript as proof. Claude, Hermes, Ollama, and other agents route through MCP clients or wrappers; the governance boundary is the MCP call path, not the model vendor.
           </p>
           <div className="grid lg:grid-cols-3 gap-5">
             {proofRows.map(([agent, path, proof]) => (

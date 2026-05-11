@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Verify agent-style MCP governance through SatGate.
 
-This exercises the same MCP client path used by Claude Desktop/Claude Code and
-MCP-capable Ollama/Gemma4 wrappers:
+This exercises the same MCP client path used by Claude Desktop/Claude Code,
+Hermes, and MCP-capable Ollama wrappers:
   initialize -> tools/list -> allowed tools/call -> budget-exhausted denial.
 
 It writes a redacted proof transcript suitable for buyer/demo evidence.
@@ -28,8 +28,8 @@ PROOF_OUT = Path(os.environ.get("SATGATE_MCP_PROOF_OUT", "/tmp/satgate-mcp-agent
 
 CLIENTS = [
     {"name": "claude-desktop", "model": "claude", "version": "mcp-client"},
-    {"name": "ollama-gemma4-wrapper", "model": "gemma4", "version": "mcp-wrapper"},
-    {"name": "gemma4-local-agent", "model": "gemma4", "version": "mcp-wrapper"},
+    {"name": "hermes-agent", "model": "hermes", "version": "mcp-client"},
+    {"name": "ollama-local-wrapper", "model": "ollama", "version": "mcp-wrapper"},
 ]
 
 

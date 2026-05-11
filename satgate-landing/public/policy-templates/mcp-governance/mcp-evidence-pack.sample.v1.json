@@ -11,8 +11,8 @@
   },
   "authority_chain": {
     "principal_id": "user_platform_admin",
-    "agent_id": "agent_gemma4_research",
-    "mcp_client_id": "gemma4_mcp_wrapper",
+    "agent_id": "agent_hermes_research",
+    "mcp_client_id": "hermes_mcp_client",
     "credential_id_hash": "hmac-sha256:demo-credential",
     "delegation_chain_hash": "sha256:demo-delegation-chain",
     "current_delegation_depth": 1,
