@@ -1,6 +1,6 @@
 # SatGate MCP Proxy — Agent Governance Verification Config
 #
-# Small, fast budget for local proof that Claude/Ollama/Gemma4-style MCP clients
+# Small, fast budget for local proof that Claude/Hermes/Ollama-style MCP clients
 # can call an allowed tool through SatGate and receive a request-path denial
 # when the governed budget is exhausted.
 
@@ -9,7 +9,7 @@ server:
   name: satgate-mcp-governance-proof
   version: 0.1.0
 
-# Local stdio proof uses no bearer token so Claude/Ollama/Gemma4-style clients can
+# Local stdio proof uses no bearer token so Claude/Hermes/Ollama-style clients can
 # be exercised without test secrets. Production configs should use scoped auth and
 # tenant-bound capabilities; this script verifies request-path allow/deny/budget behavior.
 auth:

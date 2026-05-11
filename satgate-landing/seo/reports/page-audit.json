@@ -342,7 +342,7 @@
         "MCP connection is not MCP governance",
         "Observe, Control, Prove MCP tool use",
         "MCP policy templates teams can start from",
-        "Claude, Ollama, and Gemma4 get scoped MCP authority \u2014 not standing authority",
+        "Claude, Hermes, and Ollama get scoped MCP authority \u2014 not standing authority",
         "SaaS MCP is Fly-hosted",
         "Hybrid MCP is Hetzner-hosted",
         "MCP gateway questions",

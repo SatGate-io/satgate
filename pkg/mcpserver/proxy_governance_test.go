@@ -92,7 +92,7 @@ for line in sys.stdin:
 		return result
 	}
 
-	send(map[string]interface{}{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": map[string]interface{}{"protocolVersion": "2024-11-05", "capabilities": map[string]interface{}{}, "clientInfo": map[string]string{"name": "gemma4-local-agent", "version": "mcp-wrapper"}}})
+	send(map[string]interface{}{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": map[string]interface{}{"protocolVersion": "2024-11-05", "capabilities": map[string]interface{}{}, "clientInfo": map[string]string{"name": "hermes-agent", "version": "mcp-client"}}})
 	if resp := recv(); resp["result"] == nil {
 		t.Fatalf("initialize failed: %v", resp)
 	}

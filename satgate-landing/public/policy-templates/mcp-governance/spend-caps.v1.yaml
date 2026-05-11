@@ -14,7 +14,7 @@ scope:
   applies_to:
     principals: ['*']
     agents: ['agent_*']
-    mcp_clients: [claude_desktop, claude_code, cursor, openclaw, ollama_wrapper, gemma4_wrapper]
+    mcp_clients: [claude_desktop, claude_code, hermes_mcp_client, cursor, openclaw, ollama_wrapper]
     mcp_servers: ['mcp_prod_*']
     tools: ['*']
 
