@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Build Agents That Can Spend Safely | SatGate",
+  title: "Build Agents That Can Spend Safely",
   description:
     "Issue scoped capabilities, route paid calls, and verify receipts with SatGate's developer surface for agent authority, payment context, and Evidence Pack proof.",
   keywords: [
@@ -177,12 +177,12 @@ const jsonLd = {
 
 export default function BuildPage() {
   return (
-    <main className="min-h-screen bg-black text-gray-100 font-sans">
+    <main className="min-h-screen overflow-x-hidden bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(56,189,248,0.18),transparent_34%),radial-gradient(circle_at_85%_10%,rgba(168,85,247,0.18),transparent_32%),radial-gradient(circle_at_55%_80%,rgba(16,185,129,0.10),transparent_34%)]" />
-        <div className="relative mx-auto grid max-w-6xl gap-12 px-6 py-24 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+        <div className="relative mx-auto grid max-w-6xl min-w-0 gap-12 px-6 py-24 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.22em] text-cyan-200">
               <Code2 size={16} /> Developer primitive
@@ -219,14 +219,14 @@ export default function BuildPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-cyan-900/50 bg-gray-950/90 shadow-2xl shadow-cyan-950/30">
+          <div className="min-w-0 rounded-2xl border border-cyan-900/50 bg-gray-950/90 shadow-2xl shadow-cyan-950/30">
             <div className="flex items-center gap-2 border-b border-gray-800 px-4 py-3">
               <div className="h-3 w-3 rounded-full bg-red-500" />
               <div className="h-3 w-3 rounded-full bg-yellow-500" />
               <div className="h-3 w-3 rounded-full bg-green-500" />
               <span className="ml-2 text-xs font-mono text-gray-500">issue_pay_verify.py</span>
             </div>
-            <pre className="overflow-x-auto p-5 text-sm leading-6 text-gray-300"><code>{quickstart}</code></pre>
+            <pre className="max-w-full overflow-x-auto p-5 text-sm leading-6 text-gray-300"><code>{quickstart}</code></pre>
           </div>
         </div>
       </section>
@@ -252,7 +252,7 @@ export default function BuildPage() {
       </section>
 
       <section className="border-y border-gray-900 bg-gray-950/60">
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+        <div className="mx-auto grid max-w-6xl min-w-0 gap-10 px-6 py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
           <div>
             <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-purple-300">Rail-neutral by design</p>
             <h2 className="text-3xl font-bold text-white sm:text-4xl">Authority and evidence sit above the rail.</h2>
@@ -265,11 +265,11 @@ export default function BuildPage() {
               </p>
             </div>
           </div>
-          <div className="rounded-2xl border border-gray-800 bg-black p-6">
+          <div className="min-w-0 rounded-2xl border border-gray-800 bg-black p-6">
             <div className="mb-4 flex items-center gap-2 text-emerald-200">
               <BadgeCheck size={20} /> Receipt preview
             </div>
-            <pre className="overflow-x-auto rounded-xl bg-gray-950 p-5 text-sm leading-6 text-gray-300"><code>{JSON.stringify(receiptPreview, null, 2)}</code></pre>
+            <pre className="max-w-full overflow-x-auto rounded-xl bg-gray-950 p-5 text-sm leading-6 text-gray-300"><code>{JSON.stringify(receiptPreview, null, 2)}</code></pre>
           </div>
         </div>
       </section>
@@ -285,14 +285,14 @@ export default function BuildPage() {
           </a>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <div className="rounded-2xl border border-gray-800 bg-gray-950">
+        <div className="grid min-w-0 gap-6 lg:grid-cols-2">
+          <div className="min-w-0 rounded-2xl border border-gray-800 bg-gray-950">
             <div className="border-b border-gray-800 px-5 py-3 font-mono text-xs uppercase tracking-[0.18em] text-gray-500">Node preview</div>
-            <pre className="overflow-x-auto p-5 text-sm leading-6 text-gray-300"><code>{nodeExample}</code></pre>
+            <pre className="max-w-full overflow-x-auto p-5 text-sm leading-6 text-gray-300"><code>{nodeExample}</code></pre>
           </div>
-          <div className="rounded-2xl border border-gray-800 bg-gray-950">
+          <div className="min-w-0 rounded-2xl border border-gray-800 bg-gray-950">
             <div className="border-b border-gray-800 px-5 py-3 font-mono text-xs uppercase tracking-[0.18em] text-gray-500">HTTP preview</div>
-            <pre className="overflow-x-auto p-5 text-sm leading-6 text-gray-300"><code>{curlExample}</code></pre>
+            <pre className="max-w-full overflow-x-auto p-5 text-sm leading-6 text-gray-300"><code>{curlExample}</code></pre>
           </div>
         </div>
       </section>
