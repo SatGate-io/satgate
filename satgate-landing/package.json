@@ -10,7 +10,8 @@
     "seo:gsc": "python3 scripts/gsc_telemetry.py",
     "seo:links": "python3 scripts/internal_link_audit.py",
     "seo:machine": "python3 scripts/seo_machine.py",
-    "seo:check": "python3 scripts/seo_machine.py --check"
+    "seo:check": "python3 scripts/seo_machine.py --check",
+    "test:build-page": "python3 scripts/check_build_page.py"
   },
   "dependencies": {
     "lucide-react": "^0.555.0",
