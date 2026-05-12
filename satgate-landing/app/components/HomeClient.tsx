@@ -27,20 +27,14 @@ const LandingPage = () => {
           </Link>
 
           {/* Desktop menu */}
-          <div className="hidden xl:flex gap-6 text-sm font-medium text-gray-400">
+          <div className="hidden xl:flex items-center gap-5 text-sm font-medium text-gray-400">
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/mcp-gateway" className="hover:text-white transition">MCP Gateway</Link>
             <Link href="/build" className="hover:text-white transition">Build</Link>
-            <Link href="/sandbox" className="hover:text-white transition">Sandbox</Link>
-            <Link href="/capability-auth" className="hover:text-white transition">Capability Auth</Link>
-            <Link href="/agent-control-plane" className="hover:text-white transition">Control Plane</Link>
+            <Link href="/sandbox" className="hover:text-white transition">Demo</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
-            <Link href="/tools" className="hover:text-white transition">Tools</Link>
-            <Link href="/integrations" className="hover:text-white transition">Integrations</Link>
-            <Link href="/blog" className="hover:text-white transition">Blog</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
-            <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a>
-            <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 transition">Cloud →</a>
+            <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="rounded-full border border-purple-500/40 px-3 py-1.5 text-purple-300 hover:border-purple-400 hover:text-purple-200 transition">Cloud →</a>
           </div>
 
           {/* Mobile menu button */}
@@ -87,7 +81,7 @@ const LandingPage = () => {
               onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
-              Sandbox
+              Demo
             </Link>
             <Link
               href="/capability-auth"
@@ -191,7 +185,7 @@ const LandingPage = () => {
                 Build with SatGate <ArrowRight size={16} />
               </Link>
               <Link href="/sandbox" className="border border-purple-700/50 bg-purple-900/20 px-8 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition flex items-center gap-2 text-purple-300">
-                <Play size={16} /> Open Sandbox
+                <Play size={16} /> See Demo
               </Link>
               <Link href="/agent-control-plane" className="border border-cyan-700/50 bg-cyan-900/15 px-8 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition flex items-center gap-2 text-cyan-300">
                 Agent Control Plane <ArrowRight size={16} />
@@ -220,7 +214,7 @@ const LandingPage = () => {
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <div className="text-xs text-gray-500 ml-2 font-mono">hero_demo.py - Sandbox Preview</div>
+                <div className="text-xs text-gray-500 ml-2 font-mono">hero_demo.py - Demo Preview</div>
               </div>
               <video
                 autoPlay
