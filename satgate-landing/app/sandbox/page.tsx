@@ -338,16 +338,16 @@ export default function SandboxPage() {
   const webPageJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'SatGate Sandbox',
+    name: 'SatGate Demo',
     url: 'https://satgate.io/sandbox',
-    description: 'Interactive SatGate sandbox for Mint, Capability Control, Spend Control, and Paid-Rails demos.',
+    description: 'Interactive SatGate demo for Mint, Capability Control, Spend Control, and Paid-Rails.',
     datePublished: '2026-04-12',
     dateModified: '2026-05-03',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
-      { '@type': 'Thing', name: 'SatGate demo sandbox' },
+      { '@type': 'Thing', name: 'SatGate demo' },
       { '@type': 'Thing', name: 'capability control demo' },
-      { '@type': 'Thing', name: 'AI agent spend control sandbox' },
+      { '@type': 'Thing', name: 'AI agent spend control demo' },
       { '@type': 'Thing', name: 'paid-rail governance demo' },
       { '@type': 'Thing', name: 'macaroon capability verification' },
       { '@type': 'Thing', name: 'agent kill-switch revocation' },
@@ -358,11 +358,11 @@ export default function SandboxPage() {
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'SatGate Sandbox',
+    name: 'SatGate Demo',
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/sandbox',
-    description: 'Interactive SatGate sandbox for Mint, Capability Control, Spend Control, and Paid-Rails demos.',
+    description: 'Interactive SatGate demo for Mint, Capability Control, Spend Control, and Paid-Rails.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-03',
     featureList: [
@@ -380,7 +380,7 @@ export default function SandboxPage() {
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
       { '@type': 'ListItem', position: 2, name: 'AI Agent Cost Control', item: 'https://satgate.io/ai-agent-cost-control' },
-      { '@type': 'ListItem', position: 3, name: 'SatGate Sandbox', item: 'https://satgate.io/sandbox' },
+      { '@type': 'ListItem', position: 3, name: 'SatGate Demo', item: 'https://satgate.io/sandbox' },
     ],
   };
 
@@ -390,8 +390,8 @@ export default function SandboxPage() {
     mainEntity: [
       {
         '@type': 'Question',
-        name: 'What does the SatGate sandbox demonstrate?',
-        acceptedAnswer: { '@type': 'Answer', text: 'The sandbox collects the SatGate demo path: Mint for scoped authority, Capability Control for scope/delegation/revocation, Spend Control for budget enforcement, and Paid-Rails for governed payment context.' },
+        name: 'What does the SatGate demo demonstrate?',
+        acceptedAnswer: { '@type': 'Answer', text: 'The demo page collects the SatGate demo path: Mint for scoped authority, Capability Control for scope/delegation/revocation, Spend Control for budget enforcement, and Paid-Rails for governed payment context.' },
       },
       {
         '@type': 'Question',
@@ -400,7 +400,7 @@ export default function SandboxPage() {
       },
       {
         '@type': 'Question',
-        name: 'Is the sandbox for AI agent cost control or security?',
+        name: 'Is the demo for AI agent cost control or security?',
         acceptedAnswer: { '@type': 'Answer', text: 'Both. SatGate treats spend as an enforceable security boundary, combining scoped authority, revocation, audit, and budget limits into an economic firewall for AI agents.' },
       },
     ],
@@ -421,7 +421,7 @@ export default function SandboxPage() {
           <h1 className="text-lg sm:text-xl font-bold flex items-center gap-2">
             <Shield className="text-purple-400" size={24} />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
-              SatGate Sandbox
+              SatGate Demo
             </span>
           </h1>
           <Link
@@ -436,7 +436,7 @@ export default function SandboxPage() {
       {/* Demo Hub */}
       <div className="bg-gradient-to-b from-purple-950/20 to-transparent border-b border-gray-800/50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 text-center">
-          <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-purple-300">Demo path</p>
+          <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-purple-300">Interactive demo</p>
           <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
             Mint. Control. Constrain. Govern.
           </h2>
@@ -612,12 +612,12 @@ export default function SandboxPage() {
 
         <section className="mt-12 border-t border-gray-800 pt-10">
           <p className="mb-2 text-center text-xs font-mono uppercase tracking-wide text-purple-300">FAQ</p>
-          <h2 className="mb-8 text-center text-2xl font-bold text-white">SatGate sandbox questions</h2>
+          <h2 className="mb-8 text-center text-2xl font-bold text-white">SatGate demo questions</h2>
           <div className="grid gap-4 md:grid-cols-3">
             {[
-              ['What does the SatGate sandbox demonstrate?', 'The sandbox collects the SatGate demo path: Mint for scoped authority, Capability Control for scope/delegation/revocation, Spend Control for budget enforcement, and Paid-Rails for governed payment context.'],
+              ['What does the SatGate demo demonstrate?', 'The demo page collects the SatGate demo path: Mint for scoped authority, Capability Control for scope/delegation/revocation, Spend Control for budget enforcement, and Paid-Rails for governed payment context.'],
               ['How does SatGate stop unauthorized agent spend?', 'SatGate checks each agent request against identity, capability-token caveats, budget, policy, and revocation state before forwarding the request upstream.'],
-              ['Is the sandbox for AI agent cost control or security?', 'Both. SatGate treats spend as an enforceable security boundary, combining scoped authority, revocation, audit, and budget limits into an economic firewall for AI agents.'],
+              ['Is the demo for AI agent cost control or security?', 'Both. SatGate treats spend as an enforceable security boundary, combining scoped authority, revocation, audit, and budget limits into an economic firewall for AI agents.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
                 <h3 className="mb-2 font-bold text-white">{question}</h3>
