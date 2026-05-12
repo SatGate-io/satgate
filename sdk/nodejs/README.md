@@ -1,209 +1,74 @@
-# satgate-sdk
+# @satgate/sdk
 
-Official Node.js SDK for the [SatGate](https://github.com/SatGate-io/satgate) OSS Gateway.
+Official Node.js SDK for SatGate: the Economic Firewall for AI agents.
 
-## Installation
+## Install
 
 ```bash
-npm install satgate-sdk
+npm install @satgate/sdk
 ```
 
-## Quick Start
+## Build agents with issue/pay/verify
 
-### Admin Client
+The public package installs today. The `issue/pay/verify` API namespace is in private beta, so calls without beta access raise a structured error instead of returning mocked receipts.
 
-The `SatGateClient` provides direct access to gateway admin operations.
+```ts
+import { SatGate } from "@satgate/sdk";
 
-```typescript
-import { SatGateClient } from 'satgate-sdk';
+const satgate = new SatGate({ apiKey: process.env.SATGATE_API_KEY });
 
-const client = new SatGateClient({
-  url: 'http://localhost:8080',
-  token: 'your-admin-token',
+const capability = await satgate.issue({
+  task: "compare supplier prices",
+  agent: "procurement-agent",
+  allow: ["mcp:browser.search", "api:supplier.quote"],
+  budgetUsd: 25,
+  expiresIn: "1h",
 });
 
-// Check gateway health
-const healthy = await client.health();
-console.log('Gateway healthy:', healthy);
-
-// Mint a new capability token
-const token = await client.tokens.mint({
-  scope: 'api:read',
-  duration: '1h',
+const receipt = await satgate.pay({
+  upstream: "https://api.example.com/search",
+  capability,
+  maxUsd: 4.20,
 });
-console.log('Token:', token.token);
-console.log('Signature:', token.signature);
 
-// Validate a token
-const result = await client.tokens.validate(token.token);
-console.log('Valid:', result.valid);
-
-// Delegate a token with additional restrictions
-const child = await client.tokens.delegate({
-  parentToken: token.token,
-  caveats: ['scope = api:read'],
-});
-console.log('Child signature:', child.signature);
-
-// Ping with a capability token
-const ping = await client.ping(token.token);
-console.log('Ping:', ping);
-
-// Ban a compromised token
-await client.governance.ban(token.signature, 'Compromised credentials');
-
-// Get governance graph (token lineage, stats)
-const graph = await client.governance.getGraph();
-console.log('Active tokens:', graph.stats.active);
-
-// Reset governance data
-await client.governance.reset();
+const verified = await satgate.verify(receipt);
+console.log(verified.decision, verified.evidencePackId);
 ```
 
-### Agent Client
+Without private-beta access:
 
-The `SatGateAgentClient` is designed for AI agents — it automatically
-mints tokens, caches them, and handles L402 payment challenges.
-
-```typescript
-import { SatGateAgentClient } from 'satgate-sdk';
-
-// With admin token (auto-mints capability tokens)
-const client = new SatGateAgentClient({
-  gatewayUrl: 'http://localhost:8080',
-  adminToken: 'your-admin-token',
-  scope: 'api:read',
-  duration: '1h',
-});
-
-// Or with a pre-existing capability token
-const client2 = new SatGateAgentClient({
-  gatewayUrl: 'http://localhost:8080',
-  token: 'your-capability-token',
-});
-
-// Or via environment variables
-// SATGATE_ADMIN_TOKEN=your-admin-token
-// SATGATE_TOKEN=your-capability-token (alternative)
-const client3 = new SatGateAgentClient({
-  gatewayUrl: 'http://localhost:8080',
-});
-
-// Make requests — token handling is automatic
-const response = await client.get('/api/data');
-console.log(response.data);
-
-// Ping to verify the token
-const pingResult = await client.ping();
-console.log(pingResult);
-
-// Delegate a child token for a worker
-const childToken = await client.delegate({
-  caveats: ['scope = api:read'],
-});
+```text
+SatGateAuthError: This API namespace requires private beta access. Visit cloud.satgate.io/docs to request access.
 ```
 
-## Token Delegation
+Works with: MCP · OpenAI tools · Anthropic tools · LangChain · CrewAI · Raw HTTP
 
-### Fluent Delegation Builder
+## OSS Gateway client
 
-```typescript
-import { SatGateClient, delegate, Caveats, DelegationPatterns } from 'satgate-sdk';
+The package also includes the lower-level OSS gateway clients:
 
-const client = new SatGateClient({
-  url: 'http://localhost:8080',
-  token: 'admin-token',
+```ts
+import { SatGateClient, SatGateAgentClient } from "@satgate/sdk";
+
+const admin = new SatGateClient({
+  url: "http://localhost:8080",
+  token: "your-admin-token",
 });
-const root = await client.tokens.mint({ scope: 'api:*', duration: '24h' });
 
-// Fluent builder pattern
-const teamToken = await delegate(root.token)
-  .withScope('api:read')
-  .withExpiry(24 * 3600)
-  .forTeam('engineering')
-  .delegate(client);
+const token = await admin.tokens.mint({ scope: "api:read", duration: "1h" });
+const valid = await admin.tokens.validate(token.token);
 
-// Pre-built patterns
-const readOnlyToken = await DelegationPatterns.readOnly(root.token).delegate(client);
-const tempToken = await DelegationPatterns.temporary(root.token, 2).delegate(client);
-
-// Agent swarm token
-const swarmToken = await DelegationPatterns.agentSwarm(
-  root.token,
-  'ai-agents',
-  { budget: 500, requestsPerMinute: 5000 }
-).delegate(client);
-```
-
-### Caveat Builders
-
-```typescript
-import { Caveats } from 'satgate-sdk';
-
-const caveats = [
-  Caveats.scope('api:read'),
-  Caveats.expires(3600),
-  Caveats.routes(['/api/*', '/health']),
-  Caveats.rateLimit(100, 60),
-  Caveats.methods(['GET', 'POST']),
-  Caveats.team('engineering'),
-];
-
-const token = await client.tokens.delegate({
-  parentToken: root.token,
-  caveats,
+const agent = new SatGateAgentClient({
+  gatewayUrl: "http://localhost:8080",
+  token: token.token,
 });
+
+const response = await agent.get("/api/data");
+console.log(valid.valid, response.status);
 ```
 
-## OSS Gateway Endpoints
+## Docs
 
-This SDK targets the SatGate OSS gateway endpoints:
-
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `POST` | `/api/capability/mint` | X-Admin-Token | Mint a new capability token |
-| `POST` | `/api/capability/validate` | — | Validate a token |
-| `POST` | `/api/capability/delegate` | — | Delegate a token with caveats |
-| `GET` | `/api/capability/ping` | Bearer token | Verify a token is valid |
-| `GET` | `/api/capability/admin` | Bearer token | Admin-scope verification |
-| `POST` | `/api/governance/ban` | X-Admin-Token | Ban a token |
-| `GET` | `/api/governance/graph` | — | Get token lineage graph |
-| `POST` | `/api/governance/reset` | X-Admin-Token | Reset governance data |
-| `GET` | `/health` | — | Health check |
-
-## Error Handling
-
-```typescript
-import {
-  SatGateClient,
-  AuthenticationError,
-  NotFoundError,
-  SatGateError,
-} from 'satgate-sdk';
-
-try {
-  const client = new SatGateClient({
-    url: 'http://localhost:8080',
-    token: 'invalid-token',
-  });
-  await client.tokens.mint();
-} catch (error) {
-  if (error instanceof AuthenticationError) {
-    console.error('Invalid admin token!');
-  } else if (error instanceof SatGateError) {
-    console.error('API error:', error.message);
-  }
-}
-```
-
-## TypeScript Support
-
-This package includes full TypeScript type definitions:
-
-```typescript
-import type { Token, TokenInfo, GraphData, DelegateRequest } from 'satgate-sdk';
-```
-
-## License
-
-MIT License
+- Developer docs: https://cloud.satgate.io/docs
+- Build page: https://satgate.io/build
+- Repository: https://github.com/SatGate-io/satgate
