@@ -20,6 +20,13 @@ required_page_strings = [
     "Economic Firewall for AI agents",
     "authority and evidence layer",
     "https://cloud.satgate.io/docs",
+    "pip install satgate",
+    "npm install @satgate/sdk",
+    "issue/pay/verify API namespace is in private beta",
+    "decision: \"denied\"",
+    "budget_exhausted",
+    "Node example",
+    "HTTP example",
 ]
 
 forbidden_page_patterns = [
