@@ -69,6 +69,11 @@ The public packages install today; the `issue/pay/verify` API namespace is in pr
 SatGateAuthError: This API namespace requires private beta access. Visit cloud.satgate.io/docs to request access.
 ```
 
+Runnable examples:
+
+- `examples/python/issue_pay_verify.py`
+- `examples/node/issue-pay-verify.mjs`
+
 Works with: MCP · OpenAI tools · Anthropic tools · LangChain · CrewAI · Raw HTTP
 
 ---
