@@ -5,13 +5,13 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 setup(
     name="satgate",
-    version="1.0.0",
+    version="0.3.2",
     author="SatGate Team",
     author_email="team@satgate.io",
-    description="Python SDK for SatGate Gateway (OSS)",
+    description="Python SDK for SatGate Gateway and SatGate Cloud private-beta APIs",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/satgate-io/satgate-gateway",
+    url="https://github.com/SatGate-io/satgate",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 4 - Beta",

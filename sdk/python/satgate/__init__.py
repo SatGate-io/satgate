@@ -38,6 +38,7 @@ A Python SDK for interacting with the SatGate OSS Gateway.
     )
 """
 
+from .private_beta import SatGate
 from .client import SatGateClient
 from .agent_client import (
     SatGateAgentClient,
@@ -76,6 +77,7 @@ from .delegation import (
 from .exceptions import (
     SatGateError,
     AuthenticationError,
+    SatGateAuthError,
     NotFoundError,
     PaymentRequiredError,
     PaymentFailedError,
@@ -84,8 +86,11 @@ from .exceptions import (
     DelegationError,
 )
 
-__version__ = "2.0.0"
+__version__ = "0.3.2"
 __all__ = [
+    # SatGate Cloud private-beta facade
+    "SatGate",
+
     # Admin client
     "SatGateClient",
     
@@ -124,6 +129,7 @@ __all__ = [
     # Exceptions
     "SatGateError",
     "AuthenticationError",
+    "SatGateAuthError",
     "NotFoundError",
     "PaymentRequiredError",
     "PaymentFailedError",

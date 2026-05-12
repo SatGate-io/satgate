@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>The Economic Firewall for AI Agents</strong><br/>
-  <em>Hard budget enforcement · Per-tool cost attribution · Rail-neutral paid-rail governance</em>
+  <em>Capabilities in · Receipts out · Rails abstracted</em>
 </p>
 
 <p align="center">
@@ -18,12 +18,58 @@
 
 <p align="center">
   <a href="#the-problem">Why</a> •
+  <a href="#build-agents-with-satgate">Build</a> •
   <a href="#features">Features</a> •
   <a href="#quick-start">Quick Start</a> •
   <a href="#documentation">Docs</a> •
   <a href="https://satgate.io">Website</a> •
   <a href="https://satgate.io/blog/why-routing-isnt-governance">Blog</a>
 </p>
+
+---
+
+## Build Agents with SatGate
+
+SatGate's developer primitive is three calls: `issue()`, `pay()`, and `verify()`.
+
+```python
+import os
+from satgate import SatGate
+
+satgate = SatGate(api_key=os.getenv("SATGATE_API_KEY"))
+
+capability = satgate.issue(
+    task="research market prices",
+    agent="research-agent",
+    allow=["mcp:web.search", "api:prices.read"],
+    budget_usd=25,
+    expires_in="1h",
+)
+
+receipt = satgate.pay(
+    upstream="https://api.example.com/search",
+    capability=capability,
+    max_usd=4.20,
+)
+
+verified = satgate.verify(receipt)
+print(verified.decision, verified.evidence_pack_id)
+```
+
+Install today:
+
+```bash
+pip install satgate
+npm install @satgate/sdk
+```
+
+The public packages install today; the `issue/pay/verify` API namespace is in private beta. Calls without private-beta access raise a structured error instead of returning fake receipts:
+
+```text
+SatGateAuthError: This API namespace requires private beta access. Visit cloud.satgate.io/docs to request access.
+```
+
+Works with: MCP · OpenAI tools · Anthropic tools · LangChain · CrewAI · Raw HTTP
 
 ---
 
@@ -117,7 +163,7 @@ curl -X POST http://localhost:8080/api/capability/mint \
   -d '{"scope": "api:read", "duration": "1h"}'
 
 # Use the token:
-curl -H "Authorization: Bearer <your-token>" \
+curl -H "Authorization: Bearer YOUR_CAPABILITY_TOKEN" \
   http://localhost:8080/api/capability/ping
 
 # 3. Paid — get a payment challenge (L402 today; x402/other rails as governed context)
