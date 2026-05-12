@@ -1,38 +1,34 @@
 /**
- * SatGate Gateway Node.js SDK (OSS)
+ * SatGate Node.js SDK
  *
- * ## Admin Client (for operators)
- * 
+ * ## Developer primitive: issue/pay/verify
+ *
  * @example
  * ```typescript
- * import { SatGateClient } from '@satgate/sdk';
+ * import { SatGate } from '@satgate/sdk';
  *
- * const client = new SatGateClient({
- *   url: 'http://localhost:8080',
- *   token: 'your-admin-token'
+ * const satgate = new SatGate({ apiKey: process.env.SATGATE_API_KEY });
+ * const capability = await satgate.issue({
+ *   task: 'summarize vendor invoice',
+ *   agent: 'invoice-agent',
+ *   allow: ['POST /v1/invoices/*'],
+ *   budgetUsd: 0.25,
+ *   expiresIn: '10m',
  * });
+ * const receipt = await satgate.pay({
+ *   upstream: 'https://api.vendor.test/v1/invoices/42',
+ *   capability,
+ *   maxUsd: 0.10,
+ * });
+ * const verified = await satgate.verify(receipt);
+ * console.log(verified.decision, verified.evidencePackId ?? verified.evidence_pack_id);
+ * ```
  *
- * // Mint a new token
- * const token = await client.tokens.mint({ scope: 'api:*', duration: '1h' });
- * console.log('Token:', token.token);
- * ```
- * 
- * ## Agent Client (for AI agents)
- * 
- * @example
- * ```typescript
- * import { SatGateAgentClient } from '@satgate/sdk';
- * 
- * // With admin token (auto-mints capability tokens)
- * const client = new SatGateAgentClient({
- *   gatewayUrl: 'http://localhost:8080',
- *   adminToken: 'your-admin-token'
- * });
- * 
- * // Make requests - token management is automatic
- * const response = await client.get('/api/data');
- * console.log(response.data);
- * ```
+ * ## Compatibility: lower-level OSS Gateway clients
+ *
+ * SatGateClient and SatGateAgentClient preserve existing self-hosted gateway token,
+ * delegation, and paid-rail APIs. New Cloud/private-beta app examples should lead
+ * with issue/pay/verify.
  */
 
 // SatGate Cloud private-beta facade
@@ -81,19 +77,17 @@ export {
   delegate,
   parseCaveats,
   isMoreRestrictive,
-  DelegationNode,
 } from './delegation';
 
 // Errors
 export {
   SatGateError,
   AuthenticationError,
-  SatGateAuthError,
   NotFoundError,
-  ValidationError,
   PaymentRequiredError,
   PaymentFailedError,
   BudgetExceededError,
   TokenExpiredError,
   DelegationError,
+  SatGateAuthError,
 } from './errors';

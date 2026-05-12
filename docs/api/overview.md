@@ -1,5 +1,8 @@
 # API Overview
 
+Lower-level gateway API reference. Application SDK examples should use `issue`, `pay`, and `verify` where available: issue a scoped capability, pay upstream with a max budget, then verify the receipt.
+
+
 SatGate exposes two API groups on port **8080** (same port as the proxy):
 
 ## Capability APIs (`/api/capability/`)

@@ -2,17 +2,19 @@
 
 SatGate provides official SDKs for Python and Node.js/TypeScript.
 
+For application developers, the default SatGate primitive is `issue`, `pay`, `verify`: issue a scoped capability, pay an upstream call with a caller-supplied max budget, then verify the receipt. The lower-level clients below remain available for OSS gateway compatibility.
+
 ## Available SDKs
 
 | SDK | Package | Status |
 |-----|---------|--------|
-| [Python](python.md) | `pip install satgate` | ✅ v2.0.0 |
+| [Python](python.md) | `pip install satgate` | ✅ v0.3.2 |
 | [Node.js/TypeScript](nodejs.md) | `npm install @satgate/sdk` | ✅ |
 | [Go](go.md) | Import `pkg/` directly | ✅ Native |
 
 ## Agent SDKs
 
-Built on top of the base SDKs, these provide automatic token management and L402 payment handling for AI agents:
+Built on top of the base SDKs, these provide compatibility token management and paid-rail handling for AI agents:
 
 | SDK | Included In | Description |
 |-----|------------|-------------|

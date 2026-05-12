@@ -63,11 +63,20 @@ class SatGate:
             self.session.headers.update({"X-SatGate-Tenant": tenant})
 
     def issue(self, **payload: Any) -> AttrDict:
-        """Issue a scoped capability for an agent task."""
-        return self._post("/v1/capabilities", payload)
+        """Issue a scoped capability for an agent task.
+
+        `/v1/issue` is the primitive endpoint. `/v1/capabilities` remains a
+        compatibility fallback for early private-beta clients.
+        """
+        try:
+            return self._post("/v1/issue", payload)
+        except SatGateAuthError as exc:
+            if exc.status_code != 404:
+                raise
+            return self._post("/v1/capabilities", payload)
 
     def pay(self, **payload: Any) -> AttrDict:
-        """Route a value-bearing call under a scoped capability."""
+        """Pay an upstream call under a scoped capability with a caller-supplied max budget."""
         return self._post("/v1/pay", self._serialize(payload))
 
     def verify(self, receipt: Any) -> AttrDict:

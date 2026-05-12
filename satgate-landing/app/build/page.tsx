@@ -17,7 +17,7 @@ import {
 export const metadata: Metadata = {
   title: "Build Agents That Can Spend Safely",
   description:
-    "Issue scoped capabilities, route paid calls, and verify receipts with SatGate's developer surface for agent authority, payment context, and Evidence Pack proof.",
+    "Issue scoped capabilities, pay upstream with max budgets, and verify receipts with SatGate's developer surface for agent authority, payment context, and Evidence Pack proof.",
   keywords: [
     "SatGate build",
     "AI agent capabilities",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Build agents that can spend safely",
     description:
-      "Capabilities in. Receipts out. Rails abstracted. Build agents with scoped authority, paid-call routing, and verifiable receipts.",
+      "Capabilities in. Receipts out. Rails abstracted. Build agents with scoped authority, upstream payments with max budgets, and verifiable receipts.",
     url: "https://satgate.io/build",
     type: "website",
   },
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Build agents that can spend safely",
     description:
-      "Issue capabilities, route paid calls, and verify receipts with SatGate's rail-neutral developer primitive.",
+      "Issue scoped capabilities, pay upstream with max budgets, and verify receipts with SatGate's rail-neutral developer primitive.",
   },
 };
 
@@ -92,8 +92,8 @@ const installCommands = String.raw`# Install today (public packages):
 pip install satgate
 npm install @satgate/sdk`;
 
-const curlExample = String.raw`curl https://api.satgate.io/v1/capabilities \
-  -H "Authorization: Bearer YOUR_API_KEY" \
+const curlExample = String.raw`curl https://api.satgate.io/v1/issue \
+  -H "Authorization: Bearer $SATGATE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "agent": "research-agent",
@@ -104,9 +104,14 @@ const curlExample = String.raw`curl https://api.satgate.io/v1/capabilities \
   }'
 
 curl https://api.satgate.io/v1/pay \
-  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Authorization: Bearer $SATGATE_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"capability":"cap_...","upstream":"https://api.example.com/search","max_usd":4.20}'`;
+  -d '{"capability":"cap_...","upstream":"https://api.example.com/search","max_usd":4.20}'
+
+curl https://api.satgate.io/v1/verify \
+  -H "Authorization: Bearer $SATGATE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"receipt":"rcpt_..."}'`;
 
 const primitives = [
   {
@@ -117,15 +122,15 @@ const primitives = [
   },
   {
     icon: Route,
-    title: "Route paid calls",
+    title: "Pay upstream with max budget",
     label: "satgate.pay",
-    body: "Let the agent reach MCP tools, APIs, or paid rails through SatGate while policy is enforced before value moves.",
+    body: "Let the agent reach MCP tools, APIs, or paid rails through SatGate while a caller-supplied max budget and policy are enforced before value moves.",
   },
   {
     icon: ReceiptText,
     title: "Verify receipts",
     label: "satgate.verify",
-    body: "Return a signed decision receipt that can feed an Evidence Pack for audits, incidents, billing review, or revocation proof.",
+    body: "Verify the receipt returned by pay, then attach or fetch Evidence Pack proof for audits, incidents, billing review, or revocation proof.",
   },
 ];
 
@@ -209,7 +214,7 @@ export default function BuildPage() {
               Build agents that can spend safely
             </h1>
             <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
-              Issue scoped capabilities, route paid calls, and return verifiable receipts your principal can trust.
+              Issue scoped capabilities, pay upstream with max budgets, and return verifiable receipts your principal can trust.
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
               SatGate is the <strong className="font-semibold text-white">Economic Firewall for AI agents</strong>. This is the developer surface: <strong className="font-semibold text-white">Capabilities in. Receipts out. Rails abstracted.</strong>

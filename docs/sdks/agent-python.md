@@ -14,7 +14,7 @@ client = SatGateAgentClient(
     admin_token="your-admin-token",
 )
 
-# Tokens are minted and managed automatically
+# Compatibility path: OSS gateway capability tokens are managed automatically
 response = client.get("/api/data")
 print(response.json())
 ```

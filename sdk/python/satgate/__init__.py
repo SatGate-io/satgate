@@ -1,41 +1,30 @@
 """
-SatGate Gateway Python SDK
+SatGate Python SDK
 
-A Python SDK for interacting with the SatGate OSS Gateway.
+Developer primitive: issue/pay/verify.
 
-## Admin Client (for operators)
+    import os
+    from satgate import SatGate
 
-    from satgate import SatGateClient
-    
-    client = SatGateClient(
-        base_url="http://localhost:8080",
-        admin_token="your-admin-token"
+    satgate = SatGate(api_key=os.getenv("SATGATE_API_KEY"))
+    capability = satgate.issue(
+        task="summarize vendor invoice",
+        agent="invoice-agent",
+        allow=["POST /v1/invoices/*"],
+        budget_usd=0.25,
+        expires_in="10m",
     )
-    
-    # Mint a new token
-    token = client.tokens.mint(scope="api:*", duration="1h")
-    print(f"Token: {token.token}")
-
-## Agent Client (for AI agents)
-
-    from satgate import SatGateAgentClient
-    
-    client = SatGateAgentClient(
-        gateway_url="http://localhost:8080",
-        admin_token="your-admin-token"
+    receipt = satgate.pay(
+        upstream="https://api.vendor.test/v1/invoices/42",
+        capability=capability,
+        max_usd=0.10,
     )
-    
-    # Make requests - token management is automatic
-    response = client.get("/api/data")
+    verified = satgate.verify(receipt)
+    print(verified.decision, getattr(verified, "evidence_pack_id", None))
 
-## With a pre-existing token
-
-    from satgate import SatGateAgentClient
-    
-    client = SatGateAgentClient(
-        gateway_url="http://localhost:8080",
-        token="your-capability-token"
-    )
+Compatibility: SatGateClient and SatGateAgentClient preserve existing OSS Gateway
+token, delegation, and paid-rail APIs. New Cloud/private-beta app examples should
+lead with issue/pay/verify.
 """
 
 from .private_beta import SatGate

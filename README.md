@@ -286,7 +286,7 @@ routes:
 | Language | Package | Docs |
 |----------|---------|------|
 | Python | `pip install satgate` | [README](sdk/python/README.md) |
-| JavaScript | `npm install satgate-sdk` | [README](sdk/nodejs/README.md) |
+| JavaScript | `npm install @satgate/sdk` | [README](sdk/nodejs/README.md) |
 
 ## MCP Proxy (NEW)
 

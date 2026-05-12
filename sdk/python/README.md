@@ -44,7 +44,7 @@ SatGateAuthError: This API namespace requires private beta access. Visit cloud.s
 
 Works with: MCP · OpenAI tools · Anthropic tools · LangChain · CrewAI · Raw HTTP
 
-## OSS Gateway client
+## Compatibility: lower-level OSS Gateway client
 
 The package also includes lower-level OSS gateway clients:
 

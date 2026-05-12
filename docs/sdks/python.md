@@ -8,20 +8,56 @@ Official Python client for SatGate Gateway.
 pip install satgate
 ```
 
-## Two Clients
+## Build agents with issue/pay/verify
 
-SatGate provides two clients for different use cases:
+For application developers, SatGate's Stripe-like primitive is three calls:
+
+1. **Issue** a scoped capability for one task.
+2. **Pay** an upstream call with a caller-supplied max budget.
+3. **Verify** the returned receipt and Evidence Pack metadata.
+
+```python
+import os
+from satgate import SatGate
+
+satgate = SatGate(api_key=os.getenv("SATGATE_API_KEY"))
+
+capability = satgate.issue(
+    task="summarize vendor invoice",
+    agent="invoice-agent",
+    allow=["POST /v1/invoices/*"],
+    budget_usd=0.25,
+    expires_in="10m",
+)
+
+receipt = satgate.pay(
+    upstream="https://api.vendor.test/v1/invoices/42",
+    capability=capability,
+    max_usd=0.10,
+)
+
+verified = satgate.verify(receipt)
+print(verified.decision, getattr(verified, "evidence_pack_id", None))
+```
+
+The public package installs today. The `issue/pay/verify` API namespace is in private beta; non-beta credentials raise `SatGateAuthError` with a docs CTA instead of returning mocked success.
+
+---
+
+## Compatibility: OSS Gateway clients
 
 | Client | For | Auth |
 |--------|-----|------|
-| `SatGateClient` | **Operators** — mint tokens, ban tokens, manage governance | `X-Admin-Token` header |
-| `SatGateAgentClient` | **AI Agents** — make API calls with automatic token & payment handling | Auto-mints tokens, handles L402 |
+| `SatGateClient` | **Operators** — lower-level capability token and governance endpoints | `X-Admin-Token` header |
+| `SatGateAgentClient` | **AI Agents** — compatibility client for existing gateway token and paid-rail flows | Auto-mints tokens, handles L402 |
+
+Use these when targeting the self-hosted OSS gateway's existing token endpoints. New Cloud examples should lead with `issue/pay/verify`.
 
 ---
 
 ## Admin Client (`SatGateClient`)
 
-For operators managing tokens and governance.
+For operators managing compatibility token endpoints and governance.
 
 ```python
 from satgate import SatGateClient
