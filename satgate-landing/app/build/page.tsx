@@ -6,7 +6,6 @@ import {
   Braces,
   CheckCircle2,
   Code2,
-  FileCheck2,
   KeyRound,
   Layers3,
   ReceiptText,
@@ -46,9 +45,10 @@ export const metadata: Metadata = {
   },
 };
 
-const quickstart = `from satgate import SatGate
+const quickstart = `import os
+from satgate import SatGate
 
-satgate = SatGate(api_key=os.environ["SATGATE_API_KEY"])
+satgate = SatGate(api_key=os.getenv("SATGATE_API_KEY"))
 
 capability = satgate.issue(
     task="research market prices",
@@ -88,8 +88,7 @@ const receipt = await satgate.pay({
 const verified = await satgate.verify(receipt);
 console.log(verified.decision, verified.evidencePackId);`;
 
-const installCommands = String.raw`# Public packages are available today.
-# The issue/pay/verify namespace is private beta API access.
+const installCommands = String.raw`# Install today (public packages):
 pip install satgate
 npm install @satgate/sdk`;
 
@@ -135,6 +134,8 @@ const integrationLinks = [
   { title: "Runtime integrations", href: "/integrations", body: "See current agent-client surfaces and where OpenAI, Anthropic, LangChain, and CrewAI adapters fit." },
   { title: "Developer docs", href: "https://cloud.satgate.io/docs", body: "Use the docs for setup details while issue/pay/verify API access is in private beta." },
 ];
+
+const runtimeChips = ["MCP", "OpenAI tools", "Anthropic tools", "LangChain", "CrewAI", "Raw HTTP"];
 
 const allowedReceipt = {
   receipt_id: "rcpt_7J4xQf9",
@@ -230,9 +231,6 @@ export default function BuildPage() {
               >
                 View SDK examples <TerminalSquare size={18} />
               </a>
-              <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-purple-700/60 bg-purple-950/20 px-6 py-3 font-bold text-purple-200 transition hover:border-purple-400">
-                See proof model <FileCheck2 size={18} />
-              </Link>
             </div>
           </div>
 
@@ -248,10 +246,7 @@ export default function BuildPage() {
               <p className="mb-2 text-xs font-mono uppercase tracking-[0.18em] text-cyan-300">SDK access</p>
               <pre className="max-w-full overflow-x-auto rounded-xl bg-black p-4 text-sm leading-6 text-gray-300"><code>{installCommands}</code></pre>
               <p className="mt-3 text-sm leading-6 text-gray-500">
-                Public packages install today; the issue/pay/verify API namespace is in private beta. <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="text-cyan-300 hover:text-cyan-200">Request API access in the docs</a>.
-              </p>
-              <p className="mt-2 text-xs leading-5 text-gray-600">
-                Duration fields accept human-readable values like <code className="rounded bg-gray-900 px-1 text-gray-400">1h</code>; ISO 8601 duration support belongs in the integration docs for clients that require structured durations.
+                The issue/pay/verify API namespace is in private beta. <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="text-cyan-300 hover:text-cyan-200">Request access →</a>
               </p>
             </div>
           </div>
@@ -320,9 +315,6 @@ export default function BuildPage() {
             <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-cyan-300">Copy-paste paths</p>
             <h2 className="text-3xl font-bold text-white sm:text-4xl">Use the same primitive from SDKs, MCP, or raw HTTP.</h2>
           </div>
-          <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-cyan-300 transition hover:text-cyan-200">
-            Open developer docs <ArrowRight size={16} />
-          </a>
         </div>
 
         <div className="grid min-w-0 gap-6 lg:grid-cols-2">
@@ -345,6 +337,14 @@ export default function BuildPage() {
             <p className="mt-4 text-lg leading-8 text-gray-400">
               The runtime changes. The contract stays the same: capability before action, receipt after decision.
             </p>
+            <div className="mt-6 flex flex-wrap gap-2 text-sm text-gray-300">
+              <span className="mr-1 py-1 text-gray-500">Works with:</span>
+              {runtimeChips.map((chip) => (
+                <Link key={chip} href="/integrations" className="rounded-full border border-gray-800 bg-black px-3 py-1 transition hover:border-cyan-400 hover:text-white">
+                  {chip}
+                </Link>
+              ))}
+            </div>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             {integrationLinks.map((item) => {

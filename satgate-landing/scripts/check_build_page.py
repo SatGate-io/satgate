@@ -17,16 +17,25 @@ required_page_strings = [
     "satgate.issue",
     "satgate.pay",
     "satgate.verify",
+    "import os",
+    "os.getenv(\"SATGATE_API_KEY\")",
     "Economic Firewall for AI agents",
     "authority and evidence layer",
     "https://cloud.satgate.io/docs",
     "pip install satgate",
     "npm install @satgate/sdk",
     "issue/pay/verify API namespace is in private beta",
+    "# Install today (public packages):",
+    "Request access →",
+    "Works with:",
+    "OpenAI tools",
+    "Anthropic tools",
+    "Raw HTTP",
     "decision: \"denied\"",
     "budget_exhausted",
     "Node example",
     "HTTP example",
+    "YOUR_API_KEY",
 ]
 
 forbidden_page_patterns = [
@@ -38,6 +47,10 @@ forbidden_page_patterns = [
     r"wallet-native",
     r"when APIs become products",
     r"autonomous spend platform",
+    r"See proof model",
+    r"ISO 8601 duration support belongs",
+    r"Open developer docs",
+    r"Bearer \*\*\*",
 ]
 
 errors: list[str] = []

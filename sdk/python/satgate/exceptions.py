@@ -13,6 +13,15 @@ class AuthenticationError(SatGateError):
     pass
 
 
+class SatGateAuthError(AuthenticationError):
+    """Raised when SatGate Cloud private-beta API access is missing."""
+
+    def __init__(self, message: str, status_code: int = 401, docs_url: str = "https://cloud.satgate.io/docs"):
+        super().__init__(message)
+        self.status_code = status_code
+        self.docs_url = docs_url
+
+
 class NotFoundError(SatGateError):
     """Raised when a resource is not found"""
     pass

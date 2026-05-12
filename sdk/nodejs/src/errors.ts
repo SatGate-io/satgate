@@ -19,6 +19,21 @@ export class AuthenticationError extends SatGateError {
   }
 }
 
+export class SatGateAuthError extends AuthenticationError {
+  public readonly docsUrl: string;
+
+  constructor(
+    message: string = 'This API namespace requires private beta access. Visit cloud.satgate.io/docs to request access.',
+    statusCode: number = 401,
+    docsUrl: string = 'https://cloud.satgate.io/docs'
+  ) {
+    super(message);
+    this.name = 'SatGateAuthError';
+    this.statusCode = statusCode;
+    this.docsUrl = docsUrl;
+  }
+}
+
 export class NotFoundError extends SatGateError {
   constructor(message: string = 'Resource not found') {
     super(message, 404);

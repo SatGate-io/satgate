@@ -35,6 +35,15 @@
  * ```
  */
 
+// SatGate Cloud private-beta facade
+export {
+  SatGate,
+  SatGateOptions,
+  CapabilityRequest,
+  PayRequest,
+  SatGateReceipt,
+} from './private-beta';
+
 // Admin client
 export { SatGateClient, SatGateClientOptions } from './client';
 
@@ -79,6 +88,7 @@ export {
 export {
   SatGateError,
   AuthenticationError,
+  SatGateAuthError,
   NotFoundError,
   ValidationError,
   PaymentRequiredError,
