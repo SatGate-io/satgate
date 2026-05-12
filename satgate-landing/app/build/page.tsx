@@ -88,8 +88,13 @@ const receipt = await satgate.pay({
 const verified = await satgate.verify(receipt);
 console.log(verified.decision, verified.evidencePackId);`;
 
-const curlExample = `curl https://api.satgate.io/v1/capabilities \
-  -H "Authorization: Bearer $SATGATE_API_KEY" \
+const installCommands = String.raw`# Public packages are available today.
+# The issue/pay/verify namespace is private beta API access.
+pip install satgate
+npm install @satgate/sdk`;
+
+const curlExample = String.raw`curl https://api.satgate.io/v1/capabilities \
+  -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "agent": "research-agent",
@@ -100,7 +105,8 @@ const curlExample = `curl https://api.satgate.io/v1/capabilities \
   }'
 
 curl https://api.satgate.io/v1/pay \
-  -H "Authorization: Bearer $SATGATE_API_KEY" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
   -d '{"capability":"cap_...","upstream":"https://api.example.com/search","max_usd":4.20}'`;
 
 const primitives = [
@@ -124,16 +130,13 @@ const primitives = [
   },
 ];
 
-const integrations = [
-  ["MCP server", "Forward tool calls with capability headers and receive decision receipts per tool invocation."],
-  ["OpenAI tools", "Attach a scoped capability to tool calls so agent actions inherit budget, route, and proof policy."],
-  ["Anthropic tools", "Keep Claude tool use bounded by the same authority and receipt model."],
-  ["LangChain", "Wrap tool execution with issue/pay/verify so chains do not hold standing authority."],
-  ["CrewAI", "Give crews attenuated capabilities instead of sharing broad provider keys."],
-  ["Raw HTTP", "Use headers and JSON receipts when you do not want an SDK dependency."],
+const integrationLinks = [
+  { title: "MCP Gateway", href: "/mcp-gateway", body: "Put SatGate in front of MCP tools and preserve a receipt per tool invocation." },
+  { title: "Runtime integrations", href: "/integrations", body: "See current agent-client surfaces and where OpenAI, Anthropic, LangChain, and CrewAI adapters fit." },
+  { title: "Developer docs", href: "https://cloud.satgate.io/docs", body: "Use the docs for setup details while issue/pay/verify API access is in private beta." },
 ];
 
-const receiptPreview = {
+const allowedReceipt = {
   receipt_id: "rcpt_7J4xQf9",
   decision: "allowed",
   decision_reason: "capability_scope_and_budget_ok",
@@ -143,6 +146,20 @@ const receiptPreview = {
   route_or_tool: "api.example.com/search",
   amount_usd: "0.42",
   rail: "enterprise_ledger",
+  evidence_pack_id: "ep_2026_05_12_001",
+  signature: "ed25519:demo_redacted",
+};
+
+const deniedReceipt = {
+  receipt_id: "rcpt_9Kp1vM2",
+  decision: "denied",
+  decision_reason: "budget_exhausted",
+  agent_id: "research-agent",
+  capability_id: "cap_2Xn83k",
+  policy_version: "policy_2026_05_build_v1",
+  route_or_tool: "api.example.com/search",
+  attempted_amount_usd: "4.20",
+  remaining_budget_usd: "0.00",
   evidence_pack_id: "ep_2026_05_12_001",
   signature: "ed25519:demo_redacted",
 };
@@ -227,6 +244,16 @@ export default function BuildPage() {
               <span className="ml-2 text-xs font-mono text-gray-500">issue_pay_verify.py</span>
             </div>
             <pre className="max-w-full overflow-x-auto p-5 text-sm leading-6 text-gray-300"><code>{quickstart}</code></pre>
+            <div className="border-t border-gray-800 p-5">
+              <p className="mb-2 text-xs font-mono uppercase tracking-[0.18em] text-cyan-300">SDK access</p>
+              <pre className="max-w-full overflow-x-auto rounded-xl bg-black p-4 text-sm leading-6 text-gray-300"><code>{installCommands}</code></pre>
+              <p className="mt-3 text-sm leading-6 text-gray-500">
+                Public packages install today; the issue/pay/verify API namespace is in private beta. <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="text-cyan-300 hover:text-cyan-200">Request API access in the docs</a>.
+              </p>
+              <p className="mt-2 text-xs leading-5 text-gray-600">
+                Duration fields accept human-readable values like <code className="rounded bg-gray-900 px-1 text-gray-400">1h</code>; ISO 8601 duration support belongs in the integration docs for clients that require structured durations.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -267,9 +294,22 @@ export default function BuildPage() {
           </div>
           <div className="min-w-0 rounded-2xl border border-gray-800 bg-black p-6">
             <div className="mb-4 flex items-center gap-2 text-emerald-200">
-              <BadgeCheck size={20} /> Receipt preview
+              <BadgeCheck size={20} /> Receipt previews
             </div>
-            <pre className="max-w-full overflow-x-auto rounded-xl bg-gray-950 p-5 text-sm leading-6 text-gray-300"><code>{JSON.stringify(receiptPreview, null, 2)}</code></pre>
+            <div className="grid gap-4">
+              <div>
+                <div className="mb-2 text-xs font-mono uppercase tracking-[0.18em] text-emerald-300">Allowed</div>
+                <pre className="max-w-full overflow-x-auto rounded-xl bg-gray-950 p-5 text-sm leading-6 text-gray-300"><code>{JSON.stringify(allowedReceipt, null, 2)}</code></pre>
+              </div>
+              <div>
+                <div className="mb-2 text-xs font-mono uppercase tracking-[0.18em] text-red-300">Denied</div>
+                <pre className="max-w-full overflow-x-auto rounded-xl bg-gray-950 p-5 text-sm leading-6 text-gray-300"><code>{JSON.stringify(deniedReceipt, null, 2)}</code></pre>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-3 text-sm">
+              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">What is evidence_pack_id? →</Link>
+              <Link href="/security" className="text-cyan-300 hover:text-cyan-200">How are signatures verified? →</Link>
+            </div>
           </div>
         </div>
       </section>
@@ -287,11 +327,11 @@ export default function BuildPage() {
 
         <div className="grid min-w-0 gap-6 lg:grid-cols-2">
           <div className="min-w-0 rounded-2xl border border-gray-800 bg-gray-950">
-            <div className="border-b border-gray-800 px-5 py-3 font-mono text-xs uppercase tracking-[0.18em] text-gray-500">Node preview</div>
+            <div className="border-b border-gray-800 px-5 py-3 font-mono text-xs uppercase tracking-[0.18em] text-gray-500">Node example</div>
             <pre className="max-w-full overflow-x-auto p-5 text-sm leading-6 text-gray-300"><code>{nodeExample}</code></pre>
           </div>
           <div className="min-w-0 rounded-2xl border border-gray-800 bg-gray-950">
-            <div className="border-b border-gray-800 px-5 py-3 font-mono text-xs uppercase tracking-[0.18em] text-gray-500">HTTP preview</div>
+            <div className="border-b border-gray-800 px-5 py-3 font-mono text-xs uppercase tracking-[0.18em] text-gray-500">HTTP example</div>
             <pre className="max-w-full overflow-x-auto p-5 text-sm leading-6 text-gray-300"><code>{curlExample}</code></pre>
           </div>
         </div>
@@ -306,16 +346,28 @@ export default function BuildPage() {
               The runtime changes. The contract stays the same: capability before action, receipt after decision.
             </p>
           </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {integrations.map(([title, body]) => (
-              <div key={title} className="rounded-xl border border-gray-800 bg-black p-5">
-                <div className="mb-3 flex items-center gap-2 text-white">
-                  <CheckCircle2 className="text-emerald-300" size={18} />
-                  <h3 className="font-bold">{title}</h3>
-                </div>
-                <p className="text-sm leading-6 text-gray-400">{body}</p>
-              </div>
-            ))}
+          <div className="grid gap-4 md:grid-cols-3">
+            {integrationLinks.map((item) => {
+              const card = (
+                <>
+                  <div className="mb-3 flex items-center gap-2 text-white">
+                    <CheckCircle2 className="text-emerald-300" size={18} />
+                    <h3 className="font-bold">{item.title}</h3>
+                  </div>
+                  <p className="text-sm leading-6 text-gray-400">{item.body}</p>
+                  <div className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-cyan-300">Open <ArrowRight size={14} /></div>
+                </>
+              );
+              return item.href.startsWith("http") ? (
+                <a key={item.title} href={item.href} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-cyan-500">
+                  {card}
+                </a>
+              ) : (
+                <Link key={item.title} href={item.href} className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-cyan-500">
+                  {card}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
