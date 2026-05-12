@@ -14,7 +14,7 @@ const client = new SatGateAgentClient({
   adminToken: 'your-admin-token',
 });
 
-// Tokens are minted and managed automatically
+// Compatibility path: OSS gateway capability tokens are managed automatically
 const response = await client.get('/api/data');
 console.log(response.data);
 ```

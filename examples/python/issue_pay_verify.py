@@ -32,7 +32,7 @@ def main() -> int:
         )
 
         verified = satgate.verify(receipt)
-        print(verified.decision, verified.evidence_pack_id)
+        print(verified.decision, getattr(verified, "evidence_pack_id", getattr(verified, "evidencePackId", None)))
         return 0
     except SatGateAuthError as exc:
         print(f"SatGateAuthError: {exc}")

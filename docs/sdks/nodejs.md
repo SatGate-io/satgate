@@ -8,12 +8,49 @@ Official Node.js/TypeScript client for SatGate Gateway.
 npm install @satgate/sdk
 ```
 
-## Two Clients
+## Build agents with issue/pay/verify
+
+For application developers, SatGate's Stripe-like primitive is three calls:
+
+1. **Issue** a scoped capability for one task.
+2. **Pay** an upstream call with a caller-supplied max budget.
+3. **Verify** the returned receipt and Evidence Pack metadata.
+
+```typescript
+import { SatGate } from '@satgate/sdk';
+
+const satgate = new SatGate({ apiKey: process.env.SATGATE_API_KEY });
+
+const capability = await satgate.issue({
+  task: 'summarize vendor invoice',
+  agent: 'invoice-agent',
+  allow: ['POST /v1/invoices/*'],
+  budgetUsd: 0.25,
+  expiresIn: '10m',
+});
+
+const receipt = await satgate.pay({
+  upstream: 'https://api.vendor.test/v1/invoices/42',
+  capability,
+  maxUsd: 0.10,
+});
+
+const verified = await satgate.verify(receipt);
+console.log(verified.decision, verified.evidencePackId ?? verified.evidence_pack_id);
+```
+
+The public package installs today. The `issue/pay/verify` API namespace is in private beta; non-beta credentials raise `SatGateAuthError` with a docs CTA instead of returning mocked success.
+
+---
+
+## Compatibility: OSS Gateway clients
 
 | Client | For | Auth |
 |--------|-----|------|
-| `SatGateClient` | **Operators** — mint tokens, ban tokens, manage governance | `X-Admin-Token` header |
-| `SatGateAgentClient` | **AI Agents** — make API calls with automatic token & payment handling | Auto-mints tokens, handles L402 |
+| `SatGateClient` | **Operators** — lower-level capability token and governance endpoints | `X-Admin-Token` header |
+| `SatGateAgentClient` | **AI Agents** — compatibility client for existing gateway token and paid-rail flows | Auto-mints tokens, handles L402 |
+
+Use these when targeting the self-hosted OSS gateway's existing token endpoints. New Cloud examples should lead with `issue/pay/verify`.
 
 ---
 

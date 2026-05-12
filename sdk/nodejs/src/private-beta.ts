@@ -53,7 +53,15 @@ export class SatGate {
   }
 
   async issue(request: CapabilityRequest): Promise<SatGateReceipt> {
-    return this.post<SatGateReceipt>('/v1/capabilities', this.toApiPayload(request) as JsonObject);
+    try {
+      return await this.post<SatGateReceipt>('/v1/issue', this.toApiPayload(request) as JsonObject);
+    } catch (err) {
+      if (err instanceof SatGateAuthError && err.statusCode === 404) {
+        // Compatibility fallback for early private-beta clients and gateways.
+        return this.post<SatGateReceipt>('/v1/capabilities', this.toApiPayload(request) as JsonObject);
+      }
+      throw err;
+    }
   }
 
   async pay(request: PayRequest): Promise<SatGateReceipt> {

@@ -172,11 +172,22 @@ agent.run("Buy the latest stock report")
 
 ### Node.js
 ```javascript
-npm install satgate-sdk
+npm install @satgate/sdk
 
-import { SatGateClient } from 'satgate-sdk';
-const client = new SatGateClient();
-const data = await client.get('https://api.example.com/premium');
+import { SatGate } from '@satgate/sdk';
+const satgate = new SatGate({ apiKey: process.env.SATGATE_API_KEY });
+const capability = await satgate.issue({
+  task: 'fetch premium report',
+  agent: 'research-agent',
+  allow: ['GET /premium'],
+  budgetUsd: 1.00,
+});
+const receipt = await satgate.pay({
+  upstream: 'https://api.example.com/premium',
+  capability,
+  maxUsd: 0.25,
+});
+await satgate.verify(receipt);
 ```
 
 ### cURL
@@ -211,7 +222,7 @@ curl -H "Authorization: L402 <macaroon>:<preimage>" \
 - Cloud: https://cloud.satgate.io/cloud/login
 - GitHub: https://github.com/SatGate-io/satgate
 - Python SDK: https://pypi.org/project/satgate/
-- Node.js SDK: https://www.npmjs.com/package/satgate-sdk
+- Node.js SDK: https://www.npmjs.com/package/@satgate/sdk
 
 ## Contact
 - Email: contact@satgate.io

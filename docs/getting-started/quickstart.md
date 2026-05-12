@@ -2,6 +2,10 @@
 
 Get SatGate running in under 2 minutes.
 
+## Cloud developer primitive
+
+For Cloud/private-beta application code, prefer the three-call primitive: `issue` a scoped capability, `pay` upstream with a max budget, then `verify` the receipt. The local gateway quickstart below preserves the OSS token endpoints for compatibility.
+
 ## 1. Download
 
 ```bash
@@ -83,9 +87,9 @@ SatGate starts on port **8080**.
 # Public route — no auth needed
 curl http://localhost:8080/health
 
-# Mint a capability token
+# Mint a capability token through the OSS gateway compatibility endpoint
 TOKEN=$(curl -s -X POST http://localhost:8080/api/capability/mint \
-  -H "Authorization: Bearer my-admin-token" \
+  -H "X-Admin-Token: $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{}' | jq -r '.token')
 

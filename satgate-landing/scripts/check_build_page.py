@@ -12,7 +12,7 @@ required_page_strings = [
     "Build agents that can spend safely",
     "Capabilities in. Receipts out. Rails abstracted.",
     "Issue scoped capabilities",
-    "Route paid calls",
+    "Pay upstream with max budget",
     "Verify receipts",
     "satgate.issue",
     "satgate.pay",
@@ -35,7 +35,10 @@ required_page_strings = [
     "budget_exhausted",
     "Node example",
     "HTTP example",
-    "YOUR_API_KEY",
+    "SATGATE_API_KEY",
+    "https://api.satgate.io/v1/issue",
+    "https://api.satgate.io/v1/pay",
+    "https://api.satgate.io/v1/verify",
 ]
 
 forbidden_page_patterns = [
@@ -51,6 +54,8 @@ forbidden_page_patterns = [
     r"ISO 8601 duration support belongs",
     r"Open developer docs",
     r"Bearer \*\*\*",
+    r"Route paid calls",
+    r"/v1/capabilities",
 ]
 
 errors: list[str] = []
