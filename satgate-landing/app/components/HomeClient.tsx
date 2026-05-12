@@ -31,6 +31,7 @@ const LandingPage = () => {
             <Link href="/protect" className="hover:text-white transition">Live Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/mcp-gateway" className="hover:text-white transition">MCP Gateway</Link>
+            <Link href="/build" className="hover:text-white transition">Build</Link>
             <Link href="/capability-auth" className="hover:text-white transition">Capability Auth</Link>
             <Link href="/agent-control-plane" className="hover:text-white transition">Control Plane</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
@@ -80,6 +81,13 @@ const LandingPage = () => {
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               MCP Gateway
+            </Link>
+            <Link
+              href="/build"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              Build
             </Link>
             <Link
               href="/capability-auth"
@@ -179,6 +187,9 @@ const LandingPage = () => {
               <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
                 Start Free <ArrowRight size={16} />
               </a>
+              <Link href="/build" className="border border-cyan-700/50 bg-cyan-900/15 px-8 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition flex items-center gap-2 text-cyan-300">
+                Build with SatGate <ArrowRight size={16} />
+              </Link>
               <Link href="/sandbox" className="border border-purple-700/50 bg-purple-900/20 px-8 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition flex items-center gap-2 text-purple-300">
                 <Play size={16} /> See a Demo
               </Link>
@@ -724,6 +735,7 @@ const LandingPage = () => {
             <div>
               <h4 className="mb-4 font-bold text-white">Developers</h4>
               <ul className="space-y-2 text-sm text-gray-500">
+                <li><Link href="/build" className="hover:text-white transition">Build</Link></li>
                 <li><a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Documentation</a></li>
                 <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
                 <li><Link href="/mcp" className="hover:text-white transition">MCP Governance Hub</Link></li>
