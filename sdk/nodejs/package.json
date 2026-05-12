@@ -1,6 +1,6 @@
 {
   "name": "@satgate/sdk",
-  "version": "0.2.1",
+  "version": "0.3.2",
   "description": "Node.js SDK for SatGate Gateway and SatGate Cloud private-beta APIs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -46,6 +46,3 @@
     "node": ">=18.0.0"
   }
 }
-
-
-
