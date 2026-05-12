@@ -46,6 +46,59 @@ const BRAVO_RESPONSES = [
   '→ Market gap: identity-aware economic controls for autonomous agents.',
 ];
 
+const sandboxDemos = [
+  {
+    title: 'Mint Demo',
+    href: '/mint-demo',
+    icon: Key,
+    eyebrow: '1 · Issue authority',
+    body: 'Create scoped capability for an agent before it touches a tool, API, or paid resource.',
+  },
+  {
+    title: 'Capability Control Demo',
+    href: '/protect',
+    icon: Shield,
+    eyebrow: '2 · Control authority',
+    body: 'See scope, delegation, and revocation in the request path without making spend the center of the demo.',
+  },
+  {
+    title: 'Spend Control Demo',
+    href: '#spend-control-demo',
+    icon: DollarSign,
+    eyebrow: '3 · Constrain spend',
+    body: 'Run the budget-enforcement simulation and watch SatGate deny runaway agent spend before value moves.',
+  },
+  {
+    title: 'Paid-Rails Demo',
+    href: '/pay',
+    icon: Zap,
+    eyebrow: '4 · Govern rails',
+    body: 'Put paid-rail context behind policy and receipts without making L402/x402 the product center.',
+  },
+];
+
+function BudgetBar({ label, spent, limit, color }: { label: string; spent: number; limit: number; color: string }) {
+  if (limit === 0) return null;
+  const pct = Math.min((spent / limit) * 100, 100);
+  const exhausted = spent >= limit;
+  return (
+    <div className="bg-gray-800/50 border border-gray-700/50 rounded-lg p-3">
+      <div className="flex justify-between text-xs mb-1.5">
+        <span className="text-gray-400">{label}</span>
+        <span className={exhausted ? 'text-red-400 font-bold' : 'text-gray-300'}>
+          {spent}/{limit} credits {exhausted && '⛔'}
+        </span>
+      </div>
+      <div className="h-2 bg-gray-900 rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${exhausted ? 'bg-red-500' : color}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 // ── Main Page ──────────────────────────────────────────────────────────────────
 
 export default function SandboxPage() {
@@ -282,42 +335,20 @@ export default function SandboxPage() {
     }
   };
 
-  // ── Budget Bar ─────────────────────────────────────────────────
-
-  const BudgetBar = ({ label, spent, limit, color }: { label: string; spent: number; limit: number; color: string }) => {
-    if (limit === 0) return null;
-    const pct = Math.min((spent / limit) * 100, 100);
-    const exhausted = spent >= limit;
-    return (
-      <div className="bg-gray-800/50 border border-gray-700/50 rounded-lg p-3">
-        <div className="flex justify-between text-xs mb-1.5">
-          <span className="text-gray-400">{label}</span>
-          <span className={exhausted ? 'text-red-400 font-bold' : 'text-gray-300'}>
-            {spent}/{limit} credits {exhausted && '⛔'}
-          </span>
-        </div>
-        <div className="h-2 bg-gray-900 rounded-full overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-500 ${exhausted ? 'bg-red-500' : color}`}
-            style={{ width: `${pct}%` }}
-          />
-        </div>
-      </div>
-    );
-  };
-
   const webPageJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     name: 'SatGate Sandbox',
     url: 'https://satgate.io/sandbox',
-    description: 'Interactive sandbox for SatGate request-path enforcement: AI agent spend controls, scoped macaroons, kill switches, budgets, and API policy.',
+    description: 'Interactive SatGate sandbox for Mint, Capability Control, Spend Control, and Paid-Rails demos.',
     datePublished: '2026-04-12',
     dateModified: '2026-05-03',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
+      { '@type': 'Thing', name: 'SatGate demo sandbox' },
+      { '@type': 'Thing', name: 'capability control demo' },
       { '@type': 'Thing', name: 'AI agent spend control sandbox' },
-      { '@type': 'Thing', name: 'request-path economic policy' },
+      { '@type': 'Thing', name: 'paid-rail governance demo' },
       { '@type': 'Thing', name: 'macaroon capability verification' },
       { '@type': 'Thing', name: 'agent kill-switch revocation' },
       { '@type': 'Thing', name: 'runaway spend blocking simulation' },
@@ -331,15 +362,15 @@ export default function SandboxPage() {
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/sandbox',
-    description: 'Interactive sandbox for SatGate request-path enforcement: AI agent spend controls, scoped macaroons, kill switches, budgets, and API policy.',
+    description: 'Interactive SatGate sandbox for Mint, Capability Control, Spend Control, and Paid-Rails demos.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-03',
     featureList: [
-      'AI agent budget enforcement demo',
-      'Request-path economic policy decisions',
-      'Macaroon capability token verification',
-      'Agent kill-switch revocation',
-      'Runaway spend blocking simulation',
+      'Mint Demo',
+      'Capability Control Demo',
+      'Spend Control Demo',
+      'Paid-Rails Demo',
+      'Request-path policy decisions',
     ],
   };
 
@@ -360,7 +391,7 @@ export default function SandboxPage() {
       {
         '@type': 'Question',
         name: 'What does the SatGate sandbox demonstrate?',
-        acceptedAnswer: { '@type': 'Answer', text: 'The sandbox demonstrates SatGate enforcing economic policy in the request path: minting scoped credentials, verifying macaroons, revoking a rogue agent, and blocking runaway API spend when a budget is exhausted.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'The sandbox collects the SatGate demo path: Mint for scoped authority, Capability Control for scope/delegation/revocation, Spend Control for budget enforcement, and Paid-Rails for governed payment context.' },
       },
       {
         '@type': 'Question',
@@ -390,7 +421,7 @@ export default function SandboxPage() {
           <h1 className="text-lg sm:text-xl font-bold flex items-center gap-2">
             <Shield className="text-purple-400" size={24} />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
-              Spend Control Demo
+              SatGate Sandbox
             </span>
           </h1>
           <Link
@@ -402,8 +433,35 @@ export default function SandboxPage() {
         </div>
       </div>
 
-      {/* Hero */}
+      {/* Demo Hub */}
       <div className="bg-gradient-to-b from-purple-950/20 to-transparent border-b border-gray-800/50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 text-center">
+          <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-purple-300">Demo path</p>
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
+            Mint. Control. Constrain. Govern.
+          </h2>
+          <p className="mx-auto max-w-3xl text-lg leading-relaxed text-gray-400">
+            Start with scoped authority, then move through capability control, spend control, and paid-rail context. Each demo is a separate proof path.
+          </p>
+          <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4 text-left">
+            {sandboxDemos.map(({ title, href, icon: Icon, eyebrow, body }) => (
+              <Link
+                key={title}
+                href={href}
+                className="group rounded-2xl border border-gray-800 bg-gray-950/80 p-5 transition hover:border-purple-500/60 hover:bg-purple-950/20"
+              >
+                <Icon className="mb-4 text-purple-300 transition group-hover:text-cyan-300" size={28} />
+                <p className="mb-2 text-xs font-mono uppercase tracking-wide text-gray-500">{eyebrow}</p>
+                <h3 className="mb-3 text-lg font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Spend Control Demo */}
+      <div id="spend-control-demo" className="bg-gradient-to-b from-purple-950/20 to-transparent border-b border-gray-800/50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold mb-4">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400">
@@ -557,7 +615,7 @@ export default function SandboxPage() {
           <h2 className="mb-8 text-center text-2xl font-bold text-white">SatGate sandbox questions</h2>
           <div className="grid gap-4 md:grid-cols-3">
             {[
-              ['What does the SatGate sandbox demonstrate?', 'The sandbox demonstrates SatGate enforcing economic policy in the request path: minting scoped credentials, verifying macaroons, revoking a rogue agent, and blocking runaway API spend when a budget is exhausted.'],
+              ['What does the SatGate sandbox demonstrate?', 'The sandbox collects the SatGate demo path: Mint for scoped authority, Capability Control for scope/delegation/revocation, Spend Control for budget enforcement, and Paid-Rails for governed payment context.'],
               ['How does SatGate stop unauthorized agent spend?', 'SatGate checks each agent request against identity, capability-token caveats, budget, policy, and revocation state before forwarding the request upstream.'],
               ['Is the sandbox for AI agent cost control or security?', 'Both. SatGate treats spend as an enforceable security boundary, combining scoped authority, revocation, audit, and budget limits into an economic firewall for AI agents.'],
             ].map(([question, answer]) => (

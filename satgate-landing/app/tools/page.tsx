@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, BarChart3, Calculator, ClipboardList, Gauge, KeyRound, Megaphone, ShieldCheck, Wrench, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BarChart3, Calculator, ClipboardList, Gauge, KeyRound, Megaphone, ShieldCheck, Wrench, Zap } from 'lucide-react';
 import ToolLeadCaptureCta from '../components/ToolLeadCaptureCta';
 
 export const metadata = {
@@ -208,6 +208,12 @@ export default function ToolsPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+
+      <div className="mx-auto max-w-6xl px-6 pt-8">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-white">
+          <ArrowLeft size={16} /> Back to Home
+        </Link>
+      </div>
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(34,211,238,0.18),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(168,85,247,0.14),transparent_32%)]" />

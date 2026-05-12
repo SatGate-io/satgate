@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, BadgeCheck, KeyRound, Layers3, ShieldCheck, TimerReset, WalletCards } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BadgeCheck, KeyRound, Layers3, ShieldCheck, TimerReset, WalletCards } from 'lucide-react';
 
 export const metadata = {
   title: 'Capability-Based Authorization for AI Agents',
@@ -65,6 +65,12 @@ export default function CapabilityAuthPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+
+      <div className="mx-auto max-w-6xl px-6 pt-8">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-white">
+          <ArrowLeft size={16} /> Back to Home
+        </Link>
+      </div>
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(34,211,238,0.18),transparent_32%),radial-gradient(circle_at_80%_15%,rgba(16,185,129,0.14),transparent_34%)]" />

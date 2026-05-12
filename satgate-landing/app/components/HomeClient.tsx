@@ -28,10 +28,10 @@ const LandingPage = () => {
 
           {/* Desktop menu */}
           <div className="hidden xl:flex gap-6 text-sm font-medium text-gray-400">
-            <Link href="/protect" className="hover:text-white transition">Live Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/mcp-gateway" className="hover:text-white transition">MCP Gateway</Link>
             <Link href="/build" className="hover:text-white transition">Build</Link>
+            <Link href="/sandbox" className="hover:text-white transition">Sandbox</Link>
             <Link href="/capability-auth" className="hover:text-white transition">Capability Auth</Link>
             <Link href="/agent-control-plane" className="hover:text-white transition">Control Plane</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
@@ -62,13 +62,6 @@ const LandingPage = () => {
         >
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
             <Link
-              href="/protect"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
-            >
-              Live Demo
-            </Link>
-            <Link
               href="/govern"
               onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
@@ -88,6 +81,13 @@ const LandingPage = () => {
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Build
+            </Link>
+            <Link
+              href="/sandbox"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              Sandbox
             </Link>
             <Link
               href="/capability-auth"
@@ -191,7 +191,7 @@ const LandingPage = () => {
                 Build with SatGate <ArrowRight size={16} />
               </Link>
               <Link href="/sandbox" className="border border-purple-700/50 bg-purple-900/20 px-8 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition flex items-center gap-2 text-purple-300">
-                <Play size={16} /> See a Demo
+                <Play size={16} /> Open Sandbox
               </Link>
               <Link href="/agent-control-plane" className="border border-cyan-700/50 bg-cyan-900/15 px-8 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition flex items-center gap-2 text-cyan-300">
                 Agent Control Plane <ArrowRight size={16} />
@@ -220,7 +220,7 @@ const LandingPage = () => {
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <div className="text-xs text-gray-500 ml-2 font-mono">hero_demo.py - Live Demo</div>
+                <div className="text-xs text-gray-500 ml-2 font-mono">hero_demo.py - Sandbox Preview</div>
               </div>
               <video
                 autoPlay

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Bot, Cable, CheckCircle2, Download, Eye, FileJson, Gauge, GitBranch, LockKeyhole, ReceiptText, ServerCog, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bot, Cable, CheckCircle2, Download, Eye, FileJson, Gauge, GitBranch, LockKeyhole, ReceiptText, ServerCog, ShieldCheck } from 'lucide-react';
 
 const policyTemplates = [
   {
@@ -137,6 +137,12 @@ export default function McpGatewayPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+
+      <div className="mx-auto max-w-6xl px-6 pt-8">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-white">
+          <ArrowLeft size={16} /> Back to Home
+        </Link>
+      </div>
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_0%,rgba(34,211,238,0.18),transparent_32%),radial-gradient(circle_at_80%_10%,rgba(168,85,247,0.15),transparent_34%)]" />
