@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Check, Zap, ArrowRight, ChevronDown, Menu, X } from 'lucide-react';
+import { Check, ChevronDown, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -129,9 +129,6 @@ const PricingPage = () => {
 
           {/* Desktop menu */}
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
-            <Link href="/mint-demo" className="hover:text-white transition">Mint Demo</Link>
-            <Link href="/protect" className="hover:text-white transition">Control Demo</Link>
-            <Link href="/pay" className="hover:text-white transition">Charge Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/pricing" className="text-white transition">Pricing</Link>
             <Link href="/roi-calculator" className="hover:text-white transition">ROI Calculator</Link>
@@ -157,9 +154,6 @@ const PricingPage = () => {
           }`}
         >
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
-            <Link href="/mint-demo" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Mint Demo</Link>
-            <Link href="/protect" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Control Demo</Link>
-            <Link href="/pay" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Charge Demo</Link>
             <Link href="/govern" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Enterprise</Link>
             <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="block text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Pricing</Link>
             <Link href="/roi-calculator" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">ROI Calculator</Link>

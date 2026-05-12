@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
+  ArrowLeft,
   ArrowRight,
   BadgeCheck,
   Braces,
@@ -202,6 +203,12 @@ export default function BuildPage() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+
+      <div className="mx-auto max-w-6xl px-6 pt-8">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-white">
+          <ArrowLeft size={16} /> Back to Home
+        </Link>
+      </div>
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(56,189,248,0.18),transparent_34%),radial-gradient(circle_at_85%_10%,rgba(168,85,247,0.18),transparent_32%),radial-gradient(circle_at_55%_80%,rgba(16,185,129,0.10),transparent_34%)]" />
