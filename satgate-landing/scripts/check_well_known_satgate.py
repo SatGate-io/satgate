@@ -150,7 +150,7 @@ for needle in REQUIRED_DOC_STRINGS:
         errors.append(f"docs missing trust metadata string: {needle}")
 
 acceptor_text = ACCEPTOR_DOC.read_text() if ACCEPTOR_DOC.exists() else ""
-for needle in ["v0.0 draft", "verification_endpoint", "accepted_capability_formats", "trust_anchors", "rails_adapters", "not yet on the wire"]:
+for needle in ["v0.0 draft", "verification_endpoint", "accepted_capability_formats", "recognized_receipt_decisions", "emitted_receipt_decisions", "trust_anchors", "rails_adapters", "satgate-acceptor.schema.json"]:
     if needle not in acceptor_text:
         errors.append(f"acceptor draft missing required string: {needle}")
 

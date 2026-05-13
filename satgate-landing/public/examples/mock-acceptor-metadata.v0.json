@@ -14,10 +14,6 @@
     "satgate.capability.v1",
     "macaroon-bearer"
   ],
-  "accepted_receipt_decisions": [
-    "allowed",
-    "paid"
-  ],
   "trust_anchors": [
     {
       "issuer_id": "https://satgate.io",
@@ -47,12 +43,19 @@
       "marketplace listing",
       "reputation score",
       "SatGate endorsement",
-      "network-wide trust"
+      "network-wide trust",
+      "ranking",
+      "certification"
     ]
   },
   "emitted_receipt_decisions": [
     "allowed",
     "denied",
+    "paid"
+  ],
+  "schema_url": "https://satgate.io/.well-known/satgate-acceptor.schema.json",
+  "recognized_receipt_decisions": [
+    "allowed",
     "paid"
   ]
 }

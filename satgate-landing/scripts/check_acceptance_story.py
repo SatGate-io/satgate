@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -14,6 +15,7 @@ ACCEPTOR_DOC = REPO / "docs" / "reference" / "acceptor.md"
 DOC_INDEX = REPO / "docs" / "index.md"
 SITEMAP = ROOT / "app" / "sitemap.ts"
 BUILD = ROOT / "app" / "build" / "page.tsx"
+SCHEMA_ROUTE = ROOT / "app" / ".well-known" / "satgate-acceptor.schema.json" / "route.ts"
 MOCK_METADATA = ROOT / "public" / "examples" / "mock-acceptor-metadata.v0.json"
 MOCK_RECEIPT = ROOT / "public" / "examples" / "mock-accepted-satgate-receipt.v1.json"
 
@@ -22,6 +24,8 @@ errors: list[str] = []
 for path, label in [
     (PAGE, "public acceptance page"),
     (DOC, "acceptance docs page"),
+    (ACCEPTOR_DOC, "acceptor metadata draft"),
+    (SCHEMA_ROUTE, "acceptor schema route"),
     (MOCK_METADATA, "mock acceptor metadata"),
     (MOCK_RECEIPT, "mock accepted receipt"),
 ]:
@@ -30,7 +34,9 @@ for path, label in [
 
 page_text = PAGE.read_text() if PAGE.exists() else ""
 doc_text = DOC.read_text() if DOC.exists() else ""
-combined = page_text + "\n" + doc_text
+acceptor_doc_text = ACCEPTOR_DOC.read_text() if ACCEPTOR_DOC.exists() else ""
+schema_text = SCHEMA_ROUTE.read_text() if SCHEMA_ROUTE.exists() else ""
+combined = page_text + "\n" + doc_text + "\n" + acceptor_doc_text + "\n" + schema_text
 
 required_strings = [
     "Accepts SatGate capabilities",
@@ -49,13 +55,26 @@ required_strings = [
     "receipt_id",
     "evidence_pack_id",
     "acceptor_id",
+    "recognized_receipt_decisions",
     "emitted_receipt_decisions",
+    "satgate-acceptor.schema.json",
+    "accepted_for_mock",
+    "provisional",
+    "revoked",
+    "deprecated",
+    "issuer-side authority lifecycle primitives",
+    "issuers can **support** rails",
+    "acceptors **accept** rails",
     "decision_reason",
     "policy_version",
 ]
 for needle in required_strings:
     if needle not in combined:
         errors.append(f"acceptance story missing required string: {needle}")
+
+for stale in ["accepted_receipt_decisions", "allowed, denied, paid, delegated, or revoked"]:
+    if stale in combined:
+        errors.append(f"stale ambiguous acceptor field remains: {stale}")
 
 # These are permitted only inside the explicit forbidden-copy section.
 for overclaim in [
@@ -79,22 +98,50 @@ if ACCEPTOR_DOC.exists() and "accept-satgate-capabilities.md" not in ACCEPTOR_DO
 if BUILD.exists() and "/accept-satgate-capabilities" not in BUILD.read_text():
     errors.append("/build does not link upstream acceptance story")
 
+schema_match = re.search(r"const schema = (\{.*?\}) as const;", schema_text, re.S) if schema_text else None
+if not schema_match:
+    errors.append("acceptor schema route does not define const schema")
+else:
+    # Avoid TypeScript parsing; assert the closed enum strings we care about are present.
+    for enum_value in [
+        "satgate.acceptor_metadata.v0",
+        "internal_mock_only",
+        "active",
+        "accepted",
+        "provisional",
+        "revoked",
+        "deprecated",
+        "accepted_for_mock",
+        "recognized_receipt_decisions",
+        "emitted_receipt_decisions",
+        "capability verification and receipt emission",
+    ]:
+        if enum_value not in schema_text:
+            errors.append(f"acceptor schema missing enum/field: {enum_value}")
+
 if MOCK_METADATA.exists():
     metadata = json.loads(MOCK_METADATA.read_text())
+    if metadata.get("schema_url") != "https://satgate.io/.well-known/satgate-acceptor.schema.json":
+        errors.append("mock acceptor metadata must point schema_url at v0 acceptor schema")
     if metadata.get("status") != "internal_mock_only":
         errors.append("mock acceptor metadata must be labeled internal_mock_only")
     if metadata.get("roles") != ["acceptor"]:
         errors.append("mock acceptor metadata must use roles: ['acceptor']")
     if "trust_anchors" not in metadata:
         errors.append("mock acceptor metadata missing trust_anchors")
+    for anchor in metadata.get("trust_anchors", []):
+        if anchor.get("status") not in {"accepted", "provisional", "revoked", "deprecated", "accepted_for_mock"}:
+            errors.append(f"trust anchor has undefined status enum: {anchor.get('status')}")
     claims = metadata.get("claims", {})
     if claims.get("acceptance_means") != "capability verification and receipt emission":
         errors.append("mock acceptor metadata must define honest acceptance_means")
-    for forbidden in ["marketplace listing", "reputation score", "SatGate endorsement", "network-wide trust"]:
+    for forbidden in ["marketplace listing", "reputation score", "SatGate endorsement", "network-wide trust", "ranking", "certification"]:
         if forbidden not in claims.get("acceptance_does_not_mean", []):
             errors.append(f"mock acceptor metadata missing negative claim: {forbidden}")
-    if "denied" in metadata.get("accepted_receipt_decisions", []):
-        errors.append("mock acceptor metadata must not treat denied as accepted evidence for entry")
+    if "accepted_receipt_decisions" in metadata:
+        errors.append("mock acceptor metadata must not use ambiguous accepted_receipt_decisions")
+    if "denied" in metadata.get("recognized_receipt_decisions", []):
+        errors.append("mock acceptor metadata must not treat denied as recognized evidence for entry")
     if "denied" not in metadata.get("emitted_receipt_decisions", []):
         errors.append("mock acceptor metadata should list denied under emitted_receipt_decisions")
 
