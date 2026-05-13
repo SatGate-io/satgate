@@ -176,7 +176,7 @@ export default function CapabilityAuthPage() {
           {[
             ['/mcp-gateway', 'MCP gateway', 'Apply capabilities to tool calls.'],
             ['/agent-capability-tokens', 'Agent capability tokens', 'See how scoped authority is encoded.'],
-            ['/govern', 'AI agent governance', 'Observe, Control, and Charge agent actions.'],
+            ['/govern', 'AI agent governance', 'Observe, Control, and Prove agent actions.'],
             ['/blog/how-to-add-budget-limits-to-openai-api-calls', 'Budget limits', 'Attach spend policy to access.'],
           ].map(([href, title, body]) => (
             <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 hover:border-emerald-700 transition">

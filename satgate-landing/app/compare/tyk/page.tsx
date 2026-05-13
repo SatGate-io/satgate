@@ -18,7 +18,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate vs Tyk - API Management vs Agent Economic Governance',
-    description: 'Compare SatGate and Tyk for API management, AI agent spend governance, MCP tools, scoped authority, revocation, and robot payments.',
+    description: 'Compare SatGate and Tyk for API management, AI agent spend governance, MCP tools, scoped authority, revocation, and paid-rail governance.',
     url: 'https://satgate.io/compare/tyk',
     type: 'article',
   },

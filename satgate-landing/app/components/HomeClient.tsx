@@ -163,7 +163,7 @@ const LandingPage = () => {
           {/* Left: Copy */}
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-6">
-              <Zap size={12} /> Economic Firewall for AI Agents
+              <Zap size={12} /> Economic Firewall for Agentic API Access
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
               Govern agent authority<br/>
@@ -172,10 +172,10 @@ const LandingPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              SatGate checks scoped authority, budgets, delegation, MCP tool access, and paid-rail policy before execution — then exports Evidence Packs proving every decision.
+              SatGate gives agents bounded economic authority so humans, platforms, and upstream APIs can trust what they consume, spend, and prove.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
-              Authority before execution. Evidence after every approval, denial, spend event, delegation, and revocation.
+              Humans and platforms set policy. Agents consume approved primitives. Upstreams get receipt-backed proof.
             </p>
             <div className="flex flex-wrap gap-4">
               <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
@@ -405,10 +405,10 @@ const LandingPage = () => {
                 Govern external agent access without making payment proof equal authorization proof.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
-                <li>✓ Let approved agents pay or access without long-lived shared secrets</li>
+                <li>✓ Let approved agents consume APIs without long-lived shared secrets</li>
                 <li>✓ Preserve authority evidence above x402, L402, API-key, or enterprise billing rails</li>
                 <li>✓ Per-request pricing and policy before upstream execution</li>
-                <li>✓ Autonomous agents discover, pay, and leave an Evidence Pack</li>
+                <li>✓ Approved agents consume scoped access and leave an Evidence Pack</li>
               </ul>
             </div>
           </div>
@@ -676,9 +676,9 @@ const LandingPage = () => {
           <h2 className="mb-8 text-3xl font-bold text-white">Agent governance questions</h2>
           <div className="space-y-6">
             {[
-              ['What is SatGate?', 'SatGate is an economic control plane for internal enterprise agents. It sits in the request path to scope authority, enforce policy and budgets, prove revocation, and preserve evidence across internal APIs and paid external calls.'],
+              ['What is SatGate?', 'SatGate is the Economic Firewall for agentic API access. Humans and platforms use it to delegate bounded economic authority to agents, enforce policy and budgets, prove revocation, and preserve evidence across APIs, MCP tools, and paid external calls.'],
               ['How does SatGate govern AI agents?', 'SatGate applies scoped authority, per-agent policy, revocation, and budgets before each request reaches an API or MCP tool, so unauthorized actions and expensive calls can be blocked before they happen.'],
-              ['What are Observe, Control, and Charge?', 'Observe tracks agent traffic and cost without blocking. Control enforces budgets and scoped policy for internal agents. Charge preserves authorization evidence around external paid access across L402, x402, API-key, or enterprise billing rails.'],
+              ['How does SatGate give agents bounded economic authority?', 'Humans and platforms define policy, budgets, scope, and delegation depth. Agents consume approved API and MCP primitives through SatGate, and every approval, denial, spend event, delegation, and revocation leaves receipt-backed proof.'],
             ].map(([question, answer]) => (
               <div key={question} className="border-t border-gray-800 pt-6 first:border-t-0 first:pt-0">
                 <h3 className="mb-2 text-xl font-bold text-white">{question}</h3>
@@ -713,8 +713,8 @@ const LandingPage = () => {
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="max-w-xs text-sm text-gray-500">Govern agent authority before execution.</p>
-              <p className="text-gray-600 text-xs mt-3">Non-custodial. We never hold your keys.</p>
+              <p className="max-w-xs text-sm text-gray-500">Economic Firewall for agentic API access: bounded authority, receipts, and proof.</p>
+              <p className="text-gray-600 text-xs mt-3">Humans and platforms buy. Agents consume bounded primitives.</p>
             </div>
             <div>
               <h4 className="mb-4 font-bold text-white">Start here</h4>

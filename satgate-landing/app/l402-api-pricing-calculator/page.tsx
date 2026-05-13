@@ -114,7 +114,7 @@ export default function L402ApiPricingCalculatorPage() {
         name: 'What is L402 API pricing?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'L402 API pricing is per-request API pricing where access is unlocked through an HTTP 402 challenge and Lightning payment proof. It lets autonomous agents pay for protected API resources at request time.',
+          text: 'L402 API pricing is per-request API pricing where access is unlocked through an HTTP 402 challenge and Lightning payment proof. SatGate keeps that access tied to delegated authority, budget, scope, and receipts at request time.',
         },
       },
       {
@@ -245,7 +245,7 @@ export default function L402ApiPricingCalculatorPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is L402 API pricing?</h3>
               <p className="text-gray-400 leading-relaxed">
-                L402 API pricing is per-request API pricing where access is unlocked through an HTTP 402 challenge and Lightning payment proof. It lets autonomous agents pay for protected API resources at request time.
+                L402 API pricing is per-request API pricing where access is unlocked through an HTTP 402 challenge and Lightning payment proof. SatGate keeps that access tied to delegated authority, budget, scope, and receipts at request time.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

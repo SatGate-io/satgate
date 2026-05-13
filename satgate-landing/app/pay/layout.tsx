@@ -1,32 +1,32 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "L402 Agent Payment Demo | SatGate paid-rail governance",
+  title: "L402 Paid-Rail Governance Demo | SatGate",
   alternates: { canonical: "https://satgate.io/pay" },
   description:
-    "See SatGate paid-rail governance unlock API access with paid-rail context. Price paid-agent requests, verify payment proof, and settle API revenue before upstream access.",
+    "See SatGate govern delegated paid API access with paid-rail context, payment proof, scoped authority, receipts, and Evidence Packs before upstream access.",
   keywords: [
-    "L402 agent payment demo",
+    "L402 paid-rail governance demo",
     "SatGate paid-rail governance",
-    "paid agent payments",
+    "delegated paid API access",
     "AI agent API monetization",
     "paid-rail context",
     "HTTP 402 API payments",
     "per-request API pricing",
-    "economic firewall charge",
+    "economic firewall proof",
   ],
   openGraph: {
-    title: "L402 Agent Payment Demo | SatGate paid-rail governance",
+    title: "L402 Paid-Rail Governance Demo | SatGate",
     description:
-      "Watch AI agents pay for API access with paid-rail context before protected requests are forwarded upstream.",
+      "Watch delegated paid API access pass through policy, budget, payment proof, and receipt checks before protected requests are forwarded upstream.",
     url: "https://satgate.io/pay",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "L402 Agent Payment Demo | SatGate paid-rail governance",
+    title: "L402 Paid-Rail Governance Demo | SatGate",
     description:
-      "Per-request paid-agent payments for APIs using paid-rail context.",
+      "Per-request paid API access with scoped authority, paid-rail context, and proof.",
   },
 };
 

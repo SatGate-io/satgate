@@ -4,7 +4,7 @@ import GovernClient from "../components/GovernClient";
 export const metadata: Metadata = {
   title: "AI Agent Governance: Govern, Enforce, Prove",
   description:
-    "Govern enterprise AI agents with SatGate: scope authority, enforce request-path policy, and prove every mint, delegation, spend, denial, and revocation.",
+    "Give agents bounded economic authority with scoped policy, request-path enforcement, and proof humans and upstream APIs can trust.",
   alternates: {
     canonical: "https://satgate.io/govern",
   },
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "AI Agent Governance: Govern, Enforce, Prove",
     description:
-      "Govern enterprise AI agents with scoped authority, request-path enforcement, and Evidence Pack proof for every agent lifecycle.",
+      "Give enterprise agents bounded economic authority with request-path enforcement and Evidence Pack proof.",
     url: "https://satgate.io/govern",
     type: "website",
   },
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "AI Agent Governance: Govern, Enforce, Prove",
     description:
-      "Scope authority, enforce policy, and export Policy-to-Proof evidence for enterprise AI agents with SatGate.",
+      "Delegate bounded authority, enforce policy, and export Policy-to-Proof evidence for enterprise AI agents with SatGate.",
   },
 };
 
@@ -67,7 +67,7 @@ const faqSchema = {
       name: "What is an economic control plane for AI agents?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "An economic control plane for AI agents sits in the request path and applies scopes, budgets, delegation rules, revocation, and audit before an agent reaches an upstream API, model, or MCP tool. It turns agent activity into governed decisions with evidence.",
+        text: "An economic firewall for AI agents sits in the request path and applies scopes, budgets, delegation rules, revocation, and audit before an agent reaches an upstream API, model, or MCP tool. Humans and platforms set authority; agents consume bounded primitives; upstreams receive evidence.",
       },
     },
     {

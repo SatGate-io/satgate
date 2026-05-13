@@ -129,7 +129,7 @@ export default function IntegrationsPage() {
         name: 'Do teams need to replace Cursor, Claude, or OpenClaw to use SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. SatGate is designed to sit in the request path around existing agent tools, APIs, and MCP servers, adding Observe, Control, and Charge modes without replacing the client workflow.',
+          text: 'No. SatGate is designed to sit in the request path around existing agent tools, APIs, and MCP servers, adding Observe, Control, and Prove modes without replacing the client workflow.',
         },
       },
     ],
@@ -189,7 +189,7 @@ export default function IntegrationsPage() {
               ],
               [
                 'Do teams need to replace Cursor, Claude, or OpenClaw to use SatGate?',
-                'No. SatGate is designed to sit in the request path around existing agent tools, APIs, and MCP servers, adding Observe, Control, and Charge modes without replacing the client workflow.',
+                'No. SatGate is designed to sit in the request path around existing agent tools, APIs, and MCP servers, adding Observe, Control, and Prove modes without replacing the client workflow.',
               ],
             ].map(([question, answer]) => (
               <div key={question}>

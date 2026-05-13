@@ -27,7 +27,7 @@ export const metadata = {
 
 const rows: Array<[string, string, string]> = [
   ['Primary job', 'Economic control plane for AI agents', 'Production GenAI stack / AI gateway / observability / guardrails'],
-  ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped access, audit, robot payments', 'AI gateway, observability, guardrails, prompt management, governance, MCP access centralization'],
+  ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped access, audit, paid-rail governance', 'AI gateway, observability, guardrails, prompt management, governance, MCP access centralization'],
   ['Request-path hard budget enforcement', 'Yes', 'Partial or adjacent, depending on gateway limits and usage policy'],
   ['MCP tool budget enforcement', 'Yes', 'Not the primary economic-control focus'],
   ['Per-tool cost attribution beyond LLM calls', 'Yes', 'Primarily LLM/app traffic or gateway telemetry'],
@@ -156,7 +156,7 @@ export default function ComparePortkeyPage() {
             {([
               ['Hard agent budget enforcement', true, 'Policy decisions before expensive agent/API activity executes.'],
               ['MCP tool cost policy', true, 'Prices, limits, risk tiers, and audit evidence per tool call.'],
-              ['L402 robot payments', true, 'Request-time paid-rail context for external agent/API access.'],
+              ['L402 paid-rail governance', true, 'Request-time paid-rail context for external agent/API access.'],
               ['Broad AI gateway/observability suite', false, 'This is where Portkey may be the better fit; SatGate governs the economics around that layer.'],
             ] as Array<[string, boolean, string]>).map(([label, yes, body]) => (
               <div key={label} className="rounded-xl border border-gray-800 bg-black p-5">

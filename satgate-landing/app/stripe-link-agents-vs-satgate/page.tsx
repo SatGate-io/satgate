@@ -17,7 +17,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Stripe Link for Agents vs SatGate',
-    description: 'Stripe Link helps agents pay. SatGate controls what agents may access, spend, meter, delegate, and monetize before upstream API calls execute.',
+    description: 'Stripe Link can provide payment credentials and approval flows. SatGate controls what agents may access, spend, meter, delegate, and monetize before upstream API calls execute.',
     url: 'https://satgate.io/stripe-link-agents-vs-satgate',
     type: 'article',
   },
@@ -29,7 +29,7 @@ export const metadata = {
 };
 
 const comparison = [
-  ['Primary job', 'Give agents payment credentials and approval flows', 'Govern agent/API economic activity in the request path'],
+  ['Primary job', 'Provide payment credentials and approval flows', 'Govern agent/API economic activity in the request path'],
   ['Best fit', 'Purchases on merchant sites and payment-token flows', 'APIs, models, MCP tools, delegated agents, budgets, and monetization'],
   ['Control point', 'Wallet / credential issuance', 'Before upstream API, model, or tool access'],
   ['Budget enforcement', 'User approval and future granular controls', 'Per-agent, route, tool, tenant, workflow, and time-window budgets'],
@@ -58,7 +58,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
       {
         '@type': 'Question',
         name: 'Is Stripe Link for Agents a competitor to SatGate?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Stripe Link for Agents and SatGate operate at different layers. Link gives agents payment credentials and approval flows. SatGate governs request-path access, budgets, metering, revocation, audit, and API monetization.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'Stripe Link for Agents and SatGate operate at different layers. Link provides payment credentials and approval flows. SatGate governs request-path access, budgets, metering, revocation, audit, and API monetization.' },
       },
       {
         '@type': 'Question',
@@ -103,7 +103,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
             Stripe Link for Agents vs SatGate
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-8">
-            Stripe Link helps agents pay. SatGate controls whether agents are allowed to access, spend, meter, delegate, and monetize before upstream API calls execute.
+            Stripe Link can provide payment credentials and approval flows. SatGate controls whether agents are allowed to access, spend, meter, delegate, and monetize before upstream API calls execute.
           </p>
           <p className="text-2xl md:text-3xl font-bold text-white max-w-4xl mb-10">
             Wallets authorize payment. Economic firewalls authorize behavior.
@@ -124,7 +124,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
           <CreditCard className="text-yellow-300 mb-5" size={34} />
           <h2 className="text-2xl font-bold text-white mb-4">What Link for Agents is good at</h2>
           <p className="text-gray-300 leading-relaxed mb-5">
-            Link for Agents is a wallet and payment-credential layer. It gives an agent a way to request approval, use one-time cards or shared payment tokens, and complete purchases without exposing the user's underlying payment credentials.
+            Link for Agents is a wallet and payment-credential layer. It gives an agent a way to request approval, use one-time cards or shared payment tokens, and complete purchases without exposing the user&apos;s underlying payment credentials.
           </p>
           <ul className="space-y-3 text-gray-300">
             {['Agent purchase approval', 'One-time-use payment credentials', 'Shared payment-token flows', 'Purchase history and notifications'].map((item) => (
@@ -206,7 +206,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
         <h2 className="mb-8 text-3xl font-bold text-white">Stripe Link for Agents and SatGate questions</h2>
         <div className="grid md:grid-cols-2 gap-5">
           {[
-            ['Is Stripe Link for Agents a competitor to SatGate?', 'Stripe Link for Agents and SatGate operate at different layers. Link gives agents payment credentials and approval flows. SatGate governs request-path access, budgets, metering, revocation, audit, and API monetization.'],
+            ['Is Stripe Link for Agents a competitor to SatGate?', 'Stripe Link for Agents and SatGate operate at different layers. Link provides payment credentials and approval flows. SatGate governs request-path access, budgets, metering, revocation, audit, and API monetization.'],
             ['What is the difference between an agent wallet and an economic firewall?', 'An agent wallet authorizes payment. An economic firewall authorizes behavior: whether an agent may access an API, spend budget, call an MCP tool, delegate authority, or unlock paid access.'],
             ['Does SatGate paid-rail governance use Stripe shared payment tokens?', 'No. SatGate paid-rail governance is paid-rail context-native API monetization. Stripe shared payment tokens are a separate payment-credential flow.'],
             ['Can companies need both Link and SatGate?', 'Yes. A wallet can help an agent pay at checkout. SatGate helps API providers and enterprises control what agents can access, meter usage, enforce budgets, and charge for API or MCP activity.'],
@@ -223,7 +223,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-yellow-950/20 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">Control agent economics before payment becomes risk</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            SatGate gives API teams the request-path layer for Observe, Control, and Charge: meter every agent call, enforce budgets, revoke authority, and monetize with L402 when APIs expose paid-rail access for paid agents.
+            SatGate gives API teams the request-path Economic Firewall: meter every agent call, enforce budgets, revoke authority, and monetize with L402 when APIs expose paid-rail access for delegated agents.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">

@@ -3,12 +3,12 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "L402 Protocol Explained: HTTP 402 for Machine API Payments",
-  description: "L402 combines HTTP 402, paid-rail context, and macaroon tokens so AI agents can pay for API access in real time.",
+  description: "L402 combines HTTP 402, paid-rail context, and macaroon tokens so delegated agents can present payment proof for API access in real time.",
   alternates: { canonical: 'https://satgate.io/blog/l402-protocol-explained' },
   keywords: ['L402 protocol explained', 'L402 protocol', 'HTTP 402 Payment Required', 'Lightning API payments', 'machine-to-machine payments', 'L402 macaroons', 'API micropayments'],
   openGraph: {
     title: 'L402 Protocol Explained: HTTP 402 for Machine API Payments',
-    description: 'L402 combines HTTP 402, Lightning invoices, and macaroon tokens so AI agents can pay for API access in real time.',
+    description: 'L402 combines HTTP 402, Lightning invoices, and macaroon tokens so delegated agents can present payment proof for API access in real time.',
     url: 'https://satgate.io/blog/l402-protocol-explained',
     type: 'article',
     publishedTime: '2026-04-02T00:00:00Z',
@@ -25,7 +25,7 @@ export default function L402ProtocolExplainedBlogPage() {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
     headline: 'L402 Protocol Explained: How HTTP 402 Enables Machine-Native API Payments',
-    description: 'L402 combines HTTP 402, paid-rail context, and macaroon tokens so AI agents can pay for API access in real time.',
+    description: 'L402 combines HTTP 402, paid-rail context, and macaroon tokens so delegated agents can present payment proof for API access in real time.',
     url: 'https://satgate.io/blog/l402-protocol-explained',
     datePublished: '2026-04-02',
     dateModified: '2026-05-04',
@@ -48,7 +48,7 @@ export default function L402ProtocolExplainedBlogPage() {
         name: 'What is the L402 protocol?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'L402 is a machine-native API payment protocol that combines HTTP 402 Payment Required, Lightning invoices, and macaroon tokens so software agents can pay for API access without a human signup or credit-card flow.',
+          text: 'L402 is a machine-native API payment protocol that combines HTTP 402 Payment Required, Lightning invoices, and macaroon tokens so delegated software can present payment proof for API access without a per-request human checkout flow.',
         },
       },
       {
@@ -132,7 +132,7 @@ export default function L402ProtocolExplainedBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">3. Macaroon tokens</strong> — Capability-based bearer tokens that carry cryptographically enforced constraints (budgets, expiration, scopes). Once you pay a Lightning invoice, you receive a macaroon that proves payment and grants access.
+            <strong className="text-white">3. Macaroon tokens</strong> — Capability-based bearer tokens that carry cryptographically enforced constraints (budgets, expiration, scopes). Once delegated payment proof is presented, the client receives a macaroon that proves payment and grants access.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -164,7 +164,7 @@ Content-Type: application/json
   "description": "Translation API - 1 request"
 }
 
-Step 3: Agent pays the Lightning invoice (~200ms)
+Step 3: Delegated client presents Lightning payment proof (~200ms)
 ─────────────────────────────────────────────────
 Agent's Lightning wallet pays the invoice automatically.
 Payment settles in milliseconds. Agent receives preimage
@@ -306,13 +306,13 @@ budget_id = "budget-xyz-789"
           <h3 className="text-xl font-bold text-white mt-8 mb-3">2. Agent-to-Agent Commerce</h3>
 
           <p className="text-gray-300 leading-relaxed">
-            In multi-agent systems, agents regularly need services from other agents: a research agent buys data from a scraping agent, a coding agent pays for test execution from a CI agent. L402 makes this frictionless — the calling agent discovers the service, pays the Lightning invoice, and gets access. No human negotiates the contract. No platform takes a 30% cut.
+            In multi-agent systems, agents regularly need services from other tools or APIs. A research workflow may need paid data; a coding workflow may need paid test execution. L402 can make the proof flow request-native, while SatGate keeps human or platform authority, scope, and budget explicit.
           </p>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">3. MCP Tool Access and Monetization</h3>
 
           <p className="text-gray-300 leading-relaxed">
-            The Model Context Protocol (MCP) lets AI agents discover and use tools dynamically. L402 adds the missing economic layer — tool providers can charge per invocation, and agents can pay instantly. Note that in SatGate&apos;s architecture, MCP tool access uses enterprise budget enforcement via Redis and PostgreSQL for fiat-based billing, while L402 operates as a per-payment protocol on the HTTP gateway layer. The two complement each other: L402 for permissionless micropayments, enterprise budgets for organizational cost control.
+            The Model Context Protocol (MCP) lets AI agents discover and use tools dynamically. L402 adds the missing economic layer — tool providers can charge per invocation, and delegated clients can present payment proof instantly. Note that in SatGate&apos;s architecture, MCP tool access uses enterprise budget enforcement via Redis and PostgreSQL for fiat-based billing, while L402 operates as a per-payment protocol on the HTTP gateway layer. The two complement each other: L402 for permissionless micropayments, enterprise budgets for organizational cost control.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Implementing L402 with SatGate</h2>
@@ -371,7 +371,7 @@ routes:
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Monetization becomes instant.</strong> You deploy an API, set a price in satoshis, and agents start paying you immediately. Revenue doesn&apos;t wait for monthly billing cycles — it arrives with every request. A solo developer with a useful model can earn money from their first agent customer within minutes of deployment.
+            <strong className="text-white">Monetization becomes instant.</strong> You deploy an API, set a price in satoshis, and delegated clients can present proof immediately. Revenue does not wait for monthly billing cycles — it arrives with approved requests. A solo developer with a useful model can earn money from governed agent consumption within minutes of deployment.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -389,7 +389,7 @@ routes:
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">For API providers:</strong> Start with one endpoint. Set a price. Deploy SatGate with the <code className="text-green-300 bg-black/50 px-1 rounded">l402</code> policy and see what happens when agents can pay for your API without signing up.
+            <strong className="text-white">For API providers:</strong> Start with one endpoint. Set a price. Deploy SatGate with the <code className="text-green-300 bg-black/50 px-1 rounded">l402</code> policy and see what happens when delegated clients can present payment proof without a per-request signup flow.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -405,8 +405,8 @@ routes:
             <h2 className="mb-6 text-2xl font-bold text-white">L402 protocol questions</h2>
             <div className="space-y-5">
               {[
-                ['What is the L402 protocol?', 'L402 is a machine-native API payment protocol that combines HTTP 402 Payment Required, Lightning invoices, and macaroon tokens so software agents can pay for API access without a human signup or credit-card flow.'],
-                ['How does an AI agent use L402 to pay for an API?', 'The agent requests a protected API, receives a 402 response with a Lightning invoice and macaroon, pays the invoice, then retries with Authorization: L402 <macaroon>:<preimage> as proof of payment.'],
+                ['What is the L402 protocol?', 'L402 is a machine-native API payment protocol that combines HTTP 402 Payment Required, Lightning invoices, and macaroon tokens so delegated software can present payment proof for API access without a per-request human checkout flow.'],
+                ['How does a delegated agent use L402 for paid API access?', 'The delegated client requests a protected API, receives a 402 response with a Lightning invoice and macaroon, presents proof, then retries with Authorization: L402 <macaroon>:<preimage> as proof of payment.'],
                 ['Is L402 the same as enterprise budget enforcement?', 'No. L402 is per-request Lightning payment for external API monetization. Enterprise budget enforcement controls internal agent spend with policies, caps, revocation, and audit before upstream requests execute.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">

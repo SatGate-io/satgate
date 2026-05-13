@@ -112,7 +112,7 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
           <h1 className="text-4xl font-bold mb-4">HTTP 402 Payment Required: Meaning, Use Cases, and AI Agent Payments</h1>
           <div className="mb-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Quick answer</p>
-            <p className="text-gray-300">HTTP 402 means payment is required before access. For AI agents, the practical version is L402: an API returns a payment challenge, the agent pays over Lightning, and the gateway enforces budget before serving the request.</p>
+            <p className="text-gray-300">HTTP 402 means payment is required before access. For AI agents, the practical version is L402: an API returns a payment challenge, delegated payment proof is presented, and the gateway enforces budget before serving the request.</p>
           </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
@@ -192,7 +192,7 @@ Content-Type: application/json
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">How is L402 different from ordinary HTTP 402?</h3>
                 <p className="text-gray-300 leading-relaxed mb-0">
-                  HTTP 402 is the status code. L402 is the practical protocol pattern: HTTP 402 carries a Lightning invoice and macaroon capability token so agents can pay, receive proof, and access the API under explicit constraints.
+                  HTTP 402 is the status code. L402 is the practical protocol pattern: HTTP 402 carries a Lightning invoice and macaroon capability token so delegated clients can present payment proof and access the API under explicit constraints.
                 </p>
               </div>
               <div>
@@ -247,7 +247,7 @@ Content-Type: application/json
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">How 402 enables it:</strong> An agent calls your API. Your gateway returns 402 with a Lightning invoice for $0.002. The agent pays, receives a macaroon proof, and replays the request with the proof attached. Total time: under 500 milliseconds. The API earned revenue without ever knowing who the caller was.
+            <strong className="text-white">How 402 enables it:</strong> An agent calls your API. Your gateway returns 402 with a Lightning invoice for $0.002. A delegated client presents payment proof, receives a macaroon proof, and replays the request with the proof attached. Total time: under 500 milliseconds. The API earned revenue without ever knowing who the caller was.
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
@@ -255,7 +255,7 @@ Content-Type: application/json
 1. GET /api/translate?text=hello&target=es
    → 402 Payment Required (invoice: 10 sats)
 
-2. Agent pays Lightning invoice (200ms)
+2. Delegated client presents Lightning payment proof (200ms)
    → Receives payment preimage
 
 3. GET /api/translate?text=hello&target=es
@@ -350,7 +350,7 @@ Parent Agent ($50 macaroon)
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">How 402 enables it:</strong> Your API receives form submissions. Each submission requires a 1-sat payment (roughly $0.001). A real user&apos;s agent pays it without thinking. A spammer sending 100,000 submissions faces a $100 bill. The economics filter spam more effectively than CAPTCHAs, and they work for machine clients that can&apos;t solve CAPTCHAs anyway.
+            <strong className="text-white">How 402 enables it:</strong> Your API receives form submissions. Each submission requires a 1-sat payment (roughly $0.001). A real user&apos;s delegated client presents proof within policy. A spammer sending 100,000 submissions faces a $100 bill. The economics filter spam more effectively than CAPTCHAs, and they work for machine clients that can&apos;t solve CAPTCHAs anyway.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -469,7 +469,7 @@ Parent Agent ($50 macaroon)
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            HTTP 402 was reserved for future use in 1997. The future is here, and it looks like AI agents paying for API calls with paid-rail context, governed by macaroon tokens, settled in milliseconds. The dormant status code just woke up.
+            HTTP 402 was reserved for future use in 1997. The future is here, and it looks like delegated agents consuming paid API calls with paid-rail context, governed by macaroon tokens, settled in milliseconds. The dormant status code just woke up.
           </p>
 
           <div className="my-10 rounded-2xl border border-yellow-900/60 bg-yellow-950/20 p-6">

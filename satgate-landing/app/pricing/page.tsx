@@ -45,14 +45,14 @@ const PricingPage = () => {
     '@type': 'WebPage',
     name: 'SatGate Pricing',
     url: 'https://satgate.io/pricing',
-    description: 'Pricing for SatGate Observe, Control, and Charge modes for AI agent economic governance.',
+    description: 'Pricing for bounded agent authority: Observe audits, request-path budget enforcement, MCP tool controls, receipts, and Evidence Pack proof.',
     datePublished: '2026-04-27',
     dateModified: '2026-05-03',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'economic control plane for AI agents' },
       { '@type': 'Thing', name: 'AI agent budget enforcement' },
-      { '@type': 'Thing', name: 'SatGate Observe Control Charge' },
+      { '@type': 'Thing', name: 'SatGate Economic Firewall' },
       { '@type': 'Thing', name: 'request-path spend governance' },
       { '@type': 'Thing', name: 'rail-neutral paid-rail governance' },
     ],
@@ -82,7 +82,7 @@ const PricingPage = () => {
     '@type': 'OfferCatalog',
     name: 'SatGate Pricing',
     url: 'https://satgate.io/pricing',
-    description: 'Pricing for SatGate Observe, Control, and Charge modes for AI agent economic governance.',
+    description: 'Pricing for bounded agent authority: Observe audits, request-path budget enforcement, MCP tool controls, receipts, and Evidence Pack proof.',
     dateModified: '2026-05-03',
     itemListElement: [
       {
@@ -167,13 +167,13 @@ const PricingPage = () => {
       <header className="pt-32 pb-10 px-6 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-            Stop Paying for{' '}
+            Give Agents{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-              Agent Mistakes.
+              Bounded Authority.
             </span>
           </h1>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Every other security tool tells you how many attacks they stopped. SatGate tells you how many dollars we saved you.
+            SatGate prices the controls humans and platforms need before agents reach protected APIs: visibility, hard budget stops, receipts, and Evidence Pack proof.
           </p>
         </div>
       </header>
@@ -195,8 +195,8 @@ const PricingPage = () => {
             <span className="text-gray-600 text-xl hidden md:block">→</span>
             <span className="text-gray-600 md:hidden">↓</span>
             <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-yellow-900/20 border border-yellow-800/30">
-              <span className="text-yellow-400 font-bold text-sm">⚡ Charge</span>
-              <span className="text-gray-500 text-xs">Monetize your APIs</span>
+              <span className="text-yellow-400 font-bold text-sm">⚡ Prove</span>
+              <span className="text-gray-500 text-xs">Export receipts</span>
             </div>
           </div>
         </div>

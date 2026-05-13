@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, BellRing, CheckCircle2, CreditCard, FileSearch, Gauge, KeyRound, ShieldCheck } from 'lucide-react';
 
 export const metadata = {
-  title: 'Agent Payment Controls | Policy Before Agent Payments',
+  title: 'Agent Payment Governance | Policy Before Paid Access',
   description: 'Agent payment controls combine budgets, policy, scoped authority, revocation, metering, paid-rail context, and Evidence Pack receipts before requests execute.',
   alternates: { canonical: 'https://satgate.io/agent-payment-controls' },
   keywords: [
@@ -16,15 +16,15 @@ export const metadata = {
     'paid-rail agent governance',
   ],
   openGraph: {
-    title: 'Agent Payment Controls | Policy Before Agent Payments',
+    title: 'Agent Payment Governance | Policy Before Paid Access',
     description: 'Wallet approval is necessary but not sufficient. SatGate adds request-path budgets, scoped authority, metering, revocation, and Evidence Pack receipts.',
     url: 'https://satgate.io/agent-payment-controls',
     type: 'article',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Agent Payment Controls | Policy Before Agent Payments',
-    description: 'Control agent payments before they become runaway API, MCP, and model spend.',
+    title: 'Agent Payment Governance | Policy Before Paid Access',
+    description: 'Control delegated paid access before it becomes runaway API, MCP, and model spend.',
   },
 };
 
@@ -41,7 +41,7 @@ export default function AgentPaymentControlsPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'Agent Payment Controls | Policy Before Agent Payments',
+    headline: 'Agent Payment Governance | Policy Before Paid Access',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
@@ -55,7 +55,7 @@ export default function AgentPaymentControlsPage() {
     '@type': 'FAQPage',
     mainEntity: [
       { '@type': 'Question', name: 'What are agent payment controls?', acceptedAnswer: { '@type': 'Answer', text: 'Agent payment controls are the policies, budgets, approvals, Evidence Packs, and request-path enforcement that govern how AI agents spend money or unlock paid API access.' } },
-      { '@type': 'Question', name: 'Is wallet approval enough for AI agent payments?', acceptedAnswer: { '@type': 'Answer', text: 'No. Wallet approval can authorize a purchase, but teams also need identity, budgets, scoped access, revocation, API metering, and audit before agent requests execute.' } },
+      { '@type': 'Question', name: 'Is payment approval enough for delegated agent access?', acceptedAnswer: { '@type': 'Answer', text: 'No. Payment approval can authorize value movement, but teams also need identity, budgets, scoped access, revocation, API metering, and audit before agent requests execute.' } },
       { '@type': 'Question', name: 'How does SatGate help with agent payment controls?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate sits in the request path to observe agent activity, enforce budgets and policy, preserve paid-rail context, and record receipts before requests execute.' } },
       { '@type': 'Question', name: 'How are HTTP 402 and L402 related to agent payment controls?', acceptedAnswer: { '@type': 'Answer', text: 'HTTP 402 gives APIs a protocol-level way to request payment. L402, x402, shared payment tokens, cards, and enterprise billing are payment rails; agent payment controls decide whether the agent has authority before access is granted.' } },
     ],
@@ -90,7 +90,7 @@ export default function AgentPaymentControlsPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              Govern agent payments <ArrowRight size={18} />
+              Govern paid access <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
               See Policy-to-Proof
@@ -165,7 +165,7 @@ export default function AgentPaymentControlsPage() {
           <h2 className="text-3xl font-bold text-white mb-8">From approval to enforcement</h2>
           <div className="overflow-hidden rounded-2xl border border-gray-800">
             <div className="grid md:grid-cols-3 bg-gray-900/70 text-sm font-bold text-white">
-              <div className="p-4">Control</div><div className="p-4">Wallet layer</div><div className="p-4">Economic firewall layer</div>
+              <div className="p-4">Control</div><div className="p-4">Payment credential layer</div><div className="p-4">Economic Firewall layer</div>
             </div>
             {[
               ['Purchase approval', 'Ask the user to approve a purchase', 'Decide whether policy allows the agent to attempt the spend'],
@@ -187,7 +187,7 @@ export default function AgentPaymentControlsPage() {
           <div className="grid gap-5 md:grid-cols-2">
             {[
               ['What are agent payment controls?', 'Agent payment controls are the policies, budgets, approvals, Evidence Packs, and request-path enforcement that govern how AI agents spend money or unlock paid API access.'],
-              ['Is wallet approval enough for AI agent payments?', 'No. Wallet approval can authorize a purchase, but teams also need identity, budgets, scoped access, revocation, API metering, and audit before agent requests execute.'],
+              ['Is payment approval enough for delegated agent access?', 'No. Payment approval can authorize value movement, but teams also need identity, budgets, scoped access, revocation, API metering, and audit before agent requests execute.'],
               ['How does SatGate help with agent payment controls?', 'SatGate sits in the request path to observe agent activity, enforce budgets and policy, preserve paid-rail context, and record receipts before requests execute.'],
               ['How are HTTP 402 and L402 related to agent payment controls?', 'HTTP 402 gives APIs a protocol-level way to request payment. L402, x402, shared payment tokens, cards, and enterprise billing are payment rails; agent payment controls decide whether the agent has authority before access is granted.'],
             ].map(([question, answer]) => (
@@ -202,11 +202,11 @@ export default function AgentPaymentControlsPage() {
         <div className="rounded-3xl border border-yellow-900/60 bg-gradient-to-br from-yellow-950/20 to-cyan-950/30 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">Put policy before payment</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            SatGate gives teams the economic control plane for agent payments: request-path metering, spend limits, revocation, paid-rail context, Evidence Pack receipts, and Policy-to-Proof evidence when access is granted.
+            SatGate gives teams the Economic Firewall for delegated paid access: request-path metering, spend limits, revocation, paid-rail context, Evidence Pack receipts, and Policy-to-Proof evidence when access is granted.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              Govern agent payments <ArrowRight size={18} />
+              Govern paid access <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
               Review Policy-to-Proof

@@ -107,7 +107,7 @@ export default function LlmCostManagementBlogPage() {
           <h1 className="text-4xl font-bold mb-4">LLM Cost Management: Real-Time Budget Enforcement for AI Agents</h1>
           <div className="mb-6 rounded-2xl border border-yellow-900/60 bg-yellow-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-yellow-300">Short answer</p>
-            <p className="text-gray-300">LLM cost management is not just dashboards and alerts. For autonomous agents, it needs Observe, Control, Charge: per-agent budgets, authority before execution, model/tool prices, attribution, hard blocks, and Evidence Pack receipts for every important decision.</p>
+            <p className="text-gray-300">LLM cost management is not just dashboards and alerts. For autonomous agents, it needs Observe, Control, Prove: per-agent budgets, authority before execution, model/tool prices, attribution, hard blocks, and Evidence Pack receipts for every important decision.</p>
           </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">

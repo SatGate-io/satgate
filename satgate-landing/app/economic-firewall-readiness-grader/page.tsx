@@ -246,7 +246,7 @@ export default function EconomicFirewallReadinessGraderPage() {
               [KeyRound, 'Authority', 'Agent identity, scoped credentials, expiry, attenuation, and revocation.'],
               [Gauge, 'Budget and authority limits', 'Request-path budgets, scoped authority, per-tool caps, model routing, and loop prevention.'],
               [ReceiptText, 'Evidence', 'Evidence Pack trails that explain authority, spend context, policy decision, denial reason, route, and outcome.'],
-              [BadgeCheck, 'Paid-rail context', 'Observe, Control, and Charge paths for internal agents and rail-aware paid calls.'],
+              [BadgeCheck, 'Paid-rail context', 'Observe, Control, and Prove paths for internal agents and rail-aware paid calls.'],
             ].map(([Icon, title, body]) => {
               const TypedIcon = Icon as typeof KeyRound;
               return (
