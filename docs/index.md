@@ -30,6 +30,7 @@ SatGate Gateway is an enterprise API gateway that provides:
 | See the API reference | [API Reference](api/overview.md) |
 | Export Policy-to-Proof evidence | [Evidence Pack v1](reference/evidence-pack.md) |
 | Discover SatGate trust metadata | [SatGate Trust Metadata](reference/satgate-trust-metadata.md) |
+| Sketch upstream acceptor metadata | [Acceptor Metadata Draft](reference/acceptor.md) |
 | Run in production | [Production Checklist](operations/production-checklist.md) |
 | **Enterprise: Economic Firewall** | [Economic Firewall Quickstart](getting-started/economic-firewall-quickstart.md) |
 | **Enterprise: Team Management** | [Team Management Guide](enterprise/TEAM_MANAGEMENT.md) |

@@ -42,6 +42,8 @@ const metadata = {
     required_receipt_fields: [
       "receipt_id",
       "evidence_pack_id",
+      "issuer",
+      "issuer_kid",
       "decision",
       "decision_reason",
       "policy_version",
@@ -54,24 +56,26 @@ const metadata = {
   },
   rails_adapters: {
     supported: [
-      { id: "mcp", type: "protocol", role: "tool_transport" },
-      { id: "x402", type: "payment_rail", role: "external_paid_access" },
-      { id: "l402", type: "payment_rail", role: "external_paid_access" },
-      { id: "api_key_billing", type: "billing_adapter", role: "existing_vendor_billing" },
-      { id: "enterprise_ledger", type: "ledger_adapter", role: "internal_chargeback" },
+      { id: "mcp", type: "protocol", role: "tool_transport", status: "supported" },
+      { id: "x402", type: "payment_rail", role: "external_paid_access", status: "supported" },
+      { id: "l402", type: "payment_rail", role: "external_paid_access", status: "supported" },
+      { id: "api_key_billing", type: "billing_adapter", role: "existing_vendor_billing", status: "supported" },
+      { id: "enterprise_ledger", type: "ledger_adapter", role: "internal_chargeback", status: "supported" },
+      { id: "agentcore_payments", type: "payment_rail", role: "external_paid_access", status: "planned" },
+      { id: "pay_sh", type: "payment_rail", role: "external_paid_access", status: "planned" },
     ],
-    note: "Rails are adapters below SatGate authority and receipt verification; this metadata makes no marketplace or reputation claim.",
   },
   signing_key_discovery: {
     mode: "issuer_discovery",
     key_id_field: "issuer_kid",
     jwks_uri_template: "{issuer_id}/.well-known/jwks.json",
-    note: "Verify receipts against the issuer key referenced by issuer_kid. Tenant or deployment issuers may publish their own JWKS endpoint.",
   },
   docs: {
     build: "https://satgate.io/build",
     policy_to_proof: "https://satgate.io/policy-to-proof",
     evidence_pack_reference: "https://github.com/SatGate-io/satgate/blob/main/docs/reference/evidence-pack.md",
+    trust_metadata_reference: "https://github.com/SatGate-io/satgate/blob/main/docs/reference/satgate-trust-metadata.md",
+    acceptor_metadata_draft: "https://github.com/SatGate-io/satgate/blob/main/docs/reference/acceptor.md",
     api_docs: "https://cloud.satgate.io/docs",
   },
 } as const;
@@ -84,6 +88,7 @@ export function GET() {
       "Cache-Control": "public, max-age=3600",
       "Access-Control-Allow-Origin": "*",
       "X-Content-Type-Options": "nosniff",
+      "Vary": "Accept-Encoding",
     },
   });
 }

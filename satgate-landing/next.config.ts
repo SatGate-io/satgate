@@ -15,6 +15,12 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        source: "/.well-known/:path*",
+        headers: [
+          { key: "Vary", value: "Accept-Encoding" },
+        ],
+      },
+      {
         source: "/(.*)",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },

@@ -12,6 +12,7 @@ SCHEMA_ROUTE = ROOT / "app" / ".well-known" / "satgate.schema.json" / "route.ts"
 JWKS_ROUTE = ROOT / "app" / ".well-known" / "jwks.json" / "route.ts"
 BUILD = ROOT / "app" / "build" / "page.tsx"
 DOC = ROOT.parent / "docs" / "reference" / "satgate-trust-metadata.md"
+ACCEPTOR_DOC = ROOT.parent / "docs" / "reference" / "acceptor.md"
 DOC_INDEX = ROOT.parent / "docs" / "index.md"
 PACKAGE = ROOT / "package.json"
 
@@ -29,6 +30,8 @@ REQUIRED_ROUTE_STRINGS = [
     "satgate.evidence_pack.v1",
     "receipt_id",
     "evidence_pack_id",
+    "issuer",
+    "issuer_kid",
     "decision_reason",
     "policy_version",
     "rails_adapters",
@@ -36,6 +39,10 @@ REQUIRED_ROUTE_STRINGS = [
     "l402",
     "api_key_billing",
     "enterprise_ledger",
+    "agentcore_payments",
+    "pay_sh",
+    "status: \"supported\"",
+    "status: \"planned\"",
     "type: \"payment_rail\"",
     "role: \"external_paid_access\"",
     "key_discovery",
@@ -47,6 +54,7 @@ REQUIRED_ROUTE_STRINGS = [
     "public, max-age=3600",
     "Access-Control-Allow-Origin",
     "X-Content-Type-Options",
+    "Vary",
 ]
 
 REQUIRED_BUILD_STRINGS = [
@@ -54,6 +62,7 @@ REQUIRED_BUILD_STRINGS = [
     "/.well-known/satgate",
     "capability acceptance",
     "receipt verification fields",
+    "canonical for rail adapter status",
 ]
 
 REQUIRED_DOC_STRINGS = [
@@ -67,6 +76,12 @@ REQUIRED_DOC_STRINGS = [
     "schema_url",
     "jwks_uri",
     "array of objects",
+    "Reference verifier snippets",
+    "Acceptor Metadata Draft",
+    "agentcore_payments",
+    "pay_sh",
+    "TRUSTED_ISSUERS",
+    "untrusted receipt issuer",
 ]
 
 FORBIDDEN_ROUTE_PATTERNS = [
@@ -87,10 +102,16 @@ else:
         if needle not in route_text:
             errors.append(f"route missing required string: {needle}")
     for pattern in FORBIDDEN_ROUTE_PATTERNS:
-        # Permit the explicit disclaimer phrase "no marketplace or reputation claim".
-        text_without_disclaimer = route_text.replace("no marketplace or reputation claim", "")
-        if re.search(pattern, text_without_disclaimer, flags=re.IGNORECASE):
+        if re.search(pattern, route_text, flags=re.IGNORECASE):
             errors.append(f"route has forbidden claim language: {pattern}")
+    if re.search(r"\bnote\s*:", route_text):
+        errors.append("route should not contain prose-only note fields; keep human explanations in docs")
+    if '"issuer_kid"' not in route_text or '"issuer"' not in route_text:
+        errors.append("route required_receipt_fields must include issuer and issuer_kid")
+    for planned_id in ["agentcore_payments", "pay_sh"]:
+        planned_pattern = rf'{{ id: "{planned_id}"[^}}]+status: "planned"'
+        if not re.search(planned_pattern, route_text):
+            errors.append(f"route must mark {planned_id} as planned, not supported")
 
 
 for path, label in [(SCHEMA_ROUTE, "schema route"), (JWKS_ROUTE, "JWKS route")]:
@@ -98,13 +119,13 @@ for path, label in [(SCHEMA_ROUTE, "schema route"), (JWKS_ROUTE, "JWKS route")]:
         errors.append(f"missing {label}: {path.relative_to(ROOT)}")
     else:
         text = path.read_text()
-        for needle in ["Response.json", "Cache-Control", "Access-Control-Allow-Origin", "X-Content-Type-Options"]:
+        for needle in ["Response.json", "Cache-Control", "Access-Control-Allow-Origin", "X-Content-Type-Options", "Vary"]:
             if needle not in text:
                 errors.append(f"{label} missing required HTTP/header string: {needle}")
 
 if SCHEMA_ROUTE.exists():
     schema_text = SCHEMA_ROUTE.read_text()
-    for needle in ["SatGate Trust Metadata v1", "schema_version", "rails_adapters", "supported", "id", "type", "role"]:
+    for needle in ["SatGate Trust Metadata v1", "description", "schema_version", "roles", "uniqueItems", "required_receipt_fields", "issuer_kid", "allOf", "contains", "rails_adapters", "supported", "id", "type", "role", "status", "planned", "public, max-age=86400"]:
         if needle not in schema_text:
             errors.append(f"schema route missing required schema string: {needle}")
 
@@ -112,20 +133,33 @@ if JWKS_ROUTE.exists():
     jwks_text = JWKS_ROUTE.read_text()
     if "keys: []" not in jwks_text:
         errors.append("JWKS route should currently expose an empty keys array rather than placeholder signing keys")
+    if re.search(r"\bnote\s*:", jwks_text):
+        errors.append("JWKS route should not contain prose-only note fields")
 
 build_text = BUILD.read_text() if BUILD.exists() else ""
 for needle in REQUIRED_BUILD_STRINGS:
     if needle not in build_text:
         errors.append(f"/build missing trust metadata string: {needle}")
+if "governs MCP tools, REST APIs, API-key billing, x402, L402, and enterprise ledgers today" not in build_text:
+    errors.append("/build should separate supported rails from planned rails")
+if "planned rails such as AgentCore Payments and Pay.sh" not in build_text:
+    errors.append("/build should call AgentCore Payments and Pay.sh planned rails")
 
 doc_text = DOC.read_text() if DOC.exists() else ""
 for needle in REQUIRED_DOC_STRINGS:
     if needle not in doc_text:
         errors.append(f"docs missing trust metadata string: {needle}")
 
+acceptor_text = ACCEPTOR_DOC.read_text() if ACCEPTOR_DOC.exists() else ""
+for needle in ["v0.0 draft", "verification_endpoint", "accepted_capability_formats", "trust_anchors", "rails_adapters", "not yet on the wire"]:
+    if needle not in acceptor_text:
+        errors.append(f"acceptor draft missing required string: {needle}")
+
 index_text = DOC_INDEX.read_text() if DOC_INDEX.exists() else ""
 if "reference/satgate-trust-metadata.md" not in index_text:
     errors.append("docs index does not link satgate-trust-metadata reference")
+if "reference/acceptor.md" not in index_text:
+    errors.append("docs index does not link acceptor metadata draft")
 
 package_text = PACKAGE.read_text() if PACKAGE.exists() else ""
 if "test:well-known" not in package_text:
