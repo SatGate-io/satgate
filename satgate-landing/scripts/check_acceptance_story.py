@@ -57,6 +57,7 @@ required_strings = [
     "acceptor_id",
     "recognized_receipt_decisions",
     "emitted_receipt_decisions",
+    "emitted_receipt_fields",
     "satgate-acceptor.schema.json",
     "accepted_for_mock",
     "provisional",
@@ -114,6 +115,7 @@ else:
         "accepted_for_mock",
         "recognized_receipt_decisions",
         "emitted_receipt_decisions",
+        "emitted_receipt_fields",
         "capability verification and receipt emission",
     ]:
         if enum_value not in schema_text:
@@ -144,6 +146,10 @@ if MOCK_METADATA.exists():
         errors.append("mock acceptor metadata must not treat denied as recognized evidence for entry")
     if "denied" not in metadata.get("emitted_receipt_decisions", []):
         errors.append("mock acceptor metadata should list denied under emitted_receipt_decisions")
+    emitted_fields = metadata.get("emitted_receipt_fields", [])
+    for field in ["schema_version", "receipt_id", "acceptor_id", "decision", "receipt_hash", "signature", "task_id", "budget_id", "event_history_ref"]:
+        if field not in emitted_fields:
+            errors.append(f"mock acceptor metadata emitted_receipt_fields missing: {field}")
 
 if MOCK_RECEIPT.exists():
     receipt = json.loads(MOCK_RECEIPT.read_text())

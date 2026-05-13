@@ -55,6 +55,10 @@ for needle in [
     "SatGate should not mint reputation by assertion",
     "No receipts, no score",
     "No observed history, no ranking",
+    "cross-acceptor behavioral tracking",
+    "Self-vouch is not valid",
+    "Vouches must be revocable",
+    "emitted_receipt_fields",
 ]:
     if needle not in combined_reference:
         errors.append(f"missing reputation-substrate principle/inventory phrase: {needle}")
@@ -135,11 +139,20 @@ def _has_boundary_context(text: str, start: int, end: int) -> bool:
 public_forbidden = [
     r"SatGate reputation score",
     r"trust score",
+    r"agent score",
+    r"credit score",
     r"ranked upstreams",
     r"certified acceptor",
     r"trusted marketplace",
     r"SatGate endorsed",
     r"network-wide reputation",
+    r"preferred upstream",
+    r"verified agent rating",
+    r"agent rating",
+    r"trust rating",
+    r"reputation rating",
+    r"trust tier",
+    r"reputation tier",
 ]
 for root in PUBLIC_ROOTS:
     for path in root.rglob("*"):
