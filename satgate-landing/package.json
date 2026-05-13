@@ -14,7 +14,8 @@
     "test:build-page": "python3 scripts/check_build_page.py",
     "test:demo-ia": "python3 scripts/check_demo_ia.py",
     "test:proof-spine": "python3 scripts/check_proof_spine.py",
-    "test:well-known": "python3 scripts/check_well_known_satgate.py"
+    "test:well-known": "python3 scripts/check_well_known_satgate.py",
+    "test:acceptance-story": "python3 scripts/check_acceptance_story.py"
   },
   "dependencies": {
     "lucide-react": "^0.555.0",

@@ -1,0 +1,58 @@
+{
+  "schema_version": "satgate.acceptor_metadata.v0",
+  "metadata_url": "https://api.internal.example/.well-known/satgate",
+  "roles": [
+    "acceptor"
+  ],
+  "status": "internal_mock_only",
+  "acceptor": {
+    "name": "Internal Mock Research API",
+    "acceptor_id": "https://api.internal.example/satgate-mock",
+    "verification_endpoint": "https://api.internal.example/satgate/verify"
+  },
+  "accepted_capability_formats": [
+    "satgate.capability.v1",
+    "macaroon-bearer"
+  ],
+  "accepted_receipt_decisions": [
+    "allowed",
+    "paid"
+  ],
+  "trust_anchors": [
+    {
+      "issuer_id": "https://satgate.io",
+      "jwks_uri": "https://satgate.io/.well-known/jwks.json",
+      "status": "accepted_for_mock"
+    }
+  ],
+  "rails_adapters": {
+    "accepted": [
+      {
+        "id": "mcp",
+        "type": "protocol",
+        "role": "tool_transport",
+        "status": "supported"
+      },
+      {
+        "id": "enterprise_ledger",
+        "type": "ledger_adapter",
+        "role": "internal_chargeback",
+        "status": "supported"
+      }
+    ]
+  },
+  "claims": {
+    "acceptance_means": "capability verification and receipt emission",
+    "acceptance_does_not_mean": [
+      "marketplace listing",
+      "reputation score",
+      "SatGate endorsement",
+      "network-wide trust"
+    ]
+  },
+  "emitted_receipt_decisions": [
+    "allowed",
+    "denied",
+    "paid"
+  ]
+}
