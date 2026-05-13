@@ -243,7 +243,7 @@ export default function AgentsLandingPage() {
               <Zap className="text-yellow-400 mb-4" size={32} />
               <h3 className="text-xl font-semibold text-white mb-2">Charge</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Monetize your APIs. Agents pay per request
+                Monetize your APIs. Agents consume approved access per request
                 via paid-rail context (L402). No API keys, no subscriptions — just pay and go.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-gray-500">

@@ -16,7 +16,7 @@ import {
 export const metadata: Metadata = {
   title: "SatGate Policy-to-Proof | Evidence for Enterprise Agent Authority",
   description:
-    "SatGate turns AI agent policy decisions into evidence: mint receipts, delegation chains, spend ledgers, denial reasons, revocation proof, and exportable Evidence Packs.",
+    "Define what an agent is allowed to do, enforce it at the gateway, and produce evidence humans and upstreams can trust.",
   keywords: [
     "policy-to-proof",
     "AI agent Evidence Pack",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SatGate Policy-to-Proof",
     description:
-      "Every grant, paid call, denial, delegation, and revocation produces receipts and Evidence Pack proof your CISO, finance team, and auditor can trust.",
+      "Every grant, denial, spend event, delegation, and revocation produces receipts and Evidence Pack proof your CISO, finance team, and auditor can trust.",
     url: "https://satgate.io/policy-to-proof",
     type: "website",
   },
@@ -209,13 +209,13 @@ export default function PolicyToProofPage() {
                 Monday morning, your auditor asks who authorized the agent that tried to export customer data on Friday night. This is what they get.
               </p>
               <h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">
-                Every agent action leaves a receipt.
+                From policy to proof for agentic API access.
               </h1>
               <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
-                SatGate turns policy decisions into evidence. Mint, delegate, spend, deny, revoke — every step produces a tamper-evident artifact your security, finance, and audit teams can trust.
+                Define what an agent is allowed to do, enforce it at the gateway, and produce evidence humans and upstreams can trust.
               </p>
               <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
-                Run agents without permanent credentials, unlimited spend, or unobservable authority. Then export the proof when your CISO, auditor, board, or incident reviewer asks what happened.
+                Bind agent actions to human or platform authority; apply spend, scope, rate, and escalation limits before access; export the proof when your CISO, auditor, board, or incident reviewer asks what happened.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <Link
@@ -264,7 +264,7 @@ export default function PolicyToProofPage() {
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-cyan-300">Internal first, rail-aware when needed</p>
             <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Built for internal enterprise agents. Extends across paid external calls.</h2>
             <p className="mt-5 text-lg leading-8 text-gray-400">
-              Most enterprise agents do not need a wallet to call internal APIs. They need scoped authority, budget controls, revocation, and audit evidence around the credentials they already have.
+              Most enterprise agents do not need a wallet to call internal APIs. They need bounded delegated authority, budget controls, revocation, and audit evidence around the credentials they already have.
             </p>
             <p className="mt-4 text-base leading-7 text-gray-500">
               When that same internal workflow crosses into an external paid API, SatGate keeps the proof intact: internal scope and delegation, plus spend attribution above x402 rails, L402, API-key billing, or enterprise ledgers. Payment proves value moved. SatGate proves the agent was allowed to move it.

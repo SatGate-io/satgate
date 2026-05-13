@@ -823,7 +823,7 @@ export SATGATE_TOKEN=$TOKEN
           <div className="space-y-6">
             {[
               ['What is AI agent governance?', 'AI agent governance is the set of controls that determines which agents can call which APIs, tools, and models; how much they can spend; what authority they can delegate; and when access must be revoked. For autonomous agents, governance needs request-path enforcement, not just logs and dashboards.'],
-              ['What is an economic control plane for AI agents?', 'An economic control plane for AI agents sits in the request path and applies scopes, budgets, delegation rules, revocation, and audit before an agent reaches an upstream API, model, or MCP tool. It turns agent activity into governed decisions with evidence.'],
+              ['What is an economic firewall for AI agents?', 'An economic firewall for AI agents sits in the request path and applies scopes, budgets, delegation rules, revocation, and audit before an agent reaches an upstream API, model, or MCP tool. Humans and platforms set authority; agents consume bounded primitives; upstreams receive evidence.'],
               ['How should enterprises govern MCP tool usage?', 'Enterprises should govern MCP tools with per-tool budgets, scoped capability tokens, task and tenant attribution, Evidence Packs, revocation, and hard request-path policy decisions. Rate limits and dashboards are useful, but they do not replace enforcement before tool calls execute.'],
               ['What is the difference between AI governance and AI agent governance?', 'AI governance usually covers model risk, data policy, compliance, and human review. AI agent governance adds request-path controls for autonomous actions: scopes, budgets, delegated authority, revocation, denial reasons, spend attribution, and proof before APIs or MCP tools execute.'],
               ['Is SatGate tied to x402, L402, AgentCore Payments, or Pay.sh?', 'No. x402, L402, AgentCore Payments, Pay.sh, and related rails make it easier for agents to call paid services. SatGate is protocol-independent: it records the requesting agent, allowed action, policy basis, spend context, and evidence needed for audit, review, and control — payment or not.'],
@@ -886,7 +886,7 @@ export SATGATE_TOKEN=$TOKEN
                 <li><Link href="/agent-api-governance" className="hover:text-white transition">Agent API Governance</Link></li>
                 <li><Link href="/economic-firewall" className="hover:text-white transition">Economic Firewall</Link></li>
                 <li><Link href="/ai-agent-cost-control" className="hover:text-white transition">AI Agent Cost Control</Link></li>
-                <li><Link href="/l402-agent-payments" className="hover:text-white transition">L402 Agent Payments</Link></li>
+                <li><Link href="/l402-agent-payments" className="hover:text-white transition">Paid-Rail Governance</Link></li>
                 <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
                 <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud Dashboard</a></li>
               </ul>

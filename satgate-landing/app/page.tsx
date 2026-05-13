@@ -2,24 +2,24 @@ import type { Metadata } from "next";
 import HomeClient from "./components/HomeClient";
 
 export const metadata: Metadata = {
-  title: "SatGate — Economic Firewall for AI Agents",
+  title: "SatGate — Economic Firewall for Agentic API Access",
   description:
-    "Authority before execution. Evidence Packs after every decision across MCP, APIs, API keys, L402, x402, AgentCore Payments, Pay.sh, and enterprise billing.",
+    "SatGate gives agents bounded economic authority so humans, platforms, and upstream APIs can trust what they consume, spend, and prove.",
   alternates: {
     canonical: "https://satgate.io",
   },
   openGraph: {
-    title: "SatGate — Economic Firewall for AI Agents",
+    title: "SatGate — Economic Firewall for Agentic API Access",
     description:
-      "Policy-to-Proof governance for enterprise agents: scoped authority before execution and Evidence Packs across APIs, MCP tools, and paid rails.",
+      "Policy-to-Proof governance for enterprise agents: bounded economic authority before execution and Evidence Packs after every decision.",
     url: "https://satgate.io",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "SatGate — Economic Firewall for AI Agents",
+    title: "SatGate — Economic Firewall for Agentic API Access",
     description:
-      "Policy-to-Proof governance for enterprise agents: scoped authority before execution and Evidence Packs across APIs, MCP tools, and paid rails.",
+      "Policy-to-Proof governance for enterprise agents: bounded economic authority before execution and Evidence Packs after every decision.",
   },
 };
 
@@ -32,7 +32,7 @@ export default function HomePage() {
         name: 'SatGate',
         url: 'https://satgate.io',
         logo: 'https://satgate.io/logo_white_transparent.png',
-        description: 'SatGate is Policy-to-Proof governance for AI agent authority: decisions before execution and Evidence Packs after every action.',
+        description: 'SatGate is the Economic Firewall for agentic API access: bounded economic authority before execution and Evidence Packs after every decision.',
       },
       {
         '@type': 'WebSite',
@@ -42,9 +42,9 @@ export default function HomePage() {
       },
       {
         '@type': 'WebPage',
-        name: 'SatGate — Economic Firewall for AI Agents',
+        name: 'SatGate — Economic Firewall for Agentic API Access',
         url: 'https://satgate.io',
-        description: 'Authority before execution. Evidence Packs after every decision across MCP, APIs, API keys, L402, x402, AgentCore Payments, Pay.sh, and enterprise billing.',
+        description: 'SatGate gives agents bounded economic authority so humans, platforms, and upstream APIs can trust what they consume, spend, and prove.',
         datePublished: '2026-04-30',
         dateModified: '2026-05-05',
         isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -68,7 +68,7 @@ export default function HomePage() {
         name: 'What is SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate is Policy-to-Proof governance for enterprise agents. It sits in the request path to check authority, enforce policy and budgets, and preserve Evidence Packs across APIs, MCP tools, and paid rails.',
+          text: 'SatGate is the Economic Firewall for agentic API access. It sits in the request path so humans and platforms can delegate bounded economic authority to agents, enforce policy and budgets, and preserve Evidence Packs across APIs, MCP tools, and paid rails.',
         },
       },
       {
@@ -81,10 +81,10 @@ export default function HomePage() {
       },
       {
         '@type': 'Question',
-        name: 'What are Observe, Control, and Charge?',
+        name: 'How does SatGate give agents bounded economic authority?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Observe preserves decision receipts for agent traffic and cost context without blocking. Control enforces budgets and scoped policy for internal agents. Charge returns paid-call receipts and Evidence Pack proof across L402, x402, API-key, or enterprise billing rails.',
+          text: 'Humans and platforms define policy, budgets, scope, and delegation depth. Agents consume approved API and MCP primitives through SatGate, and every approval, denial, spend event, delegation, and revocation leaves receipt-backed proof.',
         },
       },
     ],

@@ -16,9 +16,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Build Agents That Can Spend Safely",
+  title: "Build Agents With Bounded Economic Authority",
   description:
-    "Issue scoped capabilities, pay upstream with max budgets, and verify receipts with SatGate's developer surface for agent authority, payment context, and Evidence Pack proof.",
+    "Issue scoped capabilities, enforce max budgets before upstream access, and verify receipts with SatGate's developer surface for agent authority and Evidence Pack proof.",
   keywords: [
     "SatGate build",
     "AI agent capabilities",
@@ -32,17 +32,17 @@ export const metadata: Metadata = {
     canonical: "https://satgate.io/build",
   },
   openGraph: {
-    title: "Build agents that can spend safely",
+    title: "Build agents with bounded economic authority",
     description:
-      "Capabilities in. Receipts out. Rails abstracted. Build agents with scoped authority, upstream payments with max budgets, and verifiable receipts.",
+      "Capabilities in. Receipts out. Rails abstracted. Build agents with scoped authority, max budgets before upstream access, and verifiable receipts.",
     url: "https://satgate.io/build",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Build agents that can spend safely",
+    title: "Build agents with bounded economic authority",
     description:
-      "Issue scoped capabilities, pay upstream with max budgets, and verify receipts with SatGate's rail-neutral developer primitive.",
+      "Issue scoped capabilities, enforce max budgets before upstream access, and verify receipts with SatGate's rail-neutral developer primitive.",
   },
 };
 
@@ -123,7 +123,7 @@ const primitives = [
   },
   {
     icon: Route,
-    title: "Pay upstream with max budget",
+    title: "Consume upstream with max budget",
     label: "satgate.pay",
     body: "Let the agent reach MCP tools, APIs, or paid rails through SatGate while a caller-supplied max budget and policy are enforced before value moves.",
   },
@@ -178,7 +178,7 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "WebPage",
-      name: "Build agents that can spend safely",
+      name: "Build agents with bounded economic authority",
       url: "https://satgate.io/build",
       description: metadata.description,
       datePublished: "2026-05-12",
@@ -220,10 +220,10 @@ export default function BuildPage() {
               <Code2 size={16} /> Developer primitive
             </div>
             <h1 className="max-w-4xl text-5xl font-black tracking-tight text-white sm:text-6xl lg:text-7xl">
-              Build agents that can spend safely
+              Build agents with bounded economic authority
             </h1>
             <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
-              Issue scoped capabilities, pay upstream with max budgets, and return verifiable receipts your principal can trust.
+              Issue scoped capabilities, enforce max budgets before upstream access, and return verifiable receipts your principal can trust.
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
               SatGate is the <strong className="font-semibold text-white">Economic Firewall for AI agents</strong>. This is the developer surface: <strong className="font-semibold text-white">Capabilities in. Receipts out. Rails abstracted.</strong>

@@ -120,7 +120,7 @@ export default function Http402ForAiAgentsPage() {
         <div className="rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-6">
           <h3 className="text-xl font-bold text-white mb-4">A 402-aware control plane asks</h3>
           <div className="space-y-3 text-sm">
-            {['Which payment method is being requested?', 'Is this route approved for agent payments?', 'Does the agent have authority and budget?', 'Should policy require human approval?', 'Which paid rail is being requested, and is it allowed by policy?', 'What Evidence Pack receipt should be recorded before forwarding?'].map((item) => (
+            {['Which payment method is being requested?', 'Is this route approved for delegated paid access?', 'Does the agent have authority and budget?', 'Should policy require human approval?', 'Which paid rail is being requested, and is it allowed by policy?', 'What Evidence Pack receipt should be recorded before forwarding?'].map((item) => (
               <div key={item} className="flex items-start gap-3 rounded-lg border border-gray-800 bg-black/50 p-3">
                 <CheckCircle2 className="text-yellow-300 mt-0.5" size={18} />
                 <span className="text-gray-300">{item}</span>
@@ -180,7 +180,7 @@ export default function Http402ForAiAgentsPage() {
             <ShieldCheck className="text-cyan-300 mb-5" size={34} />
             <h2 className="text-2xl font-bold text-white mb-4">Other 402 rails still need policy</h2>
             <p className="text-gray-300 leading-relaxed">
-              Stripe-style shared payment tokens, card credentials, and future payment protocols can help agents pay. They do not replace request-path controls for budget, scope, revocation, metering, receipts, or Evidence Pack proof.
+              Stripe-style shared payment tokens, card credentials, and future payment protocols can help platforms delegate paid access to agents. They do not replace request-path controls for budget, scope, revocation, metering, receipts, or Evidence Pack proof.
             </p>
           </div>
         </div>

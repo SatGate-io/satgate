@@ -9,10 +9,10 @@ SITEMAP = ROOT / "app" / "sitemap.ts"
 HOME = ROOT / "app" / "components" / "HomeClient.tsx"
 
 required_page_strings = [
-    "Build agents that can spend safely",
+    "Build Agents With Bounded Economic Authority",
     "Capabilities in. Receipts out. Rails abstracted.",
     "Issue scoped capabilities",
-    "Pay upstream with max budget",
+    "Consume upstream with max budget",
     "Verify receipts",
     "satgate.issue",
     "satgate.pay",

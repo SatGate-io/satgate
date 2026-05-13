@@ -243,7 +243,7 @@ const agentBToken = attenuate(agentAToken, {
           </p>
 
           {/* --- Three-Layer Model --- */}
-          <h2 className="text-2xl font-bold mt-12 mb-4 text-white">The Three-Layer Model: Observe, Control, Charge</h2>
+          <h2 className="text-2xl font-bold mt-12 mb-4 text-white">The Three-Layer Model: Observe, Control, Prove</h2>
           <p className="text-gray-300 leading-relaxed">
             An economic firewall operates across three functional layers:
           </p>

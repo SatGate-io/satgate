@@ -301,7 +301,7 @@ export default function AgentApiGovernancePage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-8">
           <div>
-            <h2 className="text-3xl font-bold text-white mb-6">Observe, Control, Charge agent API use</h2>
+            <h2 className="text-3xl font-bold text-white mb-6">Observe, Control, Prove agent API use</h2>
             <div className="space-y-4">
               {[
                 ['Observe', 'Attribute calls by agent, worker, route, tenant, and workflow so real access and spend patterns are visible before policy tightens.'],

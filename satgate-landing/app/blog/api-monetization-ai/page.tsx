@@ -378,7 +378,7 @@ sub_agent_token = attenuate(agent_a_token, [
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Step 3: Mint tokens with spending limits.</strong> Issue macaroon tokens to your first AI agent customers with embedded budget caps. Start generous — you want usage data more than revenue at this stage.
+            <strong className="text-white">Step 3: Mint tokens with spending limits.</strong> Issue macaroon tokens to delegated agent consumers with embedded budget caps. Start generous — you want usage data more than revenue at this stage.
           </p>
 
           <p className="text-gray-300 leading-relaxed">

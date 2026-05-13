@@ -53,7 +53,7 @@ const faqJsonLd = {
       name: 'What is SatGate paid-rail governance?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'SatGate governs paid-rail context and paid-rail context to let paid agents and AI agents pay for API access in the request path before protected data or tools are unlocked.',
+        text: 'SatGate governs paid API access by enforcing delegated authority, budgets, and policy in the request path before protected data or tools are unlocked.',
       },
     },
     {
@@ -486,7 +486,7 @@ export default function MonetizeDemoPage() {
         <h2 className="mb-8 text-center text-2xl font-bold text-white">rail-neutral paid-rail governance questions</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            ['What is SatGate paid-rail governance?', 'SatGate governs paid-rail context and paid-rail context to let paid agents and AI agents pay for API access in the request path before protected data or tools are unlocked.'],
+            ['What is SatGate paid-rail governance?', 'SatGate governs paid API access by enforcing delegated authority, budgets, and policy in the request path before protected data or tools are unlocked.'],
             ['How is L402 different from a subscription API key?', 'A subscription API key grants ongoing access and bills later. L402 lets each agent request receive a payment challenge, pay the invoice, retry with proof, and receive a paid-call receipt before access is granted.'],
             ['When should an API use per-request paid-rail context?', 'Per-request paid-rail context fit API products used by autonomous agents, paid tools, data endpoints, premium insights, and paid-agent workflows where access and payment should clear instantly.'],
           ].map(([question, answer]) => (

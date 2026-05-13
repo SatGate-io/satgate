@@ -30,7 +30,7 @@ export const metadata = {
 
 const rows: Array<[string, string, string]> = [
   ['Primary job', 'Economic control plane for AI agents', 'LLM gateway / OpenAI-compatible proxy'],
-  ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped access, robot payments', 'Model access, provider abstraction, fallbacks, routing, developer LLM access'],
+  ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped access, paid-rail governance', 'Model access, provider abstraction, fallbacks, routing, developer LLM access'],
   ['Request-path hard budget enforcement', 'Yes', 'Partial: budgets and rate limits for LLM gateway usage'],
   ['MCP tool budget enforcement', 'Yes', 'No native MCP economic firewall focus'],
   ['Per-tool cost attribution beyond LLM calls', 'Yes', 'Primarily LLM/model spend tracking'],
@@ -214,7 +214,7 @@ export default function CompareLiteLLMPage() {
             {([
               ['Hard agent budget enforcement', true, 'Budget decisions before expensive agent/API activity executes.'],
               ['MCP tool cost policy', true, 'Prices, limits, risk tiers, and audit evidence per tool call.'],
-              ['L402 robot payments', true, 'Request-time paid-rail context for external agent/API access.'],
+              ['L402 paid-rail governance', true, 'Request-time paid-rail context for external agent/API access.'],
               ['100+ model provider gateway', false, 'This is LiteLLM territory; SatGate can govern traffic before it reaches that layer.'],
             ] as Array<[string, boolean, string]>).map(([label, yes, body]) => (
               <div key={String(label)} className="rounded-xl border border-gray-800 bg-black p-5">

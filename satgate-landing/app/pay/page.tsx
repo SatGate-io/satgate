@@ -62,7 +62,7 @@ const faqJsonLd = {
       name: 'Why use L402 for agent API access?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'L402 lets autonomous agents pay at request time without subscriptions, credit cards, or long-lived API keys, making API access native to paid agents.',
+        text: 'L402 can carry payment proof at request time, but SatGate keeps the buyer-safe control layer around it: delegated authority, max budgets, scoped access, and receipts before protected APIs unlock.',
       },
     },
     {
@@ -553,7 +553,7 @@ export default function PayDemoPage() {
         <div className="grid gap-4 md:grid-cols-3">
           {[
             ['What happens during an L402 payment flow?', 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment; SatGate returns a paid-call receipt and records the decision for the Evidence Pack.'],
-            ['Why use L402 for agent API access?', 'L402 lets autonomous agents pay at request time without subscriptions, credit cards, or long-lived API keys, making API access native to paid agents.'],
+            ['Why use L402 for agent API access?', 'L402 can carry payment proof at request time, but SatGate keeps the buyer-safe control layer around it: delegated authority, max budgets, scoped access, and receipts before protected APIs unlock.'],
             ['Can paid-rail context be combined with access policy?', 'Yes. SatGate can combine L402 payment with capability tokens, scoped authorization, budget policy, receipt fields, Evidence Pack export, and revocation so payment does not become unrestricted access.'],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
