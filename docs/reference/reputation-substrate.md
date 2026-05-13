@@ -139,6 +139,22 @@ Evidence needed:
 
 Interpretation boundary: upstream acceptance proves that one integration path verified authority and emitted a receipt. It does not prove global upstream quality, safety, or ranking.
 
+## Principal and vouch semantics
+
+`principal_id` has privacy weight. It is a scoped evidence handle, not a portable behavioral identity. Verifiers MAY correlate `principal_id` across receipts inside the same tenant, acceptor, Evidence Pack, audit export, or explicit verifier trust domain. Verifiers MUST NOT treat `principal_id` as permission for cross-acceptor behavioral tracking unless the receipts were collected under a disclosed common controller, shared audit mandate, or explicit principal consent.
+
+Preferred emitters should use pairwise or tenant-scoped principal identifiers where possible. A public acceptor should not expose stable human identifiers in receipts unless the principal intentionally chose that identifier for audit use.
+
+`vouch_receipt_id` and `principal_vouched` are reputation-adjacent evidence primitives. A vouch means: a named principal made a scoped, signed assertion that a subject/capability/upstream is acceptable for a specific purpose, policy, tenant, and time window. It does not mean global trust.
+
+Vouching rules for future profiles:
+
+- A vouch must point to a signed receipt or authorization event; unsigned labels are not vouches.
+- A vouch must declare scope: subject, capability or upstream, policy/purpose, issuer, and expiry or review window.
+- Self-vouch is not valid for external verifier conclusions unless a profile explicitly labels it as self-attestation.
+- Vouches must be revocable; revocation should reference the original `vouch_receipt_id` and emit a `revoked` receipt or `revoked` event.
+- Counting vouches is a third-party reputation derivation. SatGate should not publish counts, tiers, badges, rankings, or scores from vouches without a later explicit reputation product decision.
+
 ## Additive schema optionality
 
 `/.well-known/satgate-receipt.schema.json` remains backward-compatible. The substrate adds optional field names so future emitters do not invent incompatible names:
@@ -159,7 +175,7 @@ Interpretation boundary: upstream acceptance proves that one integration path ve
 - `revoked_receipt_id`
 - `event_history_ref`
 
-None of these fields are required in v1. They preserve future optionality without breaking existing receipts.
+None of these fields are required in v1. They preserve future optionality without breaking existing receipts. Acceptor metadata can advertise `emitted_receipt_fields` so optional substrate fields remain per-acceptor expectations instead of drifting into implicit global requirements.
 
 Evidence Pack v1 likewise keeps an optional `event_history` array for verifier-observed history. Event history can answer sequence questions that a single receipt cannot: looping, retry counts, task lifecycle, post-revocation denials, and upstream acceptance over time.
 
@@ -194,6 +210,17 @@ Forbidden in public launch copy:
 - “trusted marketplace”
 - “SatGate endorsed”
 - “network-wide reputation”
+- “rating”
+- “agent rating”
+- “trust rating”
+- “reputation rating”
+- “tier”
+- “trust tier”
+- “reputation tier”
+- “agent score”
+- “credit score”
+- “verified agent rating” when it implies endorsement rather than protocol verification
+- “preferred upstream”
 
 ## Implementation rule
 

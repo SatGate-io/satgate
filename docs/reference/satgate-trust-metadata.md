@@ -221,6 +221,7 @@ The mirror artifact is still draft, but a permissive v0 schema is on the wire at
 - `accepted_capability_formats`
 - `recognized_receipt_decisions`
 - `emitted_receipt_decisions`
+- `emitted_receipt_fields` for per-acceptor optional receipt-field expectations
 - `trust_anchors` / issuer allowlist with a closed trust-anchor status enum
 - rails/adapters it can settle on under `rails_adapters.accepted`
 - machine-readable claim boundaries under `claims`
