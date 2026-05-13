@@ -3,7 +3,7 @@ import { ArrowRight, Bot, Coins, KeyRound, LockKeyhole, ReceiptText, Zap } from 
 
 export const metadata = {
   title: 'L402 Paid-Rail Governance for APIs',
-  description: 'Understand L402 as one paid rail for AI agent/API access. SatGate applies Policy-to-Proof before execution and preserves Evidence Pack receipts after payment.',
+  description: 'Understand L402 as one paid rail for agent/API access. SatGate gives delegated clients bounded economic authority, applies Policy-to-Proof before execution, and preserves Evidence Pack receipts after payment.',
   alternates: { canonical: 'https://satgate.io/l402-agent-payments' },
   keywords: [
     'L402 paid-rail governance',
@@ -181,7 +181,7 @@ export default function L402AgentPaymentsPage() {
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-10">
-            paid-rail context can carry HTTP 402 payment proof. SatGate decides whether a human or platform delegated enough authority, unlocks only scoped access, and preserves proof for every paid action.
+            paid-rail context can carry HTTP 402 payment proof. SatGate gives delegated clients bounded economic authority: it decides whether a human or platform delegated enough authority, unlocks only scoped access, and preserves proof for every paid action.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
