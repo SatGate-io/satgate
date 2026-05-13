@@ -11,15 +11,15 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://satgate-production-
 const webPageJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
-  name: 'SatGate Governance Dashboard',
+  name: 'SatGate Receipt-backed Governance Dashboard',
   url: 'https://satgate.io/dashboard',
-  description: 'Live governance dashboard for AI agent tokens, delegation depth, caveats, blocked requests, revocation hits, and economic firewall telemetry.',
+  description: 'Live governance dashboard for AI agent tokens, delegation depth, caveats, blocked requests, revocation hits, and receipt-backed governance evidence.',
   datePublished: '2026-04-12',
   dateModified: '2026-05-03',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
     { '@type': 'Thing', name: 'AI agent governance dashboard' },
-    { '@type': 'Thing', name: 'economic firewall telemetry' },
+    { '@type': 'Thing', name: 'receipt-backed governance evidence' },
     { '@type': 'Thing', name: 'agent token delegation graph' },
     { '@type': 'Thing', name: 'macaroon caveat visibility' },
     { '@type': 'Thing', name: 'request-path revocation evidence' },
@@ -29,14 +29,14 @@ const webPageJsonLd = {
 const softwareJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'SatGate Governance Dashboard',
+  name: 'SatGate Receipt-backed Governance Dashboard',
   applicationCategory: 'DeveloperApplication',
   operatingSystem: 'Web',
   url: 'https://satgate.io/dashboard',
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
   dateModified: '2026-05-03',
-  featureList: ['Agent token graph telemetry', 'Delegation depth visibility', 'Macaroon caveat inspection', 'Revocation hit tracking', 'Blocked request counters'],
+  featureList: ['Agent token receipt graph', 'Delegation receipt visibility', 'Macaroon caveat inspection', 'Revocation receipt tracking', 'Denied-call receipt counters'],
 };
 
 const faqJsonLd = {
@@ -48,23 +48,23 @@ const faqJsonLd = {
       name: 'What does the SatGate governance dashboard show?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'The SatGate governance dashboard shows active agent tokens, delegation depth, caveats, blocked requests, banned tokens, revocation hits, and economic firewall telemetry for agent activity.',
+        text: 'The SatGate governance dashboard shows active agent tokens, delegation depth, caveats, blocked requests, banned tokens, revocation hits, and receipt-backed governance evidence for agent activity.',
       },
     },
     {
       '@type': 'Question',
-      name: 'Why do AI agent teams need live governance telemetry?',
+      name: 'Why do AI agent teams need receipt-backed governance evidence?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Live governance telemetry helps teams see which agents hold authority, what scopes and budgets apply, whether tokens are delegated, and when request-path controls block risky or over-budget activity.',
+        text: 'Receipt-backed governance evidence shows which agents hold authority, what scopes and budgets apply, whether tokens are delegated, and which allowed, denied, revoked, or paid decisions feed Evidence Packs.',
       },
     },
     {
       '@type': 'Question',
-      name: 'How does dashboard telemetry connect to request-path control?',
+      name: 'How does dashboard evidence connect to request-path control?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Dashboard telemetry explains decisions after SatGate enforces them in the request path. The dashboard is evidence; the gateway is where budgets, revocation, scopes, and policy are applied before upstream access.',
+        text: 'Dashboard evidence surfaces receipts after SatGate enforces decisions in the request path. The dashboard surfaces receipt-backed decisions; Evidence Packs are the exportable proof artifact; the gateway is where budgets, revocation, scopes, and policy are applied before upstream access.',
       },
     },
   ],
@@ -294,8 +294,8 @@ export default function DashboardPage() {
           <div className="mb-8">
             <div className="flex items-start justify-between">
               <div>
-                <h1 className="text-3xl font-bold mb-2">Governance Dashboard</h1>
-                <p className="text-gray-500">Real-time visibility into your agent workforce and economic firewall.</p>
+                <h1 className="text-3xl font-bold mb-2">Receipt-backed Governance Dashboard</h1>
+                <p className="text-gray-500">Receipt-backed proof for your agent workforce and economic firewall.</p>
                 {lastFetch && (
                   <p className="text-xs text-gray-600 mt-1">
                     Last updated: {lastFetch.toLocaleTimeString()} 
@@ -361,7 +361,7 @@ export default function DashboardPage() {
                 <Shield size={16} className="text-red-400" />
               </div>
               <div className="text-2xl font-bold text-red-400">{stats.totalBlocked.toLocaleString()}</div>
-              <div className="text-xs text-gray-600 mt-1">Unpaid requests blocked</div>
+              <div className="text-xs text-gray-600 mt-1">Denied-call receipts</div>
             </div>
             
             <div className="p-5 rounded-xl bg-gray-900 border border-orange-900/30">
@@ -453,7 +453,7 @@ export default function DashboardPage() {
               
               <div className="mt-6 pt-4 border-t border-gray-800 text-center">
                 <p className="text-xs text-gray-600">
-                  This tree builds itself from observed traffic. No central token database—cryptographic provenance.
+                  This tree builds itself from observed decision receipts. No central token database—cryptographic provenance.
                 </p>
               </div>
             </div>
@@ -543,9 +543,9 @@ export default function DashboardPage() {
             <h2 className="mb-8 text-center text-2xl font-bold text-white">Governance dashboard questions</h2>
             <div className="grid gap-4 md:grid-cols-3">
               {[
-                ['What does the SatGate governance dashboard show?', 'The SatGate governance dashboard shows active agent tokens, delegation depth, caveats, blocked requests, banned tokens, revocation hits, and economic firewall telemetry for agent activity.'],
-                ['Why do AI agent teams need live governance telemetry?', 'Live governance telemetry helps teams see which agents hold authority, what scopes and budgets apply, whether tokens are delegated, and when request-path controls block risky or over-budget activity.'],
-                ['How does dashboard telemetry connect to request-path control?', 'Dashboard telemetry explains decisions after SatGate enforces them in the request path. The dashboard is evidence; the gateway is where budgets, revocation, scopes, and policy are applied before upstream access.'],
+                ['What does the SatGate governance dashboard show?', 'The SatGate governance dashboard shows active agent tokens, delegation depth, caveats, blocked requests, banned tokens, revocation hits, and receipt-backed governance evidence for agent activity.'],
+                ['Why do AI agent teams need receipt-backed governance evidence?', 'Receipt-backed governance evidence shows which agents hold authority, what scopes and budgets apply, whether tokens are delegated, and which allowed, denied, revoked, or paid decisions feed Evidence Packs.'],
+                ['How does dashboard evidence connect to request-path control?', 'Dashboard evidence surfaces receipts after SatGate enforces decisions in the request path. The dashboard surfaces receipt-backed decisions; Evidence Packs are the exportable proof artifact; the gateway is where budgets, revocation, scopes, and policy are applied before upstream access.'],
               ].map(([question, answer]) => (
                 <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
                   <h3 className="mb-2 font-bold text-white">{question}</h3>
@@ -565,7 +565,7 @@ export default function DashboardPage() {
               ) : (
                 <>
                   <span className="text-purple-400 font-medium">Demo Mode:</span> Showing sample data. 
-                  Connect to <code className="text-purple-300">/api/governance/graph</code> for live telemetry.
+                  Connect to <code className="text-purple-300">/api/governance/graph</code> for live receipt-backed governance data.
                 </>
               )}
             </p>

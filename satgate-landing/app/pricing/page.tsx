@@ -90,7 +90,7 @@ const PricingPage = () => {
         name: 'Builder / Observe',
         price: '0',
         priceCurrency: 'USD',
-        description: 'Free Observe-mode visibility for AI agent API traffic and cost attribution.',
+        description: 'Free Observe-mode receipt capture for AI agent API traffic, cost attribution, and Evidence Pack-ready decision proof.',
         availability: 'https://schema.org/InStock',
         itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate Observe', applicationCategory: 'DeveloperApplication' },
       },
@@ -98,7 +98,7 @@ const PricingPage = () => {
         '@type': 'Offer',
         name: 'Pro / Control',
         priceCurrency: 'USD',
-        description: 'Request-path budget enforcement, per-agent caps, MCP tool controls, alerts, and revocation for AI agent spend.',
+        description: 'Request-path budget enforcement, per-agent caps, MCP tool controls, alerts, revocation, and signed decision receipts for AI agent spend.',
         availability: 'https://schema.org/InStock',
         itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate Control', applicationCategory: 'DeveloperApplication' },
       },
@@ -106,7 +106,7 @@ const PricingPage = () => {
         '@type': 'Offer',
         name: 'Enterprise / Charge',
         priceCurrency: 'USD',
-        description: 'Enterprise deployment, hybrid/on-prem options, advanced governance, and paid-rail governance for paid-agent API monetization.',
+        description: 'Enterprise deployment, hybrid/on-prem options, advanced governance, and paid-rail governance where paid calls return receipts and feed Evidence Packs.',
         availability: 'https://schema.org/InStock',
         itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate paid-rail governance', applicationCategory: 'DeveloperApplication' },
       },
@@ -217,7 +217,7 @@ const PricingPage = () => {
             </div>
             <ul className="space-y-3 text-sm text-gray-400 mb-8 flex-1">
               <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" /><span><b className="text-gray-200">Unlimited</b> observe-mode requests</span></li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Real-time usage dashboard</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Real-time receipt dashboard</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Cost attribution by agent &amp; team</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Up to 3 routes</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Community support</li>
@@ -252,8 +252,8 @@ const PricingPage = () => {
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />1M control/charge requests included</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Then $0.10 per 1K overage</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Unlimited routes</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />CFO-ready chargeback reports</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Compliance exports</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />CFO-ready receipt and chargeback exports</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Evidence Pack compliance exports</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Email support</li>
             </ul>
             <a
@@ -328,7 +328,7 @@ const PricingPage = () => {
                 <tr className="border-b border-gray-800/50">
                   <td className="py-3 px-4 text-gray-300">Visibility</td>
                   <td className="py-3 px-4">Post-mortem — look back at logs</td>
-                  <td className="py-3 px-4 text-white">Live economic telemetry</td>
+                  <td className="py-3 px-4 text-white">Signed receipts + Evidence Pack export</td>
                 </tr>
                 <tr className="border-b border-gray-800/50">
                   <td className="py-3 px-4 text-gray-300">Agent Loops</td>

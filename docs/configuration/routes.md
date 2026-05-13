@@ -49,9 +49,9 @@ SatGate uses a layered policy model:
 ### Layer 1 — Economic Policies
 | Kind | Aliases | Description |
 |------|---------|-------------|
-| `chargeback` | `observe`, `audit` | Verify → allow → meter and log usage |
+| `chargeback` | `observe`, `audit` | Verify → allow → emit receipts and meter usage |
 | `fiat402` | `control`, `budget` | Verify → enforce budget → allow |
-| `l402` | `charge`, `monetize` | Verify → require Lightning payment → allow |
+| `l402` | `charge`, `monetize` | Verify → require Lightning payment → return paid-call receipt → allow |
 
 **Example: Three-tier pricing**
 

@@ -15,7 +15,7 @@ const client = new SatGateAgentClient({
 });
 
 // Compatibility path: OSS gateway capability tokens are managed automatically
-const response = await client.get('/api/data');
+const response = await client.get('/api/data') // includes receipt_id / evidence_pack_id when enabled;
 console.log(response.data);
 ```
 

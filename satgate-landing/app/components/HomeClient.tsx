@@ -634,8 +634,8 @@ const LandingPage = () => {
               {
                 step: "2",
                 title: "Apply Config",
-                description: "Apply when ready. Version history + audit log. Rollback if needed.",
-                code: `v3 (applied) ← current\nv2 (available)\nv1 (available)\n\nAudit: who, when, diff`
+                description: "Apply when ready. Version history + policy receipt trail. Rollback if needed.",
+                code: `v3 (applied) ← current\nv2 (available)\nv1 (available)\n\nReceipt: who, when, diff`
               },
               {
                 step: "3",
@@ -646,8 +646,8 @@ const LandingPage = () => {
               {
                 step: "4",
                 title: "Prove What Happened",
-                description: "Real-time verified, denied, and metered decisions with evidence you can export.",
-                code: `Verified:   1,203 requests\nDenied:     12,847 policy hits\nMetered:    $847 usage\n\n→ Export Evidence Pack`
+                description: "Receipts for allowed, denied, paid, delegated, and revoked decisions — ready to export as an Evidence Pack.",
+                code: `Allowed receipts: 1,203\nDenied receipts: 12,847\nPaid receipts:   $847 settled\nDelegations:     42\nRevocations:     9\n\n→ Export Evidence Pack`
               }
             ].map((item, i) => (
               <div key={i} className="relative">

@@ -22,7 +22,7 @@ const (
 	EventTaskSpend          EventType = "task_spend"
 )
 
-// Event is a structured event emitted by the MCP proxy.
+// Event is a structured, receipt-ready proxy event used to build Evidence Packs.
 type Event struct {
 	Type      EventType              `json:"type"`
 	Timestamp time.Time              `json:"timestamp"`
@@ -33,7 +33,7 @@ type Event struct {
 	Data      map[string]interface{} `json:"data,omitempty"`
 }
 
-// EventPublisher is the interface for publishing MCP proxy events.
+// EventPublisher is the interface for publishing receipt-ready MCP proxy events.
 // OSS: no-op. Enterprise: Redis pub/sub.
 type EventPublisher interface {
 	Publish(event Event)

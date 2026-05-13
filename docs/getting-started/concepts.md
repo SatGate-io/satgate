@@ -12,9 +12,9 @@ Each route gets one of three economic policies:
 
 | Policy | What It Does | Use Case |
 |--------|-------------|----------|
-| **Observe** (`chargeback`) | Verify → allow → meter/log | "Show me what agents are spending" |
+| **Observe** (`chargeback`) | Verify → allow → emit receipts + meter | "Show me what agents are spending" |
 | **Control** (`fiat402`) | Verify → check budget → allow/deny | "Cap each team at $500/month" |
-| **Charge** (`l402`) | Verify → require payment → allow | "Charge 10 sats per API call" |
+| **Charge** (`l402`) | Verify → require payment → return paid-call receipt → allow | "Charge 10 sats per API call" |
 
 ### Layer 2 — MCP Awareness
 SatGate can parse MCP (Model Context Protocol) JSON-RPC payloads to attribute costs at the **tool level**, not just the endpoint level. See the [MCP Gateway Guide](../guides/mcp-gateway.md).

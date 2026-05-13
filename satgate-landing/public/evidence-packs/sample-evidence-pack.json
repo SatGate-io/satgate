@@ -217,7 +217,10 @@
       "prev_receipt_hash": null,
       "reason_code": "root_capability_issued",
       "request_id": "req_demo_mint_001",
-      "receipt_hash": "sha256:bfabcfda2a24d28370627598c31d57fc4c46516df771af1152367a4c56a94d7f"
+      "receipt_hash": "sha256:bfabcfda2a24d28370627598c31d57fc4c46516df771af1152367a4c56a94d7f",
+      "evidence_pack_id": "ep_demo_2026_05_10_001",
+      "policy_version": "pol_invoice_reconciliation@2026-05-09",
+      "decision_reason": "root_capability_issued"
     },
     {
       "receipt_id": "rcpt_demo_002",
@@ -241,7 +244,10 @@
       "reason_code": "scope_budget_and_depth_attenuated",
       "delegation_id": "del_demo_001",
       "request_id": "req_demo_delegate_001",
-      "receipt_hash": "sha256:7fa4779a47bbd10d30f0dc101cfc37259f149b9602662b675436bd616866708e"
+      "receipt_hash": "sha256:7fa4779a47bbd10d30f0dc101cfc37259f149b9602662b675436bd616866708e",
+      "evidence_pack_id": "ep_demo_2026_05_10_001",
+      "policy_version": "pol_invoice_reconciliation@2026-05-09",
+      "decision_reason": "scope_budget_and_depth_attenuated"
     },
     {
       "receipt_id": "rcpt_demo_003",
@@ -269,7 +275,10 @@
       "budget_remaining": "2.82",
       "payment_context_ref": "payctx_internal_ledger",
       "request_id": "req_demo_search_001",
-      "receipt_hash": "sha256:9df4c4c272cd5db8ef2d49d1d1d4b4989d0287c83b6c0df95bb523e9fb9933da"
+      "receipt_hash": "sha256:9df4c4c272cd5db8ef2d49d1d1d4b4989d0287c83b6c0df95bb523e9fb9933da",
+      "evidence_pack_id": "ep_demo_2026_05_10_001",
+      "policy_version": "pol_invoice_reconciliation@2026-05-09",
+      "decision_reason": "receipt_3_recorded"
     },
     {
       "receipt_id": "rcpt_demo_004",
@@ -296,7 +305,10 @@
       "budget_remaining": "2.40",
       "payment_context_ref": "payctx_internal_ledger",
       "request_id": "req_demo_compare_001",
-      "receipt_hash": "sha256:e9d86ea00d2ebd7f05965345c217cb3070fafc73f72d14f3e4f24627490d5f44"
+      "receipt_hash": "sha256:e9d86ea00d2ebd7f05965345c217cb3070fafc73f72d14f3e4f24627490d5f44",
+      "evidence_pack_id": "ep_demo_2026_05_10_001",
+      "policy_version": "pol_invoice_reconciliation@2026-05-09",
+      "decision_reason": "receipt_4_recorded"
     },
     {
       "receipt_id": "rcpt_demo_005",
@@ -324,7 +336,10 @@
       "budget_remaining": "2.22",
       "payment_context_ref": "payctx_x402_001",
       "request_id": "req_demo_ocr_001",
-      "receipt_hash": "sha256:bfaaf3e9c47247c9049e861347b3bd872b39da79d0d69b34f1e640c4e14b46a2"
+      "receipt_hash": "sha256:bfaaf3e9c47247c9049e861347b3bd872b39da79d0d69b34f1e640c4e14b46a2",
+      "evidence_pack_id": "ep_demo_2026_05_10_001",
+      "policy_version": "pol_invoice_reconciliation@2026-05-09",
+      "decision_reason": "receipt_5_recorded"
     },
     {
       "receipt_id": "rcpt_demo_006",
@@ -348,7 +363,10 @@
       "route": "/v1/invoices/export",
       "reason_code": "scope_violation:no_customer_data_export",
       "request_id": "req_demo_export_001",
-      "receipt_hash": "sha256:a0e106e1a3bd927bc1bc6898e981f1572796a19a02fee6438d217b7c2079dcd4"
+      "receipt_hash": "sha256:a0e106e1a3bd927bc1bc6898e981f1572796a19a02fee6438d217b7c2079dcd4",
+      "evidence_pack_id": "ep_demo_2026_05_10_001",
+      "policy_version": "pol_invoice_reconciliation@2026-05-09",
+      "decision_reason": "scope_violation:no_customer_data_export"
     },
     {
       "receipt_id": "rcpt_demo_007",
@@ -373,7 +391,10 @@
       "reason_code": "budget_exhausted",
       "budget_remaining": "0.00",
       "request_id": "req_demo_reconcile_001",
-      "receipt_hash": "sha256:018cfea0f59352202f0a6b30b95a8d34431a46b1fd420a58f96c8507a7d0e98b"
+      "receipt_hash": "sha256:018cfea0f59352202f0a6b30b95a8d34431a46b1fd420a58f96c8507a7d0e98b",
+      "evidence_pack_id": "ep_demo_2026_05_10_001",
+      "policy_version": "pol_invoice_reconciliation@2026-05-09",
+      "decision_reason": "budget_exhausted"
     },
     {
       "receipt_id": "rcpt_demo_008",
@@ -395,7 +416,10 @@
       "prev_receipt_hash": "sha256:018cfea0f59352202f0a6b30b95a8d34431a46b1fd420a58f96c8507a7d0e98b",
       "reason_code": "incident_review_stop_worker",
       "request_id": "req_demo_revoke_001",
-      "receipt_hash": "sha256:92e2271c311706d2421b87a687ddd9684fe0b9a5de6b1b20212daa7d74af6d9e"
+      "receipt_hash": "sha256:92e2271c311706d2421b87a687ddd9684fe0b9a5de6b1b20212daa7d74af6d9e",
+      "evidence_pack_id": "ep_demo_2026_05_10_001",
+      "policy_version": "pol_invoice_reconciliation@2026-05-09",
+      "decision_reason": "incident_review_stop_worker"
     },
     {
       "receipt_id": "rcpt_demo_009",
@@ -420,7 +444,10 @@
       "mcp_tool": "invoices.search",
       "reason_code": "capability_revoked",
       "request_id": "req_demo_after_revoke_001",
-      "receipt_hash": "sha256:155a43784a059dd677ebe6bb84582ed93400b26abd646a2208cbc67772dc79b9"
+      "receipt_hash": "sha256:155a43784a059dd677ebe6bb84582ed93400b26abd646a2208cbc67772dc79b9",
+      "evidence_pack_id": "ep_demo_2026_05_10_001",
+      "policy_version": "pol_invoice_reconciliation@2026-05-09",
+      "decision_reason": "capability_revoked"
     },
     {
       "receipt_id": "rcpt_demo_010",
@@ -442,7 +469,10 @@
       "prev_receipt_hash": "sha256:155a43784a059dd677ebe6bb84582ed93400b26abd646a2208cbc67772dc79b9",
       "reason_code": "auditor_request",
       "request_id": "req_demo_export_pack_001",
-      "receipt_hash": "sha256:ffae1b076b8bb9a01969bb03645bd155f182bfa5be54b96855a21a9c3d844087"
+      "receipt_hash": "sha256:ffae1b076b8bb9a01969bb03645bd155f182bfa5be54b96855a21a9c3d844087",
+      "evidence_pack_id": "ep_demo_2026_05_10_001",
+      "policy_version": "pol_invoice_reconciliation@2026-05-09",
+      "decision_reason": "auditor_request"
     }
   ],
   "payment_context": {
@@ -530,5 +560,6 @@
     "cli": "satgate-cli proof export --tenant tenant_acme_finance"
   },
   "chain_root": "sha256:0fbd3a9a2a686c4a7c9ec9d061d64d1c69d94c50adc674567bacfec647bc74d9",
-  "signature": "ed25519:REDACTED_DEMO_SAMPLE_DO_NOT_VERIFY"
+  "signature": "ed25519:REDACTED_DEMO_SAMPLE_DO_NOT_VERIFY",
+  "policy_version": "pol_invoice_reconciliation@2026-05-09"
 }

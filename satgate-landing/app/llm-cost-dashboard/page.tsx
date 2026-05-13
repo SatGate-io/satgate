@@ -101,7 +101,7 @@ export default function LlmCostDashboardPage() {
         name: 'What should teams do after finding LLM spend risk?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Turn the dashboard finding into enforceable policy: set per-agent budgets, MCP tool caps, model-routing rules, scoped token authority, revocation triggers, and audit fields in the request path.',
+          text: 'Turn the dashboard finding into enforceable policy: set per-agent budgets, MCP tool caps, model-routing rules, scoped token authority, revocation triggers, and receipt and Evidence Pack fields in the request path.',
         },
       },
     ],
@@ -215,11 +215,11 @@ export default function LlmCostDashboardPage() {
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">From dashboard to control</p>
           <h2 className="mb-4 text-3xl font-bold text-white">Convert cost visibility into policy</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
-            A dashboard should not be a dead end. Once it exposes spend risk, generate the policy objects that let SatGate block, route, revoke, or audit the next request.
+            A dashboard should not be a dead end. Once it exposes spend risk, generate the policy objects that let SatGate block, route, revoke, or issue receipts for Evidence Packs the next request.
           </p>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {[
-              ['/agent-spend-policy-template', 'Agent spend policy', 'Budgets, MCP caps, delegation, revocation, and audit fields.'],
+              ['/agent-spend-policy-template', 'Agent spend policy', 'Budgets, MCP caps, delegation, revocation, and receipt and Evidence Pack fields.'],
               ['/mcp-tool-cost-policy-generator', 'MCP tool cost policy', 'Per-tool prices, risk tiers, limits, and deny behavior.'],
               ['/revocable-capability-token-policy-template', 'Capability-token policy', 'Scoped, expiring, revocable authority for agents and sub-agents.'],
               ['/openai-budget-policy-generator', 'OpenAI budget policy', 'Model, route, session, daily, and per-request budget limits.'],
@@ -252,7 +252,7 @@ export default function LlmCostDashboardPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What should teams do after finding LLM spend risk?</h3>
-              <p className="leading-relaxed text-gray-400">Turn the dashboard finding into enforceable policy: set per-agent budgets, MCP tool caps, model-routing rules, scoped token authority, revocation triggers, and audit fields in the request path.</p>
+              <p className="leading-relaxed text-gray-400">Turn the dashboard finding into enforceable policy: set per-agent budgets, MCP tool caps, model-routing rules, scoped token authority, revocation triggers, and receipt and Evidence Pack fields in the request path.</p>
             </div>
           </div>
         </div>

@@ -110,7 +110,7 @@ export default function Page() {
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Identity is not authority</h3><p className="leading-relaxed text-gray-400">A verified agent can still be overpowered if the token does not constrain what it can do.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Budgets belong in the credential path</h3><p className="leading-relaxed text-gray-400">Spend limits, call ceilings, and route policy need to be evaluated before forwarding traffic.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Delegation should attenuate</h3><p className="leading-relaxed text-gray-400">A parent agent should be able to create a narrower child token, never a broader one.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Audit needs token context</h3><p className="leading-relaxed text-gray-400">Every decision should record identity, capability, caveats, remaining budget, route, and outcome.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Audit needs token context</h3><p className="leading-relaxed text-gray-400">Every decision should emit a receipt with identity, capability, caveats, remaining budget, route, outcome, decision_reason, policy_version, and Evidence Pack id.</p></div>
           </div>
         </div>
       </section>

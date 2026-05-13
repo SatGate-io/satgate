@@ -71,6 +71,7 @@ receipt_requirements:
   evidence_pack_required: true
   required_receipt_fields:
     - receipt_id
+    - evidence_pack_id
     - timestamp
     - tenant_id
     - principal_id

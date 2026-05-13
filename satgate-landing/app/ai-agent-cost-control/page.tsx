@@ -57,7 +57,7 @@ const controls = [
   {
     icon: BarChart3,
     title: 'Audit and attribution',
-    body: 'Record who spent what, on which tool, through which route, and why the policy allowed or denied it.',
+    body: 'Emit receipts showing who spent what, on which tool, through which route, why policy allowed or denied it, and which Evidence Pack preserves the proof.',
   },
 ];
 

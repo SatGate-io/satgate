@@ -42,6 +42,7 @@ Together, they form the complete agent commerce stack.
 2. SatGate returns `402 Payment Required` with a Lightning invoice and macaroon
 3. `lnget` automatically pays the invoice via the agent's Lightning backend
 4. `lnget` retries the request with the L402 authorization header (macaroon + preimage)
+5. SatGate returns access with a paid-call receipt and preserves it for Evidence Pack export
 5. SatGate verifies payment, proxies request to upstream, returns response
 
 The agent code doesn't change — `lnget` handles steps 2-4 transparently.
@@ -151,7 +152,7 @@ upstreams:
     policy: observe    # Log everything, block nothing
 ```
 
-Agents using `lnget` or plain `curl` both work. You get full cost attribution in the dashboard.
+Agents using `lnget` or plain `curl` both work. You get full paid-call receipts and Evidence Pack export in the dashboard.
 
 ### Control Mode (Fiat402)
 
@@ -231,7 +232,7 @@ lnget https://agent-a-gateway.example.com/api/sentiment \
 # Payment: 100 sats, settled in <1 second
 ```
 
-Agent B paid Agent A. No signup, no API key exchange, no invoice processing. Lightning settled it in milliseconds. SatGate recorded the transaction, attributed the cost, and enforced Agent A's pricing policy.
+Agent B paid Agent A. No signup, no API key exchange, no invoice processing. Lightning settled it in milliseconds. SatGate issued a paid-call receipt, attributed the cost, and enforced Agent A's pricing policy.
 
 This is machine-to-machine commerce.
 
@@ -242,7 +243,7 @@ Lightning Labs also offers [Aperture](https://github.com/lightninglabs/aperture)
 | Feature | Aperture | SatGate |
 |---------|----------|---------|
 | L402 gating | ✅ | ✅ |
-| Dashboard & analytics | ❌ | ✅ |
+| Receipts & Evidence Packs | ❌ | ✅ |
 | Budget enforcement | ❌ | ✅ |
 | Per-agent attribution | ❌ | ✅ |
 | MCP cost profiles | ❌ | ✅ |

@@ -196,7 +196,7 @@ export default function HardCappingMcpToolSpendPage() {
                 <tr className="border-b border-gray-800">
                   <td className="py-3 px-4 font-medium text-white">Visibility</td>
                   <td className="py-3 px-4 text-red-400">Post-mortem logs</td>
-                  <td className="py-3 px-4 text-green-400">Live economic telemetry</td>
+                  <td className="py-3 px-4 text-green-400">Signed receipts + Evidence Pack export</td>
                 </tr>
                 <tr className="border-b border-gray-800">
                   <td className="py-3 px-4 font-medium text-white">Agent Loops</td>

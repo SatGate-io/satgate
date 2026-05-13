@@ -90,7 +90,27 @@
       "type": "array",
       "minItems": 1,
       "items": {
-        "$ref": "#/$defs/receipt"
+        "$ref": "#/$defs/receipt",
+        "required": [
+          "receipt_id",
+          "evidence_pack_id",
+          "policy_version",
+          "decision_reason"
+        ],
+        "properties": {
+          "evidence_pack_id": {
+            "type": "string"
+          },
+          "policy_version": {
+            "type": "string"
+          },
+          "decision_reason": {
+            "type": "string"
+          },
+          "receipt_id": {
+            "type": "string"
+          }
+        }
       }
     },
     "payment_context": {

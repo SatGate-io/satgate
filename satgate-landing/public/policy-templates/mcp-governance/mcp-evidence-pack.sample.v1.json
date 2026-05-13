@@ -29,7 +29,8 @@
     "reason": "tool_allowlisted_budget_available",
     "cost_credits": 5,
     "remaining_credits": 495,
-    "budget_id": "bud_prod_agents_daily"
+    "budget_id": "bud_prod_agents_daily",
+    "decision_reason": "tool_allowlisted_budget_available"
   },
   "integrity": {
     "receipt_id": "rcpt_mcp_demo_001",

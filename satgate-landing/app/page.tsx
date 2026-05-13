@@ -84,7 +84,7 @@ export default function HomePage() {
         name: 'What are Observe, Control, and Charge?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Observe tracks agent traffic and cost without blocking. Control enforces budgets and scoped policy for internal agents. Charge preserves authorization evidence around external paid access across L402, x402, API-key, or enterprise billing rails.',
+          text: 'Observe preserves decision receipts for agent traffic and cost context without blocking. Control enforces budgets and scoped policy for internal agents. Charge returns paid-call receipts and Evidence Pack proof across L402, x402, API-key, or enterprise billing rails.',
         },
       },
     ],
