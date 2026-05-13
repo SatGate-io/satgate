@@ -158,3 +158,7 @@ Never leak raw bearer tokens, macaroons, prompts, customer payloads, or full ext
 - chain type: `linear_hash_chain`
 
 The top-level signature signs the Evidence Pack envelope and receipt-chain root. Demo fixtures are explicitly marked as non-verifiable because they use deterministic placeholder hashes and a redacted demo signature.
+
+## Event history and future verifier conclusions
+
+Evidence Pack v1 may include optional `event_history` entries. Event history is the substrate for verifier-observed conclusions such as stayed within budget, completed task, looped/retried, revoked/attenuated, vouched by principal, or accepted by upstream. It is not a public score surface. Reputation, if ever exposed, must fall out of signed receipts and verifier-observed history rather than SatGate assertion.

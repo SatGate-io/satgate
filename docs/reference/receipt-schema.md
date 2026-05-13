@@ -93,6 +93,19 @@ Specific profiles can emit a subset. For example, acceptor metadata v0 emits onl
 - `paid` receipts require `amount_usd`, `currency: "USD"`, and `rail` so paid-call evidence does not lose payment context.
 - If `acceptor_id` is present, `capability_hash` is required so acceptor-bound receipts are tied to the capability material without leaking raw credentials.
 
+## Optional verifier-context fields
+
+Receipt v1 is intentionally additive. The following optional fields preserve future verifier/audit optionality without launching public reputation, scores, rankings, or marketplace semantics:
+
+- `task_id`, `task_status` — correlate receipts to a requested task and observed completion state.
+- `attempt`, `max_attempts`, `retry_of_receipt_id`, `parent_receipt_id` — support loop/retry analysis across event history.
+- `budget_id`, `budget_limit_usd` — bind receipts to the budget envelope used for stayed-within-budget conclusions.
+- `principal_id`, `principal_authorization_id`, `vouch_receipt_id` — preserve evidence that a named principal vouched for a subject or capability.
+- `attenuation_depth`, `caveats_hash`, `revoked_receipt_id` — preserve delegation, attenuation, caveat, and revocation lineage without leaking raw credentials.
+- `event_history_ref` — link to Evidence Pack event history when sequence evidence is required.
+
+These fields are evidence handles. They do not create a reputation claim by themselves. Verifier conclusions must be derived from signed receipts, event history, trust anchors, and verifier policy. See [Reputation Substrate](reputation-substrate.md).
+
 ## Related artifacts
 
 - Issuer metadata: `https://satgate.io/.well-known/satgate`
