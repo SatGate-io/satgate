@@ -53,8 +53,8 @@ const controls = [
   },
   {
     icon: ClipboardList,
-    title: 'Policy evidence',
-    body: 'Record who called which tool, estimated cost, remaining budget, policy decision, and upstream result.',
+    title: 'Receipt-backed policy evidence',
+    body: 'Emit a receipt for who called which tool, estimated cost, remaining budget, policy decision, decision reason, policy version, and upstream result.',
   },
   {
     icon: Zap,
@@ -66,7 +66,7 @@ const controls = [
 const examples = [
   ['web_search', '$0.01/call', '$2/session', 'Allow until session budget is exhausted'],
   ['browser_automation', '$0.05/min', '$10/day', 'Require justification after 10 minutes'],
-  ['code_execution', '$0.03/run', '$5/workflow', 'Block unsafe commands and log artifacts'],
+  ['code_execution', '$0.03/run', '$5/workflow', 'Block unsafe commands and attach artifacts to the decision receipt'],
   ['premium_data_api', '$0.25/call', '$25/tenant/day', 'Require paid-rail context and Evidence Pack receipt before access'],
   ['cloud_write_action', '$0.00 + risk', 'approval required', 'Deny unless capability includes write scope'],
 ];
@@ -132,7 +132,7 @@ export default function McpBudgetEnforcementPage() {
         name: 'What should an MCP tool budget include?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An MCP tool budget should include tool identity, price per call or minute, agent and tenant scope, session and daily caps, risk tier, enforcement action, revocation behavior, and audit fields.',
+          text: 'An MCP tool budget should include tool identity, price per call or minute, agent and tenant scope, session and daily caps, risk tier, enforcement action, revocation behavior, and receipt fields and Evidence Pack export fields.',
         },
       },
       {
@@ -280,7 +280,7 @@ export default function McpBudgetEnforcementPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What should an MCP tool budget include?</h3>
               <p className="text-gray-400 leading-relaxed">
-                An MCP tool budget should include tool identity, price per call or minute, agent and tenant scope, session and daily caps, risk tier, enforcement action, revocation behavior, and audit fields.
+                An MCP tool budget should include tool identity, price per call or minute, agent and tenant scope, session and daily caps, risk tier, enforcement action, revocation behavior, and receipt fields and Evidence Pack export fields.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

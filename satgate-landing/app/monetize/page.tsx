@@ -41,7 +41,7 @@ const softwareJsonLd = {
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
   dateModified: '2026-05-03',
-  featureList: ['HTTP 402 challenge simulation', 'Per-request Lightning pricing', 'L402 payment proof retry', 'Robot-customer monetization flow', 'Manual preimage entry'],
+  featureList: ['HTTP 402 challenge simulation', 'Per-request Lightning pricing', 'L402 payment proof retry', 'Paid-call receipt creation', 'Evidence Pack proof'],
 };
 
 const faqJsonLd = {
@@ -61,7 +61,7 @@ const faqJsonLd = {
       name: 'How is L402 different from a subscription API key?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'A subscription API key grants ongoing access and bills later. L402 lets each agent request receive a payment challenge, pay the invoice, and retry with proof before access is granted.',
+        text: 'A subscription API key grants ongoing access and bills later. L402 lets each agent request receive a payment challenge, pay the invoice, retry with proof, and receive a paid-call receipt before access is granted.',
       },
     },
     {
@@ -378,7 +378,7 @@ export default function MonetizeDemoPage() {
       <div className="w-full max-w-3xl mb-8 text-center">
         <h2 className="text-xl sm:text-2xl font-bold mb-3">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-400">
-            Zero Invoices. Zero Contracts. Zero Wait.
+            Per-request Receipts. Zero Contracts. Proof in Seconds.
           </span>
         </h2>
         <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-xl mx-auto">
@@ -487,7 +487,7 @@ export default function MonetizeDemoPage() {
         <div className="grid gap-4 md:grid-cols-3">
           {[
             ['What is SatGate paid-rail governance?', 'SatGate governs paid-rail context and paid-rail context to let paid agents and AI agents pay for API access in the request path before protected data or tools are unlocked.'],
-            ['How is L402 different from a subscription API key?', 'A subscription API key grants ongoing access and bills later. L402 lets each agent request receive a payment challenge, pay the invoice, and retry with proof before access is granted.'],
+            ['How is L402 different from a subscription API key?', 'A subscription API key grants ongoing access and bills later. L402 lets each agent request receive a payment challenge, pay the invoice, retry with proof, and receive a paid-call receipt before access is granted.'],
             ['When should an API use per-request paid-rail context?', 'Per-request paid-rail context fit API products used by autonomous agents, paid tools, data endpoints, premium insights, and paid-agent workflows where access and payment should clear instantly.'],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">

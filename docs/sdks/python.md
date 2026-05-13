@@ -200,7 +200,7 @@ client = SatGateAgentClient(
 )
 
 # L402 endpoints are handled automatically
-response = client.get("/premium/data")  # Pays Lightning invoice if needed
+response = client.get("/premium/data")  # includes receipt_id / evidence_pack_id when enabled  # Pays Lightning invoice if needed
 ```
 
 ### Token Delegation

@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SatGate Policy-to-Proof",
     description:
-      "Every grant, spend event, denial, and revocation leaves evidence your CISO, finance team, and auditor can trust.",
+      "Every grant, paid call, denial, delegation, and revocation produces receipts and Evidence Pack proof your CISO, finance team, and auditor can trust.",
     url: "https://satgate.io/policy-to-proof",
     type: "website",
   },
@@ -74,7 +74,7 @@ const evidenceQuestions = [
   {
     question: "Can we prove revocation worked?",
     artifact: "Revocation receipt + post-revoke denial",
-    body: "The revocation event and the first failed invoice-reconciler call after access ended, tied to the same authority chain.",
+    body: "The revocation receipt and the first post-revoke denial receipt after access ended, tied to the same authority chain.",
   },
 ];
 
@@ -115,6 +115,7 @@ const personas = [
 
 const evidencePack = {
   evidence_pack_id: "ep_demo_2026_05_09_001",
+  policy_version: "pol_invoice_reconciliation@2026-05-09",
   issued_at: "2026-05-09T14:22:31Z",
   expires_at: "2026-05-16T14:22:31Z",
   tenant: "acme-finance",
@@ -142,16 +143,16 @@ const evidencePack = {
     },
   ],
   receipts: [
-    { type: "mint", ts: "2026-05-09T14:22:31Z", issuer_kid: "satgate-mint-2026-05", result: "issued", caveats: ["tenant=acme-finance", "budget_usd<=25", "delegation_depth<=1"], receipt_hash: "sha256:7a2c..." },
-    { type: "delegation", ts: "2026-05-09T14:23:04Z", result: "attenuated", receipt_hash: "sha256:95f1..." },
-    { type: "spend", ts: "2026-05-09T14:23:18Z", route: "/v1/invoices/search", amount_usd: "0.18", payment_protocol: "internal_api", settlement: { rail: "internal_ledger", cost_center: "FIN-AP-042" }, result: "allowed", receipt_hash: "sha256:01d8..." },
-    { type: "spend", ts: "2026-05-09T14:24:02Z", route: "/v1/invoices/compare", amount_usd: "0.42", payment_protocol: "internal_api", settlement: { rail: "internal_ledger", cost_center: "FIN-AP-042" }, result: "allowed", receipt_hash: "sha256:a923..." },
-    { type: "spend", ts: "2026-05-09T14:24:44Z", route: "/v1/invoices/ocr", mcp_tool: "document_ai.ocr", amount_usd: "0.18", payment_protocol: "x402", settlement: { chain: "solana", tx: "REDACTED_DEMO_SAMPLE", ms: 187 }, result: "allowed", receipt_hash: "sha256:deb5..." },
-    { type: "denial", ts: "2026-05-09T14:25:08Z", reason_code: "scope_violation:no_customer_data_export", result: "blocked", receipt_hash: "sha256:9b0f..." },
-    { type: "denial", ts: "2026-05-09T14:25:33Z", reason_code: "budget_exhausted", result: "blocked", receipt_hash: "sha256:c3f6..." },
-    { type: "revocation", ts: "2026-05-09T14:26:11Z", revoked_by: "security-admin", result: "revoked", receipt_hash: "sha256:37d1..." },
-    { type: "post_revoke_denial", ts: "2026-05-09T14:26:16Z", reason_code: "capability_revoked", result: "blocked", receipt_hash: "sha256:8b95..." },
-    { type: "export", ts: "2026-05-09T14:26:31Z", result: "evidence_pack_issued", receipt_hash: "sha256:e1b3..." },
+    { receipt_id: "rcpt_mint_001", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "mint", ts: "2026-05-09T14:22:31Z", issuer_kid: "satgate-mint-2026-05", decision_reason: "root_capability_issued", result: "issued", caveats: ["tenant=acme-finance", "budget_usd<=25", "delegation_depth<=1"], receipt_hash: "sha256:7a2c..." },
+    { receipt_id: "rcpt_delegation_002", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "delegation", ts: "2026-05-09T14:23:04Z", decision_reason: "scope_budget_and_depth_attenuated", result: "attenuated", receipt_hash: "sha256:95f1..." },
+    { receipt_id: "rcpt_spend_search_003", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "spend", ts: "2026-05-09T14:23:18Z", route: "/v1/invoices/search", amount_usd: "0.18", payment_protocol: "internal_api", settlement: { rail: "internal_ledger", cost_center: "FIN-AP-042" }, decision_reason: "allowed_under_policy", result: "allowed", receipt_hash: "sha256:01d8..." },
+    { receipt_id: "rcpt_spend_compare_004", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "spend", ts: "2026-05-09T14:24:02Z", route: "/v1/invoices/compare", amount_usd: "0.42", payment_protocol: "internal_api", settlement: { rail: "internal_ledger", cost_center: "FIN-AP-042" }, decision_reason: "allowed_under_policy", result: "allowed", receipt_hash: "sha256:a923..." },
+    { receipt_id: "rcpt_paid_ocr_005", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "spend", ts: "2026-05-09T14:24:44Z", route: "/v1/invoices/ocr", mcp_tool: "document_ai.ocr", amount_usd: "0.18", payment_protocol: "x402", settlement: { chain: "solana", tx: "REDACTED_DEMO_SAMPLE", ms: 187 }, decision_reason: "allowed_under_policy", result: "allowed", receipt_hash: "sha256:deb5..." },
+    { receipt_id: "rcpt_denial_scope_006", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "denial", ts: "2026-05-09T14:25:08Z", decision_reason: "scope_violation:no_customer_data_export", reason_code: "scope_violation:no_customer_data_export", result: "blocked", receipt_hash: "sha256:9b0f..." },
+    { receipt_id: "rcpt_denial_budget_007", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "denial", ts: "2026-05-09T14:25:33Z", decision_reason: "budget_exhausted", reason_code: "budget_exhausted", result: "blocked", receipt_hash: "sha256:c3f6..." },
+    { receipt_id: "rcpt_revocation_008", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "revocation", ts: "2026-05-09T14:26:11Z", revoked_by: "security-admin", decision_reason: "capability_revoked_by_security_admin", result: "revoked", receipt_hash: "sha256:37d1..." },
+    { receipt_id: "rcpt_post_revoke_denial_009", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "post_revoke_denial", ts: "2026-05-09T14:26:16Z", decision_reason: "capability_revoked", reason_code: "capability_revoked", result: "blocked", receipt_hash: "sha256:8b95..." },
+    { receipt_id: "rcpt_export_010", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "export", ts: "2026-05-09T14:26:31Z", decision_reason: "evidence_pack_exported", result: "evidence_pack_issued", receipt_hash: "sha256:e1b3..." },
   ],
   chain_root: "sha256:f04ed8430b11c8975cc5ef35919ee078fc4cb166cd8d611ed0d94b7da69df09d",
   signature: "ed25519:REDACTED_DEMO_SAMPLE_DO_NOT_VERIFY",
@@ -350,7 +351,7 @@ export default function PolicyToProofPage() {
               <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Answer the audit questions after the invoice-reconciler acts.</h2>
             </div>
             <p className="max-w-md text-sm leading-6 text-gray-500">
-              The Evidence Pack bundles these artifacts into one export instead of sending teams on a forensics project across logs, invoices, and gateway dashboards. Authority-chain entries preserve lineage; matching receipts preserve the event log, so auditors can verify both structure and sequence.
+              The Evidence Pack bundles these artifacts into one export instead of sending teams on a forensics project across logs, invoices, and gateway dashboards. Authority-chain entries preserve lineage; matching receipts preserve the allow, deny, pay, delegate, and revoke sequence, so auditors can verify both structure and chronology.
             </p>
           </div>
 
@@ -372,7 +373,7 @@ export default function PolicyToProofPage() {
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-purple-300">Maps to audit controls</p>
             <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Audit-fluent, not just audit-flavored.</h2>
             <p className="mt-5 text-lg leading-8 text-gray-400">
-              The Evidence Pack gives security and audit teams a starting control map instead of making them translate raw gateway logs themselves.
+              The Evidence Pack gives security and audit teams a starting control map instead of making them translate raw gateway logs without receipt hashes, policy versions, and decision reasons.
             </p>
           </div>
           <div className="mt-10 grid gap-4 md:grid-cols-2">

@@ -19,7 +19,7 @@ const webPageJsonLd = {
   '@type': 'WebPage',
   name: 'SatGate paid-rail governance Demo',
   url: 'https://satgate.io/pay',
-  description: 'Interactive L402 payment demo showing HTTP 402 challenges, Lightning invoices, payment proof, and request-path API access for paid agents.',
+  description: 'Interactive paid-rail demo showing HTTP 402 challenges, Lightning invoices, paid-call receipts, Evidence Pack proof, and request-path API access for paid agents.',
   datePublished: '2026-04-12',
   dateModified: '2026-05-03',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -42,7 +42,7 @@ const softwareJsonLd = {
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
   dateModified: '2026-05-03',
-  featureList: ['HTTP 402 challenge simulation', 'paid-rail context invoice flow', 'Payment proof retry', 'Robot-customer API access', 'Manual preimage entry'],
+  featureList: ['HTTP 402 challenge simulation', 'paid-rail context invoice flow', 'Payment proof retry', 'Paid-call receipt creation', 'Evidence Pack proof'],
 };
 
 const faqJsonLd = {
@@ -54,7 +54,7 @@ const faqJsonLd = {
       name: 'What happens during an L402 payment flow?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment to unlock access.',
+        text: 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment; SatGate returns a paid-call receipt and records the decision for the Evidence Pack.',
       },
     },
     {
@@ -70,7 +70,7 @@ const faqJsonLd = {
       name: 'Can paid-rail context be combined with access policy?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. SatGate can combine L402 payment with capability tokens, scoped authorization, budget policy, audit fields, and revocation so payment does not become unrestricted access.',
+        text: 'Yes. SatGate can combine L402 payment with capability tokens, scoped authorization, budget policy, receipt fields, Evidence Pack export, and revocation so payment does not become unrestricted access.',
       },
     },
   ],
@@ -318,7 +318,7 @@ export default function PayDemoPage() {
         addLog(`💸 Paying Invoice (${selectedEndpoint.price} sats)...`, 'info');
         await new Promise(r => setTimeout(r, 1500)); 
         preimage = "mock_preimage_123";
-        addLog('✅ Payment Confirmed. Preimage secured.', 'success');
+        addLog('✅ Payment confirmed. Paid-call receipt created.', 'success');
       }
 
       // --- STEP C: RETRY WITH AUTH DISCOVERY ---
@@ -345,8 +345,9 @@ export default function PayDemoPage() {
               try {
                   addLog(`🔄 Trying ${format} format...`, 'info');
                   const finalRes = await realClient.get(TARGET_URL, token);
-                  addLog('✅ 200 OK: Request Authorized.', 'success');
+                  addLog('✅ 200 OK: Request Authorized + Receipt Returned.', 'success');
                   addLog(`📦 Payload: ${JSON.stringify(finalRes)}`, 'success');
+                  addLog('🧾 Paid-call receipt queued for Evidence Pack.', 'success');
                   success = true;
                   break;
               } catch (e: any) {
@@ -375,8 +376,9 @@ export default function PayDemoPage() {
 
       } else {
           await new Promise(r => setTimeout(r, 800));
-          addLog('✅ 200 OK: Request Authorized.', 'success');
-          addLog('📦 Payload: { "market_sentiment": "bullish", "confidence": 0.98 }', 'success');
+          addLog('✅ 200 OK: Request Authorized + Receipt Returned.', 'success');
+          addLog('📦 Payload: { "market_sentiment": "bullish", "confidence": 0.98, "receipt_id": "rcpt_paid_demo_001" }', 'success');
+          addLog('🧾 Paid-call receipt queued for Evidence Pack.', 'success');
       }
       
       setStatus('success');
@@ -439,13 +441,13 @@ export default function PayDemoPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold mb-4">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-400">
-              Zero Invoices. Zero Contracts. Zero Wait.
+              Per-request Receipts. Zero Contracts. Proof in Seconds.
             </span>
           </h2>
           <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
             Watch an AI agent <strong className="text-white">pay for API access in real-time</strong> using 
             Bitcoin Lightning. No credit cards. No monthly bills. Just instant, per-request micropayments 
-            that settle in milliseconds.
+            that return receipts and feed Evidence Packs.
           </p>
         </div>
       </div>
@@ -550,9 +552,9 @@ export default function PayDemoPage() {
         <h2 className="mb-8 text-center text-2xl font-bold text-white">L402 payment flow questions</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            ['What happens during an L402 payment flow?', 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment to unlock access.'],
+            ['What happens during an L402 payment flow?', 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment; SatGate returns a paid-call receipt and records the decision for the Evidence Pack.'],
             ['Why use L402 for agent API access?', 'L402 lets autonomous agents pay at request time without subscriptions, credit cards, or long-lived API keys, making API access native to paid agents.'],
-            ['Can paid-rail context be combined with access policy?', 'Yes. SatGate can combine L402 payment with capability tokens, scoped authorization, budget policy, audit fields, and revocation so payment does not become unrestricted access.'],
+            ['Can paid-rail context be combined with access policy?', 'Yes. SatGate can combine L402 payment with capability tokens, scoped authorization, budget policy, receipt fields, Evidence Pack export, and revocation so payment does not become unrestricted access.'],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
               <h3 className="mb-2 font-bold text-white">{question}</h3>

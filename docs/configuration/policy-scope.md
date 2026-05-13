@@ -10,7 +10,7 @@ SatGate supports six policy kinds organized in two layers:
 - **`capability`** (aliases: `protected`, `protect`) — Requires a valid macaroon token. Verifies cryptographically, sub-millisecond, no external auth calls.
 
 ### Layer 1 — Economic Policies
-- **`chargeback`** (aliases: `observe`, `audit`) — Verify token → allow request → meter and log usage. Non-blocking. Good for initial rollout.
+- **`chargeback`** (aliases: `observe`, `audit`) — Verify token → allow request → emit receipts and meter usage. Non-blocking. Good for initial rollout.
 - **`fiat402`** (aliases: `control`, `budget`) — Verify token → check budget → allow or block. Hard enforcement.
 - **`control`** requires a `pay` block in the route config.
 - **`l402`** (aliases: `charge`, `monetize`) — Verify token → require Lightning payment proof → allow. Requires `priceSats` or `pay` configuration.

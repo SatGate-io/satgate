@@ -42,7 +42,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
   const policy = useMemo(() => {
     const escalation = risk === 'high' ? 'block_and_revoke' : risk === 'medium' ? 'route_to_economy_model' : 'log_and_allow';
     const auditLevel = mode === 'control' ? 'decision_and_cost' : 'cost_attribution_only';
-    return `agent_policy: ${workflow || 'research-agent'}\nprovider: openai\nmode: ${mode}\nrisk_profile: ${risk}\nbudgets:\n  daily: ${dailyBudget.toFixed(2)} USD\n  per_session: ${sessionBudget.toFixed(2)} USD\n  per_request: ${perRequest.toFixed(2)} USD\nmodel_policy:\n  default_route: economy\n  premium_model_budget_share: ${premiumModelPct}%\n  require_justification_for:\n    - gpt-5.5\n    - gpt-5.5-pro\ncontrols:\n  on_daily_budget_exhausted: block\n  on_per_request_exceeded: ${escalation}\n  on_loop_detected: revoke_session_capability\n  on_unknown_agent: deny\ncapability:\n  expiry: task_or_24h\n  delegation: attenuated_only\n  child_budget_max: ${(sessionBudget * 0.25).toFixed(2)} USD\nevidence_pack:\n  required: true\n  receipt_id: generated_per_decision\n  include_payment_context: false\naudit:\n  level: ${auditLevel}\n  include:\n    - tenant\n    - agent\n    - workflow\n    - model\n    - estimated_cost\n    - remaining_budget\n    - policy_decision\n    - upstream_status`;
+    return `agent_policy: ${workflow || 'research-agent'}\nprovider: openai\nmode: ${mode}\nrisk_profile: ${risk}\nbudgets:\n  daily: ${dailyBudget.toFixed(2)} USD\n  per_session: ${sessionBudget.toFixed(2)} USD\n  per_request: ${perRequest.toFixed(2)} USD\nmodel_policy:\n  default_route: economy\n  premium_model_budget_share: ${premiumModelPct}%\n  require_justification_for:\n    - gpt-5.5\n    - gpt-5.5-pro\ncontrols:\n  on_daily_budget_exhausted: block\n  on_per_request_exceeded: ${escalation}\n  on_loop_detected: revoke_session_capability\n  on_unknown_agent: deny\ncapability:\n  expiry: task_or_24h\n  delegation: attenuated_only\n  child_budget_max: ${(sessionBudget * 0.25).toFixed(2)} USD\nevidence_pack:\n  required: true\n  receipt_id: generated_per_decision\n  evidence_pack_id: generated_per_workflow_or_export\n  decision_reason: required\n  policy_version: required\n  include_payment_context: false\naudit:\n  level: ${auditLevel}\n  include:\n    - tenant\n    - agent\n    - workflow\n    - model\n    - estimated_cost\n    - remaining_budget\n    - policy_decision\n    - decision_reason\n    - policy_version\n    - receipt_id\n    - evidence_pack_id\n    - upstream_status`;
   }, [dailyBudget, mode, perRequest, premiumModelPct, risk, sessionBudget, workflow]);
 
   const jsonPolicy = useMemo(() => ({
@@ -66,8 +66,8 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
       on_loop_detected: 'revoke_session_capability',
       on_unknown_agent: 'deny',
     },
-    evidence_pack: { required: true, receipt_id: 'generated_per_decision', include_payment_context: false },
-    audit: ['tenant', 'agent', 'workflow', 'model', 'estimated_cost', 'remaining_budget', 'policy_decision', 'upstream_status'],
+    evidence_pack: { required: true, receipt_id: 'generated_per_decision', evidence_pack_id: 'generated_per_workflow_or_export', decision_reason: 'required', policy_version: 'required', include_payment_context: false },
+    audit: ['tenant', 'agent', 'workflow', 'model', 'estimated_cost', 'remaining_budget', 'policy_decision', 'decision_reason', 'policy_version', 'receipt_id', 'evidence_pack_id', 'upstream_status'],
   }), [dailyBudget, mode, perRequest, premiumModelPct, risk, sessionBudget, workflow]);
 
   const webPageJsonLd = {

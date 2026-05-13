@@ -449,7 +449,7 @@ export default function GovernPage() {
       {/* Dashboard Screenshots */}
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">Dashboards that end in evidence.</h2>
+          <h2 className="text-3xl font-bold text-center mb-4">Receipts that roll up into Evidence Packs.</h2>
           <p className="text-gray-500 text-center mb-12">Real-time visibility into every agent, API call, policy decision, revocation, and dollar — with exports when proof matters.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -699,7 +699,7 @@ export default function GovernPage() {
             <div className="p-5 rounded-xl bg-gray-900 border border-gray-800 text-center">
               <div className="text-3xl mb-3">💰</div>
               <h4 className="font-semibold text-white mb-2">Evidence export</h4>
-              <p className="text-gray-500 text-sm">Every mint, delegation, spend event, denial, and revocation can land in an Evidence Pack.</p>
+              <p className="text-gray-500 text-sm">Every mint, delegation, paid call, denial, and revocation produces receipts that can land in an Evidence Pack.</p>
             </div>
           </div>
 
@@ -769,7 +769,7 @@ export default function GovernPage() {
             <div className="bg-[#12121a] border border-gray-800 rounded-xl p-6">
               <div className="text-2xl font-bold text-green-400 mb-2">3</div>
               <h3 className="text-white font-semibold mb-2">Export the evidence</h3>
-              <p className="text-gray-400 text-sm">Every grant, spend event, denial, delegation, and revocation becomes part of the evidence trail when you need to prove what happened.</p>
+              <p className="text-gray-400 text-sm">Every grant, paid call, denial, delegation, and revocation produces a receipt for the Evidence Pack when you need to prove what happened.</p>
             </div>
           </div>
 

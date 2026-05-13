@@ -176,7 +176,7 @@ export default function MCPPage() {
           {[
             ['Price every tool', 'Assign cost profiles to MCP tools so agents cannot treat expensive operations like free function calls.'],
             ['Enforce before execution', 'Block over-budget or out-of-scope tool calls before they reach the upstream MCP server.'],
-            ['Audit every decision', 'Record agent, workflow, tool, policy, budget, and revocation evidence for every governed call.'],
+            ['Audit every decision', 'Emit receipt-backed proof for agent, workflow, tool, policy, budget, paid-call, denial, delegation, and revocation decisions.'],
           ].map(([title, body]) => (
             <div key={title} className="rounded-2xl border border-gray-800 bg-black p-6">
               <h2 className="mb-3 text-2xl font-bold text-white">{title}</h2>

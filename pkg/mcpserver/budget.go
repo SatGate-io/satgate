@@ -54,10 +54,10 @@ type TenantCostResolver interface {
 type InMemoryBudgetEnforcer struct {
 	mu      sync.Mutex
 	budgets map[string]int64 // tokenID -> remaining credits
-	spent   []SpendRecord    // append-only log
+	spent   []SpendRecord    // append-only receipt-ready spend records
 }
 
-// SpendRecord is an in-memory spend log entry.
+// SpendRecord is an in-memory, receipt-ready spend record.
 type SpendRecord struct {
 	TokenID   string `json:"token_id"`
 	ToolName  string `json:"tool_name"`
@@ -176,7 +176,7 @@ func (e *InMemoryBudgetEnforcer) Remaining(_ context.Context, tokenID string) (i
 	return remaining, nil
 }
 
-// SpendLog returns a copy of all spend records (for debugging/testing).
+// SpendLog returns receipt-ready spend records for debugging/testing, not canonical Evidence Pack export.
 func (e *InMemoryBudgetEnforcer) SpendLog() []SpendRecord {
 	e.mu.Lock()
 	defer e.mu.Unlock()

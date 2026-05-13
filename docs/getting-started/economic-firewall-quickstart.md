@@ -51,7 +51,7 @@ routes:
         costCenterHeader: X-Cost-Center
 ```
 
-When an agent's budget hits zero, requests are **blocked**. Not logged. Not alerted. Blocked.
+When an agent's budget hits zero, requests are **blocked**. Not merely logged or alerted. Blocked, with a denial receipt for the Evidence Pack.
 
 ## Step 3: Charge (Lightning Payments)
 

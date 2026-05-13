@@ -72,7 +72,7 @@ Then show:
 - the authority chain
 - the policy snapshot
 - the budget snapshot
-- the x402 payment-context event
+- the x402 payment-context receipt
 - the scope denial
 - the budget denial
 - the post-revoke denial

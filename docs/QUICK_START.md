@@ -97,7 +97,7 @@ TOKEN=$(curl -s -X POST http://localhost:8080/api/capability/mint \
 curl http://localhost:8080/api/anything \
   -H "Authorization: Bearer $TOKEN"
 
-# L402 route — returns 402 Payment Required with Lightning invoice
+# L402 route — returns 402 Payment Required with Lightning invoice; paid retry returns a paid-call receipt for the Evidence Pack
 curl -i http://localhost:8080/premium/anything
 ```
 

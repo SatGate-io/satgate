@@ -12,7 +12,7 @@ SatGate Gateway is an enterprise API gateway that provides:
 - **Observe Mode** — Track who's calling your APIs (authentication + metering)
 - **Control Mode** — Enforce budget limits (authentication + enforcement)
 - **Charge Mode** — Require payment per request (L402/Fiat402 monetization)
-- **Governance** — Audit logging, token revocation, compliance exports
+- **Governance** — receipt-backed Evidence Packs, token revocation, compliance exports
 
 ## Quick Links
 
@@ -164,8 +164,8 @@ SatGate Gateway is an enterprise API gateway that provides:
 
 - **Team Management** — RBAC with Owner/Admin/Member/Viewer roles
 - **Admin Impersonation** — "View as Customer" for support
-- **Audit Logging** — Tamper-evident event trail
-- **Security Dashboard** — Filterable audit viewer
+- **Audit Logging** — Tamper-evident receipt chain
+- **Security Dashboard** — Filterable receipt and Evidence Pack viewer
 - **SSO** — OIDC/SAML integration
 - **Fleet Management** — Multi-gateway deployments
 

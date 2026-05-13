@@ -41,6 +41,18 @@
     "require_receipt_signature": true,
     "require_tenant_consistency": true,
     "require_budget_id_caveat_for_metered_tools": true,
-    "require_explicit_tool_allowlist": true
+    "require_explicit_tool_allowlist": true,
+    "require_receipt_id": true,
+    "require_evidence_pack_id": true,
+    "require_decision_reason": true,
+    "require_policy_version_on_decision": true,
+    "required_receipt_fields": [
+      "receipt_id",
+      "evidence_pack_id",
+      "policy_version",
+      "decision_reason",
+      "policy_digest",
+      "receipt_signature"
+    ]
   }
 }

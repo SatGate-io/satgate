@@ -49,11 +49,15 @@ export default function McpProxyConfigGeneratorPage() {
             SATGATE_POLICY: `${slug}-mcp-policy`,
             SATGATE_REQUIRE_AGENT_ID: 'true',
             SATGATE_REQUIRE_TASK_ID: 'true',
+            SATGATE_REQUIRE_RECEIPT_ID: 'true',
+            SATGATE_REQUIRE_EVIDENCE_PACK_ID: 'true',
+            SATGATE_REQUIRE_DECISION_REASON: 'true',
+            SATGATE_REQUIRE_POLICY_VERSION: 'true',
           },
         },
       },
     }, null, 2);
-    const yaml = `mcp_proxy:\n  name: satgate-${slug}\n  client: ${c.label}\n  config_path: ${c.configPath}\n  upstream: stdio://${slug}\n  mode: ${mode}\npolicy:\n  require_agent_id: true\n  require_task_id: true\n  session_budget_usd: ${budgetUsd}\n  max_tool_call_usd: ${expensiveToolUsd}\n  on_budget_exhausted: ${m.block ? 'block' : 'observe'}\n  paid_rail: ${m.paidRail ? 'l402' : 'disabled'}\ncredentials:\n  type: revocable_capability\n  expiry_minutes: 240\n  allow_delegation: false\naudit:\n  level: ${m.audit}\n  include:\n    - tenant_id\n    - agent_id\n    - task_id\n    - mcp_server\n    - mcp_tool\n    - estimated_cost_usd\n    - remaining_budget_usd\n    - policy_decision\n    - revocation_state`;
+    const yaml = `mcp_proxy:\n  name: satgate-${slug}\n  client: ${c.label}\n  config_path: ${c.configPath}\n  upstream: stdio://${slug}\n  mode: ${mode}\npolicy:\n  require_agent_id: true\n  require_task_id: true\n  session_budget_usd: ${budgetUsd}\n  max_tool_call_usd: ${expensiveToolUsd}\n  on_budget_exhausted: ${m.block ? 'block' : 'observe'}\n  paid_rail: ${m.paidRail ? 'l402' : 'disabled'}\ncredentials:\n  type: revocable_capability\n  expiry_minutes: 240\n  allow_delegation: false\nevidence_pack:\n  required: true\n  required_receipt_fields:\n    - receipt_id\n    - evidence_pack_id\n    - decision_reason\n    - policy_version\naudit:\n  level: ${m.audit}\n  include:\n    - tenant_id\n    - agent_id\n    - task_id\n    - mcp_server\n    - mcp_tool\n    - estimated_cost_usd\n    - remaining_budget_usd\n    - policy_decision\n    - decision_reason\n    - policy_version\n    - receipt_id\n    - evidence_pack_id\n    - revocation_state`;
     return { json, yaml, c };
   }, [budgetUsd, client, expensiveToolUsd, mode, serverName]);
 

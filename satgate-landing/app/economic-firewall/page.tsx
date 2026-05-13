@@ -403,7 +403,7 @@ export default function EconomicFirewallPage() {
           <h2 className="text-3xl font-bold text-white mb-8">Related economic control-plane topics</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              ['/policy-to-proof', 'Policy-to-Proof', 'Turn every mint, delegation, spend event, denial, and revocation into exportable evidence.'],
+              ['/policy-to-proof', 'Policy-to-Proof', 'Turn every mint, delegation, paid call, denial, and revocation into receipts and exportable Evidence Pack proof.'],
               ['/govern', 'Govern AI agents', 'Govern internal agents, preserve proof across external rails, and export Evidence Packs.'],
               ['/agent-control-plane', 'Agent control plane', 'Govern enterprise agent authority, delegation lineage, spend, audit, and revocation.'],
               ['/mcp-governance', 'MCP governance', 'Apply budget, revocation, and audit controls to MCP tool calls.'],

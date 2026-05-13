@@ -567,6 +567,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	//   control = deduct budget, enforce limits (block on exhaustion)
 	//   charge  = L402 Lightning payments (handled separately)
 	// Both observe and control always call Spend(). The only difference is what happens when budget runs out.
+	// Each allow, deny, spend, delegation, or revocation outcome should emit receipt-ready events for Evidence Pack construction.
 	// Legacy aliases (shadow→observe, soft/hard→control) accepted for backward compatibility.
 	mode := p.config.Enforcement.Mode
 	isObserve := mode == "observe" || mode == "shadow" || mode == "chargeback"
@@ -613,7 +614,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				})
 
 				if isObserve {
-					// Observe: deducted but never blocks — allows overspend for real usage tracking
+					// Observe: deducted but never blocks — allows overspend for receipt-backed usage/evidence tracking
 					log.Info().Str("tool", tc.Name).Int64("remaining", remaining).
 						Msg("observe mode: allowing overspend")
 				} else {

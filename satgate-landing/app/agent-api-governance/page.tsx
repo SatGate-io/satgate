@@ -306,7 +306,7 @@ export default function AgentApiGovernancePage() {
               {[
                 ['Observe', 'Attribute calls by agent, worker, route, tenant, and workflow so real access and spend patterns are visible before policy tightens.'],
                 ['Control', 'Issue scoped capabilities, enforce budgets and route policy, attenuate delegation, and revoke authority before the next request.'],
-                ['Prove', 'Record policy decisions, spend, outcomes, revocation events, and Evidence Pack receipts for each governed API action.'],
+                ['Prove', 'Issue receipts for policy decisions, paid actions, denials, delegations, revocations, and Evidence Pack exports for each governed API action.'],
               ].map(([title, body]) => (
                 <div key={title} className="rounded-xl border border-gray-800 bg-black p-5">
                   <h3 className="text-lg font-bold text-white mb-2">{title}</h3>

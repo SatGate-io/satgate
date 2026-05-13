@@ -99,7 +99,7 @@ routes:
       kind: public
 ```
 
-Now `/premium/*` returns HTTP 402 with a Lightning invoice. Pay the invoice to get access.
+Now `/premium/*` returns HTTP 402 with a Lightning invoice. Pay the invoice to get access; SatGate returns a paid-call receipt and preserves it for the Evidence Pack.
 
 ## 4. Add Budget Enforcement — Fiat402 Route
 
@@ -119,7 +119,7 @@ Now `/premium/*` returns HTTP 402 with a Lightning invoice. Pay the invoice to g
         costCenterHeader: X-Cost-Center
 ```
 
-Agents are stopped when their budget is spent. No alerts — blocked.
+Agents are stopped when their budget is spent. No alerts — blocked with a denial receipt for the Evidence Pack.
 
 ## Next Steps
 
