@@ -30,6 +30,7 @@ SatGate Gateway is an enterprise API gateway that provides:
 | See the API reference | [API Reference](api/overview.md) |
 | Export Policy-to-Proof evidence | [Evidence Pack v1](reference/evidence-pack.md) |
 | Discover SatGate trust metadata | [SatGate Trust Metadata](reference/satgate-trust-metadata.md) |
+| Plan stale-cache detection for protocol metadata | [Metadata Cache Protocol Notes](reference/cache-protocol.md) |
 | Validate SatGate receipts | [SatGate Receipt Schema](reference/receipt-schema.md) |
 | Preserve future verifier-derived reputation optionality | [Reputation Substrate](reference/reputation-substrate.md) |
 | Sketch upstream acceptor metadata | [Acceptor Metadata Draft](reference/acceptor.md) |
