@@ -80,7 +80,7 @@ The compatibility rule is the same: clients must ignore unknown fields, and brea
 - `verification_endpoint`: optional upstream endpoint for online verification, replay checks, or policy-specific acceptance decisions. Offline signature checks should still use issuer JWKS discovery when possible; do not require an online verifier for simple read-only flows.
 - `accepted_capability_formats`: subset of capability formats the upstream honors. An acceptor does not need to accept every format an issuer can emit.
 - `recognized_receipt_decisions`: prior receipt decisions the upstream recognizes as acceptable evidence for entry. Do not include `denied` here; denied receipts are evidence of rejection, not entry.
-- `emitted_receipt_decisions`: receipt decisions the upstream can return after evaluating a capability. Acceptor v0 emits a subset of the issuer decision space: `allowed`, `denied`, and `paid`.
+- `emitted_receipt_decisions`: receipt decisions the upstream can return after evaluating a capability. Acceptor v0 emits a subset of the issuer decision space: `allowed`, `denied`, and `paid`. Emitted receipts must validate against `https://satgate.io/.well-known/satgate-receipt.schema.json`.
 - `trust_anchors`: issuer origins the upstream accepts, optionally pinned to JWKS URIs or future certificate transparency/audit roots. The issuer must match a trust anchor before any JWKS fetch. If `jwks_uri` is omitted, verifiers use `{issuer_id}/.well-known/jwks.json`; if present, it must be HTTPS unless a local test explicitly allows otherwise. Closed v0 statuses are `accepted`, `provisional`, `revoked`, `deprecated`, and `accepted_for_mock`; `accepted_for_mock` is reserved for examples.
 - `rails_adapters.accepted`: rails the upstream will settle via or route through. The verb is deliberately different from issuer-side `rails_adapters.supported`: issuers can **support** rails for minting/routing; acceptors **accept** rails for settlement or upstream access.
 - `claims`: machine-readable claim boundary. Parsers should see that acceptance means capability verification and receipt emission, not marketplace listing, reputation score, endorsement, network-wide trust, ranking, or certification.
@@ -103,7 +103,7 @@ The first non-SatGate acceptor verifying a SatGate-issued receipt is the point w
 
 1. **Issuer metadata fixture**: `satgate.trust_metadata.v1` with `roles: ["issuer"]`, required `issuer` / `issuer_kid` receipt fields, closed receipt decisions, and a JWKS URI under the issuer origin.
 2. **JWKS fixture**: one public key with stable `kid`; no placeholder keys.
-3. **Receipt fixture**: canonical signed `satgate.receipt.v1` containing `receipt_id`, `evidence_pack_id`, `issuer`, `issuer_kid`, `acceptor_id`, `decision`, `decision_reason`, `policy_version`, `receipt_hash`, and `signature`.
+3. **Receipt fixture**: canonical signed `satgate.receipt.v1` validating against `https://satgate.io/.well-known/satgate-receipt.schema.json` and containing `schema_version`, `receipt_id`, `evidence_pack_id`, `issuer`, `issuer_kid`, `acceptor_id`, `decision`, `decision_reason`, `policy_version`, `timestamp`, `canonicalization`, `hash_algorithm`, `signature_algorithm`, `receipt_hash`, and `signature`.
 4. **Acceptor metadata fixture**: `roles: ["acceptor"]`, `schema_url`, `status`, `accepted_capability_formats`, `recognized_receipt_decisions`, `emitted_receipt_decisions`, `trust_anchors`, `rails_adapters.accepted`, and `claims`.
 5. **Verifier behavior**:
    - reject receipts whose `issuer` is not in `trust_anchors`;

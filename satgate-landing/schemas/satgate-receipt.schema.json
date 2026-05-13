@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://satgate.io/.well-known/satgate-receipt.schema.json",
+  "title": "SatGate Receipt v1",
+  "description": "Canonical schema for SatGate receipt artifacts. Receipts are decision evidence emitted by issuers and acceptors after allowed, denied, delegated, revoked, or paid decisions.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "schema_url",
+    "receipt_id",
+    "evidence_pack_id",
+    "issuer",
+    "issuer_kid",
+    "decision",
+    "decision_reason",
+    "policy_version",
+    "timestamp",
+    "canonicalization",
+    "hash_algorithm",
+    "signature_algorithm",
+    "receipt_hash",
+    "signature"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "satgate.receipt.v1"
+    },
+    "schema_url": {
+      "const": "https://satgate.io/.well-known/satgate-receipt.schema.json"
+    },
+    "receipt_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable receipt identifier."
+    },
+    "evidence_pack_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Evidence Pack this receipt rolls into."
+    },
+    "issuer": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://[^/?#]+$",
+      "description": "Trusted HTTPS issuer origin used for JWKS discovery after trust-anchor validation. No path, query, or fragment."
+    },
+    "issuer_kid": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Issuer signing-key id used to select from issuer JWKS."
+    },
+    "acceptor_id": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://[^?#]+$",
+      "description": "HTTPS upstream acceptor identity when the receipt is bound to an accepting API. Query and fragment are not allowed."
+    },
+    "capability_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capability_hash": {
+      "type": "string",
+      "pattern": "^sha256:[A-Za-z0-9+/=_:-]+$"
+    },
+    "agent_id": {
+      "type": "string"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "audience": {
+      "type": "string"
+    },
+    "route_or_tool": {
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "allowed",
+        "denied",
+        "delegated",
+        "revoked",
+        "paid"
+      ]
+    },
+    "decision_reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policy_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "rail": {
+      "type": "string"
+    },
+    "amount_usd": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^([1-9]\\d*)(\\.\\d{1,6})?$|^0\\.(0*[1-9]\\d{0,5})$"
+        },
+        {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      ],
+      "description": "Positive USD amount for paid receipts."
+    },
+    "attempted_amount_usd": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "remaining_budget_usd": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "receipt_hash": {
+      "type": "string",
+      "pattern": "^sha256:[A-Za-z0-9+/=_:-]+$",
+      "description": "SHA-256 hash over the RFC 8785 canonical payload bytes, excluding receipt_hash and signature."
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^ed25519:[A-Za-z0-9+/=_:-]+$",
+      "description": "Ed25519 issuer signature over the RFC 8785 canonical payload bytes, excluding receipt_hash and signature."
+    },
+    "mock_only": {
+      "type": "boolean",
+      "description": "True only for non-production examples."
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "canonicalization": {
+      "const": "jcs-rfc8785",
+      "description": "Canonical payload uses JSON Canonicalization Scheme (RFC 8785), excluding receipt_hash and signature fields."
+    },
+    "hash_algorithm": {
+      "const": "sha256",
+      "description": "receipt_hash is SHA-256 over the canonical payload bytes excluding receipt_hash and signature."
+    },
+    "signature_algorithm": {
+      "const": "ed25519",
+      "description": "SatGate receipt v1 signature profile. The selected issuer JWK must be Ed25519-compatible."
+    },
+    "currency": {
+      "const": "USD",
+      "description": "Currency for amount_usd; fixed to USD in v1 when amount_usd is used."
+    },
+    "settlement_reference": {
+      "type": "string",
+      "description": "Optional rail or ledger settlement reference for paid receipts."
+    }
+  },
+  "anyOf": [
+    {
+      "required": [
+        "capability_id"
+      ]
+    },
+    {
+      "required": [
+        "capability_hash"
+      ]
+    }
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "const": "paid"
+          }
+        },
+        "required": [
+          "decision"
+        ]
+      },
+      "then": {
+        "required": [
+          "amount_usd",
+          "currency",
+          "rail"
+        ]
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "acceptor_id"
+        ]
+      },
+      "then": {
+        "required": [
+          "capability_hash"
+        ]
+      }
+    }
+  ],
+  "additionalProperties": true
+}

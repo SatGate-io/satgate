@@ -278,3 +278,8 @@ assert data['issuer']['key_discovery']['method'] == 'jwks_uri'
 print('satgate trust metadata ok')
 PY
 ```
+
+
+## Receipt schema
+
+The canonical receipt schema is published at `https://satgate.io/.well-known/satgate-receipt.schema.json` and documented in [SatGate Receipt Schema](receipt-schema.md). Verifiers should validate receipts against this schema before JWKS lookup and signature verification. The schema requires `schema_version`, `schema_url`, `timestamp`, `canonicalization`, `hash_algorithm`, and `signature_algorithm` in addition to the issuer/key/decision/hash/signature fields advertised by the issuer metadata.

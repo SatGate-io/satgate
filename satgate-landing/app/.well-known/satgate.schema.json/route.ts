@@ -71,11 +71,14 @@ const schema = {
       description: "Receipt and Evidence Pack formats, required receipt fields, closed decision vocabulary, and verification endpoints.",
       required: ["receipt_format", "evidence_pack_format", "required_receipt_fields", "decisions"],
       properties: {
+        receipt_schema_url: { type: "string", format: "uri", description: "Canonical JSON Schema for satgate.receipt.v1 receipts." },
         required_receipt_fields: {
           type: "array",
           description: "Receipt fields needed to identify the issuer, select the signing key, verify the decision, and bind the receipt to an Evidence Pack.",
           items: {
             enum: [
+              "schema_version",
+              "schema_url",
               "receipt_id",
               "evidence_pack_id",
               "issuer",
@@ -83,6 +86,10 @@ const schema = {
               "decision",
               "decision_reason",
               "policy_version",
+              "timestamp",
+              "canonicalization",
+              "hash_algorithm",
+              "signature_algorithm",
               "receipt_hash",
               "signature",
             ],
@@ -91,6 +98,9 @@ const schema = {
           allOf: [
             { contains: { const: "issuer" } },
             { contains: { const: "issuer_kid" } },
+            { contains: { const: "schema_version" } },
+            { contains: { const: "schema_url" } },
+            { contains: { const: "timestamp" } },
           ],
         },
         decisions: {

@@ -1,4 +1,6 @@
 {
+  "schema_version": "satgate.receipt.v1",
+  "schema_url": "https://satgate.io/.well-known/satgate-receipt.schema.json",
   "receipt_id": "rcpt_mock_accept_001",
   "evidence_pack_id": "ep_mock_accept_001",
   "issuer": "https://satgate.io",
@@ -10,5 +12,9 @@
   "capability_hash": "sha256:mock_capability_hash",
   "receipt_hash": "sha256:mock_receipt_hash",
   "signature": "ed25519:mock_signature_not_for_production",
-  "mock_only": true
+  "mock_only": true,
+  "timestamp": "2026-05-13T12:00:00Z",
+  "canonicalization": "jcs-rfc8785",
+  "hash_algorithm": "sha256",
+  "signature_algorithm": "ed25519"
 }
