@@ -293,7 +293,10 @@ export default function BuildPage() {
             <h2 className="text-3xl font-bold text-white sm:text-4xl">Authority and evidence sit above the rail.</h2>
             <div className="mt-5 space-y-5 text-lg leading-8 text-gray-400">
               <p>
-                Payment rails change. The authority and evidence layer is the durable abstraction. SatGate can govern MCP tools, REST APIs, API-key billing, x402, L402, AgentCore Payments, Pay.sh, and enterprise ledgers without forcing your agent code to care which rail settled underneath.
+                Payment rails change. The authority and evidence layer is the durable abstraction. SatGate governs MCP tools, REST APIs, API-key billing, x402, L402, and enterprise ledgers today, and is designed to govern planned rails such as AgentCore Payments and Pay.sh without forcing your agent code to care which rail settled underneath.
+              </p>
+              <p>
+                The machine-readable <Link href="/.well-known/satgate" className="text-cyan-300 hover:text-cyan-200">/.well-known/satgate</Link> artifact is canonical for rail adapter status; marketing copy should defer to it when a rail is planned rather than already supported.
               </p>
               <p>
                 Humans and platforms deploy the policies. Agents consume capabilities. Upstreams receive verifiable proof that the action was authorized, bounded, and recorded.
