@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ROUTE = ROOT / "app" / ".well-known" / "satgate" / "route.ts"
 SCHEMA_ROUTE = ROOT / "app" / ".well-known" / "satgate.schema.json" / "route.ts"
 JWKS_ROUTE = ROOT / "app" / ".well-known" / "jwks.json" / "route.ts"
+RECEIPT_SCHEMA_ROUTE = ROOT / "app" / ".well-known" / "satgate-receipt.schema.json" / "route.ts"
 BUILD = ROOT / "app" / "build" / "page.tsx"
 DOC = ROOT.parent / "docs" / "reference" / "satgate-trust-metadata.md"
 ACCEPTOR_DOC = ROOT.parent / "docs" / "reference" / "acceptor.md"
@@ -27,6 +28,8 @@ REQUIRED_ROUTE_STRINGS = [
     "macaroon-bearer",
     "receipt_verification",
     "satgate.receipt.v1",
+    "receipt_schema_url",
+    "satgate-receipt.schema.json",
     "satgate.evidence_pack.v1",
     "receipt_id",
     "evidence_pack_id",
@@ -113,7 +116,7 @@ else:
             errors.append(f"route must mark {planned_id} as planned, not supported")
 
 
-for path, label in [(SCHEMA_ROUTE, "schema route"), (JWKS_ROUTE, "JWKS route")]:
+for path, label in [(SCHEMA_ROUTE, "schema route"), (JWKS_ROUTE, "JWKS route"), (RECEIPT_SCHEMA_ROUTE, "receipt schema route")]:
     if not path.exists():
         errors.append(f"missing {label}: {path.relative_to(ROOT)}")
     else:
@@ -127,6 +130,12 @@ if SCHEMA_ROUTE.exists():
     for needle in ["SatGate Trust Metadata v1", "description", "schema_version", "roles", "uniqueItems", "required_receipt_fields", "issuer_kid", "allOf", "contains", "rails_adapters", "supported", "id", "type", "role", "status", "planned", "public, max-age=86400"]:
         if needle not in schema_text:
             errors.append(f"schema route missing required schema string: {needle}")
+
+if RECEIPT_SCHEMA_ROUTE.exists():
+    receipt_schema_text = RECEIPT_SCHEMA_ROUTE.read_text()
+    for needle in ["satgate-receipt.schema.json", "Response.json", "public, max-age=86400"]:
+        if needle not in receipt_schema_text:
+            errors.append(f"receipt schema route missing required string: {needle}")
 
 if JWKS_ROUTE.exists():
     jwks_text = JWKS_ROUTE.read_text()

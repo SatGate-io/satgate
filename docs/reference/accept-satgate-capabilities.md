@@ -48,7 +48,7 @@ An upstream can claim **Accepts SatGate capabilities** only when it can demonstr
 4. **Issuer JWKS discovery**: the upstream fetches JWKS from `{issuer_id}/.well-known/jwks.json`, selected only after issuer trust-anchor validation.
 5. **Capability checks**: the upstream verifies signature, expiry, audience, route/tool scope, caveats, budget, and delegation depth before execution.
 6. **Bounded execution**: the upstream executes only the action authorized by the capability.
-7. **Receipt emission**: every accepted or rejected call returns a SatGate-compatible receipt with at least `receipt_id`, `evidence_pack_id`, `issuer`, `issuer_kid`, `acceptor_id`, `decision`, `decision_reason`, `policy_version`, `receipt_hash`, and `signature`.
+7. **Receipt emission**: every accepted or rejected call returns a SatGate-compatible receipt with at least `schema_version`, `receipt_id`, `evidence_pack_id`, `issuer`, `issuer_kid`, `acceptor_id`, `decision`, `decision_reason`, `policy_version`, `timestamp`, `canonicalization`, `hash_algorithm`, `signature_algorithm`, `receipt_hash`, and `signature`.
 8. **Honest claim boundary**: public copy says acceptance means verification + receipts, not marketplace reputation.
 
 ## Verification criteria
@@ -69,7 +69,7 @@ A third-party reviewer should be able to reproduce these outcomes:
 
 ### Receipt path
 
-Returned receipts must include:
+Returned receipts must validate against `https://satgate.io/.well-known/satgate-receipt.schema.json` and include:
 
 ```json
 {
@@ -98,6 +98,7 @@ Until a real upstream is ready, SatGate publishes a mock-only acceptor example:
 - Mock accepted receipt: `/examples/mock-accepted-satgate-receipt.v1.json`
 - Public explainer: `https://satgate.io/accept-satgate-capabilities`
 - Acceptor JSON Schema: `https://satgate.io/.well-known/satgate-acceptor.schema.json`
+- Receipt JSON Schema: `https://satgate.io/.well-known/satgate-receipt.schema.json`
 
 The mock proves the integration shape. It is not a live upstream, production acceptor, or public network adoption claim.
 
@@ -132,6 +133,10 @@ Content-Type: application/json
     "decision": "allowed",
     "decision_reason": "capability_scope_audience_and_budget_ok",
     "policy_version": "policy_mock_acceptance_v0",
+    "timestamp": "2026-05-13T12:00:00Z",
+    "canonicalization": "jcs-rfc8785",
+    "hash_algorithm": "sha256",
+    "signature_algorithm": "ed25519",
     "receipt_hash": "sha256:mock_receipt_hash",
     "signature": "ed25519:mock_signature_not_for_production"
   }
