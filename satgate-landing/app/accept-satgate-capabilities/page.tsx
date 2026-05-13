@@ -53,18 +53,20 @@ const checklist = [
   "Verify issuer trust anchor before fetching issuer JWKS.",
   "Verify signature, expiry, audience, route/tool scope, caveats, budget, and delegation depth before execution.",
   "Execute only the action authorized by the capability.",
-  "Return a SatGate-compatible receipt for the acceptor v0 decision subset: allowed, denied, or paid.",
+  "Return a SatGate-compatible receipt that validates against `satgate.receipt.v1` for the acceptor v0 decision subset: allowed, denied, or paid.",
   "Expose a test vector or mock endpoint before claiming real production acceptance.",
 ];
 
 const criteria = [
   { title: "Capability accepted", body: "A valid scoped capability for the upstream audience and route is accepted before execution." },
   { title: "Capability denied", body: "An expired, wrong-audience, wrong-route, over-budget, or untrusted-issuer capability is rejected with a receipt-grade denial." },
-  { title: "Receipt returned", body: "Every allowed or denied call returns a receipt with `receipt_id`, `evidence_pack_id`, `issuer`, `issuer_kid`, `decision`, `decision_reason`, `policy_version`, `receipt_hash`, and `signature`." },
+  { title: "Receipt returned", body: "Every allowed or denied call returns a receipt with `schema_version`, `schema_url`, `receipt_id`, `evidence_pack_id`, `issuer`, `issuer_kid`, `decision`, `decision_reason`, `policy_version`, `timestamp`, `canonicalization`, `hash_algorithm`, `signature_algorithm`, `receipt_hash`, and `signature`." },
   { title: "Trust remains bounded", body: "The upstream makes no marketplace, ranking, reputation, or endorsement claim. Acceptance proves verification behavior, not global trust." },
 ];
 
 const mockReceipt = {
+  schema_version: "satgate.receipt.v1",
+  schema_url: "https://satgate.io/.well-known/satgate-receipt.schema.json",
   receipt_id: "rcpt_mock_accept_001",
   evidence_pack_id: "ep_mock_accept_001",
   issuer: "https://satgate.io",
@@ -73,6 +75,10 @@ const mockReceipt = {
   decision: "allowed",
   decision_reason: "capability_scope_audience_and_budget_ok",
   policy_version: "policy_mock_acceptance_v0",
+  timestamp: "2026-05-13T00:00:00Z",
+  canonicalization: "jcs-rfc8785",
+  hash_algorithm: "sha256",
+  signature_algorithm: "ed25519",
   capability_hash: "sha256:mock_capability_hash",
   receipt_hash: "sha256:mock_receipt_hash",
   signature: "ed25519:mock_signature_not_for_production",

@@ -19,6 +19,7 @@ TRUST_DOC = REPO / "docs" / "reference" / "satgate-trust-metadata.md"
 ACCEPTOR_DOC = REPO / "docs" / "reference" / "acceptor.md"
 ISSUER_ROUTE = ROOT / "app" / ".well-known" / "satgate" / "route.ts"
 DOC_INDEX = REPO / "docs" / "index.md"
+ACCEPTANCE_PAGE = ROOT / "app" / "accept-satgate-capabilities" / "page.tsx"
 
 errors: list[str] = []
 
@@ -27,6 +28,7 @@ for path, label in [
     (SCHEMA_ROUTE, "receipt schema route"),
     (MOCK_RECEIPT, "mock receipt fixture"),
     (RECEIPT_DOC, "receipt schema docs"),
+    (ACCEPTANCE_PAGE, "acceptance page"),
 ]:
     if not path.exists():
         errors.append(f"missing {label}: {path}")
@@ -41,6 +43,74 @@ schema = json.loads(SCHEMA_JSON.read_text())
 receipt = json.loads(MOCK_RECEIPT.read_text())
 route_text = SCHEMA_ROUTE.read_text()
 combined_docs = "\n".join(path.read_text() for path in [RECEIPT_DOC, TRUST_DOC, ACCEPTOR_DOC, ISSUER_ROUTE, DOC_INDEX] if path.exists())
+page_text = ACCEPTANCE_PAGE.read_text()
+
+
+def _check_type(value: object, expected: object) -> bool:
+    expected_types = expected if isinstance(expected, list) else [expected]
+    for item in expected_types:
+        if item == "object" and isinstance(value, dict):
+            return True
+        if item == "array" and isinstance(value, list):
+            return True
+        if item == "string" and isinstance(value, str):
+            return True
+        if item == "number" and isinstance(value, (int, float)) and not isinstance(value, bool):
+            return True
+        if item == "boolean" and isinstance(value, bool):
+            return True
+    return False
+
+
+def validate_receipt_against_schema(instance: dict[str, object], schema_obj: dict[str, object], label: str) -> None:
+    """Small Draft-2020-12 subset for the SatGate receipt schema.
+
+    This intentionally avoids adding a CI dependency while still validating the
+    published mock against the contract invariants this schema uses.
+    """
+    for field in schema_obj.get("required", []):
+        if field not in instance:
+            errors.append(f"{label} missing required schema field: {field}")
+
+    properties = schema_obj.get("properties", {})
+    for field, rules in properties.items():
+        if field not in instance:
+            continue
+        value = instance[field]
+        if "const" in rules and value != rules["const"]:
+            errors.append(f"{label} field {field} must equal {rules['const']}")
+        if "enum" in rules and value not in rules["enum"]:
+            errors.append(f"{label} field {field} outside enum: {value}")
+        if "type" in rules and not _check_type(value, rules["type"]):
+            errors.append(f"{label} field {field} has wrong type")
+        if "pattern" in rules and isinstance(value, str) and not re.match(rules["pattern"], value):
+            errors.append(f"{label} field {field} does not match pattern {rules['pattern']}: {value}")
+        if "minLength" in rules and isinstance(value, str) and len(value) < rules["minLength"]:
+            errors.append(f"{label} field {field} is shorter than minLength")
+        if "oneOf" in rules:
+            matches = 0
+            for option in rules["oneOf"]:
+                if "type" in option and not _check_type(value, option["type"]):
+                    continue
+                if "exclusiveMinimum" in option and isinstance(value, (int, float)) and not value > option["exclusiveMinimum"]:
+                    continue
+                if "pattern" in option and isinstance(value, str) and not re.match(option["pattern"], value):
+                    continue
+                matches += 1
+            if matches != 1:
+                errors.append(f"{label} field {field} must match exactly one schema option")
+
+    any_of = schema_obj.get("anyOf", [])
+    if any_of and not any(all(field in instance for field in option.get("required", [])) for option in any_of):
+        errors.append(f"{label} must satisfy at least one capability binding in anyOf")
+
+    if instance.get("decision") == "paid":
+        for field in ["amount_usd", "currency", "rail"]:
+            if field not in instance:
+                errors.append(f"{label} paid receipt missing required payment field: {field}")
+    if "acceptor_id" in instance and "capability_hash" not in instance:
+        errors.append(f"{label} acceptor-bound receipt missing capability_hash")
+
 
 # Schema shape.
 if schema.get("$id") != "https://satgate.io/.well-known/satgate-receipt.schema.json":
@@ -81,10 +151,8 @@ for needle in [
     if needle not in combined_docs:
         errors.append(f"receipt docs/wiring missing: {needle}")
 
-# Minimal schema validation for the mock receipt fixture.
-for field in schema["required"]:
-    if field not in receipt:
-        errors.append(f"mock receipt missing required schema field: {field}")
+# Schema validation for the mock receipt fixture.
+validate_receipt_against_schema(receipt, schema, "mock receipt")
 if receipt.get("schema_version") != "satgate.receipt.v1":
     errors.append("mock receipt schema_version mismatch")
 if receipt.get("schema_url") != "https://satgate.io/.well-known/satgate-receipt.schema.json":
@@ -111,6 +179,22 @@ for field, prefix in [("receipt_hash", "sha256:"), ("capability_hash", "sha256:"
         errors.append(f"mock receipt {field} must start with {prefix}")
 if receipt.get("mock_only") is not True:
     errors.append("mock receipt fixture must remain mock_only: true")
+
+for field in schema["required"] + ["capability_hash", "mock_only"]:
+    if field not in page_text:
+        errors.append(f"acceptance page mock receipt block missing schema-conforming field: {field}")
+for needle in [
+    "satgate.receipt.v1",
+    "https://satgate.io/.well-known/satgate-receipt.schema.json",
+    "2026-05-13T00:00:00Z",
+    "jcs-rfc8785",
+    "sha256",
+    "ed25519",
+]:
+    if needle not in page_text:
+        errors.append(f"acceptance page mock receipt block missing value: {needle}")
+if "Verifiers MUST reject `mock_only: true` receipts when operating in a production context" not in combined_docs:
+    errors.append("receipt docs must state production verifiers reject mock_only receipts")
 
 if errors:
     print("receipt schema regression check failed:")

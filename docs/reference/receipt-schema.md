@@ -75,7 +75,7 @@ Specific profiles can emit a subset. For example, acceptor metadata v0 emits onl
   "decision_reason": "capability_scope_audience_and_budget_ok",
   "policy_version": "policy_mock_acceptance_v0",
   "capability_hash": "sha256:mock_capability_hash",
-  "timestamp": "2026-05-13T12:00:00Z",
+  "timestamp": "2026-05-13T00:00:00Z",
   "canonicalization": "jcs-rfc8785",
   "hash_algorithm": "sha256",
   "signature_algorithm": "ed25519",
@@ -103,6 +103,6 @@ Specific profiles can emit a subset. For example, acceptor metadata v0 emits onl
 
 ## Production verifier notes
 
-- Reject `mock_only: true` outside explicit fixture/test mode.
+- Verifiers MUST reject `mock_only: true` receipts when operating in a production context.
 - Reject unknown critical extensions if a future profile introduces a critical-extension mechanism; otherwise ignore unknown non-critical fields.
 - `schema_url` is required and must equal `https://satgate.io/.well-known/satgate-receipt.schema.json`.
