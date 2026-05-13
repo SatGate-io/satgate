@@ -43,7 +43,7 @@ const badgeCopy = [
   {
     label: "Machine signal",
     value: "roles: [\"acceptor\"]",
-    body: "Future acceptor metadata should advertise accepted capability formats, trust anchors, verification behavior, and returned receipt formats.",
+    body: "Acceptor metadata advertises accepted capability formats, trust anchors, recognized prior receipt decisions, emitted receipt decisions, and the claim boundary.",
   },
 ];
 
@@ -53,7 +53,7 @@ const checklist = [
   "Verify issuer trust anchor before fetching issuer JWKS.",
   "Verify signature, expiry, audience, route/tool scope, caveats, budget, and delegation depth before execution.",
   "Execute only the action authorized by the capability.",
-  "Return a SatGate-compatible receipt for allowed, denied, paid, delegated, or revoked decisions.",
+  "Return a SatGate-compatible receipt for the acceptor v0 decision subset: allowed, denied, or paid.",
   "Expose a test vector or mock endpoint before claiming real production acceptance.",
 ];
 
@@ -211,6 +211,7 @@ export default function AcceptSatGateCapabilitiesPage() {
             </div>
             <div className="mt-6 flex flex-wrap gap-3 md:mt-0">
               <Link href="/examples/mock-acceptor-metadata.v0.json" className="rounded-full border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400">Mock metadata</Link>
+              <Link href="/.well-known/satgate-acceptor.schema.json" className="rounded-full border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400">v0 schema</Link>
               <Link href="/examples/mock-accepted-satgate-receipt.v1.json" className="rounded-full bg-cyan-300 px-5 py-3 text-sm font-bold text-black transition hover:bg-cyan-200">Mock receipt</Link>
             </div>
           </div>

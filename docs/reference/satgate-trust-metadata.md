@@ -215,13 +215,15 @@ export async function verifyReceipt(receipt: Receipt) {
 
 ## Future acceptor-side metadata
 
-The mirror artifact is intentionally not on the wire yet. A draft is tracked in [Acceptor Metadata Draft](acceptor.md). An acceptor needs to advertise at least:
+The mirror artifact is still draft, but a permissive v0 schema is on the wire at `https://satgate.io/.well-known/satgate-acceptor.schema.json` to prevent early implementers from inventing incompatible field names. The draft is tracked in [Acceptor Metadata Draft](acceptor.md). An acceptor needs to advertise at least:
 
-- `verification_endpoint`
+- optional `verification_endpoint` for online verification/replay-sensitive flows
 - `accepted_capability_formats`
-- `accepted_receipt_decisions`
-- `trust_anchors` / issuer allowlist
-- rails/adapters it can settle on
+- `recognized_receipt_decisions`
+- `emitted_receipt_decisions`
+- `trust_anchors` / issuer allowlist with a closed trust-anchor status enum
+- rails/adapters it can settle on under `rails_adapters.accepted`
+- machine-readable claim boundaries under `claims`
 
 Do not add acceptor claims to the issuer artifact until an upstream actually accepts SatGate capabilities.
 

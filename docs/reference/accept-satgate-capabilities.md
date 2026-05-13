@@ -97,10 +97,11 @@ Until a real upstream is ready, SatGate publishes a mock-only acceptor example:
 - Mock acceptor metadata: `/examples/mock-acceptor-metadata.v0.json`
 - Mock accepted receipt: `/examples/mock-accepted-satgate-receipt.v1.json`
 - Public explainer: `https://satgate.io/accept-satgate-capabilities`
+- Acceptor JSON Schema: `https://satgate.io/.well-known/satgate-acceptor.schema.json`
 
 The mock proves the integration shape. It is not a live upstream, production acceptor, or public network adoption claim.
 
-The mock metadata separates `accepted_receipt_decisions` from `emitted_receipt_decisions`: `denied` can be emitted as rejection evidence, but it is not accepted as evidence for entry.
+The mock metadata separates `recognized_receipt_decisions` from `emitted_receipt_decisions`: `denied` can be emitted as rejection evidence, but it is not recognized as evidence for entry.
 
 ## Example request shape
 
@@ -139,4 +140,4 @@ Content-Type: application/json
 
 ## Relationship to acceptor metadata
 
-The future acceptor-side metadata draft lives at [`acceptor.md`](acceptor.md). This page defines the public badge and minimum integration story. The acceptor metadata draft defines the future machine-readable shape.
+The acceptor-side metadata draft lives at [`acceptor.md`](acceptor.md). The v0 schema lives at `https://satgate.io/.well-known/satgate-acceptor.schema.json`. This page defines the public badge and minimum integration story; the acceptor metadata draft and schema define the machine-readable shape.
