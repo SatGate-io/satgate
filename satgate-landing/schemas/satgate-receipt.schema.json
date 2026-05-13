@@ -177,6 +177,86 @@
     "settlement_reference": {
       "type": "string",
       "description": "Optional rail or ledger settlement reference for paid receipts."
+    },
+    "task_id": {
+      "type": "string",
+      "description": "Optional correlation id for the user/principal task this receipt helps prove."
+    },
+    "task_status": {
+      "enum": [
+        "requested",
+        "started",
+        "completed",
+        "failed",
+        "cancelled",
+        "partial"
+      ],
+      "description": "Optional task lifecycle state observed by a verifier or gateway."
+    },
+    "attempt": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Optional 1-based attempt number for loop/retry analysis."
+    },
+    "max_attempts": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Optional policy or verifier retry ceiling for the correlated task/action."
+    },
+    "retry_of_receipt_id": {
+      "type": "string",
+      "description": "Optional prior receipt id when this receipt is a retry or loop continuation."
+    },
+    "parent_receipt_id": {
+      "type": "string",
+      "description": "Optional parent receipt id for delegation, attenuation, revocation, or chained execution evidence."
+    },
+    "budget_id": {
+      "type": "string",
+      "description": "Optional budget ledger identifier used to prove stayed-within-budget later."
+    },
+    "budget_limit_usd": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^(0|[1-9]\\d*)(\\.\\d{1,6})?$"
+        },
+        {
+          "type": "number",
+          "minimum": 0
+        }
+      ],
+      "description": "Optional USD budget ceiling observed for this decision."
+    },
+    "principal_id": {
+      "type": "string",
+      "description": "Optional human/principal/service identity that authorized, delegated, vouched, or revoked authority."
+    },
+    "principal_authorization_id": {
+      "type": "string",
+      "description": "Optional id for the principal authorization or vouch event behind this decision."
+    },
+    "vouch_receipt_id": {
+      "type": "string",
+      "description": "Optional receipt id that records a principal vouch. This is evidence, not a score."
+    },
+    "attenuation_depth": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Optional observed attenuation/delegation depth at this decision."
+    },
+    "caveats_hash": {
+      "type": "string",
+      "pattern": "^sha256:[A-Za-z0-9+/=_:-]+$",
+      "description": "Optional hash of effective caveats/scopes without leaking raw credential material."
+    },
+    "revoked_receipt_id": {
+      "type": "string",
+      "description": "Optional receipt id for the revocation event this decision enforces or proves."
+    },
+    "event_history_ref": {
+      "type": "string",
+      "description": "Optional Evidence Pack or event stream reference used for verifier-observed history."
     }
   },
   "anyOf": [

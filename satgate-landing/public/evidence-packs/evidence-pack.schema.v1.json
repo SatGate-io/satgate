@@ -135,6 +135,13 @@
     "signature": {
       "type": "string",
       "pattern": "^(ed25519:|REDACTED|demo:)"
+    },
+    "event_history": {
+      "type": "array",
+      "description": "Optional verifier-observed events used to answer budget/task/loop/revocation/vouch/acceptance questions. Events are evidence, not reputation scores.",
+      "items": {
+        "$ref": "#/$defs/event"
+      }
     }
   },
   "$defs": {
@@ -479,6 +486,77 @@
           "type": "integer"
         }
       }
+    },
+    "event": {
+      "type": "object",
+      "required": [
+        "event_id",
+        "event_type",
+        "timestamp",
+        "subject",
+        "receipt_id"
+      ],
+      "properties": {
+        "event_id": {
+          "type": "string"
+        },
+        "event_type": {
+          "enum": [
+            "task_requested",
+            "task_started",
+            "task_completed",
+            "task_failed",
+            "attempt",
+            "retry",
+            "budget_observed",
+            "budget_denied",
+            "delegated",
+            "attenuated",
+            "revoked",
+            "principal_vouched",
+            "upstream_accepted",
+            "upstream_denied"
+          ]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "subject": {
+          "$ref": "#/$defs/identity"
+        },
+        "receipt_id": {
+          "type": "string"
+        },
+        "task_id": {
+          "type": "string"
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "budget_id": {
+          "type": "string"
+        },
+        "principal_id": {
+          "type": "string"
+        },
+        "acceptor_id": {
+          "type": "string",
+          "format": "uri"
+        },
+        "prev_event_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "event_hash": {
+          "type": "string",
+          "pattern": "^sha256:"
+        }
+      },
+      "additionalProperties": true
     }
   }
 }

@@ -16,7 +16,8 @@
     "test:proof-spine": "python3 scripts/check_proof_spine.py",
     "test:well-known": "python3 scripts/check_well_known_satgate.py",
     "test:acceptance-story": "python3 scripts/check_acceptance_story.py && python3 scripts/check_receipt_schema.py",
-    "test:receipt-schema": "python3 scripts/check_receipt_schema.py"
+    "test:receipt-schema": "python3 scripts/check_receipt_schema.py",
+    "test:reputation-substrate": "python3 scripts/check_reputation_substrate.py"
   },
   "dependencies": {
     "lucide-react": "^0.555.0",
