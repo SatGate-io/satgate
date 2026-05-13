@@ -227,12 +227,13 @@ The live manifest path must return:
 - `Cache-Control: public, max-age=3600`
 - `Access-Control-Allow-Origin: *`
 - `X-Content-Type-Options: nosniff`
-- `Vary: Accept-Encoding`
 - valid JSON matching `satgate.trust_metadata.v1`
 
-The schema path may use a longer cache TTL because it changes less often:
+The schema path uses a longer cache TTL because it changes less often:
 
 - `https://satgate.io/.well-known/satgate.schema.json`: `Cache-Control: public, max-age=86400`
+
+`Vary` is platform-managed by the CDN/framework and should not be treated as part of the SatGate metadata contract.
 
 ## Verification
 
@@ -252,7 +253,6 @@ with urllib.request.urlopen(url, timeout=20) as r:
     assert r.headers['cache-control'] == 'public, max-age=3600'
     assert r.headers['access-control-allow-origin'] == '*'
     assert r.headers['x-content-type-options'] == 'nosniff'
-    assert 'Accept-Encoding' in r.headers.get('vary', '')
     data = json.load(r)
 assert data['schema_version'] == 'satgate.trust_metadata.v1'
 assert data['schema_url'] == 'https://satgate.io/.well-known/satgate.schema.json'

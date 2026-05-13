@@ -54,7 +54,6 @@ REQUIRED_ROUTE_STRINGS = [
     "public, max-age=3600",
     "Access-Control-Allow-Origin",
     "X-Content-Type-Options",
-    "Vary",
 ]
 
 REQUIRED_BUILD_STRINGS = [
@@ -119,7 +118,7 @@ for path, label in [(SCHEMA_ROUTE, "schema route"), (JWKS_ROUTE, "JWKS route")]:
         errors.append(f"missing {label}: {path.relative_to(ROOT)}")
     else:
         text = path.read_text()
-        for needle in ["Response.json", "Cache-Control", "Access-Control-Allow-Origin", "X-Content-Type-Options", "Vary"]:
+        for needle in ["Response.json", "Cache-Control", "Access-Control-Allow-Origin", "X-Content-Type-Options"]:
             if needle not in text:
                 errors.append(f"{label} missing required HTTP/header string: {needle}")
 
