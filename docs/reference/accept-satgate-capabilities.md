@@ -133,7 +133,7 @@ Content-Type: application/json
     "decision": "allowed",
     "decision_reason": "capability_scope_audience_and_budget_ok",
     "policy_version": "policy_mock_acceptance_v0",
-    "timestamp": "2026-05-13T12:00:00Z",
+    "timestamp": "2026-05-13T00:00:00Z",
     "canonicalization": "jcs-rfc8785",
     "hash_algorithm": "sha256",
     "signature_algorithm": "ed25519",
