@@ -139,6 +139,7 @@ const integrationLinks = [
   { title: "MCP Gateway", href: "/mcp-gateway", body: "Put SatGate in front of MCP tools and preserve a receipt per tool invocation." },
   { title: "Runtime integrations", href: "/integrations", body: "See current agent-client surfaces and where OpenAI, Anthropic, LangChain, and CrewAI adapters fit." },
   { title: "Developer docs", href: "https://cloud.satgate.io/docs", body: "Use the docs for setup details while issue/pay/verify API access is in private beta." },
+  { title: "Trust metadata", href: "/.well-known/satgate", body: "Discover SatGate capability acceptance, supported rails, issuer metadata, and receipt verification fields." },
 ];
 
 const runtimeChips = ["MCP", "OpenAI tools", "Anthropic tools", "LangChain", "CrewAI", "Raw HTTP"];
@@ -347,7 +348,7 @@ export default function BuildPage() {
             <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-emerald-300">Agent integrations</p>
             <h2 className="text-3xl font-bold text-white sm:text-4xl">Give every runtime bounded authority.</h2>
             <p className="mt-4 text-lg leading-8 text-gray-400">
-              The runtime changes. The contract stays the same: capability before action, receipt after decision.
+              The runtime changes. The contract stays the same: capability before action, receipt after decision. The machine-readable trust metadata lives at <Link href="/.well-known/satgate" className="text-cyan-300 hover:text-cyan-200">/.well-known/satgate</Link>.
             </p>
             <div className="mt-6 flex flex-wrap gap-2 text-sm text-gray-300">
               <span className="mr-1 py-1 text-gray-500">Works with:</span>
