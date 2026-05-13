@@ -17,7 +17,8 @@
     "test:well-known": "python3 scripts/check_well_known_satgate.py",
     "test:acceptance-story": "python3 scripts/check_acceptance_story.py && python3 scripts/check_receipt_schema.py",
     "test:receipt-schema": "python3 scripts/check_receipt_schema.py",
-    "test:reputation-substrate": "python3 scripts/check_reputation_substrate.py"
+    "test:reputation-substrate": "python3 scripts/check_reputation_substrate.py",
+    "test:cache-protocol": "python3 scripts/check_cache_protocol.py"
   },
   "dependencies": {
     "lucide-react": "^0.555.0",

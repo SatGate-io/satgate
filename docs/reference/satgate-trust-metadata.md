@@ -245,6 +245,8 @@ The schema path uses a longer cache TTL because it changes less often:
 
 `Vary` is platform-managed by the CDN/framework and should not be treated as part of the SatGate metadata contract.
 
+Future freshness profiles may add a short-TTL pointer artifact such as `/.well-known/satgate-pointer.json` carrying `metadata_version`, `metadata_digest`, and `refresh_after`. That pointer is not required for `satgate.trust_metadata.v1`; it is tracked in [Metadata Cache Protocol Notes](cache-protocol.md).
+
 ## Verification
 
 ```bash

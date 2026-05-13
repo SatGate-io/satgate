@@ -144,7 +144,7 @@ Protocol implementations should not assume HTTP caching is perfectly honest. Cor
 - `next_rotation_at`: advisory JWKS/key-rotation timestamp.
 - `refresh_after`: issuer-requested revalidation time separate from CDN TTL.
 
-These are not v0.0 requirements; they are reserved as implementation lessons from opaque fetcher caches.
+These are not v0.0 requirements; they are reserved as implementation lessons from opaque fetcher caches. See [Metadata Cache Protocol Notes](cache-protocol.md) for the pointer-artifact sketch.
 
 ## Open questions
 
