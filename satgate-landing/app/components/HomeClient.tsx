@@ -389,17 +389,17 @@ const LandingPage = () => {
             <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">Their Agents - Prevent Unauthorized Access</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6 max-w-lg">
-            {/* Charge - included in Pro */}
+            {/* Prove - evidence above external rails */}
             <div className="p-6 rounded-xl bg-black border border-yellow-800/30 hover:border-yellow-600/50 transition relative">
               <div className="text-xs text-purple-400 mb-2">Protected by default →</div>
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2.5 bg-yellow-900/50 rounded-lg">
-                  <DollarSign className="text-yellow-400" size={22} />
+                  <Shield className="text-yellow-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Charge <span className="text-xs font-normal text-gray-500">(external rails)</span></h3>
+                <h3 className="font-bold text-lg">Prove <span className="text-xs font-normal text-gray-500">(evidence above rails)</span></h3>
               </div>
               <p className="text-gray-400 text-sm mb-3">
-                verify → payment proof → allow
+                verify → authority proof → Evidence Pack
               </p>
               <p className="text-xs text-yellow-400/80 mb-3 italic">
                 Govern external agent access without making payment proof equal authorization proof.
