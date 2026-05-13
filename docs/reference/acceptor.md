@@ -71,8 +71,37 @@ The compatibility rule is the same: clients must ignore unknown fields, and brea
 - No fake acceptor role in the public SatGate issuer artifact.
 - No requirement that SatGate stay in the request path after an upstream can verify receipts and capabilities directly.
 
+
+## Interop test plan draft
+
+The first non-SatGate acceptor verifying a SatGate-issued receipt is the point where this becomes a candidate standard rather than a vendor-only document. Before putting acceptor metadata on the wire, run an interop test with:
+
+1. **Issuer metadata fixture**: `satgate.trust_metadata.v1` with `roles: ["issuer"]`, required `issuer` / `issuer_kid` receipt fields, closed receipt decisions, and a JWKS URI under the issuer origin.
+2. **JWKS fixture**: one public key with stable `kid`; no placeholder keys.
+3. **Receipt fixture**: canonical signed `satgate.receipt.v1` containing `receipt_id`, `evidence_pack_id`, `issuer`, `issuer_kid`, `decision`, `decision_reason`, `policy_version`, `receipt_hash`, and `signature`.
+4. **Acceptor metadata fixture**: `roles: ["acceptor"]`, `accepted_capability_formats`, `accepted_receipt_decisions`, `trust_anchors`, and `rails_adapters.accepted`.
+5. **Verifier behavior**:
+   - reject receipts whose `issuer` is not in `trust_anchors`;
+   - fetch JWKS from the trusted issuer origin, not from SatGate's public manifest unless SatGate is the issuer;
+   - select the key by `issuer_kid`;
+   - verify the canonical receipt payload and fail closed on signature, expiry, replay, or decision-policy mismatch;
+   - on signature failure for a known trusted issuer, force-revalidate JWKS once before final rejection.
+
+Minimum passing behavior is offline signature verification plus issuer trust-anchor enforcement. Online `verification_endpoint` checks may be layered on for replay-sensitive or paid-rail flows.
+
+## Cache and freshness notes
+
+Protocol implementations should not assume HTTP caching is perfectly honest. Corporate proxies, hosted agent runtimes, and framework fetchers may serve stale bytes even when the issuer has deployed new metadata. Candidate v1.1 fields to evaluate:
+
+- `metadata_version`: monotonic manifest version for stale-cache detection.
+- `next_rotation_at`: advisory JWKS/key-rotation timestamp.
+- `refresh_after`: issuer-requested revalidation time separate from CDN TTL.
+
+These are not v0.0 requirements; they are reserved as implementation lessons from opaque fetcher caches.
+
 ## Open questions
 
 - Whether acceptor metadata belongs under the same `satgate.trust_metadata.v1` schema or a sibling acceptor schema.
 - Whether `trust_anchors` should support key pinning, issuer catalogs, or both.
 - Whether online verification endpoints should be required for paid rails or only recommended for replay-sensitive routes.
+- Whether stale-cache detection belongs in issuer metadata, acceptor metadata, JWKS metadata, or all three.

@@ -9,6 +9,11 @@ https://satgate.io/.well-known/satgate
 This is the first stable machine-readable discovery surface for agent runtimes, API gateways, and upstream services that want to understand what a SatGate issuer accepts and how receipts can be verified.
 
 It is intentionally small. It does **not** make marketplace, reputation, endorsement, ranking, or compliance claims.
+## Contract boundary
+
+The metadata contract only asserts behavior the issuing surface controls end-to-end. Infrastructure-owned behavior — CDN cache internals, framework-managed `Vary` headers, corporate proxy behavior, hosted fetcher caches, and intermediary invalidation latency — must be documented as operational reality, not encoded as a normative SatGate guarantee.
+
+If a field can be stripped, rewritten, or contradicted by a layer outside the issuer's control, keep it out of the machine contract unless that layer is part of the verified issuance surface.
 
 ## Compatibility rule
 
@@ -136,6 +141,8 @@ The federation rule is:
 Receipts reference both an issuer and an `issuer_kid`. Verifiers must first authorize the issuer origin against configured trust anchors, then fetch that issuer's JWKS, select the key by `issuer_kid`, and verify the receipt signature. Tenant or deployment issuers may publish their own JWKS endpoint. The public `satgate.io` JWKS route currently publishes an empty `keys` array instead of placeholder production tenant keys.
 
 Do **not** treat the top-level `https://satgate.io/.well-known/jwks.json` as the universal key source for every receipt. It only represents the `https://satgate.io` issuer. Also do **not** trust any issuer URL found in a receipt until it matches an acceptor-configured trust anchor; otherwise an attacker can publish their own JWKS and sign their own fake receipt.
+
+Verifiers should respect the advertised JWKS TTL during normal operation, but on signature failure for a previously trusted issuer they should force a fresh JWKS fetch before rejecting the receipt. This handles key rotation without training implementations to ignore cache policy entirely. If the issuer remains trusted and the refreshed JWKS still lacks the `issuer_kid`, fail closed.
 
 ## Reference verifier snippets
 
