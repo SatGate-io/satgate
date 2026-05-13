@@ -2,7 +2,7 @@
 
 Status: **v0.0 draft — not yet on the wire**.
 
-This document reserves the mirror side of the SatGate trust metadata model before issuer-side `satgate.trust_metadata.v1` ossifies in downstream parsers. It is intentionally documentation-only until an upstream service actually accepts SatGate capabilities.
+This document reserves the mirror side of the SatGate trust metadata model before issuer-side `satgate.trust_metadata.v1` ossifies in downstream parsers. It is intentionally documentation-only until an upstream service actually accepts SatGate capabilities. The public badge and integration story live in [Accept SatGate Capabilities](accept-satgate-capabilities.md).
 
 ## Purpose
 
@@ -41,6 +41,13 @@ The compatibility rule is the same: clients must ignore unknown fields, and brea
     "delegated",
     "paid"
   ],
+  "emitted_receipt_decisions": [
+    "allowed",
+    "denied",
+    "delegated",
+    "revoked",
+    "paid"
+  ],
   "trust_anchors": [
     {
       "issuer_id": "https://satgate.io",
@@ -61,7 +68,8 @@ The compatibility rule is the same: clients must ignore unknown fields, and brea
 
 - `verification_endpoint`: optional upstream endpoint for online verification, replay checks, or policy-specific acceptance decisions. Offline signature checks should still use issuer JWKS discovery when possible.
 - `accepted_capability_formats`: subset of capability formats the upstream honors. An acceptor does not need to accept every format an issuer can emit.
-- `accepted_receipt_decisions`: subset of receipt decisions the upstream treats as acceptable evidence for entry. For example, a read-only upstream may accept `allowed` and reject `paid`.
+- `accepted_receipt_decisions`: subset of receipt decisions the upstream treats as acceptable evidence for entry. Do not include `denied` here; denied receipts are evidence of rejection, not entry.
+- `emitted_receipt_decisions`: subset of receipt decisions the upstream can return after evaluating a capability, including `denied` when a request is rejected before execution.
 - `trust_anchors`: issuer origins the upstream accepts, optionally pinned to JWKS URIs or future certificate transparency/audit roots.
 - `rails_adapters.accepted`: rails the upstream can settle on or route through.
 

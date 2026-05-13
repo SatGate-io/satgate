@@ -140,6 +140,7 @@ const integrationLinks = [
   { title: "Runtime integrations", href: "/integrations", body: "See current agent-client surfaces and where OpenAI, Anthropic, LangChain, and CrewAI adapters fit." },
   { title: "Developer docs", href: "https://cloud.satgate.io/docs", body: "Use the docs for setup details while issue/pay/verify API access is in private beta." },
   { title: "Trust metadata", href: "/.well-known/satgate", body: "Discover SatGate capability acceptance, supported rails, issuer metadata, and receipt verification fields." },
+  { title: "Accept capabilities", href: "/accept-satgate-capabilities", body: "Show upstreams how to verify scoped SatGate capabilities and return receipts without claiming marketplace reputation." },
 ];
 
 const runtimeChips = ["MCP", "OpenAI tools", "Anthropic tools", "LangChain", "CrewAI", "Raw HTTP"];

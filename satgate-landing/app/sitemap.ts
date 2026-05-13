@@ -31,6 +31,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/mcp-cost-control', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/agent-api-governance', lastModified: '2026-05-05', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/build', lastModified: '2026-05-12', changeFrequency: 'weekly', priority: 0.95 },
+  { path: '/accept-satgate-capabilities', lastModified: '2026-05-13', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/capability-auth', lastModified: '2026-05-08', changeFrequency: 'weekly', priority: 0.95 },
   { path: '/agent-control-plane', lastModified: '2026-05-05', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/evidence-pack-demo', lastModified: '2026-05-10', changeFrequency: 'weekly', priority: 0.95 },
