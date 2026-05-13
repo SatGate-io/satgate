@@ -1,11 +1,18 @@
 const metadata = {
   schema_version: "satgate.trust_metadata.v1",
   metadata_url: "https://satgate.io/.well-known/satgate",
+  schema_url: "https://satgate.io/.well-known/satgate.schema.json",
+  roles: ["issuer"],
   issuer: {
     name: "SatGate",
     issuer_id: "https://satgate.io",
     product: "Economic Firewall for AI agents",
     contact: "contact@satgate.io",
+    key_discovery: {
+      method: "jwks_uri",
+      key_id_field: "issuer_kid",
+      jwks_uri: "https://satgate.io/.well-known/jwks.json",
+    },
   },
   capability_acceptance: {
     accepted_formats: ["satgate.capability.v1", "macaroon-bearer"],
@@ -46,13 +53,19 @@ const metadata = {
     evidence_pack_schema_url: "https://satgate.io/evidence-packs/evidence-pack.schema.v1.json",
   },
   rails_adapters: {
-    supported: ["mcp", "x402", "l402", "api_key_billing", "enterprise_ledger"],
+    supported: [
+      { id: "mcp", type: "protocol", role: "tool_transport" },
+      { id: "x402", type: "payment_rail", role: "external_paid_access" },
+      { id: "l402", type: "payment_rail", role: "external_paid_access" },
+      { id: "api_key_billing", type: "billing_adapter", role: "existing_vendor_billing" },
+      { id: "enterprise_ledger", type: "ledger_adapter", role: "internal_chargeback" },
+    ],
     note: "Rails are adapters below SatGate authority and receipt verification; this metadata makes no marketplace or reputation claim.",
   },
   signing_key_discovery: {
     mode: "issuer_discovery",
     key_id_field: "issuer_kid",
-    jwks_url_template: "{issuer_id}/.well-known/jwks.json",
+    jwks_uri_template: "{issuer_id}/.well-known/jwks.json",
     note: "Verify receipts against the issuer key referenced by issuer_kid. Tenant or deployment issuers may publish their own JWKS endpoint.",
   },
   docs: {

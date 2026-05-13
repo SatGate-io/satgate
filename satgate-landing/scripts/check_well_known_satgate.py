@@ -8,6 +8,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ROUTE = ROOT / "app" / ".well-known" / "satgate" / "route.ts"
+SCHEMA_ROUTE = ROOT / "app" / ".well-known" / "satgate.schema.json" / "route.ts"
+JWKS_ROUTE = ROOT / "app" / ".well-known" / "jwks.json" / "route.ts"
 BUILD = ROOT / "app" / "build" / "page.tsx"
 DOC = ROOT.parent / "docs" / "reference" / "satgate-trust-metadata.md"
 DOC_INDEX = ROOT.parent / "docs" / "index.md"
@@ -16,6 +18,8 @@ PACKAGE = ROOT / "package.json"
 REQUIRED_ROUTE_STRINGS = [
     "schema_version: \"satgate.trust_metadata.v1\"",
     "metadata_url: \"https://satgate.io/.well-known/satgate\"",
+    "schema_url: \"https://satgate.io/.well-known/satgate.schema.json\"",
+    "roles: [\"issuer\"]",
     "capability_acceptance",
     "accepted_formats",
     "satgate.capability.v1",
@@ -32,8 +36,12 @@ REQUIRED_ROUTE_STRINGS = [
     "l402",
     "api_key_billing",
     "enterprise_ledger",
+    "type: \"payment_rail\"",
+    "role: \"external_paid_access\"",
+    "key_discovery",
+    "jwks_uri: \"https://satgate.io/.well-known/jwks.json\"",
     "signing_key_discovery",
-    "jwks_url_template",
+    "jwks_uri_template",
     "Response.json",
     "Cache-Control",
     "public, max-age=3600",
@@ -56,6 +64,9 @@ REQUIRED_DOC_STRINGS = [
     "Signing key discovery",
     "200 OK",
     "Content-Type: application/json",
+    "schema_url",
+    "jwks_uri",
+    "array of objects",
 ]
 
 FORBIDDEN_ROUTE_PATTERNS = [
@@ -80,6 +91,27 @@ else:
         text_without_disclaimer = route_text.replace("no marketplace or reputation claim", "")
         if re.search(pattern, text_without_disclaimer, flags=re.IGNORECASE):
             errors.append(f"route has forbidden claim language: {pattern}")
+
+
+for path, label in [(SCHEMA_ROUTE, "schema route"), (JWKS_ROUTE, "JWKS route")]:
+    if not path.exists():
+        errors.append(f"missing {label}: {path.relative_to(ROOT)}")
+    else:
+        text = path.read_text()
+        for needle in ["Response.json", "Cache-Control", "Access-Control-Allow-Origin", "X-Content-Type-Options"]:
+            if needle not in text:
+                errors.append(f"{label} missing required HTTP/header string: {needle}")
+
+if SCHEMA_ROUTE.exists():
+    schema_text = SCHEMA_ROUTE.read_text()
+    for needle in ["SatGate Trust Metadata v1", "schema_version", "rails_adapters", "supported", "id", "type", "role"]:
+        if needle not in schema_text:
+            errors.append(f"schema route missing required schema string: {needle}")
+
+if JWKS_ROUTE.exists():
+    jwks_text = JWKS_ROUTE.read_text()
+    if "keys: []" not in jwks_text:
+        errors.append("JWKS route should currently expose an empty keys array rather than placeholder signing keys")
 
 build_text = BUILD.read_text() if BUILD.exists() else ""
 for needle in REQUIRED_BUILD_STRINGS:
