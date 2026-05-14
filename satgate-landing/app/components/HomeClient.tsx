@@ -30,7 +30,7 @@ const LandingPage = () => {
           <div className="hidden xl:flex items-center gap-5 text-sm font-medium text-gray-400">
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/mcp-gateway" className="hover:text-white transition">MCP Gateway</Link>
-            <Link href="/agent-authority-layer" className="hover:text-white transition">Authority Layer</Link>
+            <Link href="/agent-authority-layer" className="hover:text-white transition">Authority & Accountability</Link>
             <Link href="/build" className="hover:text-white transition">Build</Link>
             <Link href="/sandbox" className="hover:text-white transition">Demo</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
@@ -75,7 +75,7 @@ const LandingPage = () => {
               onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
-              Authority Layer
+              Authority & Accountability
             </Link>
             <Link
               href="/build"
@@ -730,7 +730,8 @@ const LandingPage = () => {
                 <li><Link href="/economic-firewall" className="hover:text-white transition">Economic Firewall</Link></li>
                 <li><Link href="/govern" className="hover:text-white transition">Enterprise</Link></li>
                 <li><Link href="/policy-to-proof" className="hover:text-white transition">Policy-to-Proof</Link></li>
-                <li><Link href="/agent-authority-layer" className="hover:text-white transition">Authority Layer</Link></li>
+                <li><Link href="/agent-authority-layer" className="hover:text-white transition">Authority & Accountability</Link></li>
+                <li><Link href="/partners/rails" className="hover:text-white transition">Rail Partners</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
                 <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud Dashboard</a></li>
               </ul>

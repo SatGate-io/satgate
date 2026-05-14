@@ -20,7 +20,7 @@ required_page_strings = [
     "import os",
     "os.getenv(\"SATGATE_API_KEY\")",
     "Economic Firewall for AI agents",
-    "authority and evidence layer",
+    "Agent Authority & Accountability Layer",
     "https://github.com/SatGate-io/satgate/blob/main/docs/index.md",
     "govern / enforce / prove",
     "issue / pay / verify",

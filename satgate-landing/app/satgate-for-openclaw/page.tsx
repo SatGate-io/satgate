@@ -3,7 +3,7 @@ import { ArrowRight, Bot, DollarSign, Gauge, KeyRound, ShieldCheck, Terminal, Wo
 
 export const metadata = {
   title: 'SatGate for OpenClaw Agents',
-  description: 'Use SatGate as the economic control plane for OpenClaw agents, sub-agents, tools, MCP calls, model routes, and API spend.',
+  description: 'Use SatGate as the economic firewall for OpenClaw agents, sub-agents, tools, MCP calls, model routes, and API spend.',
   alternates: { canonical: 'https://satgate.io/satgate-for-openclaw' },
   keywords: [
     'SatGate for OpenClaw',
@@ -15,14 +15,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate for OpenClaw Agents',
-    description: 'Use SatGate as the economic control plane for OpenClaw agents, sub-agents, tools, MCP calls, model routes, and API spend.',
+    description: 'Use SatGate as the economic firewall for OpenClaw agents, sub-agents, tools, MCP calls, model routes, and API spend.',
     url: 'https://satgate.io/satgate-for-openclaw',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate for OpenClaw Agents',
-    description: 'Use SatGate as the economic control plane for OpenClaw agents, sub-agents, tools, MCP calls, model routes, and API spend.',
+    description: 'Use SatGate as the economic firewall for OpenClaw agents, sub-agents, tools, MCP calls, model routes, and API spend.',
   },
 };
 
@@ -45,7 +45,7 @@ export default function SatGateIntegrationPage() {
     about: [
       { '@type': 'Thing', name: 'OpenClaw agent spend control' },
       { '@type': 'Thing', name: 'OpenClaw MCP budget enforcement' },
-      { '@type': 'Thing', name: 'economic control plane for OpenClaw agents' },
+      { '@type': 'Thing', name: 'economic firewall for OpenClaw agents' },
       { '@type': 'Thing', name: 'sub-agent budget attribution' },
       { '@type': 'Thing', name: 'L402 paid agent payments' },
     ],
@@ -110,7 +110,7 @@ export default function SatGateIntegrationPage() {
             <Terminal size={16} /> OpenClaw agent spend control
           </div>
 
-          <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Give OpenClaw agents an economic control plane</h1>
+          <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Give OpenClaw agents an economic firewall</h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">OpenClaw agents can run tools, spawn sub-agents, call MCP servers, route through models, and act across workflows. SatGate adds the economic firewall underneath: observe, control, and prove agent/API activity before upstream access.</p>
 
           <div className="flex flex-col gap-4 sm:flex-row">
@@ -146,7 +146,7 @@ export default function SatGateIntegrationPage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-bold text-white">SatGate controls for OpenClaw</h2>
-          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the economic control plane around agentic tool use: Observe first, Control when limits are known, Charge when external agents should pay for access.</p>
+          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the economic firewall around agentic tool use: Observe first, Control when limits are known, Charge when external agents should pay for access.</p>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {controls.map(({ icon: Icon, title, body }) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-black p-6 transition hover:border-cyan-900/70">

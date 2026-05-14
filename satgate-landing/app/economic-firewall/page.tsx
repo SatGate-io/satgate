@@ -10,7 +10,7 @@ export const metadata = {
     'economic firewall for AI agents',
     'AI agent spend control',
     'AI agent budget enforcement',
-    'economic control plane for AI agents',
+    'economic firewall for AI agents',
     'request-layer cost control',
     'API budget enforcement',
     'agent API governance',

@@ -359,7 +359,7 @@ satgate-gateway --config ./satgate.yaml`}</code>
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Final takeaway</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            Cursor MCP is not the problem. Unbounded access is. A proxy layer gives you the missing economic control plane, so the editor can stay fast without turning your tools into an unmetered free-for-all.
+            Cursor MCP is not the problem. Unbounded access is. A proxy layer gives you the missing economic firewall, so the editor can stay fast without turning your tools into an unmetered free-for-all.
           </p>
 
           <p className="text-gray-300 leading-relaxed">

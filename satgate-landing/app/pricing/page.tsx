@@ -50,7 +50,7 @@ const PricingPage = () => {
     dateModified: '2026-05-03',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
-      { '@type': 'Thing', name: 'economic control plane for AI agents' },
+      { '@type': 'Thing', name: 'economic firewall for AI agents' },
       { '@type': 'Thing', name: 'AI agent budget enforcement' },
       { '@type': 'Thing', name: 'SatGate Economic Firewall' },
       { '@type': 'Thing', name: 'request-path spend governance' },

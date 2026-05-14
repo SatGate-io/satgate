@@ -30,7 +30,7 @@ export const metadata = {
 };
 
 const rows: Array<[string, string, string]> = [
-  ['Primary job', 'Economic control plane for AI agents', 'API gateway, AI gateway, service connectivity, plugins, traffic policy, API platform operations'],
+  ['Primary job', 'Economic Firewall for AI agents', 'API gateway, AI gateway, service connectivity, plugins, traffic policy, API platform operations'],
   ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped credentials, revocation, audit, and paid-rail context', 'API gateway, AI gateway, service connectivity, plugins, traffic policy, API platform operations'],
   ['Request-path hard budget enforcement', 'Yes: before upstream API, model, or MCP tool access', 'Partial / depends on gateway policy and traffic type'],
   ['MCP tool budget enforcement', 'Yes: per-tool budgets, cost attribution, and deny decisions', 'Not the primary category focus'],
@@ -86,7 +86,7 @@ export default function ComparePage() {
         <div className="mb-12 max-w-4xl">
           <div className="mb-6 inline-flex rounded-full border border-cyan-500/30 bg-cyan-950/25 px-4 py-2 text-sm text-cyan-200">Comparison</div>
           <h1 className="mb-5 text-5xl font-extrabold tracking-tight md:text-7xl">SatGate vs Kong AI Gateway</h1>
-          <p className="text-xl leading-relaxed text-gray-300 md:text-2xl">Kong AI Gateway is the AI-facing extension of a mature API gateway platform. SatGate is different: it is the request-path economic control plane for autonomous agents, API spend, MCP tools, scoped credentials, audit, and L402 paid-agent payments.</p>
+          <p className="text-xl leading-relaxed text-gray-300 md:text-2xl">Kong AI Gateway is the AI-facing extension of a mature API gateway platform. SatGate is different: it is the request-path economic firewall for autonomous agents, API spend, MCP tools, scoped credentials, audit, and L402 paid-agent payments.</p>
         </div>
 
         <section className="mb-14 overflow-hidden rounded-2xl border border-gray-800">

@@ -31,7 +31,7 @@ export default function TermsPage() {
       { '@type': 'Thing', name: 'SatGate terms of service' },
       { '@type': 'Thing', name: 'economic access control' },
       { '@type': 'Thing', name: 'paid-rail context' },
-      { '@type': 'Thing', name: 'self-hosted economic control plane' },
+      { '@type': 'Thing', name: 'self-hosted Economic Firewall' },
       { '@type': 'Thing', name: 'Apache 2.0 open source license' },
     ],
   };

@@ -83,7 +83,7 @@ export default function SatGateForHermesAgentPage() {
       {
         '@type': 'Question',
         name: 'Does SatGate replace Hermes Agent?',
-        acceptedAnswer: { '@type': 'Answer', text: 'No. Hermes Agent remains the agent workflow. SatGate adds the economic control plane around MCP tools, APIs, model routes, paid data sources, and credentials.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'No. Hermes Agent remains the agent workflow. SatGate adds the economic firewall around MCP tools, APIs, model routes, paid data sources, and credentials.' },
       },
     ],
   };
@@ -112,7 +112,7 @@ export default function SatGateForHermesAgentPage() {
             <BrainCircuit size={16} /> Hermes Agent MCP spend control
           </div>
 
-          <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Give Hermes Agent workflows an economic control plane</h1>
+          <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Give Hermes Agent workflows an economic firewall</h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
             Hermes Agent is built for persistent, skillful agent workflows. SatGate adds the missing economic firewall: per-agent budgets, MCP tool cost policy, scoped credentials, revocation, and audit before upstream APIs or tools execute.
           </p>
@@ -170,7 +170,7 @@ export default function SatGateForHermesAgentPage() {
             {[
               ['Can SatGate govern Hermes Agent MCP tools?', 'Yes. SatGate can sit between Hermes Agent workflows and MCP servers or upstream APIs to enforce budgets, allowed tools, scoped credentials, revocation, and Evidence Packs before tool calls execute.'],
               ['Why does a self-improving agent need economic governance?', 'Persistent or learning agents can reuse skills, retry workflows, call tools, and delegate work over time. SatGate adds request-path economic policy so those actions have budgets, scopes, expiry, and kill switches.'],
-              ['Does SatGate replace Hermes Agent?', 'No. Hermes Agent remains the agent workflow. SatGate adds the economic control plane around MCP tools, APIs, model routes, paid data sources, and credentials.'],
+              ['Does SatGate replace Hermes Agent?', 'No. Hermes Agent remains the agent workflow. SatGate adds the economic firewall around MCP tools, APIs, model routes, paid data sources, and credentials.'],
             ].map(([question, answer]) => (
               <div key={question}>
                 <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

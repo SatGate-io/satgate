@@ -30,7 +30,7 @@ export default function CompareBifrostPage() {
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'Bifrost alternative for AI agents' },
-      { '@type': 'Thing', name: 'LLM router vs economic control plane' },
+      { '@type': 'Thing', name: 'LLM router vs economic firewall' },
       { '@type': 'Thing', name: 'AI agent spend governance' },
       { '@type': 'Thing', name: 'MCP per-tool budget enforcement' },
     ],
@@ -197,7 +197,7 @@ export default function CompareBifrostPage() {
                   <p className="text-cyan-400 font-medium text-sm mb-2">SatGate</p>
                   <p className="text-gray-400 text-sm">
                     <strong className="text-white">Hard enforcement.</strong> When budget is exceeded, requests are blocked. 
-                    No "oops" moments. The CFO knows exactly what will be spent.
+                    No &quot;oops&quot; moments. The CFO knows exactly what will be spent.
                   </p>
                 </div>
                 <div className="bg-gray-800/50 rounded-lg p-4">
@@ -280,15 +280,15 @@ export default function CompareBifrostPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="text-cyan-400 mt-0.5 flex-shrink-0" size={16} />
-                  <span>You're <strong className="text-white">monetizing API access</strong> (charging per call)</span>
+                  <span>You&apos;re <strong className="text-white">monetizing API access</strong> (charging per call)</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="text-cyan-400 mt-0.5 flex-shrink-0" size={16} />
-                  <span>You're protecting <strong className="text-white">REST APIs, MCP tools, or any HTTP endpoint</strong></span>
+                  <span>You&apos;re protecting <strong className="text-white">REST APIs, MCP tools, or any HTTP endpoint</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="text-cyan-400 mt-0.5 flex-shrink-0" size={16} />
-                  <span>The CFO asks <strong className="text-white">"how do we control AI spend?"</strong></span>
+                  <span>The CFO asks <strong className="text-white">&quot;how do we control AI spend?&quot;</strong></span>
                 </li>
               </ul>
             </div>
@@ -306,7 +306,7 @@ export default function CompareBifrostPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="text-gray-500 mt-0.5 flex-shrink-0" size={16} />
-                  <span>You're optimizing for <strong className="text-gray-300">minimum latency</strong> on LLM calls</span>
+                  <span>You&apos;re optimizing for <strong className="text-gray-300">minimum latency</strong> on LLM calls</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="text-gray-500 mt-0.5 flex-shrink-0" size={16} />

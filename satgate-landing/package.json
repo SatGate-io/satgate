@@ -19,7 +19,8 @@
     "test:receipt-schema": "python3 scripts/check_receipt_schema.py",
     "test:reputation-substrate": "python3 scripts/check_reputation_substrate.py",
     "test:cache-protocol": "python3 scripts/check_cache_protocol.py",
-    "test:buyer-narrative": "python3 scripts/check_buyer_narrative.py"
+    "test:buyer-narrative": "python3 scripts/check_buyer_narrative.py",
+    "test:authority-followups": "python3 scripts/check_authority_followups.py"
   },
   "dependencies": {
     "lucide-react": "^0.555.0",

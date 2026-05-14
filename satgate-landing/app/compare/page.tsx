@@ -42,7 +42,7 @@ const comparisons = [
   {
     href: '/compare/portkey',
     title: 'SatGate vs Portkey',
-    description: 'GenAI production stack vs economic control plane. Portkey covers gateway, observability, guardrails, and prompts; SatGate governs agent economics.',
+    description: 'GenAI production stack vs economic firewall. Portkey covers gateway, observability, guardrails, and prompts; SatGate governs agent economics.',
     icon: BarChart3,
     color: 'orange',
   },

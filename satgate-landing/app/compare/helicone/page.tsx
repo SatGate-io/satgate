@@ -26,7 +26,7 @@ export const metadata = {
 };
 
 const rows: Array<[string, string, string]> = [
-  ['Primary job', 'Economic control plane for AI agents', 'LLM observability / AI gateway / debugging and analytics'],
+  ['Primary job', 'Economic Firewall for AI agents', 'LLM observability / AI gateway / debugging and analytics'],
   ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped access, audit, paid-rail governance', 'Routing, debugging, request analytics, provider integrations, LLM app monitoring'],
   ['Request-path hard budget enforcement', 'Yes', 'Partial or adjacent, depending on gateway limits and usage policy'],
   ['MCP tool budget enforcement', 'Yes', 'Not the primary economic-control focus'],

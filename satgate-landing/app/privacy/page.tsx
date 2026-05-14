@@ -29,7 +29,7 @@ export default function PrivacyPage() {
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'SatGate Cloud privacy' },
-      { '@type': 'Thing', name: 'self-hosted economic control plane privacy' },
+      { '@type': 'Thing', name: 'self-hosted Economic Firewall privacy' },
       { '@type': 'Thing', name: 'API request metadata privacy' },
       { '@type': 'Thing', name: 'hybrid gateway telemetry' },
     ],
