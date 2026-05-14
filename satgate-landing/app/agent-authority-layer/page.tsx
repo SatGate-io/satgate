@@ -59,6 +59,7 @@ const audiences = [
 
 const publicSpecs = [
   ["Evidence Pack schema", "https://github.com/SatGate-io/satgate/blob/main/docs/reference/receipt-schema.md"],
+  ["Live Evidence Pack example", "https://api.satgate.io/v1/evidence/evid_LrlgUSR1R3SEYtxy0npX7mgneWZFa5ek"],
   ["Receipt JSON schema", "https://satgate.io/.well-known/satgate-receipt.schema.json"],
   ["Issuer JWKS", "https://api.satgate.io/.well-known/jwks.json"],
   ["Open verifier", "https://github.com/SatGate-io/evidence-pack-verifier"],
