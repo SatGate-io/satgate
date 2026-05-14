@@ -147,6 +147,7 @@ const buildDocLinks = [
   { title: "Quickstart", href: `${docsBase}/getting-started/quickstart.md`, body: "Start with the issue/pay/verify primitive and local gateway compatibility path." },
   { title: "Capability schema", href: `${docsBase}/reference/capability-schema.md`, body: "The bounded authority contract: issuer, subject, allowlist, budget, expiry, caveats, and delegation depth." },
   { title: "Receipt schema", href: `${docsBase}/reference/receipt-schema.md`, body: "The signed decision artifact for allowed, denied, delegated, revoked, and paid outcomes." },
+  { title: "Open verifier", href: "https://github.com/SatGate-io/evidence-pack-verifier", body: "Verify a live Evidence Pack from the issuer JWKS with RFC8785 canonicalization and Ed25519 signatures." },
   { title: "MCP integration", href: `${docsBase}/guides/mcp-gateway.md`, body: "Put SatGate in front of MCP tools and preserve a receipt per tool invocation." },
   { title: "Raw HTTP", href: `${docsBase}/guides/raw-http.md`, body: "Copy-paste curl for issue, pay, and verify without an SDK." },
   { title: "OpenAI tools", href: `${docsBase}/guides/openai-tools.md`, body: "Wrap OpenAI tool execution with SatGate authority and receipt verification." },

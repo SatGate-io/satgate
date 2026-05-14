@@ -13,6 +13,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '', lastModified: '2026-05-05', changeFrequency: 'weekly', priority: 1.0 },
   { path: '/govern', lastModified: '2026-05-05', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/economic-firewall', lastModified: '2026-05-05', changeFrequency: 'weekly', priority: 0.9 },
+  { path: '/agent-authority-layer', lastModified: '2026-05-14', changeFrequency: 'weekly', priority: 0.95 },
   { path: '/policy-to-proof', lastModified: '2026-05-10', changeFrequency: 'weekly', priority: 0.95 },
   { path: '/stripe-link-agents-vs-satgate', lastModified: '2026-05-02', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/agent-payment-controls', lastModified: '2026-05-02', changeFrequency: 'weekly', priority: 0.9 },
@@ -97,7 +98,7 @@ const blogRoutes: SitemapEntry[] = [
   { path: '/blog/how-we-built-budget-enforcement-mcp', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/blog/hard-capping-mcp-tool-spend', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/blog/security-as-a-profit-center', lastModified: '2026-05-02', changeFrequency: 'monthly', priority: 0.6 },
-  { path: '/blog/ai-agent-api-cost-control', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.7 },
+
   { path: '/blog/what-is-an-economic-firewall', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/blog/mcp-budget-enforcement-guide', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/agent-swarms-cost-governance', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.7 },
