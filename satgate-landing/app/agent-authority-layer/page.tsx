@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description:
     "SatGate is the rail-neutral authority and accountability layer for AI agents. Signed, verifiable receipts before any rail moves value.",
   keywords: [
-    "agent authority layer",
+    "agent authority and accountability layer",
     "AI agent accountability",
     "AI agent receipts",
     "Evidence Pack verifier",
@@ -63,6 +63,7 @@ const publicSpecs = [
   ["Receipt JSON schema", "https://satgate.io/.well-known/satgate-receipt.schema.json"],
   ["Issuer JWKS", "https://api.satgate.io/.well-known/jwks.json"],
   ["Open verifier", "https://github.com/SatGate-io/evidence-pack-verifier"],
+  ["Rail partner brief", "/partners/rails"],
 ];
 
 const faqs = [

@@ -75,7 +75,7 @@ export default function GovernPage() {
             </span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            SatGate is the economic control plane for enterprise agents: scope authority before work starts, enforce policy at runtime, and preserve evidence after every allowed, denied, delegated, or revoked action.
+            SatGate is the Economic Firewall for enterprise agents: scope authority before work starts, enforce policy at runtime, and preserve evidence after every allowed, denied, delegated, or revoked action.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/policy-to-proof" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center justify-center gap-2">

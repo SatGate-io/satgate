@@ -146,7 +146,7 @@ export default function SatGateIntegrationPage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-bold text-white">SatGate controls for Claude Code</h2>
-          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the economic control plane around agentic tool use: Observe first, Control when limits are known, Charge when external agents should pay for access.</p>
+          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the economic firewall around agentic tool use: Observe first, Control when limits are known, Charge when external agents should pay for access.</p>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {controls.map(({ icon: Icon, title, body }) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-black p-6 transition hover:border-cyan-900/70">

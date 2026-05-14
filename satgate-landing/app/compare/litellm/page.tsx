@@ -13,7 +13,7 @@ export const metadata = {
     'LiteLLM spend tracking',
     'AI agent cost control',
     'MCP budget enforcement',
-    'economic control plane for AI agents',
+    'economic firewall for AI agents',
   ],
   openGraph: {
     title: 'SatGate vs LiteLLM - AI Gateway vs Economic Firewall',
@@ -29,7 +29,7 @@ export const metadata = {
 };
 
 const rows: Array<[string, string, string]> = [
-  ['Primary job', 'Economic control plane for AI agents', 'LLM gateway / OpenAI-compatible proxy'],
+  ['Primary job', 'Economic Firewall for AI agents', 'LLM gateway / OpenAI-compatible proxy'],
   ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped access, paid-rail governance', 'Model access, provider abstraction, fallbacks, routing, developer LLM access'],
   ['Request-path hard budget enforcement', 'Yes', 'Partial: budgets and rate limits for LLM gateway usage'],
   ['MCP tool budget enforcement', 'Yes', 'No native MCP economic firewall focus'],

@@ -1,0 +1,104 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Length 1954 >>
+stream
+BT
+/F1 11 Tf
+50 770 Td
+14 TL
+(SatGate Agent Authority & Accountability Layer) Tj
+T*
+(Partner brief for payment rails, API platforms, and agent ecosystems) Tj
+T*
+() Tj
+T*
+(Positioning) Tj
+T*
+(SatGate is the Economic Firewall for agentic API access. The Agent Authority &) Tj
+T*
+(Accountability Layer sits above payment rails, APIs, MCP tools, and enterprise ledgers) Tj
+T*
+(so partners can prove which agent was authorized, under which policy, before value) Tj
+T*
+(moved or an upstream action executed.) Tj
+T*
+() Tj
+T*
+(Why rails need this) Tj
+T*
+(Payment rails answer whether value can move. Enterprises and partners still need to) Tj
+T*
+(know who delegated authority, what scope and budget applied, whether the decision) Tj
+T*
+(happened before execution, and what evidence exists after the fact.) Tj
+T*
+() Tj
+T*
+(Policy-to-Proof flow) Tj
+T*
+(1. Authority: delegate a bounded capability with tenant, route, tool, budget, expiry,) Tj
+T*
+(policy version, and delegation depth.) Tj
+T*
+(2. Decision: enforce policy in the request path before API, MCP, or payment execution.) Tj
+T*
+(3. Receipt: emit a signed decision receipt for allowed, denied, delegated, revoked,) Tj
+T*
+(and paid events.) Tj
+T*
+(4. Evidence Pack: roll receipts into verifiable artifacts anchored by issuer JWKS and) Tj
+T*
+(checked by the open verifier.) Tj
+T*
+() Tj
+T*
+(Partner artifact links) Tj
+T*
+(Overview: https://satgate.io/partners/rails) Tj
+T*
+(Authority layer: https://satgate.io/agent-authority-layer) Tj
+T*
+(Open verifier: https://github.com/SatGate-io/evidence-pack-verifier) Tj
+T*
+(Live Evidence Pack:) Tj
+T*
+(https://api.satgate.io/v1/evidence/evid_LrlgUSR1R3SEYtxy0npX7mgneWZFa5ek) Tj
+T*
+(Receipt schema: https://satgate.io/.well-known/satgate-receipt.schema.json) Tj
+T*
+() Tj
+T*
+(Partner conversation) Tj
+T*
+(Start with receipts: what your rail sees, what SatGate proves, and what a customer,) Tj
+T*
+(reviewer, fraud team, or auditor can independently verify later.) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 4 0 R >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000191 00000 n 
+0000002197 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+2323
+%%EOF

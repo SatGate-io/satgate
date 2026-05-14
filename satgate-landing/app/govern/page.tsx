@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   keywords: [
     "enterprise AI agent governance",
     "AI agent authority governance",
-    "economic control plane for AI agents",
+    "economic firewall for AI agents",
     "MCP governance for enterprises",
     "AI agent budget enforcement",
     "agent delegation controls",
@@ -43,7 +43,7 @@ const webPageSchema = {
   isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
   about: [
     { "@type": "Thing", name: "AI agent governance" },
-    { "@type": "Thing", name: "economic control plane for AI agents" },
+    { "@type": "Thing", name: "economic firewall for AI agents" },
     { "@type": "Thing", name: "MCP governance for enterprises" },
     { "@type": "Thing", name: "agent delegation controls" },
     { "@type": "Thing", name: "Policy-to-Proof for AI agents" },
@@ -64,7 +64,7 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "What is an economic control plane for AI agents?",
+      name: "What is an economic firewall for AI agents?",
       acceptedAnswer: {
         "@type": "Answer",
         text: "An economic firewall for AI agents sits in the request path and applies scopes, budgets, delegation rules, revocation, and audit before an agent reaches an upstream API, model, or MCP tool. Humans and platforms set authority; agents consume bounded primitives; upstreams receive evidence.",

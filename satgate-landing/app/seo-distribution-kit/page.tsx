@@ -104,7 +104,7 @@ export default function SeoDistributionKitPage() {
         name: 'Who should use the distribution kit?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'The kit is for founders, developer advocates, content teams, sales engineers, and partners who need consistent language for SatGate as the economic control plane for AI agents.',
+          text: 'The kit is for founders, developer advocates, content teams, sales engineers, and partners who need consistent language for SatGate as the economic firewall for AI agents.',
         },
       },
     ],
@@ -167,7 +167,7 @@ export default function SeoDistributionKitPage() {
           {[
             ['What is the SatGate SEO Distribution Kit?', 'The SatGate SEO Distribution Kit packages launch copy, backlink angles, promotion targets, and reusable positioning for AI agent cost control, economic firewall, MCP governance, and L402 payment assets.'],
             ['Which SatGate pages should be promoted first?', 'Promote the tools hub, AI agent cost control, economic firewall, runaway spend index, ROI calculator, MCP policy generators, revocable capability-token template, L402 pricing calculator, governance dashboard, Protect demo, and monetization demo first.'],
-            ['Who should use the distribution kit?', 'The kit is for founders, developer advocates, content teams, sales engineers, and partners who need consistent language for SatGate as the economic control plane for AI agents.'],
+            ['Who should use the distribution kit?', 'The kit is for founders, developer advocates, content teams, sales engineers, and partners who need consistent language for SatGate as the economic firewall for AI agents.'],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-3 text-xl font-bold text-white">{question}</h3>

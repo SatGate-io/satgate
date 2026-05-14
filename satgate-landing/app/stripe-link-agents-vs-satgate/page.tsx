@@ -10,7 +10,7 @@ export const metadata = {
     'Link for Agents',
     'agent payment controls',
     'AI agent wallet governance',
-    'economic control plane for AI agents',
+    'economic firewall for AI agents',
     'economic firewall for AI agents',
     'HTTP 402 agents',
     'L402 agent payments',
@@ -136,7 +136,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
           <ShieldCheck className="text-cyan-300 mb-5" size={34} />
           <h2 className="text-2xl font-bold text-white mb-4">What SatGate is built for</h2>
           <p className="text-gray-300 leading-relaxed mb-5">
-            SatGate is the economic control plane in front of APIs, models, MCP tools, and delegated agent workflows. It observes traffic, enforces policy, meters usage, revokes access, and charges for API access when needed.
+            SatGate is the economic firewall in front of APIs, models, MCP tools, and delegated agent workflows. It observes traffic, enforces policy, meters usage, revokes access, and charges for API access when needed.
           </p>
           <ul className="space-y-3 text-gray-300">
             {['Request-path budget enforcement', 'Per-agent and per-tool metering', 'Revocable capability and API access', 'paid-rail context-native API monetization'].map((item) => (

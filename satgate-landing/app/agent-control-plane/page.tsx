@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     "agent kill switch",
     "agent Evidence Pack",
     "AI agent spend governance",
-    "economic control plane for AI agents",
+    "economic firewall for AI agents",
   ],
   alternates: {
     canonical: "https://satgate.io/agent-control-plane",
