@@ -1,10 +1,16 @@
-# LangChain Integration Guide
+# LangChain Integration
+
+## SatGate voice
+
+LangChain handles chains and tool orchestration. SatGate handles issue/pay/verify at the authority boundary: issue a scoped capability, enforce a max budget before the tool call, then verify the receipt.
+
+Related: [Raw HTTP issue/pay/verify](raw-http.md), [Capability schema](../reference/capability-schema.md), [Receipt schema](../reference/receipt-schema.md).
 
 This guide shows how to use the SatGate Python SDK with LangChain to build AI agents that interact with SatGate-protected APIs.
 
 ## Prerequisites
 
-- A running SatGate OSS gateway (see [Quick Start](../README.md))
+- A running SatGate OSS gateway (see [Quick Start](../../README.md))
 - Python 3.9+
 - An admin token for your gateway
 
@@ -47,12 +53,14 @@ result = agent.run("What's the current Bitcoin price?")
 print(result)
 ```
 
-Under the hood, `SatGateTool`:
-1. Mints a capability token via `POST /api/capability/mint` (using the admin token)
-2. Caches the token for subsequent requests
-3. Sends the request to the endpoint with a `Bearer` token
-4. If the endpoint returns 402 (L402), pays the Lightning invoice automatically (if a wallet is configured)
-5. Returns the API response as structured JSON that the LLM can reason about
+Under the hood, current OSS `SatGateTool` compatibility mode:
+1. Mints a capability token via `POST /api/capability/mint` when an admin token is provided.
+2. Caches the token for subsequent requests.
+3. Sends the request to the endpoint with a `Bearer` token.
+4. Enforces gateway policy before the upstream tool sees the call.
+5. Returns the API response or structured denial JSON that the LLM can reason about.
+
+For Cloud/private-beta application code, prefer the higher-level primitive in [Raw HTTP issue/pay/verify](raw-http.md): issue scoped authority, invoke through `pay` with a max budget, then verify the returned receipt and Evidence Pack handle.
 
 ### Using a Pre-Existing Token
 
@@ -212,29 +220,29 @@ Delegation uses macaroon attenuation — the child token is cryptographically de
 - **Revocation**: Ban the parent to revoke all children instantly
 - **Auditability**: The governance graph tracks the full delegation tree
 
-## 5. L402 (Lightning) Payments
+## 5. Optional paid-route settlement context
 
-If your gateway has L402-protected routes, the agent can pay automatically:
+If your gateway has a paid route, L402/Lightning can be one settlement adapter underneath the same authority boundary. Keep this secondary: SatGate should first decide whether the tool call is authorized, bounded, and receipted.
 
 ```python
 from satgate.agent_client import LNDWallet
 from satgate.langchain import SatGateTool
 
-# Configure a Lightning wallet
+# Configure a Lightning wallet for optional L402 settlement
 wallet = LNDWallet(
     host="localhost:8080",
     macaroon_path="~/.lnd/data/chain/bitcoin/mainnet/admin.macaroon",
     cert_path="~/.lnd/tls.cert",
 )
 
-# Tool with automatic Lightning payments
+# Tool with optional paid-route settlement
 paid_tool = SatGateTool(
     name="premium_api",
-    description="Access premium API data (pay-per-request via Lightning)",
+    description="Access premium API data through a governed paid route",
     gateway_url="http://localhost:8080",
     admin_token="your-admin-token",
     endpoint="/api/premium/data",
-    wallet=wallet,  # will automatically pay L402 invoices
+    wallet=wallet,  # optional L402 adapter after policy allows the call
 )
 ```
 
@@ -302,16 +310,26 @@ Tools return structured JSON that the LLM can understand:
   "action_required": "Please approve additional budget or use a different approach."
 }
 
-// Payment required (no wallet)
+// Denied by policy or budget
 {
   "success": false,
-  "error": "payment_required",
-  "message": "This API requires payment: 100 sats",
-  "action_required": "Payment could not be completed automatically."
+  "error": "satgate_denied",
+  "decision_reason": "budget_exhausted",
+  "receipt_id": "rcpt_...",
+  "evidence_pack_id": "evid_...",
+  "action_required": "Request a larger budget or choose a cheaper tool."
+}
+
+// Optional paid route with no configured settlement adapter
+{
+  "success": false,
+  "error": "settlement_required",
+  "message": "This route requires settlement after SatGate policy approval.",
+  "action_required": "Configure an approved payment adapter or use a non-paid route."
 }
 ```
 
-The LLM sees these structured errors and can reason about them — e.g., stopping when budget is exhausted, or suggesting the user configure a wallet.
+The LLM sees structured errors and can reason about them, but the verifier should trust the signed receipt and Evidence Pack handle, not the model's interpretation of the error text.
 
 ## Full Example: Research Agent
 

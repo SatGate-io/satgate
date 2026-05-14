@@ -2,9 +2,9 @@
 
 Get SatGate running in under 2 minutes.
 
-## Cloud developer primitive
+## Developer primitive
 
-For Cloud/private-beta application code, prefer the three-call primitive: `issue` a scoped capability, `pay` upstream with a max budget, then `verify` the receipt. The local gateway quickstart below preserves the OSS token endpoints for compatibility.
+For application code, prefer the three-call primitive: `issue` a scoped capability, `pay` or invoke upstream with a max budget, then `verify` the receipt. The local gateway quickstart below preserves OSS token endpoints for compatibility and local testing.
 
 ## 1. Download
 
@@ -41,6 +41,7 @@ server:
 admin:
   token: "my-admin-token"
 
+# Optional: enable mock settlement for local paid-route tests.
 lightning:
   provider: mock
 
@@ -63,6 +64,8 @@ routes:
     policy:
       kind: capability
 
+  # Optional paid route. Use this only when testing settlement adapters;
+  # the primary SatGate contract remains govern/enforce/prove.
   - name: paid-endpoint
     match:
       pathPrefix: /premium
@@ -97,15 +100,18 @@ TOKEN=$(curl -s -X POST http://localhost:8080/api/capability/mint \
 curl http://localhost:8080/api/anything \
   -H "Authorization: Bearer $TOKEN"
 
-# L402 route — returns 402 Payment Required with Lightning invoice; paid retry returns a paid-call receipt for the Evidence Pack
+# Optional paid route — returns 402 Payment Required with a mock settlement challenge; paid retry returns a paid-call receipt for the Evidence Pack
 curl -i http://localhost:8080/premium/anything
 ```
 
 ## Next Steps
 
-- [Route Configuration](configuration/routes.md)
-- [Policy & Scope](configuration/policy-scope.md)
-- [Lightning Providers](configuration/lightning-providers.md)
-- [MCP Gateway Guide](guides/mcp-gateway.md)
-- [API Overview](api/overview.md)
+- [Route Configuration](../configuration/routes.md)
+- [Policy & Scope](../configuration/policy-scope.md)
+- [MCP Gateway Guide](../guides/mcp-gateway.md)
+- [Lightning Providers](../configuration/lightning-providers.md) — optional paid-route settlement
+- [Raw HTTP issue/pay/verify](../guides/raw-http.md)
+- [Capability Schema](../reference/capability-schema.md)
+- [Receipt Schema](../reference/receipt-schema.md)
+- [API Overview](../api/overview.md)
 - [SatGate Cloud](https://cloud.satgate.io) — managed version, free Observe tier

@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "SatGate build",
     "AI agent capabilities",
     "agent receipts",
-    "agent payment rails",
+    "agent governance receipts",
     "MCP capability tokens",
     "AI agent SDK",
     "Economic Firewall for AI agents",
@@ -125,7 +125,7 @@ const primitives = [
     icon: Route,
     title: "Consume upstream with max budget",
     label: "satgate.pay",
-    body: "Let the agent reach MCP tools, APIs, or paid rails through SatGate while a caller-supplied max budget and policy are enforced before value moves.",
+    body: "Let the agent reach MCP tools, APIs, or paid routes through SatGate while a caller-supplied max budget and policy are enforced before execution or settlement.",
   },
   {
     icon: ReceiptText,
@@ -135,15 +135,38 @@ const primitives = [
   },
 ];
 
-const integrationLinks = [
-  { title: "MCP Gateway", href: "/mcp-gateway", body: "Put SatGate in front of MCP tools and preserve a receipt per tool invocation." },
-  { title: "Runtime integrations", href: "/integrations", body: "See current agent-client surfaces and where OpenAI, Anthropic, LangChain, and CrewAI adapters fit." },
-  { title: "Developer docs", href: "https://cloud.satgate.io/docs", body: "Use the docs for setup details while issue/pay/verify API access is in private beta." },
-  { title: "Trust metadata", href: "/.well-known/satgate", body: "Discover SatGate capability acceptance, supported rails, issuer metadata, and receipt verification fields." },
-  { title: "Accept capabilities", href: "/accept-satgate-capabilities", body: "Show upstreams how to verify scoped SatGate capabilities and return receipts without claiming marketplace reputation." },
+const docsBase = "https://github.com/SatGate-io/satgate/blob/main/docs";
+
+const voiceCards = [
+  { title: "Marketing voice", label: "govern / enforce / prove", body: "Explain the buyer outcome: scoped authority before action, policy enforcement before upstream access, and Evidence Pack proof after every decision." },
+  { title: "Developer voice", label: "issue / pay / verify", body: "Give builders one primitive across SDKs, MCP, raw HTTP, OpenAI tools, Anthropic tools, LangChain, and CrewAI." },
+  { title: "Machine voice", label: "schemas / signatures / receipts", body: "Anchor verifiers on canonical capability fields, receipt schema, JWKS discovery, RFC 8785 canonicalization, and Ed25519 signatures." },
 ];
 
-const runtimeChips = ["MCP", "OpenAI tools", "Anthropic tools", "LangChain", "CrewAI", "Raw HTTP"];
+const buildDocLinks = [
+  { title: "Quickstart", href: `${docsBase}/getting-started/quickstart.md`, body: "Start with the issue/pay/verify primitive and local gateway compatibility path." },
+  { title: "Capability schema", href: `${docsBase}/reference/capability-schema.md`, body: "The bounded authority contract: issuer, subject, allowlist, budget, expiry, caveats, and delegation depth." },
+  { title: "Receipt schema", href: `${docsBase}/reference/receipt-schema.md`, body: "The signed decision artifact for allowed, denied, delegated, revoked, and paid outcomes." },
+  { title: "MCP integration", href: `${docsBase}/guides/mcp-gateway.md`, body: "Put SatGate in front of MCP tools and preserve a receipt per tool invocation." },
+  { title: "Raw HTTP", href: `${docsBase}/guides/raw-http.md`, body: "Copy-paste curl for issue, pay, and verify without an SDK." },
+  { title: "OpenAI tools", href: `${docsBase}/guides/openai-tools.md`, body: "Wrap OpenAI tool execution with SatGate authority and receipt verification." },
+  { title: "Anthropic tools", href: `${docsBase}/guides/anthropic-tools.md`, body: "Govern Anthropic tool use outside the provider boundary." },
+  { title: "LangChain", href: `${docsBase}/guides/langchain-integration.md`, body: "Keep LangChain orchestration, add SatGate at the tool authority boundary." },
+  { title: "CrewAI", href: `${docsBase}/guides/crewai.md`, body: "Give each CrewAI tool wrapper scoped authority and Evidence Pack proof." },
+
+  { title: "API overview", href: `${docsBase}/api/overview.md`, body: "Low-level gateway compatibility APIs and how they relate to issue/pay/verify." },
+  { title: "Python SDK", href: `${docsBase}/sdks/python.md`, body: "Python SDK setup and compatibility paths." },
+  { title: "Node.js SDK", href: `${docsBase}/sdks/nodejs.md`, body: "Node.js SDK setup and compatibility paths." },
+];
+
+const runtimeChips = [
+  { label: "MCP", href: `${docsBase}/guides/mcp-gateway.md` },
+  { label: "OpenAI tools", href: `${docsBase}/guides/openai-tools.md` },
+  { label: "Anthropic tools", href: `${docsBase}/guides/anthropic-tools.md` },
+  { label: "LangChain", href: `${docsBase}/guides/langchain-integration.md` },
+  { label: "CrewAI", href: `${docsBase}/guides/crewai.md` },
+  { label: "Raw HTTP", href: `${docsBase}/guides/raw-http.md` },
+];
 
 const allowedReceipt = {
   receipt_id: "rcpt_7J4xQf9",
@@ -230,7 +253,7 @@ export default function BuildPage() {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a
-                href="https://cloud.satgate.io/docs"
+                href="https://github.com/SatGate-io/satgate/blob/main/docs/index.md"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200"
@@ -260,7 +283,7 @@ export default function BuildPage() {
               <p className="mb-2 text-xs font-mono uppercase tracking-[0.18em] text-cyan-300">SDK access</p>
               <pre className="max-w-full overflow-x-auto rounded-xl bg-black p-4 text-sm leading-6 text-gray-300"><code>{installCommands}</code></pre>
               <p className="mt-3 text-sm leading-6 text-gray-500">
-                The issue/pay/verify API namespace is in private beta. <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="text-cyan-300 hover:text-cyan-200">Request access →</a>
+                The issue/pay/verify API namespace is in private beta. <a href="https://github.com/SatGate-io/satgate/blob/main/docs/index.md" target="_blank" rel="noopener noreferrer" className="text-cyan-300 hover:text-cyan-200">Request access →</a>
               </p>
             </div>
           </div>
@@ -269,10 +292,29 @@ export default function BuildPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="mb-10 max-w-3xl">
+          <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-cyan-300">Docs IA</p>
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">Three voices, one proof spine.</h2>
+          <p className="mt-4 text-lg leading-8 text-gray-400">
+            SatGate docs now separate the buyer story from builder examples and verifier contracts: marketing says govern/enforce/prove, developers use issue/pay/verify, machines consume schemas/signatures/receipts.
+          </p>
+        </div>
+        <div className="grid gap-5 md:grid-cols-3">
+          {voiceCards.map((item) => (
+            <div key={item.title} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
+              <div className="mb-3 inline-flex rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 font-mono text-xs text-cyan-200">{item.label}</div>
+              <h3 className="mb-3 text-2xl font-bold text-white">{item.title}</h3>
+              <p className="leading-relaxed text-gray-400">{item.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <div className="mb-10 max-w-3xl">
           <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-emerald-300">Three calls</p>
           <h2 className="text-3xl font-bold text-white sm:text-4xl">Issue. Pay. Verify.</h2>
           <p className="mt-4 text-lg leading-8 text-gray-400">
-            Developers should not wire payment rails, revocation logic, audit trails, and tool policy by hand. SatGate makes agent authority feel like a simple primitive while preserving enterprise proof.
+            Developers should not wire settlement adapters, revocation logic, evidence exports, and tool policy by hand. SatGate makes agent authority feel like a simple primitive while preserving enterprise proof.
           </p>
         </div>
         <div className="grid gap-5 md:grid-cols-3">
@@ -297,7 +339,7 @@ export default function BuildPage() {
                 Payment rails change. The authority and evidence layer is the durable abstraction. SatGate governs MCP tools, REST APIs, API-key billing, x402, L402, and enterprise ledgers today, and is designed to govern planned rails such as AgentCore Payments and Pay.sh without forcing your agent code to care which rail settled underneath.
               </p>
               <p>
-                The machine-readable <Link href="/.well-known/satgate" className="text-cyan-300 hover:text-cyan-200">/.well-known/satgate</Link> artifact is canonical for rail adapter status; marketing copy should defer to it when a rail is planned rather than already supported.
+                The machine-readable <a href="https://satgate.io/.well-known/satgate" className="text-cyan-300 hover:text-cyan-200">/.well-known/satgate</a> artifact is canonical for rail adapter status; marketing copy should defer to it when a rail is planned rather than already supported.
               </p>
               <p>
                 Humans and platforms deploy the policies. Agents consume capabilities. Upstreams receive verifiable proof that the action was authorized, bounded, and recorded.
@@ -352,19 +394,19 @@ export default function BuildPage() {
             <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-emerald-300">Agent integrations</p>
             <h2 className="text-3xl font-bold text-white sm:text-4xl">Give every runtime bounded authority.</h2>
             <p className="mt-4 text-lg leading-8 text-gray-400">
-              The runtime changes. The contract stays the same: capability before action, receipt after decision. The machine-readable trust metadata lives at <Link href="/.well-known/satgate" className="text-cyan-300 hover:text-cyan-200">/.well-known/satgate</Link>.
+              The runtime changes. The contract stays the same: capability before action, receipt after decision. The machine-readable trust metadata lives at <a href="https://satgate.io/.well-known/satgate" className="text-cyan-300 hover:text-cyan-200">/.well-known/satgate</a>.
             </p>
             <div className="mt-6 flex flex-wrap gap-2 text-sm text-gray-300">
               <span className="mr-1 py-1 text-gray-500">Works with:</span>
               {runtimeChips.map((chip) => (
-                <Link key={chip} href="/integrations" className="rounded-full border border-gray-800 bg-black px-3 py-1 transition hover:border-cyan-400 hover:text-white">
-                  {chip}
-                </Link>
+                <a key={chip.label} href={chip.href} target="_blank" rel="noopener noreferrer" className="rounded-full border border-gray-800 bg-black px-3 py-1 transition hover:border-cyan-400 hover:text-white">
+                  {chip.label}
+                </a>
               ))}
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
-            {integrationLinks.map((item) => {
+            {buildDocLinks.map((item) => {
               const card = (
                 <>
                   <div className="mb-3 flex items-center gap-2 text-white">
@@ -372,17 +414,13 @@ export default function BuildPage() {
                     <h3 className="font-bold">{item.title}</h3>
                   </div>
                   <p className="text-sm leading-6 text-gray-400">{item.body}</p>
-                  <div className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-cyan-300">Open <ArrowRight size={14} /></div>
+                  <div className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-cyan-300">Open doc <ArrowRight size={14} /></div>
                 </>
               );
-              return item.href.startsWith("http") ? (
+              return (
                 <a key={item.title} href={item.href} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-cyan-500">
                   {card}
                 </a>
-              ) : (
-                <Link key={item.title} href={item.href} className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-cyan-500">
-                  {card}
-                </Link>
               );
             })}
           </div>
@@ -426,7 +464,7 @@ export default function BuildPage() {
           Start with issue/pay/verify. Keep the buyer story on Economic Firewall and Policy-to-Proof. Let agents consume the primitives.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+          <a href="https://github.com/SatGate-io/satgate/blob/main/docs/index.md" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
             Open docs <ArrowRight size={18} />
           </a>
           <Link href="/capability-auth" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-400">

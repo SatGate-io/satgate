@@ -181,7 +181,7 @@ curl http://localhost:9090/api/v1/system/preflight \
 
 ## Enable Strict Tenant Isolation
 
-Follow the [Production Cutover Runbook](../operations/production-cutover.md) after validation.
+Follow the [Production Cutover Runbook](../operations/production-checklist.md) after validation.
 
 ## High Availability
 
@@ -281,7 +281,7 @@ kubectl get certificate -n satgate
 ## Next Steps
 
 - [Production Checklist](../operations/production-checklist.md)
-- [Production Cutover](../operations/production-cutover.md)
-- [Monitoring Setup](../operations/monitoring.md)
+- [Production checklist](../operations/production-checklist.md)
+- [Backup and restore](../operations/backup-restore.md)
 
 
