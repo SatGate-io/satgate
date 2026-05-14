@@ -13,6 +13,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '', lastModified: '2026-05-05', changeFrequency: 'weekly', priority: 1.0 },
   { path: '/govern', lastModified: '2026-05-05', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/economic-firewall', lastModified: '2026-05-05', changeFrequency: 'weekly', priority: 0.9 },
+  { path: '/agent-authority-layer', lastModified: '2026-05-14', changeFrequency: 'weekly', priority: 0.95 },
   { path: '/policy-to-proof', lastModified: '2026-05-10', changeFrequency: 'weekly', priority: 0.95 },
   { path: '/stripe-link-agents-vs-satgate', lastModified: '2026-05-02', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/agent-payment-controls', lastModified: '2026-05-02', changeFrequency: 'weekly', priority: 0.9 },
