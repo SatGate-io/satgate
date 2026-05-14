@@ -114,6 +114,9 @@ export default function RailPartnersPage() {
               <Link href="/agent-authority-layer" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
                 See the authority and accountability layer <ArrowRight size={18} />
               </Link>
+              <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
+                See the Economic Firewall category <ArrowRight size={18} />
+              </Link>
             </div>
           </div>
 
