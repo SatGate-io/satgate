@@ -466,5 +466,5 @@ Standard MCP methods (`tools/list`, `tools/call`, `initialize`, `ping`, etc.) ar
 ## Further Reading
 
 - [MCP Specification](https://modelcontextprotocol.io/specification)
-- [SatGate Quick Start](https://github.com/SatGate-io/satgate#-quick-start)
-- [Token Delegation Guide](https://github.com/SatGate-io/satgate#token-delegation)
+- [SatGate Quick Start](https://github.com/SatGate-io/satgate#quick-start)
+- [Capability schema](../reference/capability-schema.md)

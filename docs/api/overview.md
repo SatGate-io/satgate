@@ -1,9 +1,19 @@
 # API Overview
 
-Lower-level gateway API reference. Application SDK examples should use `issue`, `pay`, and `verify` where available: issue a scoped capability, pay upstream with a max budget, then verify the receipt.
+Lower-level gateway API reference. Application SDK examples should use `issue`, `pay`, and `verify` where available: issue a scoped capability, invoke upstream through `pay` with a max budget, then verify the receipt.
 
 
-SatGate exposes two API groups on port **8080** (same port as the proxy):
+SatGate exposes these OSS/gateway compatibility API groups on port **8080** (same port as the proxy). They are useful for local gateways and lower-level integrations; app teams should prefer issue/pay/verify when available:
+
+## Developer-first paths
+
+Most application integrations should start with the developer voice rather than the low-level gateway API:
+
+- [Quickstart](../getting-started/quickstart.md)
+- [Raw HTTP issue/pay/verify](../guides/raw-http.md)
+- [MCP integration](../guides/mcp-gateway.md)
+- [Receipt schema](../reference/receipt-schema.md)
+- [Capability schema](../reference/capability-schema.md)
 
 ## Capability APIs (`/api/capability/`)
 

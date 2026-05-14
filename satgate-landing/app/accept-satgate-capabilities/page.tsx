@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, BadgeCheck, CheckCircle2, FileCheck2, KeyRound, ReceiptText, ShieldCheck, XCircle } from "lucide-react";
+import { ArrowLeft, BadgeCheck, CheckCircle2, FileCheck2, ShieldCheck, XCircle } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Accept SatGate Capabilities",
@@ -217,7 +217,7 @@ export default function AcceptSatGateCapabilitiesPage() {
             </div>
             <div className="mt-6 flex flex-wrap gap-3 md:mt-0">
               <Link href="/examples/mock-acceptor-metadata.v0.json" className="rounded-full border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400">Mock metadata</Link>
-              <Link href="/.well-known/satgate-acceptor.schema.json" className="rounded-full border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400">v0 schema</Link>
+              <a href="https://satgate.io/.well-known/satgate-acceptor.schema.json" className="rounded-full border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400">v0 schema</a>
               <Link href="/examples/mock-accepted-satgate-receipt.v1.json" className="rounded-full bg-cyan-300 px-5 py-3 text-sm font-bold text-black transition hover:bg-cyan-200">Mock receipt</Link>
             </div>
           </div>

@@ -461,8 +461,8 @@ Things we should consider based on this analysis:
 
 ## Resources
 
-- [SatGate Gateway Documentation](https://satgate.io/docs)
-- [SatGate GitHub Repository](https://github.com/SatGate-io/satgate-gateway)
+- [SatGate documentation index](index.md)
+- [SatGate GitHub Repository](https://github.com/SatGate-io/satgate)
 - [Aperture (Lightning Labs)](https://github.com/lightninglabs/aperture)
 - [Kong Gateway](https://konghq.com/products/kong-gateway)
 - [Zuplo](https://zuplo.com)
