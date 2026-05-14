@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "lucide-react": "^0.555.0",
-    "next": "^16.1.6",
+    "next": "^16.2.6",
     "react": "19.2.1",
     "react-dom": "19.2.1",
     "resend": "^6.9.3"
@@ -34,8 +34,11 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "^16.1.6",
+    "eslint-config-next": "^16.2.6",
     "tailwindcss": "^4",
     "typescript": "5.9.3"
+  },
+  "overrides": {
+    "postcss": "8.5.14"
   }
 }
