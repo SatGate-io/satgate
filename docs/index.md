@@ -28,6 +28,7 @@ For app teams and agent builders. The developer primitive is three calls:
 Build paths:
 
 - [Quickstart](getting-started/quickstart.md)
+- [Issue → pay → verify L402 quickstart](getting-started/issue-pay-verify.md)
 - [Raw HTTP issue/pay/verify](guides/raw-http.md)
 - [MCP integration](guides/mcp-gateway.md)
 - [OpenAI tools example](guides/openai-tools.md)
