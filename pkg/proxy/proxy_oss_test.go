@@ -75,6 +75,21 @@ func newTestGatewayWithUpstream(t *testing.T, upstream *httptest.Server, policyK
 	return gw, cfg
 }
 
+type structuralNonMockProvider struct{}
+
+func (structuralNonMockProvider) CreateInvoice(amountSats int64, memo string) (*lightning.Invoice, error) {
+	return lightning.NewMockProvider().CreateInvoice(amountSats, memo)
+}
+func (structuralNonMockProvider) CheckPayment(paymentHash string) (bool, error) { return false, nil }
+func (structuralNonMockProvider) GetBalance() (int64, error)                    { return 0, nil }
+func (structuralNonMockProvider) GetInfo() (*lightning.NodeInfo, error) {
+	return &lightning.NodeInfo{}, nil
+}
+func (structuralNonMockProvider) SimulatePayment(paymentHash string) {}
+func (structuralNonMockProvider) GetPreimage(paymentHash string) (string, bool) {
+	return strings.Repeat("a", 64), true
+}
+
 // --- New() constructor tests ---
 
 func TestNew_RequiresConfig(t *testing.T) {
@@ -399,22 +414,7 @@ func TestL402Policy_MockPayEndpointReturnsAuthorizationForPaidRetry(t *testing.T
 
 	gw := newTestGateway(t, newL402TestConfig(upstream.URL))
 
-	challengeReq := httptest.NewRequest("GET", "/api/test", nil)
-	challengeW := httptest.NewRecorder()
-	gw.ServeHTTP(challengeW, challengeReq)
-	if challengeW.Code != http.StatusPaymentRequired {
-		t.Fatalf("expected initial 402, got %d", challengeW.Code)
-	}
-
-	macaroon := extractL402MacaroonFromChallenge(t, challengeW.Header().Get("WWW-Authenticate"))
-	var challengeBody map[string]interface{}
-	if err := json.NewDecoder(challengeW.Body).Decode(&challengeBody); err != nil {
-		t.Fatalf("decode challenge body: %v", err)
-	}
-	paymentHash, ok := challengeBody["payment_hash"].(string)
-	if !ok || paymentHash == "" {
-		t.Fatalf("expected payment_hash in challenge body, got %#v", challengeBody)
-	}
+	macaroon, paymentHash := issueL402TestChallenge(t, gw)
 
 	payReq := httptest.NewRequest("POST", "/api/l402/mock-pay", strings.NewReader(`{"payment_hash":"`+paymentHash+`","macaroon":"`+macaroon+`"}`))
 	payReq.Header.Set("Content-Type", "application/json")
@@ -443,6 +443,66 @@ func TestL402Policy_MockPayEndpointReturnsAuthorizationForPaidRetry(t *testing.T
 	}
 }
 
+func TestL402Policy_MockPayEndpointRejectsMismatchedMacaroonHash(t *testing.T) {
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer upstream.Close()
+
+	gw := newTestGateway(t, newL402TestConfig(upstream.URL))
+	macaroon, _ := issueL402TestChallenge(t, gw)
+	_, differentPaymentHash := issueL402TestChallenge(t, gw)
+
+	payReq := httptest.NewRequest("POST", "/api/l402/mock-pay", strings.NewReader(`{"payment_hash":"`+differentPaymentHash+`","macaroon":"`+macaroon+`"}`))
+	payReq.Header.Set("Content-Type", "application/json")
+	payReq.Header.Set("X-Admin-Token", "admin-secret")
+	payW := httptest.NewRecorder()
+	gw.ServeHTTP(payW, payReq)
+
+	if payW.Code != http.StatusBadRequest {
+		t.Fatalf("expected mismatched macaroon/payment_hash to return 400, got %d body=%s", payW.Code, payW.Body.String())
+	}
+	if !strings.Contains(payW.Body.String(), "macaroon does not match payment_hash") {
+		t.Fatalf("expected mismatch error body, got %s", payW.Body.String())
+	}
+}
+
+func TestL402Policy_MockPayEndpointRequiresConcreteMockProvider(t *testing.T) {
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer upstream.Close()
+
+	gw := newTestGateway(t, newL402TestConfig(upstream.URL))
+	gw.lightning = structuralNonMockProvider{}
+
+	payReq := httptest.NewRequest("POST", "/api/l402/mock-pay", strings.NewReader(`{"payment_hash":"hash","macaroon":"mac"}`))
+	payReq.Header.Set("Content-Type", "application/json")
+	payReq.Header.Set("X-Admin-Token", "admin-secret")
+	payW := httptest.NewRecorder()
+	gw.ServeHTTP(payW, payReq)
+
+	if payW.Code != http.StatusNotImplemented {
+		t.Fatalf("expected non-concrete mock provider to return 501, got %d body=%s", payW.Code, payW.Body.String())
+	}
+}
+
+func TestIsBuiltInAPIEndpoint(t *testing.T) {
+	tests := map[string]bool{
+		"/api/l402/mock-pay":    true,
+		"/api/capability/mint":  true,
+		"/api/governance/rules": true,
+		"/api/test":             false,
+		"/api/customer/v1":      false,
+		"/check-payment/hash":   false,
+	}
+	for path, want := range tests {
+		if got := isBuiltInAPIEndpoint(path); got != want {
+			t.Fatalf("isBuiltInAPIEndpoint(%q)=%t, want %t", path, got, want)
+		}
+	}
+}
+
 func newL402TestConfig(upstreamURL string) *config.Config {
 	return &config.Config{
 		Server: config.ServerConfig{Listen: ":8080"},
@@ -462,6 +522,28 @@ func newL402TestConfig(upstreamURL string) *config.Config {
 			},
 		},
 	}
+}
+
+func issueL402TestChallenge(t *testing.T, gw *Gateway) (string, string) {
+	t.Helper()
+
+	challengeReq := httptest.NewRequest("GET", "/api/test", nil)
+	challengeW := httptest.NewRecorder()
+	gw.ServeHTTP(challengeW, challengeReq)
+	if challengeW.Code != http.StatusPaymentRequired {
+		t.Fatalf("expected initial 402, got %d body=%s", challengeW.Code, challengeW.Body.String())
+	}
+
+	macaroon := extractL402MacaroonFromChallenge(t, challengeW.Header().Get("WWW-Authenticate"))
+	var challengeBody map[string]interface{}
+	if err := json.NewDecoder(challengeW.Body).Decode(&challengeBody); err != nil {
+		t.Fatalf("decode challenge body: %v", err)
+	}
+	paymentHash, ok := challengeBody["payment_hash"].(string)
+	if !ok || paymentHash == "" {
+		t.Fatalf("expected payment_hash in challenge body, got %#v", challengeBody)
+	}
+	return macaroon, paymentHash
 }
 
 func extractL402MacaroonFromChallenge(t *testing.T, challenge string) string {

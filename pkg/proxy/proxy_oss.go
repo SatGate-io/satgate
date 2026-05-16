@@ -203,8 +203,9 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Rate limit admin API endpoints
-	if strings.HasPrefix(r.URL.Path, "/api/") {
+	// Rate limit built-in admin/API endpoints without throttling customer
+	// upstream routes that happen to live under /api/.
+	if isBuiltInAPIEndpoint(r.URL.Path) {
 		clientIP := extractIP(r)
 		if !g.adminLimiter.allow(clientIP) {
 			w.Header().Set("Content-Type", "application/json")
@@ -512,6 +513,12 @@ func (g *Gateway) issueL402Challenge(w http.ResponseWriter, r *http.Request, rou
 	fmt.Fprintf(w, `{"error":"payment_required","invoice":"%s","amount_sats":%d,"payment_hash":"%s"}`, invoice, priceSats, paymentHash)
 }
 
+func isBuiltInAPIEndpoint(path string) bool {
+	return path == "/api/l402/mock-pay" ||
+		strings.HasPrefix(path, "/api/capability/") ||
+		strings.HasPrefix(path, "/api/governance/")
+}
+
 // handleCheckPayment allows frontend to poll for payment status
 func (g *Gateway) handleCheckPayment(w http.ResponseWriter, r *http.Request) {
 	// Extract payment hash from URL: /check-payment/{payment_hash}
@@ -545,11 +552,6 @@ func (g *Gateway) handleCheckPayment(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, `{"paid":%t}`, paid)
 }
 
-type mockL402Payer interface {
-	SimulatePayment(paymentHash string)
-	GetPreimage(paymentHash string) (string, bool)
-}
-
 func (g *Gateway) handleL402MockPay(w http.ResponseWriter, r *http.Request) {
 	if !g.validAdminToken(r.Header.Get("X-Admin-Token")) {
 		w.Header().Set("Content-Type", "application/json")
@@ -558,7 +560,7 @@ func (g *Gateway) handleL402MockPay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mock, ok := g.lightning.(mockL402Payer)
+	mock, ok := g.lightning.(*lightning.MockProvider)
 	if !ok {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNotImplemented)
@@ -581,6 +583,14 @@ func (g *Gateway) handleL402MockPay(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{"error": "payment_hash and macaroon are required"})
+		return
+	}
+
+	mac, err := g.macaroonSvc.Verify(req.Macaroon)
+	if err != nil || mac.GetCaveat("payment_hash") != req.PaymentHash {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "macaroon does not match payment_hash"})
 		return
 	}
 
