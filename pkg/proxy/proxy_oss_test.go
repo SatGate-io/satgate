@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -366,24 +367,7 @@ func TestL402Policy_NoToken_Returns402(t *testing.T) {
 	}))
 	defer upstream.Close()
 
-	cfg := &config.Config{
-		Server: config.ServerConfig{Listen: ":8080"},
-		Admin:  config.AdminConfig{Token: "admin-secret", CORSAllowedOrigins: []string{"https://example.com"}},
-		Upstreams: map[string]config.Upstream{
-			"backend": {URL: upstream.URL},
-		},
-		Routes: []config.Route{
-			{
-				Name:     "paid",
-				Match:    config.RouteMatch{PathPrefix: "/api/"},
-				Upstream: "backend",
-				Policy: config.RoutePolicy{
-					Kind:      "l402",
-					PriceSats: 100,
-				},
-			},
-		},
-	}
+	cfg := newL402TestConfig(upstream.URL)
 	gw := newTestGateway(t, cfg)
 
 	req := httptest.NewRequest("GET", "/api/test", nil)
@@ -403,6 +387,90 @@ func TestL402Policy_NoToken_Returns402(t *testing.T) {
 	if !strings.Contains(authHeader, "invoice=") {
 		t.Error("expected invoice in L402 challenge")
 	}
+}
+
+func TestL402Policy_MockPayEndpointReturnsAuthorizationForPaidRetry(t *testing.T) {
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]string{"paid": "true", "path": r.URL.Path})
+	}))
+	defer upstream.Close()
+
+	gw := newTestGateway(t, newL402TestConfig(upstream.URL))
+
+	challengeReq := httptest.NewRequest("GET", "/api/test", nil)
+	challengeW := httptest.NewRecorder()
+	gw.ServeHTTP(challengeW, challengeReq)
+	if challengeW.Code != http.StatusPaymentRequired {
+		t.Fatalf("expected initial 402, got %d", challengeW.Code)
+	}
+
+	macaroon := extractL402MacaroonFromChallenge(t, challengeW.Header().Get("WWW-Authenticate"))
+	var challengeBody map[string]interface{}
+	if err := json.NewDecoder(challengeW.Body).Decode(&challengeBody); err != nil {
+		t.Fatalf("decode challenge body: %v", err)
+	}
+	paymentHash, ok := challengeBody["payment_hash"].(string)
+	if !ok || paymentHash == "" {
+		t.Fatalf("expected payment_hash in challenge body, got %#v", challengeBody)
+	}
+
+	payReq := httptest.NewRequest("POST", "/api/l402/mock-pay", strings.NewReader(`{"payment_hash":"`+paymentHash+`","macaroon":"`+macaroon+`"}`))
+	payReq.Header.Set("Content-Type", "application/json")
+	payReq.Header.Set("X-Admin-Token", "admin-secret")
+	payW := httptest.NewRecorder()
+	gw.ServeHTTP(payW, payReq)
+	if payW.Code != http.StatusOK {
+		t.Fatalf("expected mock pay endpoint to return 200, got %d body=%s", payW.Code, payW.Body.String())
+	}
+
+	var payBody map[string]string
+	if err := json.NewDecoder(payW.Body).Decode(&payBody); err != nil {
+		t.Fatalf("decode pay body: %v", err)
+	}
+	authorization := payBody["authorization"]
+	if !strings.HasPrefix(authorization, "L402 "+macaroon+":") {
+		t.Fatalf("expected L402 authorization header, got %q", authorization)
+	}
+
+	paidReq := httptest.NewRequest("GET", "/api/test", nil)
+	paidReq.Header.Set("Authorization", authorization)
+	paidW := httptest.NewRecorder()
+	gw.ServeHTTP(paidW, paidReq)
+	if paidW.Code != http.StatusOK {
+		t.Fatalf("expected paid retry to proxy upstream, got %d body=%s", paidW.Code, paidW.Body.String())
+	}
+}
+
+func newL402TestConfig(upstreamURL string) *config.Config {
+	return &config.Config{
+		Server: config.ServerConfig{Listen: ":8080"},
+		Admin:  config.AdminConfig{Token: "admin-secret", CORSAllowedOrigins: []string{"https://example.com"}},
+		Upstreams: map[string]config.Upstream{
+			"backend": {URL: upstreamURL},
+		},
+		Routes: []config.Route{
+			{
+				Name:     "paid",
+				Match:    config.RouteMatch{PathPrefix: "/api/"},
+				Upstream: "backend",
+				Policy: config.RoutePolicy{
+					Kind:      "l402",
+					PriceSats: 100,
+				},
+			},
+		},
+	}
+}
+
+func extractL402MacaroonFromChallenge(t *testing.T, challenge string) string {
+	t.Helper()
+	match := regexp.MustCompile(`macaroon="([^"]+)"`).FindStringSubmatch(challenge)
+	if len(match) != 2 {
+		t.Fatalf("expected macaroon in challenge %q", challenge)
+	}
+	return match[1]
 }
 
 // --- StripPrefix tests ---

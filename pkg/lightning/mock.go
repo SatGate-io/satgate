@@ -93,6 +93,18 @@ func (m *MockProvider) SimulatePayment(paymentHash string) {
 	}
 }
 
+// GetPreimage returns the mock preimage for a payment hash.
+func (m *MockProvider) GetPreimage(paymentHash string) (string, bool) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	inv, ok := m.invoices[paymentHash]
+	if !ok {
+		return "", false
+	}
+	return inv.Preimage, true
+}
+
 // GetBalance returns mock balance
 func (m *MockProvider) GetBalance() (int64, error) {
 	m.mu.RLock()

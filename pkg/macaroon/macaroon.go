@@ -80,13 +80,15 @@ func (s *Service) Mint(scope string, expiresAt time.Time) (*Macaroon, error) {
 // from the root key and comparing the final signature.
 // Accepts both binary (libmacaroon V2) and JSON (custom) formats.
 func (s *Service) Verify(token string) (*Macaroon, error) {
-	// Try binary format first (lnget/Aperture clients), then JSON format (our SDKs)
-	mac, err := s.DecodeBinary(token)
+	// Binary L402 macaroons use libmacaroon's canonical signature algorithm;
+	// verify them with the library before converting into SatGate's struct shape.
+	if mac, err := s.verifyBinary(token); err == nil {
+		return mac, nil
+	}
+
+	mac, err := s.Decode(token)
 	if err != nil {
-		mac, err = s.Decode(token)
-		if err != nil {
-			return nil, fmt.Errorf("failed to decode token: %w", err)
-		}
+		return nil, fmt.Errorf("failed to decode token: %w", err)
 	}
 
 	// Reconstruct the chained signature from root key
@@ -103,6 +105,26 @@ func (s *Service) Verify(token string) (*Macaroon, error) {
 	}
 
 	return mac, nil
+}
+
+func (s *Service) verifyBinary(token string) (*Macaroon, error) {
+	data, err := base64.StdEncoding.DecodeString(token)
+	if err != nil {
+		data, err = base64.RawStdEncoding.DecodeString(token)
+		if err != nil {
+			return nil, fmt.Errorf("invalid base64: %w", err)
+		}
+	}
+
+	var v2mac macaroonv2.Macaroon
+	if err := v2mac.UnmarshalBinary(data); err != nil {
+		return nil, fmt.Errorf("invalid binary macaroon: %w", err)
+	}
+	if err := v2mac.Verify(s.rootKey, s.verifyCaveat, nil); err != nil {
+		return nil, err
+	}
+
+	return s.decodeVerifiedBinaryMacaroon(&v2mac), nil
 }
 
 // Delegate creates a child macaroon with additional caveats using proper
@@ -225,6 +247,10 @@ func (s *Service) DecodeBinary(token string) (*Macaroon, error) {
 		return nil, fmt.Errorf("invalid binary macaroon: %w", err)
 	}
 
+	return s.decodeVerifiedBinaryMacaroon(&v2mac), nil
+}
+
+func (s *Service) decodeVerifiedBinaryMacaroon(v2mac *macaroonv2.Macaroon) *Macaroon {
 	mac := &Macaroon{
 		Version:    2,
 		Location:   v2mac.Location(),
@@ -237,7 +263,7 @@ func (s *Service) DecodeBinary(token string) (*Macaroon, error) {
 		mac.Caveats = append(mac.Caveats, string(cav.Id))
 	}
 
-	return mac, nil
+	return mac
 }
 
 // Encode serializes a macaroon to a string

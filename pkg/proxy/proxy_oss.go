@@ -215,6 +215,14 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Admin endpoint: complete a mock L402 payment for local demos and tests.
+	// This is intentionally available only for Lightning providers that expose
+	// mock preimages; real Lightning backends must settle externally.
+	if r.URL.Path == "/api/l402/mock-pay" && r.Method == "POST" {
+		g.handleL402MockPay(w, r)
+		return
+	}
+
 	// Admin endpoint: Capability token minting
 	if r.URL.Path == "/api/capability/mint" && r.Method == "POST" {
 		g.handleCapabilityMint(w, r)
@@ -535,6 +543,84 @@ func (g *Gateway) handleCheckPayment(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, `{"paid":%t}`, paid)
+}
+
+type mockL402Payer interface {
+	SimulatePayment(paymentHash string)
+	GetPreimage(paymentHash string) (string, bool)
+}
+
+func (g *Gateway) handleL402MockPay(w http.ResponseWriter, r *http.Request) {
+	if !g.validAdminToken(r.Header.Get("X-Admin-Token")) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid or missing X-Admin-Token"})
+		return
+	}
+
+	mock, ok := g.lightning.(mockL402Payer)
+	if !ok {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotImplemented)
+		json.NewEncoder(w).Encode(map[string]string{"error": "mock L402 payment is only available with the mock Lightning provider"})
+		return
+	}
+
+	r.Body = io.NopCloser(io.LimitReader(r.Body, 1048576))
+	var req struct {
+		PaymentHash string `json:"payment_hash"`
+		Macaroon    string `json:"macaroon"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid request body"})
+		return
+	}
+	if len(req.PaymentHash) != 64 || req.Macaroon == "" {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "payment_hash and macaroon are required"})
+		return
+	}
+
+	preimage, ok := mock.GetPreimage(req.PaymentHash)
+	if !ok {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "payment hash not found"})
+		return
+	}
+	mock.SimulatePayment(req.PaymentHash)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"paid":          "true",
+		"payment_hash":  req.PaymentHash,
+		"authorization": "L402 " + req.Macaroon + ":" + preimage,
+	})
+}
+
+func (g *Gateway) validAdminToken(adminToken string) bool {
+	if adminToken == "" {
+		return false
+	}
+
+	validTokens := []string{}
+	if g.config.Admin.Token != "" {
+		validTokens = append(validTokens, g.config.Admin.Token)
+	}
+	if envToken := strings.TrimSpace(getEnv("ADMIN_TOKEN", "")); envToken != "" {
+		validTokens = append(validTokens, envToken)
+	}
+
+	for _, vt := range validTokens {
+		if subtle.ConstantTimeCompare([]byte(adminToken), []byte(vt)) == 1 {
+			return true
+		}
+	}
+	return false
 }
 
 // matchRoute finds the route matching the request.

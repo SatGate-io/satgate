@@ -100,12 +100,14 @@ TOKEN=$(curl -s -X POST http://localhost:8080/api/capability/mint \
 curl http://localhost:8080/api/anything \
   -H "Authorization: Bearer $TOKEN"
 
-# Optional paid route — returns 402 Payment Required with a mock settlement challenge; paid retry returns a paid-call receipt for the Evidence Pack
+# Optional paid route — returns 402 Payment Required with a mock settlement challenge.
+# For the full paid retry, use the issue → pay → verify quickstart.
 curl -i http://localhost:8080/premium/anything
 ```
 
 ## Next Steps
 
+- [Issue → Pay → Verify L402 Quickstart](issue-pay-verify.md)
 - [Route Configuration](../configuration/routes.md)
 - [Policy & Scope](../configuration/policy-scope.md)
 - [MCP Gateway Guide](../guides/mcp-gateway.md)
