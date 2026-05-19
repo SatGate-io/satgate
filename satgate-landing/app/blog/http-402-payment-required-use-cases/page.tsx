@@ -458,18 +458,18 @@ Parent Agent ($50 macaroon)
             The pattern is consistent: wherever monthly subscriptions create friction for machine consumers, 402 with L402 provides a smoother alternative. Agents don&apos;t want to manage subscriptions. They want to pay for what they use, when they use it.
           </p>
 
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Future: 402 as Default Commerce Layer</h2>
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Future: 402 as a Paid Rail Under Authority</h2>
 
           <p className="text-gray-300 leading-relaxed">
             HTTP 402 is evolving from a curiosity into a fundamental building block of the agent economy. As more APIs expose 402 endpoints, agents will develop increasingly sophisticated payment strategies: comparing prices across providers, pre-funding budgets for anticipated workflows, and negotiating bulk rates through macaroon caveats.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            The end state is an internet where machines can discover, evaluate, purchase, and consume digital services without any human in the loop. Not because humans aren&apos;t important &mdash; but because humans set the budgets, constraints, and policies, and the machines execute within those boundaries at speeds no human could match.
+            The enterprise end state is not agents spending freely. Humans and platforms set budgets, constraints, and policies; agents execute inside those boundaries; the payment rail carries value only after authority has been checked.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            HTTP 402 was reserved for future use in 1997. The future is here, and it looks like delegated agents consuming paid API calls with paid-rail context, governed by macaroon tokens, settled in milliseconds. The dormant status code just woke up.
+HTTP 402 was reserved for future use in 1997. For agent systems, the useful version is narrower: 402 is paid-rail context around an authority decision, with policy checked before value moves and Evidence Packs available after the call.
           </p>
 
           <div className="my-10 rounded-2xl border border-yellow-900/60 bg-yellow-950/20 p-6">
@@ -482,35 +482,35 @@ Parent Agent ($50 macaroon)
               <Link href="/l402-agent-payments" className="text-cyan-300 hover:text-cyan-200">L402 agent payments →</Link>
               <Link href="/http-402-for-ai-agents" className="text-cyan-300 hover:text-cyan-200">HTTP 402 for AI agents →</Link>
               <Link href="/agent-payment-controls" className="text-cyan-300 hover:text-cyan-200">Agent payment controls →</Link>
-              <Link href="/economic-firewall" className="text-cyan-300 hover:text-cyan-200">Economic firewall →</Link>
+              <Link href="/partners/rails" className="text-cyan-300 hover:text-cyan-200">Paid-rail governance →</Link>
             </div>
           </div>
 
 
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
-            <h3 className="mb-3 text-xl font-bold text-white">SatGate growth path: Observe → Control → Charge</h3>
+            <h3 className="mb-3 text-xl font-bold text-white">SatGate path: Observe → Control → Prove</h3>
             <p className="mb-4 text-gray-300">
-              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or paid-agent revenue.
+              Start by observing paid-agent and API usage. Move to Control when budgets, scopes, and payment authority need to stop bad calls before value moves. Preserve Evidence Packs so each paid-rail decision can be verified later.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
-              <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway →</Link>
-              <Link href="/capability-auth" className="text-cyan-300 hover:text-cyan-200">Capability auth →</Link>
+              <Link href="/partners/rails" className="text-cyan-300 hover:text-cyan-200">Paid-rail partner brief →</Link>
+              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>
           </div>
 
           {/* CTA Section */}
           <div className="mt-16 bg-gradient-to-r from-blue-900/20 to-cyan-900/20 border border-blue-800/30 rounded-xl p-8">
-            <h3 className="text-xl font-bold text-white mb-3">Add 402 Payment Required to Your API</h3>
+            <h3 className="text-xl font-bold text-white mb-3">Govern 402 payments before value moves</h3>
             <p className="text-gray-300 mb-4">
-              SatGate is an economic gateway that adds L402 payment support, budget enforcement, and macaroon authentication to any API. Deploy in front of your existing infrastructure and start monetizing agent traffic today.
+              SatGate treats HTTP 402 and L402 as paid rails around authority decisions. Deploy it in front of APIs to enforce scope, budget, and payment policy before execution, then preserve Evidence Packs for later verification.
             </p>
             <div className="flex flex-wrap gap-3">
               <a href="https://github.com/SatGate-io/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
                 View on GitHub
               </a>
-              <Link href="/blog/l402-protocol-explained" className="inline-flex items-center gap-2 border border-blue-500 text-blue-300 px-6 py-3 rounded-lg font-bold hover:bg-blue-900/30 transition text-sm">
-                Read: L402 Protocol Explained →
+              <Link href="/partners/rails" className="inline-flex items-center gap-2 border border-blue-500 text-blue-300 px-6 py-3 rounded-lg font-bold hover:bg-blue-900/30 transition text-sm">
+                Read: Paid-Rail Partner Brief →
               </Link>
             </div>
           </div>

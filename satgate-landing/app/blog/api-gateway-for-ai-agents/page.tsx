@@ -197,7 +197,7 @@ Monetization          Subscription tiers      Per-call micropayments (L402)`}</c
             The gap isn't in routing, load balancing, or TLS termination. Every gateway handles that. The gap is in <strong className="text-white">economic awareness</strong> — understanding that API calls have variable costs, that agents need budgets (not rate limits), and that delegation requires cryptographic trust chains.
           </p>
 
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Missing Layer: Economic Governance</h2>
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Missing Layer: Request-Path Governance</h2>
           
           <p className="text-gray-300 leading-relaxed">
             An API gateway for AI agents needs three capabilities that traditional gateways lack entirely:
@@ -279,7 +279,7 @@ satgate mint \\
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">How SatGate Approaches It</h2>
           
           <p className="text-gray-300 leading-relaxed">
-            SatGate isn't competing with Kong or Gravitee on routing and load balancing. Those are solved problems. Instead, SatGate sits as an <strong className="text-white">economic governance layer</strong> — either as a standalone proxy or alongside your existing gateway.
+            SatGate isn't competing with Kong or Gravitee on routing and load balancing. Those are solved problems. Instead, SatGate sits as a <strong className="text-white">request-path governance layer</strong> — either as a standalone proxy or alongside your existing gateway.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -292,12 +292,12 @@ satgate mint \\
 └──────────────┬───────────────────────────┘
                │
 ┌──────────────▼───────────────────────────┐
-│  SatGate Economic Layer                  │
-│  ├─ Verify macaroon + caveats            │
-│  ├─ Check budget (atomic Redis op)       │
+│  SatGate Policy-to-Proof Layer           │
+│  ├─ Verify capability + caveats          │
+│  ├─ Check policy and budget atomically   │
 │  ├─ Resolve tool cost                    │
-│  ├─ Decrement budget                     │
-│  └─ Log economic event                   │
+│  ├─ Allow, deny, or require approval     │
+│  └─ Emit Evidence Pack                   │
 └──────────────┬───────────────────────────┘
                │
 ┌──────────────▼───────────────────────────┐
@@ -307,23 +307,23 @@ satgate mint \\
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            This means you don't rip and replace your existing infrastructure. SatGate adds the economic layer that agents need while your current gateway continues handling TLS, routing, and load balancing.
+            This means you don't rip and replace your existing infrastructure. SatGate adds the Policy-to-Proof layer that agents need while your current gateway continues handling TLS, routing, and load balancing.
           </p>
 
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Enterprise Path: Observe → Control → Charge</h2>
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Enterprise Path: Observe → Control → Prove</h2>
           
           <p className="text-gray-300 leading-relaxed">
             Most enterprises aren't ready to enforce budgets on day one. That's fine. SatGate supports a progressive adoption model:
           </p>
 
           <ul className="text-gray-300 space-y-3">
-            <li><strong className="text-white">Observe:</strong> Deploy in audit mode. See what your agents are spending. No enforcement, just visibility. "We had no idea GPT-4 calls were 80% of our agent costs."</li>
-            <li><strong className="text-white">Control:</strong> Enable request-path budget enforcement. Set dollar-denominated limits per agent, per team, per route, and per MCP tool. "Engineering gets $5,000/month for agent API spend."</li>
-            <li><strong className="text-white">Charge (L402):</strong> Enable Lightning-based micropayments. SatGate governs paid-rail context for paid agents that pay per API request before access. Fiat402 is separate and should not be conflated with Charge.</li>
+            <li><strong className="text-white">Observe:</strong> Deploy in audit mode. See what agents are calling, spending, and delegating. No enforcement yet, just structured visibility.</li>
+            <li><strong className="text-white">Control:</strong> Enable request-path policy. Set budget, scope, route, tenant, and MCP-tool limits that block bad calls before they execute.</li>
+            <li><strong className="text-white">Prove:</strong> Preserve Evidence Packs for allow, deny, spend, delegation, and revocation decisions so security, finance, and auditors can verify what happened later.</li>
           </ul>
 
           <p className="text-gray-300 leading-relaxed">
-            Each stage builds on the last. By the time you're at L402, you have a fully autonomous economic system — agents that can discover, negotiate, and pay for API services without human intervention.
+            Each stage builds on the last. By the time paid rails enter the flow, they are governed context, not the control plane. Humans set policy and budgets; agents execute within those boundaries; SatGate preserves the proof.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">What to Look For in an Agent-Aware Gateway</h2>
@@ -338,9 +338,9 @@ satgate mint \\
             <li>✅ <strong className="text-white">Atomic budget enforcement</strong> (no race conditions at scale)</li>
             <li>✅ <strong className="text-white">Capability-based tokens</strong> (attenuated delegation, not all-or-nothing keys)</li>
             <li>✅ <strong className="text-white">Delegation chain tracking</strong> (who delegated to whom, and whose budget pays)</li>
-            <li>✅ <strong className="text-white">Economic Evidence Pack</strong> (spend attribution by agent, tool, team)</li>
+            <li>✅ <strong className="text-white">Evidence Packs</strong> (signed proof of allow, deny, spend, and delegation decisions)</li>
             <li>✅ <strong className="text-white">Structured budget exhaustion errors</strong> (agents need to reason about limits)</li>
-            <li>✅ <strong className="text-white">Progressive adoption</strong> (observe → control → charge)</li>
+            <li>✅ <strong className="text-white">Progressive adoption</strong> (observe → control → prove)</li>
           </ul>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Bottom Line</h2>
@@ -350,7 +350,7 @@ satgate mint \\
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            You don't need to replace your gateway. You need to add an economic governance layer that understands budgets, delegation, and variable costs. That's the difference between an API gateway that routes traffic and one that governs autonomous economic activity.
+            You don't need to replace your gateway. You need to add request-path governance that understands authority, budgets, delegation, and variable costs, then proves each decision. That's the difference between an API gateway that routes traffic and one that governs autonomous agent activity.
           </p>
 
           <div className="my-8 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
@@ -404,24 +404,24 @@ satgate mint \\
           </div>
 
           <div className="my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
-            <h3 className="mb-3 text-xl font-bold text-white">Compare routing gateways against economic control</h3>
-            <p className="mb-4 text-gray-300">Use the comparison hub and MCP proxy generator to map where existing gateways stop and SatGate&apos;s request-path controls begin.</p>
+            <h3 className="mb-3 text-xl font-bold text-white">Compare routing gateways against Policy-to-Proof</h3>
+            <p className="mb-4 text-gray-300">Use the comparison hub and MCP governance pages to map where existing gateways stop and SatGate&apos;s authority, budget, and Evidence Pack controls begin.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/compare" className="text-cyan-300 hover:text-cyan-200">Comparison hub →</Link>
-              <Link href="/mcp-proxy-config-generator" className="text-cyan-300 hover:text-cyan-200">MCP proxy config generator →</Link>
-              <Link href="/economic-firewall" className="text-cyan-300 hover:text-cyan-200">Economic firewall →</Link>
+              <Link href="/mcp-governance" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
+              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
             </div>
           </div>
 
 
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
-            <h3 className="mb-3 text-xl font-bold text-white">SatGate growth path: Observe → Control → Charge</h3>
+            <h3 className="mb-3 text-xl font-bold text-white">SatGate path: Observe → Control → Prove</h3>
             <p className="mb-4 text-gray-300">
-              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or paid-agent revenue.
+              Start by observing agent, API, and MCP usage. Move to request-path control when budgets, scopes, and revocation need to stop bad calls before they run. Preserve Evidence Packs so every allow, deny, and budget decision can be verified later.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
-              <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway →</Link>
-              <Link href="/capability-auth" className="text-cyan-300 hover:text-cyan-200">Capability auth →</Link>
+              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
+              <Link href="/mcp-governance" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>
           </div>

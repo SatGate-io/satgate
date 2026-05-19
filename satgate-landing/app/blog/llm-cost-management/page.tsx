@@ -335,10 +335,10 @@ Authorization: Bearer macaroon_v1_agent42_budget500
             With capability-based budgets, the orchestrator <em>delegates a portion</em> of its budget to each sub-agent. The research agent gets 2,000 credits. Each scraper gets 200. Summarizers get 50. The total can never exceed the parent's allocation. It's hierarchical, cryptographically enforced, and impossible to game.
           </p>
 
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Economic Firewall Approach</h2>
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Policy-to-Proof Approach</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            SatGate implements these four capabilities as an <strong className="text-white">economic firewall</strong> — a gateway-layer enforcement mechanism that sits between your agents and the LLM providers they call.
+            SatGate implements these four capabilities as request-path governance: a policy enforcement point between your agents and the LLM providers they call, plus Evidence Packs that prove what was allowed or denied later.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -441,8 +441,8 @@ satgate mint \\
             <h3 className="mb-3 text-xl font-bold text-white">From dashboard to control plane</h3>
             <p className="mb-4 text-gray-300">If a page is already earning LLM cost management impressions, route that intent into the pages that convert: tools, policy templates, and comparison pages.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
-              <Link href="/tools" className="text-cyan-300 hover:text-cyan-200">AI agent cost tools →</Link>
-              <Link href="/economic-firewall" className="text-cyan-300 hover:text-cyan-200">Economic firewall →</Link>
+              <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">AI agent governance →</Link>
+              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
               <Link href="/agent-spend-policy-template" className="text-cyan-300 hover:text-cyan-200">Spend policy template →</Link>
               <Link href="/mcp-cost-control" className="text-cyan-300 hover:text-cyan-200">MCP cost control →</Link>
               <Link href="/mcp-proxy-config-generator" className="text-cyan-300 hover:text-cyan-200">MCP proxy config generator →</Link>
@@ -463,13 +463,13 @@ satgate mint \\
 
 
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
-            <h3 className="mb-3 text-xl font-bold text-white">SatGate growth path: Observe → Control → Charge</h3>
+            <h3 className="mb-3 text-xl font-bold text-white">SatGate path: Observe → Control → Prove</h3>
             <p className="mb-4 text-gray-300">
-              Start by using SatGate to Observe agent, API, and MCP usage. Move to Control when budgets, scopes, and revocation need to stop bad calls before they run. Add Charge when usage should become billable access, chargeback, or paid-agent revenue.
+              Start by observing agent, API, and MCP usage. Move to request-path control when budgets, scopes, and revocation need to stop bad calls before they run. Preserve Evidence Packs so every allow, deny, and budget decision can be verified later.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
-              <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway →</Link>
-              <Link href="/capability-auth" className="text-cyan-300 hover:text-cyan-200">Capability auth →</Link>
+              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
+              <Link href="/mcp-governance" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>
           </div>

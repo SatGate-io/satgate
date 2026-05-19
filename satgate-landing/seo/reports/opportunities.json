@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-10T22:40:19.919292Z",
+  "generatedAt": "2026-05-19T00:37:01.226986Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -133,7 +133,7 @@
       ],
       "intent": "commercial-investigation",
       "funnelStage": "solution-aware",
-      "productAngle": "SatGate acts as an economic firewall and gateway for agent API and MCP access.",
+      "productAngle": "SatGate adds request-path governance for agent API and MCP access: authority before execution, budget enforcement, and Evidence Pack proof.",
       "cta": "Route agents through SatGate",
       "status": "existing",
       "clicks": 0,
