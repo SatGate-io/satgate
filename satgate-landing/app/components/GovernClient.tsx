@@ -75,7 +75,7 @@ export default function GovernPage() {
             </span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            SatGate is the Economic Firewall for enterprise agents: scope authority before work starts, enforce policy at runtime, and preserve evidence after every allowed, denied, delegated, or revoked action.
+            SatGate is the Economic Firewall for enterprise agents, implemented through Policy-to-Proof: scope authority before work starts, enforce request-path policy, and preserve Evidence Packs after every allowed, denied, delegated, or revoked action.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/policy-to-proof" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center justify-center gap-2">
@@ -823,7 +823,7 @@ export SATGATE_TOKEN=$TOKEN
           <div className="space-y-6">
             {[
               ['What is AI agent governance?', 'AI agent governance is the set of controls that determines which agents can call which APIs, tools, and models; how much they can spend; what authority they can delegate; and when access must be revoked. For autonomous agents, governance needs request-path enforcement, not just logs and dashboards.'],
-              ['What is an economic firewall for AI agents?', 'An economic firewall for AI agents sits in the request path and applies scopes, budgets, delegation rules, revocation, and audit before an agent reaches an upstream API, model, or MCP tool. Humans and platforms set authority; agents consume bounded primitives; upstreams receive evidence.'],
+              ['What is Policy-to-Proof governance for AI agents?', 'Policy-to-Proof governance sits in the request path, applies scopes, budgets, delegation rules, and revocation before an agent reaches an upstream API, model, or MCP tool, then preserves Evidence Packs so the decision can be verified later.'],
               ['How should enterprises govern MCP tool usage?', 'Enterprises should govern MCP tools with per-tool budgets, scoped capability tokens, task and tenant attribution, Evidence Packs, revocation, and hard request-path policy decisions. Rate limits and dashboards are useful, but they do not replace enforcement before tool calls execute.'],
               ['What is the difference between AI governance and AI agent governance?', 'AI governance usually covers model risk, data policy, compliance, and human review. AI agent governance adds request-path controls for autonomous actions: scopes, budgets, delegated authority, revocation, denial reasons, spend attribution, and proof before APIs or MCP tools execute.'],
               ['Is SatGate tied to x402, L402, AgentCore Payments, or Pay.sh?', 'No. x402, L402, AgentCore Payments, Pay.sh, and related rails make it easier for agents to call paid services. SatGate is protocol-independent: it records the requesting agent, allowed action, policy basis, spend context, and evidence needed for audit, review, and control — payment or not.'],

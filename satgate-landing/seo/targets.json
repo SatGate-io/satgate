@@ -91,7 +91,7 @@
     ],
     "intent": "commercial-investigation",
     "funnelStage": "solution-aware",
-    "productAngle": "SatGate acts as an economic firewall and gateway for agent API and MCP access.",
+    "productAngle": "SatGate adds request-path governance for agent API and MCP access: authority before execution, budget enforcement, and Evidence Pack proof.",
     "cta": "Route agents through SatGate",
     "status": "existing"
   },

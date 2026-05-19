@@ -2,24 +2,25 @@ import type { Metadata } from "next";
 import GovernClient from "../components/GovernClient";
 
 export const metadata: Metadata = {
-  title: "AI Agent Governance: Govern, Enforce, Prove",
+  title: "AI Agent Governance: Policy-to-Proof",
   description:
-    "Give agents bounded economic authority with scoped policy, request-path enforcement, and proof humans and upstream APIs can trust.",
+    "AI agent governance for the Economic Firewall category: scope authority, enforce request-path policy, and export Evidence Packs for every agent decision.",
   alternates: {
     canonical: "https://satgate.io/govern",
   },
   keywords: [
     "enterprise AI agent governance",
     "AI agent authority governance",
-    "economic firewall for AI agents",
+    "Economic Firewall for AI agents",
+    "Policy-to-Proof governance for AI agents",
     "MCP governance for enterprises",
     "AI agent budget enforcement",
     "agent delegation controls",
     "Policy-to-Proof for AI agents",
-    "Govern Enforce Prove",
+    "Evidence Packs for AI agents",
   ],
   openGraph: {
-    title: "AI Agent Governance: Govern, Enforce, Prove",
+    title: "AI Agent Governance: Policy-to-Proof",
     description:
       "Give enterprise agents bounded economic authority with request-path enforcement and Evidence Pack proof.",
     url: "https://satgate.io/govern",
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Agent Governance: Govern, Enforce, Prove",
+    title: "AI Agent Governance: Policy-to-Proof",
     description:
       "Delegate bounded authority, enforce policy, and export Policy-to-Proof evidence for enterprise AI agents with SatGate.",
   },
@@ -39,11 +40,12 @@ const webPageSchema = {
   name: "AI Agent Governance Platform",
   description: metadata.description,
   url: "https://satgate.io/govern",
-  dateModified: "2026-05-05",
+  dateModified: "2026-05-18",
   isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
   about: [
     { "@type": "Thing", name: "AI agent governance" },
-    { "@type": "Thing", name: "economic firewall for AI agents" },
+    { "@type": "Thing", name: "Economic Firewall for AI agents" },
+    { "@type": "Thing", name: "Policy-to-Proof governance for AI agents" },
     { "@type": "Thing", name: "MCP governance for enterprises" },
     { "@type": "Thing", name: "agent delegation controls" },
     { "@type": "Thing", name: "Policy-to-Proof for AI agents" },
@@ -64,10 +66,10 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "What is an economic firewall for AI agents?",
+      name: "What is Policy-to-Proof governance for AI agents?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "An economic firewall for AI agents sits in the request path and applies scopes, budgets, delegation rules, revocation, and audit before an agent reaches an upstream API, model, or MCP tool. Humans and platforms set authority; agents consume bounded primitives; upstreams receive evidence.",
+        text: "Policy-to-Proof governance for AI agents sits in the request path, applies scopes, budgets, delegation rules, and revocation before an agent reaches an upstream API, model, or MCP tool, then preserves an Evidence Pack so the decision can be verified later.",
       },
     },
     {

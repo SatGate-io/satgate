@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-10T22:40:19.919763Z",
+  "generatedAt": "2026-05-19T00:37:01.227531Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -34,11 +34,10 @@
         "/ai-agent-runaway-spend-index",
         "/blog",
         "/blog/llm-cost-management",
-        "/capability-auth",
-        "/economic-firewall-readiness-grader",
         "/govern",
-        "/mcp-gateway",
+        "/mcp-governance",
         "/openai-budget-policy-generator",
+        "/policy-to-proof",
         "/tools"
       ],
       "schemaTypes": [
@@ -49,7 +48,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1318,
+      "wordCount": 1315,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -75,7 +74,7 @@
         "The LLM Cost Management Landscape Today",
         "Why Monitoring Fails When Agents Hold the Wallet",
         "What Real LLM Cost Management Looks Like",
-        "The Economic Firewall Approach",
+        "The Policy-to-Proof Approach",
         "Monitoring + Enforcement: Not Either/Or",
         "LLM Cost Dashboard FAQ",
         "Getting Started"
@@ -83,17 +82,15 @@
       "internalLinks": [
         "/agent-spend-policy-template",
         "/blog",
-        "/capability-auth",
         "/compare",
-        "/economic-firewall",
         "/economic-firewall-readiness-grader",
         "/govern",
         "/llm-cost-dashboard",
         "/llm-cost-monitoring",
         "/mcp-cost-control",
-        "/mcp-gateway",
+        "/mcp-governance",
         "/mcp-proxy-config-generator",
-        "/tools"
+        "/policy-to-proof"
       ],
       "schemaTypes": [
         "Answer",
@@ -103,7 +100,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2177,
+      "wordCount": 2179,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -132,20 +129,18 @@
         "The L402 Protocol: Making 402 Practical",
         "Implementation Considerations",
         "402 in the Wild: Early Adopters",
-        "The Future: 402 as Default Commerce Layer"
+        "The Future: 402 as a Paid Rail Under Authority"
       ],
       "internalLinks": [
         "/agent-payment-controls",
         "/blog",
-        "/blog/l402-protocol-explained",
-        "/capability-auth",
-        "/economic-firewall",
         "/govern",
         "/http-402-for-ai-agents",
         "/l402-agent-payments",
         "/l402-api-pricing-calculator",
-        "/mcp-gateway",
         "/paid-agent-payments",
+        "/partners/rails",
+        "/policy-to-proof",
         "/tools"
       ],
       "schemaTypes": [
@@ -156,7 +151,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2611,
+      "wordCount": 2596,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -194,11 +189,11 @@
         "/agent-capability-tokens",
         "/agent-control-plane",
         "/blog",
-        "/capability-auth",
         "/design-partners",
         "/economic-firewall-readiness-grader",
         "/govern",
-        "/mcp-gateway",
+        "/mcp-governance",
+        "/policy-to-proof",
         "/revocable-agent-credentials",
         "/revocable-capability-token-policy-template"
       ],
@@ -210,7 +205,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2673,
+      "wordCount": 2671,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -221,10 +216,10 @@
     {
       "path": "/govern",
       "exists": true,
-      "title": "AI Agent Governance: Govern, Enforce, Prove",
-      "titleLength": 43,
-      "metaDescription": "Govern enterprise AI agents with SatGate: scope authority, enforce request-path policy, and prove every mint, delegation, spend, denial, and revocation.",
-      "metaDescriptionLength": 152,
+      "title": "AI Agent Governance: Policy-to-Proof",
+      "titleLength": 36,
+      "metaDescription": "AI agent governance for the Economic Firewall category: scope authority, enforce request-path policy, and export Evidence Packs for every agent decision.",
+      "metaDescriptionLength": 153,
       "canonical": "/govern",
       "h1": [
         "Govern what agents can do. Prove every decision."
@@ -235,7 +230,7 @@
         "Built for enterprise control owners",
         "Govern, enforce, prove.",
         "The runaway agent story",
-        "Dashboards that end in evidence.",
+        "Receipts that roll up into Evidence Packs.",
         "Delegation that leaves a trail",
         "Single Go Binary. Zero Dependencies.",
         "The authority commons \u2014 inside your company",
@@ -269,7 +264,7 @@
         "WebPage",
         "WebSite"
       ],
-      "wordCount": 1683,
+      "wordCount": 1696,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -293,22 +288,20 @@
         "The Old Model: Human-Driven API Traffic",
         "The New Model: Autonomous Agent Traffic",
         "What Traditional Gateways Actually Do",
-        "The Missing Layer: Economic Governance",
+        "The Missing Layer: Request-Path Governance",
         "Why Not Just Add Plugins?",
         "How SatGate Approaches It",
-        "The Enterprise Path: Observe \u2192 Control \u2192 Charge",
+        "The Enterprise Path: Observe \u2192 Control \u2192 Prove",
         "What to Look For in an Agent-Aware Gateway",
         "The Bottom Line",
         "API Gateway for AI Agents FAQ"
       ],
       "internalLinks": [
         "/blog",
-        "/capability-auth",
         "/compare",
-        "/economic-firewall",
         "/govern",
-        "/mcp-gateway",
-        "/mcp-proxy-config-generator"
+        "/mcp-governance",
+        "/policy-to-proof"
       ],
       "schemaTypes": [
         "Answer",
@@ -318,7 +311,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1391,
+      "wordCount": 1376,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -340,7 +333,7 @@
       "h1Count": 1,
       "h2s": [
         "MCP connection is not MCP governance",
-        "Observe, Control, Charge MCP tool use",
+        "Observe, Control, Prove MCP tool use",
         "MCP policy templates teams can start from",
         "Claude, Hermes, and Ollama get scoped MCP authority \u2014 not standing authority",
         "SaaS MCP is Fly-hosted",
@@ -366,7 +359,7 @@
         "Question",
         "SoftwareApplication"
       ],
-      "wordCount": 903,
+      "wordCount": 910,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -408,7 +401,7 @@
         "Question",
         "SoftwareApplication"
       ],
-      "wordCount": 518,
+      "wordCount": 521,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
