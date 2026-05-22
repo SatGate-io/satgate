@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-19T00:37:01.227868Z",
+  "generatedAt": "2026-05-22T16:31:14.339200Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -183,6 +183,21 @@
         "FAQPage",
         "BreadcrumbList",
         "SoftwareApplication"
+      ]
+    },
+    {
+      "path": "/blog/ai-spend-governance",
+      "priority": "P3",
+      "score": 26,
+      "primaryKeyword": "AI spend governance",
+      "recommendedTitle": "",
+      "recommendedMetaDescription": "",
+      "contentChanges": [],
+      "internalLinksToAdd": [],
+      "schemaToAdd": [
+        "FAQPage",
+        "BreadcrumbList",
+        "TechArticle"
       ]
     },
     {

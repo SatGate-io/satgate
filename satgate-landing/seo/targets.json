@@ -1,5 +1,23 @@
 [
   {
+    "path": "/blog/ai-spend-governance",
+    "cluster": "ai-spend-governance",
+    "primaryKeyword": "AI spend governance",
+    "secondaryKeywords": [
+      "enterprise AI cost control",
+      "usage-based AI pricing",
+      "AI agent cost management",
+      "LLM cost governance",
+      "AI budget controls",
+      "AI FinOps"
+    ],
+    "intent": "informational-commercial",
+    "funnelStage": "problem-aware",
+    "productAngle": "SatGate provides request-path AI spend governance: observe usage, control budgets and policy before execution, and preserve Evidence Pack proof.",
+    "cta": "Learn about Economic Firewalls",
+    "status": "new"
+  },
+  {
     "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
     "cluster": "openai-budget-limits",
     "primaryKeyword": "openai api budget limit",

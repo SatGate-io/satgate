@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Calendar, Clock, User } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: 'AI Agent Governance Blog: Cost Control, MCP, L402, Economic Firewalls',
@@ -30,6 +30,15 @@ export const metadata = {
 
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
+  {
+    slug: 'ai-spend-governance',
+    title: 'AI Spend Governance: Control Usage-Based AI Costs Before They Scale',
+    description: 'Usage-based AI pricing makes cost an operating risk. Learn why enterprises need request-path controls to observe, control, and prove AI agent spend.',
+    date: '2026-05-22',
+    readTime: '9 min read',
+    author: 'SatGate Team',
+    tags: ['AI Spend Governance', 'Cost Control', 'AI Agents', 'Enterprise'],
+  },
   {
     slug: 'cursor-mcp-proxy-setup-guide',
     title: 'Cursor MCP Proxy Setup Guide: Add Budget Controls and Evidence Packs to Your Tools',
@@ -372,7 +381,7 @@ export default function BlogPage() {
               ['/runaway-agent-cost-calculator', 'Runaway Agent Cost Calculator', 'Model loop, retry, fanout, and paid tool-call exposure.'],
               ['/openai-budget-policy-generator', 'OpenAI Budget Policy Generator', 'Generate OpenAI spend caps, routing, revocation, and audit policy.'],
               ['/mcp-tool-cost-policy-generator', 'MCP Tool Cost Policy Generator', 'Create per-tool MCP budgets, risk actions, and audit rules.'],
-              ['/economic-firewall-readiness-grader', 'Economic Firewall Readiness Grader', 'Score identity, budgets, MCP tools, revocation, audit, routing, and Charge.'],
+              ['/economic-firewall-readiness-grader', 'Economic Firewall Readiness Grader', 'Score identity, budgets, MCP tools, revocation, audit, routing, and proof.'],
               ['/economic-firewall', 'Economic Firewall Definition', 'Learn the request-path category for AI agent economic governance.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black/60 p-4 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
