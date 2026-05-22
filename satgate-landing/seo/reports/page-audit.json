@@ -1,6 +1,56 @@
 {
-  "generatedAt": "2026-05-19T00:37:01.227531Z",
+  "generatedAt": "2026-05-22T16:31:14.338862Z",
   "items": [
+    {
+      "path": "/blog/ai-spend-governance",
+      "exists": true,
+      "title": "AI Spend Governance: Control Usage-Based AI Costs Before They Scale",
+      "titleLength": 67,
+      "metaDescription": "Why usage-based AI pricing, agentic workflows, and tool-calling systems require request-path spend governance, not just dashboards after the bill arrives.",
+      "metaDescriptionLength": 154,
+      "canonical": "/blog/ai-spend-governance",
+      "h1": [
+        "AI Spend Governance: Control Usage-Based AI Costs Before They Scale"
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "Why agentic AI costs stratify",
+        "Seat management is not AI spend governance",
+        "AI governance has to answer harder questions",
+        "Dashboards are necessary. They are not sufficient.",
+        "Estimate the cost of runaway agent loops",
+        "The Observe, Control, Prove model",
+        "What enterprises should require",
+        "The operating model for enterprise AI",
+        "SatGate&apos;s view",
+        "Related reading"
+      ],
+      "internalLinks": [
+        "/blog",
+        "/blog/ai-agent-spending-limits",
+        "/blog/llm-cost-management",
+        "/blog/the-enterprise-adoption-playbook-observe-control-charge",
+        "/compare/langsmith-helicone-datadog",
+        "/economic-firewall",
+        "/policy-to-proof",
+        "/runaway-agent-cost-calculator"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "FAQPage",
+        "Organization",
+        "Question",
+        "TechArticle",
+        "Thing"
+      ],
+      "wordCount": 1316,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
       "exists": true,
