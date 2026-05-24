@@ -492,7 +492,7 @@ X-SatGate-Budget-Limit: 2500
             </p>
 
             {/* --- Three Modes --- */}
-            <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Three Modes: Observe → Control → Charge</h2>
+            <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Three Modes: Observe → Control → Prove</h2>
 
             <p>Not every organization is ready to hard-block their agents on day one. SatGate supports a progressive rollout:</p>
 

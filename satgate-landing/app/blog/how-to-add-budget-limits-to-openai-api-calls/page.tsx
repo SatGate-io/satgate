@@ -38,7 +38,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
       { '@type': 'Thing', name: 'per-agent OpenAI budgets' },
       { '@type': 'Thing', name: 'request-path budget enforcement' },
       { '@type': 'Thing', name: 'runaway LLM spend prevention' },
-      { '@type': 'Thing', name: 'Observe Control Charge' },
+      { '@type': 'Thing', name: 'Observe Control Prove' },
       { '@type': 'Thing', name: 'Evidence Pack receipts' },
     ],
   };
@@ -117,6 +117,10 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
           <div className="mb-6 rounded-2xl border border-green-900/60 bg-green-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-green-300">Direct answer</p>
             <p className="text-gray-300">The safest way to set OpenAI API budget limits is to enforce spend before each request reaches OpenAI: Observe usage, Control authority and budget before execution, and Prove every allowed, denied, or downgraded call with an Evidence Pack receipt.</p>
+          </div>
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row">
+            <Link href="/openai-budget-policy-generator" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Generate an OpenAI budget policy</Link>
+            <Link href="/govern" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-purple-500">See Policy-to-Proof governance</Link>
           </div>
           
           <p className="text-xl text-gray-400 mb-6">

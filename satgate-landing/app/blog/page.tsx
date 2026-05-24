@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: 'AI Agent Governance Blog: Cost Control, MCP, L402, Economic Firewalls',
-  description: 'Guides on AI agent governance, economic firewalls, MCP budget enforcement, paid-rail context, capability tokens, API monetization, and cost control.',
+  title: 'AI Agent Governance Blog: Cost Control, MCP, and Policy-to-Proof',
+  description: 'Guides on AI agent governance, Policy-to-Proof governance, MCP budget enforcement, paid-rail context, capability tokens, API monetization, and cost control.',
   alternates: { canonical: 'https://satgate.io/blog' },
   keywords: [
     'AI agent governance blog',
@@ -16,15 +16,15 @@ export const metadata = {
     'API economics',
   ],
   openGraph: {
-    title: 'AI Agent Governance Blog: Cost Control, MCP, L402, Economic Firewalls',
-    description: 'Guides on AI agent governance, economic firewalls, MCP budget enforcement, paid-rail context, capability tokens, API monetization, and cost control.',
+    title: 'AI Agent Governance Blog: Cost Control, MCP, and Policy-to-Proof',
+    description: 'Guides on AI agent governance, Policy-to-Proof governance, MCP budget enforcement, paid-rail context, capability tokens, API monetization, and cost control.',
     url: 'https://satgate.io/blog',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AI Agent Governance Blog: Cost Control, MCP, L402, Economic Firewalls',
-    description: 'AI agent governance, economic firewalls, MCP budget enforcement, paid-rail context, capability tokens, API monetization, and cost control.',
+    title: 'AI Agent Governance Blog: Cost Control, MCP, and Policy-to-Proof',
+    description: 'AI agent governance, Policy-to-Proof governance, MCP budget enforcement, paid-rail context, capability tokens, API monetization, and cost control.',
   },
 };
 
@@ -150,7 +150,7 @@ const posts = [
   {
     slug: 'why-economic-firewalls-are-the-prerequisite-for-autonomous-ai-agents',
     title: 'Economic Firewalls for Autonomous AI Agents: Hard Budgets and Authority',
-    description: 'Why autonomous AI agents need economic firewalls: hard spend ceilings, bounded authority, revocation, Evidence Packs, and request-path enforcement.',
+    description: 'Why autonomous AI agents need Policy-to-Proof governance: hard spend ceilings, bounded authority, revocation, Evidence Packs, and request-path enforcement.',
     date: '2026-03-20',
     readTime: '11 min read',
     author: 'Matt Dean',
@@ -204,7 +204,7 @@ const posts = [
   {
     slug: 'ai-agent-api-cost-control',
     title: 'AI Agent API Cost Control: Stop Runaway Spend Before API Calls Execute',
-    description: 'Control AI agent API costs with request-path budget checks, tool pricing, delegated spend limits, revocation, and economic firewalls.',
+    description: 'Control AI agent API costs with request-path budget checks, tool pricing, delegated spend limits, revocation, and Policy-to-Proof governance.',
     date: '2026-03-05',
     readTime: '8 min read',
     author: 'Matt Dean',
@@ -295,7 +295,7 @@ export default function BlogPage() {
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent governance' },
-      { '@type': 'Thing', name: 'economic firewalls' },
+      { '@type': 'Thing', name: 'Policy-to-Proof governance' },
       { '@type': 'Thing', name: 'MCP budget enforcement' },
       { '@type': 'Thing', name: 'paid-rail context' },
       { '@type': 'Thing', name: 'revocable capability tokens' },
@@ -328,7 +328,7 @@ export default function BlogPage() {
         name: 'What does the SatGate blog cover?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'The SatGate blog covers AI agent governance, economic firewalls, AI agent cost control, MCP budget enforcement, revocable capability tokens, paid-rail context, and API economics for autonomous agents.',
+          text: 'The SatGate blog covers AI agent governance, Policy-to-Proof governance, AI agent cost control, MCP budget enforcement, revocable capability tokens, paid-rail context, and API economics for autonomous agents.',
         },
       },
       {
@@ -379,9 +379,9 @@ export default function BlogPage() {
             {[
               ['/roi-calculator', 'AI Agent ROI Calculator', 'Estimate ghost spend, loop waste, payback period, and enforcement ROI.'],
               ['/runaway-agent-cost-calculator', 'Runaway Agent Cost Calculator', 'Model loop, retry, fanout, and paid tool-call exposure.'],
-              ['/openai-budget-policy-generator', 'OpenAI Budget Policy Generator', 'Generate OpenAI spend caps, routing, revocation, and audit policy.'],
-              ['/mcp-tool-cost-policy-generator', 'MCP Tool Cost Policy Generator', 'Create per-tool MCP budgets, risk actions, and audit rules.'],
-              ['/economic-firewall-readiness-grader', 'Economic Firewall Readiness Grader', 'Score identity, budgets, MCP tools, revocation, audit, routing, and proof.'],
+              ['/openai-budget-policy-generator', 'OpenAI Budget Policy Generator', 'Generate OpenAI spend caps, routing, revocation, and Evidence Pack policy.'],
+              ['/mcp-tool-cost-policy-generator', 'MCP Tool Cost Policy Generator', 'Create per-tool MCP budgets, risk actions, and proof rules.'],
+              ['/economic-firewall-readiness-grader', 'Economic Firewall Readiness Grader', 'Score identity, budgets, MCP tools, revocation, routing, and Evidence Pack proof.'],
               ['/economic-firewall', 'Economic Firewall Definition', 'Learn the request-path category for AI agent economic governance.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black/60 p-4 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
@@ -445,7 +445,7 @@ export default function BlogPage() {
           <h2 className="mb-6 text-2xl font-bold text-white">SatGate blog questions</h2>
           <div className="space-y-5">
             {[
-              ['What does the SatGate blog cover?', 'The SatGate blog covers AI agent governance, economic firewalls, AI agent cost control, MCP budget enforcement, revocable capability tokens, paid-rail context, and API economics for autonomous agents.'],
+              ['What does the SatGate blog cover?', 'The SatGate blog covers AI agent governance, Policy-to-Proof governance, AI agent cost control, MCP budget enforcement, revocable capability tokens, paid-rail context, and API economics for autonomous agents.'],
               ['Where should I start if I need to control AI agent spend?', 'Start with the AI agent cost control guide, the economic firewall definition, the ROI calculator, and the MCP budget enforcement guide to understand the request-path controls needed before agents spend.'],
               ['How is SatGate different from an LLM dashboard or API gateway?', 'LLM dashboards report spend after it happens and traditional API gateways mainly route traffic. SatGate sits in the request path to observe, control, and prove agent/API activity before upstream access.'],
             ].map(([question, answer]) => (

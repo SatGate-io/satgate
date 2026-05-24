@@ -50,7 +50,7 @@ const PricingPage = () => {
     dateModified: '2026-05-03',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
-      { '@type': 'Thing', name: 'economic firewall for AI agents' },
+      { '@type': 'Thing', name: 'Agent Authority & Accountability Layer' },
       { '@type': 'Thing', name: 'AI agent budget enforcement' },
       { '@type': 'Thing', name: 'SatGate Economic Firewall' },
       { '@type': 'Thing', name: 'request-path spend governance' },
@@ -178,7 +178,7 @@ const PricingPage = () => {
         </div>
       </header>
 
-      {/* Observe → Control → Charge Journey */}
+      {/* Observe → Control → Prove Journey */}
       <section className="pb-10 px-6">
         <div className="max-w-3xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">

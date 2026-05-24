@@ -29,13 +29,13 @@ SITEMAP_PATH_RE = re.compile(r"path:\s*'([^']*)'")
 RECOMMENDED_META = {
  '/blog/how-to-add-budget-limits-to-openai-api-calls': {
    'title': 'OpenAI API Budget Limits: Control Spend Before Calls',
-   'description': 'Learn how to add OpenAI API budget limits, prevent runaway agent spend, and enforce usage controls before calls execute.'},
+   'description': 'Add OpenAI API budget limits with authority before execution, Observe/Control/Prove controls, and Evidence Pack receipts.'},
  '/blog/llm-cost-management': {
    'title': 'LLM Cost Management: Control AI Spend Before It Happens',
-   'description': 'A practical guide to LLM cost management using usage observability, budget controls, and chargeback workflows for AI agents.'},
+   'description': 'A practical guide to LLM cost management using authority before execution, budget controls, and Evidence Pack receipts for AI agents.'},
  '/blog/http-402-payment-required-use-cases': {
    'title': 'HTTP 402 Payment Required: API and Agent Use Cases',
-   'description': 'See how HTTP 402 can support paid API access, metered MCP tools, and agent transactions using SatGate.'},
+   'description': 'HTTP 402 and L402 are paid-rail context. SatGate governs authority before execution and preserves Evidence Packs.'},
  '/blog/macaroon-tokens-vs-api-keys': {
    'title': 'Macaroon Tokens vs API Keys for Agent Access',
    'description': 'Compare macaroon tokens and API keys for scoped authorization, delegated access, and safer AI agent permissions.'},
@@ -46,7 +46,7 @@ RECOMMENDED_META = {
    'title': 'API Gateway for AI Agents: Control Tool and API Access',
    'description': 'Learn how an API gateway for AI agents can enforce access, budgets, observability, and monetization across APIs and MCP tools.'},
  '/mcp-gateway': {
-   'title': 'MCP Gateway for Governed Agent Tool Access',
+   'title': 'MCP Gateway for Agent Governance and Evidence Packs',
    'description': 'Use SatGate as an MCP gateway to check authority before tool execution, enforce policy, and export Evidence Packs.'},
  '/capability-auth': {
    'title': 'Capability-Based Authorization for AI Agents',
@@ -90,6 +90,17 @@ def score_item(row: dict[str, Any], target: dict[str, Any]) -> dict[str, Any]:
     return {**target, 'clicks': row.get('clicks',0), 'impressions': int(imps), 'ctr': ctr, 'position': pos,
             'expectedCtr': exp, 'ctrGap': round(gap,4), 'score': score, 'priority': priority}
 
+def comparison_title_for_path(path: str) -> str:
+    if not path.startswith('/compare/'):
+        return ''
+    config = APP / 'compare' / '_components' / 'comparisons.ts'
+    if not config.exists():
+        return ''
+    slug = path.rsplit('/', 1)[-1]
+    text = config.read_text(errors='ignore')
+    m = re.search(rf"['\"]{re.escape(slug)}['\"]:\s*\{{.*?title:\s*['\"]([^'\"]+)['\"]", text, re.S)
+    return m.group(1) if m else ''
+
 def audit_page(target: dict[str, Any], sitemap_paths: set[str]) -> dict[str, Any]:
     path=target['path']; f=route_file(path); issues=[]
     if not f.exists():
@@ -117,6 +128,9 @@ def audit_page(target: dict[str, Any], sitemap_paths: set[str]) -> dict[str, Any
     canon_match=CANON_RE.search(meta)
     canonical=canon_match.group(2) if canon_match else ''
     h1s=[clean_text(m.group(1)) for m in H1_RE.finditer(text)]
+    comparison_title = comparison_title_for_path(path)
+    if comparison_title:
+        h1s=[comparison_title if not h1 else h1 for h1 in h1s]
     h2s=[clean_text(m.group(1)) for m in H2_RE.finditer(text)]
     links=sorted({m.group(2) for m in LINK_RE.finditer(text)})
     schema_types=sorted(set(re.findall(r"['\"]@type['\"]:\s*['\"]([^'\"]+)['\"]", text)))

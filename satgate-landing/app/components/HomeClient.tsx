@@ -171,7 +171,7 @@ const LandingPage = () => {
           {/* Left: Copy */}
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-6">
-              <Zap size={12} /> Economic Firewall for Agentic API Access
+              <Zap size={12} /> Agent Authority & Accountability Layer
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
               Govern agent authority<br/>
@@ -336,7 +336,7 @@ const LandingPage = () => {
               <span>✓ Capabilities + Caveats</span>
               <span>✓ Delegation chains</span>
               <span>✓ Next-request revocation</span>
-              <span>✓ Tamper-evident audit</span>
+              <span>✓ Tamper-evident Evidence Pack receipts</span>
             </div>
           </div>
 
@@ -361,7 +361,7 @@ const LandingPage = () => {
                 Start here. No workflow changes. Map authority, tools, and spend before enforcing policy.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
-                <li>✓ Audit mode - zero disruption to existing agents</li>
+                <li>✓ Observe mode - zero disruption to existing agents</li>
                 <li>✓ Usage attribution by team and cost center</li>
                 <li>✓ See exactly which agents, tools, and routes create risk before you change anything</li>
                 <li>✓ Zero latency impact</li>
@@ -684,7 +684,7 @@ const LandingPage = () => {
           <h2 className="mb-8 text-3xl font-bold text-white">Agent governance questions</h2>
           <div className="space-y-6">
             {[
-              ['What is SatGate?', 'SatGate is the Economic Firewall for agentic API access. Humans and platforms use it to delegate bounded economic authority to agents, enforce policy and budgets, prove revocation, and preserve evidence across APIs, MCP tools, and paid external calls.'],
+              ['What is SatGate?', 'SatGate is the Agent Authority & Accountability Layer for governed agent execution. Humans and platforms use it to delegate bounded economic authority to agents, enforce policy and budgets, prove revocation, and preserve evidence across APIs, MCP tools, and paid external calls.'],
               ['How does SatGate govern AI agents?', 'SatGate applies scoped authority, per-agent policy, revocation, and budgets before each request reaches an API or MCP tool, so unauthorized actions and expensive calls can be blocked before they happen.'],
               ['How does SatGate give agents bounded economic authority?', 'Humans and platforms define policy, budgets, scope, and delegation depth. Agents consume approved API and MCP primitives through SatGate, and every approval, denial, spend event, delegation, and revocation leaves receipt-backed proof.'],
             ].map(([question, answer]) => (
@@ -721,7 +721,7 @@ const LandingPage = () => {
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="max-w-xs text-sm text-gray-500">Economic Firewall for agentic API access: bounded authority, receipts, and proof.</p>
+              <p className="max-w-xs text-sm text-gray-500">Agent Authority & Accountability Layer: bounded authority, Evidence Pack receipts, and proof.</p>
               <p className="text-gray-600 text-xs mt-3">Humans and platforms buy. Agents consume bounded primitives.</p>
             </div>
             <div>

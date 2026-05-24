@@ -3,26 +3,26 @@ import { ArrowRight, Bot, DollarSign, Gauge, KeyRound, ShieldCheck, Terminal, Wo
 
 export const metadata = {
   title: 'SatGate for OpenClaw Agents',
-  description: 'Use SatGate as the economic firewall for OpenClaw agents, sub-agents, tools, MCP calls, model routes, and API spend.',
+  description: 'Use SatGate as the Agent Authority & Accountability Layer for governed OpenClaw execution across sub-agents, tools, MCP calls, model routes, and API spend.',
   alternates: { canonical: 'https://satgate.io/satgate-for-openclaw' },
   keywords: [
     'SatGate for OpenClaw',
     'OpenClaw agent spend control',
     'OpenClaw MCP budget enforcement',
     'AI agent cost control',
-    'economic firewall for AI agents',
+    'Agent Authority & Accountability Layer',
     'revocable agent credentials',
   ],
   openGraph: {
     title: 'SatGate for OpenClaw Agents',
-    description: 'Use SatGate as the economic firewall for OpenClaw agents, sub-agents, tools, MCP calls, model routes, and API spend.',
+    description: 'Use SatGate as the Agent Authority & Accountability Layer for governed OpenClaw execution across sub-agents, tools, MCP calls, model routes, and API spend.',
     url: 'https://satgate.io/satgate-for-openclaw',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate for OpenClaw Agents',
-    description: 'Use SatGate as the economic firewall for OpenClaw agents, sub-agents, tools, MCP calls, model routes, and API spend.',
+    description: 'Use SatGate as the Agent Authority & Accountability Layer for governed OpenClaw execution across sub-agents, tools, MCP calls, model routes, and API spend.',
   },
 };
 
@@ -45,7 +45,7 @@ export default function SatGateIntegrationPage() {
     about: [
       { '@type': 'Thing', name: 'OpenClaw agent spend control' },
       { '@type': 'Thing', name: 'OpenClaw MCP budget enforcement' },
-      { '@type': 'Thing', name: 'economic firewall for OpenClaw agents' },
+      { '@type': 'Thing', name: 'governed OpenClaw agent execution' },
       { '@type': 'Thing', name: 'sub-agent budget attribution' },
       { '@type': 'Thing', name: 'L402 paid agent payments' },
     ],
@@ -77,7 +77,7 @@ export default function SatGateIntegrationPage() {
       {
         '@type': 'Question',
         name: 'Is SatGate just another observability dashboard?',
-        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, audit, and L402 payment before upstream access.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, Evidence Pack receipts, and paid-rail context before upstream access.' },
       },
       {
         '@type': 'Question',
@@ -110,12 +110,12 @@ export default function SatGateIntegrationPage() {
             <Terminal size={16} /> OpenClaw agent spend control
           </div>
 
-          <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Give OpenClaw agents an economic firewall</h1>
-          <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">OpenClaw agents can run tools, spawn sub-agents, call MCP servers, route through models, and act across workflows. SatGate adds the economic firewall underneath: observe, control, and prove agent/API activity before upstream access.</p>
+          <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Give OpenClaw agents authority before execution</h1>
+          <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">OpenClaw agents can run tools, spawn sub-agents, call MCP servers, route through models, and act across workflows. SatGate adds the Agent Authority & Accountability Layer underneath: Observe, Control, and Prove agent/API activity before upstream access.</p>
 
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-              Learn the economic firewall <ArrowRight size={18} />
+              See Policy-to-Proof <ArrowRight size={18} />
             </Link>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               AI agent cost control
@@ -146,7 +146,7 @@ export default function SatGateIntegrationPage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-bold text-white">SatGate controls for OpenClaw</h2>
-          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the economic firewall around agentic tool use: Observe first, Control when limits are known, Charge when external agents should pay for access.</p>
+          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the governance layer around agentic tool use: Observe first, Control when limits are known, and Prove every approval, denial, and paid-access decision with Evidence Pack receipts.</p>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {controls.map(({ icon: Icon, title, body }) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-black p-6 transition hover:border-cyan-900/70">
@@ -178,7 +178,7 @@ export default function SatGateIntegrationPage() {
           <div className="grid gap-5 md:grid-cols-3">
             {[
               ['How does SatGate fit with OpenClaw?', 'OpenClaw coordinates agents and tools. SatGate governs the economics of those requests: who can spend, on what, under which budget, and with which Evidence Pack.'],
-              ['Is SatGate just another observability dashboard?', 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, audit, and L402 payment before upstream access.'],
+              ['Is SatGate just another observability dashboard?', 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, Evidence Pack receipts, and paid-rail context before upstream access.'],
               ['Can SatGate start in observe-only mode?', 'Yes. Teams can start with Observe to map agent and tool spend, then graduate to Control policies once safe limits are clear.'],
             ].map(([question, answer]) => (
               <div key={question}>
@@ -192,9 +192,9 @@ export default function SatGateIntegrationPage() {
 
       <section className="mx-auto max-w-6xl px-6 pb-24">
         <div className="rounded-3xl border border-purple-900/40 bg-gradient-to-br from-purple-950/40 to-cyan-950/20 p-8 md:p-10">
-          <div className="mb-4 flex items-center gap-3 text-purple-200"><Bot size={24} /><span className="font-semibold">Observe → Control → Charge</span></div>
+          <div className="mb-4 flex items-center gap-3 text-purple-200"><Bot size={24} /><span className="font-semibold">Observe → Control → Prove</span></div>
           <h2 className="mb-4 text-3xl font-bold text-white">Make OpenClaw agent activity governable.</h2>
-          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate gives agent teams the missing economic layer: budgets, scoped authority, revocation, audit, and paid-rail context where machine customers need to pay for APIs.</p>
+          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate gives agent teams the missing economic layer: budgets, scoped authority, revocation, Evidence Pack receipts, and paid-rail context where external agents need governed API access.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-300 px-6 py-3 font-bold text-black transition hover:bg-cyan-200">
               MCP budget enforcement <Gauge size={18} />

@@ -112,7 +112,11 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
           <h1 className="text-4xl font-bold mb-4">HTTP 402 Payment Required: Meaning, Use Cases, and AI Agent Payments</h1>
           <div className="mb-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Quick answer</p>
-            <p className="text-gray-300">HTTP 402 means payment is required before access. For AI agents, the practical version is L402: an API returns a payment challenge, delegated payment proof is presented, and the gateway enforces budget before serving the request.</p>
+            <p className="text-gray-300">HTTP 402 means payment is required before access. For AI agents, 402/L402 are paid-rail context: SatGate still checks authority, budget, and policy before payment or execution, then preserves Evidence Pack receipts.</p>
+          </div>
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row">
+            <Link href="/partners/rails" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">See paid-rail governance</Link>
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">See Policy-to-Proof</Link>
           </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">

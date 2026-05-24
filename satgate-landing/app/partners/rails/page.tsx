@@ -105,7 +105,7 @@ export default function RailPartnersPage() {
               Rails can authorize value movement. SatGate proves the agent was allowed to attempt it: who delegated authority, which policy applied, what budget was left, and what evidence exists after the decision.
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
-              The Economic Firewall category stays durable while rails change. SatGate’s Agent Authority & Accountability Layer sits above x402, L402, Stripe, AgentCore Payments, Pay.sh, API-key billing, and enterprise ledgers.
+              Paid rails keep changing. SatGate’s Agent Authority & Accountability Layer sits above x402, L402, Stripe, AgentCore Payments, Pay.sh, API-key billing, and enterprise ledgers.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a href="/briefs/satgate-agent-authority-rails-brief.pdf" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -114,8 +114,8 @@ export default function RailPartnersPage() {
               <Link href="/agent-authority-layer" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
                 See the authority and accountability layer <ArrowRight size={18} />
               </Link>
-              <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
-                See the Economic Firewall category <ArrowRight size={18} />
+              <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
+                See Policy-to-Proof <ArrowRight size={18} />
               </Link>
             </div>
           </div>

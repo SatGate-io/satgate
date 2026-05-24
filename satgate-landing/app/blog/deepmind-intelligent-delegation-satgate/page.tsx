@@ -250,7 +250,7 @@ export default function DeepMindDelegationPage() {
                   <p className="text-white font-semibold mb-1">Authority Thresholds &amp; Kill Switches</p>
                   <p className="text-gray-500 text-sm mb-2">Paper: Human-in-the-loop intervention when risk exceeds tolerance (pp. 18–19)</p>
                   <p className="text-gray-300 text-sm">
-                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Enforcement modes (Observe → Control → Charge)
+                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Enforcement modes (Observe → Control → Prove)
                     let operators graduate trust incrementally. Budget alerts trigger before limits hit.
                     Token revocation is immediate — one API call kills an agent&apos;s access across the
                     entire delegation tree.
@@ -437,7 +437,7 @@ export default function DeepMindDelegationPage() {
               <p className="text-gray-300 text-sm m-0">
                 <strong className="text-white">Enterprises need a trust gradient, not a binary switch.</strong> The
                 paper discusses trust establishment. In practice, operators want to observe first, then control, then
-                charge. SatGate&apos;s three-mode progression (Observe → Control → Charge) lets teams build confidence
+                prove. SatGate&apos;s three-mode progression (Observe → Control → Prove) lets teams build confidence
                 incrementally without rearchitecting.
               </p>
             </div>

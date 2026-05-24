@@ -101,13 +101,17 @@ export default function LlmCostManagementBlogPage() {
           <div className="flex flex-wrap gap-2 mb-4">
             <span className="px-2 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono">Cost Control</span>
             <span className="px-2 py-1 rounded-full bg-cyan-900/30 border border-cyan-500/30 text-cyan-300 text-xs font-mono">LLM</span>
-            <span className="px-2 py-1 rounded-full bg-yellow-900/30 border border-yellow-500/30 text-yellow-300 text-xs font-mono">Economic Firewall</span>
+            <span className="px-2 py-1 rounded-full bg-yellow-900/30 border border-yellow-500/30 text-yellow-300 text-xs font-mono">Policy-to-Proof</span>
           </div>
           
           <h1 className="text-4xl font-bold mb-4">LLM Cost Management: Real-Time Budget Enforcement for AI Agents</h1>
           <div className="mb-6 rounded-2xl border border-yellow-900/60 bg-yellow-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-yellow-300">Short answer</p>
             <p className="text-gray-300">LLM cost management is not just dashboards and alerts. For autonomous agents, it needs Observe, Control, Prove: per-agent budgets, authority before execution, model/tool prices, attribution, hard blocks, and Evidence Pack receipts for every important decision.</p>
+          </div>
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row">
+            <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">See the LLM cost dashboard pattern</Link>
+            <Link href="/govern" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-yellow-500">Turn visibility into Policy-to-Proof control</Link>
           </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">

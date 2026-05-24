@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import HomeClient from "./components/HomeClient";
 
 export const metadata: Metadata = {
-  title: "SatGate — Economic Firewall for Agentic API Access",
+  title: "SatGate — Agent Authority & Accountability Layer",
   description:
-    "SatGate gives agents bounded economic authority so humans, platforms, and upstream APIs can trust what they consume, spend, and prove.",
+    "SatGate governs agent authority before execution so humans, platforms, and upstream APIs can trust what agents access, spend, and prove.",
   alternates: {
     canonical: "https://satgate.io",
   },
   openGraph: {
-    title: "SatGate — Economic Firewall for Agentic API Access",
+    title: "SatGate — Agent Authority & Accountability Layer",
     description:
       "Policy-to-Proof governance for enterprise agents: bounded economic authority before execution and Evidence Packs after every decision.",
     url: "https://satgate.io",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "SatGate — Economic Firewall for Agentic API Access",
+    title: "SatGate — Agent Authority & Accountability Layer",
     description:
       "Policy-to-Proof governance for enterprise agents: bounded economic authority before execution and Evidence Packs after every decision.",
   },
@@ -32,7 +32,7 @@ export default function HomePage() {
         name: 'SatGate',
         url: 'https://satgate.io',
         logo: 'https://satgate.io/logo_white_transparent.png',
-        description: 'SatGate is the Economic Firewall for agentic API access: bounded economic authority before execution and Evidence Packs after every decision.',
+        description: 'SatGate is the Agent Authority & Accountability Layer for governed agent execution: authority before execution and Evidence Pack receipts after every decision.',
       },
       {
         '@type': 'WebSite',
@@ -42,9 +42,9 @@ export default function HomePage() {
       },
       {
         '@type': 'WebPage',
-        name: 'SatGate — Economic Firewall for Agentic API Access',
+        name: 'SatGate — Agent Authority & Accountability Layer',
         url: 'https://satgate.io',
-        description: 'SatGate gives agents bounded economic authority so humans, platforms, and upstream APIs can trust what they consume, spend, and prove.',
+        description: 'SatGate governs agent authority before execution so humans, platforms, and upstream APIs can trust what agents access, spend, and prove.',
         datePublished: '2026-04-30',
         dateModified: '2026-05-05',
         isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -68,7 +68,7 @@ export default function HomePage() {
         name: 'What is SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate is the Economic Firewall for agentic API access. It sits in the request path so humans and platforms can delegate bounded economic authority to agents, enforce policy and budgets, and preserve Evidence Packs across APIs, MCP tools, and paid rails.',
+          text: 'SatGate is the Agent Authority & Accountability Layer for governed agent execution. It sits in the request path so humans and platforms can delegate bounded authority to agents, enforce policy and budgets, and preserve Evidence Packs across APIs, MCP tools, and paid rails.',
         },
       },
       {
