@@ -56,8 +56,8 @@ const faqs = [
 ];
 
 export const metadata = {
-  title: 'MCP Gateway for Budget Enforcement and Evidence Packs',
-  description: 'Use SatGate as the MCP gateway for budget enforcement, tool allowlists, tenant isolation, delegation depth, and MCP Evidence Pack proof.',
+  title: 'MCP Gateway for Agent Governance and Evidence Packs',
+  description: 'Use SatGate as an MCP gateway to check authority before tool execution, enforce policy, and export Evidence Packs.',
   alternates: { canonical: 'https://satgate.io/mcp-gateway' },
   keywords: [
     'MCP gateway',
@@ -73,15 +73,15 @@ export const metadata = {
     'Hermes MCP governance',
   ],
   openGraph: {
-    title: 'MCP Gateway for Budget Enforcement and Evidence Packs',
-    description: 'Put SatGate in the MCP request path: allow or deny tool calls, enforce budgets, and export Evidence Pack receipts.',
+    title: 'MCP Gateway for Agent Governance and Evidence Packs',
+    description: 'Put SatGate in the MCP request path: check authority before tool execution, enforce policy, and export Evidence Pack receipts.',
     url: 'https://satgate.io/mcp-gateway',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MCP Gateway for Budget Enforcement and Evidence Packs',
-    description: 'Govern Claude, Hermes, Ollama, Cursor, and custom MCP agents with budget enforcement and Evidence Pack proof.',
+    title: 'MCP Gateway for Agent Governance and Evidence Packs',
+    description: 'Govern Claude, Hermes, Ollama, Cursor, and custom MCP agents with authority checks and Evidence Pack proof.',
   },
 };
 
@@ -151,10 +151,10 @@ export default function McpGatewayPage() {
             <Cable size={16} /> Model Context Protocol governance gateway
           </div>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight max-w-5xl mb-8">
-            MCP Gateway for Budget Enforcement and Evidence Packs
+            MCP Gateway for Agent Governance and Evidence Packs
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-8">
-            SatGate sits between AI agents — Claude, Hermes, Ollama, Cursor, OpenClaw, or custom MCP clients — and the tools they want to call. Every MCP request is checked for authority, budget, tenant, tool scope, and delegation before execution — then recorded as proof.
+            SatGate sits between AI agents — Claude, Hermes, Ollama, Cursor, OpenClaw, or custom MCP clients — and the tools they want to call. Every MCP request is checked for authority, budget, tenant, tool scope, and delegation before execution — then preserved as Evidence Pack proof.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">

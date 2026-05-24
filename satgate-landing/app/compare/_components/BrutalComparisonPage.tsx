@@ -36,7 +36,7 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
     dateModified: '2026-05-10',
     mainEntityOfPage: `https://satgate.io/compare/${config.slug}`,
     about: [
-      { '@type': 'Thing', name: 'agent economic firewall' },
+      { '@type': 'Thing', name: 'agent authority governance' },
       { '@type': 'Thing', name: 'pre-execution policy enforcement' },
       { '@type': 'Thing', name: 'MCP-native proxying' },
       { '@type': 'Thing', name: 'Evidence Packs' },

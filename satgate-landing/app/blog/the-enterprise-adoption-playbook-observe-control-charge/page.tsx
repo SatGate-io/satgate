@@ -34,7 +34,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'economic governance for AI agents' },
-      { '@type': 'Thing', name: 'Observe Control Charge' },
+      { '@type': 'Thing', name: 'Observe Control Prove' },
       { '@type': 'Thing', name: 'AI agent budget enforcement' },
       { '@type': 'Thing', name: 'paid-agent API monetization' },
     ],

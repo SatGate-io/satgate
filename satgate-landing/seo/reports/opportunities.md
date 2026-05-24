@@ -1,6 +1,6 @@
 # SatGate SEO Machine Report
 
-Generated: 2026-05-22T16:31:14.339376Z
+Generated: 2026-05-24T15:27:40.211858Z
 
 ## Ranked opportunities
 
@@ -100,7 +100,7 @@ Generated: 2026-05-22T16:31:14.339376Z
 
 ### /blog/how-to-add-budget-limits-to-openai-api-calls
 - Title: OpenAI API Budget Limits: Control Spend Before Calls
-- Meta: Learn how to add OpenAI API budget limits, prevent runaway agent spend, and enforce usage controls before calls execute.
+- Meta: Add OpenAI API budget limits with authority before execution, Observe/Control/Prove controls, and Evidence Pack receipts.
 - Content changes:
   - Add or tighten the above-the-fold direct-answer block for the primary query.
   - Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end.
@@ -108,7 +108,7 @@ Generated: 2026-05-22T16:31:14.339376Z
 
 ### /blog/http-402-payment-required-use-cases
 - Title: HTTP 402 Payment Required: API and Agent Use Cases
-- Meta: See how HTTP 402 can support paid API access, metered MCP tools, and agent transactions using SatGate.
+- Meta: HTTP 402 and L402 are paid-rail context. SatGate governs authority before execution and preserves Evidence Packs.
 - Content changes:
   - Add or tighten the above-the-fold direct-answer block for the primary query.
   - Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end.
@@ -132,7 +132,7 @@ Generated: 2026-05-22T16:31:14.339376Z
 
 ### /blog/llm-cost-management
 - Title: LLM Cost Management: Control AI Spend Before It Happens
-- Meta: A practical guide to LLM cost management using usage observability, budget controls, and chargeback workflows for AI agents.
+- Meta: A practical guide to LLM cost management using authority before execution, budget controls, and Evidence Pack receipts for AI agents.
 - Content changes:
   - Add or tighten the above-the-fold direct-answer block for the primary query.
   - Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end.
@@ -147,7 +147,7 @@ Generated: 2026-05-22T16:31:14.339376Z
 - Links to add: /mcp-gateway, /govern, /blog/llm-cost-management, /blog/http-402-payment-required-use-cases
 
 ### /mcp-gateway
-- Title: MCP Gateway for Governed Agent Tool Access
+- Title: MCP Gateway for Agent Governance and Evidence Packs
 - Meta: Use SatGate as an MCP gateway to check authority before tool execution, enforce policy, and export Evidence Packs.
 - Content changes:
   - Make this the commercial MCP gateway hub and link all MCP blog/tool pages into it.

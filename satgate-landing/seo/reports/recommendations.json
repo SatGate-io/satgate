@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-22T16:31:14.339200Z",
+  "generatedAt": "2026-05-24T15:27:40.211706Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -7,7 +7,7 @@
       "score": 98,
       "primaryKeyword": "openai api budget limit",
       "recommendedTitle": "OpenAI API Budget Limits: Control Spend Before Calls",
-      "recommendedMetaDescription": "Learn how to add OpenAI API budget limits, prevent runaway agent spend, and enforce usage controls before calls execute.",
+      "recommendedMetaDescription": "Add OpenAI API budget limits with authority before execution, Observe/Control/Prove controls, and Evidence Pack receipts.",
       "contentChanges": [
         "Add or tighten the above-the-fold direct-answer block for the primary query.",
         "Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end."
@@ -30,7 +30,7 @@
       "score": 91,
       "primaryKeyword": "http 402 payment required",
       "recommendedTitle": "HTTP 402 Payment Required: API and Agent Use Cases",
-      "recommendedMetaDescription": "See how HTTP 402 can support paid API access, metered MCP tools, and agent transactions using SatGate.",
+      "recommendedMetaDescription": "HTTP 402 and L402 are paid-rail context. SatGate governs authority before execution and preserves Evidence Packs.",
       "contentChanges": [
         "Add or tighten the above-the-fold direct-answer block for the primary query.",
         "Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end."
@@ -99,7 +99,7 @@
       "score": 75,
       "primaryKeyword": "llm cost management",
       "recommendedTitle": "LLM Cost Management: Control AI Spend Before It Happens",
-      "recommendedMetaDescription": "A practical guide to LLM cost management using usage observability, budget controls, and chargeback workflows for AI agents.",
+      "recommendedMetaDescription": "A practical guide to LLM cost management using authority before execution, budget controls, and Evidence Pack receipts for AI agents.",
       "contentChanges": [
         "Add or tighten the above-the-fold direct-answer block for the primary query.",
         "Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end."
@@ -144,7 +144,7 @@
       "priority": "P2",
       "score": 50,
       "primaryKeyword": "mcp gateway",
-      "recommendedTitle": "MCP Gateway for Governed Agent Tool Access",
+      "recommendedTitle": "MCP Gateway for Agent Governance and Evidence Packs",
       "recommendedMetaDescription": "Use SatGate as an MCP gateway to check authority before tool execution, enforce policy, and export Evidence Packs.",
       "contentChanges": [
         "Make this the commercial MCP gateway hub and link all MCP blog/tool pages into it."

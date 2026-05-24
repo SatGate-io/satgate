@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-22T16:31:14.338367Z",
+  "generatedAt": "2026-05-24T15:27:40.211021Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -208,7 +208,7 @@
       "intent": "informational-commercial",
       "funnelStage": "problem-aware",
       "productAngle": "SatGate provides request-path AI spend governance: observe usage, control budgets and policy before execution, and preserve Evidence Pack proof.",
-      "cta": "Learn about Economic Firewalls",
+      "cta": "See Policy-to-Proof",
       "status": "new",
       "clicks": 0,
       "impressions": 0,
@@ -231,7 +231,7 @@
       ],
       "intent": "comparison",
       "funnelStage": "solution-aware",
-      "productAngle": "SatGate is the provider-neutral economic firewall for delegated agent spend across clouds, MCP tools, APIs, and paid rails.",
+      "productAngle": "SatGate is the provider-neutral Agent Authority & Accountability Layer for delegated agent spend across clouds, MCP tools, APIs, and paid rails.",
       "cta": "See Policy-to-Proof",
       "status": "new",
       "clicks": 0,
@@ -349,7 +349,7 @@
         "Cloudflare AI Gateway alternative",
         "AI gateway budget enforcement",
         "MCP tool governance",
-        "agent economic firewall"
+        "agent authority governance"
       ],
       "intent": "comparison",
       "funnelStage": "solution-aware",

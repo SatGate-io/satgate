@@ -75,7 +75,7 @@ export default function GovernPage() {
             </span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            SatGate is the Economic Firewall for enterprise agents, implemented through Policy-to-Proof: scope authority before work starts, enforce request-path policy, and preserve Evidence Packs after every allowed, denied, delegated, or revoked action.
+            SatGate is the Policy-to-Proof governance layer for enterprise agents: scope authority before work starts, enforce request-path policy, and preserve Evidence Packs after every allowed, denied, delegated, or revoked action.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/policy-to-proof" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center justify-center gap-2">

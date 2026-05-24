@@ -14,9 +14,9 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
   'aws-agentcore-payments': {
     slug: 'aws-agentcore-payments',
     competitor: 'AWS AgentCore Payments',
-    eyebrow: 'Managed agent payments vs economic firewall',
-    title: 'SatGate vs AWS AgentCore Payments',
-    description: 'AWS AgentCore Payments helps agents transact inside the AWS AgentCore ecosystem. SatGate governs whether agents are allowed to access, spend, delegate, call MCP tools, or use paid rails before execution across the multi-provider enterprise environment.',
+    eyebrow: 'Managed agent payments vs Policy-to-Proof governance',
+    title: 'SatGate vs AWS AgentCore Payments: Governance Above Paid Rails',
+    description: 'AWS AgentCore Payments helps agents transact inside AWS. SatGate governs authority, Evidence Pack proof, MCP tools, and paid rails before execution across the multi-provider enterprise environment.',
     verdict: 'If your world is AWS AgentCore, AWS gives you managed payments. If your environment spans OpenAI, Anthropic, local agents, MCP tools, internal APIs, hybrid gateways, and multiple payment rails, SatGate is the control layer.',
     competitorGoodAt: [
       'Managed payment enablement for agents built around AWS AgentCore patterns.',
@@ -30,9 +30,9 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
       standardAxes.evidence,
     ],
     rows: [
-      { axis: 'Primary job', satgate: 'Economic firewall: decide what an autonomous agent may access, spend, delegate, and prove before execution.', competitor: 'Managed agent payment capability in the AWS AgentCore stack.', winner: 'SatGate' },
+      { axis: 'Primary job', satgate: 'Policy-to-Proof governance: decide what an autonomous agent may access, spend, delegate, and prove before execution.', competitor: 'Managed agent payment capability in the AWS AgentCore stack.', winner: 'SatGate' },
       { axis: 'Cross-provider', satgate: standardAxes.crossProvider, competitor: 'Strongest for organizations standardized on AWS, Bedrock, and AgentCore.', winner: 'SatGate' },
-      { axis: 'Cross-rail', satgate: standardAxes.crossRail, competitor: 'Payment/session rails in AWS-managed agent flows; not a general economic control plane for every provider and private API.', winner: 'SatGate' },
+      { axis: 'Cross-rail', satgate: standardAxes.crossRail, competitor: 'Payment/session rails in AWS-managed agent flows; not a general authority-and-proof layer for every provider and private API.', winner: 'SatGate' },
       { axis: 'Pre-execution control', satgate: standardAxes.preExecution, competitor: 'Can help with managed agent access/payment flows, but the center is not provider-neutral policy before every external spend event.', winner: 'SatGate' },
       { axis: 'Delegation', satgate: standardAxes.delegation, competitor: 'AWS identity and agent controls help inside AWS; portability across heterogeneous agents and sub-agents requires additional governance.', winner: 'SatGate' },
       { axis: 'Evidence Packs', satgate: standardAxes.evidence, competitor: 'AWS observability gives logs/traces. SatGate packages the policy decision and economic proof itself.', winner: 'SatGate' },
@@ -56,9 +56,9 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
   'cloudflare-ai-gateway': {
     slug: 'cloudflare-ai-gateway',
     competitor: 'Cloudflare AI Gateway',
-    eyebrow: 'AI traffic gateway vs economic firewall',
-    title: 'SatGate vs Cloudflare AI Gateway',
-    description: 'Cloudflare AI Gateway is strong AI traffic infrastructure: analytics, logging, caching, rate limits, retries, fallback, and provider access on Cloudflare. SatGate is pre-execution economic governance for agents, APIs, MCP tools, delegated authority, and paid rails.',
+    eyebrow: 'AI traffic gateway vs Policy-to-Proof governance',
+    title: 'SatGate vs Cloudflare AI Gateway: Policy-to-Proof for Agent Actions',
+    description: 'Cloudflare AI Gateway is strong AI traffic infrastructure. SatGate is Policy-to-Proof governance for agent authority, MCP tools, delegated spend, paid rails, and Evidence Packs.',
     verdict: 'Cloudflare helps move and observe AI traffic. SatGate decides whether an autonomous agent is authorized to spend before that traffic exists.',
     competitorGoodAt: [
       'Edge-native AI traffic analytics, logging, caching, rate limits, retries, and fallback.',
@@ -67,14 +67,14 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     ],
     satgateGoodAt: [standardAxes.crossRail, standardAxes.preExecution, standardAxes.delegation, standardAxes.mcp],
     rows: [
-      { axis: 'Primary job', satgate: 'Pre-execution economic policy enforcement for autonomous agents.', competitor: 'AI traffic gateway for analytics, caching, rate limits, retries, fallback, and provider access.', winner: 'Tie' },
+      { axis: 'Primary job', satgate: 'Pre-execution authority and evidence policy enforcement for autonomous agents.', competitor: 'AI traffic gateway for analytics, caching, rate limits, retries, fallback, and provider access.', winner: 'Tie' },
       { axis: 'Cross-provider', satgate: 'Provider choice is an implementation detail behind one agent authority policy.', competitor: 'Strong multi-provider AI traffic gateway features.', winner: 'Tie' },
-      { axis: 'Cross-rail', satgate: standardAxes.crossRail, competitor: 'Primarily AI/model traffic; not payment/API/MCP economic rail governance as the center of the product.', winner: 'SatGate' },
+      { axis: 'Cross-rail', satgate: standardAxes.crossRail, competitor: 'Primarily AI/model traffic; not payment/API/MCP authority governance as the center of the product.', winner: 'SatGate' },
       { axis: 'Pre-execution control', satgate: standardAxes.preExecution, competitor: 'Rate limits and gateway controls are useful, but they are not delegated economic authority.', winner: 'SatGate' },
       { axis: 'Delegation', satgate: standardAxes.delegation, competitor: 'No native SatGate-style attenuated agent capability and delegation-depth model.', winner: 'SatGate' },
       { axis: 'Evidence Packs', satgate: standardAxes.evidence, competitor: 'Logs and analytics explain traffic; they do not package authority, budget, and proof as the core artifact.', winner: 'SatGate' },
       { axis: 'Hybrid deployment', satgate: standardAxes.hybrid, competitor: 'Cloudflare-managed edge platform.', winner: 'SatGate' },
-      { axis: 'MCP-native proxying', satgate: standardAxes.mcp, competitor: 'AI Gateway is not primarily an MCP economic policy proxy.', winner: 'SatGate' },
+      { axis: 'MCP-native proxying', satgate: standardAxes.mcp, competitor: 'AI Gateway is not primarily an MCP authority policy proxy.', winner: 'SatGate' },
     ],
     bullets: [
       { title: 'Gateway is not governance', body: 'Routing, caching, and retry logic do not decide whether a delegated agent should be allowed to spend on a protected tool.' },
@@ -94,7 +94,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     slug: 'langsmith-helicone-datadog',
     competitor: 'LangSmith, Helicone, and Datadog',
     eyebrow: 'Observability vs pre-execution control',
-    title: 'SatGate vs LangSmith, Helicone, and Datadog',
+    title: 'SatGate vs LangSmith, Helicone, and Datadog: Proof Before Postmortems',
     description: 'LangSmith, Helicone, and Datadog help teams trace, debug, monitor, evaluate, and analyze LLM systems. SatGate sits before execution to enforce agent budgets, delegated authority, MCP tool policy, paid-rail access, and Evidence Packs.',
     verdict: 'Observability tells you what agents did. SatGate controls what agents are allowed to do before they do it.',
     competitorGoodAt: [
@@ -131,7 +131,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     slug: 'api-gateway-rate-limits',
     competitor: 'API Gateway rate limits',
     eyebrow: 'Traffic primitive vs authority primitive',
-    title: 'SatGate vs API Gateway Rate Limits',
+    title: 'SatGate vs API Gateway Rate Limits: Authority Beats Quotas',
     description: 'API Gateway rate limits throttle request volume. SatGate governs delegated agent authority: budget, route, tool, tenant, payment rail, evidence requirement, and revocation before the request executes.',
     verdict: 'Rate limits answer “how many requests?” SatGate answers “is this agent allowed to spend this budget on this resource right now, and can we prove why?”',
     competitorGoodAt: [
@@ -168,8 +168,8 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     slug: 'openai-anthropic-budget-controls',
     competitor: 'native OpenAI and Anthropic budget controls',
     eyebrow: 'Provider caps vs cross-provider control',
-    title: 'SatGate vs Native OpenAI and Anthropic Budget Controls',
-    description: 'OpenAI and Anthropic budget controls are useful provider-specific guardrails. SatGate is the cross-provider economic firewall above them: delegated budgets, MCP tool governance, paid API access, hybrid enforcement, and Evidence Packs.',
+    title: 'SatGate vs OpenAI and Anthropic Budgets: Cross-Provider Authority',
+    description: 'OpenAI and Anthropic budget controls are useful provider-specific guardrails. SatGate is the cross-provider Agent Authority & Accountability Layer above them: delegated budgets, MCP tool governance, paid API access, hybrid enforcement, and Evidence Packs.',
     verdict: 'Native budgets are necessary last-mile guardrails. They are not a portable agent authorization layer across providers, tools, APIs, rails, and hybrid systems.',
     competitorGoodAt: [
       'Capping or tracking spend inside a single model provider account, project, workspace, or organization.',

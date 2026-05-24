@@ -4,14 +4,14 @@ import GovernClient from "../components/GovernClient";
 export const metadata: Metadata = {
   title: "AI Agent Governance: Policy-to-Proof",
   description:
-    "AI agent governance for the Economic Firewall category: scope authority, enforce request-path policy, and export Evidence Packs for every agent decision.",
+    "AI agent governance from Policy-to-Proof: scope authority, enforce request-path policy, and export Evidence Pack receipts for every agent decision.",
   alternates: {
     canonical: "https://satgate.io/govern",
   },
   keywords: [
     "enterprise AI agent governance",
     "AI agent authority governance",
-    "Economic Firewall for AI agents",
+    "Agent Authority & Accountability Layer",
     "Policy-to-Proof governance for AI agents",
     "MCP governance for enterprises",
     "AI agent budget enforcement",
@@ -44,7 +44,7 @@ const webPageSchema = {
   isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
   about: [
     { "@type": "Thing", name: "AI agent governance" },
-    { "@type": "Thing", name: "Economic Firewall for AI agents" },
+    { "@type": "Thing", name: "Agent Authority & Accountability Layer" },
     { "@type": "Thing", name: "Policy-to-Proof governance for AI agents" },
     { "@type": "Thing", name: "MCP governance for enterprises" },
     { "@type": "Thing", name: "agent delegation controls" },
@@ -93,7 +93,7 @@ const faqSchema = {
       name: "Is SatGate tied to x402, L402, AgentCore Payments, or Pay.sh?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "No. x402, L402, AgentCore Payments, Pay.sh, and related rails make it easier for agents to call paid services. SatGate is protocol-independent: it records the requesting agent, allowed action, policy basis, spend context, and evidence needed for audit, review, and control — payment or not.",
+        text: "No. x402, L402, AgentCore Payments, Pay.sh, and related rails make it easier for agents to call paid services. SatGate is protocol-independent: it records the requesting agent, allowed action, policy basis, spend context, and evidence needed for Evidence Pack review, accountability, and control — payment or not.",
       },
     },
   ],

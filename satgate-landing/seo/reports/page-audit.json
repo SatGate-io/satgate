@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-22T16:31:14.338862Z",
+  "generatedAt": "2026-05-24T15:27:40.211423Z",
   "items": [
     {
       "path": "/blog/ai-spend-governance",
@@ -98,7 +98,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1315,
+      "wordCount": 1323,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -150,7 +150,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2179,
+      "wordCount": 2189,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -268,8 +268,8 @@
       "exists": true,
       "title": "AI Agent Governance: Policy-to-Proof",
       "titleLength": 36,
-      "metaDescription": "AI agent governance for the Economic Firewall category: scope authority, enforce request-path policy, and export Evidence Packs for every agent decision.",
-      "metaDescriptionLength": 153,
+      "metaDescription": "AI agent governance from Policy-to-Proof: scope authority, enforce request-path policy, and export Evidence Pack receipts for every agent decision.",
+      "metaDescriptionLength": 147,
       "canonical": "/govern",
       "h1": [
         "Govern what agents can do. Prove every decision."
@@ -314,7 +314,7 @@
         "WebPage",
         "WebSite"
       ],
-      "wordCount": 1696,
+      "wordCount": 1692,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -372,13 +372,13 @@
     {
       "path": "/mcp-gateway",
       "exists": true,
-      "title": "MCP Gateway for Budget Enforcement and Evidence Packs",
-      "titleLength": 53,
-      "metaDescription": "Use SatGate as the MCP gateway for budget enforcement, tool allowlists, tenant isolation, delegation depth, and MCP Evidence Pack proof.",
-      "metaDescriptionLength": 136,
+      "title": "MCP Gateway for Agent Governance and Evidence Packs",
+      "titleLength": 51,
+      "metaDescription": "Use SatGate as an MCP gateway to check authority before tool execution, enforce policy, and export Evidence Packs.",
+      "metaDescriptionLength": 114,
       "canonical": "/mcp-gateway",
       "h1": [
-        "MCP Gateway for Budget Enforcement and Evidence Packs"
+        "MCP Gateway for Agent Governance and Evidence Packs"
       ],
       "h1Count": 1,
       "h2s": [
@@ -462,13 +462,189 @@
     {
       "path": "/compare/aws-agentcore-payments",
       "exists": true,
-      "title": "SatGate vs AWS AgentCore Payments Control",
-      "titleLength": 41,
+      "title": "SatGate vs AWS AgentCore Payments: Governance Above Paid Rails",
+      "titleLength": 62,
       "metaDescription": "Compare SatGate and AWS AgentCore Payments across cross-provider control, paid rails, MCP proxying, delegated budgets, hybrid deployment, and Evidence Packs.",
       "metaDescriptionLength": 157,
       "canonical": "/compare/aws-agentcore-payments",
       "h1": [
-        ""
+        "SatGate vs AWS AgentCore Payments: Governance Above Paid Rails"
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "Where is genuinely useful",
+        "Where SatGate evaluates agent authority",
+        "What to compare for agent governance",
+        "Why this matters in production",
+        "FAQ",
+        "Dashboards explain what happened. SatGate controls what agents are allowed to do."
+      ],
+      "internalLinks": [
+        "/compare",
+        "/evidence-pack-demo",
+        "/mcp-governance",
+        "/policy-to-proof"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "BreadcrumbList",
+        "FAQPage",
+        "ListItem",
+        "Organization",
+        "Question",
+        "TechArticle",
+        "Thing"
+      ],
+      "wordCount": 440,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
+    {
+      "path": "/compare/cloudflare-ai-gateway",
+      "exists": true,
+      "title": "SatGate vs Cloudflare AI Gateway: Policy-to-Proof for Agent Actions",
+      "titleLength": 67,
+      "metaDescription": "Compare Cloudflare AI Gateway and SatGate across AI routing, rate limits, pre-execution control, MCP proxying, delegated budgets, and Evidence Packs.",
+      "metaDescriptionLength": 149,
+      "canonical": "/compare/cloudflare-ai-gateway",
+      "h1": [
+        "SatGate vs Cloudflare AI Gateway: Policy-to-Proof for Agent Actions"
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "Where is genuinely useful",
+        "Where SatGate evaluates agent authority",
+        "What to compare for agent governance",
+        "Why this matters in production",
+        "FAQ",
+        "Dashboards explain what happened. SatGate controls what agents are allowed to do."
+      ],
+      "internalLinks": [
+        "/compare",
+        "/evidence-pack-demo",
+        "/mcp-governance",
+        "/policy-to-proof"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "BreadcrumbList",
+        "FAQPage",
+        "ListItem",
+        "Organization",
+        "Question",
+        "TechArticle",
+        "Thing"
+      ],
+      "wordCount": 438,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
+    {
+      "path": "/compare/langsmith-helicone-datadog",
+      "exists": true,
+      "title": "SatGate vs LangSmith, Helicone, Datadog: Proof Before Postmortems",
+      "titleLength": 65,
+      "metaDescription": "Compare LLM observability tools with SatGate pre-execution control: delegated budgets, MCP tool policy, paid rails, hybrid enforcement, and Evidence Packs.",
+      "metaDescriptionLength": 155,
+      "canonical": "/compare/langsmith-helicone-datadog",
+      "h1": [
+        "SatGate vs LangSmith, Helicone, and Datadog: Proof Before Postmortems"
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "Where is genuinely useful",
+        "Where SatGate evaluates agent authority",
+        "What to compare for agent governance",
+        "Why this matters in production",
+        "FAQ",
+        "Dashboards explain what happened. SatGate controls what agents are allowed to do."
+      ],
+      "internalLinks": [
+        "/compare",
+        "/evidence-pack-demo",
+        "/mcp-governance",
+        "/policy-to-proof"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "BreadcrumbList",
+        "FAQPage",
+        "ListItem",
+        "Organization",
+        "Question",
+        "TechArticle",
+        "Thing"
+      ],
+      "wordCount": 436,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
+    {
+      "path": "/compare/api-gateway-rate-limits",
+      "exists": true,
+      "title": "SatGate vs API Gateway Rate Limits: Authority Beats Quotas",
+      "titleLength": 58,
+      "metaDescription": "Compare API Gateway rate limits with SatGate agent authority: delegated budgets, MCP tool policy, paid rails, hybrid enforcement, and Evidence Packs.",
+      "metaDescriptionLength": 149,
+      "canonical": "/compare/api-gateway-rate-limits",
+      "h1": [
+        "SatGate vs API Gateway Rate Limits: Authority Beats Quotas"
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "Where is genuinely useful",
+        "Where SatGate evaluates agent authority",
+        "What to compare for agent governance",
+        "Why this matters in production",
+        "FAQ",
+        "Dashboards explain what happened. SatGate controls what agents are allowed to do."
+      ],
+      "internalLinks": [
+        "/compare",
+        "/evidence-pack-demo",
+        "/mcp-governance",
+        "/policy-to-proof"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "BreadcrumbList",
+        "FAQPage",
+        "ListItem",
+        "Organization",
+        "Question",
+        "TechArticle",
+        "Thing"
+      ],
+      "wordCount": 440,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
+    {
+      "path": "/compare/openai-anthropic-budget-controls",
+      "exists": true,
+      "title": "SatGate vs OpenAI and Anthropic Budgets: Cross-Provider Authority",
+      "titleLength": 65,
+      "metaDescription": "Compare native OpenAI and Anthropic budget controls with SatGate cross-provider agent budgets, MCP policy, paid rails, hybrid control, and Evidence Packs.",
+      "metaDescriptionLength": 154,
+      "canonical": "/compare/openai-anthropic-budget-controls",
+      "h1": [
+        "SatGate vs OpenAI and Anthropic Budgets: Cross-Provider Authority"
       ],
       "h1Count": 1,
       "h2s": [
@@ -496,182 +672,6 @@
         "Thing"
       ],
       "wordCount": 437,
-      "hasObserveControlProve": true,
-      "hasEvidencePack": true,
-      "hasFAQ": true,
-      "hasProductCTA": true,
-      "inSitemap": true,
-      "issues": []
-    },
-    {
-      "path": "/compare/cloudflare-ai-gateway",
-      "exists": true,
-      "title": "SatGate vs Cloudflare AI Gateway Control",
-      "titleLength": 40,
-      "metaDescription": "Compare Cloudflare AI Gateway and SatGate across AI routing, rate limits, pre-execution control, MCP proxying, delegated budgets, and Evidence Packs.",
-      "metaDescriptionLength": 149,
-      "canonical": "/compare/cloudflare-ai-gateway",
-      "h1": [
-        ""
-      ],
-      "h1Count": 1,
-      "h2s": [
-        "Where is genuinely useful",
-        "Where SatGate evaluates agent authority",
-        "What to compare for agent governance",
-        "Why this matters in production",
-        "FAQ",
-        "Dashboards explain what happened. SatGate controls what agents are allowed to do."
-      ],
-      "internalLinks": [
-        "/compare",
-        "/evidence-pack-demo",
-        "/mcp-governance",
-        "/policy-to-proof"
-      ],
-      "schemaTypes": [
-        "Answer",
-        "BreadcrumbList",
-        "FAQPage",
-        "ListItem",
-        "Organization",
-        "Question",
-        "TechArticle",
-        "Thing"
-      ],
-      "wordCount": 435,
-      "hasObserveControlProve": true,
-      "hasEvidencePack": true,
-      "hasFAQ": true,
-      "hasProductCTA": true,
-      "inSitemap": true,
-      "issues": []
-    },
-    {
-      "path": "/compare/langsmith-helicone-datadog",
-      "exists": true,
-      "title": "SatGate vs LangSmith, Helicone, Datadog",
-      "titleLength": 39,
-      "metaDescription": "Compare LLM observability tools with SatGate pre-execution control: delegated budgets, MCP tool policy, paid rails, hybrid enforcement, and Evidence Packs.",
-      "metaDescriptionLength": 155,
-      "canonical": "/compare/langsmith-helicone-datadog",
-      "h1": [
-        ""
-      ],
-      "h1Count": 1,
-      "h2s": [
-        "Where is genuinely useful",
-        "Where SatGate evaluates agent authority",
-        "What to compare for agent governance",
-        "Why this matters in production",
-        "FAQ",
-        "Dashboards explain what happened. SatGate controls what agents are allowed to do."
-      ],
-      "internalLinks": [
-        "/compare",
-        "/evidence-pack-demo",
-        "/mcp-governance",
-        "/policy-to-proof"
-      ],
-      "schemaTypes": [
-        "Answer",
-        "BreadcrumbList",
-        "FAQPage",
-        "ListItem",
-        "Organization",
-        "Question",
-        "TechArticle",
-        "Thing"
-      ],
-      "wordCount": 433,
-      "hasObserveControlProve": true,
-      "hasEvidencePack": true,
-      "hasFAQ": true,
-      "hasProductCTA": true,
-      "inSitemap": true,
-      "issues": []
-    },
-    {
-      "path": "/compare/api-gateway-rate-limits",
-      "exists": true,
-      "title": "SatGate vs API Gateway Rate Limits for Agents",
-      "titleLength": 45,
-      "metaDescription": "Compare API Gateway rate limits with SatGate agent authority: delegated budgets, MCP tool policy, paid rails, hybrid enforcement, and Evidence Packs.",
-      "metaDescriptionLength": 149,
-      "canonical": "/compare/api-gateway-rate-limits",
-      "h1": [
-        ""
-      ],
-      "h1Count": 1,
-      "h2s": [
-        "Where is genuinely useful",
-        "Where SatGate evaluates agent authority",
-        "What to compare for agent governance",
-        "Why this matters in production",
-        "FAQ",
-        "Dashboards explain what happened. SatGate controls what agents are allowed to do."
-      ],
-      "internalLinks": [
-        "/compare",
-        "/evidence-pack-demo",
-        "/mcp-governance",
-        "/policy-to-proof"
-      ],
-      "schemaTypes": [
-        "Answer",
-        "BreadcrumbList",
-        "FAQPage",
-        "ListItem",
-        "Organization",
-        "Question",
-        "TechArticle",
-        "Thing"
-      ],
-      "wordCount": 439,
-      "hasObserveControlProve": true,
-      "hasEvidencePack": true,
-      "hasFAQ": true,
-      "hasProductCTA": true,
-      "inSitemap": true,
-      "issues": []
-    },
-    {
-      "path": "/compare/openai-anthropic-budget-controls",
-      "exists": true,
-      "title": "SatGate vs OpenAI / Anthropic Budgets",
-      "titleLength": 37,
-      "metaDescription": "Compare native OpenAI and Anthropic budget controls with SatGate cross-provider agent budgets, MCP policy, paid rails, hybrid control, and Evidence Packs.",
-      "metaDescriptionLength": 154,
-      "canonical": "/compare/openai-anthropic-budget-controls",
-      "h1": [
-        ""
-      ],
-      "h1Count": 1,
-      "h2s": [
-        "Where is genuinely useful",
-        "Where SatGate evaluates agent authority",
-        "What to compare for agent governance",
-        "Why this matters in production",
-        "FAQ",
-        "Dashboards explain what happened. SatGate controls what agents are allowed to do."
-      ],
-      "internalLinks": [
-        "/compare",
-        "/evidence-pack-demo",
-        "/mcp-governance",
-        "/policy-to-proof"
-      ],
-      "schemaTypes": [
-        "Answer",
-        "BreadcrumbList",
-        "FAQPage",
-        "ListItem",
-        "Organization",
-        "Question",
-        "TechArticle",
-        "Thing"
-      ],
-      "wordCount": 435,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
