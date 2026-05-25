@@ -88,7 +88,7 @@ export default function LlmCostMonitoringPage() {
         name: 'How do you turn LLM cost monitoring signals into controls?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Convert monitoring signals into policy objects: per-agent and per-route budgets, MCP tool caps, model-routing rules, scoped capability tokens, revocation triggers, and audit requirements enforced before upstream calls execute.',
+          text: 'Convert monitoring signals into policy objects: per-agent and per-route budgets, MCP tool caps, model-routing rules, scoped capability tokens, revocation triggers, and Evidence Pack requirements enforced before upstream calls execute.',
         },
       },
     ],
@@ -208,10 +208,10 @@ export default function LlmCostMonitoringPage() {
           </p>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {[
-              ['/agent-spend-policy-template', 'Agent spend policy', 'Budgets, delegation, revocation, MCP tool caps, and audit fields.'],
+              ['/agent-spend-policy-template', 'Agent spend policy', 'Budgets, delegation, revocation, MCP tool caps, and Evidence Pack fields.'],
               ['/mcp-tool-cost-policy-generator', 'MCP tool cost policy', 'Per-tool prices, risk tiers, limits, and deny behavior.'],
               ['/revocable-capability-token-policy-template', 'Capability-token policy', 'Scoped, expiring, revocable agent authority with budget caveats.'],
-              ['/economic-firewall-readiness-grader', 'Readiness grader', 'Find gaps across identity, budgets, routing, revocation, audit, and Charge.'],
+              ['/economic-firewall-readiness-grader', 'Readiness grader', 'Find gaps across identity, budgets, routing, revocation, Evidence Pack proof, and paid-rail context.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-purple-500/50 hover:bg-purple-950/20">
                 <h3 className="mb-2 font-bold text-white">{title}</h3>
@@ -241,7 +241,7 @@ export default function LlmCostMonitoringPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How do you turn LLM cost monitoring signals into controls?</h3>
-              <p className="leading-relaxed text-gray-400">Convert monitoring signals into policy objects: per-agent and per-route budgets, MCP tool caps, model-routing rules, scoped capability tokens, revocation triggers, and audit requirements enforced before upstream calls execute.</p>
+              <p className="leading-relaxed text-gray-400">Convert monitoring signals into policy objects: per-agent and per-route budgets, MCP tool caps, model-routing rules, scoped capability tokens, revocation triggers, and Evidence Pack requirements enforced before upstream calls execute.</p>
             </div>
           </div>
         </div>
@@ -260,7 +260,7 @@ export default function LlmCostMonitoringPage() {
             </Link>
             <Link href="/agent-spend-policy-template" className="rounded-2xl border border-gray-800 bg-black/70 p-6 transition hover:border-purple-600">
               <h3 className="mb-2 text-lg font-bold text-white">Agent spend policy →</h3>
-              <p className="text-gray-400">Turn monitoring signals into budget, revocation, and audit policy.</p>
+              <p className="text-gray-400">Turn monitoring signals into budget, revocation, and Evidence Pack policy.</p>
             </Link>
           </div>
         </div>

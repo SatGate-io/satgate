@@ -272,21 +272,21 @@ const agentBToken = attenuate(agentAToken, {
                 <Zap className="text-yellow-400" size={20} />
               </div>
               <div>
-                <p className="text-white font-semibold text-lg">Charge</p>
-                <p className="text-gray-400">Monetize API access via paid-rail context. Agents pay per call using cryptographic payment proofs &mdash; no accounts, no invoices, no billing portals.</p>
+                <p className="text-white font-semibold text-lg">Prove</p>
+                <p className="text-gray-400">Preserve Evidence Pack receipts for allowed, denied, delegated, revoked, and paid-rail decisions. Paid rails such as L402 or x402 can move value; the governance layer proves why access was allowed.</p>
               </div>
             </div>
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            A critical distinction: <strong>Control and Charge are parallel use cases, not sequential stages.</strong> They both build on the Observe layer, but they serve different audiences:
+            A critical distinction: <strong>paid rails are context, not the product center.</strong> Enterprises need request-path authority before execution and Evidence Pack proof after the decision, whether the call is internal or crosses a paid rail.
           </p>
           <ul className="text-gray-300 space-y-2">
-            <li><strong>Observe → Control</strong> is the enterprise path. You&rsquo;re running agents internally and need to govern their spending. Budget enforcement, cost attribution, delegation hierarchies.</li>
-            <li><strong>Observe → Charge</strong> is the API monetization path. You&rsquo;re exposing APIs or MCP tools to external agents and want to get paid per call. L402 micropayments, usage-based billing, no signup required.</li>
+            <li><strong>Observe → Control</strong> is the enterprise path: identify the agent, bind budget and scope, and block over-budget work before it executes.</li>
+            <li><strong>Observe → Prove</strong> is the accountability path: preserve receipts for policy decisions, spend, delegation, denials, revocation, and paid-rail context.</li>
           </ul>
           <p className="text-gray-300 leading-relaxed">
-            Most organizations will start with Observe (because you need visibility before you can set sensible limits), then branch into Control, Charge, or both depending on whether they&rsquo;re consuming or selling API access.
+            Most organizations will start with Observe, then move high-risk routes into Control and export Evidence Packs when security, finance, or compliance asks what happened.
           </p>
 
           {/* --- Why Now --- */}

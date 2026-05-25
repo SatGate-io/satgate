@@ -75,7 +75,7 @@ export default function GovernPage() {
             </span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            SatGate is the Policy-to-Proof governance layer for enterprise agents: scope authority before work starts, enforce request-path policy, and preserve Evidence Packs after every allowed, denied, delegated, or revoked action.
+            SatGate governs AI agents with authority before execution, Observe/Control/Prove controls, MCP governance, paid-rail context, and Evidence Pack receipts for every allowed, denied, delegated, or revoked action.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/policy-to-proof" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center justify-center gap-2">
@@ -137,7 +137,7 @@ export default function GovernPage() {
           <div className="text-center mt-8">
             <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-gray-900 border border-gray-800 rounded-full text-sm">
               <Key size={16} className="text-purple-400" />
-              <span className="text-gray-400">Same <span className="text-white font-semibold">macaroon capability</span> — same authority chain — one evidence trail</span>
+              <span className="text-gray-400">Same <span className="text-white font-semibold">macaroon capability</span> — same authority chain — one Evidence Pack</span>
             </div>
           </div>
         </div>
@@ -148,7 +148,7 @@ export default function GovernPage() {
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">Built for enterprise control owners</h2>
           <p className="text-gray-500 text-center mb-4">Security. Finance. Platform.</p>
-          <p className="text-xs text-gray-600 text-center mb-12">Scoped authority, enforceable limits, and audit-ready evidence for autonomous agent work.</p>
+          <p className="text-xs text-gray-600 text-center mb-12">Scoped authority, enforceable limits, and Evidence Pack proof for autonomous agent work.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* CFO — Margins (Observe) */}
@@ -173,7 +173,7 @@ export default function GovernPage() {
                 <p className="text-xs text-gray-400">Attribute spend to agent, token, route, tool, and policy before finance has to reconstruct it</p>
               </div>
               <div className="mt-4">
-                <Link href="/policy-to-proof" className="text-xs text-cyan-400 hover:text-cyan-300 transition">See the evidence pack →</Link>
+                <Link href="/policy-to-proof" className="text-xs text-cyan-400 hover:text-cyan-300 transition">See the Evidence Pack →</Link>
               </div>
             </div>
 
@@ -236,7 +236,7 @@ export default function GovernPage() {
       <section id="observe" className="py-20 px-6 border-t border-gray-800 bg-gradient-to-b from-gray-900/30 to-black">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">Govern, enforce, prove.</h2>
-          <p className="text-gray-500 text-center mb-12">Start with visibility, move enforcement into the request path, then export the evidence when security, finance, or audit asks what happened.</p>
+          <p className="text-gray-500 text-center mb-12">Start with visibility, move enforcement into the request path, then export the Evidence Pack when security, finance, or compliance asks what happened.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Observe */}
@@ -292,7 +292,7 @@ export default function GovernPage() {
                 <li className="text-yellow-400">✓ Evidence Pack exports</li>
                 <li className="text-yellow-400">✓ Signed denial and revocation trail</li>
                 <li className="text-yellow-400">✓ x402/L402/API-key billing context</li>
-                <li className="text-yellow-400">✓ Audit-ready authority timeline</li>
+                <li className="text-yellow-400">✓ Evidence Pack authority timeline</li>
               </ul>
             </div>
           </div>
@@ -473,7 +473,7 @@ export default function GovernPage() {
                 icon: <Shield size={24} className="text-red-400" />,
               },
               {
-                title: 'Audit Evidence Export',
+                title: 'Evidence Pack Export',
                 description: 'Export mint receipts, delegation chains, spend ledger entries, denial reasons, and revocation proof in one Evidence Pack.',
                 gradient: 'from-cyan-600 to-blue-600',
                 icon: <FileSearch size={24} className="text-cyan-400" />,
@@ -531,7 +531,7 @@ export default function GovernPage() {
               {[
                 { name: 'Finance Parent Agent', scope: 'invoice:*', budget: '$10k/mo', color: 'cyan' },
                 { name: 'Approval Agent', scope: 'payment:approve', budget: '$5k/mo', color: 'green' },
-                { name: 'Audit Export Agent', scope: 'evidence:export', budget: 'read-only', color: 'yellow' },
+                { name: 'Evidence Pack Export Agent', scope: 'evidence:export', budget: 'read-only', color: 'yellow' },
               ].map((dept) => (
                 <div key={dept.name} className={`p-4 rounded-xl bg-gray-900 border border-${dept.color}-800/30 text-center`}>
                   <div className="flex items-center justify-center gap-2 mb-1">
@@ -652,7 +652,7 @@ export default function GovernPage() {
                 <li>• Delegation happens outside the control plane</li>
                 <li>• Spend and access are reconstructed after the fact</li>
                 <li>• Revocation requires rotating shared secrets</li>
-                <li className="text-red-400 font-medium">• Audit depends on screenshots and log joins</li>
+                <li className="text-red-400 font-medium">• Proof depends on screenshots and log joins</li>
               </ul>
             </div>
             <div className="p-6 rounded-xl bg-green-950/20 border border-green-900/30">
@@ -798,13 +798,13 @@ export SATGATE_TOKEN=$TOKEN
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Governance rollout kit</p>
           <h2 className="mb-4 text-3xl font-bold text-white">Turn enterprise governance into request-path controls</h2>
           <p className="mb-8 max-w-3xl text-gray-400 leading-relaxed">
-            High-level AI governance only matters when it becomes enforceable policy: identity, budgets, scoped credentials, MCP tool limits, audit, revocation, and evidence before agents act.
+            High-level AI governance only matters when it becomes enforceable policy: identity, budgets, scoped credentials, MCP tool limits, revocation, and Evidence Pack proof before agents act.
           </p>
           <div className="grid gap-4 md:grid-cols-2">
             {[
               ['/agent-api-key-risk-assessment', 'Agent API key risk assessment', 'Find static-key blast radius before autonomous agents inherit unlimited API access.'],
-              ['/economic-firewall-readiness-grader', 'Agent governance readiness grader', 'Score identity, budgets, MCP governance, revocation, delegation, audit, routing, and rail-aware readiness.'],
-              ['/agent-spend-policy-template', 'Agent spend policy template', 'Generate YAML/JSON policy for per-agent budgets, MCP caps, delegation, revocation, and audit.'],
+              ['/economic-firewall-readiness-grader', 'Agent governance readiness grader', 'Score identity, budgets, MCP governance, revocation, delegation, Evidence Pack proof, routing, and rail-aware readiness.'],
+              ['/agent-spend-policy-template', 'Agent spend policy template', 'Generate YAML/JSON policy for per-agent budgets, MCP caps, delegation, revocation, and Evidence Pack fields.'],
               ['/mcp-cost-control', 'MCP cost control', 'Treat MCP tool calls as governed events with per-tool prices, caps, denial reasons, and evidence.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black/50 p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
@@ -826,7 +826,7 @@ export SATGATE_TOKEN=$TOKEN
               ['What is Policy-to-Proof governance for AI agents?', 'Policy-to-Proof governance sits in the request path, applies scopes, budgets, delegation rules, and revocation before an agent reaches an upstream API, model, or MCP tool, then preserves Evidence Packs so the decision can be verified later.'],
               ['How should enterprises govern MCP tool usage?', 'Enterprises should govern MCP tools with per-tool budgets, scoped capability tokens, task and tenant attribution, Evidence Packs, revocation, and hard request-path policy decisions. Rate limits and dashboards are useful, but they do not replace enforcement before tool calls execute.'],
               ['What is the difference between AI governance and AI agent governance?', 'AI governance usually covers model risk, data policy, compliance, and human review. AI agent governance adds request-path controls for autonomous actions: scopes, budgets, delegated authority, revocation, denial reasons, spend attribution, and proof before APIs or MCP tools execute.'],
-              ['Is SatGate tied to x402, L402, AgentCore Payments, or Pay.sh?', 'No. x402, L402, AgentCore Payments, Pay.sh, and related rails make it easier for agents to call paid services. SatGate is protocol-independent: it records the requesting agent, allowed action, policy basis, spend context, and evidence needed for audit, review, and control — payment or not.'],
+              ['Is SatGate tied to x402, L402, AgentCore Payments, or Pay.sh?', 'No. x402, L402, AgentCore Payments, Pay.sh, and related rails make it easier for agents to call paid services. SatGate is protocol-independent: it records the requesting agent, allowed action, policy basis, spend context, and Evidence Pack receipts needed for accountability and control — payment or not.'],
             ].map(([question, answer]) => (
               <div key={question} className="border-t border-gray-800 pt-6 first:border-t-0 first:pt-0">
                 <h3 className="mb-2 text-xl font-bold text-white">{question}</h3>
