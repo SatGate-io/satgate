@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-24T15:27:40.211423Z",
+  "generatedAt": "2026-05-25T14:23:18.276329Z",
   "items": [
     {
       "path": "/blog/ai-spend-governance",
@@ -268,8 +268,8 @@
       "exists": true,
       "title": "AI Agent Governance: Policy-to-Proof",
       "titleLength": 36,
-      "metaDescription": "AI agent governance from Policy-to-Proof: scope authority, enforce request-path policy, and export Evidence Pack receipts for every agent decision.",
-      "metaDescriptionLength": 147,
+      "metaDescription": "Govern AI agents with SatGate: authority before execution, Observe/Control/Prove, MCP governance, paid-rail context, and Evidence Packs.",
+      "metaDescriptionLength": 136,
       "canonical": "/govern",
       "h1": [
         "Govern what agents can do. Prove every decision."
@@ -314,7 +314,7 @@
         "WebPage",
         "WebSite"
       ],
-      "wordCount": 1692,
+      "wordCount": 1690,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,

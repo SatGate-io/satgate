@@ -4,7 +4,7 @@ import GovernClient from "../components/GovernClient";
 export const metadata: Metadata = {
   title: "AI Agent Governance: Policy-to-Proof",
   description:
-    "AI agent governance from Policy-to-Proof: scope authority, enforce request-path policy, and export Evidence Pack receipts for every agent decision.",
+    "Govern AI agents with SatGate: authority before execution, Observe/Control/Prove, MCP governance, paid-rail context, and Evidence Packs.",
   alternates: {
     canonical: "https://satgate.io/govern",
   },
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "AI Agent Governance: Policy-to-Proof",
     description:
-      "Give enterprise agents bounded economic authority with request-path enforcement and Evidence Pack proof.",
+      "Govern enterprise agents with authority before execution, Observe/Control/Prove, MCP governance, paid-rail context, and Evidence Packs.",
     url: "https://satgate.io/govern",
     type: "website",
   },
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "AI Agent Governance: Policy-to-Proof",
     description:
-      "Delegate bounded authority, enforce policy, and export Policy-to-Proof evidence for enterprise AI agents with SatGate.",
+      "AI agent governance with authority before execution, Observe/Control/Prove, MCP governance, and Evidence Pack proof.",
   },
 };
 
@@ -40,7 +40,7 @@ const webPageSchema = {
   name: "AI Agent Governance Platform",
   description: metadata.description,
   url: "https://satgate.io/govern",
-  dateModified: "2026-05-18",
+  dateModified: "2026-05-24",
   isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
   about: [
     { "@type": "Thing", name: "AI agent governance" },
@@ -61,7 +61,7 @@ const faqSchema = {
       name: "What is AI agent governance?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "AI agent governance is the set of controls that determines which agents can call which APIs, tools, and models; how much they can spend; what authority they can delegate; and when access must be revoked. For autonomous agents, governance needs request-path enforcement, not just logs and dashboards.",
+        text: "AI agent governance is the set of controls that determines which agents can call which APIs, tools, and models; how much they can spend; what authority they can delegate; and when access must be revoked. For autonomous agents, governance needs request-path enforcement, not just logs, dashboards, and postmortems.",
       },
     },
     {
@@ -93,7 +93,7 @@ const faqSchema = {
       name: "Is SatGate tied to x402, L402, AgentCore Payments, or Pay.sh?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "No. x402, L402, AgentCore Payments, Pay.sh, and related rails make it easier for agents to call paid services. SatGate is protocol-independent: it records the requesting agent, allowed action, policy basis, spend context, and evidence needed for Evidence Pack review, accountability, and control — payment or not.",
+        text: "No. x402, L402, AgentCore Payments, Pay.sh, and related rails make it easier for agents to call paid services. SatGate is protocol-independent: it records the requesting agent, allowed action, policy basis, spend context, and Evidence Pack receipts needed for accountability and control — payment or not.",
       },
     },
   ],

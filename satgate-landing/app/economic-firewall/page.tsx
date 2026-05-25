@@ -188,16 +188,22 @@ export default function EconomicFirewallPage() {
             Economic Firewall for AI Agents
           </h1>
 
-          <p className="text-xl md:text-2xl text-gray-300 max-w-3xl leading-relaxed mb-10">
+          <p className="text-xl md:text-2xl text-gray-300 max-w-3xl leading-relaxed mb-6">
             An economic firewall controls what autonomous agents can access, how much they can spend, what they can delegate, and which Evidence Pack artifacts are captured before each API request reaches the upstream provider.
+          </p>
+          <p className="max-w-3xl rounded-2xl border border-purple-900/50 bg-purple-950/20 p-5 text-lg leading-relaxed text-purple-100 mb-10">
+            Think of this as the legacy SEO/category term. The current SatGate product narrative is Policy-to-Proof governance: authority before execution, Observe/Control/Prove, and Evidence Pack receipts after every agent action.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              Grade your readiness <ArrowRight size={18} />
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
+              See Policy-to-Proof <ArrowRight size={18} />
             </Link>
-            <Link href="/blog/what-is-an-economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
-              Read the deep-dive
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              Govern AI agents
+            </Link>
+            <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              Govern MCP tools
             </Link>
           </div>
         </div>

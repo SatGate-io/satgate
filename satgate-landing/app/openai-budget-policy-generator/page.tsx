@@ -172,20 +172,20 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(34,211,238,0.18),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(168,85,247,0.14),transparent_32%)]" />
         <div className="relative mx-auto max-w-6xl px-6 py-24">
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-950/30 px-4 py-2 text-sm text-cyan-200">
-            <ClipboardList size={16} /> OpenAI spend policy generator
+            <ClipboardList size={16} /> OpenAI authority policy generator
           </div>
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">
             OpenAI API Budget Limit Generator
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Generate a request-path budget policy for AI agents calling OpenAI: per-request caps, daily spend limits, session budgets, model routing, revocation, and Evidence Pack receipts.
+            Generate request-path authority policy for AI agents calling OpenAI: per-request caps, daily spend limits, session budgets, model routing, revocation, and Evidence Pack receipts.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/blog/how-to-add-budget-limits-to-openai-api-calls" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Read the OpenAI budget guide <ArrowRight size={18} />
             </Link>
-            <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
-              See agent cost control
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              See Policy-to-Proof governance
             </Link>
           </div>
         </div>
