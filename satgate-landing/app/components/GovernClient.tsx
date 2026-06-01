@@ -69,20 +69,20 @@ export default function GovernPage() {
             <Shield size={12} /> Enterprise agent governance
           </div>
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-            Govern what agents can do.
+            Enterprise AI agent governance,
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-              Prove every decision.
+              from Policy to Proof.
             </span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            SatGate governs AI agents with authority before execution, Observe/Control/Prove controls, MCP governance, paid-rail context, and Evidence Pack receipts for every allowed, denied, delegated, or revoked action.
+            SatGate puts governance in the request path: Observe agent activity, Control scopes, budgets, delegation, and revocation before execution, then Prove every decision with Evidence Packs across APIs, MCP tools, and paid rails.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/policy-to-proof" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center justify-center gap-2">
               See Policy-to-Proof <ArrowRight size={18} />
             </Link>
             <Link href="https://cloud.satgate.io/cloud/login" className="border border-gray-700 px-8 py-3 rounded-lg font-bold hover:border-gray-500 transition flex items-center justify-center gap-2">
-              Start Free <Eye size={18} />
+              Start in Observe mode <Eye size={18} />
             </Link>
           </div>
         </div>

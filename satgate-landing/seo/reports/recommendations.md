@@ -1,6 +1,6 @@
 # SatGate SEO Machine Report
 
-Generated: 2026-05-25T14:23:18.277119Z
+Generated: 2026-06-01T02:14:10.345926Z
 
 ## Ranked opportunities
 

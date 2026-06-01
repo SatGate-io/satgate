@@ -3,21 +3,21 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "LLM Cost Management: Control AI Spend Before It Happens",
-  description: "A practical guide to LLM cost management using authority before execution, budget controls, and Evidence Pack receipts for AI agents.",
+  title: "LLM Cost Management: Dashboards, Budgets, and Hard Controls",
+  description: "Compare LLM cost dashboards, monitoring, budgets, and request-path enforcement. Move from Observe to Control to Evidence Pack proof.",
   alternates: { canonical: 'https://satgate.io/blog/llm-cost-management' },
   keywords: ['LLM cost dashboard', 'LLM monitoring dashboard', 'LLM cost management', 'LLM cost control', 'LLM tracing dashboard', 'cost latency per request', 'AI budget enforcement', 'AI agent cost control', 'request-path budget enforcement'],
   openGraph: {
-    title: 'LLM Cost Management: Control AI Spend Before It Happens',
-    description: 'A practical guide to LLM cost management using authority before execution, budget controls, and Evidence Pack receipts for AI agents.',
+    title: 'LLM Cost Management: Dashboards, Budgets, and Hard Controls',
+    description: 'Compare LLM cost dashboards, monitoring, budgets, and request-path enforcement. Move from Observe to Control to Evidence Pack proof.',
     url: 'https://satgate.io/blog/llm-cost-management',
     type: 'article',
     publishedTime: '2026-03-17T00:00:00Z',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'LLM Cost Management: Control AI Spend Before It Happens',
-    description: 'LLM cost management with authority before execution, budget controls, and Evidence Pack receipts for agents.',
+    title: 'LLM Cost Management: Dashboards, Budgets, and Hard Controls',
+    description: 'LLM cost dashboards are only the first step. Add budgets, request-path controls, and Evidence Pack proof for agent spend.',
   },
 };
 
@@ -25,12 +25,12 @@ export default function LlmCostManagementBlogPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'LLM Cost Management: Control AI Spend Before It Happens',
+    headline: 'LLM Cost Management: Dashboards, Budgets, and Hard Controls',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-17',
-    dateModified: '2026-05-05',
+    dateModified: '2026-06-01',
     mainEntityOfPage: 'https://satgate.io/blog/llm-cost-management',
     about: [
       { '@type': 'Thing', name: 'LLM cost management' },
@@ -104,18 +104,18 @@ export default function LlmCostManagementBlogPage() {
             <span className="px-2 py-1 rounded-full bg-yellow-900/30 border border-yellow-500/30 text-yellow-300 text-xs font-mono">Policy-to-Proof</span>
           </div>
           
-          <h1 className="text-4xl font-bold mb-4">LLM Cost Management: Real-Time Budget Enforcement for AI Agents</h1>
+          <h1 className="text-4xl font-bold mb-4">LLM Cost Management Needs More Than Dashboards</h1>
           <div className="mb-6 rounded-2xl border border-yellow-900/60 bg-yellow-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-yellow-300">Short answer</p>
-            <p className="text-gray-300">LLM cost management is not just dashboards and alerts. For autonomous agents, it needs Observe, Control, Prove: per-agent budgets, authority before execution, model/tool prices, attribution, hard blocks, and Evidence Pack receipts for every important decision.</p>
+            <p className="text-gray-300">Dashboards explain token spend after the fact. Real LLM cost management connects every model, tool, agent, and workflow to a budget decision before the next request runs, then Proves the decision with an Evidence Pack.</p>
           </div>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row">
-            <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">See the LLM cost dashboard pattern</Link>
-            <Link href="/govern" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-yellow-500">Turn visibility into Policy-to-Proof control</Link>
+            <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Use the LLM cost dashboard checklist</Link>
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-yellow-500">Turn monitoring into Policy-to-Proof controls</Link>
           </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
-            Dashboards tell you what you spent. Enforcement controls what you spend. Here's why the difference matters more than ever.
+            Dashboards explain token spend after the fact. Real LLM cost management sets budgets before the next model, tool, or agent request runs.
           </p>
           
           <div className="flex items-center gap-4 text-sm text-gray-500">
