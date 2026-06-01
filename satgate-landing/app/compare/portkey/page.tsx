@@ -26,7 +26,7 @@ export const metadata = {
 };
 
 const rows: Array<[string, string, string]> = [
-  ['Primary job', 'Economic Firewall for AI agents', 'Production GenAI stack / AI gateway / observability / guardrails'],
+  ['Primary job', 'Policy-to-Proof governance for enterprise agents', 'Production GenAI stack / AI gateway / observability / guardrails'],
   ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped access, audit, paid-rail governance', 'AI gateway, observability, guardrails, prompt management, governance, MCP access centralization'],
   ['Request-path hard budget enforcement', 'Yes', 'Partial or adjacent, depending on gateway limits and usage policy'],
   ['MCP tool budget enforcement', 'Yes', 'Not the primary economic-control focus'],
@@ -42,7 +42,7 @@ const satgateWins = [
   { icon: ShieldCheck, title: 'Economic firewall in the request path', body: 'SatGate decides whether an agent should access, spend, route, delegate, or pay before upstream APIs, MCP tools, and model calls execute.' },
   { icon: Gauge, title: 'Hard budgets for autonomous workflows', body: 'Control spend by tenant, agent, workflow, delegated sub-agent, route, model, tool, session, day, and request.' },
   { icon: KeyRound, title: 'Scoped, revocable agent authority', body: 'Issue expiring capabilities constrained by route, tool, budget, call count, expiry, and delegation rules instead of broad static keys.' },
-  { icon: Zap, title: 'Charge paid agents', body: 'Use paid-rail context when external agents should pay for APIs, datasets, tools, or premium capabilities at request time.' },
+  { icon: Zap, title: 'Govern paid-rail access', body: 'Govern paid-rail context before external agents access APIs, datasets, tools, or premium capabilities at request time.' },
 ];
 
 const competitorWins: Array<{ title: string; body: string }> = [
@@ -190,7 +190,7 @@ export default function ComparePortkeyPage() {
           <h2 className="mb-4 text-3xl font-bold text-white">Gateway features are useful. Economic governance is different.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate helps platform, finance, and security teams control what autonomous agents can spend, access, delegate, and monetize before the next request leaves the building.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Learn economic firewalls <ArrowRight size={18} /></Link>
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">See Policy-to-Proof <ArrowRight size={18} /></Link>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">See agent cost control</Link>
           </div>
         </section>

@@ -2,49 +2,49 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Check, DollarSign, Gauge, KeyRound, Minus, ShieldCheck, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate vs Kong AI Gateway - AI Gateway vs Economic Firewall',
+  title: 'SatGate vs Kong AI Gateway - AI Gateway vs Policy-to-Proof',
   description: 'Compare SatGate and Kong AI Gateway. Kong is API/AI gateway infrastructure; SatGate governs agent spend, MCP tools, scoped credentials, and paid-rail context.',
   alternates: { canonical: 'https://satgate.io/compare/kong-ai-gateway' },
   keywords: [
     'SatGate vs Kong AI Gateway',
     'Kong AI Gateway alternative',
-    'AI gateway vs economic firewall',
+    'AI gateway vs Policy-to-Proof governance',
     'Kong AI Gateway comparison',
     'agent API spend control',
     'SatGate comparison',
-    'economic firewall',
+    'Policy-to-Proof governance',
     'AI agent cost control',
     'MCP budget enforcement',
   ],
   openGraph: {
-    title: 'SatGate vs Kong AI Gateway - AI Gateway vs Economic Firewall',
+    title: 'SatGate vs Kong AI Gateway - AI Gateway vs Policy-to-Proof',
     description: 'Compare SatGate and Kong AI Gateway for gateway infrastructure, agent economics, MCP tool controls, scoped credentials, and paid-rail context.',
     url: 'https://satgate.io/compare/kong-ai-gateway',
     type: 'article',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SatGate vs Kong AI Gateway - Gateway vs Economic Firewall',
+    title: 'SatGate vs Kong AI Gateway - Gateway vs Policy-to-Proof',
     description: 'Kong runs API gateway infrastructure. SatGate enforces agent budgets, MCP tool costs, scoped credentials, and paid-rail context.',
   },
 };
 
 const rows: Array<[string, string, string]> = [
-  ['Primary job', 'Economic Firewall for AI agents', 'API gateway, AI gateway, service connectivity, plugins, traffic policy, API platform operations'],
-  ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped credentials, revocation, audit, and paid-rail context', 'API gateway, AI gateway, service connectivity, plugins, traffic policy, API platform operations'],
+  ['Primary job', 'Policy-to-Proof governance for enterprise agents', 'API gateway, AI gateway, service connectivity, plugins, traffic policy, API platform operations'],
+  ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped credentials, revocation, Evidence Packs, and paid-rail context', 'API gateway, AI gateway, service connectivity, plugins, traffic policy, API platform operations'],
   ['Request-path hard budget enforcement', 'Yes: before upstream API, model, or MCP tool access', 'Partial / depends on gateway policy and traffic type'],
   ['MCP tool budget enforcement', 'Yes: per-tool budgets, cost attribution, and deny decisions', 'Not the primary category focus'],
   ['Scoped revocable agent capabilities', 'Yes: route, tool, call, budget, expiry, delegation, and revocation caveats', 'Typically API keys, policies, tokens, or platform auth primitives'],
   ['Runaway agent spend benchmark/data', 'Yes: benchmark page plus JSON/CSV dataset', 'No direct equivalent'],
-  ['L402 paid-agent API payments', 'Yes: Charge uses paid-rail context payment before access', 'No native SatGate-style paid-rail governance focus'],
+  ['L402 paid-agent API payments', 'Yes: governs paid-rail context before access and preserves Evidence Pack proof', 'No native SatGate-style paid-rail governance focus'],
   ['Broad API/AI platform management', 'Focused on economic governance layer', 'Yes / stronger fit'],
 ];
 
 const satgateWins = [
-  { icon: ShieldCheck, title: 'Economic firewall for agents', body: 'SatGate decides whether an autonomous agent can spend, access, delegate, route, revoke, or pay before the next request executes.' },
+  { icon: ShieldCheck, title: 'Policy-to-Proof for agents', body: 'SatGate decides whether an autonomous agent can spend, access, delegate, route, revoke, or pay before the next request executes.' },
   { icon: Gauge, title: 'Budgets beyond LLM tokens', body: 'Enforce cost controls across APIs, MCP tools, models, routes, workflows, tenants, agents, and delegated sub-agents.' },
   { icon: KeyRound, title: 'Scoped, revocable authority', body: 'Replace broad static keys with expiring capabilities constrained by route, tool, budget, calls, expiry, and delegation.' },
-  { icon: Zap, title: 'Charge paid agents', body: 'Use paid-rail context when external agents should pay for APIs, tools, datasets, or premium capabilities at request time.' },
+  { icon: Zap, title: 'Govern paid-rail access', body: 'Govern paid-rail context before external agents access APIs, tools, datasets, or premium capabilities at request time.' },
 ];
 
 const competitorWins = [
@@ -56,7 +56,7 @@ export default function ComparePage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'SatGate vs Kong AI Gateway - AI Gateway vs Economic Firewall',
+    headline: 'SatGate vs Kong AI Gateway - AI Gateway vs Policy-to-Proof',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
@@ -69,7 +69,7 @@ export default function ComparePage() {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
-      { '@type': 'Question', name: 'Is SatGate a Kong AI Gateway replacement?', acceptedAnswer: { '@type': 'Answer', text: 'Not directly. Kong AI Gateway is the AI-facing extension of a mature API gateway platform. SatGate is an economic firewall for AI agents, API spend, MCP tools, scoped capabilities, revocation, audit, and paid-rail context.' } },
+      { '@type': 'Question', name: 'Is SatGate a Kong AI Gateway replacement?', acceptedAnswer: { '@type': 'Answer', text: 'Not directly. Kong AI Gateway is the AI-facing extension of a mature API gateway platform. SatGate is an Policy-to-Proof governance for AI agents, API spend, MCP tools, scoped capabilities, revocation, Evidence Packs, and paid-rail context.' } },
       { '@type': 'Question', name: 'Can SatGate and Kong AI Gateway work together?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics before upstream access.' } },
       { '@type': 'Question', name: 'When should I choose SatGate?', acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when the core problem is autonomous agent economic governance: hard budgets, MCP tool spend, revocable credentials, delegated authority, Evidence Packs, and paid-agent payment.' } },
       { '@type': 'Question', name: 'When should I choose Kong AI Gateway?', acceptedAnswer: { '@type': 'Answer', text: 'Choose Kong when the primary need is a broad API gateway/API management platform with AI traffic support.' } },
@@ -86,7 +86,7 @@ export default function ComparePage() {
         <div className="mb-12 max-w-4xl">
           <div className="mb-6 inline-flex rounded-full border border-cyan-500/30 bg-cyan-950/25 px-4 py-2 text-sm text-cyan-200">Comparison</div>
           <h1 className="mb-5 text-5xl font-extrabold tracking-tight md:text-7xl">SatGate vs Kong AI Gateway</h1>
-          <p className="text-xl leading-relaxed text-gray-300 md:text-2xl">Kong AI Gateway is the AI-facing extension of a mature API gateway platform. SatGate is different: it is the request-path economic firewall for autonomous agents, API spend, MCP tools, scoped credentials, audit, and L402 paid-agent payments.</p>
+          <p className="text-xl leading-relaxed text-gray-300 md:text-2xl">Kong AI Gateway is the AI-facing extension of a mature API gateway platform. SatGate is different: it is the request-path Policy-to-Proof governance layer for autonomous agents, API spend, MCP tools, scoped credentials, Evidence Packs, and paid-rail context.</p>
         </div>
 
         <section className="mb-14 overflow-hidden rounded-2xl border border-gray-800">
@@ -105,7 +105,7 @@ export default function ComparePage() {
           <h2 className="mb-6 text-3xl font-bold text-white">SatGate vs Kong AI Gateway FAQ</h2>
           <div className="grid gap-5 md:grid-cols-2">
             {[
-              ['Is SatGate a Kong AI Gateway replacement?', 'Not directly. Kong AI Gateway is the AI-facing extension of a mature API gateway platform. SatGate is an economic firewall for AI agents, API spend, MCP tools, scoped capabilities, revocation, audit, and paid-rail context.'],
+              ['Is SatGate a Kong AI Gateway replacement?', 'Not directly. Kong AI Gateway is the AI-facing extension of a mature API gateway platform. SatGate is an Policy-to-Proof governance for AI agents, API spend, MCP tools, scoped capabilities, revocation, Evidence Packs, and paid-rail context.'],
               ['Can SatGate and Kong AI Gateway work together?', 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics before upstream access.'],
               ['When should I choose SatGate?', 'Choose SatGate when the core problem is autonomous agent economic governance: hard budgets, MCP tool spend, revocable credentials, delegated authority, Evidence Packs, and paid-agent payment.'],
               ['When should I choose Kong AI Gateway?', 'Choose Kong when the primary need is a broad API gateway/API management platform with AI traffic support.'],
@@ -122,7 +122,7 @@ export default function ComparePage() {
           <h2 className="mb-4 text-3xl font-bold text-white">Use the right layer.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">Gateways, API management, and observability tools are useful. They do not automatically solve agent economics. SatGate adds the pre-request decision layer: should this agent spend, access, delegate, revoke, route, or pay right now?</p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Economic firewall <ArrowRight size={18} /></Link>
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Policy-to-Proof <ArrowRight size={18} /></Link>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">AI agent cost control</Link>
           </div>
         </section>

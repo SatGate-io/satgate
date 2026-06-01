@@ -125,8 +125,8 @@ export default function LlmCostMonitoringPage() {
             <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               See dashboard checklist <ArrowRight size={18} />
             </Link>
-            <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
-              Learn economic firewalls
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
+              See AI agent governance
             </Link>
           </div>
         </div>

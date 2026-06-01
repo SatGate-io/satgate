@@ -129,10 +129,10 @@ const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: 'How does Control differ from Charge?',
+      name: 'How does Control differ from Prove?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Control enforces access, budget, scope, and revocation policy for agent activity. Charge uses paid-rail context when external agents or paid agents should pay before API access is unlocked.',
+        text: 'Control enforces access, budget, scope, and revocation policy for agent activity. Prove preserves Evidence Pack receipts for paid-rail context and other agent decisions before API access is unlocked.',
       },
     },
   ],
@@ -1784,7 +1784,7 @@ export default function ProtectDemoPage() {
             {[
               ['What does SatGate Control protect?', 'SatGate Control protects agent API and MCP tool calls by enforcing scoped capability tokens, budgets, delegation limits, revocation, and audit policy before requests reach upstream services.'],
               ['Why use revocable capability tokens for agents?', 'Revocable capability tokens give agents narrow, expiring authority that can be delegated safely and killed instantly without rotating global API keys or service-account credentials.'],
-              ['How does Control differ from Charge?', 'Control enforces access, budget, scope, and revocation policy for agent activity. Charge uses paid-rail context when external agents or paid agents should pay before API access is unlocked.'],
+              ['How does Control differ from Prove?', 'Control enforces access, budget, scope, and revocation policy for agent activity. Prove preserves Evidence Pack receipts for paid-rail context and other agent decisions before API access is unlocked.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
                 <h3 className="mb-2 font-bold text-white">{question}</h3>

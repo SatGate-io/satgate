@@ -44,7 +44,7 @@ RECOMMENDED_META = {
    'description': 'Govern AI agents with SatGate: authority before execution, Observe/Control/Prove, MCP governance, paid-rail context, and Evidence Packs.'},
  '/blog/api-gateway-for-ai-agents': {
    'title': 'API Gateway for AI Agents: Control Tool and API Access',
-   'description': 'Learn how an API gateway for AI agents can enforce access, budgets, observability, and monetization across APIs and MCP tools.'},
+   'description': 'Learn how an API gateway for AI agents can enforce authority before execution, budgets, MCP governance, and Evidence Packs across APIs and paid rails.'},
  '/mcp-gateway': {
    'title': 'MCP Gateway for Agent Governance and Evidence Packs',
    'description': 'Use SatGate as an MCP gateway to check authority before tool execution, enforce policy, and export Evidence Packs.'},

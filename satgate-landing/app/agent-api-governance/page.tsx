@@ -388,7 +388,7 @@ evidence:
               ['/policy-to-proof', 'Policy-to-Proof', 'See how agent API decisions become Evidence Pack proof.'],
               ['/blog/macaroon-tokens-vs-api-keys', 'Macaroons vs API keys', 'Why attenuated capabilities beat static API keys for agents.'],
               ['/agent-control-plane', 'Agent control plane', 'Govern enterprise agent authority, delegation lineage, spend, audit, and revocation.'],
-              ['/economic-firewall', 'Economic firewall', 'The request-path control layer for agent access, spend, and proof.'],
+              ['/evidence-pack-demo', 'Evidence Pack demo', 'Show how allow, deny, budget, delegation, and revocation decisions become receipts.'],
               ['/mcp-governance', 'MCP governance', 'Apply authority, budgets, revocation, and Evidence Pack receipts to agent tool calls.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">

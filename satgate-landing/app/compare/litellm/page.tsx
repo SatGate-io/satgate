@@ -29,7 +29,7 @@ export const metadata = {
 };
 
 const rows: Array<[string, string, string]> = [
-  ['Primary job', 'Economic Firewall for AI agents', 'LLM gateway / OpenAI-compatible proxy'],
+  ['Primary job', 'Policy-to-Proof governance for enterprise agents', 'LLM gateway / OpenAI-compatible proxy'],
   ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped access, paid-rail governance', 'Model access, provider abstraction, fallbacks, routing, developer LLM access'],
   ['Request-path hard budget enforcement', 'Yes', 'Partial: budgets and rate limits for LLM gateway usage'],
   ['MCP tool budget enforcement', 'Yes', 'No native MCP economic firewall focus'],
@@ -59,8 +59,8 @@ const satgateWins: Array<{ icon: typeof ShieldCheck; title: string; body: string
   },
   {
     icon: Zap,
-    title: 'Charge paid agents',
-    body: 'Use paid-rail context when external agents should pay for APIs, tools, datasets, or premium capabilities at request time.',
+    title: 'Govern paid-rail access',
+    body: 'Govern paid-rail context before external agents access APIs, tools, datasets, or premium capabilities at request time.',
   },
 ];
 
@@ -251,8 +251,8 @@ export default function CompareLiteLLMPage() {
             LiteLLM helps developers reach models. SatGate helps platform, finance, and security teams control what autonomous agents can spend, access, delegate, and monetize before the next request leaves the building.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-              Learn economic firewalls <ArrowRight size={18} />
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+              See Policy-to-Proof <ArrowRight size={18} />
             </Link>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               See agent cost control

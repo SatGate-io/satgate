@@ -112,8 +112,8 @@ export default function StripeLinkAgentsVsSatGatePage() {
             <Link href="/agent-payment-controls" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
               Build agent payment controls <ArrowRight size={18} />
             </Link>
-            <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
-              Learn the economic firewall
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              See AI agent governance
             </Link>
           </div>
         </div>

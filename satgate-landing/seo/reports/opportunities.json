@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-01T02:14:10.345024Z",
+  "generatedAt": "2026-06-01T13:45:29.180488Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -38,7 +38,7 @@
       "intent": "informational-commercial",
       "funnelStage": "problem-aware",
       "productAngle": "SatGate treats HTTP 402 and L402 as paid-rail context: budget authority before paid access and Evidence Pack proof after the request.",
-      "cta": "See paid-rail governance",
+      "cta": "Govern paid agent access",
       "status": "existing",
       "clicks": 1,
       "impressions": 831,

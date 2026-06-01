@@ -3,11 +3,11 @@ import { ArrowLeft, Calendar, Clock, Eye, Shield, Zap, CheckCircle, ArrowRight }
 
 export const metadata = {
   title: 'Enterprise Adoption Playbook: Observe, Control, Prove',
-  description: 'Observe, Control, Prove is an enterprise change management strategy. Learn how to adopt economic governance for AI agents incrementally, building trust at each stage.',
+  description: 'Observe, Control, Prove is the enterprise rollout path for Policy-to-Proof governance: start with visibility, add controls, then preserve Evidence Pack proof.',
   openGraph: {
     title: 'The Enterprise Adoption Playbook: Observe, Control, Prove',
-    description: 'A three-stage framework for adopting economic governance for AI agents — without breaking anything along the way.',
-    url: 'https://satgate.io/blog/the-enterprise-adoption-playbook-observe-control-charge',
+    description: 'A three-stage framework for adopting Policy-to-Proof governance for AI agents — without breaking anything along the way.',
+    url: 'https://satgate.io/blog/the-enterprise-adoption-playbook-observe-control-prove',
     type: 'article',
 
     publishedTime: '2026-03-20T00:00:00Z',
@@ -15,10 +15,10 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'The Enterprise Adoption Playbook: Observe, Control, Prove',
-    description: 'A three-stage framework for adopting economic governance for AI agents — without breaking anything along the way.',
+    description: 'A three-stage framework for adopting Policy-to-Proof governance for AI agents — without breaking anything along the way.',
   },
   keywords: ['AI agent governance', 'enterprise AI adoption', 'economic firewall', 'AI cost control', 'AI agent budget enforcement', 'L402', 'macaroons', 'MCP governance', 'agent economy', 'AI change management'],
-  alternates: { canonical: 'https://satgate.io/blog/the-enterprise-adoption-playbook-observe-control-charge' },
+  alternates: { canonical: 'https://satgate.io/blog/the-enterprise-adoption-playbook-observe-control-prove' },
 };
 
 export default function EnterpriseAdoptionPlaybookPage() {
@@ -26,17 +26,17 @@ export default function EnterpriseAdoptionPlaybookPage() {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
     headline: 'The Enterprise Adoption Playbook: Observe, Control, Prove',
-    description: 'A three-stage framework for adopting economic governance for AI agents: observe spend, control internal agent budgets, then charge external paid agents.',
-    url: 'https://satgate.io/blog/the-enterprise-adoption-playbook-observe-control-charge',
+    description: 'A three-stage framework for adopting Policy-to-Proof governance for AI agents: observe agent activity, control authority before execution, then prove every decision with Evidence Packs.',
+    url: 'https://satgate.io/blog/the-enterprise-adoption-playbook-observe-control-prove',
     datePublished: '2026-03-20',
-    dateModified: '2026-05-02',
+    dateModified: '2026-06-01',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
-      { '@type': 'Thing', name: 'economic governance for AI agents' },
+      { '@type': 'Thing', name: 'Policy-to-Proof governance for AI agents' },
       { '@type': 'Thing', name: 'Observe Control Prove' },
       { '@type': 'Thing', name: 'AI agent budget enforcement' },
-      { '@type': 'Thing', name: 'paid-agent API monetization' },
+      { '@type': 'Thing', name: 'Policy-to-Proof governance' },
     ],
   };
 
@@ -49,7 +49,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
         name: 'What are Observe, Control, and Prove in AI agent governance?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Charge monetizes external agent access with paid-rail context.',
+          text: 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Prove preserves Evidence Pack receipts for allow, deny, budget, delegation, and paid-rail decisions.',
         },
       },
       {
@@ -62,7 +62,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
       },
       {
         '@type': 'Question',
-        name: 'Is Charge the same as internal budget enforcement?',
+        name: 'Is Prove the same as internal budget enforcement?',
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'No. Internal budget enforcement controls spend for agents you own. Paid-rail governance is the monetization path for external delegated agents consuming your APIs under policy.',
@@ -208,32 +208,32 @@ export default function EnterpriseAdoptionPlaybookPage() {
             This transforms governance from an IT oversight exercise into a hard business constraint. The budget isn&apos;t a guideline — it&apos;s a wall.
           </p>
 
-          {/* Stage 3: Charge */}
+          {/* Stage 3: Prove */}
           <div className="my-12 p-6 bg-gradient-to-r from-yellow-900/20 to-yellow-800/10 border border-yellow-500/20 rounded-xl">
             <div className="flex items-center gap-3 mb-4">
               <Zap className="text-yellow-400" size={28} />
-              <h2 className="text-2xl font-bold text-white m-0">Stage 3: Charge</h2>
-              <span className="px-3 py-1 rounded-full bg-yellow-900/40 border border-yellow-500/30 text-yellow-300 text-sm font-mono">L402 Mode</span>
+              <h2 className="text-2xl font-bold text-white m-0">Stage 3: Prove</h2>
+              <span className="px-3 py-1 rounded-full bg-yellow-900/40 border border-yellow-500/30 text-yellow-300 text-sm font-mono">Evidence Pack Mode</span>
             </div>
-            <p className="text-yellow-200 text-lg font-medium mb-0">Autonomous micropayments. Payment receipt is the auth token.</p>
+            <p className="text-yellow-200 text-lg font-medium mb-0">Every allow, deny, budget, delegation, and paid-rail decision leaves a receipt.</p>
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            L402 mode is a fundamentally different paradigm — and an important clarification: it&apos;s not necessarily sequential with Control. While Observe → Control is a linear progression for internal governance, Charge operates as a parallel path designed for a different problem: API monetization.
+            Prove is the stage where governance stops being a dashboard claim and becomes an artifact. SatGate preserves the policy basis, requesting agent, delegated scope, budget state, route, paid-rail context when present, and final decision as an Evidence Pack receipt that finance, security, and compliance can inspect later.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            In L402 mode, SatGate enables real-time, per-transaction settlement via the Lightning Network. External agents discover your API, negotiate the price, and pay — all in a single HTTP flow. No account creation. No API key provisioning. No billing cycles or invoice reconciliation. The payment receipt <em>is</em> the authentication token.
+            Paid rails such as L402 can still matter, but they are not the center of the framework. They are one context SatGate can govern before value moves. The product job is broader: prove why an autonomous agent was allowed, denied, downgraded, routed, or required to seek approval before execution.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            This unlocks pricing models that were previously impossible at scale:
+            This unlocks proof models that traditional API governance rarely captures:
           </p>
           <ul className="text-gray-300 space-y-2">
-            <li><strong>Pay-per-token:</strong> Charge downstream consumers based on actual LLM token consumption, not flat monthly tiers.</li>
-            <li><strong>Pay-per-call:</strong> Every API invocation carries its own economic settlement. No prepaid credits, no overages, no true-up at month-end.</li>
-            <li><strong>Dynamic pricing:</strong> Adjust prices based on demand, model costs, or priority tiers — in real time.</li>
+            <li><strong>Budget receipts:</strong> show which cap, tenant, workflow, or delegated token authorized the spend.</li>
+            <li><strong>Delegation receipts:</strong> preserve parent/child authority, caveats, expiration, and revocation state.</li>
+            <li><strong>Paid-rail receipts:</strong> record when payment context was checked before access without making payment the product center.</li>
           </ul>
           <p className="text-gray-300 leading-relaxed">
-            The implications for the agent economy are significant. When agents can autonomously discover, evaluate, and pay for services without human intervention, the friction of machine-to-machine commerce drops to near zero. Your API becomes accessible to any agent with a Lightning wallet — which, in the emerging ecosystem, is increasingly all of them.
+            The result is accountability that survives vendor dashboards and postmortem guesswork. You can answer not just what happened, but who had authority, which policy applied, and what proof was preserved when the agent acted.
           </p>
 
           {/* Strategic Benefits */}
@@ -249,7 +249,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
                 <CheckCircle className="text-green-400" size={18} />
                 <h4 className="font-bold text-white m-0">Incremental Trust Building</h4>
               </div>
-              <p className="text-gray-400 text-sm m-0">Each stage produces evidence that justifies the next. Observe proves the need for Control. Control demonstrates the maturity for Charge. You&apos;re not asking leadership to trust a theoretical model — you&apos;re showing them data from your own environment.</p>
+              <p className="text-gray-400 text-sm m-0">Each stage produces evidence that justifies the next. Observe proves the need for Control. Control produces the receipts that make Prove credible. You&apos;re not asking leadership to trust a theoretical model — you&apos;re showing them data and Evidence Packs from your own environment.</p>
             </div>
             <div className="p-4 bg-gray-900 border border-gray-800 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
@@ -270,7 +270,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
                 <CheckCircle className="text-green-400" size={18} />
                 <h4 className="font-bold text-white m-0">Future-Proofing for the Agent Economy</h4>
               </div>
-              <p className="text-gray-400 text-sm m-0">The organizations that figure out economic governance first will be the ones positioned to monetize their APIs in a world where the buyers are machines. L402 readiness isn&apos;t a nice-to-have — it&apos;s the on-ramp to the next generation of API commerce.</p>
+              <p className="text-gray-400 text-sm m-0">The organizations that figure out Policy-to-Proof governance first will be the ones positioned to let agents act with real autonomy. Paid rails can be added where useful, but the durable advantage is proof: every request has authority, policy, decision, and receipt context.</p>
             </div>
           </div>
 
@@ -296,19 +296,19 @@ export default function EnterpriseAdoptionPlaybookPage() {
             <div className="p-6 bg-gradient-to-b from-yellow-900/20 to-transparent border border-yellow-500/20 rounded-xl">
               <h3 className="text-lg font-bold text-yellow-300 mb-3">Their Agents (External)</h3>
               <div className="flex items-center gap-2 mb-4">
-                <span className="text-yellow-300 font-mono text-sm">Charge</span>
+                <span className="text-yellow-300 font-mono text-sm">Prove</span>
               </div>
               <p className="text-gray-400 text-sm">
-                For external agents consuming your APIs, the path is monetization. L402 turns your endpoints into pay-per-use services that any agent can discover and transact with — no onboarding, no contracts, no invoicing.
+                For external agents consuming your APIs, the path is governed proof. Paid rails such as L402 may handle value movement, but SatGate decides whether access is allowed and preserves the Evidence Pack that explains the decision.
               </p>
             </div>
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            The principle is straightforward: <strong>first, govern your own house. Then open the gates — on your terms.</strong>
+            The principle is straightforward: <strong>first, govern your own house. Then expand access — with proof.</strong>
           </p>
           <p className="text-gray-300 leading-relaxed">
-            Organizations that try to monetize externally before they&apos;ve governed internally are building on a shaky foundation. If you don&apos;t know what your own agents cost, you can&apos;t price your APIs accurately. If you haven&apos;t stress-tested your budget enforcement, you can&apos;t trust it to protect your margins when external traffic scales.
+            Organizations that expose agent-facing APIs before they can prove internal governance are building on a shaky foundation. If you don&apos;t know what your own agents cost, delegate, and touch, you can&apos;t safely govern external agents either. If you haven&apos;t stress-tested budget enforcement and Evidence Pack proof, you can&apos;t trust the same controls when external traffic scales.
           </p>
 
           {/* Getting Started */}
@@ -322,14 +322,14 @@ export default function EnterpriseAdoptionPlaybookPage() {
             <li><strong>Let it run for two weeks.</strong> Collect baseline data. Identify your top spenders, noisiest agents, and most expensive tool calls.</li>
             <li><strong>Present the data to stakeholders.</strong> You now have an evidence-based case for budget enforcement — with specific numbers, not hypotheticals.</li>
             <li><strong>Activate Fiat402 (Control) mode.</strong> Set budgets based on your observed baselines plus a reasonable margin. Monitor for the first week and adjust.</li>
-            <li><strong>Evaluate L402 (Charge) readiness.</strong> If you have APIs that external agents should pay for, the monetization layer is ready when you are.</li>
+            <li><strong>Activate Prove mode.</strong> Preserve Evidence Pack receipts for allow, deny, budget, delegation, revocation, and paid-rail decisions.</li>
           </ol>
 
           <p className="text-gray-300 leading-relaxed mt-6">
             No big bang. No analysis paralysis. No $47,000 surprises on a Monday morning.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            Just a clear path from visibility to control to revenue — at whatever pace your organization is ready for.
+            Just a clear path from visibility to control to proof — at whatever pace your organization is ready for.
           </p>
 
           <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
@@ -337,9 +337,9 @@ export default function EnterpriseAdoptionPlaybookPage() {
             <h2 className="mb-6 text-2xl font-bold text-white">Observe, Control, Prove adoption questions</h2>
             <div className="space-y-5">
               {[
-                ['What are Observe, Control, and Prove in AI agent governance?', 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Charge monetizes external agent access with paid-rail context.'],
+                ['What are Observe, Control, and Prove in AI agent governance?', 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Prove preserves Evidence Pack receipts for allow, deny, budget, delegation, and paid-rail decisions.'],
                 ['Why should enterprises start AI agent governance in Observe mode?', 'Observe mode gives teams real baseline data on agent spend, tool usage, retry loops, and cost outliers before hard caps are introduced, making later enforcement safer and easier to justify.'],
-                ['Is Charge the same as internal budget enforcement?', 'No. Internal budget enforcement controls spend for agents you own. Paid-rail governance is the monetization path for external delegated agents consuming your APIs under policy.'],
+                ['Is Prove the same as internal budget enforcement?', 'No. Internal budget enforcement controls spend for agents you own. Prove is the evidence layer that preserves receipts for budget, authority, delegation, revocation, and paid-rail decisions.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     "agent governance receipts",
     "MCP capability tokens",
     "AI agent SDK",
-    "Economic Firewall for AI agents",
+    "Agent Authority & Accountability Layer",
   ],
   alternates: {
     canonical: "https://satgate.io/build",
@@ -209,7 +209,7 @@ const jsonLd = {
       dateModified: "2026-05-12",
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
       about: [
-        { "@type": "Thing", name: "Economic Firewall for AI agents" },
+        { "@type": "Thing", name: "Agent Authority & Accountability Layer" },
         { "@type": "Thing", name: "agent capabilities" },
         { "@type": "Thing", name: "verifiable receipts" },
         { "@type": "Thing", name: "rail-neutral payment governance" },
@@ -250,7 +250,7 @@ export default function BuildPage() {
               Issue scoped capabilities, enforce max budgets before upstream access, and return verifiable receipts your principal can trust.
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
-              SatGate is the <strong className="font-semibold text-white">Economic Firewall for AI agents</strong>. This is the developer surface: <strong className="font-semibold text-white">Capabilities in. Receipts out. Rails abstracted.</strong>
+              SatGate is the <strong className="font-semibold text-white">Agent Authority &amp; Accountability Layer</strong>. This is the developer surface: <strong className="font-semibold text-white">Capabilities in. Receipts out. Rails abstracted.</strong>
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a

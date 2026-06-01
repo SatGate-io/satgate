@@ -269,8 +269,8 @@ export default function LlmCostDashboardPage() {
               <h3 className="mb-2 text-lg font-bold text-white">AI agent cost control →</h3>
               <p className="text-gray-400">Control model, API, and MCP spend before it happens.</p>
             </Link>
-            <Link href="/economic-firewall" className="rounded-2xl border border-gray-800 bg-black/70 p-6 transition hover:border-cyan-600">
-              <h3 className="mb-2 text-lg font-bold text-white">Economic firewall →</h3>
+            <Link href="/govern" className="rounded-2xl border border-gray-800 bg-black/70 p-6 transition hover:border-cyan-600">
+              <h3 className="mb-2 text-lg font-bold text-white">AI agent governance →</h3>
               <p className="text-gray-400">Move from observability to request-path economic governance.</p>
             </Link>
           </div>
