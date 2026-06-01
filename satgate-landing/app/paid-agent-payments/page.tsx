@@ -332,7 +332,7 @@ export default function RobotCustomerPaymentsPage() {
               ['/l402-agent-payments', 'L402 paid-rail governance', 'Govern Lightning payment proof before protected API access.'],
               ['/agent-capability-tokens', 'Agent capability tokens', 'Give agents scoped, budgeted, expiring access after proof.'],
               ['/revocable-agent-credentials', 'Revocable agent credentials', 'Revoke delegated access when policy, budget, or risk changes.'],
-              ['/economic-firewall', 'Economic Firewall', 'Bound delegated agent authority in one request path.'],
+              ['/govern', 'AI agent governance', 'Bound delegated agent authority before paid-rail execution.'],
               ['/mcp-budget-enforcement', 'MCP budget enforcement', 'Apply the same budget logic to paid tools and MCP servers.'],
               ['/ai-agent-cost-control', 'AI agent cost control', 'Stop agent overspend before upstream requests execute.'],
             ].map(([href, title, body]) => (
@@ -355,8 +355,8 @@ export default function RobotCustomerPaymentsPage() {
             <Link href="/monetize" className="inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-300 text-black px-6 py-3 font-bold hover:bg-yellow-200 transition">
               Monetize APIs with SatGate <ArrowRight size={18} />
             </Link>
-            <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
-              Learn the economic firewall
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              See AI agent governance
             </Link>
           </div>
         </div>

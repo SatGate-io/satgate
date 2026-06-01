@@ -114,7 +114,7 @@ export default function SatGateIntegrationPage() {
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">OpenClaw agents can run tools, spawn sub-agents, call MCP servers, route through models, and act across workflows. SatGate adds the Agent Authority & Accountability Layer underneath: Observe, Control, and Prove agent/API activity before upstream access.</p>
 
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               See Policy-to-Proof <ArrowRight size={18} />
             </Link>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">

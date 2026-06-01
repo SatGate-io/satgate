@@ -30,7 +30,7 @@
 - [ ] "API cost attribution by team and department"
 - [ ] "How to monetize your API with Lightning payments"
 - [ ] "Prevent AI agent runaway costs"
-- [ ] "AI agent audit trail compliance"
+- [ ] "AI agent Evidence Pack compliance"
 - [ ] "Compare API gateways for AI workloads"
 
 ### Thought Leadership
@@ -59,7 +59,7 @@
 - 2026-04-02: "L402 Protocol Explained"
 - 2026-04-02: "HTTP 402 Payment Required: The Dormant Status Code That Powers the Agent Economy" (also on dev.to)
 - 2026-04-03: "Zero Trust for AI Agents: Why Identity-Based Security Collapses When Machines Call the Shots" (also on dev.to)
-- 2026-04-09: "Cursor MCP Proxy Setup Guide: Add Budget Controls and Audit Trails to Your Tools"
+- 2026-04-09: "Cursor MCP Proxy Setup Guide: Add Budget Controls and Evidence Packs to Your Tools"
 
 ## dev.to Account
 - Handle: @mattdeangit

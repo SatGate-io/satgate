@@ -381,7 +381,7 @@ HTTP/1.1 200 OK
               ['/agent-capability-tokens', 'Agent capability tokens', 'Scope paid access with route, budget, expiry, delegation, and revocation caveats.'],
               ['/blog/l402-protocol-explained', 'L402 protocol explained', 'How HTTP 402, Lightning, and macaroons enable API payments.'],
               ['/l402-api-pricing-calculator', 'L402 API pricing calculator', 'Estimate per-request agent/API paid-access pricing.'],
-              ['/economic-firewall', 'Economic Firewall', 'Bound delegated agent authority in one request-path control plane.'],
+              ['/govern', 'AI agent governance', 'Bound delegated agent authority before paid-rail execution.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">
                 <h3 className="font-bold text-white mb-2">{title}</h3>

@@ -1,6 +1,6 @@
 # SatGate SEO Machine Report
 
-Generated: 2026-06-01T02:14:10.345926Z
+Generated: 2026-06-01T13:45:29.181518Z
 
 ## Ranked opportunities
 
@@ -140,7 +140,7 @@ Generated: 2026-06-01T02:14:10.345926Z
 
 ### /blog/api-gateway-for-ai-agents
 - Title: API Gateway for AI Agents: Control Tool and API Access
-- Meta: Learn how an API gateway for AI agents can enforce access, budgets, observability, and monetization across APIs and MCP tools.
+- Meta: Learn how an API gateway for AI agents can enforce authority before execution, budgets, MCP governance, and Evidence Packs across APIs and paid rails.
 - Content changes:
   - Add or tighten the above-the-fold direct-answer block for the primary query.
   - Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end.

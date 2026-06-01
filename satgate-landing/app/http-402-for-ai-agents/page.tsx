@@ -219,7 +219,7 @@ export default function Http402ForAiAgentsPage() {
             ['/govern', 'Govern AI agents', 'Govern paid agent actions before execution.'],
             ['/l402-agent-payments', 'L402 agent payments', 'Understand paid-rail context as one paid rail for governed agent/API access.'],
             ['/agent-payment-controls', 'Agent payment controls', 'Policy, budgets, approval, receipts, and payment rails for AI agents.'],
-            ['/economic-firewall', 'Economic firewall', 'Control agent access, spend, and paid-rail context before upstream API calls execute.'],
+            ['/policy-to-proof', 'Policy-to-Proof', 'Turn paid-rail context into governed authority decisions and Evidence Pack proof.'],
             ['/l402-api-pricing-calculator', 'L402 API pricing calculator', 'Estimate request-native pricing for agent/API paid-access scenarios.'],
           ].map(([href, title, body]) => (
             <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">

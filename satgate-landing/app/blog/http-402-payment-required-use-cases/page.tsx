@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "HTTP 402 Payment Required: Meaning, Use Cases, and AI Agents",
-  description: "HTTP 402 Payment Required explained: why it was reserved, how L402 works for paid APIs, and how agents need budget authority before paid access.",
+  title: "HTTP 402 Payment Required: API and Agent Use Cases",
+  description: "HTTP 402 and L402 are paid-rail context. SatGate governs authority before execution and preserves Evidence Packs.",
   alternates: { canonical: 'https://satgate.io/blog/http-402-payment-required-use-cases' },
   keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API'],
   openGraph: {
@@ -115,7 +115,7 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
             <p className="text-gray-300">HTTP 402 means access is available after payment. For AI agents, 402 and L402 are paid-rail context: authority, budget, and policy should be checked before value moves, with Evidence Pack proof after the request.</p>
           </div>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row">
-            <Link href="/partners/rails" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">See paid-rail governance</Link>
+            <Link href="/govern" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Govern paid agent access</Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">See Policy-to-Proof</Link>
           </div>
           

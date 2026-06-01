@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-01T02:14:10.345481Z",
+  "generatedAt": "2026-06-01T13:45:29.180936Z",
   "items": [
     {
       "path": "/blog/ai-spend-governance",
@@ -29,9 +29,8 @@
         "/blog",
         "/blog/ai-agent-spending-limits",
         "/blog/llm-cost-management",
-        "/blog/the-enterprise-adoption-playbook-observe-control-charge",
+        "/blog/the-enterprise-adoption-playbook-observe-control-prove",
         "/compare/langsmith-helicone-datadog",
-        "/economic-firewall",
         "/policy-to-proof",
         "/runaway-agent-cost-calculator"
       ],
@@ -43,7 +42,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1316,
+      "wordCount": 1315,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -161,10 +160,10 @@
     {
       "path": "/blog/http-402-payment-required-use-cases",
       "exists": true,
-      "title": "HTTP 402 Payment Required: Meaning, Use Cases, and AI Agents",
-      "titleLength": 60,
-      "metaDescription": "HTTP 402 Payment Required explained: why it was reserved, how L402 works for paid APIs, and how agents need budget authority before paid access.",
-      "metaDescriptionLength": 144,
+      "title": "HTTP 402 Payment Required: API and Agent Use Cases",
+      "titleLength": 50,
+      "metaDescription": "HTTP 402 and L402 are paid-rail context. SatGate governs authority before execution and preserves Evidence Packs.",
+      "metaDescriptionLength": 113,
       "canonical": "/blog/http-402-payment-required-use-cases",
       "h1": [
         "HTTP 402 Payment Required: Meaning, Reserved Use, and AI Agent Payments"
@@ -205,7 +204,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2655,
+      "wordCount": 2647,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -331,8 +330,8 @@
       "exists": true,
       "title": "API Gateway for AI Agents: Control Tool and API Access",
       "titleLength": 54,
-      "metaDescription": "Learn how AI agent gateways enforce authority before execution with Observe/Control/Prove, budgets, MCP governance, and Evidence Packs.",
-      "metaDescriptionLength": 135,
+      "metaDescription": "Learn how AI agent gateways enforce authority before execution with Observe/Control/Prove, budgets, MCP governance, Evidence Packs, and paid rails.",
+      "metaDescriptionLength": 147,
       "canonical": "/blog/api-gateway-for-ai-agents",
       "h1": [
         "API Gateway for AI Agents: Budgets, MCP Tools, and Economic Control"
@@ -365,7 +364,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1376,
+      "wordCount": 1378,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -480,6 +479,7 @@
         "Where SatGate evaluates agent authority",
         "What to compare for agent governance",
         "Why this matters in production",
+        "The hard question is not routing. It is who had authority before execution.",
         "FAQ",
         "Dashboards explain what happened. SatGate controls what agents are allowed to do."
       ],
@@ -499,7 +499,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 440,
+      "wordCount": 627,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -524,6 +524,7 @@
         "Where SatGate evaluates agent authority",
         "What to compare for agent governance",
         "Why this matters in production",
+        "The hard question is not routing. It is who had authority before execution.",
         "FAQ",
         "Dashboards explain what happened. SatGate controls what agents are allowed to do."
       ],
@@ -543,7 +544,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 438,
+      "wordCount": 625,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -568,6 +569,7 @@
         "Where SatGate evaluates agent authority",
         "What to compare for agent governance",
         "Why this matters in production",
+        "The hard question is not routing. It is who had authority before execution.",
         "FAQ",
         "Dashboards explain what happened. SatGate controls what agents are allowed to do."
       ],
@@ -587,7 +589,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 436,
+      "wordCount": 623,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -612,6 +614,7 @@
         "Where SatGate evaluates agent authority",
         "What to compare for agent governance",
         "Why this matters in production",
+        "The hard question is not routing. It is who had authority before execution.",
         "FAQ",
         "Dashboards explain what happened. SatGate controls what agents are allowed to do."
       ],
@@ -631,7 +634,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 440,
+      "wordCount": 627,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -656,6 +659,7 @@
         "Where SatGate evaluates agent authority",
         "What to compare for agent governance",
         "Why this matters in production",
+        "The hard question is not routing. It is who had authority before execution.",
         "FAQ",
         "Dashboards explain what happened. SatGate controls what agents are allowed to do."
       ],
@@ -675,7 +679,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 437,
+      "wordCount": 624,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,

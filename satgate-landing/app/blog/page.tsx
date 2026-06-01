@@ -139,7 +139,7 @@ const posts = [
     tags: ['Security', 'Economic Firewall', 'Adversarial AI', 'Macaroons'],
   },
   {
-    slug: 'the-enterprise-adoption-playbook-observe-control-charge',
+    slug: 'the-enterprise-adoption-playbook-observe-control-prove',
     title: 'The Enterprise Adoption Playbook: Observe, Control, Prove',
     description: 'Observe, Control, Prove is an enterprise change management strategy for adopting economic governance incrementally, building trust at each stage.',
     date: '2026-03-20',

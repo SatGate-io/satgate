@@ -4,7 +4,7 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "API Gateway for AI Agents: Control Tool and API Access",
-  description: "Learn how AI agent gateways enforce authority before execution with Observe/Control/Prove, budgets, MCP governance, and Evidence Packs.",
+  description: "Learn how AI agent gateways enforce authority before execution with Observe/Control/Prove, budgets, MCP governance, Evidence Packs, and paid rails.",
   alternates: { canonical: 'https://satgate.io/blog/api-gateway-for-ai-agents' },
   keywords: ['API gateway for AI agents', 'AI agent gateway', 'API gateway comparison', 'agent economy gateway', 'AI API management', 'economic firewall gateway'],
   openGraph: {

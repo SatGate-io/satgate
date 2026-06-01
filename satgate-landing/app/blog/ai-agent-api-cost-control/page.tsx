@@ -173,7 +173,7 @@ export default function AiAgentApiCostControlPage() {
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Economic firewalls: budget enforcement at the gateway layer</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            An <Link href="/economic-firewall" className="text-cyan-400 hover:text-cyan-300">economic firewall</Link> is the missing layer between autonomous agents and billable APIs. It sits inline, checks the policy attached to the agent capability, and decides whether the request should be observed, controlled, charged, routed, or blocked.
+            An <Link href="/govern" className="text-cyan-400 hover:text-cyan-300">AI agent governance layer</Link> is the missing layer between autonomous agents and billable APIs. It sits inline, checks the policy attached to the agent capability, and decides whether the request should be observed, controlled, proved, routed, or blocked.
           </p>
 
           <p className="text-gray-300 leading-relaxed">

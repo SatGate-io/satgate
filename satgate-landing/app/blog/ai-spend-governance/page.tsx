@@ -297,8 +297,8 @@ export default function AiSpendGovernanceBlogPage() {
               SatGate is Economic Firewall infrastructure for enterprise agents. It gives teams a Policy-to-Proof control layer for AI, API, MCP, and paid-tool usage: observe the call, control the policy before execution, and prove what happened afterward with Evidence Pack receipts.
             </p>
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
-              <Link href="/economic-firewall" className="inline-flex items-center justify-center rounded-lg bg-cyan-400 px-5 py-3 font-bold text-black transition hover:bg-cyan-300">
-                Learn about Economic Firewalls
+              <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg bg-cyan-400 px-5 py-3 font-bold text-black transition hover:bg-cyan-300">
+                See Policy-to-Proof governance
               </Link>
               <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 font-bold text-white transition hover:border-cyan-500">
                 See Policy-to-Proof
@@ -310,7 +310,7 @@ export default function AiSpendGovernanceBlogPage() {
           <ul className="text-gray-300 space-y-2">
             <li><Link href="/blog/llm-cost-management" className="text-cyan-400 hover:text-cyan-300 underline">LLM cost management: dashboards vs real-time budget enforcement</Link></li>
             <li><Link href="/blog/ai-agent-spending-limits" className="text-cyan-400 hover:text-cyan-300 underline">AI agent spending limits: hard budgets by agent, tool, and workflow</Link></li>
-            <li><Link href="/blog/the-enterprise-adoption-playbook-observe-control-charge" className="text-cyan-400 hover:text-cyan-300 underline">The enterprise adoption playbook: Observe, Control, Prove</Link></li>
+            <li><Link href="/blog/the-enterprise-adoption-playbook-observe-control-prove" className="text-cyan-400 hover:text-cyan-300 underline">The enterprise adoption playbook: Observe, Control, Prove</Link></li>
             <li><Link href="/compare/langsmith-helicone-datadog" className="text-cyan-400 hover:text-cyan-300 underline">LLM observability vs agent control</Link></li>
           </ul>
         </article>

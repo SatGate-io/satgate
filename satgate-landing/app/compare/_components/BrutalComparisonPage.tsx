@@ -163,6 +163,32 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
         </div>
       </section>
 
+      <section className="border-y border-gray-900 bg-black">
+        <div className="mx-auto grid max-w-6xl gap-8 px-6 py-16 lg:grid-cols-[1.1fr_.9fr]">
+          <div>
+            <p className="mb-3 text-sm font-mono uppercase tracking-wide text-cyan-300">Policy-to-Proof layer</p>
+            <h2 className="mb-5 text-3xl font-bold text-white">The hard question is not routing. It is who had authority before execution.</h2>
+            <div className="space-y-4 text-lg leading-relaxed text-gray-300">
+              <p>
+                Most gateways, observability tools, and payment rails explain a narrow part of the transaction: where a request went, how much it cost, or whether a token was valid. Enterprise agent governance needs a pre-execution decision that binds identity, tenant, delegated scope, budget, tool, payment context, and revocation state before the upstream system sees the call.
+              </p>
+              <p>
+                That is the SatGate distinction in these comparisons. SatGate is not trying to replace every model router, tracing stack, API gateway, or paid rail. It sits above them as an Agent Authority &amp; Accountability Layer: Observe the agent request, Control what it is allowed to do, and Prove the decision with an Evidence Pack that security, finance, and compliance can inspect later.
+              </p>
+            </div>
+          </div>
+          <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <h3 className="mb-4 text-xl font-bold text-white">What an Evidence Pack should preserve</h3>
+            <ul className="space-y-3 text-gray-300">
+              <li><strong className="text-white">Authority:</strong> the agent, user, tenant, token caveats, and delegated depth behind the request.</li>
+              <li><strong className="text-white">Policy:</strong> the budget, tool, paid-rail, allowlist, and revocation checks evaluated before execution.</li>
+              <li><strong className="text-white">Decision:</strong> whether SatGate allowed, denied, downgraded, routed, or required additional approval.</li>
+              <li><strong className="text-white">Proof:</strong> signed receipt metadata that can survive dashboards, vendor logs, and postmortem guesswork.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="mb-8 text-3xl font-bold text-white">FAQ</h2>
