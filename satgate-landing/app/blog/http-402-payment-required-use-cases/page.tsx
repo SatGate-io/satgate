@@ -2,21 +2,21 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "HTTP 402 Payment Required: API and Agent Use Cases",
-  description: "HTTP 402 and L402 are paid-rail context. SatGate governs authority before execution and preserves Evidence Packs.",
+  title: "HTTP 402 Payment Required: Meaning, Use Cases, and AI Agents",
+  description: "HTTP 402 Payment Required explained: why it was reserved, how L402 works for paid APIs, and how agents need budget authority before paid access.",
   alternates: { canonical: 'https://satgate.io/blog/http-402-payment-required-use-cases' },
   keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API'],
   openGraph: {
-    title: 'HTTP 402 Payment Required: Meaning, Reserved Use & Agents',
-    description: 'Learn HTTP 402 history, L402 payment challenges, and how SatGate governs paid-rail access with Evidence Packs.',
+    title: 'HTTP 402 Payment Required: Meaning, Use Cases, and AI Agents',
+    description: 'HTTP 402 explained: reserved status code history, L402 paid API access, agent budget authority, and Evidence Pack proof.',
     url: 'https://satgate.io/blog/http-402-payment-required-use-cases',
     type: 'article',
     publishedTime: '2026-04-02T00:00:00Z',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'HTTP 402 Payment Required: Meaning, Reserved Use & Agents',
-    description: 'HTTP 402 explained: reserved status code history, L402 payment challenges, paid-rail governance, and Evidence Packs.',
+    title: 'HTTP 402 Payment Required: Meaning, Use Cases, and AI Agents',
+    description: 'HTTP 402 explained for reserved use, L402 paid APIs, agent budget authority, paid-rail governance, and Evidence Packs.',
   },
 };
 
@@ -24,12 +24,12 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'HTTP 402 Payment Required: API and Agent Use Cases',
+    headline: 'HTTP 402 Payment Required: Meaning, Use Cases, and AI Agents',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-02',
-    dateModified: '2026-05-05',
+    dateModified: '2026-06-01',
     mainEntityOfPage: 'https://satgate.io/blog/http-402-payment-required-use-cases',
     about: [
       { '@type': 'Thing', name: 'HTTP 402 Payment Required' },
@@ -109,10 +109,10 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
             <span className="px-2 py-1 rounded-full bg-green-900/30 border border-green-500/30 text-green-300 text-xs font-mono">AI Agents</span>
           </div>
           
-          <h1 className="text-4xl font-bold mb-4">HTTP 402 Payment Required: Meaning, Use Cases, and AI Agent Payments</h1>
+          <h1 className="text-4xl font-bold mb-4">HTTP 402 Payment Required: Meaning, Reserved Use, and AI Agent Payments</h1>
           <div className="mb-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Quick answer</p>
-            <p className="text-gray-300">HTTP 402 means payment is required before access. For AI agents, 402/L402 are paid-rail context: SatGate still checks authority, budget, and policy before payment or execution, then preserves Evidence Pack receipts.</p>
+            <p className="text-gray-300">HTTP 402 means access is available after payment. For AI agents, 402 and L402 are paid-rail context: authority, budget, and policy should be checked before value moves, with Evidence Pack proof after the request.</p>
           </div>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row">
             <Link href="/partners/rails" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">See paid-rail governance</Link>
@@ -120,7 +120,7 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
           </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
-            For nearly thirty years, HTTP 402 has been &ldquo;reserved for future use.&rdquo; AI agents are the future it was reserved for. Here are the real-world use cases finally bringing it to life.
+            For nearly thirty years, HTTP 402 has meant &ldquo;reserved for future use.&rdquo; Paid APIs and AI agents finally make it practical, but payment still needs governance before value moves.
           </p>
           
           <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -490,6 +490,19 @@ HTTP 402 was reserved for future use in 1997. For agent systems, the useful vers
             </div>
           </div>
 
+
+          <div className="my-10 rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6">
+            <h3 className="mb-3 text-xl font-bold text-white">Related 402 and agent-payment controls</h3>
+            <p className="mb-4 text-gray-300">
+              If you are evaluating HTTP 402 for agent-facing APIs, connect the paid rail to pricing, MCP gateway policy, capability authority, and API monetization controls before exposing it to autonomous callers.
+            </p>
+            <div className="flex flex-wrap gap-3 text-sm font-semibold">
+              <Link href="/pay" className="text-cyan-300 hover:text-cyan-200">SatGate Pay →</Link>
+              <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway controls →</Link>
+              <Link href="/capability-auth" className="text-cyan-300 hover:text-cyan-200">Capability auth →</Link>
+              <Link href="/blog/api-monetization-ai" className="text-cyan-300 hover:text-cyan-200">API monetization for AI →</Link>
+            </div>
+          </div>
 
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">SatGate path: Observe → Control → Prove</h3>

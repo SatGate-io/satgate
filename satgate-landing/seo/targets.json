@@ -29,7 +29,7 @@
     ],
     "intent": "how-to",
     "funnelStage": "problem-aware",
-    "productAngle": "SatGate adds enforceable per-agent and per-tool budget limits before calls reach OpenAI.",
+    "productAngle": "SatGate enforces OpenAI API budget limits by agent, team, and workflow before GPT calls execute, then preserves Evidence Pack proof.",
     "cta": "Generate an OpenAI budget policy",
     "status": "existing"
   },
@@ -45,8 +45,8 @@
     ],
     "intent": "commercial-investigation",
     "funnelStage": "solution-aware",
-    "productAngle": "SatGate connects LLM cost visibility to request-path authority before execution and Evidence Pack proof.",
-    "cta": "Turn cost visibility into control",
+    "productAngle": "SatGate turns LLM cost dashboards into request-path budget authority, hard controls, and Evidence Pack proof.",
+    "cta": "Turn monitoring into Policy-to-Proof controls",
     "status": "existing"
   },
   {
@@ -61,8 +61,8 @@
     ],
     "intent": "informational-commercial",
     "funnelStage": "problem-aware",
-    "productAngle": "SatGate treats HTTP 402 and L402 as paid-rail context around authority decisions and Evidence Pack proof.",
-    "cta": "See SatGate paid-rail governance",
+    "productAngle": "SatGate treats HTTP 402 and L402 as paid-rail context: budget authority before paid access and Evidence Pack proof after the request.",
+    "cta": "See paid-rail governance",
     "status": "existing"
   },
   {
@@ -93,8 +93,8 @@
     ],
     "intent": "commercial",
     "funnelStage": "solution-aware",
-    "productAngle": "SatGate is the Policy-to-Proof control plane for authority before execution and Evidence Packs after every agent action.",
-    "cta": "Govern agent access",
+    "productAngle": "SatGate is enterprise AI agent governance from Policy to Proof: Observe usage, Control budgets and access, and Prove every decision with Evidence Packs.",
+    "cta": "See Policy-to-Proof",
     "status": "existing"
   },
   {

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-25T14:23:18.276329Z",
+  "generatedAt": "2026-06-01T02:14:10.345481Z",
   "items": [
     {
       "path": "/blog/ai-spend-governance",
@@ -54,13 +54,13 @@
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
       "exists": true,
-      "title": "OpenAI API Budget Limits: Control Spend Before Calls",
-      "titleLength": 52,
-      "metaDescription": "Add OpenAI API budget limits with authority before execution, Observe/Control/Prove controls, and Evidence Pack receipts.",
-      "metaDescriptionLength": 121,
+      "title": "OpenAI API Budget Limits: Hard Caps Before GPT Calls Run",
+      "titleLength": 56,
+      "metaDescription": "Set OpenAI API budget limits by agent, team, or workflow. Enforce hard caps before GPT calls execute and preserve Evidence Pack proof.",
+      "metaDescriptionLength": 134,
       "canonical": "/blog/how-to-add-budget-limits-to-openai-api-calls",
       "h1": [
-        "How to Set Hard Budget Limits on OpenAI API Calls"
+        "How to Add Hard Budget Limits to OpenAI API Calls"
       ],
       "h1Count": 1,
       "h2s": [
@@ -98,7 +98,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1323,
+      "wordCount": 1322,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -109,13 +109,13 @@
     {
       "path": "/blog/llm-cost-management",
       "exists": true,
-      "title": "LLM Cost Management: Control AI Spend Before It Happens",
-      "titleLength": 55,
-      "metaDescription": "A practical guide to LLM cost management using authority before execution, budget controls, and Evidence Pack receipts for AI agents.",
-      "metaDescriptionLength": 133,
+      "title": "LLM Cost Management: Dashboards, Budgets, and Hard Controls",
+      "titleLength": 59,
+      "metaDescription": "Compare LLM cost dashboards, monitoring, budgets, and request-path enforcement. Move from Observe to Control to Evidence Pack proof.",
+      "metaDescriptionLength": 132,
       "canonical": "/blog/llm-cost-management",
       "h1": [
-        "LLM Cost Management: Real-Time Budget Enforcement for AI Agents"
+        "LLM Cost Management Needs More Than Dashboards"
       ],
       "h1Count": 1,
       "h2s": [
@@ -150,7 +150,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2189,
+      "wordCount": 2187,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -161,13 +161,13 @@
     {
       "path": "/blog/http-402-payment-required-use-cases",
       "exists": true,
-      "title": "HTTP 402 Payment Required: API and Agent Use Cases",
-      "titleLength": 50,
-      "metaDescription": "HTTP 402 and L402 are paid-rail context. SatGate governs authority before execution and preserves Evidence Packs.",
-      "metaDescriptionLength": 113,
+      "title": "HTTP 402 Payment Required: Meaning, Use Cases, and AI Agents",
+      "titleLength": 60,
+      "metaDescription": "HTTP 402 Payment Required explained: why it was reserved, how L402 works for paid APIs, and how agents need budget authority before paid access.",
+      "metaDescriptionLength": 144,
       "canonical": "/blog/http-402-payment-required-use-cases",
       "h1": [
-        "HTTP 402 Payment Required: Meaning, Use Cases, and AI Agent Payments"
+        "HTTP 402 Payment Required: Meaning, Reserved Use, and AI Agent Payments"
       ],
       "h1Count": 1,
       "h2s": [
@@ -184,12 +184,16 @@
       "internalLinks": [
         "/agent-payment-controls",
         "/blog",
+        "/blog/api-monetization-ai",
+        "/capability-auth",
         "/govern",
         "/http-402-for-ai-agents",
         "/l402-agent-payments",
         "/l402-api-pricing-calculator",
+        "/mcp-gateway",
         "/paid-agent-payments",
         "/partners/rails",
+        "/pay",
         "/policy-to-proof",
         "/tools"
       ],
@@ -201,7 +205,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2596,
+      "wordCount": 2655,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -266,13 +270,13 @@
     {
       "path": "/govern",
       "exists": true,
-      "title": "AI Agent Governance: Policy-to-Proof",
-      "titleLength": 36,
-      "metaDescription": "Govern AI agents with SatGate: authority before execution, Observe/Control/Prove, MCP governance, paid-rail context, and Evidence Packs.",
-      "metaDescriptionLength": 136,
+      "title": "Enterprise AI Agent Governance: Policy-to-Proof Controls",
+      "titleLength": 56,
+      "metaDescription": "Govern AI agents before execution: Observe usage, Control budgets and access, and Prove decisions with Evidence Packs across APIs, MCP, and paid rails.",
+      "metaDescriptionLength": 151,
       "canonical": "/govern",
       "h1": [
-        "Govern what agents can do. Prove every decision."
+        "Enterprise AI agent governance, from Policy to Proof."
       ],
       "h1Count": 1,
       "h2s": [
@@ -314,7 +318,7 @@
         "WebPage",
         "WebSite"
       ],
-      "wordCount": 1690,
+      "wordCount": 1707,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
