@@ -63,7 +63,7 @@ export default function MCPPage() {
     url: 'https://satgate.io/mcp',
     description: metadata.description,
     datePublished: '2026-05-01',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-03',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'MCP governance' },
