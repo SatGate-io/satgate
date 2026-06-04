@@ -46,7 +46,7 @@ export default function AgentPaymentControlsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-05-01',
-    dateModified: '2026-05-02',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/agent-payment-controls',
   };
 
@@ -210,6 +210,9 @@ export default function AgentPaymentControlsPage() {
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
               Review Policy-to-Proof
+            </Link>
+            <Link href="/http-402-for-ai-agents" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
+              HTTP 402 for agents
             </Link>
           </div>
         </div>

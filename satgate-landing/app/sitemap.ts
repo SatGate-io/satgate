@@ -17,7 +17,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/partners/rails', lastModified: '2026-06-03', changeFrequency: 'weekly', priority: 0.85 },
   { path: '/policy-to-proof', lastModified: '2026-06-04', changeFrequency: 'weekly', priority: 0.95 },
   { path: '/stripe-link-agents-vs-satgate', lastModified: '2026-05-02', changeFrequency: 'weekly', priority: 0.9 },
-  { path: '/agent-payment-controls', lastModified: '2026-05-02', changeFrequency: 'weekly', priority: 0.9 },
+  { path: '/agent-payment-controls', lastModified: '2026-06-04', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/http-402-for-ai-agents', lastModified: '2026-05-02', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/ai-agent-cost-control', lastModified: '2026-06-04', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/llm-cost-dashboard', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.85 },
