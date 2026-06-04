@@ -135,7 +135,7 @@ func New(cfg *Config) (*Proxy, error) {
 					tokenID = hashToken(rootMac.Identifier + rootMac.Signature)
 					p.rootToken = cfg.Auth.RootToken
 					log.Info().Str("tokenId", tokenID).Msg("reusing supplied root token")
-					fmt.Fprintf(os.Stderr, "ROOT_TOKEN=%s\n", cfg.Auth.RootToken)
+					log.Info().Str("tokenId", tokenID).Msg("root token available programmatically; not printing secret")
 					fmt.Fprintf(os.Stderr, "TOKEN_ID=%s\n", tokenID)
 				} else {
 					rootMac, mintErr := macAuth.Service.Mint("api:*", time.Now().Add(24*time.Hour))
@@ -147,7 +147,7 @@ func New(cfg *Config) (*Proxy, error) {
 					tokenID = hashToken(rootMac.Identifier + rootMac.Signature)
 					p.rootToken = rootToken
 					log.Info().Str("tokenId", tokenID).Msg("auto-minted root token")
-					fmt.Fprintf(os.Stderr, "ROOT_TOKEN=%s\n", rootToken)
+					log.Info().Str("tokenId", tokenID).Msg("root token available programmatically; not printing secret")
 					fmt.Fprintf(os.Stderr, "TOKEN_ID=%s\n", tokenID)
 				}
 			}
