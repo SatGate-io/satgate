@@ -50,7 +50,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/integrations', lastModified: '2026-05-03', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/pricing', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/security', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/blog', lastModified: '2026-05-22', changeFrequency: 'weekly', priority: 0.8 },
+  { path: '/blog', lastModified: '2026-06-04', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/compare', lastModified: '2026-05-10', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/compare/aws-agentcore-payments', lastModified: '2026-05-10', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/compare/cloudflare-ai-gateway', lastModified: '2026-05-10', changeFrequency: 'monthly', priority: 0.8 },
@@ -93,6 +93,7 @@ const staticRoutes: SitemapEntry[] = [
 ];
 
 const blogRoutes: SitemapEntry[] = [
+  { path: '/blog/always-on-agents-economic-authority', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/blog/ai-spend-governance', lastModified: '2026-05-22', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/why-routing-isnt-governance', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/blog/beyond-connection-economic-governance-mcp', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.6 },

@@ -31,6 +31,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'always-on-agents-economic-authority',
+    title: 'Always-On Agents Need More Than Identity. They Need Economic Authority.',
+    description: 'Microsoft Scout shows where enterprise agents are headed: identity and access matter, but external agent actions also need economic authority, payment ownership, and proof.',
+    date: '2026-06-04',
+    readTime: '8 min read',
+    author: 'SatGate Team',
+    tags: ['AI Agent Governance', 'Economic Firewall', 'MCP Governance'],
+  },
+  {
     slug: 'ai-spend-governance',
     title: 'AI Spend Governance: Control Usage-Based AI Costs Before They Scale',
     description: 'Usage-based AI pricing makes cost an operating risk. Learn why enterprises need request-path controls to observe, control, and prove AI agent spend.',
