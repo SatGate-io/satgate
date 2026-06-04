@@ -167,7 +167,7 @@ const jsonLd = {
       url: "https://satgate.io/policy-to-proof",
       description: metadata.description,
       datePublished: "2026-05-09",
-      dateModified: "2026-05-09",
+      dateModified: "2026-06-04",
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
       about: [
         { "@type": "Thing", name: "AI agent authority evidence" },
@@ -506,6 +506,12 @@ export default function PolicyToProofPage() {
                   >
                     View JSON export <ArrowRight size={18} />
                   </a>
+                  <Link
+                    href="/economic-firewall"
+                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-5 py-3 font-bold text-white transition hover:border-emerald-300/60"
+                  >
+                    Map proof to the economic firewall <ArrowRight size={18} />
+                  </Link>
                   <a
                     href="mailto:contact@satgate.io?subject=SatGate%20Policy-to-Proof%20walkthrough"
                     className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-5 py-3 font-bold text-white transition hover:border-emerald-300/60"
