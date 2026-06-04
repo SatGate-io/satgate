@@ -68,7 +68,7 @@ export default function AiAgentCostControlPage() {
     name: 'AI Agent Cost Control | Request-Path Budget Enforcement',
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-cost-control',
-    dateModified: '2026-05-05',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent cost control' },
@@ -88,7 +88,7 @@ export default function AiAgentCostControlPage() {
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-cost-control',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-05',
+    dateModified: '2026-06-04',
     about: webPageJsonLd.about,
     offers: { '@type': 'Offer', url: 'https://satgate.io/pricing' },
     featureList: [
@@ -519,9 +519,14 @@ export default function AiAgentCostControlPage() {
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
             Use the SatGate ROI calculator to model ghost spend, runaway loops, wasted tool calls, and the payback period for request-path budget enforcement with Policy-to-Proof receipt coverage.
           </p>
-          <Link href="/roi-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-            Open the ROI calculator <ArrowRight size={18} />
-          </Link>
+          <div className="flex flex-col gap-4 sm:flex-row">
+            <Link href="/roi-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
+              Open the ROI calculator <ArrowRight size={18} />
+            </Link>
+            <Link href="/ai-agent-runaway-spend-index" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-purple-500 transition">
+              Read runaway spend index <ArrowRight size={18} />
+            </Link>
+          </div>
         </div>
       </section>
     </main>
