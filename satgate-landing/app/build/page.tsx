@@ -206,7 +206,7 @@ const jsonLd = {
       url: "https://satgate.io/build",
       description: metadata.description,
       datePublished: "2026-05-12",
-      dateModified: "2026-05-12",
+      dateModified: "2026-06-03",
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
       about: [
         { "@type": "Thing", name: "Agent Authority & Accountability Layer" },
@@ -470,6 +470,9 @@ export default function BuildPage() {
           </a>
           <Link href="/capability-auth" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-400">
             Capability auth model <ArrowRight size={18} />
+          </Link>
+          <Link href="/accept-satgate-capabilities" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-400">
+            Accept SatGate capabilities <ArrowRight size={18} />
           </Link>
         </div>
       </section>
