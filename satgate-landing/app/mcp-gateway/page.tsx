@@ -309,6 +309,9 @@ export default function McpGatewayPage() {
             <Link href="/policy-templates/mcp-governance/mcp-governance-policy-bundle.v1.json" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               Download policy bundle <GitBranch size={18} />
             </Link>
+            <Link href="/mcp-proxy-config-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              Generate MCP proxy config
+            </Link>
           </div>
         </div>
       </section>

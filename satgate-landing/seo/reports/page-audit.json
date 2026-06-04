@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-04T16:04:03.096470Z",
+  "generatedAt": "2026-06-04T16:34:33.854855Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -444,6 +444,7 @@
       "internalLinks": [
         "/govern",
         "/mcp-budget-enforcement",
+        "/mcp-proxy-config-generator",
         "/policy-templates/mcp-governance/mcp-governance-policy-bundle.v1.json",
         "/policy-to-proof"
       ],
@@ -458,7 +459,7 @@
         "Question",
         "SoftwareApplication"
       ],
-      "wordCount": 910,
+      "wordCount": 914,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
