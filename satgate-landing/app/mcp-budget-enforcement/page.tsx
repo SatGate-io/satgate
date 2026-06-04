@@ -321,6 +321,9 @@ export default function McpBudgetEnforcementPage() {
           <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
             See Policy-to-Proof
           </Link>
+          <Link href="/mcp-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+            Control MCP costs
+          </Link>
         </div>
       </section>
     </main>
