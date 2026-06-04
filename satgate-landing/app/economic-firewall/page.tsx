@@ -65,7 +65,7 @@ export default function EconomicFirewallPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-05-09',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/economic-firewall',
   };
 
@@ -466,6 +466,9 @@ export default function EconomicFirewallPage() {
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               Review Policy-to-Proof
+            </Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              Grade firewall readiness
             </Link>
           </div>
         </div>
