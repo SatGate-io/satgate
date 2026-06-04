@@ -71,7 +71,7 @@ export default function AgentApiGovernancePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-05-05',
+    dateModified: '2026-06-03',
     mainEntityOfPage: 'https://satgate.io/agent-api-governance',
     about: [
       { '@type': 'Thing', name: 'agent API governance' },
@@ -202,6 +202,9 @@ export default function AgentApiGovernancePage() {
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               See Policy-to-Proof
+            </Link>
+            <Link href="/revocable-agent-credentials" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              Revocable agent credentials
             </Link>
           </div>
         </div>
