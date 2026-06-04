@@ -47,7 +47,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-05-01',
-    dateModified: '2026-05-02',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/stripe-link-agents-vs-satgate',
   };
 
@@ -231,6 +231,9 @@ export default function StripeLinkAgentsVsSatGatePage() {
             </Link>
             <Link href="/http-402-for-ai-agents" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               Understand HTTP 402 for agents
+            </Link>
+            <Link href="/agent-payment-controls" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              Compare payment controls
             </Link>
           </div>
         </div>
