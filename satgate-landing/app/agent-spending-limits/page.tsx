@@ -46,7 +46,7 @@ export default function Page() {
     url: 'https://satgate.io/agent-spending-limits',
     description: metadata.description,
     datePublished: '2026-05-01',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent spending limits' },
@@ -66,7 +66,7 @@ export default function Page() {
     description: metadata.description,
     url: 'https://satgate.io/agent-spending-limits',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     featureList: ['Request-path budget enforcement', 'AI agent spend caps', 'MCP tool cost control', 'Revocable credentials', 'Audit receipts', 'Policy-to-Proof evidence'],
     audience: { '@type': 'Audience', audienceType: 'AI platform, API, finance, and security teams' },
   };
@@ -196,6 +196,7 @@ export default function Page() {
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Govern agent spending limits <ArrowRight size={18} /></Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Review Policy-to-Proof</Link>
+            <Link href="/agent-spend-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Generate spend policy</Link>
           </div>
         </div>
       </section>
