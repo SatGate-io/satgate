@@ -252,6 +252,9 @@ def audit_canonicals() -> tuple[int, list[tuple[str, str]]]:
         match = CANONICAL_RE.search(text)
         if not match:
             continue
+        if "redirect(" in text:
+            # Legacy redirect pages intentionally canonicalize to their destination.
+            continue
         scanned += 1
         canonical_path = normalize_path(match.group(1))
         route_path = app_route_for_page(file_path)

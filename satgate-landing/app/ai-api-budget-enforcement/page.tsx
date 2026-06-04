@@ -3,7 +3,7 @@ import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptTe
 
 export const metadata = {
   title: 'AI API Budget Enforcement | Hard Caps for Agent API Spend',
-  description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with request-path controls, revocation, and Evidence Pack receipts.',
+  description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with request-path controls.',
   alternates: { canonical: 'https://satgate.io/ai-api-budget-enforcement' },
   keywords: [
     'AI API budget enforcement',

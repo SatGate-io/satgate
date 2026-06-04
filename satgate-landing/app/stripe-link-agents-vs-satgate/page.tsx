@@ -17,7 +17,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Stripe Link for Agents vs SatGate',
-    description: 'Stripe Link can provide payment credentials and approval flows. SatGate controls what agents may access, spend, meter, delegate, and monetize before upstream API calls execute.',
+    description: 'Stripe Link provides payment credentials and approvals. SatGate controls what agents may access, spend, delegate, and monetize before API calls.',
     url: 'https://satgate.io/stripe-link-agents-vs-satgate',
     type: 'article',
   },

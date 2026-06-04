@@ -15,7 +15,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate Capability Lifecycle Control',
-    description: 'Issue capability → delegate → attenuate → revoke → prove, with customer-visible caveats, delegation depth, child spend caps, next-request revocation, and Evidence Pack audit records.',
+    description: 'Issue capability → delegate → attenuate → revoke → prove with caveats, child spend caps, revocation, and Evidence Pack records.',
     url: 'https://satgate.io/capability-lifecycle-demo',
     type: 'article',
   },
