@@ -45,7 +45,7 @@ export default function Http402ForAiAgentsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-05-01',
-    dateModified: '2026-05-02',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/http-402-for-ai-agents',
     about: [
       { '@type': 'Thing', name: 'HTTP 402 for AI agents' },
@@ -99,6 +99,9 @@ export default function Http402ForAiAgentsPage() {
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
               See Policy-to-Proof
+            </Link>
+            <Link href="/l402-agent-payments" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
+              L402 agent payments
             </Link>
           </div>
         </div>
