@@ -1,6 +1,52 @@
 {
-  "generatedAt": "2026-06-01T13:45:29.180936Z",
+  "generatedAt": "2026-06-04T13:29:38.774264Z",
   "items": [
+    {
+      "path": "/blog/always-on-agents-economic-authority",
+      "exists": true,
+      "title": "Always-On Agents Need More Than Identity: Economic Authority",
+      "titleLength": 60,
+      "metaDescription": "Microsoft Scout shows where enterprise agents are headed. Observe, Control, Prove external agent actions with economic authority, spend ownership, and evidence.",
+      "metaDescriptionLength": 160,
+      "canonical": "/blog/always-on-agents-economic-authority",
+      "h1": [
+        "Always-on agents need more than identity. They need economic authority."
+      ],
+      "h1Count": 1,
+      "h2s": [
+        "Identity is necessary. It is not the whole job.",
+        "The clean split",
+        "The missing layer is economic authority.",
+        "MCP makes this urgent.",
+        "Logs are not proof.",
+        "Policy-to-Proof for agent action",
+        "Where Microsoft ends and the wider agent economy begins.",
+        "The split is clean.",
+        "Govern external agent actions before they execute"
+      ],
+      "internalLinks": [
+        "/blog",
+        "/economic-firewall",
+        "/govern",
+        "/mcp-governance",
+        "/policy-to-proof"
+      ],
+      "schemaTypes": [
+        "Answer",
+        "FAQPage",
+        "Organization",
+        "Question",
+        "TechArticle",
+        "Thing"
+      ],
+      "wordCount": 1491,
+      "hasObserveControlProve": true,
+      "hasEvidencePack": true,
+      "hasFAQ": true,
+      "hasProductCTA": true,
+      "inSitemap": true,
+      "issues": []
+    },
     {
       "path": "/blog/ai-spend-governance",
       "exists": true,

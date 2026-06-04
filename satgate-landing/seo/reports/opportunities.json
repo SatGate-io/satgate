@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-01T13:45:29.180488Z",
+  "generatedAt": "2026-06-04T13:29:38.773790Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -192,6 +192,32 @@
       "ctrGap": 0.005,
       "score": 50,
       "priority": "P2"
+    },
+    {
+      "path": "/blog/always-on-agents-economic-authority",
+      "cluster": "ai-agent-governance",
+      "primaryKeyword": "always-on agents",
+      "secondaryKeywords": [
+        "AI agent governance",
+        "enterprise AI agent governance",
+        "economic authority",
+        "MCP governance",
+        "AI agent spend controls",
+        "agent policy enforcement"
+      ],
+      "intent": "informational-commercial",
+      "funnelStage": "problem-aware",
+      "productAngle": "SatGate governs external agent economic authority: what actions are allowed, what they cost, who pays, and what Evidence Pack proof exists.",
+      "cta": "Govern external agent actions",
+      "status": "new",
+      "clicks": 0,
+      "impressions": 0,
+      "ctr": 0.0,
+      "position": 100.0,
+      "expectedCtr": 0.005,
+      "ctrGap": 0.005,
+      "score": 26,
+      "priority": "P3"
     },
     {
       "path": "/blog/ai-spend-governance",

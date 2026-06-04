@@ -1,5 +1,23 @@
 [
   {
+    "path": "/blog/always-on-agents-economic-authority",
+    "cluster": "ai-agent-governance",
+    "primaryKeyword": "always-on agents",
+    "secondaryKeywords": [
+      "AI agent governance",
+      "enterprise AI agent governance",
+      "economic authority",
+      "MCP governance",
+      "AI agent spend controls",
+      "agent policy enforcement"
+    ],
+    "intent": "informational-commercial",
+    "funnelStage": "problem-aware",
+    "productAngle": "SatGate governs external agent economic authority: what actions are allowed, what they cost, who pays, and what Evidence Pack proof exists.",
+    "cta": "Govern external agent actions",
+    "status": "new"
+  },
+  {
     "path": "/blog/ai-spend-governance",
     "cluster": "ai-spend-governance",
     "primaryKeyword": "AI spend governance",

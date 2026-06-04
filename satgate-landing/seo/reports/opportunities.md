@@ -1,6 +1,6 @@
 # SatGate SEO Machine Report
 
-Generated: 2026-06-01T13:45:29.181518Z
+Generated: 2026-06-04T13:29:38.774837Z
 
 ## Ranked opportunities
 
@@ -49,6 +49,12 @@ Generated: 2026-06-01T13:45:29.181518Z
 ### P2 — /capability-auth
 - Score: 50
 - Query: `capability based authorization`
+- GSC: 0 clicks / 0 impressions / 0.00% CTR / pos 100.00
+- CTR gap: 0.50 pp
+
+### P3 — /blog/always-on-agents-economic-authority
+- Score: 26
+- Query: `always-on agents`
 - GSC: 0 clicks / 0 impressions / 0.00% CTR / pos 100.00
 - CTR gap: 0.50 pp
 
@@ -159,6 +165,12 @@ Generated: 2026-06-01T13:45:29.181518Z
 - Content changes:
   - Use identity-vs-capability framing and link macaroon/API-key content into this page.
 - Links to add: /blog/macaroon-tokens-vs-api-keys, /agent-capability-tokens, /govern, /mcp-gateway, /revocable-capability-token-policy-template
+
+### /blog/always-on-agents-economic-authority
+- Title: 
+- Meta: 
+- Content changes:
+- Links to add: 
 
 ### /blog/ai-spend-governance
 - Title: 
