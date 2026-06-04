@@ -40,7 +40,7 @@ const webPageSchema = {
   name: "Enterprise AI Agent Governance Platform",
   description: metadata.description,
   url: "https://satgate.io/govern",
-  dateModified: "2026-06-01",
+  dateModified: "2026-06-04",
   isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
   about: [
     { "@type": "Thing", name: "AI agent governance" },
