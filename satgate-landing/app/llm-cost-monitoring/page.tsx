@@ -45,7 +45,7 @@ export default function LlmCostMonitoringPage() {
     url: 'https://satgate.io/llm-cost-monitoring',
     description: metadata.description,
     datePublished: '2026-05-01',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'LLM cost monitoring' },
@@ -127,6 +127,9 @@ export default function LlmCostMonitoringPage() {
             </Link>
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
               See AI agent governance
+            </Link>
+            <Link href="/ai-api-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
+              Enforce API budgets
             </Link>
           </div>
         </div>
