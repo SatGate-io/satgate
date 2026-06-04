@@ -45,7 +45,7 @@ export default function LlmCostDashboardPage() {
     url: 'https://satgate.io/llm-cost-dashboard',
     description: metadata.description,
     datePublished: '2026-05-01',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'LLM cost dashboard' },
@@ -64,7 +64,7 @@ export default function LlmCostDashboardPage() {
     url: 'https://satgate.io/llm-cost-dashboard',
     description: metadata.description,
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     featureList: dashboardMetrics.map((m) => m.title),
   };
 
@@ -141,6 +141,9 @@ export default function LlmCostDashboardPage() {
             </Link>
             <Link href="/llm-cost-monitoring" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Compare monitoring vs enforcement
+            </Link>
+            <Link href="/ai-api-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Enforce API budgets
             </Link>
           </div>
         </div>

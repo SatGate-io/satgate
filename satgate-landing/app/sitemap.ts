@@ -20,7 +20,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/agent-payment-controls', lastModified: '2026-06-04', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/http-402-for-ai-agents', lastModified: '2026-06-04', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/ai-agent-cost-control', lastModified: '2026-06-04', changeFrequency: 'weekly', priority: 0.9 },
-  { path: '/llm-cost-dashboard', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.85 },
+  { path: '/llm-cost-dashboard', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/llm-cost-monitoring', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/ai-api-budget-enforcement', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/agent-spending-limits', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.85 },
