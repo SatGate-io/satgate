@@ -15,7 +15,7 @@ const webPageJsonLd = {
   url: 'https://satgate.io/dashboard',
   description: 'Live governance dashboard for AI agent tokens, delegation depth, caveats, blocked requests, revocation hits, and receipt-backed governance evidence.',
   datePublished: '2026-04-12',
-  dateModified: '2026-05-03',
+  dateModified: '2026-06-04',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
     { '@type': 'Thing', name: 'AI agent governance dashboard' },
@@ -35,7 +35,7 @@ const softwareJsonLd = {
   url: 'https://satgate.io/dashboard',
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-  dateModified: '2026-05-03',
+  dateModified: '2026-06-04',
   featureList: ['Agent token receipt graph', 'Delegation receipt visibility', 'Macaroon caveat inspection', 'Revocation receipt tracking', 'Denied-call receipt counters'],
 };
 
@@ -296,6 +296,14 @@ export default function DashboardPage() {
               <div>
                 <h1 className="text-3xl font-bold mb-2">Receipt-backed Governance Dashboard</h1>
                 <p className="text-gray-500">Receipt-backed proof for your agent workforce and economic firewall.</p>
+                <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                  <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-bold text-white transition hover:border-cyan-500">
+                    See Policy-to-Proof
+                  </Link>
+                  <Link href="/evidence-pack-demo" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-bold text-white transition hover:border-cyan-500">
+                    Evidence Pack demo
+                  </Link>
+                </div>
                 {lastFetch && (
                   <p className="text-xs text-gray-600 mt-1">
                     Last updated: {lastFetch.toLocaleTimeString()} 
