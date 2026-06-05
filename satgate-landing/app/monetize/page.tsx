@@ -20,7 +20,7 @@ const webPageJsonLd = {
   url: 'https://satgate.io/monetize',
   description: 'Interactive SatGate paid-rail governance demo for monetizing APIs with paid-rail context, HTTP 402 challenges, paid-agent access, and request-path proof verification.',
   datePublished: '2026-04-12',
-  dateModified: '2026-05-03',
+  dateModified: '2026-06-04',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
     { '@type': 'Thing', name: 'API monetization for AI agents' },
@@ -40,7 +40,7 @@ const softwareJsonLd = {
   url: 'https://satgate.io/monetize',
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-  dateModified: '2026-05-03',
+  dateModified: '2026-06-04',
   featureList: ['HTTP 402 challenge simulation', 'Per-request Lightning pricing', 'L402 payment proof retry', 'Paid-call receipt creation', 'Evidence Pack proof'],
 };
 
@@ -386,6 +386,14 @@ export default function MonetizeDemoPage() {
           Bitcoin Lightning. No credit cards. No monthly bills. Just instant, per-request micropayments 
           that settle in milliseconds.
         </p>
+        <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link href="/paid-agent-payments" className="text-yellow-300 hover:text-yellow-200 text-sm font-semibold underline underline-offset-4 transition">
+            Govern paid agent access →
+          </Link>
+          <Link href="/blog/api-monetization-ai" className="text-cyan-300 hover:text-cyan-200 text-sm font-semibold underline underline-offset-4 transition">
+            API monetization guide →
+          </Link>
+        </div>
       </div>
 
       {/* Main Console UI */}
