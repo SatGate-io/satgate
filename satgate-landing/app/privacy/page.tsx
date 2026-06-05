@@ -25,7 +25,7 @@ export default function PrivacyPage() {
     name: 'Privacy Policy - SatGate',
     description: metadata.description,
     url: 'https://satgate.io/privacy',
-    dateModified: '2026-05-05',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'SatGate Cloud privacy' },
@@ -42,9 +42,17 @@ export default function PrivacyPage() {
         <Link href="/" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Home
         </Link>
+        <div className="mb-8 flex flex-col gap-3 sm:flex-row">
+          <Link href="/security" className="rounded-lg border border-gray-800 px-4 py-2 text-sm font-bold text-white transition hover:border-purple-500">
+            Security practices
+          </Link>
+          <Link href="/terms" className="rounded-lg border border-gray-800 px-4 py-2 text-sm font-bold text-white transition hover:border-purple-500">
+            Terms of Service
+          </Link>
+        </div>
         
         <h1 className="text-4xl font-bold mb-2">Privacy Policy</h1>
-        <p className="text-gray-500 mb-12">Last updated: February 2026</p>
+        <p className="text-gray-500 mb-12">Last updated: June 2026</p>
 
         <div className="prose prose-invert prose-gray max-w-none space-y-8">
           
