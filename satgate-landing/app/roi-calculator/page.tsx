@@ -75,7 +75,7 @@ export default function ROICalculatorPage() {
     name: 'AI Agent ROI Calculator',
     description: 'Estimate runaway AI agent loop exposure, budget-control ROI, and the receipts needed for Policy-to-Proof evidence across paid APIs and MCP tools.',
     url: 'https://satgate.io/roi-calculator',
-    dateModified: '2026-05-05',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent ROI calculator' },
@@ -110,7 +110,7 @@ export default function ROICalculatorPage() {
       { '@type': 'Audience', audienceType: 'AI engineering teams deploying paid MCP tools and APIs' },
     ],
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-05',
+    dateModified: '2026-06-04',
     about: webPageJsonLd.about,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
@@ -641,6 +641,12 @@ export default function ROICalculatorPage() {
               className="inline-block border border-gray-700 text-gray-300 px-10 py-4 rounded-full font-bold text-lg hover:border-gray-500 hover:bg-gray-800 transition"
             >
               See Policy-to-Proof
+            </Link>
+            <Link
+              href="/runaway-agent-cost-calculator"
+              className="inline-block border border-gray-700 text-gray-300 px-10 py-4 rounded-full font-bold text-lg hover:border-purple-500 hover:bg-gray-800 transition"
+            >
+              Runaway cost calculator
             </Link>
           </div>
         </div>
