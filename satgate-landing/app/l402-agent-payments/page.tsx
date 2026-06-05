@@ -72,7 +72,7 @@ export default function L402AgentPaymentsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/l402-agent-payments',
     about: [
       { '@type': 'Thing', name: 'L402 paid-rail governance' },
@@ -404,6 +404,9 @@ HTTP/1.1 200 OK
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
               View Policy-to-Proof
+            </Link>
+            <Link href="/agent-payment-controls" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
+              Agent payment controls
             </Link>
           </div>
         </div>
