@@ -73,7 +73,7 @@ export default function AgentSpendPolicyTemplatePage() {
     url: 'https://satgate.io/agent-spend-policy-template',
     description: 'Generate copyable YAML and JSON policy templates for AI agent authority, budgets, MCP tool caps, revocation, receipts, and Evidence Pack fields.',
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent budget policy template' },
@@ -94,7 +94,7 @@ export default function AgentSpendPolicyTemplatePage() {
     url: 'https://satgate.io/agent-spend-policy-template',
     description: 'Generate copyable YAML and JSON policy templates for AI agent authority, budgets, MCP tool caps, revocation, receipts, and Evidence Pack fields.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     audience: webPageJsonLd.audience,
     featureList: ['YAML budget policy generation', 'JSON budget policy generation', 'MCP tool cost caps', 'Delegation limit templates', 'Receipt and Evidence Pack field templates'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -313,6 +313,9 @@ export default function AgentSpendPolicyTemplatePage() {
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Create Evidence Pack trail
+            </Link>
+            <Link href="/ai-api-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Budget enforcement guide
             </Link>
           </div>
         </div>
