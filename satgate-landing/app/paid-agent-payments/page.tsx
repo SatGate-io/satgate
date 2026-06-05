@@ -79,7 +79,7 @@ export default function RobotCustomerPaymentsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/paid-agent-payments',
     about: [
       { '@type': 'Thing', name: 'delegated paid API access' },
@@ -357,6 +357,9 @@ export default function RobotCustomerPaymentsPage() {
             </Link>
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               See AI agent governance
+            </Link>
+            <Link href="/agent-payment-controls" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              Agent payment controls
             </Link>
           </div>
         </div>

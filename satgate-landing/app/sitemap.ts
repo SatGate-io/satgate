@@ -41,7 +41,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/agent-capability-tokens', lastModified: '2026-06-03', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/capability-lifecycle-demo', lastModified: '2026-06-04', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/l402-agent-payments', lastModified: '2026-06-04', changeFrequency: 'weekly', priority: 0.9 },
-  { path: '/paid-agent-payments', lastModified: '2026-05-10', changeFrequency: 'weekly', priority: 0.9 },
+  { path: '/paid-agent-payments', lastModified: '2026-06-04', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/satgate-for-cursor', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/satgate-for-claude-code', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/satgate-for-claude-desktop', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.8 },
