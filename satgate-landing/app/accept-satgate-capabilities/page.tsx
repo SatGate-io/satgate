@@ -92,7 +92,7 @@ const jsonLd = {
   description: metadata.description,
   url: "https://satgate.io/accept-satgate-capabilities",
   datePublished: "2026-05-13",
-  dateModified: "2026-05-13",
+  dateModified: "2026-06-04",
   about: ["SatGate capabilities", "upstream API acceptance", "verifiable receipts"],
 };
 
@@ -122,6 +122,7 @@ export default function AcceptSatGateCapabilitiesPage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/build" className="rounded-full bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-cyan-100">Build with capabilities</Link>
+              <Link href="/capability-auth" className="rounded-full border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400">Review capability auth</Link>
               <Link href="https://github.com/SatGate-io/satgate/blob/main/docs/reference/accept-satgate-capabilities.md" className="rounded-full border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400">Read the acceptance docs</Link>
             </div>
           </div>
