@@ -83,7 +83,7 @@ const webPageJsonLd = {
   url: 'https://satgate.io/protect',
   description: 'Interactive SatGate Control demo showing scoped capability tokens, budgets, delegation limits, revocation, and request-path policy for AI agents.',
   datePublished: '2026-04-12',
-  dateModified: '2026-05-03',
+  dateModified: '2026-06-04',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
     { '@type': 'Thing', name: 'SatGate Control' },
@@ -103,7 +103,7 @@ const softwareJsonLd = {
   url: 'https://satgate.io/protect',
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-  dateModified: '2026-05-03',
+  dateModified: '2026-06-04',
   featureList: ['Scoped capability token minting', 'Budget enforcement simulation', 'Delegated token limits', 'Revocation testing', 'Policy Evidence Pack'],
 };
 
@@ -1800,19 +1800,25 @@ export default function ProtectDemoPage() {
             This demo runs against the live SatGate OSS deployment on Railway.
           </p>
           <div className="flex justify-center gap-4">
-            <a 
-              href="https://github.com/SatGate-io/satgate" 
-              target="_blank" 
+            <a
+              href="https://github.com/SatGate-io/satgate"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-purple-400 hover:text-purple-300 text-sm underline underline-offset-4 transition"
             >
               View Source on GitHub →
             </a>
-            <Link 
+            <Link
               href="/pay"
               className="text-cyan-400 hover:text-cyan-300 text-sm underline underline-offset-4 transition"
             >
               Try Charge Mode →
+            </Link>
+            <Link
+              href="/capability-lifecycle-demo"
+              className="text-emerald-400 hover:text-emerald-300 text-sm underline underline-offset-4 transition"
+            >
+              Capability lifecycle demo →
             </Link>
           </div>
         </div>

@@ -67,7 +67,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/compare/tyk', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/compare/langfuse', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/compare/cloud-native', lastModified: '2026-05-02', changeFrequency: 'monthly', priority: 0.7 },
-  { path: '/protect', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.7 },
+  { path: '/protect', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/crawl', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/pay', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/monetize', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.7 },
