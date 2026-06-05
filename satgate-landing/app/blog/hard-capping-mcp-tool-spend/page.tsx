@@ -30,7 +30,7 @@ export default function HardCappingMcpToolSpendPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-02-14',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/blog/hard-capping-mcp-tool-spend',
     about: [
       { '@type': 'Thing', name: 'hard-capping MCP tool spend' },
@@ -388,6 +388,9 @@ satgate token attenuate <root-token> \\
           </Link>
           <Link href="/roi-calculator" className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-6 py-3 rounded-lg font-bold hover:border-purple-600/50 transition">
             Calculate Your ROI
+          </Link>
+          <Link href="/mcp-budget-enforcement" className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-6 py-3 rounded-lg font-bold hover:border-purple-600/50 transition">
+            MCP budget enforcement
           </Link>
         </div>
       </div>
