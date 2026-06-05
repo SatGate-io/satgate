@@ -342,7 +342,7 @@ export default function SandboxPage() {
     url: 'https://satgate.io/sandbox',
     description: 'Interactive SatGate demo for Mint, Capability Control, Spend Control, and Paid-Rails.',
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'SatGate demo' },
@@ -364,7 +364,7 @@ export default function SandboxPage() {
     url: 'https://satgate.io/sandbox',
     description: 'Interactive SatGate demo for Mint, Capability Control, Spend Control, and Paid-Rails.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     featureList: [
       'Mint Demo',
       'Capability Control Demo',
@@ -443,6 +443,14 @@ export default function SandboxPage() {
           <p className="mx-auto max-w-3xl text-lg leading-relaxed text-gray-400">
             Start with scoped authority, then move through capability control, spend control, and paid-rail context. Each demo is a separate proof path.
           </p>
+          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link href="/economic-firewall-readiness-grader" className="text-purple-300 hover:text-purple-200 text-sm font-semibold underline underline-offset-4 transition">
+              Grade economic firewall readiness →
+            </Link>
+            <Link href="/agent-spend-policy-template" className="text-cyan-300 hover:text-cyan-200 text-sm font-semibold underline underline-offset-4 transition">
+              Start from a spend policy →
+            </Link>
+          </div>
           <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4 text-left">
             {sandboxDemos.map(({ title, href, icon: Icon, eyebrow, body }) => (
               <Link
