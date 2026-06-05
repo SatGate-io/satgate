@@ -136,7 +136,7 @@ export default function ToolsPage() {
     url: 'https://satgate.io/tools',
     description: metadata.description,
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent cost control tools' },
@@ -233,6 +233,9 @@ export default function ToolsPage() {
             </Link>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               See agent cost control
+            </Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Grade firewall readiness
             </Link>
           </div>
         </div>
