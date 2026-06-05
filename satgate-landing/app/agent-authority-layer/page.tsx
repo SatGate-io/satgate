@@ -97,7 +97,7 @@ const jsonLd = {
       name: "Agent Authority & Accountability Layer",
       url: "https://satgate.io/agent-authority-layer",
       description: metadata.description,
-      dateModified: "2026-06-03",
+      dateModified: "2026-06-04",
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
       about: [
         { "@type": "Thing", name: "AI agent authority" },
@@ -168,6 +168,9 @@ export default function AgentAuthorityLayerPage() {
               </Link>
               <Link href="/design-partners" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
                 Talk to us
+              </Link>
+              <Link href="/evidence-pack-demo" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
+                View Evidence Pack demo
               </Link>
             </div>
           </div>
