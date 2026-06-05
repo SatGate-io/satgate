@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowLeft, Shield, Lock, Eye, Key, Zap, CheckCircle, Code, GitBranch, Bot, Activity, Server, FileText } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Shield, Lock, Eye, Key, Zap, CheckCircle, Code, GitBranch, Bot, Activity, Server, FileText } from 'lucide-react';
 
 export const metadata = {
   title: 'SatGate Security | Capability Tokens for AI Agent Governance',
@@ -36,7 +36,7 @@ export default function SecurityPage() {
     url: 'https://satgate.io/security',
     description: metadata.description,
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent security' },
@@ -410,12 +410,20 @@ export default function SecurityPage() {
             <p className="text-gray-400 text-sm mb-4">
               All gateway code is open source under the Apache 2.0 License. Audit every line, fork it, run your own infrastructure.
             </p>
-            <a 
-              href="https://github.com/SatGate-io/satgate" 
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-sm font-medium text-gray-300 transition"
-            >
-              <Code size={16} /> View Source on GitHub →
-            </a>
+            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <a
+                href="https://github.com/SatGate-io/satgate"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-sm font-medium text-gray-300 transition"
+              >
+                <Code size={16} /> View Source on GitHub →
+              </a>
+              <Link
+                href="/capability-auth"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-sm font-medium text-gray-300 transition"
+              >
+                Capability auth <ArrowRight size={16} />
+              </Link>
+            </div>
           </section>
 
         </div>
