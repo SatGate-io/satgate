@@ -41,7 +41,7 @@ export default function SatGateIntegrationPage() {
     url: 'https://satgate.io/satgate-for-claude-desktop',
     description: metadata.description,
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'Claude Desktop MCP budget enforcement' },
@@ -62,7 +62,7 @@ export default function SatGateIntegrationPage() {
     description: metadata.description,
     url: 'https://satgate.io/satgate-for-claude-desktop',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     audience: webPageJsonLd.audience,
     featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'Request-path Evidence Packs', 'rail-neutral paid-rail governance'],
   };
@@ -121,6 +121,9 @@ export default function SatGateIntegrationPage() {
             </Link>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               AI agent cost control
+            </Link>
+            <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Govern MCP access
             </Link>
           </div>
         </div>
