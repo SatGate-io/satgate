@@ -68,7 +68,7 @@ export default function McpProxyConfigGeneratorPage() {
     url: 'https://satgate.io/mcp-proxy-config-generator',
     description: 'Generate MCP proxy configs for Cursor, Claude, OpenClaw, and custom MCP clients with scoped authority, budgets, Evidence Pack receipts, revocation, and optional paid-rail context.',
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'MCP proxy config generator' },
@@ -89,7 +89,7 @@ export default function McpProxyConfigGeneratorPage() {
     url: 'https://satgate.io/mcp-proxy-config-generator',
     description: 'Generate MCP proxy configs for Cursor, Claude, OpenClaw, and custom MCP clients with scoped authority, budgets, Evidence Pack receipts, revocation, and optional paid-rail context.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     audience: webPageJsonLd.audience,
     featureList: ['Cursor MCP config generation', 'Claude MCP config generation', 'OpenClaw MCP config generation', 'Budget and audit policy generation', 'Optional paid-rail context config'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -308,6 +308,9 @@ export default function McpProxyConfigGeneratorPage() {
             </Link>
             <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               MCP tool policy generator
+            </Link>
+            <Link href="/mcp-gateway" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              MCP gateway pattern
             </Link>
           </div>
         </div>
