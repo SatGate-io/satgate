@@ -40,7 +40,7 @@ export default function SatGateIntegrationPage() {
     name: 'SatGate for Cursor AI Agents',
     description: metadata.description,
     url: 'https://satgate.io/satgate-for-cursor',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'Cursor agent spend control' },
@@ -60,7 +60,7 @@ export default function SatGateIntegrationPage() {
     description: metadata.description,
     url: 'https://satgate.io/satgate-for-cursor',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     about: webPageJsonLd.about,
     featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'Request-path Evidence Packs', 'rail-neutral paid-rail governance'],
   };
@@ -119,6 +119,9 @@ export default function SatGateIntegrationPage() {
             </Link>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               AI agent cost control
+            </Link>
+            <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Enforce MCP budgets
             </Link>
           </div>
         </div>
