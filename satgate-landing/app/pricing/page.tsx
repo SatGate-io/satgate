@@ -47,7 +47,7 @@ const PricingPage = () => {
     url: 'https://satgate.io/pricing',
     description: 'Pricing for bounded agent authority: Observe audits, request-path budget enforcement, MCP tool controls, receipts, and Evidence Pack proof.',
     datePublished: '2026-04-27',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'Agent Authority & Accountability Layer' },
@@ -83,7 +83,7 @@ const PricingPage = () => {
     name: 'SatGate Pricing',
     url: 'https://satgate.io/pricing',
     description: 'Pricing for bounded agent authority: Observe audits, request-path budget enforcement, MCP tool controls, receipts, and Evidence Pack proof.',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     itemListElement: [
       {
         '@type': 'Offer',
@@ -423,6 +423,12 @@ const PricingPage = () => {
             >
               Talk to Sales
             </a>
+            <Link
+              href="/ai-api-budget-enforcement"
+              className="inline-block border border-gray-700 text-gray-300 px-10 py-4 rounded-full font-bold text-lg hover:border-purple-500 hover:bg-gray-800 transition"
+            >
+              Budget enforcement guide
+            </Link>
           </div>
         </div>
       </section>
