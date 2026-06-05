@@ -156,7 +156,7 @@ export default function ComparePage() {
     name: 'Compare SatGate',
     description: metadata.description,
     url: 'https://satgate.io/compare',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI gateway comparison' },
@@ -172,7 +172,7 @@ export default function ComparePage() {
     '@type': 'ItemList',
     name: 'SatGate comparison pages',
     description: metadata.description,
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     about: webPageJsonLd.about,
     itemListElement: comparisons.map((item, index) => ({
       '@type': 'ListItem',
@@ -280,6 +280,14 @@ export default function ComparePage() {
           <p className="max-w-4xl leading-relaxed text-gray-300">
             LiteLLM, Portkey, Helicone, Cloudflare AI Gateway, Kong AI Gateway, Apigee, Tyk, Langfuse, Bifrost, and Zuplo are useful infrastructure. The difference is category: SatGate is the economic firewall — the request-path layer that decides what autonomous agents can spend, access, delegate, revoke, audit, or pay for before the next call executes.
           </p>
+          <div className="mt-6 flex flex-col gap-4 sm:flex-row">
+            <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+              Economic firewall category <ArrowRight size={18} />
+            </Link>
+            <Link href="/agent-control-plane" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Agent control plane
+            </Link>
+          </div>
         </section>
 
         <section className="mt-12 rounded-2xl border border-gray-800 bg-gray-950 p-8">
