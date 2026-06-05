@@ -171,7 +171,7 @@ const jsonLd = {
       description:
         "An agent control plane for enterprise AI agents: scoped capabilities, delegation lineage, request-path budget enforcement, Evidence Pack exports, and revocation without standing API keys.",
       datePublished: "2026-04-27",
-      dateModified: "2026-05-05",
+      dateModified: "2026-06-04",
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
       about: [
         { "@type": "Thing", name: "AI agent control plane" },
@@ -607,12 +607,20 @@ export default function AgentControlPlanePage() {
           <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-slate-300">
             No standing API keys. No unmanaged delegation. No invisible spend.
           </p>
-          <a
-            href="mailto:contact@satgate.io?subject=SatGate%20Agent%20Control%20Plane%20demo"
-            className="mt-8 inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 text-base font-black text-slate-950 transition hover:bg-cyan-100"
-          >
-            Book a demo <ArrowRight size={18} />
-          </a>
+          <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Link
+              href="/capability-auth"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 px-6 py-4 text-base font-black text-white transition hover:border-cyan-300/60"
+            >
+              Review capability auth <ArrowRight size={18} />
+            </Link>
+            <a
+              href="mailto:contact@satgate.io?subject=SatGate%20Agent%20Control%20Plane%20demo"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 text-base font-black text-slate-950 transition hover:bg-cyan-100"
+            >
+              Book a demo <ArrowRight size={18} />
+            </a>
+          </div>
         </div>
       </section>
     </main>
