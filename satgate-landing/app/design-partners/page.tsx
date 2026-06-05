@@ -81,7 +81,7 @@ export default function DesignPartnersPage() {
     url: 'https://satgate.io/design-partners',
     description: 'Early access for teams shaping SatGate Policy-to-Proof capabilities for AI agent budget enforcement, MCP governance, API controls, paid-rail context, and Evidence Pack proof.',
     datePublished: '2026-04-27',
-    dateModified: '2026-05-02',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent economic governance' },
@@ -194,9 +194,14 @@ export default function DesignPartnersPage() {
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
             We're working with <strong className="text-white">10 enterprises</strong> to shape SatGate's Policy-to-Proof layer for AI agent requests. Gate one MCP tool, REST API, or LLM endpoint in a bounded lane — see which agent had authority, what it spent, what was denied, and what Evidence Pack proof was preserved. Get direct engineering support and a product shaped by your needs.
           </p>
-          <a href="#apply" className="inline-flex items-center gap-2 bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
-            Apply Now <ArrowRight size={18} />
-          </a>
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <a href="#apply" className="inline-flex items-center gap-2 bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
+              Apply Now <ArrowRight size={18} />
+            </a>
+            <Link href="/economic-firewall" className="inline-flex items-center gap-2 rounded-lg border border-gray-700 px-8 py-3 font-bold text-white transition hover:border-cyan-500">
+              See economic firewall
+            </Link>
+          </div>
         </div>
       </header>
 
