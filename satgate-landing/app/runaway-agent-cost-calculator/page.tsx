@@ -64,7 +64,7 @@ export default function RunawayAgentCostCalculatorPage() {
     url: 'https://satgate.io/runaway-agent-cost-calculator',
     description: 'Estimate runaway AI agent loop costs from agent count, calls per minute, tool-call cost, loop duration, delegation fanout, and incident frequency.',
     datePublished: '2026-05-01',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'runaway agent spend' },
@@ -84,7 +84,7 @@ export default function RunawayAgentCostCalculatorPage() {
     url: 'https://satgate.io/runaway-agent-cost-calculator',
     description: 'Estimate runaway AI agent loop costs from agent count, calls per minute, tool-call cost, loop duration, delegation fanout, and incident frequency.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     about: webPageJsonLd.about,
     featureList: ['Agent loop cost modeling', 'Delegation fanout exposure', 'Monthly and annual exposure estimates', 'Budget enforcement savings estimate'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -293,6 +293,9 @@ export default function RunawayAgentCostCalculatorPage() {
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">
               See Policy-to-Proof
+            </Link>
+            <Link href="/ai-agent-runaway-spend-index" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">
+              Runaway spend index
             </Link>
           </div>
         </div>
