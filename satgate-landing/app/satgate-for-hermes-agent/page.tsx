@@ -41,7 +41,7 @@ export default function SatGateForHermesAgentPage() {
     name: 'SatGate for Hermes Agent MCP Workflows',
     description: metadata.description,
     url: 'https://satgate.io/satgate-for-hermes-agent',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'Hermes Agent MCP budget enforcement' },
@@ -61,7 +61,7 @@ export default function SatGateForHermesAgentPage() {
     description: metadata.description,
     url: 'https://satgate.io/satgate-for-hermes-agent',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     about: webPageJsonLd.about,
     featureList: ['Hermes Agent MCP budget enforcement', 'AI agent spend control', 'MCP tool cost policy', 'Revocable capability tokens', 'Request-path Evidence Packs'],
   };
@@ -123,6 +123,9 @@ export default function SatGateForHermesAgentPage() {
             </Link>
             <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               MCP governance
+            </Link>
+            <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Generate tool cost policy
             </Link>
           </div>
         </div>
