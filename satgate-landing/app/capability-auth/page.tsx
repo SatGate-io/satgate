@@ -42,7 +42,7 @@ export default function CapabilityAuthPage() {
     applicationCategory: 'SecurityApplication',
     description: metadata.description,
     url: 'https://satgate.io/capability-auth',
-    dateModified: '2026-05-08',
+    dateModified: '2026-06-04',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     featureList: capabilities.map((item) => item.title),
   };
@@ -90,6 +90,9 @@ export default function CapabilityAuthPage() {
             </Link>
             <Link href="/blog/macaroon-tokens-vs-api-keys" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-emerald-500 transition">
               Compare macaroons and API keys
+            </Link>
+            <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-emerald-500 transition">
+              Agent capability tokens
             </Link>
           </div>
         </div>

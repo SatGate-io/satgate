@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-05T00:34:10.985101Z",
+  "generatedAt": "2026-06-05T01:04:43.423567Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -488,6 +488,7 @@
         "Stop handing agents broad API keys."
       ],
       "internalLinks": [
+        "/agent-capability-tokens",
         "/blog/macaroon-tokens-vs-api-keys",
         "/design-partners",
         "/revocable-capability-token-policy-template"
@@ -501,7 +502,7 @@
         "Question",
         "SoftwareApplication"
       ],
-      "wordCount": 521,
+      "wordCount": 524,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
