@@ -16,7 +16,7 @@ const webPageJsonLd = {
   name: 'Economic Firewall for AI Agents',
   description: 'Protect HTTP APIs and MCP tools that AI agents call with request-path budget enforcement, revocation, audit, and delegated capability controls.',
   url: 'https://satgate.io/agents',
-  dateModified: '2026-05-04',
+  dateModified: '2026-06-04',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
     { '@type': 'Thing', name: 'economic firewall for AI agents' },
@@ -408,6 +408,13 @@ export default function AgentsLandingPage() {
             >
               <Bot size={20} />
               Try Live Demo
+            </Link>
+            <Link
+              href="/agent-control-plane"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-gray-200 font-semibold text-lg transition"
+            >
+              <SlidersHorizontal size={20} />
+              Agent control plane
             </Link>
           </div>
         </div>
