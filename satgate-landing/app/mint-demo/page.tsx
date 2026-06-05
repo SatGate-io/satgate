@@ -117,7 +117,7 @@ export default function MintDemoPage() {
     url: 'https://satgate.io/mint-demo',
     description: 'Interactive demo for minting budget-aware capability tokens and macaroons for AI agents with scopes, expiry, delegation limits, and revocation policy.',
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'SatGate Mint' },
@@ -137,7 +137,7 @@ export default function MintDemoPage() {
     url: 'https://satgate.io/mint-demo',
     description: 'Interactive demo for minting budget-aware capability tokens and macaroons for AI agents with scopes, expiry, delegation limits, and revocation policy.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     featureList: ['Workload identity exchange', 'Macaroon capability minting', 'Budget caveat preview', 'Policy verification', 'Scoped agent credential demo'],
   };
 
@@ -452,6 +452,12 @@ export default function MintDemoPage() {
                 className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-medium transition"
               >
                 SDK Docs <ArrowRight size={14} />
+              </Link>
+              <Link
+                href="/revocable-agent-credentials"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-medium transition"
+              >
+                Revocable credentials <ArrowRight size={14} />
               </Link>
             </div>
           </div>
