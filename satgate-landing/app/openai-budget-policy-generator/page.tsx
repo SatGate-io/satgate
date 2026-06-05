@@ -77,7 +77,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
     url: 'https://satgate.io/openai-budget-policy-generator',
     description: 'Generate request-path OpenAI API budget policy for autonomous agents, model routing, spend caps, revocation, and Evidence Pack receipts.',
     datePublished: '2026-04-29',
-    dateModified: '2026-05-02',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'OpenAI API budget limits' },
@@ -95,6 +95,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
     url: 'https://satgate.io/openai-budget-policy-generator',
     description: 'Generate OpenAI API budget policy for autonomous agents, workflows, model routes, per-request caps, daily budgets, and Evidence Pack receipts.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-06-04',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     featureList: [
       'OpenAI per-request budget caps',
@@ -290,6 +291,9 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
             </Link>
             <Link href="/runaway-agent-cost-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Calculate runaway cost
+            </Link>
+            <Link href="/ai-api-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              AI API budget enforcement
             </Link>
           </div>
         </div>

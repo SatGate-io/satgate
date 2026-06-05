@@ -79,7 +79,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/revocable-capability-token-policy-template', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/l402-api-pricing-calculator', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/runaway-agent-cost-calculator', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/openai-budget-policy-generator', lastModified: '2026-05-02', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/openai-budget-policy-generator', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/mcp-tool-cost-policy-generator', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/mcp-proxy-config-generator', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/economic-firewall-readiness-grader', lastModified: '2026-05-05', changeFrequency: 'monthly', priority: 0.8 },
