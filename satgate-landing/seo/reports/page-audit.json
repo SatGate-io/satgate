@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-05T20:04:56.421688Z",
+  "generatedAt": "2026-06-05T20:34:07.766542Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -72,6 +72,7 @@
         "Related reading"
       ],
       "internalLinks": [
+        "/ai-api-budget-enforcement",
         "/blog",
         "/blog/ai-agent-spending-limits",
         "/blog/llm-cost-management",
@@ -88,7 +89,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1315,
+      "wordCount": 1317,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,

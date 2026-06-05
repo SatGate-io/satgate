@@ -43,7 +43,7 @@ export default function AiSpendGovernanceBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-05-22',
-    dateModified: '2026-05-22',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/blog/ai-spend-governance',
     about: [
       { '@type': 'Thing', name: 'AI spend governance' },
@@ -300,8 +300,8 @@ export default function AiSpendGovernanceBlogPage() {
               <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg bg-cyan-400 px-5 py-3 font-bold text-black transition hover:bg-cyan-300">
                 See Policy-to-Proof governance
               </Link>
-              <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 font-bold text-white transition hover:border-cyan-500">
-                See Policy-to-Proof
+              <Link href="/ai-api-budget-enforcement" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 font-bold text-white transition hover:border-cyan-500">
+                Enforce AI API budgets
               </Link>
             </div>
           </div>
