@@ -69,7 +69,7 @@ export default function IntegrationsPage() {
     url: 'https://satgate.io/integrations',
     description: metadata.description,
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'SatGate integrations' },
@@ -173,6 +173,14 @@ export default function IntegrationsPage() {
           <p className="max-w-4xl text-lg leading-relaxed text-gray-300">
             Agent governance is adopted inside real workflows. SatGate sits between agent clients and upstream APIs, MCP servers, and paid tools so teams can observe, control, and prove before autonomous requests create cost or risk.
           </p>
+          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
+            <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+              Govern MCP workflows <ArrowRight size={18} />
+            </Link>
+            <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Economic firewall overview
+            </Link>
+          </div>
         </section>
 
         <section className="mt-14 rounded-2xl border border-gray-800 bg-gray-950 p-8">

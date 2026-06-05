@@ -47,7 +47,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/satgate-for-claude-desktop', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/satgate-for-openclaw', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/satgate-for-hermes-agent', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/integrations', lastModified: '2026-05-03', changeFrequency: 'weekly', priority: 0.8 },
+  { path: '/integrations', lastModified: '2026-06-04', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/pricing', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/security', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog', lastModified: '2026-06-04', changeFrequency: 'weekly', priority: 0.8 },
