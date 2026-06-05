@@ -85,7 +85,7 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
     url: 'https://satgate.io/revocable-capability-token-policy-template',
     description: 'Generate scoped, expiring, revocable capability-token policy for AI agents, sub-agents, MCP tools, budgets, receipts, and Evidence Pack evidence.',
     datePublished: '2026-04-12',
-    dateModified: '2026-05-05',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'revocable capability token policy template' },
@@ -106,7 +106,7 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
     url: 'https://satgate.io/revocable-capability-token-policy-template',
     description: 'Generate scoped, expiring, revocable capability-token policy for AI agents, sub-agents, MCP tools, budgets, receipts, and Evidence Pack evidence.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-05',
+    dateModified: '2026-06-04',
     audience: webPageJsonLd.audience,
     featureList: ['YAML capability-token policy generation', 'JSON capability-token policy generation', 'Delegation attenuation controls', 'Budget exhaustion revocation rules', 'Receipt field templates', 'Evidence Pack export fields'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -308,6 +308,9 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Create Evidence Pack trail
+            </Link>
+            <Link href="/capability-auth" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Capability auth model
             </Link>
           </div>
         </div>
