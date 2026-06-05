@@ -95,7 +95,7 @@ const staticRoutes: SitemapEntry[] = [
 const blogRoutes: SitemapEntry[] = [
   { path: '/blog/always-on-agents-economic-authority', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/blog/ai-spend-governance', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/blog/why-routing-isnt-governance', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.6 },
+  { path: '/blog/why-routing-isnt-governance', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/blog/beyond-connection-economic-governance-mcp', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/blog/how-we-built-budget-enforcement-mcp', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/blog/hard-capping-mcp-tool-spend', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.6 },

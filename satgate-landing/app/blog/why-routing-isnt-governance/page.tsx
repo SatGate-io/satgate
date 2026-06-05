@@ -27,7 +27,7 @@ export default function WhyRoutingIsntGovernancePage() {
     description: "AI gateways excel at routing LLM calls. But when agents control spend autonomously, routing isn't enough. You need economic governance.",
     url: 'https://satgate.io/blog/why-routing-isnt-governance',
     datePublished: '2026-02-06',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -83,7 +83,7 @@ export default function WhyRoutingIsntGovernancePage() {
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
         </Link>
-        
+
         {/* Header */}
         <header className="mb-12">
           <div className="flex flex-wrap gap-2 mb-4">
@@ -97,14 +97,14 @@ export default function WhyRoutingIsntGovernancePage() {
               Agent Economy
             </span>
           </div>
-          
+
           <h1 className="text-4xl font-bold mb-4">Why Routing Isn't Governance</h1>
-          
+
           <p className="text-xl text-gray-400 mb-6">
-            AI gateways excel at routing LLM calls. But when agents control spend autonomously, 
+            AI gateways excel at routing LLM calls. But when agents control spend autonomously,
             routing isn't enough. You need economic governance.
           </p>
-          
+
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <span className="flex items-center gap-1">
               <Calendar size={14} />
@@ -120,15 +120,15 @@ export default function WhyRoutingIsntGovernancePage() {
         {/* Article Content */}
         <article className="prose prose-invert prose-gray max-w-none">
           <div className="space-y-6 text-gray-300 leading-relaxed">
-            
+
             <p className="text-lg">
-              The AI gateway market is booming. Bifrost, LiteLLM, Portkey, and others are racing to 
+              The AI gateway market is booming. Bifrost, LiteLLM, Portkey, and others are racing to
               solve the same problem: <em>how do you efficiently route LLM calls across multiple providers?</em>
             </p>
 
             <p>
-              It's a real problem. When you're building AI applications, you don't want to be locked 
-              into a single provider. You want failover when OpenAI goes down. You want load balancing 
+              It's a real problem. When you're building AI applications, you don't want to be locked
+              into a single provider. You want failover when OpenAI goes down. You want load balancing
               across API keys. You want semantic caching to reduce costs.
             </p>
 
@@ -154,8 +154,8 @@ export default function WhyRoutingIsntGovernancePage() {
             </ul>
 
             <p>
-              These are infrastructure questions. They're about reliability and performance. 
-              And they assume a human is ultimately in control — making decisions about which 
+              These are infrastructure questions. They're about reliability and performance.
+              And they assume a human is ultimately in control — making decisions about which
               applications to build, which APIs to call, and how much to spend.
             </p>
 
@@ -166,8 +166,8 @@ export default function WhyRoutingIsntGovernancePage() {
             </p>
 
             <p>
-              An agent with access to an MCP tool server can decide — autonomously — to make 
-              thousands of API calls. It can spawn sub-agents, each with their own tool access. 
+              An agent with access to an MCP tool server can decide — autonomously — to make
+              thousands of API calls. It can spawn sub-agents, each with their own tool access.
               It can run overnight while you sleep.
             </p>
 
@@ -213,12 +213,12 @@ export default function WhyRoutingIsntGovernancePage() {
             </div>
 
             <p>
-              Routing gateways live in the infrastructure layer. They make sure requests get to 
+              Routing gateways live in the infrastructure layer. They make sure requests get to
               the right place efficiently. But they don't answer the economic question.
             </p>
 
             <p>
-              That's the gap. And it's the gap that will cause six-figure surprises when agents 
+              That's the gap. And it's the gap that will cause six-figure surprises when agents
               start running autonomously at scale.
             </p>
 
@@ -240,16 +240,16 @@ export default function WhyRoutingIsntGovernancePage() {
                 <div>
                   <h4 className="font-bold text-white mb-1">Per-Tool Cost Attribution</h4>
                   <p className="text-gray-400 text-sm">
-                    In MCP, agents call tools by name. Governance means knowing that Agent X 
-                    spent $47 on the <code className="bg-gray-800 px-1 rounded">search_database</code> tool 
-                    and $12 on <code className="bg-gray-800 px-1 rounded">send_email</code>. 
+                    In MCP, agents call tools by name. Governance means knowing that Agent X
+                    spent $47 on the <code className="bg-gray-800 px-1 rounded">search_database</code> tool
+                    and $12 on <code className="bg-gray-800 px-1 rounded">send_email</code>.
                     Not just "Agent X made 1,000 requests."
                   </p>
                 </div>
                 <div>
                   <h4 className="font-bold text-white mb-1">Delegation Without Escalation</h4>
                   <p className="text-gray-400 text-sm">
-                    When Agent A spawns Agent B, it should be able to give B a subset of its 
+                    When Agent A spawns Agent B, it should be able to give B a subset of its
                     budget — not the master key. Macaroon-based credentials enable this; API keys don't.
                   </p>
                 </div>
@@ -259,7 +259,7 @@ export default function WhyRoutingIsntGovernancePage() {
             <h2 className="text-2xl font-bold text-white mt-12 mb-4">Routing + Governance</h2>
 
             <p>
-              This isn't an either/or situation. Routing gateways and economic gateways solve 
+              This isn't an either/or situation. Routing gateways and economic gateways solve
               different problems. You might use both:
             </p>
 
@@ -268,7 +268,7 @@ export default function WhyRoutingIsntGovernancePage() {
             </div>
 
             <p>
-              The economic gateway enforces budgets and tracks attribution. The routing gateway 
+              The economic gateway enforces budgets and tracks attribution. The routing gateway
               optimizes which provider handles each call. Different layers, different concerns.
             </p>
 
@@ -279,12 +279,12 @@ export default function WhyRoutingIsntGovernancePage() {
             </p>
 
             <p className="text-xl font-medium text-white my-6">
-              "If my agent makes 10,000 calls tonight while I'm asleep, 
+              "If my agent makes 10,000 calls tonight while I'm asleep,
               who decides when it stops?"
             </p>
 
             <p>
-              If the answer is "when it finishes the task" or "when the API rate limits kick in," 
+              If the answer is "when it finishes the task" or "when the API rate limits kick in,"
               you have a routing gateway.
             </p>
 
@@ -293,7 +293,7 @@ export default function WhyRoutingIsntGovernancePage() {
             </p>
 
             <p>
-              The agent economy needs both. But right now, almost everyone has routing. 
+              The agent economy needs both. But right now, almost everyone has routing.
               Almost no one has governance.
             </p>
 
@@ -335,17 +335,23 @@ export default function WhyRoutingIsntGovernancePage() {
             Start with free Observe mode. See what your agents are actually spending.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              href="/design-partners" 
+            <Link
+              href="/design-partners"
               className="inline-flex items-center justify-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition"
             >
               Apply for Design Partner Program
             </Link>
-            <Link 
-              href="/compare" 
+            <Link
+              href="/compare"
               className="inline-flex items-center justify-center gap-2 bg-gray-800 text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-700 transition"
             >
               See How We Compare
+            </Link>
+            <Link
+              href="/agent-control-plane"
+              className="inline-flex items-center justify-center gap-2 bg-gray-800 text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-700 transition"
+            >
+              Agent control plane
             </Link>
           </div>
         </section>
