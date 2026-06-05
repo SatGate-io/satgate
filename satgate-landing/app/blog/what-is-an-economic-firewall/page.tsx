@@ -28,7 +28,7 @@ export default function WhatIsEconomicFirewallPage() {
     description: 'An economic firewall enforces AI agent budget limits in real time before autonomous API, model, or MCP tool calls execute.',
     url: 'https://satgate.io/blog/what-is-an-economic-firewall',
     datePublished: '2026-03-18',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -334,6 +334,9 @@ const agentBToken = attenuate(agentAToken, {
               </a>
               <Link href="/sandbox" className="border border-purple-700/50 bg-purple-900/20 px-6 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition text-purple-300">
                 Try the Sandbox
+              </Link>
+              <Link href="/economic-firewall" className="border border-purple-700/50 bg-purple-900/20 px-6 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition text-purple-300">
+                Economic firewall guide
               </Link>
             </div>
           </div>

@@ -101,7 +101,7 @@ const blogRoutes: SitemapEntry[] = [
   { path: '/blog/hard-capping-mcp-tool-spend', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/blog/security-as-a-profit-center', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.6 },
 
-  { path: '/blog/what-is-an-economic-firewall', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.7 },
+  { path: '/blog/what-is-an-economic-firewall', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/blog/mcp-budget-enforcement-guide', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/agent-swarms-cost-governance', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/blog/ai-agent-spending-limits', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.7 },
