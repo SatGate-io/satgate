@@ -1,14 +1,129 @@
 package mcpserver
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"io"
+	"os"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/satgate-io/satgate/pkg/macaroon"
 )
+
+func captureStderr(t *testing.T, fn func()) string {
+	t.Helper()
+	old := os.Stderr
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatalf("create stderr pipe: %v", err)
+	}
+	os.Stderr = w
+
+	var buf bytes.Buffer
+	done := make(chan error, 1)
+	go func() {
+		_, copyErr := io.Copy(&buf, r)
+		done <- copyErr
+	}()
+
+	fn()
+
+	_ = w.Close()
+	os.Stderr = old
+	if err := <-done; err != nil {
+		t.Fatalf("read stderr: %v", err)
+	}
+	_ = r.Close()
+	return buf.String()
+}
+
+func TestProxyAutoMintRootDoesNotPrintSecretToken(t *testing.T) {
+	cfg := &Config{
+		Server: ServerConfig{Transport: "stdio", Name: "test", Version: "1.0"},
+		Auth: AuthConfig{
+			Mode:         "header",
+			RootKey:      "test-root-key",
+			AutoMintRoot: true,
+		},
+		Upstreams: map[string]UpstreamConfig{
+			"mock": {Transport: "stdio", Command: []string{"python3", "-c", "import sys; sys.exit(0)"}},
+		},
+		Budget:      BudgetConfig{Backend: "memory", Limit: 500, FailMode: "closed"},
+		Enforcement: EnforcementConfig{Mode: "hard"},
+		Logging:     LoggingConfig{Level: "error"},
+	}
+	cfg.applyDefaults()
+
+	var proxy *Proxy
+	stderr := captureStderr(t, func() {
+		var err error
+		proxy, err = New(cfg)
+		if err != nil {
+			t.Fatalf("create proxy: %v", err)
+		}
+	})
+
+	if proxy.RootToken() == "" {
+		t.Fatal("expected auto-minted root token to remain available programmatically")
+	}
+	if strings.Contains(stderr, proxy.RootToken()) {
+		t.Fatalf("stderr leaked root token: %q", stderr)
+	}
+	if strings.Contains(stderr, "ROOT_TOKEN=") {
+		t.Fatalf("stderr must not print ROOT_TOKEN marker: %q", stderr)
+	}
+	if !strings.Contains(stderr, "TOKEN_ID=") {
+		t.Fatalf("stderr should still print non-secret token id for operators, got %q", stderr)
+	}
+}
+
+func TestProxyReusedRootTokenDoesNotPrintSecretToken(t *testing.T) {
+	svc, err := macaroon.NewService("test-root-key")
+	if err != nil {
+		t.Fatalf("create macaroon service: %v", err)
+	}
+	rootMac, err := svc.Mint("api:*", time.Now().Add(time.Hour))
+	if err != nil {
+		t.Fatalf("mint root macaroon: %v", err)
+	}
+	rootToken := svc.Encode(rootMac)
+
+	cfg := &Config{
+		Server: ServerConfig{Transport: "stdio", Name: "test", Version: "1.0"},
+		Auth: AuthConfig{
+			Mode:         "header",
+			RootKey:      "test-root-key",
+			AutoMintRoot: true,
+			RootToken:    rootToken,
+		},
+		Upstreams: map[string]UpstreamConfig{
+			"mock": {Transport: "stdio", Command: []string{"python3", "-c", "import sys; sys.exit(0)"}},
+		},
+		Budget:      BudgetConfig{Backend: "memory", Limit: 500, FailMode: "closed"},
+		Enforcement: EnforcementConfig{Mode: "hard"},
+		Logging:     LoggingConfig{Level: "error"},
+	}
+	cfg.applyDefaults()
+
+	stderr := captureStderr(t, func() {
+		if _, err := New(cfg); err != nil {
+			t.Fatalf("create proxy: %v", err)
+		}
+	})
+
+	if strings.Contains(stderr, rootToken) {
+		t.Fatalf("stderr leaked supplied root token: %q", stderr)
+	}
+	if strings.Contains(stderr, "ROOT_TOKEN=") {
+		t.Fatalf("stderr must not print ROOT_TOKEN marker: %q", stderr)
+	}
+	if !strings.Contains(stderr, "TOKEN_ID=") {
+		t.Fatalf("stderr should still print non-secret token id for operators, got %q", stderr)
+	}
+}
 
 // pipeTransport connects two ends of a pipe as a Transport.
 type pipeTransport struct {

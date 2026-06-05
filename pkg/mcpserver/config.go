@@ -68,8 +68,9 @@ type AuthConfig struct {
 	// RootKey for macaroon verification (for mode=header).
 	RootKey string `yaml:"rootKey,omitempty"`
 
-	// AutoMintRoot: if true (and mode=header), auto-mint a root macaroon on startup
-	// and print it to stderr. Useful for demos and development.
+	// AutoMintRoot: if true (and mode=header), auto-mint a root macaroon on startup.
+	// The raw root token is retained programmatically via Proxy.RootToken but is
+	// never printed to stderr/logs; only TOKEN_ID is emitted for operator wiring.
 	AutoMintRoot bool `yaml:"autoMintRoot,omitempty"`
 
 	// RootToken: if set (with autoMintRoot), reuse this token instead of minting a
