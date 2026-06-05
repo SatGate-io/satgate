@@ -33,7 +33,7 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-05-10',
-    dateModified: '2026-05-10',
+    dateModified: '2026-06-04',
     mainEntityOfPage: `https://satgate.io/compare/${config.slug}`,
     about: [
       { '@type': 'Thing', name: 'agent authority governance' },
