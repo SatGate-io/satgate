@@ -75,7 +75,7 @@ export default function McpToolCostPolicyGeneratorPage() {
     url: 'https://satgate.io/mcp-tool-cost-policy-generator',
     description: 'Generate MCP tool cost policy for per-tool budgets, session caps, risk actions, revocation, and Evidence Pack receipts.',
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'MCP tool cost policy generator' },
@@ -96,7 +96,7 @@ export default function McpToolCostPolicyGeneratorPage() {
     url: 'https://satgate.io/mcp-tool-cost-policy-generator',
     description: 'Generate MCP tool cost policy for per-tool budgets, session caps, risk actions, revocation, and Evidence Pack receipts.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     audience: webPageJsonLd.audience,
     featureList: ['MCP policy YAML generation', 'MCP policy JSON generation', 'Per-tool budget controls', 'Unknown cost risk actions', 'Revocation and Evidence Pack policy templates'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -250,6 +250,9 @@ export default function McpToolCostPolicyGeneratorPage() {
             </Link>
             <Link href="/openai-budget-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Generate OpenAI budget policy
+            </Link>
+            <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              MCP budget enforcement
             </Link>
           </div>
         </div>
