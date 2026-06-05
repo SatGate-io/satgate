@@ -40,7 +40,7 @@ export default function SatGateIntegrationPage() {
     name: 'SatGate for OpenClaw Agents',
     description: metadata.description,
     url: 'https://satgate.io/satgate-for-openclaw',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'OpenClaw agent spend control' },
@@ -60,7 +60,7 @@ export default function SatGateIntegrationPage() {
     description: metadata.description,
     url: 'https://satgate.io/satgate-for-openclaw',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     about: webPageJsonLd.about,
     featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'Request-path Evidence Packs', 'rail-neutral paid-rail governance'],
   };
@@ -119,6 +119,9 @@ export default function SatGateIntegrationPage() {
             </Link>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               AI agent cost control
+            </Link>
+            <Link href="/agent-authority-layer" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Agent authority layer
             </Link>
           </div>
         </div>
