@@ -77,7 +77,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/agent-api-key-risk-assessment', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/agent-spend-policy-template', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/revocable-capability-token-policy-template', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/l402-api-pricing-calculator', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/l402-api-pricing-calculator', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/runaway-agent-cost-calculator', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/openai-budget-policy-generator', lastModified: '2026-05-02', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/mcp-tool-cost-policy-generator', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.8 },

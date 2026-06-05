@@ -70,7 +70,7 @@ export default function L402ApiPricingCalculatorPage() {
     url: 'https://satgate.io/l402-api-pricing-calculator',
     description: 'Estimate per-request L402 API pricing, paid-agent access revenue, gross margin, free allowance, and Lightning sats per request for governed AI agent API access.',
     datePublished: '2026-05-01',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'L402 API pricing' },
@@ -90,7 +90,7 @@ export default function L402ApiPricingCalculatorPage() {
     url: 'https://satgate.io/l402-api-pricing-calculator',
     description: 'Estimate per-request L402 API pricing, paid-agent access revenue, gross margin, free allowance, and Lightning sats per request for governed AI agent API access.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     featureList: ['Per-request L402 pricing', 'Paid-agent access revenue estimate', 'Gross margin modeling', 'Free allowance planning', 'Adjustable sats per request conversion'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
@@ -288,6 +288,9 @@ export default function L402ApiPricingCalculatorPage() {
             </Link>
             <Link href="/blog/l402-protocol-explained" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-yellow-500">
               L402 protocol explained
+            </Link>
+            <Link href="/paid-agent-payments" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-yellow-500">
+              Paid agent payment controls
             </Link>
           </div>
         </div>
