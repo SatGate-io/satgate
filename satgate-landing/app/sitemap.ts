@@ -74,7 +74,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/mint-demo', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/sandbox', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/roi-calculator', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/agent-api-key-risk-assessment', lastModified: '2026-05-05', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/agent-api-key-risk-assessment', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/agent-spend-policy-template', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/revocable-capability-token-policy-template', lastModified: '2026-05-05', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/l402-api-pricing-calculator', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.8 },

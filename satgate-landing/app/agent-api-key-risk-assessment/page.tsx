@@ -62,7 +62,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
     url: 'https://satgate.io/agent-api-key-risk-assessment',
     description: 'Free assessment for API key risk in autonomous AI agent workflows, including scope, budget, revocation, delegation, and audit gaps.',
     datePublished: '2026-04-12',
-    dateModified: '2026-05-05',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent API key risk assessment' },
@@ -83,7 +83,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
     url: 'https://satgate.io/agent-api-key-risk-assessment',
     description: 'Free assessment for API key risk in autonomous AI agent workflows, including scope, budget, revocation, delegation, and audit gaps.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-05',
+    dateModified: '2026-06-04',
     audience: webPageJsonLd.audience,
     featureList: ['Static API key risk scoring', 'Scope gap assessment', 'Budget control checklist', 'Revocation gap assessment', 'Delegation and audit risk scoring'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -271,6 +271,9 @@ export default function AgentApiKeyRiskAssessmentPage() {
             </Link>
             <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Economic firewall readiness
+            </Link>
+            <Link href="/security" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Review security model
             </Link>
           </div>
         </div>
