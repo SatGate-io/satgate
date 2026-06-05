@@ -27,7 +27,7 @@ export default function BeyondConnectionPage() {
     description: 'The MCP ecosystem talks about capability. Economic governance adds cost, budget, revocation, delegation, and audit policy to MCP tool calls.',
     url: 'https://satgate.io/blog/beyond-connection-economic-governance-mcp',
     datePublished: '2026-02-12',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -578,6 +578,15 @@ satgate spend`}</pre>
             <p className="text-xl font-medium text-white mt-8">
               Don&apos;t wait for the bill to learn how your agents behave.
             </p>
+
+            <div className="not-prose my-8 flex flex-col gap-4 sm:flex-row">
+              <Link href="/mcp-governance" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 font-bold text-black transition hover:bg-gray-200">
+                See MCP governance
+              </Link>
+              <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 font-bold text-white transition hover:border-purple-500">
+                Generate MCP tool policy
+              </Link>
+            </div>
 
             <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
               <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">FAQ</p>
