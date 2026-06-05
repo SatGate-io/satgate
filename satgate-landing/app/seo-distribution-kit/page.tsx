@@ -43,7 +43,7 @@ export default function SeoDistributionKitPage() {
     url: 'https://satgate.io/seo-distribution-kit',
     description: metadata.description,
     datePublished: '2026-04-26',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent cost control distribution' },
@@ -63,7 +63,7 @@ export default function SeoDistributionKitPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/seo-distribution-kit',
     about: assets.map(([name, url]) => ({ '@type': 'WebPage', name, url: `https://satgate.io${url}` })),
     mentions: webPageJsonLd.about,
@@ -126,9 +126,14 @@ export default function SeoDistributionKitPage() {
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
             Copy, launch angles, and promotion targets for SatGate&apos;s AI agent cost control tools, LLM cost dashboard guides, MCP policy generators, revocable capability-token templates, L402 pricing calculator, and recurring runaway spend data assets.
           </p>
-          <a href="/distribution/satgate-seo-machine-launch-kit.md" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-            Download Markdown kit <ArrowRight size={18} />
-          </a>
+          <div className="flex flex-col gap-4 sm:flex-row">
+            <a href="/distribution/satgate-seo-machine-launch-kit.md" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+              Download Markdown kit <ArrowRight size={18} />
+            </a>
+            <Link href="/tools" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
+              Promote the tools hub
+            </Link>
+          </div>
         </div>
       </section>
 

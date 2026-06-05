@@ -84,7 +84,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/mcp-proxy-config-generator', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/economic-firewall-readiness-grader', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/tools', lastModified: '2026-06-04', changeFrequency: 'weekly', priority: 0.8 },
-  { path: '/seo-distribution-kit', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/seo-distribution-kit', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/design-partners', lastModified: '2026-05-02', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/dashboard', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/agents', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.6 },
