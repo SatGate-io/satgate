@@ -27,7 +27,7 @@ export default function McpProxyBlogPage() {
     description: 'We shipped an open-source MCP proxy that enforces per-tool budgets with cryptographic delegation for AI agent tool calls.',
     url: 'https://satgate.io/blog/how-we-built-budget-enforcement-mcp',
     datePublished: '2026-02-13',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -259,6 +259,8 @@ Result:
               <a href="https://github.com/SatGate-io/satgate/tree/main/pkg/mcpserver" className="text-cyan-400 hover:text-cyan-300">GitHub →</a>
               {' · '}
               <a href="https://satgate.io/pricing" className="text-cyan-400 hover:text-cyan-300">Enterprise →</a>
+              {' · '}
+              <Link href="/mcp-budget-enforcement" className="text-cyan-400 hover:text-cyan-300">MCP budget enforcement →</Link>
             </p>
           </div>
 
