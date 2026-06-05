@@ -29,7 +29,7 @@ export default function SecurityAsAProfitCenterPage() {
     description: 'SatGate shows how many dollars security saved, not just attacks blocked. Learn why economic governance can become a profit center.',
     url: 'https://satgate.io/blog/security-as-a-profit-center',
     datePublished: '2026-02-14',
-    dateModified: '2026-05-02',
+    dateModified: '2026-06-04',
     author: { '@type': 'Person', name: 'Matt Dean' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -354,6 +354,9 @@ Example:
           </Link>
           <Link href="/pricing" className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-6 py-3 rounded-lg font-bold hover:border-purple-600/50 transition">
             View Pricing
+          </Link>
+          <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-6 py-3 rounded-lg font-bold hover:border-purple-600/50 transition">
+            Grade firewall readiness
           </Link>
         </div>
       </div>
