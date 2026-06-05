@@ -83,7 +83,7 @@ const webPageJsonLd = {
   url: 'https://satgate.io/crawl',
   description: 'Interactive Protect mode demo for scoped AI agent capability tokens, delegation, policy enforcement, revocation, and audit before API access.',
   datePublished: '2026-04-12',
-  dateModified: '2026-05-03',
+  dateModified: '2026-06-04',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
     { '@type': 'Thing', name: 'SatGate Protect' },
@@ -103,7 +103,7 @@ const softwareJsonLd = {
   url: 'https://satgate.io/crawl',
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-  dateModified: '2026-05-03',
+  dateModified: '2026-06-04',
   featureList: ['Capability token minting', 'Agent credential delegation', 'Policy enforcement simulation', 'Credential revocation flow', 'Request Evidence Pack'],
 };
 
@@ -1743,19 +1743,25 @@ export default function ProtectDemoPage() {
             This demo runs against the live SatGate OSS deployment on Railway.
           </p>
           <div className="flex justify-center gap-4">
-            <a 
-              href="https://github.com/SatGate-io/satgate" 
-              target="_blank" 
+            <a
+              href="https://github.com/SatGate-io/satgate"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-purple-400 hover:text-purple-300 text-sm underline underline-offset-4 transition"
             >
               View Source on GitHub →
             </a>
-            <Link 
+            <Link
               href="/pay"
               className="text-cyan-400 hover:text-cyan-300 text-sm underline underline-offset-4 transition"
             >
               Try Pay Mode →
+            </Link>
+            <Link
+              href="/agent-api-governance"
+              className="text-emerald-400 hover:text-emerald-300 text-sm underline underline-offset-4 transition"
+            >
+              Agent API governance →
             </Link>
           </div>
         </div>
