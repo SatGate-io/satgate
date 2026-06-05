@@ -95,7 +95,7 @@ export default function EconomicFirewallReadinessGraderPage() {
     name: 'Economic Firewall Readiness Grader',
     url: 'https://satgate.io/economic-firewall-readiness-grader',
     description: 'Grade AI agent economic governance readiness across identity, request-path budgets, MCP tools, revocation, delegation, audit, routing, and paid-rail context.',
-    dateModified: '2026-05-05',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'economic firewall readiness' },
@@ -115,7 +115,7 @@ export default function EconomicFirewallReadinessGraderPage() {
     url: 'https://satgate.io/economic-firewall-readiness-grader',
     description: 'Grade AI agent economic governance readiness across identity, budgets, MCP tools, revocation, delegation, audit, routing, and payments.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-05',
+    dateModified: '2026-06-04',
     about: webPageJsonLd.about,
     featureList: ['Agent identity attribution scoring', 'Request-path budget readiness scoring', 'MCP tool cost governance checks', 'Revocation and delegation readiness checks', 'Audit, routing, and paid-rail context readiness checks'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -294,6 +294,9 @@ export default function EconomicFirewallReadinessGraderPage() {
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               See the Evidence Pack
+            </Link>
+            <Link href="/agent-api-key-risk-assessment" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Assess API key risk
             </Link>
           </div>
         </div>
