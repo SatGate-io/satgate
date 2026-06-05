@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-05T01:34:20.816549Z",
+  "generatedAt": "2026-06-05T02:04:20.141116Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -755,6 +755,7 @@
         "This is the capability lifecycle enterprises can govern."
       ],
       "internalLinks": [
+        "/accept-satgate-capabilities",
         "/agent-capability-tokens",
         "/govern",
         "/policy-to-proof",
@@ -770,7 +771,7 @@
         "WebPage",
         "WebSite"
       ],
-      "wordCount": 472,
+      "wordCount": 475,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,

@@ -258,6 +258,9 @@ export default function CapabilityLifecycleDemo() {
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               See Policy-to-Proof
             </Link>
+            <Link href="/accept-satgate-capabilities" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Accept SatGate capabilities
+            </Link>
           </div>
         </div>
       </section>

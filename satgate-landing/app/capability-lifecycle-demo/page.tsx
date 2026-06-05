@@ -34,7 +34,7 @@ export default function CapabilityLifecycleDemoPage() {
     url: 'https://satgate.io/capability-lifecycle-demo',
     description: metadata.description,
     datePublished: '2026-05-10',
-    dateModified: '2026-05-10',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'agent capability lifecycle' },
