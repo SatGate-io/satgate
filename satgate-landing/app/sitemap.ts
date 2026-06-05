@@ -24,7 +24,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/llm-cost-monitoring', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/ai-api-budget-enforcement', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/agent-spending-limits', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.85 },
-  { path: '/ai-agent-runaway-spend-benchmark', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.85 },
+  { path: '/ai-agent-runaway-spend-benchmark', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/ai-agent-runaway-spend-index', lastModified: '2026-06-03', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/mcp', lastModified: '2026-06-03', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/mcp-gateway', lastModified: '2026-06-03', changeFrequency: 'weekly', priority: 0.95 },
