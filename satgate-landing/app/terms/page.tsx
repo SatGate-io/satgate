@@ -25,7 +25,7 @@ export default function TermsPage() {
     name: 'Terms of Service - SatGate',
     description: metadata.description,
     url: 'https://satgate.io/terms',
-    dateModified: '2026-05-05',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'SatGate terms of service' },
@@ -43,9 +43,17 @@ export default function TermsPage() {
         <Link href="/" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Home
         </Link>
+        <div className="mb-8 flex flex-col gap-3 sm:flex-row">
+          <Link href="/privacy" className="rounded-lg border border-gray-800 px-4 py-2 text-sm font-bold text-white transition hover:border-purple-500">
+            Privacy Policy
+          </Link>
+          <Link href="/security" className="rounded-lg border border-gray-800 px-4 py-2 text-sm font-bold text-white transition hover:border-purple-500">
+            Security practices
+          </Link>
+        </div>
 
         <h1 className="text-4xl font-bold mb-2">Terms of Service</h1>
-        <p className="text-gray-500 mb-12">Last updated: February 2026</p>
+        <p className="text-gray-500 mb-12">Last updated: June 2026</p>
 
         <div className="prose prose-invert prose-gray max-w-none space-y-8">
 

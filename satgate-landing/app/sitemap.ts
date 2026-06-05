@@ -89,7 +89,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/dashboard', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/agents', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/privacy', lastModified: '2026-06-04', changeFrequency: 'yearly', priority: 0.3 },
-  { path: '/terms', lastModified: '2026-05-05', changeFrequency: 'yearly', priority: 0.3 },
+  { path: '/terms', lastModified: '2026-06-04', changeFrequency: 'yearly', priority: 0.3 },
 ];
 
 const blogRoutes: SitemapEntry[] = [
