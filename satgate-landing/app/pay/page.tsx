@@ -21,7 +21,7 @@ const webPageJsonLd = {
   url: 'https://satgate.io/pay',
   description: 'Interactive paid-rail demo showing HTTP 402 challenges, Lightning invoices, paid-call receipts, Evidence Pack proof, and request-path API access for paid agents.',
   datePublished: '2026-04-12',
-  dateModified: '2026-05-03',
+  dateModified: '2026-06-04',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
     { '@type': 'Thing', name: 'SatGate paid-rail governance' },
@@ -41,7 +41,7 @@ const softwareJsonLd = {
   url: 'https://satgate.io/pay',
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-  dateModified: '2026-05-03',
+  dateModified: '2026-06-04',
   featureList: ['HTTP 402 challenge simulation', 'paid-rail context invoice flow', 'Payment proof retry', 'Paid-call receipt creation', 'Evidence Pack proof'],
 };
 
@@ -449,6 +449,14 @@ export default function PayDemoPage() {
             Bitcoin Lightning. No credit cards. No monthly bills. Just instant, per-request micropayments 
             that return receipts and feed Evidence Packs.
           </p>
+          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link href="/l402-agent-payments" className="text-yellow-300 hover:text-yellow-200 text-sm font-semibold underline underline-offset-4 transition">
+              L402 agent payment governance →
+            </Link>
+            <Link href="/http-402-for-ai-agents" className="text-cyan-300 hover:text-cyan-200 text-sm font-semibold underline underline-offset-4 transition">
+              HTTP 402 for AI agents →
+            </Link>
+          </div>
         </div>
       </div>
 
