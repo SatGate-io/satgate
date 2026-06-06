@@ -29,7 +29,7 @@ export default function DeepMindDelegationPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-11',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/blog/deepmind-intelligent-delegation-satgate',
     about: [
       { '@type': 'Thing', name: 'intelligent AI delegation' },
@@ -475,6 +475,9 @@ export default function DeepMindDelegationPage() {
             </Link>
             <Link href="https://cloud.satgate.io/cloud/signup" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 text-white font-semibold text-sm hover:bg-purple-500 transition no-underline">
               Start Free on Cloud <ArrowRight size={16} />
+            </Link>
+            <Link href="/agent-authority-layer" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-purple-700/50 bg-purple-900/20 text-purple-300 font-semibold text-sm hover:bg-purple-900/40 transition no-underline">
+              Agent authority layer <ArrowRight size={16} />
             </Link>
           </div>
 

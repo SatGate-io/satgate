@@ -105,7 +105,7 @@ const blogRoutes: SitemapEntry[] = [
   { path: '/blog/mcp-budget-enforcement-guide', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/agent-swarms-cost-governance', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/blog/ai-agent-spending-limits', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.7 },
-  { path: '/blog/deepmind-intelligent-delegation-satgate', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/blog/deepmind-intelligent-delegation-satgate', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/api-gateway-for-ai-agents', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/llm-cost-management', lastModified: '2026-06-01', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/ai-agent-api-cost-control', lastModified: '2026-05-05', changeFrequency: 'monthly', priority: 0.8 },
