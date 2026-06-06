@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T09:34:26.556612Z",
+  "generatedAt": "2026-06-06T10:04:05.989579Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -180,12 +180,15 @@
       "internalLinks": [
         "/agent-spend-policy-template",
         "/blog",
+        "/blog/api-gateway-for-ai-agents",
+        "/blog/how-to-add-budget-limits-to-openai-api-calls",
         "/compare",
         "/economic-firewall-readiness-grader",
         "/govern",
         "/llm-cost-dashboard",
         "/llm-cost-monitoring",
         "/mcp-cost-control",
+        "/mcp-gateway",
         "/mcp-governance",
         "/mcp-proxy-config-generator",
         "/policy-to-proof"
@@ -198,7 +201,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2187,
+      "wordCount": 2200,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
