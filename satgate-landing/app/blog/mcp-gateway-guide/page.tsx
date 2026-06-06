@@ -28,7 +28,7 @@ export default function McpGatewayGuideBlogPage() {
     description: 'A complete MCP gateway guide covering architecture, authentication, tool aggregation, observability, and request-path budget enforcement for AI agent tool calls.',
     url: 'https://satgate.io/blog/mcp-gateway-guide',
     datePublished: '2026-03-24',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -668,6 +668,8 @@ Orchestrator (10,000 credits)
               <a href="https://github.com/SatGate-io/satgate" className="text-cyan-400 hover:text-cyan-300">GitHub →</a>
               {' · '}
               <a href="https://satgate.io/blog/mcp-budget-enforcement-guide" className="text-cyan-400 hover:text-cyan-300">MCP Budget Enforcement Guide →</a>
+              {' · '}
+              <Link href="/mcp-gateway" className="text-cyan-400 hover:text-cyan-300">MCP Gateway →</Link>
               {' · '}
               <a href="https://satgate.io/pricing" className="text-cyan-400 hover:text-cyan-300">Enterprise →</a>
             </p>
