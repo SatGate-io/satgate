@@ -30,7 +30,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-07',
-    dateModified: '2026-06-01',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls',
     about: [
       { '@type': 'Thing', name: 'OpenAI API budget limits' },
@@ -588,6 +588,8 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
               <Link href="/ai-agent-runaway-spend-index" className="text-cyan-300 hover:text-cyan-200">Runaway spend index →</Link>
               <Link href="/blog/llm-cost-management" className="text-cyan-300 hover:text-cyan-200">LLM cost management →</Link>
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">Enterprise governance →</Link>
+              <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway →</Link>
+              <Link href="/capability-auth" className="text-cyan-300 hover:text-cyan-200">Capability auth →</Link>
             </div>
           </div>
 

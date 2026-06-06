@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T08:04:19.161873Z",
+  "generatedAt": "2026-06-06T08:34:23.561718Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -130,7 +130,9 @@
         "/ai-agent-runaway-spend-index",
         "/blog",
         "/blog/llm-cost-management",
+        "/capability-auth",
         "/govern",
+        "/mcp-gateway",
         "/mcp-governance",
         "/openai-budget-policy-generator",
         "/policy-to-proof",
@@ -144,7 +146,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1322,
+      "wordCount": 1328,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
