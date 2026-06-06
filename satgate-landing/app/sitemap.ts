@@ -118,7 +118,7 @@ const blogRoutes: SitemapEntry[] = [
   { path: '/blog/why-process-wont-scale-for-ai-agent-costs', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/macaroon-tokens-vs-api-keys', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/http-402-payment-required-use-cases', lastModified: '2026-06-01', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/blog/l402-protocol-explained', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/blog/l402-protocol-explained', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/zero-trust-for-ai-agents', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/start-at-1-credit-economic-policy', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/how-to-add-budget-limits-to-openai-api-calls', lastModified: '2026-06-01', changeFrequency: 'monthly', priority: 0.8 },

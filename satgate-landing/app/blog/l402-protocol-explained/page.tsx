@@ -28,7 +28,7 @@ export default function L402ProtocolExplainedBlogPage() {
     description: 'L402 combines HTTP 402, paid-rail context, and macaroon tokens so delegated agents can present payment proof for API access in real time.',
     url: 'https://satgate.io/blog/l402-protocol-explained',
     datePublished: '2026-04-02',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -421,7 +421,7 @@ routes:
           <div className="mt-16 bg-gradient-to-r from-yellow-900/20 to-green-900/20 border border-yellow-800/30 rounded-xl p-8">
             <h3 className="text-xl font-bold text-white mb-3">Ready to Add L402 Payments to Your API?</h3>
             <p className="text-gray-300 mb-4">
-              SatGate implements L402 as a gateway policy — deploy in front of any API to enable machine-native micropayments with zero changes to your backend. Open source. Production ready.
+              SatGate implements L402 as a gateway policy — deploy in front of any API to enable machine-native micropayments with zero changes to your backend. Open source. Built for gateway deployment.
             </p>
             <div className="flex flex-wrap gap-3">
               <a href="https://github.com/SatGate-io/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
@@ -429,6 +429,9 @@ routes:
               </a>
               <Link href="/design-partners" className="inline-flex items-center gap-2 border border-yellow-500 text-yellow-300 px-6 py-3 rounded-lg font-bold hover:bg-yellow-900/30 transition text-sm">
                 Become a Design Partner
+              </Link>
+              <Link href="/l402-agent-payments" className="inline-flex items-center gap-2 border border-yellow-500 text-yellow-300 px-6 py-3 rounded-lg font-bold hover:bg-yellow-900/30 transition text-sm">
+                L402 agent payments
               </Link>
             </div>
           </div>
