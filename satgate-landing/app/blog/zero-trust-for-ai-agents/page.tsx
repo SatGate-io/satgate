@@ -29,7 +29,7 @@ export default function ZeroTrustForAIAgentsBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-03',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/blog/zero-trust-for-ai-agents',
     about: [
       { '@type': 'Thing', name: 'Zero Trust for AI agents' },
@@ -419,6 +419,9 @@ Token: search-worker-12
               </a>
               <Link href="/design-partners" className="inline-flex items-center gap-2 border border-red-500 text-red-300 px-6 py-3 rounded-lg font-bold hover:bg-red-900/30 transition text-sm">
                 Become a Design Partner
+              </Link>
+              <Link href="/capability-auth" className="inline-flex items-center gap-2 border border-red-500 text-red-300 px-6 py-3 rounded-lg font-bold hover:bg-red-900/30 transition text-sm">
+                Capability auth
               </Link>
             </div>
           </div>
