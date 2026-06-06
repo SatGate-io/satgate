@@ -134,14 +134,14 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     competitor: 'API Gateway rate limits',
     eyebrow: 'Traffic primitive vs authority primitive',
     title: 'SatGate vs API Gateway Rate Limits: Authority Beats Quotas',
-    description: 'API Gateway rate limits throttle request volume. SatGate governs delegated agent authority: budget, route, tool, tenant, payment rail, evidence requirement, and revocation before the request executes.',
-    verdict: 'Rate limits answer “how many requests?” SatGate answers “is this agent allowed to spend this budget on this resource right now, and can we prove why?”',
+    description: 'API Gateway rate limits throttle request volume. SatGate governs delegated agent authority before execution: budget, route, MCP tool, tenant, payment rail, evidence requirement, revocation, and delegation depth.',
+    verdict: 'Rate limits answer “how many requests?” SatGate answers “is this agent allowed to spend this budget, call this MCP tool, use this route, and can we prove why?”',
     competitorGoodAt: [
       'Basic traffic shaping: requests per second, bursts, quotas, usage plans, and abuse reduction.',
       'Protecting APIs from generic floods or accidental high-volume clients.',
       'Fitting into existing API gateway stacks such as AWS API Gateway, Kong, NGINX, Envoy, Apigee, or Tyk.',
     ],
-    satgateGoodAt: [standardAxes.preExecution, standardAxes.delegation, standardAxes.evidence, standardAxes.crossRail],
+    satgateGoodAt: [standardAxes.preExecution, standardAxes.delegation, standardAxes.evidence, standardAxes.crossRail, standardAxes.mcp],
     rows: [
       { axis: 'Primary job', satgate: 'Agent-aware economic authorization and proof.', competitor: 'Request throughput control.', winner: 'SatGate' },
       { axis: 'Cross-provider', satgate: standardAxes.crossProvider, competitor: 'Possible only if you custom-route everything through one gateway estate.', winner: 'SatGate' },
@@ -162,8 +162,9 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
       { question: 'Should I remove API Gateway rate limits?', answer: 'No. Keep them. SatGate adds agent-aware economic policy above blunt traffic controls.' },
       { question: 'What does SatGate know that a rate limit does not?', answer: 'Delegated authority, remaining budget, MCP tool identity, route policy, paid-rail context, tenant, agent lineage, and evidence requirements.' },
       { question: 'Can SatGate run with existing gateways?', answer: 'Yes. SatGate can sit before, beside, or behind existing gateway infrastructure depending on where enforcement belongs.' },
+      { question: 'Why are rate limits weak for agent spend?', answer: 'Because request count does not encode tool risk, dollar impact, delegated authority, remaining budget, tenant context, or Evidence Pack proof. One allowed request can still be the expensive one.' },
     ],
-    ctaPrimary: { href: '/agent-capability-tokens', label: 'Use capability tokens' },
+    ctaPrimary: { href: '/agent-spend-policy-template', label: 'Create spend policy' },
     ctaSecondary: { href: '/mcp-budget-enforcement', label: 'Enforce MCP budgets' },
   },
   'openai-anthropic-budget-controls': {
