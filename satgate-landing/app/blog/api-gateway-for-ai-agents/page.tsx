@@ -30,7 +30,7 @@ export default function ApiGatewayForAiAgentsBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-12',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/blog/api-gateway-for-ai-agents',
     about: [
       { '@type': 'Thing', name: 'API gateway for AI agents' },
@@ -422,6 +422,7 @@ satgate mint \\
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
               <Link href="/mcp-governance" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
+              <Link href="/agent-api-governance" className="text-cyan-300 hover:text-cyan-200">Agent API governance →</Link>
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>
           </div>

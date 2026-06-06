@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T01:34:21.943857Z",
+  "generatedAt": "2026-06-06T02:04:07.584158Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -397,6 +397,7 @@
         "API Gateway for AI Agents FAQ"
       ],
       "internalLinks": [
+        "/agent-api-governance",
         "/blog",
         "/compare",
         "/govern",
@@ -411,7 +412,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1378,
+      "wordCount": 1382,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
