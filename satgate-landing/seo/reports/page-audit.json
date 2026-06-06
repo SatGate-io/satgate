@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T09:04:29.565622Z",
+  "generatedAt": "2026-06-06T09:34:26.556612Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -346,10 +346,12 @@
         "/agent-api-governance",
         "/agent-control-plane",
         "/ai-agent-cost-control",
+        "/capability-auth",
         "/design-partners",
         "/economic-firewall",
         "/govern",
         "/l402-agent-payments",
+        "/mcp-gateway",
         "/mcp-governance",
         "/mint-demo",
         "/pay",
@@ -367,7 +369,7 @@
         "WebPage",
         "WebSite"
       ],
-      "wordCount": 1711,
+      "wordCount": 1712,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,

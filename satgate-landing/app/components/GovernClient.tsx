@@ -84,8 +84,11 @@ export default function GovernPage() {
             <Link href="https://cloud.satgate.io/cloud/login" className="border border-gray-700 px-8 py-3 rounded-lg font-bold hover:border-gray-500 transition flex items-center justify-center gap-2">
               Start in Observe mode <Eye size={18} />
             </Link>
-            <Link href="/economic-firewall" className="border border-gray-700 px-8 py-3 rounded-lg font-bold hover:border-purple-500 transition flex items-center justify-center gap-2">
-              Define the economic firewall <Shield size={18} />
+            <Link href="/mcp-gateway" className="border border-gray-700 px-8 py-3 rounded-lg font-bold hover:border-cyan-500 transition flex items-center justify-center gap-2">
+              Govern MCP tools <ArrowRight size={18} />
+            </Link>
+            <Link href="/capability-auth" className="border border-gray-700 px-8 py-3 rounded-lg font-bold hover:border-purple-500 transition flex items-center justify-center gap-2">
+              Capability auth <Shield size={18} />
             </Link>
           </div>
         </div>
