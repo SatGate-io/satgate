@@ -71,7 +71,7 @@ export default function McpGovernancePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-06-03',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/mcp-governance',
     about: [
       { '@type': 'Thing', name: 'MCP governance' },
@@ -184,8 +184,8 @@ export default function McpGovernancePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              See SatGate governance <ArrowRight size={18} />
+            <Link href="/mcp-proxy-config-generator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
+              Generate MCP proxy config <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               See Policy-to-Proof
@@ -359,6 +359,7 @@ evidence:
               ['/govern', 'Govern AI agents', 'Govern MCP authority before tool execution.'],
               ['/mcp-budget-enforcement', 'MCP budget enforcement', 'Hard caps, per-tool prices, and request-path budget decisions for MCP servers.'],
               ['/mcp-cost-control', 'MCP cost control', 'Control paid tool calls, retries, SaaS actions, cloud tasks, and data lookups before MCP tools execute.'],
+              ['/mcp-proxy-config-generator', 'MCP proxy config generator', 'Generate governed MCP proxy JSON and policy YAML for Cursor, Claude, OpenClaw, and custom clients.'],
               ['/mcp-tool-cost-policy-generator', 'MCP tool cost policy generator', 'Generate practical policy for Cursor, Claude Desktop, Claude Code, OpenClaw, and custom clients.'],
               ['/satgate-for-cursor', 'SatGate for Cursor', 'Govern Cursor MCP/tool workflows with budgets and audit.'],
               ['/satgate-for-openclaw', 'SatGate for OpenClaw', 'Apply economic policy to proactive agents, sub-agents, and tools.'],
@@ -379,8 +380,8 @@ evidence:
             Connect tools quickly with MCP. Govern them with SatGate. Check authority before execution, revoke risky capabilities, and turn every allow/deny decision into audit evidence for the Evidence Pack.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              Govern MCP tool calls <ArrowRight size={18} />
+            <Link href="/mcp-proxy-config-generator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
+              Generate MCP proxy config <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               See Policy-to-Proof
