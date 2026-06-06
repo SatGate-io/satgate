@@ -36,7 +36,7 @@ export default function AiAgentApiCostControlPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-05',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/blog/ai-agent-api-cost-control',
     about: [
       { '@type': 'Thing', name: 'AI agent API cost control' },
@@ -262,6 +262,7 @@ audit:
               <li><Link href="/blog/mcp-budget-enforcement-guide" className="text-cyan-400 hover:text-cyan-300">MCP Budget Enforcement: A Practical Guide</Link></li>
               <li><Link href="/blog/how-to-add-budget-limits-to-openai-api-calls" className="text-cyan-400 hover:text-cyan-300">OpenAI API Budget Limits</Link></li>
               <li><Link href="/blog/what-is-an-economic-firewall" className="text-cyan-400 hover:text-cyan-300">What Is an Economic Firewall?</Link></li>
+              <li><Link href="/ai-agent-cost-control" className="text-cyan-400 hover:text-cyan-300">AI Agent Cost Control landing page</Link></li>
             </ul>
           </div>
         </article>
