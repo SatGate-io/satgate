@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T05:34:09.288211Z",
+  "generatedAt": "2026-06-06T06:04:10.055497Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -289,6 +289,7 @@
         "/agent-capability-tokens",
         "/agent-control-plane",
         "/blog",
+        "/capability-auth",
         "/design-partners",
         "/economic-firewall-readiness-grader",
         "/govern",
@@ -305,7 +306,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2671,
+      "wordCount": 2674,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
