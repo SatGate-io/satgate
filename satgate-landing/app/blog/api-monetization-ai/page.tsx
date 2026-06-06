@@ -29,7 +29,7 @@ export default function ApiMonetizationAiBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-26',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/blog/api-monetization-ai',
     about: [
       { '@type': 'Thing', name: 'API monetization for AI agents' },
@@ -429,6 +429,9 @@ sub_agent_token = attenuate(agent_a_token, [
               </a>
               <Link href="/design-partners" className="inline-flex items-center gap-2 border border-purple-500 text-purple-300 px-6 py-3 rounded-lg font-bold hover:bg-purple-900/30 transition text-sm">
                 Become a Design Partner
+              </Link>
+              <Link href="/monetize" className="inline-flex items-center gap-2 border border-purple-500 text-purple-300 px-6 py-3 rounded-lg font-bold hover:bg-purple-900/30 transition text-sm">
+                API monetization hub
               </Link>
             </div>
           </div>
