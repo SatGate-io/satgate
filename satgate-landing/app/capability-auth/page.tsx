@@ -179,6 +179,8 @@ export default function CapabilityAuthPage() {
           {[
             ['/mcp-gateway', 'MCP gateway', 'Apply capabilities to tool calls.'],
             ['/agent-capability-tokens', 'Agent capability tokens', 'See how scoped authority is encoded.'],
+            ['/revocable-capability-token-policy-template', 'Capability policy template', 'Generate a scoped, revocable policy.'],
+            ['/revocable-agent-credentials', 'Revocable credentials', 'Kill risky agent access before the next request.'],
             ['/govern', 'AI agent governance', 'Observe, Control, and Prove agent actions.'],
             ['/blog/how-to-add-budget-limits-to-openai-api-calls', 'Budget limits', 'Attach spend policy to access.'],
           ].map(([href, title, body]) => (
