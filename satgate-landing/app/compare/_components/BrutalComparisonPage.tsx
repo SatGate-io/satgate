@@ -204,6 +204,23 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-16">
+        <h2 className="mb-8 text-3xl font-bold text-white">Related agent governance resources</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[
+            ['/agent-payment-controls', 'Agent payment controls', 'Govern paid rails before agents spend.'],
+            ['/mcp-gateway', 'MCP gateway', 'Control tool calls at the protocol boundary.'],
+            ['/capability-auth', 'Capability auth', 'Replace broad keys with scoped authority.'],
+            ['/pay', 'Paid API rails', 'Connect payment context to policy proof.'],
+          ].map(([href, title, body]) => (
+            <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-cyan-700">
+              <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+              <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-purple-950/30 p-8 md:p-12">
           <div className="mb-5 flex items-center gap-3 text-cyan-300"><XCircle size={22} /> <span className="font-mono text-sm uppercase tracking-wide">The governance gap</span></div>
           <h2 className="mb-4 max-w-4xl text-3xl font-bold text-white">Dashboards explain what happened. SatGate controls what agents are allowed to do.</h2>

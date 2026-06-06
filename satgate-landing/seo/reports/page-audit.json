@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T12:05:48.767196Z",
+  "generatedAt": "2026-06-06T12:34:11.111288Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -545,6 +545,7 @@
         "Why this matters in production",
         "The hard question is not routing. It is who had authority before execution.",
         "FAQ",
+        "Related agent governance resources",
         "Dashboards explain what happened. SatGate controls what agents are allowed to do."
       ],
       "internalLinks": [
@@ -563,7 +564,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 627,
+      "wordCount": 632,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -590,6 +591,7 @@
         "Why this matters in production",
         "The hard question is not routing. It is who had authority before execution.",
         "FAQ",
+        "Related agent governance resources",
         "Dashboards explain what happened. SatGate controls what agents are allowed to do."
       ],
       "internalLinks": [
@@ -608,7 +610,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 625,
+      "wordCount": 630,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -635,6 +637,7 @@
         "Why this matters in production",
         "The hard question is not routing. It is who had authority before execution.",
         "FAQ",
+        "Related agent governance resources",
         "Dashboards explain what happened. SatGate controls what agents are allowed to do."
       ],
       "internalLinks": [
@@ -653,7 +656,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 623,
+      "wordCount": 628,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -680,6 +683,7 @@
         "Why this matters in production",
         "The hard question is not routing. It is who had authority before execution.",
         "FAQ",
+        "Related agent governance resources",
         "Dashboards explain what happened. SatGate controls what agents are allowed to do."
       ],
       "internalLinks": [
@@ -698,7 +702,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 627,
+      "wordCount": 632,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -725,6 +729,7 @@
         "Why this matters in production",
         "The hard question is not routing. It is who had authority before execution.",
         "FAQ",
+        "Related agent governance resources",
         "Dashboards explain what happened. SatGate controls what agents are allowed to do."
       ],
       "internalLinks": [
@@ -743,7 +748,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 624,
+      "wordCount": 629,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
