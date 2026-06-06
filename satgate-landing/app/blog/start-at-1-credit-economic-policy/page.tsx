@@ -28,7 +28,7 @@ export default function StartAt1CreditBlogPage() {
     description: 'Stop guessing tool costs. Start at 1 credit in Observe mode, measure real usage, then refine policy and enforce with confidence.',
     url: 'https://satgate.io/blog/start-at-1-credit-economic-policy',
     datePublished: '2026-04-07',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -78,20 +78,20 @@ export default function StartAt1CreditBlogPage() {
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
         </Link>
-        
+
         <header className="mb-12">
           <div className="flex flex-wrap gap-2 mb-4">
             <span className="px-2 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono">Economic Policy</span>
             <span className="px-2 py-1 rounded-full bg-cyan-900/30 border border-cyan-500/30 text-cyan-300 text-xs font-mono">Best Practices</span>
             <span className="px-2 py-1 rounded-full bg-green-900/30 border border-green-500/30 text-green-300 text-xs font-mono">AI Agents</span>
           </div>
-          
+
           <h1 className="text-4xl font-bold mb-4">Start at 1 Credit: A Smarter Way to Price AI Agent Tools</h1>
-          
+
           <p className="text-xl text-gray-400 mb-6 italic">
             Most teams guess wrong when pricing AI tools upfront. Here's a better way: start everything at 1 credit, measure real usage patterns, refine policy from evidence in Observe mode, then let data, not assumptions, guide Control.
           </p>
-          
+
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <span className="flex items-center gap-1"><Calendar size={14} /> April 7, 2026</span>
             <span className="flex items-center gap-1"><Clock size={14} /> 5 min read</span>
@@ -99,7 +99,7 @@ export default function StartAt1CreditBlogPage() {
         </header>
 
         <article className="prose prose-invert prose-lg max-w-none">
-          
+
           <p className="text-gray-300 text-lg leading-relaxed">
             You just deployed SatGate. You're staring at the MCP Cost Profile screen, trying to decide: should web search cost 1 credit or 10? Should image generation be 50 credits or 500? Should that internal database query be basically free at 0.1 credits?
           </p>
@@ -164,7 +164,7 @@ export default function StartAt1CreditBlogPage() {
               <li><strong className="text-white">image_generate:</strong> 765 calls (4%)</li>
               <li><strong className="text-white">code_execute:</strong> 2,644 calls (14%)</li>
             </ul>
-            
+
             <h3 className="text-yellow-400 font-bold mb-4">Provider invoices show:</h3>
             <ul className="text-gray-300 space-y-1 mb-6">
               <li><strong className="text-white">Image API:</strong> $426 (48% of cost for 4% of usage!)</li>
@@ -172,7 +172,7 @@ export default function StartAt1CreditBlogPage() {
               <li><strong className="text-white">Search API:</strong> $89 (10%)</li>
               <li><strong className="text-white">Compute:</strong> $62 (7%)</li>
             </ul>
-            
+
             <h3 className="text-cyan-400 font-bold mb-4">Week 2: Observe Mode, refined from real data</h3>
             <ul className="text-gray-300 space-y-1 mb-6">
               <li><strong className="text-white">web_search:</strong> stays at 1 credit (high volume, low cost)</li>
@@ -250,14 +250,22 @@ export default function StartAt1CreditBlogPage() {
           <div className="mt-16 p-6 bg-gradient-to-br from-purple-900/20 to-cyan-900/20 border border-purple-500/30 rounded-xl">
             <p className="text-lg font-semibold text-white mb-3">Ready to implement smarter economic policy?</p>
             <p className="text-gray-400 mb-4">SatGate makes it easy to start with observation, learn from data, and control costs intelligently.</p>
-            <Link 
-              href="/"
-              className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition"
-            >
-              Start your free trial <ArrowLeft size={16} className="rotate-180" />
-            </Link>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition"
+              >
+                Start your free trial <ArrowLeft size={16} className="rotate-180" />
+              </Link>
+              <Link
+                href="/mcp-tool-cost-policy-generator"
+                className="inline-flex items-center gap-2 border border-purple-500 text-purple-300 px-4 py-2 rounded-lg font-medium hover:bg-purple-900/30 transition"
+              >
+                Generate tool policy
+              </Link>
+            </div>
           </div>
-          
+
         </article>
       </div>
     </div>
