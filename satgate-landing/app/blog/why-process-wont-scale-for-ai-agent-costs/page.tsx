@@ -29,7 +29,7 @@ export default function WhyProcessWontScaleBlogPage() {
     description: "InformationWeek's AI agent cost-control advice is useful, but process won't scale. See which controls an economic firewall can automate.",
     url: 'https://satgate.io/blog/why-process-wont-scale-for-ai-agent-costs',
     datePublished: '2026-03-28',
-    dateModified: '2026-05-02',
+    dateModified: '2026-06-04',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -299,7 +299,9 @@ export default function WhyProcessWontScaleBlogPage() {
               {' · '}
               <a href="https://satgate.io/pricing" className="text-cyan-400 hover:text-cyan-300">Pricing →</a>
               {' · '}
-              <a href="https://github.com/nicewook/satgate" className="text-cyan-400 hover:text-cyan-300">GitHub →</a>
+              <Link href="/ai-agent-cost-control" className="text-cyan-400 hover:text-cyan-300">AI agent cost control →</Link>
+              {' · '}
+              <a href="https://github.com/SatGate-io/satgate" className="text-cyan-400 hover:text-cyan-300">GitHub →</a>
             </p>
           </div>
 
