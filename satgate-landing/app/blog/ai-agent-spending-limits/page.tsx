@@ -29,7 +29,7 @@ export default function AiAgentSpendingLimitsBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-10',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/blog/ai-agent-spending-limits',
     about: [
       { '@type': 'Thing', name: 'AI agent spending limits' },
@@ -229,6 +229,8 @@ export default function AiAgentSpendingLimitsBlogPage() {
               <a href="https://github.com/SatGate-io/satgate" className="text-cyan-400 hover:text-cyan-300">GitHub →</a>
               {' · '}
               <a href="https://satgate.io/pricing" className="text-cyan-400 hover:text-cyan-300">Enterprise →</a>
+              {' · '}
+              <Link href="/agent-spending-limits" className="text-cyan-400 hover:text-cyan-300">Agent spending limits →</Link>
             </p>
           </div>
 
