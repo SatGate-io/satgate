@@ -28,7 +28,7 @@ export default function CursorMCPProxySetupGuidePage() {
     description: 'Learn how to set up a Cursor MCP proxy with SatGate to enforce budgets, meter tool usage, and add Evidence Packs without changing your MCP servers.',
     url: 'https://satgate.io/blog/cursor-mcp-proxy-setup-guide',
     datePublished: '2026-04-09',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -353,7 +353,7 @@ satgate-gateway --config ./satgate.yaml`}</code>
           </ul>
 
           <p className="text-gray-300 leading-relaxed">
-            That is the difference between an MCP demo and production-grade MCP governance.
+            That is the difference between an MCP demo and request-path MCP governance.
           </p>
 
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Final takeaway</h2>
@@ -395,6 +395,9 @@ satgate-gateway --config ./satgate.yaml`}</code>
               <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-900 transition">
                 Read the Docs
               </a>
+              <Link href="/satgate-for-cursor" className="inline-flex items-center px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-900 transition">
+                SatGate for Cursor
+              </Link>
             </div>
           </div>
         </article>
