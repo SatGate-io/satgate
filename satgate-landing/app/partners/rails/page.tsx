@@ -66,7 +66,7 @@ const jsonLd = {
       name: "SatGate for Payment Rails",
       url: "https://satgate.io/partners/rails",
       description: metadata.description,
-      dateModified: "2026-06-03",
+      dateModified: "2026-06-04",
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
       about: [
         { "@type": "Thing", name: "agent payment rail governance" },
@@ -117,6 +117,9 @@ export default function RailPartnersPage() {
               </Link>
               <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
                 See Policy-to-Proof <ArrowRight size={18} />
+              </Link>
+              <Link href="/l402-agent-payments" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+                L402 agent payments <ArrowRight size={18} />
               </Link>
             </div>
           </div>
@@ -216,6 +219,9 @@ export default function RailPartnersPage() {
           </a>
           <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-400">
             Developer primitives <GitBranch size={18} />
+          </Link>
+          <Link href="/pay" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-400">
+            Paid API rails <ArrowRight size={18} />
           </Link>
         </div>
       </section>
