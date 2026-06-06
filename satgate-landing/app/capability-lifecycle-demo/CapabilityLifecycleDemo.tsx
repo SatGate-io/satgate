@@ -245,6 +245,23 @@ export default function CapabilityLifecycleDemo() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <h2 className="mb-8 text-3xl font-bold text-white">Related capability governance resources</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[
+            ['/capability-auth', 'Capability auth', 'Map identity to scoped, budget-aware authority.'],
+            ['/revocable-agent-credentials', 'Revocable credentials', 'Stop risky access before the next request.'],
+            ['/blog/macaroon-tokens-vs-api-keys', 'Macaroons vs API keys', 'Compare attenuated tokens with broad shared secrets.'],
+            ['/mcp-gateway', 'MCP gateway', 'Enforce capability caveats on tool calls.'],
+          ].map(([href, title, body]) => (
+            <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-cyan-700">
+              <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+              <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-6 pb-24 pt-4">
         <div className="rounded-3xl border border-purple-900/60 bg-gradient-to-br from-purple-950/30 to-cyan-950/25 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">This is the capability lifecycle enterprises can govern.</h2>
