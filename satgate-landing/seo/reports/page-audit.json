@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T15:09:37.130345Z",
+  "generatedAt": "2026-06-06T15:36:42.262925Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -531,8 +531,8 @@
       "exists": true,
       "title": "SatGate vs AWS AgentCore Payments: Governance Above Paid Rails",
       "titleLength": 62,
-      "metaDescription": "Compare SatGate and AWS AgentCore Payments across cross-provider control, paid rails, MCP proxying, delegated budgets, hybrid deployment, and Evidence Packs.",
-      "metaDescriptionLength": 157,
+      "metaDescription": "Compare SatGate and AWS AgentCore Payments across cross-provider control, paid rails, MCP gateway policy, delegated budgets, and Evidence Packs.",
+      "metaDescriptionLength": 144,
       "canonical": "/compare/aws-agentcore-payments",
       "h1": [
         "SatGate vs AWS AgentCore Payments: Governance Above Paid Rails"
@@ -610,7 +610,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 635,
+      "wordCount": 636,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -656,7 +656,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 632,
+      "wordCount": 633,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -702,7 +702,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 637,
+      "wordCount": 638,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -748,7 +748,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 632,
+      "wordCount": 633,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,

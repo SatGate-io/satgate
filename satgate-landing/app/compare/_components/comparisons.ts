@@ -16,8 +16,8 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     competitor: 'AWS AgentCore Payments',
     eyebrow: 'Managed agent payments vs Policy-to-Proof governance',
     title: 'SatGate vs AWS AgentCore Payments: Governance Above Paid Rails',
-    description: 'AWS AgentCore Payments helps agents transact inside AWS. SatGate governs authority, Evidence Pack proof, MCP tools, and paid rails before execution across the multi-provider enterprise environment.',
-    verdict: 'If your world is AWS AgentCore, AWS gives you managed payments. If your environment spans OpenAI, Anthropic, local agents, MCP tools, internal APIs, hybrid gateways, and multiple payment rails, SatGate is the control layer.',
+    description: 'AWS AgentCore Payments helps agents transact inside AWS. SatGate governs authority, Evidence Pack proof, MCP gateway calls, delegated budgets, and paid rails before execution across the multi-provider enterprise environment.',
+    verdict: 'If your world is AWS AgentCore, AWS gives you managed payments. If your environment spans OpenAI, Anthropic, local agents, MCP tools, private APIs, hybrid gateways, and multiple payment rails, SatGate is the control layer above the rail.',
     competitorGoodAt: [
       'Managed payment enablement for agents built around AWS AgentCore patterns.',
       'Tight fit for teams standardizing agent runtime, identity, tools, and observability inside AWS.',
@@ -28,6 +28,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
       standardAxes.crossRail,
       standardAxes.preExecution,
       standardAxes.evidence,
+      standardAxes.mcp,
     ],
     rows: [
       { axis: 'Primary job', satgate: 'Policy-to-Proof governance: decide what an autonomous agent may access, spend, delegate, and prove before execution.', competitor: 'Managed agent payment capability in the AWS AgentCore stack.', winner: 'SatGate' },
@@ -49,9 +50,10 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
       { question: 'Does SatGate replace AWS AgentCore Payments?', answer: 'Not necessarily. AWS AgentCore Payments is useful for AWS-native agent payments. SatGate is the cross-provider control layer for agent authority, budgets, MCP tools, APIs, and paid rails.' },
       { question: 'What is the key difference?', answer: 'AgentCore Payments helps an AWS agent pay. SatGate decides whether any agent is allowed to spend, access, delegate, or pay before execution.' },
       { question: 'Can they work together?', answer: 'Yes. SatGate can govern broader enterprise agent authority while AWS handles AWS-native runtime or payment mechanics where that stack is used.' },
+      { question: 'Why is payment not enough for agent governance?', answer: 'A payment rail can move value. SatGate decides whether the agent, tenant, tool, route, delegated budget, and evidence requirement allow that value movement before execution.' },
     ],
-    ctaPrimary: { href: '/policy-to-proof', label: 'See Policy-to-Proof' },
-    ctaSecondary: { href: '/agent-payment-controls', label: 'Compare payment controls' },
+    ctaPrimary: { href: '/agent-payment-controls', label: 'Compare payment controls' },
+    ctaSecondary: { href: '/mcp-gateway', label: 'Govern MCP gateway calls' },
   },
   'cloudflare-ai-gateway': {
     slug: 'cloudflare-ai-gateway',
