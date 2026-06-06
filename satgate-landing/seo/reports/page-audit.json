@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T13:04:17.071876Z",
+  "generatedAt": "2026-06-06T13:34:17.245791Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -564,7 +564,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 632,
+      "wordCount": 633,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -577,8 +577,8 @@
       "exists": true,
       "title": "SatGate vs Cloudflare AI Gateway: Policy-to-Proof for Agent Actions",
       "titleLength": 67,
-      "metaDescription": "Compare Cloudflare AI Gateway and SatGate across AI routing, rate limits, pre-execution control, MCP proxying, delegated budgets, and Evidence Packs.",
-      "metaDescriptionLength": 149,
+      "metaDescription": "Compare Cloudflare AI Gateway and SatGate across AI routing, rate limits, MCP gateway governance, pre-execution control, delegated budgets, and Evidence Packs.",
+      "metaDescriptionLength": 159,
       "canonical": "/compare/cloudflare-ai-gateway",
       "h1": [
         "SatGate vs Cloudflare AI Gateway: Policy-to-Proof for Agent Actions"
@@ -610,7 +610,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 630,
+      "wordCount": 632,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -656,7 +656,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 628,
+      "wordCount": 629,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -702,7 +702,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 632,
+      "wordCount": 633,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -748,7 +748,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 629,
+      "wordCount": 630,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
