@@ -30,7 +30,7 @@ export default function WhyEconomicFirewallsPrerequisitePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-20',
-    dateModified: '2026-05-03',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/blog/why-economic-firewalls-are-the-prerequisite-for-autonomous-ai-agents',
     about: [
       { '@type': 'Thing', name: 'economic firewalls for autonomous AI agents' },
@@ -320,6 +320,9 @@ export default function WhyEconomicFirewallsPrerequisitePage() {
           </Link>
           <Link href="/pricing" className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-6 py-3 rounded-lg font-bold hover:border-purple-600/50 transition">
             View Pricing
+          </Link>
+          <Link href="/economic-firewall" className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-6 py-3 rounded-lg font-bold hover:border-purple-600/50 transition">
+            Economic firewall guide
           </Link>
         </div>
       </div>
