@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T10:04:05.989579Z",
+  "generatedAt": "2026-06-06T10:34:19.704046Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -452,9 +452,11 @@
         "Launch an MCP gateway agents can safely use."
       ],
       "internalLinks": [
+        "/blog/api-gateway-for-ai-agents",
         "/govern",
         "/mcp-budget-enforcement",
         "/mcp-proxy-config-generator",
+        "/mcp-tool-cost-policy-generator",
         "/policy-templates/mcp-governance/mcp-governance-policy-bundle.v1.json",
         "/policy-to-proof"
       ],
@@ -469,7 +471,7 @@
         "Question",
         "SoftwareApplication"
       ],
-      "wordCount": 914,
+      "wordCount": 921,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,

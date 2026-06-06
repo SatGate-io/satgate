@@ -94,7 +94,7 @@ export default function McpGatewayPage() {
     operatingSystem: 'Cloud, Hybrid',
     description: metadata.description,
     url: 'https://satgate.io/mcp-gateway',
-    dateModified: '2026-05-10',
+    dateModified: '2026-06-04',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     featureList: [
       'MCP budget enforcement',
@@ -157,8 +157,11 @@ export default function McpGatewayPage() {
             SatGate sits between AI agents — Claude, Hermes, Ollama, Cursor, OpenClaw, or custom MCP clients — and the tools they want to call. Every MCP request is checked for authority, budget, tenant, tool scope, and delegation before execution — then preserved as Evidence Pack proof.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              Govern MCP tool access <ArrowRight size={18} />
+            <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
+              Generate MCP tool policy <ArrowRight size={18} />
+            </Link>
+            <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              Govern MCP tool access
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               See Policy-to-Proof
@@ -311,6 +314,9 @@ export default function McpGatewayPage() {
             </Link>
             <Link href="/mcp-proxy-config-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               Generate MCP proxy config
+            </Link>
+            <Link href="/blog/api-gateway-for-ai-agents" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              API gateway guide
             </Link>
           </div>
         </div>
