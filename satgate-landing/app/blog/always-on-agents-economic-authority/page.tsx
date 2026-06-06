@@ -131,6 +131,9 @@ export default function AlwaysOnAgentsEconomicAuthorityBlogPage() {
             <Link href="/mcp-governance" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
               MCP governance
             </Link>
+            <Link href="/capability-auth" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
+              Capability auth
+            </Link>
           </div>
 
           <p className="text-xl text-gray-400 mb-6 italic">
@@ -361,6 +364,9 @@ export default function AlwaysOnAgentsEconomicAuthorityBlogPage() {
               </Link>
               <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
                 See Policy-to-Proof
+              </Link>
+              <Link href="/mcp-gateway" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
+                MCP gateway
               </Link>
             </div>
           </div>
