@@ -30,7 +30,7 @@ export default function McpBudgetEnforcementGuidePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-05',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/blog/mcp-budget-enforcement-guide',
     about: [
       { '@type': 'Thing', name: 'MCP budget enforcement' },
@@ -387,6 +387,7 @@ curl -X POST http://localhost:9090/admin/mint \\
               <Link href="/mcp-tool-cost-policy-generator" className="text-cyan-300 hover:text-cyan-200">MCP tool cost policy generator →</Link>
               <Link href="/mcp-proxy-config-generator" className="text-cyan-300 hover:text-cyan-200">MCP proxy config generator →</Link>
               <Link href="/mcp-cost-control" className="text-cyan-300 hover:text-cyan-200">MCP cost control →</Link>
+              <Link href="/mcp-budget-enforcement" className="text-cyan-300 hover:text-cyan-200">MCP budget enforcement →</Link>
             </div>
           </div>
           <RoiCta
