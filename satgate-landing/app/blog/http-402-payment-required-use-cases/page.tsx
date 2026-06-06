@@ -29,7 +29,7 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-02',
-    dateModified: '2026-06-01',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/blog/http-402-payment-required-use-cases',
     about: [
       { '@type': 'Thing', name: 'HTTP 402 Payment Required' },
@@ -115,7 +115,8 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
             <p className="text-gray-300">HTTP 402 means access is available after payment. For AI agents, 402 and L402 are paid-rail context: authority, budget, and policy should be checked before value moves, with Evidence Pack proof after the request.</p>
           </div>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row">
-            <Link href="/govern" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Govern paid agent access</Link>
+            <Link href="/pay" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Build paid agent access</Link>
+            <Link href="/govern" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">Govern paid agent access</Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">See Policy-to-Proof</Link>
           </div>
           
