@@ -28,7 +28,7 @@ export default function AdversarialBlogPage() {
     description: 'Four adversarial cost-control attacks against AI agent economic firewalls and the cryptographic defenses that stop them.',
     url: 'https://satgate.io/blog/can-adversaries-game-your-economic-firewall',
     datePublished: '2026-03-23',
-    dateModified: '2026-05-02',
+    dateModified: '2026-06-04',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -397,6 +397,12 @@ export default function AdversarialBlogPage() {
               className="inline-flex items-center gap-2 bg-transparent text-white border border-gray-600 px-6 py-3 rounded-lg font-bold hover:border-purple-500 transition"
             >
               Become a Design Partner
+            </Link>
+            <Link
+              href="/economic-firewall-readiness-grader"
+              className="inline-flex items-center gap-2 bg-transparent text-white border border-gray-600 px-6 py-3 rounded-lg font-bold hover:border-purple-500 transition"
+            >
+              Grade Firewall Readiness
             </Link>
           </div>
         </section>
