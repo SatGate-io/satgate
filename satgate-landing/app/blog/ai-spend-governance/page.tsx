@@ -303,6 +303,9 @@ export default function AiSpendGovernanceBlogPage() {
               <Link href="/ai-api-budget-enforcement" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 font-bold text-white transition hover:border-cyan-500">
                 Enforce AI API budgets
               </Link>
+              <Link href="/economic-firewall" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 font-bold text-white transition hover:border-cyan-500">
+                Economic firewall guide
+              </Link>
             </div>
           </div>
 
@@ -312,6 +315,7 @@ export default function AiSpendGovernanceBlogPage() {
             <li><Link href="/blog/ai-agent-spending-limits" className="text-cyan-400 hover:text-cyan-300 underline">AI agent spending limits: hard budgets by agent, tool, and workflow</Link></li>
             <li><Link href="/blog/the-enterprise-adoption-playbook-observe-control-prove" className="text-cyan-400 hover:text-cyan-300 underline">The enterprise adoption playbook: Observe, Control, Prove</Link></li>
             <li><Link href="/compare/langsmith-helicone-datadog" className="text-cyan-400 hover:text-cyan-300 underline">LLM observability vs agent control</Link></li>
+            <li><Link href="/mcp-gateway" className="text-cyan-400 hover:text-cyan-300 underline">MCP gateway for request-path governance</Link></li>
           </ul>
         </article>
       </div>

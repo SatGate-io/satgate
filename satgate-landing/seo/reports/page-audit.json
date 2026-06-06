@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T11:34:19.309942Z",
+  "generatedAt": "2026-06-06T12:05:48.767196Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -80,6 +80,8 @@
         "/blog/llm-cost-management",
         "/blog/the-enterprise-adoption-playbook-observe-control-prove",
         "/compare/langsmith-helicone-datadog",
+        "/economic-firewall",
+        "/mcp-gateway",
         "/policy-to-proof",
         "/runaway-agent-cost-calculator"
       ],
@@ -91,7 +93,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1317,
+      "wordCount": 1325,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
