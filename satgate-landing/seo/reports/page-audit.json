@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T14:34:24.419470Z",
+  "generatedAt": "2026-06-06T15:09:37.130345Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -564,7 +564,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 635,
+      "wordCount": 636,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -610,7 +610,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 634,
+      "wordCount": 635,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -656,7 +656,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 631,
+      "wordCount": 632,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -702,7 +702,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 636,
+      "wordCount": 637,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -715,8 +715,8 @@
       "exists": true,
       "title": "SatGate vs OpenAI and Anthropic Budgets: Cross-Provider Authority",
       "titleLength": 65,
-      "metaDescription": "Compare native OpenAI and Anthropic budget controls with SatGate cross-provider agent budgets, MCP policy, paid rails, hybrid control, and Evidence Packs.",
-      "metaDescriptionLength": 154,
+      "metaDescription": "Compare native OpenAI and Anthropic budget controls with SatGate cross-provider agent budgets, MCP gateway policy, paid rails, and Evidence Packs.",
+      "metaDescriptionLength": 146,
       "canonical": "/compare/openai-anthropic-budget-controls",
       "h1": [
         "SatGate vs OpenAI and Anthropic Budgets: Cross-Provider Authority"

@@ -172,14 +172,14 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     competitor: 'native OpenAI and Anthropic budget controls',
     eyebrow: 'Provider caps vs cross-provider control',
     title: 'SatGate vs OpenAI and Anthropic Budgets: Cross-Provider Authority',
-    description: 'OpenAI and Anthropic budget controls are useful provider-specific guardrails. SatGate is the cross-provider Agent Authority & Accountability Layer above them: delegated budgets, MCP tool governance, paid API access, hybrid enforcement, and Evidence Packs.',
+    description: 'OpenAI and Anthropic budget controls are useful provider-specific guardrails. SatGate is the cross-provider Agent Authority & Accountability Layer above them: delegated budgets, MCP gateway governance, paid API access, hybrid enforcement, and Evidence Packs.',
     verdict: 'Native budgets are necessary last-mile guardrails. They are not a portable agent authorization layer across providers, tools, APIs, rails, and hybrid systems.',
     competitorGoodAt: [
       'Capping or tracking spend inside a single model provider account, project, workspace, or organization.',
       'Provider-native usage dashboards, API keys, rate limits, and admin controls.',
       'Last-mile protection against runaway usage within that vendor’s platform.',
     ],
-    satgateGoodAt: [standardAxes.crossProvider, standardAxes.crossRail, standardAxes.delegation, standardAxes.mcp],
+    satgateGoodAt: [standardAxes.crossProvider, standardAxes.crossRail, standardAxes.delegation, standardAxes.mcp, standardAxes.evidence],
     rows: [
       { axis: 'Primary job', satgate: 'One delegated authority layer across agents, providers, APIs, MCP tools, and paid rails.', competitor: 'Provider-specific spend caps, rate limits, usage dashboards, and keys.', winner: 'SatGate' },
       { axis: 'Cross-provider', satgate: standardAxes.crossProvider, competitor: 'OpenAI controls OpenAI. Anthropic controls Anthropic.', winner: 'SatGate' },
@@ -193,13 +193,14 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     bullets: [
       { title: 'Provider controls stop at the vendor boundary', body: 'The moment an agent leaves OpenAI or Anthropic for an MCP tool, SaaS API, database, or payment rail, native budgets no longer cover the full workflow.' },
       { title: 'Keys are not delegation', body: 'An API key or project limit is not the same as a scoped, expiring, budgeted capability for a specific task or child agent.' },
-      { title: 'Cross-provider agents need one policy', body: 'Real agents call multiple models and tools. One provider dashboard per vendor is not an enterprise control plane.' },
+      { title: 'Cross-provider agents need one policy', body: 'Real agents call multiple models, MCP tools, SaaS APIs, and paid rails. One provider dashboard per vendor is not an enterprise control plane.' },
       { title: 'Evidence must span the workflow', body: 'When a task touches Anthropic, OpenAI, a private MCP tool, and a paid API, the proof cannot live in four disconnected consoles.' },
     ],
     faqs: [
       { question: 'Should teams still use OpenAI and Anthropic budgets?', answer: 'Yes. Native budgets are useful provider-side backstops. SatGate adds cross-provider agent authority before traffic reaches those providers.' },
       { question: 'What does SatGate add above native budgets?', answer: 'Delegated capabilities, per-agent and per-tool budgets, MCP-native enforcement, paid-rail policy, hybrid deployment, and Evidence Packs.' },
       { question: 'Why not just set lower provider limits?', answer: 'Lower limits reduce blast radius inside one vendor. They do not govern the agent’s full workflow across other models, APIs, tools, and payment rails.' },
+      { question: 'Where should cross-provider budget policy live?', answer: 'In the request path before model, MCP tool, SaaS API, or paid-rail execution, where SatGate can evaluate delegated authority, remaining budget, tenant, route, and evidence requirements.' },
     ],
     ctaPrimary: { href: '/openai-budget-policy-generator', label: 'Generate an OpenAI policy' },
     ctaSecondary: { href: '/ai-api-budget-enforcement', label: 'Enforce AI API budgets' },
