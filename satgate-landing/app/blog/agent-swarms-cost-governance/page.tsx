@@ -29,7 +29,7 @@ export default function AgentSwarmsCostGovernancePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-05',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     mainEntityOfPage: 'https://satgate.io/blog/agent-swarms-cost-governance',
     about: [
       { '@type': 'Thing', name: 'agent swarm cost control' },
@@ -291,6 +291,9 @@ satgate delegate --from <coder-token> \\
               </Link>
               <Link href="/govern" className="border border-purple-700/50 bg-purple-900/20 px-6 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition text-purple-300">
                 Enterprise Governance
+              </Link>
+              <Link href="/agent-control-plane" className="border border-purple-700/50 bg-purple-900/20 px-6 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition text-purple-300">
+                Agent control plane
               </Link>
             </div>
           </div>
