@@ -39,7 +39,7 @@ const webPageJsonLd = {
   name: 'AI Agent Runaway Spend Index',
   description: metadata.description,
   url: 'https://satgate.io/ai-agent-runaway-spend-index',
-  dateModified: '2026-06-03',
+  dateModified: '2026-06-04',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
     { '@type': 'Thing', name: 'AI agent runaway spend' },
@@ -58,7 +58,7 @@ const jsonLd = {
   url: 'https://satgate.io/ai-agent-runaway-spend-index',
   creator: { '@type': 'Organization', name: 'SatGate' },
   datePublished: '2026-04-26',
-  dateModified: '2026-06-03',
+  dateModified: '2026-06-04',
   about: webPageJsonLd.about,
   keywords: ['AI agent spend control', 'MCP cost control', 'runaway AI spend', 'economic firewall'],
   distribution: [
@@ -222,6 +222,8 @@ export default function AiAgentRunawaySpendIndexPage() {
             <Link href="/agent-spend-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Generate spend policy <ArrowRight size={18} /></Link>
             <Link href="/ai-agent-runaway-spend-benchmark" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">Read benchmark methodology</Link>
             <Link href="/runaway-agent-cost-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">Calculate runaway cost</Link>
+            <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">Generate MCP tool policy</Link>
+            <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">Grade readiness</Link>
           </div>
         </div>
       </section>
