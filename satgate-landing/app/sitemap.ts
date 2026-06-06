@@ -109,7 +109,7 @@ const blogRoutes: SitemapEntry[] = [
   { path: '/blog/api-gateway-for-ai-agents', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/llm-cost-management', lastModified: '2026-06-01', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/ai-agent-api-cost-control', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/blog/ai-governance-api-teams', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.7 },
+  { path: '/blog/ai-governance-api-teams', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/blog/why-economic-firewalls-are-the-prerequisite-for-autonomous-ai-agents', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/the-enterprise-adoption-playbook-observe-control-prove', lastModified: '2026-06-01', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/can-adversaries-game-your-economic-firewall', lastModified: '2026-05-02', changeFrequency: 'monthly', priority: 0.8 },

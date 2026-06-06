@@ -28,7 +28,7 @@ export default function AiGovernanceApiTeamsBlogPage() {
     description: 'API teams need AI governance for budgets, permissions, and Evidence Packs — not just routing. Learn where traditional API management falls short.',
     url: 'https://satgate.io/blog/ai-governance-api-teams',
     datePublished: '2026-03-19',
-    dateModified: '2026-05-04',
+    dateModified: '2026-06-04',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -433,6 +433,8 @@ export API_BASE_URL=https://gateway.satgate.io/v1
               <a href="https://github.com/SatGate-io/satgate" className="text-cyan-400 hover:text-cyan-300">GitHub →</a>
               {' · '}
               <a href="https://satgate.io/pricing" className="text-cyan-400 hover:text-cyan-300">Enterprise →</a>
+              {' · '}
+              <Link href="/agent-api-governance" className="text-cyan-400 hover:text-cyan-300">Agent API governance →</Link>
             </p>
           </div>
 
