@@ -63,7 +63,7 @@ export default function MCPPage() {
     url: 'https://satgate.io/mcp',
     description: metadata.description,
     datePublished: '2026-05-01',
-    dateModified: '2026-06-03',
+    dateModified: '2026-06-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'MCP governance' },
@@ -182,6 +182,44 @@ export default function MCPPage() {
               <h2 className="mb-3 text-2xl font-bold text-white">{title}</h2>
               <p className="leading-relaxed text-gray-400">{body}</p>
             </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <div className="mb-10 max-w-3xl">
+          <h2 className="mb-4 text-3xl font-bold text-white">Turn MCP access into an enforceable control path</h2>
+          <p className="text-lg leading-relaxed text-gray-400">
+            The MCP hub should route teams from tool discovery into real controls: proxy configuration, scoped credentials, and budget policy that can stop a bad call before it executes.
+          </p>
+        </div>
+        <div className="grid gap-5 md:grid-cols-3">
+          {[
+            {
+              href: '/mcp-proxy-config-generator',
+              title: 'Generate proxy config',
+              description: 'Create MCP proxy JSON and policy YAML for Cursor, Claude, OpenClaw, and custom agent runtimes.',
+              icon: Terminal,
+            },
+            {
+              href: '/capability-auth',
+              title: 'Scope MCP authority',
+              description: 'Replace broad tool access with expiring, revocable capabilities tied to agent, tenant, task, and budget.',
+              icon: KeyRound,
+            },
+            {
+              href: '/ai-agent-cost-control',
+              title: 'Control agent spend',
+              description: 'Connect MCP tool budgets to the wider AI agent cost-control layer for models, APIs, tools, and delegation.',
+              icon: Gauge,
+            },
+          ].map(({ href, title, description, icon: Icon }) => (
+            <Link key={href} href={href} className="group rounded-2xl border border-gray-800 bg-gray-950 p-6 transition hover:border-cyan-500/50 hover:bg-cyan-950/10">
+              <Icon className="mb-5 text-cyan-300 transition group-hover:text-cyan-200" size={28} />
+              <h3 className="mb-3 text-xl font-bold text-white">{title}</h3>
+              <p className="mb-5 leading-relaxed text-gray-400">{description}</p>
+              <span className="inline-flex items-center gap-2 font-semibold text-cyan-300">Open resource <ArrowRight size={16} /></span>
+            </Link>
           ))}
         </div>
       </section>
