@@ -30,7 +30,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-07',
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-07',
     mainEntityOfPage: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls',
     about: [
       { '@type': 'Thing', name: 'OpenAI API budget limits' },
@@ -53,6 +53,14 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'OpenAI has account-level usage limits, but they are not the same as request-path budget enforcement. They are coarse, can lag behind real usage, and usually cannot isolate spend by agent, user, session, workflow, or tool before a request executes.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Are OpenAI usage limits and budget alerts enough for agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No. OpenAI usage limits and alerts help govern the account, but autonomous agents need request-path policy that can enforce per-agent, per-customer, and per-workflow budgets before each API call runs.',
         },
       },
       {
@@ -553,6 +561,11 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">Does OpenAI have built-in spending limits?</h3>
           <p className="text-gray-300 leading-relaxed">
             OpenAI has account-level usage limits, but they are not the same as request-path budget enforcement. They are coarse, can lag behind real usage, and usually cannot isolate spend by agent, user, session, workflow, or tool before a request executes.
+          </p>
+
+          <h3 className="text-xl font-semibold mt-6 mb-3 text-white">Are OpenAI usage limits and budget alerts enough for agents?</h3>
+          <p className="text-gray-300 leading-relaxed">
+            No. OpenAI usage limits and alerts help govern the account, but autonomous agents need request-path policy that can enforce per-agent, per-customer, and per-workflow budgets before each API call runs.
           </p>
 
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">What is the difference between a rate limit and a budget limit for OpenAI?</h3>
