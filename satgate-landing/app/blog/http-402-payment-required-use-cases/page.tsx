@@ -2,21 +2,21 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "HTTP 402 Payment Required: API and Agent Use Cases",
-  description: "HTTP 402 and L402 are paid-rail context. SatGate governs authority before execution and preserves Evidence Packs.",
+  title: "HTTP 402 Payment Required: Agent Implementation Guide",
+  description: "Implement HTTP 402 for AI agents with L402 payment challenges, budget checks, payment proof, retries, and Evidence Pack records.",
   alternates: { canonical: 'https://satgate.io/blog/http-402-payment-required-use-cases' },
   keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API'],
   openGraph: {
-    title: 'HTTP 402 Payment Required: Meaning, Use Cases, and AI Agents',
-    description: 'HTTP 402 explained: reserved status code history, L402 paid API access, agent budget authority, and Evidence Pack proof.',
+    title: 'HTTP 402 Payment Required: Agent Implementation Guide',
+    description: 'HTTP 402 explained for AI agents: L402 payment challenges, budget checks, payment proof, retries, and Evidence Pack records.',
     url: 'https://satgate.io/blog/http-402-payment-required-use-cases',
     type: 'article',
     publishedTime: '2026-04-02T00:00:00Z',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'HTTP 402 Payment Required: Meaning, Use Cases, and AI Agents',
-    description: 'HTTP 402 explained for reserved use, L402 paid APIs, agent budget authority, paid-rail governance, and Evidence Packs.',
+    title: 'HTTP 402 Payment Required: Agent Implementation Guide',
+    description: 'HTTP 402 explained for AI agent payment challenges, budget authority, L402 proof, retries, and Evidence Packs.',
   },
 };
 
@@ -24,12 +24,12 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'HTTP 402 Payment Required: Meaning, Use Cases, and AI Agents',
+    headline: 'HTTP 402 Payment Required: Agent Implementation Guide',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-02',
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-07',
     mainEntityOfPage: 'https://satgate.io/blog/http-402-payment-required-use-cases',
     about: [
       { '@type': 'Thing', name: 'HTTP 402 Payment Required' },
@@ -81,7 +81,7 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
         name: 'How does an AI agent implement HTTP 402 Payment Required?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An AI agent handles HTTP 402 by reading the payment challenge, checking its budget policy, paying the invoice when allowed, receiving or presenting payment proof, and retrying the API request with the L402 credential.',
+          text: 'An AI agent handles HTTP 402 by reading the payment challenge, checking budget and authority policy, paying the invoice only when allowed, receiving or presenting payment proof, retrying the API request with the L402 credential, and recording the decision for audit.',
         },
       },
     ],
@@ -203,7 +203,7 @@ Content-Type: application/json
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">How does an AI agent implement HTTP 402 Payment Required?</h3>
                 <p className="text-gray-300 leading-relaxed mb-0">
-                  The agent receives a 402 challenge, checks whether policy allows the payment, pays the Lightning invoice, attaches the L402 credential or payment proof, and retries the request. The gateway should still enforce budgets so the agent cannot buy unlimited API calls.
+                  The agent receives a 402 challenge, checks budget and authority policy, pays the Lightning invoice only when allowed, attaches the L402 credential or payment proof, retries the request, and records the decision for audit. The gateway should still enforce budgets so the agent cannot buy unlimited API calls.
                 </p>
               </div>
               <div>
