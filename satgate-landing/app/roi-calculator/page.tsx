@@ -75,7 +75,7 @@ export default function ROICalculatorPage() {
     name: 'AI Agent ROI Calculator',
     description: 'Estimate runaway AI agent loop exposure, budget-control ROI, and the receipts needed for Policy-to-Proof evidence across paid APIs and MCP tools.',
     url: 'https://satgate.io/roi-calculator',
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-07',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent ROI calculator' },
@@ -110,7 +110,7 @@ export default function ROICalculatorPage() {
       { '@type': 'Audience', audienceType: 'AI engineering teams deploying paid MCP tools and APIs' },
     ],
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-07',
     about: webPageJsonLd.about,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
@@ -149,6 +149,14 @@ export default function ROICalculatorPage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'You need the number of active agents, average cost per tool call, calls per agent per day, expected loop or error frequency, and average loop duration before discovery.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How should finance teams use the ROI result?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Finance teams should treat the result as avoidable exposure, then separate production, sandbox, and external-agent traffic so each budget-control case has clear assumptions, owners, and enforcement thresholds.',
         },
       },
       {
@@ -205,7 +213,7 @@ export default function ROICalculatorPage() {
       {
         '@type': 'HowToStep',
         name: 'Enter active agents',
-        text: 'Set the number of autonomous agents, workflows, or delegated sub-agents that can call paid tools or APIs.',
+        text: 'Set the number of autonomous agents, workflows, or delegated sub-agents that can call paid tools or APIs. Group production, sandbox, and external agents separately when finance needs a cleaner payback case.',
       },
       {
         '@type': 'HowToStep',
@@ -592,6 +600,12 @@ export default function ROICalculatorPage() {
               <h3 className="mb-2 text-xl font-bold text-white">What inputs do I need for the AI agent ROI calculator?</h3>
               <p className="text-gray-400 leading-relaxed">
                 You need the number of active agents, average cost per tool call, calls per agent per day, expected loop or error frequency, and average loop duration before discovery.
+              </p>
+            </div>
+            <div>
+              <h3 className="mb-2 text-xl font-bold text-white">How should finance teams use the ROI result?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Treat the result as avoidable exposure, then separate production, sandbox, and external-agent traffic so each budget-control case has clear assumptions, owners, and enforcement thresholds.
               </p>
             </div>
             <div>
