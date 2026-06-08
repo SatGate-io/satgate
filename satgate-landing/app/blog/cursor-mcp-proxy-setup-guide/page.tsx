@@ -28,7 +28,7 @@ export default function CursorMCPProxySetupGuidePage() {
     description: 'Learn how to set up a Cursor MCP proxy with SatGate to enforce budgets, meter tool usage, and add Evidence Packs without changing your MCP servers.',
     url: 'https://satgate.io/blog/cursor-mcp-proxy-setup-guide',
     datePublished: '2026-04-09',
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-07',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -49,6 +49,14 @@ export default function CursorMCPProxySetupGuidePage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'An MCP proxy gives Cursor a governance point between the editor and downstream tools, letting teams enforce budgets, add Evidence Packs, and apply per-tool policy without rewriting every MCP server.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Where do Cursor MCP proxy settings go?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Cursor MCP proxy settings belong in the Cursor MCP server configuration for the workspace or user profile. Point Cursor at the proxy endpoint instead of the raw MCP server, then keep budget, scope, and token policy in the proxy layer.',
         },
       },
       {
@@ -372,6 +380,7 @@ satgate-gateway --config ./satgate.yaml`}</code>
             <div className="space-y-5">
               {[
                 ['Why use an MCP proxy with Cursor?', 'An MCP proxy gives Cursor a governance point between the editor and downstream tools, letting teams enforce budgets, add Evidence Packs, and apply per-tool policy without rewriting every MCP server.'],
+                ['Where do Cursor MCP proxy settings go?', 'Cursor MCP proxy settings belong in the Cursor MCP server configuration for the workspace or user profile. Point Cursor at the proxy endpoint instead of the raw MCP server, then keep budget, scope, and token policy in the proxy layer.'],
                 ['Can a Cursor MCP proxy stop runaway tool spend?', 'Yes. A request-path proxy can price tool calls, track spend, and block calls when budgets are exhausted before expensive APIs or infrastructure actions execute.'],
                 ['Should Cursor MCP tools use the same policy in development and production?', 'No. Development, staging, and production-adjacent workflows should use separate tokens, budgets, and tool scopes so one environment cannot accidentally inherit another environment’s authority.'],
               ].map(([question, answer]) => (
