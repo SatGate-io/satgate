@@ -17,6 +17,7 @@ Checks quiet crawl/answer-engine failure modes:
 13. OpenGraph/Twitter titles over 70 characters.
 14. Sitemap lastModified dates older than page JSON-LD dateModified dates.
 15. Canonical page URLs missing from sitemap.
+16. Sitemap URLs disallowed by app/robots.ts.
 
 This stays intentionally lightweight and static so it can run during heartbeat SEO
 work without starting Next.js.
@@ -33,6 +34,7 @@ ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / "app"
 PUBLIC = ROOT / "public"
 SITEMAP = APP / "sitemap.ts"
+ROBOTS = APP / "robots.ts"
 LLMS = PUBLIC / "llms.txt"
 MAX_META_DESCRIPTION_LENGTH = 160
 MAX_META_TITLE_LENGTH = 70
@@ -58,6 +60,8 @@ OPENGRAPH_BLOCK_RE = re.compile(r"openGraph:\s*\{(.*?)\n\s*\},", re.DOTALL)
 OPENGRAPH_URL_RE = re.compile(r"url:\s*['\"]https://satgate\.io([^'\"]*)['\"]")
 TWITTER_BLOCK_RE = re.compile(r"twitter:\s*\{(.*?)\n\s*\},", re.DOTALL)
 SOCIAL_DESCRIPTION_RE = re.compile(r"description:\s*(['\"])(.*?)\1", re.DOTALL)
+ROBOTS_DISALLOW_BLOCK_RE = re.compile(r"disallow:\s*\[(.*?)\]", re.DOTALL)
+STRING_LITERAL_RE = re.compile(r"['\"]([^'\"]+)['\"]")
 
 IGNORE_PREFIXES = ("/api/",)
 IGNORE_PATHS = {"/", ""}
@@ -383,6 +387,29 @@ def audit_sitemap_freshness() -> tuple[int, list[tuple[str, str]]]:
     return scanned, stale
 
 
+def robot_disallow_paths() -> set[str]:
+    if not ROBOTS.exists():
+        return set()
+    text = ROBOTS.read_text(errors="ignore")
+    paths: set[str] = set()
+    for block in ROBOTS_DISALLOW_BLOCK_RE.findall(text):
+        paths.update(normalize_path(path) for path in STRING_LITERAL_RE.findall(block))
+    return paths
+
+
+def audit_sitemap_robots_conflicts() -> tuple[int, list[tuple[str, str]]]:
+    entries = sitemap_entries()
+    disallowed = robot_disallow_paths()
+    conflicts: list[tuple[str, str]] = []
+
+    for path in sorted(entries):
+        for rule in sorted(disallowed):
+            if path == rule or path.startswith(rule.rstrip("/") + "/"):
+                conflicts.append((path, f"disallowed by robots rule {rule}"))
+
+    return len(entries), conflicts
+
+
 def main() -> int:
     link_count, missing_links = audit_internal_links()
     placeholder_href_count, placeholder_hrefs = audit_placeholder_hrefs()
@@ -399,6 +426,7 @@ def main() -> int:
     social_title_count, overlong_social_titles = audit_social_titles()
     sitemap_freshness_count, stale_sitemap_freshness = audit_sitemap_freshness()
     canonical_sitemap_count, missing_canonicals_in_sitemap = audit_canonicals_in_sitemap()
+    sitemap_robots_count, sitemap_robots_conflicts = audit_sitemap_robots_conflicts()
 
     print(f"internal links scanned: {link_count}")
     print(f"placeholder hrefs scanned: {placeholder_href_count}")
@@ -415,6 +443,7 @@ def main() -> int:
     print(f"social metadata titles scanned: {social_title_count}")
     print(f"sitemap freshness pages scanned: {sitemap_freshness_count}")
     print(f"canonical sitemap coverage pages scanned: {canonical_sitemap_count}")
+    print(f"sitemap robots conflicts scanned: {sitemap_robots_count}")
 
     failed = False
     if missing_links:
@@ -507,10 +536,16 @@ def main() -> int:
         for file_path, detail in missing_canonicals_in_sitemap:
             print(f"{file_path}: {detail}")
 
+    if sitemap_robots_conflicts:
+        failed = True
+        print("sitemap URLs disallowed by robots.ts:")
+        for route, detail in sitemap_robots_conflicts:
+            print(f"{route}: {detail}")
+
     if failed:
         return 1
 
-    print("no missing static/app internal, placeholder href, sitemap, llms.txt, metadata-title/description, blog TechArticle, JSON-LD freshness, canonical, OpenGraph URL, metadata canonical-presence, social-title/description, sitemap-freshness, or canonical-sitemap targets found")
+    print("no missing static/app internal, placeholder href, sitemap, llms.txt, metadata-title/description, blog TechArticle, JSON-LD freshness, canonical, OpenGraph URL, metadata canonical-presence, social-title/description, sitemap-freshness, canonical-sitemap, or sitemap-robots targets found")
     return 0
 
 
