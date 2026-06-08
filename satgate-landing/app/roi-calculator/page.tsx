@@ -664,6 +664,22 @@ export default function ROICalculatorPage() {
         </div>
       </section>
 
+      <section className="pb-20 px-6">
+        <div className="max-w-5xl mx-auto rounded-2xl border border-gray-800 bg-gray-900/60 p-6 md:p-8">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Next step</p>
+          <h2 className="mb-4 text-2xl md:text-3xl font-bold text-white">Turn ROI assumptions into enforceable policy</h2>
+          <p className="mb-6 max-w-3xl text-gray-400 leading-relaxed">
+            Once the model shows exposure, convert the highest-risk routes and tools into explicit budgets, MCP tool prices, and downgrade/block behavior.
+          </p>
+          <div className="flex flex-wrap gap-3 text-sm font-semibold">
+            <Link href="/agent-spend-policy-template" className="text-purple-300 hover:text-purple-200">Agent spend policy template →</Link>
+            <Link href="/mcp-tool-cost-policy-generator" className="text-purple-300 hover:text-purple-200">MCP tool cost policy generator →</Link>
+            <Link href="/openai-budget-policy-generator" className="text-purple-300 hover:text-purple-200">OpenAI budget policy generator →</Link>
+            <Link href="/economic-firewall-readiness-grader" className="text-purple-300 hover:text-purple-200">Readiness grader →</Link>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-4xl mx-auto text-center">
