@@ -593,9 +593,11 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
             <p className="mb-4 text-gray-300">Use the policy generator and spend template to convert this guide into per-agent, per-session, per-request, and model-route controls.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/openai-budget-policy-generator" className="text-cyan-300 hover:text-cyan-200">OpenAI budget generator →</Link>
+              <Link href="/roi-calculator" className="text-cyan-300 hover:text-cyan-200">AI agent ROI calculator →</Link>
               <Link href="/ai-agent-cost-control" className="text-cyan-300 hover:text-cyan-200">AI agent cost control →</Link>
               <Link href="/tools" className="text-cyan-300 hover:text-cyan-200">Cost-control tools →</Link>
               <Link href="/agent-spend-policy-template" className="text-cyan-300 hover:text-cyan-200">Agent spend policy template →</Link>
+              <Link href="/mcp-tool-cost-policy-generator" className="text-cyan-300 hover:text-cyan-200">MCP tool cost policy generator →</Link>
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
               <Link href="/agent-api-key-risk-assessment" className="text-cyan-300 hover:text-cyan-200">API key risk assessment →</Link>
               <Link href="/ai-agent-runaway-spend-index" className="text-cyan-300 hover:text-cyan-200">Runaway spend index →</Link>
