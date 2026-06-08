@@ -464,7 +464,9 @@ satgate mint \\
               <Link href="/blog/how-to-add-budget-limits-to-openai-api-calls" className="text-cyan-300 hover:text-cyan-200">OpenAI budget limits →</Link>
               <Link href="/blog/api-gateway-for-ai-agents" className="text-cyan-300 hover:text-cyan-200">API gateway for AI agents →</Link>
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
+              <Link href="/roi-calculator" className="text-cyan-300 hover:text-cyan-200">ROI calculator →</Link>
               <Link href="/agent-spend-policy-template" className="text-cyan-300 hover:text-cyan-200">Spend policy template →</Link>
+              <Link href="/mcp-tool-cost-policy-generator" className="text-cyan-300 hover:text-cyan-200">MCP tool cost policy generator →</Link>
               <Link href="/mcp-cost-control" className="text-cyan-300 hover:text-cyan-200">MCP cost control →</Link>
               <Link href="/mcp-proxy-config-generator" className="text-cyan-300 hover:text-cyan-200">MCP proxy config generator →</Link>
               <Link href="/economic-firewall-readiness-grader" className="text-cyan-300 hover:text-cyan-200">Readiness grader →</Link>
@@ -478,7 +480,9 @@ satgate mint \\
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/llm-cost-dashboard" className="text-cyan-300 hover:text-cyan-200">LLM cost dashboard checklist →</Link>
               <Link href="/llm-cost-monitoring" className="text-cyan-300 hover:text-cyan-200">LLM cost monitoring guide →</Link>
+              <Link href="/roi-calculator" className="text-cyan-300 hover:text-cyan-200">AI agent ROI calculator →</Link>
               <Link href="/agent-spend-policy-template" className="text-cyan-300 hover:text-cyan-200">Agent spend policy template →</Link>
+              <Link href="/mcp-tool-cost-policy-generator" className="text-cyan-300 hover:text-cyan-200">MCP tool cost policy generator →</Link>
             </div>
           </div>
 
