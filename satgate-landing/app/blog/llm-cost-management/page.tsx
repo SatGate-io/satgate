@@ -30,7 +30,7 @@ export default function LlmCostManagementBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-17',
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-07',
     mainEntityOfPage: 'https://satgate.io/blog/llm-cost-management',
     about: [
       { '@type': 'Thing', name: 'LLM cost management' },
@@ -47,6 +47,14 @@ export default function LlmCostManagementBlogPage() {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is LLM cost management?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'LLM cost management is the practice of attributing model, token, tool, and agent spend to owners, monitoring cost and latency per request, setting budgets, and enforcing hard limits before autonomous systems create unapproved spend.',
+        },
+      },
       {
         '@type': 'Question',
         name: 'What should an LLM cost dashboard show?',
@@ -388,6 +396,12 @@ satgate mint \\
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">LLM Cost Dashboard FAQ</h2>
 
           <div className="space-y-6 rounded-2xl border border-gray-800 bg-gray-950/60 p-6">
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2">What is LLM cost management?</h3>
+              <p className="text-gray-300 leading-relaxed mb-0">
+                LLM cost management means attributing model, token, tool, and agent spend to owners, monitoring cost and latency per request, setting budgets, and enforcing hard limits before autonomous systems create unapproved spend.
+              </p>
+            </div>
             <div>
               <h3 className="text-xl font-bold text-white mb-2">What should an LLM cost dashboard show?</h3>
               <p className="text-gray-300 leading-relaxed mb-0">
