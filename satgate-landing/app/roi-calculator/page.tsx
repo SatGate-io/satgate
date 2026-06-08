@@ -169,6 +169,14 @@ export default function ROICalculatorPage() {
       },
       {
         '@type': 'Question',
+        name: 'Should I model average cost or worst-case agent cost?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Model both. Average cost helps finance forecast normal spend, while worst-case cost shows the exposure from expensive models, premium tools, retries, fanout, and long-running loops that require hard request-path enforcement.',
+        },
+      },
+      {
+        '@type': 'Question',
         name: 'What should I do after estimating runaway agent spend?',
         acceptedAnswer: {
           '@type': 'Answer',
@@ -620,6 +628,12 @@ export default function ROICalculatorPage() {
               <h3 className="mb-2 text-xl font-bold text-white">How should I estimate average MCP tool-call cost?</h3>
               <p className="text-gray-400 leading-relaxed">
                 Use blended cost when exact pricing is unknown: combine model tokens, paid API calls, data-provider fees, browser or cloud actions, and human-review cost into one average tool-call estimate, then refine it with observed SatGate receipts.
+              </p>
+            </div>
+            <div>
+              <h3 className="mb-2 text-xl font-bold text-white">Should I model average cost or worst-case agent cost?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Model both. Average cost helps finance forecast normal spend, while worst-case cost shows the exposure from expensive models, premium tools, retries, fanout, and long-running loops that require hard request-path enforcement.
               </p>
             </div>
             <div>
