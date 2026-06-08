@@ -156,7 +156,7 @@ export default function ComparePage() {
     name: 'Compare SatGate',
     description: metadata.description,
     url: 'https://satgate.io/compare',
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-07',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI gateway comparison' },
@@ -172,7 +172,7 @@ export default function ComparePage() {
     '@type': 'ItemList',
     name: 'SatGate comparison pages',
     description: metadata.description,
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-07',
     about: webPageJsonLd.about,
     itemListElement: comparisons.map((item, index) => ({
       '@type': 'ListItem',
@@ -196,6 +196,14 @@ export default function ComparePage() {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is SatGate?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'SatGate is an economic firewall and agent control plane. It sits in the request path to govern autonomous agent spend, scoped authority, MCP tool costs, revocation, audit evidence, and paid-rail context before upstream APIs, models, or tools are used.',
+        },
+      },
       {
         '@type': 'Question',
         name: 'How is SatGate different from AI gateways?',
@@ -294,6 +302,10 @@ export default function ComparePage() {
           <h2 className="mb-6 text-2xl font-bold text-white">Comparison FAQ</h2>
           <div className="space-y-5">
             {[
+              [
+                'What is SatGate?',
+                'SatGate is an economic firewall and agent control plane. It sits in the request path to govern autonomous agent spend, scoped authority, MCP tool costs, revocation, audit evidence, and paid-rail context before upstream APIs, models, or tools are used.',
+              ],
               [
                 'How is SatGate different from AI gateways?',
                 'Most AI gateways focus on routing, provider abstraction, caching, rate limits, observability, or prompt operations. SatGate focuses on request-path economic governance: hard budgets, scoped agent authority, MCP tool cost policy, audit evidence, revocation, and paid-rail context before upstream access.',
