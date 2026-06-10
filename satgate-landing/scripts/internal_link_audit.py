@@ -235,6 +235,10 @@ def audit_jsonld_freshness() -> tuple[int, list[tuple[str, str]]]:
     return scanned, missing
 
 
+def is_redirect_only_page(text: str) -> bool:
+    return "next/navigation" in text and "redirect(" in text
+
+
 def app_route_for_page(file_path: Path) -> str:
     relative = file_path.relative_to(APP)
     route_parts = relative.parts[:-1]
@@ -249,6 +253,8 @@ def audit_canonicals() -> tuple[int, list[tuple[str, str]]]:
 
     for file_path in sorted(APP.glob("**/page.tsx")):
         text = file_path.read_text(errors="ignore")
+        if is_redirect_only_page(text):
+            continue
         match = CANONICAL_RE.search(text)
         if not match:
             continue
@@ -347,6 +353,8 @@ def audit_canonicals_in_sitemap() -> tuple[int, list[tuple[str, str]]]:
 
     for file_path in sorted(APP.glob("**/page.tsx")):
         text = file_path.read_text(errors="ignore")
+        if is_redirect_only_page(text):
+            continue
         match = CANONICAL_RE.search(text)
         if not match:
             continue

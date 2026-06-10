@@ -3,7 +3,7 @@ import { ArrowRight, BadgeCheck, Ban, Clock, Fingerprint, GitBranch, KeyRound, S
 
 export const metadata = {
   title: 'Agent API Governance | Identity, Revocation, Budgets, Audit',
-  description: 'Govern AI agent API access with scoped capabilities, delegation limits, revocation, policy checks, and Evidence Pack receipts. Replace unlimited API keys with authority enforced before execution.',
+  description: 'Govern AI agent API access with scoped capabilities, delegation limits, revocation, policy checks, and Evidence Pack receipts before execution.',
   alternates: { canonical: 'https://satgate.io/agent-api-governance' },
   keywords: [
     'agent API governance',

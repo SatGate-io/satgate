@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/dashboard', '/crawl', '/playground', '/monetize'],
+        disallow: ['/playground'],
       },
     ],
     sitemap: 'https://satgate.io/sitemap.xml',

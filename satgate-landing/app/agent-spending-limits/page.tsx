@@ -3,7 +3,7 @@ import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptTe
 
 export const metadata = {
   title: 'Agent Spending Limits | Spend Caps for Autonomous AI Agents',
-  description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day. Enforce authority, revocation, and Evidence Pack receipts before spend occurs.',
+  description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day. Enforce authority before spend occurs.',
   alternates: { canonical: 'https://satgate.io/agent-spending-limits' },
   keywords: [
     'agent spending limits',
@@ -18,14 +18,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Agent Spending Limits | Spend Caps for Autonomous AI Agents',
-    description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day with authority and Evidence Pack receipts before spend occurs.',
+    description: 'Set AI agent spending limits by route, tool, model, tenant, workflow, session, and day before spend occurs.',
     url: 'https://satgate.io/agent-spending-limits',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Agent Spending Limits | Spend Caps for Autonomous AI Agents',
-    description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day with authority and Evidence Pack receipts before spend occurs.',
+    description: 'Set AI agent spending limits by route, tool, model, tenant, workflow, session, and day before spend occurs.',
   },
 };
 
@@ -34,7 +34,7 @@ const controls = [
   { icon: DollarSign, title: 'Budget checks', body: 'Evaluate remaining spend, per-request ceilings, daily caps, tool caps, and route budgets before forwarding.' },
   { icon: KeyRound, title: 'Scoped credentials', body: 'Use expiring capabilities instead of broad static keys so authority matches the job.' },
   { icon: Ban, title: 'Revocation', body: 'Block the next request when a credential, workflow, route, budget, or agent should stop.' },
-  { icon: ReceiptText, title: 'Audit trails', body: 'Record allow/deny decisions with policy, budget remaining, route, tool, estimated cost, and outcome.' },
+  { icon: ReceiptText, title: 'Evidence receipts', body: 'Record allow/deny decisions with policy, budget remaining, route, tool, estimated cost, and outcome.' },
   { icon: BarChart3, title: 'Benchmark risk', body: 'Model loops, retry storms, fanout, detection delay, and avoided spend with benchmark-backed scenarios.' },
 ];
 

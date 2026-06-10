@@ -3,7 +3,7 @@ import { ArrowRight, BadgeDollarSign, Bot, ClipboardList, Gauge, KeyRound, Shiel
 
 export const metadata = {
   title: 'MCP Budget Enforcement for AI Agents',
-  description: 'Enforce budgets, prices, risk tiers, revocation, and Evidence Pack receipts before AI agents execute MCP tools. SatGate puts authority before execution in the MCP request path.',
+  description: 'Enforce MCP tool budgets, prices, risk tiers, revocation, and Evidence Pack receipts before AI agents execute tool calls.',
   alternates: { canonical: 'https://satgate.io/mcp-budget-enforcement' },
   keywords: [
     'MCP budget enforcement',
