@@ -105,6 +105,7 @@ const jsonLd = {
   operatingSystem: 'Web',
   url: 'https://satgate.io/evidence-pack-demo',
   description: metadata.description,
+  dateModified: '2026-06-10',
   featureList: [
     'Canonical Evidence Pack v1 schema',
     'Authority chain viewer',
@@ -178,7 +179,7 @@ export default function EvidencePackDemoPage() {
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
             <p className="mb-3 text-sm font-bold uppercase tracking-[0.24em] text-cyan-300">Prospect comprehension check</p>
-            <h2 className="text-3xl font-black tracking-tight sm:text-5xl">The artifact answers the buyer's core questions.</h2>
+            <h2 className="text-3xl font-black tracking-tight sm:text-5xl">The artifact answers the buyer&apos;s core questions.</h2>
           </div>
           <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {answerCards.map(({ icon: Icon, question, answer, detail }) => (

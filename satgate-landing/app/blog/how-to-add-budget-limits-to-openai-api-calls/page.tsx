@@ -2,22 +2,25 @@ import Link from 'next/link';
 import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
+const pageTitle = 'OpenAI API Budget Limits: Prevent Runaway GPT Spend';
+const pageDescription = 'Set OpenAI API budget limits by agent, team, or workflow. Block, downgrade, or route GPT calls before spend exceeds policy, with Evidence Pack receipts.';
+
 export const metadata = {
-  title: "OpenAI API Budget Limits: Hard Caps Before GPT Calls Run",
-  description: "Set OpenAI API budget limits by agent, team, or workflow. Enforce hard caps before GPT calls execute and preserve Evidence Pack proof.",
+  title: 'OpenAI API Budget Limits: Prevent Runaway GPT Spend',
+  description: 'Set OpenAI API budget limits by agent, team, or workflow. Block, downgrade, or route GPT calls before spend exceeds policy, with Evidence Pack receipts.',
   alternates: { canonical: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls' },
   keywords: ['OpenAI API budget limits', 'OpenAI cost control', 'API gateway OpenAI', 'GPT-4 spending limits', 'OpenAI API costs', 'prevent OpenAI overspending', 'hard cap OpenAI spend', 'per-agent OpenAI budget'],
   openGraph: {
-    title: 'OpenAI API Budget Limits: Hard Caps Before GPT Calls Run',
-    description: 'Set OpenAI API budget limits by agent, team, or workflow. Enforce hard caps before GPT calls execute and preserve Evidence Pack proof.',
+    title: pageTitle,
+    description: pageDescription,
     url: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls',
     type: 'article',
     publishedTime: '2026-04-07T00:00:00Z',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OpenAI API Budget Limits: Hard Caps Before GPT Calls Run',
-    description: 'Set per-agent, team, and workflow budgets before GPT calls execute, then prove each allow, deny, or downgrade decision.',
+    title: pageTitle,
+    description: pageDescription,
   },
 };
 
@@ -25,12 +28,12 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'OpenAI API Budget Limits: Hard Caps Before GPT Calls Run',
+    headline: pageTitle,
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-07',
-    dateModified: '2026-06-01',
+    dateModified: '2026-06-10',
     mainEntityOfPage: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls',
     about: [
       { '@type': 'Thing', name: 'OpenAI API budget limits' },
@@ -90,6 +93,51 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
     ],
   };
 
+  const howToSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to add OpenAI API budget limits',
+    description: 'A request-path rollout for enforcing OpenAI API budget limits before autonomous agent calls reach GPT models.',
+    totalTime: 'PT30M',
+    supply: [
+      { '@type': 'HowToSupply', name: 'OpenAI API key' },
+      { '@type': 'HowToSupply', name: 'SatGate gateway or request-path budget proxy' },
+      { '@type': 'HowToSupply', name: 'Per-agent, team, customer, or workflow budget policy' },
+    ],
+    step: [
+      {
+        '@type': 'HowToStep',
+        name: 'Route OpenAI calls through the budget gateway',
+        text: 'Place SatGate in front of OpenAI so every GPT request can be identified, priced, and governed before execution.',
+        url: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls#step-1-install-the-gateway',
+      },
+      {
+        '@type': 'HowToStep',
+        name: 'Create scoped budget-limited tokens',
+        text: 'Issue separate tokens for development, production, high-priority workflows, teams, customers, or agents with hard daily, hourly, session, and per-request limits.',
+        url: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls#step-2-create-budget-limited-tokens',
+      },
+      {
+        '@type': 'HowToStep',
+        name: 'Configure the OpenAI client base URL',
+        text: 'Point the existing OpenAI SDK client at the SatGate base URL and use the budget-limited token instead of a broad upstream API key.',
+        url: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls#step-3-update-your-code',
+      },
+      {
+        '@type': 'HowToStep',
+        name: 'Attach budgets to teams, customers, and agents',
+        text: 'Enforce separate OpenAI API budgets by team, customer, workflow, environment, session, or autonomous agent before each call executes.',
+        url: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls#step-4-configure-team-budgets',
+      },
+      {
+        '@type': 'HowToStep',
+        name: 'Preserve proof for allow, deny, and downgrade decisions',
+        text: 'Record request-path budget decisions as Evidence Pack receipts so teams can audit why a GPT call was allowed, blocked, downgraded, or routed.',
+        url: 'https://satgate.io/policy-to-proof',
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script
@@ -99,6 +147,10 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
       />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -113,10 +165,10 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
             <span className="px-2 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono">API Gateway</span>
           </div>
           
-          <h1 className="text-4xl font-bold mb-4">How to Add Hard Budget Limits to OpenAI API Calls</h1>
+          <h1 className="text-4xl font-bold mb-4">How to Add OpenAI API Budget Limits Before GPT Calls Run</h1>
           <div className="mb-6 rounded-2xl border border-green-900/60 bg-green-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-green-300">Direct answer</p>
-            <p className="text-gray-300">OpenAI usage limits are account-level. Request-path controls enforce per-agent, per-team, and per-workflow budgets before a GPT call reaches OpenAI, then Prove each allow, deny, or downgrade with an Evidence Pack receipt.</p>
+            <p className="text-gray-300">OpenAI API budget limits are safest when enforced before each call, not after usage appears in a dashboard. Put a request-path gateway in front of OpenAI, identify the agent, team, or workflow, estimate model and token cost, check remaining budget, then allow, block, downgrade, or route the GPT call with an Evidence Pack receipt.</p>
           </div>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row">
             <Link href="/openai-budget-policy-generator" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Generate an OpenAI budget policy</Link>
@@ -135,10 +187,10 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
 
         <article className="prose prose-invert prose-lg max-w-none">
           
-          <h2 className="text-2xl font-bold mt-8 mb-4 text-white">The $72,000 Lesson</h2>
+          <h2 className="text-2xl font-bold mt-8 mb-4 text-white">The Runaway Spend Lesson</h2>
           
           <p className="text-gray-300 leading-relaxed">
-            Last month, a developer shared their nightmare: a misconfigured retry loop burned $72,000 in OpenAI credits overnight. The dashboard showed the damage hours later. The bill? Non-negotiable.
+            A familiar failure pattern: a misconfigured retry loop burns through a large OpenAI budget overnight. The dashboard shows the damage hours later. The bill is already real.
           </p>
           
           <p className="text-gray-300 leading-relaxed">
@@ -153,7 +205,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
           </ul>
           
           <p className="text-gray-300 leading-relaxed">
-            OpenAI&apos;s built-in limits? They&apos;re monthly caps that email you after overspending. That&apos;s like a smoke detector that texts you after your house burns down.
+            OpenAI&apos;s built-in account controls are useful, but they are not per-agent request-path enforcement. They can lag real usage and cannot always isolate spend by agent, team, workflow, customer, or session before a call runs.
           </p>
           
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Why Traditional Solutions Fail</h2>
@@ -165,14 +217,14 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">1. OpenAI&apos;s Usage Limits</h3>
           
           <p className="text-gray-300 leading-relaxed">
-            OpenAI offers monthly spending limits, but they have critical flaws:
+            OpenAI account-level spending controls help, but they are not enough for autonomous or multi-tenant agent traffic:
           </p>
           
           <ul className="list-disc list-inside space-y-2 text-gray-300 my-4">
             <li><strong>Delayed enforcement:</strong> Limits check against cached usage data</li>
             <li><strong>All-or-nothing:</strong> Hit the limit? Your entire account stops</li>
             <li><strong>No granularity:</strong> Can&apos;t set limits per team, project, or user</li>
-            <li><strong>Soft enforcement:</strong> &ldquo;Hard limits&rdquo; can still overshoot by 10-20%</li>
+            <li><strong>Request-path gap:</strong> account-level controls do not decide per-call agent authority before execution</li>
           </ul>
           
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">2. Monitoring Dashboards</h3>
@@ -246,7 +298,7 @@ class OpenAIBudgetWrapper:
             Here&apos;s how to implement it properly with SatGate:
           </p>
           
-          <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Step 1: Install the Gateway</h2>
+          <h2 id="step-1-install-the-gateway" className="text-2xl font-bold mt-8 mb-4 text-white">Step 1: Install the Gateway</h2>
           
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
             <code>{`# Install SatGate
@@ -256,7 +308,7 @@ npm install -g @satgate/gateway
 satgate start --proxy openai`}</code>
           </pre>
           
-          <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Step 2: Create Budget-Limited Tokens</h2>
+          <h2 id="step-2-create-budget-limited-tokens" className="text-2xl font-bold mt-8 mb-4 text-white">Step 2: Create Budget-Limited Tokens</h2>
           
           <p className="text-gray-300 leading-relaxed">
             Instead of using your OpenAI API key directly, create derivative tokens with spending limits:
@@ -284,7 +336,7 @@ satgate token create \\
   --upstream openai`}</code>
           </pre>
           
-          <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Step 3: Update Your Code</h2>
+          <h2 id="step-3-update-your-code" className="text-2xl font-bold mt-8 mb-4 text-white">Step 3: Update Your Code</h2>
           
           <p className="text-gray-300 leading-relaxed">
             The beautiful part? Your application code barely changes:
@@ -311,7 +363,7 @@ const response = await openai.chat.completions.create({
 });`}</code>
           </pre>
           
-          <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Step 4: Configure Team Budgets</h2>
+          <h2 id="step-4-configure-team-budgets" className="text-2xl font-bold mt-8 mb-4 text-white">Step 4: Configure Team Budgets</h2>
           
           <p className="text-gray-300 leading-relaxed">
             For larger teams, create hierarchical budgets:
@@ -339,7 +391,7 @@ satgate token create \\
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Real-World Example: Preventing Retry Storms</h2>
           
           <p className="text-gray-300 leading-relaxed">
-            Here&apos;s how SatGate prevents the $72,000 nightmare scenario:
+            Here&apos;s how SatGate reduces the retry-loop failure mode:
           </p>
           
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
@@ -473,9 +525,9 @@ satgate alerts add \\
           </p>
           
           <ul className="list-disc list-inside space-y-2 text-gray-300 my-4">
-            <li><strong>100% prevention</strong> of runaway spend incidents</li>
-            <li><strong>73% reduction</strong> in overall OpenAI costs (better visibility)</li>
-            <li><strong>Zero production outages</strong> from hitting OpenAI account limits</li>
+            <li><strong>Request-path blocking</strong> for calls that exceed policy</li>
+            <li><strong>Cleaner cost attribution</strong> by agent, team, workflow, customer, and route</li>
+            <li><strong>Fewer account-wide surprises</strong> from shared-key or retry-loop spend</li>
             <li><strong>Granular insights</strong> into cost per feature/team/user</li>
           </ul>
           

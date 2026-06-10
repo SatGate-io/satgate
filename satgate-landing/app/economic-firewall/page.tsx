@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle2, Shield, Gauge, WalletCards, Activity, KeyRoun
 
 export const metadata = {
   title: 'Economic Firewall for AI Agents',
-  description: 'Learn what an economic firewall is and how SatGate governs AI agent authority, spend, paid rails, and revocation before execution, then exports Evidence Pack proof.',
+  description: 'Learn how an economic firewall governs AI agent authority, spend, paid rails, and revocation before execution, with Evidence Pack proof.',
   alternates: { canonical: 'https://satgate.io/economic-firewall' },
   keywords: [
     'economic firewall',
@@ -17,7 +17,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Economic Firewall for AI Agents',
-    description: 'The request-path control layer for AI agent authority, spend, revocation, audit evidence, and paid-rail context.',
+    description: 'The request-path control layer for AI agent authority, spend, revocation, Evidence Packs, and paid-rail context.',
     url: 'https://satgate.io/economic-firewall',
     type: 'article',
   },

@@ -69,14 +69,18 @@ export default function GovernPage() {
             <Shield size={12} /> Enterprise agent governance
           </div>
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-            Enterprise AI agent governance,
+            AI Agent Governance
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
               from Policy to Proof.
             </span>
           </h1>
-          <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-400 mb-6 max-w-2xl mx-auto leading-relaxed">
             SatGate puts governance in the request path: Observe agent activity, Control scopes, budgets, delegation, and revocation before execution, then Prove every decision with Evidence Packs across APIs, MCP tools, and paid rails.
           </p>
+          <div className="mb-10 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-5 text-left">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-purple-300">Direct answer</p>
+            <p className="text-gray-300">AI agent governance is the request-path control layer that decides what an agent can do before it reaches an API, MCP tool, model, or paid rail. SatGate acts as an Agent Authority & Accountability Layer: Observe usage, Control scopes, budgets, delegation, and revocation, then Prove each decision with Evidence Packs.</p>
+          </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/policy-to-proof" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center justify-center gap-2">
               See Policy-to-Proof <ArrowRight size={18} />

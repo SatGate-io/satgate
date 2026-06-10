@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-04T13:29:38.774264Z",
+  "generatedAt": "2026-06-10T04:53:34.178654Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -39,7 +39,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1491,
+      "wordCount": 1492,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -99,17 +99,17 @@
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
       "exists": true,
-      "title": "OpenAI API Budget Limits: Hard Caps Before GPT Calls Run",
-      "titleLength": 56,
-      "metaDescription": "Set OpenAI API budget limits by agent, team, or workflow. Enforce hard caps before GPT calls execute and preserve Evidence Pack proof.",
-      "metaDescriptionLength": 134,
+      "title": "OpenAI API Budget Limits: Prevent Runaway GPT Spend",
+      "titleLength": 51,
+      "metaDescription": "Set OpenAI API budget limits by agent, team, or workflow. Block, downgrade, or route GPT calls before spend exceeds policy, with Evidence Pack receipts.",
+      "metaDescriptionLength": 152,
       "canonical": "/blog/how-to-add-budget-limits-to-openai-api-calls",
       "h1": [
-        "How to Add Hard Budget Limits to OpenAI API Calls"
+        "How to Add OpenAI API Budget Limits Before GPT Calls Run"
       ],
       "h1Count": 1,
       "h2s": [
-        "The $72,000 Lesson",
+        "The Runaway Spend Lesson",
         "Why Traditional Solutions Fail",
         "The Solution: Request-Level Budget Enforcement",
         "Step 1: Install the Gateway",
@@ -138,12 +138,15 @@
       "schemaTypes": [
         "Answer",
         "FAQPage",
+        "HowTo",
+        "HowToStep",
+        "HowToSupply",
         "Organization",
         "Question",
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1322,
+      "wordCount": 1423,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -315,13 +318,13 @@
     {
       "path": "/govern",
       "exists": true,
-      "title": "Enterprise AI Agent Governance: Policy-to-Proof Controls",
-      "titleLength": 56,
-      "metaDescription": "Govern AI agents before execution: Observe usage, Control budgets and access, and Prove decisions with Evidence Packs across APIs, MCP, and paid rails.",
-      "metaDescriptionLength": 151,
+      "title": "AI Agent Governance: Policy-to-Proof Controls",
+      "titleLength": 45,
+      "metaDescription": "Govern AI agents before execution with request-path scopes, budgets, revocation, MCP controls, and Evidence Packs across APIs and paid rails.",
+      "metaDescriptionLength": 141,
       "canonical": "/govern",
       "h1": [
-        "Enterprise AI agent governance, from Policy to Proof."
+        "AI Agent Governance from Policy to Proof."
       ],
       "h1Count": 1,
       "h2s": [
@@ -363,7 +366,7 @@
         "WebPage",
         "WebSite"
       ],
-      "wordCount": 1707,
+      "wordCount": 1754,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,

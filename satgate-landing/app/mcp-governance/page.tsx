@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowRight, Cable, Eye, Gauge, KeyRound, ShieldAlert, Wrench } from 'lucide-react';
 
 export const metadata = {
-  title: 'MCP Governance: Authority, Policy, and Audit Receipts',
-  description: 'Govern Model Context Protocol tools with SatGate. Check agent authority before MCP calls execute, enforce policy, revoke access, and produce Evidence Pack receipts for every decision.',
+  title: 'MCP Governance: Authority, Policy, Evidence Packs',
+  description: 'Govern MCP tools with SatGate: check authority before calls execute, enforce policy, revoke access, and create Evidence Pack receipts.',
   alternates: { canonical: 'https://satgate.io/mcp-governance' },
   keywords: [
     'MCP governance',
@@ -17,7 +17,7 @@ export const metadata = {
     'MCP tool spend limits',
   ],
   openGraph: {
-    title: 'MCP Governance: Authority, Policy, and Audit Receipts',
+    title: 'MCP Governance: Authority, Policy, Evidence Packs',
     description: 'Control Model Context Protocol tool calls with authority policy, scoped budgets, revocation, Evidence Pack receipts, and Evidence Pack proof.',
     url: 'https://satgate.io/mcp-governance',
     type: 'article',

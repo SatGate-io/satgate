@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import GovernClient from "../components/GovernClient";
 
 export const metadata: Metadata = {
-  title: "Enterprise AI Agent Governance: Policy-to-Proof Controls",
+  title: "AI Agent Governance: Policy-to-Proof Controls",
   description:
-    "Govern AI agents before execution: Observe usage, Control budgets and access, and Prove decisions with Evidence Packs across APIs, MCP, and paid rails.",
+    "Govern AI agents before execution with request-path scopes, budgets, revocation, MCP controls, and Evidence Packs across APIs and paid rails.",
   alternates: {
     canonical: "https://satgate.io/govern",
   },
@@ -20,27 +20,27 @@ export const metadata: Metadata = {
     "Evidence Packs for AI agents",
   ],
   openGraph: {
-    title: "Enterprise AI Agent Governance: Policy-to-Proof Controls",
+    title: "AI Agent Governance: Policy-to-Proof Controls",
     description:
-      "Govern AI agents before execution: Observe usage, Control budgets and access, and Prove decisions with Evidence Packs across APIs, MCP, and paid rails.",
+      "Govern AI agents before execution with request-path scopes, budgets, revocation, MCP controls, and Evidence Packs across APIs and paid rails.",
     url: "https://satgate.io/govern",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Enterprise AI Agent Governance: Policy-to-Proof Controls",
+    title: "AI Agent Governance: Policy-to-Proof Controls",
     description:
-      "Observe agent usage, Control access and budgets before execution, and Prove every decision with Evidence Packs.",
+      "Control agent scopes, budgets, delegation, revocation, MCP tools, and paid rails before execution — then Prove decisions with Evidence Packs.",
   },
 };
 
 const webPageSchema = {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  name: "Enterprise AI Agent Governance Platform",
+  name: "AI Agent Governance: Policy-to-Proof Controls",
   description: metadata.description,
   url: "https://satgate.io/govern",
-  dateModified: "2026-06-01",
+  dateModified: "2026-06-10",
   isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
   about: [
     { "@type": "Thing", name: "AI agent governance" },

@@ -3,7 +3,7 @@ import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptTe
 
 export const metadata = {
   title: 'MCP Cost Control | Budget Enforcement for Tool-Calling Agents',
-  description: 'Control MCP tool costs with per-tool budgets, scoped credentials, revocation, Evidence Pack receipts, and request-path enforcement for Cursor, Claude, and OpenClaw.',
+  description: 'Control MCP tool costs with budgets, scoped credentials, revocation, Evidence Pack receipts, and request-path enforcement.',
   alternates: { canonical: 'https://satgate.io/mcp-cost-control' },
   keywords: [
     'MCP cost control',
@@ -18,14 +18,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'MCP Cost Control | Budget Enforcement for Tool-Calling Agents',
-    description: 'Control MCP tool costs with per-tool budgets, risk tiers, scoped credentials, revocation, Evidence Pack receipts, and request-path enforcement.',
+    description: 'Control MCP tool costs with budgets, risk tiers, scoped credentials, revocation, Evidence Pack receipts, and request-path enforcement.',
     url: 'https://satgate.io/mcp-cost-control',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'MCP Cost Control | Budget Enforcement for Tool-Calling Agents',
-    description: 'Control MCP tool costs with per-tool budgets, risk tiers, scoped credentials, revocation, Evidence Pack receipts, and request-path enforcement.',
+    description: 'Control MCP tool costs with budgets, risk tiers, scoped credentials, revocation, Evidence Pack receipts, and request-path enforcement.',
   },
 };
 
@@ -34,7 +34,7 @@ const controls = [
   { icon: DollarSign, title: 'Budget checks', body: 'Evaluate remaining spend, per-request ceilings, daily caps, tool caps, and route budgets before forwarding.' },
   { icon: KeyRound, title: 'Scoped credentials', body: 'Use expiring capabilities instead of broad static keys so authority matches the job.' },
   { icon: Ban, title: 'Revocation', body: 'Block the next request when a credential, workflow, route, budget, or agent should stop.' },
-  { icon: ReceiptText, title: 'Audit trails', body: 'Record allow/deny decisions with policy, budget remaining, route, tool, estimated cost, and outcome.' },
+  { icon: ReceiptText, title: 'Evidence receipts', body: 'Record allow/deny decisions with policy, budget remaining, route, tool, estimated cost, and outcome.' },
   { icon: BarChart3, title: 'Benchmark risk', body: 'Model loops, retry storms, fanout, detection delay, and avoided spend with benchmark-backed scenarios.' },
 ];
 

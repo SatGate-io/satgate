@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle2, CreditCard, Gauge, KeyRound, ShieldCheck, Wal
 
 export const metadata = {
   title: 'Stripe Link for Agents vs SatGate',
-  description: 'Compare Stripe Link for Agents and SatGate: agent wallets and payment credentials vs request-path economic control, budgets, audit, and L402.',
+  description: 'Compare Stripe Link for Agents and SatGate: payment credentials vs request-path economic control, budgets, Evidence Packs, and L402.',
   alternates: { canonical: 'https://satgate.io/stripe-link-agents-vs-satgate' },
   keywords: [
     'Stripe Link for Agents vs SatGate',
@@ -17,7 +17,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Stripe Link for Agents vs SatGate',
-    description: 'Stripe Link can provide payment credentials and approval flows. SatGate controls what agents may access, spend, meter, delegate, and monetize before upstream API calls execute.',
+    description: 'Stripe Link handles payment credentials. SatGate governs what agents may access, spend, meter, delegate, and monetize before execution.',
     url: 'https://satgate.io/stripe-link-agents-vs-satgate',
     type: 'article',
   },
