@@ -68,7 +68,7 @@ export default function AiAgentCostControlPage() {
     name: 'AI Agent Cost Control | Request-Path Budget Enforcement',
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-cost-control',
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-08',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent cost control' },
@@ -88,7 +88,7 @@ export default function AiAgentCostControlPage() {
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-cost-control',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-08',
     about: webPageJsonLd.about,
     offers: { '@type': 'Offer', url: 'https://satgate.io/pricing' },
     featureList: [
@@ -161,6 +161,14 @@ export default function AiAgentCostControlPage() {
           text: 'Add budget enforcement before agents receive access to paid APIs, premium models, MCP tools, data providers, or external services where retries, loops, or delegation can create real cost.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'How do you build the business case for AI agent cost control?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Build the case by separating normal agent spend from avoidable exposure: retry loops, MCP tool fanout, delegated sub-agents, premium-model misuse, and delayed detection. Then map the highest-risk paths to request-path budgets, kill switches, revocation, and Evidence Pack receipts.',
+        },
+      },
     ],
   };
 
@@ -230,6 +238,33 @@ export default function AiAgentCostControlPage() {
     ],
   };
 
+  const businessCaseJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent cost-control business case',
+    description: 'The finance and platform inputs needed to justify request-path AI agent budget enforcement.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Normal agent spend baseline',
+        description: 'Expected model, API, and MCP tool spend by agent, workflow, customer, team, route, and environment.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Avoidable runaway exposure',
+        description: 'Spend from retry storms, loops, delegated fanout, premium model misuse, paid tool chains, and delayed alerts.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Control and proof requirements',
+        description: 'Per-agent budgets, per-tool caps, route ceilings, downgrade behavior, revocation triggers, denial reasons, and Evidence Pack receipt fields.',
+      },
+    ],
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -246,6 +281,7 @@ export default function AiAgentCostControlPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(buyingChecklistJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(rolloutJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(businessCaseJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -410,6 +446,29 @@ export default function AiAgentCostControlPage() {
         </div>
       </section>
 
+      <section className="border-t border-gray-900 bg-gray-950/60">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Business case</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">Separate normal agent spend from avoidable exposure</h2>
+          <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+            Buyers do not need another chart that says AI is expensive. They need a defensible case for which agent spend should exist, which spend is preventable, and which controls prove the difference.
+          </p>
+          <div className="grid gap-5 md:grid-cols-3">
+            {[
+              ['Normal spend baseline', 'Expected model, API, and MCP tool cost by agent, workflow, customer, team, route, and environment.', '/llm-cost-dashboard'],
+              ['Avoidable exposure', 'Retry storms, loops, delegated fanout, premium-model misuse, paid tool chains, and delayed alerts.', '/roi-calculator'],
+              ['Control and proof plan', 'Per-agent budgets, per-tool caps, route ceilings, downgrade behavior, revocation triggers, denial reasons, and Evidence Pack receipts.', '/agent-spend-policy-template'],
+            ].map(([title, body, href]) => (
+              <Link key={title} href={href} className="rounded-xl border border-gray-800 bg-black p-6 transition hover:border-purple-500/50 hover:bg-purple-950/20">
+                <h3 className="mb-2 text-xl font-bold text-white">{title}</h3>
+                <p className="mb-4 text-sm leading-relaxed text-gray-400">{body}</p>
+                <span className="text-sm font-semibold text-purple-300">Open resource →</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="border-t border-gray-900 bg-black">
         <div className="max-w-6xl mx-auto px-6 py-20">
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">90-day rollout</p>
@@ -507,6 +566,12 @@ export default function AiAgentCostControlPage() {
               <h3 className="mb-2 text-xl font-bold text-white">When should a team add AI agent budget enforcement?</h3>
               <p className="text-gray-400 leading-relaxed">
                 Add budget enforcement before agents receive access to paid APIs, premium models, MCP tools, data providers, or external services where retries, loops, or delegation can create real cost.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How do you build the business case for AI agent cost control?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Separate normal agent spend from avoidable exposure: retry loops, MCP tool fanout, delegated sub-agents, premium-model misuse, and delayed detection. Then map the highest-risk paths to request-path budgets, kill switches, revocation, and Evidence Pack receipts.
               </p>
             </div>
           </div>

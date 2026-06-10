@@ -65,7 +65,7 @@ export default function EconomicFirewallPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-08',
     mainEntityOfPage: 'https://satgate.io/economic-firewall',
   };
 
@@ -160,6 +160,33 @@ export default function EconomicFirewallPage() {
     ],
   };
 
+  const architectureJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Economic firewall reference architecture',
+    description: 'The request-path architecture for placing an economic firewall between AI agents and paid models, APIs, MCP tools, and agent payment rails.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Agent request source',
+        description: 'The agent, workflow, delegated sub-agent, tenant, route, tool, model, and capability token behind the request.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Economic firewall decision point',
+        description: 'SatGate evaluates identity, scoped authority, budget, tool cost, expiry, revocation, denial policy, and payment context before execution.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Governed upstream execution',
+        description: 'Allowed requests reach models, APIs, MCP tools, or paid rails; denied or downgraded requests preserve decision proof and Evidence Pack receipts.',
+      },
+    ],
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -175,6 +202,7 @@ export default function EconomicFirewallPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(implementationPathJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(architectureJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -254,6 +282,35 @@ export default function EconomicFirewallPage() {
                 <span className="text-gray-300">{item}</span>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-gray-900 bg-black">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Reference architecture</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">Where the economic firewall sits</h2>
+          <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+            An economic firewall belongs in the execution path, between autonomous agents and anything that can create cost, move data, delegate authority, or unlock paid access. That position lets it decide before execution instead of explaining spend after the fact.
+          </p>
+          <div className="grid gap-5 lg:grid-cols-3">
+            {[
+              ['1', 'Agent request source', 'Agent, workflow, delegated sub-agent, tenant, route, tool, model, and capability token.'],
+              ['2', 'SatGate economic firewall', 'Identity, scoped authority, budget, tool cost, expiry, revocation, denial policy, payment context, and Evidence Pack capture.'],
+              ['3', 'Governed upstream execution', 'Models, APIs, MCP tools, paid rails, SaaS actions, browser tasks, cloud jobs, and data providers.'],
+            ].map(([step, title, body]) => (
+              <div key={step} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
+                <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500/15 font-mono text-cyan-200">{step}</div>
+                <h3 className="mb-3 text-xl font-bold text-white">{title}</h3>
+                <p className="leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+            <h3 className="mb-3 text-xl font-bold text-white">The key architectural rule</h3>
+            <p className="text-lg leading-relaxed text-gray-300">
+              If the control runs after the upstream call, it is monitoring. If it runs before the upstream call and can allow, deny, downgrade, revoke, or route with proof, it is an economic firewall.
+            </p>
           </div>
         </div>
       </section>

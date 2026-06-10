@@ -94,7 +94,7 @@ export default function McpGatewayPage() {
     operatingSystem: 'Cloud, Hybrid',
     description: metadata.description,
     url: 'https://satgate.io/mcp-gateway',
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-08',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     featureList: [
       'MCP budget enforcement',
@@ -122,6 +122,42 @@ export default function McpGatewayPage() {
       encodingFormat: template.format === 'JSON' ? 'application/json' : 'application/x-yaml',
     })),
   };
+  const hubJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP gateway commercial hub resources',
+    description: 'The buyer path for moving from MCP gateway evaluation to governance rollout, budget enforcement, proxy configuration, and policy proof.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'MCP governance',
+        description: 'Category page for MCP authority, budget, revocation, audit, and Evidence Pack governance.',
+        url: 'https://satgate.io/mcp-governance',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'MCP budget enforcement',
+        description: 'Hard-cap MCP tool spend before tool calls execute.',
+        url: 'https://satgate.io/mcp-budget-enforcement',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'MCP proxy config generator',
+        description: 'Generate client/server proxy configuration for governed MCP rollout.',
+        url: 'https://satgate.io/mcp-proxy-config-generator',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'API gateway for AI agents',
+        description: 'Explain how MCP gateway governance fits the broader AI-agent API gateway category.',
+        url: 'https://satgate.io/blog/api-gateway-for-ai-agents',
+      },
+    ],
+  };
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -136,6 +172,7 @@ export default function McpGatewayPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(hubJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <div className="mx-auto max-w-6xl px-6 pt-8">
@@ -169,6 +206,30 @@ export default function McpGatewayPage() {
             <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-800 px-6 py-3 font-bold text-gray-200 hover:border-cyan-500 transition">
               MCP budget enforcement
             </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-gray-900 bg-black">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="text-sm font-mono uppercase tracking-wide text-cyan-300 mb-2">Commercial MCP gateway hub</p>
+          <h2 className="text-3xl font-bold text-white mb-4">From MCP connection to MCP budget enforcement</h2>
+          <p className="text-gray-400 max-w-4xl mb-10 text-lg leading-relaxed">
+            Teams evaluating MCP gateways need more than a proxy. They need a buyer path: understand MCP governance, cap tool spend, generate proxy config, then prove allow and deny decisions with Evidence Pack receipts.
+          </p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              ['/mcp-governance', 'MCP governance', 'Define authority, budget, revocation, audit, and Evidence Pack requirements for MCP tool use.'],
+              ['/mcp-budget-enforcement', 'MCP budget enforcement', 'Hard-cap per-tool, per-agent, and per-session spend before MCP tool execution.'],
+              ['/mcp-proxy-config-generator', 'MCP proxy config generator', 'Generate governed MCP client/server config for Cursor, Claude, OpenClaw, and custom clients.'],
+              ['/blog/api-gateway-for-ai-agents', 'API gateway for AI agents', 'Connect MCP gateway controls to the broader AI-agent API governance category.'],
+            ].map(([href, title, body]) => (
+              <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
+                <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400 mb-4">{body}</p>
+                <span className="text-sm font-semibold text-cyan-300">Open resource →</span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

@@ -61,7 +61,20 @@ export default function ROICalculatorPage() {
     const satgateSavings = monthlyLoopWaste * 0.98;
     const paybackDays = satgateSavings > 0 ? (99 / satgateSavings) * 30 : Infinity;
     const annualROI = satgateSavings > 0 ? ((satgateSavings * 12 - 99 * 12) / (99 * 12)) : 0;
-    return { monthlyToolSpend, monthlyLoopWaste, annualRisk, satgateSavings, paybackDays, annualROI };
+    const dailyNormalSpend = agents * callsPerDay * costPerCall;
+    const perAgentDailyBudget = callsPerDay * costPerCall * 1.2;
+    const loopKillSwitchBudget = Math.max(loopDuration * costPerCall * 0.25, costPerCall * 10);
+    return {
+      monthlyToolSpend,
+      monthlyLoopWaste,
+      annualRisk,
+      satgateSavings,
+      paybackDays,
+      annualROI,
+      dailyNormalSpend,
+      perAgentDailyBudget,
+      loopKillSwitchBudget,
+    };
   }, [agents, costPerCall, callsPerDay, loopFreq, loopDuration]);
 
   const maxBar = calc.monthlyToolSpend + calc.monthlyLoopWaste;
@@ -75,7 +88,7 @@ export default function ROICalculatorPage() {
     name: 'AI Agent ROI Calculator',
     description: 'Estimate runaway AI agent loop exposure, budget-control ROI, and the receipts needed for Policy-to-Proof evidence across paid APIs and MCP tools.',
     url: 'https://satgate.io/roi-calculator',
-    dateModified: '2026-06-07',
+    dateModified: '2026-06-08',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent ROI calculator' },
@@ -110,7 +123,7 @@ export default function ROICalculatorPage() {
       { '@type': 'Audience', audienceType: 'AI engineering teams deploying paid MCP tools and APIs' },
     ],
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-06-07',
+    dateModified: '2026-06-08',
     about: webPageJsonLd.about,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
@@ -181,6 +194,14 @@ export default function ROICalculatorPage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'Turn the exposure model into Policy-to-Proof controls: define authority, budget limits, MCP tool caps, scoped capability-token policy, receipts, and Evidence Pack exports.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Which budget control should I set first?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Start with a per-agent daily budget, then add a loop kill switch for repeated paid calls in one workflow. The daily budget controls normal spend drift, while the kill switch stops exception paths before they become invoices.',
         },
       },
       {
@@ -303,6 +324,33 @@ export default function ROICalculatorPage() {
     ],
   };
 
+  const budgetPolicyJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent ROI calculator policy outputs',
+    description: 'Budget-control outputs teams can convert from ROI assumptions into SatGate request-path enforcement policy.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Normal daily agent spend baseline',
+        description: 'A baseline for expected daily spend across active agents before loop or retry waste.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Per-agent daily budget',
+        description: 'A first hard cap for each autonomous agent based on expected daily request volume and average tool-call cost.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Loop kill-switch budget',
+        description: 'A short-window budget that blocks repeated paid calls in one workflow before a retry loop becomes material spend.',
+      },
+    ],
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -321,6 +369,7 @@ export default function ROICalculatorPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(scenariosJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breakEvenJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(budgetPolicyJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       {/* Navigation */}
       <nav className="border-b border-gray-800 backdrop-blur-md fixed w-full z-50 bg-black/50">
@@ -428,6 +477,31 @@ export default function ROICalculatorPage() {
                   </span>
                 </div>
               </div>
+            </div>
+
+            {/* Policy outputs */}
+            <div className="p-6 md:p-8 rounded-2xl bg-gray-900 border border-gray-800">
+              <h2 className="text-lg font-bold text-white mb-3">Suggested First Controls</h2>
+              <p className="mb-5 text-sm leading-relaxed text-gray-400">
+                These starter limits turn the ROI assumptions into budget policy before paid API, model, or MCP calls execute.
+              </p>
+              <div className="space-y-4">
+                <div className="flex justify-between items-baseline gap-4">
+                  <span className="text-gray-400 text-sm">Normal Daily Agent Spend</span>
+                  <span className="text-white font-bold text-lg tabular-nums transition-all duration-300">{fmt.format(calc.dailyNormalSpend)}</span>
+                </div>
+                <div className="flex justify-between items-baseline gap-4">
+                  <span className="text-gray-400 text-sm">Per-Agent Daily Budget</span>
+                  <span className="text-cyan-300 font-extrabold text-xl tabular-nums transition-all duration-300">{fmt.format(calc.perAgentDailyBudget)}</span>
+                </div>
+                <div className="flex justify-between items-baseline gap-4">
+                  <span className="text-gray-400 text-sm">Loop Kill-Switch Budget</span>
+                  <span className="text-red-300 font-extrabold text-xl tabular-nums transition-all duration-300">{fmt.format(calc.loopKillSwitchBudget)}</span>
+                </div>
+              </div>
+              <Link href="/agent-spend-policy-template" className="mt-6 inline-flex text-sm font-semibold text-cyan-300 hover:text-cyan-200">
+                Generate policy from these limits →
+              </Link>
             </div>
 
             {/* Bar Chart */}
@@ -640,6 +714,12 @@ export default function ROICalculatorPage() {
               <h3 className="mb-2 text-xl font-bold text-white">What should I do after estimating runaway agent spend?</h3>
               <p className="text-gray-400 leading-relaxed">
                 Turn the exposure model into Policy-to-Proof controls: define authority, budget limits, MCP tool caps, scoped capability-token policy, receipts, and Evidence Pack exports.
+              </p>
+            </div>
+            <div>
+              <h3 className="mb-2 text-xl font-bold text-white">Which budget control should I set first?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Start with a per-agent daily budget, then add a loop kill switch for repeated paid calls in one workflow. The daily budget controls normal spend drift, while the kill switch stops exception paths before they become invoices.
               </p>
             </div>
             <div>

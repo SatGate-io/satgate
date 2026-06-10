@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T16:36:06.683949Z",
+  "generatedAt": "2026-06-10T17:06:16.127502Z",
   "items": [
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
@@ -10,7 +10,8 @@
       "recommendedMetaDescription": "Add OpenAI API budget limits with authority before execution, Observe/Control/Prove controls, and Evidence Pack receipts.",
       "contentChanges": [
         "Add or tighten the above-the-fold direct-answer block for the primary query.",
-        "Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end."
+        "Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end.",
+        "Fix SEO audit issues: missing title; missing meta description"
       ],
       "internalLinksToAdd": [
         "/blog/llm-cost-management",

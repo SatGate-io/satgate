@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T16:36:06.683728Z",
+  "generatedAt": "2026-06-10T17:06:16.127291Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -104,13 +104,13 @@
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
       "exists": true,
-      "title": "OpenAI API Budget Limits: Hard Caps Before GPT Calls Run",
-      "titleLength": 56,
-      "metaDescription": "Set OpenAI API budget limits by agent, team, or workflow. Enforce hard caps before GPT calls execute and preserve Evidence Pack proof.",
-      "metaDescriptionLength": 134,
+      "title": "",
+      "titleLength": 0,
+      "metaDescription": "",
+      "metaDescriptionLength": 0,
       "canonical": "/blog/how-to-add-budget-limits-to-openai-api-calls",
       "h1": [
-        "How to Add Hard Budget Limits to OpenAI API Calls"
+        "OpenAI API Budget Limits: How to Control Spend Before Calls Run"
       ],
       "h1Count": 1,
       "h2s": [
@@ -138,25 +138,33 @@
         "/govern",
         "/mcp-gateway",
         "/mcp-governance",
+        "/mcp-tool-cost-policy-generator",
         "/openai-budget-policy-generator",
         "/policy-to-proof",
+        "/roi-calculator",
         "/tools"
       ],
       "schemaTypes": [
         "Answer",
         "FAQPage",
+        "HowTo",
+        "HowToStep",
+        "HowToSupply",
         "Organization",
         "Question",
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1328,
+      "wordCount": 1399,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
       "hasProductCTA": true,
       "inSitemap": true,
-      "issues": []
+      "issues": [
+        "missing title",
+        "missing meta description"
+      ]
     },
     {
       "path": "/blog/llm-cost-management",
@@ -195,7 +203,9 @@
         "/mcp-gateway",
         "/mcp-governance",
         "/mcp-proxy-config-generator",
-        "/policy-to-proof"
+        "/mcp-tool-cost-policy-generator",
+        "/policy-to-proof",
+        "/roi-calculator"
       ],
       "schemaTypes": [
         "Answer",
@@ -205,7 +215,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2200,
+      "wordCount": 2258,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -216,10 +226,10 @@
     {
       "path": "/blog/http-402-payment-required-use-cases",
       "exists": true,
-      "title": "HTTP 402 Payment Required: API and Agent Use Cases",
-      "titleLength": 50,
-      "metaDescription": "HTTP 402 and L402 are paid-rail context. SatGate governs authority before execution and preserves Evidence Packs.",
-      "metaDescriptionLength": 113,
+      "title": "HTTP 402 Payment Required: Agent Implementation Guide",
+      "titleLength": 53,
+      "metaDescription": "Implement HTTP 402 for AI agents with L402 payment challenges, budget checks, payment proof, retries, and Evidence Pack records.",
+      "metaDescriptionLength": 128,
       "canonical": "/blog/http-402-payment-required-use-cases",
       "h1": [
         "HTTP 402 Payment Required: Meaning, Reserved Use, and AI Agent Payments"
@@ -260,7 +270,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2651,
+      "wordCount": 2659,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -445,6 +455,7 @@
       ],
       "h1Count": 1,
       "h2s": [
+        "From MCP connection to MCP budget enforcement",
         "MCP connection is not MCP governance",
         "Observe, Control, Prove MCP tool use",
         "MCP policy templates teams can start from",
@@ -470,12 +481,13 @@
         "DataDownload",
         "Dataset",
         "FAQPage",
+        "ItemList",
         "ListItem",
         "Organization",
         "Question",
         "SoftwareApplication"
       ],
-      "wordCount": 921,
+      "wordCount": 978,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,

@@ -1,6 +1,6 @@
 # SatGate SEO Machine Report
 
-Generated: 2026-06-06T16:36:06.684079Z
+Generated: 2026-06-10T17:06:16.127634Z
 
 ## Ranked opportunities
 
@@ -102,6 +102,10 @@ Generated: 2026-06-06T16:36:06.684079Z
 
 ## Audit failures
 
+### /blog/how-to-add-budget-limits-to-openai-api-calls
+- missing title
+- missing meta description
+
 ## Recommendations
 
 ### /blog/how-to-add-budget-limits-to-openai-api-calls
@@ -110,6 +114,7 @@ Generated: 2026-06-06T16:36:06.684079Z
 - Content changes:
   - Add or tighten the above-the-fold direct-answer block for the primary query.
   - Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end.
+  - Fix SEO audit issues: missing title; missing meta description
 - Links to add: /blog/llm-cost-management, /govern, /mcp-gateway, /capability-auth
 
 ### /blog/http-402-payment-required-use-cases

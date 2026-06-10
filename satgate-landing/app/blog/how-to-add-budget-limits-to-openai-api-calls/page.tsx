@@ -2,22 +2,25 @@ import Link from 'next/link';
 import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
+const pageTitle = 'OpenAI API Budget Limits: Control Spend Before Calls Run';
+const pageDescription = 'Add OpenAI API budget limits with authority before execution, Observe/Control/Prove controls, and Evidence Pack receipts.';
+
 export const metadata = {
-  title: "OpenAI API Budget Limits: Hard Caps Before GPT Calls Run",
-  description: "Set OpenAI API budget limits by agent, team, or workflow. Enforce hard caps before GPT calls execute and preserve Evidence Pack proof.",
+  title: pageTitle,
+  description: pageDescription,
   alternates: { canonical: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls' },
   keywords: ['OpenAI API budget limits', 'OpenAI cost control', 'API gateway OpenAI', 'GPT-4 spending limits', 'OpenAI API costs', 'prevent OpenAI overspending', 'hard cap OpenAI spend', 'per-agent OpenAI budget'],
   openGraph: {
-    title: 'OpenAI API Budget Limits: Hard Caps Before GPT Calls Run',
-    description: 'Set OpenAI API budget limits by agent, team, or workflow. Enforce hard caps before GPT calls execute and preserve Evidence Pack proof.',
+    title: pageTitle,
+    description: pageDescription,
     url: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls',
     type: 'article',
     publishedTime: '2026-04-07T00:00:00Z',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OpenAI API Budget Limits: Hard Caps Before GPT Calls Run',
-    description: 'Set per-agent, team, and workflow budgets before GPT calls execute, then prove each allow, deny, or downgrade decision.',
+    title: pageTitle,
+    description: pageDescription,
   },
 };
 
@@ -25,12 +28,12 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'OpenAI API Budget Limits: Hard Caps Before GPT Calls Run',
+    headline: 'OpenAI API Budget Limits: Control Spend Before Calls Run',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-07',
-    dateModified: '2026-06-07',
+    dateModified: '2026-06-08',
     mainEntityOfPage: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls',
     about: [
       { '@type': 'Thing', name: 'OpenAI API budget limits' },
@@ -98,6 +101,51 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
     ],
   };
 
+  const howToSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to add OpenAI API budget limits',
+    description: 'A request-path rollout for enforcing OpenAI API budget limits before autonomous agent calls reach GPT models.',
+    totalTime: 'PT30M',
+    supply: [
+      { '@type': 'HowToSupply', name: 'OpenAI API key' },
+      { '@type': 'HowToSupply', name: 'SatGate gateway or request-path budget proxy' },
+      { '@type': 'HowToSupply', name: 'Per-agent, team, customer, or workflow budget policy' },
+    ],
+    step: [
+      {
+        '@type': 'HowToStep',
+        name: 'Route OpenAI calls through the budget gateway',
+        text: 'Place SatGate in front of OpenAI so every GPT request can be identified, priced, and governed before execution.',
+        url: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls#step-1-install-the-gateway',
+      },
+      {
+        '@type': 'HowToStep',
+        name: 'Create scoped budget-limited tokens',
+        text: 'Issue separate tokens for development, production, high-priority workflows, teams, customers, or agents with hard daily, hourly, session, and per-request limits.',
+        url: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls#step-2-create-budget-limited-tokens',
+      },
+      {
+        '@type': 'HowToStep',
+        name: 'Configure the OpenAI client base URL',
+        text: 'Point the existing OpenAI SDK client at the SatGate base URL and use the budget-limited token instead of a broad upstream API key.',
+        url: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls#step-3-update-your-code',
+      },
+      {
+        '@type': 'HowToStep',
+        name: 'Attach budgets to teams, customers, and agents',
+        text: 'Enforce separate OpenAI API budgets by team, customer, workflow, environment, session, or autonomous agent before each call executes.',
+        url: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls#step-4-configure-team-budgets',
+      },
+      {
+        '@type': 'HowToStep',
+        name: 'Preserve proof for allow, deny, and downgrade decisions',
+        text: 'Record request-path budget decisions as Evidence Pack receipts so teams can audit why a GPT call was allowed, blocked, downgraded, or routed.',
+        url: 'https://satgate.io/policy-to-proof',
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script
@@ -107,6 +155,10 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
       />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -121,10 +173,10 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
             <span className="px-2 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono">API Gateway</span>
           </div>
           
-          <h1 className="text-4xl font-bold mb-4">How to Add Hard Budget Limits to OpenAI API Calls</h1>
+          <h1 className="text-4xl font-bold mb-4">OpenAI API Budget Limits: How to Control Spend Before Calls Run</h1>
           <div className="mb-6 rounded-2xl border border-green-900/60 bg-green-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-green-300">Direct answer</p>
-            <p className="text-gray-300">OpenAI usage limits are account-level. Request-path controls enforce per-agent, per-team, and per-workflow budgets before a GPT call reaches OpenAI, then Prove each allow, deny, or downgrade with an Evidence Pack receipt.</p>
+            <p className="text-gray-300">OpenAI API budget limits should be enforced in the request path: identify the agent or team, price the GPT call, check remaining budget, and allow, deny, downgrade, or route the request before it reaches OpenAI.</p>
           </div>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row">
             <Link href="/openai-budget-policy-generator" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Generate an OpenAI budget policy</Link>
