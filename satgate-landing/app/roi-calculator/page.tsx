@@ -559,6 +559,7 @@ export default function ROICalculatorPage() {
               { href: '/policy-to-proof', title: 'Map ROI to Policy-to-Proof', body: 'Connect exposure to enforceable checks, receipts, and an Evidence Pack.' },
               { href: '/govern', title: 'Govern agent execution', body: 'Put authority, budget, and audit policy in the request path before execution.' },
               { href: '/agent-spend-policy-template', title: 'Generate budget policy', body: 'Convert ROI exposure into YAML and JSON budget policy with receipt fields.' },
+              { href: '/economic-firewall', title: 'Understand economic firewalls', body: 'Learn how inline budget enforcement, agent identity, and revocation govern agent spend.' },
             ].map((item) => (
               <Link key={item.href} href={item.href} className="block rounded-xl border border-gray-800 bg-black/40 p-5 transition hover:border-cyan-500/40 hover:bg-cyan-950/20">
                 <h3 className="mb-2 font-bold text-white">{item.title}</h3>
