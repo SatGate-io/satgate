@@ -71,7 +71,7 @@ export default function McpGovernancePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-11',
     mainEntityOfPage: 'https://satgate.io/mcp-governance',
     about: [
       { '@type': 'Thing', name: 'MCP governance' },

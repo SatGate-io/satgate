@@ -68,7 +68,7 @@ export default function AiAgentCostControlPage() {
     name: 'AI Agent Cost Control | Request-Path Budget Enforcement',
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-cost-control',
-    dateModified: '2026-06-08',
+    dateModified: '2026-06-11',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent cost control' },
@@ -88,7 +88,7 @@ export default function AiAgentCostControlPage() {
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-cost-control',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-06-08',
+    dateModified: '2026-06-11',
     about: webPageJsonLd.about,
     offers: { '@type': 'Offer', url: 'https://satgate.io/pricing' },
     featureList: [

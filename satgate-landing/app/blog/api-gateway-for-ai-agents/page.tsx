@@ -30,7 +30,7 @@ export default function ApiGatewayForAiAgentsBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-12',
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-11',
     mainEntityOfPage: 'https://satgate.io/blog/api-gateway-for-ai-agents',
     about: [
       { '@type': 'Thing', name: 'API gateway for AI agents' },
