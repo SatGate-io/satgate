@@ -51,7 +51,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/pricing', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/security', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog', lastModified: '2026-06-04', changeFrequency: 'weekly', priority: 0.8 },
-  { path: '/compare', lastModified: '2026-06-07', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/compare', lastModified: '2026-06-11', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/compare/aws-agentcore-payments', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/compare/cloudflare-ai-gateway', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/compare/langsmith-helicone-datadog', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
@@ -121,7 +121,7 @@ const blogRoutes: SitemapEntry[] = [
   { path: '/blog/l402-protocol-explained', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/zero-trust-for-ai-agents', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/start-at-1-credit-economic-policy', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/blog/how-to-add-budget-limits-to-openai-api-calls', lastModified: '2026-06-10', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/blog/how-to-add-budget-limits-to-openai-api-calls', lastModified: '2026-06-11', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/cursor-mcp-proxy-setup-guide', lastModified: '2026-06-07', changeFrequency: 'monthly', priority: 0.8 },
 ];
 

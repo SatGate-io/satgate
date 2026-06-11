@@ -156,7 +156,7 @@ export default function ComparePage() {
     name: 'Compare SatGate',
     description: metadata.description,
     url: 'https://satgate.io/compare',
-    dateModified: '2026-06-07',
+    dateModified: '2026-06-11',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI gateway comparison' },
@@ -172,7 +172,7 @@ export default function ComparePage() {
     '@type': 'ItemList',
     name: 'SatGate comparison pages',
     description: metadata.description,
-    dateModified: '2026-06-07',
+    dateModified: '2026-06-11',
     about: webPageJsonLd.about,
     itemListElement: comparisons.map((item, index) => ({
       '@type': 'ListItem',
