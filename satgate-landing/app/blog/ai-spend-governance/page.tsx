@@ -43,7 +43,7 @@ export default function AiSpendGovernanceBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-05-22',
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-11',
     mainEntityOfPage: 'https://satgate.io/blog/ai-spend-governance',
     about: [
       { '@type': 'Thing', name: 'AI spend governance' },

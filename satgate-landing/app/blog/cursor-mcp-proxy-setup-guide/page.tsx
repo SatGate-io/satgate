@@ -28,7 +28,7 @@ export default function CursorMCPProxySetupGuidePage() {
     description: 'Learn how to set up a Cursor MCP proxy with SatGate to enforce budgets, meter tool usage, and add Evidence Packs without changing your MCP servers.',
     url: 'https://satgate.io/blog/cursor-mcp-proxy-setup-guide',
     datePublished: '2026-04-09',
-    dateModified: '2026-06-07',
+    dateModified: '2026-06-11',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [

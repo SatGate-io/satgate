@@ -94,7 +94,7 @@ const staticRoutes: SitemapEntry[] = [
 
 const blogRoutes: SitemapEntry[] = [
   { path: '/blog/always-on-agents-economic-authority', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.85 },
-  { path: '/blog/ai-spend-governance', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/blog/ai-spend-governance', lastModified: '2026-06-11', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/why-routing-isnt-governance', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/blog/beyond-connection-economic-governance-mcp', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/blog/how-we-built-budget-enforcement-mcp', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.6 },
@@ -122,7 +122,7 @@ const blogRoutes: SitemapEntry[] = [
   { path: '/blog/zero-trust-for-ai-agents', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/start-at-1-credit-economic-policy', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/how-to-add-budget-limits-to-openai-api-calls', lastModified: '2026-06-11', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/blog/cursor-mcp-proxy-setup-guide', lastModified: '2026-06-07', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/blog/cursor-mcp-proxy-setup-guide', lastModified: '2026-06-11', changeFrequency: 'monthly', priority: 0.8 },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
