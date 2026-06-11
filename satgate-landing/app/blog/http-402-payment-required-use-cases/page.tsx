@@ -5,7 +5,7 @@ export const metadata = {
   title: "HTTP 402 Payment Required: Agent Implementation Guide",
   description: "Implement HTTP 402 for AI agents with L402 payment challenges, budget checks, payment proof, retries, and Evidence Pack records.",
   alternates: { canonical: 'https://satgate.io/blog/http-402-payment-required-use-cases' },
-  keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API'],
+  keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API', 'HTTP 402 agent implementation'],
   openGraph: {
     title: 'HTTP 402 Payment Required: Agent Implementation Guide',
     description: 'HTTP 402 explained for AI agents: L402 payment challenges, budget checks, payment proof, retries, and Evidence Pack records.',
@@ -29,7 +29,7 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-02',
-    dateModified: '2026-06-07',
+    dateModified: '2026-06-11',
     mainEntityOfPage: 'https://satgate.io/blog/http-402-payment-required-use-cases',
     about: [
       { '@type': 'Thing', name: 'HTTP 402 Payment Required' },
