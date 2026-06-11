@@ -476,7 +476,9 @@ export default function EconomicFirewallPage() {
               ['/ai-api-budget-enforcement', 'AI API budget enforcement', 'Hard budget checks before model, tool, or API calls leave the request path.'],
               ['/agent-spending-limits', 'Agent spending limits', 'Spend caps by task, workflow, delegated sub-agent, route, model, and tool.'],
               ['/mcp-cost-control', 'MCP cost control', 'Control paid tool calls, retries, SaaS actions, cloud tasks, and data lookups.'],
+              ['/mcp-budget-enforcement', 'MCP budget enforcement', 'Enforce budgets and revocation before agents call MCP tools.'],
               ['/agent-payment-controls', 'Agent payment controls', 'Govern wallet approval, budgets, 402 challenges, and paid-rail context.'],
+              ['/paid-agent-payments', 'Governed paid API access for agents', 'Enable delegated paid API access for agents with scoped authority and Evidence Packs.'],
               ['/http-402-for-ai-agents', 'HTTP 402 for AI agents', 'Understand payment challenges, shared payment tokens, and L402.'],
               ['/l402-agent-payments', 'L402 agent payments', 'Preserve payment context before unlocking protected API access.'],
             ].map(([href, title, body]) => (

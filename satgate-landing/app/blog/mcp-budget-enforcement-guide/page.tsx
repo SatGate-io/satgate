@@ -30,7 +30,7 @@ export default function McpBudgetEnforcementGuidePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-05',
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-11',
     mainEntityOfPage: 'https://satgate.io/blog/mcp-budget-enforcement-guide',
     about: [
       { '@type': 'Thing', name: 'MCP budget enforcement' },
