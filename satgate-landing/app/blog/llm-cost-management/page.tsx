@@ -30,7 +30,7 @@ export default function LlmCostManagementBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-17',
-    dateModified: '2026-06-07',
+    dateModified: '2026-06-11',
     mainEntityOfPage: 'https://satgate.io/blog/llm-cost-management',
     about: [
       { '@type': 'Thing', name: 'LLM cost management' },
@@ -462,6 +462,7 @@ satgate mint \\
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">AI agent governance →</Link>
               <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway →</Link>
               <Link href="/blog/how-to-add-budget-limits-to-openai-api-calls" className="text-cyan-300 hover:text-cyan-200">OpenAI budget limits →</Link>
+              <Link href="/blog/ai-agent-api-cost-control" className="text-cyan-300 hover:text-cyan-200">AI agent API cost control →</Link>
               <Link href="/blog/api-gateway-for-ai-agents" className="text-cyan-300 hover:text-cyan-200">API gateway for AI agents →</Link>
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
               <Link href="/roi-calculator" className="text-cyan-300 hover:text-cyan-200">ROI calculator →</Link>
