@@ -9,7 +9,7 @@ export const metadata = {
   title: pageTitle,
   description: pageDescription,
   alternates: { canonical: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls' },
-  keywords: ['OpenAI API budget limits', 'OpenAI cost control', 'API gateway OpenAI', 'GPT-4 spending limits', 'OpenAI API costs', 'prevent OpenAI overspending', 'hard cap OpenAI spend', 'per-agent OpenAI budget'],
+  keywords: ['OpenAI API budget limits', 'OpenAI cost control', 'API gateway OpenAI', 'GPT-4 spending limits', 'OpenAI API costs', 'prevent OpenAI overspending', 'hard cap OpenAI spend', 'per-agent OpenAI budget', 'OpenAI API usage limits', 'OpenAI budget alerts', 'OpenAI official docs'],
   openGraph: {
     title: pageTitle,
     description: pageDescription,
@@ -33,7 +33,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-07',
-    dateModified: '2026-06-08',
+    dateModified: '2026-06-10',
     mainEntityOfPage: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls',
     about: [
       { '@type': 'Thing', name: 'OpenAI API budget limits' },
@@ -88,6 +88,22 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'Yes. A request-path budget gateway can attach spend policy to a team, customer, environment, workflow, or agent token, then enforce separate OpenAI API budgets before each request executes.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Where can I find OpenAI\'s official usage limits and budget alerts?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'OpenAI\'s official documents list monthly spending limits and alert thresholds, but they are coarse account‑level caps that can overshoot and cannot isolate spend by agent, user, session, workflow, or tool before execution. For per‑agent, per‑customer, and per‑workflow enforcement before each GPT call runs, use a request‑path budget gateway like SatGate.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What tools can control runaway AI agent API costs?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Request‑path budget gateways like SatGate enforce per‑agent, per‑customer, and per‑workflow spending limits before each API call runs, preventing runaway loops and retry storms that monitoring dashboards only detect after the fact.',
         },
       },
       {
