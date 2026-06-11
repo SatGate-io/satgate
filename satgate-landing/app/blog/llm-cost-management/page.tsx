@@ -460,6 +460,7 @@ satgate mint \\
             <p className="mb-4 text-gray-300">If a page is already earning LLM cost management impressions, route that intent into the pages that convert: tools, policy templates, and comparison pages.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">AI agent governance →</Link>
+              <Link href="/economic-firewall" className="text-cyan-300 hover:text-cyan-200">Economic firewall →</Link>
               <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway →</Link>
               <Link href="/blog/how-to-add-budget-limits-to-openai-api-calls" className="text-cyan-300 hover:text-cyan-200">OpenAI budget limits →</Link>
               <Link href="/blog/ai-agent-api-cost-control" className="text-cyan-300 hover:text-cyan-200">AI agent API cost control →</Link>
