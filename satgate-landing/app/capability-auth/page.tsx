@@ -42,7 +42,7 @@ export default function CapabilityAuthPage() {
     applicationCategory: 'SecurityApplication',
     description: metadata.description,
     url: 'https://satgate.io/capability-auth',
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-11',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     featureList: capabilities.map((item) => item.title),
   };

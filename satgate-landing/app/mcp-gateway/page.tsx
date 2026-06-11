@@ -94,7 +94,7 @@ export default function McpGatewayPage() {
     operatingSystem: 'Cloud, Hybrid',
     description: metadata.description,
     url: 'https://satgate.io/mcp-gateway',
-    dateModified: '2026-06-08',
+    dateModified: '2026-06-11',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     featureList: [
       'MCP budget enforcement',

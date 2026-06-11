@@ -50,7 +50,7 @@ export default function AlwaysOnAgentsEconomicAuthorityBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-06-04',
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-11',
     mainEntityOfPage: url,
     about: [
       { '@type': 'Thing', name: 'always-on agents' },
