@@ -3,7 +3,7 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 const pageTitle = 'OpenAI API Budget Limits: Control Spend Before Calls Run';
-const pageDescription = 'Add OpenAI API budget limits with authority before execution, Observe/Control/Prove controls, and Evidence Pack receipts.';
+const pageDescription = 'OpenAI API budget limits and official usage alerts are coarse; add request‑path enforcement before GPT calls run with Observe/Control/Prove controls and Evidence Pack receipts.';
 
 export const metadata = {
   title: pageTitle,
