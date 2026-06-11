@@ -29,7 +29,7 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-31',
-    dateModified: '2026-06-04',
+    dateModified: '2026-06-11',
     mainEntityOfPage: 'https://satgate.io/blog/macaroon-tokens-vs-api-keys',
     about: [
       { '@type': 'Thing', name: 'macaroon tokens versus API keys' },
