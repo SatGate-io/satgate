@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "HTTP 402 Payment Required: Agent Implementation Guide",
-  description: "Implement HTTP 402 for AI agents with L402 payment challenges, budget checks, payment proof, retries, and Evidence Pack records.",
+  title: "HTTP 402 Payment Required: API and Agent Use Cases",
+  description: "HTTP 402 and L402 are paid‑rail context. SatGate governs authority before execution and preserves Evidence Packs.",
   alternates: { canonical: 'https://satgate.io/blog/http-402-payment-required-use-cases' },
   keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API', 'HTTP 402 agent implementation'],
   openGraph: {
