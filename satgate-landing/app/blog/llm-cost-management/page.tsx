@@ -3,21 +3,21 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "LLM Cost Management: Dashboards, Budgets, and Hard Controls",
-  description: "Compare LLM cost dashboards, monitoring, budgets, and request-path enforcement. Move from Observe to Control to Evidence Pack proof.",
+  title: "LLM Cost Management: Control AI Spend Before It Happens",
+  description: "A practical guide to LLM cost management using authority before execution, budget controls, and Evidence Pack receipts for AI agents.",
   alternates: { canonical: 'https://satgate.io/blog/llm-cost-management' },
   keywords: ['LLM cost dashboard', 'LLM monitoring dashboard', 'LLM cost management', 'LLM cost control', 'LLM tracing dashboard', 'cost latency per request', 'AI budget enforcement', 'AI agent cost control', 'request-path budget enforcement'],
   openGraph: {
-    title: 'LLM Cost Management: Dashboards, Budgets, and Hard Controls',
-    description: 'Compare LLM cost dashboards, monitoring, budgets, and request-path enforcement. Move from Observe to Control to Evidence Pack proof.',
+    title: 'LLM Cost Management: Control AI Spend Before It Happens',
+    description: 'A practical guide to LLM cost management using authority before execution, budget controls, and Evidence Pack receipts for AI agents.',
     url: 'https://satgate.io/blog/llm-cost-management',
     type: 'article',
     publishedTime: '2026-03-17T00:00:00Z',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'LLM Cost Management: Dashboards, Budgets, and Hard Controls',
-    description: 'LLM cost dashboards are only the first step. Add budgets, request-path controls, and Evidence Pack proof for agent spend.',
+    title: 'LLM Cost Management: Control AI Spend Before It Happens',
+    description: 'A practical guide to LLM cost management using authority before execution, budget controls, and Evidence Pack receipts for AI agents.',
   },
 };
 
@@ -25,7 +25,7 @@ export default function LlmCostManagementBlogPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'LLM Cost Management: Dashboards, Budgets, and Hard Controls',
+    headline: 'LLM Cost Management: Control AI Spend Before It Happens',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },

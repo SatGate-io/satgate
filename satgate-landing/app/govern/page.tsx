@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import GovernClient from "../components/GovernClient";
 
 export const metadata: Metadata = {
-  title: "Enterprise AI Agent Governance: Policy-to-Proof Controls",
+  title: "AI Agent Governance: Policy-to-Proof",
   description:
-    "Govern AI agents before execution: Observe usage, Control budgets and access, and Prove decisions with Evidence Packs across APIs, MCP, and paid rails.",
+    "Govern AI agents with SatGate: authority before execution, Observe/Control/Prove, MCP governance, paid-rail context, and Evidence Packs.",
   alternates: {
     canonical: "https://satgate.io/govern",
   },
@@ -20,9 +20,9 @@ export const metadata: Metadata = {
     "Evidence Packs for AI agents",
   ],
   openGraph: {
-    title: "Enterprise AI Agent Governance: Policy-to-Proof Controls",
+    title: "AI Agent Governance: Policy-to-Proof",
     description:
-      "Govern AI agents before execution: Observe usage, Control budgets and access, and Prove decisions with Evidence Packs across APIs, MCP, and paid rails.",
+      "Govern AI agents with SatGate: authority before execution, Observe/Control/Prove, MCP governance, paid-rail context, and Evidence Packs.",
     url: "https://satgate.io/govern",
     type: "website",
   },
