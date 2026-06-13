@@ -3,21 +3,21 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "API Gateway for AI Agents: Control Tool and API Access",
-  description: "Learn how AI agent gateways enforce authority before execution with Observe/Control/Prove, budgets, MCP governance, Evidence Packs, and paid rails.",
+  title: "AI Agent API Gateway: Budgets, MCP, and Tool Cost Control",
+  description: "AI‑agent‑aware API gateways enforce budgets, MCP tool scope, and scoped tokens before execution—replacing rate limits with economic firewalls.",
   alternates: { canonical: 'https://satgate.io/blog/api-gateway-for-ai-agents' },
   keywords: ['API gateway for AI agents', 'AI agent gateway', 'API gateway comparison', 'agent economy gateway', 'AI API management', 'economic firewall gateway'],
   openGraph: {
-    title: 'API Gateway for AI Agents: Budgets, MCP, and Tool Costs',
-    description: 'Agent-aware API gateways need Observe/Control/Prove, budgets, MCP tool controls, scoped tokens, revocation, and Evidence Packs.',
+    title: 'AI Agent API Gateway: Budgets, MCP, and Tool Cost Control',
+    description: 'AI‑agent‑aware API gateways enforce budgets, MCP tool scope, and scoped tokens before execution—replacing rate limits with economic firewalls.',
     url: 'https://satgate.io/blog/api-gateway-for-ai-agents',
     type: 'article',
     publishedTime: '2026-03-12T00:00:00Z',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'API Gateway for AI Agents: Budgets, MCP, and Tool Costs',
-    description: 'Traditional gateways route traffic. AI agent gateways must observe, control, and prove authority, MCP tool scope, revocation, and paid-rail context.',
+    title: 'AI Agent API Gateway: Budgets, MCP, and Tool Cost Control',
+    description: 'Traditional gateways route traffic. AI agent gateways enforce budgets, MCP tool scope, and scoped tokens before execution.',
   },
 };
 
@@ -25,12 +25,12 @@ export default function ApiGatewayForAiAgentsBlogPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'API Gateway for AI Agents: Control Tool and API Access',
+    headline: 'AI Agent API Gateway: Budgets, MCP, and Tool Cost Control',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-12',
-    dateModified: '2026-06-11',
+    dateModified: '2026-06-12',
     mainEntityOfPage: 'https://satgate.io/blog/api-gateway-for-ai-agents',
     about: [
       { '@type': 'Thing', name: 'API gateway for AI agents' },

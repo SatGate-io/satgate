@@ -2,21 +2,21 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "Macaroon Tokens vs API Keys for Agent Access",
-  description: "Compare macaroon tokens and API keys for scoped authorization, delegated access, and safer AI agent permissions.",
+  title: "Macaroon Tokens vs API Keys: Safer AI Agent Authentication",
+  description: "Macaroon tokens provide scoped, revocable, budget‑aware credentials for AI agents—replacing static API keys with capability‑based security.",
   alternates: { canonical: 'https://satgate.io/blog/macaroon-tokens-vs-api-keys' },
   keywords: ['macaroon tokens vs API keys', 'capability-based authentication', 'API authentication AI agents', 'delegated authority tokens', 'macaroon authentication', 'AI agent security', 'capability tokens'],
   openGraph: {
-    title: 'Macaroon Tokens vs API Keys for AI Agents',
-    description: 'Compare macaroon authentication and API keys for scoped AI agent credentials, revocation, delegation, and budget limits.',
+    title: 'Macaroon Tokens vs API Keys: Safer AI Agent Authentication',
+    description: 'Macaroon tokens provide scoped, revocable, budget‑aware credentials for AI agents—replacing static API keys with capability‑based security.',
     url: 'https://satgate.io/blog/macaroon-tokens-vs-api-keys',
     type: 'article',
     publishedTime: '2026-03-31T00:00:00Z',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Macaroon Tokens vs API Keys for AI Agents',
-    description: 'Macaroon authentication gives AI agents scoped credentials with expiry, delegation, revocation, and budget caveats.',
+    title: 'Macaroon Tokens vs API Keys: Safer AI Agent Authentication',
+    description: 'Replace static API keys with macaroon tokens: scoped, revocable, budget‑aware credentials for safe AI agent delegation.',
   },
 };
 
@@ -29,7 +29,7 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-31',
-    dateModified: '2026-06-11',
+    dateModified: '2026-06-12',
     mainEntityOfPage: 'https://satgate.io/blog/macaroon-tokens-vs-api-keys',
     about: [
       { '@type': 'Thing', name: 'macaroon tokens versus API keys' },

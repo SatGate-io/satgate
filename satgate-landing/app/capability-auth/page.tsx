@@ -2,19 +2,19 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, BadgeCheck, KeyRound, Layers3, ShieldCheck, TimerReset, WalletCards } from 'lucide-react';
 
 export const metadata = {
-  title: 'Capability-Based Authorization for AI Agents',
-  description: 'Replace broad API keys with scoped, revocable capabilities, authority before execution, and Evidence Pack proof.',
+  title: 'Capability-Based Authorization for AI Agents: Scoped, Revocable, Budget‑Aware',
+  description: 'Replace broad API keys with scoped, revocable capabilities that include budget limits, delegation, and Evidence Pack proof for AI agent security.',
   alternates: { canonical: 'https://satgate.io/capability-auth' },
   keywords: ['capability based authorization', 'capability auth', 'agent authorization', 'capability tokens', 'macaroon tokens', 'delegated authorization', 'AI agent permissions'],
   openGraph: {
-    title: 'Capability-Based Authorization for AI Agents',
-    description: 'Give agents scoped, revocable capabilities and Evidence Pack proof instead of broad static API keys.',
+    title: 'Capability-Based Authorization for AI Agents: Scoped, Revocable, Budget‑Aware',
+    description: 'Give AI agents scoped, revocable capabilities with budget limits, delegation, and Evidence Pack proof—instead of static API keys.',
     url: 'https://satgate.io/capability-auth',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Capability-Based Authorization for AI Agents',
+    title: 'Capability-Based Authorization for AI Agents: Scoped, Revocable, Budget‑Aware',
     description: 'Use SatGate to scope agent authority before execution and prove decisions with Evidence Packs.',
   },
 };
@@ -42,7 +42,7 @@ export default function CapabilityAuthPage() {
     applicationCategory: 'SecurityApplication',
     description: metadata.description,
     url: 'https://satgate.io/capability-auth',
-    dateModified: '2026-06-11',
+    dateModified: '2026-06-12',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     featureList: capabilities.map((item) => item.title),
   };

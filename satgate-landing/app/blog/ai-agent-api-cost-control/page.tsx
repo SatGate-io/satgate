@@ -36,7 +36,7 @@ export default function AiAgentApiCostControlPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-05',
-    dateModified: '2026-06-11',
+    dateModified: '2026-06-12',
     mainEntityOfPage: 'https://satgate.io/blog/ai-agent-api-cost-control',
     about: [
       { '@type': 'Thing', name: 'AI agent API cost control' },
