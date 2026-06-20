@@ -208,7 +208,7 @@ export default function AgentSwarmsCostGovernancePage() {
               <CheckCircle className="text-green-400 mt-1 shrink-0" size={18} />
               <div>
                 <p className="text-white font-semibold">Cascade revocation</p>
-                <p className="text-gray-400">If a coordinator goes rogue, revoke its token. Every agent in the delegation tree is instantly invalidated — no need to track down individual agents.</p>
+                <p className="text-gray-400">If a coordinator goes rogue, revoke its token. Governed requests from agents in the delegation tree are denied at policy check — no need to track down individual agents.</p>
               </div>
             </div>
             <div className="flex items-start gap-3">

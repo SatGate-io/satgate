@@ -184,8 +184,8 @@ export default function SecurityPage() {
             <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
               <h4 className="text-white text-sm font-bold mb-2">Cascade Revocation</h4>
               <p className="text-gray-500 text-xs mb-0">
-                Revoking a parent token instantly invalidates all of its children. No propagation delay — 
-                the gateway checks revocation status on every request. Admin kill switch: immediate.
+                Revoking a parent token invalidates governed child requests at the next policy check.
+                The gateway checks revocation status before each governed request.
               </p>
             </div>
           </section>
