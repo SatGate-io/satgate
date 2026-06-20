@@ -966,7 +966,7 @@ export default function ProtectDemoPage() {
                     </div>
                   </div>
                   <p className="text-gray-300 leading-relaxed">
-                    "The token is compromised. Ban it <strong className="text-orange-400">globally and instantly</strong>. 
+                    "The token is compromised. Ban it <strong className="text-orange-400">globally</strong>.
                     We're stateless for validation (fast), but stateful for revocation (secure). 
                     This is the <strong className="text-orange-400">Panic Button</strong>."
                   </p>
@@ -1363,7 +1363,7 @@ export default function ProtectDemoPage() {
                           <XCircle size={18} /> Token Rejected!
                         </div>
                         <p className="text-gray-400 text-sm mb-3">
-                          The banned token was instantly rejected. The attacker is locked out.
+                          The banned token is rejected on the next governed request. The attacker is locked out.
                         </p>
                         <pre className="text-xs bg-black rounded-lg p-3 text-red-400 overflow-x-auto">
 {`{
@@ -1430,7 +1430,7 @@ export default function ProtectDemoPage() {
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle size={16} className="text-green-400 mt-0.5 flex-shrink-0" />
-                        <span>Instant Kill Switch revocation — no propagation delay</span>
+                        <span>Kill Switch revocation checked before the next governed request</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle size={16} className="text-green-400 mt-0.5 flex-shrink-0" />

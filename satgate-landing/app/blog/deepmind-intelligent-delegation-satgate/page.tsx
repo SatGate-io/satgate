@@ -233,7 +233,7 @@ export default function DeepMindDelegationPage() {
                   <p className="text-gray-300 text-sm">
                     <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Every request is logged with full token
                     lineage — which parent minted it, what caveats it carries, what it spent. Token revocation
-                    cascades: revoking a parent instantly invalidates all children. The Evidence Pack is the
+                    cascades: revoking a parent invalidates governed child requests at the next policy check. The Evidence Pack is the
                     accountability mechanism.
                   </p>
                 </div>
@@ -327,7 +327,7 @@ export default function DeepMindDelegationPage() {
                   <p className="text-gray-500 text-sm mb-2">Paper: Algorithmic circuit breakers that invalidate tokens across delegation chains (pp. 18–19)</p>
                   <p className="text-gray-300 text-sm">
                     <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Governance service with cascade revocation.
-                    Banning a parent token instantly invalidates every child and grandchild in the delegation tree.
+                    Banning a parent token causes governed child and grandchild requests to be denied at their next policy check.
                     Rate limiting acts as an additional circuit breaker — runaway agents hit throttling before they can
                     cause economic damage.
                   </p>

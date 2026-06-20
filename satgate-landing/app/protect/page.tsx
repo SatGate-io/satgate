@@ -124,7 +124,7 @@ const faqJsonLd = {
       name: 'Why use revocable capability tokens for agents?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Revocable capability tokens give agents narrow, expiring authority that can be delegated safely and killed instantly without rotating global API keys or service-account credentials.',
+        text: 'Revocable capability tokens give agents narrow, expiring authority that can be delegated safely and denied at policy check without rotating global API keys or service-account credentials.',
       },
     },
     {
@@ -1006,7 +1006,7 @@ export default function ProtectDemoPage() {
                     </div>
                   </div>
                   <p className="text-gray-300 leading-relaxed">
-                    "The token is compromised. Ban it <strong className="text-orange-400">globally and instantly</strong>. 
+                    "The token is compromised. Ban it <strong className="text-orange-400">globally</strong>.
                     We're stateless for validation (fast), but stateful for revocation (secure). 
                     This is the <strong className="text-orange-400">Panic Button</strong>."
                   </p>
@@ -1044,7 +1044,7 @@ export default function ProtectDemoPage() {
                         <User size={18} /> CISO Role
                       </div>
                       <p className="text-gray-400 text-sm">
-                        Issues root credentials. Retains authority. Can revoke instantly.
+                        Issues root credentials. Retains authority. Can revoke governed access.
                       </p>
                     </div>
                     <div className="p-4 bg-black rounded-xl border border-gray-800">
@@ -1412,7 +1412,7 @@ export default function ProtectDemoPage() {
                           <XCircle size={18} /> Token Rejected!
                         </div>
                         <p className="text-gray-400 text-sm mb-3">
-                          The banned token was instantly rejected. The attacker is locked out.
+                          The banned token is rejected on the next governed request. The attacker is locked out.
                         </p>
                         <pre className="text-xs bg-black rounded-lg p-3 text-red-400 overflow-x-auto">
 {`{
@@ -1475,7 +1475,7 @@ export default function ProtectDemoPage() {
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle size={16} className="text-green-400 mt-0.5 flex-shrink-0" />
-                        <span>CISO retains authority (instant Kill Switch revocation)</span>
+                        <span>CISO retains authority (Kill Switch checked before governed requests)</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle size={16} className="text-green-400 mt-0.5 flex-shrink-0" />
@@ -1783,7 +1783,7 @@ export default function ProtectDemoPage() {
           <div className="grid gap-4 md:grid-cols-3">
             {[
               ['What does SatGate Control protect?', 'SatGate Control protects agent API and MCP tool calls by enforcing scoped capability tokens, budgets, delegation limits, revocation, and audit policy before requests reach upstream services.'],
-              ['Why use revocable capability tokens for agents?', 'Revocable capability tokens give agents narrow, expiring authority that can be delegated safely and killed instantly without rotating global API keys or service-account credentials.'],
+              ['Why use revocable capability tokens for agents?', 'Revocable capability tokens give agents narrow, expiring authority that can be delegated safely and denied at policy check without rotating global API keys or service-account credentials.'],
               ['How does Control differ from Prove?', 'Control enforces access, budget, scope, and revocation policy for agent activity. Prove preserves Evidence Pack receipts for paid-rail context and other agent decisions before API access is unlocked.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">

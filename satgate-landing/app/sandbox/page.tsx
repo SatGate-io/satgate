@@ -142,7 +142,7 @@ export default function SandboxPage() {
 
     addEvent({ id: 'alpha-header', agent: 'alpha', type: 'summary', status: 'running',
       label: '🔴 Agent Alpha — Admin Kill Switch',
-      detail: 'Can an admin instantly cut off a rogue agent? Watch.' });
+      detail: 'Can an admin deny a rogue agent at the next governed request? Watch.' });
 
     // Step 1: Auth
     const authId = 'alpha-auth';
@@ -191,7 +191,7 @@ export default function SandboxPage() {
     await sleep(jitter(300));
     if (abortRef.current) return;
     updateEvent(revokeId, { status: 'revoked', latencyMs: jitter(12),
-      detail: '✓ Token revoked instantly — agent has no idea yet.' });
+      detail: '✓ Token revoked — next governed request should be denied.' });
 
     await sleep(600);
     if (abortRef.current) return;
@@ -203,10 +203,10 @@ export default function SandboxPage() {
     await sleep(jitter(400));
     if (abortRef.current) return;
     updateEvent(verifyId, { status: 'blocked', latencyMs: jitter(8),
-      detail: 'HTTP 401 — Blocked. Agent is permanently locked out. Zero human latency.' });
+      detail: 'HTTP 401 — Blocked on the next governed request after revocation.' });
 
     addEvent({ id: 'alpha-done', agent: 'alpha', type: 'summary', status: 'success',
-      label: '✓ Kill switch works: Authenticate → Call API → Admin Revoke → Instant Block' });
+      label: '✓ Kill switch works: Authenticate → Call API → Admin Revoke → Next request blocked' });
 
     return true;
   }, []);
@@ -469,7 +469,7 @@ export default function SandboxPage() {
             </span>
           </h2>
           <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
-            Two scenarios CFOs care about: a rogue agent gets cut off instantly, and an agent
+            Two scenarios CFOs care about: a rogue agent gets denied at the next governed request, and an agent
             hits its budget ceiling and stops — before the bill arrives.
           </p>
         </div>

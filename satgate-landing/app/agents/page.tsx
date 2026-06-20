@@ -268,7 +268,7 @@ export default function AgentsLandingPage() {
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Your agents present an identity credential, SatGate mints a budgeted macaroon, 
-              and they&apos;re through the gate. When the budget runs out or you revoke access — they stop. Instantly.
+              and they&apos;re through the gate. When the budget runs out or you revoke access, the next governed request stops before upstream.
             </p>
           </div>
 
@@ -300,7 +300,7 @@ export default function AgentsLandingPage() {
                 <Ban className="text-red-400" size={16} />
                 <h4 className="text-red-300 font-semibold text-sm">Admin Kill Switch</h4>
               </div>
-              <p className="text-gray-500 text-xs">Revoke any agent&apos;s token instantly. Next request gets 401. Cascade revocation kills the entire delegation tree.</p>
+              <p className="text-gray-500 text-xs">Revoke any agent&apos;s token. The next governed request gets 401, including cascade to delegated child tokens.</p>
             </div>
             <div className="bg-amber-950/20 border border-amber-900/30 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-2">

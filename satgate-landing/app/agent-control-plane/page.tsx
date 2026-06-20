@@ -137,7 +137,7 @@ const faqs = [
   ],
   [
     "How is an agent control plane different from an API gateway?",
-    "An API gateway protects services. An agent control plane governs the agents using those services: their budget, customer boundary, delegation rights, Evidence Pack, and ability to be revoked instantly.",
+    "An API gateway protects services. An agent control plane governs the agents using those services: their budget, customer boundary, delegation rights, Evidence Pack, and ability to have governed requests denied after revocation.",
   ],
   [
     "Why do enterprise AI agents need no standing authority?",

@@ -279,7 +279,7 @@ satgate delegate \\
 
           <p className="text-gray-300 leading-relaxed">
             The parent&apos;s budget is the ceiling. Sub-agents can never collectively exceed what 
-            was delegated. If you revoke the parent token, the entire tree is instantly invalidated.
+            was delegated. If you revoke the parent token, governed child requests are denied at policy check.
           </p>
 
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">Step 6: Monitor and Attribute</h2>

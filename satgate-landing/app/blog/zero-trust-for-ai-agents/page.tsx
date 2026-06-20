@@ -316,7 +316,7 @@ Token: search-worker-12
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Enforce budgets at the gateway.</strong> Every API call has a cost. The gateway tracks cumulative spend against the token&apos;s budget caveat. When the budget is exhausted, access stops — instantly, automatically, with no human intervention.
+            <strong className="text-white">Enforce budgets at the gateway.</strong> Every API call has a cost. The gateway tracks cumulative spend against the token&apos;s budget caveat. When the budget is exhausted, the gateway denies the request automatically, with no human intervention.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
