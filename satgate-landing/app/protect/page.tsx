@@ -5,7 +5,7 @@ import {
   Key, Shield, Lock, Unlock, Play, ArrowLeft, Copy, Check, 
   ChevronRight, AlertTriangle, CheckCircle, XCircle, User, 
   Bot, GitBranch, Clock, RefreshCw, Eye, Trash2, Wifi, WifiOff,
-  Ban, ShieldOff, Zap, Activity
+  Ban, ShieldOff, Zap, Activity, ArrowRight
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -855,6 +855,30 @@ export default function ProtectDemoPage() {
         </div>
       </div>
 
+      <section id="proof-path" className="border-b border-gray-800/50 bg-cyan-950/10">
+        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+          <div className="rounded-2xl border border-cyan-500/30 bg-black/40 p-6">
+            <p className="mb-2 text-xs font-mono uppercase tracking-[0.22em] text-cyan-300">Deterministic public proof path</p>
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <h3 className="text-2xl font-bold text-white">Need the buyer-safe allow/deny/revoke proof?</h3>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-300">
+                  The one-click Control scenes are useful for protocol exploration. The deterministic buyer proof lives on the public demo path and shows 401 no authority, 200 allowed, 402/403 denial, revoke/replay denial, and Evidence Pack export without auth or hidden shortcuts.
+                </p>
+              </div>
+              <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
+                <Link href="/sandbox#golden-path" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">
+                  Run the 90-second proof <ArrowRight size={16} />
+                </Link>
+                <Link href="/evidence-pack-demo" className="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-400/40 bg-cyan-400/10 px-5 py-3 text-sm font-bold text-cyan-100 transition hover:border-cyan-200">
+                  View Evidence Pack <ArrowRight size={16} />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         
         {/* Scene Progress */}
@@ -1377,11 +1401,11 @@ export default function ProtectDemoPage() {
 
                       <div className="bg-gradient-to-r from-orange-950/30 to-red-950/30 rounded-xl p-4 border border-orange-800/30">
                         <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
-                          <Zap size={16} className="text-yellow-400" /> Instant Propagation
+                          <Zap size={16} className="text-yellow-400" /> Next-request Enforcement
                         </h4>
                         <p className="text-gray-400 text-sm">
                           Unlike traditional IAM where revocation can take minutes/hours to propagate, 
-                          SatGate's ban list is checked on every request. The token is dead <strong>now</strong>.
+                          SatGate checks revocation on every governed request. The next replay is denied at policy check.
                         </p>
                       </div>
 
@@ -1425,8 +1449,8 @@ export default function ProtectDemoPage() {
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="p-4 bg-black rounded-xl border border-orange-800/50 text-center">
-                          <div className="text-2xl font-bold text-orange-400 mb-1">Instant</div>
-                          <div className="text-gray-400 text-xs">Revocation Time</div>
+                          <div className="text-2xl font-bold text-orange-400 mb-1">Next request</div>
+                          <div className="text-gray-400 text-xs">Denied after revoke</div>
                         </div>
                         <div className="p-4 bg-black rounded-xl border border-red-800/50 text-center">
                           <div className="text-2xl font-bold text-red-400 mb-1">Global</div>
@@ -1498,10 +1522,10 @@ export default function ProtectDemoPage() {
                         <RefreshCw size={18} className={isLoading ? 'animate-spin' : ''} /> Run Again
                       </button>
                       <Link
-                        href="/pay"
+                        href="/evidence-pack-demo"
                         className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-xl font-bold hover:opacity-90 transition flex items-center justify-center gap-2"
                       >
-                        Try Charge Mode <ChevronRight size={18} />
+                        View Evidence Pack <ChevronRight size={18} />
                       </Link>
                     </div>
                     {!useSimulation && adminToken && (

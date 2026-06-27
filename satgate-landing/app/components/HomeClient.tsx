@@ -186,17 +186,17 @@ const LandingPage = () => {
               Humans and platforms set policy. Agents consume approved primitives. Upstreams get receipt-backed proof.
             </p>
             <div className="flex flex-wrap gap-4">
-              <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
-                Start Free <ArrowRight size={16} />
-              </a>
+              <Link href="/sandbox#golden-path" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
+                Run authority proof <ArrowRight size={16} />
+              </Link>
               <Link href="/build" className="border border-cyan-700/50 bg-cyan-900/15 px-8 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition flex items-center gap-2 text-cyan-300">
                 Build with SatGate <ArrowRight size={16} />
               </Link>
-              <Link href="/sandbox" className="border border-purple-700/50 bg-purple-900/20 px-8 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition flex items-center gap-2 text-purple-300">
-                <Play size={16} /> See Demo
+              <Link href="/sandbox#golden-path" className="border border-purple-700/50 bg-purple-900/20 px-8 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition flex items-center gap-2 text-purple-300">
+                <Play size={16} /> Run the 90-second SatGate proof
               </Link>
-              <Link href="/agent-control-plane" className="border border-cyan-700/50 bg-cyan-900/15 px-8 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition flex items-center gap-2 text-cyan-300">
-                Agent Control Plane <ArrowRight size={16} />
+              <Link href="/evidence-pack-demo" className="border border-cyan-700/50 bg-cyan-900/15 px-8 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition flex items-center gap-2 text-cyan-300">
+                See an Evidence Pack <ArrowRight size={16} />
               </Link>
             </div>
 
