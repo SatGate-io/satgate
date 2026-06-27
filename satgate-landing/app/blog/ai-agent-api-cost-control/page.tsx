@@ -56,7 +56,7 @@ export default function AiAgentApiCostControlPage() {
         name: 'How do you control AI agent API costs?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Control AI agent API costs by putting an enforcement layer in the request path. The layer should identify the agent, price the API or tool call, check remaining budget, apply route/model policy, and block or downgrade requests before upstream spend occurs.',
+          text: 'Control AI agent API costs by putting an enforcement layer in the request path. The layer should identify the agent, price the API or tool call, check remaining budget, apply route/model policy, and deny or downgrade requests at the gateway before forwarding.',
         },
       },
       {
@@ -80,7 +80,7 @@ export default function AiAgentApiCostControlPage() {
         name: 'When should AI agent API cost controls block a request?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'AI agent API cost controls should block a request before execution when the estimated cost exceeds the remaining budget, the tool or route is outside scope, the credential is revoked or expired, or a delegated sub-agent would exceed its parent allowance.',
+          text: 'AI agent API cost controls should deny a request at the gateway policy check when the estimated cost exceeds the remaining budget, the tool or route is outside scope, the credential is revoked or expired, or a delegated sub-agent would exceed its parent allowance.',
         },
       },
     ],
@@ -229,7 +229,7 @@ audit:
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">How do you control AI agent API costs?</h3>
                 <p className="text-gray-300 leading-relaxed mb-0">
-                  Put an enforcement layer in the request path. It should identify the agent, price the API or tool call, check remaining budget, apply route/model policy, and block or downgrade requests before upstream spend occurs.
+                  Put an enforcement layer in the request path. It should identify the agent, price the API or tool call, check remaining budget, apply route/model policy, and deny or downgrade requests at the gateway before forwarding.
                 </p>
               </div>
               <div>
@@ -247,7 +247,7 @@ audit:
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">When should AI agent API cost controls block a request?</h3>
                 <p className="text-gray-300 leading-relaxed mb-0">
-                  They should block before execution when the estimated cost exceeds remaining budget, the tool or route is outside scope, the credential is revoked or expired, or a delegated sub-agent would exceed its parent allowance.
+                  They should deny at the gateway policy check when the estimated cost exceeds remaining budget, the tool or route is outside scope, the credential is revoked or expired, or a delegated sub-agent would exceed its parent allowance.
                 </p>
               </div>
             </div>

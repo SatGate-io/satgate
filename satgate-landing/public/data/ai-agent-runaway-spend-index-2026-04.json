@@ -24,6 +24,6 @@
     "delegation and sub-agent fanout caps",
     "revocable capability tokens",
     "budget exhaustion errors agents can reason about",
-    "request-path enforcement before upstream calls execute"
+    "request-path enforcement at the gateway before forwarding to upstream services"
   ]
 }

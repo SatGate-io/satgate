@@ -7,7 +7,7 @@ SatGate docs are organized around three voices. Use the voice that matches the r
 For buyers, operators, and security leaders. The story is not a payment rail. It is Policy-to-Proof governance for agents.
 
 - **Govern**: define scoped authority before an agent can act.
-- **Enforce**: apply policy, budget, route/tool scope, expiry, and delegation limits before upstream access.
+- **Enforce**: apply policy, budget, route/tool scope, expiry, and delegation limits at the gateway before forwarding.
 - **Prove**: return signed receipts and Evidence Packs for allowed, denied, delegated, revoked, and settlement-aware decisions.
 
 Start here:

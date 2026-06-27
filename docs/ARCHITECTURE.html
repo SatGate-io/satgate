@@ -404,7 +404,7 @@ compliance</li>
 │  ├─────────────────────────────────────────────────────────────────────┤   │
 │  │                                                                     │   │
 │  │  Responsibilities:                                                  │   │
-│  │  • Maintain token ban list (instant revocation)                     │   │
+│  │  • Maintain token ban list (next-request revocation checks)                     │   │
 │  │  • Track token lineage (parent → child relationships)               │   │
 │  │  • Record all minted tokens                                         │   │
 │  │  • Audit logging (immutable)                                        │   │
@@ -925,7 +925,7 @@ Gateway</h3>
 │  │                                                                       │  │
 │  │  • HMAC-SHA256 token signatures (256-bit key)                         │  │
 │  │  • Time-based expiration (caveats)                                    │  │
-│  │  • Instant revocation (governance ban list)                           │  │
+│  │  • Next-request revocation checks (governance ban list)                           │  │
 │  │  • Scope-based authorization                                          │  │
 │  │  • No token storage (stateless validation)                            │  │
 │  │                                                                       │  │

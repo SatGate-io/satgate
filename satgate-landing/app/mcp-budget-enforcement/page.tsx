@@ -116,7 +116,7 @@ export default function McpBudgetEnforcementPage() {
         name: 'Can dashboards enforce MCP spend?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Dashboards can report spend after the fact. MCP budget enforcement needs to sit in the request path so policy can allow, deny, route, approve, require paid-rail context, or revoke before the tool executes.',
+          text: 'Dashboards can report spend after the fact. MCP budget enforcement needs to sit in the request path so policy can allow, deny, route, approve, require paid-rail context, or revoke at the gateway policy check.',
         },
       },
       {
@@ -268,7 +268,7 @@ export default function McpBudgetEnforcementPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Can dashboards enforce MCP spend?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Dashboards can report spend after the fact. MCP budget enforcement needs to sit in the request path so policy can allow, deny, route, approve, require paid-rail context, or revoke before the tool executes.
+                Dashboards can report spend after the fact. MCP budget enforcement needs to sit in the request path so policy can allow, deny, route, approve, require paid-rail context, or revoke at the gateway policy check.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

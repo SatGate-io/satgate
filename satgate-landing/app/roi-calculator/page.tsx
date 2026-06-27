@@ -140,7 +140,7 @@ export default function ROICalculatorPage() {
         name: 'How does SatGate reduce runaway AI agent spend?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate enforces per-agent, per-tool, per-route, and per-request budget policy before upstream API calls execute, blocking or routing requests that exceed economic policy.',
+          text: 'SatGate enforces per-agent, per-tool, per-route, and per-request budget policy at the gateway before forwarding to upstream APIs, blocking or routing requests that exceed economic policy.',
         },
       },
       {
@@ -487,7 +487,7 @@ export default function ROICalculatorPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-black/40 p-5">
               <h3 className="mb-2 font-bold text-white">SatGate savings model</h3>
-              <p className="text-sm leading-relaxed text-gray-400">Request-path budget enforcement blocks most loop waste before upstream APIs or MCP tools execute.</p>
+              <p className="text-sm leading-relaxed text-gray-400">Request-path budget enforcement denies over-budget requests at the gateway before forwarding to upstream APIs or MCP tools.</p>
             </div>
           </div>
         </div>
@@ -585,7 +585,7 @@ export default function ROICalculatorPage() {
             <div>
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate reduce runaway AI agent spend?</h3>
               <p className="text-gray-400 leading-relaxed">
-                SatGate enforces per-agent, per-tool, per-route, and per-request budget policy before upstream API calls execute, blocking or routing requests that exceed economic policy.
+                SatGate enforces per-agent, per-tool, per-route, and per-request budget policy at the gateway before forwarding to upstream APIs, blocking or routing requests that exceed economic policy.
               </p>
             </div>
             <div>

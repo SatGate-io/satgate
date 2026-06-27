@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: "L402 Paid-Rail Governance Demo | SatGate",
   alternates: { canonical: "https://satgate.io/pay" },
   description:
-    "See SatGate govern delegated paid API access with paid-rail context, payment proof, scoped authority, receipts, and Evidence Packs before upstream access.",
+    "See SatGate govern delegated paid API access with paid-rail context, payment proof, scoped authority, receipts, and Evidence Packs at the gateway before forwarding.",
   keywords: [
     "L402 paid-rail governance demo",
     "SatGate paid-rail governance",

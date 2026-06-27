@@ -39,7 +39,7 @@ const rows: Array<[string, string, string]> = [
 ];
 
 const satgateWins = [
-  { icon: ShieldCheck, title: 'Economic firewall in the request path', body: 'SatGate decides whether an agent should access, spend, route, delegate, or pay before upstream APIs, MCP tools, and model calls execute.' },
+  { icon: ShieldCheck, title: 'Economic firewall in the request path', body: 'SatGate decides whether an agent should access, spend, route, delegate, or pay at the gateway before forwarding to upstream APIs, MCP tools, and model calls.' },
   { icon: Gauge, title: 'Hard budgets for autonomous workflows', body: 'Control spend by tenant, agent, workflow, delegated sub-agent, route, model, tool, session, day, and request.' },
   { icon: KeyRound, title: 'Scoped, revocable agent authority', body: 'Issue expiring capabilities constrained by route, tool, budget, call count, expiry, and delegation rules instead of broad static keys.' },
   { icon: Zap, title: 'Govern paid-rail access', body: 'Govern paid-rail context before external agents access APIs, datasets, tools, or premium capabilities at request time.' },

@@ -37,7 +37,7 @@ const lifecycle = [
     label: '4. Revoke',
     title: 'Revoke authority before the next request',
     buyer: 'When the job is complete, behavior falls outside policy, or the parent is revoked, the child is denied on its next gateway-enforced request.',
-    technical: 'Set revocation_state=revoked for the child capability; SatGate rejects the next request at the gateway before upstream execution.',
+    technical: 'Set revocation_state=revoked for the child capability; SatGate rejects the next governed request at the gateway policy check.',
     status: 'Denied',
     evidence: 'revocation decision recorded',
   },

@@ -65,7 +65,7 @@ export default function DeepMindDelegationPage() {
         name: 'How does SatGate implement intelligent agent delegation?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate uses macaroon-based capability tokens with caveats for route scope, MCP tool scope, budgets, expiry, and delegation chains, then enforces those constraints in the request path before upstream APIs execute.',
+          text: 'SatGate uses macaroon-based capability tokens with caveats for route scope, MCP tool scope, budgets, expiry, and delegation chains, then enforces those constraints in the request path before forwarding to upstream APIs.',
         },
       },
       {
@@ -485,7 +485,7 @@ export default function DeepMindDelegationPage() {
               {[
                 ['What are Delegation Capability Tokens for AI agents?', 'Delegation Capability Tokens are scoped credentials that let an agent pass limited authority to another agent. The useful form is attenuated: each delegation can only narrow permissions, budgets, routes, tools, or time windows.'],
                 ['Why are macaroons a strong primitive for AI agent delegation?', 'Macaroons support cryptographic caveats, local verification, and privilege attenuation. A parent token can mint child tokens with stricter constraints, but a child token cannot expand authority beyond its parent.'],
-                ['How does SatGate implement intelligent agent delegation?', 'SatGate uses macaroon-based capability tokens with caveats for route scope, MCP tool scope, budgets, expiry, and delegation chains, then enforces those constraints in the request path before upstream APIs execute.'],
+                ['How does SatGate implement intelligent agent delegation?', 'SatGate uses macaroon-based capability tokens with caveats for route scope, MCP tool scope, budgets, expiry, and delegation chains, then enforces those constraints in the request path before forwarding to upstream APIs.'],
                 ['What does Intelligent AI Delegation require beyond task routing?', 'Intelligent AI delegation needs explicit authority transfer, attenuated permissions, resource budgets, accountability across delegation chains, revocation, and enforcement before delegated agents can call APIs, MCP tools, or paid services.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">

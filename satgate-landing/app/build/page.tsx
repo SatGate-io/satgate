@@ -18,7 +18,7 @@ import {
 export const metadata: Metadata = {
   title: "Build Agents With Bounded Economic Authority",
   description:
-    "Issue scoped capabilities, enforce max budgets before upstream access, and verify receipts with SatGate's developer surface for agent authority and Evidence Pack proof.",
+    "Issue scoped capabilities, enforce max budgets at the gateway before forwarding, and verify receipts with SatGate's developer surface for agent authority and Evidence Pack proof.",
   keywords: [
     "SatGate build",
     "AI agent capabilities",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Build agents with bounded economic authority",
     description:
-      "Capabilities in. Receipts out. Rails abstracted. Build agents with scoped authority, max budgets before upstream access, and verifiable receipts.",
+      "Capabilities in. Receipts out. Rails abstracted. Build agents with scoped authority, max budgets at the gateway before forwarding, and verifiable receipts.",
     url: "https://satgate.io/build",
     type: "website",
   },
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Build agents with bounded economic authority",
     description:
-      "Issue scoped capabilities, enforce max budgets before upstream access, and verify receipts with SatGate's rail-neutral developer primitive.",
+      "Issue scoped capabilities, enforce max budgets at the gateway before forwarding, and verify receipts with SatGate's rail-neutral developer primitive.",
   },
 };
 
@@ -138,7 +138,7 @@ const primitives = [
 const docsBase = "https://github.com/SatGate-io/satgate/blob/main/docs";
 
 const voiceCards = [
-  { title: "Marketing voice", label: "govern / enforce / prove", body: "Explain the buyer outcome: scoped authority before action, policy enforcement before upstream access, and Evidence Pack proof after every decision." },
+  { title: "Marketing voice", label: "govern / enforce / prove", body: "Explain the buyer outcome: scoped authority before action, policy enforcement at the gateway before forwarding, and Evidence Pack proof after every decision." },
   { title: "Developer voice", label: "issue / pay / verify", body: "Give builders one primitive across SDKs, MCP, raw HTTP, OpenAI tools, Anthropic tools, LangChain, and CrewAI." },
   { title: "Machine voice", label: "schemas / signatures / receipts", body: "Anchor verifiers on canonical capability fields, receipt schema, JWKS discovery, RFC 8785 canonicalization, and Ed25519 signatures." },
 ];
@@ -247,7 +247,7 @@ export default function BuildPage() {
               Build agents with bounded economic authority
             </h1>
             <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
-              Issue scoped capabilities, enforce max budgets before upstream access, and return verifiable receipts your principal can trust.
+              Issue scoped capabilities, enforce max budgets at the gateway before forwarding, and return verifiable receipts your principal can trust.
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
               SatGate is the <strong className="font-semibold text-white">Agent Authority &amp; Accountability Layer</strong>. This is the developer surface: <strong className="font-semibold text-white">Capabilities in. Receipts out. Rails abstracted.</strong>

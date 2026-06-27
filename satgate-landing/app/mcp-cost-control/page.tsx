@@ -76,7 +76,7 @@ export default function Page() {
     '@type': 'FAQPage',
     mainEntity: [
       { '@type': 'Question', name: 'What is MCP cost control?', acceptedAnswer: { '@type': 'Answer', text: 'MCP cost control is the practice of pricing, limiting, attributing, and auditing Model Context Protocol tool calls before they execute so agents cannot create hidden API, SaaS, cloud, search, or data spend.' } },
-      { '@type': 'Question', name: 'Why are dashboards not enough?', acceptedAnswer: { '@type': 'Answer', text: 'Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced before upstream access.' } },
+      { '@type': 'Question', name: 'Why are dashboards not enough?', acceptedAnswer: { '@type': 'Answer', text: 'Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced at the gateway before forwarding.' } },
       { '@type': 'Question', name: 'How does SatGate help?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate sits in the request path and checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before forwarding the request.' } },
       { '@type': 'Question', name: 'How is MCP cost control different from LLM cost control?', acceptedAnswer: { '@type': 'Answer', text: 'LLM cost control focuses on model and token usage. MCP cost control covers tool calls that can trigger paid search, browser automation, cloud actions, SaaS APIs, data lookups, code execution, or delegated workflows outside the LLM bill.' } },
       { '@type': 'Question', name: 'Where should MCP tool cost policy be enforced?', acceptedAnswer: { '@type': 'Answer', text: 'MCP tool cost policy should be enforced in the request path before the MCP server executes the tool, so expensive calls can be blocked, downgraded, routed, approved, revoked, paid, or recorded before cost is created.' } },
@@ -119,7 +119,7 @@ export default function Page() {
           <h2 className="mb-6 text-3xl font-bold text-white">The control point is before the call</h2>
           <div className="space-y-5 text-lg leading-relaxed text-gray-300">
             <p>Autonomous agents can generate real costs through model calls, API requests, MCP tools, delegated sub-agents, retries, and background workflows. If the policy check happens after the request, the money is already spent.</p>
-            <p>SatGate enforces economic policy at the gateway boundary. Every important request can be evaluated against budget, scope, identity, revocation, route, tool, receipt, and audit rules before upstream access.</p>
+            <p>SatGate enforces economic policy at the gateway boundary. Every important request can be evaluated against budget, scope, identity, revocation, route, tool, receipt, and audit rules at the gateway before forwarding.</p>
             <p>That is the difference between cost reporting and economic control.</p>
           </div>
         </div>
@@ -164,7 +164,7 @@ export default function Page() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Why are dashboards not enough?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced before upstream access.
+                Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced at the gateway before forwarding.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

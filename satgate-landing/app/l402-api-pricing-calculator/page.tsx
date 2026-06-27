@@ -122,7 +122,7 @@ export default function L402ApiPricingCalculatorPage() {
         name: 'How should APIs price paid agent access?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Start from marginal cost per request, add target gross margin, account for free allowances or trial traffic, and enforce payment or budget policy before upstream access. L402 is one paid rail; SatGate preserves the authority and receipt context around access.',
+          text: 'Start from marginal cost per request, add target gross margin, account for free allowances or trial traffic, and enforce payment or budget policy at the gateway before forwarding. L402 is one paid rail; SatGate preserves the authority and receipt context around access.',
         },
       },
       {
@@ -251,7 +251,7 @@ export default function L402ApiPricingCalculatorPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How should APIs price paid agent access?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Start from marginal cost per request, add target gross margin, account for free allowances or trial traffic, and enforce payment or budget policy before upstream access. L402 is one paid rail; SatGate preserves the authority and receipt context around access.
+                Start from marginal cost per request, add target gross margin, account for free allowances or trial traffic, and enforce payment or budget policy at the gateway before forwarding. L402 is one paid rail; SatGate preserves the authority and receipt context around access.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

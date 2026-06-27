@@ -64,7 +64,7 @@ export default function AiGovernanceApiTeamsBlogPage() {
         name: 'Where should API teams enforce AI agent policy?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'API teams should enforce AI agent policy in the request path at an economic firewall, gateway, or MCP proxy so budget, permission, revocation, and audit checks happen before upstream work executes.',
+          text: 'API teams should enforce AI agent policy in the request path at an economic firewall, gateway, or MCP proxy so budget, permission, revocation, and audit checks happen at the gateway policy check before forwarding.',
         },
       },
     ],
@@ -412,7 +412,7 @@ export API_BASE_URL=https://gateway.satgate.io/v1
               {[
                 ['What does AI governance mean for API teams?', 'For API teams, AI governance means enforcing who can call an API, what each agent can spend, which tools or routes are allowed, when access should be revoked, and how every autonomous request is audited.'],
                 ['Why is routing not enough for AI API governance?', 'Routing moves traffic to the right upstream service, but it does not decide whether an autonomous agent is allowed to spend money, use a high-risk tool, exceed a workflow budget, or delegate access to a sub-agent.'],
-                ['Where should API teams enforce AI agent policy?', 'Enforce AI agent policy in the request path at an economic firewall, gateway, or MCP proxy so budget, permission, revocation, and audit checks happen before upstream work executes.'],
+                ['Where should API teams enforce AI agent policy?', 'Enforce AI agent policy in the request path at an economic firewall, gateway, or MCP proxy so budget, permission, revocation, and audit checks happen at the gateway policy check before forwarding.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

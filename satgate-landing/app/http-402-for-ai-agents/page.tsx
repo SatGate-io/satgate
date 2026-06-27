@@ -114,7 +114,7 @@ export default function Http402ForAiAgentsPage() {
             That challenge may point to different rails: card-based credentials, shared payment tokens, paid-rail context invoices, or future protocols. But the payment challenge is not the governance layer.
           </p>
           <p>
-            SatGate sits before upstream access and applies policy: identify the agent, confirm authority, estimate cost, enforce budgets, decide whether the rail is allowed, record the challenge, and unlock only scoped access after proof.
+            SatGate sits at the gateway before forwarding and applies policy: identify the agent, confirm authority, estimate cost, enforce budgets, decide whether the rail is allowed, record the challenge, and unlock only scoped access after proof.
           </p>
         </div>
         <div className="rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-6">

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "AI Agent Budget Enforcement Demo | SatGate Control",
     description:
-      "Watch SatGate enforce per-agent budgets, MCP tool limits, delegation controls, policy decisions, and revocation before upstream spend happens.",
+      "Watch SatGate enforce per-agent budgets, MCP tool limits, delegation controls, policy decisions, and revocation at the gateway policy check.",
     url: "https://satgate.io/protect",
     type: "website",
   },

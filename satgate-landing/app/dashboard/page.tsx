@@ -64,7 +64,7 @@ const faqJsonLd = {
       name: 'How does dashboard evidence connect to request-path control?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Dashboard evidence surfaces receipts after SatGate enforces decisions in the request path. The dashboard surfaces receipt-backed decisions; Evidence Packs are the exportable proof artifact; the gateway is where budgets, revocation, scopes, and policy are applied before upstream access.',
+        text: 'Dashboard evidence surfaces receipts after SatGate enforces decisions in the request path. The dashboard surfaces receipt-backed decisions; Evidence Packs are the exportable proof artifact; the gateway is where budgets, revocation, scopes, and policy are applied at the gateway before forwarding.',
       },
     },
   ],
@@ -545,7 +545,7 @@ export default function DashboardPage() {
               {[
                 ['What does the SatGate governance dashboard show?', 'The SatGate governance dashboard shows active agent tokens, delegation depth, caveats, blocked requests, banned tokens, revocation hits, and receipt-backed governance evidence for agent activity.'],
                 ['Why do AI agent teams need receipt-backed governance evidence?', 'Receipt-backed governance evidence shows which agents hold authority, what scopes and budgets apply, whether tokens are delegated, and which allowed, denied, revoked, or paid decisions feed Evidence Packs.'],
-                ['How does dashboard evidence connect to request-path control?', 'Dashboard evidence surfaces receipts after SatGate enforces decisions in the request path. The dashboard surfaces receipt-backed decisions; Evidence Packs are the exportable proof artifact; the gateway is where budgets, revocation, scopes, and policy are applied before upstream access.'],
+                ['How does dashboard evidence connect to request-path control?', 'Dashboard evidence surfaces receipts after SatGate enforces decisions in the request path. The dashboard surfaces receipt-backed decisions; Evidence Packs are the exportable proof artifact; the gateway is where budgets, revocation, scopes, and policy are applied at the gateway before forwarding.'],
               ].map(([question, answer]) => (
                 <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
                   <h3 className="mb-2 font-bold text-white">{question}</h3>

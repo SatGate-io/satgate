@@ -415,7 +415,7 @@ const LandingPage = () => {
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ Let approved agents consume APIs without long-lived shared secrets</li>
                 <li>✓ Preserve authority evidence above x402, L402, API-key, or enterprise billing rails</li>
-                <li>✓ Per-request pricing and policy before upstream execution</li>
+                <li>✓ Per-request pricing and policy at the gateway before forwarding</li>
                 <li>✓ Approved agents consume scoped access and leave an Evidence Pack</li>
               </ul>
             </div>
@@ -536,14 +536,14 @@ const LandingPage = () => {
               <DollarSign className="text-green-400 mb-2" size={20} />
               <h3 className="font-bold text-sm mb-1">Budget Ceilings</h3>
               <p className="text-gray-400 text-xs">
-                Per-agent and per-route economic policy, enforced before upstream execution.
+                Per-agent and per-route economic policy, checked at the gateway before forwarding.
               </p>
             </div>
             <div className="p-4 rounded-lg bg-gray-800/50 border border-gray-700">
               <Zap className="text-yellow-400 mb-2" size={20} />
               <h3 className="font-bold text-sm mb-1">Immediate Enforcement</h3>
               <p className="text-gray-400 text-xs">
-                When limits hit, requests stop. Not after billing. Now.
+                When limits hit, the gateway denies the next governed request before forwarding.
               </p>
             </div>
           </div>

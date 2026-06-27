@@ -1,7 +1,7 @@
 # SatGate SEO Machine Distribution Kit — 2026-04-29
 
 ## Positioning
-SatGate is the economic control plane for AI agents: it observes, controls, and charges agent/API activity before upstream access.
+SatGate is the economic control plane for AI agents: it observes, controls, and charges agent/API activity at the gateway before forwarding.
 
 ## Launch Posts
 
@@ -42,7 +42,7 @@ AI agents make API calls autonomously. That breaks traditional cost controls.
 
 SatGate now has a public toolset for modeling and enforcing agent spend: runaway cost calculators, LLM cost monitoring guides, MCP budget policy generators, revocable capability-token policy templates, governance dashboard demos, agent credential risk scoring, L402 API pricing, and a monthly runaway spend index.
 
-The thesis is simple: monitoring is not enough. Agent spend must be governed before upstream access.
+The thesis is simple: monitoring is not enough. Agent spend must be governed at the gateway before forwarding.
 
 Start here: https://satgate.io/tools
 

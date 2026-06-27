@@ -63,7 +63,7 @@ export default function SecurityPage() {
       {
         '@type': 'Question',
         name: 'How does SatGate secure AI agent API access?',
-        acceptedAnswer: { '@type': 'Answer', text: 'SatGate secures AI agent API access with request-path policy enforcement, capability tokens, macaroon caveats, scoped budgets, expiry, delegation limits, revocation, and audit evidence before upstream access.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'SatGate secures AI agent API access with request-path policy enforcement, capability tokens, macaroon caveats, scoped budgets, expiry, delegation limits, revocation, and audit evidence at the gateway before forwarding.' },
       },
       {
         '@type': 'Question',
@@ -318,7 +318,7 @@ export default function SecurityPage() {
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
                 <h3 className="text-white text-sm font-bold mb-2">How does SatGate secure AI agent API access?</h3>
                 <p className="text-gray-500 text-xs mb-0">
-                  SatGate secures AI agent API access with request-path policy enforcement, capability tokens, macaroon caveats, scoped budgets, expiry, delegation limits, revocation, and audit evidence before upstream access.
+                  SatGate secures AI agent API access with request-path policy enforcement, capability tokens, macaroon caveats, scoped budgets, expiry, delegation limits, revocation, and audit evidence at the gateway before forwarding.
                 </p>
               </div>
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">

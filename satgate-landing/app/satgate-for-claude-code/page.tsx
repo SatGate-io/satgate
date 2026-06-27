@@ -77,7 +77,7 @@ export default function SatGateIntegrationPage() {
       {
         '@type': 'Question',
         name: 'Is SatGate just another observability dashboard?',
-        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, audit, and L402 payment before upstream access.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, audit, and L402 payment at the gateway before forwarding.' },
       },
       {
         '@type': 'Question',
@@ -178,7 +178,7 @@ export default function SatGateIntegrationPage() {
           <div className="grid gap-5 md:grid-cols-3">
             {[
               ['Why use SatGate with Claude Code?', 'Claude Code is powerful because it can act autonomously. SatGate adds economic policy so autonomy has budgets, scoped access, revocation, and audit rather than broad keys and after-the-fact billing alerts.'],
-              ['Is SatGate just another observability dashboard?', 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, audit, and L402 payment before upstream access.'],
+              ['Is SatGate just another observability dashboard?', 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, audit, and L402 payment at the gateway before forwarding.'],
               ['Can SatGate start in observe-only mode?', 'Yes. Teams can start with Observe to map agent and tool spend, then graduate to Control policies once safe limits are clear.'],
             ].map(([question, answer]) => (
               <div key={question}>

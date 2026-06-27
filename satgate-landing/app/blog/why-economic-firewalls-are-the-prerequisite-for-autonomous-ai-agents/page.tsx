@@ -66,7 +66,7 @@ export default function WhyEconomicFirewallsPrerequisitePage() {
         name: 'Are economic firewalls only cost-control tools?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. Cost control is one function, but the larger purpose is economic governance: deciding which agents may access, spend, route, delegate, or pay before upstream work executes.',
+          text: 'No. Cost control is one function, but the larger purpose is economic governance: deciding which agents may access, spend, route, delegate, or pay at the gateway policy check before forwarding.',
         },
       },
       {
@@ -274,7 +274,7 @@ export default function WhyEconomicFirewallsPrerequisitePage() {
               {[
                 ['Why do autonomous AI agents need economic firewalls?', 'Autonomous AI agents need economic firewalls because they can spend money, call paid APIs, delegate work, and purchase resources faster than humans can approve or monitor. Economic firewalls bound that authority before spend occurs.'],
                 ['How do economic firewalls enable agent autonomy?', 'They let teams grant agents real autonomy inside hard budget, scope, expiry, revocation, and audit boundaries, so risk committees can approve independent action without accepting unbounded liability.'],
-                ['Are economic firewalls only cost-control tools?', 'No. Cost control is one function, but the larger purpose is economic governance: deciding which agents may access, spend, route, delegate, or pay before upstream work executes.'],
+                ['Are economic firewalls only cost-control tools?', 'No. Cost control is one function, but the larger purpose is economic governance: deciding which agents may access, spend, route, delegate, or pay at the gateway policy check before forwarding.'],
                 ['What controls should an economic firewall apply to autonomous agents?', 'An economic firewall should apply hard spend ceilings, route and tool scope, expiry windows, delegated budget limits, revocation, Evidence Packs, and request-path deny decisions before autonomous agents can spend or call paid services.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">

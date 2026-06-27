@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SatGate Agent Control Plane",
     description:
-      "Control the agent. Control delegation. Prove the lineage. Meter spend. Shut it down instantly.",
+      "Control the agent. Control delegation. Prove the lineage. Meter spend. Stop the next governed request.",
     images: ["/acp-demo/satgate-acp-thumbnail.jpg"],
   },
 };

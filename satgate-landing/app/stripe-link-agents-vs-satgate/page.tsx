@@ -17,7 +17,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Stripe Link for Agents vs SatGate',
-    description: 'Stripe Link can provide payment credentials and approval flows. SatGate controls what agents may access, spend, meter, delegate, and monetize before upstream API calls execute.',
+    description: 'Stripe Link can provide payment credentials and approval flows. SatGate controls what agents may access, spend, meter, delegate, and monetize at the gateway before forwarding to upstream APIs.',
     url: 'https://satgate.io/stripe-link-agents-vs-satgate',
     type: 'article',
   },
@@ -31,7 +31,7 @@ export const metadata = {
 const comparison = [
   ['Primary job', 'Provide payment credentials and approval flows', 'Govern agent/API economic activity in the request path'],
   ['Best fit', 'Purchases on merchant sites and payment-token flows', 'APIs, models, MCP tools, delegated agents, budgets, and monetization'],
-  ['Control point', 'Wallet / credential issuance', 'Before upstream API, model, or tool access'],
+  ['Control point', 'Wallet / credential issuance', 'Gateway policy check before forwarding to an upstream API, model, or tool'],
   ['Budget enforcement', 'User approval and future granular controls', 'Per-agent, route, tool, tenant, workflow, and time-window budgets'],
   ['API metering', 'Not the core product', 'Core Observe capability'],
   ['Payment rail', 'Cards and shared payment tokens', 'SatGate paid-rail governance uses paid-rail context for API monetization'],
@@ -103,7 +103,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
             Stripe Link for Agents vs SatGate
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-8">
-            Stripe Link can provide payment credentials and approval flows. SatGate controls whether agents are allowed to access, spend, meter, delegate, and monetize before upstream API calls execute.
+            Stripe Link can provide payment credentials and approval flows. SatGate controls whether agents are allowed to access, spend, meter, delegate, and monetize at the gateway before forwarding to upstream APIs.
           </p>
           <p className="text-2xl md:text-3xl font-bold text-white max-w-4xl mb-10">
             Wallets authorize payment. Economic firewalls authorize behavior.

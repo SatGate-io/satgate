@@ -268,7 +268,7 @@ export default function AgentsLandingPage() {
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Your agents present an identity credential, SatGate mints a budgeted macaroon, 
-              and they&apos;re through the gate. When the budget runs out or you revoke access, the next governed request stops before upstream.
+              and they&apos;re through the gate. When the budget runs out or you revoke access, the next governed request is denied at the gateway policy check.
             </p>
           </div>
 

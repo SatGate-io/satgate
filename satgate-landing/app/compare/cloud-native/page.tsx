@@ -93,7 +93,7 @@ const CloudNativeComparisonPage = () => {
         name: 'How is SatGate different from AWS, Azure, or GCP AI governance?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate is provider-neutral and enforces economic policy before upstream calls execute. It can cap per-agent, per-tool, and per-task spend across clouds instead of relying on one cloud billing system.',
+          text: 'SatGate is provider-neutral and enforces economic policy at the gateway before forwarding to upstream services. It can cap per-agent, per-tool, and per-task spend across clouds instead of relying on one cloud billing system.',
         },
       },
       {
@@ -301,7 +301,7 @@ const CloudNativeComparisonPage = () => {
           <div className="space-y-5">
             {[
               ['Why are cloud-native AI governance tools not enough for autonomous agents?', 'Cloud-native tools are usually siloed to one provider and built around IAM, logs, and after-the-fact billing. Autonomous agents need request-path controls that follow tool calls across clouds, APIs, and MCP servers.'],
-              ['How is SatGate different from AWS, Azure, or GCP AI governance?', 'SatGate is provider-neutral and enforces economic policy before upstream calls execute. It can cap per-agent, per-tool, and per-task spend across clouds instead of relying on one cloud billing system.'],
+              ['How is SatGate different from AWS, Azure, or GCP AI governance?', 'SatGate is provider-neutral and enforces economic policy at the gateway before forwarding to upstream services. It can cap per-agent, per-tool, and per-task spend across clouds instead of relying on one cloud billing system.'],
               ['Can SatGate work alongside cloud-native AI platforms?', 'Yes. SatGate can sit between agents and cloud-hosted models or tools, adding budget enforcement, cost attribution, and policy controls while the cloud platform continues to provide compute and model hosting.'],
             ].map(([question, answer]) => (
               <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">

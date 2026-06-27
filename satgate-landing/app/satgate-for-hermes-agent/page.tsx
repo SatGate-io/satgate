@@ -114,7 +114,7 @@ export default function SatGateForHermesAgentPage() {
 
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Give Hermes Agent workflows an economic firewall</h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Hermes Agent is built for persistent, skillful agent workflows. SatGate adds the missing economic firewall: per-agent budgets, MCP tool cost policy, scoped credentials, revocation, and audit before upstream APIs or tools execute.
+            Hermes Agent is built for persistent, skillful agent workflows. SatGate adds the missing economic firewall: per-agent budgets, MCP tool cost policy, scoped credentials, revocation, and audit at the gateway before forwarding to upstream APIs or tools.
           </p>
 
           <div className="flex flex-col gap-4 sm:flex-row">

@@ -45,7 +45,7 @@ const satgateWins: Array<{ icon: typeof ShieldCheck; title: string; body: string
   {
     icon: ShieldCheck,
     title: 'Economic firewall, not just LLM gateway',
-    body: 'SatGate governs whether an agent should access, spend, route, delegate, or pay before upstream APIs and tools execute.',
+    body: 'SatGate governs whether an agent should access, spend, route, delegate, or pay at the gateway before forwarding to upstream APIs and tools.',
   },
   {
     icon: Gauge,

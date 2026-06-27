@@ -65,7 +65,7 @@ export default function ZeroTrustForAIAgentsBlogPage() {
         name: 'How does an economic firewall extend Zero Trust for AI agents?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An economic firewall enforces cost, scope, and delegation in the request path before upstream APIs execute, giving teams budget-aware authorization that identity systems alone cannot provide.',
+          text: 'An economic firewall enforces cost, scope, and delegation in the request path before forwarding to upstream APIs, giving teams budget-aware authorization that identity systems alone cannot provide.',
         },
       },
       {
@@ -396,7 +396,7 @@ Token: search-worker-12
               {[
                 ['Why does traditional Zero Trust break down for AI agents?', 'Traditional Zero Trust assumes stable human identities, managed devices, and predictable access patterns. AI agents are ephemeral, delegate to sub-agents, and can generate thousands of API calls from one task.'],
                 ['What replaces identity-based security for autonomous agents?', 'Autonomous agents need capability-based security: scoped, revocable tokens that encode what the agent can do, how much it can spend, where it can call, and when authority expires.'],
-                ['How does an economic firewall extend Zero Trust for AI agents?', 'An economic firewall enforces cost, scope, and delegation in the request path before upstream APIs execute, giving teams budget-aware authorization that identity systems alone cannot provide.'],
+                ['How does an economic firewall extend Zero Trust for AI agents?', 'An economic firewall enforces cost, scope, and delegation in the request path before forwarding to upstream APIs, giving teams budget-aware authorization that identity systems alone cannot provide.'],
                 ['Can Zero Trust policies express agent budgets and delegated authority?', 'Most Zero Trust policies can express identity, device posture, location, and application access, but they usually cannot express per-agent spend limits, delegated budget attenuation, MCP tool costs, or proof-of-payment requirements before each request.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
