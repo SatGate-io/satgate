@@ -240,7 +240,10 @@ export default function EvidencePackDemoPage() {
           <div className="space-y-3">
             {receipts.map((receipt) => (
               <article key={receipt.receipt_id} className="grid gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-5 md:grid-cols-[0.25fr_0.9fr_1fr_0.8fr] md:items-center">
-                <div className="font-mono text-xs text-gray-500">#{receipt.seq} · {receipt.ts.slice(11, 19)}</div>
+                <div className="font-mono text-xs text-gray-500">
+                  <div>#{receipt.seq} · {receipt.ts.slice(11, 19)}</div>
+                  <div className="mt-1 break-all text-cyan-300">{receipt.receipt_id}</div>
+                </div>
                 <div>
                   <p className="font-bold text-white">{receipt.type}</p>
                   <p className="text-xs text-gray-500">{receipt.action}</p>
