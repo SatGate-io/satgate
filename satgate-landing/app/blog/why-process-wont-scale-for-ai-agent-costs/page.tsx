@@ -65,7 +65,7 @@ export default function WhyProcessWontScaleBlogPage() {
         name: 'What is the alternative to manual AI cost governance?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'The alternative is request-path economic governance: every agent request is checked against budget, routing, revocation, and audit policy before upstream APIs, models, or MCP tools execute.',
+          text: 'The alternative is request-path economic governance: every agent request is checked against budget, routing, revocation, and audit policy at the gateway before forwarding to upstream APIs, models, or MCP tools.',
         },
       },
     ],
@@ -275,7 +275,7 @@ export default function WhyProcessWontScaleBlogPage() {
               {[
                 ['Why does process-based AI agent cost control fail at scale?', 'Process-based cost control fails because autonomous agents make API and tool calls faster than humans can review dashboards, spreadsheets, or invoices. Controls need to execute before each costly request.'],
                 ['Which AI agent cost controls should be automated?', 'Budget checks, model routing, per-tool cost attribution, workflow spend tracking, policy templates, token quotas, and real-time denials should be automated at the gateway or economic firewall layer.'],
-                ['What is the alternative to manual AI cost governance?', 'The alternative is request-path economic governance: every agent request is checked against budget, routing, revocation, and audit policy before upstream APIs, models, or MCP tools execute.'],
+                ['What is the alternative to manual AI cost governance?', 'The alternative is request-path economic governance: every agent request is checked against budget, routing, revocation, and audit policy at the gateway before forwarding to upstream APIs, models, or MCP tools.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

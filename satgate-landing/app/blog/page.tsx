@@ -353,7 +353,7 @@ export default function BlogPage() {
         name: 'How is SatGate different from an LLM dashboard or API gateway?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'LLM dashboards report spend after it happens and traditional API gateways mainly route traffic. SatGate sits in the request path to observe, control, and prove agent/API activity before upstream access.',
+          text: 'LLM dashboards report spend after it happens and traditional API gateways mainly route traffic. SatGate sits in the request path to observe, control, and prove agent/API activity at the gateway before forwarding.',
         },
       },
     ],
@@ -456,7 +456,7 @@ export default function BlogPage() {
             {[
               ['What does the SatGate blog cover?', 'The SatGate blog covers AI agent governance, Policy-to-Proof governance, AI agent cost control, MCP budget enforcement, revocable capability tokens, paid-rail context, and API economics for autonomous agents.'],
               ['Where should I start if I need to control AI agent spend?', 'Start with the AI agent cost control guide, the economic firewall definition, the ROI calculator, and the MCP budget enforcement guide to understand the request-path controls needed before agents spend.'],
-              ['How is SatGate different from an LLM dashboard or API gateway?', 'LLM dashboards report spend after it happens and traditional API gateways mainly route traffic. SatGate sits in the request path to observe, control, and prove agent/API activity before upstream access.'],
+              ['How is SatGate different from an LLM dashboard or API gateway?', 'LLM dashboards report spend after it happens and traditional API gateways mainly route traffic. SatGate sits in the request path to observe, control, and prove agent/API activity at the gateway before forwarding.'],
             ].map(([question, answer]) => (
               <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                 <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

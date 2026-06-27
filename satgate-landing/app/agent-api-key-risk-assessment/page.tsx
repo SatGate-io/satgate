@@ -137,7 +137,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
         name: 'How does SatGate reduce API key risk?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate sits in the request path and checks identity, budget, route, scope, expiry, revocation, and policy before upstream API or MCP tool access.',
+          text: 'SatGate sits in the request path and checks identity, budget, route, scope, expiry, revocation, and policy at the gateway before forwarding to an upstream API or MCP tool.',
         },
       },
     ],
@@ -247,7 +247,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate reduce API key risk?</h3>
-              <p className="leading-relaxed text-gray-400">SatGate sits in the request path and checks identity, budget, route, scope, expiry, revocation, and policy before upstream API or MCP tool access.</p>
+              <p className="leading-relaxed text-gray-400">SatGate sits in the request path and checks identity, budget, route, scope, expiry, revocation, and policy at the gateway before forwarding to an upstream API or MCP tool.</p>
             </div>
           </div>
         </div>
@@ -257,7 +257,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-orange-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Move from API keys to economic capabilities.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            SatGate turns agent access into request-path policy: scoped authority, spend limits, revocation, audit, and payment controls before upstream access.
+            SatGate turns agent access into request-path policy: scoped authority, spend limits, revocation, audit, and payment controls at the gateway before forwarding.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">

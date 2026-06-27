@@ -334,7 +334,7 @@ export default function RobotCustomerPaymentsPage() {
               ['/revocable-agent-credentials', 'Revocable agent credentials', 'Revoke delegated access when policy, budget, or risk changes.'],
               ['/govern', 'AI agent governance', 'Bound delegated agent authority before paid-rail execution.'],
               ['/mcp-budget-enforcement', 'MCP budget enforcement', 'Apply the same budget logic to paid tools and MCP servers.'],
-              ['/ai-agent-cost-control', 'AI agent cost control', 'Stop agent overspend before upstream requests execute.'],
+              ['/ai-agent-cost-control', 'AI agent cost control', 'Stop agent overspend at the gateway policy check.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">
                 <h3 className="font-bold text-white mb-2">{title}</h3>

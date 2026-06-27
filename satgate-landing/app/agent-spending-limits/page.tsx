@@ -76,7 +76,7 @@ export default function Page() {
     '@type': 'FAQPage',
     mainEntity: [
       { '@type': 'Question', name: 'What are agent spending limits?', acceptedAnswer: { '@type': 'Answer', text: 'Agent spending limits are request-path budgets and caps that constrain what autonomous AI agents can spend by task, route, tool, model, workflow, tenant, session, or day before requests execute.' } },
-      { '@type': 'Question', name: 'Why are dashboards not enough?', acceptedAnswer: { '@type': 'Answer', text: 'Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced before upstream access.' } },
+      { '@type': 'Question', name: 'Why are dashboards not enough?', acceptedAnswer: { '@type': 'Answer', text: 'Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced at the gateway before forwarding.' } },
       { '@type': 'Question', name: 'How does SatGate help?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate sits in the request path and checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before forwarding the request.' } },
       { '@type': 'Question', name: 'What spending limits should AI agents have?', acceptedAnswer: { '@type': 'Answer', text: 'AI agents should have spending limits by tenant, agent, task, workflow, session, model, tool, route, delegated sub-agent, and time window, with per-request ceilings and emergency revocation.' } },
       { '@type': 'Question', name: 'Are spending limits better than rate limits for AI agents?', acceptedAnswer: { '@type': 'Answer', text: 'They solve different problems. Rate limits control frequency, while spending limits control economic exposure by checking request price, remaining budget, scope, and policy before cost is created.' } },
@@ -119,7 +119,7 @@ export default function Page() {
           <h2 className="mb-6 text-3xl font-bold text-white">The control point is before the call</h2>
           <div className="space-y-5 text-lg leading-relaxed text-gray-300">
             <p>Autonomous agents can generate real costs through model calls, API requests, MCP tools, delegated sub-agents, retries, and background workflows. If the policy check happens after the request, the money is already spent.</p>
-            <p>SatGate enforces economic policy at the gateway boundary. Every important request can be evaluated against budget, scope, identity, revocation, route, tool, receipt, and audit rules before upstream access.</p>
+            <p>SatGate enforces economic policy at the gateway boundary. Every important request can be evaluated against budget, scope, identity, revocation, route, tool, receipt, and audit rules at the gateway before forwarding.</p>
             <p>That is the difference between cost reporting and economic control.</p>
           </div>
         </div>
@@ -164,7 +164,7 @@ export default function Page() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Why are dashboards not enough?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced before upstream access.
+                Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced at the gateway before forwarding.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

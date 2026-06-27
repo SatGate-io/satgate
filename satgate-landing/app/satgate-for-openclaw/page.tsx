@@ -77,7 +77,7 @@ export default function SatGateIntegrationPage() {
       {
         '@type': 'Question',
         name: 'Is SatGate just another observability dashboard?',
-        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, Evidence Pack receipts, and paid-rail context before upstream access.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, Evidence Pack receipts, and paid-rail context at the gateway before forwarding.' },
       },
       {
         '@type': 'Question',
@@ -111,7 +111,7 @@ export default function SatGateIntegrationPage() {
           </div>
 
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Give OpenClaw agents authority before execution</h1>
-          <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">OpenClaw agents can run tools, spawn sub-agents, call MCP servers, route through models, and act across workflows. SatGate adds the Agent Authority & Accountability Layer underneath: Observe, Control, and Prove agent/API activity before upstream access.</p>
+          <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">OpenClaw agents can run tools, spawn sub-agents, call MCP servers, route through models, and act across workflows. SatGate adds the Agent Authority & Accountability Layer underneath: Observe, Control, and Prove agent/API activity at the gateway before forwarding.</p>
 
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -178,7 +178,7 @@ export default function SatGateIntegrationPage() {
           <div className="grid gap-5 md:grid-cols-3">
             {[
               ['How does SatGate fit with OpenClaw?', 'OpenClaw coordinates agents and tools. SatGate governs the economics of those requests: who can spend, on what, under which budget, and with which Evidence Pack.'],
-              ['Is SatGate just another observability dashboard?', 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, Evidence Pack receipts, and paid-rail context before upstream access.'],
+              ['Is SatGate just another observability dashboard?', 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, Evidence Pack receipts, and paid-rail context at the gateway before forwarding.'],
               ['Can SatGate start in observe-only mode?', 'Yes. Teams can start with Observe to map agent and tool spend, then graduate to Control policies once safe limits are clear.'],
             ].map(([question, answer]) => (
               <div key={question}>

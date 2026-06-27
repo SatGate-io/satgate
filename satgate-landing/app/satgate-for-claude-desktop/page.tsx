@@ -79,7 +79,7 @@ export default function SatGateIntegrationPage() {
       {
         '@type': 'Question',
         name: 'Is SatGate just another observability dashboard?',
-        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, audit, and L402 payment before upstream access.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, audit, and L402 payment at the gateway before forwarding.' },
       },
       {
         '@type': 'Question',
@@ -185,7 +185,7 @@ export default function SatGateIntegrationPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Is SatGate just another observability dashboard?</h3>
-              <p className="leading-relaxed text-gray-400">No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, audit, and L402 payment before upstream access.</p>
+              <p className="leading-relaxed text-gray-400">No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, audit, and L402 payment at the gateway before forwarding.</p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Can SatGate start in observe-only mode?</h3>

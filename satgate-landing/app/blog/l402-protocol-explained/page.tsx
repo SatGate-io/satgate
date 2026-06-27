@@ -64,7 +64,7 @@ export default function L402ProtocolExplainedBlogPage() {
         name: 'Is L402 the same as enterprise budget enforcement?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. L402 is per-request Lightning payment for external API monetization. Enterprise budget enforcement controls internal agent spend with policies, caps, revocation, and audit before upstream requests execute.',
+          text: 'No. L402 is per-request Lightning payment for external API monetization. Enterprise budget enforcement controls internal agent spend with policies, caps, revocation, and audit at the gateway policy check before forwarding.',
         },
       },
     ],
@@ -407,7 +407,7 @@ routes:
               {[
                 ['What is the L402 protocol?', 'L402 is a machine-native API payment protocol that combines HTTP 402 Payment Required, Lightning invoices, and macaroon tokens so delegated software can present payment proof for API access without a per-request human checkout flow.'],
                 ['How does a delegated agent use L402 for paid API access?', 'The delegated client requests a protected API, receives a 402 response with a Lightning invoice and macaroon, presents proof, then retries with Authorization: L402 <macaroon>:<preimage> as proof of payment.'],
-                ['Is L402 the same as enterprise budget enforcement?', 'No. L402 is per-request Lightning payment for external API monetization. Enterprise budget enforcement controls internal agent spend with policies, caps, revocation, and audit before upstream requests execute.'],
+                ['Is L402 the same as enterprise budget enforcement?', 'No. L402 is per-request Lightning payment for external API monetization. Enterprise budget enforcement controls internal agent spend with policies, caps, revocation, and audit at the gateway policy check before forwarding.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

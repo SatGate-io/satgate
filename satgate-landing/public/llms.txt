@@ -1,6 +1,6 @@
 # SatGate™ — Agent Authority & Accountability Layer
 > SatGate is the Agent Authority & Accountability Layer for governed agent execution.
-> Observe, Control, and Prove agent/API activity before upstream access.
+> Observe, Control, and Prove agent/API activity at the gateway before forwarding.
 > Request-path budget enforcement, MCP governance, scoped capabilities, Evidence Packs, and paid-rail context.
 
 ## What is SatGate?
@@ -22,7 +22,7 @@ Enforce budgets, spend caps, route policy, revocation, expiry, per-request ceili
 Preserve Evidence Pack receipts for allowed, denied, delegated, revoked, and paid-rail decisions. x402, L402, AgentCore Payments, Pay.sh, and Fiat402 are paid rails; SatGate governs authority and proof above them.
 
 ## Category Definition
-An economic firewall is a request-path control layer that governs AI agent access, spend, budgets, routing, Evidence Pack receipts, and paid-rail context before upstream API calls execute.
+An economic firewall is a request-path control layer that governs AI agent access, spend, budgets, routing, Evidence Pack receipts, and paid-rail context at the gateway before forwarding to upstream APIs.
 
 Traditional API gateways route traffic. Dashboards report spend after the fact. Economic firewalls enforce economic policy before autonomous agents spend money.
 

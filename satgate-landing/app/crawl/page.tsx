@@ -538,7 +538,7 @@ export default function ProtectDemoPage() {
         
         addLog('', 'info');
         addLog('✅ Token BANNED successfully!', 'success');
-        addLog('⚡ Propagation: INSTANT (no sync delay)', 'success');
+        addLog('✅ Revocation state recorded for the next governed check', 'success');
         addLog('📝 Ban reason: "Demo revocation - compromised token"', 'info');
         addLog('🔗 All child tokens derived from this: ALSO BANNED', 'warn');
         
@@ -574,7 +574,7 @@ export default function ProtectDemoPage() {
       const data = await response.json();
       addLog('', 'info');
       addLog('✅ Token BANNED successfully!', 'success');
-      addLog('⚡ Propagation: INSTANT', 'success');
+      addLog('✅ Revocation state recorded', 'success');
       
       setBannedToken(childToken.raw);
       setRevocationResult({ banned: true, tested: false });
@@ -614,7 +614,7 @@ export default function ProtectDemoPage() {
         addLog('   reason: "This token has been banned by an administrator"', 'error');
         addLog('   code: "TOKEN_BANNED"', 'error');
         addLog('', 'info');
-        addLog('💡 The Panic Button worked. Token is dead globally.', 'success');
+        addLog('💡 The Panic Button worked. The next governed request was denied.', 'success');
         
         setRevocationResult({ banned: true, tested: true });
         return;
@@ -631,7 +631,7 @@ export default function ProtectDemoPage() {
         addLog('🚫 403 Forbidden - TOKEN REVOKED!', 'error');
         addLog(`📝 Response: ${JSON.stringify(data)}`, 'info');
         addLog('', 'info');
-        addLog('💡 The Panic Button worked. Token is dead globally.', 'success');
+        addLog('💡 The Panic Button worked. The next governed request was denied.', 'success');
         setRevocationResult({ banned: true, tested: true });
       } else {
         addLog(`⚠️ Unexpected response: ${response.status}`, 'warn');
@@ -1328,11 +1328,11 @@ export default function ProtectDemoPage() {
 
                       <div className="bg-gradient-to-r from-orange-950/30 to-red-950/30 rounded-xl p-4 border border-orange-800/30">
                         <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
-                          <Zap size={16} className="text-yellow-400" /> Instant Propagation
+                          <Zap size={16} className="text-yellow-400" /> Next-request check
                         </h4>
                         <p className="text-gray-400 text-sm">
                           Unlike traditional IAM where revocation can take minutes/hours to propagate, 
-                          SatGate's ban list is checked on every request. The token is dead <strong>now</strong>.
+                          SatGate's ban list is checked on every governed request. The next request is denied at the gateway policy check.
                         </p>
                       </div>
 
@@ -1363,7 +1363,7 @@ export default function ProtectDemoPage() {
                           <XCircle size={18} /> Token Rejected!
                         </div>
                         <p className="text-gray-400 text-sm mb-3">
-                          The banned token is rejected on the next governed request. The attacker is locked out.
+                          The banned token is rejected on the next governed request at the gateway policy check.
                         </p>
                         <pre className="text-xs bg-black rounded-lg p-3 text-red-400 overflow-x-auto">
 {`{
@@ -1376,8 +1376,8 @@ export default function ProtectDemoPage() {
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="p-4 bg-black rounded-xl border border-orange-800/50 text-center">
-                          <div className="text-2xl font-bold text-orange-400 mb-1">Instant</div>
-                          <div className="text-gray-400 text-xs">Revocation Time</div>
+                          <div className="text-2xl font-bold text-orange-400 mb-1">Next request</div>
+                          <div className="text-gray-400 text-xs">Revocation Check</div>
                         </div>
                         <div className="p-4 bg-black rounded-xl border border-red-800/50 text-center">
                           <div className="text-2xl font-bold text-red-400 mb-1">Global</div>
@@ -1408,8 +1408,8 @@ export default function ProtectDemoPage() {
                       <div className="text-gray-400 text-sm">Admin tickets required</div>
                     </div>
                     <div className="p-4 bg-black rounded-xl border border-orange-800/50">
-                      <div className="text-3xl font-bold text-orange-400 mb-1">Instant</div>
-                      <div className="text-gray-400 text-sm">Kill Switch revocation</div>
+                      <div className="text-3xl font-bold text-orange-400 mb-1">Next request</div>
+                      <div className="text-gray-400 text-sm">Kill Switch check</div>
                     </div>
                   </div>
 

@@ -26,7 +26,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'L402 Paid-Rail Governance for APIs',
-    description: 'L402 can carry Lightning payment proof for agent/API access. SatGate governs the action, budget, rail, and receipt before upstream execution.',
+    description: 'L402 can carry Lightning payment proof for agent/API access. SatGate checks the action, budget, rail, and receipt at the gateway before forwarding.',
   },
 };
 
@@ -303,7 +303,7 @@ HTTP/1.1 200 OK
 { "answer": "paid premium result" }`}</code></pre>
         </div>
         <p className="text-gray-400 mt-5 leading-relaxed">
-          In this pattern, the merchant runs SatGate. The delegated client or wallet presents payment proof. Payment, authorization, receipt capture, and audit happen before upstream access.
+          In this pattern, the merchant runs SatGate. The delegated client or wallet presents payment proof. Payment, authorization, receipt capture, and audit happen at the gateway before forwarding.
         </p>
       </section>
 

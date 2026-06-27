@@ -62,7 +62,7 @@ REQUIRED = {
         "Build Agents With Bounded Economic Authority",
         "Build agents with bounded economic authority",
         "Consume upstream with max budget",
-        "enforce max budgets before upstream access",
+        "enforce max budgets at the gateway before forwarding",
     ],
     "app/paid-agent-payments/page.tsx": [
         "Agents consume. Humans and platforms buy.",

@@ -103,7 +103,7 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
       {
         '@type': 'Question',
         name: 'How does SatGate reduce runaway spend?',
-        acceptedAnswer: { '@type': 'Answer', text: 'SatGate checks identity, budget, route, tool scope, request cost, expiry, and revocation before upstream access, blocking the next expensive request when policy says stop and recording the decision in an Evidence Pack.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'SatGate checks identity, budget, route, tool scope, request cost, expiry, and revocation at the gateway before forwarding, blocking the next expensive request when policy says stop and recording the decision in an Evidence Pack.' },
       },
       {
         '@type': 'Question',
@@ -232,7 +232,7 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
       <section className="border-y border-gray-900 bg-black">
         <div className="mx-auto grid max-w-6xl gap-8 px-6 py-20 lg:grid-cols-3">
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Zap className="mb-4 text-yellow-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Observe</h2><p className="leading-relaxed text-gray-400">Route agent traffic through SatGate to attribute cost by agent, workflow, route, tool, tenant, and MCP server before enforcing hard limits.</p></div>
-          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Gauge className="mb-4 text-cyan-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Control</h2><p className="leading-relaxed text-gray-400">Enforce per-agent budgets, per-tool caps, route policy, revocation, expiry, and kill switches before upstream API calls execute.</p></div>
+          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Gauge className="mb-4 text-cyan-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Control</h2><p className="leading-relaxed text-gray-400">Enforce per-agent budgets, per-tool caps, route policy, revocation, expiry, and kill switches at the gateway before forwarding to upstream APIs.</p></div>
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Bot className="mb-4 text-purple-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Prove</h2><p className="leading-relaxed text-gray-400">Record the policy decision, budget state, paid-rail context, and upstream outcome in an Evidence Pack before anyone argues about the bill.</p></div>
         </div>
       </section>
@@ -245,7 +245,7 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
             {[
               ['What is AI agent runaway spend?', 'AI agent runaway spend is cost created when autonomous agents loop, retry, delegate, or continue calling paid APIs and MCP tools after the work is no longer economically justified.'],
               ['Why do dashboards fail to control runaway agent cost?', 'Dashboards report spend after requests complete. Autonomous agents can generate hundreds or thousands of paid calls before a human sees an alert, so enforcement has to happen before forwarding each request.'],
-              ['How does SatGate reduce runaway spend?', 'SatGate checks identity, budget, route, tool scope, request cost, expiry, and revocation before upstream access, blocking the next expensive request when policy says stop and recording the decision in an Evidence Pack.'],
+              ['How does SatGate reduce runaway spend?', 'SatGate checks identity, budget, route, tool scope, request cost, expiry, and revocation at the gateway before forwarding, blocking the next expensive request when policy says stop and recording the decision in an Evidence Pack.'],
               ['Which benchmark variable is most dangerous for AI agent cost?', 'Detection delay is usually the most dangerous variable because agents can create paid calls at machine speed while dashboards, billing alerts, and humans react after spend has already happened.'],
               ['Why include MCP tools in runaway spend benchmarks?', 'MCP tools can trigger paid APIs, browser automation, cloud jobs, data exports, or code agents. A low model cost can still become expensive when tool calls fan out without per-tool budgets.'],
             ].map(([question, answer]) => (

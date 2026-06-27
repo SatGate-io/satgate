@@ -88,7 +88,7 @@ export default function LlmCostMonitoringPage() {
         name: 'How do you turn LLM cost monitoring signals into controls?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Convert monitoring signals into policy objects: per-agent and per-route budgets, MCP tool caps, model-routing rules, scoped capability tokens, revocation triggers, and Evidence Pack requirements enforced before upstream calls execute.',
+          text: 'Convert monitoring signals into policy objects: per-agent and per-route budgets, MCP tool caps, model-routing rules, scoped capability tokens, revocation triggers, and Evidence Pack requirements enforced at the gateway before forwarding to upstream services.',
         },
       },
     ],
@@ -241,7 +241,7 @@ export default function LlmCostMonitoringPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How do you turn LLM cost monitoring signals into controls?</h3>
-              <p className="leading-relaxed text-gray-400">Convert monitoring signals into policy objects: per-agent and per-route budgets, MCP tool caps, model-routing rules, scoped capability tokens, revocation triggers, and Evidence Pack requirements enforced before upstream calls execute.</p>
+              <p className="leading-relaxed text-gray-400">Convert monitoring signals into policy objects: per-agent and per-route budgets, MCP tool caps, model-routing rules, scoped capability tokens, revocation triggers, and Evidence Pack requirements enforced at the gateway before forwarding to upstream services.</p>
             </div>
           </div>
         </div>

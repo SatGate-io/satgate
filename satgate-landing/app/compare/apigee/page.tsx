@@ -32,7 +32,7 @@ export const metadata = {
 const rows: Array<[string, string, string]> = [
   ['Primary job', 'Policy-to-Proof governance for enterprise agents', 'Enterprise API management, API products, developer portals, analytics, policy, monetization, and Google Cloud integration'],
   ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped credentials, revocation, Evidence Packs, and paid-rail context', 'Enterprise API management, API products, developer portals, analytics, policy, monetization, and Google Cloud integration'],
-  ['Request-path hard budget enforcement', 'Yes: before upstream API, model, or MCP tool access', 'Partial / depends on gateway policy and traffic type'],
+  ['Request-path hard budget enforcement', 'Yes: at the gateway before forwarding to an upstream API, model, or MCP tool', 'Partial / depends on gateway policy and traffic type'],
   ['MCP tool budget enforcement', 'Yes: per-tool budgets, cost attribution, and deny decisions', 'Not the primary category focus'],
   ['Scoped revocable agent capabilities', 'Yes: route, tool, call, budget, expiry, delegation, and revocation caveats', 'Typically API keys, policies, tokens, or platform auth primitives'],
   ['Runaway agent spend benchmark/data', 'Yes: benchmark page plus JSON/CSV dataset', 'No direct equivalent'],
@@ -70,7 +70,7 @@ export default function ComparePage() {
     '@type': 'FAQPage',
     mainEntity: [
       { '@type': 'Question', name: 'Is SatGate a Google Apigee replacement?', acceptedAnswer: { '@type': 'Answer', text: 'Not directly. Apigee is a full enterprise API management platform. SatGate is an Policy-to-Proof governance for AI agents, API spend, MCP tools, scoped capabilities, revocation, Evidence Packs, and paid-rail context.' } },
-      { '@type': 'Question', name: 'Can SatGate and Google Apigee work together?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics before upstream access.' } },
+      { '@type': 'Question', name: 'Can SatGate and Google Apigee work together?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics at the gateway before forwarding.' } },
       { '@type': 'Question', name: 'When should I choose SatGate?', acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when the core problem is autonomous agent economic governance: hard budgets, MCP tool spend, revocable credentials, delegated authority, Evidence Packs, and paid-agent payment.' } },
       { '@type': 'Question', name: 'When should I choose Google Apigee?', acceptedAnswer: { '@type': 'Answer', text: 'Choose Apigee when the primary need is broad enterprise API management across human and application consumers.' } },
     ],
@@ -106,7 +106,7 @@ export default function ComparePage() {
           <div className="grid gap-5 md:grid-cols-2">
             {[
               ['Is SatGate a Google Apigee replacement?', 'Not directly. Apigee is a full enterprise API management platform. SatGate is an Policy-to-Proof governance for AI agents, API spend, MCP tools, scoped capabilities, revocation, Evidence Packs, and paid-rail context.'],
-              ['Can SatGate and Google Apigee work together?', 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics before upstream access.'],
+              ['Can SatGate and Google Apigee work together?', 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics at the gateway before forwarding.'],
               ['When should I choose SatGate?', 'Choose SatGate when the core problem is autonomous agent economic governance: hard budgets, MCP tool spend, revocable credentials, delegated authority, Evidence Packs, and paid-agent payment.'],
               ['When should I choose Google Apigee?', 'Choose Apigee when the primary need is broad enterprise API management across human and application consumers.'],
             ].map(([question, answer]) => (

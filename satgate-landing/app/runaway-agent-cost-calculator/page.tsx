@@ -107,7 +107,7 @@ export default function RunawayAgentCostCalculatorPage() {
       {
         '@type': 'Question',
         name: 'How does SatGate reduce runaway agent costs?',
-        acceptedAnswer: { '@type': 'Answer', text: 'SatGate enforces request-path budgets, scoped authority, per-tool spend caps, revocation, and route policy before upstream API or MCP tool calls execute, then records the decision in the Evidence Pack.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'SatGate enforces request-path budgets, scoped authority, per-tool spend caps, revocation, and route policy at the gateway before forwarding to upstream APIs or MCP tools, then records the decision in the Evidence Pack.' },
       },
       {
         '@type': 'Question',
@@ -227,7 +227,7 @@ export default function RunawayAgentCostCalculatorPage() {
               [Bot, 'Agent count', 'More autonomous workers means more simultaneous paid decisions.'],
               [Gauge, 'Call velocity', 'Retries and tool loops create cost at machine speed.'],
               [ReceiptText, 'Tool pricing', 'MCP tools can hide search, data, cloud, or premium API costs.'],
-              [ShieldCheck, 'Late detection', 'Dashboards report spend after the bill. Enforcement blocks before execution.'],
+              [ShieldCheck, 'Late detection', 'Dashboards report spend after the bill. Gateway policy checks deny over-budget requests before forwarding.'],
             ].map(([Icon, title, body]) => {
               const TypedIcon = Icon as typeof Bot;
               return (
@@ -262,7 +262,7 @@ export default function RunawayAgentCostCalculatorPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate reduce runaway agent costs?</h3>
               <p className="text-gray-400 leading-relaxed">
-                SatGate enforces request-path budgets, scoped authority, per-tool spend caps, revocation, and route policy before upstream API or MCP tool calls execute, then records the decision in the Evidence Pack.
+                SatGate enforces request-path budgets, scoped authority, per-tool spend caps, revocation, and route policy at the gateway before forwarding to upstream APIs or MCP tools, then records the decision in the Evidence Pack.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

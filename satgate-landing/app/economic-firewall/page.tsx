@@ -128,7 +128,7 @@ export default function EconomicFirewallPage() {
     '@context': 'https://schema.org',
     '@type': 'DefinedTerm',
     name: 'Economic firewall',
-    description: 'A request-path control layer that governs AI agent authority, spend, budgets, revocation, audit evidence, and payment context before upstream API calls execute.',
+    description: 'A request-path control layer that governs AI agent authority, spend, budgets, revocation, audit evidence, and payment context at the gateway before forwarding to upstream APIs.',
     inDefinedTermSet: 'https://satgate.io/economic-firewall',
     url: 'https://satgate.io/economic-firewall',
   };
@@ -287,7 +287,7 @@ export default function EconomicFirewallPage() {
                 Paid rails such as x402, L402, AgentCore Payments, Pay.sh, API-key billing, and wallet flows can help value move between agents and services. That is useful, but payment approval is not the same as governing agent behavior.
               </p>
               <p>
-                An economic firewall sits earlier in the path. It decides whether an agent may access an API, consume budget, call an MCP tool, delegate authority, or unlock a paid resource before upstream work happens.
+                An economic firewall sits at the gateway boundary. It decides whether an agent may access an API, consume budget, call an MCP tool, delegate authority, or unlock a paid resource before forwarding.
               </p>
               <p className="font-semibold text-white">
                 Payment rails authorize value movement. Economic firewalls authorize behavior — and preserve the proof.

@@ -217,7 +217,7 @@ Delegation uses macaroon attenuation — the child token is cryptographically de
 
 - **No extra network calls**: Delegation happens locally (the gateway verifies the chain)
 - **Least privilege**: Each worker gets only what it needs
-- **Revocation**: Ban the parent to revoke all children instantly
+- **Revocation**: Ban the parent so child tokens fail the next governed gateway check
 - **Auditability**: The governance graph tracks the full delegation tree
 
 ## 5. Optional paid-route settlement context

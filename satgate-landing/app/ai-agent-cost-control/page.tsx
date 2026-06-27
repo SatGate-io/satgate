@@ -118,7 +118,7 @@ export default function AiAgentCostControlPage() {
         name: 'Why are provider dashboards not enough for AI agent spend control?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Dashboards report spend after the fact. Autonomous agents can retry, loop, and delegate fast enough that budget enforcement must happen inline before upstream API calls complete.',
+          text: 'Dashboards report spend after the fact. Autonomous agents can retry, loop, and delegate fast enough that budget enforcement must happen inline at the gateway at the gateway before forwarding to upstream APIs.',
         },
       },
       {
@@ -476,7 +476,7 @@ export default function AiAgentCostControlPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Why are provider dashboards not enough for AI agent spend control?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Dashboards report spend after the fact. Autonomous agents can retry, loop, and delegate fast enough that budget enforcement must happen inline before upstream API calls complete.
+                Dashboards report spend after the fact. Autonomous agents can retry, loop, and delegate fast enough that budget enforcement must happen inline at the gateway at the gateway before forwarding to upstream APIs.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

@@ -42,7 +42,7 @@ const controls = [
 
 const proofRows = [
   ['Claude Desktop / Claude Code', 'MCP stdio config points the client at satgate-mcp before the upstream server.', 'Verified MCP-compatible path: allowed web_search call, budget-exhausted code_execute denial, Evidence Pack-style decision transcript.'],
-  ['Ollama agent wrapper', 'Local Ollama agents use an MCP-capable wrapper that speaks stdio or SSE to SatGate.', 'Same protocol path: list tools, call allowed tool, burn budget, receive denial before upstream execution.'],
+  ['Ollama agent wrapper', 'Local Ollama agents use an MCP-capable wrapper that speaks stdio or SSE to SatGate.', 'Same protocol path: list tools, call allowed tool, burn budget, receive denial at the gateway policy check.'],
   ['Hermes agent runtime', 'Hermes agents running through an MCP client receive no standing tool authority; SatGate grants scoped calls per policy.', 'The sample Evidence Pack shows the receipt fields that bind tenant, agent, tool, policy digest, budget ID, decision reason, and remaining credits.'],
 ];
 

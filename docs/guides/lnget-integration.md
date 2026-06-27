@@ -128,7 +128,7 @@ That's it. The agent gets data, the API gets paid.
 | **Per-agent spend tracking** | ❌ | ✅ |
 | **Per-tool cost attribution (MCP)** | ❌ | ✅ |
 | **Token delegation hierarchy** | ❌ | ✅ |
-| **Instant token revocation** | ❌ | ✅ |
+| **Next-request token revocation checks** | ❌ | ✅ |
 | **Cost center rollups** | ❌ | ✅ |
 | **Multi-tenant isolation** | ❌ | ✅ |
 | **Observe → Control → Charge modes** | ❌ | ✅ |

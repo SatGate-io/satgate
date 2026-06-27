@@ -250,7 +250,7 @@ agent_c_macaroon = attenuate(agent_b_macaroon, [
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            This solves the delegation problem elegantly. Any agent can safely create more restrictive tokens for sub-agents without involving the original API provider. The math is guaranteed by cryptography: attenuated tokens can only have fewer permissions, never more.
+            This solves the delegation problem elegantly. Any agent can safely create more restrictive tokens for sub-agents without involving the original API provider. The cryptography constrains delegation: attenuated tokens can only have fewer permissions, never more.
           </p>
 
           <div className="my-8 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-6">

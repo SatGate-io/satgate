@@ -167,7 +167,7 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
         name: 'How does SatGate enforce these token policies?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate sits in the request path as an economic firewall, checking token scope, budget, delegation, revocation state, and receipt policy before upstream model, API, MCP, or externally exposed agent access.',
+          text: 'SatGate sits in the request path as an economic firewall, checking token scope, budget, delegation, revocation state, and receipt policy at the gateway before forwarding to model, API, MCP, or externally exposed agent access.',
         },
       },
     ],
@@ -290,7 +290,7 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate enforce these token policies?</h3>
-              <p className="leading-relaxed text-gray-400">SatGate sits in the request path as an economic firewall, checking token scope, budget, delegation, revocation state, and receipt policy before upstream model, API, MCP, or externally exposed agent access.</p>
+              <p className="leading-relaxed text-gray-400">SatGate sits in the request path as an economic firewall, checking token scope, budget, delegation, revocation state, and receipt policy at the gateway before forwarding to model, API, MCP, or externally exposed agent access.</p>
             </div>
           </div>
         </div>

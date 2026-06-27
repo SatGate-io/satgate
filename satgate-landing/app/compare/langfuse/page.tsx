@@ -32,7 +32,7 @@ export const metadata = {
 const rows: Array<[string, string, string]> = [
   ['Primary job', 'Policy-to-Proof governance for enterprise agents', 'LLM observability, traces, prompt management, evaluations, metrics, debugging, and product analytics for AI applications'],
   ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped credentials, revocation, Evidence Packs, and paid-rail context', 'LLM observability, traces, prompt management, evaluations, metrics, debugging, and product analytics for AI applications'],
-  ['Request-path hard budget enforcement', 'Yes: before upstream API, model, or MCP tool access', 'Partial / depends on gateway policy and traffic type'],
+  ['Request-path hard budget enforcement', 'Yes: at the gateway before forwarding to an upstream API, model, or MCP tool', 'Partial / depends on gateway policy and traffic type'],
   ['MCP tool budget enforcement', 'Yes: per-tool budgets, cost attribution, and deny decisions', 'Not the primary category focus'],
   ['Scoped revocable agent capabilities', 'Yes: route, tool, call, budget, expiry, delegation, and revocation caveats', 'Typically API keys, policies, tokens, or platform auth primitives'],
   ['Runaway agent spend benchmark/data', 'Yes: benchmark page plus JSON/CSV dataset', 'No direct equivalent'],
@@ -70,7 +70,7 @@ export default function ComparePage() {
     '@type': 'FAQPage',
     mainEntity: [
       { '@type': 'Question', name: 'Is SatGate a Langfuse replacement?', acceptedAnswer: { '@type': 'Answer', text: 'Not directly. Langfuse is an LLM observability and evaluation platform. SatGate is an Policy-to-Proof governance for AI agents, API spend, MCP tools, scoped capabilities, revocation, Evidence Packs, and paid-rail context.' } },
-      { '@type': 'Question', name: 'Can SatGate and Langfuse work together?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics before upstream access.' } },
+      { '@type': 'Question', name: 'Can SatGate and Langfuse work together?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics at the gateway before forwarding.' } },
       { '@type': 'Question', name: 'When should I choose SatGate?', acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when the core problem is autonomous agent economic governance: hard budgets, MCP tool spend, revocable credentials, delegated authority, Evidence Packs, and paid-agent payment.' } },
       { '@type': 'Question', name: 'When should I choose Langfuse?', acceptedAnswer: { '@type': 'Answer', text: 'Choose Langfuse when the primary need is tracing, prompt management, evaluations, metrics, and AI application observability.' } },
     ],
@@ -106,7 +106,7 @@ export default function ComparePage() {
           <div className="grid gap-5 md:grid-cols-2">
             {[
               ['Is SatGate a Langfuse replacement?', 'Not directly. Langfuse is an LLM observability and evaluation platform. SatGate is an Policy-to-Proof governance for AI agents, API spend, MCP tools, scoped capabilities, revocation, Evidence Packs, and paid-rail context.'],
-              ['Can SatGate and Langfuse work together?', 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics before upstream access.'],
+              ['Can SatGate and Langfuse work together?', 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics at the gateway before forwarding.'],
               ['When should I choose SatGate?', 'Choose SatGate when the core problem is autonomous agent economic governance: hard budgets, MCP tool spend, revocable credentials, delegated authority, Evidence Packs, and paid-agent payment.'],
               ['When should I choose Langfuse?', 'Choose Langfuse when the primary need is tracing, prompt management, evaluations, metrics, and AI application observability.'],
             ].map(([question, answer]) => (

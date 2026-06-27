@@ -101,7 +101,7 @@ const faqJsonLd = {
       name: 'How does SatGate reduce runaway agent spend?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'SatGate reduces runaway agent spend by enforcing per-request budgets, MCP tool cost policy, revocable capabilities, delegation caps, audit requirements, and kill switches before upstream calls execute.',
+        text: 'SatGate reduces runaway agent spend by enforcing per-request budgets, MCP tool cost policy, revocable capabilities, delegation caps, audit requirements, and kill switches at the gateway before forwarding to upstream services.',
       },
     },
     {
@@ -200,7 +200,7 @@ export default function AiAgentRunawaySpendIndexPage() {
           {[
             ['What is the AI Agent Runaway Spend Index?', 'The AI Agent Runaway Spend Index is a recurring benchmark of modeled autonomous agent cost failures, including retry loops, MCP tool storms, delegated fanout, paid API polling, and avoided spend from request-path controls.'],
             ['Why do runaway AI agents create cost risk?', 'Agents can loop, retry, delegate, and call paid tools or APIs much faster than humans. Without request-path budgets and kill switches, small mistakes can become expensive incidents before dashboards report the damage.'],
-            ['How does SatGate reduce runaway agent spend?', 'SatGate reduces runaway agent spend by enforcing per-request budgets, MCP tool cost policy, revocable capabilities, delegation caps, audit requirements, and kill switches before upstream calls execute.'],
+            ['How does SatGate reduce runaway agent spend?', 'SatGate reduces runaway agent spend by enforcing per-request budgets, MCP tool cost policy, revocable capabilities, delegation caps, audit requirements, and kill switches at the gateway before forwarding to upstream services.'],
             ['Which failure modes does the index track?', 'The index tracks OpenAI retry loops, MCP browser automation loops, sub-agent research fanout, paid data API polling loops, and multi-tenant agent swarms.'],
             ['How should teams use the index?', 'Teams should use the index as a control-plan checklist: price expensive tools, set per-request and session budgets, cap delegation, require revocable capabilities, and block loops in the request path.'],
           ].map(([question, answer]) => (
@@ -216,7 +216,7 @@ export default function AiAgentRunawaySpendIndexPage() {
         <div className="rounded-3xl border border-orange-900/60 bg-gradient-to-br from-orange-950/40 to-cyan-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Use the index as a control-plan checklist</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            The pattern is consistent: agent spend incidents are not solved by better dashboards. They are solved by request-path budget enforcement, MCP tool cost policy, revocable capabilities, delegation caps, and kill switches before upstream calls execute.
+            The pattern is consistent: agent spend incidents are not solved by better dashboards. They are solved by request-path budget enforcement, MCP tool cost policy, revocable capabilities, delegation caps, and kill switches at the gateway before forwarding to upstream services.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/agent-spend-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Generate spend policy <ArrowRight size={18} /></Link>
