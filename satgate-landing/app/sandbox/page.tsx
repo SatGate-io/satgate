@@ -12,6 +12,7 @@ import {
 
 type StepStatus = 'pending' | 'running' | 'success' | 'blocked' | 'error' | 'revoked';
 type DemoMode = 'kill-switch' | 'budget' | 'both';
+type GoldenStepTone = 'blocked' | 'issued' | 'allowed' | 'denied' | 'revoked' | 'proof';
 
 interface FeedEvent {
   id: string;
@@ -76,6 +77,152 @@ const sandboxDemos = [
     body: 'Put paid-rail context behind policy and receipts without making L402/x402 the product center.',
   },
 ];
+const goldenPathSteps: Array<{
+  label: string;
+  status: string;
+  decision: string;
+  reason: string;
+  route: string;
+  budget: string;
+  receipt: string;
+  tone: GoldenStepTone;
+}> = [
+  {
+    label: '1 · No authority',
+    status: 'HTTP 401',
+    decision: 'denied',
+    reason: 'DEFAULT_PROTECTION: no capability token presented',
+    route: '/v1/invoices/search',
+    budget: 'No budget consumed',
+    receipt: 'rcpt_demo_unauth_001',
+    tone: 'blocked',
+  },
+  {
+    label: '2 · Scoped authority issued',
+    status: 'capability minted',
+    decision: 'issued',
+    reason: 'tenant=acme-finance; scope=/v1/invoices/*; budget<=3.00 USD',
+    route: 'agent:invoice-reconciler-worker',
+    budget: '3.00 USD delegated budget',
+    receipt: 'rcpt_demo_001 / rcpt_demo_002',
+    tone: 'issued',
+  },
+  {
+    label: '3 · Allowed action',
+    status: 'HTTP 200',
+    decision: 'allowed',
+    reason: 'allowed_under_policy',
+    route: 'mcp:invoices.search',
+    budget: '0.18 USD spent; 2.82 USD remaining',
+    receipt: 'rcpt_demo_003',
+    tone: 'allowed',
+  },
+  {
+    label: '4 · Out-of-scope denial',
+    status: 'HTTP 403',
+    decision: 'blocked',
+    reason: 'scope_violation:no_customer_data_export',
+    route: '/v1/invoices/export',
+    budget: 'No export spend allowed',
+    receipt: 'rcpt_demo_006',
+    tone: 'denied',
+  },
+  {
+    label: '5 · Budget denial',
+    status: 'HTTP 402',
+    decision: 'blocked',
+    reason: 'budget_exhausted',
+    route: '/v1/invoices/reconcile',
+    budget: '0.78 / 3.00 USD spent; remaining shown as 0.00 after denial',
+    receipt: 'rcpt_demo_007',
+    tone: 'denied',
+  },
+  {
+    label: '6 · Revoke / replay denial',
+    status: 'HTTP 401/403',
+    decision: 'blocked',
+    reason: 'capability_revoked',
+    route: 'mcp:invoices.search',
+    budget: 'No additional spend after revoke',
+    receipt: 'rcpt_demo_008 / rcpt_demo_009',
+    tone: 'revoked',
+  },
+];
+
+const goldenToneClasses: Record<GoldenStepTone, string> = {
+  blocked: 'border-red-500/40 bg-red-950/25 text-red-100',
+  issued: 'border-cyan-500/40 bg-cyan-950/25 text-cyan-100',
+  allowed: 'border-emerald-500/40 bg-emerald-950/25 text-emerald-100',
+  denied: 'border-orange-500/40 bg-orange-950/25 text-orange-100',
+  revoked: 'border-purple-500/40 bg-purple-950/25 text-purple-100',
+  proof: 'border-white/20 bg-white/10 text-white',
+};
+
+function ProofCtas({ compact = false }: { compact?: boolean }) {
+  const base = compact ? 'px-3 py-2 text-xs' : 'px-5 py-3 text-sm';
+  return (
+    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <Link href="/evidence-pack-demo" className={`${base} inline-flex items-center justify-center gap-2 rounded-lg bg-white font-bold text-black transition hover:bg-gray-200`}>
+        View Evidence Pack <ArrowRight size={16} />
+      </Link>
+      <a href="/evidence-packs/sample-evidence-pack.v1.json" className={`${base} inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-400/40 bg-cyan-400/10 font-bold text-cyan-100 transition hover:border-cyan-200`}>
+        Download JSON <ArrowRight size={16} />
+      </a>
+      <a href="/evidence-packs/evidence-pack.schema.v1.json" className={`${base} inline-flex items-center justify-center gap-2 rounded-lg border border-purple-400/40 bg-purple-400/10 font-bold text-purple-100 transition hover:border-purple-200`}>
+        Verify schema <ArrowRight size={16} />
+      </a>
+    </div>
+  );
+}
+
+function GoldenPathSection() {
+  return (
+    <section id="golden-path" className="border-b border-cyan-500/20 bg-[radial-gradient(circle_at_20%_0%,rgba(34,211,238,0.16),transparent_30%),radial-gradient(circle_at_85%_20%,rgba(168,85,247,0.16),transparent_35%)]">
+      <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+        <p className="mb-3 text-sm font-mono uppercase tracking-[0.24em] text-cyan-300">90-second SatGate proof</p>
+        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+          <div>
+            <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-5xl">
+              Run authority proof: allow, deny, revoke, then inspect the Evidence Pack.
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-gray-300">
+              This public proof path is deterministic and uses the same sample Evidence Pack shown in the viewer. It is a buyer-comprehension demo, not a production-promotion claim.
+            </p>
+            <div className="mt-6 rounded-2xl border border-yellow-500/30 bg-yellow-950/20 p-4 text-sm leading-6 text-yellow-100">
+              <strong>Caveat:</strong> budget-before-upstream here is a response-shape proof path. Do not describe it as keyed upstream counter/log-delta proof unless that instrumentation is added separately.
+            </div>
+            <div className="mt-6">
+              <ProofCtas />
+            </div>
+          </div>
+          <div className="space-y-3">
+            {goldenPathSteps.map((step) => (
+              <article key={step.label} className={`rounded-2xl border p-4 ${goldenToneClasses[step.tone]}`}>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <h3 className="font-bold text-white">{step.label}</h3>
+                  <span className="rounded-full border border-white/15 bg-black/30 px-3 py-1 font-mono text-xs">{step.status}</span>
+                </div>
+                <dl className="mt-3 grid gap-2 text-xs text-gray-300 sm:grid-cols-2">
+                  <div><dt className="text-gray-500">decision</dt><dd className="font-mono text-white">{step.decision}</dd></div>
+                  <div><dt className="text-gray-500">reason</dt><dd className="font-mono text-white">{step.reason}</dd></div>
+                  <div><dt className="text-gray-500">route/tool</dt><dd className="font-mono text-white">{step.route}</dd></div>
+                  <div><dt className="text-gray-500">budget impact</dt><dd className="font-mono text-white">{step.budget}</dd></div>
+                  <div className="sm:col-span-2"><dt className="text-gray-500">receipt</dt><dd className="font-mono text-white">{step.receipt}</dd></div>
+                </dl>
+              </article>
+            ))}
+            <article className={`rounded-2xl border p-4 ${goldenToneClasses.proof}`}>
+              <h3 className="font-bold text-white">7 · Proof artifact exported</h3>
+              <p className="mt-2 text-sm text-gray-300">Evidence Pack <code className="text-cyan-200">ep_demo_2026_05_10_001</code> links every receipt and explains the policy, subject, tenant, route/tool, budget state, receipt chain, hash, and demo signature caveat.</p>
+              <div className="mt-4"><ProofCtas compact /></div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 
 function BudgetBar({ label, spent, limit, color }: { label: string; spent: number; limit: number; color: string }) {
   if (limit === 0) return null;
@@ -302,6 +449,9 @@ export default function SandboxPage() {
       await runBravo();
     }
 
+    addEvent({ id: 'proof-exported', agent: 'bravo', type: 'summary', status: 'success',
+      label: '✓ Evidence Pack ready: inspect receipt chain, JSON export, schema, hash, and signature caveat',
+      detail: 'Open /evidence-pack-demo or download /evidence-packs/sample-evidence-pack.v1.json to verify the proof artifact.' });
     setPhase('done');
     setRunning(false);
   }, [selectedMode, runAlpha, runBravo]);
@@ -425,13 +575,15 @@ export default function SandboxPage() {
             </span>
           </h1>
           <Link
-            href="https://cloud.satgate.io/cloud/login"
+            href="#golden-path"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-medium transition"
           >
-            Try It Free <ArrowRight size={14} />
+            View Evidence Pack <ArrowRight size={14} />
           </Link>
         </div>
       </div>
+
+      <GoldenPathSection />
 
       {/* Demo Hub */}
       <div className="bg-gradient-to-b from-purple-950/20 to-transparent border-b border-gray-800/50">
@@ -441,8 +593,16 @@ export default function SandboxPage() {
             Mint. Control. Constrain. Govern.
           </h2>
           <p className="mx-auto max-w-3xl text-lg leading-relaxed text-gray-400">
-            Start with scoped authority, then move through capability control, spend control, and paid-rail context. Each demo is a separate proof path.
+            Start with the 90-second authority proof, then move through capability control, spend control, and paid-rail context. Every proof moment links to the Evidence Pack or receipt export.
           </p>
+          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link href="#golden-path" className="text-purple-300 hover:text-purple-200 text-sm font-semibold underline underline-offset-4 transition">
+              Run the 90-second SatGate proof →
+            </Link>
+            <Link href="/evidence-pack-demo" className="text-cyan-300 hover:text-cyan-200 text-sm font-semibold underline underline-offset-4 transition">
+              See an Evidence Pack →
+            </Link>
+          </div>
           <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4 text-left">
             {sandboxDemos.map(({ title, href, icon: Icon, eyebrow, body }) => (
               <Link
@@ -575,6 +735,14 @@ export default function SandboxPage() {
           )}
         </div>
 
+        {phase === 'done' && !running && (
+          <div className="mt-6 rounded-2xl border border-cyan-500/30 bg-cyan-950/20 p-5">
+            <h3 className="mb-2 text-lg font-bold text-white">Proof artifact ready</h3>
+            <p className="mb-4 text-sm text-gray-300">The simulation is the explainer; the Evidence Pack is the buyer-visible proof artifact.</p>
+            <ProofCtas />
+          </div>
+        )}
+
         {/* Architecture Expandable */}
         <div className="mt-8 border border-gray-800 rounded-xl overflow-hidden">
           <button
@@ -630,20 +798,20 @@ export default function SandboxPage() {
         {/* CTA */}
         <div className="mt-12 text-center">
           <p className="text-gray-500 text-sm mb-4">
-            This was a simulation. The real thing runs on your infrastructure in minutes.
+            This was a deterministic public proof demo. The production path still requires a separate promotion decision.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="https://cloud.satgate.io/cloud/login"
+              href="#golden-path"
               className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-bold transition shadow-lg shadow-purple-500/20"
             >
-              Start Free — No Credit Card <ArrowRight size={16} />
+              Run authority proof <ArrowRight size={16} />
             </Link>
             <Link
-              href="https://github.com/SatGate-io/satgate"
+              href="/evidence-pack-demo"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-sm font-medium text-gray-300 transition"
             >
-              View on GitHub
+              See Evidence Pack
             </Link>
           </div>
         </div>
