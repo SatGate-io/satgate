@@ -655,7 +655,7 @@ const LandingPage = () => {
                 step: "4",
                 title: "Prove What Happened",
                 description: "Receipts for allowed, denied, paid, delegated, and revoked decisions — ready to export as an Evidence Pack.",
-                code: `Allowed receipts: 1,203\nDenied receipts: 12,847\nPaid receipts:   $847 settled\nDelegations:     42\nRevocations:     9\n\n→ Export Evidence Pack`
+                code: `Illustrative sample — not live customer data\nAllowed receipts: 1,203\nDenied receipts: 12,847\nPaid receipts:   $847 settled\nDelegations:     42\nRevocations:     9\n\n→ Export Evidence Pack`
               }
             ].map((item, i) => (
               <div key={i} className="relative">
