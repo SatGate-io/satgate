@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SatGate Policy-to-Proof",
     description:
-      "Every grant, denial, spend event, delegation, and revocation produces receipts and Evidence Pack proof your CISO, finance team, and auditor can trust.",
+      "Every grant, paid call, denial, delegation, and revocation produces receipts and Evidence Pack proof your CISO, finance team, and auditor can trust.",
     url: "https://satgate.io/policy-to-proof",
     type: "website",
   },
