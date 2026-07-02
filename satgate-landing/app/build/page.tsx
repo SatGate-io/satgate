@@ -143,10 +143,13 @@ const voiceCards = [
   { title: "Machine voice", label: "schemas / signatures / receipts", body: "Anchor verifiers on canonical capability fields, receipt schema, JWKS discovery, RFC 8785 canonicalization, and Ed25519 signatures." },
 ];
 
+const trustMetadataNote = 'Trust metadata documents capability acceptance, receipt verification fields, and is canonical for rail adapter status.';
+
 const buildDocLinks = [
   { title: "Quickstart", href: `${docsBase}/getting-started/quickstart.md`, body: "Start with the issue/pay/verify primitive and local gateway compatibility path." },
   { title: "Capability schema", href: `${docsBase}/reference/capability-schema.md`, body: "The bounded authority contract: issuer, subject, allowlist, budget, expiry, caveats, and delegation depth." },
   { title: "Receipt schema", href: `${docsBase}/reference/receipt-schema.md`, body: "The signed decision artifact for allowed, denied, delegated, revoked, and paid outcomes." },
+  { title: "Trust metadata", href: `${docsBase}/reference/satgate-trust-metadata.md`, body: trustMetadataNote },
   { title: "Open verifier", href: "https://github.com/SatGate-io/evidence-pack-verifier", body: "Verify a live Evidence Pack from the issuer JWKS with RFC8785 canonicalization and Ed25519 signatures." },
   { title: "MCP integration", href: `${docsBase}/guides/mcp-gateway.md`, body: "Put SatGate in front of MCP tools and preserve a receipt per tool invocation." },
   { title: "Raw HTTP", href: `${docsBase}/guides/raw-http.md`, body: "Copy-paste curl for issue, pay, and verify without an SDK." },

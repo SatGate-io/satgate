@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SatGate — Agent Authority & Accountability Layer",
     description:
-      "Policy-to-Proof governance for enterprise agents: bounded economic authority before execution and Evidence Packs after every decision.",
+      "Policy-to-Proof governance for enterprise agents: bounded economic authority before execution and Evidence Pack proof, decision receipts, and paid-call receipts after governed decisions.",
     url: "https://satgate.io",
     type: "website",
   },
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SatGate — Agent Authority & Accountability Layer",
     description:
-      "Policy-to-Proof governance for enterprise agents: bounded economic authority before execution and Evidence Packs after every decision.",
+      "Policy-to-Proof governance for enterprise agents: bounded economic authority before execution and Evidence Pack proof, decision receipts, and paid-call receipts after governed decisions.",
   },
 };
 
@@ -32,7 +32,7 @@ export default function HomePage() {
         name: 'SatGate',
         url: 'https://satgate.io',
         logo: 'https://satgate.io/logo_white_transparent.png',
-        description: 'SatGate is the Agent Authority & Accountability Layer for governed agent execution: authority before execution and Evidence Pack receipts after every decision.',
+        description: 'SatGate is the Agent Authority & Accountability Layer for governed agent execution: authority before execution and Evidence Pack proof through decision receipts and paid-call receipts after governed decisions.',
       },
       {
         '@type': 'WebSite',
@@ -68,7 +68,7 @@ export default function HomePage() {
         name: 'What is SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate is the Agent Authority & Accountability Layer for governed agent execution. It sits in the request path so humans and platforms can delegate bounded authority to agents, enforce policy and budgets, and preserve Evidence Packs across APIs, MCP tools, and paid rails.',
+          text: 'SatGate is the Agent Authority & Accountability Layer for governed agent execution. It sits in the request path so humans and platforms can delegate bounded authority to agents, enforce policy and budgets, and preserve Evidence Packs for governed API, MCP tool, and paid-rail decisions.',
         },
       },
       {
@@ -84,7 +84,7 @@ export default function HomePage() {
         name: 'How does SatGate give agents bounded economic authority?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Humans and platforms define policy, budgets, scope, and delegation depth. Agents consume approved API and MCP primitives through SatGate, and every approval, denial, spend event, delegation, and revocation leaves receipt-backed proof.',
+          text: 'Humans and platforms define policy, budgets, scope, and delegation depth. Agents consume approved API and MCP primitives through SatGate, and allowed, denied, delegated, revoked, and paid-rail decisions leave receipt-backed proof.',
         },
       },
     ],

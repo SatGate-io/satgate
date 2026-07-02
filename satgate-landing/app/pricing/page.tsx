@@ -338,7 +338,7 @@ const PricingPage = () => {
                 <tr>
                   <td className="py-3 px-4 text-gray-300">Authentication</td>
                   <td className="py-3 px-4">Basic / bearer tokens</td>
-                  <td className="py-3 px-4 text-white">L402 — cryptographic proof-of-budget</td>
+                  <td className="py-3 px-4 text-white">Paid-rail context — L402/x402-aware governance</td>
                 </tr>
               </tbody>
             </table>
@@ -363,7 +363,7 @@ const PricingPage = () => {
             <div className="text-center">
               <div className="text-3xl mb-3">💰</div>
               <h3 className="font-bold text-white mb-2">Revenue Enablement</h3>
-              <p className="text-gray-400 text-sm">Charge other companies&apos; agents micropayments via L402. Trust-as-a-Service for enterprise deals.</p>
+              <p className="text-gray-400 text-sm">Govern paid-rail context such as L402/x402 while SatGate proves agent authority, policy, and budget decisions.</p>
             </div>
           </div>
         </div>
@@ -436,7 +436,7 @@ const PricingPage = () => {
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="text-gray-500 text-sm">The Economic Firewall for AI agent requests.</p>
+              <p className="text-gray-500 text-sm">The Agent Authority & Accountability Layer for governed agent requests.</p>
               <p className="text-gray-600 text-xs mt-3">Non-custodial. We never hold your keys.</p>
             </div>
             <div>
