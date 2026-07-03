@@ -54,6 +54,7 @@ type Proxy struct {
 	auth              Authenticator
 	delegator         *Delegator
 	events            EventPublisher
+	evidence          EvidenceRecorder
 	revocation        RevocationChecker // optional, checks if token is revoked
 	toolsListEnricher ToolsListEnricher // optional, enriches tools/list with cost metadata
 	taskTracker       *TaskTracker      // MCP task-level cost aggregation (SEP-1686)
@@ -228,6 +229,11 @@ func (p *Proxy) SetEventPublisher(ep EventPublisher) {
 	if p.delegator != nil {
 		p.delegator.SetEventPublisher(ep)
 	}
+}
+
+// SetEvidenceRecorder wires signed evidence recording for governed MCP decisions.
+func (p *Proxy) SetEvidenceRecorder(rec EvidenceRecorder) {
+	p.evidence = rec
 }
 
 // SetRevocationChecker sets the revocation checker for token validation.
@@ -572,11 +578,21 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	mode := p.config.Enforcement.Mode
 	isObserve := mode == "observe" || mode == "shadow" || mode == "chargeback"
 	isControl := mode == "control" || mode == "hard" || mode == "soft" || mode == "fiat402"
+	var allowedEvidence *MCPEvidence
 
 	if (isObserve || isControl) && budgetID != "" && cost > 0 {
 		// Auto-initialize budget from macaroon caveat if not yet initialized
 		if tokenInfo.BudgetLimit > 0 {
 			_ = p.budget.Initialize(ctx, budgetID, tokenInfo.BudgetLimit)
+		}
+		if p.evidence != nil && isControl {
+			if err := p.evidence.Preflight(ctx); err != nil {
+				log.Error().Err(err).Str("tool", tc.Name).Str("budgetId", budgetID).Msg("MCP evidence preflight failed")
+				return NewErrorResponseWithData(req.ID, CodeInternalError, "Evidence proof unavailable", map[string]interface{}{
+					"error": "proof_unavailable",
+					"tool":  tc.Name,
+				}), nil
+			}
 		}
 		result, err := p.budget.Spend(ctx, budgetID, tc.Name, cost, requestID)
 		if err != nil {
@@ -610,6 +626,10 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 						"cost":         cost,
 						"remaining":    remaining,
 						"budget_limit": tokenInfo.BudgetLimit,
+						"request_id":   requestID,
+						"policy_mode":  normalizeEnforcementMode(mode),
+						"decision":     "denied",
+						"reason":       result.ErrorCode,
 					},
 				})
 
@@ -618,20 +638,37 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 					log.Info().Str("tool", tc.Name).Int64("remaining", remaining).
 						Msg("observe mode: allowing overspend")
 				} else {
-					// Control: block the request
+					// Control: block the request, with issuer-anchored evidence when configured.
 					errMsg := "Budget exhausted"
 					errCode := result.ErrorCode
 					if errCode == "insufficient_budget" {
 						errMsg = fmt.Sprintf("Insufficient budget: tool '%s' costs %d credits, %d remaining", tc.Name, cost, remaining)
 					}
-					return NewErrorResponseWithData(req.ID, CodeBudgetExhausted, errMsg, map[string]interface{}{
+					evidence, evidenceErr := p.recordMCPDecision(ctx, req, tokenInfo, tc.Name, MCPDecision{
+						Decision:         "denied",
+						DecisionReason:   errCode,
+						PolicyMode:       normalizeEnforcementMode(mode),
+						CostCredits:      cost,
+						RemainingCredits: remaining,
+						RequestID:        requestID,
+					})
+					if evidenceErr != nil {
+						log.Error().Err(evidenceErr).Str("tool", tc.Name).Str("budgetId", budgetID).Msg("MCP denial evidence recording failed")
+						return NewErrorResponseWithData(req.ID, CodeInternalError, "Evidence proof unavailable", map[string]interface{}{
+							"error": "proof_unavailable",
+							"tool":  tc.Name,
+						}), nil
+					}
+					data := map[string]interface{}{
 						"error":             errCode,
 						"tool":              tc.Name,
 						"cost_credits":      cost,
 						"remaining_credits": remaining,
 						"token_id":          tokenInfo.TokenID,
 						"budget_id":         budgetID,
-					}), nil
+					}
+					mergeEvidenceData(data, evidence)
+					return NewErrorResponseWithData(req.ID, CodeBudgetExhausted, errMsg, data), nil
 				}
 			} else {
 				// Backend failure (Redis down, network error, etc.)
@@ -673,8 +710,30 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 					"cost":         cost,
 					"remaining":    result.Remaining,
 					"budget_limit": tokenInfo.BudgetLimit,
+					"request_id":   requestID,
+					"policy_mode":  normalizeEnforcementMode(mode),
 				},
 			})
+
+			var evidenceErr error
+			allowedEvidence, evidenceErr = p.recordMCPDecision(ctx, req, tokenInfo, tc.Name, MCPDecision{
+				Decision:         "allowed",
+				DecisionReason:   "budget_authorized",
+				PolicyMode:       normalizeEnforcementMode(mode),
+				CostCredits:      cost,
+				RemainingCredits: result.Remaining,
+				RequestID:        requestID,
+			})
+			if evidenceErr != nil {
+				log.Error().Err(evidenceErr).Str("tool", tc.Name).Str("budgetId", budgetID).Msg("MCP allowed evidence recording failed")
+				if isControl {
+					p.compensateMCPSpend(ctx, budgetID, requestID, cost)
+					return NewErrorResponseWithData(req.ID, CodeInternalError, "Evidence proof unavailable", map[string]interface{}{
+						"error": "proof_unavailable",
+						"tool":  tc.Name,
+					}), nil
+				}
+			}
 		}
 	}
 
@@ -764,7 +823,95 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 
 	// Rewrite the response ID to match the client's request ID
 	resp.ID = req.ID
+	attachMCPEvidenceToResponse(resp, allowedEvidence)
 	return resp, nil
+}
+
+func (p *Proxy) recordMCPDecision(ctx context.Context, req *Request, tokenInfo *TokenInfo, toolName string, decision MCPDecision) (*MCPEvidence, error) {
+	if p.evidence == nil {
+		return nil, nil
+	}
+	decision.TenantID = tokenInfo.TenantID
+	decision.TokenID = tokenInfo.TokenID
+	decision.BudgetID = tokenInfo.BudgetID
+	decision.BudgetSubjectID = tokenInfo.BudgetID
+	decision.BudgetLimitCredits = tokenInfo.BudgetLimit
+	decision.DelegationDepth = int64(tokenInfo.DelegationDepth)
+	decision.DelegationBudget = tokenInfo.DelegationBudget
+	decision.ParentTokenID = tokenInfo.ParentTokenID
+	decision.Scope = tokenInfo.Scope
+	decision.MCPMethod = MethodToolsCall
+	decision.ToolName = toolName
+	decision.RouteOrTool = "mcp:tools/call:" + toolName
+	decision.JSONRPCID = string(req.ID)
+	if decision.PolicyMode == "" {
+		decision.PolicyMode = normalizeEnforcementMode(p.config.Enforcement.Mode)
+	}
+	if decision.RemainingBeforeCredits == 0 && decision.Decision == "allowed" {
+		decision.RemainingBeforeCredits = decision.RemainingCredits + decision.CostCredits
+	}
+	if decision.RemainingBeforeCredits == 0 && decision.Decision != "allowed" {
+		decision.RemainingBeforeCredits = decision.RemainingCredits
+	}
+	return p.evidence.RecordMCPDecision(ctx, decision)
+}
+
+func (p *Proxy) compensateMCPSpend(ctx context.Context, budgetID, requestID string, cost int64) {
+	compensator, ok := p.budget.(BudgetCompensator)
+	if !ok || budgetID == "" || requestID == "" || cost <= 0 {
+		return
+	}
+	if err := compensator.Compensate(ctx, budgetID, requestID, cost); err != nil {
+		log.Error().Err(err).Str("budgetId", budgetID).Str("requestId", requestID).Msg("failed to compensate MCP debit after evidence failure")
+	}
+}
+
+func mergeEvidenceData(data map[string]interface{}, evidence *MCPEvidence) {
+	if data == nil || evidence == nil {
+		return
+	}
+	if evidence.ReceiptID != "" {
+		data["receipt_id"] = evidence.ReceiptID
+	}
+	if evidence.ReceiptHash != "" {
+		data["receipt_hash"] = evidence.ReceiptHash
+	}
+	if evidence.EvidencePackID != "" {
+		data["evidence_pack_id"] = evidence.EvidencePackID
+	}
+	if evidence.EvidenceURL != "" {
+		data["evidence_url"] = evidence.EvidenceURL
+	}
+	if evidence.VerifyURL != "" {
+		data["verify_url"] = evidence.VerifyURL
+	}
+	if evidence.JWKSURL != "" {
+		data["jwks_url"] = evidence.JWKSURL
+	}
+}
+
+func attachMCPEvidenceToResponse(resp *Response, evidence *MCPEvidence) {
+	if resp == nil || evidence == nil || len(resp.Result) == 0 {
+		return
+	}
+	var result map[string]interface{}
+	if err := json.Unmarshal(resp.Result, &result); err != nil {
+		return
+	}
+	meta, _ := result["_meta"].(map[string]interface{})
+	if meta == nil {
+		meta = map[string]interface{}{}
+	}
+	evidenceData := map[string]interface{}{}
+	mergeEvidenceData(evidenceData, evidence)
+	if len(evidenceData) == 0 {
+		return
+	}
+	meta["satgate_evidence"] = evidenceData
+	result["_meta"] = meta
+	if encoded, err := json.Marshal(result); err == nil {
+		resp.Result = encoded
+	}
 }
 
 // handleDelegate processes satgate/delegate requests.
