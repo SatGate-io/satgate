@@ -87,7 +87,7 @@ export default function SecurityPage() {
         <Link href="/" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Home
         </Link>
-        
+
         <h1 className="text-4xl font-bold mb-2">Security</h1>
         <p className="text-gray-500 mb-12">Economic Access Control — built by security practitioners, not bolted on after.</p>
 
@@ -97,16 +97,16 @@ export default function SecurityPage() {
           <section className="bg-gradient-to-r from-purple-900/20 to-cyan-900/20 border border-purple-800/30 rounded-xl p-6">
             <h2 className="text-xl font-bold text-white mb-4">The Security Model</h2>
             <p className="text-gray-400 leading-relaxed mb-4">
-              SatGate implements <strong className="text-white">Economic Access Control</strong> — a capability-based security model 
+              SatGate implements <strong className="text-white">Economic Access Control</strong> — a capability-based security model
               where every API request must present a cryptographically verified token with embedded access constraints.
             </p>
             <p className="text-gray-400 leading-relaxed mb-4">
-              Traditional APIs ask <em>&ldquo;who are you?&rdquo;</em> and maintain identity databases. 
-              SatGate asks <em>&ldquo;what can you afford?&rdquo;</em> — enforcing budgets, scopes, and delegation limits 
-              at the request layer. No user databases. No PII. No credential stuffing surface.
+              Traditional APIs ask <em>&ldquo;who are you?&rdquo;</em> and often tie enforcement to broad user credentials.
+              SatGate asks <em>&ldquo;what is this workload allowed to do and spend?&rdquo;</em> — enforcing budgets, scopes, and delegation limits
+              at the request layer. The enforcement path does not require an upstream end-user identity database; SatGate Cloud may still store account emails for login, billing, and tenant administration.
             </p>
             <p className="text-gray-400 leading-relaxed mb-0">
-              The gateway operates as a <strong className="text-white">Policy Enforcement Point (PEP)</strong>. 
+              The gateway operates as a <strong className="text-white">Policy Enforcement Point (PEP)</strong>.
               No request reaches your upstream without passing cryptographic verification.
             </p>
           </section>
@@ -118,7 +118,7 @@ export default function SecurityPage() {
               <h2 className="text-xl font-bold text-white mb-0">SatGate Mint — Trust Broker</h2>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              Agents authenticate through your existing identity infrastructure. SatGate Mint exchanges workload identity tokens 
+              Agents authenticate through your existing identity infrastructure. SatGate Mint exchanges workload identity tokens
               (OIDC JWTs from Kubernetes, AWS IAM, or any OIDC provider) for capability-bearing macaroons with policy-defined constraints.
             </p>
             <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5 mb-4">
@@ -153,29 +153,29 @@ export default function SecurityPage() {
               <h2 className="text-xl font-bold text-white mb-0">Why Macaroons</h2>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              API keys are passwords. JWTs are ID cards. Macaroons are <strong className="text-white">signed checks with spending limits</strong> — 
+              API keys are passwords. JWTs are ID cards. Macaroons are <strong className="text-white">signed checks with spending limits</strong> —
               and every person who touches the check can only reduce the limit, never increase it.
             </p>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
                 <h4 className="text-white text-sm font-bold mb-2">Delegation Without Calling Home</h4>
                 <p className="text-gray-500 text-xs">
-                  A manager mints a token, carves off a weaker one for their team, who delegates further to an agent. 
+                  A manager mints a token, carves off a weaker one for their team, who delegates further to an agent.
                   Each step is cryptographically chained — no API call, no DB write. Permissions only shrink.
                 </p>
               </div>
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
                 <h4 className="text-white text-sm font-bold mb-2">Runtime Constraints Built In</h4>
                 <p className="text-gray-500 text-xs">
-                  Caveats encode &ldquo;only until 5pm,&rdquo; &ldquo;only for /openai/*,&rdquo; or &ldquo;max 200 credits.&rdquo; 
+                  Caveats encode &ldquo;only until 5pm,&rdquo; &ldquo;only for /openai/*,&rdquo; or &ldquo;max 200 credits.&rdquo;
                   Verified at the gateway on every request. The token carries its own budget.
                 </p>
               </div>
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
                 <h4 className="text-white text-sm font-bold mb-2">The Right Primitive for Agents</h4>
                 <p className="text-gray-500 text-xs">
-                  Agents can&apos;t do OAuth flows or sign up for accounts. But they can hold a bearer token 
+                  Agents can&apos;t do OAuth flows or sign up for accounts. But they can hold a bearer token
                   that encodes exactly what they&apos;re allowed to do and spend. That&apos;s a macaroon.
                 </p>
               </div>
@@ -245,7 +245,7 @@ export default function SecurityPage() {
               <h2 className="text-xl font-bold text-white mb-0">Zero Trust Access Control</h2>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              SatGate is a Zero Trust Policy Enforcement Point for API access. It verifies every request and 
+              SatGate is a Zero Trust Policy Enforcement Point for API access. It verifies every request and
               enforces scoped access — no network trust assumptions.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
@@ -340,11 +340,11 @@ export default function SecurityPage() {
           <section className="bg-purple-900/20 border border-purple-800/30 rounded-xl p-6 text-center">
             <h2 className="text-xl font-bold text-white mb-3">Enterprise Security Review</h2>
             <p className="text-gray-400 text-sm mb-4">
-              Need to evaluate SatGate for your security team? Download the full Security Posture Pack — 
+              Need to evaluate SatGate for your security team? Download the full Security Posture Pack —
               covers architecture, encryption, data handling, audit, and compliance.
             </p>
-            <a 
-              href="https://cloud.satgate.io/docs/security-pack" 
+            <a
+              href="https://cloud.satgate.io/docs/security-pack"
               className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-bold transition"
             >
               <FileText size={16} /> View Security Posture Pack →
@@ -356,8 +356,8 @@ export default function SecurityPage() {
             <h2 className="text-xl font-bold text-white mb-3">Leadership</h2>
             <p className="text-gray-400 leading-relaxed">
               SatGate was founded by{' '}
-              <a href="https://linkedin.com/in/waynemattadeen" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">Wayne Mattadeen</a>, 
-              a cybersecurity executive with 27+ years of experience across Deloitte, Accenture, and EY — including 
+              <a href="https://linkedin.com/in/waynemattadeen" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">Wayne Mattadeen</a>,
+              a cybersecurity executive with 27+ years of experience across Deloitte, Accenture, and EY — including
               partner-level roles focused on enterprise security architecture and Zero Trust.
             </p>
             <p className="text-gray-400 leading-relaxed">
@@ -410,8 +410,8 @@ export default function SecurityPage() {
             <p className="text-gray-400 text-sm mb-4">
               All gateway code is open source under the Apache 2.0 License. Audit every line, fork it, run your own infrastructure.
             </p>
-            <a 
-              href="https://github.com/SatGate-io/satgate" 
+            <a
+              href="https://github.com/SatGate-io/satgate"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-sm font-medium text-gray-300 transition"
             >
               <Code size={16} /> View Source on GitHub →

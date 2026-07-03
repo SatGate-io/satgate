@@ -37,6 +37,8 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/capability-auth', lastModified: '2026-05-08', changeFrequency: 'weekly', priority: 0.95 },
   { path: '/agent-control-plane', lastModified: '2026-05-05', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/evidence-pack-demo', lastModified: '2026-05-10', changeFrequency: 'weekly', priority: 0.95 },
+  { path: '/verify-evidence-pack', lastModified: '2026-07-02', changeFrequency: 'weekly', priority: 0.95 },
+  { path: '/docs', lastModified: '2026-07-02', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/revocable-agent-credentials', lastModified: '2026-05-02', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/agent-capability-tokens', lastModified: '2026-05-10', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/capability-lifecycle-demo', lastModified: '2026-05-10', changeFrequency: 'weekly', priority: 0.9 },
