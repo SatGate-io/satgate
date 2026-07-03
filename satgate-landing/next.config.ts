@@ -6,7 +6,6 @@ const nextConfig: NextConfig = {
     return [
       { source: '/blog/the-enterprise-adoption-playbook-observe-control-charge', destination: '/blog/the-enterprise-adoption-playbook-observe-control-prove', permanent: true },
       { source: '/blog/agent-to-agent-collaboration-security', destination: '/blog', permanent: true },
-      { source: '/docs', destination: '/', permanent: true },
       { source: '/about', destination: '/', permanent: true },
       { source: '/contact', destination: '/design-partners', permanent: true },
       { source: '/demo', destination: '/sandbox', permanent: true },

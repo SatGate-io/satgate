@@ -2,6 +2,7 @@
   "schema_version": "satgate.evidence_pack.v1",
   "evidence_pack_id": "ep_demo_2026_05_10_001",
   "environment": "demo",
+  "mock_only": true,
   "pack_type": "public_demo_redacted",
   "issued_at": "2026-05-10T14:26:31Z",
   "valid_from": "2026-05-10T14:22:31Z",
