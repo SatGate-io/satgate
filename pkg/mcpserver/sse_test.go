@@ -93,6 +93,49 @@ func TestSSEServer_ConnectAndMessage(t *testing.T) {
 	}
 }
 
+func TestSSESessionContextWithIdentityIncludesVerifiedTokenInfo(t *testing.T) {
+	base := context.Background()
+	session := &sseSession{
+		ctx:      base,
+		tokenID:  "tok-session",
+		tenantID: "tenant-session",
+		budgetID: "budget-session",
+		verifiedTokenInfo: &TokenInfo{
+			TokenID:  "tok-session",
+			BudgetID: "budget-session",
+			TenantID: "tenant-session",
+		},
+	}
+
+	ctx := session.contextWithIdentity()
+	if got := TenantFromContext(ctx); got != "tenant-session" {
+		t.Fatalf("tenant from context = %q, want tenant-session", got)
+	}
+	info := TokenInfoFromContext(ctx)
+	if info == nil {
+		t.Fatal("expected token info in context")
+	}
+	if info.TokenID != "tok-session" || info.BudgetID != "budget-session" || info.TenantID != "tenant-session" {
+		t.Fatalf("token info = %#v", info)
+	}
+}
+
+func TestSSESessionContextWithIdentityDoesNotTrustFallbackCaveatIdentity(t *testing.T) {
+	session := &sseSession{
+		ctx:      context.Background(),
+		tenantID: "tenant-from-unverified-caveat",
+		budgetID: "budget-from-unverified-caveat",
+	}
+
+	ctx := session.contextWithIdentity()
+	if got := TenantFromContext(ctx); got != "tenant-from-unverified-caveat" {
+		t.Fatalf("tenant from context = %q, want fallback tenant for routing/session tracking", got)
+	}
+	if info := TokenInfoFromContext(ctx); info != nil {
+		t.Fatalf("unverified caveat identity must not become TokenInfo, got %#v", info)
+	}
+}
+
 func TestSSEServer_BudgetEnforcement(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

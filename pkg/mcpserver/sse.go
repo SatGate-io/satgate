@@ -30,13 +30,25 @@ type SSEServer struct {
 
 // sseSession represents one connected MCP client over SSE.
 type sseSession struct {
-	id       string
-	messages chan json.RawMessage // outbound messages to client
-	ctx      context.Context
-	cancel   context.CancelFunc
-	tokenID  string // from auth at connect time (may be empty)
-	tenantID string // from auth at connect time (may be empty)
-	budgetID string // from auth at connect time (may be empty)
+	id                string
+	messages          chan json.RawMessage // outbound messages to client
+	ctx               context.Context
+	cancel            context.CancelFunc
+	tokenID           string     // from auth/session tracking (may be empty)
+	tenantID          string     // from auth/session tracking (may be empty)
+	budgetID          string     // from auth/session tracking (may be empty)
+	verifiedTokenInfo *TokenInfo // only set after authenticator verification succeeds
+}
+
+func (s *sseSession) contextWithIdentity() context.Context {
+	ctx := s.ctx
+	if s.tenantID != "" {
+		ctx = context.WithValue(ctx, CtxTenantID, s.tenantID)
+	}
+	if s.verifiedTokenInfo != nil {
+		ctx = context.WithValue(ctx, CtxTokenInfo, s.verifiedTokenInfo)
+	}
+	return ctx
 }
 
 // SSEOption configures optional SSEServer settings.
@@ -207,6 +219,7 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 				session.tokenID = info.TokenID
 				session.tenantID = info.TenantID
 				session.budgetID = info.BudgetID
+				session.verifiedTokenInfo = info
 				resolved = true
 			}
 		}
@@ -308,6 +321,7 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 				session.tokenID = info.TokenID
 				session.tenantID = info.TenantID
 				session.budgetID = info.BudgetID
+				session.verifiedTokenInfo = info
 				resolved = true
 			}
 		}
@@ -354,12 +368,10 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 
 	// Handle request asynchronously — don't block the HTTP response
 	go func() {
-		// Inject session's tenant ID into context so tools/list and other
-		// methods can access it (for multi-tenant upstream routing).
-		reqCtx := session.ctx
-		if session.tenantID != "" {
-			reqCtx = context.WithValue(reqCtx, CtxTenantID, session.tenantID)
-		}
+		// Inject session identity into context so unauthenticated-but-session-scoped
+		// methods such as tools/list can use the already-resolved tenant and budget
+		// subject without re-verifying or guessing from global session state.
+		reqCtx := session.contextWithIdentity()
 		resp, handleErr := s.proxy.handleRequest(reqCtx, req)
 		if handleErr != nil {
 			resp = NewErrorResponse(req.ID, CodeInternalError, handleErr.Error())
