@@ -30,13 +30,14 @@ type SSEServer struct {
 
 // sseSession represents one connected MCP client over SSE.
 type sseSession struct {
-	id       string
-	messages chan json.RawMessage // outbound messages to client
-	ctx      context.Context
-	cancel   context.CancelFunc
-	tokenID  string // from auth at connect time (may be empty)
-	tenantID string // from auth at connect time (may be empty)
-	budgetID string // from auth at connect time (may be empty)
+	id                string
+	messages          chan json.RawMessage // outbound messages to client
+	ctx               context.Context
+	cancel            context.CancelFunc
+	tokenID           string     // from auth/session tracking (may be empty)
+	tenantID          string     // from auth/session tracking (may be empty)
+	budgetID          string     // from auth/session tracking (may be empty)
+	verifiedTokenInfo *TokenInfo // only set after authenticator verification succeeds
 }
 
 func (s *sseSession) contextWithIdentity() context.Context {
@@ -44,12 +45,8 @@ func (s *sseSession) contextWithIdentity() context.Context {
 	if s.tenantID != "" {
 		ctx = context.WithValue(ctx, CtxTenantID, s.tenantID)
 	}
-	if s.tokenID != "" || s.budgetID != "" || s.tenantID != "" {
-		ctx = context.WithValue(ctx, CtxTokenInfo, &TokenInfo{
-			TokenID:  s.tokenID,
-			BudgetID: s.budgetID,
-			TenantID: s.tenantID,
-		})
+	if s.verifiedTokenInfo != nil {
+		ctx = context.WithValue(ctx, CtxTokenInfo, s.verifiedTokenInfo)
 	}
 	return ctx
 }
@@ -222,6 +219,7 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 				session.tokenID = info.TokenID
 				session.tenantID = info.TenantID
 				session.budgetID = info.BudgetID
+				session.verifiedTokenInfo = info
 				resolved = true
 			}
 		}
@@ -323,6 +321,7 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 				session.tokenID = info.TokenID
 				session.tenantID = info.TenantID
 				session.budgetID = info.BudgetID
+				session.verifiedTokenInfo = info
 				resolved = true
 			}
 		}
