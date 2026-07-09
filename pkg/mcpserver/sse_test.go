@@ -93,6 +93,28 @@ func TestSSEServer_ConnectAndMessage(t *testing.T) {
 	}
 }
 
+func TestSSESessionContextWithIdentityIncludesTokenInfo(t *testing.T) {
+	base := context.Background()
+	session := &sseSession{
+		ctx:      base,
+		tokenID:  "tok-session",
+		tenantID: "tenant-session",
+		budgetID: "budget-session",
+	}
+
+	ctx := session.contextWithIdentity()
+	if got := TenantFromContext(ctx); got != "tenant-session" {
+		t.Fatalf("tenant from context = %q, want tenant-session", got)
+	}
+	info := TokenInfoFromContext(ctx)
+	if info == nil {
+		t.Fatal("expected token info in context")
+	}
+	if info.TokenID != "tok-session" || info.BudgetID != "budget-session" || info.TenantID != "tenant-session" {
+		t.Fatalf("token info = %#v", info)
+	}
+}
+
 func TestSSEServer_BudgetEnforcement(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

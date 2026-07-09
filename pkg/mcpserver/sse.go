@@ -39,6 +39,21 @@ type sseSession struct {
 	budgetID string // from auth at connect time (may be empty)
 }
 
+func (s *sseSession) contextWithIdentity() context.Context {
+	ctx := s.ctx
+	if s.tenantID != "" {
+		ctx = context.WithValue(ctx, CtxTenantID, s.tenantID)
+	}
+	if s.tokenID != "" || s.budgetID != "" || s.tenantID != "" {
+		ctx = context.WithValue(ctx, CtxTokenInfo, &TokenInfo{
+			TokenID:  s.tokenID,
+			BudgetID: s.budgetID,
+			TenantID: s.tenantID,
+		})
+	}
+	return ctx
+}
+
 // SSEOption configures optional SSEServer settings.
 type SSEOption func(*SSEServer)
 
@@ -354,12 +369,10 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 
 	// Handle request asynchronously — don't block the HTTP response
 	go func() {
-		// Inject session's tenant ID into context so tools/list and other
-		// methods can access it (for multi-tenant upstream routing).
-		reqCtx := session.ctx
-		if session.tenantID != "" {
-			reqCtx = context.WithValue(reqCtx, CtxTenantID, session.tenantID)
-		}
+		// Inject session identity into context so unauthenticated-but-session-scoped
+		// methods such as tools/list can use the already-resolved tenant and budget
+		// subject without re-verifying or guessing from global session state.
+		reqCtx := session.contextWithIdentity()
 		resp, handleErr := s.proxy.handleRequest(reqCtx, req)
 		if handleErr != nil {
 			resp = NewErrorResponse(req.ID, CodeInternalError, handleErr.Error())
