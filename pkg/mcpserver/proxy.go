@@ -707,14 +707,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				TokenID:   tokenInfo.TokenID,
 				BudgetID:  budgetID,
 				TenantID:  tenantID,
-				Data: map[string]interface{}{
-					"tool":         tc.Name,
-					"cost":         cost,
-					"remaining":    result.Remaining,
-					"budget_limit": tokenInfo.BudgetLimit,
-					"request_id":   eventRequestID,
-					"policy_mode":  normalizeEnforcementMode(mode),
-				},
+				Data:      budgetSpendEventData(tc.Name, cost, result.Remaining, tokenInfo.BudgetLimit, eventRequestID, requestID, mode),
 			})
 
 			var evidenceErr error
@@ -857,6 +850,18 @@ func (p *Proxy) recordMCPDecision(ctx context.Context, req *Request, tokenInfo *
 		decision.RemainingBeforeCredits = decision.RemainingCredits
 	}
 	return p.evidence.RecordMCPDecision(ctx, decision)
+}
+
+func budgetSpendEventData(tool string, cost, remaining, budgetLimit int64, requestIdentity, callerRequestID, mode string) map[string]interface{} {
+	return map[string]interface{}{
+		"tool":              tool,
+		"cost":              cost,
+		"remaining":         remaining,
+		"budget_limit":      budgetLimit,
+		"request_id":        requestIdentity,
+		"caller_request_id": callerRequestID,
+		"policy_mode":       normalizeEnforcementMode(mode),
+	}
 }
 
 func budgetEventRequestID(callerRequestID string, result *BudgetResult) string {
