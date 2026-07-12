@@ -559,6 +559,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 
 	// Generate request ID for idempotency
 	requestID := generateRequestID(budgetID, tc.Name, req.ID)
+	eventRequestID := requestID
 
 	log.Debug().
 		Str("tool", tc.Name).
@@ -595,6 +596,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			}
 		}
 		result, err := p.budget.Spend(ctx, budgetID, tc.Name, cost, requestID)
+		eventRequestID = budgetEventRequestID(requestID, result)
 		if err != nil {
 			isBudgetExhausted := result != nil && (result.ErrorCode == "budget_exhausted" || result.ErrorCode == "insufficient_budget")
 
@@ -626,7 +628,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 						"cost":         cost,
 						"remaining":    remaining,
 						"budget_limit": tokenInfo.BudgetLimit,
-						"request_id":   requestID,
+						"request_id":   eventRequestID,
 						"policy_mode":  normalizeEnforcementMode(mode),
 						"decision":     "denied",
 						"reason":       result.ErrorCode,
@@ -650,7 +652,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 						PolicyMode:       normalizeEnforcementMode(mode),
 						CostCredits:      cost,
 						RemainingCredits: remaining,
-						RequestID:        requestID,
+						RequestID:        eventRequestID,
 					})
 					if evidenceErr != nil {
 						log.Error().Err(evidenceErr).Str("tool", tc.Name).Str("budgetId", budgetID).Msg("MCP denial evidence recording failed")
@@ -710,7 +712,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 					"cost":         cost,
 					"remaining":    result.Remaining,
 					"budget_limit": tokenInfo.BudgetLimit,
-					"request_id":   requestID,
+					"request_id":   eventRequestID,
 					"policy_mode":  normalizeEnforcementMode(mode),
 				},
 			})
@@ -722,12 +724,12 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				PolicyMode:       normalizeEnforcementMode(mode),
 				CostCredits:      cost,
 				RemainingCredits: result.Remaining,
-				RequestID:        requestID,
+				RequestID:        eventRequestID,
 			})
 			if evidenceErr != nil {
 				log.Error().Err(evidenceErr).Str("tool", tc.Name).Str("budgetId", budgetID).Msg("MCP allowed evidence recording failed")
 				if isControl {
-					p.compensateMCPSpend(ctx, budgetID, requestID, cost)
+					p.compensateMCPSpend(ctx, budgetID, eventRequestID, cost)
 					return NewErrorResponseWithData(req.ID, CodeInternalError, "Evidence proof unavailable", map[string]interface{}{
 						"error": "proof_unavailable",
 						"tool":  tc.Name,
@@ -748,6 +750,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			"tool":        tc.Name,
 			"cost":        cost,
 			"enforcement": p.config.Enforcement.Mode,
+			"request_id":  eventRequestID,
 		},
 	})
 
@@ -854,6 +857,13 @@ func (p *Proxy) recordMCPDecision(ctx context.Context, req *Request, tokenInfo *
 		decision.RemainingBeforeCredits = decision.RemainingCredits
 	}
 	return p.evidence.RecordMCPDecision(ctx, decision)
+}
+
+func budgetEventRequestID(callerRequestID string, result *BudgetResult) string {
+	if result != nil && result.RequestID != "" {
+		return result.RequestID
+	}
+	return callerRequestID
 }
 
 func (p *Proxy) compensateMCPSpend(ctx context.Context, budgetID, requestID string, cost int64) {

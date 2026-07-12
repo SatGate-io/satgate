@@ -13,6 +13,7 @@ type BudgetResult struct {
 	Remaining int64  `json:"remaining"`
 	TokenID   string `json:"token_id"`
 	Cost      int64  `json:"cost"`
+	RequestID string `json:"request_id,omitempty"`
 	ErrorCode string `json:"error_code,omitempty"`
 }
 
