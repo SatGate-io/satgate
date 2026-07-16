@@ -26,6 +26,10 @@ type MCPDecision struct {
 	CostCredits            int64  `json:"cost_credits"`
 	RemainingCredits       int64  `json:"remaining_credits"`
 	RemainingBeforeCredits int64  `json:"remaining_before_credits"`
+	// NoVerifiedCapability marks terminal denials produced before credential
+	// verification succeeds. Recorders must not project token, capability, or
+	// evaluated-budget authority for this profile.
+	NoVerifiedCapability bool `json:"no_verified_capability,omitempty"`
 }
 
 // MCPEvidence is the verifier-facing handle returned after recording an MCP

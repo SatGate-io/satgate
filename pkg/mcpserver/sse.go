@@ -30,23 +30,73 @@ type SSEServer struct {
 
 // sseSession represents one connected MCP client over SSE.
 type sseSession struct {
-	id                string
-	messages          chan json.RawMessage // outbound messages to client
-	ctx               context.Context
-	cancel            context.CancelFunc
+	id       string
+	messages chan json.RawMessage // outbound messages to client
+	ctx      context.Context
+	cancel   context.CancelFunc
+
+	identityMu        sync.RWMutex
 	tokenID           string     // from auth/session tracking (may be empty)
 	tenantID          string     // from auth/session tracking (may be empty)
 	budgetID          string     // from auth/session tracking (may be empty)
 	verifiedTokenInfo *TokenInfo // only set after authenticator verification succeeds
 }
 
-func (s *sseSession) contextWithIdentity() context.Context {
-	ctx := s.ctx
-	if s.tenantID != "" {
-		ctx = context.WithValue(ctx, CtxTenantID, s.tenantID)
+type sseSessionIdentity struct {
+	tokenID           string
+	tenantID          string
+	budgetID          string
+	verifiedTokenInfo *TokenInfo
+}
+
+func (s *sseSession) identitySnapshot() sseSessionIdentity {
+	s.identityMu.RLock()
+	defer s.identityMu.RUnlock()
+	identity := sseSessionIdentity{
+		tokenID:  s.tokenID,
+		tenantID: s.tenantID,
+		budgetID: s.budgetID,
 	}
 	if s.verifiedTokenInfo != nil {
-		ctx = context.WithValue(ctx, CtxTokenInfo, s.verifiedTokenInfo)
+		info := *s.verifiedTokenInfo
+		identity.verifiedTokenInfo = &info
+	}
+	return identity
+}
+
+func (s *sseSession) setVerifiedIdentity(info *TokenInfo) {
+	if info == nil {
+		return
+	}
+	copyInfo := *info
+	s.identityMu.Lock()
+	s.tokenID = info.TokenID
+	s.tenantID = info.TenantID
+	s.budgetID = info.BudgetID
+	s.verifiedTokenInfo = &copyInfo
+	s.identityMu.Unlock()
+}
+
+func (s *sseSession) setTrackingIdentity(tenantID, budgetID string) {
+	if tenantID == "" {
+		return
+	}
+	s.identityMu.Lock()
+	if s.tenantID == "" {
+		s.tenantID = tenantID
+		s.budgetID = budgetID
+	}
+	s.identityMu.Unlock()
+}
+
+func (s *sseSession) contextWithIdentity() context.Context {
+	ctx := s.ctx
+	identity := s.identitySnapshot()
+	if identity.tenantID != "" {
+		ctx = context.WithValue(ctx, CtxTenantID, identity.tenantID)
+	}
+	if identity.verifiedTokenInfo != nil {
+		ctx = context.WithValue(ctx, CtxTokenInfo, identity.verifiedTokenInfo)
 	}
 	return ctx
 }
@@ -168,8 +218,8 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 			// Only reject on definitive errors (enterprise misrouting, revocation)
 			// NOT on key-mismatch (multi-tenant SaaS where key lookup is deferred)
 			if strings.Contains(errMsg, "enterprise deployment") || strings.Contains(errMsg, "token revoked") {
-				log.Warn().Str("error", errMsg).Msg("SSE connection rejected at pre-connect")
-				http.Error(w, errMsg, http.StatusForbidden)
+				log.Warn().Msg("SSE connection rejected at pre-connect")
+				s.writePreConnectDenial(w, r, errMsg)
 				cancel()
 				return
 			}
@@ -186,13 +236,14 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 		s.mu.Unlock()
 		cancel()
 		log.Info().Str("session", sessionID).Msg("SSE session closed")
+		identity := session.identitySnapshot()
 		s.proxy.events.Publish(Event{
 			Type:      EventSessionClose,
 			Timestamp: time.Now(),
 			SessionID: sessionID,
-			TokenID:   session.tokenID,
-			TenantID:  session.tenantID,
-			BudgetID:  session.budgetID,
+			TokenID:   identity.tokenID,
+			TenantID:  identity.tenantID,
+			BudgetID:  identity.budgetID,
 		})
 	}()
 
@@ -216,10 +267,7 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 		var resolved bool
 		if s.proxy.auth != nil {
 			if info, err := s.proxy.auth.Verify(ctx, authToken); err == nil {
-				session.tokenID = info.TokenID
-				session.tenantID = info.TenantID
-				session.budgetID = info.BudgetID
-				session.verifiedTokenInfo = info
+				session.setVerifiedIdentity(info)
 				resolved = true
 			}
 		}
@@ -227,20 +275,20 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 			// Best-effort: decode macaroon and read caveats for dashboard tracking.
 			// This is NOT security enforcement — tool calls are verified on /message.
 			if tid, bid := extractTokenCaveats(authToken); tid != "" {
-				session.tenantID = tid
-				session.budgetID = bid
+				session.setTrackingIdentity(tid, bid)
 			}
 		}
 	}
 
-	log.Info().Str("session", sessionID).Str("tenant", session.tenantID).Msg("SSE session established")
+	identity := session.identitySnapshot()
+	log.Info().Str("session", sessionID).Str("tenant", identity.tenantID).Msg("SSE session established")
 	s.proxy.events.Publish(Event{
 		Type:      EventSessionConnect,
 		Timestamp: time.Now(),
 		SessionID: sessionID,
-		TokenID:   session.tokenID,
-		TenantID:  session.tenantID,
-		BudgetID:  session.budgetID,
+		TokenID:   identity.tokenID,
+		TenantID:  identity.tenantID,
+		BudgetID:  identity.budgetID,
 	})
 
 	// Stream outbound messages with keepalive
@@ -258,13 +306,14 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, ": keepalive\n\n")
 			flusher.Flush()
 			// Publish keepalive event so enterprise Redis TTLs stay fresh
+			identity := session.identitySnapshot()
 			s.proxy.events.Publish(Event{
 				Type:      EventSessionKeepalive,
 				Timestamp: time.Now(),
 				SessionID: sessionID,
-				TokenID:   session.tokenID,
-				TenantID:  session.tenantID,
-				BudgetID:  session.budgetID,
+				TokenID:   identity.tokenID,
+				TenantID:  identity.tenantID,
+				BudgetID:  identity.budgetID,
 			})
 
 		case <-ctx.Done():
@@ -314,33 +363,30 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 	// Authorization header on the initial SSE GET — only on POST /message.
 	// When we see a token here for the first time, extract tenant/budget info
 	// and re-publish a session_connect event so the dashboard picks it up.
-	if authToken != "" && session.tenantID == "" {
+	if authToken != "" && session.identitySnapshot().tenantID == "" {
 		var resolved bool
 		if s.proxy.auth != nil {
 			if info, err := s.proxy.auth.Verify(session.ctx, authToken); err == nil {
-				session.tokenID = info.TokenID
-				session.tenantID = info.TenantID
-				session.budgetID = info.BudgetID
-				session.verifiedTokenInfo = info
+				session.setVerifiedIdentity(info)
 				resolved = true
 			}
 		}
 		if !resolved {
 			if tid, bid := extractTokenCaveats(authToken); tid != "" {
-				session.tenantID = tid
-				session.budgetID = bid
+				session.setTrackingIdentity(tid, bid)
 			}
 		}
-		// Re-publish session_connect with correct identity
-		if session.tenantID != "" {
-			log.Info().Str("session", sessionID).Str("tenant", session.tenantID).Msg("session identity resolved from message auth")
+		// Re-publish session_connect with correct identity.
+		identity := session.identitySnapshot()
+		if identity.tenantID != "" {
+			log.Info().Str("session", sessionID).Str("tenant", identity.tenantID).Msg("session identity resolved from message auth")
 			s.proxy.events.Publish(Event{
 				Type:      EventSessionConnect,
 				Timestamp: time.Now(),
 				SessionID: sessionID,
-				TokenID:   session.tokenID,
-				TenantID:  session.tenantID,
-				BudgetID:  session.budgetID,
+				TokenID:   identity.tokenID,
+				TenantID:  identity.tenantID,
+				BudgetID:  identity.budgetID,
 			})
 		}
 	}
@@ -393,6 +439,64 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	w.WriteHeader(http.StatusAccepted)
+}
+
+func (s *SSEServer) writePreConnectDenial(w http.ResponseWriter, r *http.Request, verifierError string) {
+	code := "WRONG_LANE"
+	errorName := "wrong_lane"
+	message := "Credential is not valid for this MCP endpoint."
+	isRevoked := strings.Contains(verifierError, "token revoked")
+	if isRevoked {
+		code = "TOKEN_REVOKED"
+		errorName = "token_revoked"
+		message = "This credential has been revoked."
+	}
+
+	response := map[string]interface{}{
+		"error":   errorName,
+		"code":    code,
+		"message": message,
+	}
+
+	// TenantFromContext is populated only by trusted in-process routing
+	// middleware. Never derive signed tenant authority from caller headers or
+	// unverified token caveats at this pre-connect boundary.
+	tenantID := TenantFromContext(r.Context())
+	if isRevoked && tenantID != "" && s.proxy.evidence != nil {
+		requestID := "mcp-sse-" + generateSessionID()
+		if err := s.proxy.evidence.Preflight(r.Context()); err == nil {
+			proof, recordErr := s.proxy.evidence.RecordMCPDecision(r.Context(), MCPDecision{
+				Decision:             "denied",
+				DecisionReason:       "token_revoked",
+				PolicyMode:           "auth",
+				TenantID:             tenantID,
+				MCPMethod:            "sse/connect",
+				RouteOrTool:          "mcp:sse:connect",
+				RequestID:            requestID,
+				NoVerifiedCapability: true,
+			})
+			if recordErr == nil && proof != nil && proof.EvidenceURL != "" {
+				response["proof"] = map[string]string{
+					"receipt_id":       proof.ReceiptID,
+					"receipt_hash":     proof.ReceiptHash,
+					"evidence_pack_id": proof.EvidencePackID,
+					"evidence_url":     proof.EvidenceURL,
+					"verify_url":       proof.VerifyURL,
+					"jwks_url":         proof.JWKSURL,
+					"request_id":       requestID,
+				}
+				w.Header().Set("X-SatGate-Request-ID", requestID)
+				w.Header().Set("X-SatGate-Receipt-ID", proof.ReceiptID)
+				w.Header().Set("X-SatGate-Receipt-Hash", proof.ReceiptHash)
+				w.Header().Set("X-SatGate-Evidence-Pack-ID", proof.EvidencePackID)
+				w.Header().Set("Link", fmt.Sprintf("<%s>; rel=\"satgate-evidence-pack\"; type=\"application/json\"", proof.EvidenceURL))
+			}
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusForbidden)
+	_ = json.NewEncoder(w).Encode(response)
 }
 
 func (s *SSEServer) handleHealth(w http.ResponseWriter, _ *http.Request) {
