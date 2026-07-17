@@ -91,7 +91,7 @@ export default function McpGatewayPage() {
     '@type': 'SoftwareApplication',
     name: 'SatGate MCP Gateway',
     applicationCategory: 'SecurityApplication',
-    operatingSystem: 'Cloud, Hybrid',
+    operatingSystem: 'Web',
     description: metadata.description,
     url: 'https://satgate.io/mcp-gateway',
     dateModified: '2026-05-10',

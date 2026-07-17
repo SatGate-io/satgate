@@ -97,6 +97,7 @@ const PricingPage = () => {
       {
         '@type': 'Offer',
         name: 'Pro / Control',
+        price: '99',
         priceCurrency: 'USD',
         description: 'Request-path budget enforcement, per-agent caps, MCP tool controls, alerts, revocation, and signed decision receipts for AI agent spend.',
         availability: 'https://schema.org/InStock',

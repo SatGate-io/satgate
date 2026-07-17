@@ -180,7 +180,7 @@ const LandingPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              One gateway in front of the APIs, models, and tools your agents touch: budgets and scope enforced before execution, and signed evidence your auditor can verify independently.
+              One gateway in front of the APIs, models, and tools your agents touch: budgets and scope enforced before execution, and signed receipts your auditor can verify independently.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
               Humans and platforms set policy. Agents consume approved primitives. Upstreams get receipt-backed proof.

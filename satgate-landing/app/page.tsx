@@ -4,7 +4,7 @@ import HomeClient from "./components/HomeClient";
 export const metadata: Metadata = {
   title: "SatGate — Agent Authority & Accountability Layer",
   description:
-    "SatGate prevents agent overspend and produces signed evidence your auditor can verify independently. Agent authority is governed before execution.",
+    "SatGate prevents agent overspend and produces signed receipts your auditor can verify independently. Agent authority is governed before execution.",
   alternates: {
     canonical: "https://satgate.io",
   },
