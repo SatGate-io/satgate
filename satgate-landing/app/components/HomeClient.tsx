@@ -330,7 +330,7 @@ const LandingPage = () => {
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
               Every protected route requires valid credentials (Macaroons). Capabilities, caveats,
-              delegation, and revocation-built into the protocol, not bolted on.
+              delegation, and revocation are built into the protocol, not bolted on.
             </p>
             <div className="flex flex-wrap gap-4 text-sm text-gray-500">
               <span>✓ Capabilities + Caveats</span>
