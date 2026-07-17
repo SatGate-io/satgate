@@ -174,13 +174,13 @@ const LandingPage = () => {
               <Zap size={12} /> Agent Authority & Accountability Layer
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-              Govern agent authority<br/>
+              Stop agent overspend.<br/>
               <span className="sr-only"> </span><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-                before execution.
+                Prove what they did.
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              SatGate gives agents bounded economic authority so humans, platforms, and upstream APIs can trust what they consume, spend, and prove.
+              One gateway in front of the APIs, models, and tools your agents touch: budgets and scope enforced before execution, and signed evidence your auditor can verify independently.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
               Humans and platforms set policy. Agents consume approved primitives. Upstreams get receipt-backed proof.
