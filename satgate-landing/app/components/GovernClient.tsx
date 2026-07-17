@@ -91,9 +91,9 @@ export default function GovernPage() {
       {/* One Token, Two Threats */}
       <section className="py-16 px-6 border-t border-gray-800 bg-gradient-to-b from-gray-900/20 to-black">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-3">Govern internal agents. Preserve proof across external rails.</h2>
+          <h2 className="text-3xl font-bold text-center mb-3">Prevent before execution. Prove after. On both lanes.</h2>
           <p className="text-gray-500 text-center mb-10 max-w-2xl mx-auto">
-            The same capability chain scopes authority, enforces spend limits, preserves delegation lineage, and proves what happened whether the call stays internal or crosses into paid external access.
+            The same capability chain scopes authority, enforces spend limits, and preserves delegation lineage whether the call stays internal or crosses into paid external access. Supported receipt paths preserve proof.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
@@ -125,13 +125,19 @@ export default function GovernPage() {
                   <p className="text-xs font-mono text-yellow-400 uppercase tracking-wider">Their Agents (External)</p>
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Preserve <span className="text-yellow-400">Proof</span></h3>
-              <p className="text-gray-400 text-sm mb-3">Payment proves value moved. SatGate proves the agent was allowed to move it across L402, x402, API-key billing, or enterprise ledgers.</p>
+              <h3 className="text-xl font-bold text-white mb-2">Admit <span className="text-yellow-400">External Agents</span></h3>
+              <p className="text-gray-400 text-sm mb-3">Approved external agents consume your APIs with scoped, expiring access instead of long-lived shared secrets, with per-request policy and pricing above L402, x402, API-key billing, or enterprise ledgers.</p>
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <Zap size={12} className="text-yellow-400" />
-                <span>Evidence preserved across rails</span>
+                <span>Authorized before admission</span>
               </div>
             </div>
+          </div>
+
+          <div className="max-w-3xl mx-auto mt-6 p-6 rounded-xl bg-black border-2 border-purple-500/40">
+            <p className="text-xs font-mono text-purple-400 uppercase tracking-wider mb-3">Proof spans both lanes</p>
+            <h3 className="text-xl font-bold text-white mb-2">Prove <span className="text-purple-400">Across Both Agent Lanes</span></h3>
+            <p className="text-gray-400 text-sm">Internal or external, supported governed decisions can produce signed receipts. Payment proves value moved; SatGate proves authority was evaluated. Where receipt export is enabled, receipts reconcile into Evidence Packs your auditor can verify independently.</p>
           </div>
 
           <div className="text-center mt-8">
@@ -235,7 +241,7 @@ export default function GovernPage() {
       {/* Govern → Enforce → Prove */}
       <section id="observe" className="py-20 px-6 border-t border-gray-800 bg-gradient-to-b from-gray-900/30 to-black">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">Govern, enforce, prove.</h2>
+          <h2 className="text-3xl font-bold text-center mb-4">Observe, control, prove.</h2>
           <p className="text-gray-500 text-center mb-12">Start with visibility, move enforcement into the request path, then export the Evidence Pack when security, finance, or compliance asks what happened.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -248,7 +254,7 @@ export default function GovernPage() {
                 <h3 className="font-bold text-lg">Observe</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                Map every agent, token, route, MCP tool, model, and workflow before enforcing policy. Observe mode builds the authority and spend picture without disrupting teams.
+                Map every governed agent, token, route, MCP tool, model, and workflow before enforcing policy. Observe mode builds the authority and spend picture without changing agent code.
               </p>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li className="text-purple-400">✓ Agent and token inventory</li>
@@ -450,7 +456,7 @@ export default function GovernPage() {
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">Receipts that roll up into Evidence Packs.</h2>
-          <p className="text-gray-500 text-center mb-12">Real-time visibility into every agent, API call, policy decision, revocation, and dollar — with exports when proof matters.</p>
+          <p className="text-gray-500 text-center mb-12">Real-time visibility into every governed agent, API call, policy decision, revocation, and dollar — with exports when proof matters.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
@@ -594,7 +600,7 @@ export default function GovernPage() {
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Single Go Binary. Zero Dependencies.</h2>
+            <h2 className="text-3xl font-bold mb-4">Single Go Binary. No External Dependencies.</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Deploy anywhere in minutes. No JVM, no runtime, no dependency hell. One binary that runs on anything.
             </p>
@@ -621,7 +627,7 @@ export default function GovernPage() {
               <h4 className="font-semibold text-white">Hybrid Mode</h4>
             </div>
             <p className="text-gray-400 text-sm max-w-lg mx-auto">
-              Gateway runs in your VPC. Dashboard in our cloud (or yours). Your data never leaves your infrastructure.
+              Gateway runs in your VPC. Dashboard in our cloud (or yours). Gateway traffic stays inside your infrastructure.
               The best of both worlds: self-hosted security, managed convenience.
             </p>
           </div>
@@ -660,7 +666,7 @@ export default function GovernPage() {
                 <CheckCircle size={18} className="text-green-400" /> With SatGate
               </h3>
               <ul className="space-y-3 text-sm text-gray-400">
-                <li>• Every agent gets scoped, revocable authority</li>
+                <li>• Every governed agent gets scoped, revocable authority</li>
                 <li>• Delegated workers inherit narrower limits</li>
                 <li>• Policy, budget, and scope denials stop requests before execution</li>
                 <li>• Revocation creates proof plus a post-revoke denial</li>

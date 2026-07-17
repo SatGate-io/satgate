@@ -8,7 +8,7 @@ import Image from 'next/image';
 const faqs = [
   {
     q: 'What counts as a request?',
-    a: 'Every API call proxied through the gateway in Control or Charge mode counts as a metered request. Observe-mode requests are always free and unlimited — no catches.',
+    a: 'Every API call proxied through the gateway in Control or paid-rail admission mode counts as a metered request. Observe-mode requests are always free and unlimited — no catches.',
   },
   {
     q: 'How does the Free → Pro upgrade work?',
@@ -28,11 +28,11 @@ const faqs = [
   },
   {
     q: 'Is there a free trial of Pro?',
-    a: 'Every account starts with a 14-day Pro trial. No credit card required. After the trial, you drop to Free (Observe) — you never lose visibility.',
+    a: 'Every account starts with a 14-day Pro trial. No credit card required. After the trial, you drop to Free (Observe) — you keep Observe-mode visibility.',
   },
   {
-    q: 'Do you support hybrid/on-prem deployment?',
-    a: 'Yes, on the Enterprise plan. The gateway runs in your infrastructure with our managed control plane. Or fully air-gapped — your choice.',
+    q: 'Do you support Dedicated deployment?',
+    a: 'Yes, by contract on the Enterprise plan. Deployment and custody boundaries are agreed during onboarding for each Dedicated environment.',
   },
 ];
 
@@ -97,6 +97,7 @@ const PricingPage = () => {
       {
         '@type': 'Offer',
         name: 'Pro / Control',
+        price: '99',
         priceCurrency: 'USD',
         description: 'Request-path budget enforcement, per-agent caps, MCP tool controls, alerts, revocation, and signed decision receipts for AI agent spend.',
         availability: 'https://schema.org/InStock',
@@ -104,11 +105,11 @@ const PricingPage = () => {
       },
       {
         '@type': 'Offer',
-        name: 'Enterprise / Charge',
+        name: 'Enterprise',
         priceCurrency: 'USD',
-        description: 'Enterprise deployment, hybrid/on-prem options, advanced governance, and paid-rail governance where paid calls return receipts and feed Evidence Packs.',
+        description: 'Enterprise governance, contract-triggered Dedicated deployment, advanced controls, and paid-rail admission where supported paid calls return receipts and feed Evidence Packs.',
         availability: 'https://schema.org/InStock',
-        itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate paid-rail governance', applicationCategory: 'DeveloperApplication' },
+        itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate Enterprise', applicationCategory: 'DeveloperApplication' },
       },
     ],
   };
@@ -232,7 +233,7 @@ const PricingPage = () => {
             </a>
           </div>
 
-          {/* Pro (Control + Charge) — highlighted */}
+          {/* Pro (Control + paid-rail admission) — highlighted */}
           <div className="p-6 rounded-xl bg-gray-900 border-2 border-purple-500/60 hover:border-purple-400 transition flex flex-col relative">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-purple-600 text-white text-xs font-bold">
               MOST POPULAR
@@ -249,7 +250,7 @@ const PricingPage = () => {
             <ul className="space-y-3 text-sm text-gray-400 mb-8 flex-1">
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" /><span><b className="text-gray-200">Budget enforcement</b> — hard stops per agent, team, or API</span></li>
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Real-time alerts at 80%, 90%, and limit</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />1M control/charge requests included</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />1M controlled or paid-rail requests included</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Then $0.10 per 1K overage</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Unlimited routes</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />CFO-ready receipt and chargeback exports</li>
@@ -278,7 +279,7 @@ const PricingPage = () => {
             <p className="text-xs text-gray-500 mb-4 -mt-4">Everything in Pro, plus:</p>
             <ul className="space-y-3 text-sm text-gray-400 mb-8 flex-1">
               <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" /><span><b className="text-gray-200">Unlimited</b> requests — no metering caps</span></li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Hybrid / on-prem / air-gapped deployment</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Contract-triggered Dedicated deployment</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />SSO/SCIM + RBAC</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Full Evidence Pack &amp; retention policies</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />SOC 2 compliance package</li>

@@ -512,7 +512,7 @@ X-SatGate-Budget-Limit: 2500
                 </p>
               </div>
               <div className="bg-gray-900 border border-yellow-500/30 rounded-xl p-4">
-                <p className="font-bold text-yellow-300 mb-1">💲 Charge (Custom)</p>
+                <p className="font-bold text-yellow-300 mb-1">💲 Paid Rails (Custom)</p>
                 <p className="text-gray-400">
                   Monetize your APIs with L402 micropayments over Lightning. Agents pay per-call with 
                   cryptographic proof of payment. Your MCP tools become revenue generators, not cost centers.

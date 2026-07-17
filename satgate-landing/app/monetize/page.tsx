@@ -378,13 +378,13 @@ export default function MonetizeDemoPage() {
       <div className="w-full max-w-3xl mb-8 text-center">
         <h2 className="text-xl sm:text-2xl font-bold mb-3">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-400">
-            Per-request Receipts. Zero Contracts. Proof in Seconds.
+            Per-request Payment Proof. Scoped Access. Receipt-backed Evidence.
           </span>
         </h2>
         <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-xl mx-auto">
-          Watch an AI agent <strong className="text-white">pay for API access in real-time</strong> using 
-          Bitcoin Lightning. No credit cards. No monthly bills. Just instant, per-request micropayments 
-          that settle in milliseconds.
+          Watch an AI agent <strong className="text-white">pay for API access</strong> in this Bitcoin
+          Lightning demo. SatGate verifies payment and configured authority before access, then returns
+          a receipt that can feed an Evidence Pack. Settlement behavior depends on the selected rail.
         </p>
       </div>
 

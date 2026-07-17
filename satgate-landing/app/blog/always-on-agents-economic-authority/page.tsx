@@ -3,13 +3,13 @@ import { ArrowLeft, ArrowRight, Calendar, Clock } from 'lucide-react';
 
 const title = 'Always-On Agents Need More Than Identity: Economic Authority';
 const description =
-  'Microsoft Scout shows where enterprise agents are headed. Observe, Control, Prove external agent actions with economic authority, spend ownership, and evidence.';
+  'Microsoft Scout shows where enterprise agents are headed. Observe, Control, and Prove agent actions with economic authority, spend ownership, and evidence.';
 const url = 'https://satgate.io/blog/always-on-agents-economic-authority';
 
 export const metadata = {
   title: 'Always-On Agents Need More Than Identity: Economic Authority',
   description:
-    'Microsoft Scout shows where enterprise agents are headed. Observe, Control, Prove external agent actions with economic authority, spend ownership, and evidence.',
+    'Microsoft Scout shows where enterprise agents are headed. Observe, Control, and Prove agent actions with economic authority, spend ownership, and evidence.',
   alternates: { canonical: 'https://satgate.io/blog/always-on-agents-economic-authority' },
   keywords: [
     'always-on agents',

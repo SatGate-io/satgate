@@ -52,7 +52,7 @@ const faqs = [
   ['What is an MCP Evidence Pack?', 'An MCP Evidence Pack is the proof artifact for governed tool activity: who called which MCP tool, through which client and server, under which policy and budget, with which allow or deny decision, and what receipt proves it.'],
   ['Can SatGate govern Claude, Hermes, or Ollama MCP agents?', 'Yes. Claude Desktop, Claude Code, Hermes, Ollama wrappers, Cursor, OpenClaw, and custom MCP-capable clients can route tool calls through SatGate. The agent gets no standing authority; SatGate grants or denies each tool call.'],
   ['How is an MCP gateway different from an API gateway?', 'A traditional API gateway mostly routes HTTP traffic and checks identity. An MCP gateway also understands agent tool calls, capability scope, per-tool cost, budget policy, tenant isolation, delegation lineage, and Evidence Pack outcomes.'],
-  ['Can SatGate host MCP servers?', 'Yes. SatGate supports SaaS MCP for fast hosted deployment and Hybrid MCP for dedicated enterprise runtime control. The split is deliberate: SaaS MCP is Fly-hosted; Hybrid MCP is Hetzner-hosted.'],
+  ['Can SatGate host MCP servers?', 'Yes. SatGate supports SaaS MCP for managed hosted deployment. Enterprise buyers needing isolated runtime boundaries can contract for a Dedicated deployment with custody and operations defined during onboarding.'],
 ];
 
 export const metadata = {
@@ -91,7 +91,7 @@ export default function McpGatewayPage() {
     '@type': 'SoftwareApplication',
     name: 'SatGate MCP Gateway',
     applicationCategory: 'SecurityApplication',
-    operatingSystem: 'Cloud, Hybrid',
+    operatingSystem: 'Web',
     description: metadata.description,
     url: 'https://satgate.io/mcp-gateway',
     dateModified: '2026-05-10',
@@ -178,7 +178,7 @@ export default function McpGatewayPage() {
               MCP makes tools reachable. It does not answer whether this agent, tenant, budget, delegation chain, or tool call should be trusted right now. That missing decision point is where runaway spend, cross-tenant mistakes, and unauditable agent actions sneak in.
             </p>
             <p>
-              SatGate turns the MCP gateway into a Zero Trust policy enforcement point for agents: authority before execution, receipt after every action, and Evidence Pack proof when a security, platform, finance, or buyer team asks what happened. That is Policy-to-Proof applied to MCP.
+              SatGate turns the MCP gateway into a Zero Trust policy enforcement point for agents: authority before execution, signed receipts on supported governed paths, and Evidence Pack proof when a security, platform, finance, or buyer team asks what happened. That is Policy-to-Proof applied to MCP.
             </p>
           </div>
         </div>
@@ -261,8 +261,8 @@ export default function McpGatewayPage() {
         </div>
         <div className="rounded-2xl border border-gray-800 bg-gray-950 p-7">
           <ShieldCheck className="text-cyan-300 mb-4" size={30} />
-          <h2 className="text-2xl font-bold text-white mb-3">Hybrid MCP is Hetzner-hosted</h2>
-          <p className="text-gray-300 leading-relaxed">Use Hybrid MCP when regulated environments need dedicated runtime boundaries, stronger operational control, and deployment evidence separate from the shared SaaS plane.</p>
+          <h2 className="text-2xl font-bold text-white mb-3">Dedicated MCP is contract-triggered</h2>
+          <p className="text-gray-300 leading-relaxed">Use Dedicated MCP when enterprise requirements call for isolated runtime boundaries and agreed operational controls. Deployment and custody boundaries are defined by contract; it is not a shared hybrid tier.</p>
         </div>
       </section>
 

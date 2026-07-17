@@ -65,7 +65,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
         name: 'Is Prove the same as internal budget enforcement?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. Internal budget enforcement controls spend for agents you own. Paid-rail governance is the monetization path for external delegated agents consuming your APIs under policy.',
+          text: 'No. Internal budget enforcement controls spend for agents you own. Prove is the evidence layer that preserves receipts for budget, authority, delegation, revocation, and paid-rail decisions.',
         },
       },
     ],
@@ -296,13 +296,17 @@ export default function EnterpriseAdoptionPlaybookPage() {
             <div className="p-6 bg-gradient-to-b from-yellow-900/20 to-transparent border border-yellow-500/20 rounded-xl">
               <h3 className="text-lg font-bold text-yellow-300 mb-3">Their Agents (External)</h3>
               <div className="flex items-center gap-2 mb-4">
-                <span className="text-yellow-300 font-mono text-sm">Prove</span>
+                <span className="text-yellow-300 font-mono text-sm">Admit</span>
               </div>
               <p className="text-gray-400 text-sm">
-                For external agents consuming your APIs, the path is governed proof. Paid rails such as L402 may handle value movement, but SatGate decides whether access is allowed and preserves the Evidence Pack that explains the decision.
+                For external agents consuming your APIs, the path is governed admission. Paid rails such as L402 may handle value movement, but SatGate decides whether access is allowed before any of it happens.
               </p>
             </div>
           </div>
+
+          <p className="text-gray-300 leading-relaxed">
+            Prove can span both lanes. Where receipt export is enabled, supported governed decisions record authority, policy, decision, and outcome in Evidence Packs an auditor can verify independently.
+          </p>
 
           <p className="text-gray-300 leading-relaxed">
             The principle is straightforward: <strong>first, govern your own house. Then expand access — with proof.</strong>
@@ -318,7 +322,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
             The beauty of progressive adoption is that Step 1 is small, safe, and immediately valuable.
           </p>
           <ol className="text-gray-300 space-y-3">
-            <li><strong>Deploy SatGate in Fiat (Observe) mode.</strong> Fifteen minutes. Zero risk. Point your agent traffic through the proxy and assign cost values to your tools.</li>
+            <li><strong>Deploy SatGate in Fiat (Observe) mode.</strong> Fifteen minutes. Nothing gets blocked. Point your agent traffic through the proxy and assign cost values to your tools.</li>
             <li><strong>Let it run for two weeks.</strong> Collect baseline data. Identify your top spenders, noisiest agents, and most expensive tool calls.</li>
             <li><strong>Present the data to stakeholders.</strong> You now have an evidence-based case for budget enforcement — with specific numbers, not hypotheticals.</li>
             <li><strong>Activate Fiat402 (Control) mode.</strong> Set budgets based on your observed baselines plus a reasonable margin. Monitor for the first week and adjust.</li>

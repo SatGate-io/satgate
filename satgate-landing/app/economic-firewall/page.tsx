@@ -192,7 +192,7 @@ export default function EconomicFirewallPage() {
             An economic firewall controls what autonomous agents can access, how much they can spend, what they can delegate, and which Evidence Pack artifacts are captured before each API request reaches the upstream provider.
           </p>
           <p className="max-w-3xl rounded-2xl border border-purple-900/50 bg-purple-950/20 p-5 text-lg leading-relaxed text-purple-100 mb-10">
-            Think of this as the legacy SEO/category term. The current SatGate product narrative is Policy-to-Proof governance: authority before execution, Observe/Control/Prove, and Evidence Pack receipts after every agent action.
+            Think of this as the legacy SEO/category term. The current SatGate product narrative is Policy-to-Proof governance: authority before execution, Observe/Control/Prove, and signed receipts that can feed Evidence Packs on supported governed paths.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
@@ -410,7 +410,7 @@ export default function EconomicFirewallPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               ['/policy-to-proof', 'Policy-to-Proof', 'Turn every mint, delegation, paid call, denial, and revocation into receipts and exportable Evidence Pack proof.'],
-              ['/agent-authority-layer', 'Agent Authority & Accountability Layer', 'The rail-neutral authority and signed Evidence Pack proof layer above every payment rail.'],
+              ['/agent-authority-layer', 'Agent Authority & Accountability Layer', 'The rail-neutral authority layer above supported payment rails, with signed receipts that can be assembled into Evidence Packs.'],
               ['/govern', 'Govern AI agents', 'Govern internal agents, preserve proof across external rails, and export Evidence Packs.'],
               ['/agent-control-plane', 'Agent control plane', 'Govern enterprise agent authority, delegation lineage, spend, audit, and revocation.'],
               ['/mcp-governance', 'MCP governance', 'Apply budget, revocation, and audit controls to MCP tool calls.'],

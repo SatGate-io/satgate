@@ -98,7 +98,7 @@ export default function SecurityPage() {
             <h2 className="text-xl font-bold text-white mb-4">The Security Model</h2>
             <p className="text-gray-400 leading-relaxed mb-4">
               SatGate implements <strong className="text-white">Economic Access Control</strong> — a capability-based security model
-              where every API request must present a cryptographically verified token with embedded access constraints.
+              where every protected API request must present a cryptographically verified token with embedded access constraints.
             </p>
             <p className="text-gray-400 leading-relaxed mb-4">
               Traditional APIs ask <em>&ldquo;who are you?&rdquo;</em> and often tie enforcement to broad user credentials.
@@ -140,7 +140,7 @@ export default function SecurityPage() {
               </div>
             </div>
             <ul className="text-gray-400 text-sm space-y-2 list-none pl-0">
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Zero secrets to manage.</strong> Agents present their existing workload identity — no API keys to rotate, no credentials to store.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">No long-lived secrets to manage.</strong> Agents present their existing workload identity — no API keys to rotate, no credentials to store.</span></li>
               <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Policy-driven issuance.</strong> Each agent policy defines budget, scope, TTL, and delegation permissions. Different agents get different constraints.</span></li>
               <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Multi-provider support.</strong> Same issuer with different audiences routes to different policies — enforce different budgets per agent class.</span></li>
             </ul>
@@ -217,8 +217,8 @@ export default function SecurityPage() {
               <div className="bg-gray-900/50 border border-yellow-800/30 rounded-lg p-4 flex items-start gap-4">
                 <Zap size={20} className="text-yellow-400 mt-1 flex-shrink-0" />
                 <div>
-                  <h4 className="text-white text-sm font-bold">Charge</h4>
-                  <p className="text-gray-500 text-xs mb-0">Verify → Payment Proof → Allow. paid-rail context micropayments. Per-request pricing. Instant settlement, no invoices, no chargebacks.</p>
+                  <h4 className="text-white text-sm font-bold">Charge (paid-rail policy)</h4>
+                  <p className="text-gray-500 text-xs mb-0">Verify → Payment Proof → Allow. Admits approved external agents through configured paid rails with per-request pricing and scoped policy. Settlement, invoicing, and disputes depend on the selected rail.</p>
                 </div>
               </div>
             </div>
@@ -233,8 +233,8 @@ export default function SecurityPage() {
             <ul className="text-gray-400 text-sm space-y-2 list-none pl-0">
               <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Never stores upstream credentials.</strong> SatGate verifies tokens at the gateway. Your API keys, secrets, and upstream credentials stay in your infrastructure.</span></li>
               <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">No request body inspection.</strong> Gateway inspects only token and routing metadata. Request payloads pass through opaque (MCP proxy reads method/tool name for cost attribution only).</span></li>
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Tenant-isolated data.</strong> All data scoped by tenant_id. Cross-tenant access is architecturally impossible.</span></li>
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">paid-rail context settle directly.</strong> In Charge mode, payments go from payer to your Lightning node. SatGate never touches funds.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Tenant-isolated data.</strong> All data scoped by tenant_id and enforced at the data layer — no shared query paths across tenants.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Non-custodial paid-rail context.</strong> In the Lightning demo, payment moves from payer to the configured recipient without SatGate taking custody. Other rails follow their own settlement and dispute rules.</span></li>
             </ul>
           </section>
 
@@ -245,7 +245,7 @@ export default function SecurityPage() {
               <h2 className="text-xl font-bold text-white mb-0">Zero Trust Access Control</h2>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              SatGate is a Zero Trust Policy Enforcement Point for API access. It verifies every request and
+              SatGate is a Zero Trust Policy Enforcement Point for API access. It verifies every protected request and
               enforces scoped access — no network trust assumptions.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
@@ -279,7 +279,7 @@ export default function SecurityPage() {
               <h2 className="text-xl font-bold text-white mb-0">Audit & Compliance</h2>
             </div>
             <ul className="text-gray-400 text-sm space-y-2 list-none pl-0">
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">55 event types</strong> across 12 categories in immutable audit log. Every mint, revocation, delegation, budget change, and config update recorded.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">55 event types</strong> across 12 categories in a tamper-evident audit log. Every mint, revocation, delegation, budget change, and config update recorded.</span></li>
               <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Real-time alerts</strong> via Slack, Discord, email, or custom webhooks for critical events.</span></li>
               <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Shadow Report</strong> — real-time dashboard showing all agent traffic, spend, and policy violations.</span></li>
               <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Export</strong> — CSV/JSON export for audit log and billing data via dashboard and API.</span></li>

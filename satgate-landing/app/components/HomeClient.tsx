@@ -174,13 +174,13 @@ const LandingPage = () => {
               <Zap size={12} /> Agent Authority & Accountability Layer
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-              Stop agent overspend.<br/>
+              Prevent agent overspend.<br/>
               <span className="sr-only"> </span><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
                 Prove what they did.
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              One gateway in front of the APIs, models, and tools your agents touch: budgets and scope enforced before execution, and signed evidence your auditor can verify independently.
+              One gateway in front of the APIs, models, and tools your agents touch: budgets and scope enforced before execution, and signed receipts your auditor can verify independently.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
               Humans and platforms set policy. Agents consume approved primitives. Upstreams get receipt-backed proof.
@@ -432,16 +432,16 @@ const LandingPage = () => {
               </div>
               <div>
                 <h3 className="text-xl font-bold">Prove</h3>
-                <p className="text-gray-500 text-sm">Every governed decision, for your agents and theirs</p>
+                <p className="text-gray-500 text-sm">Receipt-backed proof for your agents and theirs</p>
               </div>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              Signed receipts for allowed, denied, paid, delegated, and revoked decisions are reconciled into
-              Evidence Packs your auditor can verify independently.
+              Supported allowed, denied, paid, delegated, and revoked decisions can produce signed receipts
+              that reconcile into Evidence Packs your auditor can verify independently.
             </p>
             <div className="flex flex-wrap gap-4 text-sm text-gray-500">
               <span>✓ Both agent lanes</span>
-              <span>✓ Every governed decision</span>
+              <span>✓ Supported governed decisions</span>
               <span>✓ Signed, tamper-evident receipts</span>
               <span>✓ Independently verifiable Evidence Packs</span>
             </div>

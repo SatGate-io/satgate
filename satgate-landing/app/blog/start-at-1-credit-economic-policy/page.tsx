@@ -16,7 +16,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Start at 1 Credit: Smarter AI Agent Tool Pricing',
-    description: 'Use Observe mode to price AI agent tools from real usage before moving to Control and Charge.',
+    description: 'Use Observe mode to price AI agent tools from real usage before moving to Control and paid-rail admission.',
   },
 };
 
