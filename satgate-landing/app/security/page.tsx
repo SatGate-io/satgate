@@ -218,7 +218,7 @@ export default function SecurityPage() {
                 <Zap size={20} className="text-yellow-400 mt-1 flex-shrink-0" />
                 <div>
                   <h4 className="text-white text-sm font-bold">Charge (paid-rail policy)</h4>
-                  <p className="text-gray-500 text-xs mb-0">Verify → Payment Proof → Allow. Admits approved external agents via paid-rail micropayments. Per-request pricing. Instant settlement, no invoices, no chargebacks.</p>
+                  <p className="text-gray-500 text-xs mb-0">Verify → Payment Proof → Allow. Admits approved external agents through configured paid rails with per-request pricing and scoped policy. Settlement, invoicing, and disputes depend on the selected rail.</p>
                 </div>
               </div>
             </div>

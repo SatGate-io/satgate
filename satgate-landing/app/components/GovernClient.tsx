@@ -93,7 +93,7 @@ export default function GovernPage() {
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-3">Prevent before execution. Prove after. On both lanes.</h2>
           <p className="text-gray-500 text-center mb-10 max-w-2xl mx-auto">
-            The same capability chain scopes authority, enforces spend limits, and preserves delegation lineage whether the call stays internal or crosses into paid external access. Every governed decision leaves proof.
+            The same capability chain scopes authority, enforces spend limits, and preserves delegation lineage whether the call stays internal or crosses into paid external access. Supported receipt paths preserve proof.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
@@ -136,8 +136,8 @@ export default function GovernPage() {
 
           <div className="max-w-3xl mx-auto mt-6 p-6 rounded-xl bg-black border-2 border-purple-500/40">
             <p className="text-xs font-mono text-purple-400 uppercase tracking-wider mb-3">Proof spans both lanes</p>
-            <h3 className="text-xl font-bold text-white mb-2">Prove <span className="text-purple-400">Every Governed Decision</span></h3>
-            <p className="text-gray-400 text-sm">Internal or external, every governed decision produces a signed receipt. Payment proves value moved; SatGate proves the agent was allowed to move it. Receipts reconcile into Evidence Packs your auditor can verify independently.</p>
+            <h3 className="text-xl font-bold text-white mb-2">Prove <span className="text-purple-400">Across Both Agent Lanes</span></h3>
+            <p className="text-gray-400 text-sm">Internal or external, supported governed decisions can produce signed receipts. Payment proves value moved; SatGate proves authority was evaluated. Where receipt export is enabled, receipts reconcile into Evidence Packs your auditor can verify independently.</p>
           </div>
 
           <div className="text-center mt-8">

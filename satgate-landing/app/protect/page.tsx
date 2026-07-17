@@ -132,7 +132,7 @@ const faqJsonLd = {
       name: 'How does Control differ from Prove?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Control enforces scopes, budgets, and revocation before execution. Prove exports signed Evidence Packs for every governed decision — your agents and external ones alike — so an auditor can verify what happened without trusting SatGate.',
+        text: 'Control enforces scopes, budgets, and revocation before execution. Prove exports signed Evidence Packs for supported receipt-producing decisions across internal and external agent lanes, so an auditor can verify what happened without trusting SatGate.',
       },
     },
   ],
@@ -937,7 +937,7 @@ export default function ProtectDemoPage() {
                     </div>
                   </div>
                   <p className="text-gray-300 leading-relaxed">
-                    Default Protection is the foundation of SatGate's security model. <strong className="text-blue-400">Every protected 
+                    Default Protection is the foundation of SatGate's security model. <strong className="text-blue-400">Every protected
                     (non-PUBLIC) request is cryptographically verified</strong> — signatures, caveats, delegation chains. You can't turn this off.
                     Then you choose your <strong className="text-white">economic policy</strong>: observe, control, or charge.
                   </p>
@@ -1808,7 +1808,7 @@ export default function ProtectDemoPage() {
             {[
               ['What does SatGate Control protect?', 'SatGate Control protects agent API and MCP tool calls by enforcing scoped capability tokens, budgets, delegation limits, revocation, and audit policy before requests reach upstream services.'],
               ['Why use revocable capability tokens for agents?', 'Revocable capability tokens give agents narrow, expiring authority that can be delegated safely and denied at policy check without rotating global API keys or service-account credentials.'],
-              ['How does Control differ from Prove?', 'Control enforces scopes, budgets, and revocation before execution. Prove exports signed Evidence Packs for every governed decision — your agents and external ones alike — so an auditor can verify what happened without trusting SatGate.'],
+              ['How does Control differ from Prove?', 'Control enforces scopes, budgets, and revocation before execution. Prove exports signed Evidence Packs for supported receipt-producing decisions across internal and external agent lanes, so an auditor can verify what happened without trusting SatGate.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
                 <h3 className="mb-2 font-bold text-white">{question}</h3>

@@ -183,7 +183,7 @@ export default function AiAgentApiCostControlPage() {
           <div className="my-8 rounded-xl border border-cyan-700/50 bg-cyan-950/20 p-6">
             <p className="text-cyan-200 font-semibold mb-2">SatGate pattern:</p>
             <p className="text-gray-300 mb-0">
-              Observe first to learn real cost. Control next with hard caps and revocation. Admit paid external agents when the API itself becomes a product — and Prove every governed decision along the way.
+              Observe first to learn real cost. Control next with hard caps and revocation. Admit paid external agents when the API itself becomes a product — and preserve receipt-backed proof on supported governed paths.
             </p>
           </div>
 

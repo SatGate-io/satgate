@@ -305,7 +305,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            Prove spans both lanes. Whether the decision governs your own agent or admits someone else&apos;s, the same Evidence Pack receipt records authority, policy, decision, and outcome — and an auditor can verify it independently.
+            Prove can span both lanes. Where receipt export is enabled, supported governed decisions record authority, policy, decision, and outcome in Evidence Packs an auditor can verify independently.
           </p>
 
           <p className="text-gray-300 leading-relaxed">

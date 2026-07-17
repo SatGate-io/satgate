@@ -432,16 +432,16 @@ const LandingPage = () => {
               </div>
               <div>
                 <h3 className="text-xl font-bold">Prove</h3>
-                <p className="text-gray-500 text-sm">Every governed decision, for your agents and theirs</p>
+                <p className="text-gray-500 text-sm">Receipt-backed proof for your agents and theirs</p>
               </div>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              Signed receipts for allowed, denied, paid, delegated, and revoked decisions are reconciled into
-              Evidence Packs your auditor can verify independently.
+              Supported allowed, denied, paid, delegated, and revoked decisions can produce signed receipts
+              that reconcile into Evidence Packs your auditor can verify independently.
             </p>
             <div className="flex flex-wrap gap-4 text-sm text-gray-500">
               <span>✓ Both agent lanes</span>
-              <span>✓ Every governed decision</span>
+              <span>✓ Supported governed decisions</span>
               <span>✓ Signed, tamper-evident receipts</span>
               <span>✓ Independently verifiable Evidence Packs</span>
             </div>

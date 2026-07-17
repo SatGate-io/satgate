@@ -346,7 +346,7 @@ Token: search-worker-12
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Admit mode (paid rails, <code className="text-sm">policy: charge</code>)</strong> — requires payment before access. No budget tracking needed because each request is prepaid via Lightning micropayment. This mode admits external agents you&apos;ve never seen before — they pay, they get scoped access, no signup required. Every admission still produces a signed receipt: payment proves value moved, the receipt proves the agent was allowed to move it.
+            <strong className="text-white">Admit mode (paid rails, <code className="text-sm">policy: charge</code>)</strong> — requires payment before access. Payment is one policy input; SatGate still evaluates scoped authority and configured access policy. Approved external agents can pay per request and receive scoped access without a subscription. On supported receipt paths, admission can produce a signed receipt: payment proves value moved, while the receipt records the authority decision.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
