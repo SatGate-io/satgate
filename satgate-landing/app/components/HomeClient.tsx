@@ -361,10 +361,10 @@ const LandingPage = () => {
                 Start here. No workflow changes. Map authority, tools, and spend before enforcing policy.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
-                <li>✓ Observe mode - zero disruption to existing agents</li>
+                <li>✓ Observe mode - no enforcement changes to existing agent workflows</li>
                 <li>✓ Usage attribution by team and cost center</li>
                 <li>✓ See exactly which agents, tools, and routes create risk before you change anything</li>
-                <li>✓ Zero latency impact</li>
+                <li>✓ Designed for low-overhead observation</li>
               </ul>
             </div>
 
@@ -396,28 +396,54 @@ const LandingPage = () => {
           <div className="mb-4">
             <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">Their Agents - Prevent Unauthorized Access</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6 max-w-lg">
-            {/* Prove - evidence above external rails */}
+          <div className="grid grid-cols-1 gap-6 mb-6 max-w-lg">
+            {/* Admit - external agents above payment rails */}
             <div className="p-6 rounded-xl bg-black border border-yellow-800/30 hover:border-yellow-600/50 transition relative">
               <div className="text-xs text-purple-400 mb-2">Protected by default →</div>
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2.5 bg-yellow-900/50 rounded-lg">
                   <Shield className="text-yellow-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Prove <span className="text-xs font-normal text-gray-500">(evidence above rails)</span></h3>
+                <h3 className="font-bold text-lg">Admit <span className="text-xs font-normal text-gray-500">(external agents, above rails)</span></h3>
               </div>
               <p className="text-gray-400 text-sm mb-3">
-                verify → authority proof → Evidence Pack
+                verify → authorize → admit
               </p>
               <p className="text-xs text-yellow-400/80 mb-3 italic">
-                Govern external agent access without making payment proof equal authorization proof.
+                Let approved external agents consume your APIs with scoped access, without making payment proof equal authorization proof.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
-                <li>✓ Let approved agents consume APIs without long-lived shared secrets</li>
-                <li>✓ Preserve authority evidence above x402, L402, API-key, or enterprise billing rails</li>
+                <li>✓ No long-lived shared secrets for approved external agents</li>
+                <li>✓ Authority evidence above x402, L402, API-key, or enterprise billing rails</li>
                 <li>✓ Per-request pricing and policy at the gateway before forwarding</li>
-                <li>✓ Approved agents consume scoped access and leave an Evidence Pack</li>
+                <li>✓ Scoped access on your terms</li>
               </ul>
+            </div>
+          </div>
+
+          {/* Prove - spans both agent lanes */}
+          <div className="p-8 rounded-xl bg-black border-2 border-purple-500/50 mb-6 relative">
+            <div className="absolute -top-3 left-6 bg-purple-600 text-xs font-bold px-3 py-1 rounded">
+              PROOF SPANS BOTH LANES
+            </div>
+            <div className="flex items-center gap-3 mb-4 mt-2">
+              <div className="p-3 bg-purple-900/30 rounded-lg">
+                <CheckCircle className="text-purple-400" size={24} />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold">Prove</h3>
+                <p className="text-gray-500 text-sm">Every governed decision, for your agents and theirs</p>
+              </div>
+            </div>
+            <p className="text-gray-400 leading-relaxed mb-4">
+              Signed receipts for allowed, denied, paid, delegated, and revoked decisions are reconciled into
+              Evidence Packs your auditor can verify independently.
+            </p>
+            <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+              <span>✓ Both agent lanes</span>
+              <span>✓ Every governed decision</span>
+              <span>✓ Signed, tamper-evident receipts</span>
+              <span>✓ Independently verifiable Evidence Packs</span>
             </div>
           </div>
 
@@ -467,7 +493,7 @@ const LandingPage = () => {
             </span>
             <h2 className="text-2xl font-bold mb-2">Badge in once. Fly through every gate.</h2>
             <p className="text-gray-400 text-sm max-w-xl mx-auto">
-              Agents get a credential at startup - like mounting an EZ Pass. Every request after that flows through the gateway: verified, metered, no slowdowns.
+              Agents get a credential at startup - like mounting an EZ Pass. Every request after that flows through the gateway to be verified and metered under policy.
             </p>
           </div>
           <div className="flex items-center justify-center gap-2 md:gap-4 flex-wrap text-sm mt-8">
@@ -502,7 +528,7 @@ const LandingPage = () => {
             </div>
           </div>
           <p className="text-xs text-gray-600 text-center mt-6">
-            No identity lookups on the hot path. No per-request auth round-trips. Just cryptographic verification at wire speed.
+            Capability verification stays on the request path without per-request identity round-trips.
           </p>
         </div>
       </section>
