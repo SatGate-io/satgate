@@ -429,7 +429,7 @@ export default function PayDemoPage() {
           <h1 className="text-lg sm:text-xl font-bold flex items-center gap-2">
             <Zap className="text-yellow-400" size={24} />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-400">
-              Charge Demo
+              Paid-Rail Demo
             </span>
           </h1>
           <div className="w-[120px]"></div>
@@ -441,7 +441,7 @@ export default function PayDemoPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold mb-4">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-400">
-              Per-request Receipts. Zero Contracts. Proof in Seconds.
+              Per-request Receipts. No Contracts to Negotiate. Proof in Seconds.
             </span>
           </h2>
           <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">

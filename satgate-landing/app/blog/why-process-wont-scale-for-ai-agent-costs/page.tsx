@@ -170,7 +170,7 @@ export default function WhyProcessWontScaleBlogPage() {
             Tracking is necessary. But tracking alone is <a href="/blog/llm-cost-management" className="text-cyan-400 hover:text-cyan-300">observability, not governance</a>. A dashboard that shows you spent $47K last week is useful for the post-mortem. It&apos;s useless for preventing the next one.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            Infrastructure-level cost tracking means <strong>real-time shadow reporting with per-agent, per-tool attribution</strong> — not batch reports that arrive after the damage is done. Every API call is metered, attributed, and visible in real time. You see the spend as it happens, not after.
+            Infrastructure-level cost tracking means <strong>real-time shadow reporting with per-agent, per-tool attribution</strong> — not batch reports that arrive after the damage is done. Every routed API call is metered, attributed, and visible in real time. You see the spend as it happens, not after.
           </p>
 
           <h3 className="text-xl font-semibold text-white mt-8 mb-3">#5: Optimize Cost-Effective Workflows</h3>
@@ -199,7 +199,7 @@ export default function WhyProcessWontScaleBlogPage() {
             If the quota is a configuration value in the orchestration layer, the agent can read it, respect it, or ignore it. If the quota is a soft limit that triggers an alert, someone has to be watching. If the quota is a setting in a dashboard that requires manual action when exceeded, you&apos;ve built a process that fails at 3 AM on a Saturday.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            The infrastructure-level version is <strong>budget caveats baked into bearer tokens</strong>. The agent&apos;s credential — the thing it presents to authenticate every API call — has the budget limit cryptographically embedded in it. The agent literally cannot overspend because the gateway rejects any call that would exceed the budget. Not because the agent chooses to stop. Because the <em>credential</em> enforces the limit. This is the difference between a{' '}
+            The infrastructure-level version is <strong>budget caveats baked into bearer tokens</strong>. The agent&apos;s credential — the thing it presents to authenticate every API call — has the budget limit cryptographically embedded in it. The agent cannot overspend on governed routes because the gateway rejects any call that would exceed the budget. Not because the agent chooses to stop. Because the <em>credential</em> enforces the limit. This is the difference between a{' '}
             <a href="/blog/what-is-an-economic-firewall" className="text-cyan-400 hover:text-cyan-300">policy and a control</a>.
           </p>
           <p className="text-gray-300 leading-relaxed">
@@ -289,7 +289,7 @@ export default function WhyProcessWontScaleBlogPage() {
           <div className="mt-12 p-6 bg-gray-900/50 border border-gray-800 rounded-lg">
             <h3 className="text-xl font-bold text-white mb-3">See Your Agent Spend — Before It Surprises You</h3>
             <p className="text-gray-300 mb-4">
-              <a href="https://satgate.io" className="text-cyan-400 hover:text-cyan-300">SatGate</a> is an economic firewall for AI agent API calls. Start in <strong>Observe mode</strong> — zero risk, zero enforcement, immediate visibility into what your agents are spending, where, and why.
+              <a href="https://satgate.io" className="text-cyan-400 hover:text-cyan-300">SatGate</a> is an economic firewall for AI agent API calls. Start in <strong>Observe mode</strong> — no blocking, no enforcement, immediate visibility into what your agents are spending, where, and why.
             </p>
             <p className="text-gray-300">
               No code changes. No agent modifications. Just deploy the gateway and watch.

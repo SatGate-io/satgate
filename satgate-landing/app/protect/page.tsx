@@ -132,7 +132,7 @@ const faqJsonLd = {
       name: 'How does Control differ from Prove?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Control enforces access, budget, scope, and revocation policy for agent activity. Prove preserves Evidence Pack receipts for paid-rail context and other agent decisions before API access is unlocked.',
+        text: 'Control enforces scopes, budgets, and revocation before execution. Prove exports signed Evidence Packs for every governed decision — your agents and external ones alike — so an auditor can verify what happened without trusting SatGate.',
       },
     },
   ],
@@ -847,7 +847,7 @@ export default function ProtectDemoPage() {
             All non-PUBLIC routes have <strong className="text-white">Default Protection</strong> — cryptographic 
             verification, caveats, delegation, revocation. Then choose your economic policy: 
             <strong className="text-purple-400"> observe</strong> (audit), <strong className="text-cyan-400">control</strong> (budget), 
-            or <strong className="text-yellow-400">charge</strong> (payments).
+            or <strong className="text-yellow-400">charge</strong> (paid-rail policy for admitting external agents).
           </p>
           <p className="text-gray-500 text-sm mt-3">
             Protection is the starting state. Economics are configurable.
@@ -937,8 +937,8 @@ export default function ProtectDemoPage() {
                     </div>
                   </div>
                   <p className="text-gray-300 leading-relaxed">
-                    Default Protection is the foundation of SatGate's security model. <strong className="text-blue-400">Every request 
-                    is cryptographically verified</strong> — signatures, caveats, delegation chains. You can't turn this off.
+                    Default Protection is the foundation of SatGate's security model. <strong className="text-blue-400">Every protected 
+                    (non-PUBLIC) request is cryptographically verified</strong> — signatures, caveats, delegation chains. You can't turn this off.
                     Then you choose your <strong className="text-white">economic policy</strong>: observe, control, or charge.
                   </p>
                 </>
@@ -1051,7 +1051,7 @@ export default function ProtectDemoPage() {
                   <p className="text-gray-300 leading-relaxed">
                     Everything you just saw is <strong className="text-blue-400">always on</strong>. You can't turn off protection—
                     you only choose how value is accounted for. Try <strong className="text-purple-400">Observe</strong> for visibility, 
-                    <strong className="text-cyan-400"> Control</strong> for budgets, or <strong className="text-yellow-400">Charge</strong> for revenue.
+                    <strong className="text-cyan-400"> Control</strong> for budgets, or <strong className="text-yellow-400">Charge</strong> to admit paid external agents.
                   </p>
                 </>
               )}
@@ -1491,7 +1491,7 @@ export default function ProtectDemoPage() {
                     <ul className="text-gray-300 text-sm space-y-2">
                       <li className="flex items-start gap-2">
                         <CheckCircle size={16} className="text-green-400 mt-0.5 flex-shrink-0" />
-                        <span><strong className="text-blue-400">Security is intrinsic</strong> — every request cryptographically verified</span>
+                        <span><strong className="text-blue-400">Security is intrinsic</strong> — every protected request cryptographically verified</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle size={16} className="text-green-400 mt-0.5 flex-shrink-0" />
@@ -1808,7 +1808,7 @@ export default function ProtectDemoPage() {
             {[
               ['What does SatGate Control protect?', 'SatGate Control protects agent API and MCP tool calls by enforcing scoped capability tokens, budgets, delegation limits, revocation, and audit policy before requests reach upstream services.'],
               ['Why use revocable capability tokens for agents?', 'Revocable capability tokens give agents narrow, expiring authority that can be delegated safely and denied at policy check without rotating global API keys or service-account credentials.'],
-              ['How does Control differ from Prove?', 'Control enforces access, budget, scope, and revocation policy for agent activity. Prove preserves Evidence Pack receipts for paid-rail context and other agent decisions before API access is unlocked.'],
+              ['How does Control differ from Prove?', 'Control enforces scopes, budgets, and revocation before execution. Prove exports signed Evidence Packs for every governed decision — your agents and external ones alike — so an auditor can verify what happened without trusting SatGate.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
                 <h3 className="mb-2 font-bold text-white">{question}</h3>
@@ -1836,7 +1836,7 @@ export default function ProtectDemoPage() {
               href="/pay"
               className="text-cyan-400 hover:text-cyan-300 text-sm underline underline-offset-4 transition"
             >
-              Try Charge Mode →
+              Try the Paid-Rail Demo →
             </Link>
           </div>
         </div>

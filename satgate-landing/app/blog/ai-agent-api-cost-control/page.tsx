@@ -183,7 +183,7 @@ export default function AiAgentApiCostControlPage() {
           <div className="my-8 rounded-xl border border-cyan-700/50 bg-cyan-950/20 p-6">
             <p className="text-cyan-200 font-semibold mb-2">SatGate pattern:</p>
             <p className="text-gray-300 mb-0">
-              Observe first to learn real cost. Control next with hard caps and revocation. Charge when the API itself becomes a product for external agents or paid agents.
+              Observe first to learn real cost. Control next with hard caps and revocation. Admit paid external agents when the API itself becomes a product — and Prove every governed decision along the way.
             </p>
           </div>
 
@@ -216,7 +216,7 @@ audit:
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            Then move the riskiest paths into Control mode. Add per-agent budgets, per-request ceilings, and revocation. Finally, when you expose APIs to external autonomous agents, add Charge so the same request path can collect payment before access.
+            Then move the riskiest paths into Control mode. Add per-agent budgets, per-request ceilings, and revocation. Finally, when you expose APIs to external autonomous agents, add paid-rail admission (<code>policy: charge</code>) so the same request path can collect payment before access.
           </p>
 
           <p className="text-gray-300 leading-relaxed">

@@ -178,7 +178,7 @@ export default function McpGatewayPage() {
               MCP makes tools reachable. It does not answer whether this agent, tenant, budget, delegation chain, or tool call should be trusted right now. That missing decision point is where runaway spend, cross-tenant mistakes, and unauditable agent actions sneak in.
             </p>
             <p>
-              SatGate turns the MCP gateway into a Zero Trust policy enforcement point for agents: authority before execution, receipt after every action, and Evidence Pack proof when a security, platform, finance, or buyer team asks what happened. That is Policy-to-Proof applied to MCP.
+              SatGate turns the MCP gateway into a Zero Trust policy enforcement point for agents: authority before execution, receipt after every governed action, and Evidence Pack proof when a security, platform, finance, or buyer team asks what happened. That is Policy-to-Proof applied to MCP.
             </p>
           </div>
         </div>

@@ -28,7 +28,7 @@ const faqs = [
   },
   {
     q: 'Is there a free trial of Pro?',
-    a: 'Every account starts with a 14-day Pro trial. No credit card required. After the trial, you drop to Free (Observe) — you never lose visibility.',
+    a: 'Every account starts with a 14-day Pro trial. No credit card required. After the trial, you drop to Free (Observe) — you keep Observe-mode visibility.',
   },
   {
     q: 'Do you support hybrid/on-prem deployment?',
@@ -104,7 +104,7 @@ const PricingPage = () => {
       },
       {
         '@type': 'Offer',
-        name: 'Enterprise / Charge',
+        name: 'Enterprise / Paid Rails',
         priceCurrency: 'USD',
         description: 'Enterprise deployment, hybrid/on-prem options, advanced governance, and paid-rail governance where paid calls return receipts and feed Evidence Packs.',
         availability: 'https://schema.org/InStock',

@@ -378,7 +378,7 @@ export default function MonetizeDemoPage() {
       <div className="w-full max-w-3xl mb-8 text-center">
         <h2 className="text-xl sm:text-2xl font-bold mb-3">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-400">
-            Per-request Receipts. Zero Contracts. Proof in Seconds.
+            Per-request Receipts. No Contracts to Negotiate. Proof in Seconds.
           </span>
         </h2>
         <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-xl mx-auto">

@@ -36,7 +36,7 @@ const faqJsonLd = {
       name: 'What is an economic firewall for AI agents?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'An economic firewall for AI agents sits in the request path to observe, control, and audit every API or MCP tool call before autonomous agents create cost or access risk.',
+        text: 'An economic firewall for AI agents sits in the request path to observe, control, and audit every governed API or MCP tool call before autonomous agents create cost or access risk.',
       },
     },
     {
@@ -74,7 +74,7 @@ export default function AgentsLandingPage() {
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
             <Link href="/mint-demo" className="hover:text-white transition">Mint Demo</Link>
             <Link href="/protect" className="hover:text-white transition">Control Demo</Link>
-            <Link href="/pay" className="hover:text-white transition">Charge Demo</Link>
+            <Link href="/pay" className="hover:text-white transition">Paid-Rail Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
@@ -146,7 +146,7 @@ export default function AgentsLandingPage() {
               </div>
               <p className="text-gray-400 text-sm mb-4 leading-relaxed">
                 Your agents call OpenAI, Stripe, internal services — SatGate sits in front as a reverse proxy. 
-                Every request is authenticated, metered, and budget-checked before reaching the upstream.
+                Every routed request is authenticated and attributed before reaching the upstream; budgets enforce in Control mode.
               </p>
               <div className="bg-black rounded-lg p-4 font-mono text-xs text-gray-400 mb-4">
                 <div className="text-gray-600"># Route config</div>
@@ -213,7 +213,7 @@ export default function AgentsLandingPage() {
               <Eye className="text-purple-400 mb-4" size={32} />
               <h3 className="text-xl font-semibold text-white mb-2">Observe</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
-                See every API call, every tool invocation, every credit spent — without blocking anything.
+                See every governed API call, tool invocation, and credit spent — without blocking anything.
                 Shadow reporting shows what enforcement <em>would</em> have caught.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
@@ -238,12 +238,12 @@ export default function AgentsLandingPage() {
               </ul>
             </div>
 
-            {/* Charge */}
+            {/* Admit */}
             <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-8">
               <Zap className="text-yellow-400 mb-4" size={32} />
-              <h3 className="text-xl font-semibold text-white mb-2">Charge</h3>
+              <h3 className="text-xl font-semibold text-white mb-2">Admit</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Monetize your APIs. Agents consume approved access per request
+                Monetize your APIs. Approved external agents consume scoped access per request
                 via paid-rail context (L402). No API keys, no subscriptions — just pay and go.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
@@ -336,7 +336,7 @@ export default function AgentsLandingPage() {
               {
                 icon: <Shield className="text-purple-400" size={24} />,
                 title: 'Macaroon Authentication',
-                desc: 'Every agent gets a cryptographic bearer token with built-in scope, expiry, and budget caveats. Not an API key — a capability.',
+                desc: 'Every governed agent gets a cryptographic bearer token with built-in scope, expiry, and budget caveats. Not an API key — a capability.',
               },
               {
                 icon: <DollarSign className="text-yellow-400" size={24} />,
@@ -351,7 +351,7 @@ export default function AgentsLandingPage() {
               {
                 icon: <Lock className="text-red-400" size={24} />,
                 title: 'Zero Trust by Default',
-                desc: 'Agents start with zero access. Every request is authenticated and authorized. No ambient authority, no overprivileged keys.',
+                desc: 'Agents start with zero access. Every protected request is authenticated and authorized. No ambient authority, no overprivileged keys.',
               },
             ].map((item) => (
               <div key={item.title} className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 flex gap-4">
@@ -373,7 +373,7 @@ export default function AgentsLandingPage() {
           <h2 className="text-3xl font-bold text-center text-white mb-10">AI agent economic firewall questions</h2>
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              ['What is an economic firewall for AI agents?', 'An economic firewall for AI agents sits in the request path to observe, control, and audit every API or MCP tool call before autonomous agents create cost or access risk.'],
+              ['What is an economic firewall for AI agents?', 'An economic firewall for AI agents sits in the request path to observe, control, and audit every governed API or MCP tool call before autonomous agents create cost or access risk.'],
               ['Can SatGate protect both HTTP APIs and MCP tools?', 'Yes. SatGate protects HTTP APIs and MCP tool servers with the same request-path policies for identity, budgets, revocation, audit, and tool-cost enforcement.'],
               ['How does SatGate stop runaway agent spend?', 'SatGate enforces per-agent budgets, per-tool caps, request attribution, delegation limits, and revocable capabilities before the next upstream call executes.'],
             ].map(([question, answer]) => (

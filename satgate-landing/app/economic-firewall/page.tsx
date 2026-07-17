@@ -192,7 +192,7 @@ export default function EconomicFirewallPage() {
             An economic firewall controls what autonomous agents can access, how much they can spend, what they can delegate, and which Evidence Pack artifacts are captured before each API request reaches the upstream provider.
           </p>
           <p className="max-w-3xl rounded-2xl border border-purple-900/50 bg-purple-950/20 p-5 text-lg leading-relaxed text-purple-100 mb-10">
-            Think of this as the legacy SEO/category term. The current SatGate product narrative is Policy-to-Proof governance: authority before execution, Observe/Control/Prove, and Evidence Pack receipts after every agent action.
+            Think of this as the legacy SEO/category term. The current SatGate product narrative is Policy-to-Proof governance: authority before execution, Observe/Control/Prove, and Evidence Pack receipts after every governed agent action.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">

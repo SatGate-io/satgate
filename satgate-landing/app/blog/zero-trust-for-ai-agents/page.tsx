@@ -346,7 +346,7 @@ Token: search-worker-12
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Charge mode (L402)</strong> — requires payment before access. No budget tracking needed because each request is prepaid via Lightning micropayment. This mode enables permissionless API access for agents you&apos;ve never seen before — they pay, they get access, no signup required.
+            <strong className="text-white">Admit mode (paid rails, <code className="text-sm">policy: charge</code>)</strong> — requires payment before access. No budget tracking needed because each request is prepaid via Lightning micropayment. This mode admits external agents you&apos;ve never seen before — they pay, they get scoped access, no signup required. Every admission still produces a signed receipt: payment proves value moved, the receipt proves the agent was allowed to move it.
           </p>
 
           <p className="text-gray-300 leading-relaxed">

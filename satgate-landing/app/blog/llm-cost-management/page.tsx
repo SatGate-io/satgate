@@ -336,7 +336,7 @@ Authorization: Bearer macaroon_v1_agent42_budget500
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            With capability-based budgets, the orchestrator <em>delegates a portion</em> of its budget to each sub-agent. The research agent gets 2,000 credits. Each scraper gets 200. Summarizers get 50. The total can never exceed the parent's allocation. It's hierarchical, cryptographically enforced, and impossible to game.
+            With capability-based budgets, the orchestrator <em>delegates a portion</em> of its budget to each sub-agent. The research agent gets 2,000 credits. Each scraper gets 200. Summarizers get 50. The total can never exceed the parent's allocation. It's hierarchical and cryptographically enforced — the constraint lives in the credential, not in a policy document.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Policy-to-Proof Approach</h2>
