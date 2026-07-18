@@ -100,7 +100,7 @@ python tools/verify_evidence_pack.py pack.json \
             </div>
             <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-5 text-amber-50">
               <h3 className="font-bold">Does not prove by itself</h3>
-              <p className="mt-2 text-sm leading-6">Billing settlement, upstream counter reconciliation, Hybrid/MCP parity, instant revocation propagation, or broad production readiness unless those claims are separately evidenced.</p>
+              <p className="mt-2 text-sm leading-6">Billing settlement, upstream counter reconciliation, MCP or deployment parity, instant revocation propagation, or broad production readiness unless those claims are separately evidenced.</p>
             </div>
           </div>
         </div>

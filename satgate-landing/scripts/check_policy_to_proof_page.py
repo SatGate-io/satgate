@@ -658,7 +658,7 @@ mcp_authority_required_phrases = {
         "MCP Evidence Pack receipt",
         "Evidence Pack",
         "SaaS MCP is Fly-hosted",
-        "Hybrid MCP is Hetzner-hosted",
+        "Dedicated MCP is contract-triggered",
         "Observe, Control, Charge MCP tool use",
         "/mcp-governance",
         "Govern MCP tool access",
@@ -710,6 +710,7 @@ mcp_authority_forbidden_phrases = {
         "/blog/http-402-payment-required-use-cases",
         "Check, Govern, Prove MCP tool use",
         "Run SaaS or Hybrid MCP",
+        "Hybrid MCP is Hetzner-hosted",
     ],
     "agent-api-governance": [
         "research-bot",
