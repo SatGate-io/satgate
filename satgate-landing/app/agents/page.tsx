@@ -243,8 +243,9 @@ export default function AgentsLandingPage() {
               <Zap className="text-yellow-400 mb-4" size={32} />
               <h3 className="text-xl font-semibold text-white mb-2">Admit</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Monetize your APIs. Approved external agents consume scoped access per request
-                via paid-rail context (L402). No API keys, no subscriptions — just pay and go.
+                Monetize your APIs. Approved external agents are admitted under a charge policy
+                (<code className="text-xs">policy: charge</code>): scoped, paid access per request
+                via paid rails (L402), without sharing long-lived API keys or requiring a subscription.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> paid-rail context</li>
