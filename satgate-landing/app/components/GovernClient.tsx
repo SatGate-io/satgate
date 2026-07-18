@@ -624,11 +624,12 @@ export default function GovernPage() {
           <div className="bg-gradient-to-r from-cyan-900/20 to-purple-900/20 border border-cyan-800/30 rounded-xl p-6 text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
               <Network size={18} className="text-cyan-400" />
-              <h4 className="font-semibold text-white">Hybrid Mode</h4>
+              <h4 className="font-semibold text-white">SaaS or Dedicated</h4>
             </div>
             <p className="text-gray-400 text-sm max-w-lg mx-auto">
-              Gateway runs in your VPC. Dashboard in our cloud (or yours). Gateway traffic stays inside your infrastructure.
-              The best of both worlds: self-hosted security, managed convenience.
+              Start on the managed platform at cloud.satgate.io. When requirements call for isolation, the same
+              platform deploys as a single-customer Dedicated environment — deployment and custody boundaries
+              agreed by contract during onboarding, up to fully client-operated.
             </p>
           </div>
         </div>
