@@ -52,6 +52,17 @@ REQUIRED_PHRASES = {
         "policy_version",
         "decision_reason",
     ],
+    "app/verify-evidence-pack/page.tsx": [
+        "Don&apos;t trust us—verify it yourself.",
+        "valid=true",
+        "trusted_issuer_valid=true",
+        "--jwks-file jwks.json",
+        "--require-trusted-issuer",
+        "Current limits",
+        "/evidence/policy-to-proof-closure-20260718.json",
+        "62d00ac4bff91e56fea8f5e8e42ceb0bb46461c46ba5d5a8c9645047baba4f5a",
+        "162f523d054feb99c2d65fadad7ecb3aa2d5127f1748160ca97424b73215eb7c",
+    ],
     "app/openai-budget-policy-generator/page.tsx": [
         "receipt_id",
         "evidence_pack_id",
@@ -158,12 +169,60 @@ def check_mcp_templates() -> list[str]:
     return errors
 
 
+def check_sanitized_closure() -> list[str]:
+    errors: list[str] = []
+    path = ROOT / "public/evidence/policy-to-proof-closure-20260718.json"
+    if not path.exists():
+        return ["missing sanitized Policy-to-Proof closure record"]
+    record = json.loads(path.read_text())
+    if record.get("scope") != "staging_only":
+        errors.append("sanitized closure scope must remain staging_only")
+    verification = record.get("verification", {})
+    for key in [
+        "manifest_entries_verified",
+        "sensitive_data_scan_passed",
+        "verifier_copies_byte_identical",
+        "strict_verifier_valid",
+        "trusted_issuer_valid",
+        "restart_parity_verified",
+    ]:
+        if verification.get(key) is not True:
+            errors.append(f"sanitized closure verification.{key} is not true")
+    boundaries = record.get("boundaries", {})
+    for key in [
+        "production_touched",
+        "production_promotion_authorized",
+        "contains_raw_pack_identifiers",
+        "contains_raw_receipt_identifiers",
+        "contains_evidence_access_identifiers",
+        "contains_bearer_urls",
+        "contains_payment_credentials",
+        "proves_runtime_truth_independently",
+        "proves_billing_settlement",
+        "proves_external_archive_anchoring",
+        "proves_hardware_key_custody",
+    ]:
+        if boundaries.get(key) is not False:
+            errors.append(f"sanitized closure boundaries.{key} must remain false")
+    containment = record.get("historical_bearer_containment", {})
+    if containment.get("exposed_staging_evidence_urls_found") != 2:
+        errors.append("sanitized closure containment count drifted")
+    if containment.get("targeted_archive_entries_removed") != 2:
+        errors.append("sanitized closure removed count drifted")
+    if containment.get("all_urls_http_404_after_restart") is not True:
+        errors.append("sanitized closure must preserve post-restart 404 containment")
+    if containment.get("git_history_rewritten") is not False:
+        errors.append("sanitized closure must not imply Git history was rewritten")
+    return errors
+
+
 def main() -> int:
     errors = []
     errors += check_phrases()
     errors += check_evidence_pack_schema()
     errors += check_evidence_pack_samples()
     errors += check_mcp_templates()
+    errors += check_sanitized_closure()
     if errors:
         print("Proof-spine guard failed:")
         for error in errors:
