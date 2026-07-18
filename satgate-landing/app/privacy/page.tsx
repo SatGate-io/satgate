@@ -85,9 +85,9 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-2xl font-bold text-white mb-4">Dedicated &amp; Self-Hosted Deployments</h2>
             <p className="text-gray-400 leading-relaxed">
-              In a Dedicated deployment, custody boundaries are agreed by contract during onboarding. When the 
-              gateway runs in your environment, all proxied traffic stays in your infrastructure. We have no access 
-              to your server logs, API traffic, or Lightning node data. Where a SatGate-operated dashboard is part 
+              In a Dedicated deployment, custody boundaries are agreed by contract during onboarding. When the
+              gateway runs in your environment, all proxied traffic stays in your infrastructure. We have no access
+              to your server logs, API traffic, or Lightning node data. Where a SatGate-operated dashboard is part
               of the agreed deployment, it receives only aggregated telemetry (request counts, budget status) — never request contents.
             </p>
           </section>
