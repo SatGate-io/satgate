@@ -70,7 +70,7 @@ export default function DesignPartnersPage() {
     { q: 'How long is the program?', a: '90 days. After that, you keep everything you built and get priority access to GA pricing.' },
     { q: 'Is it really free?', a: 'Yes. The design-partner path starts with an agreed staging lane and no credit card. You get visibility into agent traffic and help shape the authority, budget, revocation, and Evidence Pack workflows that matter in your environment.' },
     { q: 'Do I need to change my code?', a: 'Usually no. Most pilots start with a DNS, proxy, or MCP configuration change around one staging endpoint or tool. We verify the path together before expanding.' },
-    { q: 'Where does my data go?', a: 'Your infrastructure in hybrid mode. The SatGate gateway runs in your VPC. We never see your API payloads or sensitive data.' },
+    { q: 'Where does my data go?', a: 'Your infrastructure. In a Dedicated deployment the SatGate gateway runs in your environment, with custody boundaries agreed during onboarding. We never see your API payloads or sensitive data.' },
     { q: 'Is this for production traffic?', a: 'Design partners usually start in staging or a bounded pilot lane. The goal is to verify request-path policy, revocation, budgets, and Evidence Pack proof before expanding scope.' },
   ];
 

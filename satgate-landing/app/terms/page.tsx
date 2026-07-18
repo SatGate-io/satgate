@@ -3,18 +3,18 @@ import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
   title: 'Terms of Service - SatGate',
-  description: 'SatGate terms of service for cloud, self-hosted, and hybrid deployments, including economic access control, paid-rail context, licensing, and prohibited uses.',
+  description: 'SatGate terms of service for SaaS and Dedicated deployments, including economic access control, paid-rail context, licensing, and prohibited uses.',
   alternates: { canonical: 'https://satgate.io/terms' },
   openGraph: {
     title: 'Terms of Service - SatGate',
-    description: 'SatGate terms for cloud, self-hosted, and hybrid economic-control-plane deployments, paid-rail context, and licensing.',
+    description: 'SatGate terms for SaaS and Dedicated economic-control-plane deployments, paid-rail context, and licensing.',
     url: 'https://satgate.io/terms',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Terms of Service - SatGate',
-    description: 'SatGate terms for cloud, self-hosted, and hybrid economic-control-plane deployments, paid-rail context, and licensing.',
+    description: 'SatGate terms for SaaS and Dedicated economic-control-plane deployments, paid-rail context, and licensing.',
   },
 };
 
