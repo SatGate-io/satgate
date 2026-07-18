@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "record_type": "policy_to_proof_sanitized_closure",
+  "generated_at": "2026-07-18T20:50:36Z",
+  "scope": "staging_only",
+  "source_fingerprints": {
+    "reviewed_candidate_commit": "f320ccf8a0f0248526c8cedea68ab14c9acb59d4",
+    "enterprise_merge_commit": "24bb146a2eb062959b86470bd819618d51f55505",
+    "sanitized_manifest_sha256": "62d00ac4bff91e56fea8f5e8e42ceb0bb46461c46ba5d5a8c9645047baba4f5a"
+  },
+  "verification": {
+    "manifest_entries_verified": true,
+    "manifest_entry_count": 10,
+    "sensitive_data_scan_passed": true,
+    "json_string_boundary_passed": true,
+    "claim_hygiene_passed": true,
+    "verifier_copies_byte_identical": true,
+    "strict_verifier_tests_passed": true,
+    "strict_verifier_test_count": 71,
+    "strict_verifier_valid": true,
+    "trusted_issuer_valid": true,
+    "restart_parity_verified": true
+  },
+  "historical_bearer_containment": {
+    "exposed_staging_evidence_urls_found": 2,
+    "retrievable_before_containment": true,
+    "targeted_archive_entries_removed": 2,
+    "process_cache_cleared_by_restart": true,
+    "all_urls_http_404_after_restart": true,
+    "not_found_responses_indistinguishable": true,
+    "git_history_rewritten": false,
+    "source_repository_private": true,
+    "residual_private_history_risk_accepted": true
+  },
+  "boundaries": {
+    "production_touched": false,
+    "production_promotion_authorized": false,
+    "contains_raw_pack_identifiers": false,
+    "contains_raw_receipt_identifiers": false,
+    "contains_evidence_access_identifiers": false,
+    "contains_bearer_urls": false,
+    "contains_payment_credentials": false,
+    "proves_runtime_truth_independently": false,
+    "proves_billing_settlement": false,
+    "proves_external_archive_anchoring": false,
+    "proves_hardware_key_custody": false
+  }
+}
