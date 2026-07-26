@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "ANY",
+    "urlPathPattern": "/.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "results": [
+        {
+          "id": "result-001",
+          "title": "Internal Knowledge Base Result",
+          "content": "Simulated internal API response processed by SatGate with cost tracking.",
+          "relevance_score": 85,
+          "source": "internal-kb"
+        }
+      ],
+      "total_results": 1,
+      "query_time_ms": 25,
+      "cached": false
+    },
+    "fixedDelayMilliseconds": 100
+  }
+}

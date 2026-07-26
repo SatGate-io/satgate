@@ -1,0 +1,102 @@
+# Local-only SatGate public demo configuration.
+
+server:
+  host: "0.0.0.0"
+  port: 8080
+  trustTenantHeaderInDev: true
+  tenantIsolationEnabled: true
+  tenantIsolationRequired: false
+  allowedHosts: []
+  readTimeout: 30s
+  writeTimeout: 30s
+
+admin:
+  token: "${DEMO_ADMIN_TOKEN}"
+  enableMetrics: false
+  enablePprof: false
+  enableDevLogin: true
+  enableSwaggerUI: false
+  corsAllowedOrigins:
+    - "http://localhost:3000"
+    - "http://localhost:13000"
+  corsAllowCredentials: true
+
+upstreams:
+  internal-demo:
+    url: "http://mock-internal:8080"
+    timeout: 10s
+
+routes:
+  - name: "budgeted-ai"
+    match:
+      pathPrefix: "/budgeted/ai"
+    upstream: "internal-demo"
+    policy:
+      kind: "fiat402"
+      scope: "api:budgeted-ai"
+      costCredits: 10
+      pay:
+        mode: "fiat402"
+        price: 0.01
+        unit: "per_request"
+        costCenter: "public-demo"
+        enforceBudget: true
+
+  - name: "health"
+    match:
+      pathPrefix: "/healthz"
+    upstream: "internal-demo"
+    policy:
+      kind: "public"
+
+lightning:
+  provider: "mock"
+
+database:
+  host: "postgres"
+  port: 5432
+  name: "satgate"
+  user: "satgate"
+  password: "satgate"
+  sslMode: "disable"
+  maxConns: 10
+  maxIdleConns: 2
+
+redis:
+  enabled: true
+  addr: "redis:6379"
+  password: ""
+  db: 0
+  maxRetries: 3
+
+cloud:
+  enabled: true
+  jwtSecret: "${DEMO_CLOUD_JWT_SECRET}"
+  baseURL: "http://localhost:8080"
+  # Guarded by the gateway: accepted only for non-production HTTP loopback.
+  allowDevTokens: true
+
+demo:
+  enabled: true
+  autoSeedData: false
+  mockResponses: true
+
+observability:
+  metrics:
+    enabled: false
+  tracing:
+    enabled: false
+  logging:
+    level: "info"
+    format: "json"
+
+security:
+  rateLimiting:
+    enabled: true
+    defaultRPS: 100
+  governance:
+    enabled: true
+    autoRevokeChildren: true
+  tenantIsolation:
+    enabled: true
+    required: false
