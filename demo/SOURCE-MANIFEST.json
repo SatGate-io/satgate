@@ -1,0 +1,94 @@
+{
+  "schema_version": "satgate.public_demo_source_manifest.v1",
+  "public_base_commit": "23e5a86e480ca818417fb1f36977ea501be5e13d",
+  "public_base_tree": "38c275ddc5faecb81d7ddd0bdda8e1c0368d8bd8",
+  "source_repository": "SatGate-io/satgate-enterprise",
+  "source_commit": "200cdec3a8d820ec6da19ad5848fa9392db3f5b9",
+  "source_tree": "e930ea2605089a53c3d02462f8def1fbb90a993c",
+  "files": [
+    {
+      "public_path": "demo/README.md",
+      "source_path": "demo/README.md",
+      "source_blob": "67205fdde199426b2685eee5bb932374d98fa741",
+      "mode": "adapted",
+      "sha256": "140489dde0940e4a18ad3cb11dadb0b24a39ec530d0cedc21593866a47bfc4f1"
+    },
+    {
+      "public_path": "demo/_vendor/rfc8785/__init__.py",
+      "source_path": "demo/_vendor/rfc8785/__init__.py",
+      "source_blob": "5a1f9d919643fa3bcaa0999ea66d9c535568c42a",
+      "mode": "exact",
+      "sha256": "fa44927afd547caf7547247078bcf28863d1e69caf116d258c532b3f20ffd154"
+    },
+    {
+      "public_path": "demo/_vendor/rfc8785/_impl.py",
+      "source_path": "demo/_vendor/rfc8785/_impl.py",
+      "source_blob": "3137d3326b98938affadb1be711ee411eb2ab86e",
+      "mode": "exact",
+      "sha256": "c25bc3a046528482d53bee3487b837f31dd9c05f33e8f13288c7aab320932cec"
+    },
+    {
+      "public_path": "demo/_vendor/rfc8785/py.typed",
+      "source_path": "demo/_vendor/rfc8785/py.typed",
+      "source_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "mode": "exact",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "public_path": "demo/configs/demo.yaml",
+      "source_path": "demo/configs/demo.yaml",
+      "source_blob": "c4949640a73b8b512f93183d94919fa888d90c21",
+      "mode": "adapted",
+      "sha256": "7b81f4a2fd85489625e6812706baf7fd243447a0ee935519bb529f935aacdd30"
+    },
+    {
+      "public_path": "demo/docker-compose.yml",
+      "source_path": "demo/docker-compose.yml",
+      "source_blob": "e8dcf88a8f2f7949232d4a4a6a16bd4c05999096",
+      "mode": "adapted",
+      "sha256": "752efd740aa07499c8976bdd8e0fd2f7f4597ca6c79a5dcf614d761c1b911be1"
+    },
+    {
+      "public_path": "demo/golden-path.sh",
+      "source_path": "demo/golden-path.sh",
+      "source_blob": "c6542faaa3956ba93b58e45469e9b2f6e83056f6",
+      "mode": "adapted",
+      "sha256": "8e2913aaa814842ede619fe7cafbb5683685081f2e5ad8af9e51e4ac6b5d1556"
+    },
+    {
+      "public_path": "demo/init-db/00-cloud-tenants.sql",
+      "source_path": "demo/init-db/00-cloud-tenants.sql",
+      "source_blob": "160d822d4e3ee6825699c4a7a27fbee69e5a82d6",
+      "mode": "exact",
+      "sha256": "f8f89a678700da85910fc8811947f9c46e4531ffcafbf25b6ecf7a374a989b6a"
+    },
+    {
+      "public_path": "demo/init-db/01-billing-usage.sql",
+      "source_path": "gateway/internal/billing/store/postgres.go",
+      "source_blob": "f29e76d2db70d61c03b8531c4712dd98d837f5d4",
+      "mode": "adapted",
+      "sha256": "20ba445204fd672143833ea82aa943a3efea263d29b28ffed70b50abfcfcdf7e"
+    },
+    {
+      "public_path": "demo/mock-apis/internal/search.json",
+      "source_path": "demo/mock-apis/internal/search.json",
+      "source_blob": "49280ef34325bf30b1c9982862dd20c35a8f4fe8",
+      "mode": "exact",
+      "sha256": "35968e4684e30e6dcfd90d4f5551d682fa0ee900482681319da4d9f756b3d4c8"
+    },
+    {
+      "public_path": "demo/requirements-verifier.txt",
+      "source_path": null,
+      "source_blob": null,
+      "mode": "new",
+      "sha256": "7d1645155d88d7328164814a2f56ae3bbb4d25a1f545cee331805e80306674cf"
+    },
+    {
+      "public_path": "demo/verify_evidence_pack.py",
+      "source_path": "demo/verify_evidence_pack.py",
+      "source_blob": "76fe89a681d7f15f06a8d941ebef33daabbb7ade",
+      "mode": "exact",
+      "sha256": "e7262f830cf25cdbb563358b62dcfee1ded56f54727c0fcea3074699e95294e1"
+    }
+  ]
+}

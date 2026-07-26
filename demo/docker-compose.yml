@@ -1,0 +1,130 @@
+name: satgate-public-demo
+
+services:
+  archive-init:
+    image: postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+    pull_policy: always
+    user: "0:0"
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["chown 1000:1000 /data/evidence-archive && chmod 0700 /data/evidence-archive"]
+    volumes:
+      - demo_evidence_archive:/data/evidence-archive
+    restart: "no"
+
+  gateway:
+    image: ghcr.io/satgate-io/satgate-gateway-demo@sha256:c20c826cf234b895299ab77f86c6e8f0df772858ba0d8e607d75339ac4e579c7
+    pull_policy: always
+    init: true
+    ports:
+      - "127.0.0.1:${SATGATE_DEMO_GATEWAY_PORT:-8080}:8080"
+    environment:
+      DEMO_MODE: "true"
+      CONFIG_FILE: /app/configs/demo.yaml
+      ADMIN_TOKEN: demo-admin-token-2024
+      DEMO_ADMIN_TOKEN: demo-admin-token-2024
+      LIGHTNING_BACKEND: mock
+      DATABASE_URL: postgres://satgate:satgate@postgres:5432/satgate?sslmode=disable
+      PGPASSWORD: satgate
+      REDIS_URL: redis://redis:6379
+      CLOUD_ENABLED: "true"
+      CLOUD_JWT_SECRET: demo-jwt-secret-key-local-only
+      DEMO_CLOUD_JWT_SECRET: demo-jwt-secret-key-local-only
+      CLOUD_BASE_URL: http://localhost:${SATGATE_DEMO_GATEWAY_PORT:-8080}
+      TRUST_TENANT_HEADER_IN_DEV: "true"
+      ENABLE_DEMO_ENDPOINTS: "true"
+      SATGATE_EVIDENCE_ARCHIVE_DIR: /data/evidence-archive
+      SATGATE_EVIDENCE_ARCHIVE_REQUIRED: "true"
+      SATGATE_RECEIPT_ISSUER: https://localhost
+      SATGATE_RECEIPT_SIGNING_KID: local-demo-v1
+      SATGATE_RECEIPT_SIGNING_KEY_B64: Qq9mCjlOdQfAfGs4Pje2Nk-UpjeuUx78H27wjk8m4_U
+      SATGATE_RECEIPT_SIGNING_KEY_REQUIRED: "true"
+    volumes:
+      - ./configs:/app/configs:ro
+      - demo_evidence_archive:/data/evidence-archive
+    depends_on:
+      archive-init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mock-internal:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://127.0.0.1:8080/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  dashboard:
+    image: ghcr.io/satgate-io/satgate-dashboard-demo@sha256:9e84ea39ffce96f3930a28bf140037c67a307bac5389e4bbabea2b43e5f212f9
+    pull_policy: always
+    init: true
+    ports:
+      - "127.0.0.1:${SATGATE_DEMO_DASHBOARD_PORT:-3000}:3000"
+    environment:
+      DEMO_MODE: "true"
+      GATEWAY_URL: http://gateway:8080
+      GATEWAY_ADMIN_URL: http://gateway:8080
+      NEXT_PUBLIC_GATEWAY_URL: http://localhost:${SATGATE_DEMO_GATEWAY_PORT:-8080}
+      NEXT_PUBLIC_APP_URL: http://localhost:${SATGATE_DEMO_DASHBOARD_PORT:-3000}
+      DASHBOARD_URL: http://localhost:${SATGATE_DEMO_DASHBOARD_PORT:-3000}
+      ADMIN_TOKEN: demo-admin-token-2024
+      DEV_LOGIN_ENABLED: "true"
+      NEXT_PUBLIC_ENABLE_DEV_LOGIN: "true"
+      DEMO_USER_EMAIL: demo@example.invalid
+      DEMO_USER_NAME: Demo User
+    depends_on:
+      gateway:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  postgres:
+    image: postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+    pull_policy: always
+    environment:
+      POSTGRES_USER: satgate
+      POSTGRES_PASSWORD: satgate
+      POSTGRES_DB: satgate
+    volumes:
+      - demo_postgres_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U satgate -d satgate"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2
+    pull_policy: always
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  mock-internal:
+    image: wiremock/wiremock:3.13.2@sha256:0d4ecb3e4dc8213fd7a4d37d6a78f6e6b553a6d2e15bd51b0999781282ac61b3
+    pull_policy: always
+    volumes:
+      - ./mock-apis/internal:/home/wiremock/mappings:ro
+    command: ["--global-response-templating"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://127.0.0.1:8080/__admin/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  demo_postgres_data:
+  demo_evidence_archive:
