@@ -60,9 +60,9 @@ Expected result: `valid=true`, `trusted_issuer_valid=false`, and the explicit em
 
 ## Image identities
 
-- Gateway: `ghcr.io/satgate-io/satgate-gateway-demo@sha256:c20c826cf234b895299ab77f86c6e8f0df772858ba0d8e607d75339ac4e579c7`
-- Dashboard: `ghcr.io/satgate-io/satgate-dashboard-demo@sha256:9e84ea39ffce96f3930a28bf140037c67a307bac5389e4bbabea2b43e5f212f9`
-- Source revision embedded in both images: `200cdec3a8d820ec6da19ad5848fa9392db3f5b9`
+- Gateway: `ghcr.io/satgate-io/satgate-gateway-demo@sha256:b10848b4847be4b62c80a004f18af50e450937d92b9238a6c697a319880ab8c9`
+- Dashboard: `ghcr.io/satgate-io/satgate-dashboard-demo@sha256:06a6a6fceeedeaa31f9fedcdbe3f73fc990dfab98172bf644985a7c9a4f7b878`
+- Source revision embedded in both images: `e7df444bc6caf49966959037330c4e887665b181`
 
 `SOURCE-MANIFEST.json` records where each public-demo file came from and whether it was copied exactly, adapted for the public boundary, or created for this kit.
 

@@ -9,8 +9,8 @@ from pathlib import Path
 DEMO = Path(__file__).resolve().parents[1]
 REPO = DEMO.parent
 
-GATEWAY = "ghcr.io/satgate-io/satgate-gateway-demo@sha256:c20c826cf234b895299ab77f86c6e8f0df772858ba0d8e607d75339ac4e579c7"
-DASHBOARD = "ghcr.io/satgate-io/satgate-dashboard-demo@sha256:9e84ea39ffce96f3930a28bf140037c67a307bac5389e4bbabea2b43e5f212f9"
+GATEWAY = "ghcr.io/satgate-io/satgate-gateway-demo@sha256:b10848b4847be4b62c80a004f18af50e450937d92b9238a6c697a319880ab8c9"
+DASHBOARD = "ghcr.io/satgate-io/satgate-dashboard-demo@sha256:06a6a6fceeedeaa31f9fedcdbe3f73fc990dfab98172bf644985a7c9a4f7b878"
 EXPECTED_SERVICES = {"archive-init", "gateway", "dashboard", "postgres", "redis", "mock-internal"}
 FORBIDDEN_TERMS = (
     "satgate-gateway-enterprise",
@@ -134,7 +134,7 @@ class PublicDemoStaticTest(unittest.TestCase):
 
     def test_source_manifest_covers_every_non_test_file(self) -> None:
         manifest = json.loads(text(DEMO / "SOURCE-MANIFEST.json"))
-        self.assertEqual(manifest["source_commit"], "200cdec3a8d820ec6da19ad5848fa9392db3f5b9")
+        self.assertEqual(manifest["source_commit"], "e7df444bc6caf49966959037330c4e887665b181")
         entries = manifest["files"]
         paths = {entry["public_path"] for entry in entries}
         actual = {
