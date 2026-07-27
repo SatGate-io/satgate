@@ -1,17 +1,17 @@
 {
   "schema_version": "satgate.public_demo_source_manifest.v1",
-  "public_base_commit": "23e5a86e480ca818417fb1f36977ea501be5e13d",
-  "public_base_tree": "38c275ddc5faecb81d7ddd0bdda8e1c0368d8bd8",
+  "public_base_commit": "41ec7170c220f85b9498717e343e38c5d8f6eb14",
+  "public_base_tree": "423854534f6ba8be12f7eada30a8c2f9ecea0434",
   "source_repository": "SatGate-io/satgate-enterprise",
-  "source_commit": "200cdec3a8d820ec6da19ad5848fa9392db3f5b9",
-  "source_tree": "e930ea2605089a53c3d02462f8def1fbb90a993c",
+  "source_commit": "e7df444bc6caf49966959037330c4e887665b181",
+  "source_tree": "04ad671bdd30bc39dc2997dd0e4639f61109a293",
   "files": [
     {
       "public_path": "demo/README.md",
       "source_path": "demo/README.md",
-      "source_blob": "67205fdde199426b2685eee5bb932374d98fa741",
+      "source_blob": "997ecb5ba5887f498da9ce12702c35dcf6539cbb",
       "mode": "adapted",
-      "sha256": "140489dde0940e4a18ad3cb11dadb0b24a39ec530d0cedc21593866a47bfc4f1"
+      "sha256": "57a9bb05dc8a845cd796b41e1a5ab915f757d64daaea40bd8b1f7fd33037eea0"
     },
     {
       "public_path": "demo/_vendor/rfc8785/__init__.py",
@@ -46,7 +46,7 @@
       "source_path": "demo/docker-compose.yml",
       "source_blob": "e8dcf88a8f2f7949232d4a4a6a16bd4c05999096",
       "mode": "adapted",
-      "sha256": "752efd740aa07499c8976bdd8e0fd2f7f4597ca6c79a5dcf614d761c1b911be1"
+      "sha256": "bdf347113e904bdbf515df92a57ccda493bf26024e31d328963f0eaceb3b8d97"
     },
     {
       "public_path": "demo/golden-path.sh",
