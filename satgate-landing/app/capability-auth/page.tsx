@@ -32,6 +32,7 @@ const faqs = [
   ['How are capabilities different from API keys?', 'API keys usually prove broad account ownership. Capabilities are narrower: they describe what this agent can access and spend right now, and they can be attenuated or revoked without rotating a shared secret.'],
   ['Can capabilities include budget limits?', 'Yes. SatGate treats economic policy as part of authorization. A capability can carry or reference budget, per-tool pricing, route scope, tenant context, and delegation depth.'],
   ['Are macaroons capability tokens?', 'Macaroons are a practical way to implement attenuated capability-style authority because caveats can constrain scope, time, budget, route, and delegation.'],
+  ['How does UCAN relate to capability-based authorization?', 'UCAN is a capability-based authorization model built around user-controlled authorization networks. SatGate uses the same core idea of delegated, scoped, attenuable authority and adds request-path budget enforcement, revocation, and Evidence Pack proof for AI agents.'],
 ];
 
 export default function CapabilityAuthPage() {
@@ -42,7 +43,7 @@ export default function CapabilityAuthPage() {
     applicationCategory: 'SecurityApplication',
     description: metadata.description,
     url: 'https://satgate.io/capability-auth',
-    dateModified: '2026-05-08',
+    dateModified: '2026-08-04',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     featureList: capabilities.map((item) => item.title),
   };
@@ -59,11 +60,44 @@ export default function CapabilityAuthPage() {
       { '@type': 'ListItem', position: 2, name: 'Capability Auth', item: 'https://satgate.io/capability-auth' },
     ],
   };
+  const ucanJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'UCAN and capability-based authorization for AI agents',
+    description: 'How UCAN-style capability delegation maps to AI agent authority, scoped access, attenuation, budget limits, revocation, and proof.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Delegated authority',
+        description: 'A principal grants a specific capability to an agent instead of sharing broad account credentials.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Attenuation',
+        description: 'A child capability can be narrower than the parent by route, tool, tenant, task, budget, expiry, and delegation depth.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Request-path enforcement',
+        description: 'SatGate checks the capability before forwarding each API, model, MCP tool, or paid-access request.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Evidence Pack proof',
+        description: 'Each allow, deny, delegation, revocation, and paid decision can leave a receipt for finance, security, and audit review.',
+      },
+    ],
+  };
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ucanJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <div className="mx-auto max-w-6xl px-6 pt-8">
@@ -153,6 +187,29 @@ export default function CapabilityAuthPage() {
               <p className="text-gray-300 leading-relaxed">{body}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="border-y border-gray-900 bg-gray-950/60">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-[0.2em] text-emerald-300">UCAN-style authority</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">UCAN capability authorization is the right mental model for agents</h2>
+          <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+            UCAN-style authorization starts from a better premise than static keys: give software a specific delegated capability, let it pass down less authority, and make every later use prove it stayed inside bounds.
+          </p>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['Delegated authority', 'A principal grants a specific capability to an agent instead of sharing broad account credentials.'],
+              ['Attenuation', 'A child capability can be narrower than the parent by route, tool, tenant, task, budget, expiry, and delegation depth.'],
+              ['Request-path enforcement', 'SatGate checks the capability before forwarding each API, model, MCP tool, or paid-access request.'],
+              ['Evidence Pack proof', 'Each allow, deny, delegation, revocation, and paid decision leaves a receipt for finance, security, and audit review.'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black p-6">
+                <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

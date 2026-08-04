@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T21:34:40.001508Z",
+  "generatedAt": "2026-08-04T23:34:42.281659Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -486,6 +486,7 @@
         "Why identity auth is too blunt for agents",
         "What a capability should carry",
         "Capabilities vs API keys, OAuth, and macaroons",
+        "UCAN capability authorization is the right mental model for agents",
         "Capability auth questions",
         "Related authorization resources",
         "Stop handing agents broad API keys."
@@ -499,12 +500,13 @@
         "Answer",
         "BreadcrumbList",
         "FAQPage",
+        "ItemList",
         "ListItem",
         "Organization",
         "Question",
         "SoftwareApplication"
       ],
-      "wordCount": 521,
+      "wordCount": 617,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
