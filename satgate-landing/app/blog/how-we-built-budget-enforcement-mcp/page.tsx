@@ -27,7 +27,7 @@ export default function McpProxyBlogPage() {
     description: 'We shipped an open-source MCP proxy that enforces per-tool budgets with cryptographic delegation for AI agent tool calls.',
     url: 'https://satgate.io/blog/how-we-built-budget-enforcement-mcp',
     datePublished: '2026-02-13',
-    dateModified: '2026-05-04',
+    dateModified: '2026-08-04',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -69,10 +69,44 @@ export default function McpProxyBlogPage() {
     ],
   };
 
+  const architectureJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP budget enforcement architecture components',
+    description: 'Core components required to enforce MCP tool budgets in the request path.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'MCP proxy interception',
+        description: 'Intercept tools/call messages between the agent client and upstream MCP server before execution.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Per-tool cost resolver',
+        description: 'Resolve tool prices with exact, wildcard, and default cost rules before each tool call.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Budget enforcer',
+        description: 'Check and spend from the agent, session, workflow, or delegated token budget atomically.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Structured denial and proof',
+        description: 'Return budget_exhausted errors and preserve receipt fields for Evidence Pack export.',
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(architectureJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -106,6 +140,20 @@ export default function McpProxyBlogPage() {
           <p className="text-gray-300 leading-relaxed">
             We shipped an open-source MCP proxy that intercepts <code>tools/call</code> JSON-RPC messages and enforces per-tool budgets with cryptographic delegation. Here&apos;s how we built it.
           </p>
+
+          <div className="not-prose my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Implementation path</p>
+            <h2 className="mb-3 text-2xl font-bold text-white">Move from architecture to enforceable MCP policy</h2>
+            <p className="mb-5 text-gray-300">
+              This engineering writeup explains the control loop. These pages turn the architecture into deployable MCP governance and tool-cost policy.
+            </p>
+            <div className="grid gap-3 text-sm font-semibold sm:grid-cols-2">
+              <Link href="/mcp-budget-enforcement" className="rounded-lg border border-gray-800 bg-black/40 p-4 text-cyan-300 hover:border-cyan-500/50">MCP budget enforcement →</Link>
+              <Link href="/mcp-tool-cost-policy-generator" className="rounded-lg border border-gray-800 bg-black/40 p-4 text-cyan-300 hover:border-cyan-500/50">Generate MCP tool policy →</Link>
+              <Link href="/mcp-proxy-config-generator" className="rounded-lg border border-gray-800 bg-black/40 p-4 text-cyan-300 hover:border-cyan-500/50">Generate proxy config →</Link>
+              <Link href="/blog/mcp-budget-enforcement-guide" className="rounded-lg border border-gray-800 bg-black/40 p-4 text-cyan-300 hover:border-cyan-500/50">Read the budget guide →</Link>
+            </div>
+          </div>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Architecture</h2>
           <p className="text-gray-300 leading-relaxed">
@@ -184,6 +232,17 @@ export default function McpProxyBlogPage() {
             The agent gets a structured error it can handle gracefully — not a crashed process or an infinite retry.
           </p>
 
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The request-path enforcement loop</h2>
+          <p className="text-gray-300 leading-relaxed">
+            The implementation reduces MCP budget enforcement to four steps that happen before the upstream tool executes.
+          </p>
+          <ol className="text-gray-300 space-y-2">
+            <li><strong className="text-white">Intercept:</strong> catch each <code>tools/call</code> message at the MCP proxy boundary.</li>
+            <li><strong className="text-white">Price:</strong> resolve the tool cost with exact, wildcard, and default cost rules.</li>
+            <li><strong className="text-white">Enforce:</strong> check and spend from the agent, session, workflow, or delegated token budget.</li>
+            <li><strong className="text-white">Prove:</strong> return a structured denial when exhausted and preserve the receipt fields for Evidence Pack export.</li>
+          </ol>
+
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Delegation: The Hard Part</h2>
           <p className="text-gray-300 leading-relaxed">
             When an orchestrator agent spawns sub-agents, each needs its own budget. The parent carves credits from its own allocation:
@@ -259,6 +318,10 @@ Result:
               <a href="https://github.com/SatGate-io/satgate/tree/main/pkg/mcpserver" className="text-cyan-400 hover:text-cyan-300">GitHub →</a>
               {' · '}
               <a href="https://satgate.io/pricing" className="text-cyan-400 hover:text-cyan-300">Enterprise →</a>
+              {' · '}
+              <Link href="/mcp-tool-cost-policy-generator" className="text-cyan-400 hover:text-cyan-300">MCP tool policy generator →</Link>
+              {' · '}
+              <Link href="/mcp-governance" className="text-cyan-400 hover:text-cyan-300">MCP governance →</Link>
             </p>
           </div>
 

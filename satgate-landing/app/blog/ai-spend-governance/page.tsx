@@ -43,7 +43,7 @@ export default function AiSpendGovernanceBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-05-22',
-    dateModified: '2026-05-22',
+    dateModified: '2026-08-04',
     mainEntityOfPage: 'https://satgate.io/blog/ai-spend-governance',
     about: [
       { '@type': 'Thing', name: 'AI spend governance' },
@@ -92,6 +92,47 @@ export default function AiSpendGovernanceBlogPage() {
           text: 'Enterprises should require usage attribution by user, agent, workflow, model, API, and tool; request-path policy enforcement; budget controls; routing decisions; approval flows; and Evidence Pack receipts that prove which policy allowed or denied each important action.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'How is AI spend governance different from AI cost observability?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AI cost observability explains usage after it happens. AI spend governance adds request-path authority, budget checks, routing, revocation, and proof before model, API, MCP tool, or paid-service spend is created.',
+        },
+      },
+    ],
+  };
+
+  const governanceControlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI spend governance controls',
+    description: 'The operating controls enterprises need to govern usage-based AI spend before agent, model, API, or tool requests execute.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Attribute cost to the unit of work',
+        description: 'Track spend by user, tenant, agent, workflow, model, API, MCP tool, route, and policy version.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Set budget authority before execution',
+        description: 'Apply per-request, session, workflow, tenant, agent, route, and tool budgets before forwarding the request.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Route or deny based on risk and cost',
+        description: 'Downgrade, reroute, approve, escalate, or block expensive actions before the upstream provider creates cost.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Preserve finance and security proof',
+        description: 'Create Evidence Pack receipts showing policy inputs, decisions, budgets, denial reasons, and outcomes.',
+      },
     ],
   };
 
@@ -99,6 +140,7 @@ export default function AiSpendGovernanceBlogPage() {
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(governanceControlsJsonLd) }} />
 
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -143,6 +185,27 @@ export default function AiSpendGovernanceBlogPage() {
           <p className="text-gray-300 leading-relaxed">
             Token-based pricing exposes what flat-rate AI plans masked: AI cost is not just a procurement issue. Once agents, copilots, workflows, APIs, and paid tools start making calls all day, spend becomes an operating risk.
           </p>
+
+          <div className="not-prose my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-[0.2em] text-cyan-300">AI spend governance controls</p>
+            <h2 className="mb-3 text-2xl font-bold text-white">Govern spend before the model, API, or tool executes</h2>
+            <p className="mb-5 text-gray-300 leading-relaxed">
+              The search intent behind AI spend governance is not another month-end report. It is an operating model for controlling usage-based AI while agents are still making decisions.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                ['Attribution', 'User, tenant, agent, workflow, model, API, MCP tool, route, and policy version.'],
+                ['Budget authority', 'Per-request, session, workflow, tenant, agent, route, and tool budgets checked before execution.'],
+                ['Routing and denial', 'Downgrade, reroute, approve, escalate, or block expensive requests based on risk and remaining budget.'],
+                ['Proof', 'Evidence Pack receipts for policy inputs, spend context, decision reason, and outcome.'],
+              ].map(([title, body]) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-4">
+                  <h3 className="mb-2 font-bold text-white">{title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Why agentic AI costs stratify</h2>
 
@@ -309,6 +372,7 @@ export default function AiSpendGovernanceBlogPage() {
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Related reading</h2>
           <ul className="text-gray-300 space-y-2">
             <li><Link href="/blog/llm-cost-management" className="text-cyan-400 hover:text-cyan-300 underline">LLM cost management: dashboards vs real-time budget enforcement</Link></li>
+            <li><Link href="/ai-agent-cost-control" className="text-cyan-400 hover:text-cyan-300 underline">AI agent cost control: spending controls before execution</Link></li>
             <li><Link href="/blog/ai-agent-spending-limits" className="text-cyan-400 hover:text-cyan-300 underline">AI agent spending limits: hard budgets by agent, tool, and workflow</Link></li>
             <li><Link href="/blog/the-enterprise-adoption-playbook-observe-control-prove" className="text-cyan-400 hover:text-cyan-300 underline">The enterprise adoption playbook: Observe, Control, Prove</Link></li>
             <li><Link href="/compare/langsmith-helicone-datadog" className="text-cyan-400 hover:text-cyan-300 underline">LLM observability vs agent control</Link></li>

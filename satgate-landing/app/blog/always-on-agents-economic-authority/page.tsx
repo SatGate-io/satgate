@@ -26,7 +26,7 @@ export const metadata = {
   openGraph: {
     title,
     description,
-    url,
+    url: 'https://satgate.io/blog/always-on-agents-economic-authority',
     type: 'article',
     publishedTime: '2026-06-04T00:00:00Z',
     modifiedTime: '2026-06-04T00:00:00Z',

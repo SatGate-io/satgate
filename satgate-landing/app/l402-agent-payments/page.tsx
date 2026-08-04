@@ -3,7 +3,7 @@ import { ArrowRight, Bot, Coins, KeyRound, LockKeyhole, ReceiptText, Zap } from 
 
 export const metadata = {
   title: 'L402 Paid-Rail Governance for APIs',
-  description: 'Understand L402 as one paid rail for agent/API access. SatGate gives delegated clients bounded economic authority, applies Policy-to-Proof before execution, and preserves Evidence Pack receipts after payment.',
+  description: 'Understand L402 as one paid rail for agent/API access, governed by bounded economic authority, Policy-to-Proof, and Evidence Pack receipts.',
   alternates: { canonical: 'https://satgate.io/l402-agent-payments' },
   keywords: [
     'L402 paid-rail governance',

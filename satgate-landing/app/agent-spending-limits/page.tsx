@@ -3,7 +3,7 @@ import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptTe
 
 export const metadata = {
   title: 'Agent Spending Limits | Spend Caps for Autonomous AI Agents',
-  description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day. Enforce authority, revocation, and Evidence Pack receipts before spend occurs.',
+  description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day with request-path budget enforcement.',
   alternates: { canonical: 'https://satgate.io/agent-spending-limits' },
   keywords: [
     'agent spending limits',

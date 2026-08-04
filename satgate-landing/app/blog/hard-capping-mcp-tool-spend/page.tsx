@@ -30,7 +30,7 @@ export default function HardCappingMcpToolSpendPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-02-14',
-    dateModified: '2026-05-03',
+    dateModified: '2026-08-04',
     mainEntityOfPage: 'https://satgate.io/blog/hard-capping-mcp-tool-spend',
     about: [
       { '@type': 'Thing', name: 'hard-capping MCP tool spend' },
@@ -80,10 +80,44 @@ export default function HardCappingMcpToolSpendPage() {
     ],
   };
 
+  const mcpBudgetChecklistJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP tool budget enforcement checklist',
+    description: 'Controls required to hard-cap MCP tool spend before Claude Code, Cursor, Claude Desktop, or custom agents execute paid work.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Tool identity and price',
+        description: 'Assign each MCP tool a price, default fallback, wildcard match, and risk tier before tool execution.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Agent and session budget',
+        description: 'Enforce budget by agent, tenant, workflow, session, client, server, tool, and time window.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Revocation behavior',
+        description: 'Block, revoke, downgrade, or require review when unknown tools, expensive calls, loops, or exhausted budgets appear.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Evidence Pack receipt',
+        description: 'Record MCP client, server, tool, estimated cost, remaining budget, policy decision, denial reason, and upstream outcome.',
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(mcpBudgetChecklistJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -122,6 +156,20 @@ export default function HardCappingMcpToolSpendPage() {
           <p className="text-gray-300 leading-relaxed">
             There&apos;s a fix. And it doesn&apos;t involve monitoring dashboards, Slack alerts, or hoping you catch it in time.
           </p>
+
+          <div className="not-prose my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Implementation path</p>
+            <h2 className="mb-3 text-2xl font-bold text-white">Turn MCP hard caps into enforceable policy</h2>
+            <p className="mb-5 text-gray-300">
+              Use this guide for the failure mode, then move into the MCP governance pages and policy generator to define the actual request-path controls.
+            </p>
+            <div className="grid gap-3 text-sm font-semibold sm:grid-cols-2">
+              <Link href="/mcp-budget-enforcement" className="rounded-lg border border-gray-800 bg-black/40 p-4 text-cyan-300 hover:border-cyan-500/50">MCP budget enforcement →</Link>
+              <Link href="/mcp-governance" className="rounded-lg border border-gray-800 bg-black/40 p-4 text-cyan-300 hover:border-cyan-500/50">MCP governance →</Link>
+              <Link href="/mcp-tool-cost-policy-generator" className="rounded-lg border border-gray-800 bg-black/40 p-4 text-cyan-300 hover:border-cyan-500/50">Generate MCP tool policy →</Link>
+              <Link href="/mcp-proxy-config-generator" className="rounded-lg border border-gray-800 bg-black/40 p-4 text-cyan-300 hover:border-cyan-500/50">Generate MCP proxy config →</Link>
+            </div>
+          </div>
 
           {/* The Problem */}
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Problem: MCP Has No Credit Card Limit</h2>
@@ -272,6 +320,17 @@ export default function HardCappingMcpToolSpendPage() {
           <p className="text-gray-300 leading-relaxed">
             The agent receives a clean error, stops calling the tool, and continues with other work. No crash, no hang — just a boundary.
           </p>
+
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The MCP tool budget enforcement checklist</h2>
+          <p className="text-gray-300 leading-relaxed">
+            A hard cap needs enough context to price and stop the next tool call, not merely explain the last one.
+          </p>
+          <ul className="text-gray-300 space-y-2">
+            <li><strong className="text-white">Tool identity and price:</strong> server, tool name, default fallback, wildcard match, price, and risk tier.</li>
+            <li><strong className="text-white">Agent and session budget:</strong> tenant, agent, client, workflow, session, and time-window budgets.</li>
+            <li><strong className="text-white">Revocation behavior:</strong> block, revoke, downgrade, or require review when tools are unknown, expensive, looping, or exhausted.</li>
+            <li><strong className="text-white">Evidence Pack receipt:</strong> client, server, tool, estimated cost, remaining budget, policy decision, denial reason, and upstream outcome.</li>
+          </ul>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Macaroon Delegation</h3>
           <p className="text-gray-300 leading-relaxed">

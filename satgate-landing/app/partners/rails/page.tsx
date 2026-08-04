@@ -66,6 +66,8 @@ const jsonLd = {
       name: "SatGate for Payment Rails",
       url: "https://satgate.io/partners/rails",
       description: metadata.description,
+      datePublished: "2026-05-14",
+      dateModified: "2026-08-04",
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
       about: [
         { "@type": "Thing", name: "agent payment rail governance" },

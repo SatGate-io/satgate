@@ -15,14 +15,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate Capability Lifecycle Control',
-    description: 'Issue capability → delegate → attenuate → revoke → prove, with customer-visible caveats, delegation depth, child spend caps, next-request revocation, and Evidence Pack audit records.',
+    description: 'Issue, delegate, attenuate, revoke, and prove scoped agent authority with child spend caps and Evidence Pack records.',
     url: 'https://satgate.io/capability-lifecycle-demo',
     type: 'article',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate Capability Lifecycle Control',
-    description: 'Issue capability → delegate → attenuate → revoke → prove, with scoped authority, child spend caps, next-request revocation, and Evidence Pack proof.',
+    description: 'Issue, delegate, attenuate, revoke, and prove scoped authority with child spend caps and Evidence Pack proof.',
   },
 };
 

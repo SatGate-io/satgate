@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-06-04T13:29:38.774264Z",
+  "generatedAt": "2026-08-04T21:34:40.001508Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
       "exists": true,
       "title": "Always-On Agents Need More Than Identity: Economic Authority",
       "titleLength": 60,
-      "metaDescription": "Microsoft Scout shows where enterprise agents are headed. Observe, Control, Prove external agent actions with economic authority, spend ownership, and evidence.",
-      "metaDescriptionLength": 160,
+      "metaDescription": "Microsoft Scout shows where enterprise agents are headed. Observe, Control, and Prove agent actions with economic authority, spend ownership, and evidence.",
+      "metaDescriptionLength": 155,
       "canonical": "/blog/always-on-agents-economic-authority",
       "h1": [
         "Always-on agents need more than identity. They need economic authority."
@@ -60,6 +60,7 @@
       ],
       "h1Count": 1,
       "h2s": [
+        "Govern spend before the model, API, or tool executes",
         "Why agentic AI costs stratify",
         "Seat management is not AI spend governance",
         "AI governance has to answer harder questions",
@@ -72,6 +73,7 @@
         "Related reading"
       ],
       "internalLinks": [
+        "/ai-agent-cost-control",
         "/blog",
         "/blog/ai-agent-spending-limits",
         "/blog/llm-cost-management",
@@ -83,12 +85,14 @@
       "schemaTypes": [
         "Answer",
         "FAQPage",
+        "ItemList",
+        "ListItem",
         "Organization",
         "Question",
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1315,
+      "wordCount": 1375,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -195,7 +199,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2187,
+      "wordCount": 2196,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -304,7 +308,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2671,
+      "wordCount": 2669,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -325,13 +329,13 @@
       ],
       "h1Count": 1,
       "h2s": [
-        "Govern internal agents. Preserve proof across external rails.",
+        "Prevent before execution. Prove after. On both lanes.",
         "Built for enterprise control owners",
-        "Govern, enforce, prove.",
+        "Observe, control, prove.",
         "The runaway agent story",
         "Receipts that roll up into Evidence Packs.",
         "Delegation that leaves a trail",
-        "Single Go Binary. Zero Dependencies.",
+        "Single Go Binary. No External Dependencies.",
         "The authority commons \u2014 inside your company",
         "Your internal APIs are authority surfaces",
         "See authority minted \u2014 then prove the lifecycle",
@@ -363,7 +367,7 @@
         "WebPage",
         "WebSite"
       ],
-      "wordCount": 1707,
+      "wordCount": 1774,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -436,7 +440,7 @@
         "MCP policy templates teams can start from",
         "Claude, Hermes, and Ollama get scoped MCP authority \u2014 not standing authority",
         "SaaS MCP is Fly-hosted",
-        "Hybrid MCP is Hetzner-hosted",
+        "Dedicated MCP is contract-triggered",
         "MCP gateway questions",
         "Related MCP governance resources",
         "Launch an MCP gateway agents can safely use."
@@ -458,7 +462,7 @@
         "Question",
         "SoftwareApplication"
       ],
-      "wordCount": 910,
+      "wordCount": 921,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -513,8 +517,8 @@
       "exists": true,
       "title": "SatGate vs AWS AgentCore Payments: Governance Above Paid Rails",
       "titleLength": 62,
-      "metaDescription": "Compare SatGate and AWS AgentCore Payments across cross-provider control, paid rails, MCP proxying, delegated budgets, hybrid deployment, and Evidence Packs.",
-      "metaDescriptionLength": 157,
+      "metaDescription": "Compare SatGate and AWS AgentCore Payments across cross-provider control, paid rails, MCP proxying, delegated budgets, flexible deployment, and Evidence Packs.",
+      "metaDescriptionLength": 159,
       "canonical": "/compare/aws-agentcore-payments",
       "h1": [
         "SatGate vs AWS AgentCore Payments: Governance Above Paid Rails"
@@ -603,8 +607,8 @@
       "exists": true,
       "title": "SatGate vs LangSmith, Helicone, Datadog: Proof Before Postmortems",
       "titleLength": 65,
-      "metaDescription": "Compare LLM observability tools with SatGate pre-execution control: delegated budgets, MCP tool policy, paid rails, hybrid enforcement, and Evidence Packs.",
-      "metaDescriptionLength": 155,
+      "metaDescription": "Compare LLM observability tools with SatGate pre-execution control: delegated budgets, MCP tool policy, paid rails, flexible deployment, and Evidence Packs.",
+      "metaDescriptionLength": 156,
       "canonical": "/compare/langsmith-helicone-datadog",
       "h1": [
         "SatGate vs LangSmith, Helicone, and Datadog: Proof Before Postmortems"
@@ -648,8 +652,8 @@
       "exists": true,
       "title": "SatGate vs API Gateway Rate Limits: Authority Beats Quotas",
       "titleLength": 58,
-      "metaDescription": "Compare API Gateway rate limits with SatGate agent authority: delegated budgets, MCP tool policy, paid rails, hybrid enforcement, and Evidence Packs.",
-      "metaDescriptionLength": 149,
+      "metaDescription": "Compare API Gateway rate limits with SatGate agent authority: delegated budgets, MCP tool policy, paid rails, flexible deployment, and Evidence Packs.",
+      "metaDescriptionLength": 150,
       "canonical": "/compare/api-gateway-rate-limits",
       "h1": [
         "SatGate vs API Gateway Rate Limits: Authority Beats Quotas"
@@ -693,8 +697,8 @@
       "exists": true,
       "title": "SatGate vs OpenAI and Anthropic Budgets: Cross-Provider Authority",
       "titleLength": 65,
-      "metaDescription": "Compare native OpenAI and Anthropic budget controls with SatGate cross-provider agent budgets, MCP policy, paid rails, hybrid control, and Evidence Packs.",
-      "metaDescriptionLength": 154,
+      "metaDescription": "Compare native OpenAI and Anthropic budget controls with SatGate cross-provider agent budgets, MCP policy, paid rails, flexible deployment, and Evidence Packs.",
+      "metaDescriptionLength": 159,
       "canonical": "/compare/openai-anthropic-budget-controls",
       "h1": [
         "SatGate vs OpenAI and Anthropic Budgets: Cross-Provider Authority"

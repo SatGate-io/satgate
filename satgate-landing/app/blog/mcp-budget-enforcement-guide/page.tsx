@@ -30,7 +30,7 @@ export default function McpBudgetEnforcementGuidePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-05',
-    dateModified: '2026-05-04',
+    dateModified: '2026-08-04',
     mainEntityOfPage: 'https://satgate.io/blog/mcp-budget-enforcement-guide',
     about: [
       { '@type': 'Thing', name: 'MCP budget enforcement' },
@@ -80,6 +80,39 @@ export default function McpBudgetEnforcementGuidePage() {
     ],
   };
 
+  const implementationChecklistJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP budget enforcement implementation checklist',
+    description: 'A practical checklist for moving MCP tools from unmetered access to request-path budget enforcement.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Price each MCP tool',
+        description: 'Set default, exact-match, wildcard, and high-risk MCP tool prices before tool execution.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Bind budget to agent authority',
+        description: 'Tie budgets to tenant, agent, workflow, route, MCP server, tool, session, and delegated sub-agent caveats.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Enforce before tools/call',
+        description: 'Check remaining budget and policy before forwarding the JSON-RPC tools/call request to the upstream MCP server.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Preserve receipts',
+        description: 'Capture tool cost, remaining budget, policy decision, denial reason, and Evidence Pack fields for every governed call.',
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script
@@ -89,6 +122,10 @@ export default function McpBudgetEnforcementGuidePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(implementationChecklistJsonLd) }}
       />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -122,6 +159,20 @@ export default function McpBudgetEnforcementGuidePage() {
             to a cheap lookup function and a $2 code execution tool look identical at the protocol level. 
             This guide shows how to add economic governance to any MCP server.
           </p>
+
+          <div className="not-prose my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Implementation path</p>
+            <h2 className="mb-3 text-2xl font-bold text-white">Convert MCP budget guidance into deployable controls</h2>
+            <p className="mb-5 text-gray-300">
+              Use this guide to understand the pattern, then generate policy and config for the actual client/server pair you need to govern.
+            </p>
+            <div className="grid gap-3 text-sm font-semibold sm:grid-cols-2">
+              <Link href="/mcp-tool-cost-policy-generator" className="rounded-lg border border-gray-800 bg-black/40 p-4 text-cyan-300 hover:border-cyan-500/50">Generate MCP tool policy →</Link>
+              <Link href="/mcp-proxy-config-generator" className="rounded-lg border border-gray-800 bg-black/40 p-4 text-cyan-300 hover:border-cyan-500/50">Generate MCP proxy config →</Link>
+              <Link href="/mcp-budget-enforcement" className="rounded-lg border border-gray-800 bg-black/40 p-4 text-cyan-300 hover:border-cyan-500/50">MCP budget enforcement page →</Link>
+              <Link href="/mcp-governance" className="rounded-lg border border-gray-800 bg-black/40 p-4 text-cyan-300 hover:border-cyan-500/50">MCP governance page →</Link>
+            </div>
+          </div>
 
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">The Problem with Unmetered MCP</h2>
           <p className="text-gray-300 leading-relaxed">
@@ -299,6 +350,17 @@ satgate delegate \\
             by team, with trends over time. Start in Observe mode to see the data, then switch to Control 
             when you&apos;re ready to enforce.
           </p>
+
+          <h2 className="text-2xl font-bold mt-12 mb-4 text-white">MCP budget enforcement implementation checklist</h2>
+          <p className="text-gray-300 leading-relaxed">
+            The practical rollout is simple: price tools, bind budget to authority, enforce before <code className="bg-gray-800 px-1.5 rounded text-purple-300">tools/call</code>, and preserve proof for every decision.
+          </p>
+          <ol className="text-gray-300 space-y-2">
+            <li><strong className="text-white">Price each MCP tool:</strong> define default, exact-match, wildcard, and high-risk tool costs.</li>
+            <li><strong className="text-white">Bind budget to agent authority:</strong> scope budgets by tenant, agent, workflow, MCP server, tool, session, and delegated sub-agent.</li>
+            <li><strong className="text-white">Enforce before execution:</strong> check remaining budget before forwarding the JSON-RPC tool call.</li>
+            <li><strong className="text-white">Preserve receipts:</strong> record tool cost, remaining budget, decision reason, policy version, and Evidence Pack fields.</li>
+          </ol>
 
           <div className="my-8 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-6">
             <h2 className="text-2xl font-bold text-white mb-4">MCP Budget Enforcement FAQ</h2>

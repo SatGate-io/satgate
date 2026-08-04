@@ -3,7 +3,7 @@ import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptTe
 
 export const metadata = {
   title: 'MCP Cost Control | Budget Enforcement for Tool-Calling Agents',
-  description: 'Control MCP tool costs with per-tool budgets, scoped credentials, revocation, Evidence Pack receipts, and request-path enforcement for Cursor, Claude, and OpenClaw.',
+  description: 'Control MCP tool costs with per-tool budgets, scoped credentials, revocation, Evidence Pack receipts, and request-path enforcement.',
   alternates: { canonical: 'https://satgate.io/mcp-cost-control' },
   keywords: [
     'MCP cost control',

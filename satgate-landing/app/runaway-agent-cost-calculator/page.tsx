@@ -64,7 +64,7 @@ export default function RunawayAgentCostCalculatorPage() {
     url: 'https://satgate.io/runaway-agent-cost-calculator',
     description: 'Estimate runaway AI agent loop costs from agent count, calls per minute, tool-call cost, loop duration, delegation fanout, and incident frequency.',
     datePublished: '2026-05-01',
-    dateModified: '2026-05-04',
+    dateModified: '2026-08-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'runaway agent spend' },
@@ -84,7 +84,7 @@ export default function RunawayAgentCostCalculatorPage() {
     url: 'https://satgate.io/runaway-agent-cost-calculator',
     description: 'Estimate runaway AI agent loop costs from agent count, calls per minute, tool-call cost, loop duration, delegation fanout, and incident frequency.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-04',
+    dateModified: '2026-08-04',
     about: webPageJsonLd.about,
     featureList: ['Agent loop cost modeling', 'Delegation fanout exposure', 'Monthly and annual exposure estimates', 'Budget enforcement savings estimate'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -119,9 +119,46 @@ export default function RunawayAgentCostCalculatorPage() {
         name: 'How soon should runaway agent loops be blocked?',
         acceptedAnswer: { '@type': 'Answer', text: 'Runaway loops should be blocked at the first budget, per-tool cap, route policy, or revocation trigger. Waiting for dashboards or monthly invoices means the cost has already been created.' },
       },
+      {
+        '@type': 'Question',
+        name: 'How do you calculate autonomous retry loop cost?',
+        acceptedAnswer: { '@type': 'Answer', text: 'Multiply active agents by paid calls per minute, minutes before discovery, delegation fanout, and average cost per call. SatGate then compares the unmanaged loop cost with the cost after request-path enforcement blocks the loop early.' },
+      },
     ],
   };
 
+  const retryLoopJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Autonomous retry loop cost drivers',
+    description: 'The variables that determine runaway cost when autonomous agents retry, loop, or delegate paid API and MCP tool calls.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Retry velocity',
+        description: 'Paid API, model, or MCP tool calls per agent per minute while the loop is active.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Detection lag',
+        description: 'Minutes before the team, dashboard, or alerting system notices the retry loop.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Delegation fanout',
+        description: 'Additional sub-agents or workers that multiply the paid call stream.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Request-path stop time',
+        description: 'How quickly budget enforcement, revocation, or policy denial blocks the next paid request.',
+      },
+    ],
+  };
 
   const howToJsonLd = {
     '@context': 'https://schema.org',
@@ -152,6 +189,7 @@ export default function RunawayAgentCostCalculatorPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(retryLoopJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
@@ -244,6 +282,34 @@ export default function RunawayAgentCostCalculatorPage() {
 
       <section className="border-t border-gray-900 bg-black">
         <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-orange-300">Autonomous retry loops</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">Autonomous retry loop cost is velocity times detection lag</h2>
+          <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+            The GSC-visible search intent is blunt: teams want to know what retry loops cost before they become invoice archaeology. The model is simple enough for finance and platform teams to share.
+          </p>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['Retry velocity', 'Paid API, model, or MCP tool calls per agent per minute while the loop is active.'],
+              ['Detection lag', 'Minutes before dashboards, alerts, or humans notice that the retry loop is still spending.'],
+              ['Delegation fanout', 'Sub-agents and worker pools that multiply the paid call stream behind one task.'],
+              ['Stop time', 'How quickly request-path budget checks, revocation, or policy denial blocks the next paid request.'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+                <h3 className="mb-2 text-xl font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 rounded-xl border border-orange-900/50 bg-orange-950/10 p-6">
+            <p className="font-mono text-sm text-orange-200">
+              retry loop cost = active agents x calls per minute x minutes before discovery x fanout x cost per call
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-orange-300">FAQ</p>
           <h2 className="mb-8 text-3xl font-bold text-white">Runaway agent cost questions</h2>
           <div className="grid gap-5 md:grid-cols-2">
@@ -275,6 +341,12 @@ export default function RunawayAgentCostCalculatorPage() {
               <h3 className="mb-2 text-xl font-bold text-white">How soon should runaway agent loops be blocked?</h3>
               <p className="text-gray-400 leading-relaxed">
                 Runaway loops should be blocked at the first budget, per-tool cap, route policy, or revocation trigger. Waiting for dashboards or monthly invoices means the cost has already been created.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How do you calculate autonomous retry loop cost?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Multiply active agents by paid calls per minute, minutes before discovery, delegation fanout, and average cost per call. SatGate then compares unmanaged retry-loop cost with the cost after request-path controls stop the loop early.
               </p>
             </div>
           </div>

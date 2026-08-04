@@ -3,14 +3,13 @@ import { ArrowRight, CheckCircle2, Shield, Gauge, WalletCards, Activity, KeyRoun
 
 export const metadata = {
   title: 'Economic Firewall for AI Agents',
-  description: 'Learn what an economic firewall is and how SatGate governs AI agent authority, spend, paid rails, and revocation before execution, then exports Evidence Pack proof.',
+  description: 'Learn what an economic firewall is and how SatGate governs AI agent authority, spend, paid rails, revocation, and Evidence Pack proof.',
   alternates: { canonical: 'https://satgate.io/economic-firewall' },
   keywords: [
     'economic firewall',
     'economic firewall for AI agents',
     'AI agent spend control',
     'AI agent budget enforcement',
-    'economic firewall for AI agents',
     'request-layer cost control',
     'API budget enforcement',
     'agent API governance',
@@ -65,7 +64,7 @@ export default function EconomicFirewallPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-05-09',
+    dateModified: '2026-08-04',
     mainEntityOfPage: 'https://satgate.io/economic-firewall',
   };
 
@@ -160,6 +159,39 @@ export default function EconomicFirewallPage() {
     ],
   };
 
+  const controlMatrixJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Economic firewall control matrix',
+    description: 'The core request-path decisions an economic firewall makes for autonomous AI agent traffic.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Authority',
+        description: 'Confirms tenant, agent, workflow, scope, expiry, delegation caveats, and revocation status before execution.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Economics',
+        description: 'Checks per-request cost, remaining budget, route ceiling, tool price, paid-rail context, and spend attribution.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Outcome',
+        description: 'Allows, denies, routes, delegates, meters, charges, or records the request with a policy receipt.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Proof',
+        description: 'Preserves denial reasons, policy inputs, authority chain, spend context, and Evidence Pack export fields.',
+      },
+    ],
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -175,6 +207,7 @@ export default function EconomicFirewallPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(implementationPathJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(controlMatrixJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -274,6 +307,27 @@ export default function EconomicFirewallPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-6 py-20">
+        <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Control matrix</p>
+        <h2 className="mb-4 text-3xl font-bold text-white">The four decisions every agent request needs</h2>
+        <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+          Economic firewalls turn vague governance language into one deterministic request-path check: authority, economics, outcome, and proof.
+        </p>
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {[
+            ['Authority', 'Who is calling, what scoped capability applies, has it expired, and was it revoked?'],
+            ['Economics', 'What does this request cost, which budget pays for it, and does budget remain?'],
+            ['Outcome', 'Should the gateway allow, deny, route, delegate, meter, charge, or record this request?'],
+            ['Proof', 'Which receipt fields preserve policy inputs, denial reasons, spend context, and Evidence Pack export data?'],
+          ].map(([title, body]) => (
+            <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-5">
+              <h3 className="mb-2 text-xl font-bold text-white">{title}</h3>
+              <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+            </div>
+          ))}
         </div>
       </section>
 

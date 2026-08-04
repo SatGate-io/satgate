@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SatGate — Agent Authority & Accountability Layer",
     description:
-      "Policy-to-Proof governance for enterprise agents: bounded economic authority before execution and Evidence Pack proof, decision receipts, and paid-call receipts after governed decisions.",
+      "Policy-to-Proof governance for enterprise agents: bounded authority before execution and Evidence Pack proof after governed decisions.",
     url: "https://satgate.io",
     type: "website",
   },
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SatGate — Agent Authority & Accountability Layer",
     description:
-      "Policy-to-Proof governance for enterprise agents: bounded economic authority before execution and Evidence Pack proof, decision receipts, and paid-call receipts after governed decisions.",
+      "Policy-to-Proof governance for enterprise agents: bounded authority before execution and Evidence Pack proof after governed decisions.",
   },
 };
 

@@ -70,14 +70,35 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
     audit: ['tenant', 'agent', 'workflow', 'model', 'estimated_cost', 'remaining_budget', 'policy_decision', 'decision_reason', 'policy_version', 'receipt_id', 'evidence_pack_id', 'upstream_status'],
   }), [dailyBudget, mode, perRequest, premiumModelPct, risk, sessionBudget, workflow]);
 
+  const policyExamples = [
+    {
+      title: 'Support triage agent',
+      budget: '$75/day, $8/session, $0.60/request',
+      routing: 'Default to economy model; require justification for premium escalation',
+      control: 'Route over-budget requests to a cheaper model and record the decision reason',
+    },
+    {
+      title: 'Coding-agent workflow',
+      budget: '$150/day, $20/session, $1.25/request',
+      routing: 'Allow premium model use only for tests, security review, and release blockers',
+      control: 'Block and revoke the session capability when loop detection fires',
+    },
+    {
+      title: 'Customer-facing AI feature',
+      budget: '$25/customer/day, $5/session, $0.35/request',
+      routing: 'Separate budget by customer, plan tier, route, and environment',
+      control: 'Deny unknown agents and preserve receipt fields for finance review',
+    },
+  ];
+
   const webPageJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'OpenAI API Budget Limit Generator',
+    name: 'OpenAI API Budget Limit Generator for AI Agents',
     url: 'https://satgate.io/openai-budget-policy-generator',
     description: 'Generate request-path OpenAI API budget policy for autonomous agents, model routing, spend caps, revocation, and Evidence Pack receipts.',
     datePublished: '2026-04-29',
-    dateModified: '2026-05-02',
+    dateModified: '2026-08-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'OpenAI API budget limits' },
@@ -89,7 +110,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'OpenAI API Budget Limit Generator',
+    name: 'OpenAI API Budget Limit Generator for AI Agents',
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/openai-budget-policy-generator',
@@ -104,6 +125,19 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
       'YAML and JSON policy output',
     ],
     audience: { '@type': 'Audience', audienceType: 'AI platform, security, and FinOps teams' },
+  };
+
+  const examplesJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'OpenAI API budget policy examples',
+    description: 'Example request-path OpenAI budget policies for support agents, coding agents, and customer-facing AI features.',
+    itemListElement: policyExamples.map((example, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: example.title,
+      description: `${example.budget}. ${example.routing}. ${example.control}.`,
+    })),
   };
 
   const howToJsonLd = {
@@ -166,6 +200,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(examplesJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -247,6 +282,26 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Policy examples</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">OpenAI budget policies by agent workflow</h2>
+          <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+            Use the generator to tune the exact values, then carry these patterns into request-path controls for support agents, coding agents, and customer-facing AI features.
+          </p>
+          <div className="grid gap-5 md:grid-cols-3">
+            {policyExamples.map((example) => (
+              <div key={example.title} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+                <h3 className="mb-3 text-xl font-bold text-white">{example.title}</h3>
+                <p className="mb-3 text-sm leading-relaxed text-gray-400"><span className="font-semibold text-gray-200">Budget:</span> {example.budget}</p>
+                <p className="mb-3 text-sm leading-relaxed text-gray-400"><span className="font-semibold text-gray-200">Routing:</span> {example.routing}</p>
+                <p className="text-sm leading-relaxed text-gray-400"><span className="font-semibold text-gray-200">Control:</span> {example.control}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

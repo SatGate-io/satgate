@@ -68,7 +68,7 @@ export default function AiAgentCostControlPage() {
     name: 'AI Agent Cost Control | Request-Path Budget Enforcement',
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-cost-control',
-    dateModified: '2026-05-05',
+    dateModified: '2026-08-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent cost control' },
@@ -88,7 +88,7 @@ export default function AiAgentCostControlPage() {
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-cost-control',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-05',
+    dateModified: '2026-08-04',
     about: webPageJsonLd.about,
     offers: { '@type': 'Offer', url: 'https://satgate.io/pricing' },
     featureList: [
@@ -118,7 +118,7 @@ export default function AiAgentCostControlPage() {
         name: 'Why are provider dashboards not enough for AI agent spend control?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Dashboards report spend after the fact. Autonomous agents can retry, loop, and delegate fast enough that budget enforcement must happen inline at the gateway at the gateway before forwarding to upstream APIs.',
+          text: 'Dashboards report spend after the fact. Autonomous agents can retry, loop, and delegate fast enough that budget enforcement must happen inline at the gateway before forwarding to upstream APIs.',
         },
       },
       {
@@ -159,6 +159,14 @@ export default function AiAgentCostControlPage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'Add budget enforcement before agents receive access to paid APIs, premium models, MCP tools, data providers, or external services where retries, loops, or delegation can create real cost.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What AI agent spending controls should come first?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Start with per-agent identity, per-request ceilings, session and daily budgets, MCP tool prices, delegation limits, revocation triggers, and Evidence Pack receipts. These controls stop spend before dashboards or invoices report it.',
         },
       },
     ],
@@ -230,6 +238,72 @@ export default function AiAgentCostControlPage() {
     ],
   };
 
+  const comparisonJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent cost-control alternatives comparison',
+    description: 'How request-path AI agent budget enforcement compares with provider dashboards, account spend caps, and rate limits.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Provider dashboards',
+        description: 'Useful for reporting model and token usage after the spend has already happened, but too late to stop runaway agent loops.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Account-level spend caps',
+        description: 'Can prevent catastrophic account spend, but usually shut down unrelated workloads and lack per-agent attribution.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Rate limits',
+        description: 'Throttle request volume without understanding per-request economics, MCP tool prices, delegation, or remaining budget.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'SatGate request-path budget enforcement',
+        description: 'Checks agent identity, scoped authority, tool cost, remaining budget, revocation, and receipt policy before upstream execution.',
+      },
+    ],
+  };
+
+  const spendingControlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent spending controls',
+    description: 'The first request-path controls teams should add before autonomous agents can create API, model, MCP tool, or paid-access spend.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Per-agent identity and attribution',
+        description: 'Every request should include tenant, workflow, agent, delegated sub-agent, route, model, and tool context.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Budget ceilings before execution',
+        description: 'Check per-request, session, daily, route, model, and tool budgets before forwarding to upstream services.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Delegation and revocation limits',
+        description: 'Limit child-agent authority and block the next governed request when policy, budget, or risk changes.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Evidence Pack receipts',
+        description: 'Preserve policy inputs, allow/deny decisions, remaining budget, denial reasons, and proof fields for audit.',
+      },
+    ],
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -246,6 +320,8 @@ export default function AiAgentCostControlPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(buyingChecklistJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(rolloutJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(comparisonJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(spendingControlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -370,6 +446,60 @@ export default function AiAgentCostControlPage() {
 
       <section className="border-t border-gray-900 bg-black">
         <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Buyer comparison</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">AI agent cost control is not another dashboard</h2>
+          <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+            The buying question is not whether you can see spend. It is whether policy can stop unauthorized or over-budget agent work before the upstream provider creates the bill.
+          </p>
+          <div className="overflow-hidden rounded-2xl border border-gray-800">
+            <div className="grid md:grid-cols-4 bg-gray-900/70 text-sm font-bold text-white">
+              <div className="p-4">Approach</div>
+              <div className="p-4">Best for</div>
+              <div className="p-4">Agent-cost gap</div>
+              <div className="p-4">SatGate role</div>
+            </div>
+            {[
+              ['Provider dashboards', 'After-the-fact reporting', 'Shows invoices after loops, retries, and MCP tools already spent money.', 'Adds pre-execution budget checks and receipts.'],
+              ['Account spend caps', 'Last-resort account protection', 'Stops everyone at once and does not explain which agent caused the breach.', 'Enforces per-agent, per-route, and per-tool budgets.'],
+              ['Rate limits', 'Traffic shaping', 'Counts requests without pricing model calls, paid tools, or delegated sub-agent fanout.', 'Evaluates request economics before forwarding.'],
+              ['SatGate', 'Request-path agent budget enforcement', 'Designed for autonomous agent authority, spend, revocation, and proof.', 'Observe, Control, and Prove each agent/API decision.'],
+            ].map(([approach, best, gap, role]) => (
+              <div key={approach} className="grid md:grid-cols-4 border-t border-gray-800 text-gray-300">
+                <div className="p-4 font-semibold text-white">{approach}</div>
+                <div className="p-4">{best}</div>
+                <div className="p-4">{gap}</div>
+                <div className="p-4">{role}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-gray-950/50">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Spending controls</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">AI agent spending controls that belong in the request path</h2>
+          <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+            The current search signal is clear: buyers are not asking for prettier dashboards. They are asking which controls stop agent spend before an autonomous workflow turns one bad loop into a real bill.
+          </p>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['Identity and attribution', 'Attach tenant, workflow, agent, delegated sub-agent, route, model, and MCP tool context to every request.'],
+              ['Budget ceilings', 'Enforce per-request, session, daily, route, model, and tool budgets before upstream execution.'],
+              ['Delegation and revocation', 'Limit child-agent authority and block the next governed request when policy, risk, or budget changes.'],
+              ['Evidence Pack receipts', 'Record policy inputs, allow/deny decisions, remaining budget, denial reasons, and proof fields.'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black p-6">
+                <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="max-w-6xl mx-auto px-6 py-20">
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Buying checklist</p>
           <h2 className="mb-4 text-3xl font-bold text-white">What to demand from AI agent cost-control software</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
@@ -476,7 +606,7 @@ export default function AiAgentCostControlPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Why are provider dashboards not enough for AI agent spend control?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Dashboards report spend after the fact. Autonomous agents can retry, loop, and delegate fast enough that budget enforcement must happen inline at the gateway at the gateway before forwarding to upstream APIs.
+                Dashboards report spend after the fact. Autonomous agents can retry, loop, and delegate fast enough that budget enforcement must happen inline at the gateway before forwarding to upstream APIs.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

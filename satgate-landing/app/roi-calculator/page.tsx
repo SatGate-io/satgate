@@ -68,6 +68,41 @@ export default function ROICalculatorPage() {
   const withoutSatgate = maxBar;
   const withSatgate = calc.monthlyToolSpend + (calc.monthlyLoopWaste * 0.02);
   const barMax = Math.max(withoutSatgate, 1);
+  const roiExamples = [
+    {
+      title: 'MCP support agent team',
+      agents: 25,
+      callsPerDay: 180,
+      costPerCall: '$0.04',
+      loopFrequency: '1.5%',
+      wastedCalls: 120,
+      monthlyAvoidableSpend: '$3,888',
+      payback: '< 1 day',
+      control: 'Per-agent MCP tool caps and deny receipts',
+    },
+    {
+      title: 'Enterprise coding-agent rollout',
+      agents: 150,
+      callsPerDay: 320,
+      costPerCall: '$0.08',
+      loopFrequency: '0.8%',
+      wastedCalls: 180,
+      monthlyAvoidableSpend: '$16,589',
+      payback: '< 1 day',
+      control: 'Route budgets, scoped capability tokens, and Evidence Pack exports',
+    },
+    {
+      title: 'External robot-customer API',
+      agents: 60,
+      callsPerDay: 500,
+      costPerCall: '$0.03',
+      loopFrequency: '2.0%',
+      wastedCalls: 90,
+      monthlyAvoidableSpend: '$4,860',
+      payback: '< 1 day',
+      control: 'Request-path budget enforcement before paid upstream access',
+    },
+  ];
 
   const webPageJsonLd = {
     '@context': 'https://schema.org',
@@ -75,7 +110,7 @@ export default function ROICalculatorPage() {
     name: 'AI Agent ROI Calculator',
     description: 'Estimate runaway AI agent loop exposure, budget-control ROI, and the receipts needed for Policy-to-Proof evidence across paid APIs and MCP tools.',
     url: 'https://satgate.io/roi-calculator',
-    dateModified: '2026-05-05',
+    dateModified: '2026-08-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent ROI calculator' },
@@ -110,7 +145,7 @@ export default function ROICalculatorPage() {
       { '@type': 'Audience', audienceType: 'AI engineering teams deploying paid MCP tools and APIs' },
     ],
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-05',
+    dateModified: '2026-08-04',
     about: webPageJsonLd.about,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
@@ -279,6 +314,31 @@ export default function ROICalculatorPage() {
     ],
   };
 
+  const exampleResultsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: 'AI agent budget enforcement ROI example results',
+    description: 'Representative examples for estimating runaway AI agent spend, avoided monthly waste, payback period, and the SatGate controls that map ROI to proof.',
+    url: 'https://satgate.io/roi-calculator',
+    creator: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
+    dateModified: '2026-08-04',
+    variableMeasured: [
+      'active agents',
+      'tool calls per agent per day',
+      'average cost per tool call',
+      'loop frequency',
+      'wasted calls before discovery',
+      'monthly avoidable spend',
+      'payback period',
+      'request-path enforcement control',
+    ],
+    distribution: {
+      '@type': 'DataDownload',
+      encodingFormat: 'text/html',
+      contentUrl: 'https://satgate.io/roi-calculator',
+    },
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -297,6 +357,7 @@ export default function ROICalculatorPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(scenariosJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breakEvenJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(exampleResultsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       {/* Navigation */}
       <nav className="border-b border-gray-800 backdrop-blur-md fixed w-full z-50 bg-black/50">
@@ -536,6 +597,44 @@ export default function ROICalculatorPage() {
                 <span className="text-sm font-semibold text-green-300">Map this to proof →</span>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Example scenarios */}
+      <section className="pb-20 px-6">
+        <div className="max-w-5xl mx-auto rounded-2xl border border-gray-800 bg-gray-900/60 p-6 md:p-8">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Example results</p>
+          <h2 className="mb-4 text-2xl md:text-3xl font-bold text-white">AI agent budget enforcement ROI benchmarks</h2>
+          <p className="mb-8 max-w-3xl text-gray-400 leading-relaxed">
+            Use these examples as starting points when finance, platform, and security teams need a shared estimate before real traffic is available in Observe mode.
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[760px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-gray-800 text-xs uppercase tracking-wide text-gray-500">
+                  <th className="py-3 pr-4 font-semibold">Scenario</th>
+                  <th className="py-3 pr-4 font-semibold">Inputs</th>
+                  <th className="py-3 pr-4 font-semibold">Avoidable spend</th>
+                  <th className="py-3 pr-4 font-semibold">SatGate control</th>
+                </tr>
+              </thead>
+              <tbody>
+                {roiExamples.map((example) => (
+                  <tr key={example.title} className="border-b border-gray-800/70 align-top">
+                    <td className="py-4 pr-4 font-bold text-white">{example.title}</td>
+                    <td className="py-4 pr-4 text-gray-400">
+                      {example.agents} agents, {example.callsPerDay} calls/day, {example.costPerCall}/call, {example.loopFrequency} loop frequency, {example.wastedCalls} wasted calls
+                    </td>
+                    <td className="py-4 pr-4">
+                      <span className="block font-bold text-green-300">{example.monthlyAvoidableSpend}/mo</span>
+                      <span className="text-gray-500">Payback: {example.payback}</span>
+                    </td>
+                    <td className="py-4 pr-4 text-gray-400">{example.control}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>

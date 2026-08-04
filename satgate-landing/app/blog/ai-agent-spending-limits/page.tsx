@@ -29,7 +29,7 @@ export default function AiAgentSpendingLimitsBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-10',
-    dateModified: '2026-05-04',
+    dateModified: '2026-08-04',
     mainEntityOfPage: 'https://satgate.io/blog/ai-agent-spending-limits',
     about: [
       { '@type': 'Thing', name: 'AI agent spending limits' },
@@ -79,10 +79,44 @@ export default function AiAgentSpendingLimitsBlogPage() {
     ],
   };
 
+  const policyChecklistJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent spending limits policy checklist',
+    description: 'The minimum fields teams should define before giving autonomous agents access to paid APIs, models, or MCP tools.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Identity and scope',
+        description: 'Tie each budget to tenant, agent, workflow, route, model, tool, customer, and delegated sub-agent identity.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Budget and time window',
+        description: 'Set per-request, per-session, daily, weekly, workflow, and delegated-child budgets before execution.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Enforcement outcome',
+        description: 'Define whether over-budget requests are denied, downgraded, queued, routed, revoked, or escalated.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Evidence Pack receipt fields',
+        description: 'Record policy version, remaining budget, estimated cost, decision reason, agent identity, route, and upstream outcome.',
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(policyChecklistJsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
           <ArrowLeft size={18} /> Back to Blog
@@ -123,6 +157,20 @@ export default function AiAgentSpendingLimitsBlogPage() {
           <p className="text-gray-300 leading-relaxed">
             For agents, you need <strong>budget limits</strong> — not rate limits. Predictable <em>spending</em>, not just predictable <em>requests</em>.
           </p>
+
+          <div className="not-prose my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Implementation path</p>
+            <h2 className="mb-3 text-2xl font-bold text-white">Turn this article into request-path policy</h2>
+            <p className="mb-5 text-gray-300">
+              If you are evaluating agent spend caps, start with the commercial overview, generate a policy, then model the downside from runaway loops.
+            </p>
+            <div className="grid gap-3 text-sm font-semibold sm:grid-cols-2">
+              <Link href="/agent-spending-limits" className="rounded-lg border border-gray-800 bg-black/40 p-4 text-cyan-300 hover:border-cyan-500/50">Agent spending limits pillar →</Link>
+              <Link href="/ai-agent-cost-control" className="rounded-lg border border-gray-800 bg-black/40 p-4 text-cyan-300 hover:border-cyan-500/50">AI agent cost-control page →</Link>
+              <Link href="/agent-spend-policy-template" className="rounded-lg border border-gray-800 bg-black/40 p-4 text-cyan-300 hover:border-cyan-500/50">Generate spend policy →</Link>
+              <Link href="/runaway-agent-cost-calculator" className="rounded-lg border border-gray-800 bg-black/40 p-4 text-cyan-300 hover:border-cyan-500/50">Model runaway spend →</Link>
+            </div>
+          </div>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Runaway Agent Horror Story</h2>
           <p className="text-gray-300 leading-relaxed">
@@ -167,6 +215,17 @@ export default function AiAgentSpendingLimitsBlogPage() {
           <p className="text-gray-300 leading-relaxed">
             The agent gets a structured error it can handle gracefully — not a crashed process or an infinite retry.
           </p>
+
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The agent spending limit policy checklist</h2>
+          <p className="text-gray-300 leading-relaxed">
+            A real spending limit needs more than one dollar value. It needs enough context to decide whether a request should run before the upstream API or MCP tool creates cost.
+          </p>
+          <ul className="text-gray-300 space-y-2">
+            <li><strong className="text-white">Identity and scope:</strong> tenant, agent, workflow, model, route, tool, customer, and delegated sub-agent.</li>
+            <li><strong className="text-white">Budget and time window:</strong> per-request, per-session, per-day, per-workflow, and delegated-child budgets.</li>
+            <li><strong className="text-white">Enforcement outcome:</strong> deny, downgrade, queue, route, revoke, or escalate when budget is exhausted.</li>
+            <li><strong className="text-white">Evidence fields:</strong> policy version, remaining budget, estimated cost, decision reason, receipt ID, and upstream outcome.</li>
+          </ul>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Cost Granularity Matters</h2>
           <p className="text-gray-300 leading-relaxed">
@@ -220,7 +279,7 @@ export default function AiAgentSpendingLimitsBlogPage() {
 
           <div className="mt-12 p-6 bg-gray-900/50 border border-gray-800 rounded-lg">
             <p className="text-gray-300 mb-4">
-              The code is open source. Try it:
+              The code is open source. Try it, or start with a generated policy before routing production traffic:
             </p>
             <pre className="bg-gray-900/70 rounded p-3 text-sm overflow-x-auto">
               <code className="text-green-300">{`go install github.com/satgate-io/satgate/cmd/satgate-mcp@latest`}</code>
@@ -229,6 +288,10 @@ export default function AiAgentSpendingLimitsBlogPage() {
               <a href="https://github.com/SatGate-io/satgate" className="text-cyan-400 hover:text-cyan-300">GitHub →</a>
               {' · '}
               <a href="https://satgate.io/pricing" className="text-cyan-400 hover:text-cyan-300">Enterprise →</a>
+              {' · '}
+              <Link href="/agent-spend-policy-template" className="text-cyan-400 hover:text-cyan-300">Spend policy template →</Link>
+              {' · '}
+              <Link href="/economic-firewall-readiness-grader" className="text-cyan-400 hover:text-cyan-300">Readiness grader →</Link>
             </p>
           </div>
 

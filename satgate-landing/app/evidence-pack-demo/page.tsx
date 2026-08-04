@@ -105,6 +105,7 @@ const jsonLd = {
   operatingSystem: 'Web',
   url: 'https://satgate.io/evidence-pack-demo',
   description: metadata.description,
+  dateModified: '2026-08-04',
   featureList: [
     'Canonical Evidence Pack v1 schema',
     'Authority chain viewer',

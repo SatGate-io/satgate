@@ -3,7 +3,7 @@ import { ArrowRight, Cable, Eye, Gauge, KeyRound, ShieldAlert, Wrench } from 'lu
 
 export const metadata = {
   title: 'MCP Governance: Authority, Policy, and Audit Receipts',
-  description: 'Govern Model Context Protocol tools with SatGate. Check agent authority before MCP calls execute, enforce policy, revoke access, and produce Evidence Pack receipts for every decision.',
+  description: 'Govern Model Context Protocol tools with request-path authority checks, policy enforcement, revocation, and Evidence Pack receipts.',
   alternates: { canonical: 'https://satgate.io/mcp-governance' },
   keywords: [
     'MCP governance',

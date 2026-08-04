@@ -97,6 +97,8 @@ const jsonLd = {
       name: "Agent Authority & Accountability Layer",
       url: "https://satgate.io/agent-authority-layer",
       description: metadata.description,
+      datePublished: "2026-05-14",
+      dateModified: "2026-08-04",
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
       about: [
         { "@type": "Thing", name: "AI agent authority" },
@@ -109,6 +111,7 @@ const jsonLd = {
       "@type": "SoftwareApplication",
       name: "SatGate",
       applicationCategory: "BusinessApplication",
+      dateModified: "2026-08-04",
       featureList: [
         "Delegated agent authority",
         "Pre-flight policy enforcement",
