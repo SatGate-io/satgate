@@ -3,7 +3,7 @@ import { ArrowRight, Cable, Eye, Gauge, KeyRound, ShieldAlert, Wrench } from 'lu
 
 export const metadata = {
   title: 'MCP Governance: Authority, Policy, and Audit Receipts',
-  description: 'Govern Model Context Protocol tools with request-path authority checks, policy enforcement, revocation, and Evidence Pack receipts.',
+  description: 'Govern MCP tool calls with request-path authority checks, budget enforcement, revocation, and Evidence Pack receipts.',
   alternates: { canonical: 'https://satgate.io/mcp-governance' },
   keywords: [
     'MCP governance',
@@ -18,7 +18,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'MCP Governance: Authority, Policy, and Audit Receipts',
-    description: 'Control Model Context Protocol tool calls with authority policy, scoped budgets, revocation, Evidence Pack receipts, and Evidence Pack proof.',
+    description: 'Control Model Context Protocol tool calls with authority policy, scoped budgets, revocation, and Evidence Pack proof.',
     url: 'https://satgate.io/mcp-governance',
     type: 'article',
   },
@@ -71,7 +71,7 @@ export default function McpGovernancePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-05-03',
+    dateModified: '2026-08-05',
     mainEntityOfPage: 'https://satgate.io/mcp-governance',
     about: [
       { '@type': 'Thing', name: 'MCP governance' },
@@ -79,6 +79,8 @@ export default function McpGovernancePage() {
       { '@type': 'Thing', name: 'Model Context Protocol Evidence Pack receipts' },
       { '@type': 'Thing', name: 'MCP proxy policy' },
       { '@type': 'Thing', name: 'agent tool spend limits' },
+      { '@type': 'Thing', name: 'request-path control for AI agents' },
+      { '@type': 'Thing', name: 'capability-based authorization for MCP tools' },
     ],
   };
 
@@ -134,6 +136,14 @@ export default function McpGovernancePage() {
           text: 'A proxy is the cleanest way to enforce MCP budgets because it places policy in the request path between agents and tools. That lets teams identify, price, allow, block, revoke, and audit tool calls without rewriting every MCP server.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'How does MCP governance fit request-path control for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'MCP governance is one request-path control: it applies capability scope, tool allowlists, per-tool budgets, revocation, delegation limits, and Evidence Pack receipts before autonomous agents execute tool calls.',
+        },
+      },
     ],
   };
 
@@ -183,12 +193,55 @@ export default function McpGovernancePage() {
             MCP makes tools easy for agents to use. SatGate makes tool use governable: every MCP call is identified, checked against policy, allowed or denied before execution, and recorded as proof.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
               See SatGate governance <ArrowRight size={18} />
             </Link>
+            <Link href="/mcp-gateway" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              MCP gateway hub
+            </Link>
+            <Link href="/capability-auth" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              Capability authorization
+            </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               See Policy-to-Proof
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-6 py-16">
+        <div className="rounded-2xl border border-cyan-900/50 bg-gray-950 p-6 md:p-8">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Direct answer</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">MCP governance controls tool authority before autonomous agents execute work</h2>
+          <p className="mb-6 text-lg leading-relaxed text-gray-300">
+            MCP governance is the request-path policy layer for Model Context Protocol tool calls. SatGate identifies the tenant, agent, capability, MCP client, server, tool, budget, and delegation chain; checks scope and spend before execution; revokes risky access before the next request; and exports Evidence Pack proof for every governed allow or deny decision.
+          </p>
+          <div className="grid gap-4 md:grid-cols-4">
+            {[
+              ['Tool scope', 'Which MCP server, tool, method, tenant, workflow, and delegated worker is allowed?'],
+              ['Spend control', 'What per-tool, per-session, per-agent, or per-tenant budget applies before execution?'],
+              ['Revocation', 'Which agent, worker, capability, or tool grant must be denied on the next request?'],
+              ['Evidence', 'Which receipt proves policy basis, budget state, decision, outcome, and Evidence Pack export?'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-4">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Link href="/mcp-gateway" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
+              MCP gateway <ArrowRight size={16} />
+            </Link>
+            <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
+              Tool cost policy generator <ArrowRight size={16} />
+            </Link>
+            <Link href="/capability-auth" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
+              Capability authorization <ArrowRight size={16} />
+            </Link>
+            <Link href="/blog/api-gateway-for-ai-agents" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
+              API gateway guide <ArrowRight size={16} />
             </Link>
           </div>
         </div>
@@ -347,11 +400,19 @@ evidence:
                 A proxy is the cleanest way to enforce MCP budgets because it places policy in the request path between agents and tools. That lets teams identify, price, allow, block, revoke, and audit tool calls without rewriting every MCP server.
               </p>
             </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How does MCP governance fit request-path control for AI agents?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                MCP governance is one request-path control: it applies capability scope, tool allowlists, per-tool budgets, revocation, delegation limits, and Evidence Pack receipts before autonomous agents execute tool calls.
+              </p>
+            </div>
           </div>
 
           <h2 className="text-3xl font-bold text-white mb-8">Related MCP governance topics</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
+              ['/mcp-gateway', 'MCP gateway', 'Use SatGate as the commercial MCP gateway hub for authority checks, budgets, and Evidence Packs.'],
+              ['/capability-auth', 'Capability-based authorization', 'Replace standing MCP tool authority with scoped, revocable, budget-aware capabilities.'],
               ['/policy-to-proof', 'Policy-to-Proof', 'See how MCP allow, deny, delegate, and revoke decisions become Evidence Pack proof.'],
               ['/govern', 'Govern AI agents', 'Govern MCP authority before tool execution.'],
               ['/mcp-budget-enforcement', 'MCP budget enforcement', 'Hard caps, per-tool prices, and request-path budget decisions for MCP servers.'],
