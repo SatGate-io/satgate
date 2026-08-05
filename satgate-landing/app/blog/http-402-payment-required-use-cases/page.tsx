@@ -29,7 +29,7 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-02',
-    dateModified: '2026-06-01',
+    dateModified: '2026-08-05',
     mainEntityOfPage: 'https://satgate.io/blog/http-402-payment-required-use-cases',
     about: [
       { '@type': 'Thing', name: 'HTTP 402 Payment Required' },
@@ -84,6 +84,47 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
           text: 'An AI agent handles HTTP 402 by reading the payment challenge, checking its budget policy, paying the invoice when allowed, receiving or presenting payment proof, and retrying the API request with the L402 credential.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'Is HTTP 402 Payment Required a standard status code?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. HTTP 402 Payment Required is a registered client-error status code, but it was reserved for future use and does not define one universal payment flow by itself. Protocols such as L402 make 402 actionable for APIs by specifying the payment challenge and proof pattern.',
+        },
+      },
+    ],
+  };
+
+  const statusCodeDecisionJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'HTTP 402 Payment Required status code decision guide',
+    description: 'When APIs should return 401, 402, 403, or 429 for authentication, payment, authorization, and rate-limit failures.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: '401 Unauthorized',
+        description: 'Use 401 when the client has not authenticated or needs to present valid credentials.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: '402 Payment Required',
+        description: 'Use 402 when access is available after payment or proof of payment, subject to budget and authority policy.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: '403 Forbidden',
+        description: 'Use 403 when the caller is known but the requested action is not allowed even if payment is offered.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: '429 Too Many Requests',
+        description: 'Use 429 when the client has exceeded a rate or concurrency limit and should slow down or retry later.',
+      },
     ],
   };
 
@@ -96,6 +137,10 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(statusCodeDecisionJsonLd) }}
       />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -160,6 +205,27 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
             That distinction matters. A 401 tells the client to present credentials. A 402 tells the client to present <em>payment</em>. The resource isn&apos;t forbidden &mdash; it&apos;s for sale. This is a fundamentally different relationship between client and server, and it enables business models that 401/403 can&apos;t express.
           </p>
 
+          <div className="my-8 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Status code decision</p>
+            <h2 className="mb-3 text-2xl font-bold text-white">Use 402 when payment can unlock access</h2>
+            <p className="mb-5 text-gray-300 leading-relaxed">
+              The fastest way to understand HTTP 402 is to compare it with the neighboring client-error codes most APIs already use.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                ['401 Unauthorized', 'The client needs to authenticate or present valid credentials.'],
+                ['402 Payment Required', 'The resource is available after payment or proof of payment, subject to budget and authority policy.'],
+                ['403 Forbidden', 'The caller is known, but the action is not allowed even if payment is offered.'],
+                ['429 Too Many Requests', 'The client exceeded a rate or concurrency limit and should slow down or retry later.'],
+              ].map(([title, body]) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-4">
+                  <h3 className="mb-2 font-bold text-white">{title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
             <code className="text-green-300">{`# Standard 402 response with L402 challenge
 HTTP/1.1 402 Payment Required
@@ -209,6 +275,12 @@ Content-Type: application/json
                 <h3 className="text-xl font-bold text-white mb-2">When should an API return HTTP 402 instead of 401 or 403?</h3>
                 <p className="text-gray-300 leading-relaxed mb-0">
                   Return HTTP 402 when access is allowed after payment. Use 401 when authentication is missing, 403 when access is forbidden, and 402 when the resource is available but requires payment or proof of payment first.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">Is HTTP 402 Payment Required a standard status code?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  Yes. HTTP 402 Payment Required is a registered client-error status code, but it was reserved for future use and does not define one universal payment flow by itself. L402 makes 402 actionable for APIs by specifying the payment challenge and proof pattern.
                 </p>
               </div>
             </div>

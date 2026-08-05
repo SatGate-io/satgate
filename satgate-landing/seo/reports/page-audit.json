@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-05T02:04:59.631937Z",
+  "generatedAt": "2026-08-05T02:34:57.123569Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -228,6 +228,7 @@
       "h2s": [
         "HTTP 402 Payment Required Agent Implementation",
         "What HTTP 402 Actually Means",
+        "Use 402 when payment can unlock access",
         "HTTP 402 Payment Required FAQ",
         "Why 402 Stayed Dormant for Decades",
         "Seven Real-World Use Cases for HTTP 402",
@@ -255,12 +256,14 @@
       "schemaTypes": [
         "Answer",
         "FAQPage",
+        "ItemList",
+        "ListItem",
         "Organization",
         "Question",
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2647,
+      "wordCount": 2740,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
