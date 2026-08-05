@@ -30,7 +30,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-07',
-    dateModified: '2026-06-01',
+    dateModified: '2026-08-05',
     mainEntityOfPage: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls',
     about: [
       { '@type': 'Thing', name: 'OpenAI API budget limits' },
@@ -87,6 +87,50 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
           text: 'Put a gateway in front of OpenAI, identify the agent or team, estimate the request cost from model and token policy, check remaining budget, and allow, block, or downgrade the request before it reaches the OpenAI API.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'Can OpenAI API budget limits be enforced per project, agent, or workflow?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. A request-path gateway can enforce OpenAI API budgets by project, agent, workflow, user, customer, session, model, or route before forwarding a request to OpenAI.',
+        },
+      },
+    ],
+  };
+
+  const howToJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to add budget limits to OpenAI API calls',
+    description: 'A request-path setup checklist for enforcing OpenAI API budget limits before GPT calls execute.',
+    totalTime: 'PT10M',
+    tool: [{ '@type': 'HowToTool', name: 'SatGate OpenAI budget gateway' }],
+    step: [
+      {
+        '@type': 'HowToStep',
+        name: 'Route OpenAI traffic through a gateway',
+        text: 'Put a budget-aware gateway in front of the OpenAI API so requests can be priced and checked before forwarding.',
+      },
+      {
+        '@type': 'HowToStep',
+        name: 'Attach identity and budget labels',
+        text: 'Tag each request with project, agent, team, customer, session, workflow, model, and route so budgets can be isolated.',
+      },
+      {
+        '@type': 'HowToStep',
+        name: 'Define budget policy',
+        text: 'Set per-request, daily, session, team, customer, and premium-model budgets with downgrade, block, queue, or approval behavior.',
+      },
+      {
+        '@type': 'HowToStep',
+        name: 'Enforce before execution',
+        text: 'Estimate request cost, check remaining budget atomically, and allow, block, downgrade, or require approval before the GPT call reaches OpenAI.',
+      },
+      {
+        '@type': 'HowToStep',
+        name: 'Preserve proof',
+        text: 'Record each allow, deny, downgrade, approval, or revocation decision as an Evidence Pack receipt for finance and security review.',
+      },
     ],
   };
 
@@ -99,6 +143,10 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
       />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -245,6 +293,28 @@ class OpenAIBudgetWrapper:
           <p className="text-gray-300 leading-relaxed">
             Here&apos;s how to implement it properly with SatGate:
           </p>
+
+          <div className="my-8 rounded-2xl border border-green-900/60 bg-green-950/20 p-6">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-green-300">Setup checklist</p>
+            <h2 className="mb-3 text-2xl font-bold text-white">OpenAI API budget limits need five request-path controls</h2>
+            <p className="mb-5 text-gray-300 leading-relaxed">
+              The budget has to be checked while the request is still stoppable, not after the OpenAI invoice updates.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                ['Route through a gateway', 'Proxy OpenAI calls so policy can run before the upstream request.'],
+                ['Attach identity labels', 'Project, agent, team, customer, session, workflow, model, and route.'],
+                ['Define budget policy', 'Per-request, daily, session, team, customer, and premium-model limits.'],
+                ['Choose enforcement behavior', 'Allow, block, downgrade, queue, require approval, or revoke before execution.'],
+                ['Preserve proof', 'Evidence Pack receipts for allow, deny, downgrade, approval, and revocation decisions.'],
+              ].map(([title, body]) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-4">
+                  <h3 className="mb-2 font-bold text-white">{title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
           
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Step 1: Install the Gateway</h2>
           
@@ -573,6 +643,11 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">How do you enforce an OpenAI API budget limit before GPT calls run?</h3>
           <p className="text-gray-300 leading-relaxed">
             Put a gateway in front of OpenAI, identify the agent or team, estimate the request cost from model and token policy, check remaining budget, and allow, block, or downgrade the request before it reaches the OpenAI API.
+          </p>
+
+          <h3 className="text-xl font-semibold mt-6 mb-3 text-white">Can OpenAI API budget limits be enforced per project, agent, or workflow?</h3>
+          <p className="text-gray-300 leading-relaxed">
+            Yes. A request-path gateway can enforce OpenAI API budgets by project, agent, workflow, user, customer, session, model, or route before forwarding a request to OpenAI.
           </p>
 
           <div className="my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">

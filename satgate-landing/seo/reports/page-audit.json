@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-05T01:35:04.699710Z",
+  "generatedAt": "2026-08-05T02:04:59.631937Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -116,6 +116,7 @@
         "The $72,000 Lesson",
         "Why Traditional Solutions Fail",
         "The Solution: Request-Level Budget Enforcement",
+        "OpenAI API budget limits need five request-path controls",
         "Step 1: Install the Gateway",
         "Step 2: Create Budget-Limited Tokens",
         "Step 3: Update Your Code",
@@ -123,8 +124,7 @@
         "Real-World Example: Preventing Retry Storms",
         "Advanced: Per-User Budgets for AI Apps",
         "Monitoring and Alerts",
-        "The Results",
-        "Common Questions"
+        "The Results"
       ],
       "internalLinks": [
         "/agent-api-key-risk-assessment",
@@ -142,12 +142,15 @@
       "schemaTypes": [
         "Answer",
         "FAQPage",
+        "HowTo",
+        "HowToStep",
+        "HowToTool",
         "Organization",
         "Question",
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1322,
+      "wordCount": 1403,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
