@@ -110,7 +110,7 @@ export default function ROICalculatorPage() {
     name: 'AI Agent ROI Calculator',
     description: 'Estimate runaway AI agent loop exposure, budget-control ROI, and the receipts needed for Policy-to-Proof evidence across paid APIs and MCP tools.',
     url: 'https://satgate.io/roi-calculator',
-    dateModified: '2026-08-04',
+    dateModified: '2026-08-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent ROI calculator' },
@@ -134,6 +134,7 @@ export default function ROICalculatorPage() {
       'Monthly AI agent tool spend estimate',
       'Runaway loop ghost spend exposure',
       'Annual AI agent cost-risk model',
+      'ROI-to-enforcement priority model',
       'Request-path budget enforcement savings estimate',
       'Payback period and annual ROI estimate',
       'Links from ROI exposure to Policy-to-Proof controls and Evidence Pack receipts',
@@ -145,7 +146,7 @@ export default function ROICalculatorPage() {
       { '@type': 'Audience', audienceType: 'AI engineering teams deploying paid MCP tools and APIs' },
     ],
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-08-04',
+    dateModified: '2026-08-05',
     about: webPageJsonLd.about,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
@@ -224,6 +225,14 @@ export default function ROICalculatorPage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'Platform, security, finance, and AI engineering teams should use it before giving autonomous agents access to paid APIs, model providers, MCP tools, data services, or external agent marketplaces.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What controls should you fund first after calculating AI agent ROI?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Fund the controls closest to cost creation first: per-agent and per-tool budgets, pre-request allow or deny decisions, revocation before the next request, and Evidence Pack receipts for denied, downgraded, paid, and delegated calls.',
         },
       },
     ],
@@ -314,6 +323,39 @@ export default function ROICalculatorPage() {
     ],
   };
 
+  const enforcementDecisionJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent ROI to budget enforcement decision model',
+    description: 'How to turn AI agent ROI calculator output into the first request-path enforcement controls to fund.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'High ghost spend',
+        description: 'Prioritize hard per-agent, per-tool, and per-route budget caps before paid API or MCP requests execute.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'High loop frequency',
+        description: 'Prioritize loop detection, structured denials, downgrade paths, and revocation triggers before retry storms create cost.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'High delegation fanout',
+        description: 'Prioritize scoped capability tokens, child-agent budget attenuation, delegation-chain attribution, and receipt export.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Short payback period',
+        description: 'Move the highest-risk routes from Observe to Control mode and preserve Evidence Packs for finance, security, and audit review.',
+      },
+    ],
+  };
+
   const exampleResultsJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Dataset',
@@ -321,7 +363,7 @@ export default function ROICalculatorPage() {
     description: 'Representative examples for estimating runaway AI agent spend, avoided monthly waste, payback period, and the SatGate controls that map ROI to proof.',
     url: 'https://satgate.io/roi-calculator',
     creator: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-08-04',
+    dateModified: '2026-08-05',
     variableMeasured: [
       'active agents',
       'tool calls per agent per day',
@@ -357,6 +399,7 @@ export default function ROICalculatorPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(scenariosJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breakEvenJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(enforcementDecisionJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(exampleResultsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       {/* Navigation */}
@@ -528,6 +571,35 @@ export default function ROICalculatorPage() {
                 <p className="text-sm text-gray-400">{item.body}</p>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Enforcement priority */}
+      <section className="pb-20 px-6">
+        <div className="max-w-5xl mx-auto rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6 md:p-8">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Enforcement priority</p>
+          <h2 className="mb-4 text-2xl md:text-3xl font-bold text-white">Use ROI to decide which agent budget controls to fund first</h2>
+          <p className="mb-8 max-w-3xl text-gray-400 leading-relaxed">
+            The useful output is not just a payback number. It is a ranked enforcement plan: where spend is created, which request is still stoppable, and what proof finance and security will need afterward.
+          </p>
+          <div className="grid gap-5 md:grid-cols-2">
+            {[
+              ['High ghost spend', 'Start with hard per-agent, per-tool, and per-route budget caps before paid API or MCP requests execute.'],
+              ['High loop frequency', 'Add loop detection, structured denials, downgrade paths, and revocation triggers before retries create cost.'],
+              ['High delegation fanout', 'Use scoped capability tokens, child-agent budget attenuation, delegation-chain attribution, and receipt export.'],
+              ['Short payback period', 'Move the highest-risk routes from Observe to Control mode and preserve Evidence Packs for review.'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black/40 p-5">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-wrap gap-3 text-sm font-semibold">
+            <Link href="/ai-agent-cost-control" className="text-cyan-300 hover:text-cyan-200">AI agent cost control →</Link>
+            <Link href="/mcp-tool-cost-policy-generator" className="text-cyan-300 hover:text-cyan-200">MCP tool policy generator →</Link>
+            <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">See Policy-to-Proof →</Link>
           </div>
         </div>
       </section>
@@ -717,6 +789,12 @@ export default function ROICalculatorPage() {
                 Platform, security, finance, and AI engineering teams should use it before giving autonomous agents access to paid APIs, model providers, MCP tools, data services, or external agent marketplaces.
               </p>
             </div>
+            <div>
+              <h3 className="mb-2 text-xl font-bold text-white">What controls should you fund first after calculating AI agent ROI?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Fund the controls closest to cost creation first: per-agent and per-tool budgets, pre-request allow or deny decisions, revocation before the next request, and Evidence Pack receipts for denied, downgraded, paid, and delegated calls.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -727,6 +805,9 @@ export default function ROICalculatorPage() {
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Turn this ROI model into proof</h2>
           <p className="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
             SatGate checks authority before execution, records every policy decision as a receipt, and packages the evidence for review.
+          </p>
+          <p className="text-gray-500 mb-8 max-w-xl mx-auto">
+            Every agent action leaves a receipt, so a 90-second Evidence Pack cut can show the budget decision behind the ROI number.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

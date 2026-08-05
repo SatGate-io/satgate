@@ -194,7 +194,7 @@ export default function McpBudgetEnforcementPage() {
             Rate limits are too crude. Dashboards are too late. Approval queues do not scale when agents make hundreds of small decisions. MCP budget enforcement belongs in the request path, where each tool call can be priced, evaluated, allowed, denied, routed, approved, or bound to paid-rail context before execution.
           </p>
           <p>
-            SatGate is the economic firewall for that path: observe MCP activity, control risky spend before execution, and prove each budget or paid-rail decision with an Evidence Pack receipt.
+            SatGate is the economic firewall for that path: observe MCP activity, put authority before execution, control risky spend before execution, and prove each budget or paid-rail decision with an Evidence Pack receipt.
           </p>
         </div>
         <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">

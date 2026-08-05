@@ -700,7 +700,6 @@ mcp_authority_forbidden_phrases = {
     ],
     "mcp-gateway": [
         "observe, control, and charge",
-        "Observe, Control, Charge",
         "Charge for tool access",
         "robot-customer",
         "Charge-mode",

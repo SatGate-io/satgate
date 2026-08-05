@@ -267,7 +267,7 @@ export default function EconomicFirewallPage() {
               Rate limits can slow traffic. Dashboards can explain yesterday&apos;s bill. Neither can answer the question that matters before a request happens: <strong className="text-white">is this agent allowed to take this action right now?</strong>
             </p>
             <p>
-              Economic firewalls are the missing control plane between autonomous agents and governed APIs. They combine identity, authority policy, budget enforcement, observability, revocation, provider routing, Evidence Pack capture, and optional payment context into one request-path decision.
+              Economic firewalls are the missing control plane between autonomous agents and governed APIs. SatGate governs AI agent authority, spend, paid rails, and revocation before execution, then exports Evidence Pack proof. They combine identity, authority policy, budget enforcement, observability, revocation, provider routing, Evidence Pack capture, and optional payment context into one request-path decision.
             </p>
           </div>
         </div>

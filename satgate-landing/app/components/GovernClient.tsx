@@ -75,7 +75,7 @@ export default function GovernPage() {
             </span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            SatGate puts governance in the request path: Observe agent activity, Control scopes, budgets, delegation, and revocation before execution, then Prove every decision with Evidence Packs across APIs, MCP tools, and paid rails.
+            Govern internal agents. Preserve proof across external rails. SatGate puts governance in the request path: Observe agent activity, Control scopes, budgets, delegation, and revocation before execution, then Prove every decision with Evidence Packs across APIs, MCP tools, and paid rails.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/policy-to-proof" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center justify-center gap-2">
@@ -137,7 +137,7 @@ export default function GovernPage() {
           <div className="max-w-3xl mx-auto mt-6 p-6 rounded-xl bg-black border-2 border-purple-500/40">
             <p className="text-xs font-mono text-purple-400 uppercase tracking-wider mb-3">Proof spans both lanes</p>
             <h3 className="text-xl font-bold text-white mb-2">Prove <span className="text-purple-400">Across Both Agent Lanes</span></h3>
-            <p className="text-gray-400 text-sm">Internal or external, supported governed decisions can produce signed receipts. Payment proves value moved; SatGate proves authority was evaluated. Where receipt export is enabled, receipts reconcile into Evidence Packs your auditor can verify independently.</p>
+            <p className="text-gray-400 text-sm">Govern, enforce, prove. Internal or external, supported governed decisions can produce signed receipts. Payment proves value moved. SatGate proves the agent was allowed to move it. Evidence preserved across rails reconciles into Evidence Packs your auditor can verify independently.</p>
           </div>
 
           <div className="text-center mt-8">

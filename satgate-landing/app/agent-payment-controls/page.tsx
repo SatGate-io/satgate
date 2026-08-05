@@ -86,11 +86,11 @@ export default function AgentPaymentControlsPage() {
             Agent Payment Controls Start With Policy Before Payment
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-10">
-            AI agents can use wallets, cards, shared payment tokens, HTTP 402 challenges, L402, x402, or enterprise billing rails. The control layer is policy: who may spend, how much, on what authority, and with what receipt.
+            Policy Before Agent Payments. AI agents can use wallets, cards, shared payment tokens, HTTP 402 challenges, L402, x402, or enterprise billing rails. The control layer is policy: who may spend, how much, on what authority, and with what receipt.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              Govern paid access <ArrowRight size={18} />
+              Govern agent payments <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
               See Policy-to-Proof

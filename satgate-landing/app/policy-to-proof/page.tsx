@@ -215,7 +215,7 @@ export default function PolicyToProofPage() {
                 Define what an agent is allowed to do, enforce it at the gateway, and produce evidence humans and upstreams can trust.
               </p>
               <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
-                Bind agent actions to human or platform authority; apply spend, scope, rate, and escalation limits before access; export the proof when your CISO, auditor, board, or incident reviewer asks what happened.
+                Every agent action leaves a receipt. Bind agent actions to human or platform authority; apply spend, scope, rate, and escalation limits before access; export the proof when your CISO, auditor, board, or incident reviewer asks what happened.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <Link
@@ -436,7 +436,7 @@ export default function PolicyToProofPage() {
               The demo ends on the exported Evidence Pack: one artifact proving authority, spend, denial, and revocation across the invoice-reconciler lifecycle. Even producing the Evidence Pack is itself an auditable event.
             </p>
             <p className="mt-4 text-sm leading-6 text-gray-500">
-              Read the six-step lifecycle below, or watch the 90-second cut.
+              Read the six-step lifecycle below, or watch the 90-second cut. The 90-second Evidence Pack cut shows the same authority chain as receipts.
             </p>
           </div>
 

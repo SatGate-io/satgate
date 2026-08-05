@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-05T00:35:02.101172Z",
+  "generatedAt": "2026-08-05T01:09:53.608108Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -370,7 +370,7 @@
         "WebPage",
         "WebSite"
       ],
-      "wordCount": 1774,
+      "wordCount": 1787,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
@@ -433,18 +433,18 @@
     {
       "path": "/mcp-gateway",
       "exists": true,
-      "title": "MCP Gateway for Agent Governance and Evidence Packs",
-      "titleLength": 51,
+      "title": "MCP Gateway for Budget Enforcement and Evidence Packs",
+      "titleLength": 53,
       "metaDescription": "Use SatGate as an MCP gateway to check authority before tool execution, enforce policy, and export Evidence Packs.",
       "metaDescriptionLength": 114,
       "canonical": "/mcp-gateway",
       "h1": [
-        "MCP Gateway for Agent Governance and Evidence Packs"
+        "MCP Gateway for Budget Enforcement and Evidence Packs"
       ],
       "h1Count": 1,
       "h2s": [
         "MCP connection is not MCP governance",
-        "Observe, Control, Prove MCP tool use",
+        "Observe, Control, Charge MCP tool use",
         "MCP policy templates teams can start from",
         "Claude, Hermes, and Ollama get scoped MCP authority \u2014 not standing authority",
         "SaaS MCP is Fly-hosted",
