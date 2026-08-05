@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T23:34:42.281659Z",
+  "generatedAt": "2026-08-05T00:05:51.004944Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -169,6 +169,7 @@
       "h1Count": 1,
       "h2s": [
         "LLM Cost Dashboard Design Pattern: Cost, Latency, Traces, Budget",
+        "Budget management means deciding before the call, not after the invoice",
         "If You Need an LLM Cost Dashboard for Finance",
         "The LLM Cost Management Landscape Today",
         "Why Monitoring Fails When Agents Hold the Wallet",
@@ -194,12 +195,14 @@
       "schemaTypes": [
         "Answer",
         "FAQPage",
+        "ItemList",
+        "ListItem",
         "Organization",
         "Question",
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2196,
+      "wordCount": 2298,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,

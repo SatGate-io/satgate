@@ -30,7 +30,7 @@ export default function LlmCostManagementBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-17',
-    dateModified: '2026-06-01',
+    dateModified: '2026-08-05',
     mainEntityOfPage: 'https://satgate.io/blog/llm-cost-management',
     about: [
       { '@type': 'Thing', name: 'LLM cost management' },
@@ -79,6 +79,47 @@ export default function LlmCostManagementBlogPage() {
           text: 'LLM observability platforms can show cost and latency per trace, but teams running autonomous agents should also require request-path budget enforcement. The dashboard should expose token cost, latency, customer account, trace ID, agent, tool, and the allow/block/downgrade budget decision for every request.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'What is LLM budget management?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'LLM budget management is the operating model for assigning model, user, customer, workflow, agent, and tool budgets before requests execute. It should combine dashboards with request-path controls that allow, block, downgrade, route, or charge each call before cost is created.',
+        },
+      },
+    ],
+  };
+
+  const budgetManagementJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'LLM budget management controls',
+    description: 'The core controls needed to move from LLM cost dashboards to enforceable budget management for agents, tools, and workflows.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Budget unit',
+        description: 'Set budgets by customer, tenant, user, workflow, agent, model, route, and MCP tool instead of only by provider account.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Pre-request decision',
+        description: 'Estimate cost and decide whether to allow, block, downgrade, route, charge, or escalate before forwarding the request.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Attribution and alerts',
+        description: 'Show cost, latency, trace ID, agent, tool, workflow, customer account, and remaining budget in the dashboard.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Proof',
+        description: 'Preserve Evidence Pack receipts for budget decisions, denials, downgrades, paid calls, and revocation events.',
+      },
     ],
   };
 
@@ -91,6 +132,10 @@ export default function LlmCostManagementBlogPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(budgetManagementJsonLd) }}
       />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -168,6 +213,27 @@ export default function LlmCostManagementBlogPage() {
           <p className="text-gray-300 leading-relaxed">
             The dashboard is the visibility layer. The control layer is the gateway that makes the budget decision before the call reaches OpenAI, Anthropic, an MCP server, or any paid API. Without that decision point, the dashboard is just a nicer post-mortem.
           </p>
+
+          <div className="my-8 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">LLM budget management</p>
+            <h2 className="mb-3 text-2xl font-bold text-white">Budget management means deciding before the call, not after the invoice</h2>
+            <p className="mb-5 text-gray-300 leading-relaxed">
+              The useful operating model is simple: the dashboard shows what is happening, but the gateway owns the budget decision while the request is still stoppable.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                ['Budget unit', 'Customer, tenant, user, workflow, agent, model, route, and MCP tool budgets.'],
+                ['Pre-request decision', 'Allow, block, downgrade, route, charge, or escalate before forwarding the request.'],
+                ['Attribution', 'Cost, latency, trace ID, agent, tool, workflow, customer account, and remaining budget.'],
+                ['Proof', 'Evidence Pack receipts for budget decisions, denials, downgrades, paid calls, and revocation events.'],
+              ].map(([title, body]) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-4">
+                  <h3 className="mb-2 font-bold text-white">{title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
 
           <div className="my-8 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-6">
             <h2 className="text-2xl font-bold text-white mb-4">If You Need an LLM Cost Dashboard for Finance</h2>
@@ -404,6 +470,12 @@ satgate mint \\
               <h3 className="text-xl font-bold text-white mb-2">What should finance teams require from LLM cost management?</h3>
               <p className="text-gray-300 leading-relaxed mb-0">
                 Finance teams should require customer-level attribution, weekly spend reports, budget status by agent and workflow, and hard enforcement controls that prevent spend from exceeding approved limits instead of only sending alerts after the fact.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2">What is LLM budget management?</h3>
+              <p className="text-gray-300 leading-relaxed mb-0">
+                LLM budget management assigns spend authority by customer, workflow, agent, model, route, and MCP tool before requests execute. The dashboard should show spend and remaining budget, but the gateway should make the allow, block, downgrade, route, charge, or escalate decision before the upstream provider creates cost.
               </p>
             </div>
             <div>
