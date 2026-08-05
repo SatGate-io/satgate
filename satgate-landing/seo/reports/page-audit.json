@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-05T01:09:53.608108Z",
+  "generatedAt": "2026-08-05T01:35:04.699710Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -278,6 +278,7 @@
       ],
       "h1Count": 1,
       "h2s": [
+        "Use API keys for stable apps; use macaroon tokens for delegated AI agents",
         "The API Key Model: Identity Without Constraints",
         "The Macaroon Model: Capabilities With Built-In Constraints",
         "Macaroon Tokens vs API Keys FAQ",
@@ -295,6 +296,7 @@
         "/agent-capability-tokens",
         "/agent-control-plane",
         "/blog",
+        "/capability-auth",
         "/design-partners",
         "/economic-firewall-readiness-grader",
         "/govern",
@@ -306,12 +308,14 @@
       "schemaTypes": [
         "Answer",
         "FAQPage",
+        "ItemList",
+        "ListItem",
         "Organization",
         "Question",
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2669,
+      "wordCount": 2776,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,

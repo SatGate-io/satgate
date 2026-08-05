@@ -29,7 +29,7 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-31',
-    dateModified: '2026-05-04',
+    dateModified: '2026-08-05',
     mainEntityOfPage: 'https://satgate.io/blog/macaroon-tokens-vs-api-keys',
     about: [
       { '@type': 'Thing', name: 'macaroon tokens versus API keys' },
@@ -76,6 +76,47 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
           text: 'Macaroon authentication supports revocation by combining short expirations, caveats, revocation identifiers, and gateway-side deny lists. A compromised agent token can be invalidated without rotating every account-level API key.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'Should AI agents use API keys or macaroon tokens?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Use API keys for stable human-operated integrations with simple account-level access. Use macaroon tokens for AI agents that need scoped authority, delegated sub-agent access, request-path budget enforcement, revocation, and Evidence Pack auditability.',
+        },
+      },
+    ],
+  };
+
+  const comparisonJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Macaroon tokens vs API keys comparison criteria',
+    description: 'The main decision criteria for choosing API keys or macaroon tokens for AI agent access.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Scope',
+        description: 'API keys usually grant account-level access; macaroon tokens can bind scope to route, tool, task, tenant, and workflow.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Delegation',
+        description: 'API keys are unsafe to share; macaroons can be attenuated so sub-agents receive less authority than the parent.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Budget enforcement',
+        description: 'API keys need external billing checks; macaroons can carry budget caveats that a gateway verifies before each request.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Revocation and proof',
+        description: 'API keys often require rotation; macaroons can use expiry, revocation identifiers, gateway deny lists, and Evidence Pack receipts.',
+      },
     ],
   };
 
@@ -88,6 +129,10 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(comparisonJsonLd) }}
       />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -130,6 +175,32 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
           <p className="text-gray-300 leading-relaxed">
             This is why the agent economy needs <strong className="text-white">capability-based authentication</strong> instead of identity-based authentication. And the best implementation of capability-based auth for APIs is macaroon tokens.
           </p>
+
+          <div className="my-8 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Decision matrix</p>
+            <h2 className="mb-3 text-2xl font-bold text-white">Use API keys for stable apps; use macaroon tokens for delegated AI agents</h2>
+            <p className="mb-5 text-gray-300 leading-relaxed">
+              The decision is not about which secret format is newer. It is about whether the caller needs bounded, delegated, budget-aware authority that can be checked before every request.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                ['Scope', 'API keys usually grant account-level access. Macaroons bind scope to route, tool, task, tenant, and workflow.'],
+                ['Delegation', 'API keys are unsafe to share. Macaroons attenuate so sub-agents receive less authority than the parent.'],
+                ['Budget enforcement', 'API keys need external billing checks. Macaroons carry caveats a gateway verifies before each request.'],
+                ['Revocation and proof', 'API keys usually require rotation. Macaroons support expiry, revocation IDs, deny lists, and Evidence Pack receipts.'],
+              ].map(([title, body]) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-4">
+                  <h3 className="mb-2 font-bold text-white">{title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-5 flex flex-wrap gap-3 text-sm font-semibold">
+              <Link href="/capability-auth" className="text-cyan-300 hover:text-cyan-200">Capability auth →</Link>
+              <Link href="/agent-capability-tokens" className="text-cyan-300 hover:text-cyan-200">Agent capability tokens →</Link>
+              <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">Govern agent access →</Link>
+            </div>
+          </div>
 
           <p className="text-gray-300 leading-relaxed">
             Let's break down why API keys fail for AI workloads, how macaroons solve the problem, and what this means for your API's security model.
@@ -278,6 +349,12 @@ agent_c_macaroon = attenuate(agent_b_macaroon, [
                 <h3 className="text-xl font-bold text-white mb-2">How does macaroon authentication support revocation?</h3>
                 <p className="text-gray-300 leading-relaxed mb-0">
                   Macaroon authentication supports revocation by combining short expirations, caveats, revocation identifiers, and gateway-side deny lists. A compromised agent token can be invalidated without rotating every account-level API key.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">Should AI agents use API keys or macaroon tokens?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  Use API keys for stable human-operated integrations with simple account-level access. Use macaroon tokens for AI agents that need scoped authority, delegated sub-agent access, request-path budget enforcement, revocation, and Evidence Pack auditability.
                 </p>
               </div>
             </div>
