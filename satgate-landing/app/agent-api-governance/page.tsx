@@ -3,7 +3,7 @@ import { ArrowRight, BadgeCheck, Ban, Clock, Fingerprint, GitBranch, KeyRound, S
 
 export const metadata = {
   title: 'Agent API Governance | Identity, Revocation, Budgets, Audit',
-  description: 'Govern AI agent API access with scoped capabilities, delegation limits, revocation, policy checks, and Evidence Pack receipts before execution.',
+  description: 'Govern AI agent API access with tenant identity, scoped capabilities, delegation limits, revocation, budgets, and Evidence Pack receipts.',
   alternates: { canonical: 'https://satgate.io/agent-api-governance' },
   keywords: [
     'agent API governance',
@@ -18,14 +18,14 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Agent API Governance',
-    description: 'Replace unlimited API keys with scoped, revocable, budget-aware agent capabilities enforced in the request path.',
+    description: 'Replace unlimited API keys with tenant-bound, scoped, revocable, budget-aware agent capabilities enforced in the request path.',
     url: 'https://satgate.io/agent-api-governance',
     type: 'article',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Agent API Governance',
-    description: 'Govern AI agent identity, delegated access, revocation, policy checks, and Evidence Pack receipts before API calls execute.',
+    description: 'Govern AI agent identity, delegated access, revocation, budgets, and Evidence Pack receipts before API calls execute.',
   },
 };
 
@@ -71,13 +71,15 @@ export default function AgentApiGovernancePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-05-05',
+    dateModified: '2026-08-05',
     mainEntityOfPage: 'https://satgate.io/agent-api-governance',
     about: [
       { '@type': 'Thing', name: 'agent API governance' },
       { '@type': 'Thing', name: 'revocable agent credentials' },
       { '@type': 'Thing', name: 'capability tokens for AI agents' },
       { '@type': 'Thing', name: 'delegated API access control' },
+      { '@type': 'Thing', name: 'tenant identity for AI agents' },
+      { '@type': 'Thing', name: 'agent-scoped API keys' },
       { '@type': 'Thing', name: 'request-path API policy' },
     ],
   };
@@ -126,6 +128,14 @@ export default function AgentApiGovernancePage() {
           text: 'Agent API governance reduces blast radius by narrowing each credential to the minimum routes, tools, budget, delegation depth, and lifetime needed for the task, with revocation before the next request.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'How do you govern tenant and agent identity for API calls?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Govern tenant and agent identity by binding every API request to tenant, agent, task, workflow, parent capability, delegated worker, route, budget, and policy version before the request reaches the upstream API.',
+        },
+      },
     ],
   };
 
@@ -158,6 +168,12 @@ export default function AgentApiGovernancePage() {
         position: 4,
         name: 'Delegation with attenuation',
         description: 'Sub-agents never inherit full parent authority; each delegation shrinks scope, budget, lifetime, and allowed tools.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 5,
+        name: 'Tenant-bound evidence',
+        description: 'Receipts tie each API decision to tenant, agent, policy version, capability chain, budget state, route, denial reason, and Evidence Pack export.',
       },
     ],
   };
@@ -202,6 +218,43 @@ export default function AgentApiGovernancePage() {
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               See Policy-to-Proof
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-6 py-16">
+        <div className="rounded-2xl border border-yellow-900/50 bg-gray-950 p-6 md:p-8">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-yellow-300">Direct answer</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">Agent API governance binds every call to identity, authority, budget, and proof</h2>
+          <p className="mb-6 text-lg leading-relaxed text-gray-300">
+            Agent API governance is the request-path control layer for autonomous API access. It identifies the tenant, agent, task, workflow, delegated worker, capability, route, and policy version; enforces scope, budget, expiry, and revocation before execution; then preserves an Evidence Pack receipt for the allow or deny decision.
+          </p>
+          <div className="grid gap-4 md:grid-cols-4">
+            {[
+              ['Tenant identity', 'Bind every call to the customer, workspace, workflow, parent agent, and delegated worker behind it.'],
+              ['Scoped authority', 'Replace standing API keys with capabilities limited by route, method, tool, task, and expiry.'],
+              ['Budget checks', 'Block over-budget API, model, or MCP calls before upstream execution or paid access.'],
+              ['Revocation proof', 'Record the revoke event and the first denied request after authority is removed.'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-4">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Link href="/capability-auth" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-yellow-500">
+              Capability authorization <ArrowRight size={16} />
+            </Link>
+            <Link href="/mcp-gateway" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-yellow-500">
+              MCP gateway controls <ArrowRight size={16} />
+            </Link>
+            <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-yellow-500">
+              Capability policy template <ArrowRight size={16} />
+            </Link>
+            <Link href="/agent-api-key-risk-assessment" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-yellow-500">
+              API key risk assessment <ArrowRight size={16} />
             </Link>
           </div>
         </div>
@@ -377,12 +430,21 @@ evidence:
                 Agent API governance reduces blast radius by narrowing each credential to the minimum routes, tools, budget, delegation depth, and lifetime needed for the task, with revocation before the next request.
               </p>
             </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How do you govern tenant and agent identity for API calls?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Govern tenant and agent identity by binding every API request to tenant, agent, task, workflow, parent capability, delegated worker, route, budget, and policy version before the request reaches the upstream API.
+              </p>
+            </div>
           </div>
 
           <h2 className="text-3xl font-bold text-white mb-8">Related governance guides</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               ['/agent-api-key-risk-assessment', 'Agent API key risk assessment', 'Score static key risk across scope, budget, expiry, revocation, delegation, and audit gaps.'],
+              ['/capability-auth', 'Capability-based authorization', 'Replace broad API keys with scoped, revocable, budget-aware capabilities.'],
+              ['/mcp-gateway', 'MCP gateway', 'Apply agent API governance to MCP tool calls before execution.'],
+              ['/revocable-capability-token-policy-template', 'Capability policy template', 'Generate scoped, expiring, budget-aware authority policy in YAML or JSON.'],
               ['/revocable-agent-credentials', 'Revocable agent credentials', 'Scoped credentials, expiry, and kill switches for autonomous access.'],
               ['/agent-capability-tokens', 'Agent capability tokens', 'Encode scope, budget, route, delegation, and revocation into agent authority.'],
               ['/policy-to-proof', 'Policy-to-Proof', 'See how agent API decisions become Evidence Pack proof.'],
