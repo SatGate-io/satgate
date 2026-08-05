@@ -56,7 +56,7 @@ const faqs = [
 ];
 
 export const metadata = {
-  title: 'MCP Gateway for Budget Enforcement and Evidence Packs',
+  title: 'MCP Gateway for Agent Governance and Evidence Packs',
   description: 'Use SatGate as an MCP gateway to check authority before tool execution, enforce policy, and export Evidence Packs.',
   alternates: { canonical: 'https://satgate.io/mcp-gateway' },
   keywords: [
@@ -73,14 +73,14 @@ export const metadata = {
     'Hermes MCP governance',
   ],
   openGraph: {
-    title: 'MCP Gateway for Budget Enforcement and Evidence Packs',
+    title: 'MCP Gateway for Agent Governance and Evidence Packs',
     description: 'Put SatGate in the MCP request path: check authority before tool execution, enforce policy, and export Evidence Pack receipts.',
     url: 'https://satgate.io/mcp-gateway',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MCP Gateway for Budget Enforcement and Evidence Packs',
+    title: 'MCP Gateway for Agent Governance and Evidence Packs',
     description: 'Govern Claude, Hermes, Ollama, Cursor, and custom MCP agents with authority checks and Evidence Pack proof.',
   },
 };
@@ -94,7 +94,7 @@ export default function McpGatewayPage() {
     operatingSystem: 'Web',
     description: metadata.description,
     url: 'https://satgate.io/mcp-gateway',
-    dateModified: '2026-05-10',
+    dateModified: '2026-08-05',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     featureList: [
       'MCP budget enforcement',
@@ -102,6 +102,38 @@ export default function McpGatewayPage() {
       'MCP tool allowlist policy',
       'Tenant isolation for MCP servers',
       'Delegation-depth enforcement for agent capabilities',
+    ],
+  };
+  const mcpGatewayControlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP gateway governance controls',
+    description: 'Commercial MCP gateway controls for AI agent tool access, budget enforcement, capability authorization, audit proof, and Evidence Pack export.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Tool authority before execution',
+        description: 'Identify the tenant, agent, capability, MCP client, server, and tool before an upstream MCP tool call runs.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'MCP tool budget enforcement',
+        description: 'Price each governed tool call and enforce per-agent, per-session, per-tenant, and per-tool budgets before spend occurs.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Capability-based authorization',
+        description: 'Use scoped, revocable, budget-aware capabilities instead of standing MCP tool authority or shared API keys.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Evidence Pack proof',
+        description: 'Export signed receipts for allowed calls, denied calls, budget state, delegation lineage, revocation, and paid-rail context.',
+      },
     ],
   };
   const faqJsonLd = {
@@ -135,6 +167,7 @@ export default function McpGatewayPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(mcpGatewayControlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
@@ -151,10 +184,13 @@ export default function McpGatewayPage() {
             <Cable size={16} /> Model Context Protocol governance gateway
           </div>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight max-w-5xl mb-8">
-            MCP Gateway for Budget Enforcement and Evidence Packs
+            MCP Gateway for Agent Governance and Evidence Packs
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-8">
             SatGate sits between AI agents — Claude, Hermes, Ollama, Cursor, OpenClaw, or custom MCP clients — and the tools they want to call. Every MCP request is checked for authority, budget, tenant, tool scope, and delegation before execution — then preserved as Evidence Pack proof.
+          </p>
+          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-cyan-100">
+            MCP Gateway for Budget Enforcement and Evidence Packs is the commercial control path: connect agents to tools, enforce authority before tool execution, and export proof after each governed decision.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
@@ -165,6 +201,43 @@ export default function McpGatewayPage() {
             </Link>
             <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-800 px-6 py-3 font-bold text-gray-200 hover:border-cyan-500 transition">
               MCP budget enforcement
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-6 py-16">
+        <div className="rounded-2xl border border-cyan-900/50 bg-gray-950 p-6 md:p-8">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Direct answer</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">An MCP gateway governs tool calls before agents reach the server</h2>
+          <p className="mb-6 text-lg leading-relaxed text-gray-300">
+            An MCP gateway sits between AI agents and Model Context Protocol servers. SatGate uses that position to identify the agent, check capability scope, price the requested tool call, enforce MCP budget policy, deny unauthorized execution, and export Evidence Pack receipts for the decision.
+          </p>
+          <div className="grid gap-4 md:grid-cols-4">
+            {[
+              ['Identify', 'Tenant, agent, workflow, MCP client, server, tool, token, and delegation chain.'],
+              ['Authorize', 'Capability scope, tool allowlist, tenant boundary, expiry, and revocation state.'],
+              ['Budget', 'Per-tool cost, remaining budget, rate context, and fail-closed spend controls.'],
+              ['Prove', 'Allowed and denied MCP calls preserved as Evidence Pack receipts.'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-4">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Link href="/capability-auth" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
+              Capability authorization <ArrowRight size={16} />
+            </Link>
+            <Link href="/blog/api-gateway-for-ai-agents" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
+              API gateway for AI agents <ArrowRight size={16} />
+            </Link>
+            <Link href="/blog/mcp-budget-enforcement-guide" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
+              MCP budget guide <ArrowRight size={16} />
+            </Link>
+            <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
+              Tool cost policy generator <ArrowRight size={16} />
             </Link>
           </div>
         </div>
@@ -284,6 +357,10 @@ export default function McpGatewayPage() {
         <h2 className="text-3xl font-bold text-white mb-6">Related MCP governance resources</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
+            ['/govern', 'AI agent governance', 'Govern agent authority, budgets, revocation, and Evidence Pack proof before execution.'],
+            ['/capability-auth', 'Capability authorization', 'Replace standing MCP tool authority with scoped, revocable, budget-aware capabilities.'],
+            ['/blog/api-gateway-for-ai-agents', 'API gateway for AI agents', 'See why agent gateways need MCP tool control, budgets, and proof beyond routing.'],
+            ['/blog/mcp-budget-enforcement-guide', 'MCP budget enforcement guide', 'Walk through hard caps, tool prices, and request-path denial for MCP calls.'],
             ['/mcp-governance', 'MCP governance', 'Govern MCP tool calls with authority, policy, revocation, and Evidence Pack receipts.'],
             ['/mcp-budget-enforcement', 'MCP budget enforcement', 'Hard-cap per-tool spend before MCP tools execute.'],
             ['/mcp-tool-cost-policy-generator', 'MCP tool policy generator', 'Generate MCP tool cost and Evidence Pack policy.'],

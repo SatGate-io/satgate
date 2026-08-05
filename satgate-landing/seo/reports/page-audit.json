@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-05T03:05:49.128180Z",
+  "generatedAt": "2026-08-05T03:35:56.418632Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -448,16 +448,17 @@
     {
       "path": "/mcp-gateway",
       "exists": true,
-      "title": "MCP Gateway for Budget Enforcement and Evidence Packs",
-      "titleLength": 53,
+      "title": "MCP Gateway for Agent Governance and Evidence Packs",
+      "titleLength": 51,
       "metaDescription": "Use SatGate as an MCP gateway to check authority before tool execution, enforce policy, and export Evidence Packs.",
       "metaDescriptionLength": 114,
       "canonical": "/mcp-gateway",
       "h1": [
-        "MCP Gateway for Budget Enforcement and Evidence Packs"
+        "MCP Gateway for Agent Governance and Evidence Packs"
       ],
       "h1Count": 1,
       "h2s": [
+        "An MCP gateway governs tool calls before agents reach the server",
         "MCP connection is not MCP governance",
         "Observe, Control, Charge MCP tool use",
         "MCP policy templates teams can start from",
@@ -469,8 +470,12 @@
         "Launch an MCP gateway agents can safely use."
       ],
       "internalLinks": [
+        "/blog/api-gateway-for-ai-agents",
+        "/blog/mcp-budget-enforcement-guide",
+        "/capability-auth",
         "/govern",
         "/mcp-budget-enforcement",
+        "/mcp-tool-cost-policy-generator",
         "/policy-templates/mcp-governance/mcp-governance-policy-bundle.v1.json",
         "/policy-to-proof"
       ],
@@ -480,12 +485,13 @@
         "DataDownload",
         "Dataset",
         "FAQPage",
+        "ItemList",
         "ListItem",
         "Organization",
         "Question",
         "SoftwareApplication"
       ],
-      "wordCount": 921,
+      "wordCount": 1030,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
