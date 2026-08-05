@@ -30,7 +30,7 @@ export default function ApiGatewayForAiAgentsBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-12',
-    dateModified: '2026-05-04',
+    dateModified: '2026-08-05',
     mainEntityOfPage: 'https://satgate.io/blog/api-gateway-for-ai-agents',
     about: [
       { '@type': 'Thing', name: 'API gateway for AI agents' },
@@ -79,6 +79,47 @@ export default function ApiGatewayForAiAgentsBlogPage() {
           text: 'Yes. An AI agent API gateway can sit in front of, behind, or alongside existing gateways like Kong, Apigee, Tyk, or Cloudflare. The existing gateway can keep routing traffic while the agent-aware layer enforces budgets, tool scope, delegation, and payment policy.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'How should an API gateway control MCP tools for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An API gateway for AI agents should treat each MCP tool call as a priced, scoped action. It should verify the agent capability, check the tool allowlist, enforce the remaining session or tenant budget, apply revocation policy, and preserve an Evidence Pack before forwarding the MCP request.',
+        },
+      },
+    ],
+  };
+
+  const gatewayChecklistJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'API gateway controls for AI agents',
+    description: 'The control checklist an API gateway needs before forwarding autonomous agent, API, MCP, model, or paid-rail requests.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Agent identity',
+        description: 'Bind each request to an agent, user, tenant, workflow, and delegation chain instead of only an API key.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Tool and API scope',
+        description: 'Check whether the capability permits the requested API route, model, MCP tool, paid rail, and downstream action.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Budget decision',
+        description: 'Resolve the request cost, check remaining budget atomically, and allow, block, downgrade, route, charge, or escalate before execution.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Revocation and proof',
+        description: 'Honor revocation before the next request and emit Evidence Pack receipts for allow, deny, spend, delegation, paid-rail, and revocation events.',
+      },
     ],
   };
 
@@ -91,6 +132,10 @@ export default function ApiGatewayForAiAgentsBlogPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(gatewayChecklistJsonLd) }}
       />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -129,6 +174,32 @@ export default function ApiGatewayForAiAgentsBlogPage() {
           <p className="text-gray-300 leading-relaxed">
             But something changed. Your API consumers aren't just mobile apps and microservices anymore. They're autonomous AI agents — and they behave nothing like the traffic patterns these gateways were designed for.
           </p>
+
+          <div className="my-8 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Agent gateway checklist</p>
+            <h2 className="mb-3 text-2xl font-bold text-white">Before an AI agent API call executes, the gateway has to decide four things</h2>
+            <p className="mb-5 text-gray-300 leading-relaxed">
+              Routing is the last step. The first step is deciding whether this agent, acting in this workflow, with this capability, can spend this budget on this API, MCP tool, model, or paid rail right now.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                ['Agent identity', 'Bind the request to agent, user, tenant, workflow, and delegation chain.'],
+                ['Tool and API scope', 'Check route, model, MCP tool, paid rail, and downstream action permissions.'],
+                ['Budget decision', 'Resolve cost and allow, block, downgrade, route, charge, or escalate before execution.'],
+                ['Revocation and proof', 'Honor revocation on the next request and preserve Evidence Pack receipts.'],
+              ].map(([title, body]) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-4">
+                  <h3 className="mb-2 font-bold text-white">{title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-5 flex flex-wrap gap-3 text-sm font-semibold">
+              <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway →</Link>
+              <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">AI agent governance →</Link>
+              <Link href="/blog/llm-cost-management" className="text-cyan-300 hover:text-cyan-200">LLM cost management →</Link>
+            </div>
+          </div>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Old Model: Human-Driven API Traffic</h2>
           
@@ -378,6 +449,12 @@ satgate mint \\
                 <h3 className="text-xl font-bold text-white mb-2">Can an AI agent API gateway work with existing gateways like Kong or Apigee?</h3>
                 <p className="text-gray-300 leading-relaxed mb-0">
                   Yes. An AI agent API gateway can sit in front of, behind, or alongside existing gateways like Kong, Apigee, Tyk, or Cloudflare. The existing gateway can keep routing traffic while the agent-aware layer enforces budgets, tool scope, delegation, and payment policy.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">How should an API gateway control MCP tools for AI agents?</h3>
+                <p className="text-gray-300 leading-relaxed mb-0">
+                  It should treat every MCP tool call as a priced, scoped action. The gateway verifies the agent capability, checks the MCP tool allowlist, enforces the remaining session or tenant budget, applies revocation policy, and preserves an Evidence Pack before forwarding the request.
                 </p>
               </div>
             </div>

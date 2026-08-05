@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-05T00:05:51.004944Z",
+  "generatedAt": "2026-08-05T00:35:02.101172Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -391,6 +391,7 @@
       ],
       "h1Count": 1,
       "h2s": [
+        "Before an AI agent API call executes, the gateway has to decide four things",
         "The Old Model: Human-Driven API Traffic",
         "The New Model: Autonomous Agent Traffic",
         "What Traditional Gateways Actually Do",
@@ -404,20 +405,24 @@
       ],
       "internalLinks": [
         "/blog",
+        "/blog/llm-cost-management",
         "/compare",
         "/govern",
+        "/mcp-gateway",
         "/mcp-governance",
         "/policy-to-proof"
       ],
       "schemaTypes": [
         "Answer",
         "FAQPage",
+        "ItemList",
+        "ListItem",
         "Organization",
         "Question",
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1378,
+      "wordCount": 1506,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
