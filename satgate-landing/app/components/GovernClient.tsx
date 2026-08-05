@@ -88,6 +88,40 @@ export default function GovernPage() {
         </div>
       </header>
 
+      <section className="px-6 pb-16">
+        <div className="max-w-5xl mx-auto rounded-2xl border border-purple-900/50 bg-gray-950 p-6 md:p-8">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Direct answer</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">AI agent governance means controlling autonomous actions before they execute</h2>
+          <p className="mb-6 text-lg leading-relaxed text-gray-300">
+            AI agent governance is the request-path control layer that decides which agents can call which APIs, models, and MCP tools; what they can spend; what authority they can delegate; when access must be revoked; and what proof remains afterward. SatGate turns governance from a policy document into Observe, Control, and Prove controls that run before the upstream action.
+          </p>
+          <div className="grid gap-4 md:grid-cols-4">
+            {[
+              ['Authority', 'Agent, tenant, task, route, and capability scope checked before execution.'],
+              ['Budget', 'Per-agent, per-route, per-session, and MCP tool spend limits enforced before spend occurs.'],
+              ['Revocation', 'Delegated credentials can be narrowed, expired, or denied on the next request.'],
+              ['Proof', 'Evidence Packs preserve receipts for policy, spend, denial, revocation, and paid-rail context.'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-4">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Link href="/mcp-gateway" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
+              MCP gateway controls <ArrowRight size={16} />
+            </Link>
+            <Link href="/capability-auth" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-purple-500">
+              Capability-based authorization <ArrowRight size={16} />
+            </Link>
+            <Link href="/blog/llm-cost-management" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-yellow-500">
+              LLM cost management <ArrowRight size={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* One Token, Two Threats */}
       <section className="py-16 px-6 border-t border-gray-800 bg-gradient-to-b from-gray-900/20 to-black">
         <div className="max-w-4xl mx-auto">

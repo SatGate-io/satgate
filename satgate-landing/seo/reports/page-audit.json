@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-05T02:34:57.123569Z",
+  "generatedAt": "2026-08-05T03:05:49.128180Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -332,16 +332,17 @@
     {
       "path": "/govern",
       "exists": true,
-      "title": "Enterprise AI Agent Governance: Policy-to-Proof Controls",
-      "titleLength": 56,
-      "metaDescription": "Govern AI agents before execution: Observe usage, Control budgets and access, and Prove decisions with Evidence Packs across APIs, MCP, and paid rails.",
-      "metaDescriptionLength": 151,
+      "title": "AI Agent Governance: Policy-to-Proof Controls",
+      "titleLength": 45,
+      "metaDescription": "Govern AI agents with SatGate: authority before execution, Observe/Control/Prove, MCP governance, paid-rail context, and Evidence Packs.",
+      "metaDescriptionLength": 136,
       "canonical": "/govern",
       "h1": [
         "Enterprise AI agent governance, from Policy to Proof."
       ],
       "h1Count": 1,
       "h2s": [
+        "AI agent governance means controlling autonomous actions before they execute",
         "Prevent before execution. Prove after. On both lanes.",
         "Built for enterprise control owners",
         "Observe, control, prove.",
@@ -352,17 +353,19 @@
         "The authority commons \u2014 inside your company",
         "Your internal APIs are authority surfaces",
         "See authority minted \u2014 then prove the lifecycle",
-        "From Demo to Thousands of Agents",
-        "Turn enterprise governance into request-path controls"
+        "From Demo to Thousands of Agents"
       ],
       "internalLinks": [
         "/agent-api-governance",
         "/agent-control-plane",
         "/ai-agent-cost-control",
+        "/blog/llm-cost-management",
+        "/capability-auth",
         "/design-partners",
         "/economic-firewall",
         "/govern",
         "/l402-agent-payments",
+        "/mcp-gateway",
         "/mcp-governance",
         "/mint-demo",
         "/pay",
@@ -375,12 +378,14 @@
       "schemaTypes": [
         "Answer",
         "FAQPage",
+        "ItemList",
+        "ListItem",
         "Question",
         "Thing",
         "WebPage",
         "WebSite"
       ],
-      "wordCount": 1787,
+      "wordCount": 1867,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,

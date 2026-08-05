@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import GovernClient from "../components/GovernClient";
 
 export const metadata: Metadata = {
-  title: "Enterprise AI Agent Governance: Policy-to-Proof Controls",
+  title: "AI Agent Governance: Policy-to-Proof Controls",
   description:
-    "Govern AI agents before execution: Observe usage, Control budgets and access, and Prove decisions with Evidence Packs across APIs, MCP, and paid rails.",
+    "Govern AI agents with SatGate: authority before execution, Observe/Control/Prove, MCP governance, paid-rail context, and Evidence Packs.",
   alternates: {
     canonical: "https://satgate.io/govern",
   },
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     "Evidence Packs for AI agents",
   ],
   openGraph: {
-    title: "Enterprise AI Agent Governance: Policy-to-Proof Controls",
+    title: "AI Agent Governance: Policy-to-Proof Controls",
     description:
       "Govern AI agents before execution: Observe usage, Control budgets and access, and Prove decisions with Evidence Packs across APIs, MCP, and paid rails.",
     url: "https://satgate.io/govern",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Enterprise AI Agent Governance: Policy-to-Proof Controls",
+    title: "AI Agent Governance: Policy-to-Proof Controls",
     description:
       "Observe agent usage, Control access and budgets before execution, and Prove every decision with Evidence Packs.",
   },
@@ -37,10 +37,10 @@ export const metadata: Metadata = {
 const webPageSchema = {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  name: "Enterprise AI Agent Governance Platform",
+  name: "AI Agent Governance: Policy-to-Proof Controls",
   description: metadata.description,
   url: "https://satgate.io/govern",
-  dateModified: "2026-06-01",
+  dateModified: "2026-08-05",
   isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
   about: [
     { "@type": "Thing", name: "AI agent governance" },
@@ -49,6 +49,44 @@ const webPageSchema = {
     { "@type": "Thing", name: "MCP governance for enterprises" },
     { "@type": "Thing", name: "agent delegation controls" },
     { "@type": "Thing", name: "Policy-to-Proof for AI agents" },
+  ],
+};
+
+const governanceControlsSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "AI agent governance control checklist",
+  description:
+    "Request-path controls for governing AI agent access, budget, delegation, MCP tool usage, revocation, paid-rail context, and Evidence Pack proof before agents execute actions.",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Authority before execution",
+      description:
+        "Check agent identity, tenant, task, route scope, tool scope, and capability caveats before forwarding the request.",
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Budget and MCP tool enforcement",
+      description:
+        "Enforce per-agent, per-route, per-session, and per-tool budget controls in the request path rather than relying on dashboards after spend occurs.",
+    },
+    {
+      "@type": "ListItem",
+      position: 3,
+      name: "Delegation and revocation proof",
+      description:
+        "Record delegated authority, attenuated child credentials, revocation events, and the first denied request after revoke.",
+    },
+    {
+      "@type": "ListItem",
+      position: 4,
+      name: "Evidence Pack export",
+      description:
+        "Preserve receipts for policy basis, denial reasons, spend context, paid-rail context, and audit-ready verification.",
+    },
   ],
 };
 
@@ -109,6 +147,10 @@ export default function GovernPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(governanceControlsSchema) }}
       />
       <GovernClient />
     </>
