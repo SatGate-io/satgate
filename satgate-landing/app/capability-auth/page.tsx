@@ -3,19 +3,19 @@ import { ArrowLeft, ArrowRight, BadgeCheck, KeyRound, Layers3, ShieldCheck, Time
 
 export const metadata = {
   title: 'Capability-Based Authorization for AI Agents',
-  description: 'Replace broad API keys with scoped, revocable capabilities, authority before execution, and Evidence Pack proof.',
+  description: 'Replace broad API keys with scoped, revocable, budget-aware capabilities for AI agents using SatGate.',
   alternates: { canonical: 'https://satgate.io/capability-auth' },
   keywords: ['capability based authorization', 'capability auth', 'agent authorization', 'capability tokens', 'macaroon tokens', 'delegated authorization', 'AI agent permissions'],
   openGraph: {
     title: 'Capability-Based Authorization for AI Agents',
-    description: 'Give agents scoped, revocable capabilities and Evidence Pack proof instead of broad static API keys.',
+    description: 'Replace broad API keys with scoped, revocable, budget-aware capabilities and Evidence Pack proof for AI agents.',
     url: 'https://satgate.io/capability-auth',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Capability-Based Authorization for AI Agents',
-    description: 'Use SatGate to scope agent authority before execution and prove decisions with Evidence Packs.',
+    description: 'Use SatGate to give AI agents scoped, revocable, budget-aware authority before execution.',
   },
 };
 
@@ -43,7 +43,7 @@ export default function CapabilityAuthPage() {
     applicationCategory: 'SecurityApplication',
     description: metadata.description,
     url: 'https://satgate.io/capability-auth',
-    dateModified: '2026-08-04',
+    dateModified: '2026-08-05',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     featureList: capabilities.map((item) => item.title),
   };
@@ -124,6 +124,43 @@ export default function CapabilityAuthPage() {
             </Link>
             <Link href="/blog/macaroon-tokens-vs-api-keys" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-emerald-500 transition">
               Compare macaroons and API keys
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-6 py-16">
+        <div className="rounded-2xl border border-emerald-900/50 bg-gray-950 p-6 md:p-8">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-emerald-300">Direct answer</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">Capability-based authorization replaces identity-only access with bounded authority</h2>
+          <p className="mb-6 text-lg leading-relaxed text-gray-300">
+            Capability-based authorization gives an AI agent a specific, bounded grant: which API, model, route, MCP tool, tenant, budget, expiry window, and delegation depth it can use. SatGate checks that capability in the request path before execution, then preserves Evidence Pack proof for allowed calls, denied calls, revocation, and delegated authority.
+          </p>
+          <div className="grid gap-4 md:grid-cols-4">
+            {[
+              ['Identity', 'Who is this agent, tenant, workflow, or delegated worker?'],
+              ['Authority', 'Which route, tool, action, scope, and capability caveat is allowed?'],
+              ['Economics', 'How much can it spend per request, session, tool, workflow, or tenant?'],
+              ['Proof', 'Which receipt proves the grant, denial, revocation, or delegation decision?'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-4">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Link href="/blog/macaroon-tokens-vs-api-keys" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-emerald-500">
+              Macaroons vs API keys <ArrowRight size={16} />
+            </Link>
+            <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-emerald-500">
+              Agent capability tokens <ArrowRight size={16} />
+            </Link>
+            <Link href="/mcp-gateway" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-emerald-500">
+              MCP gateway <ArrowRight size={16} />
+            </Link>
+            <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-emerald-500">
+              Capability policy template <ArrowRight size={16} />
             </Link>
           </div>
         </div>
@@ -231,9 +268,11 @@ export default function CapabilityAuthPage() {
         <h2 className="text-3xl font-bold text-white mb-6">Related authorization resources</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
+            ['/blog/macaroon-tokens-vs-api-keys', 'Macaroon tokens vs API keys', 'Compare broad account keys with attenuated capability-style credentials.'],
             ['/mcp-gateway', 'MCP gateway', 'Apply capabilities to tool calls.'],
             ['/agent-capability-tokens', 'Agent capability tokens', 'See how scoped authority is encoded.'],
             ['/govern', 'AI agent governance', 'Observe, Control, and Prove agent actions.'],
+            ['/revocable-capability-token-policy-template', 'Revocable capability template', 'Generate scoped, expiring, budget-aware policy in YAML or JSON.'],
             ['/blog/how-to-add-budget-limits-to-openai-api-calls', 'Budget limits', 'Attach spend policy to access.'],
           ].map(([href, title, body]) => (
             <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 hover:border-emerald-700 transition">

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-05T03:35:56.418632Z",
+  "generatedAt": "2026-08-05T04:04:53.312373Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -504,14 +504,15 @@
       "exists": true,
       "title": "Capability-Based Authorization for AI Agents",
       "titleLength": 44,
-      "metaDescription": "Replace broad API keys with scoped, revocable capabilities, authority before execution, and Evidence Pack proof.",
-      "metaDescriptionLength": 112,
+      "metaDescription": "Replace broad API keys with scoped, revocable, budget-aware capabilities for AI agents using SatGate.",
+      "metaDescriptionLength": 101,
       "canonical": "/capability-auth",
       "h1": [
         "Capability-Based Authorization for AI Agents"
       ],
       "h1Count": 1,
       "h2s": [
+        "Capability-based authorization replaces identity-only access with bounded authority",
         "Why identity auth is too blunt for agents",
         "What a capability should carry",
         "Capabilities vs API keys, OAuth, and macaroons",
@@ -521,8 +522,10 @@
         "Stop handing agents broad API keys."
       ],
       "internalLinks": [
+        "/agent-capability-tokens",
         "/blog/macaroon-tokens-vs-api-keys",
         "/design-partners",
+        "/mcp-gateway",
         "/revocable-capability-token-policy-template"
       ],
       "schemaTypes": [
@@ -535,7 +538,7 @@
         "Question",
         "SoftwareApplication"
       ],
-      "wordCount": 617,
+      "wordCount": 689,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,

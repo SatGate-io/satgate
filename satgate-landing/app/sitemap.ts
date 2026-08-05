@@ -34,7 +34,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/agent-api-governance', lastModified: '2026-05-05', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/build', lastModified: '2026-05-12', changeFrequency: 'weekly', priority: 0.95 },
   { path: '/accept-satgate-capabilities', lastModified: '2026-05-13', changeFrequency: 'weekly', priority: 0.9 },
-  { path: '/capability-auth', lastModified: '2026-08-04', changeFrequency: 'weekly', priority: 0.95 },
+  { path: '/capability-auth', lastModified: '2026-08-05', changeFrequency: 'weekly', priority: 0.95 },
   { path: '/agent-control-plane', lastModified: '2026-05-05', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/evidence-pack-demo', lastModified: '2026-08-04', changeFrequency: 'weekly', priority: 0.95 },
   { path: '/verify-evidence-pack', lastModified: '2026-07-02', changeFrequency: 'weekly', priority: 0.95 },
