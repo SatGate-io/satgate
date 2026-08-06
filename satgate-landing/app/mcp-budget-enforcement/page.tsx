@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowRight, BadgeDollarSign, Bot, ClipboardList, Gauge, KeyRound, ShieldCheck, Wrench, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'MCP Budget Enforcement for AI Agents',
-  description: 'Enforce budgets, prices, risk tiers, revocation, and Evidence Pack receipts before AI agents execute MCP tools.',
+  title: 'MCP Budget Enforcement: Tool Spend Limits for AI Agents',
+  description: 'Use MCP budget enforcement to set tool spend limits, per-tool prices, MCP proxy budget policy, revocation, and Evidence Pack receipts.',
   alternates: { canonical: 'https://satgate.io/mcp-budget-enforcement' },
   keywords: [
     'MCP budget enforcement',
@@ -11,6 +11,9 @@ export const metadata = {
     'MCP tool cost control',
     'MCP governance',
     'MCP proxy budget limits',
+    'MCP for budgeting',
+    'MCP tool spend enforcement',
+    'MCP budget policy',
     'Claude MCP budget enforcement',
     'Cursor MCP budget limits',
     'AI agent tool budgets',
@@ -18,15 +21,15 @@ export const metadata = {
     'MCP Evidence Pack receipts',
   ],
   openGraph: {
-    title: 'MCP Budget Enforcement for AI Agents',
-    description: 'Set enforceable budgets, prices, risk tiers, revocation, and Evidence Pack receipts before autonomous agents execute MCP tools.',
+    title: 'MCP Budget Enforcement: Tool Spend Limits for AI Agents',
+    description: 'Set enforceable MCP tool spend limits, prices, risk tiers, revocation, and Evidence Pack receipts before agents execute tools.',
     url: 'https://satgate.io/mcp-budget-enforcement',
     type: 'article',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MCP Budget Enforcement for AI Agents',
-    description: 'Stop MCP tools from becoming an unbounded spend surface for autonomous agents.',
+    title: 'MCP Budget Enforcement: Tool Spend Limits for AI Agents',
+    description: 'Stop MCP tools from becoming an unbounded spend surface for autonomous agents with request-path budget policy.',
   },
 };
 
@@ -71,6 +74,14 @@ const examples = [
   ['cloud_write_action', '$0.00 + risk', 'approval required', 'Deny unless capability includes write scope'],
 ];
 
+const budgetModel = [
+  ['Tool identity', 'Name the MCP server, tool, route, and action class so policy applies to the exact operation, not the whole integration.'],
+  ['Price rule', 'Attach a price per call, minute, token, result, external API lookup, or paid-rail event before execution.'],
+  ['Budget scope', 'Set per-agent, per-session, per-workflow, per-tenant, daily, and hard-stop ceilings.'],
+  ['Decision behavior', 'Allow, deny, downgrade, ask approval, require paid-rail context, or revoke the capability when limits are hit.'],
+  ['Proof fields', 'Record the caller, delegated authority, price, remaining budget, policy version, decision reason, and Evidence Pack receipt.'],
+];
+
 export default function McpBudgetEnforcementPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
@@ -80,11 +91,14 @@ export default function McpBudgetEnforcementPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-05-03',
+    dateModified: '2026-08-06',
     mainEntityOfPage: 'https://satgate.io/mcp-budget-enforcement',
     about: [
       { '@type': 'Thing', name: 'MCP budget enforcement' },
       { '@type': 'Thing', name: 'MCP spend limits' },
+      { '@type': 'Thing', name: 'MCP for budgeting' },
+      { '@type': 'Thing', name: 'MCP tool spend enforcement' },
+      { '@type': 'Thing', name: 'MCP proxy budget policy' },
       { '@type': 'Thing', name: 'AI agent tool budgets' },
       { '@type': 'Thing', name: 'per-tool pricing policy' },
       { '@type': 'Thing', name: 'L402 paid MCP tool access' },
@@ -109,6 +123,22 @@ export default function McpBudgetEnforcementPage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'Autonomous agents can call tools repeatedly, delegate to sub-agents, or trigger expensive external APIs. Budget limits prevent MCP tools from becoming an unbounded spend surface.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How can teams use MCP for budgeting?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Teams can use MCP for budgeting by pricing each tool call, binding spend limits to agent, session, workflow, and tenant scope, and enforcing those limits through a request-path MCP gateway before the tool executes.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is MCP tool spend enforcement?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'MCP tool spend enforcement is the request-path policy layer that decides whether an agent can call a tool based on price, remaining budget, risk tier, delegated authority, and required audit proof.',
         },
       },
       {
@@ -155,11 +185,27 @@ export default function McpBudgetEnforcementPage() {
     ],
   };
 
+  const budgetModelJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP budget enforcement model',
+    description:
+      'A request-path model for MCP for budgeting: tool identity, price rule, budget scope, decision behavior, and Evidence Pack proof fields.',
+    dateModified: '2026-08-06',
+    itemListElement: budgetModel.map(([title, body], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: title,
+      description: body,
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(budgetModelJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(34,211,238,0.18),transparent_30%),radial-gradient(circle_at_82%_12%,rgba(168,85,247,0.16),transparent_34%)]" />
@@ -180,6 +226,24 @@ export default function McpBudgetEnforcementPage() {
             <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               See MCP governance
             </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-gray-900 bg-gray-950/50">
+        <div className="max-w-6xl mx-auto px-6 py-16">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Direct answer</p>
+          <h2 className="mb-5 text-3xl font-bold text-white">MCP for budgeting means pricing tool calls before execution</h2>
+          <p className="max-w-4xl text-lg leading-relaxed text-gray-300">
+            MCP for budgeting is not a dashboard. It is an MCP proxy or gateway policy layer that prices each tool call, checks agent and tenant budgets, applies risk-tier rules, and records proof before the tool executes. That is how teams keep browser, search, code, cloud, data, and paid API tools from becoming an unlimited agent spend surface.
+          </p>
+          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+            {budgetModel.map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black p-5">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -263,6 +327,18 @@ export default function McpBudgetEnforcementPage() {
               <h3 className="mb-2 text-xl font-bold text-white">Why do MCP tools need budget limits?</h3>
               <p className="text-gray-400 leading-relaxed">
                 Autonomous agents can call tools repeatedly, delegate to sub-agents, or trigger expensive external APIs. Budget limits prevent MCP tools from becoming an unbounded spend surface.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How can teams use MCP for budgeting?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Teams can use MCP for budgeting by pricing each tool call, binding spend limits to agent, session, workflow, and tenant scope, and enforcing those limits through a request-path MCP gateway before the tool executes.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is MCP tool spend enforcement?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                MCP tool spend enforcement is the request-path policy layer that decides whether an agent can call a tool based on price, remaining budget, risk tier, delegated authority, and required audit proof.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

@@ -29,7 +29,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/mcp', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/mcp-gateway', lastModified: '2026-08-05', changeFrequency: 'weekly', priority: 0.95 },
   { path: '/mcp-governance', lastModified: '2026-08-05', changeFrequency: 'weekly', priority: 0.9 },
-  { path: '/mcp-budget-enforcement', lastModified: '2026-05-03', changeFrequency: 'weekly', priority: 0.9 },
+  { path: '/mcp-budget-enforcement', lastModified: '2026-08-06', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/mcp-cost-control', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/agent-api-governance', lastModified: '2026-08-05', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/build', lastModified: '2026-05-12', changeFrequency: 'weekly', priority: 0.95 },
