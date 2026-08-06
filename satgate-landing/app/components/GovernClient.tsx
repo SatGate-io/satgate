@@ -11,6 +11,25 @@ import {
 import Link from 'next/link';
 import Image from 'next/image';
 
+const enterpriseGovernanceRows = [
+  {
+    label: 'Enterprise API policy enforcement',
+    body: 'Route, method, tenant, identity, capability scope, and budget checks run before an agent reaches internal or external APIs.',
+  },
+  {
+    label: 'MCP governance policy',
+    body: 'MCP tools get allowlists, per-tool budgets, data boundaries, delegation depth, and Evidence Pack receipts instead of unaudited tool access.',
+  },
+  {
+    label: 'Governed data access',
+    body: 'Agents can read, enrich, export, or write only the data required for the current task, with every denial tied to a policy reason.',
+  },
+  {
+    label: 'Governed AI delivery',
+    body: 'Security, finance, and platform teams get one path from observe mode to request-path control and proof for deployed agent workflows.',
+  },
+];
+
 export default function GovernPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -117,6 +136,37 @@ export default function GovernPage() {
             </Link>
             <Link href="/blog/llm-cost-management" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-yellow-500">
               LLM cost management <ArrowRight size={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-6 pb-16">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-8 max-w-3xl">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Enterprise policy enforcement</p>
+            <h2 className="mb-4 text-3xl font-bold text-white">Govern AI agents with MCP, API policy, budget controls, and data-access proof</h2>
+            <p className="text-lg leading-relaxed text-gray-300">
+              Enterprise AI agent governance needs controls that execute at runtime. SatGate gives platform teams a policy enforcement point for API calls, MCP tools, data access, spend, delegation, and revocation before autonomous actions reach production systems.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {enterpriseGovernanceRows.map((row) => (
+              <div key={row.label} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+                <h3 className="mb-2 text-xl font-bold text-white">{row.label}</h3>
+                <p className="leading-relaxed text-gray-400">{row.body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
+              MCP governance policy <ArrowRight size={16} />
+            </Link>
+            <Link href="/agent-api-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-purple-500">
+              Agent API governance <ArrowRight size={16} />
+            </Link>
+            <Link href="/agent-spend-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-yellow-500">
+              Spend policy template <ArrowRight size={16} />
             </Link>
           </div>
         </div>

@@ -2,14 +2,19 @@ import type { Metadata } from "next";
 import GovernClient from "../components/GovernClient";
 
 export const metadata: Metadata = {
-  title: "AI Agent Governance: Policy-to-Proof Controls",
+  title: "AI Agent Governance: Enterprise Policy Enforcement Tools",
   description:
-    "Govern AI agents with SatGate: authority before execution, Observe/Control/Prove, MCP governance, paid-rail context, and Evidence Packs.",
+    "Govern AI agents with enterprise API policy enforcement, MCP governance policy, budget controls, governed data access, and Evidence Packs.",
   alternates: {
     canonical: "https://satgate.io/govern",
   },
   keywords: [
     "enterprise AI agent governance",
+    "enterprise API policy enforcement tools",
+    "governed AI delivery",
+    "governed data access for AI agents",
+    "govern AI agents with MCP",
+    "MCP governance policy for enterprise teams",
     "AI agent authority governance",
     "Agent Authority & Accountability Layer",
     "Policy-to-Proof governance for AI agents",
@@ -20,30 +25,35 @@ export const metadata: Metadata = {
     "Evidence Packs for AI agents",
   ],
   openGraph: {
-    title: "AI Agent Governance: Policy-to-Proof Controls",
+    title: "AI Agent Governance: Enterprise Policy Enforcement Tools",
     description:
-      "Govern AI agents before execution: Observe usage, Control budgets and access, and Prove decisions with Evidence Packs across APIs, MCP, and paid rails.",
+      "Govern AI agents before execution with API policy enforcement, MCP governance policy, budget controls, governed data access, and Evidence Packs.",
     url: "https://satgate.io/govern",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Agent Governance: Policy-to-Proof Controls",
+    title: "AI Agent Governance for Enterprise Teams",
     description:
-      "Observe agent usage, Control access and budgets before execution, and Prove every decision with Evidence Packs.",
+      "Request-path policy enforcement for AI agents, MCP tools, data access, budgets, delegation, and proof.",
   },
 };
 
 const webPageSchema = {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  name: "AI Agent Governance: Policy-to-Proof Controls",
+  name: "AI Agent Governance: Enterprise Policy Enforcement Tools",
   description: metadata.description,
   url: "https://satgate.io/govern",
-  dateModified: "2026-08-05",
+  dateModified: "2026-08-06",
   isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
   about: [
     { "@type": "Thing", name: "AI agent governance" },
+    { "@type": "Thing", name: "enterprise API policy enforcement tools" },
+    { "@type": "Thing", name: "governed AI delivery" },
+    { "@type": "Thing", name: "governed data access for AI agents" },
+    { "@type": "Thing", name: "govern AI agents with MCP" },
+    { "@type": "Thing", name: "MCP governance policy for enterprise teams" },
     { "@type": "Thing", name: "Agent Authority & Accountability Layer" },
     { "@type": "Thing", name: "Policy-to-Proof governance for AI agents" },
     { "@type": "Thing", name: "MCP governance for enterprises" },
@@ -90,6 +100,44 @@ const governanceControlsSchema = {
   ],
 };
 
+const enterprisePolicySchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Enterprise AI agent governance policy model",
+  description:
+    "Policy areas enterprise teams need when governing AI agents across APIs, MCP tools, data access, spend, delegation, and Evidence Pack proof.",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Enterprise API policy enforcement",
+      description:
+        "Apply route, method, tenant, identity, scope, and rate policy before the agent reaches internal or external APIs.",
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "MCP governance policy",
+      description:
+        "Govern MCP tool calls with allowlists, per-tool budgets, tenant boundaries, delegation depth, and audit receipts.",
+    },
+    {
+      "@type": "ListItem",
+      position: 3,
+      name: "Governed data access",
+      description:
+        "Limit which datasets, records, exports, and enrichment services an AI agent can touch for the current task.",
+    },
+    {
+      "@type": "ListItem",
+      position: 4,
+      name: "Governed AI delivery",
+      description:
+        "Move from policy documents to request-path enforcement, denial, revocation, and proof that security, finance, and platform teams can review.",
+    },
+  ],
+};
+
 const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -128,6 +176,22 @@ const faqSchema = {
     },
     {
       "@type": "Question",
+      name: "Where can enterprises enforce AI agent API policy?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Enterprises should enforce AI agent API policy in the request path, before calls reach APIs, models, MCP tools, or paid services. SatGate checks identity, tenant, route, scope, budget, data-access caveats, delegation, and revocation before forwarding the request.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How do you govern AI agents with MCP at scale?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "To govern AI agents with MCP at scale, put a gateway or proxy in front of MCP tools, define per-tool allowlists and budgets, attach tenant and task identity, constrain delegation, enforce revocation before execution, and export Evidence Pack receipts for every allow or deny decision.",
+      },
+    },
+    {
+      "@type": "Question",
       name: "Is SatGate tied to x402, L402, AgentCore Payments, or Pay.sh?",
       acceptedAnswer: {
         "@type": "Answer",
@@ -151,6 +215,10 @@ export default function GovernPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(governanceControlsSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(enterprisePolicySchema) }}
       />
       <GovernClient />
     </>
