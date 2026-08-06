@@ -3,11 +3,16 @@ import Link from "next/link";
 import { ArrowRight, BadgeCheck, FileCheck2, KeyRound, Layers3, ReceiptText, ShieldCheck } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Agent Authority & Accountability Layer | SatGate",
+  title: "AI Agent Authority Layer and Accountability Layer | SatGate",
   description:
-    "SatGate is the rail-neutral authority and accountability layer for AI agents. Signed, verifiable receipts before any rail moves value.",
+    "SatGate is the AI agent authority layer and accountability layer: bounded authority before execution, budget policy, revocation, and signed Evidence Pack receipts.",
   keywords: [
+    "AI agent authority layer",
+    "agent accountability layer",
     "agent authority and accountability layer",
+    "authority before execution",
+    "bounded agent authority",
+    "agent policy enforcement",
     "AI agent accountability",
     "AI agent receipts",
     "Evidence Pack verifier",
@@ -17,15 +22,15 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://satgate.io/agent-authority-layer" },
   openGraph: {
-    title: "Agent Authority & Accountability Layer | SatGate",
+    title: "AI Agent Authority Layer and Accountability Layer | SatGate",
     description:
-      "Rail-neutral authority, pre-flight policy enforcement, and signed Evidence Pack proof for autonomous agents.",
+      "Bounded authority before execution, request-path policy enforcement, and signed Evidence Pack proof for autonomous agents.",
     url: "https://satgate.io/agent-authority-layer",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Agent Authority & Accountability Layer",
+    title: "AI Agent Authority Layer",
     description:
       "SatGate proves which agent was authorized, under which policy, before any rail or upstream service is touched.",
   },
@@ -57,6 +62,21 @@ const audiences = [
   ["Insurers and fraud teams", "Underwrite or score agent behavior from verifiable Evidence Pack artifacts."],
 ];
 
+const authorityControls = [
+  ["Agent identity", "Which agent, tenant, task, workflow, and parent delegation chain is acting."],
+  ["Scope", "Which API route, model endpoint, MCP tool, data class, or paid rail the agent may touch."],
+  ["Budget", "How much the agent may spend per request, session, workflow, child delegation, or lifetime."],
+  ["Revocation", "Whether expired, exhausted, risky, looped, or manually revoked authority stops the next request."],
+  ["Proof", "Which signed receipt, decision reason, policy version, hash, and Evidence Pack preserve accountability."],
+];
+
+const lifecycleSteps = [
+  ["Delegate", "A human, platform, or parent workflow grants scoped authority with tenant, task, route, budget, expiry, and delegation limits."],
+  ["Check", "SatGate evaluates authority, budget, revocation state, risk tier, and paid-rail context before the upstream call."],
+  ["Decide", "The request is allowed, denied, routed, capped, revoked, or recorded according to the policy in force."],
+  ["Prove", "A signed receipt records agent identity, policy version, decision reason, spend context, outcome, and Evidence Pack link."],
+];
+
 const publicSpecs = [
   ["Evidence Pack schema", "https://github.com/SatGate-io/satgate/blob/main/docs/reference/receipt-schema.md"],
   ["Live Evidence Pack example", "https://api.satgate.io/v1/evidence/evid_LrlgUSR1R3SEYtxy0npX7mgneWZFa5ek"],
@@ -67,6 +87,16 @@ const publicSpecs = [
 ];
 
 const faqs = [
+  {
+    question: "What is an AI agent authority layer?",
+    answer:
+      "An AI agent authority layer is the request-path control layer that decides what an agent can access, spend, delegate, or trigger before the action reaches APIs, MCP tools, payment rails, or other upstream systems.",
+  },
+  {
+    question: "What is an agent accountability layer?",
+    answer:
+      "An agent accountability layer records verifiable proof for each governed agent decision: identity, scope, budget, policy version, decision reason, receipt hash, signature, and Evidence Pack link.",
+  },
   {
     question: "Is SatGate a payment processor?",
     answer:
@@ -98,10 +128,14 @@ const jsonLd = {
       url: "https://satgate.io/agent-authority-layer",
       description: metadata.description,
       datePublished: "2026-05-14",
-      dateModified: "2026-08-04",
+      dateModified: "2026-08-06",
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
       about: [
+        { "@type": "Thing", name: "AI agent authority layer" },
+        { "@type": "Thing", name: "agent accountability layer" },
         { "@type": "Thing", name: "AI agent authority" },
+        { "@type": "Thing", name: "authority before execution" },
+        { "@type": "Thing", name: "bounded agent authority" },
         { "@type": "Thing", name: "Evidence Pack" },
         { "@type": "Thing", name: "rail-neutral agent governance" },
         { "@type": "Thing", name: "Ed25519 receipt verification" },
@@ -111,8 +145,10 @@ const jsonLd = {
       "@type": "SoftwareApplication",
       name: "SatGate",
       applicationCategory: "BusinessApplication",
-      dateModified: "2026-08-04",
+      dateModified: "2026-08-06",
       featureList: [
+        "AI agent authority layer",
+        "Agent accountability layer",
         "Delegated agent authority",
         "Pre-flight policy enforcement",
         "Signed Evidence Packs",
@@ -125,6 +161,28 @@ const jsonLd = {
         "@type": "Question",
         name: faq.question,
         acceptedAnswer: { "@type": "Answer", text: faq.answer },
+      })),
+    },
+    {
+      "@type": "ItemList",
+      name: "AI agent authority controls",
+      itemListElement: authorityControls.map(([name, description], index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name,
+        description,
+      })),
+    },
+    {
+      "@type": "HowTo",
+      name: "How SatGate governs agent authority before execution",
+      description:
+        "Delegate bounded authority, check policy in the request path, decide before execution, and prove the outcome with an Evidence Pack receipt.",
+      step: lifecycleSteps.map(([name, text], index) => ({
+        "@type": "HowToStep",
+        position: index + 1,
+        name,
+        text,
       })),
     },
     {
@@ -156,13 +214,13 @@ export default function AgentAuthorityLayerPage() {
               <Layers3 size={14} /> Rail-neutral governance
             </div>
             <h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">
-              Agent Authority & Accountability Layer
+              AI Agent Authority & Accountability Layer
             </h1>
             <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
-              Payment rails answer one question: <span className="text-white">can this agent pay?</span> SatGate answers the question that comes first: was this agent authorized, under whose policy, within what budget and scope, and can we prove it later?
+              SatGate is the AI agent authority layer for bounded authority before execution. Payment rails answer one question: <span className="text-white">can this agent pay?</span> SatGate answers the question that comes first: was this agent authorized, under whose policy, within what budget and scope, and can we prove it later?
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
-              Every rail — x402, L402, Stripe Agent Toolkit, AgentCore, Coinbase, and internal ledgers — has the same governance gap. SatGate fills it once, above the rail.
+              Every rail — x402, L402, Stripe Agent Toolkit, AgentCore, Coinbase, and internal ledgers — has the same governance gap. SatGate fills it once, above the rail, and preserves the accountability layer with signed Evidence Pack receipts.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -213,6 +271,54 @@ export default function AgentAuthorityLayerPage() {
               </div>
             );
           })}
+        </div>
+      </section>
+
+      <section className="border-y border-gray-900 bg-gray-950/60">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="mb-10 max-w-3xl">
+            <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-cyan-300">Control surface</p>
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">An AI agent authority layer controls access, spend, delegation, revocation, and proof.</h2>
+            <p className="mt-5 text-lg leading-8 text-gray-400">
+              The point is not another dashboard after an agent acts. The authority layer sits before execution and asks whether this exact agent, under this exact policy, should reach the next API, MCP tool, model, or paid rail.
+            </p>
+          </div>
+          <div className="overflow-x-auto rounded-2xl border border-gray-800">
+            <table className="min-w-[760px] w-full border-collapse text-left text-sm">
+              <thead className="bg-black text-gray-300">
+                <tr>
+                  <th className="p-4 font-semibold">Control</th>
+                  <th className="p-4 font-semibold">What SatGate checks before execution</th>
+                </tr>
+              </thead>
+              <tbody>
+                {authorityControls.map(([control, description]) => (
+                  <tr key={control} className="border-t border-gray-800 bg-black/60 align-top">
+                    <td className="p-4 font-bold text-white">{control}</td>
+                    <td className="p-4 leading-relaxed text-gray-400">{description}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <div className="mb-10 max-w-3xl">
+          <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-emerald-300">Authority lifecycle</p>
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">Authority before execution, accountability after every decision.</h2>
+          <p className="mt-5 text-lg leading-8 text-gray-400">
+            SatGate turns agent governance into a repeatable lifecycle: delegate bounded authority, enforce it in the request path, and preserve proof that outside teams can verify.
+          </p>
+        </div>
+        <div className="grid gap-5 md:grid-cols-4">
+          {lifecycleSteps.map(([title, body]) => (
+            <div key={title} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="text-xl font-bold text-white">{title}</h3>
+              <p className="mt-3 leading-7 text-gray-400">{body}</p>
+            </div>
+          ))}
         </div>
       </section>
 
