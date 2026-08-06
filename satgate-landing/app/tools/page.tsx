@@ -3,11 +3,16 @@ import { ArrowLeft, ArrowRight, BarChart3, Calculator, ClipboardList, Gauge, Key
 import ToolLeadCaptureCta from '../components/ToolLeadCaptureCta';
 
 export const metadata = {
-  title: 'AI Agent Cost Control Tools',
-  description: 'Free calculators and policy generators for AI agent spend control, MCP governance, OpenAI budget limits, and economic firewall readiness.',
+  title: 'AI Agent Orchestration Security Tools and Pricing',
+  description: 'Free calculators and policy generators for AI agent orchestration security, cost control, MCP governance, pricing, budgets, and economic firewall readiness.',
   alternates: { canonical: 'https://satgate.io/tools' },
   keywords: [
     'AI agent cost control tools',
+    'AI agent orchestration security tools and pricing',
+    'AI agent orchestration security tools',
+    'AI agent security tools pricing',
+    'FactSet MCP pricing governance',
+    'MCP pricing calculator',
     'AI agent spend calculator',
     'AI agent runaway spend index',
     'LLM cost dashboard',
@@ -23,15 +28,15 @@ export const metadata = {
     'agent budget enforcement tools',
   ],
   openGraph: {
-    title: 'AI Agent Cost Control Tools',
-    description: 'Calculators, benchmarks, policy templates, and generators for agent spend, runaway loops, OpenAI budgets, MCP tool costs, and economic firewall readiness.',
+    title: 'AI Agent Orchestration Security Tools and Pricing',
+    description: 'Calculators, benchmarks, policy templates, and generators for agent spend, orchestration security, MCP pricing, budgets, and economic firewall readiness.',
     url: 'https://satgate.io/tools',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AI Agent Cost Control Tools',
-    description: 'Free calculators, benchmarks, and policy generators for AI agent spend control, MCP governance, and economic firewall readiness.',
+    title: 'AI Agent Security Tools and Pricing',
+    description: 'Free calculators, benchmarks, and policy generators for agent orchestration security, MCP pricing, budgets, and governance.',
   },
 };
 
@@ -132,14 +137,18 @@ export default function ToolsPage() {
   const webPageJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    name: 'AI Agent Cost Control Tools',
+    name: 'AI Agent Orchestration Security Tools and Pricing',
     url: 'https://satgate.io/tools',
     description: metadata.description,
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-08-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent cost control tools' },
+      { '@type': 'Thing', name: 'AI agent orchestration security tools and pricing' },
+      { '@type': 'Thing', name: 'AI agent security tools pricing' },
+      { '@type': 'Thing', name: 'FactSet MCP pricing governance' },
+      { '@type': 'Thing', name: 'MCP pricing calculator' },
       { '@type': 'Thing', name: 'economic firewall readiness' },
       { '@type': 'Thing', name: 'MCP governance policy generators' },
       { '@type': 'Thing', name: 'OpenAI budget limits' },
@@ -160,6 +169,39 @@ export default function ToolsPage() {
       url: `https://satgate.io${tool.href}`,
       description: tool.description,
     })),
+  };
+
+  const pricingCriteriaJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent orchestration security tool pricing criteria',
+    description: 'Criteria for evaluating AI agent orchestration security tools and pricing before selecting controls for MCP, API, model, and paid-tool workflows.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Runtime control surface',
+        description: 'Check whether the tool controls agent access to APIs, MCP tools, models, data exports, delegated workers, and paid services before execution.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Pricing unit',
+        description: 'Compare pricing by request, token, tool call, agent, workflow, seat, tenant, deployment, or governed spend volume.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'MCP and data-tool pricing',
+        description: 'Model third-party tool costs such as FactSet MCP pricing or paid data-enrichment calls as per-tool budget events.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Proof and audit',
+        description: 'Require receipts for allow, deny, downgrade, revocation, delegation, spend, and Evidence Pack export.',
+      },
+    ],
   };
 
   const breadcrumbJsonLd = {
@@ -193,6 +235,22 @@ export default function ToolsPage() {
       },
       {
         '@type': 'Question',
+        name: 'How should I compare AI agent orchestration security tools and pricing?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Compare AI agent orchestration security tools by runtime control surface, pricing unit, MCP and paid-tool budget support, revocation, delegation controls, and proof. A useful evaluation separates dashboards from request-path controls that can block, downgrade, route, or charge before execution.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How should teams model FactSet MCP pricing or other paid data-tool costs?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Teams should model FactSet MCP pricing and similar paid data-tool costs as per-tool budget events: assign unit prices, cap calls by agent and workflow, check remaining budget before execution, and record Evidence Pack receipts for each allow or deny decision.',
+        },
+      },
+      {
+        '@type': 'Question',
         name: 'How do these tools relate to an economic firewall?',
         acceptedAnswer: {
           '@type': 'Answer',
@@ -206,6 +264,7 @@ export default function ToolsPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingCriteriaJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
@@ -222,10 +281,10 @@ export default function ToolsPage() {
             <Calculator size={16} /> Free calculators and policy generators
           </div>
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">
-            AI Agent Cost Control Tools
+            AI Agent Orchestration Security Tools and Pricing
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Quantify runaway agent spend, generate enforceable budget policy, govern MCP tools, and grade your economic firewall readiness before autonomous agents hit production scale.
+            Quantify runaway agent spend, compare orchestration security controls, model MCP and paid-tool pricing, generate enforceable budget policy, and grade economic firewall readiness before autonomous agents hit production scale.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -234,6 +293,31 @@ export default function ToolsPage() {
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               See agent cost control
             </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-gray-900 bg-gray-950/60">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="mb-10 max-w-4xl">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Pricing criteria</p>
+            <h2 className="mb-4 text-3xl font-bold text-white">List AI agent orchestration security tools by what they can price, control, and prove</h2>
+            <p className="text-lg leading-relaxed text-gray-300">
+              Tool lists are useless if they only compare features. For autonomous agents, pricing has to include the governed unit: request, token, MCP tool call, paid data lookup, workflow, agent, tenant, or deployment.
+            </p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-4">
+            {[
+              ['Runtime control', 'Can it block or downgrade API, MCP, model, data export, and paid-service calls before execution?'],
+              ['Pricing unit', 'Does pricing map to seats, requests, tool calls, agents, workflows, tenants, or governed spend?'],
+              ['Paid data tools', 'Can FactSet MCP pricing or other paid data-tool costs become per-tool budget policy?'],
+              ['Proof', 'Does it export receipts for spend, denial, downgrade, delegation, revocation, and Evidence Packs?'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-2xl border border-gray-800 bg-black p-5">
+                <h3 className="mb-2 text-xl font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -281,6 +365,14 @@ export default function ToolsPage() {
             [
               'Which SatGate tool should I start with?',
               'Start with the AI Agent ROI Calculator if you need a business case, the Runaway Agent Cost Calculator if you need incident exposure, the OpenAI or MCP policy generators if you need enforceable policy, and the Economic Firewall Readiness Grader if you need a gap assessment.',
+            ],
+            [
+              'How should I compare AI agent orchestration security tools and pricing?',
+              'Compare runtime control surface, pricing unit, MCP and paid-tool budget support, revocation, delegation controls, and proof. Separate dashboards from request-path controls that can block, downgrade, route, or charge before execution.',
+            ],
+            [
+              'How should teams model FactSet MCP pricing or other paid data-tool costs?',
+              'Model FactSet MCP pricing and similar paid data-tool costs as per-tool budget events: assign unit prices, cap calls by agent and workflow, check remaining budget before execution, and record Evidence Pack receipts.',
             ],
             [
               'How do these tools relate to an economic firewall?',
