@@ -17,12 +17,20 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "SatGate Agent Control Plane | Govern Enterprise AI Agents",
+  title: "AI Agent Control Plane Gateway | SatGate Enterprise Governance",
   description:
-    "SatGate is an agent control plane for enterprise AI agents: scoped capabilities, delegation lineage, request-path budget enforcement, Evidence Pack exports, and next-request revocation.",
+    "SatGate is an AI agent control plane gateway for enterprise governance, policy controls, data exfiltration prevention, tool misuse prevention, budgets, and revocation.",
   keywords: [
     "agent control plane",
     "AI agent control plane",
+    "AI control plane gateway",
+    "enterprise AI control plane solution",
+    "governance control plane",
+    "MCP control plane",
+    "agent control plane policy controls",
+    "prevent data exfiltration and tool misuse",
+    "AI agent tool misuse prevention",
+    "AI agent data exfiltration prevention",
     "enterprise AI agent governance",
     "AI agent delegation control",
     "agent capability management",
@@ -36,9 +44,9 @@ export const metadata: Metadata = {
     canonical: "https://satgate.io/agent-control-plane",
   },
   openGraph: {
-    title: "SatGate Agent Control Plane | Govern Enterprise AI Agents",
+    title: "AI Agent Control Plane Gateway | SatGate Enterprise Governance",
     description:
-      "Govern enterprise AI agents with scoped capabilities, delegation lineage, request-path budgets, Evidence Pack exports, and next-request revocation.",
+      "Govern enterprise AI agents with policy controls, scoped capabilities, delegation lineage, request-path budgets, Evidence Packs, and revocation.",
     url: "https://satgate.io/agent-control-plane",
     type: "website",
     images: [
@@ -52,12 +60,31 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "SatGate Agent Control Plane",
+    title: "AI Agent Control Plane Gateway",
     description:
-      "Control the agent. Control delegation. Prove the lineage. Meter spend. Stop the next governed request.",
+      "Control agent policy, delegation, tool use, data boundaries, spend, proof, and next-request revocation.",
     images: ["/acp-demo/satgate-acp-thumbnail.jpg"],
   },
 };
+
+const gatewayControls = [
+  [
+    "Policy controls",
+    "Evaluate identity, task, tool, route, tenant, data boundary, budget, and revocation before the request leaves the agent stack.",
+  ],
+  [
+    "Data exfiltration prevention",
+    "Block exports, broad retrieval, customer-boundary crossings, and sensitive API access unless the agent has scoped authority for that job.",
+  ],
+  [
+    "Tool misuse prevention",
+    "Stop risky MCP tools, SaaS actions, browser automation, paid APIs, and delegated workers before they run outside policy.",
+  ],
+  [
+    "MCP control plane",
+    "Apply the same authority, spend, audit, and revocation model to MCP servers and tools that already govern direct API calls.",
+  ],
+];
 
 const proofPoints = [
   {
@@ -147,6 +174,18 @@ const faqs = [
     "How does SatGate control agent delegation?",
     "SatGate lets a parent agent hand off only the authority it is allowed to share. The worker gets narrower limits, the handoff is visible, and attempts to exceed policy are blocked before they become spend or risk.",
   ],
+  [
+    "What is an AI control plane gateway?",
+    "An AI control plane gateway is the request-path layer that decides whether an agent may call a model, API, MCP tool, paid rail, or delegated worker. SatGate uses that layer to enforce policy controls before execution.",
+  ],
+  [
+    "How does an agent control plane prevent data exfiltration and tool misuse?",
+    "SatGate checks tenant boundaries, allowed tools, route scope, credential caveats, delegated authority, and budget before forwarding. A request that could export data or misuse a tool is denied before the downstream system runs.",
+  ],
+  [
+    "Can the same control plane govern MCP tools?",
+    "Yes. SatGate treats MCP tools as governed request-path actions, so MCP servers can inherit the same identity, spend, revocation, Evidence Pack, and policy controls used for APIs and paid calls.",
+  ],
 ];
 
 const relatedTopics = [
@@ -169,12 +208,19 @@ const jsonLd = {
       name: "SatGate Agent Control Plane",
       url: "https://satgate.io/agent-control-plane",
       description:
-        "An agent control plane for enterprise AI agents: scoped capabilities, delegation lineage, request-path budget enforcement, Evidence Pack exports, and revocation without standing API keys.",
+        "An AI agent control plane gateway for enterprise governance: scoped capabilities, policy controls, delegation lineage, request-path budget enforcement, Evidence Pack exports, data exfiltration prevention, tool misuse prevention, and revocation without standing API keys.",
       datePublished: "2026-04-27",
-      dateModified: "2026-05-05",
+      dateModified: "2026-08-06",
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
       about: [
         { "@type": "Thing", name: "AI agent control plane" },
+        { "@type": "Thing", name: "AI control plane gateway" },
+        { "@type": "Thing", name: "enterprise AI control plane solution" },
+        { "@type": "Thing", name: "governance control plane" },
+        { "@type": "Thing", name: "MCP control plane" },
+        { "@type": "Thing", name: "agent control plane policy controls" },
+        { "@type": "Thing", name: "AI agent data exfiltration prevention" },
+        { "@type": "Thing", name: "AI agent tool misuse prevention" },
         { "@type": "Thing", name: "AI agent delegation control" },
         { "@type": "Thing", name: "agent capability management" },
         { "@type": "Thing", name: "request-path budget enforcement" },
@@ -196,7 +242,14 @@ const jsonLd = {
       operatingSystem: "Any",
       url: "https://satgate.io/agent-control-plane",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      dateModified: "2026-08-06",
       featureList: [
+        "AI control plane gateway",
+        "Enterprise AI control plane solution",
+        "Agent control-plane policy controls",
+        "Data exfiltration prevention for AI agents",
+        "Tool misuse prevention for AI agents",
+        "MCP control plane",
         "No standing API keys for enterprise AI agents",
         "Scoped agent capabilities",
         "Delegation lineage proof",
@@ -212,6 +265,18 @@ const jsonLd = {
       description:
         "Core controls required to govern enterprise AI agents without standing keys, unmanaged delegation, or invisible spend.",
       itemListElement: controlPlaneCapabilities.map(([name, description], index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name,
+        description,
+      })),
+    },
+    {
+      "@type": "ItemList",
+      name: "AI control plane gateway enforcement points",
+      description:
+        "Request-path controls SatGate uses to prevent AI agent data exfiltration, tool misuse, runaway spend, and unmanaged MCP access.",
+      itemListElement: gatewayControls.map(([name, description], index) => ({
         "@type": "ListItem",
         position: index + 1,
         name,
@@ -279,13 +344,13 @@ export default function AgentControlPlanePage() {
               Governed AI agents
             </div>
             <h1 className="max-w-4xl text-5xl font-black leading-[0.95] tracking-[-0.055em] text-white sm:text-6xl lg:text-7xl">
-              SatGate Agent Control Plane
+              AI agent control plane gateway
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-slate-300">
-              Govern enterprise AI agents before they touch expensive models, sensitive APIs, paid tools, or customer data. SatGate gives every agent bounded authority, visible spend, controlled delegation, and next-request revocation.
+              Govern enterprise AI agents before they touch expensive models, sensitive APIs, paid tools, MCP servers, or customer data. SatGate gives every agent bounded authority, visible spend, controlled delegation, policy controls, and next-request revocation.
             </p>
             <p className="mt-5 max-w-2xl text-lg font-semibold text-cyan-200">
-              Let agents work — without giving them blank checks, permanent keys, or invisible authority.
+              Let agents work without giving them blank checks, permanent keys, invisible authority, or an easy path to data exfiltration and tool misuse.
             </p>
             <div className="mt-9 flex flex-col gap-4 sm:flex-row">
               <a
@@ -318,6 +383,44 @@ export default function AgentControlPlanePage() {
                 Watch the full walkthrough →
               </a>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-white/10 bg-white/[0.025] px-5 py-16 sm:px-8 lg:py-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-9 grid gap-6 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
+            <div>
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-sm font-semibold text-cyan-200">
+                <ShieldCheck size={15} />
+                Direct answer
+              </div>
+              <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
+                An AI control plane gateway enforces policy before agents act.
+              </h2>
+            </div>
+            <p className="text-lg leading-8 text-slate-300">
+              SatGate is the enterprise AI control plane solution for teams that need governance in the request path, not another after-the-fact dashboard. It checks authority, budget, data scope, MCP tool permission, delegation, and revocation before forwarding agent traffic.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {gatewayControls.map(([title, body]) => (
+              <div key={title} className="rounded-3xl border border-white/10 bg-[#07111f] p-5">
+                <h3 className="text-lg font-bold text-white">{title}</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-400">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/mcp-governance" className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm font-bold text-cyan-200 transition hover:bg-cyan-400/10">
+              MCP governance <ArrowRight size={16} />
+            </Link>
+            <Link href="/agent-api-governance" className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm font-bold text-cyan-200 transition hover:bg-cyan-400/10">
+              Agent API governance <ArrowRight size={16} />
+            </Link>
+            <Link href="/economic-firewall" className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm font-bold text-cyan-200 transition hover:bg-cyan-400/10">
+              Economic firewall <ArrowRight size={16} />
+            </Link>
           </div>
         </div>
       </section>
@@ -382,10 +485,10 @@ export default function AgentControlPlanePage() {
               Run autonomous agents with authority you can explain.
             </h2>
             <p className="mt-5 text-lg leading-8 text-slate-300">
-              AI agents are starting to call APIs, use paid tools, delegate work, and act across customer environments. A production team needs more than connection and logs — it needs a way to decide what each agent is allowed to do before the action happens.
+              AI agents are starting to call APIs, use paid tools, delegate work, and act across customer environments. A production team needs more than connection and logs; it needs a governance control plane that decides what each agent is allowed to do before the action happens.
             </p>
             <p className="mt-4 text-lg leading-8 text-slate-300">
-              SatGate turns agent authority into a governed business object: scoped, budgeted, delegated, metered, audited, and revocable. The agent can move fast, but it never gets unlimited power.
+              SatGate turns agent authority into a governed business object: scoped, budgeted, delegated, metered, audited, and revocable. The agent can move fast, but it never gets unlimited power over data, tools, spend, or downstream systems.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
