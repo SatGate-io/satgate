@@ -7,6 +7,13 @@ import { ArrowRight, Bot, Gauge, ReceiptText, ShieldCheck, Zap } from 'lucide-re
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 
+const formulaRows = [
+  ['Autonomous retry loops cost', 'active agents x paid calls per minute x minutes before discovery x delegation fanout x cost per call'],
+  ['Runaway LLM agent costs', 'LLM calls x token or request price x retry duration x fanout'],
+  ['Runaway tool costs', 'MCP or SaaS tool calls x per-call price x loop duration x delegated workers'],
+  ['Avoidable cost', 'unmanaged loop cost - cost when request-path enforcement stops the loop early'],
+];
+
 function Slider({ label, value, min, max, step, suffix = '', prefix = '', onChange }: {
   label: string;
   value: number;
@@ -62,12 +69,17 @@ export default function RunawayAgentCostCalculatorPage() {
     '@type': 'WebPage',
     name: 'Runaway Agent Cost Calculator',
     url: 'https://satgate.io/runaway-agent-cost-calculator',
-    description: 'Estimate runaway AI agent loop costs from agent count, calls per minute, tool-call cost, loop duration, delegation fanout, and incident frequency.',
+    description: 'Estimate runaway AI agent costs from autonomous retry loops, LLM agent loops, paid tool calls, delegation fanout, detection lag, and request-path budget enforcement.',
     datePublished: '2026-05-01',
-    dateModified: '2026-08-04',
+    dateModified: '2026-08-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'runaway agent spend' },
+      { '@type': 'Thing', name: 'autonomous retry loops cost' },
+      { '@type': 'Thing', name: 'runaway cost' },
+      { '@type': 'Thing', name: 'runaway costs' },
+      { '@type': 'Thing', name: 'runaway LLM agent costs' },
+      { '@type': 'Thing', name: 'LLM agent runaway costs' },
       { '@type': 'Thing', name: 'AI agent loop cost' },
       { '@type': 'Thing', name: 'delegated sub-agent fanout' },
       { '@type': 'Thing', name: 'MCP tool budget exposure' },
@@ -82,11 +94,11 @@ export default function RunawayAgentCostCalculatorPage() {
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/runaway-agent-cost-calculator',
-    description: 'Estimate runaway AI agent loop costs from agent count, calls per minute, tool-call cost, loop duration, delegation fanout, and incident frequency.',
+    description: webPageJsonLd.description,
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-08-04',
+    dateModified: '2026-08-06',
     about: webPageJsonLd.about,
-    featureList: ['Agent loop cost modeling', 'Delegation fanout exposure', 'Monthly and annual exposure estimates', 'Budget enforcement savings estimate'],
+    featureList: ['Autonomous retry loop cost modeling', 'Runaway LLM agent cost modeling', 'Runaway tool cost modeling', 'Delegation fanout exposure', 'Monthly and annual exposure estimates', 'Budget enforcement savings estimate'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
@@ -160,6 +172,19 @@ export default function RunawayAgentCostCalculatorPage() {
     ],
   };
 
+  const formulaJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Runaway AI agent cost formulas',
+    description: 'Plain-English formulas for autonomous retry loop cost, runaway LLM agent costs, runaway tool costs, and avoidable cost.',
+    itemListElement: formulaRows.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
+  };
+
   const howToJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
@@ -190,6 +215,7 @@ export default function RunawayAgentCostCalculatorPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(retryLoopJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(formulaJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
@@ -200,10 +226,10 @@ export default function RunawayAgentCostCalculatorPage() {
             <Zap size={16} /> AI agent loop cost calculator
           </div>
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">
-            Runaway Agent Cost Calculator
+            Autonomous retry loop cost calculator
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Estimate how fast autonomous agents can burn through API, model, and MCP tool budgets when loops, retries, or delegated sub-agents run without request-path budget enforcement.
+            Estimate runaway AI agent costs from autonomous retry loops, LLM agent loops, paid API calls, MCP tool calls, and delegated sub-agents before request-path budget enforcement stops the next request.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -285,7 +311,7 @@ export default function RunawayAgentCostCalculatorPage() {
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-orange-300">Autonomous retry loops</p>
           <h2 className="mb-4 text-3xl font-bold text-white">Autonomous retry loop cost is velocity times detection lag</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
-            The GSC-visible search intent is blunt: teams want to know what retry loops cost before they become invoice archaeology. The model is simple enough for finance and platform teams to share.
+            The search intent is blunt: teams want to know what retry loops cost before they become invoice archaeology. The model is simple enough for finance and platform teams to share.
           </p>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {[
@@ -303,6 +329,31 @@ export default function RunawayAgentCostCalculatorPage() {
           <div className="mt-8 rounded-xl border border-orange-900/50 bg-orange-950/10 p-6">
             <p className="font-mono text-sm text-orange-200">
               retry loop cost = active agents x calls per minute x minutes before discovery x fanout x cost per call
+            </p>
+          </div>
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            {formulaRows.map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+                <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                <p className="font-mono text-sm leading-relaxed text-orange-100">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-gray-950/60">
+        <div className="mx-auto grid max-w-6xl gap-8 px-6 py-20 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-orange-300">LLM and tool loops</p>
+            <h2 className="text-3xl font-bold text-white">Runaway LLM agent costs are only part of the exposure</h2>
+          </div>
+          <div className="space-y-5 text-lg leading-relaxed text-gray-300">
+            <p>
+              A runaway LLM agent can burn model budget through repeated reasoning calls, but the larger bill often appears when the same loop triggers paid tools: search, browser automation, SaaS APIs, cloud actions, code execution, data vendors, or MCP servers.
+            </p>
+            <p>
+              SatGate models both sides of the runaway cost problem: LLM calls and downstream tool calls. Then it compares unmanaged spend with the cost when gateway policy blocks, downgrades, or revokes the next over-budget request.
             </p>
           </div>
         </div>

@@ -1,11 +1,16 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Runaway Agent Cost Calculator',
-  description: 'Estimate the cost of AI agent loops, retries, delegated sub-agents, and paid tool calls before budget enforcement stops runaway spend.',
+  title: 'Autonomous Retry Loop Cost Calculator | Runaway AI Agent Costs',
+  description: 'Calculate runaway AI agent costs from autonomous retry loops, LLM agent loops, tool calls, delegation fanout, detection lag, and budget enforcement.',
   alternates: { canonical: 'https://satgate.io/runaway-agent-cost-calculator' },
   keywords: [
     'runaway agent cost calculator',
+    'autonomous retry loops cost',
+    'runaway cost',
+    'runaway costs',
+    'runaway LLM agent costs',
+    'LLM agent runaway costs',
     'AI agent loop cost calculator',
     'AI agent spend calculator',
     'agent budget enforcement calculator',
@@ -13,15 +18,15 @@ export const metadata: Metadata = {
     'MCP tool cost calculator',
   ],
   openGraph: {
-    title: 'Runaway Agent Cost Calculator',
-    description: 'Model how fast autonomous agents can burn API, model, and MCP tool budgets when loops or retries go unchecked.',
+    title: 'Autonomous Retry Loop Cost Calculator | Runaway AI Agent Costs',
+    description: 'Model runaway AI agent costs from retry loops, LLM calls, MCP tools, delegation fanout, detection lag, and budget enforcement.',
     url: 'https://satgate.io/runaway-agent-cost-calculator',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Runaway Agent Cost Calculator',
-    description: 'Estimate AI agent loop, retry, and tool-call cost exposure before request-path budget enforcement.',
+    title: 'Autonomous Retry Loop Cost Calculator',
+    description: 'Estimate AI agent loop, retry, and tool-call exposure before request-path budget enforcement.',
   },
 };
 
