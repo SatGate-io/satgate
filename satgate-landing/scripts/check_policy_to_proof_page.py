@@ -473,7 +473,6 @@ spend_longtail_forbidden_phrases = {
         "when agents become customers",
         "03 / CHARGE",
         "/robot-customer-payments",
-        "economic control plane",
         "Preserve proof when value moves",
         "03 / PROOF",
         "Preserve paid-access evidence",

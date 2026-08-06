@@ -134,6 +134,9 @@ export default function GovernPage() {
             <Link href="/capability-auth" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-purple-500">
               Capability-based authorization <ArrowRight size={16} />
             </Link>
+            <Link href="/economic-control-plane" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-green-500">
+              Economic control plane <ArrowRight size={16} />
+            </Link>
             <Link href="/blog/llm-cost-management" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-yellow-500">
               LLM cost management <ArrowRight size={16} />
             </Link>
@@ -894,6 +897,7 @@ export SATGATE_TOKEN=$TOKEN
           <div className="grid gap-4 md:grid-cols-2">
             {[
               ['/agent-api-key-risk-assessment', 'Agent API key risk assessment', 'Find static-key blast radius before autonomous agents inherit unlimited API access.'],
+              ['/economic-control-plane', 'Economic control plane', 'Define the operating layer for authority, budgets, routing, revocation, paid context, and proof before execution.'],
               ['/economic-firewall-readiness-grader', 'Agent governance readiness grader', 'Score identity, budgets, MCP governance, revocation, delegation, Evidence Pack proof, routing, and rail-aware readiness.'],
               ['/agent-spend-policy-template', 'Agent spend policy template', 'Generate YAML/JSON policy for per-agent budgets, MCP caps, delegation, revocation, and Evidence Pack fields.'],
               ['/mcp-cost-control', 'MCP cost control', 'Treat MCP tool calls as governed events with per-tool prices, caps, denial reasons, and evidence.'],
@@ -972,6 +976,7 @@ export SATGATE_TOKEN=$TOKEN
               <h4 className="font-bold text-white mb-4">Resources</h4>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><Link href="/policy-to-proof" className="hover:text-white transition">Policy-to-Proof</Link></li>
+                <li><Link href="/economic-control-plane" className="hover:text-white transition">Economic Control Plane</Link></li>
                 <li><Link href="/agent-control-plane" className="hover:text-white transition">Agent Control Plane</Link></li>
                 <li><Link href="/mcp-governance" className="hover:text-white transition">MCP Governance</Link></li>
                 <li><Link href="/agent-api-governance" className="hover:text-white transition">Agent API Governance</Link></li>

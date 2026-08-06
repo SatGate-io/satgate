@@ -13,6 +13,7 @@ export const metadata = {
     'LLM cost control',
     'OpenAI API budget limits',
     'MCP budget enforcement',
+    'economic control plane for AI agents',
     'runaway agent spend',
     'AI cost governance',
     'per-customer AI API budget limits',
@@ -79,6 +80,7 @@ export default function AiAgentCostControlPage() {
       { '@type': 'Thing', name: 'AI agent spend control' },
       { '@type': 'Thing', name: 'request-path budget enforcement' },
       { '@type': 'Thing', name: 'MCP budget enforcement' },
+      { '@type': 'Thing', name: 'economic control plane for AI agents' },
       { '@type': 'Thing', name: 'runaway AI agent spend prevention' },
       { '@type': 'Thing', name: 'per-customer AI API budget limits' },
       { '@type': 'Thing', name: 'customer AI API spending controls' },
@@ -437,6 +439,9 @@ export default function AiAgentCostControlPage() {
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               See Policy-to-Proof
             </Link>
+            <Link href="/economic-control-plane" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-purple-500 transition">
+              Economic control plane
+            </Link>
             <Link href="/roi-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               Estimate avoided spend
             </Link>
@@ -517,6 +522,7 @@ export default function AiAgentCostControlPage() {
           <h2 className="text-3xl font-bold text-white mb-8">High-intent use cases</h2>
           <div className="grid md:grid-cols-2 gap-5">
             {[
+              ['Economic control plane', 'Understand the request-path operating layer for authority, budgets, routing, revocation, paid context, and proof.', '/economic-control-plane'],
               ['AI API budget enforcement', 'Enforce per-agent and per-workflow spend caps before OpenAI, Claude, MCP, or paid API requests leave your environment.', '/ai-api-budget-enforcement'],
               ['Agent spending limits', 'Set hard caps by task, route, model, tool, tenant, session, and delegated sub-agent.', '/agent-spending-limits'],
               ['Agent spend policy template', 'Generate copyable YAML/JSON policy for budgets, tools, delegation, revocation, and audit fields.', '/agent-spend-policy-template'],

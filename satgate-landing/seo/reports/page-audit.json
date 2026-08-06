@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-06T21:37:41.685320Z",
+  "generatedAt": "2026-08-06T22:06:24.253160Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -368,6 +368,7 @@
         "/blog/llm-cost-management",
         "/capability-auth",
         "/design-partners",
+        "/economic-control-plane",
         "/economic-firewall",
         "/govern",
         "/l402-agent-payments",
@@ -391,7 +392,7 @@
         "WebPage",
         "WebSite"
       ],
-      "wordCount": 1984,
+      "wordCount": 1997,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
