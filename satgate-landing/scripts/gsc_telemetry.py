@@ -163,6 +163,24 @@ def inspect_urls(searchconsole, urls: list[str]) -> list[dict[str, str]]:
     return results
 
 
+def fetch_sitemap_status(webmasters) -> dict[str, Any]:
+    try:
+        status = webmasters.sitemaps().get(siteUrl=SITE, feedpath=SITEMAP_URL).execute()
+        return {
+            "path": status.get("path", SITEMAP_URL),
+            "lastSubmitted": status.get("lastSubmitted", ""),
+            "lastDownloaded": status.get("lastDownloaded", ""),
+            "isPending": status.get("isPending", False),
+            "isSitemapsIndex": status.get("isSitemapsIndex", False),
+            "type": status.get("type", ""),
+            "warnings": status.get("warnings", "0"),
+            "errors": status.get("errors", "0"),
+            "contents": status.get("contents", []),
+        }
+    except Exception as exc:
+        return {"path": SITEMAP_URL, "error": str(exc)[:240]}
+
+
 def pct(x: float) -> str:
     return f"{x * 100:.2f}%"
 
@@ -195,6 +213,7 @@ def main() -> None:
         raise SystemExit(f"No access to {SITE}")
 
     sitemap_urls = fetch_sitemap_urls()
+    sitemap_status = fetch_sitemap_status(webmasters)
     page_rows = query_searchanalytics(webmasters, args.start, args.end, ["page"])
     query_rows = query_searchanalytics(webmasters, args.start, args.end, ["query"])
     page_query_rows = query_searchanalytics(webmasters, args.start, args.end, ["page", "query"])
@@ -248,6 +267,21 @@ def main() -> None:
         f"- CTR: **{pct(overall_ctr)}**",
         f"- Avg position: **{avg_position:.1f}**",
         "",
+        "## Sitemap Submission Status",
+        "",
+        table(
+            ["Sitemap", "Submitted", "Downloaded", "Pending", "URLs submitted", "URLs indexed", "Warnings", "Errors"],
+            [[
+                sitemap_status.get("path", SITEMAP_URL),
+                sitemap_status.get("lastSubmitted", ""),
+                sitemap_status.get("lastDownloaded", ""),
+                sitemap_status.get("isPending", ""),
+                (sitemap_status.get("contents") or [{}])[0].get("submitted", ""),
+                (sitemap_status.get("contents") or [{}])[0].get("indexed", ""),
+                sitemap_status.get("warnings", ""),
+                sitemap_status.get("errors", sitemap_status.get("error", "")),
+            ]],
+        ),
         "## Cluster Performance",
         "",
         table(
@@ -313,6 +347,7 @@ def main() -> None:
         "end": args.end,
         "generated": today,
         "sitemapUrlCount": len(sitemap_urls),
+        "sitemapStatus": sitemap_status,
         "summary": {"clicks": total_clicks, "impressions": total_impressions, "ctr": overall_ctr, "position": avg_position},
         "clusters": cluster_summary,
         "pageRows": page_rows,
