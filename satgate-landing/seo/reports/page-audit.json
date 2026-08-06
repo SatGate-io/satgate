@@ -450,17 +450,18 @@
     {
       "path": "/mcp-gateway",
       "exists": true,
-      "title": "MCP Gateway for Agent Governance and Evidence Packs",
-      "titleLength": 51,
-      "metaDescription": "Use SatGate as an MCP gateway to check authority before tool execution, enforce policy, and export Evidence Packs.",
-      "metaDescriptionLength": 114,
+      "title": "MCP Gateway: MCP Gate for Evidence Packs and Budgets",
+      "titleLength": 52,
+      "metaDescription": "Use SatGate as an MCP gateway and policy gate to check tool authority, enforce budgets, and export MCP Evidence Pack receipts.",
+      "metaDescriptionLength": 126,
       "canonical": "/mcp-gateway",
       "h1": [
-        "MCP Gateway for Agent Governance and Evidence Packs"
+        "MCP Gateway for Agent Governance, Budgets, and Evidence Packs"
       ],
       "h1Count": 1,
       "h2s": [
         "An MCP gateway governs tool calls before agents reach the server",
+        "An MCP gate should leave proof, not just logs",
         "MCP connection is not MCP governance",
         "Observe, Control, Charge MCP tool use",
         "MCP policy templates teams can start from",
@@ -493,7 +494,7 @@
         "Question",
         "SoftwareApplication"
       ],
-      "wordCount": 1030,
+      "wordCount": 1275,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,

@@ -48,22 +48,36 @@ const proofRows = [
 
 const faqs = [
   ['What is an MCP gateway?', 'An MCP gateway sits between AI agents and Model Context Protocol servers. SatGate observes tool calls, applies access policy and MCP budget enforcement, records MCP Evidence Pack receipts, and proves decisions before tools execute.'],
+  ['What is an MCP gate?', 'MCP gate is shorthand for the policy gate between an AI agent and MCP servers. SatGate acts as that gate by checking identity, capability scope, budget, tenant boundary, and Evidence Pack receipt requirements before a tool call executes.'],
   ['What is MCP budget enforcement?', 'MCP budget enforcement checks the cost of a requested tool call against a tenant, agent, session, delegation, or tool budget before the call reaches the upstream MCP server. If the budget is missing or exhausted, SatGate denies the call in the request path.'],
   ['What is an MCP Evidence Pack?', 'An MCP Evidence Pack is the proof artifact for governed tool activity: who called which MCP tool, through which client and server, under which policy and budget, with which allow or deny decision, and what receipt proves it.'],
+  ['What does Evidence MCP mean?', 'Evidence MCP usually means proof for Model Context Protocol tool activity. In SatGate, that proof is an MCP Evidence Pack: a receipt-backed record of the agent, tenant, client, server, tool, budget, policy version, and decision outcome.'],
   ['Can SatGate govern Claude, Hermes, or Ollama MCP agents?', 'Yes. Claude Desktop, Claude Code, Hermes, Ollama wrappers, Cursor, OpenClaw, and custom MCP-capable clients can route tool calls through SatGate. The agent gets no standing authority; SatGate grants or denies each tool call.'],
   ['How is an MCP gateway different from an API gateway?', 'A traditional API gateway mostly routes HTTP traffic and checks identity. An MCP gateway also understands agent tool calls, capability scope, per-tool cost, budget policy, tenant isolation, delegation lineage, and Evidence Pack outcomes.'],
   ['Can SatGate host MCP servers?', 'Yes. SatGate supports SaaS MCP for managed hosted deployment. Enterprise buyers needing isolated runtime boundaries can contract for a Dedicated deployment with custody and operations defined during onboarding.'],
 ];
 
+const evidenceFields = [
+  ['Caller identity', 'Tenant, principal, agent, workflow, and MCP client that requested the tool.'],
+  ['Tool target', 'MCP server, tool name, route, action, risk tier, and requested arguments summary.'],
+  ['Authority state', 'Capability scope, expiry, delegation lineage, revocation status, and policy version.'],
+  ['Budget state', 'Price, remaining budget, budget scope, enforcement action, and paid-rail context when present.'],
+  ['Decision proof', 'Allow or deny result, reason code, receipt ID, Evidence Pack link, and upstream outcome.'],
+];
+
 export const metadata = {
-  title: 'MCP Gateway for Agent Governance and Evidence Packs',
-  description: 'Use SatGate as an MCP gateway to check authority before tool execution, enforce policy, and export Evidence Packs.',
+  title: 'MCP Gateway: MCP Gate for Evidence Packs and Budgets',
+  description: 'Use SatGate as an MCP gateway and policy gate to check tool authority, enforce budgets, and export MCP Evidence Pack receipts.',
   alternates: { canonical: 'https://satgate.io/mcp-gateway' },
   keywords: [
     'MCP gateway',
+    'MCP gate',
+    'evidence MCP',
     'Model Context Protocol gateway',
     'MCP budget enforcement',
     'MCP Evidence Pack',
+    'MCP evidence receipts',
+    'MCP gateway evidence',
     'MCP policy templates',
     'MCP tool allowlist',
     'MCP tenant isolation',
@@ -73,15 +87,15 @@ export const metadata = {
     'Hermes MCP governance',
   ],
   openGraph: {
-    title: 'MCP Gateway for Agent Governance and Evidence Packs',
-    description: 'Put SatGate in the MCP request path: check authority before tool execution, enforce policy, and export Evidence Pack receipts.',
+    title: 'MCP Gateway: MCP Gate for Evidence Packs and Budgets',
+    description: 'Put SatGate in the MCP request path: check authority before tool execution, enforce policy, and export MCP Evidence Pack receipts.',
     url: 'https://satgate.io/mcp-gateway',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MCP Gateway for Agent Governance and Evidence Packs',
-    description: 'Govern Claude, Hermes, Ollama, Cursor, and custom MCP agents with authority checks and Evidence Pack proof.',
+    title: 'MCP Gateway: MCP Gate for Evidence Packs and Budgets',
+    description: 'Govern Claude, Hermes, Ollama, Cursor, and custom MCP agents with authority checks, budgets, and Evidence Pack proof.',
   },
 };
 
@@ -94,11 +108,13 @@ export default function McpGatewayPage() {
     operatingSystem: 'Web',
     description: metadata.description,
     url: 'https://satgate.io/mcp-gateway',
-    dateModified: '2026-08-05',
+    dateModified: '2026-08-06',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     featureList: [
       'MCP budget enforcement',
       'MCP Evidence Pack receipts',
+      'MCP gate policy enforcement',
+      'Evidence MCP receipt fields',
       'MCP tool allowlist policy',
       'Tenant isolation for MCP servers',
       'Delegation-depth enforcement for agent capabilities',
@@ -108,7 +124,8 @@ export default function McpGatewayPage() {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: 'MCP gateway governance controls',
-    description: 'Commercial MCP gateway controls for AI agent tool access, budget enforcement, capability authorization, audit proof, and Evidence Pack export.',
+    description: 'Commercial MCP gateway controls for AI agent tool access, MCP gate enforcement, budget enforcement, capability authorization, audit proof, and Evidence Pack export.',
+    dateModified: '2026-08-06',
     itemListElement: [
       {
         '@type': 'ListItem',
@@ -154,6 +171,20 @@ export default function McpGatewayPage() {
       encodingFormat: template.format === 'JSON' ? 'application/json' : 'application/x-yaml',
     })),
   };
+  const evidenceFieldsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP Evidence Pack receipt fields',
+    description:
+      'Evidence MCP receipt fields that prove governed Model Context Protocol tool calls: caller identity, tool target, authority state, budget state, and decision proof.',
+    dateModified: '2026-08-06',
+    itemListElement: evidenceFields.map(([title, body], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: title,
+      description: body,
+    })),
+  };
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -169,6 +200,7 @@ export default function McpGatewayPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(mcpGatewayControlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(evidenceFieldsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <div className="mx-auto max-w-6xl px-6 pt-8">
@@ -184,7 +216,7 @@ export default function McpGatewayPage() {
             <Cable size={16} /> Model Context Protocol governance gateway
           </div>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight max-w-5xl mb-8">
-            MCP Gateway for Agent Governance and Evidence Packs
+            MCP Gateway for Agent Governance, Budgets, and Evidence Packs
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-8">
             SatGate sits between AI agents — Claude, Hermes, Ollama, Cursor, OpenClaw, or custom MCP clients — and the tools they want to call. Every MCP request is checked for authority, budget, tenant, tool scope, and delegation before execution — then preserved as Evidence Pack proof.
@@ -239,6 +271,24 @@ export default function McpGatewayPage() {
             <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
               Tool cost policy generator <ArrowRight size={16} />
             </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-gray-900 bg-gray-950/60">
+        <div className="max-w-6xl mx-auto px-6 py-16">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Evidence MCP</p>
+          <h2 className="mb-5 text-3xl font-bold text-white">An MCP gate should leave proof, not just logs</h2>
+          <p className="max-w-4xl text-lg leading-relaxed text-gray-300">
+            Teams searching for evidence MCP usually need proof that agent tool calls were governed. SatGate turns the MCP gate into a receipt layer: every supported allow, deny, budget, tenant, delegation, and revocation decision can be exported as an MCP Evidence Pack instead of disappearing into raw logs.
+          </p>
+          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+            {evidenceFields.map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black p-5">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
