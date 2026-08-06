@@ -1,12 +1,16 @@
 import Link from 'next/link';
-import { ArrowRight, Bot, Gauge, KeyRound, ShieldCheck, Terminal, Wrench } from 'lucide-react';
+import { ArrowRight, Bot, Gauge, ShieldCheck, Terminal, Wrench } from 'lucide-react';
 
 export const metadata = {
-  title: 'MCP Governance for AI Agents',
-  description: 'Govern MCP tool calls with per-tool budgets, scoped capabilities, revocation, Evidence Packs, and economic firewall controls for Cursor, Claude, and OpenClaw.',
+  title: 'MCP for Budgeting: Tool Spend Governance for AI Agents',
+  description: 'Use MCP for budgeting AI agent tools with per-tool costs, spend caps, scoped capabilities, revocation, expense tracking, and Evidence Packs.',
   alternates: { canonical: 'https://satgate.io/mcp' },
   keywords: [
     'MCP governance',
+    'MCP for budgeting',
+    'Model Context Protocol expense tracker',
+    'MCP tool budget governance',
+    'MCP expense tracking',
     'MCP budget enforcement',
     'MCP cost control',
     'MCP tool spend control',
@@ -16,15 +20,15 @@ export const metadata = {
     'Claude Desktop MCP governance',
   ],
   openGraph: {
-    title: 'MCP Governance for AI Agents',
-    description: 'Request-path budgets, scoped capabilities, revocation, and Evidence Packs for MCP tool calls.',
+    title: 'MCP for Budgeting: Tool Spend Governance for AI Agents',
+    description: 'Use MCP for budgeting with per-tool costs, spend caps, expense tracking, scoped capabilities, revocation, and Evidence Packs.',
     url: 'https://satgate.io/mcp',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MCP Governance for AI Agents',
-    description: 'Control MCP tool spend, authority, revocation, and audit evidence before agent tool calls execute.',
+    title: 'MCP for Budgeting',
+    description: 'Control MCP tool spend, authority, revocation, expense tracking, and audit evidence before tool calls execute.',
   },
 };
 
@@ -59,14 +63,18 @@ export default function MCPPage() {
   const webPageJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'MCP Governance for AI Agents',
+    name: 'MCP for Budgeting: Tool Spend Governance for AI Agents',
     url: 'https://satgate.io/mcp',
     description: metadata.description,
     datePublished: '2026-05-01',
-    dateModified: '2026-05-03',
+    dateModified: '2026-08-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'MCP governance' },
+      { '@type': 'Thing', name: 'MCP for budgeting' },
+      { '@type': 'Thing', name: 'Model Context Protocol expense tracker' },
+      { '@type': 'Thing', name: 'MCP tool budget governance' },
+      { '@type': 'Thing', name: 'MCP expense tracking' },
       { '@type': 'Thing', name: 'MCP budget enforcement' },
       { '@type': 'Thing', name: 'MCP tool spend control' },
       { '@type': 'Thing', name: 'economic firewall for MCP' },
@@ -86,6 +94,39 @@ export default function MCPPage() {
       url: `https://satgate.io${card.href}`,
       description: card.description,
     })),
+  };
+
+  const budgetingJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP for budgeting controls',
+    description: 'Budgeting and expense-tracking controls for Model Context Protocol tools used by AI agents.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Per-tool price table',
+        description: 'Assign unit costs to MCP tools so search, browser, data export, code execution, and paid APIs can be budgeted separately.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Agent and workflow budgets',
+        description: 'Track remaining budget by tenant, user, parent agent, child agent, workflow, session, and tool.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Pre-tool-call enforcement',
+        description: 'Allow, deny, downgrade, route, or escalate before the MCP server executes an expensive tool call.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Expense tracker receipts',
+        description: 'Emit Evidence Pack receipts showing agent, tool, unit price, spend, remaining budget, policy version, and denial reason.',
+      },
+    ],
   };
 
   const breadcrumbJsonLd = {
@@ -119,6 +160,22 @@ export default function MCPPage() {
       },
       {
         '@type': 'Question',
+        name: 'Can MCP be used for budgeting AI agent tools?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. MCP can be used for budgeting when a gateway or proxy prices each tool call, attributes spend to the agent and workflow, checks remaining budget before execution, and emits expense-tracking receipts afterward.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What should a Model Context Protocol expense tracker record?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A Model Context Protocol expense tracker should record agent identity, tenant, workflow, MCP tool name, unit price, call count, remaining budget, policy version, allow or deny decision, and Evidence Pack receipt id.',
+        },
+      },
+      {
+        '@type': 'Question',
         name: 'How does SatGate control MCP spend?',
         acceptedAnswer: {
           '@type': 'Answer',
@@ -132,6 +189,7 @@ export default function MCPPage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(budgetingJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
@@ -142,10 +200,10 @@ export default function MCPPage() {
             <Bot size={16} /> Economic firewall for MCP tools
           </div>
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">
-            MCP Governance for AI Agents
+            MCP for Budgeting AI Agent Tool Spend
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            MCP gives agents tools. SatGate gives teams the economic firewall around those tools: per-tool budgets, scoped capabilities, revocation, Evidence Packs, and policy before execution.
+            MCP gives agents tools. SatGate turns those tools into budgeted, priced, and auditable economic events: per-tool budgets, expense tracking, scoped capabilities, revocation, Evidence Packs, and policy before execution.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -154,6 +212,31 @@ export default function MCPPage() {
             <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Read the governance guide
             </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-gray-900 bg-gray-950/60">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="mb-10 max-w-4xl">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">MCP for budgeting</p>
+            <h2 className="mb-4 text-3xl font-bold text-white">Use MCP as the expense boundary for autonomous agent tools</h2>
+            <p className="text-lg leading-relaxed text-gray-300">
+              A Model Context Protocol expense tracker is only useful if it can stop the next tool call. SatGate prices MCP tools, checks the remaining budget before execution, and records the decision in an Evidence Pack.
+            </p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-4">
+            {[
+              ['Price table', 'Assign per-call costs to each MCP tool, route, model, data export, or paid API action.'],
+              ['Budget scope', 'Limit spend by tenant, user, parent agent, child agent, workflow, session, and tool.'],
+              ['Pre-call decision', 'Allow, deny, downgrade, route, or escalate before the MCP server executes.'],
+              ['Expense proof', 'Record unit price, spend, remaining budget, policy version, and Evidence Pack receipt id.'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-2xl border border-gray-800 bg-black p-5">
+                <h3 className="mb-2 text-xl font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -191,6 +274,8 @@ export default function MCPPage() {
         <div className="space-y-5">
           {[
             ['What is MCP governance?', 'MCP governance is the control layer around Model Context Protocol tool calls: budgets, scoped authority, revocation, Evidence Packs, and risk actions before agents execute tools.'],
+            ['Can MCP be used for budgeting AI agent tools?', 'Yes. MCP can be used for budgeting when a gateway or proxy prices each tool call, attributes spend to the agent and workflow, checks remaining budget before execution, and emits expense-tracking receipts afterward.'],
+            ['What should a Model Context Protocol expense tracker record?', 'It should record agent identity, tenant, workflow, MCP tool name, unit price, call count, remaining budget, policy version, allow or deny decision, and Evidence Pack receipt id.'],
             ['Why do MCP tools need budget enforcement?', 'Autonomous agents can call paid or risky tools repeatedly, delegate work, or loop. MCP budget enforcement stops over-budget tool calls in the request path instead of discovering spend after the fact.'],
             ['How does SatGate control MCP spend?', 'SatGate can proxy MCP traffic and enforce per-tool prices, session caps, workflow budgets, capability caveats, revocation, and audit requirements before tool calls reach the upstream MCP server.'],
           ].map(([question, answer]) => (
