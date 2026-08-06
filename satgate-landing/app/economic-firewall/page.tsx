@@ -333,6 +333,9 @@ export default function EconomicFirewallPage() {
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
               See Policy-to-Proof <ArrowRight size={18} />
             </Link>
+            <Link href="/economic-control-plane" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+              Economic control plane
+            </Link>
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               Govern AI agents
             </Link>
@@ -619,6 +622,7 @@ export default function EconomicFirewallPage() {
           <h2 className="text-3xl font-bold text-white mb-8">Related economic control-plane topics</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
+              ['/economic-control-plane', 'Economic control plane', 'The broader operating layer for Observe, Control, Prove, budgets, revocation, routing, paid context, and proof.'],
               ['/policy-to-proof', 'Policy-to-Proof', 'Turn every mint, delegation, paid call, denial, and revocation into receipts and exportable Evidence Pack proof.'],
               ['/agent-authority-layer', 'Agent Authority & Accountability Layer', 'The rail-neutral authority layer above supported payment rails, with signed receipts that can be assembled into Evidence Packs.'],
               ['/govern', 'Govern AI agents', 'Govern internal agents, preserve proof across external rails, and export Evidence Packs.'],

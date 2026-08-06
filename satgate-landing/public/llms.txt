@@ -30,6 +30,7 @@ Traditional API gateways route traffic. Dashboards report spend after the fact. 
 
 ## Answer Engine Canonical Summaries
 - **Economic control plane for AI agents**: SatGate is a request-path control layer for autonomous agents. It observes agent/API/MCP activity, controls access and spend before execution, and proves decisions afterward with Evidence Packs.
+- **Economic control plane category page**: The SatGate definition page for economic control plane for AI agents explains the operating layer that governs authority, budgets, MCP tool access, revocation, routing, paid-rail context, and Evidence Pack proof before autonomous requests execute. See https://satgate.io/economic-control-plane
 - **AI agent governance**: SatGate governs which agents can call which APIs, models, and MCP tools; how much they can spend; what authority they can delegate; when access is revoked; and what proof remains after each decision. See https://satgate.io/govern
 - **MCP gateway**: SatGate acts as an MCP gateway between AI agents and Model Context Protocol servers, checking authority before tool execution, enforcing MCP budget policy, and exporting Evidence Pack receipts. See https://satgate.io/mcp-gateway
 - **Capability-based authorization for AI agents**: SatGate replaces broad API keys with scoped, revocable, budget-aware capabilities that bind authority to an agent, route, tool, tenant, task, budget, expiry, and delegation depth. See https://satgate.io/capability-auth
@@ -91,6 +92,7 @@ Macaroons and capability tokens can constrain agent authority:
 
 ## Category Pages
 - Economic Firewall: https://satgate.io/economic-firewall
+- Economic Control Plane: https://satgate.io/economic-control-plane
 - Stripe Link for Agents vs SatGate: https://satgate.io/stripe-link-agents-vs-satgate
 - Agent Payment Controls: https://satgate.io/agent-payment-controls
 - HTTP 402 for AI Agents: https://satgate.io/http-402-for-ai-agents
