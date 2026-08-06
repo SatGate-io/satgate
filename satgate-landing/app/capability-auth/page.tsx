@@ -2,13 +2,27 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, BadgeCheck, KeyRound, Layers3, ShieldCheck, TimerReset, WalletCards } from 'lucide-react';
 
 export const metadata = {
-  title: 'Capability-Based Authorization for AI Agents',
-  description: 'Replace broad API keys with scoped, revocable, budget-aware capabilities for AI agents using SatGate.',
+  title: 'Capability-Based Authorization for AI Agents: UCAN and Macaroons',
+  description: 'Compare UCAN, macaroons, and capability tokens for AI agent authorization with scoped, revocable, budget-aware authority.',
   alternates: { canonical: 'https://satgate.io/capability-auth' },
-  keywords: ['capability based authorization', 'capability auth', 'agent authorization', 'capability tokens', 'macaroon tokens', 'delegated authorization', 'AI agent permissions'],
+  keywords: [
+    'capability based authorization',
+    'capability auth',
+    'agent authorization',
+    'capability token',
+    'capability tokens',
+    'macaroon tokens',
+    'macaroons capability-based authorization',
+    'UCAN capability tokens',
+    'UCAN capability-based authorization spec',
+    'UCAN authorization capability tokens spec',
+    'what authorization capabilities do AI agents need',
+    'delegated authorization',
+    'AI agent permissions',
+  ],
   openGraph: {
     title: 'Capability-Based Authorization for AI Agents',
-    description: 'Replace broad API keys with scoped, revocable, budget-aware capabilities and Evidence Pack proof for AI agents.',
+    description: 'Compare UCAN, macaroons, and capability tokens for scoped, revocable, budget-aware AI agent authorization.',
     url: 'https://satgate.io/capability-auth',
     type: 'website',
   },
@@ -26,6 +40,15 @@ const capabilities = [
   { icon: TimerReset, title: 'Expire and revoke', body: 'Keep authority short-lived and kill risky access before the next request reaches a model, API, or tool.' },
 ];
 
+const requiredAgentCapabilities = [
+  ['Scoped action', 'The agent should receive authority for specific routes, methods, MCP tools, data boundaries, and business actions, not broad account access.'],
+  ['Time limit', 'The grant should expire quickly and be refreshable only when the task, tenant, and policy context still justify it.'],
+  ['Budget limit', 'The capability should carry or reference per-request, per-session, per-tool, and per-workflow spend limits.'],
+  ['Delegation rule', 'If the agent can delegate, every child capability should be narrower than the parent by scope, budget, expiry, and tool access.'],
+  ['Revocation check', 'The gateway should check revocation before the next request so risky authority stops without rotating every upstream secret.'],
+  ['Proof receipt', 'Every allow, deny, delegation, paid call, and revocation should leave Evidence Pack proof for security, finance, and audit review.'],
+];
+
 const faqs = [
   ['What is capability-based authorization?', 'Capability-based authorization gives a caller a specific, constrained capability: what it can do, where it can do it, for how long, with what budget, and whether it can delegate narrower authority.'],
   ['Why are capabilities useful for AI agents?', 'Agents act autonomously, call tools repeatedly, and delegate work. Capabilities limit blast radius by encoding scope, budget, expiry, revocation, and delegation into the authority the agent actually uses.'],
@@ -33,9 +56,31 @@ const faqs = [
   ['Can capabilities include budget limits?', 'Yes. SatGate treats economic policy as part of authorization. A capability can carry or reference budget, per-tool pricing, route scope, tenant context, and delegation depth.'],
   ['Are macaroons capability tokens?', 'Macaroons are a practical way to implement attenuated capability-style authority because caveats can constrain scope, time, budget, route, and delegation.'],
   ['How does UCAN relate to capability-based authorization?', 'UCAN is a capability-based authorization model built around user-controlled authorization networks. SatGate uses the same core idea of delegated, scoped, attenuable authority and adds request-path budget enforcement, revocation, and Evidence Pack proof for AI agents.'],
+  ['What authorization capabilities do AI agents need?', 'AI agents need scoped action rights, tenant and task binding, tool limits, time limits, budget limits, delegation limits, revocation checks, and proof receipts. They should not receive permanent, broad, freely shareable authority.'],
+  ['How do UCAN capability tokens compare with macaroons?', 'UCAN and macaroons both support capability-style authorization. UCAN emphasizes delegated user-controlled authorization, while macaroons use caveats to attenuate authority. For agents, the important pattern is scoped, time-limited, non-transferable, budget-aware authority checked before use.'],
 ];
 
 export default function CapabilityAuthPage() {
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Capability-Based Authorization for AI Agents',
+    description: metadata.description,
+    url: 'https://satgate.io/capability-auth',
+    datePublished: '2026-05-01',
+    dateModified: '2026-08-06',
+    isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
+    about: [
+      { '@type': 'Thing', name: 'capability-based authorization' },
+      { '@type': 'Thing', name: 'capability token' },
+      { '@type': 'Thing', name: 'AI agent authorization capabilities' },
+      { '@type': 'Thing', name: 'macaroons capability-based authorization' },
+      { '@type': 'Thing', name: 'UCAN capability tokens' },
+      { '@type': 'Thing', name: 'UCAN capability-based authorization spec' },
+      { '@type': 'Thing', name: 'delegated authorization for AI agents' },
+      { '@type': 'Thing', name: 'revocable agent credentials' },
+    ],
+  };
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -43,9 +88,9 @@ export default function CapabilityAuthPage() {
     applicationCategory: 'SecurityApplication',
     description: metadata.description,
     url: 'https://satgate.io/capability-auth',
-    dateModified: '2026-08-05',
+    dateModified: '2026-08-06',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    featureList: capabilities.map((item) => item.title),
+    featureList: ['UCAN capability-token comparison', 'Macaroon caveat comparison', 'Scoped agent authority', 'Budget-aware capability policy', 'Delegation attenuation', 'Revocation checks', 'Evidence Pack proof'],
   };
   const faqJsonLd = {
     '@context': 'https://schema.org',
@@ -92,12 +137,26 @@ export default function CapabilityAuthPage() {
       },
     ],
   };
+  const requiredCapabilitiesJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Authorization capabilities AI agents need',
+    description: 'The minimum capability constraints AI agents should have before they can call APIs, models, MCP tools, or delegated workers.',
+    itemListElement: requiredAgentCapabilities.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
+  };
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ucanJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(requiredCapabilitiesJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <div className="mx-auto max-w-6xl px-6 pt-8">
@@ -113,10 +172,10 @@ export default function CapabilityAuthPage() {
             <ShieldCheck size={16} /> Scoped authority for autonomous agents
           </div>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight max-w-5xl mb-8">
-            Capability-Based Authorization for AI Agents
+            Capability-based authorization for AI agents
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-8">
-            Identity tells you who is calling. Capability auth tells you what this agent can access, spend, delegate, and revoke before every API or MCP request.
+            Identity tells you who is calling. Capability auth tells you what this agent can access, spend, delegate, and revoke before every API or MCP request. UCAN and macaroons are useful mental models because both move authorization away from permanent shared keys and toward bounded authority.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
@@ -162,6 +221,24 @@ export default function CapabilityAuthPage() {
             <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-emerald-500">
               Capability policy template <ArrowRight size={16} />
             </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-gray-900 bg-gray-950/60">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-emerald-300">Direct answer</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">AI agents need scoped, time-limited, non-transferable capabilities</h2>
+          <p className="mb-10 max-w-4xl text-lg leading-relaxed text-gray-300">
+            The wrong answer is permanent, broad access that every agent can share. The right default is a capability token scoped to one agent, task, tenant, route, MCP tool set, budget, expiry window, delegation rule, revocation check, and proof receipt.
+          </p>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {requiredAgentCapabilities.map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black p-6">
+                <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -232,7 +309,7 @@ export default function CapabilityAuthPage() {
           <p className="mb-2 text-sm font-mono uppercase tracking-[0.2em] text-emerald-300">UCAN-style authority</p>
           <h2 className="mb-4 text-3xl font-bold text-white">UCAN capability authorization is the right mental model for agents</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
-            UCAN-style authorization starts from a better premise than static keys: give software a specific delegated capability, let it pass down less authority, and make every later use prove it stayed inside bounds.
+            UCAN-style authorization starts from a better premise than static keys: give software a specific delegated capability, let it pass down less authority, and make every later use prove it stayed inside bounds. Macaroons reach a similar shape through caveats: constraints attached to a token that narrow what it can do before the request is accepted.
           </p>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {[

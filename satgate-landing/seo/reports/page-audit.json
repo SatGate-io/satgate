@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-06T03:05:09.474731Z",
+  "generatedAt": "2026-08-06T10:35:11.195273Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -505,17 +505,18 @@
     {
       "path": "/capability-auth",
       "exists": true,
-      "title": "Capability-Based Authorization for AI Agents",
-      "titleLength": 44,
-      "metaDescription": "Replace broad API keys with scoped, revocable, budget-aware capabilities for AI agents using SatGate.",
-      "metaDescriptionLength": 101,
+      "title": "Capability-Based Authorization for AI Agents: UCAN and Macaroons",
+      "titleLength": 64,
+      "metaDescription": "Compare UCAN, macaroons, and capability tokens for AI agent authorization with scoped, revocable, budget-aware authority.",
+      "metaDescriptionLength": 121,
       "canonical": "/capability-auth",
       "h1": [
-        "Capability-Based Authorization for AI Agents"
+        "Capability-based authorization for AI agents"
       ],
       "h1Count": 1,
       "h2s": [
         "Capability-based authorization replaces identity-only access with bounded authority",
+        "AI agents need scoped, time-limited, non-transferable capabilities",
         "Why identity auth is too blunt for agents",
         "What a capability should carry",
         "Capabilities vs API keys, OAuth, and macaroons",
@@ -539,9 +540,12 @@
         "ListItem",
         "Organization",
         "Question",
-        "SoftwareApplication"
+        "SoftwareApplication",
+        "Thing",
+        "WebPage",
+        "WebSite"
       ],
-      "wordCount": 689,
+      "wordCount": 1055,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
