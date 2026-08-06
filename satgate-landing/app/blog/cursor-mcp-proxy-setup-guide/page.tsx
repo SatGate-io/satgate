@@ -2,12 +2,12 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: 'Cursor MCP Proxy Setup Guide: Budgets and Evidence Packs',
-  description: 'Learn how to set up a Cursor MCP proxy with SatGate to enforce budgets, meter tool usage, and add Evidence Packs without changing your MCP servers.',
+  title: 'Cursor Proxy Setup: MCP Budgets and Evidence Packs',
+  description: 'Set up a Cursor proxy for MCP tools with SatGate budgets, per-tool policy, spend metering, and Evidence Pack receipts.',
   alternates: { canonical: 'https://satgate.io/blog/cursor-mcp-proxy-setup-guide' },
-  keywords: ['Cursor MCP proxy setup guide', 'Cursor MCP proxy', 'MCP budget control', 'Cursor tool Evidence Pack', 'SatGate MCP proxy', 'Cursor MCP security'],
+  keywords: ['Cursor proxy', 'Cursor agent proxy', 'Cursor MCP proxy setup guide', 'Cursor MCP proxy', 'MCP budget control', 'Cursor tool Evidence Pack', 'SatGate MCP proxy', 'Cursor MCP security'],
   openGraph: {
-    title: 'Cursor MCP Proxy Setup Guide: Budgets and Evidence Packs',
+    title: 'Cursor Proxy Setup: MCP Budgets and Evidence Packs',
     description: 'Set up a Cursor MCP proxy to enforce budgets, meter tool usage, and add Evidence Packs without changing MCP servers.',
     url: 'https://satgate.io/blog/cursor-mcp-proxy-setup-guide',
     type: 'article',
@@ -15,7 +15,7 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cursor MCP Proxy Setup Guide: Budgets and Evidence Packs',
+    title: 'Cursor Proxy Setup: MCP Budgets and Evidence Packs',
     description: 'Add request-path budget controls and Evidence Packs to Cursor MCP tools through a SatGate proxy.',
   },
 };
@@ -28,11 +28,13 @@ export default function CursorMCPProxySetupGuidePage() {
     description: 'Learn how to set up a Cursor MCP proxy with SatGate to enforce budgets, meter tool usage, and add Evidence Packs without changing your MCP servers.',
     url: 'https://satgate.io/blog/cursor-mcp-proxy-setup-guide',
     datePublished: '2026-04-09',
-    dateModified: '2026-05-04',
+    dateModified: '2026-08-06',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'Cursor MCP proxy' },
+      { '@type': 'Thing', name: 'Cursor proxy' },
+      { '@type': 'Thing', name: 'Cursor agent proxy' },
       { '@type': 'Thing', name: 'MCP budget control' },
       { '@type': 'Thing', name: 'Cursor tool Evidence Packs' },
       { '@type': 'Thing', name: 'AI coding agent governance' },
@@ -43,6 +45,14 @@ export default function CursorMCPProxySetupGuidePage() {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is a Cursor proxy for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A Cursor proxy is a policy layer between Cursor and downstream MCP tools, APIs, or infrastructure. It lets teams enforce tool scope, budgets, attribution, and Evidence Pack receipts before the coding agent executes a tool call.',
+        },
+      },
       {
         '@type': 'Question',
         name: 'Why use an MCP proxy with Cursor?',
@@ -57,6 +67,14 @@ export default function CursorMCPProxySetupGuidePage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'Yes. A request-path proxy can price tool calls, track spend, and block calls when budgets are exhausted before expensive APIs or infrastructure actions execute.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What should a Cursor agent proxy enforce?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A Cursor agent proxy should enforce scoped tokens, per-tool allowlists, MCP budget limits, write-action controls, environment separation, tenant attribution, and request-path audit receipts.',
         },
       },
       {
@@ -87,7 +105,19 @@ export default function CursorMCPProxySetupGuidePage() {
             <span className="px-2 py-1 rounded-full bg-yellow-900/30 border border-yellow-500/30 text-yellow-300 text-xs font-mono">Governance</span>
           </div>
 
-          <h1 className="text-4xl font-bold mb-4">Cursor MCP Proxy Setup Guide: Add Budget Controls and Evidence Packs to Your Tools</h1>
+          <h1 className="text-4xl font-bold mb-4">Cursor Proxy Setup: Add MCP Budget Controls and Evidence Packs to Your Tools</h1>
+
+          <div className="mb-6 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-5">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-purple-300">Quick answer</p>
+            <p className="text-gray-300">
+              A Cursor proxy is a control point between Cursor and MCP tools. SatGate uses that position to enforce scoped agent tokens, per-tool budgets, write-action policy, team attribution, and Evidence Pack receipts before the coding agent can call downstream tools.
+            </p>
+          </div>
+
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row">
+            <Link href="/mcp-gateway" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">MCP gateway</Link>
+            <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-purple-500">MCP budget enforcement</Link>
+          </div>
 
           <p className="text-xl text-gray-400 mb-6">
             Cursor makes MCP tools easy to connect. It does not give you budget enforcement, spend attribution, or strong policy control out of the box. Here&apos;s how to add a proxy layer that does.
@@ -117,6 +147,20 @@ export default function CursorMCPProxySetupGuidePage() {
           <p className="text-gray-300 leading-relaxed">
             That&apos;s why a Cursor MCP proxy matters. It gives you a policy point between the client and the tools. Instead of trusting every connected tool equally, you can insert an economic and security control layer that decides what gets through.
           </p>
+
+          <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Cursor agent proxy checklist</h2>
+
+          <p className="text-gray-300 leading-relaxed">
+            A Cursor agent proxy is useful when it does more than forward traffic. The gateway should make every MCP tool call answer five questions before execution:
+          </p>
+
+          <ul className="list-disc list-inside space-y-2 text-gray-300 my-4">
+            <li>Which developer, team, project, environment, and agent is asking?</li>
+            <li>Which MCP server and tool is being requested?</li>
+            <li>What does the tool call cost, and which budget pays for it?</li>
+            <li>Does the scoped token allow this read, write, or paid action?</li>
+            <li>What Evidence Pack receipt proves the allow or deny decision?</li>
+          </ul>
 
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">What a good Cursor MCP proxy should do</h2>
 
@@ -371,8 +415,10 @@ satgate-gateway --config ./satgate.yaml`}</code>
             <h2 className="mb-6 text-2xl font-bold text-white">Cursor MCP proxy questions</h2>
             <div className="space-y-5">
               {[
+                ['What is a Cursor proxy for AI agents?', 'A Cursor proxy is a policy layer between Cursor and downstream MCP tools, APIs, or infrastructure. It lets teams enforce tool scope, budgets, attribution, and Evidence Pack receipts before the coding agent executes a tool call.'],
                 ['Why use an MCP proxy with Cursor?', 'An MCP proxy gives Cursor a governance point between the editor and downstream tools, letting teams enforce budgets, add Evidence Packs, and apply per-tool policy without rewriting every MCP server.'],
                 ['Can a Cursor MCP proxy stop runaway tool spend?', 'Yes. A request-path proxy can price tool calls, track spend, and block calls when budgets are exhausted before expensive APIs or infrastructure actions execute.'],
+                ['What should a Cursor agent proxy enforce?', 'A Cursor agent proxy should enforce scoped tokens, per-tool allowlists, MCP budget limits, write-action controls, environment separation, tenant attribution, and request-path audit receipts.'],
                 ['Should Cursor MCP tools use the same policy in development and production?', 'No. Development, staging, and production-adjacent workflows should use separate tokens, budgets, and tool scopes so one environment cannot accidentally inherit another environment’s authority.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
