@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-05T05:35:50.135584Z",
+  "generatedAt": "2026-08-06T03:05:09.474731Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -103,17 +103,18 @@
     {
       "path": "/blog/how-to-add-budget-limits-to-openai-api-calls",
       "exists": true,
-      "title": "OpenAI API Budget Limits: Hard Caps Before GPT Calls Run",
-      "titleLength": 56,
-      "metaDescription": "Set OpenAI API budget limits by agent, team, or workflow. Enforce hard caps before GPT calls execute and preserve Evidence Pack proof.",
-      "metaDescriptionLength": 134,
+      "title": "OpenAI API Budget Limits: Stop Monthly Overspend Before GPT Calls",
+      "titleLength": 65,
+      "metaDescription": "Prevent teams or customers from overspending on OpenAI API calls each month with per-agent, per-team, and per-workflow hard caps before GPT calls execute.",
+      "metaDescriptionLength": 154,
       "canonical": "/blog/how-to-add-budget-limits-to-openai-api-calls",
       "h1": [
-        "How to Add Hard Budget Limits to OpenAI API Calls"
+        "How to Stop Teams from Overspending on OpenAI API Calls Each Month"
       ],
       "h1Count": 1,
       "h2s": [
         "The $72,000 Lesson",
+        "How to keep one team or customer from blowing through the OpenAI budget",
         "Why Traditional Solutions Fail",
         "The Solution: Request-Level Budget Enforcement",
         "OpenAI API budget limits need five request-path controls",
@@ -123,8 +124,7 @@
         "Step 4: Configure Team Budgets",
         "Real-World Example: Preventing Retry Storms",
         "Advanced: Per-User Budgets for AI Apps",
-        "Monitoring and Alerts",
-        "The Results"
+        "Monitoring and Alerts"
       ],
       "internalLinks": [
         "/agent-api-key-risk-assessment",
@@ -145,12 +145,14 @@
         "HowTo",
         "HowToStep",
         "HowToTool",
+        "ItemList",
+        "ListItem",
         "Organization",
         "Question",
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1403,
+      "wordCount": 1569,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
