@@ -2,13 +2,19 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: 'AI Spend Governance: Control Usage-Based AI Costs Before They Scale',
+  title: 'AI Spend Governance: Operating Model for Usage-Based AI Costs',
   description:
-    'Why usage-based AI pricing, agentic workflows, and tool-calling systems require request-path spend governance, not just dashboards after the bill arrives.',
+    'An AI spend governance operating model for enterprises controlling usage-based AI pricing, autonomous spend controls, budgets, and proof.',
   alternates: { canonical: 'https://satgate.io/blog/ai-spend-governance' },
   keywords: [
     'AI spend governance',
+    'AI spend governance operating model',
+    'how to govern AI spend',
+    'enterprises cost control AI usage-based pricing',
+    'enterprises overspend AI usage-based pricing',
+    'autonomous spend controls',
     'enterprise AI cost control',
+    'enterprise AI cost governance',
     'usage-based AI pricing',
     'AI agent cost management',
     'LLM cost governance',
@@ -19,18 +25,18 @@ export const metadata = {
     'request-path budget enforcement',
   ],
   openGraph: {
-    title: 'AI Spend Governance: Control Usage-Based AI Costs Before They Scale',
+    title: 'AI Spend Governance: Operating Model for Usage-Based AI Costs',
     description:
-      'Flat-rate AI hid the economics. Agentic AI exposes them. Enterprises need Observe, Control, Prove for spend before execution.',
+      'Flat-rate AI hid the economics. Usage-based AI exposes them. Enterprises need an operating model for Observe, Control, and Prove before execution.',
     url: 'https://satgate.io/blog/ai-spend-governance',
     type: 'article',
     publishedTime: '2026-05-22T00:00:00Z',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AI Spend Governance: Control Usage-Based AI Costs Before They Scale',
+    title: 'AI Spend Governance Operating Model',
     description:
-      'Usage-based AI pricing makes cost an operating risk. The answer is request-path governance: Observe, Control, Prove.',
+      'How enterprises govern usage-based AI pricing with autonomous spend controls before execution.',
   },
 };
 
@@ -38,15 +44,19 @@ export default function AiSpendGovernanceBlogPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'AI Spend Governance: Control Usage-Based AI Costs Before They Scale',
+    headline: 'AI Spend Governance: Operating Model for Usage-Based AI Costs',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-05-22',
-    dateModified: '2026-08-04',
+    dateModified: '2026-08-06',
     mainEntityOfPage: 'https://satgate.io/blog/ai-spend-governance',
     about: [
       { '@type': 'Thing', name: 'AI spend governance' },
+      { '@type': 'Thing', name: 'AI spend governance operating model' },
+      { '@type': 'Thing', name: 'how to govern AI spend' },
+      { '@type': 'Thing', name: 'enterprises cost control AI usage-based pricing' },
+      { '@type': 'Thing', name: 'autonomous spend controls' },
       { '@type': 'Thing', name: 'usage-based AI pricing' },
       { '@type': 'Thing', name: 'enterprise AI cost control' },
       { '@type': 'Thing', name: 'AI agent cost management' },
@@ -94,6 +104,22 @@ export default function AiSpendGovernanceBlogPage() {
       },
       {
         '@type': 'Question',
+        name: 'What is an AI spend governance operating model?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An AI spend governance operating model defines who owns usage-based AI spend, how costs are attributed, which budgets and policies apply before execution, how autonomous spend controls deny or route risky requests, and what evidence proves each decision.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How should enterprises control AI usage-based pricing?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Enterprises should control AI usage-based pricing by attributing spend to users, agents, workflows, models, APIs, and MCP tools, then enforcing per-request and per-workflow budgets before execution instead of relying only on monthly invoices or dashboards.',
+        },
+      },
+      {
+        '@type': 'Question',
         name: 'How is AI spend governance different from AI cost observability?',
         acceptedAnswer: {
           '@type': 'Answer',
@@ -136,11 +162,45 @@ export default function AiSpendGovernanceBlogPage() {
     ],
   };
 
+  const operatingModelJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI spend governance operating model',
+    description: 'An enterprise operating model for governing usage-based AI pricing before autonomous agents create cost.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Ownership',
+        description: 'Assign AI spend governance across finance, platform, security, product, and application teams.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Attribution',
+        description: 'Attribute usage-based AI spend to user, agent, workflow, route, model, MCP tool, tenant, and policy.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Autonomous spend controls',
+        description: 'Set hard budgets, approvals, model-routing rules, downgrade paths, and denial policy before execution.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Proof',
+        description: 'Preserve Evidence Pack receipts for spend decisions, budget denials, policy basis, and exceptions.',
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(governanceControlsJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(operatingModelJsonLd) }} />
 
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/blog" className="text-gray-500 hover:text-white flex items-center gap-2 transition mb-8">
@@ -154,12 +214,12 @@ export default function AiSpendGovernanceBlogPage() {
             <span className="px-2 py-1 rounded-full bg-yellow-900/30 border border-yellow-500/30 text-yellow-300 text-xs font-mono">Economic Firewall</span>
           </div>
 
-          <h1 className="text-4xl font-bold mb-4">AI Spend Governance: Control Usage-Based AI Costs Before They Scale</h1>
+          <h1 className="text-4xl font-bold mb-4">AI Spend Governance: Operating Model for Usage-Based AI Costs</h1>
 
           <div className="mb-6 rounded-2xl border border-yellow-900/60 bg-yellow-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-yellow-300">Short answer</p>
             <p className="text-gray-300">
-              Flat-rate AI made adoption feel simple. Usage-based AI makes every model call, tool call, retry, and agent loop part of the operating model. Enterprises need to Observe, Control, and Prove AI usage before costs turn into surprises.
+              AI spend governance is the operating model enterprises use to control usage-based AI pricing before agents, models, APIs, and MCP tools create cost. It combines attribution, autonomous spend controls, request-path budget enforcement, and proof.
             </p>
           </div>
 
@@ -185,6 +245,27 @@ export default function AiSpendGovernanceBlogPage() {
           <p className="text-gray-300 leading-relaxed">
             Token-based pricing exposes what flat-rate AI plans masked: AI cost is not just a procurement issue. Once agents, copilots, workflows, APIs, and paid tools start making calls all day, spend becomes an operating risk.
           </p>
+
+          <div className="not-prose my-10 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-6">
+            <p className="mb-2 text-sm font-mono uppercase tracking-[0.2em] text-purple-300">Operating model</p>
+            <h2 className="mb-3 text-2xl font-bold text-white">How to govern AI spend before usage-based pricing overruns the budget</h2>
+            <p className="mb-5 text-gray-300 leading-relaxed">
+              Enterprises overspend on usage-based AI when ownership, attribution, budgets, and enforcement live in separate systems. A practical AI spend governance operating model puts those controls into one request path.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                ['Ownership', 'Finance owns unit economics; platform owns enforcement; security owns authority; product owns exceptions.'],
+                ['Attribution', 'Every call is tied to user, agent, workflow, tenant, model, API, MCP tool, route, and policy.'],
+                ['Autonomous spend controls', 'Budgets, approvals, routing, downgrades, and denials fire before the agent action executes.'],
+                ['Proof', 'Evidence Packs show the policy basis, remaining budget, decision, denial reason, and exception path.'],
+              ].map(([title, body]) => (
+                <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-4">
+                  <h3 className="mb-2 font-bold text-white">{title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
 
           <div className="not-prose my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
             <p className="mb-2 text-sm font-mono uppercase tracking-[0.2em] text-cyan-300">AI spend governance controls</p>
@@ -363,8 +444,8 @@ export default function AiSpendGovernanceBlogPage() {
               <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg bg-cyan-400 px-5 py-3 font-bold text-black transition hover:bg-cyan-300">
                 See Policy-to-Proof governance
               </Link>
-              <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 font-bold text-white transition hover:border-cyan-500">
-                See Policy-to-Proof
+              <Link href="/agent-spend-policy-template" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 font-bold text-white transition hover:border-cyan-500">
+                Generate a spend policy
               </Link>
             </div>
           </div>

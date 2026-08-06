@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-06T15:06:03.071721Z",
+  "generatedAt": "2026-08-06T15:35:21.472525Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -50,16 +50,17 @@
     {
       "path": "/blog/ai-spend-governance",
       "exists": true,
-      "title": "AI Spend Governance: Control Usage-Based AI Costs Before They Scale",
-      "titleLength": 67,
-      "metaDescription": "Why usage-based AI pricing, agentic workflows, and tool-calling systems require request-path spend governance, not just dashboards after the bill arrives.",
-      "metaDescriptionLength": 154,
+      "title": "AI Spend Governance: Operating Model for Usage-Based AI Costs",
+      "titleLength": 61,
+      "metaDescription": "An AI spend governance operating model for enterprises controlling usage-based AI pricing, autonomous spend controls, budgets, and proof.",
+      "metaDescriptionLength": 137,
       "canonical": "/blog/ai-spend-governance",
       "h1": [
-        "AI Spend Governance: Control Usage-Based AI Costs Before They Scale"
+        "AI Spend Governance: Operating Model for Usage-Based AI Costs"
       ],
       "h1Count": 1,
       "h2s": [
+        "How to govern AI spend before usage-based pricing overruns the budget",
         "Govern spend before the model, API, or tool executes",
         "Why agentic AI costs stratify",
         "Seat management is not AI spend governance",
@@ -73,6 +74,7 @@
         "Related reading"
       ],
       "internalLinks": [
+        "/agent-spend-policy-template",
         "/ai-agent-cost-control",
         "/blog",
         "/blog/ai-agent-spending-limits",
@@ -92,7 +94,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 1375,
+      "wordCount": 1458,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
