@@ -8,7 +8,21 @@ const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD',
 const usd0 = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 
-function Slider({ label, value, min, max, step, suffix = '', prefix = '', onChange }: {
+const pricingTiers = [
+  ['Discovery calls', 'Search, lookup, metadata, lightweight enrichment', '$0.001-$0.01', 'Use small L402 prices or free allowance; preserve identity and receipt context.'],
+  ['Valuable API calls', 'Data extraction, premium lookup, workflow step, paid model/tool route', '$0.01-$0.25', 'Challenge with HTTP 402, verify Lightning payment proof, and enforce agent budget.'],
+  ['High-cost resources', 'Browser session, compute job, bulk export, premium third-party API', '$0.25-$5.00+', 'Require explicit price, hard cap, revocation behavior, and Evidence Pack receipt.'],
+  ['State-changing access', 'Purchase, deploy, write, submit, reserve, transfer', 'Policy priced', 'Treat payment as necessary but insufficient; scope, authority, and risk policy still decide.'],
+];
+
+const formulaSteps = [
+  ['Marginal cost', 'Estimate provider, compute, search, browser, data, fraud, support, and payment-network cost per request.'],
+  ['Target margin', 'Divide cost by one minus target gross margin to get the minimum paid-access price.'],
+  ['Agent conversion', 'Estimate which agent traffic should pay after free or trial allowance.'],
+  ['Rail proof', 'Convert the USD target into sats for L402 and record paid-rail context without treating every 402 rail as the same protocol.'],
+];
+
+function Slider({ label, value, min, max, step, suffix = '', prefix = '', displayValue, onChange }: {
   label: string;
   value: number;
   min: number;
@@ -16,6 +30,7 @@ function Slider({ label, value, min, max, step, suffix = '', prefix = '', onChan
   step: number;
   suffix?: string;
   prefix?: string;
+  displayValue?: string;
   onChange: (value: number) => void;
 }) {
   const pct = ((value - min) / (max - min)) * 100;
@@ -23,7 +38,7 @@ function Slider({ label, value, min, max, step, suffix = '', prefix = '', onChan
     <label className="block rounded-xl border border-gray-800 bg-black/50 p-5">
       <div className="mb-3 flex items-center justify-between gap-4">
         <span className="font-medium text-gray-300">{label}</span>
-        <span className="font-mono font-bold text-white">{prefix}{value.toLocaleString()}{suffix}</span>
+        <span className="font-mono font-bold text-white">{displayValue ?? `${prefix}${value.toLocaleString()}${suffix}`}</span>
       </div>
       <input
         type="range"
@@ -68,12 +83,15 @@ export default function L402ApiPricingCalculatorPage() {
     '@type': 'WebPage',
     name: 'L402 API Pricing Calculator',
     url: 'https://satgate.io/l402-api-pricing-calculator',
-    description: 'Estimate per-request L402 API pricing, paid-agent access revenue, gross margin, free allowance, and Lightning sats per request for governed AI agent API access.',
+    description: 'Estimate per-request L402 API pricing, HTTP 402 paid-agent access tiers, gross margin, free allowance, and Lightning sats per request for governed AI agent API access.',
     datePublished: '2026-05-01',
-    dateModified: '2026-05-03',
+    dateModified: '2026-08-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'L402 API pricing' },
+      { '@type': 'Thing', name: 'L402 pricing template' },
+      { '@type': 'Thing', name: 'HTTP 402 API pricing' },
+      { '@type': 'Thing', name: 'sats per API request calculator' },
       { '@type': 'Thing', name: 'paid-agent access revenue' },
       { '@type': 'Thing', name: 'Lightning sats per request' },
       { '@type': 'Thing', name: 'governed AI agent paid access' },
@@ -88,10 +106,10 @@ export default function L402ApiPricingCalculatorPage() {
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/l402-api-pricing-calculator',
-    description: 'Estimate per-request L402 API pricing, paid-agent access revenue, gross margin, free allowance, and Lightning sats per request for governed AI agent API access.',
+    description: 'Estimate per-request L402 API pricing, HTTP 402 paid-agent access tiers, gross margin, free allowance, and Lightning sats per request for governed AI agent API access.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
-    featureList: ['Per-request L402 pricing', 'Paid-agent access revenue estimate', 'Gross margin modeling', 'Free allowance planning', 'Adjustable sats per request conversion'],
+    dateModified: '2026-08-06',
+    featureList: ['Per-request L402 pricing', 'HTTP 402 paid-agent access tiers', 'Paid-agent access revenue estimate', 'Gross margin modeling', 'Free allowance planning', 'Adjustable sats per request conversion'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
@@ -122,7 +140,7 @@ export default function L402ApiPricingCalculatorPage() {
         name: 'How should APIs price paid agent access?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Start from marginal cost per request, add target gross margin, account for free allowances or trial traffic, and enforce payment or budget policy at the gateway before forwarding. L402 is one paid rail; SatGate preserves the authority and receipt context around access.',
+          text: 'Start from marginal cost per request, divide by one minus target gross margin, account for free allowances or trial traffic, and enforce payment or budget policy at the gateway before forwarding. L402 is one paid rail; SatGate preserves the authority and receipt context around access.',
         },
       },
       {
@@ -152,12 +170,39 @@ export default function L402ApiPricingCalculatorPage() {
     ],
   };
 
+  const pricingTierJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'L402 API pricing template tiers',
+    itemListElement: pricingTiers.map(([name, examples, price, policy], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description: `${examples}: ${price}. ${policy}`,
+    })),
+  };
+
+  const howToJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to calculate L402 API pricing',
+    description: 'Estimate marginal cost, target margin, paid-agent conversion, free allowance, and sats per request for L402 paid API access.',
+    step: formulaSteps.map(([name, text], index) => ({
+      '@type': 'HowToStep',
+      position: index + 1,
+      name,
+      text,
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingTierJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(250,204,21,0.18),transparent_32%),radial-gradient(circle_at_82%_10%,rgba(34,211,238,0.15),transparent_34%)]" />
@@ -169,7 +214,7 @@ export default function L402ApiPricingCalculatorPage() {
             L402 API Pricing Calculator
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Estimate per-request pricing, gross margin, paid agent-access demand, and Lightning sats per request before you expose paid API access to autonomous agents.
+            Estimate L402 pricing tiers, per-request margin, paid agent-access demand, and Lightning sats per API call before you expose paid API access to autonomous agents.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <a href="#calculator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -187,7 +232,7 @@ export default function L402ApiPricingCalculatorPage() {
           <h2 className="mb-6 text-3xl font-bold text-white">Model paid agent/API demand</h2>
           <div className="grid gap-4">
             <Slider label="Agent/API requests per day" value={requestsPerDay} min={100} max={100000} step={100} onChange={setRequestsPerDay} />
-            <Slider label="Marginal cost per request" value={costPerRequestCents} min={1} max={250} step={1} prefix="$0." onChange={setCostPerRequestCents} />
+            <Slider label="Marginal cost per request" value={costPerRequestCents} min={1} max={250} step={1} displayValue={usd.format(costPerRequestCents / 100)} onChange={setCostPerRequestCents} />
             <Slider label="Target gross margin" value={marginPct} min={20} max={95} step={1} suffix="%" onChange={setMarginPct} />
             <Slider label="Paying agent conversion" value={conversionPct} min={1} max={80} step={1} suffix="%" onChange={setConversionPct} />
             <Slider label="Free/trial allowance" value={freeAllowancePct} min={0} max={90} step={1} suffix="%" onChange={setFreeAllowancePct} />
@@ -237,6 +282,58 @@ export default function L402ApiPricingCalculatorPage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <div className="mb-10 max-w-4xl">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-yellow-300">Pricing template</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">L402 API pricing tiers for paid agent access</h2>
+          <p className="text-lg leading-relaxed text-gray-300">
+            A useful L402 pricing template separates cheap discovery from valuable data, expensive resources, and state-changing actions. Payment proof unlocks the route, but SatGate still checks delegated authority, remaining budget, revocation status, and audit requirements before forwarding.
+          </p>
+        </div>
+        <div className="overflow-x-auto rounded-2xl border border-gray-800">
+          <table className="min-w-[760px] w-full border-collapse text-left text-sm">
+            <thead className="bg-gray-950 text-gray-300">
+              <tr>
+                <th className="p-4 font-semibold">Tier</th>
+                <th className="p-4 font-semibold">Example API access</th>
+                <th className="p-4 font-semibold">Starting price</th>
+                <th className="p-4 font-semibold">Governance rule</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pricingTiers.map(([tier, examples, price, policy]) => (
+                <tr key={tier} className="border-t border-gray-800 bg-black/60 align-top">
+                  <td className="p-4 font-bold text-white">{tier}</td>
+                  <td className="p-4 text-gray-300">{examples}</td>
+                  <td className="p-4 text-yellow-200">{price}</td>
+                  <td className="p-4 leading-relaxed text-gray-400">{policy}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="border-y border-gray-900 bg-gray-950/60">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="mb-10 max-w-4xl">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-yellow-300">Formula</p>
+            <h2 className="mb-4 text-3xl font-bold text-white">L402 price = cost / (1 - margin), then convert to sats</h2>
+            <p className="text-lg leading-relaxed text-gray-300">
+              For a $0.02 marginal API cost and 70% gross margin target, the minimum paid-agent price is $0.0667 per request. The calculator then converts that USD target into sats using the BTC/USD reference assumption you choose.
+            </p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-4">
+            {formulaSteps.map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black p-6">
+                <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                <p className="leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="border-t border-gray-900 bg-black">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-yellow-300">FAQ</p>
@@ -251,7 +348,7 @@ export default function L402ApiPricingCalculatorPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How should APIs price paid agent access?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Start from marginal cost per request, add target gross margin, account for free allowances or trial traffic, and enforce payment or budget policy at the gateway before forwarding. L402 is one paid rail; SatGate preserves the authority and receipt context around access.
+                Start from marginal cost per request, divide by one minus target gross margin, account for free allowances or trial traffic, and enforce payment or budget policy at the gateway before forwarding. L402 is one paid rail; SatGate preserves the authority and receipt context around access.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
