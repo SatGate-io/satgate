@@ -81,6 +81,17 @@ export default function ROICalculatorPage() {
       control: 'Per-agent MCP tool caps and deny receipts',
     },
     {
+      title: 'AI voice agent support desk',
+      agents: 80,
+      callsPerDay: 260,
+      costPerCall: '$0.06',
+      loopFrequency: '1.2%',
+      wastedCalls: 140,
+      monthlyAvoidableSpend: '$12,579',
+      payback: '< 1 day',
+      control: 'Voice-agent tool budgets, route caps, and chargeback receipts',
+    },
+    {
       title: 'Enterprise coding-agent rollout',
       agents: 150,
       callsPerDay: 320,
@@ -108,13 +119,18 @@ export default function ROICalculatorPage() {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     name: 'AI Agent ROI Calculator',
-    description: 'Estimate runaway AI agent loop exposure, budget-control ROI, and the receipts needed for Policy-to-Proof evidence across paid APIs and MCP tools.',
+    description: 'Calculate AI agent ROI, voice agent payback, chargeback exposure, loop waste, budget-control priorities, and request-path enforcement savings with Policy-to-Proof evidence.',
     url: 'https://satgate.io/roi-calculator',
-    dateModified: '2026-08-05',
+    dateModified: '2026-08-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent ROI calculator' },
+      { '@type': 'Thing', name: 'AI voice agent ROI calculator' },
       { '@type': 'Thing', name: 'AI agent ROI formula' },
+      { '@type': 'Thing', name: 'agent ROI calculator' },
+      { '@type': 'Thing', name: 'voice agent payback calculator' },
+      { '@type': 'Thing', name: 'AI agent payback period' },
+      { '@type': 'Thing', name: 'AI chargeback ROI calculator' },
       { '@type': 'Thing', name: 'runaway AI agent loop exposure' },
       { '@type': 'Thing', name: 'request-path budget enforcement ROI' },
       { '@type': 'Thing', name: 'Policy-to-Proof receipts' },
@@ -130,8 +146,11 @@ export default function ROICalculatorPage() {
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/roi-calculator',
-    description: 'Estimate runaway agent loop exposure, budget-control ROI, and the receipts needed for Policy-to-Proof evidence.',
+    description: webPageJsonLd.description,
     featureList: [
+      'AI voice agent ROI calculator',
+      'AI agent payback period model',
+      'Chargeback exposure estimate',
       'Monthly AI agent tool spend estimate',
       'Runaway loop ghost spend exposure',
       'Annual AI agent cost-risk model',
@@ -147,7 +166,7 @@ export default function ROICalculatorPage() {
       { '@type': 'Audience', audienceType: 'AI engineering teams deploying paid MCP tools and APIs' },
     ],
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-08-05',
+    dateModified: '2026-08-06',
     about: webPageJsonLd.about,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
@@ -156,6 +175,30 @@ export default function ROICalculatorPage() {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How do you calculate AI voice agent ROI?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AI voice agent ROI can be estimated by comparing avoided support labor and automated resolution value against voice-agent model, telephony, tool, and failure-loop costs, then subtracting the cost of request-path budget enforcement.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How does chargeback affect AI agent ROI?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Chargeback improves AI agent ROI analysis by attributing model, API, MCP tool, and workflow spend to the agent, tenant, route, policy, and business owner that caused the cost.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the payback period for AI agent budget enforcement?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Payback period is the enforcement cost divided by monthly avoided ghost spend. For high-volume agents or paid-tool workflows, the payback period can be measured in days when one prevented loop offsets the control cost.',
+        },
+      },
       {
         '@type': 'Question',
         name: 'How do you calculate AI agent ghost spend?',
@@ -298,6 +341,12 @@ export default function ROICalculatorPage() {
       },
       {
         '@type': 'ListItem',
+        position: 4,
+        name: 'AI voice agent support desk',
+        description: 'A voice agent can create ROI when successful automations exceed model, telephony, tool, escalation, and loop waste costs.',
+      },
+      {
+        '@type': 'ListItem',
         position: 3,
         name: 'Paid API retry storm',
         description: 'A workflow retries failed or low-confidence calls against billable APIs before humans notice the cost.',
@@ -395,6 +444,18 @@ export default function ROICalculatorPage() {
         name: 'Annual ROI',
         description: '(Annual avoided spend - annual enforcement cost) / annual enforcement cost.',
       },
+      {
+        '@type': 'ListItem',
+        position: 5,
+        name: 'AI voice agent ROI',
+        description: '(Avoided support labor + automated resolution value - voice-agent operating cost - enforcement cost) / enforcement cost.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 6,
+        name: 'Chargeback ROI',
+        description: 'Attributed agent spend recovered or prevented through tenant, workflow, route, model, tool, policy, and receipt-level accountability.',
+      },
     ],
   };
 
@@ -405,7 +466,7 @@ export default function ROICalculatorPage() {
     description: 'Representative examples for estimating runaway AI agent spend, avoided monthly waste, payback period, and the SatGate controls that map ROI to proof.',
     url: 'https://satgate.io/roi-calculator',
     creator: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-08-05',
+    dateModified: '2026-08-06',
     variableMeasured: [
       'active agents',
       'tool calls per agent per day',
@@ -414,6 +475,8 @@ export default function ROICalculatorPage() {
       'wasted calls before discovery',
       'monthly avoidable spend',
       'payback period',
+      'AI voice agent ROI',
+      'chargeback exposure',
       'request-path enforcement control',
     ],
     distribution: {
@@ -490,17 +553,38 @@ export default function ROICalculatorPage() {
       <header className="pt-32 pb-10 px-6 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
-            How Much Are{' '}
+            AI Agent ROI Calculator for{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-pink-400 to-purple-400">
-              Agent Loops
+              Payback and Ghost Spend
             </span>{' '}
-            Costing You?
           </h1>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Adjust the sliders below to see your hidden &ldquo;ghost spend&rdquo; — and how fast SatGate pays for itself.
+            Model AI agent ROI, voice agent payback, chargeback exposure, loop waste, and how fast request-path budget enforcement pays for itself.
           </p>
         </div>
       </header>
+
+      <section className="pb-16 px-6">
+        <div className="max-w-5xl mx-auto rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6 md:p-8">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Direct answer</p>
+          <h2 className="mb-4 text-2xl md:text-3xl font-bold text-white">AI agent ROI is avoided waste plus automation value minus control cost</h2>
+          <p className="mb-6 max-w-3xl text-gray-400 leading-relaxed">
+            For platform and finance teams, the useful AI agent ROI formula is: annual avoided ghost spend plus automation value minus annual enforcement cost, divided by annual enforcement cost. Voice-agent ROI uses the same structure, but adds telephony, escalation, call-resolution value, and support-labor displacement.
+          </p>
+          <div className="grid gap-4 md:grid-cols-3">
+            {[
+              ['AI agent ROI formula', '(Annual avoided waste + automation value - annual control cost) / annual control cost.'],
+              ['AI voice agent ROI', '(Resolved-call value + avoided support labor - model, voice, tool, escalation, and control costs) / control cost.'],
+              ['Chargeback ROI', 'Attributed spend recovered or prevented by tenant, workflow, route, model, MCP tool, policy version, and receipt.'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black/40 p-5">
+                <h3 className="mb-2 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Calculator */}
       <section className="pb-20 px-6">
@@ -672,6 +756,14 @@ export default function ROICalculatorPage() {
               <h3 className="mb-2 font-bold text-white">Annual ROI</h3>
               <p className="text-sm leading-relaxed text-gray-400">(Annual avoided ghost spend - annual enforcement cost) / annual enforcement cost.</p>
             </div>
+            <div className="rounded-xl border border-gray-800 bg-black/40 p-5">
+              <h3 className="mb-2 font-bold text-white">Voice agent ROI</h3>
+              <p className="text-sm leading-relaxed text-gray-400">(Resolved-call value + avoided support labor - model, voice, tool, escalation, and control costs) / control cost.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-black/40 p-5">
+              <h3 className="mb-2 font-bold text-white">Chargeback ROI</h3>
+              <p className="text-sm leading-relaxed text-gray-400">Attributed spend recovered or prevented by tenant, workflow, route, model, tool, policy version, and receipt.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -689,6 +781,7 @@ export default function ROICalculatorPage() {
               ['Runaway MCP tool loop', 'An agent repeatedly calls a paid tool, data source, browser action, cloud task, or SaaS operation until a budget check stops it.'],
               ['Delegated sub-agent fanout', 'A parent agent creates sub-agents that multiply model, API, and tool calls faster than team-level budgets can explain.'],
               ['Paid API retry storm', 'A workflow retries failed or low-confidence calls against billable APIs, turning an exception path into a hidden invoice.'],
+              ['AI voice agent escalation loop', 'A voice agent repeats tool calls, escalations, summaries, or retries across calls until per-workflow budgets stop the waste.'],
             ].map(([title, body]) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-black/40 p-5">
                 <h3 className="mb-2 font-bold text-white">{title}</h3>
@@ -791,6 +884,24 @@ export default function ROICalculatorPage() {
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
           <h2 className="mb-6 text-2xl md:text-3xl font-bold text-white">AI agent ROI calculator questions</h2>
           <div className="space-y-6">
+            <div>
+              <h3 className="mb-2 text-xl font-bold text-white">How do you calculate AI voice agent ROI?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                AI voice agent ROI can be estimated by comparing avoided support labor and automated resolution value against voice-agent model, telephony, tool, and failure-loop costs, then subtracting the cost of request-path budget enforcement.
+              </p>
+            </div>
+            <div>
+              <h3 className="mb-2 text-xl font-bold text-white">How does chargeback affect AI agent ROI?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Chargeback improves AI agent ROI analysis by attributing model, API, MCP tool, and workflow spend to the agent, tenant, route, policy, and business owner that caused the cost.
+              </p>
+            </div>
+            <div>
+              <h3 className="mb-2 text-xl font-bold text-white">What is the payback period for AI agent budget enforcement?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Payback period is the enforcement cost divided by monthly avoided ghost spend. For high-volume agents or paid-tool workflows, the payback period can be measured in days when one prevented loop offsets the control cost.
+              </p>
+            </div>
             <div>
               <h3 className="mb-2 text-xl font-bold text-white">How do you calculate AI agent ghost spend?</h3>
               <p className="text-gray-400 leading-relaxed">
