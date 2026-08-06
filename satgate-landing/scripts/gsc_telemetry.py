@@ -14,11 +14,13 @@ Requires a Search Console OAuth token with webmasters scope at:
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import datetime as dt
 import json
 import pathlib
 import re
 import sys
+import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 from collections import defaultdict
@@ -31,6 +33,8 @@ from googleapiclient.discovery import build
 SITE = "sc-domain:satgate.io"
 BASE_URL = "https://satgate.io"
 SITEMAP_URL = "https://satgate.io/sitemap.xml"
+LIVE_CHECK_TIMEOUT_SECONDS = 15
+LIVE_CHECK_MAX_WORKERS = 12
 TOKEN_PATH = pathlib.Path("/Users/mattdean/.gbrain/google-search-console-tokens.json")
 DEFAULT_OUT_DIR = pathlib.Path("/Users/mattdean/Obsidian/AgentMemory/Agent-OpenClaw/reports")
 DEFAULT_JSON_DIR = pathlib.Path("/Users/mattdean/.openclaw/workspace/reports")
@@ -181,6 +185,33 @@ def fetch_sitemap_status(webmasters) -> dict[str, Any]:
         return {"path": SITEMAP_URL, "error": str(exc)[:240]}
 
 
+def request_live_url(url: str, method: str) -> dict[str, Any]:
+    req = urllib.request.Request(url, method=method, headers={"User-Agent": "SatGate SEO telemetry"})
+    with urllib.request.urlopen(req, timeout=LIVE_CHECK_TIMEOUT_SECONDS) as res:
+        return {"url": url, "status": res.status, "finalUrl": res.geturl(), "error": ""}
+
+
+def check_live_url(url: str) -> dict[str, Any]:
+    try:
+        return request_live_url(url, "HEAD")
+    except urllib.error.HTTPError as exc:
+        if exc.code in {403, 405}:
+            try:
+                return request_live_url(url, "GET")
+            except Exception as retry_exc:  # noqa: BLE001
+                return {"url": url, "status": None, "finalUrl": url, "error": str(retry_exc)[:200]}
+        return {"url": url, "status": exc.code, "finalUrl": exc.geturl(), "error": str(exc)[:200]}
+    except Exception as exc:  # noqa: BLE001
+        return {"url": url, "status": None, "finalUrl": url, "error": str(exc)[:200]}
+
+
+def check_live_sitemap_urls(urls: list[str]) -> dict[str, Any]:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=LIVE_CHECK_MAX_WORKERS) as pool:
+        checks = list(pool.map(check_live_url, urls))
+    bad = [check for check in checks if check.get("status") != 200 or check.get("finalUrl") != check.get("url")]
+    return {"checked": len(checks), "badCount": len(bad), "bad": bad}
+
+
 def pct(x: float) -> str:
     return f"{x * 100:.2f}%"
 
@@ -201,6 +232,7 @@ def main() -> None:
     parser.add_argument("--out-dir", default=str(DEFAULT_OUT_DIR))
     parser.add_argument("--json-dir", default=str(DEFAULT_JSON_DIR))
     parser.add_argument("--inspect", type=int, default=20, help="Max URLs to inspect. Keep conservative for quota.")
+    parser.add_argument("--live-sitemap-check", action="store_true", help="Check live sitemap URLs for non-200 responses or redirects.")
     args = parser.parse_args()
 
     creds = get_creds()
@@ -214,6 +246,7 @@ def main() -> None:
 
     sitemap_urls = fetch_sitemap_urls()
     sitemap_status = fetch_sitemap_status(webmasters)
+    live_sitemap_check = check_live_sitemap_urls(sitemap_urls) if args.live_sitemap_check else None
     page_rows = query_searchanalytics(webmasters, args.start, args.end, ["page"])
     query_rows = query_searchanalytics(webmasters, args.start, args.end, ["query"])
     page_query_rows = query_searchanalytics(webmasters, args.start, args.end, ["page", "query"])
@@ -282,6 +315,16 @@ def main() -> None:
                 sitemap_status.get("errors", sitemap_status.get("error", "")),
             ]],
         ),
+        "## Live Sitemap URL Health",
+        "",
+        table(
+            ["Checked", "Bad URLs", "Status"],
+            [[
+                live_sitemap_check.get("checked", "") if live_sitemap_check else "not run",
+                live_sitemap_check.get("badCount", "") if live_sitemap_check else "",
+                "all 200/no redirects" if live_sitemap_check and live_sitemap_check.get("badCount") == 0 else ("issues found" if live_sitemap_check else ""),
+            ]],
+        ),
         "## Cluster Performance",
         "",
         table(
@@ -348,6 +391,7 @@ def main() -> None:
         "generated": today,
         "sitemapUrlCount": len(sitemap_urls),
         "sitemapStatus": sitemap_status,
+        "liveSitemapCheck": live_sitemap_check,
         "summary": {"clicks": total_clicks, "impressions": total_impressions, "ctr": overall_ctr, "position": avg_position},
         "clusters": cluster_summary,
         "pageRows": page_rows,
