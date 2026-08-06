@@ -34,7 +34,7 @@ Traditional API gateways route traffic. Dashboards report spend after the fact. 
 - **MCP gateway**: SatGate acts as an MCP gateway between AI agents and Model Context Protocol servers, checking authority before tool execution, enforcing MCP budget policy, and exporting Evidence Pack receipts. See https://satgate.io/mcp-gateway
 - **Capability-based authorization for AI agents**: SatGate replaces broad API keys with scoped, revocable, budget-aware capabilities that bind authority to an agent, route, tool, tenant, task, budget, expiry, and delegation depth. See https://satgate.io/capability-auth
 - **AI agent cost control**: SatGate controls agent spend in the request path with per-agent, per-route, per-session, per-tool, and per-tenant budgets before upstream calls execute. See https://satgate.io/ai-agent-cost-control
-- **ROI calculator**: SatGate's ROI calculator turns modeled runaway-agent exposure into an enforcement plan for budgets, MCP tool caps, revocation, and Evidence Pack proof. See https://satgate.io/roi-calculator
+- **ROI calculator**: SatGate's ROI calculator turns modeled runaway-agent exposure into an enforcement plan for budgets, MCP tool caps, revocation, and Evidence Pack proof. AI agent ROI is estimated as annual avoided ghost spend minus annual enforcement cost, divided by annual enforcement cost. See https://satgate.io/roi-calculator
 
 ## Key Concepts
 - **Agent Authority & Accountability Layer**: The layer that governs authority before execution and preserves Evidence Pack receipts afterward.

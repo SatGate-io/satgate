@@ -114,6 +114,7 @@ export default function ROICalculatorPage() {
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent ROI calculator' },
+      { '@type': 'Thing', name: 'AI agent ROI formula' },
       { '@type': 'Thing', name: 'runaway AI agent loop exposure' },
       { '@type': 'Thing', name: 'request-path budget enforcement ROI' },
       { '@type': 'Thing', name: 'Policy-to-Proof receipts' },
@@ -161,6 +162,14 @@ export default function ROICalculatorPage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'Ghost spend is estimated from active agents, tool calls per day, average cost per tool call, loop frequency, and the number of calls wasted before a loop is detected.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the AI agent ROI formula?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AI agent ROI can be estimated as annual avoided ghost spend minus annual enforcement cost, divided by annual enforcement cost. Ghost spend is active agents multiplied by daily tool calls, average cost per call, loop frequency, wasted calls before discovery, and 30 days.',
         },
       },
       {
@@ -356,6 +365,39 @@ export default function ROICalculatorPage() {
     ],
   };
 
+  const formulaJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent ROI formula',
+    description: 'Formula steps for converting autonomous agent activity into ghost spend, avoided spend, payback period, and ROI for request-path budget enforcement.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Normal monthly tool spend',
+        description: 'Active agents x daily tool calls x average cost per call x 30 days.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Monthly ghost spend',
+        description: 'Normal monthly call volume x loop frequency x wasted calls before discovery x average cost per call.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Annual avoided spend',
+        description: 'Monthly ghost spend prevented by request-path budget enforcement x 12 months.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Annual ROI',
+        description: '(Annual avoided spend - annual enforcement cost) / annual enforcement cost.',
+      },
+    ],
+  };
+
   const exampleResultsJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Dataset',
@@ -400,6 +442,7 @@ export default function ROICalculatorPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(scenariosJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breakEvenJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(enforcementDecisionJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(formulaJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(exampleResultsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       {/* Navigation */}
@@ -608,8 +651,11 @@ export default function ROICalculatorPage() {
       <section className="pb-20 px-6">
         <div className="max-w-5xl mx-auto rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6 md:p-8">
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">ROI assumptions</p>
-          <h2 className="mb-4 text-2xl md:text-3xl font-bold text-white">How the calculator turns agent activity into budget-enforcement ROI</h2>
-          <div className="grid gap-5 md:grid-cols-3">
+          <h2 className="mb-4 text-2xl md:text-3xl font-bold text-white">AI agent ROI formula and assumptions</h2>
+          <p className="mb-8 max-w-3xl text-gray-400 leading-relaxed">
+            The formula translates autonomous agent activity into a business case: estimate normal spend, isolate ghost spend from loops or retries, then compare avoided annual waste with request-path enforcement cost.
+          </p>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-xl border border-gray-800 bg-black/40 p-5">
               <h3 className="mb-2 font-bold text-white">Normal monthly spend</h3>
               <p className="text-sm leading-relaxed text-gray-400">Agents × calls per day × average cost per call × 30 days.</p>
@@ -621,6 +667,10 @@ export default function ROICalculatorPage() {
             <div className="rounded-xl border border-gray-800 bg-black/40 p-5">
               <h3 className="mb-2 font-bold text-white">SatGate savings model</h3>
               <p className="text-sm leading-relaxed text-gray-400">Request-path budget enforcement denies over-budget requests at the gateway before forwarding to upstream APIs or MCP tools.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-black/40 p-5">
+              <h3 className="mb-2 font-bold text-white">Annual ROI</h3>
+              <p className="text-sm leading-relaxed text-gray-400">(Annual avoided ghost spend - annual enforcement cost) / annual enforcement cost.</p>
             </div>
           </div>
         </div>
@@ -745,6 +795,12 @@ export default function ROICalculatorPage() {
               <h3 className="mb-2 text-xl font-bold text-white">How do you calculate AI agent ghost spend?</h3>
               <p className="text-gray-400 leading-relaxed">
                 Ghost spend is estimated from active agents, tool calls per day, average cost per tool call, loop frequency, and the number of calls wasted before a loop is detected.
+              </p>
+            </div>
+            <div>
+              <h3 className="mb-2 text-xl font-bold text-white">What is the AI agent ROI formula?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                AI agent ROI can be estimated as annual avoided ghost spend minus annual enforcement cost, divided by annual enforcement cost. Ghost spend is active agents multiplied by daily tool calls, average cost per call, loop frequency, wasted calls before discovery, and 30 days.
               </p>
             </div>
             <div>
