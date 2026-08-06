@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-06T15:35:21.472525Z",
+  "generatedAt": "2026-08-06T16:05:27.608646Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -165,18 +165,19 @@
     {
       "path": "/blog/llm-cost-management",
       "exists": true,
-      "title": "LLM Cost Management: Dashboards, Budgets, and Hard Controls",
-      "titleLength": 59,
-      "metaDescription": "Compare LLM cost dashboards, monitoring, budgets, and request-path enforcement. Move from Observe to Control to Evidence Pack proof.",
-      "metaDescriptionLength": 132,
+      "title": "LLM Budget Management Platform: Dashboards and Hard Controls",
+      "titleLength": 60,
+      "metaDescription": "LLM budget management and cost management platform guide: dashboards, monitoring, request-path controls, per-agent budgets, and proof.",
+      "metaDescriptionLength": 134,
       "canonical": "/blog/llm-cost-management",
       "h1": [
-        "LLM Cost Management Needs More Than Dashboards"
+        "LLM Budget Management Needs More Than Dashboards"
       ],
       "h1Count": 1,
       "h2s": [
         "LLM Cost Dashboard Design Pattern: Cost, Latency, Traces, Budget",
         "Budget management means deciding before the call, not after the invoice",
+        "What an LLM cost management platform should include",
         "If You Need an LLM Cost Dashboard for Finance",
         "The LLM Cost Management Landscape Today",
         "Why Monitoring Fails When Agents Hold the Wallet",
@@ -209,7 +210,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2298,
+      "wordCount": 2364,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
