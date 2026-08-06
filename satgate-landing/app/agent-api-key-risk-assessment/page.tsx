@@ -31,6 +31,21 @@ const risks = [
   { key: 'noAudit', label: 'Audit logs cannot prove which agent, route, tool, budget, and policy decision created spend', weight: 10 },
 ];
 
+const replacementControls = [
+  ['Shared production key', 'Agent-scoped API keys', 'Issue authority per agent, tenant, task, workflow, route, and tool instead of sharing one credential across automations.'],
+  ['Manual API key rotation', 'Automatic expiry and revocation', 'Shorten lifetime, revoke by capability, and stop a single agent without rotating every integration.'],
+  ['Broad route access', 'Attenuated scope', 'Constrain allowed methods, routes, MCP tools, data classes, and downstream providers before forwarding.'],
+  ['No spend limit', 'Budget-aware capabilities', 'Attach per-request, per-tool, per-session, and delegated child budgets directly to authority.'],
+  ['Generic request logs', 'Policy-to-proof receipts', 'Record identity, scope, budget, route, tool, policy decision, revocation state, and outcome for audit.'],
+];
+
+const assessmentSteps = [
+  ['Inventory keys', 'Map every static API key, shared secret, MCP server token, service account, and production credential an agent can reach.'],
+  ['Score blast radius', 'Check whether each key is shared, long-lived, broad, unbudgeted, delegated, hard to revoke, or impossible to attribute.'],
+  ['Replace authority', 'Move high-risk workflows to scoped, revocable, budget-aware capabilities enforced in the request path.'],
+  ['Prove decisions', 'Record policy decisions, remaining budget, route, tool, receipt ID, and outcome so security and finance can audit usage.'],
+];
+
 export default function AgentApiKeyRiskAssessmentPage() {
   const [answers, setAnswers] = useState<Record<string, boolean>>({
     shared: true,
@@ -60,12 +75,16 @@ export default function AgentApiKeyRiskAssessmentPage() {
     '@type': 'WebPage',
     name: 'Agent API Key Risk Assessment',
     url: 'https://satgate.io/agent-api-key-risk-assessment',
-    description: 'Free assessment for API key risk in autonomous AI agent workflows, including scope, budget, revocation, delegation, and audit gaps.',
+    description: 'Free assessment for AI agent API key security risk in autonomous workflows, including shared keys, scope, budget, API key rotation, revocation, delegation, and audit gaps.',
     datePublished: '2026-04-12',
-    dateModified: '2026-05-05',
+    dateModified: '2026-08-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent API key risk assessment' },
+      { '@type': 'Thing', name: 'AI agent API key security' },
+      { '@type': 'Thing', name: 'agent API key management' },
+      { '@type': 'Thing', name: 'API key rotation for AI agents' },
+      { '@type': 'Thing', name: 'agent-scoped API keys' },
       { '@type': 'Thing', name: 'static API key blast radius' },
       { '@type': 'Thing', name: 'revocable agent credentials' },
       { '@type': 'Thing', name: 'budget-aware capability tokens' },
@@ -81,11 +100,11 @@ export default function AgentApiKeyRiskAssessmentPage() {
     applicationCategory: 'SecurityApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/agent-api-key-risk-assessment',
-    description: 'Free assessment for API key risk in autonomous AI agent workflows, including scope, budget, revocation, delegation, and audit gaps.',
+    description: 'Free assessment for AI agent API key security risk in autonomous workflows, including shared keys, scope, budget, API key rotation, revocation, delegation, and audit gaps.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-05',
+    dateModified: '2026-08-06',
     audience: webPageJsonLd.audience,
-    featureList: ['Static API key risk scoring', 'Scope gap assessment', 'Budget control checklist', 'Revocation gap assessment', 'Delegation and audit risk scoring'],
+    featureList: ['Static API key risk scoring', 'AI agent API key security scoring', 'Scope gap assessment', 'Budget control checklist', 'API key rotation gap assessment', 'Revocation gap assessment', 'Delegation and audit risk scoring'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
@@ -126,6 +145,14 @@ export default function AgentApiKeyRiskAssessmentPage() {
       },
       {
         '@type': 'Question',
+        name: 'How should teams manage API keys for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AI agent API key management should avoid shared long-lived secrets. Use scoped, expiring, revocable, budget-aware credentials, bind them to tenant and task identity, and enforce policy in the request path before each API or MCP tool call.',
+        },
+      },
+      {
+        '@type': 'Question',
         name: 'What should replace broad API keys for agents?',
         acceptedAnswer: {
           '@type': 'Answer',
@@ -143,6 +170,31 @@ export default function AgentApiKeyRiskAssessmentPage() {
     ],
   };
 
+  const replacementControlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent API key replacement controls',
+    itemListElement: replacementControls.map(([risk, replacement, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: `${risk} -> ${replacement}`,
+      description,
+    })),
+  };
+
+  const assessmentHowToJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to assess AI agent API key risk',
+    description: 'Inventory static API keys, score blast radius, replace broad authority with scoped capabilities, and prove request-path decisions.',
+    step: assessmentSteps.map(([name, text], index) => ({
+      '@type': 'HowToStep',
+      position: index + 1,
+      name,
+      text,
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
@@ -150,6 +202,8 @@ export default function AgentApiKeyRiskAssessmentPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(riskFactorsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(replacementControlsJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(assessmentHowToJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_0%,rgba(249,115,22,0.18),transparent_34%),radial-gradient(circle_at_80%_10%,rgba(34,211,238,0.14),transparent_32%)]" />
@@ -161,7 +215,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
             Agent API Key Risk Assessment
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Score how dangerous your current API key model becomes when autonomous agents, MCP tools, and delegated sub-agents can spend or access resources without a human in the loop.
+            Score your AI agent API key security posture: shared keys, broad scopes, weak API key rotation, missing budgets, delegated sub-agents, revocation gaps, and audit blind spots before agents can spend or access resources without a human in the loop.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <a href="#assessment" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -232,6 +286,56 @@ export default function AgentApiKeyRiskAssessmentPage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <div className="mb-10 max-w-4xl">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-orange-300">Replacement model</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">Agent API key management should move from static secrets to scoped capabilities</h2>
+          <p className="text-lg leading-relaxed text-gray-300">
+            API key rotation is not enough when agents can loop, delegate, and spend. The safer pattern is to issue narrow authority for one task, enforce cost and scope before every request, and revoke that authority without breaking unrelated services.
+          </p>
+        </div>
+        <div className="overflow-x-auto rounded-2xl border border-gray-800">
+          <table className="min-w-[760px] w-full border-collapse text-left text-sm">
+            <thead className="bg-gray-950 text-gray-300">
+              <tr>
+                <th className="p-4 font-semibold">Risky key pattern</th>
+                <th className="p-4 font-semibold">Replacement control</th>
+                <th className="p-4 font-semibold">Why it matters for agents</th>
+              </tr>
+            </thead>
+            <tbody>
+              {replacementControls.map(([risk, replacement, description]) => (
+                <tr key={risk} className="border-t border-gray-800 bg-black/60 align-top">
+                  <td className="p-4 font-bold text-white">{risk}</td>
+                  <td className="p-4 text-cyan-200">{replacement}</td>
+                  <td className="p-4 leading-relaxed text-gray-400">{description}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="border-y border-gray-900 bg-gray-950/60">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="mb-10 max-w-4xl">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-orange-300">Assessment path</p>
+            <h2 className="mb-4 text-3xl font-bold text-white">How to assess API key blast radius before agents inherit it</h2>
+            <p className="text-lg leading-relaxed text-gray-300">
+              The assessment starts with inventory, but the real question is whether one autonomous workflow can turn a leaked, copied, or overbroad credential into spend, data exposure, or irreversible API actions.
+            </p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-4">
+            {assessmentSteps.map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black p-6">
+                <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                <p className="leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="border-b border-gray-900 bg-black">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-orange-300">FAQ</p>
@@ -240,6 +344,10 @@ export default function AgentApiKeyRiskAssessmentPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Why are static API keys risky for AI agents?</h3>
               <p className="leading-relaxed text-gray-400">Static API keys are usually broad, long-lived, copyable, and disconnected from task-level budgets. Autonomous agents can loop, retry, delegate, or call paid tools quickly, so key authority needs scope, expiry, revocation, budget, and audit controls.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How should teams manage API keys for AI agents?</h3>
+              <p className="leading-relaxed text-gray-400">AI agent API key management should avoid shared long-lived secrets. Use scoped, expiring, revocable, budget-aware credentials, bind them to tenant and task identity, and enforce policy in the request path before each API or MCP tool call.</p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What should replace broad API keys for agents?</h3>
