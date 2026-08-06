@@ -38,6 +38,13 @@ const workloads = {
   mcp: { route: '/mcp/tools/*', model: 'agent-runtime', tool: 'expensive_mcp_tool', risk: 'high' },
 };
 
+const policyFields = [
+  [Gauge, 'Budget limits', 'Daily, session, workflow, per-request, route, model, and MCP tool caps with block behavior when exhausted.'],
+  [Wrench, 'Tool policy', 'Allowed MCP tools, SaaS actions, browser tools, paid data sources, risk tiers, max call cost, and approval rules.'],
+  [KeyRound, 'Authority scope', 'Tenant, agent, task, credential caveats, expiry, delegation rights, and next-request revocation triggers.'],
+  [ReceiptText, 'Audit proof', 'Receipt id, Evidence Pack id, policy version, estimated cost, remaining budget, decision reason, and revocation state.'],
+];
+
 type TierKey = keyof typeof tiers;
 type WorkloadKey = keyof typeof workloads;
 
@@ -69,14 +76,19 @@ export default function AgentSpendPolicyTemplatePage() {
   const webPageJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'Agent Budget Policy Template',
+    name: 'AI Agent Budget Policy Template Generator',
     url: 'https://satgate.io/agent-spend-policy-template',
-    description: 'Generate copyable YAML and JSON policy templates for AI agent authority, budgets, MCP tool caps, revocation, receipts, and Evidence Pack fields.',
+    description: 'Generate copyable YAML and JSON policy templates for AI agent spend policy, budget limits, MCP tool caps, delegation limits, revocation, receipts, and Evidence Pack fields.',
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-08-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent budget policy template' },
+      { '@type': 'Thing', name: 'AI agent spend policy template' },
+      { '@type': 'Thing', name: 'agent spend policy generator' },
+      { '@type': 'Thing', name: 'AI agent budget policy generator' },
+      { '@type': 'Thing', name: 'AI agent spending limit policy' },
+      { '@type': 'Thing', name: 'MCP tool budget policy template' },
       { '@type': 'Thing', name: 'request-path budget enforcement' },
       { '@type': 'Thing', name: 'MCP tool cost policy' },
       { '@type': 'Thing', name: 'agent delegation limits' },
@@ -88,16 +100,29 @@ export default function AgentSpendPolicyTemplatePage() {
   const softwareJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Agent Budget Policy Template',
+    name: 'AI Agent Budget Policy Template Generator',
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/agent-spend-policy-template',
-    description: 'Generate copyable YAML and JSON policy templates for AI agent authority, budgets, MCP tool caps, revocation, receipts, and Evidence Pack fields.',
+    description: webPageJsonLd.description,
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-08-06',
     audience: webPageJsonLd.audience,
-    featureList: ['YAML budget policy generation', 'JSON budget policy generation', 'MCP tool cost caps', 'Delegation limit templates', 'Receipt and Evidence Pack field templates'],
+    featureList: ['AI agent spend policy generation', 'YAML budget policy generation', 'JSON budget policy generation', 'MCP tool budget policy templates', 'Spending limit policy examples', 'Delegation limit templates', 'Receipt and Evidence Pack field templates'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  };
+
+  const policyFieldsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent spend policy template fields',
+    description: 'The fields a budget policy template should include before autonomous AI agents can spend, call tools, or delegate work.',
+    itemListElement: policyFields.map(([, name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const breadcrumbJsonLd = {
@@ -148,6 +173,30 @@ export default function AgentSpendPolicyTemplatePage() {
       },
       {
         '@type': 'Question',
+        name: 'What is an AI agent spend policy template?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An AI agent spend policy template is a reusable YAML or JSON policy that defines budget limits, tool caps, delegation rules, credential expiry, revocation triggers, receipt fields, and Evidence Pack requirements for autonomous agent requests.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do you generate an AI agent budget policy?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Generate an AI agent budget policy by choosing the agent workload, environment, budget mode, route limits, MCP tool caps, delegation settings, credential expiry, revocation triggers, and audit fields, then enforcing the policy before requests execute.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Should MCP tools have separate budget policy?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. MCP tools should have separate budget policy because tool calls can trigger search, SaaS, cloud, code execution, browser automation, paid data, or delegated work outside the model bill.',
+        },
+      },
+      {
+        '@type': 'Question',
         name: 'Should agent budget policy start in Observe or Control mode?',
         acceptedAnswer: {
           '@type': 'Answer',
@@ -161,6 +210,7 @@ export default function AgentSpendPolicyTemplatePage() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(policyFieldsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
@@ -171,10 +221,10 @@ export default function AgentSpendPolicyTemplatePage() {
             <ClipboardList size={16} /> Free agent budget policy template
           </div>
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">
-            Agent Budget Policy Template
+            AI Agent Budget Policy Template Generator
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Generate practical YAML or JSON policy for AI agent authority, budgets, per-request caps, MCP tool costs, delegation limits, revocation, receipts, and Evidence Pack fields.
+            Generate practical YAML or JSON policy for AI agent spend limits, tool caps, authority, per-request budgets, MCP tool costs, delegation limits, revocation, receipts, and Evidence Pack fields.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <a href="#template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -182,6 +232,43 @@ export default function AgentSpendPolicyTemplatePage() {
             </a>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               See Policy-to-Proof
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-gray-900 bg-gray-950/60">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="mb-10 grid gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
+            <div>
+              <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Direct answer</p>
+              <h2 className="text-3xl font-bold text-white">An AI agent spend policy template turns budget rules into enforceable YAML</h2>
+            </div>
+            <p className="text-lg leading-relaxed text-gray-300">
+              Use this generator when you need an AI agent budget policy, an agent spend policy template, or an MCP tool budget policy template that can move from Observe to Control. The policy should state who the agent is, what it can call, how much it can spend, what it can delegate, when it expires, and what receipt proves the decision.
+            </p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {policyFields.map(([Icon, title, body]) => {
+              const CardIcon = Icon as typeof Gauge;
+              return (
+                <div key={String(title)} className="rounded-2xl border border-gray-800 bg-black p-6">
+                  <CardIcon className="mb-4 text-cyan-300" size={28} />
+                  <h3 className="mb-2 text-lg font-bold text-white">{String(title)}</h3>
+                  <p className="text-sm leading-relaxed text-gray-400">{String(body)}</p>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/ai-agent-cost-control" className="inline-flex items-center gap-2 rounded-full border border-gray-700 px-4 py-2 text-sm font-bold text-cyan-200 transition hover:border-cyan-500">
+              AI agent cost control <ArrowRight size={16} />
+            </Link>
+            <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center gap-2 rounded-full border border-gray-700 px-4 py-2 text-sm font-bold text-cyan-200 transition hover:border-cyan-500">
+              MCP tool cost policy <ArrowRight size={16} />
+            </Link>
+            <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center gap-2 rounded-full border border-gray-700 px-4 py-2 text-sm font-bold text-cyan-200 transition hover:border-cyan-500">
+              Capability token policy <ArrowRight size={16} />
             </Link>
           </div>
         </div>
@@ -289,6 +376,24 @@ export default function AgentSpendPolicyTemplatePage() {
               <h3 className="mb-2 text-xl font-bold text-white">What fields should every AI agent budget policy include?</h3>
               <p className="text-gray-400 leading-relaxed">
                 Every AI agent budget policy should include tenant, agent, task, route, model, tool, per-request cap, session budget, daily budget, delegation limits, credential expiry, revocation triggers, receipt ids, policy versions, and Evidence Pack fields.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is an AI agent spend policy template?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                An AI agent spend policy template is a reusable YAML or JSON policy that defines budget limits, tool caps, delegation rules, credential expiry, revocation triggers, receipt fields, and Evidence Pack requirements for autonomous agent requests.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How do you generate an AI agent budget policy?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Generate an AI agent budget policy by choosing the agent workload, environment, budget mode, route limits, MCP tool caps, delegation settings, credential expiry, revocation triggers, and audit fields, then enforcing the policy before requests execute.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Should MCP tools have separate budget policy?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Yes. MCP tools should have separate budget policy because tool calls can trigger search, SaaS, cloud, code execution, browser automation, paid data, or delegated work outside the model bill.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
