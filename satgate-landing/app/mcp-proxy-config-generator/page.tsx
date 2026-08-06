@@ -21,6 +21,21 @@ const modes = {
 type ClientKey = keyof typeof clients;
 type ModeKey = keyof typeof modes;
 
+const setupSteps = [
+  ['Choose the client', 'Pick Cursor, Claude Desktop, Claude Code, OpenClaw, or a custom MCP client so the generated file matches the expected config location.'],
+  ['Wrap the upstream server', 'Route the original MCP server through the SatGate MCP proxy command instead of calling the server directly.'],
+  ['Set the budget policy', 'Choose Observe, Control, or Control plus paid-rail context, then set the session budget and expensive-tool cap.'],
+  ['Require scoped authority', 'Require agent ID, task ID, receipt ID, policy version, and revocation state before tool execution.'],
+  ['Test and enforce', 'Run the MCP client in Observe mode first, then move high-cost or sensitive tools into Control mode with denial and revocation rules.'],
+];
+
+const clientRows = [
+  ['Cursor MCP proxy config', '.cursor/mcp.json', 'Govern coding-agent tools, repo search, issue actions, browser tasks, and paid API calls.'],
+  ['Claude Desktop MCP proxy config', 'claude_desktop_config.json', 'Put personal and team MCP servers behind budgets, receipts, and scoped authority.'],
+  ['Claude Code MCP proxy config', '.mcp.json', 'Control terminal-adjacent tools, code actions, delegated workflows, and expensive tool loops.'],
+  ['OpenClaw MCP proxy config', 'openclaw.yaml', 'Preserve paid-rail context, Evidence Pack receipts, and agent identity across OpenClaw tools.'],
+];
+
 export default function McpProxyConfigGeneratorPage() {
   const [client, setClient] = useState<ClientKey>('cursor');
   const [mode, setMode] = useState<ModeKey>('control');
@@ -66,13 +81,16 @@ export default function McpProxyConfigGeneratorPage() {
     '@type': 'WebPage',
     name: 'MCP Proxy Config Generator',
     url: 'https://satgate.io/mcp-proxy-config-generator',
-    description: 'Generate MCP proxy configs for Cursor, Claude, OpenClaw, and custom MCP clients with scoped authority, budgets, Evidence Pack receipts, revocation, and optional paid-rail context.',
+    description: 'Generate MCP proxy configs and setup steps for Cursor, Claude Desktop, Claude Code, OpenClaw, and custom MCP clients with scoped authority, budgets, Evidence Pack receipts, revocation, and optional paid-rail context.',
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-08-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'MCP proxy config generator' },
       { '@type': 'Thing', name: 'SatGate MCP proxy' },
+      { '@type': 'Thing', name: 'Cursor MCP proxy config' },
+      { '@type': 'Thing', name: 'Claude Desktop MCP proxy config' },
+      { '@type': 'Thing', name: 'Claude Code MCP proxy config' },
       { '@type': 'Thing', name: 'Cursor and Claude MCP governance' },
       { '@type': 'Thing', name: 'MCP request-path budget enforcement' },
       { '@type': 'Thing', name: 'paid-rail context for MCP tools' },
@@ -87,11 +105,11 @@ export default function McpProxyConfigGeneratorPage() {
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/mcp-proxy-config-generator',
-    description: 'Generate MCP proxy configs for Cursor, Claude, OpenClaw, and custom MCP clients with scoped authority, budgets, Evidence Pack receipts, revocation, and optional paid-rail context.',
+    description: 'Generate MCP proxy configs and setup steps for Cursor, Claude Desktop, Claude Code, OpenClaw, and custom MCP clients with scoped authority, budgets, Evidence Pack receipts, revocation, and optional paid-rail context.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-08-06',
     audience: webPageJsonLd.audience,
-    featureList: ['Cursor MCP config generation', 'Claude MCP config generation', 'OpenClaw MCP config generation', 'Budget and audit policy generation', 'Optional paid-rail context config'],
+    featureList: ['Cursor MCP config generation', 'Claude Desktop MCP config generation', 'Claude Code MCP config generation', 'OpenClaw MCP config generation', 'Budget and audit policy generation', 'Optional paid-rail context config'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
@@ -115,6 +133,14 @@ export default function McpProxyConfigGeneratorPage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'An MCP proxy sits between an AI agent client and MCP servers so tool calls can be observed, audited, budgeted, denied, revoked, or governed with paid-rail context before expensive actions execute.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do you set up an MCP proxy for Cursor or Claude?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Generate the client-specific MCP config, replace the direct MCP server command with the SatGate proxy command, set budgets and required receipt fields, then test in Observe mode before enforcing Control mode.',
         },
       },
       {
@@ -152,12 +178,39 @@ export default function McpProxyConfigGeneratorPage() {
     ],
   };
 
+  const setupHowToJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to set up an MCP proxy with SatGate',
+    description: 'Generate an MCP proxy config, route the upstream MCP server through SatGate, apply scoped authority and budget policy, then test in Observe mode before Control mode.',
+    step: setupSteps.map(([name, text], index) => ({
+      '@type': 'HowToStep',
+      position: index + 1,
+      name,
+      text,
+    })),
+  };
+
+  const clientConfigJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP proxy config targets',
+    itemListElement: clientRows.map(([name, configPath, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description: `${configPath}: ${description}`,
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(setupHowToJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(clientConfigJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(34,211,238,0.18),transparent_32%),radial-gradient(circle_at_82%_10%,rgba(168,85,247,0.16),transparent_34%)]" />
@@ -169,7 +222,7 @@ export default function McpProxyConfigGeneratorPage() {
             MCP Proxy Config Generator
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Generate a starter SatGate MCP proxy config for Cursor, Claude Desktop, Claude Code, OpenClaw, or custom MCP clients with budgets, audit, revocation, and optional paid-rail context.
+            Generate a starter SatGate MCP proxy config and setup guide for Cursor, Claude Desktop, Claude Code, OpenClaw, or custom MCP clients with budgets, audit, revocation, scoped authority, and optional paid-rail context.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <a href="#generator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -257,6 +310,56 @@ export default function McpProxyConfigGeneratorPage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <div className="mb-10 max-w-4xl">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Setup guide</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">MCP proxy setup for Cursor, Claude, and OpenClaw</h2>
+          <p className="text-lg leading-relaxed text-gray-300">
+            The safest MCP proxy setup keeps the client experience unchanged while moving tool authority, budgets, paid-rail context, revocation, and Evidence Pack receipts into the request path before the upstream MCP server runs.
+          </p>
+        </div>
+        <div className="grid gap-5 md:grid-cols-5">
+          {setupSteps.map(([title, body]) => (
+            <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-5">
+              <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+              <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y border-gray-900 bg-gray-950/60">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="mb-10 max-w-4xl">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Client configs</p>
+            <h2 className="mb-4 text-3xl font-bold text-white">What each MCP client needs</h2>
+            <p className="text-lg leading-relaxed text-gray-300">
+              Each client stores MCP server definitions differently. SatGate keeps the same upstream tool surface, but inserts budget enforcement, scoped authority checks, and audit receipts around the command.
+            </p>
+          </div>
+          <div className="overflow-x-auto rounded-2xl border border-gray-800">
+            <table className="min-w-[760px] w-full border-collapse text-left text-sm">
+              <thead className="bg-black text-gray-300">
+                <tr>
+                  <th className="p-4 font-semibold">Target</th>
+                  <th className="p-4 font-semibold">Config path</th>
+                  <th className="p-4 font-semibold">Best use</th>
+                </tr>
+              </thead>
+              <tbody>
+                {clientRows.map(([target, configPath, use]) => (
+                  <tr key={target} className="border-t border-gray-800 bg-black/60 align-top">
+                    <td className="p-4 font-bold text-white">{target}</td>
+                    <td className="p-4 font-mono text-cyan-200">{configPath}</td>
+                    <td className="p-4 leading-relaxed text-gray-400">{use}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       <section className="border-t border-gray-900 bg-black">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
@@ -266,6 +369,12 @@ export default function McpProxyConfigGeneratorPage() {
               <h3 className="mb-2 text-xl font-bold text-white">What is an MCP proxy?</h3>
               <p className="text-gray-400 leading-relaxed">
                 An MCP proxy sits between an AI agent client and MCP servers so tool calls can be observed, audited, budgeted, denied, revoked, or governed with paid-rail context before expensive actions execute.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How do you set up an MCP proxy for Cursor or Claude?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Generate the client-specific MCP config, replace the direct MCP server command with the SatGate proxy command, set budgets and required receipt fields, then test in Observe mode before enforcing Control mode.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
