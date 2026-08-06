@@ -7,6 +7,7 @@ export const metadata = {
   alternates: { canonical: 'https://satgate.io/ai-agent-cost-control' },
   keywords: [
     'AI agent cost control',
+    'AI agent cost-control software',
     'AI agent spend control',
     'AI agent budget enforcement',
     'LLM cost control',
@@ -68,10 +69,11 @@ export default function AiAgentCostControlPage() {
     name: 'AI Agent Cost Control | Request-Path Budget Enforcement',
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-cost-control',
-    dateModified: '2026-08-04',
+    dateModified: '2026-08-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent cost control' },
+      { '@type': 'Thing', name: 'AI agent cost-control software' },
       { '@type': 'Thing', name: 'AI agent spend control' },
       { '@type': 'Thing', name: 'request-path budget enforcement' },
       { '@type': 'Thing', name: 'MCP budget enforcement' },
@@ -88,7 +90,7 @@ export default function AiAgentCostControlPage() {
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-cost-control',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-08-04',
+    dateModified: '2026-08-05',
     about: webPageJsonLd.about,
     offers: { '@type': 'Offer', url: 'https://satgate.io/pricing' },
     featureList: [
@@ -111,6 +113,14 @@ export default function AiAgentCostControlPage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'AI agent cost control is the practice of attributing, budgeting, limiting, and preserving receipts for autonomous agent API and tool spend before requests execute.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What should AI agent cost-control software do?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AI agent cost-control software should identify each agent request, price the model/API/MCP tool action, check remaining budget and scoped authority, deny or reroute over-budget calls, revoke risky access, and preserve receipts before cost is created.',
         },
       },
       {
@@ -304,6 +314,39 @@ export default function AiAgentCostControlPage() {
     ],
   };
 
+  const softwareEvaluationJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent cost-control software evaluation criteria',
+    description: 'Commercial evaluation criteria for teams buying AI agent cost-control software.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Pre-execution budget decisions',
+        description: 'The system should make allow, deny, reroute, meter, revoke, or require-payment decisions before upstream cost is created.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Agent and workflow attribution',
+        description: 'Spend should map to tenant, team, workflow, agent, delegated sub-agent, route, model, MCP tool, and token.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Scoped authority and revocation',
+        description: 'Agents should use expiring, scoped capabilities with budget caveats and immediate revocation instead of broad shared API keys.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Audit-ready proof',
+        description: 'Every allowed, denied, delegated, revoked, routed, or paid request should produce receipt fields that finance, security, and compliance can inspect.',
+      },
+    ],
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -322,6 +365,7 @@ export default function AiAgentCostControlPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(rolloutJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(comparisonJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(spendingControlsJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareEvaluationJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -477,6 +521,29 @@ export default function AiAgentCostControlPage() {
 
       <section className="border-t border-gray-900 bg-gray-950/50">
         <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Software evaluation</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">What AI agent cost-control software must decide before execution</h2>
+          <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+            The core buying test is simple: can the system stop, reroute, revoke, meter, or require payment before an autonomous agent creates cost? If the answer is no, the product is reporting risk, not controlling it.
+          </p>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['Budget decision', 'Is there enough tenant, agent, workflow, route, model, and MCP tool budget left for this request?'],
+              ['Authority decision', 'Does the capability still allow this action, tool, route, delegation depth, and expiry window?'],
+              ['Outcome decision', 'Should the gateway allow, deny, reroute, meter, revoke, require payment, or record only?'],
+              ['Proof decision', 'Which receipt fields preserve policy inputs, spend context, denial reason, and Evidence Pack proof?'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black p-6">
+                <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-gray-950/50">
+        <div className="max-w-6xl mx-auto px-6 py-20">
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Spending controls</p>
           <h2 className="mb-4 text-3xl font-bold text-white">AI agent spending controls that belong in the request path</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
@@ -574,7 +641,7 @@ export default function AiAgentCostControlPage() {
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Cost-control toolkit</p>
           <h2 className="mb-4 text-3xl font-bold text-white">Turn spend exposure into enforceable controls</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
-            The commercial page should lead buyers from awareness to action: estimate the risk, generate the policy, then enforce it in the request path.
+            Move from awareness to action: estimate the risk, generate the policy, then enforce it in the request path before agents call expensive models, APIs, and MCP tools.
           </p>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {[
@@ -601,6 +668,12 @@ export default function AiAgentCostControlPage() {
               <h3 className="mb-2 text-xl font-bold text-white">What is AI agent cost control?</h3>
               <p className="text-gray-400 leading-relaxed">
                 AI agent cost control is the practice of attributing, budgeting, limiting, and preserving receipts for autonomous agent API and tool spend before requests execute.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What should AI agent cost-control software do?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                AI agent cost-control software should identify each agent request, price the model/API/MCP tool action, check remaining budget and scoped authority, deny or reroute over-budget calls, revoke risky access, and preserve receipts before cost is created.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
