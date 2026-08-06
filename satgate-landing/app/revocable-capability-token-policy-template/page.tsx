@@ -49,6 +49,29 @@ const profiles = {
 
 type ProfileKey = keyof typeof profiles;
 
+const caveatRows = [
+  ['Subject caveat', 'subject, tenant_id, task_id', 'Prevents one agent credential from becoming ambient authority across tenants or workflows.'],
+  ['Scope caveat', 'scopes, audience, allowed routes/tools', 'Limits the token to the model, API, MCP tool, data class, or route the task actually needs.'],
+  ['Economic caveat', 'token_lifetime_usd, per_request_usd', 'Turns authorization into budget-aware authority instead of a blank check.'],
+  ['Delegation caveat', 'child_budget_pct, child_ttl_minutes, subset scopes', 'Allows sub-agents only with attenuated scope, shorter lifetime, and smaller budget.'],
+  ['Revocation caveat', 'kill_switch, parent revocation, loop detection', 'Lets SatGate stop future requests without rotating unrelated service credentials.'],
+];
+
+const revocationRows = [
+  ['Budget exhausted', 'Revoke and block when the token, child token, task, or session budget reaches zero.'],
+  ['Loop detected', 'Revoke the session when repeated retries or tool calls show runaway behavior.'],
+  ['Policy violation', 'Revoke when requested route, tool, scope, tenant, or audience does not match the caveats.'],
+  ['Parent revoked', 'Cascade revocation through delegated child tokens when parent authority is removed.'],
+  ['Manual kill switch', 'Let security or platform teams revoke all matching agent authority for a tenant or incident.'],
+];
+
+const generationSteps = [
+  ['Choose profile', 'Select the agent workflow type so default scopes, budgets, risk tier, expiry, and delegation behavior match expected risk.'],
+  ['Bind context', 'Set tenant and task identifiers so the capability token is tied to a specific authority boundary.'],
+  ['Add caveats', 'Encode scope, budget, expiry, delegation, revocation, and audit requirements as policy fields.'],
+  ['Enforce in path', 'Check caveats, revocation state, remaining budget, and receipt requirements at the gateway before forwarding.'],
+];
+
 export default function RevocableCapabilityTokenPolicyTemplatePage() {
   const [profile, setProfile] = useState<ProfileKey>('coding');
   const [tenant, setTenant] = useState('acme-prod');
@@ -83,12 +106,16 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
     '@type': 'WebPage',
     name: 'Revocable Capability Token Policy Template',
     url: 'https://satgate.io/revocable-capability-token-policy-template',
-    description: 'Generate scoped, expiring, revocable capability-token policy for AI agents, sub-agents, MCP tools, budgets, receipts, and Evidence Pack evidence.',
+    description: 'Generate scoped, expiring, revocable capability-token policy for AI agents, sub-agents, MCP tools, caveats, delegation attenuation, budgets, receipts, and Evidence Pack evidence.',
     datePublished: '2026-04-12',
-    dateModified: '2026-05-05',
+    dateModified: '2026-08-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'revocable capability token policy template' },
+      { '@type': 'Thing', name: 'AI agent capability token' },
+      { '@type': 'Thing', name: 'capability token caveats' },
+      { '@type': 'Thing', name: 'delegation attenuation for agents' },
+      { '@type': 'Thing', name: 'revocable agent credentials' },
       { '@type': 'Thing', name: 'scoped AI agent credentials' },
       { '@type': 'Thing', name: 'agent token attenuation' },
       { '@type': 'Thing', name: 'macaroon-style caveats for agents' },
@@ -104,11 +131,11 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/revocable-capability-token-policy-template',
-    description: 'Generate scoped, expiring, revocable capability-token policy for AI agents, sub-agents, MCP tools, budgets, receipts, and Evidence Pack evidence.',
+    description: 'Generate scoped, expiring, revocable capability-token policy for AI agents, sub-agents, MCP tools, caveats, delegation attenuation, budgets, receipts, and Evidence Pack evidence.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-05',
+    dateModified: '2026-08-06',
     audience: webPageJsonLd.audience,
-    featureList: ['YAML capability-token policy generation', 'JSON capability-token policy generation', 'Delegation attenuation controls', 'Budget exhaustion revocation rules', 'Receipt field templates', 'Evidence Pack export fields'],
+    featureList: ['YAML capability-token policy generation', 'JSON capability-token policy generation', 'Capability token caveats', 'Delegation attenuation controls', 'Budget exhaustion revocation rules', 'Receipt field templates', 'Evidence Pack export fields'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
@@ -156,6 +183,22 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
       },
       {
         '@type': 'Question',
+        name: 'What caveats should AI agent capability tokens include?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AI agent capability-token caveats should bind subject, tenant, task, audience, scope, route, tool, budget, expiry, delegation limits, revocation triggers, and audit fields so every request can be checked before access.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is delegation attenuation for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Delegation attenuation means a child or sub-agent receives less authority than the parent: smaller budget, shorter expiry, subset scopes, and stricter revocation rules.',
+        },
+      },
+      {
+        '@type': 'Question',
         name: 'Why are capability tokens better than shared API keys for agents?',
         acceptedAnswer: {
           '@type': 'Answer',
@@ -173,6 +216,43 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
     ],
   };
 
+  const caveatsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent capability token caveats',
+    itemListElement: caveatRows.map(([name, fields, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description: `${fields}: ${description}`,
+    })),
+  };
+
+  const revocationJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Capability token revocation triggers',
+    itemListElement: revocationRows.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
+  };
+
+  const howToJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to generate revocable AI agent capability-token policy',
+    description: 'Choose an agent profile, bind tenant and task context, add caveats, then enforce the policy in the request path.',
+    step: generationSteps.map(([name, text], index) => ({
+      '@type': 'HowToStep',
+      position: index + 1,
+      name,
+      text,
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
@@ -180,6 +260,9 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(checklistJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(caveatsJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(revocationJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(34,211,238,0.18),transparent_32%),radial-gradient(circle_at_82%_10%,rgba(168,85,247,0.16),transparent_34%)]" />
@@ -191,7 +274,7 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
             Revocable Capability Token Policy Template
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Generate scoped, expiring, revocable token policy for AI agents, sub-agents, MCP tools, request budgets, delegation, kill switches, receipts, and Evidence Pack evidence.
+            Generate scoped, expiring, revocable AI agent capability-token policy with caveats for sub-agents, MCP tools, request budgets, delegation attenuation, kill switches, receipts, and Evidence Pack evidence.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <a href="#template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -275,6 +358,56 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <div className="mb-10 max-w-4xl">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Caveats</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">Capability token caveats make agent authority enforceable</h2>
+          <p className="text-lg leading-relaxed text-gray-300">
+            A capability token is only useful for autonomous agents if its caveats are specific enough to enforce before a request. SatGate treats identity, scope, budget, expiry, delegation, and revocation as one policy object instead of separate logs.
+          </p>
+        </div>
+        <div className="overflow-x-auto rounded-2xl border border-gray-800">
+          <table className="min-w-[760px] w-full border-collapse text-left text-sm">
+            <thead className="bg-gray-950 text-gray-300">
+              <tr>
+                <th className="p-4 font-semibold">Caveat</th>
+                <th className="p-4 font-semibold">Policy fields</th>
+                <th className="p-4 font-semibold">Why it matters</th>
+              </tr>
+            </thead>
+            <tbody>
+              {caveatRows.map(([caveat, fields, description]) => (
+                <tr key={caveat} className="border-t border-gray-800 bg-black/60 align-top">
+                  <td className="p-4 font-bold text-white">{caveat}</td>
+                  <td className="p-4 font-mono text-cyan-200">{fields}</td>
+                  <td className="p-4 leading-relaxed text-gray-400">{description}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="border-y border-gray-900 bg-gray-950/60">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="mb-10 max-w-4xl">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Revocation</p>
+            <h2 className="mb-4 text-3xl font-bold text-white">Revocation policy should be explicit before the token is minted</h2>
+            <p className="text-lg leading-relaxed text-gray-300">
+              API key rotation reacts after authority spreads. Revocable capability-token policy lets SatGate stop the next request when budget, loop, delegation, or scope rules fail.
+            </p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-5">
+            {revocationRows.map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black p-5">
+                <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="border-b border-gray-900 bg-black">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
@@ -283,6 +416,14 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is a revocable capability token for AI agents?</h3>
               <p className="leading-relaxed text-gray-400">A revocable capability token gives an agent narrowly scoped authority for a tenant, task, tool, budget, and time window. Unlike a static API key, it can expire, be attenuated for sub-agents, and be revoked when policy fails.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What caveats should AI agent capability tokens include?</h3>
+              <p className="leading-relaxed text-gray-400">AI agent capability-token caveats should bind subject, tenant, task, audience, scope, route, tool, budget, expiry, delegation limits, revocation triggers, and audit fields so every request can be checked before access.</p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is delegation attenuation for AI agents?</h3>
+              <p className="leading-relaxed text-gray-400">Delegation attenuation means a child or sub-agent receives less authority than the parent: smaller budget, shorter expiry, subset scopes, and stricter revocation rules.</p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Why are capability tokens better than shared API keys for agents?</h3>
