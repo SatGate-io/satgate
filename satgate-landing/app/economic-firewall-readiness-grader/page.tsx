@@ -94,11 +94,13 @@ export default function EconomicFirewallReadinessGraderPage() {
     '@type': 'WebPage',
     name: 'Economic Firewall Readiness Grader',
     url: 'https://satgate.io/economic-firewall-readiness-grader',
-    description: 'Grade AI agent economic governance readiness across identity, request-path budgets, MCP tools, revocation, delegation, audit, routing, and paid-rail context.',
-    dateModified: '2026-05-05',
+    description: 'Grade AI agent economic governance readiness and build a decision package across identity, request-path budgets, MCP tools, revocation, delegation, audit, routing, and paid-rail context.',
+    dateModified: '2026-08-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'economic firewall readiness' },
+      { '@type': 'Thing', name: 'economic firewall readiness decision package' },
+      { '@type': 'Thing', name: 'AI agent governance readiness score' },
       { '@type': 'Thing', name: 'AI agent economic governance' },
       { '@type': 'Thing', name: 'request-path budget controls' },
       { '@type': 'Thing', name: 'MCP governance assessment' },
@@ -113,9 +115,9 @@ export default function EconomicFirewallReadinessGraderPage() {
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/economic-firewall-readiness-grader',
-    description: 'Grade AI agent economic governance readiness across identity, budgets, MCP tools, revocation, delegation, audit, routing, and payments.',
+    description: 'Grade AI agent economic governance readiness and generate a decision package across identity, budgets, MCP tools, revocation, delegation, audit, routing, and payments.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-05',
+    dateModified: '2026-08-05',
     about: webPageJsonLd.about,
     featureList: ['Agent identity attribution scoring', 'Request-path budget readiness scoring', 'MCP tool cost governance checks', 'Revocation and delegation readiness checks', 'Audit, routing, and paid-rail context readiness checks'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -126,6 +128,7 @@ export default function EconomicFirewallReadinessGraderPage() {
     '@type': 'FAQPage',
     mainEntity: [
       { '@type': 'Question', name: 'What is economic firewall readiness?', acceptedAnswer: { '@type': 'Answer', text: 'Economic firewall readiness measures whether an organization can observe, control, audit, revoke, route, budget, and preserve paid-rail context for AI agent/API activity before requests execute.' } },
+      { '@type': 'Question', name: 'What is an economic firewall readiness decision package?', acceptedAnswer: { '@type': 'Answer', text: 'An economic firewall readiness decision package is the score, gap list, priority fixes, and evidence plan a platform team uses to decide whether agent traffic can move from Observe mode into request-path Control and Prove governance.' } },
       { '@type': 'Question', name: 'What score means we are ready for autonomous agents?', acceptedAnswer: { '@type': 'Answer', text: 'A score above 85 means most core request-path controls are in place. Lower scores indicate gaps in identity, budget enforcement, MCP governance, revocation, audit, routing, or payment.' } },
       { '@type': 'Question', name: 'How does SatGate improve readiness?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate sits in the request path to observe agent/API activity, enforce budget and access policy, revoke scoped capabilities, preserve Evidence Pack proof, route economically, and govern paid rails when value moves.' } },
       { '@type': 'Question', name: 'Which gaps should teams fix first?', acceptedAnswer: { '@type': 'Answer', text: 'Teams should fix request attribution, hard budget enforcement, MCP tool policy, scoped revocable credentials, and Evidence Pack capture first because those controls stop unauthorized actions before execution.' } },
@@ -146,6 +149,39 @@ export default function EconomicFirewallReadinessGraderPage() {
     })),
   };
 
+  const decisionPackageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Economic firewall readiness decision package',
+    description: 'The outputs a team needs before deciding whether AI agent traffic is ready for request-path budget enforcement and Evidence Pack proof.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Readiness score',
+        description: 'A percentage and letter grade across identity, budgets, MCP tools, revocation, delegation, audit evidence, routing, and paid-rail context.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Priority gap list',
+        description: 'The missing controls that should be fixed before autonomous agents receive broader authority or paid API access.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Control-mode recommendation',
+        description: 'A proceed, partial proceed, or hold decision for moving high-risk traffic from Observe mode into request-path Control.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Evidence plan',
+        description: 'The receipt and Evidence Pack fields needed to prove allowed, denied, delegated, revoked, routed, or paid requests after execution.',
+      },
+    ],
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -161,6 +197,7 @@ export default function EconomicFirewallReadinessGraderPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(readinessCriteriaJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(decisionPackageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -171,7 +208,7 @@ export default function EconomicFirewallReadinessGraderPage() {
           </div>
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Economic Firewall Readiness Grader</h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Grade whether your agent/API stack can handle autonomous authority: identity, request-path budgets, MCP tool policy, revocation, delegation, Evidence Pack capture, routing, and paid-rail context.
+            Grade whether your agent/API stack can handle autonomous authority and produce a decision package for identity, request-path budgets, MCP tool policy, revocation, delegation, Evidence Pack capture, routing, and paid-rail context.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -263,11 +300,35 @@ export default function EconomicFirewallReadinessGraderPage() {
 
       <section className="border-t border-gray-900 bg-black">
         <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Decision package</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">Turn a readiness score into a proceed-or-hold decision</h2>
+          <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+            A readiness grader is useful only if it changes the rollout decision. Use the score, missing controls, and evidence plan to decide which agent traffic can move from Observe mode into request-path Control and Prove governance.
+          </p>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['Readiness score', 'A percentage and letter grade across authority, budget, MCP, revocation, delegation, audit, routing, and paid-rail controls.'],
+              ['Priority gap list', 'The missing controls to fix before agents get broader authority or paid API access.'],
+              ['Control-mode recommendation', 'A proceed, partial proceed, or hold decision for moving high-risk routes into enforcement.'],
+              ['Evidence plan', 'The receipt fields and Evidence Pack artifacts needed to prove allowed, denied, delegated, revoked, routed, or paid requests.'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+                <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-20">
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">FAQ</p>
           <h2 className="mb-8 text-3xl font-bold text-white">Economic firewall readiness questions</h2>
           <div className="grid gap-5 md:grid-cols-2">
             {[
               ['What is economic firewall readiness?', 'Economic firewall readiness measures whether an organization can observe, control, audit, revoke, route, budget, and preserve paid-rail context for AI agent/API activity before requests execute.'],
+              ['What is an economic firewall readiness decision package?', 'An economic firewall readiness decision package is the score, gap list, priority fixes, and evidence plan a platform team uses to decide whether agent traffic can move from Observe mode into request-path Control and Prove governance.'],
               ['What score means we are ready for autonomous agents?', 'A score above 85 means most core request-path controls are in place. Lower scores indicate gaps in identity, budget enforcement, MCP governance, revocation, audit, routing, or payment.'],
               ['How does SatGate improve readiness?', 'SatGate sits in the request path to observe agent/API activity, enforce budget and access policy, revoke scoped capabilities, preserve Evidence Pack proof, route economically, and govern paid rails when value moves.'],
               ['Which gaps should teams fix first?', 'Teams should fix request attribution, hard budget enforcement, MCP tool policy, scoped revocable credentials, and Evidence Pack capture first because those controls stop unauthorized actions before execution.'],

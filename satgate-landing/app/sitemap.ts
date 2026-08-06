@@ -85,7 +85,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/openai-budget-policy-generator', lastModified: '2026-08-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/mcp-tool-cost-policy-generator', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/mcp-proxy-config-generator', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/economic-firewall-readiness-grader', lastModified: '2026-05-05', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/economic-firewall-readiness-grader', lastModified: '2026-08-05', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/tools', lastModified: '2026-05-03', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/seo-distribution-kit', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/design-partners', lastModified: '2026-05-02', changeFrequency: 'monthly', priority: 0.6 },
