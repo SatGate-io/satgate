@@ -15,6 +15,8 @@ export const metadata = {
     'MCP budget enforcement',
     'runaway agent spend',
     'AI cost governance',
+    'per-customer AI API budget limits',
+    'customer AI API spending controls',
   ],
   openGraph: {
     title: 'AI Agent Cost Control | Request-Path Budget Enforcement',
@@ -69,7 +71,7 @@ export default function AiAgentCostControlPage() {
     name: 'AI Agent Cost Control | Request-Path Budget Enforcement',
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-cost-control',
-    dateModified: '2026-08-05',
+    dateModified: '2026-08-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent cost control' },
@@ -78,6 +80,8 @@ export default function AiAgentCostControlPage() {
       { '@type': 'Thing', name: 'request-path budget enforcement' },
       { '@type': 'Thing', name: 'MCP budget enforcement' },
       { '@type': 'Thing', name: 'runaway AI agent spend prevention' },
+      { '@type': 'Thing', name: 'per-customer AI API budget limits' },
+      { '@type': 'Thing', name: 'customer AI API spending controls' },
     ],
   };
 
@@ -90,12 +94,13 @@ export default function AiAgentCostControlPage() {
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-cost-control',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-08-05',
+    dateModified: '2026-08-06',
     about: webPageJsonLd.about,
     offers: { '@type': 'Offer', url: 'https://satgate.io/pricing' },
     featureList: [
       'Per-agent budget enforcement',
       'Per-tool cost attribution',
+      'Per-customer AI API budget limits',
       'MCP budget enforcement',
       'Revocable agent credentials',
       'Request-path Evidence Pack receipts',
@@ -169,6 +174,14 @@ export default function AiAgentCostControlPage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'Add budget enforcement before agents receive access to paid APIs, premium models, MCP tools, data providers, or external services where retries, loops, or delegation can create real cost.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: "I need to set spending limits per customer on my AI API so one customer doesn't blow through my budget. What should I use?",
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Use request-path AI API budget enforcement with tenant and customer attribution, per-customer budgets, per-request ceilings, route and model caps, structured denials, and receipts. SatGate applies those limits before the upstream API or model call executes, so one customer cannot consume the shared budget for everyone else.',
         },
       },
       {
@@ -314,6 +327,39 @@ export default function AiAgentCostControlPage() {
     ],
   };
 
+  const customerBudgetControlsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Per-customer AI API budget controls',
+    description: 'How to stop one customer or tenant from exhausting a shared AI API budget before upstream model, API, or MCP tool execution.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Tenant and customer attribution',
+        description: 'Attach tenant, customer, workflow, agent, route, model, and tool context to every AI API request.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Per-customer budget ceilings',
+        description: 'Check customer-specific per-request, daily, monthly, route, model, and tool budgets before forwarding the request.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Structured over-budget denials',
+        description: 'Return a denial the application or agent can handle instead of letting one customer drain shared provider spend.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: 'Receipts and chargeback evidence',
+        description: 'Record remaining budget, policy decision, denial reason, route, model, tool price, and customer attribution for finance review.',
+      },
+    ],
+  };
+
   const softwareEvaluationJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -365,6 +411,7 @@ export default function AiAgentCostControlPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(rolloutJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(comparisonJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(spendingControlsJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(customerBudgetControlsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareEvaluationJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
@@ -567,6 +614,34 @@ export default function AiAgentCostControlPage() {
 
       <section className="border-t border-gray-900 bg-black">
         <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Customer budgets</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">Set per-customer AI API spending limits before shared budget is consumed</h2>
+          <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+            If one customer can exhaust the provider account budget for everyone, the control belongs in the request path. SatGate attributes each call to a tenant or customer, prices the route/model/tool, checks the customer budget, and returns a structured denial before upstream spend happens.
+          </p>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['Attribute the customer', 'Attach tenant, customer, workflow, agent, route, model, and MCP tool context to every request.'],
+              ['Check budget first', 'Enforce per-request, daily, monthly, route, model, and tool ceilings before forwarding.'],
+              ['Deny gracefully', 'Return structured budget denials the app or agent can use to downgrade, ask for approval, or stop.'],
+              ['Preserve chargeback proof', 'Record remaining budget, decision reason, route, model, tool price, and receipt fields.'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+                <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 flex flex-wrap gap-4">
+            <Link href="/ai-api-budget-enforcement" className="inline-flex items-center gap-2 font-semibold text-cyan-300 hover:text-cyan-200">AI API budget enforcement <ArrowRight size={16} /></Link>
+            <Link href="/agent-spend-policy-template" className="inline-flex items-center gap-2 font-semibold text-purple-300 hover:text-purple-200">Generate a spend policy <ArrowRight size={16} /></Link>
+            <Link href="/roi-calculator" className="inline-flex items-center gap-2 font-semibold text-green-300 hover:text-green-200">Estimate budget risk <ArrowRight size={16} /></Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-900 bg-black">
+        <div className="max-w-6xl mx-auto px-6 py-20">
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Buying checklist</p>
           <h2 className="mb-4 text-3xl font-bold text-white">What to demand from AI agent cost-control software</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
@@ -686,6 +761,12 @@ export default function AiAgentCostControlPage() {
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate enforce AI agent budgets?</h3>
               <p className="text-gray-400 leading-relaxed">
                 SatGate checks agent identity, route, tool cost, remaining budget, revocation status, and policy in the request path before forwarding each request.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How do I stop one customer from blowing through my AI API budget?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Put per-customer AI API budget limits in the request path: attribute each request to a tenant/customer, price the model/API/MCP tool call, check remaining budget before forwarding, and return a structured denial with receipt fields when the customer is out of budget.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

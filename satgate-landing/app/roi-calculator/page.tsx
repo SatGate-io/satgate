@@ -114,6 +114,29 @@ export default function ROICalculatorPage() {
       control: 'Request-path budget enforcement before paid upstream access',
     },
   ];
+  const roiExampleJsonLdItems = roiExamples.map((example, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    item: {
+      '@type': 'CreativeWork',
+      name: example.title,
+      description: `${example.agents} agents, ${example.callsPerDay} calls per day, ${example.costPerCall} per call, ${example.loopFrequency} loop frequency, ${example.wastedCalls} wasted calls, ${example.monthlyAvoidableSpend} monthly avoidable spend, ${example.payback} payback.`,
+      about: [
+        { '@type': 'Thing', name: 'AI agent budget enforcement ROI' },
+        { '@type': 'Thing', name: example.control },
+      ],
+      additionalProperty: [
+        { '@type': 'PropertyValue', name: 'Active agents', value: example.agents },
+        { '@type': 'PropertyValue', name: 'Calls per agent per day', value: example.callsPerDay },
+        { '@type': 'PropertyValue', name: 'Average cost per call', value: example.costPerCall },
+        { '@type': 'PropertyValue', name: 'Loop frequency', value: example.loopFrequency },
+        { '@type': 'PropertyValue', name: 'Wasted calls before discovery', value: example.wastedCalls },
+        { '@type': 'PropertyValue', name: 'Monthly avoidable spend', value: example.monthlyAvoidableSpend },
+        { '@type': 'PropertyValue', name: 'Payback period', value: example.payback },
+        { '@type': 'PropertyValue', name: 'SatGate control', value: example.control },
+      ],
+    },
+  }));
 
   const webPageJsonLd = {
     '@context': 'https://schema.org',
@@ -341,13 +364,13 @@ export default function ROICalculatorPage() {
       },
       {
         '@type': 'ListItem',
-        position: 4,
+        position: 3,
         name: 'AI voice agent support desk',
         description: 'A voice agent can create ROI when successful automations exceed model, telephony, tool, escalation, and loop waste costs.',
       },
       {
         '@type': 'ListItem',
-        position: 3,
+        position: 4,
         name: 'Paid API retry storm',
         description: 'A workflow retries failed or low-confidence calls against billable APIs before humans notice the cost.',
       },
@@ -483,6 +506,11 @@ export default function ROICalculatorPage() {
       '@type': 'DataDownload',
       encodingFormat: 'text/html',
       contentUrl: 'https://satgate.io/roi-calculator',
+    },
+    mainEntity: {
+      '@type': 'ItemList',
+      name: 'AI agent ROI benchmark scenarios',
+      itemListElement: roiExampleJsonLdItems,
     },
   };
 
