@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "seo:gsc": "python3 scripts/gsc_telemetry.py",
+    "seo:gsc-sitemap": "python3 scripts/gsc_sitemap.py",
     "seo:sitemap-live": "python3 scripts/check_live_sitemap.py",
     "seo:links": "python3 scripts/internal_link_audit.py",
     "seo:machine": "python3 scripts/seo_machine.py",
