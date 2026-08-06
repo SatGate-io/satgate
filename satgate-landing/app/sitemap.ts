@@ -10,7 +10,7 @@ type SitemapEntry = {
 const baseUrl = 'https://satgate.io';
 
 const staticRoutes: SitemapEntry[] = [
-  { path: '', lastModified: '2026-05-05', changeFrequency: 'weekly', priority: 1.0 },
+  { path: '', lastModified: '2026-08-06', changeFrequency: 'weekly', priority: 1.0 },
   { path: '/govern', lastModified: '2026-08-06', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/economic-control-plane', lastModified: '2026-08-06', changeFrequency: 'weekly', priority: 0.95 },
   { path: '/economic-firewall', lastModified: '2026-08-06', changeFrequency: 'weekly', priority: 0.9 },

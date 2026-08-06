@@ -2,24 +2,24 @@ import type { Metadata } from "next";
 import HomeClient from "./components/HomeClient";
 
 export const metadata: Metadata = {
-  title: "SatGate — Agent Authority & Accountability Layer",
+  title: "SatGate — Economic Control Plane for AI Agents",
   description:
-    "SatGate prevents agent overspend and produces signed receipts your auditor can verify independently. Agent authority is governed before execution.",
+    "SatGate is the economic control plane for AI agents: govern authority, budgets, revocation, MCP tools, paid rails, and Evidence Pack proof before execution.",
   alternates: {
     canonical: "https://satgate.io",
   },
   openGraph: {
-    title: "SatGate — Agent Authority & Accountability Layer",
+    title: "SatGate — Economic Control Plane for AI Agents",
     description:
-      "Policy-to-Proof governance for enterprise agents: bounded authority before execution and Evidence Pack proof after governed decisions.",
+      "Policy-to-Proof governance for enterprise agents: bounded authority, budgets, revocation, and Evidence Pack proof before governed decisions execute.",
     url: "https://satgate.io",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "SatGate — Agent Authority & Accountability Layer",
+    title: "SatGate — Economic Control Plane for AI Agents",
     description:
-      "Policy-to-Proof governance for enterprise agents: bounded authority before execution and Evidence Pack proof after governed decisions.",
+      "Policy-to-Proof governance for enterprise agents: bounded authority, budgets, revocation, and Evidence Pack proof before governed decisions execute.",
   },
 };
 
@@ -32,7 +32,7 @@ export default function HomePage() {
         name: 'SatGate',
         url: 'https://satgate.io',
         logo: 'https://satgate.io/logo_white_transparent.png',
-        description: 'SatGate is the Agent Authority & Accountability Layer for governed agent execution: authority before execution and Evidence Pack proof through decision receipts and paid-call receipts after governed decisions.',
+        description: 'SatGate is the economic control plane and Agent Authority & Accountability Layer for governed agent execution: authority, budgets, revocation, and Evidence Pack proof before decisions execute.',
       },
       {
         '@type': 'WebSite',
@@ -42,13 +42,14 @@ export default function HomePage() {
       },
       {
         '@type': 'WebPage',
-        name: 'SatGate — Agent Authority & Accountability Layer',
+        name: 'SatGate — Economic Control Plane for AI Agents',
         url: 'https://satgate.io',
-        description: 'SatGate governs agent authority before execution so humans, platforms, and upstream APIs can trust what agents access, spend, and prove.',
+        description: 'SatGate governs agent authority, budgets, revocation, MCP tools, and paid-rail context before execution so humans, platforms, and upstream APIs can trust what agents access, spend, and prove.',
         datePublished: '2026-04-30',
-        dateModified: '2026-05-05',
+        dateModified: '2026-08-06',
         isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
         about: [
+          { '@type': 'Thing', name: 'economic control plane for AI agents' },
           { '@type': 'Thing', name: 'Policy-to-Proof governance' },
           { '@type': 'Thing', name: 'Evidence Packs' },
           { '@type': 'Thing', name: 'authority before execution' },
@@ -68,7 +69,7 @@ export default function HomePage() {
         name: 'What is SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate is the Agent Authority & Accountability Layer for governed agent execution. It sits in the request path so humans and platforms can delegate bounded authority to agents, enforce policy and budgets, and preserve Evidence Packs for governed API, MCP tool, and paid-rail decisions.',
+          text: 'SatGate is the economic control plane and Agent Authority & Accountability Layer for governed agent execution. It sits in the request path so humans and platforms can delegate bounded authority to agents, enforce policy and budgets, and preserve Evidence Packs for governed API, MCP tool, and paid-rail decisions.',
         },
       },
       {

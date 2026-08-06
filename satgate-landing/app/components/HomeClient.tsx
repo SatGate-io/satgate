@@ -99,6 +99,13 @@ const LandingPage = () => {
               Capability Auth
             </Link>
             <Link
+              href="/economic-control-plane"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              Economic Control Plane
+            </Link>
+            <Link
               href="/agent-control-plane"
               onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
@@ -287,6 +294,16 @@ const LandingPage = () => {
           <div className="mb-6">
             <Link href="/tools" className="inline-flex items-center gap-2 text-cyan-300 hover:text-cyan-200 font-semibold transition">
               View all free AI agent governance tools <ArrowRight size={16} />
+            </Link>
+          </div>
+          <div className="mb-5 rounded-xl border border-purple-800/60 bg-purple-950/15 p-5">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Category definition</p>
+            <h3 className="mb-2 text-xl font-bold text-white">Economic control plane for AI agents</h3>
+            <p className="mb-4 max-w-3xl text-sm leading-relaxed text-gray-400">
+              The operating layer that governs agent authority, budgets, MCP tool access, routing, revocation, paid-rail context, and Evidence Pack proof before autonomous requests execute.
+            </p>
+            <Link href="/economic-control-plane" className="inline-flex items-center gap-2 text-sm font-semibold text-purple-300 hover:text-purple-200">
+              Read the definition <ArrowRight size={14} />
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -710,7 +727,7 @@ const LandingPage = () => {
           <h2 className="mb-8 text-3xl font-bold text-white">Agent governance questions</h2>
           <div className="space-y-6">
             {[
-              ['What is SatGate?', 'SatGate is the Agent Authority & Accountability Layer for governed agent execution. Humans and platforms use it to delegate bounded economic authority to agents, enforce policy and budgets, prove revocation, and preserve evidence across APIs, MCP tools, and paid external calls.'],
+              ['What is SatGate?', 'SatGate is the economic control plane and Agent Authority & Accountability Layer for governed agent execution. Humans and platforms use it to delegate bounded economic authority to agents, enforce policy and budgets, prove revocation, and preserve evidence across APIs, MCP tools, and paid external calls.'],
               ['How does SatGate govern AI agents?', 'SatGate applies scoped authority, per-agent policy, revocation, and budgets before each request reaches an API or MCP tool, so unauthorized actions and expensive calls can be blocked before they happen.'],
               ['How does SatGate give agents bounded economic authority?', 'Humans and platforms define policy, budgets, scope, and delegation depth. Agents consume approved API and MCP primitives through SatGate, and every approval, denial, spend event, delegation, and revocation leaves receipt-backed proof.'],
             ].map(([question, answer]) => (
@@ -753,6 +770,7 @@ const LandingPage = () => {
             <div>
               <h4 className="mb-4 font-bold text-white">Start here</h4>
               <ul className="space-y-2 text-sm text-gray-500">
+                <li><Link href="/economic-control-plane" className="hover:text-white transition">Economic Control Plane</Link></li>
                 <li><Link href="/economic-firewall" className="hover:text-white transition">Economic Firewall</Link></li>
                 <li><Link href="/govern" className="hover:text-white transition">Enterprise</Link></li>
                 <li><Link href="/policy-to-proof" className="hover:text-white transition">Policy-to-Proof</Link></li>
