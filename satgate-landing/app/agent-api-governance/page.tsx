@@ -2,13 +2,18 @@ import Link from 'next/link';
 import { ArrowRight, BadgeCheck, Ban, Clock, Fingerprint, GitBranch, KeyRound, ShieldCheck } from 'lucide-react';
 
 export const metadata = {
-  title: 'Agent API Governance | Identity, Revocation, Budgets, Audit',
-  description: 'Govern AI agent API access with tenant identity, scoped capabilities, delegation limits, revocation, budgets, and Evidence Pack receipts.',
+  title: 'Agent API Governance: API Access Control for AI Agents',
+  description: 'Govern AI agent API access control with agent-scoped API keys, delegated authorization, tenant-bound credentials, budgets, revocation, and audit proof.',
   alternates: { canonical: 'https://satgate.io/agent-api-governance' },
   keywords: [
     'agent API governance',
     'AI agent API governance',
+    'AI agent API access control',
+    'agent API key governance',
     'agent-scoped API keys',
+    'tenant-bound agent API keys',
+    'delegated API authorization',
+    'API access governance for AI agents',
     'revocable agent credentials',
     'capability tokens for AI agents',
     'delegated API access',
@@ -17,17 +22,25 @@ export const metadata = {
     'zero trust for AI agents',
   ],
   openGraph: {
-    title: 'Agent API Governance',
-    description: 'Replace unlimited API keys with tenant-bound, scoped, revocable, budget-aware agent capabilities enforced in the request path.',
+    title: 'Agent API Governance: API Access Control for AI Agents',
+    description: 'Replace unlimited API keys with tenant-bound, scoped, revocable, budget-aware agent capabilities enforced before API execution.',
     url: 'https://satgate.io/agent-api-governance',
     type: 'article',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Agent API Governance',
-    description: 'Govern AI agent identity, delegated access, revocation, budgets, and Evidence Pack receipts before API calls execute.',
+    description: 'Govern AI agent API access control, delegated authorization, revocation, budgets, and Evidence Pack receipts before execution.',
   },
 };
+
+const accessControlChecklist = [
+  ['Agent API access control', 'Require tenant, agent, task, workflow, route, tool, budget, and policy context before an API call executes.'],
+  ['Agent API key governance', 'Replace broad static keys with scoped, expiring, revocable credentials that can be narrowed without rotating every provider secret.'],
+  ['Delegated API authorization', 'Allow parent agents to delegate only smaller authority: fewer routes, lower budgets, shorter expiry, and tighter tool access.'],
+  ['Tenant-bound credentials', 'Bind each credential to a customer, workspace, workflow, agent, and Evidence Pack so cross-tenant access is denied by default.'],
+  ['Revocation proof', 'Record the revocation event and first denied request after revoke so security can prove the kill switch worked.'],
+];
 
 const principles = [
   {
@@ -71,12 +84,17 @@ export default function AgentApiGovernancePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-08-05',
+    dateModified: '2026-08-06',
     mainEntityOfPage: 'https://satgate.io/agent-api-governance',
     about: [
       { '@type': 'Thing', name: 'agent API governance' },
+      { '@type': 'Thing', name: 'AI agent API access control' },
+      { '@type': 'Thing', name: 'agent API key governance' },
       { '@type': 'Thing', name: 'revocable agent credentials' },
       { '@type': 'Thing', name: 'capability tokens for AI agents' },
+      { '@type': 'Thing', name: 'tenant-bound agent API keys' },
+      { '@type': 'Thing', name: 'delegated API authorization' },
+      { '@type': 'Thing', name: 'API access governance for AI agents' },
       { '@type': 'Thing', name: 'delegated API access control' },
       { '@type': 'Thing', name: 'tenant identity for AI agents' },
       { '@type': 'Thing', name: 'agent-scoped API keys' },
@@ -88,6 +106,30 @@ export default function AgentApiGovernancePage() {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is AI agent API access control?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AI agent API access control is the practice of checking the agent, tenant, task, route, tool scope, credential caveats, budget, delegation rights, expiry, and revocation state before an API request executes.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How is agent API key governance different from normal API key management?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Normal API key management tracks ownership and rotation. Agent API key governance also limits what an autonomous agent can do, spend, delegate, and continue doing at runtime.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is delegated API authorization for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Delegated API authorization lets a parent agent hand off only narrower API authority to a worker agent, with lower budgets, shorter expiry, fewer routes, and separate audit receipts.',
+        },
+      },
       {
         '@type': 'Question',
         name: 'What is agent API governance?',
@@ -178,6 +220,19 @@ export default function AgentApiGovernancePage() {
     ],
   };
 
+  const accessControlJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AI agent API access control checklist',
+    description: 'The request-path controls required for AI agent API key governance, delegated authorization, tenant-bound credentials, revocation, and audit proof.',
+    itemListElement: accessControlChecklist.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -192,6 +247,7 @@ export default function AgentApiGovernancePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(requirementsJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(accessControlJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -202,11 +258,11 @@ export default function AgentApiGovernancePage() {
           </div>
 
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight max-w-5xl mb-8">
-            Agent API Governance Starts Where API Keys Fail
+            Agent API governance starts where API keys fail
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-10">
-            AI agents need more than static API keys. They need scoped capabilities, delegation limits, expiry, revocation, and policy checks before every API request — with a receipt proving each decision.
+            AI agents need more than static API keys. They need API access control with scoped capabilities, tenant-bound credentials, delegated authorization, expiry, revocation, budget checks, and policy checks before every API request — with a receipt proving each decision.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
@@ -256,6 +312,24 @@ export default function AgentApiGovernancePage() {
             <Link href="/agent-api-key-risk-assessment" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-yellow-500">
               API key risk assessment <ArrowRight size={16} />
             </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-gray-900 bg-black">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-yellow-300">API access checklist</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">AI agent API access control needs more than key rotation</h2>
+          <p className="mb-10 max-w-4xl text-lg leading-relaxed text-gray-300">
+            Agent API key governance is not just inventory and rotation. It is runtime control: which agent can call which API, for which tenant and task, with which budget, whether it can delegate, and whether the next request should be denied.
+          </p>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-5">
+            {accessControlChecklist.map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-5">
+                <h3 className="mb-2 text-base font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -400,6 +474,24 @@ evidence:
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-yellow-300">FAQ</p>
           <h2 className="mb-8 text-3xl font-bold text-white">Agent API governance questions</h2>
           <div className="grid gap-5 md:grid-cols-2 mb-16">
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is AI agent API access control?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                AI agent API access control checks the agent, tenant, task, route, tool scope, credential caveats, budget, delegation rights, expiry, and revocation state before an API request executes.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How is agent API key governance different from normal API key management?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Normal API key management tracks ownership and rotation. Agent API key governance also limits what an autonomous agent can do, spend, delegate, and continue doing at runtime.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is delegated API authorization for AI agents?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Delegated API authorization lets a parent agent hand off only narrower API authority to a worker agent, with lower budgets, shorter expiry, fewer routes, and separate audit receipts.
+              </p>
+            </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is agent API governance?</h3>
               <p className="text-gray-400 leading-relaxed">
