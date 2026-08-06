@@ -2,11 +2,17 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: 'AI Agent Governance Blog: Cost Control, MCP, and Policy-to-Proof',
-  description: 'Guides on AI agent governance, Policy-to-Proof governance, MCP budget enforcement, paid-rail context, capability tokens, API monetization, and cost control.',
+  title: 'AI Agent Governance Blog: MCP, Token Cost Controls, and Budgets',
+  description: 'Guides for limiting autonomous agent actions through MCP, AI gateway token-level cost controls, runaway token costs, budgets, and proof.',
   alternates: { canonical: 'https://satgate.io/blog' },
   keywords: [
     'AI agent governance blog',
+    'AI agent API blog',
+    'agent tools blog',
+    'AI gateway tools with token-level cost controls',
+    'how do I limit what an autonomous agent can do through MCP',
+    'runaway token costs caused by AI agent tool access',
+    'model context protocol expense tracker',
     'AI agent cost control',
     'economic firewall',
     'MCP governance',
@@ -16,15 +22,15 @@ export const metadata = {
     'API economics',
   ],
   openGraph: {
-    title: 'AI Agent Governance Blog: Cost Control, MCP, and Policy-to-Proof',
-    description: 'Guides on AI agent governance, Policy-to-Proof governance, MCP budget enforcement, paid-rail context, capability tokens, API monetization, and cost control.',
+    title: 'AI Agent Governance Blog: MCP, Token Cost Controls, and Budgets',
+    description: 'Guides for limiting autonomous agent actions through MCP, token-level cost controls, runaway token costs, budgets, and proof.',
     url: 'https://satgate.io/blog',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AI Agent Governance Blog: Cost Control, MCP, and Policy-to-Proof',
-    description: 'AI agent governance, Policy-to-Proof governance, MCP budget enforcement, paid-rail context, capability tokens, API monetization, and cost control.',
+    title: 'AI Agent Governance Blog',
+    description: 'MCP governance, token-level cost controls, autonomous agent limits, budgets, and Policy-to-Proof evidence.',
   },
 };
 
@@ -300,10 +306,14 @@ export default function BlogPage() {
     name: 'SatGate AI Agent Governance Blog',
     description: metadata.description,
     url: 'https://satgate.io/blog',
-    dateModified: '2026-05-04',
+    dateModified: '2026-08-06',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent governance' },
+      { '@type': 'Thing', name: 'AI gateway tools with token-level cost controls' },
+      { '@type': 'Thing', name: 'how do I limit what an autonomous agent can do through MCP' },
+      { '@type': 'Thing', name: 'runaway token costs caused by AI agent tool access' },
+      { '@type': 'Thing', name: 'model context protocol expense tracker' },
       { '@type': 'Thing', name: 'Policy-to-Proof governance' },
       { '@type': 'Thing', name: 'MCP budget enforcement' },
       { '@type': 'Thing', name: 'paid-rail context' },
@@ -317,7 +327,7 @@ export default function BlogPage() {
     '@type': 'ItemList',
     name: 'SatGate AI agent governance blog posts',
     description: metadata.description,
-    dateModified: '2026-05-04',
+    dateModified: '2026-08-06',
     about: blogCollectionJsonLd.about,
     itemListElement: posts.map((post, index) => ({
       '@type': 'ListItem',
@@ -350,6 +360,22 @@ export default function BlogPage() {
       },
       {
         '@type': 'Question',
+        name: 'How do I limit what an autonomous agent can do through MCP?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Start with MCP budget enforcement, MCP proxy configuration, capability tokens, and Evidence Pack receipts. The SatGate blog links to implementation guides that show how to limit MCP tools by agent, task, tenant, budget, and revocation state before tool calls execute.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Which guides cover AI gateway tools with token-level cost controls?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Use the OpenAI budget limits guide, LLM cost management guide, AI agent cost control guide, MCP budget enforcement guide, and runaway agent cost calculator to evaluate token-level cost controls and request-path budget enforcement.',
+        },
+      },
+      {
+        '@type': 'Question',
         name: 'How is SatGate different from an LLM dashboard or API gateway?',
         acceptedAnswer: {
           '@type': 'Answer',
@@ -370,11 +396,34 @@ export default function BlogPage() {
         </Link>
         
         <div className="mb-12">
-          <h1 className="text-4xl font-bold mb-4">Blog</h1>
+          <h1 className="text-4xl font-bold mb-4">AI Agent Governance Blog</h1>
           <p className="text-xl text-gray-400">
-            Insights on API economics, agent governance, and the future of machine-to-machine commerce.
+            Guides on MCP governance, token-level cost controls, autonomous agent limits, budgets, and Policy-to-Proof evidence.
           </p>
         </div>
+
+        <section className="mb-12 rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6">
+          <div className="mb-5">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Start here</p>
+            <h2 className="mb-2 text-2xl font-bold text-white">Find the right guide for AI gateway cost controls and MCP limits</h2>
+            <p className="text-gray-400">
+              If the question is how to limit autonomous agent actions, prevent runaway token costs, or track Model Context Protocol expenses, these are the strongest starting points.
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {[
+              ['/blog/how-to-add-budget-limits-to-openai-api-calls', 'Token-level cost controls', 'How AI gateways enforce OpenAI and LLM budget limits before each request.'],
+              ['/mcp-budget-enforcement', 'Limit MCP tool access', 'Set per-tool budgets, scopes, deny rules, and Evidence Pack receipts for MCP calls.'],
+              ['/blog/mcp-budget-enforcement-guide', 'MCP budget enforcement guide', 'A practical guide to capping MCP tool spend and stopping runaway tool access.'],
+              ['/runaway-agent-cost-calculator', 'Runaway token cost calculator', 'Model retry loops, fanout, tool calls, and autonomous agent overspend risk.'],
+            ].map(([href, title, body]) => (
+              <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black/60 p-4 transition hover:border-purple-500/50 hover:bg-purple-950/20">
+                <h3 className="mb-1 font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <section className="mb-12 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
           <div className="mb-5">
@@ -456,6 +505,8 @@ export default function BlogPage() {
             {[
               ['What does the SatGate blog cover?', 'The SatGate blog covers AI agent governance, Policy-to-Proof governance, AI agent cost control, MCP budget enforcement, revocable capability tokens, paid-rail context, and API economics for autonomous agents.'],
               ['Where should I start if I need to control AI agent spend?', 'Start with the AI agent cost control guide, the economic firewall definition, the ROI calculator, and the MCP budget enforcement guide to understand the request-path controls needed before agents spend.'],
+              ['How do I limit what an autonomous agent can do through MCP?', 'Start with MCP budget enforcement, MCP proxy configuration, capability tokens, and Evidence Pack receipts. These guides show how to limit MCP tools by agent, task, tenant, budget, and revocation state before tool calls execute.'],
+              ['Which guides cover AI gateway tools with token-level cost controls?', 'Use the OpenAI budget limits guide, LLM cost management guide, AI agent cost control guide, MCP budget enforcement guide, and runaway agent cost calculator to evaluate token-level cost controls and request-path budget enforcement.'],
               ['How is SatGate different from an LLM dashboard or API gateway?', 'LLM dashboards report spend after it happens and traditional API gateways mainly route traffic. SatGate sits in the request path to observe, control, and prove agent/API activity at the gateway before forwarding.'],
             ].map(([question, answer]) => (
               <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">

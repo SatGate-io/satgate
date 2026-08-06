@@ -53,7 +53,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/integrations', lastModified: '2026-05-03', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/pricing', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/security', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/blog', lastModified: '2026-06-04', changeFrequency: 'weekly', priority: 0.8 },
+  { path: '/blog', lastModified: '2026-08-06', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/compare', lastModified: '2026-08-05', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/compare/aws-agentcore-payments', lastModified: '2026-05-10', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/compare/cloudflare-ai-gateway', lastModified: '2026-05-10', changeFrequency: 'monthly', priority: 0.8 },
