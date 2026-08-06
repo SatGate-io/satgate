@@ -24,7 +24,7 @@ Preserve Evidence Pack receipts for allowed, denied, delegated, revoked, and pai
 ## Category Definition
 An economic control plane for AI agents is the request-path layer that governs authority, budget, tool access, revocation, delegation, paid-rail context, and Evidence Pack proof before autonomous agents reach APIs, models, MCP servers, or paid services.
 
-An economic firewall is a request-path control layer that governs AI agent access, spend, budgets, routing, Evidence Pack receipts, and paid-rail context at the gateway before forwarding to upstream APIs.
+An economic firewall is a request-path control layer that decides whether an AI agent may access, spend, delegate, route, or pay before an upstream API, model, MCP tool, or paid service call executes. Minimum controls include agent and tenant identity, scoped authority, per-request and period budgets, route and tool policy, revocation status, structured denials, and Evidence Pack receipt fields.
 
 Traditional API gateways route traffic. Dashboards report spend after the fact. Economic firewalls enforce economic policy before autonomous agents spend money.
 
