@@ -15,6 +15,7 @@ export const metadata = {
     'Model Context Protocol governance',
     'MCP proxy',
     'MCP tool spend limits',
+    'economic control plane for AI agents',
   ],
   openGraph: {
     title: 'MCP Governance: Authority, Policy, and Audit Receipts',
@@ -71,7 +72,7 @@ export default function McpGovernancePage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-08-05',
+    dateModified: '2026-08-06',
     mainEntityOfPage: 'https://satgate.io/mcp-governance',
     about: [
       { '@type': 'Thing', name: 'MCP governance' },
@@ -81,6 +82,7 @@ export default function McpGovernancePage() {
       { '@type': 'Thing', name: 'agent tool spend limits' },
       { '@type': 'Thing', name: 'request-path control for AI agents' },
       { '@type': 'Thing', name: 'capability-based authorization for MCP tools' },
+      { '@type': 'Thing', name: 'economic control plane for AI agents' },
     ],
   };
 
@@ -412,6 +414,7 @@ evidence:
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               ['/mcp-gateway', 'MCP gateway', 'Use SatGate as the commercial MCP gateway hub for authority checks, budgets, and Evidence Packs.'],
+              ['/economic-control-plane', 'Economic control plane', 'Place MCP governance inside the broader layer for authority, budgets, routing, revocation, paid context, and proof.'],
               ['/capability-auth', 'Capability-based authorization', 'Replace standing MCP tool authority with scoped, revocable, budget-aware capabilities.'],
               ['/policy-to-proof', 'Policy-to-Proof', 'See how MCP allow, deny, delegate, and revoke decisions become Evidence Pack proof.'],
               ['/govern', 'Govern AI agents', 'Govern MCP authority before tool execution.'],

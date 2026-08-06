@@ -19,6 +19,7 @@ export const metadata = {
     'AI agent tool budgets',
     'Model Context Protocol governance',
     'MCP Evidence Pack receipts',
+    'economic control plane for AI agents',
   ],
   openGraph: {
     title: 'MCP Budget Enforcement: Tool Spend Limits for AI Agents',
@@ -102,6 +103,7 @@ export default function McpBudgetEnforcementPage() {
       { '@type': 'Thing', name: 'AI agent tool budgets' },
       { '@type': 'Thing', name: 'per-tool pricing policy' },
       { '@type': 'Thing', name: 'L402 paid MCP tool access' },
+      { '@type': 'Thing', name: 'economic control plane for AI agents' },
     ],
   };
 
@@ -371,6 +373,7 @@ export default function McpBudgetEnforcementPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               ['/mcp-governance', 'MCP governance', 'Control, audit, and revoke MCP tool activity.'],
+              ['/economic-control-plane', 'Economic control plane', 'Understand where MCP budget enforcement fits in the broader request-path control layer.'],
               ['/mcp-tool-cost-policy-generator', 'MCP policy generator', 'Generate a concrete tool-cost policy.'],
               ['/blog/mcp-budget-enforcement-guide', 'Budget enforcement guide', 'Deep dive on MCP budgets and spend controls.'],
               ['/blog/hard-capping-mcp-tool-spend', 'Hard-cap MCP spend', 'How to stop runaway tool loops.'],

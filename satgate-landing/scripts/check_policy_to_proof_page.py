@@ -693,7 +693,6 @@ mcp_authority_forbidden_phrases = {
         "Economic firewall category",
         "Generate MCP tool policy",
         "control spend and access",
-        "economic control plane",
         "Cursor MCP proxy",
         "Agents call tools without per-tool spend caps",
     ],

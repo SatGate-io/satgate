@@ -18,6 +18,7 @@ export const metadata = {
     'capability tokens for AI agents',
     'delegated API access',
     'AI agent access control',
+    'economic control plane for AI agents',
     'macaroons vs API keys',
     'zero trust for AI agents',
   ],
@@ -99,6 +100,7 @@ export default function AgentApiGovernancePage() {
       { '@type': 'Thing', name: 'tenant identity for AI agents' },
       { '@type': 'Thing', name: 'agent-scoped API keys' },
       { '@type': 'Thing', name: 'request-path API policy' },
+      { '@type': 'Thing', name: 'economic control plane for AI agents' },
     ],
   };
 
@@ -534,6 +536,7 @@ evidence:
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               ['/agent-api-key-risk-assessment', 'Agent API key risk assessment', 'Score static key risk across scope, budget, expiry, revocation, delegation, and audit gaps.'],
+              ['/economic-control-plane', 'Economic control plane', 'See how API governance fits the broader authority, budget, revocation, routing, and proof layer.'],
               ['/capability-auth', 'Capability-based authorization', 'Replace broad API keys with scoped, revocable, budget-aware capabilities.'],
               ['/mcp-gateway', 'MCP gateway', 'Apply agent API governance to MCP tool calls before execution.'],
               ['/revocable-capability-token-policy-template', 'Capability policy template', 'Generate scoped, expiring, budget-aware authority policy in YAML or JSON.'],
