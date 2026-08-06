@@ -7,6 +7,7 @@ export const metadata = {
   alternates: { canonical: 'https://satgate.io/economic-firewall' },
   keywords: [
     'economic firewall',
+    'economic control plane for AI agents',
     'economic firewall for AI agents',
     'AI agent spend control',
     'AI agent budget enforcement',
@@ -64,7 +65,7 @@ export default function EconomicFirewallPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-08-04',
+    dateModified: '2026-08-05',
     mainEntityOfPage: 'https://satgate.io/economic-firewall',
   };
 
@@ -77,7 +78,15 @@ export default function EconomicFirewallPage() {
         name: 'What is an economic firewall?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An economic firewall is an inline control layer that governs what AI agents can access, how much they can spend, what they can delegate, and which Evidence Pack artifacts are captured before each API request reaches the upstream provider.',
+          text: 'An economic firewall is an inline control layer and economic control plane for AI agents. It governs what agents can access, how much they can spend, what they can delegate, and which Evidence Pack artifacts are captured before each API request reaches the upstream provider.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is an economic control plane for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'An economic control plane for AI agents is the request-path system that connects agent identity, scoped authority, budget enforcement, payment context, denial reasons, revocation, and audit evidence into one allow or deny decision before execution.',
         },
       },
       {
@@ -192,6 +201,33 @@ export default function EconomicFirewallPage() {
     ],
   };
 
+  const categoryTermsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Economic control plane terms for AI agents',
+    description: 'How SatGate defines the economic firewall and economic control plane category for autonomous agent traffic.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Economic control plane for AI agents',
+        description: 'The request-path system that joins identity, authority, budgets, paid-rail context, revocation, denial reasons, and Evidence Pack proof before an agent request executes.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Economic firewall',
+        description: 'The enforcement boundary that allows, denies, routes, meters, delegates, records, or charges agent/API activity based on policy and remaining budget.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Request-layer cost control',
+        description: 'Budget and spend enforcement that happens before upstream model, API, MCP tool, or paid-resource execution instead of after a bill arrives.',
+      },
+    ],
+  };
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -208,6 +244,7 @@ export default function EconomicFirewallPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(implementationPathJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(controlMatrixJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(categoryTermsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
@@ -223,6 +260,9 @@ export default function EconomicFirewallPage() {
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-3xl leading-relaxed mb-6">
             An economic firewall controls what autonomous agents can access, how much they can spend, what they can delegate, and which Evidence Pack artifacts are captured before each API request reaches the upstream provider.
+          </p>
+          <p className="max-w-3xl text-lg leading-relaxed text-gray-400 mb-6">
+            In SatGate language, the economic firewall is the enforcement boundary inside the broader economic control plane for AI agents: identity, authority, budgets, payment context, revocation, denial, and proof in one request-path decision.
           </p>
           <p className="max-w-3xl rounded-2xl border border-purple-900/50 bg-purple-950/20 p-5 text-lg leading-relaxed text-purple-100 mb-10">
             Think of this as the legacy SEO/category term. The current SatGate product narrative is Policy-to-Proof governance: authority before execution, Observe/Control/Prove, and signed receipts that can feed Evidence Packs on supported governed paths.
@@ -252,6 +292,38 @@ export default function EconomicFirewallPage() {
             <p className="mt-5 text-gray-400 text-lg leading-relaxed">
               It extends the API gateway pattern with agent identity, scoped authority, cost attribution, budget enforcement, revocation, denial reasons, Evidence Pack capture, and payment context — the pieces autonomous agent traffic needs and traditional routing does not provide.
             </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-gray-900 bg-black">
+        <div className="max-w-6xl mx-auto px-6 py-14">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Direct answer</p>
+          <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+            <div>
+              <h2 className="mb-4 text-3xl font-bold text-white">What is an economic control plane for AI agents?</h2>
+              <p className="text-lg leading-relaxed text-gray-300">
+                An economic control plane for AI agents is the request-path system that connects agent identity, scoped authority, budget enforcement, payment context, denial reasons, revocation, and audit evidence before execution.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
+              <p className="mb-4 text-gray-400">
+                The phrase matters because agent traffic is no longer just authenticated traffic. It is delegated, metered, tool-calling, retrying, sometimes paid traffic. A control plane has to answer the economic question in real time: may this agent spend authority or money on this action right now?
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {[
+                  ['Observe', 'Attribute every call to the tenant, agent, route, model, workflow, MCP tool, and paid rail.'],
+                  ['Control', 'Deny, allow, route, meter, revoke, or require payment before upstream execution.'],
+                  ['Prove', 'Preserve receipts, denial reasons, policy inputs, and Evidence Pack export fields.'],
+                  ['Improve', 'Use observed risk to tighten budgets, caveats, revocation, and tool policy.'],
+                ].map(([title, body]) => (
+                  <div key={title} className="rounded-xl border border-gray-800 bg-black p-4">
+                    <h3 className="mb-1 font-bold text-white">{title}</h3>
+                    <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -493,6 +565,7 @@ export default function EconomicFirewallPage() {
           <div className="grid gap-5 md:grid-cols-2">
             {[
               ['What is an economic firewall?', 'An economic firewall is an inline control layer that governs what AI agents can access, how much they can spend, what they can delegate, and which Evidence Pack artifacts are captured before each API request reaches the upstream provider.'],
+              ['What is an economic control plane for AI agents?', 'An economic control plane for AI agents is the request-path system that connects agent identity, scoped authority, budget enforcement, payment context, denial reasons, revocation, and audit evidence into one allow or deny decision before execution.'],
               ['How is an economic firewall different from rate limiting?', 'Rate limiting counts requests. An economic firewall enforces scoped authority, budgets, revocation, agent identity, tool policy, denial reasons, and payment context in the request path.'],
               ['Why do AI agents need economic firewalls?', 'Autonomous agents can loop, delegate, retry, and call paid tools without a human approving each request. SatGate denies unauthorized actions before execution and preserves auditable proof afterward.'],
               ['Is an economic firewall the same as an API gateway?', 'No. An API gateway can route and secure traffic, but an economic firewall adds per-agent authority, budget caveats, delegated credentials, denial reasons, revocation proof, and rail-aware payment context before requests execute.'],
