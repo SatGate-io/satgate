@@ -1,15 +1,21 @@
 import Link from 'next/link';
-import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptText } from 'lucide-react';
+import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptText, ShieldCheck, Tags } from 'lucide-react';
 
 export const metadata = {
-  title: 'MCP Cost Control | Budget Enforcement for Tool-Calling Agents',
-  description: 'Control MCP tool costs with per-tool budgets, scoped credentials, revocation, Evidence Pack receipts, and request-path enforcement.',
+  title: 'MCP Cost Control: Tool Spend Limits and Spend Attribution',
+  description: 'Set MCP tool spend limits, attribute agent tool costs, and enforce MCP cost policy before tool execution with SatGate.',
   alternates: { canonical: 'https://satgate.io/mcp-cost-control' },
   keywords: [
     'MCP cost control',
     'MCP budget enforcement',
     'MCP tool cost control',
     'MCP spend control',
+    'MCP tool spend limits',
+    'MCP spend attribution',
+    'MCP cost policy',
+    'MCP cost dashboard',
+    'MCP tool cost calculator',
+    'MCP tool spend limits for AI agents',
     'tool calling budget enforcement',
     'AI agent tool cost control',
     'economic firewall',
@@ -17,17 +23,25 @@ export const metadata = {
     'AI agent cost control',
   ],
   openGraph: {
-    title: 'MCP Cost Control | Budget Enforcement for Tool-Calling Agents',
-    description: 'Control MCP tool costs with per-tool budgets, risk tiers, scoped credentials, revocation, Evidence Pack receipts, and request-path enforcement.',
+    title: 'MCP Cost Control: Tool Spend Limits and Spend Attribution',
+    description: 'Set MCP tool spend limits, attribute agent tool costs, and enforce MCP cost policy before tool execution with SatGate.',
     url: 'https://satgate.io/mcp-cost-control',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MCP Cost Control | Budget Enforcement for Tool-Calling Agents',
-    description: 'Control MCP tool costs with per-tool budgets, risk tiers, scoped credentials, revocation, Evidence Pack receipts, and request-path enforcement.',
+    title: 'MCP Cost Control: Tool Spend Limits and Spend Attribution',
+    description: 'Set MCP tool spend limits, attribute agent tool costs, and enforce MCP cost policy before tool execution with SatGate.',
   },
 };
+
+const spendModel = [
+  { icon: Tags, title: 'Tool price', body: 'Map each MCP tool to expected cost, metering unit, vendor, risk tier, and escalation path before agents can call it.' },
+  { icon: ShieldCheck, title: 'Spend limit', body: 'Apply per-tool, per-agent, per-tenant, per-workflow, and per-day ceilings at the gateway instead of waiting for billing alerts.' },
+  { icon: Bot, title: 'Attribution label', body: 'Attach agent, user, tenant, workflow, route, MCP server, tool name, and policy version to every allowed or denied call.' },
+  { icon: Ban, title: 'Enforcement action', body: 'Allow, deny, downgrade, require approval, route to a cheaper provider, revoke authority, or stop a runaway sequence before cost is created.' },
+  { icon: ReceiptText, title: 'Evidence receipt', body: 'Write an Evidence Pack entry with estimated cost, remaining budget, policy decision, request path, and execution outcome.' },
+];
 
 const controls = [
   { icon: Bot, title: 'Agent identity', body: 'Attribute requests to the tenant, agent, task, workflow, route, model, MCP tool, and delegated sub-agent.' },
@@ -42,15 +56,20 @@ export default function Page() {
   const webPageJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'MCP Cost Control | Budget Enforcement for Tool-Calling Agents',
+    name: 'MCP Cost Control: Tool Spend Limits and Spend Attribution',
     url: 'https://satgate.io/mcp-cost-control',
     description: metadata.description,
     datePublished: '2026-05-01',
-    dateModified: '2026-05-03',
+    dateModified: '2026-08-06',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'MCP cost control' },
       { '@type': 'Thing', name: 'MCP tool cost control' },
+      { '@type': 'Thing', name: 'MCP tool spend limits' },
+      { '@type': 'Thing', name: 'MCP spend attribution' },
+      { '@type': 'Thing', name: 'MCP cost policy' },
+      { '@type': 'Thing', name: 'MCP cost dashboard' },
+      { '@type': 'Thing', name: 'MCP tool cost calculator' },
       { '@type': 'Thing', name: 'tool-calling budget enforcement' },
       { '@type': 'Thing', name: 'AI agent tool cost control' },
       { '@type': 'Thing', name: 'request-path MCP policy' },
@@ -66,9 +85,22 @@ export default function Page() {
     description: metadata.description,
     url: 'https://satgate.io/mcp-cost-control',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
-    featureList: ['Request-path budget enforcement', 'AI agent spend caps', 'MCP tool cost control', 'Revocable credentials', 'Audit trails'],
+    dateModified: '2026-08-06',
+    featureList: ['Request-path budget enforcement', 'MCP tool spend limits', 'MCP spend attribution', 'MCP cost policy', 'MCP cost dashboard controls', 'Revocable credentials', 'Audit trails'],
     audience: { '@type': 'Audience', audienceType: 'AI platform, MCP, finance, and security teams' },
+  };
+
+  const spendModelJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'MCP cost control model',
+    description: 'The controls an MCP gateway needs to enforce tool spend limits before execution.',
+    itemListElement: spendModel.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.title,
+      description: item.body,
+    })),
   };
 
   const faqJsonLd = {
@@ -80,6 +112,9 @@ export default function Page() {
       { '@type': 'Question', name: 'How does SatGate help?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate sits in the request path and checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before forwarding the request.' } },
       { '@type': 'Question', name: 'How is MCP cost control different from LLM cost control?', acceptedAnswer: { '@type': 'Answer', text: 'LLM cost control focuses on model and token usage. MCP cost control covers tool calls that can trigger paid search, browser automation, cloud actions, SaaS APIs, data lookups, code execution, or delegated workflows outside the LLM bill.' } },
       { '@type': 'Question', name: 'Where should MCP tool cost policy be enforced?', acceptedAnswer: { '@type': 'Answer', text: 'MCP tool cost policy should be enforced in the request path before the MCP server executes the tool, so expensive calls can be blocked, downgraded, routed, approved, revoked, paid, or recorded before cost is created.' } },
+      { '@type': 'Question', name: 'How do teams set MCP tool spend limits?', acceptedAnswer: { '@type': 'Answer', text: 'Teams set MCP tool spend limits by pricing each tool, grouping limits by agent, tenant, workflow, route, and time window, then enforcing those limits at the gateway before the MCP server executes the tool.' } },
+      { '@type': 'Question', name: 'What is MCP spend attribution?', acceptedAnswer: { '@type': 'Answer', text: 'MCP spend attribution connects every tool call to the agent, user, tenant, workflow, route, MCP server, tool name, policy version, and decision that caused the spend or blocked it.' } },
+      { '@type': 'Question', name: 'Is an MCP cost dashboard enough?', acceptedAnswer: { '@type': 'Answer', text: 'An MCP cost dashboard helps finance and platform teams see spend, but it is not enough for autonomous agents. Tool spend limits need request-path enforcement so expensive calls can be stopped before invoices grow.' } },
     ],
   };
 
@@ -97,6 +132,7 @@ export default function Page() {
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(spendModelJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
@@ -109,8 +145,34 @@ export default function Page() {
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Govern MCP tool spend <ArrowRight size={18} /></Link>
             <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Generate MCP policy</Link>
-            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">See Policy-to-Proof</Link>
+            <Link href="/runaway-agent-cost-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Estimate runaway cost</Link>
           </div>
+        </div>
+      </section>
+
+      <section className="border-b border-gray-900 bg-gray-950/50">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <div>
+              <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Direct answer</p>
+              <h2 className="max-w-3xl text-3xl font-bold text-white">MCP cost control means tool spend limits before execution</h2>
+            </div>
+            <Link href="/mcp-budget-enforcement" className="inline-flex items-center gap-2 font-semibold text-cyan-200 transition hover:text-cyan-100">
+              Compare budget enforcement <ArrowRight size={18} />
+            </Link>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-5">
+            {spendModel.map(({ icon: Icon, title, body }) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black p-5">
+                <Icon className="mb-4 text-cyan-300" size={24} />
+                <h3 className="mb-2 text-base font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-8 max-w-4xl text-lg leading-relaxed text-gray-300">
+            A dashboard can show MCP spend after the fact. SatGate turns the dashboard into an economic firewall by enforcing MCP cost policy on the request path: price the tool, check the remaining limit, attribute the caller, make the allow or deny decision, and write the receipt before the MCP server runs.
+          </p>
         </div>
       </section>
 
@@ -119,7 +181,7 @@ export default function Page() {
           <h2 className="mb-6 text-3xl font-bold text-white">The control point is before the call</h2>
           <div className="space-y-5 text-lg leading-relaxed text-gray-300">
             <p>Autonomous agents can generate real costs through model calls, API requests, MCP tools, delegated sub-agents, retries, and background workflows. If the policy check happens after the request, the money is already spent.</p>
-            <p>SatGate enforces economic policy at the gateway boundary. Every important request can be evaluated against budget, scope, identity, revocation, route, tool, receipt, and audit rules at the gateway before forwarding.</p>
+            <p>SatGate enforces economic policy at the gateway boundary. Every important request can be evaluated against budget, scope, identity, revocation, route, MCP tool, tool price, spend attribution, receipt, and audit rules at the gateway before forwarding.</p>
             <p>That is the difference between cost reporting and economic control.</p>
           </div>
         </div>
@@ -185,6 +247,24 @@ export default function Page() {
                 MCP tool cost policy should be enforced in the request path before the MCP server executes the tool, so expensive calls can be blocked, downgraded, routed, approved, revoked, paid, or recorded before cost is created.
               </p>
             </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">How do teams set MCP tool spend limits?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Teams set MCP tool spend limits by pricing each tool, grouping limits by agent, tenant, workflow, route, and time window, then enforcing those limits at the gateway before the MCP server executes the tool.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">What is MCP spend attribution?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                MCP spend attribution connects every tool call to the agent, user, tenant, workflow, route, MCP server, tool name, policy version, and decision that caused the spend or blocked it.
+              </p>
+            </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Is an MCP cost dashboard enough?</h3>
+              <p className="text-gray-400 leading-relaxed">
+                An MCP cost dashboard helps finance and platform teams see spend, but it is not enough for autonomous agents. Tool spend limits need request-path enforcement so expensive calls can be stopped before invoices grow.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -195,6 +275,7 @@ export default function Page() {
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate is the economic firewall for AI agents: observe every MCP tool call, enforce spend before execution, and preserve receipts for policy, revocation, and access decisions.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Govern MCP tool spend <ArrowRight size={18} /></Link>
+            <Link href="/mcp-gateway" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Review MCP gateway</Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Review Policy-to-Proof</Link>
           </div>
         </div>
