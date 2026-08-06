@@ -3,11 +3,15 @@ import ToolLeadCaptureCta from '../components/ToolLeadCaptureCta';
 import { ArrowRight, BarChart3, Bot, Clock, DollarSign, Download, Gauge, ShieldCheck, Workflow, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'AI Agent Runaway Spend Benchmark',
-  description: 'Original benchmark modeling how fast autonomous AI agents can create runaway API, model, and MCP tool spend without request-path budget enforcement.',
+  title: 'AI Agent Runaway Spend Benchmark: Constraint Violations',
+  description: 'A benchmark for evaluating outcome-driven constraint violations in autonomous AI agents: runaway spend, MCP tool fanout, loops, and budgets.',
   alternates: { canonical: 'https://satgate.io/ai-agent-runaway-spend-benchmark' },
   keywords: [
     'AI agent runaway spend benchmark',
+    'benchmark for evaluating outcome-driven constraint violations in autonomous AI agents',
+    'outcome-driven constraint violations autonomous AI agents',
+    'autonomous AI agent constraint violation benchmark',
+    'runaway AI agent',
     'AI agent cost benchmark',
     'runaway AI agent spend',
     'agent loop cost benchmark',
@@ -16,15 +20,15 @@ export const metadata = {
     'economic firewall benchmark',
   ],
   openGraph: {
-    title: 'AI Agent Runaway Spend Benchmark',
-    description: 'A practical benchmark for agent loops, retries, MCP tool fanout, detection delay, and request-path budget enforcement.',
+    title: 'AI Agent Runaway Spend Benchmark: Constraint Violations',
+    description: 'A benchmark for outcome-driven constraint violations: agent loops, retries, MCP tool fanout, detection delay, and request-path budget enforcement.',
     url: 'https://satgate.io/ai-agent-runaway-spend-benchmark',
     type: 'article',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AI Agent Runaway Spend Benchmark',
-    description: 'How fast autonomous agents can burn API and MCP tool budget without authority-before-execution controls.',
+    title: 'Runaway AI Agent Benchmark',
+    description: 'Outcome-driven constraint violations and runaway spend scenarios for autonomous AI agents.',
   },
 };
 
@@ -47,15 +51,19 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'AI Agent Runaway Spend Benchmark',
+    headline: 'AI Agent Runaway Spend Benchmark: Constraint Violations',
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-runaway-spend-benchmark',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-05-03',
+    dateModified: '2026-08-06',
     about: [
       { '@type': 'Thing', name: 'AI agent runaway spend benchmark' },
+      { '@type': 'Thing', name: 'benchmark for evaluating outcome-driven constraint violations in autonomous AI agents' },
+      { '@type': 'Thing', name: 'outcome-driven constraint violations autonomous AI agents' },
+      { '@type': 'Thing', name: 'autonomous AI agent constraint violation benchmark' },
+      { '@type': 'Thing', name: 'runaway AI agent' },
       { '@type': 'Thing', name: 'agent loop cost benchmark' },
       { '@type': 'Thing', name: 'MCP tool spend benchmark' },
       { '@type': 'Thing', name: 'economic firewall benchmark' },
@@ -66,12 +74,12 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
   const datasetJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Dataset',
-    name: 'AI Agent Runaway Spend Benchmark Scenarios',
-    description: 'Modeled benchmark scenarios estimating uncontrolled and request-path controlled spend for autonomous AI agent loops, MCP retry storms, and agent swarms.',
+    name: 'AI Agent Runaway Spend and Constraint Violation Benchmark Scenarios',
+    description: 'Modeled benchmark scenarios estimating uncontrolled and request-path controlled spend for autonomous AI agent outcome-driven constraint violations, loops, MCP retry storms, and agent swarms.',
     creator: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-03',
+    dateModified: '2026-08-06',
     license: 'https://satgate.io/terms',
-    variableMeasured: ['agents', 'calls per minute', 'fanout', 'cost per call', 'detection delay', 'uncontrolled cost', 'controlled cost'],
+    variableMeasured: ['agents', 'calls per minute', 'fanout', 'cost per call', 'detection delay', 'uncontrolled cost', 'controlled cost', 'constraint violation outcome'],
     distribution: [
       {
         '@type': 'DataDownload',
@@ -104,6 +112,11 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
         '@type': 'Question',
         name: 'How does SatGate reduce runaway spend?',
         acceptedAnswer: { '@type': 'Answer', text: 'SatGate checks identity, budget, route, tool scope, request cost, expiry, and revocation at the gateway before forwarding, blocking the next expensive request when policy says stop and recording the decision in an Evidence Pack.' },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is an outcome-driven constraint violation benchmark for autonomous AI agents?',
+        acceptedAnswer: { '@type': 'Answer', text: 'An outcome-driven constraint violation benchmark tests whether autonomous AI agents stay inside declared limits while pursuing a goal. For cost governance, the outcome is spend avoided or created when agents loop, retry, delegate, call MCP tools, or exceed budget constraints.' },
       },
       {
         '@type': 'Question',
@@ -148,6 +161,31 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/runaway-agent-cost-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Model your exposure <ArrowRight size={18} /></Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">See Policy-to-Proof</Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-gray-900 bg-gray-950/60">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="mb-10 max-w-4xl">
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-orange-300">Constraint violation benchmark</p>
+            <h2 className="mb-4 text-3xl font-bold text-white">A benchmark for evaluating outcome-driven constraint violations in autonomous AI agents</h2>
+            <p className="text-lg leading-relaxed text-gray-300">
+              Autonomous agents can satisfy the task while violating the economic constraint. This benchmark treats runaway spend as an outcome-driven constraint violation: the agent keeps pursuing the goal, but the workflow exceeds the budget, tool, delegation, or detection-delay boundary that should have stopped it.
+            </p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-4">
+            {[
+              ['Outcome', 'The agent finishes or continues the job, but creates avoidable model, API, MCP tool, or paid-rail cost.'],
+              ['Constraint', 'Budget, call count, route scope, tool scope, fanout, expiry, delegation depth, or revocation status.'],
+              ['Violation', 'The agent loops, retries, delegates, fans out, or calls paid tools after the policy boundary is crossed.'],
+              ['Control result', 'Request-path enforcement blocks or downgrades the next call and records proof in an Evidence Pack.'],
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-2xl border border-gray-800 bg-black p-5">
+                <h3 className="mb-2 text-xl font-bold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -244,6 +282,7 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
           <div className="space-y-5">
             {[
               ['What is AI agent runaway spend?', 'AI agent runaway spend is cost created when autonomous agents loop, retry, delegate, or continue calling paid APIs and MCP tools after the work is no longer economically justified.'],
+              ['What is an outcome-driven constraint violation benchmark for autonomous AI agents?', 'It tests whether autonomous AI agents stay inside declared limits while pursuing a goal. For cost governance, the outcome is spend avoided or created when agents loop, retry, delegate, call MCP tools, or exceed budget constraints.'],
               ['Why do dashboards fail to control runaway agent cost?', 'Dashboards report spend after requests complete. Autonomous agents can generate hundreds or thousands of paid calls before a human sees an alert, so enforcement has to happen before forwarding each request.'],
               ['How does SatGate reduce runaway spend?', 'SatGate checks identity, budget, route, tool scope, request cost, expiry, and revocation at the gateway before forwarding, blocking the next expensive request when policy says stop and recording the decision in an Evidence Pack.'],
               ['Which benchmark variable is most dangerous for AI agent cost?', 'Detection delay is usually the most dangerous variable because agents can create paid calls at machine speed while dashboards, billing alerts, and humans react after spend has already happened.'],
@@ -268,7 +307,7 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-3xl border border-orange-900/60 bg-gradient-to-br from-orange-950/40 to-cyan-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">The fix is not a better bill. It is a pre-request decision.</h2>
-          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate puts authority before execution for AI agents: observe cost, control spend before execution, and prove every allowed, denied, routed, revoked, or paid decision with an Evidence Pack receipt.</p>
+          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate puts authority before execution for AI agents: observe cost, control spend before execution, and prove every allowed, denied, routed, revoked, or paid decision with an Evidence Pack receipt. These are authority-before-execution controls for runaway AI agent workflows.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Govern agent spend <ArrowRight size={18} /></Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">See Policy-to-Proof</Link>
