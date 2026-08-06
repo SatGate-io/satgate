@@ -1,12 +1,15 @@
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Check, DollarSign, Gauge, KeyRound, Minus, ShieldCheck, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Gauge, KeyRound, ShieldCheck, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate vs Kong AI Gateway - AI Gateway vs Policy-to-Proof',
-  description: 'Compare SatGate and Kong AI Gateway. Kong is API/AI gateway infrastructure; SatGate governs agent spend, MCP tools, scoped credentials, and paid-rail context.',
+  title: 'SatGate vs Kong AI Gateway: Agent Spend Controls',
+  description: 'Compare SatGate and Kong AI Gateway for agent spend, MCP tools, scoped credentials, paid-rail context, and DeepInspect-vs-Kong AI gateway evaluation criteria.',
   alternates: { canonical: 'https://satgate.io/compare/kong-ai-gateway' },
   keywords: [
     'SatGate vs Kong AI Gateway',
+    'DeepInspect vs Kong AI Gateway',
+    'DeepInspect Kong AI Gateway comparison',
+    'Kong AI Gateway agent spend controls',
     'Kong AI Gateway alternative',
     'AI gateway vs Policy-to-Proof governance',
     'Kong AI Gateway comparison',
@@ -17,15 +20,15 @@ export const metadata = {
     'MCP budget enforcement',
   ],
   openGraph: {
-    title: 'SatGate vs Kong AI Gateway - AI Gateway vs Policy-to-Proof',
-    description: 'Compare SatGate and Kong AI Gateway for gateway infrastructure, agent economics, MCP tool controls, scoped credentials, and paid-rail context.',
+    title: 'SatGate vs Kong AI Gateway: Agent Spend Controls',
+    description: 'Compare SatGate and Kong AI Gateway for agent economics, MCP tool controls, scoped credentials, paid-rail context, and DeepInspect criteria.',
     url: 'https://satgate.io/compare/kong-ai-gateway',
     type: 'article',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SatGate vs Kong AI Gateway - Gateway vs Policy-to-Proof',
-    description: 'Kong runs API gateway infrastructure. SatGate enforces agent budgets, MCP tool costs, scoped credentials, and paid-rail context.',
+    title: 'SatGate vs Kong AI Gateway',
+    description: 'Agent spend controls, MCP tool budgets, scoped credentials, paid rails, and DeepInspect-vs-Kong evaluation criteria.',
   },
 };
 
@@ -38,6 +41,13 @@ const rows: Array<[string, string, string]> = [
   ['Runaway agent spend benchmark/data', 'Yes: benchmark page plus JSON/CSV dataset', 'No direct equivalent'],
   ['L402 paid-agent API payments', 'Yes: governs paid-rail context before access and preserves Evidence Pack proof', 'No native SatGate-style paid-rail governance focus'],
   ['Broad API/AI platform management', 'Focused on economic governance layer', 'Yes / stronger fit'],
+];
+
+const evaluationCriteria = [
+  ['Gateway policy', 'How API traffic, auth, routing, plugins, and AI provider connectivity are configured and operated.'],
+  ['Inspection depth', 'Whether prompt, response, trace, tool, and policy signals can be inspected deeply enough for security review.'],
+  ['Economic enforcement', 'Whether budgets, paid-tool costs, MCP tool limits, and model-routing decisions happen before spend is created.'],
+  ['Proof', 'Whether the platform leaves Evidence Pack receipts for allow, deny, downgrade, revocation, delegation, and paid-rail context.'],
 ];
 
 const satgateWins = [
@@ -56,21 +66,42 @@ export default function ComparePage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'SatGate vs Kong AI Gateway - AI Gateway vs Policy-to-Proof',
+    headline: 'SatGate vs Kong AI Gateway: Agent Spend Controls and DeepInspect Criteria',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-05-04',
+    dateModified: '2026-08-06',
     mainEntityOfPage: 'https://satgate.io/compare/kong-ai-gateway',
+    about: [
+      { '@type': 'Thing', name: 'SatGate vs Kong AI Gateway' },
+      { '@type': 'Thing', name: 'DeepInspect vs Kong AI Gateway' },
+      { '@type': 'Thing', name: 'Kong AI Gateway agent spend controls' },
+      { '@type': 'Thing', name: 'AI gateway vs Policy-to-Proof governance' },
+      { '@type': 'Thing', name: 'MCP budget enforcement' },
+    ],
+  };
+
+  const criteriaJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'DeepInspect vs Kong AI Gateway evaluation criteria',
+    description: 'Criteria teams can use when comparing DeepInspect, Kong AI Gateway, SatGate, and other AI gateway or inspection tools for agent governance.',
+    itemListElement: evaluationCriteria.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
   };
 
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
-      { '@type': 'Question', name: 'Is SatGate a Kong AI Gateway replacement?', acceptedAnswer: { '@type': 'Answer', text: 'Not directly. Kong AI Gateway is the AI-facing extension of a mature API gateway platform. SatGate is an Policy-to-Proof governance for AI agents, API spend, MCP tools, scoped capabilities, revocation, Evidence Packs, and paid-rail context.' } },
+      { '@type': 'Question', name: 'Is SatGate a Kong AI Gateway replacement?', acceptedAnswer: { '@type': 'Answer', text: 'Not directly. Kong AI Gateway is the AI-facing extension of a mature API gateway platform. SatGate is a Policy-to-Proof governance layer for AI agents, API spend, MCP tools, scoped capabilities, revocation, Evidence Packs, and paid-rail context.' } },
       { '@type': 'Question', name: 'Can SatGate and Kong AI Gateway work together?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics at the gateway before forwarding.' } },
+      { '@type': 'Question', name: 'How should I evaluate DeepInspect vs Kong AI Gateway?', acceptedAnswer: { '@type': 'Answer', text: 'When evaluating DeepInspect vs Kong AI Gateway, separate inspection depth, gateway operations, and economic enforcement. Inspection tools help analyze prompts, traces, responses, or risks; API gateways manage traffic and connectivity; SatGate adds request-path agent spend controls, MCP tool budgets, scoped authority, and Evidence Pack proof.' } },
       { '@type': 'Question', name: 'When should I choose SatGate?', acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when the core problem is autonomous agent economic governance: hard budgets, MCP tool spend, revocable credentials, delegated authority, Evidence Packs, and paid-agent payment.' } },
       { '@type': 'Question', name: 'When should I choose Kong AI Gateway?', acceptedAnswer: { '@type': 'Answer', text: 'Choose Kong when the primary need is a broad API gateway/API management platform with AI traffic support.' } },
     ],
@@ -79,6 +110,7 @@ export default function ComparePage() {
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(criteriaJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <section className="mx-auto max-w-6xl px-6 py-16">
@@ -88,6 +120,22 @@ export default function ComparePage() {
           <h1 className="mb-5 text-5xl font-extrabold tracking-tight md:text-7xl">SatGate vs Kong AI Gateway</h1>
           <p className="text-xl leading-relaxed text-gray-300 md:text-2xl">Kong AI Gateway is the AI-facing extension of a mature API gateway platform. SatGate is different: it is the request-path Policy-to-Proof governance layer for autonomous agents, API spend, MCP tools, scoped credentials, Evidence Packs, and paid-rail context.</p>
         </div>
+
+        <section className="mb-14 rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6 md:p-8">
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">DeepInspect vs Kong AI Gateway</p>
+          <h2 className="mb-4 text-3xl font-bold text-white">Compare inspection, gateway operations, and economic enforcement separately</h2>
+          <p className="mb-6 text-lg leading-relaxed text-gray-300">
+            Teams comparing DeepInspect vs Kong AI Gateway are usually deciding where AI traffic inspection ends and runtime control begins. SatGate belongs in that evaluation as the agent economic control layer: budgets, MCP tool costs, scoped credentials, revocation, paid-rail context, and proof before requests execute.
+          </p>
+          <div className="grid gap-4 md:grid-cols-2">
+            {evaluationCriteria.map(([title, body]) => (
+              <div key={title} className="rounded-xl border border-gray-800 bg-black/50 p-5">
+                <h3 className="mb-2 text-xl font-bold text-white">{title}</h3>
+                <p className="leading-relaxed text-gray-400">{body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
         <section className="mb-14 overflow-hidden rounded-2xl border border-gray-800">
           <div className="grid md:grid-cols-3 bg-gray-900/70 text-sm font-bold text-white"><div className="p-4">Capability</div><div className="p-4">SatGate</div><div className="p-4">Kong AI Gateway</div></div>
@@ -105,8 +153,9 @@ export default function ComparePage() {
           <h2 className="mb-6 text-3xl font-bold text-white">SatGate vs Kong AI Gateway FAQ</h2>
           <div className="grid gap-5 md:grid-cols-2">
             {[
-              ['Is SatGate a Kong AI Gateway replacement?', 'Not directly. Kong AI Gateway is the AI-facing extension of a mature API gateway platform. SatGate is an Policy-to-Proof governance for AI agents, API spend, MCP tools, scoped capabilities, revocation, Evidence Packs, and paid-rail context.'],
+              ['Is SatGate a Kong AI Gateway replacement?', 'Not directly. Kong AI Gateway is the AI-facing extension of a mature API gateway platform. SatGate is a Policy-to-Proof governance layer for AI agents, API spend, MCP tools, scoped capabilities, revocation, Evidence Packs, and paid-rail context.'],
               ['Can SatGate and Kong AI Gateway work together?', 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics at the gateway before forwarding.'],
+              ['How should I evaluate DeepInspect vs Kong AI Gateway?', 'Separate inspection depth, gateway operations, and economic enforcement. Inspection tools analyze prompts, traces, responses, or risks; API gateways manage traffic and connectivity; SatGate adds request-path agent spend controls, MCP tool budgets, scoped authority, and Evidence Pack proof.'],
               ['When should I choose SatGate?', 'Choose SatGate when the core problem is autonomous agent economic governance: hard budgets, MCP tool spend, revocable credentials, delegated authority, Evidence Packs, and paid-agent payment.'],
               ['When should I choose Kong AI Gateway?', 'Choose Kong when the primary need is a broad API gateway/API management platform with AI traffic support.'],
             ].map(([question, answer]) => (

@@ -65,7 +65,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/compare/litellm', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/compare/portkey', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/compare/helicone', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.7 },
-  { path: '/compare/kong-ai-gateway', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.7 },
+  { path: '/compare/kong-ai-gateway', lastModified: '2026-08-06', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/compare/apigee', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/compare/tyk', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/compare/langfuse', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.7 },
