@@ -14,6 +14,7 @@ export const metadata = {
     'HTTP 402 API monetization',
     'paid-rail agent governance',
     'agent payment controls',
+    'economic control plane for AI agents',
   ],
   openGraph: {
     title: 'HTTP 402 for AI Agents',
@@ -45,13 +46,14 @@ export default function Http402ForAiAgentsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-05-01',
-    dateModified: '2026-05-02',
+    dateModified: '2026-08-06',
     mainEntityOfPage: 'https://satgate.io/http-402-for-ai-agents',
     about: [
       { '@type': 'Thing', name: 'HTTP 402 for AI agents' },
       { '@type': 'Thing', name: 'paid-rail agent governance' },
       { '@type': 'Thing', name: 'paid-rail context paid rail' },
       { '@type': 'Thing', name: 'AI agent payment policy' },
+      { '@type': 'Thing', name: 'economic control plane for AI agents' },
     ],
   };
 
@@ -63,6 +65,7 @@ export default function Http402ForAiAgentsPage() {
       { '@type': 'Question', name: 'Is HTTP 402 the same as L402?', acceptedAnswer: { '@type': 'Answer', text: 'No. HTTP 402 is the status code. L402 is a Lightning-based payment and access pattern that uses HTTP 402. paid-rail context is one rail SatGate can govern in the request path.' } },
       { '@type': 'Question', name: 'How are Stripe shared payment tokens different from L402?', acceptedAnswer: { '@type': 'Answer', text: 'Stripe-style shared payment tokens are a payment-credential method for supported 402 flows. L402 uses Lightning payment proof to unlock scoped API access. They are separate rails.' } },
       { '@type': 'Question', name: 'Why do 402 payment challenges need policy?', acceptedAnswer: { '@type': 'Answer', text: 'A payment challenge tells the agent how to pay, but it does not decide whether the agent should be allowed to spend, which budget applies, whether the route is in scope, or how the event should feed the Evidence Pack.' } },
+      { '@type': 'Question', name: 'Where does HTTP 402 fit in an economic control plane for AI agents?', acceptedAnswer: { '@type': 'Answer', text: 'HTTP 402 is the paid-access signal. An economic control plane for AI agents decides whether the agent, route, rail, budget, and scope allow payment or access before the request is forwarded.' } },
     ],
   };
 
@@ -97,6 +100,9 @@ export default function Http402ForAiAgentsPage() {
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
               Govern paid agent actions <ArrowRight size={18} />
             </Link>
+            <Link href="/economic-control-plane" className="inline-flex items-center justify-center gap-2 rounded-lg border border-green-600 px-6 py-3 font-bold text-green-200 hover:border-green-400 hover:bg-green-950/30 transition">
+              Economic control plane
+            </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
               See Policy-to-Proof
             </Link>
@@ -114,7 +120,7 @@ export default function Http402ForAiAgentsPage() {
             That challenge may point to different rails: card-based credentials, shared payment tokens, paid-rail context invoices, or future protocols. But the payment challenge is not the governance layer.
           </p>
           <p>
-            SatGate sits at the gateway before forwarding and applies policy: identify the agent, confirm authority, estimate cost, enforce budgets, decide whether the rail is allowed, record the challenge, and unlock only scoped access after proof.
+            SatGate sits at the gateway before forwarding and applies policy as an <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">economic control plane for AI agents</Link>: identify the agent, confirm authority, estimate cost, enforce budgets, decide whether the rail is allowed, record the challenge, and unlock only scoped access after proof.
           </p>
         </div>
         <div className="rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-6">
@@ -207,6 +213,10 @@ export default function Http402ForAiAgentsPage() {
               <h3 className="text-xl font-bold text-white mb-2">Why do 402 payment challenges need policy?</h3>
               <p className="text-gray-400 leading-relaxed">A payment challenge tells the agent how to pay, but it does not decide whether the agent should be allowed to spend, which budget applies, whether the route is in scope, or how the event should feed the Evidence Pack.</p>
             </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="text-xl font-bold text-white mb-2">Where does HTTP 402 fit in an economic control plane?</h3>
+              <p className="text-gray-400 leading-relaxed">HTTP 402 is the paid-access signal. The economic control plane decides whether the agent, route, rail, budget, and scope allow payment or access before the request is forwarded.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -219,7 +229,7 @@ export default function Http402ForAiAgentsPage() {
             ['/govern', 'Govern AI agents', 'Govern paid agent actions before execution.'],
             ['/l402-agent-payments', 'L402 agent payments', 'Understand paid-rail context as one paid rail for governed agent/API access.'],
             ['/agent-payment-controls', 'Agent payment controls', 'Policy, budgets, approval, receipts, and payment rails for AI agents.'],
-            ['/policy-to-proof', 'Policy-to-Proof', 'Turn paid-rail context into governed authority decisions and Evidence Pack proof.'],
+            ['/economic-control-plane', 'Economic control plane', 'Place 402 rails inside request-path authority, budget, scope, revocation, and proof.'],
             ['/l402-api-pricing-calculator', 'L402 API pricing calculator', 'Estimate request-native pricing for agent/API paid-access scenarios.'],
           ].map(([href, title, body]) => (
             <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">
@@ -242,6 +252,9 @@ export default function Http402ForAiAgentsPage() {
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
               See Policy-to-Proof
+            </Link>
+            <Link href="/economic-control-plane" className="inline-flex items-center justify-center gap-2 rounded-lg border border-green-600 px-6 py-3 font-bold text-green-200 hover:border-green-400 transition">
+              Read the category page
             </Link>
           </div>
         </div>
