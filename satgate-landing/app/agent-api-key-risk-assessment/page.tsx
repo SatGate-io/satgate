@@ -77,7 +77,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
     url: 'https://satgate.io/agent-api-key-risk-assessment',
     description: 'Free assessment for AI agent API key security risk in autonomous workflows, including shared keys, scope, budget, API key rotation, revocation, delegation, and audit gaps.',
     datePublished: '2026-04-12',
-    dateModified: '2026-08-06',
+    dateModified: '2026-08-07',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent API key risk assessment' },
@@ -89,6 +89,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
       { '@type': 'Thing', name: 'revocable agent credentials' },
       { '@type': 'Thing', name: 'budget-aware capability tokens' },
       { '@type': 'Thing', name: 'request-path agent API governance' },
+      { '@type': 'Thing', name: 'economic control plane for AI agents' },
     ],
     audience: { '@type': 'Audience', audienceType: 'Security, API, platform, and AI engineering teams' },
   };
@@ -102,7 +103,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
     url: 'https://satgate.io/agent-api-key-risk-assessment',
     description: 'Free assessment for AI agent API key security risk in autonomous workflows, including shared keys, scope, budget, API key rotation, revocation, delegation, and audit gaps.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-08-06',
+    dateModified: '2026-08-07',
     audience: webPageJsonLd.audience,
     featureList: ['Static API key risk scoring', 'AI agent API key security scoring', 'Scope gap assessment', 'Budget control checklist', 'API key rotation gap assessment', 'Revocation gap assessment', 'Delegation and audit risk scoring'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -167,6 +168,14 @@ export default function AgentApiKeyRiskAssessmentPage() {
           text: 'SatGate sits in the request path and checks identity, budget, route, scope, expiry, revocation, and policy at the gateway before forwarding to an upstream API or MCP tool.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'Where does API key risk fit in an economic control plane?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'API key risk is credential blast radius inside the economic control plane for AI agents. Broad keys should be replaced with scoped, revocable, budget-aware capabilities enforced before each API, model, or MCP request.',
+        },
+      },
     ],
   };
 
@@ -224,6 +233,9 @@ export default function AgentApiKeyRiskAssessmentPage() {
             <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">
               Generate token policy
             </Link>
+            <Link href="/economic-control-plane" className="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-500 px-6 py-3 font-bold text-cyan-200 transition hover:bg-cyan-950/30">
+              Economic control plane
+            </Link>
             <Link href="/agent-api-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">
               Agent API governance
             </Link>
@@ -265,7 +277,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-bold text-white">What safer agent authority looks like</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
-            API keys were designed for applications. Autonomous agents need attenuated, revocable, budget-aware capabilities enforced before the request reaches the upstream API or MCP server.
+            API keys were designed for applications. Autonomous agents need attenuated, revocable, budget-aware capabilities inside an <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">economic control plane for AI agents</Link>, enforced before the request reaches the upstream API or MCP server.
           </p>
           <div className="grid gap-5 md:grid-cols-3">
             {[
@@ -357,6 +369,10 @@ export default function AgentApiKeyRiskAssessmentPage() {
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate reduce API key risk?</h3>
               <p className="leading-relaxed text-gray-400">SatGate sits in the request path and checks identity, budget, route, scope, expiry, revocation, and policy at the gateway before forwarding to an upstream API or MCP tool.</p>
             </div>
+            <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+              <h3 className="mb-2 text-xl font-bold text-white">Where does API key risk fit in an economic control plane?</h3>
+              <p className="leading-relaxed text-gray-400">API key risk is credential blast radius inside the economic control plane for AI agents. Broad keys should be replaced with scoped, revocable, budget-aware capabilities enforced before each API, model, or MCP request.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -365,7 +381,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-orange-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Move from API keys to economic capabilities.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            SatGate turns agent access into request-path policy: scoped authority, spend limits, revocation, audit, and payment controls at the gateway before forwarding.
+            SatGate turns agent access into an <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">economic control plane</Link>: scoped authority, spend limits, revocation, audit, and payment controls at the gateway before forwarding.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -379,6 +395,9 @@ export default function AgentApiKeyRiskAssessmentPage() {
             </Link>
             <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Economic firewall readiness
+            </Link>
+            <Link href="/economic-control-plane" className="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-500 px-6 py-3 font-bold text-cyan-200 transition hover:bg-cyan-950/30">
+              Read the category page
             </Link>
           </div>
         </div>
