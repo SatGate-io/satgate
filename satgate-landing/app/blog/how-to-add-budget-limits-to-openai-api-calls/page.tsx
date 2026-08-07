@@ -6,7 +6,7 @@ export const metadata = {
   title: "OpenAI API Budget Limits: Stop Monthly Overspend Before GPT Calls",
   description: "Prevent teams or customers from overspending on OpenAI API calls each month with per-agent, per-team, and per-workflow hard caps before GPT calls execute.",
   alternates: { canonical: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls' },
-  keywords: ['OpenAI API budget limits', 'OpenAI cost control', 'API gateway OpenAI', 'GPT-4 spending limits', 'OpenAI API costs', 'prevent OpenAI overspending', 'hard cap OpenAI spend', 'per-agent OpenAI budget', 'OpenAI monthly budget alerts', 'OpenAI 429 monthly budget exceeded'],
+  keywords: ['OpenAI API budget limits', 'OpenAI cost control', 'API gateway OpenAI', 'GPT-4 spending limits', 'OpenAI API costs', 'prevent OpenAI overspending', 'hard cap OpenAI spend', 'per-agent OpenAI budget', 'OpenAI monthly budget alerts', 'OpenAI 429 monthly budget exceeded', 'economic control plane for AI agents'],
   openGraph: {
     title: 'OpenAI API Budget Limits: Stop Monthly Overspend Before GPT Calls',
     description: 'Prevent teams or customers from overspending on OpenAI API calls each month with request-path budget enforcement and Evidence Pack proof.',
@@ -30,7 +30,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-07',
-    dateModified: '2026-08-05',
+    dateModified: '2026-08-06',
     mainEntityOfPage: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls',
     about: [
       { '@type': 'Thing', name: 'OpenAI API budget limits' },
@@ -40,6 +40,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
       { '@type': 'Thing', name: 'hard caps for GPT spend' },
       { '@type': 'Thing', name: 'per-agent OpenAI budgets' },
       { '@type': 'Thing', name: 'request-path budget enforcement' },
+      { '@type': 'Thing', name: 'economic control plane for AI agents' },
       { '@type': 'Thing', name: 'runaway LLM spend prevention' },
       { '@type': 'Thing', name: 'Observe Control Prove' },
       { '@type': 'Thing', name: 'Evidence Pack receipts' },
@@ -224,6 +225,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
           </div>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row">
             <Link href="/openai-budget-policy-generator" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Generate an OpenAI budget policy</Link>
+            <Link href="/economic-control-plane" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-green-500">Economic control plane</Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-purple-500">See Policy-to-Proof for agent spend</Link>
           </div>
           
@@ -678,6 +680,9 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
               <li>Price the request using model, token, and tool policy before forwarding it.</li>
               <li>Block, downgrade, queue, or require approval when the remaining budget is not enough.</li>
             </ol>
+            <p className="text-gray-300 leading-relaxed">
+              In SatGate language, OpenAI budget enforcement is one control inside the broader <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200 underline underline-offset-4">economic control plane for AI agents</Link>: authority, budget, routing, revocation, and proof before autonomous requests execute.
+            </p>
           </div>
           
           <div className="bg-gray-900 border border-gray-800 p-6 rounded-lg mt-8">

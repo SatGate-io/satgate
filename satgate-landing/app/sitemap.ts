@@ -125,7 +125,7 @@ const blogRoutes: SitemapEntry[] = [
   { path: '/blog/l402-protocol-explained', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/zero-trust-for-ai-agents', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/start-at-1-credit-economic-policy', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/blog/how-to-add-budget-limits-to-openai-api-calls', lastModified: '2026-08-05', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/blog/how-to-add-budget-limits-to-openai-api-calls', lastModified: '2026-08-06', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/cursor-mcp-proxy-setup-guide', lastModified: '2026-08-06', changeFrequency: 'monthly', priority: 0.8 },
 ];
 
