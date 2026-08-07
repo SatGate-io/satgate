@@ -13,6 +13,7 @@ export const metadata = {
     'revocable API keys',
     'scoped agent credentials',
     'MCP revocation',
+    'economic control plane for AI agents',
   ],
   openGraph: {
     title: 'Revocable Agent Credentials | Kill Switches for AI Agents',
@@ -46,8 +47,8 @@ export default function Page() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-26',
-    dateModified: '2026-05-02',
-    about: ['AI agent security', 'Agent API governance', 'Capability-based security', 'Economic firewall'],
+    dateModified: '2026-08-07',
+    about: ['AI agent security', 'Agent API governance', 'Capability-based security', 'Economic firewall', 'economic control plane for AI agents'],
   };
 
   const faqJsonLd = {
@@ -57,6 +58,7 @@ export default function Page() {
       { '@type': 'Question', name: 'What is a revocable agent credential?', acceptedAnswer: { '@type': 'Answer', text: 'A revocable agent credential is a scoped, expiring capability issued to an autonomous agent for a specific task, workflow, route, tool, budget, or time window. It can be invalidated before the next request without rotating global API keys.' } },
       { '@type': 'Question', name: 'Why are static API keys risky for AI agents?', acceptedAnswer: { '@type': 'Answer', text: 'Static API keys are broad, long-lived, and hard to delegate safely. Autonomous agents need credentials with scoped authority, budget limits, expiry, revocation, and audit context.' } },
       { '@type': 'Question', name: 'How does SatGate enforce agent credentials?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate sits in the request path and checks identity, token scope, route, tool, budget, expiry, delegation rules, and revocation state before forwarding upstream.' } },
+      { '@type': 'Question', name: 'Where do revocable credentials fit in an economic control plane?', acceptedAnswer: { '@type': 'Answer', text: 'Revocable credentials are the kill-switch layer inside an economic control plane for AI agents. They let the gateway stop the next API, model, or MCP request when authority, budget, scope, or risk changes.' } },
     ],
   };
 
@@ -83,6 +85,7 @@ export default function Page() {
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">AI agents should not hold broad, long-lived API keys. They need task-scoped credentials that can be narrowed, expired, or revoked before the next API, model, or MCP tool call executes.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Generate token policy <ArrowRight size={18} /></Link>
+            <Link href="/economic-control-plane" className="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-500 px-6 py-3 font-bold text-cyan-200 transition hover:bg-cyan-950/30">Economic control plane</Link>
             <Link href="/agent-api-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Agent API governance</Link>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">AI agent cost control</Link>
           </div>
@@ -94,7 +97,7 @@ export default function Page() {
           <h2 className="mb-6 text-3xl font-bold text-white">Credentials have to carry economic policy</h2>
           <div className="space-y-5 text-lg leading-relaxed text-gray-300">
             <p>Human access systems assume stable users, managed devices, predictable sessions, and human-scale request rates. Agent systems are different: credentials can be copied into tools, delegated to sub-agents, retried in loops, and used faster than a billing alert can fire.</p>
-            <p>The safe model is not a single permanent secret. It is a request-path capability that answers: what can this agent do, on which route, for how long, with what budget, and can it still be revoked right now?</p>
+            <p>The safe model is not a single permanent secret. It is a request-path capability inside an <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">economic control plane for AI agents</Link> that answers: what can this agent do, on which route, for how long, with what budget, and can it still be revoked right now?</p>
             <p>SatGate turns those answers into enforceable policy at the gateway before forwarding to an upstream API, model, or MCP tool happens.</p>
           </div>
         </div>
@@ -158,6 +161,7 @@ audit:
               ['What is a revocable agent credential?', 'A revocable agent credential is a scoped, expiring capability issued to an autonomous agent for a specific task, workflow, route, tool, budget, or time window. It can be invalidated before the next request without rotating global API keys.'],
               ['Why are static API keys risky for AI agents?', 'Static API keys are broad, long-lived, and hard to delegate safely. Autonomous agents need credentials with scoped authority, budget limits, expiry, revocation, and audit context.'],
               ['How does SatGate enforce agent credentials?', 'SatGate sits in the request path and checks identity, token scope, route, tool, budget, expiry, delegation rules, and revocation state before forwarding upstream.'],
+              ['Where do revocable credentials fit in an economic control plane?', 'Revocable credentials are the kill-switch layer inside an economic control plane for AI agents. They let the gateway stop the next API, model, or MCP request when authority, budget, scope, or risk changes.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">
                 <h3 className="mb-2 font-bold text-white">{question}</h3>
@@ -171,9 +175,10 @@ audit:
       <section className="mx-auto max-w-6xl px-6 pb-24">
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/35 to-yellow-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Agent autonomy needs scoped authority, not bigger secrets.</h2>
-          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate provides the economic firewall underneath agent credentials: observe who is calling, control what they can spend and access, and revoke authority before the next request.</p>
+          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate provides the <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">economic control plane</Link> underneath agent credentials: observe who is calling, control what they can spend and access, and revoke authority before the next request.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Grade readiness <ArrowRight size={18} /></Link>
+            <Link href="/economic-control-plane" className="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-500 px-6 py-3 font-bold text-cyan-200 transition hover:bg-cyan-950/30">Read the category page</Link>
             <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">MCP budget enforcement</Link>
           </div>
         </div>
