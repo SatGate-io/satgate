@@ -5,7 +5,7 @@ export const metadata = {
   title: "L402 Protocol Explained: HTTP 402 for Machine API Payments",
   description: "L402 combines HTTP 402, paid-rail context, and macaroon tokens so delegated agents can present payment proof for API access in real time.",
   alternates: { canonical: 'https://satgate.io/blog/l402-protocol-explained' },
-  keywords: ['L402 protocol explained', 'L402 protocol', 'HTTP 402 Payment Required', 'Lightning API payments', 'machine-to-machine payments', 'L402 macaroons', 'API micropayments'],
+  keywords: ['L402 protocol explained', 'L402 protocol', 'HTTP 402 Payment Required', 'Lightning API payments', 'machine-to-machine payments', 'L402 macaroons', 'API micropayments', 'economic control plane for AI agents'],
   openGraph: {
     title: 'L402 Protocol Explained: HTTP 402 for Machine API Payments',
     description: 'L402 combines HTTP 402, Lightning invoices, and macaroon tokens so delegated agents can present payment proof for API access in real time.',
@@ -28,7 +28,7 @@ export default function L402ProtocolExplainedBlogPage() {
     description: 'L402 combines HTTP 402, paid-rail context, and macaroon tokens so delegated agents can present payment proof for API access in real time.',
     url: 'https://satgate.io/blog/l402-protocol-explained',
     datePublished: '2026-04-02',
-    dateModified: '2026-05-04',
+    dateModified: '2026-08-06',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
@@ -36,6 +36,7 @@ export default function L402ProtocolExplainedBlogPage() {
       { '@type': 'Thing', name: 'HTTP 402 Payment Required' },
       { '@type': 'Thing', name: 'Lightning API payments' },
       { '@type': 'Thing', name: 'machine-native API monetization' },
+      { '@type': 'Thing', name: 'economic control plane for AI agents' },
     ],
   };
 
@@ -67,6 +68,14 @@ export default function L402ProtocolExplainedBlogPage() {
           text: 'No. L402 is per-request Lightning payment for external API monetization. Enterprise budget enforcement controls internal agent spend with policies, caps, revocation, and audit at the gateway policy check before forwarding.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'Where does L402 fit in an economic control plane for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'L402 is the payment and proof rail. An economic control plane for AI agents decides whether the request is allowed before the rail moves value, then records budget, authority, routing, revocation, and Evidence Pack proof around the payment.',
+        },
+      },
     ],
   };
 
@@ -88,6 +97,16 @@ export default function L402ProtocolExplainedBlogPage() {
           </div>
           
           <h1 className="text-4xl font-bold mb-4">L402 Protocol Explained: How HTTP 402 Enables Machine-Native API Payments</h1>
+
+          <div className="mb-6 rounded-2xl border border-yellow-900/60 bg-yellow-950/20 p-5">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-yellow-300">Quick answer</p>
+            <p className="text-gray-300">L402 is the paid-access rail for machine API payments. SatGate uses it as one rail inside the broader <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">economic control plane for AI agents</Link>, where authority, budget, revocation, routing, and proof are checked around every request.</p>
+          </div>
+
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row">
+            <Link href="/l402-api-pricing-calculator" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Model L402 pricing</Link>
+            <Link href="/economic-control-plane" className="inline-flex items-center justify-center rounded-lg border border-green-600 px-5 py-3 text-sm font-bold text-green-200 transition hover:border-green-400 hover:bg-green-950/30">Economic control plane</Link>
+          </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
             In 1997, the HTTP spec reserved status code 402 &ldquo;for future use.&rdquo; Nearly three decades later, L402 turns that placeholder into a fully functional payment protocol — letting AI agents discover, pay for, and consume APIs without a human in the loop.
@@ -352,6 +371,10 @@ routes:
             For use cases that need budget enforcement on top of payments — say, an enterprise that wants agents to pay per-call but also cap total department spend — SatGate offers the <code className="text-green-300 bg-black/50 px-1 rounded">fiat402</code> policy, which combines payment requirements with Redis-backed budget tracking. Different tool for different requirements.
           </p>
 
+          <p className="text-gray-300 leading-relaxed">
+            That is the control-plane boundary: L402 proves payment, while SatGate&apos;s <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">economic control plane</Link> decides whether the agent, tenant, scope, budget, and revocation state allow the request before any paid rail carries value.
+          </p>
+
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Bigger Picture: L402 as Agent Economy Infrastructure</h2>
 
           <p className="text-gray-300 leading-relaxed">
@@ -408,6 +431,7 @@ routes:
                 ['What is the L402 protocol?', 'L402 is a machine-native API payment protocol that combines HTTP 402 Payment Required, Lightning invoices, and macaroon tokens so delegated software can present payment proof for API access without a per-request human checkout flow.'],
                 ['How does a delegated agent use L402 for paid API access?', 'The delegated client requests a protected API, receives a 402 response with a Lightning invoice and macaroon, presents proof, then retries with Authorization: L402 <macaroon>:<preimage> as proof of payment.'],
                 ['Is L402 the same as enterprise budget enforcement?', 'No. L402 is per-request Lightning payment for external API monetization. Enterprise budget enforcement controls internal agent spend with policies, caps, revocation, and audit at the gateway policy check before forwarding.'],
+                ['Where does L402 fit in an economic control plane for AI agents?', 'L402 is the payment and proof rail. The economic control plane decides whether the request is allowed before payment, then preserves budget, authority, routing, revocation, and Evidence Pack proof around the call.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
@@ -429,6 +453,9 @@ routes:
               </a>
               <Link href="/design-partners" className="inline-flex items-center gap-2 border border-yellow-500 text-yellow-300 px-6 py-3 rounded-lg font-bold hover:bg-yellow-900/30 transition text-sm">
                 Become a Design Partner
+              </Link>
+              <Link href="/economic-control-plane" className="inline-flex items-center gap-2 border border-green-500 text-green-300 px-6 py-3 rounded-lg font-bold hover:bg-green-900/30 transition text-sm">
+                Read: Economic Control Plane →
               </Link>
             </div>
           </div>
