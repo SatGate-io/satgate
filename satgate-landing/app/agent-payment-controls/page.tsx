@@ -14,6 +14,7 @@ export const metadata = {
     'agent spend control',
     'HTTP 402 agents',
     'paid-rail agent governance',
+    'economic control plane for AI agents',
   ],
   openGraph: {
     title: 'Agent Payment Governance | Policy Before Paid Access',
@@ -46,8 +47,14 @@ export default function AgentPaymentControlsPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-05-01',
-    dateModified: '2026-05-02',
+    dateModified: '2026-08-06',
     mainEntityOfPage: 'https://satgate.io/agent-payment-controls',
+    about: [
+      { '@type': 'Thing', name: 'agent payment controls' },
+      { '@type': 'Thing', name: 'paid-rail agent governance' },
+      { '@type': 'Thing', name: 'economic control plane for AI agents' },
+      { '@type': 'Thing', name: 'HTTP 402 agents' },
+    ],
   };
 
   const faqJsonLd = {
@@ -58,6 +65,7 @@ export default function AgentPaymentControlsPage() {
       { '@type': 'Question', name: 'Is payment approval enough for delegated agent access?', acceptedAnswer: { '@type': 'Answer', text: 'No. Payment approval can authorize value movement, but teams also need identity, budgets, scoped access, revocation, API metering, and audit before agent requests execute.' } },
       { '@type': 'Question', name: 'How does SatGate help with agent payment controls?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate sits in the request path to observe agent activity, enforce budgets and policy, preserve paid-rail context, and record receipts before requests execute.' } },
       { '@type': 'Question', name: 'How are HTTP 402 and L402 related to agent payment controls?', acceptedAnswer: { '@type': 'Answer', text: 'HTTP 402 gives APIs a protocol-level way to request payment. L402, x402, shared payment tokens, cards, and enterprise billing are payment rails; agent payment controls decide whether the agent has authority before access is granted.' } },
+      { '@type': 'Question', name: 'Where do agent payment controls fit in an economic control plane?', acceptedAnswer: { '@type': 'Answer', text: 'Agent payment controls are one part of the economic control plane for AI agents: they decide whether a paid rail, wallet, 402 challenge, or priced tool call is allowed under identity, scope, budget, revocation, and Evidence Pack policy.' } },
     ],
   };
 
@@ -92,6 +100,9 @@ export default function AgentPaymentControlsPage() {
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
               Govern agent payments <ArrowRight size={18} />
             </Link>
+            <Link href="/economic-control-plane" className="inline-flex items-center justify-center gap-2 rounded-lg border border-green-600 px-6 py-3 font-bold text-green-200 hover:border-green-400 hover:bg-green-950/30 transition">
+              Economic control plane
+            </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
               See Policy-to-Proof
             </Link>
@@ -109,7 +120,7 @@ export default function AgentPaymentControlsPage() {
             A company still needs to know which agent is acting, which route or MCP tool it is touching, what the action will cost, whether budget remains, whether scope is valid, and whether the outcome should be allowed, denied, paid, or recorded in the Evidence Pack.
           </p>
           <p>
-            SatGate adds that missing request-path layer: observe economic activity, enforce policy and budgets, preserve paid-rail context, and record a receipt before access is granted.
+            SatGate adds that missing request-path layer: an <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">economic control plane for AI agents</Link> that observes economic activity, enforces policy and budgets, preserves paid-rail context, and records a receipt before access is granted.
           </p>
         </div>
         <div className="rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-6">
@@ -129,7 +140,7 @@ export default function AgentPaymentControlsPage() {
         <div className="max-w-6xl mx-auto px-6 py-20">
           <h2 className="text-3xl font-bold text-white mb-4">The agent payment control stack</h2>
           <p className="text-gray-400 max-w-3xl mb-10 text-lg">
-            The right stack separates payment credentials from economic governance. Wallets can authorize payment; SatGate enforces behavior before API, model, and MCP access.
+            The right stack separates payment credentials from economic governance. Wallets can authorize payment; SatGate&apos;s economic control plane enforces behavior before API, model, and MCP access.
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {controls.map(({ icon: Icon, title, body }) => (
@@ -190,6 +201,7 @@ export default function AgentPaymentControlsPage() {
               ['Is payment approval enough for delegated agent access?', 'No. Payment approval can authorize value movement, but teams also need identity, budgets, scoped access, revocation, API metering, and audit before agent requests execute.'],
               ['How does SatGate help with agent payment controls?', 'SatGate sits in the request path to observe agent activity, enforce budgets and policy, preserve paid-rail context, and record receipts before requests execute.'],
               ['How are HTTP 402 and L402 related to agent payment controls?', 'HTTP 402 gives APIs a protocol-level way to request payment. L402, x402, shared payment tokens, cards, and enterprise billing are payment rails; agent payment controls decide whether the agent has authority before access is granted.'],
+              ['Where do agent payment controls fit in an economic control plane?', 'Agent payment controls are one part of the economic control plane for AI agents: they decide whether a paid rail, wallet, 402 challenge, or priced tool call is allowed under identity, scope, budget, revocation, and Evidence Pack policy.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">
                 <h3 className="mb-2 font-bold text-white">{question}</h3>
@@ -202,7 +214,7 @@ export default function AgentPaymentControlsPage() {
         <div className="rounded-3xl border border-yellow-900/60 bg-gradient-to-br from-yellow-950/20 to-cyan-950/30 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">Put policy before payment</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            SatGate gives teams the Economic Firewall for delegated paid access: request-path metering, spend limits, revocation, paid-rail context, Evidence Pack receipts, and Policy-to-Proof evidence when access is granted.
+            SatGate gives teams the <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">economic control plane</Link> for delegated paid access: request-path metering, spend limits, revocation, paid-rail context, Evidence Pack receipts, and Policy-to-Proof evidence when access is granted.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
@@ -210,6 +222,9 @@ export default function AgentPaymentControlsPage() {
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
               Review Policy-to-Proof
+            </Link>
+            <Link href="/economic-control-plane" className="inline-flex items-center justify-center gap-2 rounded-lg border border-green-600 px-6 py-3 font-bold text-green-200 hover:border-green-400 transition">
+              Read the category page
             </Link>
           </div>
         </div>
