@@ -5,7 +5,7 @@ export const metadata = {
   title: "Zero Trust for AI Agents: Capability Tokens, Revocation, and Budgets",
   description: "Zero Trust for AI agents needs more than identity: scoped capability tokens, revocation, delegation limits, and request-path budget enforcement.",
   alternates: { canonical: 'https://satgate.io/blog/zero-trust-for-ai-agents' },
-  keywords: ['Zero Trust AI agents', 'Zero Trust for AI', 'AI agent security', 'capability-based security', 'API security AI agents', 'macaroon tokens', 'agent delegation security'],
+  keywords: ['Zero Trust AI agents', 'Zero Trust for AI', 'AI agent security', 'capability-based security', 'API security AI agents', 'macaroon tokens', 'agent delegation security', 'economic control plane for AI agents'],
   openGraph: {
     title: 'Zero Trust for AI Agents: Tokens, Revocation, and Budgets',
     description: 'Zero Trust for AI agents needs scoped capability tokens, revocation, delegation limits, and request-path budget enforcement.',
@@ -29,7 +29,7 @@ export default function ZeroTrustForAIAgentsBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-03',
-    dateModified: '2026-05-04',
+    dateModified: '2026-08-07',
     mainEntityOfPage: 'https://satgate.io/blog/zero-trust-for-ai-agents',
     about: [
       { '@type': 'Thing', name: 'Zero Trust for AI agents' },
@@ -37,6 +37,7 @@ export default function ZeroTrustForAIAgentsBlogPage() {
       { '@type': 'Thing', name: 'scoped and revocable agent tokens' },
       { '@type': 'Thing', name: 'delegation limits for autonomous agents' },
       { '@type': 'Thing', name: 'budget-aware authorization' },
+      { '@type': 'Thing', name: 'economic control plane for AI agents' },
     ],
   };
 
@@ -76,6 +77,14 @@ export default function ZeroTrustForAIAgentsBlogPage() {
           text: 'Most Zero Trust policies can express identity, device posture, location, and application access, but they usually cannot express per-agent spend limits, delegated budget attenuation, MCP tool costs, or proof-of-payment requirements before each request.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'Where does Zero Trust fit in an economic control plane for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Zero Trust verifies identity and context. The economic control plane for AI agents adds request-path authority, budget, scope, delegation, revocation, paid-rail policy, and Evidence Pack proof before API, model, or MCP access executes.',
+        },
+      },
     ],
   };
 
@@ -97,6 +106,16 @@ export default function ZeroTrustForAIAgentsBlogPage() {
           </div>
           
           <h1 className="text-4xl font-bold mb-4">Zero Trust for AI Agents: Why Identity-Based Security Collapses When Machines Call the Shots</h1>
+
+          <div className="mb-6 rounded-2xl border border-red-900/60 bg-red-950/20 p-5">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-red-300">Quick answer</p>
+            <p className="text-gray-300">Zero Trust verifies identity and context. AI agents also need an <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">economic control plane</Link> that enforces authority, budgets, scope, delegation, revocation, and proof before tool, model, or API access executes.</p>
+          </div>
+
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row">
+            <Link href="/economic-control-plane" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Economic control plane</Link>
+            <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-red-500">Agent capability tokens</Link>
+          </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
             Zero Trust says &ldquo;never trust, always verify.&rdquo; But verify <em>what</em>, exactly, when the requester is an autonomous agent that spawns sub-agents, delegates credentials, and makes 1,500 API calls per prompt? Identity-based security was designed for humans. The agent economy needs something fundamentally different.
@@ -398,6 +417,7 @@ Token: search-worker-12
                 ['What replaces identity-based security for autonomous agents?', 'Autonomous agents need capability-based security: scoped, revocable tokens that encode what the agent can do, how much it can spend, where it can call, and when authority expires.'],
                 ['How does an economic firewall extend Zero Trust for AI agents?', 'An economic firewall enforces cost, scope, and delegation in the request path before forwarding to upstream APIs, giving teams budget-aware authorization that identity systems alone cannot provide.'],
                 ['Can Zero Trust policies express agent budgets and delegated authority?', 'Most Zero Trust policies can express identity, device posture, location, and application access, but they usually cannot express per-agent spend limits, delegated budget attenuation, MCP tool costs, or proof-of-payment requirements before each request.'],
+                ['Where does Zero Trust fit in an economic control plane for AI agents?', 'Zero Trust verifies identity and context. The economic control plane adds request-path authority, budget, scope, delegation, revocation, paid-rail policy, and Evidence Pack proof before API, model, or MCP access executes.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
@@ -411,7 +431,7 @@ Token: search-worker-12
           <div className="mt-16 bg-gradient-to-r from-red-900/20 to-blue-900/20 border border-red-800/30 rounded-xl p-8">
             <h3 className="text-xl font-bold text-white mb-3">Ready to Secure Your AI Agent Traffic?</h3>
             <p className="text-gray-300 mb-4">
-              SatGate adds capability-based security and budget enforcement to any API — without replacing your existing identity stack. Deploy in observe mode today, enforce tomorrow.
+              SatGate adds capability-based security, budget enforcement, and the economic control plane for AI agents to any API — without replacing your existing identity stack. Deploy in observe mode today, enforce tomorrow.
             </p>
             <div className="flex flex-wrap gap-3">
               <a href="https://github.com/SatGate-io/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
@@ -419,6 +439,9 @@ Token: search-worker-12
               </a>
               <Link href="/design-partners" className="inline-flex items-center gap-2 border border-red-500 text-red-300 px-6 py-3 rounded-lg font-bold hover:bg-red-900/30 transition text-sm">
                 Become a Design Partner
+              </Link>
+              <Link href="/economic-control-plane" className="inline-flex items-center gap-2 border border-cyan-500 text-cyan-300 px-6 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition text-sm">
+                Read: Economic Control Plane →
               </Link>
             </div>
           </div>
