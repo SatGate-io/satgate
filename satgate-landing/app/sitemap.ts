@@ -118,7 +118,7 @@ const blogRoutes: SitemapEntry[] = [
   { path: '/blog/the-enterprise-adoption-playbook-observe-control-prove', lastModified: '2026-06-01', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/can-adversaries-game-your-economic-firewall', lastModified: '2026-05-02', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/mcp-gateway-guide', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/blog/api-monetization-ai', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/blog/api-monetization-ai', lastModified: '2026-08-06', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/why-process-wont-scale-for-ai-agent-costs', lastModified: '2026-05-02', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/macaroon-tokens-vs-api-keys', lastModified: '2026-08-05', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/http-402-payment-required-use-cases', lastModified: '2026-08-06', changeFrequency: 'monthly', priority: 0.8 },

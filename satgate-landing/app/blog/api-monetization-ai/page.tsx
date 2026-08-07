@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
@@ -5,7 +6,7 @@ export const metadata = {
   title: "API Monetization for AI Agents: Pricing, Billing, L402, and Metering",
   description: "How to monetize APIs for AI agents with machine-readable pricing, request-path metering, budget enforcement, and paid-rail context.",
   alternates: { canonical: 'https://satgate.io/blog/api-monetization-ai' },
-  keywords: ['API monetization AI', 'API monetization for AI agents', 'monetize API AI', 'AI agent billing', 'machine-to-machine payments', 'API pricing AI agents', 'rail-neutral paid-rail governance'],
+  keywords: ['API monetization AI', 'API monetization for AI agents', 'monetize API AI', 'AI agent billing', 'machine-to-machine payments', 'API pricing AI agents', 'rail-neutral paid-rail governance', 'economic control plane for AI agents'],
   openGraph: {
     title: 'API Monetization for AI Agents: Pricing, Billing, and L402',
     description: 'Monetize APIs for AI agents with machine-readable pricing, request-path metering, budget enforcement, and paid-rail context.',
@@ -29,7 +30,7 @@ export default function ApiMonetizationAiBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-26',
-    dateModified: '2026-05-04',
+    dateModified: '2026-08-06',
     mainEntityOfPage: 'https://satgate.io/blog/api-monetization-ai',
     about: [
       { '@type': 'Thing', name: 'API monetization for AI agents' },
@@ -37,6 +38,7 @@ export default function ApiMonetizationAiBlogPage() {
       { '@type': 'Thing', name: 'request-path API metering' },
       { '@type': 'Thing', name: 'L402 API payments' },
       { '@type': 'Thing', name: 'paid agent billing' },
+      { '@type': 'Thing', name: 'economic control plane for AI agents' },
     ],
   };
 
@@ -76,6 +78,14 @@ export default function ApiMonetizationAiBlogPage() {
           text: 'No. Usage-based SaaS billing usually measures consumption after the fact and invoices a human account later. AI agent monetization needs machine-readable prices, request-path authorization, real-time budget checks, and machine-native payment or proof-of-payment before access is granted.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'Why does AI API monetization need an economic control plane?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AI API monetization needs an economic control plane because agents can choose tools, trigger paid calls, delegate work, and create cost before a human sees an invoice. The control plane enforces price, budget, authority, scope, rail policy, and proof in the request path.',
+        },
+      },
     ],
   };
 
@@ -96,6 +106,16 @@ export default function ApiMonetizationAiBlogPage() {
           </div>
           
           <h1 className="text-4xl font-bold mb-4">API Monetization for AI: How to Charge Agents, Not Just Developers</h1>
+
+          <div className="mb-6 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-5">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-purple-300">Quick answer</p>
+            <p className="text-gray-300">AI API monetization needs more than prices and payment rails. It needs an <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">economic control plane for AI agents</Link> that checks authority, budget, scope, rail policy, and proof before paid access executes.</p>
+          </div>
+
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row">
+            <Link href="/economic-control-plane" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Economic control plane</Link>
+            <Link href="/l402-api-pricing-calculator" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-purple-500">Model L402 pricing</Link>
+          </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
             Your API's next million customers won't have email addresses. They'll have token budgets. Here's how to monetize API access for a world where autonomous agents are the buyers.
@@ -374,7 +394,7 @@ sub_agent_token = attenuate(agent_a_token, [
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Step 2: Add budget enforcement at the gateway layer.</strong> Deploy an economic gateway (like SatGate) in front of your API. Start in observe mode — track what agents would spend without actually blocking anything. This gives you real consumption data.
+            <strong className="text-white">Step 2: Add budget enforcement at the gateway layer.</strong> Deploy an <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">economic control plane</Link> (like SatGate) in front of your API. Start in observe mode — track what agents would spend without actually blocking anything. This gives you real consumption data.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -408,6 +428,7 @@ sub_agent_token = attenuate(agent_a_token, [
                 ['Why do traditional API pricing models break for AI workloads?', 'They assume a human signs up, manages an account, and reviews invoices. AI agents discover tools dynamically, call APIs at machine speed, delegate work to sub-agents, and can create large bills before monthly billing catches up.'],
                 ['What role does L402 play in AI API monetization?', 'L402 lets APIs return HTTP 402 Payment Required with a Lightning invoice and macaroon so an agent can pay per request and receive proof-of-payment access without human signup or credit-card billing.'],
                 ['Is API monetization for AI agents the same as usage-based SaaS billing?', 'No. Usage-based SaaS billing measures consumption after the fact and invoices a human account later. AI agent monetization needs machine-readable prices, request-path authorization, real-time budget checks, and machine-native payment or proof-of-payment before access is granted.'],
+                ['Why does AI API monetization need an economic control plane?', 'Agents can choose tools, trigger paid calls, delegate work, and create cost before a human sees an invoice. The economic control plane enforces price, budget, authority, scope, rail policy, and proof in the request path.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
@@ -421,7 +442,7 @@ sub_agent_token = attenuate(agent_a_token, [
           <div className="mt-16 bg-gradient-to-r from-purple-900/20 to-cyan-900/20 border border-purple-800/30 rounded-xl p-8">
             <h3 className="text-xl font-bold text-white mb-3">Ready to Monetize Your API for AI?</h3>
             <p className="text-gray-300 mb-4">
-              SatGate adds economic governance — pricing, budgets, and machine-readable payments — to any API in minutes. Start with observe mode and go live when you're ready.
+              SatGate adds the economic control plane for AI agents — pricing, budgets, rail policy, and machine-readable payment proof — to any API in minutes. Start with observe mode and go live when you're ready.
             </p>
             <div className="flex flex-wrap gap-3">
               <a href="https://github.com/SatGate-io/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
@@ -429,6 +450,9 @@ sub_agent_token = attenuate(agent_a_token, [
               </a>
               <Link href="/design-partners" className="inline-flex items-center gap-2 border border-purple-500 text-purple-300 px-6 py-3 rounded-lg font-bold hover:bg-purple-900/30 transition text-sm">
                 Become a Design Partner
+              </Link>
+              <Link href="/economic-control-plane" className="inline-flex items-center gap-2 border border-cyan-500 text-cyan-300 px-6 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition text-sm">
+                Read: Economic Control Plane →
               </Link>
             </div>
           </div>
