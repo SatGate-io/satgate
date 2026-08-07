@@ -15,6 +15,7 @@ export const metadata: Metadata = {
     "AI chargeback ROI calculator",
     "AI agent cost calculator",
     "AI agent budget enforcement",
+    "economic control plane for AI agents",
     "runaway agent spend calculator",
     "LLM cost management calculator",
     "agent loop cost calculator",

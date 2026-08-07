@@ -156,6 +156,7 @@ export default function ROICalculatorPage() {
       { '@type': 'Thing', name: 'AI chargeback ROI calculator' },
       { '@type': 'Thing', name: 'runaway AI agent loop exposure' },
       { '@type': 'Thing', name: 'request-path budget enforcement ROI' },
+      { '@type': 'Thing', name: 'economic control plane for AI agents' },
       { '@type': 'Thing', name: 'Policy-to-Proof receipts' },
       { '@type': 'Thing', name: 'MCP tool spend risk' },
       { '@type': 'Thing', name: 'economic firewall payback period' },
@@ -718,6 +719,7 @@ export default function ROICalculatorPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
               { href: '/policy-to-proof', title: 'Map ROI to Policy-to-Proof', body: 'Connect exposure to enforceable checks, receipts, and an Evidence Pack.' },
+              { href: '/economic-control-plane', title: 'Economic control plane', body: 'Place ROI findings inside the authority, budget, routing, revocation, and proof layer.' },
               { href: '/govern', title: 'Govern agent execution', body: 'Put authority, budget, and audit policy in the request path before execution.' },
               { href: '/agent-spend-policy-template', title: 'Generate budget policy', body: 'Convert ROI exposure into YAML and JSON budget policy with receipt fields.' },
             ].map((item) => (
@@ -1039,6 +1041,7 @@ export default function ROICalculatorPage() {
                 <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
                 <li><a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Documentation</a></li>
                 <li><Link href="/govern" className="hover:text-white transition">Enterprise</Link></li>
+                <li><Link href="/economic-control-plane" className="hover:text-white transition">Economic Control Plane</Link></li>
                 <li><Link href="/design-partners" className="hover:text-white transition">Design Partners</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
                 <li><Link href="/roi-calculator" className="hover:text-white transition">ROI Calculator</Link></li>
