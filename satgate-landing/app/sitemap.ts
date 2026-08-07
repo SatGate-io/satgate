@@ -120,7 +120,7 @@ const blogRoutes: SitemapEntry[] = [
   { path: '/blog/mcp-gateway-guide', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/api-monetization-ai', lastModified: '2026-08-06', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/why-process-wont-scale-for-ai-agent-costs', lastModified: '2026-05-02', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/blog/macaroon-tokens-vs-api-keys', lastModified: '2026-08-05', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/blog/macaroon-tokens-vs-api-keys', lastModified: '2026-08-07', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/http-402-payment-required-use-cases', lastModified: '2026-08-06', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/l402-protocol-explained', lastModified: '2026-08-06', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/zero-trust-for-ai-agents', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
@@ -5,7 +6,7 @@ export const metadata = {
   title: "Macaroon Tokens vs API Keys for Agent Access",
   description: "Compare macaroon tokens and API keys for scoped authorization, delegated access, and safer AI agent permissions.",
   alternates: { canonical: 'https://satgate.io/blog/macaroon-tokens-vs-api-keys' },
-  keywords: ['macaroon tokens vs API keys', 'capability-based authentication', 'API authentication AI agents', 'delegated authority tokens', 'macaroon authentication', 'AI agent security', 'capability tokens'],
+  keywords: ['macaroon tokens vs API keys', 'capability-based authentication', 'API authentication AI agents', 'delegated authority tokens', 'macaroon authentication', 'AI agent security', 'capability tokens', 'economic control plane for AI agents'],
   openGraph: {
     title: 'Macaroon Tokens vs API Keys for AI Agents',
     description: 'Compare macaroon authentication and API keys for scoped AI agent credentials, revocation, delegation, and budget limits.',
@@ -29,7 +30,7 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-03-31',
-    dateModified: '2026-08-05',
+    dateModified: '2026-08-07',
     mainEntityOfPage: 'https://satgate.io/blog/macaroon-tokens-vs-api-keys',
     about: [
       { '@type': 'Thing', name: 'macaroon tokens versus API keys' },
@@ -37,6 +38,7 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
       { '@type': 'Thing', name: 'scoped agent credentials' },
       { '@type': 'Thing', name: 'budget caveats for agent tokens' },
       { '@type': 'Thing', name: 'revocable delegated authority' },
+      { '@type': 'Thing', name: 'economic control plane for AI agents' },
     ],
   };
 
@@ -82,6 +84,14 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'Use API keys for stable human-operated integrations with simple account-level access. Use macaroon tokens for AI agents that need scoped authority, delegated sub-agent access, request-path budget enforcement, revocation, and Evidence Pack auditability.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Where do macaroon tokens fit in an economic control plane for AI agents?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Macaroon tokens are the scoped authority layer inside an economic control plane for AI agents. They carry caveats for scope, budget, expiry, delegation, revocation, and audit that the gateway can verify before each API, model, or MCP request.',
         },
       },
     ],
@@ -149,7 +159,11 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
           <h1 className="text-4xl font-bold mb-4">Macaroon Tokens vs API Keys for AI Agents</h1>
           <div className="mb-6 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-purple-300">Quick comparison</p>
-            <p className="text-gray-300">API keys identify an account and usually grant broad access until manually rotated. Macaroons act like attenuable capabilities: each delegated token can carry caveats for scope, expiry, tool access, spend budget, revocation, and audit.</p>
+            <p className="text-gray-300">API keys identify an account and usually grant broad access until manually rotated. Macaroons act like attenuable capabilities: each delegated token can carry caveats for scope, expiry, tool access, spend budget, revocation, and audit inside an <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">economic control plane for AI agents</Link>.</p>
+          </div>
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row">
+            <Link href="/economic-control-plane" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Economic control plane</Link>
+            <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">Generate token policy</Link>
           </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
@@ -198,6 +212,7 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
             <div className="mt-5 flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/capability-auth" className="text-cyan-300 hover:text-cyan-200">Capability auth →</Link>
               <Link href="/agent-capability-tokens" className="text-cyan-300 hover:text-cyan-200">Agent capability tokens →</Link>
+              <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">Economic control plane →</Link>
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">Govern agent access →</Link>
             </div>
           </div>
@@ -684,6 +699,7 @@ attenuated_token = agent_a_token.add_caveats([
               <Link href="/revocable-agent-credentials" className="text-cyan-300 hover:text-cyan-200">Revocable credentials →</Link>
               <Link href="/agent-capability-tokens" className="text-cyan-300 hover:text-cyan-200">Capability tokens →</Link>
               <Link href="/agent-control-plane" className="text-cyan-300 hover:text-cyan-200">Agent control plane →</Link>
+              <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">Economic control plane →</Link>
               <Link href="/economic-firewall-readiness-grader" className="text-cyan-300 hover:text-cyan-200">Readiness grader →</Link>
             </div>
           </div>
@@ -696,6 +712,7 @@ attenuated_token = agent_a_token.add_caveats([
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
+              <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">Economic control plane →</Link>
               <Link href="/mcp-governance" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>
@@ -716,6 +733,9 @@ attenuated_token = agent_a_token.add_caveats([
               </a>
               <Link href="/design-partners" className="inline-flex items-center gap-2 border border-blue-500 text-blue-300 px-6 py-3 rounded-lg font-bold hover:bg-blue-900/30 transition text-sm">
                 Become a Design Partner
+              </Link>
+              <Link href="/economic-control-plane" className="inline-flex items-center gap-2 border border-cyan-500 text-cyan-300 px-6 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition text-sm">
+                Read: Economic Control Plane →
               </Link>
             </div>
           </div>

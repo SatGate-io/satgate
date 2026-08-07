@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-07T03:35:10.204204Z",
+  "generatedAt": "2026-08-07T04:06:00.058357Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -311,6 +311,7 @@
         "/blog",
         "/capability-auth",
         "/design-partners",
+        "/economic-control-plane",
         "/economic-firewall-readiness-grader",
         "/govern",
         "/mcp-governance",
@@ -328,7 +329,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2776,
+      "wordCount": 2821,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
