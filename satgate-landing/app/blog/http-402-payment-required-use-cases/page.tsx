@@ -5,7 +5,7 @@ export const metadata = {
   title: "HTTP 402 Payment Required: API and Agent Use Cases",
   description: "HTTP 402 and L402 are paid-rail context. SatGate governs authority before execution and preserves Evidence Packs.",
   alternates: { canonical: 'https://satgate.io/blog/http-402-payment-required-use-cases' },
-  keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API'],
+  keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API', 'economic control plane for AI agents'],
   openGraph: {
     title: 'HTTP 402 Payment Required: Meaning, Use Cases, and AI Agents',
     description: 'HTTP 402 explained: reserved status code history, L402 paid API access, agent budget authority, and Evidence Pack proof.',
@@ -29,7 +29,7 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-02',
-    dateModified: '2026-08-05',
+    dateModified: '2026-08-06',
     mainEntityOfPage: 'https://satgate.io/blog/http-402-payment-required-use-cases',
     about: [
       { '@type': 'Thing', name: 'HTTP 402 Payment Required' },
@@ -37,6 +37,7 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
       { '@type': 'Thing', name: 'AI agent payments' },
       { '@type': 'Thing', name: 'machine-to-machine micropayments' },
       { '@type': 'Thing', name: 'Lightning-backed API monetization' },
+      { '@type': 'Thing', name: 'economic control plane for AI agents' },
     ],
   };
 
@@ -162,6 +163,7 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
           <div className="mb-6 flex flex-col gap-3 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Govern paid agent access</Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">See Policy-to-Proof</Link>
+            <Link href="/economic-control-plane" className="inline-flex items-center justify-center rounded-lg border border-green-600 px-5 py-3 text-sm font-bold text-green-200 transition hover:border-green-400 hover:bg-green-950/30">Economic control plane</Link>
           </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
@@ -545,6 +547,10 @@ Parent Agent ($50 macaroon)
           </p>
 
           <p className="text-gray-300 leading-relaxed">
+            In SatGate language, HTTP 402 and L402 are paid-rail context inside the broader <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">economic control plane for AI agents</Link>: authority, budget, routing, revocation, and proof before value moves.
+          </p>
+
+          <p className="text-gray-300 leading-relaxed">
 HTTP 402 was reserved for future use in 1997. For agent systems, the useful version is narrower: 402 is paid-rail context around an authority decision, with policy checked before value moves and Evidence Packs available after the call.
           </p>
 
@@ -559,6 +565,7 @@ HTTP 402 was reserved for future use in 1997. For agent systems, the useful vers
               <Link href="/http-402-for-ai-agents" className="text-cyan-300 hover:text-cyan-200">HTTP 402 for AI agents →</Link>
               <Link href="/agent-payment-controls" className="text-cyan-300 hover:text-cyan-200">Agent payment controls →</Link>
               <Link href="/partners/rails" className="text-cyan-300 hover:text-cyan-200">Paid-rail governance →</Link>
+              <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">Economic control plane →</Link>
             </div>
           </div>
 
@@ -572,6 +579,7 @@ HTTP 402 was reserved for future use in 1997. For agent systems, the useful vers
               <Link href="/pay" className="text-cyan-300 hover:text-cyan-200">SatGate Pay →</Link>
               <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway controls →</Link>
               <Link href="/capability-auth" className="text-cyan-300 hover:text-cyan-200">Capability auth →</Link>
+              <Link href="/economic-control-plane" className="text-cyan-300 hover:text-cyan-200">Economic control plane →</Link>
               <Link href="/blog/api-monetization-ai" className="text-cyan-300 hover:text-cyan-200">API monetization for AI →</Link>
             </div>
           </div>

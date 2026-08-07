@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-07T00:34:56.344748Z",
+  "generatedAt": "2026-08-07T01:05:42.356555Z",
   "items": [
     {
       "path": "/blog/always-on-agents-economic-authority",
@@ -248,6 +248,7 @@
         "/blog",
         "/blog/api-monetization-ai",
         "/capability-auth",
+        "/economic-control-plane",
         "/govern",
         "/http-402-for-ai-agents",
         "/l402-agent-payments",
@@ -269,7 +270,7 @@
         "TechArticle",
         "Thing"
       ],
-      "wordCount": 2740,
+      "wordCount": 2787,
       "hasObserveControlProve": true,
       "hasEvidencePack": true,
       "hasFAQ": true,
