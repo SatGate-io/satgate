@@ -68,7 +68,7 @@ const posts = [
   },
   {
     slug: 'how-to-add-budget-limits-to-openai-api-calls',
-    title: 'OpenAI API Budget Limits: Stop Runaway GPT Spend Before It Happens',
+    title: 'OpenAI API Budget Limits: Stop Runaway Spend Before Calls',
     description: 'Learn how to enforce OpenAI API budget limits before each request, then use the ROI calculator to quantify avoided agent-loop spend.',
     date: '2026-04-07',
     readTime: '8 min read',

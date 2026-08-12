@@ -28,8 +28,8 @@ SITEMAP_PATH_RE = re.compile(r"path:\s*'([^']*)'")
 
 RECOMMENDED_META = {
  '/blog/how-to-add-budget-limits-to-openai-api-calls': {
-   'title': 'OpenAI API Budget Limits: Control Spend Before Calls',
-   'description': 'Add OpenAI API budget limits with authority before execution, Observe/Control/Prove controls, and Evidence Pack receipts.'},
+   'title': 'OpenAI API Budget Limits: Stop Runaway Spend Before Calls',
+   'description': 'Set OpenAI API budget limits by agent, team, or workflow. Stop runaway GPT spend before the call runs and keep Evidence Pack proof.'},
  '/blog/llm-cost-management': {
    'title': 'LLM Cost Management: Control AI Spend Before It Happens',
    'description': 'A practical guide to LLM cost management using authority before execution, budget controls, and Evidence Pack receipts for AI agents.'},
