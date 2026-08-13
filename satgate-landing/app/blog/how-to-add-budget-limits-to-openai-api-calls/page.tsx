@@ -3,20 +3,21 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "OpenAI API Budget Limits: Hard Caps Before GPT Calls Run",
-  description: "Set OpenAI API budget limits by agent, team, or workflow. Enforce hard caps before GPT calls execute and preserve Evidence Pack proof.",
+  title: "OpenAI API Budget Limits: Stop Runaway Spend Before Calls",
+  description: "Set OpenAI API budget limits by agent, team, or workflow. Stop runaway GPT spend before the call runs and keep Evidence Pack proof.",
   alternates: { canonical: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls' },
   keywords: ['OpenAI API budget limits', 'OpenAI cost control', 'API gateway OpenAI', 'GPT-4 spending limits', 'OpenAI API costs', 'prevent OpenAI overspending', 'hard cap OpenAI spend', 'per-agent OpenAI budget'],
   openGraph: {
-    title: 'OpenAI API Budget Limits: Hard Caps Before GPT Calls Run',
-    description: 'Set OpenAI API budget limits by agent, team, or workflow. Enforce hard caps before GPT calls execute and preserve Evidence Pack proof.',
+    title: 'OpenAI API Budget Limits: Stop Runaway Spend Before Calls',
+    description: 'Set OpenAI API budget limits by agent, team, or workflow. Stop runaway GPT spend before the call runs and keep Evidence Pack proof.',
     url: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls',
     type: 'article',
     publishedTime: '2026-04-07T00:00:00Z',
+    modifiedTime: '2026-08-12T00:00:00Z',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OpenAI API Budget Limits: Hard Caps Before GPT Calls Run',
+    title: 'OpenAI API Budget Limits: Stop Runaway Spend Before Calls',
     description: 'Set per-agent, team, and workflow budgets before GPT calls execute, then prove each allow, deny, or downgrade decision.',
   },
 };
@@ -25,12 +26,12 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'OpenAI API Budget Limits: Hard Caps Before GPT Calls Run',
+    headline: 'OpenAI API Budget Limits: Stop Runaway Spend Before Calls',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-07',
-    dateModified: '2026-06-01',
+    dateModified: '2026-08-12',
     mainEntityOfPage: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls',
     about: [
       { '@type': 'Thing', name: 'OpenAI API budget limits' },
@@ -113,7 +114,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
             <span className="px-2 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono">API Gateway</span>
           </div>
           
-          <h1 className="text-4xl font-bold mb-4">How to Add Hard Budget Limits to OpenAI API Calls</h1>
+          <h1 className="text-4xl font-bold mb-4">How to Add OpenAI API Budget Limits Before Calls Run</h1>
           <div className="mb-6 rounded-2xl border border-green-900/60 bg-green-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-green-300">Direct answer</p>
             <p className="text-gray-300">OpenAI usage limits are account-level. Request-path controls enforce per-agent, per-team, and per-workflow budgets before a GPT call reaches OpenAI, then Prove each allow, deny, or downgrade with an Evidence Pack receipt.</p>
