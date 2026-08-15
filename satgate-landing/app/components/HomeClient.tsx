@@ -35,7 +35,7 @@ const LandingPage = () => {
             <Link href="/sandbox" className="hover:text-white transition">Demo</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
-            <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="rounded-full border border-purple-500/40 px-3 py-1.5 text-purple-300 hover:border-purple-400 hover:text-purple-200 transition">Cloud →</a>
+            <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="rounded-full border border-purple-500/40 px-3 py-1.5 text-purple-300 hover:border-purple-400 hover:text-purple-200 transition">Cloud login</a>
           </div>
 
           {/* Mobile menu button */}
@@ -158,7 +158,7 @@ const LandingPage = () => {
               onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
-              Cloud
+              Cloud login
             </a>
           </div>
         </div>
@@ -205,7 +205,7 @@ const LandingPage = () => {
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
                 <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> REST · GraphQL · MCP</span>
                 <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Gateway · Sidecar · MCP Proxy</span>
-                <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Sub-ms verification</span>
+                <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Request-path verification</span>
               </div>
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
                 <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> MCP · API keys · x402-aware governance</span>
@@ -358,7 +358,7 @@ const LandingPage = () => {
                 verify → allow → meter/log
               </p>
               <p className="text-xs text-cyan-400/80 mb-3 italic">
-                Start here. No workflow changes. Map authority, tools, and spend before enforcing policy.
+                Start here. Keep agent behavior unchanged while you map authority, tools, and spend before enforcing policy.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ Observe mode - no enforcement changes to existing agent workflows</li>
@@ -586,7 +586,7 @@ const LandingPage = () => {
       <section className="py-16 px-6 border-b border-gray-800">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-bold text-center mb-3">Where It Fits</h2>
-          <p className="text-gray-500 text-center mb-10">Three deployment modes. Drop-in. No rip-and-replace.</p>
+          <p className="text-gray-500 text-center mb-10">Three integration patterns. Start with one bounded route or tool.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Standard */}
@@ -653,7 +653,7 @@ const LandingPage = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-3">How It Works</h2>
             <p className="text-gray-400 max-w-xl mx-auto">
-              Four steps to govern agent traffic. No code changes required.
+              Most pilots start with a proxy, DNS, or MCP configuration change around one bounded endpoint or tool.
             </p>
           </div>
 
@@ -732,9 +732,9 @@ const LandingPage = () => {
               <a href="mailto:contact@satgate.io" className="inline-block bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-10 py-4 rounded-full font-bold text-lg hover:opacity-90 transition shadow-lg shadow-purple-500/20">
                 Get in Touch
               </a>
-              <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="inline-block bg-white text-black px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-200 transition">
-                Start Free →
-              </a>
+              <Link href="/design-partners" className="inline-block bg-white text-black px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-200 transition">
+                Apply for a Pilot →
+              </Link>
             </div>
             <p className="text-gray-500 text-sm">
               Or <Link href="/policy-to-proof" className="text-purple-400 hover:text-purple-300 transition underline underline-offset-4">see the Policy-to-Proof evidence story →</Link>
@@ -759,7 +759,7 @@ const LandingPage = () => {
                 <li><Link href="/agent-authority-layer" className="hover:text-white transition">Authority & Accountability</Link></li>
                 <li><Link href="/partners/rails" className="hover:text-white transition">Rail Partners</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
-                <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud Dashboard</a></li>
+                <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud login</a></li>
               </ul>
             </div>
             <div>

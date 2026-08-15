@@ -67,10 +67,10 @@ export default function DesignPartnersPage() {
   };
 
   const faqs = [
-    { q: 'How long is the program?', a: '90 days. After that, you keep everything you built and get priority access to GA pricing.' },
+    { q: 'How long is the program?', a: '90 days. At the end, both sides review the governed workload, policy outcomes, Evidence Pack use, support burden, and operating evidence before deciding whether to expand, contract, or stop.' },
     { q: 'Is it really free?', a: 'Yes. The design-partner path starts with an agreed staging lane and no credit card. You get visibility into agent traffic and help shape the authority, budget, revocation, and Evidence Pack workflows that matter in your environment.' },
     { q: 'Do I need to change my code?', a: 'Usually no. Most pilots start with a DNS, proxy, or MCP configuration change around one staging endpoint or tool. We verify the path together before expanding.' },
-    { q: 'Where does my data go?', a: 'Your infrastructure. In a Dedicated deployment the SatGate gateway runs in your environment, with custody boundaries agreed during onboarding. We never see your API payloads or sensitive data.' },
+    { q: 'Where does my data go?', a: 'The data path, environment, and custody boundaries are documented before activation. Most pilots start in staging or another bounded lane. Dedicated deployment is evaluated separately during enterprise scoping.' },
     { q: 'Is this for production traffic?', a: 'Design partners usually start in staging or a bounded pilot lane. The goal is to verify request-path policy, revocation, budgets, and Evidence Pack proof before expanding scope.' },
   ];
 
@@ -81,7 +81,7 @@ export default function DesignPartnersPage() {
     url: 'https://satgate.io/design-partners',
     description: 'Early access for teams shaping SatGate Policy-to-Proof capabilities for AI agent budget enforcement, MCP governance, API controls, paid-rail context, and Evidence Pack proof.',
     datePublished: '2026-04-27',
-    dateModified: '2026-05-02',
+    dateModified: '2026-08-15',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent economic governance' },
@@ -183,16 +183,16 @@ export default function DesignPartnersPage() {
       <header className="pt-32 pb-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-900/30 border border-cyan-500/30 text-cyan-300 text-xs font-mono mb-6">
-            <Users size={12} /> Limited to 10 Companies
+            <Users size={12} /> Small cohort, one workload each
           </div>
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-            Shape the Future of{' '}
+            Test Bounded Authority on{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400">
-              AI Agent Governance
+              One Governed Workload
             </span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            We're working with <strong className="text-white">10 enterprises</strong> to shape SatGate's Policy-to-Proof layer for AI agent requests. Gate one MCP tool, REST API, or LLM endpoint in a bounded lane — see which agent had authority, what it spent, what was denied, and what Evidence Pack proof was preserved. Get direct engineering support and a product shaped by your needs.
+            SatGate is accepting a small design-partner cohort. Gate one MCP tool, REST API, or LLM endpoint in an agreed staging or bounded pilot lane. Measure which agent had authority, what it spent, what was denied, and what Evidence Pack proof was preserved before either side expands the scope.
           </p>
           <a href="#apply" className="inline-flex items-center gap-2 bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
             Apply Now <ArrowRight size={18} />
@@ -273,7 +273,7 @@ export default function DesignPartnersPage() {
                 <h3 className="font-bold text-lg">15 Minutes / Week</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                A quick sync call or async feedback. Tell us what works, what doesn't, and what you need next.
+                A quick sync call or async feedback. Tell us what works, what does not, and what you need next.
               </p>
             </div>
 
@@ -285,7 +285,7 @@ export default function DesignPartnersPage() {
                 <h3 className="font-bold text-lg">Honest Feedback</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                We want the truth. If something's broken, tell us. If a feature is missing, we need to know. Your candor makes the product better.
+                We want the truth. If something is broken, tell us. If a feature is missing, we need to know. Your candor makes the product better.
               </p>
             </div>
           </div>
@@ -296,15 +296,15 @@ export default function DesignPartnersPage() {
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">How It Works</h2>
-          <p className="text-gray-500 text-center mb-12">From application to insights in under 3 weeks.</p>
+          <p className="text-gray-500 text-center mb-12">A staged path from application to one bounded, instrumented workload.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {[
               {
                 step: '1',
                 title: 'Sign Up',
-                time: '5 minutes',
-                desc: 'Fill out the form below. We review and respond within 24 hours.',
+                time: 'About 2 minutes',
+                desc: 'Fill out the form below. We review it and reply with fit questions or a proposed pilot scope.',
                 color: 'purple',
                 icon: <Send size={20} />,
               },
@@ -350,7 +350,7 @@ export default function DesignPartnersPage() {
       <section id="apply" className="py-20 px-6 border-t border-gray-800 bg-gradient-to-b from-purple-950/10 to-black">
         <div className="max-w-2xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">Apply to the Design Partner Program</h2>
-          <p className="text-gray-500 text-center mb-10">Takes about 2 minutes. We'll respond within 24 hours.</p>
+          <p className="text-gray-500 text-center mb-10">Takes about 2 minutes. We review each application and reply with fit questions or a proposed pilot scope.</p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Name */}
@@ -443,7 +443,7 @@ export default function DesignPartnersPage() {
             {/* Challenge */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                What's your biggest challenge with AI agent management?
+                What is your biggest challenge with AI agent management?
               </label>
               <textarea
                 value={formData.challenge}
@@ -457,7 +457,7 @@ export default function DesignPartnersPage() {
             {/* Submit */}
             {submitStatus === 'sent' ? (
               <div className="w-full py-4 bg-green-900/30 border border-green-700/50 text-green-400 rounded-xl font-bold text-lg flex items-center justify-center gap-2">
-                ✓ Application received! We&apos;ll be in touch within 24 hours.
+                ✓ Application received. We will review it and follow up by email.
               </div>
             ) : (
               <button
@@ -515,7 +515,7 @@ export default function DesignPartnersPage() {
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Still have questions?</h2>
           <p className="text-gray-400 mb-8">
-            Reach out directly. We'd love to chat about your use case.
+            Reach out directly. We would be glad to discuss your use case.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="mailto:contact@satgate.io" className="border border-gray-700 px-8 py-3 rounded-lg font-bold hover:border-gray-500 transition flex items-center justify-center gap-2">
