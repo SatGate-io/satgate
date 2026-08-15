@@ -7,32 +7,28 @@ import Image from 'next/image';
 
 const faqs = [
   {
-    q: 'What counts as a request?',
-    a: 'Every API call proxied through the gateway in Control or paid-rail admission mode counts as a metered request. Observe-mode requests are always free and unlimited — no catches.',
+    q: 'What access is available today?',
+    a: 'SatGate is accepting design partners for one bounded staging endpoint, API route, or MCP tool. The public demos and Evidence Pack examples remain available without an account.',
   },
   {
-    q: 'How does the Free → Pro upgrade work?',
-    a: 'Start with Free to see what your agents are spending. When you\'re ready to enforce budgets and set hard stops, upgrade to Pro in one click. No data migration — your dashboards carry over.',
+    q: 'Does a pilot require code changes?',
+    a: 'Most pilots start with a DNS, proxy, or MCP configuration change around one bounded endpoint or tool. We verify that path before expanding it.',
   },
   {
-    q: 'Can I switch plans?',
-    a: 'Yes, upgrade or downgrade anytime. Changes take effect immediately. No lock-in.',
+    q: 'Is the hosted production service generally available?',
+    a: 'No. General self-serve production access is not the current offer. Design partners start in an agreed staging or bounded pilot lane while SatGate verifies the buyer journey and operating controls.',
   },
   {
-    q: 'Do you offer annual billing?',
-    a: 'Yes, save 20% with annual billing. Contact us for details.',
+    q: 'What does the design-partner pilot cost?',
+    a: 'The initial 90-day design-partner pilot has no charge or credit-card requirement. Any later commercial contract depends on the accepted scope, measured usage, and operating requirements.',
   },
   {
-    q: 'What happens if I exceed my request limit?',
-    a: 'Overage is billed at $0.10 per 1,000 requests. No surprise charges — you\'ll get alerts at 80% and 90% so you can adjust budgets before you hit the limit.',
+    q: 'What happens after the pilot?',
+    a: 'We review the governed workload, policy outcomes, Evidence Pack use, support burden, and operating evidence together. Both sides then decide whether to expand, contract, or stop.',
   },
   {
-    q: 'Is there a free trial of Pro?',
-    a: 'Every account starts with a 14-day Pro trial. No credit card required. After the trial, you drop to Free (Observe) — you keep Observe-mode visibility.',
-  },
-  {
-    q: 'Do you support Dedicated deployment?',
-    a: 'Yes, by contract on the Enterprise plan. Deployment and custody boundaries are agreed during onboarding for each Dedicated environment.',
+    q: 'Is Dedicated deployment available?',
+    a: 'Dedicated deployment is evaluated during enterprise scoping. It is not currently advertised as a generally available tier or SLA-backed service.',
   },
 ];
 
@@ -45,9 +41,9 @@ const PricingPage = () => {
     '@type': 'WebPage',
     name: 'SatGate Pricing',
     url: 'https://satgate.io/pricing',
-    description: 'Pricing for bounded agent authority: Observe audits, request-path budget enforcement, MCP tool controls, receipts, and Evidence Pack proof.',
+    description: 'Current SatGate access: public proof demos, bounded design-partner pilots, and post-pilot enterprise scoping.',
     datePublished: '2026-04-27',
-    dateModified: '2026-05-03',
+    dateModified: '2026-08-15',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'Agent Authority & Accountability Layer' },
@@ -82,34 +78,17 @@ const PricingPage = () => {
     '@type': 'OfferCatalog',
     name: 'SatGate Pricing',
     url: 'https://satgate.io/pricing',
-    description: 'Pricing for bounded agent authority: Observe audits, request-path budget enforcement, MCP tool controls, receipts, and Evidence Pack proof.',
-    dateModified: '2026-05-03',
+    description: 'Current SatGate access: public proof demos, bounded design-partner pilots, and post-pilot enterprise scoping.',
+    dateModified: '2026-08-15',
     itemListElement: [
       {
         '@type': 'Offer',
-        name: 'Builder / Observe',
+        name: 'SatGate Design Partner Pilot',
         price: '0',
         priceCurrency: 'USD',
-        description: 'Free Observe-mode receipt capture for AI agent API traffic, cost attribution, and Evidence Pack-ready decision proof.',
-        availability: 'https://schema.org/InStock',
-        itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate Observe', applicationCategory: 'DeveloperApplication' },
-      },
-      {
-        '@type': 'Offer',
-        name: 'Pro / Control',
-        price: '99',
-        priceCurrency: 'USD',
-        description: 'Request-path budget enforcement, per-agent caps, MCP tool controls, alerts, revocation, and signed decision receipts for AI agent spend.',
-        availability: 'https://schema.org/InStock',
-        itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate Control', applicationCategory: 'DeveloperApplication' },
-      },
-      {
-        '@type': 'Offer',
-        name: 'Enterprise',
-        priceCurrency: 'USD',
-        description: 'Enterprise governance, contract-triggered Dedicated deployment, advanced controls, and paid-rail admission where supported paid calls return receipts and feed Evidence Packs.',
-        availability: 'https://schema.org/InStock',
-        itemOffered: { '@type': 'SoftwareApplication', name: 'SatGate Enterprise', applicationCategory: 'DeveloperApplication' },
+        description: 'No-charge 90-day pilot for one agreed staging endpoint, API route, or MCP tool, with instrumentation and Evidence Pack review.',
+        availability: 'https://schema.org/LimitedAvailability',
+        itemOffered: { '@type': 'Service', name: 'SatGate Design Partner Pilot', serviceType: 'AI agent governance pilot' },
       },
     ],
   };
@@ -134,7 +113,7 @@ const PricingPage = () => {
             <Link href="/pricing" className="text-white transition">Pricing</Link>
             <Link href="/roi-calculator" className="hover:text-white transition">ROI Calculator</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
-            <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud</a>
+            <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud login</a>
           </div>
 
           {/* Mobile menu button */}
@@ -159,7 +138,7 @@ const PricingPage = () => {
             <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="block text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Pricing</Link>
             <Link href="/roi-calculator" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">ROI Calculator</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Docs</a>
-            <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Cloud</a>
+            <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Cloud login</a>
           </div>
         </div>
       </nav>
@@ -168,129 +147,118 @@ const PricingPage = () => {
       <header className="pt-32 pb-10 px-6 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-            Give Agents{' '}
+            Start with a{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-              Bounded Authority.
+              Bounded Pilot.
             </span>
           </h1>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            SatGate prices the controls humans and platforms need before agents reach protected APIs: visibility, hard budget stops, receipts, and Evidence Pack proof.
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+            Public demos show the proof model. Current hosted access is a 90-day design-partner pilot for one agreed staging endpoint, API route, or MCP tool. General self-serve production access is not the current offer.
           </p>
         </div>
       </header>
 
-      {/* Observe → Control → Prove Journey */}
+      {/* Observe, Control, Admit, Prove */}
       <section className="pb-10 px-6">
-        <div className="max-w-3xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-900/20 border border-cyan-800/30">
-              <span className="text-cyan-400 font-bold text-sm">👁 Observe</span>
-              <span className="text-gray-500 text-xs">See the spend</span>
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-cyan-900/20 border border-cyan-800/30">
+              <span className="text-cyan-400 font-bold text-sm">Observe</span>
+              <span className="text-gray-500 text-xs">Project impact</span>
             </div>
-            <span className="text-gray-600 text-xl hidden md:block">→</span>
-            <span className="text-gray-600 md:hidden">↓</span>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-900/20 border border-purple-800/30">
-              <span className="text-purple-400 font-bold text-sm">🛡 Control</span>
-              <span className="text-gray-500 text-xs">Stop the bleed</span>
+            <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-purple-900/20 border border-purple-800/30">
+              <span className="text-purple-400 font-bold text-sm">Control</span>
+              <span className="text-gray-500 text-xs">Enforce owned-agent authority</span>
             </div>
-            <span className="text-gray-600 text-xl hidden md:block">→</span>
-            <span className="text-gray-600 md:hidden">↓</span>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-yellow-900/20 border border-yellow-800/30">
-              <span className="text-yellow-400 font-bold text-sm">⚡ Prove</span>
-              <span className="text-gray-500 text-xs">Export receipts</span>
+            <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-yellow-900/20 border border-yellow-800/30">
+              <span className="text-yellow-400 font-bold text-sm">Admit</span>
+              <span className="text-gray-500 text-xs">Govern external-agent access</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-green-900/20 border border-green-800/30">
+              <span className="text-green-400 font-bold text-sm">Prove</span>
+              <span className="text-gray-500 text-xs">Verify the evidence</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Pricing Cards */}
+      {/* Current access paths */}
       <section className="pb-20 px-6">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-          {/* Free (Observe) */}
+          {/* Public proof */}
           <div className="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-600 transition flex flex-col">
             <div className="mb-6">
-              <h3 className="text-lg font-bold text-cyan-400 mb-1">Builder</h3>
-              <p className="text-gray-500 text-sm">Get out of the dark. See every cent in real-time.</p>
+              <h3 className="text-lg font-bold text-cyan-400 mb-1">Public proof</h3>
+              <p className="text-gray-500 text-sm">Inspect the model before you discuss a pilot.</p>
             </div>
             <div className="mb-6">
               <span className="text-4xl font-extrabold text-white">$0</span>
-              <span className="text-gray-500 text-sm">/month forever</span>
+              <span className="text-gray-500 text-sm"> / no account</span>
             </div>
             <ul className="space-y-3 text-sm text-gray-400 mb-8 flex-1">
-              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" /><span><b className="text-gray-200">Unlimited</b> observe-mode requests</span></li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Real-time receipt dashboard</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Cost attribution by agent &amp; team</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Up to 3 routes</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Community support</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Deterministic allow and deny example</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Evidence Pack example and verifier</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Public calculators and policy templates</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Proves the demo path only, not hosted production readiness</li>
             </ul>
-            <a
-              href="https://cloud.satgate.io/cloud/login"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/sandbox#golden-path"
               className="block text-center py-3 rounded-lg border border-gray-700 font-bold hover:border-gray-500 hover:bg-gray-800 transition"
             >
-              Start Observing — Free →
-            </a>
+              Run the Public Proof →
+            </Link>
           </div>
 
-          {/* Pro (Control + paid-rail admission) — highlighted */}
+          {/* Design partner */}
           <div className="p-6 rounded-xl bg-gray-900 border-2 border-purple-500/60 hover:border-purple-400 transition flex flex-col relative">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-purple-600 text-white text-xs font-bold">
-              MOST POPULAR
+              CURRENT ACCESS
             </div>
             <div className="mb-6">
-              <h3 className="text-lg font-bold text-purple-400 mb-1">Professional</h3>
-              <p className="text-gray-500 text-sm">The only security tool that pays for itself.</p>
+              <h3 className="text-lg font-bold text-purple-400 mb-1">Design partner</h3>
+              <p className="text-gray-500 text-sm">One governed workload, measured together.</p>
             </div>
             <div className="mb-6">
-              <span className="text-4xl font-extrabold text-white">$99</span>
-              <span className="text-gray-500 text-sm">/month</span>
+              <span className="text-4xl font-extrabold text-white">90 days</span>
+              <span className="text-gray-500 text-sm"> / no charge</span>
             </div>
-            <p className="text-xs text-gray-500 mb-4 -mt-4">Everything in Free, plus:</p>
             <ul className="space-y-3 text-sm text-gray-400 mb-8 flex-1">
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" /><span><b className="text-gray-200">Budget enforcement</b> — hard stops per agent, team, or API</span></li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Real-time alerts at 80%, 90%, and limit</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />1M controlled or paid-rail requests included</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Then $0.10 per 1K overage</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Unlimited routes</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />CFO-ready receipt and chargeback exports</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Evidence Pack compliance exports</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Email support</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />One agreed staging endpoint, API route, or MCP tool</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />A declared HTTP or MCP primary lane</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Observe, Control, and Admit only where the pilot scope supports them</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Instrumentation, weekly review, and Evidence Pack use</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Expansion only after both sides review the evidence</li>
             </ul>
-            <a
-              href="https://cloud.satgate.io/cloud/login"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/design-partners"
               className="block text-center py-3 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-bold hover:opacity-90 transition shadow-lg shadow-purple-500/20"
             >
-              Start Pro — 14 Days Free →
-            </a>
+              Apply for a Pilot →
+            </Link>
           </div>
 
-          {/* Enterprise */}
+          {/* Post-pilot enterprise */}
           <div className="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-600 transition flex flex-col">
             <div className="mb-6">
               <h3 className="text-lg font-bold text-green-400 mb-1">Enterprise</h3>
-              <p className="text-gray-500 text-sm">Turn your infrastructure into a marketplace.</p>
+              <p className="text-gray-500 text-sm">Commercial scope follows accepted pilot evidence.</p>
             </div>
             <div className="mb-6">
               <span className="text-4xl font-extrabold text-white">Custom</span>
+              <span className="text-gray-500 text-sm"> / after pilot</span>
             </div>
-            <p className="text-xs text-gray-500 mb-4 -mt-4">Everything in Pro, plus:</p>
             <ul className="space-y-3 text-sm text-gray-400 mb-8 flex-1">
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" /><span><b className="text-gray-200">Unlimited</b> requests — no metering caps</span></li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Contract-triggered Dedicated deployment</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />SSO/SCIM + RBAC</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Full Evidence Pack &amp; retention policies</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />SOC 2 compliance package</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Dedicated CSM + SLA</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Custom integrations &amp; onboarding</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Production scope requires a separate readiness decision</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Environment and custody boundaries are agreed in writing</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Usage, support, and retention are measured before pricing</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Dedicated, SLA, and compliance support remain subject to readiness and contract scope</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />No automatic expansion from pilot to production</li>
             </ul>
             <a
               href="mailto:contact@satgate.io"
               className="block text-center py-3 rounded-lg border border-gray-700 font-bold hover:border-gray-500 hover:bg-gray-800 transition"
             >
-              Talk to Us →
+              Discuss Enterprise Scope →
             </a>
           </div>
         </div>
@@ -405,19 +373,17 @@ const PricingPage = () => {
       {/* Bottom CTA */}
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-3">If your agents aren&apos;t governed, they&apos;re a liability.</h2>
+          <h2 className="text-2xl font-bold mb-3">Start with one governed workload.</h2>
           <p className="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
-            With SatGate, they&apos;re an asset. <Link href="/roi-calculator" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">Calculate your savings →</Link>
+            Pick one staging endpoint or MCP tool, define the authority boundary, and measure the result before expanding.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="https://cloud.satgate.io/cloud/login"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/design-partners"
               className="inline-block bg-white text-black px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-200 transition"
             >
-              Start Free →
-            </a>
+              Apply for a Pilot →
+            </Link>
             <a
               href="mailto:contact@satgate.io"
               className="inline-block border border-gray-700 text-gray-300 px-10 py-4 rounded-full font-bold text-lg hover:border-gray-500 hover:bg-gray-800 transition"
@@ -448,7 +414,7 @@ const PricingPage = () => {
                 <li><Link href="/govern" className="hover:text-white transition">Enterprise</Link></li>
                 <li><Link href="/design-partners" className="hover:text-white transition">Design Partners</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
-                <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud Dashboard</a></li>
+                <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud login</a></li>
               </ul>
             </div>
             <div>

@@ -28,9 +28,8 @@ REQUIRED_PHRASES = {
         "Export Evidence Pack",
     ],
     "app/pricing/page.tsx": [
-        "receipt capture",
-        "Real-time receipt dashboard",
-        "Evidence Pack compliance exports",
+        "Evidence Pack example and verifier",
+        "Instrumentation, weekly review, and Evidence Pack use",
         "Signed receipts + Evidence Pack export",
     ],
     "app/pay/page.tsx": [
@@ -89,7 +88,17 @@ REQUIRED_PHRASES = {
 
 FORBIDDEN_PUBLIC_PHRASES = {
     "app/components/HomeClient.tsx": ["Metered:    $847 usage", "Audit: who, when, diff"],
-    "app/pricing/page.tsx": ["Real-time usage dashboard", "Live economic telemetry"],
+    "app/pricing/page.tsx": [
+        "Real-time usage dashboard",
+        "Live economic telemetry",
+        "Start Free",
+        "Start Pro",
+        "Unlimited observe-mode requests",
+        "$0.10 per 1K overage",
+        "SOC 2 compliance package",
+        "Dedicated CSM + SLA",
+        "14 Days Free",
+    ],
     "app/pay/page.tsx": ["Zero Invoices. Zero Contracts. Zero Wait."],
     "app/dashboard/page.tsx": ["Dashboard telemetry explains decisions", "live governance telemetry"],
     "app/policy-to-proof/page.tsx": ["revocation event", "spend event", "matching receipts preserve the event log"],
