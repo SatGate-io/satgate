@@ -959,10 +959,14 @@ func matchScope(scope, toolName string) bool {
 	for _, s := range strings.Split(scope, ",") {
 		s = strings.TrimSpace(s)
 
-		// Strip tenant UUID prefix if present (format: "uuid:scope")
-		// UUIDs are 36 chars with hyphens (8-4-4-4-12)
-		if len(s) > 37 && s[36] == ':' && s[8] == '-' && s[13] == '-' {
-			s = s[37:]
+		// Strip tenant prefix if present (format: "tenant-id:scope").
+		// SaaS tokens are minted with tenant-prefixed scopes such as
+		// "demo-82712860:*"; older logic only handled UUID tenant IDs.
+		if idx := strings.IndexByte(s, ':'); idx > 0 {
+			rest := s[idx+1:]
+			if rest == "*" || rest == "api:*" || rest == "mcp:*" || strings.HasSuffix(rest, ":*") {
+				s = rest
+			}
 		}
 
 		if s == "*" || s == "api:*" || s == "mcp:*" {
