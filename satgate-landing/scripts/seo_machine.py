@@ -34,8 +34,8 @@ RECOMMENDED_META = {
    'title': 'LLM Cost Management: Control AI Spend Before It Happens',
    'description': 'A practical guide to LLM cost management using authority before execution, budget controls, and Evidence Pack receipts for AI agents.'},
  '/blog/http-402-payment-required-use-cases': {
-   'title': 'HTTP 402 Payment Required: API and Agent Use Cases',
-   'description': 'HTTP 402 and L402 are paid-rail context. SatGate governs authority before execution and preserves Evidence Packs.'},
+   'title': 'HTTP 402 Payment Required: Meaning and API Examples',
+   'description': 'Learn what HTTP 402 Payment Required means, why it is reserved in the HTTP standard, and how paid APIs and AI agents use it with L402.'},
  '/blog/macaroon-tokens-vs-api-keys': {
    'title': 'Macaroon Tokens vs API Keys for Agent Access',
    'description': 'Compare macaroon tokens and API keys for scoped authorization, delegated access, and safer AI agent permissions.'},
