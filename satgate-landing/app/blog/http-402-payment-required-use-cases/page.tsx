@@ -2,21 +2,21 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "HTTP 402 Payment Required: API and Agent Use Cases",
-  description: "HTTP 402 and L402 are paid-rail context. SatGate governs authority before execution and preserves Evidence Packs.",
+  title: "HTTP 402 Payment Required: Meaning and API Examples",
+  description: "Learn what HTTP 402 Payment Required means, why it is reserved in the HTTP standard, and how paid APIs and AI agents use it with L402.",
   alternates: { canonical: 'https://satgate.io/blog/http-402-payment-required-use-cases' },
   keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API'],
   openGraph: {
-    title: 'HTTP 402 Payment Required: Meaning, Use Cases, and AI Agents',
-    description: 'HTTP 402 explained: reserved status code history, L402 paid API access, agent budget authority, and Evidence Pack proof.',
+    title: 'HTTP 402 Payment Required: Meaning and API Examples',
+    description: 'Learn what HTTP 402 Payment Required means, why it is reserved in the HTTP standard, and how paid APIs and AI agents use it with L402.',
     url: 'https://satgate.io/blog/http-402-payment-required-use-cases',
     type: 'article',
     publishedTime: '2026-04-02T00:00:00Z',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'HTTP 402 Payment Required: Meaning, Use Cases, and AI Agents',
-    description: 'HTTP 402 explained for reserved use, L402 paid APIs, agent budget authority, paid-rail governance, and Evidence Packs.',
+    title: 'HTTP 402 Payment Required: Meaning and API Examples',
+    description: 'Learn what HTTP 402 Payment Required means, why it is reserved in the HTTP standard, and how paid APIs and AI agents use it with L402.',
   },
 };
 
