@@ -2,20 +2,20 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, BadgeCheck, KeyRound, Layers3, ShieldCheck, TimerReset, WalletCards } from 'lucide-react';
 
 export const metadata = {
-  title: 'Capability-Based Authorization for AI Agents',
-  description: 'Replace broad API keys with scoped, revocable capabilities, authority before execution, and Evidence Pack proof.',
+  title: 'Capability-Based Authorization: Macaroons for AI Agents',
+  description: 'Learn how macaroon capability tokens constrain AI agent access, budgets, and delegation. Revoke authority before execution and keep Evidence Pack proof.',
   alternates: { canonical: 'https://satgate.io/capability-auth' },
   keywords: ['capability based authorization', 'capability auth', 'agent authorization', 'capability tokens', 'macaroon tokens', 'delegated authorization', 'AI agent permissions'],
   openGraph: {
-    title: 'Capability-Based Authorization for AI Agents',
-    description: 'Give agents scoped, revocable capabilities and Evidence Pack proof instead of broad static API keys.',
+    title: 'Capability-Based Authorization: Macaroons for AI Agents',
+    description: 'Learn how macaroon capability tokens constrain AI agent access, budgets, and delegation. Revoke authority before execution and keep Evidence Pack proof.',
     url: 'https://satgate.io/capability-auth',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Capability-Based Authorization for AI Agents',
-    description: 'Use SatGate to scope agent authority before execution and prove decisions with Evidence Packs.',
+    title: 'Capability-Based Authorization: Macaroons for AI Agents',
+    description: 'Learn how macaroon capability tokens constrain AI agent access, budgets, and delegation. Revoke authority before execution and keep Evidence Pack proof.',
   },
 };
 
