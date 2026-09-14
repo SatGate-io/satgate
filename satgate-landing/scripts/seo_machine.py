@@ -49,8 +49,8 @@ RECOMMENDED_META = {
    'title': 'MCP Gateway for Agent Governance and Evidence Packs',
    'description': 'Use SatGate as an MCP gateway to check authority before tool execution, enforce policy, and export Evidence Packs.'},
  '/capability-auth': {
-   'title': 'Capability-Based Authorization for AI Agents',
-   'description': 'Replace broad API keys with scoped, revocable, budget-aware capabilities for AI agents using SatGate.'},
+   'title': 'Capability-Based Authorization: Macaroons for AI Agents',
+   'description': 'Learn how macaroon capability tokens constrain AI agent access, budgets, and delegation. Revoke authority before execution and keep Evidence Pack proof.'},
 }
 
 def load_json(path: Path) -> Any:
