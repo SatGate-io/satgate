@@ -259,6 +259,34 @@ func TestAgentLoopCapabilityUsesARealTokenAndLeavesItOutOfThePack(t *testing.T) 
 	}
 }
 
+func TestAgentLoopIssuerComesFromThePolicyNotSatGate(t *testing.T) {
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer upstream.Close()
+	gw := newTestGateway(t, &config.Config{
+		Admin: config.AdminConfig{Token: "admin-secret"},
+		Cloud: &config.CloudConfig{SSRF: &config.CloudSSRFConfig{AllowPrivateIPs: true}},
+	})
+	bad := agentPost(t, gw, "/api/agent/policy", map[string]string{
+		"name": "bad", "kind": "observe", "path_prefix": "/bad", "upstream_url": upstream.URL, "issuer": "http://issuer.example",
+	})
+	if bad.Code != http.StatusBadRequest {
+		t.Fatalf("http issuer accepted: %d %s", bad.Code, bad.Body.String())
+	}
+	staged := agentPost(t, gw, "/api/agent/policy", map[string]string{
+		"name": "orders", "kind": "observe", "path_prefix": "/orders", "upstream_url": upstream.URL, "issuer": "https://issuer.example",
+	})
+	var policy agentPolicy
+	decode(t, staged, &policy)
+	sim := agentPost(t, gw, "/api/agent/simulate", map[string]string{"policy_id": policy.ID})
+	var pack map[string]any
+	decode(t, sim, &pack)
+	if pack["issuer"] != "https://issuer.example" || pack["issuer"] == "https://satgate.io" {
+		t.Fatalf("issuer was not the one the agent set: %+v", pack["issuer"])
+	}
+}
+
 func agentPost(t *testing.T, gw *Gateway, path string, body any) *httptest.ResponseRecorder {
 	t.Helper()
 	raw, err := json.Marshal(body)

@@ -30,6 +30,7 @@ type agentPolicy struct {
 	UpstreamURL string `json:"upstream_url"`
 	Surface     string `json:"surface"`
 	Scope       string `json:"scope,omitempty"`
+	Issuer      string `json:"issuer,omitempty"`
 	PackID      string `json:"pack_id,omitempty"`
 	Promoted    bool   `json:"promoted"`
 }
@@ -130,10 +131,17 @@ func (g *Gateway) stageAgentPolicy(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "upstream_required"})
 		return
 	}
+	if req.Issuer != "" && !validIssuerOrigin(req.Issuer) {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_issuer"})
+		return
+	}
 	req.ID = "pol_" + randHex(8)
 	req.Promoted = false
 	loop := g.loop()
 	loop.mu.Lock()
+	if req.Issuer != "" {
+		loop.issuer = req.Issuer
+	}
 	loop.policies[req.ID] = &req
 	loop.mu.Unlock()
 	writeJSON(w, http.StatusCreated, req)
@@ -395,6 +403,11 @@ func (loop *agentLoop) issuerOrigin() string {
 		return loop.issuer
 	}
 	return "https://gateway.invalid"
+}
+
+func validIssuerOrigin(issuer string) bool {
+	rest, ok := strings.CutPrefix(issuer, "https://")
+	return ok && rest != "" && !strings.ContainsAny(rest, "/?#")
 }
 
 func agentKid(pub ed25519.PublicKey) string {
