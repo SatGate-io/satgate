@@ -149,6 +149,45 @@ func TestAgentLoopDenyDoesNotContactUpstreamAndMCPRecordsTheTool(t *testing.T) {
 	}
 }
 
+func TestAgentLoopChargeDoesNotInventAPrice(t *testing.T) {
+	var hits int
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hits++
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer upstream.Close()
+	gw := newTestGateway(t, &config.Config{
+		Admin: config.AdminConfig{Token: "admin-secret"},
+		Cloud: &config.CloudConfig{SSRF: &config.CloudSSRFConfig{AllowPrivateIPs: true}},
+	})
+	staged := agentPost(t, gw, "/api/agent/policy", map[string]string{
+		"name": "paid", "kind": "charge", "path_prefix": "/paid", "upstream_url": upstream.URL, "surface": "http",
+	})
+	var policy agentPolicy
+	decode(t, staged, &policy)
+	sim := agentPost(t, gw, "/api/agent/simulate", map[string]string{"policy_id": policy.ID, "path": "/paid"})
+	var pack map[string]any
+	decode(t, sim, &pack)
+	body := sim.Body.String()
+	if pack["decision"] != "denied" || pack["upstream_contacted"] != false || pack["promote_block"] != "price_unknown" || pack["settlement"] != false || hits != 0 {
+		t.Fatalf("charge simulation invented a call or a price: %+v hits %d", pack, hits)
+	}
+	if strings.Contains(body, "amount_sats") || strings.Contains(body, "invoice") {
+		t.Fatalf("charge simulation contained a price: %s", body)
+	}
+	promoted := agentPost(t, gw, "/api/agent/promote", map[string]string{"policy_id": policy.ID})
+	if promoted.Code != http.StatusConflict || !strings.Contains(promoted.Body.String(), "price_unknown") {
+		t.Fatalf("charge promote: %d %s", promoted.Code, promoted.Body.String())
+	}
+	if strings.Contains(promoted.Body.String(), "amount_sats") || strings.Contains(promoted.Body.String(), "invoice") {
+		t.Fatalf("promote invented a price: %s", promoted.Body.String())
+	}
+	live := agentGet(t, gw, "/paid")
+	if live.Code == http.StatusPaymentRequired || strings.Contains(live.Body.String(), "amount_sats") || hits != 0 {
+		t.Fatalf("charge went live: %d %s hits %d", live.Code, live.Body.String(), hits)
+	}
+}
+
 func agentPost(t *testing.T, gw *Gateway, path string, body any) *httptest.ResponseRecorder {
 	t.Helper()
 	raw, err := json.Marshal(body)

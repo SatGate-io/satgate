@@ -202,6 +202,9 @@ func (g *Gateway) simulateAgentPolicy(w http.ResponseWriter, r *http.Request) {
 		routeOrTool = tool
 	}
 	pack := g.evidencePack(policy, protocolDecision, reason, routeOrTool, contacted, status)
+	if policy.Kind == "charge" {
+		pack["promote_block"] = "price_unknown"
+	}
 	loop.mu.Lock()
 	id, _ := pack["evidence_pack_id"].(string)
 	loop.packs[id] = pack
@@ -242,7 +245,14 @@ func (g *Gateway) promoteAgentPolicy(w http.ResponseWriter, r *http.Request) {
 		kind = "chargeback"
 	}
 	if kind == "charge" {
-		kind = "l402"
+		writeJSON(w, http.StatusConflict, map[string]any{
+			"error":      "price_unknown",
+			"promoted":   false,
+			"policy_id":  policy.ID,
+			"pack_id":    packID,
+			"settlement": false,
+		})
+		return
 	}
 	name := "agent-" + policy.ID
 	if policy.UpstreamURL != "" {
