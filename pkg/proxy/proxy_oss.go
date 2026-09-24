@@ -56,6 +56,9 @@ type Gateway struct {
 
 	// Optional hooks (set via SetXxx methods)
 	metricsHook MetricsHook
+
+	agentOnce sync.Once
+	agent     *agentLoop
 }
 
 // replayGuard prevents L402 preimage replay attacks using an in-memory
@@ -216,6 +219,11 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	if strings.HasPrefix(r.URL.Path, "/api/agent/") {
+		g.handleAgentLoop(w, r)
+		return
+	}
+
 	// Admin endpoint: complete a mock L402 payment for local demos and tests.
 	// This is intentionally available only for Lightning providers that expose
 	// mock preimages; real Lightning backends must settle externally.
@@ -312,6 +320,10 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "chargeback":
 		// chargeback (observe/audit/policy_to_proof) supported in refactor for schema validation
 		g.handlePublic(wrapped, r, route)
+
+	case "deny":
+		http.Error(wrapped, "denied", http.StatusForbidden)
+		return
 
 	case "l402":
 		g.metrics.TotalL402.Add(1)
@@ -516,7 +528,8 @@ func (g *Gateway) issueL402Challenge(w http.ResponseWriter, r *http.Request, rou
 func isBuiltInAPIEndpoint(path string) bool {
 	return path == "/api/l402/mock-pay" ||
 		strings.HasPrefix(path, "/api/capability/") ||
-		strings.HasPrefix(path, "/api/governance/")
+		strings.HasPrefix(path, "/api/governance/") ||
+		strings.HasPrefix(path, "/api/agent/")
 }
 
 // handleCheckPayment allows frontend to poll for payment status
