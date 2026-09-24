@@ -8,9 +8,12 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -61,14 +64,13 @@ type agentLoop struct {
 	privateKey ed25519.PrivateKey
 	issuer     string
 	kid        string
+	packDir    string
 }
 
 func (g *Gateway) loop() *agentLoop {
 	g.agentOnce.Do(func() {
-		pub, priv, err := ed25519.GenerateKey(rand.Reader)
-		if err != nil {
-			panic(err)
-		}
+		dir := os.Getenv("SATGATE_AGENT_PACK_DIR")
+		pub, priv := loadAgentKey(dir)
 		g.agent = &agentLoop{
 			policies:   map[string]*agentPolicy{},
 			packs:      map[string]map[string]any{},
@@ -76,6 +78,7 @@ func (g *Gateway) loop() *agentLoop {
 			publicKey:  pub,
 			privateKey: priv,
 			kid:        agentKid(pub),
+			packDir:    dir,
 		}
 	})
 	return g.agent
@@ -229,6 +232,7 @@ func (g *Gateway) simulateAgentPolicy(w http.ResponseWriter, r *http.Request) {
 		stored.PackID = id
 	}
 	loop.mu.Unlock()
+	_ = g.saveAgentPack(pack)
 	writeJSON(w, http.StatusOK, pack)
 }
 
@@ -305,6 +309,9 @@ func (g *Gateway) getAgentPack(w http.ResponseWriter, r *http.Request) {
 	loop.mu.Lock()
 	pack := loop.packs[id]
 	loop.mu.Unlock()
+	if pack == nil {
+		pack = g.loadAgentPack(id)
+	}
 	if pack == nil {
 		writeJSON(w, http.StatusNotFound, map[string]string{"error": "pack_not_found"})
 		return
@@ -455,6 +462,7 @@ func (g *Gateway) recordLivePack(route *config.Route, r *http.Request, code int,
 	id, _ := pack["evidence_pack_id"].(string)
 	loop.packs[id] = pack
 	loop.mu.Unlock()
+	_ = g.saveAgentPack(pack)
 	return id
 }
 
@@ -498,6 +506,92 @@ func (loop *agentLoop) issuerOrigin() string {
 func validIssuerOrigin(issuer string) bool {
 	rest, ok := strings.CutPrefix(issuer, "https://")
 	return ok && rest != "" && !strings.ContainsAny(rest, "/?#")
+}
+
+func loadAgentKey(dir string) (ed25519.PublicKey, ed25519.PrivateKey) {
+	if dir == "" {
+		pub, priv, err := ed25519.GenerateKey(rand.Reader)
+		if err != nil {
+			panic(err)
+		}
+		return pub, priv
+	}
+	if err := os.MkdirAll(filepath.Join(dir, "packs"), 0o700); err != nil {
+		panic(err)
+	}
+	path := filepath.Join(dir, "signing-key.json")
+	raw, err := os.ReadFile(path)
+	if err == nil {
+		var doc struct {
+			Public  string `json:"public"`
+			Private string `json:"private"`
+		}
+		if json.Unmarshal(raw, &doc) == nil {
+			priv, privErr := base64.RawURLEncoding.DecodeString(doc.Private)
+			pub, pubErr := base64.RawURLEncoding.DecodeString(doc.Public)
+			if privErr == nil && pubErr == nil && len(priv) == ed25519.PrivateKeySize && len(pub) == ed25519.PublicKeySize {
+				return ed25519.PublicKey(pub), ed25519.PrivateKey(priv)
+			}
+		}
+	}
+	pub, priv, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		panic(err)
+	}
+	doc := map[string]string{
+		"public":  base64.RawURLEncoding.EncodeToString(pub),
+		"private": base64.RawURLEncoding.EncodeToString(priv),
+	}
+	body, _ := json.Marshal(doc)
+	if err := writeAtomic(path, body); err != nil {
+		panic(err)
+	}
+	return pub, priv
+}
+
+func (g *Gateway) saveAgentPack(pack map[string]any) error {
+	if g.agent == nil || g.agent.packDir == "" {
+		return nil
+	}
+	id, _ := pack["evidence_pack_id"].(string)
+	if !safePackID(id) {
+		return errors.New("bad pack id")
+	}
+	raw, err := json.Marshal(pack)
+	if err != nil {
+		return err
+	}
+	return writeAtomic(filepath.Join(g.agent.packDir, "packs", id+".json"), raw)
+}
+
+func (g *Gateway) loadAgentPack(id string) map[string]any {
+	if g.agent == nil || g.agent.packDir == "" || !safePackID(id) {
+		return nil
+	}
+	raw, err := os.ReadFile(filepath.Join(g.agent.packDir, "packs", id+".json"))
+	if err != nil {
+		return nil
+	}
+	var pack map[string]any
+	if json.Unmarshal(raw, &pack) != nil {
+		return nil
+	}
+	g.agent.mu.Lock()
+	g.agent.packs[id] = pack
+	g.agent.mu.Unlock()
+	return pack
+}
+
+func safePackID(id string) bool {
+	return strings.HasPrefix(id, "ep_") && !strings.ContainsAny(id, "/.\\")
+}
+
+func writeAtomic(path string, data []byte) error {
+	tmp := path + ".tmp"
+	if err := os.WriteFile(tmp, data, 0o600); err != nil {
+		return err
+	}
+	return os.Rename(tmp, path)
 }
 
 func agentKid(pub ed25519.PublicKey) string {

@@ -334,6 +334,76 @@ func TestAgentLoopIssuerComesFromThePolicyNotSatGate(t *testing.T) {
 	}
 }
 
+func TestAgentLoopPackAndKeySurviveANewProcess(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("SATGATE_AGENT_PACK_DIR", dir)
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer upstream.Close()
+	cfg := &config.Config{
+		Admin: config.AdminConfig{Token: "admin-secret"},
+		Cloud: &config.CloudConfig{SSRF: &config.CloudSSRFConfig{AllowPrivateIPs: true}},
+	}
+	gw := newTestGateway(t, cfg)
+	gw.setAgentIssuer("https://issuer.example")
+	staged := agentPost(t, gw, "/api/agent/policy", map[string]string{
+		"name": "orders", "kind": "observe", "path_prefix": "/orders", "upstream_url": upstream.URL,
+	})
+	var policy agentPolicy
+	decode(t, staged, &policy)
+	sim := agentPost(t, gw, "/api/agent/simulate", map[string]string{"policy_id": policy.ID})
+	var pack map[string]any
+	decode(t, sim, &pack)
+	id, _ := pack["evidence_pack_id"].(string)
+	first := agentJWKSKid(t, gw)
+	gw.agent.mu.Lock()
+	delete(gw.agent.packs, id)
+	gw.agent.mu.Unlock()
+	next := newTestGateway(t, cfg)
+	if agentJWKSKid(t, next) != first {
+		t.Fatal("restart minted a new signing key")
+	}
+	req := httptest.NewRequest(http.MethodGet, "/api/agent/pack/"+id, nil)
+	req.Header.Set("X-Admin-Token", "admin-secret")
+	got := httptest.NewRecorder()
+	next.ServeHTTP(got, req)
+	if got.Code != http.StatusOK {
+		t.Fatalf("pack did not survive: %d %s", got.Code, got.Body.String())
+	}
+	var loaded map[string]any
+	decode(t, got, &loaded)
+	jwks := httptest.NewRecorder()
+	next.ServeHTTP(jwks, httptest.NewRequest(http.MethodGet, "/.well-known/satgate-agent-jwks.json", nil))
+	pinned := verifierResult(t, loaded, jwks.Body.Bytes(), true)
+	if pinned["valid"] != true || pinned["trusted_issuer_valid"] != true {
+		t.Fatalf("restarted pin was not trusted: %+v", pinned)
+	}
+	keyRaw, err := os.ReadFile(filepath.Join(dir, "signing-key.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(got.Body.Bytes()), string(keyRaw)) || strings.Contains(got.Body.String(), "private") {
+		t.Fatal("pack contained the signing key")
+	}
+}
+
+func agentJWKSKid(t *testing.T, gw *Gateway) string {
+	t.Helper()
+	rec := httptest.NewRecorder()
+	gw.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/.well-known/satgate-agent-jwks.json", nil))
+	var doc struct {
+		Keys []struct {
+			Kid string `json:"kid"`
+		} `json:"keys"`
+	}
+	decode(t, rec, &doc)
+	if len(doc.Keys) != 1 || doc.Keys[0].Kid == "" {
+		t.Fatalf("jwks: %s", rec.Body.String())
+	}
+	return doc.Keys[0].Kid
+}
+
 func agentPost(t *testing.T, gw *Gateway, path string, body any) *httptest.ResponseRecorder {
 	t.Helper()
 	raw, err := json.Marshal(body)
