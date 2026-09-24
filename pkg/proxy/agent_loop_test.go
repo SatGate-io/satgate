@@ -174,6 +174,26 @@ func TestAgentLoopDenyDoesNotContactUpstreamAndMCPRecordsTheTool(t *testing.T) {
 	if !verifierAccepts(t, mcpPack) {
 		t.Fatal("public verifier rejected the mcp pack")
 	}
+	promotedMCP := agentPost(t, gw, "/api/agent/promote", map[string]string{"policy_id": mcpPolicy.ID})
+	if promotedMCP.Code != http.StatusOK {
+		t.Fatalf("mcp promote: %d %s", promotedMCP.Code, promotedMCP.Body.String())
+	}
+	liveReq := httptest.NewRequest(http.MethodPost, "/mcp", strings.NewReader(body))
+	liveRec := httptest.NewRecorder()
+	gw.ServeHTTP(liveRec, liveReq)
+	if liveRec.Code != http.StatusOK || hits != 2 {
+		t.Fatalf("live mcp: %d hits %d", liveRec.Code, hits)
+	}
+	packID := liveRec.Header().Get("SatGate-Evidence-Pack")
+	got := httptest.NewRecorder()
+	fetch := httptest.NewRequest(http.MethodGet, "/api/agent/pack/"+packID, nil)
+	fetch.Header.Set("X-Admin-Token", "admin-secret")
+	gw.ServeHTTP(got, fetch)
+	var livePack map[string]any
+	decode(t, got, &livePack)
+	if livePack["route_or_tool"] != "get_portfolio" || livePack["upstream_contacted"] != true {
+		t.Fatalf("live mcp pack: %+v", livePack)
+	}
 }
 
 func TestAgentLoopChargeDoesNotInventAPrice(t *testing.T) {

@@ -13,7 +13,7 @@ import (
 
 func cmdAgent() {
 	if len(os.Args) < 3 {
-		fmt.Fprintln(os.Stderr, "Usage: satgate-cli agent policy|simulate|promote|verify")
+		fmt.Fprintln(os.Stderr, "Usage: satgate-cli agent policy|simulate|promote|pack|verify")
 		os.Exit(1)
 	}
 	if os.Args[2] == "verify" {
@@ -33,8 +33,34 @@ func cmdAgent() {
 		agentPost(gateway, token, "/api/agent/simulate", mustRead(os.Args[3:]))
 	case "promote":
 		agentPost(gateway, token, "/api/agent/promote", mustRead(os.Args[3:]))
+	case "pack":
+		if len(os.Args) != 4 {
+			fmt.Fprintln(os.Stderr, "Usage: satgate-cli agent pack <id>")
+			os.Exit(1)
+		}
+		agentGet(gateway, token, "/api/agent/pack/"+os.Args[3])
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown agent command: %s\n", os.Args[2])
+		os.Exit(1)
+	}
+}
+
+func agentGet(gateway, token, path string) {
+	req, err := http.NewRequest(http.MethodGet, strings.TrimRight(gateway, "/")+path, nil)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	req.Header.Set("X-Admin-Token", token)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	defer resp.Body.Close()
+	out, _ := io.ReadAll(resp.Body)
+	fmt.Println(string(out))
+	if resp.StatusCode >= 300 {
 		os.Exit(1)
 	}
 }

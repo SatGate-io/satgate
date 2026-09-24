@@ -398,13 +398,32 @@ func (g *Gateway) evidencePack(policy *agentPolicy, decision, reason, routeOrToo
 }
 
 func (g *Gateway) withLivePack(w http.ResponseWriter, r *http.Request, route *config.Route) http.ResponseWriter {
-	if g.agent == nil {
+	policy := g.agentPolicyForRoute(route)
+	if policy == nil {
 		return w
 	}
-	return &livePackWriter{ResponseWriter: w, gw: g, route: route, req: r}
+	tool := ""
+	if policy.Surface == "mcp" && r.Body != nil {
+		raw, err := io.ReadAll(io.LimitReader(r.Body, 1<<20))
+		if err == nil {
+			r.Body = io.NopCloser(bytes.NewReader(raw))
+			tool = mcpTool(string(raw))
+		}
+	}
+	return &livePackWriter{ResponseWriter: w, gw: g, route: route, req: r, tool: tool}
 }
 
-func (g *Gateway) recordLivePack(route *config.Route, r *http.Request, code int) string {
+func (g *Gateway) agentPolicyForRoute(route *config.Route) *agentPolicy {
+	if g.agent == nil || route == nil {
+		return nil
+	}
+	loop := g.agent
+	loop.mu.Lock()
+	defer loop.mu.Unlock()
+	return loop.policies[loop.live[route.Match.PathPrefix]]
+}
+
+func (g *Gateway) recordLivePack(route *config.Route, r *http.Request, code int, tool string) string {
 	if g.agent == nil || route == nil {
 		return ""
 	}
@@ -427,7 +446,11 @@ func (g *Gateway) recordLivePack(route *config.Route, r *http.Request, code int)
 		contacted = false
 		status = 0
 	}
-	pack := g.evidencePack(policy, decision, reason, r.URL.Path, contacted, status)
+	routeOrTool := r.URL.Path
+	if tool != "" {
+		routeOrTool = tool
+	}
+	pack := g.evidencePack(policy, decision, reason, routeOrTool, contacted, status)
 	loop.mu.Lock()
 	id, _ := pack["evidence_pack_id"].(string)
 	loop.packs[id] = pack
@@ -440,13 +463,14 @@ type livePackWriter struct {
 	gw    *Gateway
 	route *config.Route
 	req   *http.Request
+	tool  string
 	done  bool
 }
 
 func (p *livePackWriter) WriteHeader(code int) {
 	if !p.done {
 		p.done = true
-		if id := p.gw.recordLivePack(p.route, p.req, code); id != "" {
+		if id := p.gw.recordLivePack(p.route, p.req, code, p.tool); id != "" {
 			p.Header().Set("SatGate-Evidence-Pack", id)
 		}
 	}
