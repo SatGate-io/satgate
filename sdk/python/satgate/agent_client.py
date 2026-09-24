@@ -580,3 +580,35 @@ class SatGateAgentClient:
         if self._token_cache:
             return self._token_cache.signature
         return None
+
+    def stage_policy(self, policy: dict) -> dict:
+        """Stage a policy. It is not live until promote."""
+        return self._admin_json("POST", "/api/agent/policy", policy)
+
+    def simulate_policy(self, policy_id: str, **fields) -> dict:
+        """Run a staged policy against its upstream and return the signed pack."""
+        body = {"policy_id": policy_id}
+        body.update({key: value for key, value in fields.items() if value is not None})
+        return self._admin_json("POST", "/api/agent/simulate", body)
+
+    def promote_policy(self, policy_id: str) -> dict:
+        """Make a simulated policy live. Does not invent a price."""
+        return self._admin_json("POST", "/api/agent/promote", {"policy_id": policy_id})
+
+    def fetch_pack(self, pack_id: str) -> dict:
+        """Fetch a pack the gateway already signed."""
+        return self._admin_json("GET", "/api/agent/pack/" + pack_id)
+
+    def _admin_json(self, method: str, path: str, body: Optional[dict] = None) -> dict:
+        if not self.admin_token:
+            raise AuthenticationError("admin token required")
+        resp = self.session.request(
+            method,
+            self.gateway_url.rstrip("/") + path,
+            json=body,
+            headers={"X-Admin-Token": self.admin_token, "Content-Type": "application/json"},
+            timeout=self.timeout,
+        )
+        if resp.status_code >= 400:
+            raise SatGateError(f"{method} {path} failed: {resp.status_code} {resp.text}")
+        return resp.json()
