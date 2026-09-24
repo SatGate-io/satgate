@@ -188,6 +188,77 @@ func TestAgentLoopChargeDoesNotInventAPrice(t *testing.T) {
 	}
 }
 
+func TestAgentLoopCapabilityUsesARealTokenAndLeavesItOutOfThePack(t *testing.T) {
+	var hits int
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hits++
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer upstream.Close()
+	gw := newTestGateway(t, &config.Config{
+		Admin: config.AdminConfig{Token: "admin-secret"},
+		Cloud: &config.CloudConfig{SSRF: &config.CloudSSRFConfig{AllowPrivateIPs: true}},
+	})
+	mint := agentPost(t, gw, "/api/capability/mint", map[string]string{"scope": "api:read", "duration": "1h"})
+	if mint.Code != http.StatusOK {
+		t.Fatalf("mint %d %s", mint.Code, mint.Body.String())
+	}
+	var minted struct {
+		Token string `json:"token"`
+	}
+	decode(t, mint, &minted)
+	if minted.Token == "" {
+		t.Fatal("mint returned no token")
+	}
+	staged := agentPost(t, gw, "/api/agent/policy", map[string]string{
+		"name": "gated", "kind": "capability", "path_prefix": "/gated", "upstream_url": upstream.URL, "scope": "api:read",
+	})
+	var policy agentPolicy
+	decode(t, staged, &policy)
+	missing := agentPost(t, gw, "/api/agent/simulate", map[string]string{"policy_id": policy.ID})
+	var missingPack map[string]any
+	decode(t, missing, &missingPack)
+	if missingPack["decision"] != "denied" || missingPack["upstream_contacted"] != false || hits != 0 {
+		t.Fatalf("missing token contacted upstream: %+v", missingPack)
+	}
+	bad := agentPost(t, gw, "/api/agent/simulate", map[string]string{"policy_id": policy.ID, "authorization": "Bearer not-a-token"})
+	var badPack map[string]any
+	decode(t, bad, &badPack)
+	if badPack["decision"] != "denied" || hits != 0 {
+		t.Fatalf("bad token was admitted: %+v hits %d", badPack, hits)
+	}
+	sim := agentPost(t, gw, "/api/agent/simulate", map[string]string{"policy_id": policy.ID, "authorization": "Bearer " + minted.Token})
+	var pack map[string]any
+	decode(t, sim, &pack)
+	if pack["decision"] != "allowed" || pack["upstream_contacted"] != true || hits != 1 {
+		t.Fatalf("valid token did not reach upstream: %+v hits %d", pack, hits)
+	}
+	if strings.Contains(sim.Body.String(), minted.Token) {
+		t.Fatal("pack contained the raw token")
+	}
+	if pack["identity_fingerprint"] == "" || pack["identity_fingerprint"] == minted.Token {
+		t.Fatalf("identity fingerprint missing or raw: %+v", pack["identity_fingerprint"])
+	}
+	if !verifierAccepts(t, pack) {
+		t.Fatal("public verifier rejected the capability pack")
+	}
+	promoted := agentPost(t, gw, "/api/agent/promote", map[string]string{"policy_id": policy.ID})
+	if promoted.Code != http.StatusOK {
+		t.Fatalf("promote %d %s", promoted.Code, promoted.Body.String())
+	}
+	open := agentGet(t, gw, "/gated")
+	if open.Code != http.StatusUnauthorized {
+		t.Fatalf("live route allowed a missing token: %d %s", open.Code, open.Body.String())
+	}
+	req := httptest.NewRequest(http.MethodGet, "/gated", nil)
+	req.Header.Set("Authorization", "Bearer "+minted.Token)
+	live := httptest.NewRecorder()
+	gw.ServeHTTP(live, req)
+	if live.Code != http.StatusOK || hits != 2 {
+		t.Fatalf("live token call: %d %s hits %d", live.Code, live.Body.String(), hits)
+	}
+}
+
 func agentPost(t *testing.T, gw *Gateway, path string, body any) *httptest.ResponseRecorder {
 	t.Helper()
 	raw, err := json.Marshal(body)

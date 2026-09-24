@@ -29,6 +29,7 @@ type agentPolicy struct {
 	PathPrefix  string `json:"path_prefix"`
 	UpstreamURL string `json:"upstream_url"`
 	Surface     string `json:"surface"`
+	Scope       string `json:"scope,omitempty"`
 	PackID      string `json:"pack_id,omitempty"`
 	Promoted    bool   `json:"promoted"`
 }
@@ -168,6 +169,7 @@ func (g *Gateway) simulateAgentPolicy(w http.ResponseWriter, r *http.Request) {
 	contacted := false
 	status := 0
 	tool := ""
+	identity := ""
 	if policy.Surface == "mcp" {
 		tool = mcpTool(req.Body)
 	}
@@ -182,10 +184,12 @@ func (g *Gateway) simulateAgentPolicy(w http.ResponseWriter, r *http.Request) {
 			decision = "denied"
 			break
 		}
-		if _, err := g.macaroonSvc.Verify(token); err != nil {
+		mac, err := g.macaroonSvc.Verify(token)
+		if err != nil || (policy.Scope != "" && !mac.HasScope(policy.Scope)) {
 			decision = "denied"
 			break
 		}
+		identity = "sha256:" + hex.EncodeToString(mustSHA256(mac.Signature))
 		status, contacted = g.callUpstream(policy.UpstreamURL, req.Method, req.Path, req.Body)
 		if !contacted {
 			decision = "upstream_failed"
@@ -204,6 +208,9 @@ func (g *Gateway) simulateAgentPolicy(w http.ResponseWriter, r *http.Request) {
 	pack := g.evidencePack(policy, protocolDecision, reason, routeOrTool, contacted, status)
 	if policy.Kind == "charge" {
 		pack["promote_block"] = "price_unknown"
+	}
+	if identity != "" {
+		pack["identity_fingerprint"] = identity
 	}
 	loop.mu.Lock()
 	id, _ := pack["evidence_pack_id"].(string)
@@ -273,7 +280,7 @@ func (g *Gateway) promoteAgentPolicy(w http.ResponseWriter, r *http.Request) {
 		Name:     policy.Name,
 		Match:    config.RouteMatch{PathPrefix: policy.PathPrefix},
 		Upstream: name,
-		Policy:   config.RoutePolicy{Kind: kind},
+		Policy:   config.RoutePolicy{Kind: kind, Scope: policy.Scope},
 	})
 	loop.mu.Lock()
 	policy.Promoted = true
@@ -421,6 +428,11 @@ func mcpTool(body string) string {
 		return doc.Params.Name
 	}
 	return doc.Params.Tool
+}
+
+func mustSHA256(value string) []byte {
+	sum := sha256.Sum256([]byte(value))
+	return sum[:]
 }
 
 func randHex(n int) string {
