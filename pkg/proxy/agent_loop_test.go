@@ -388,6 +388,47 @@ func TestAgentLoopPackAndKeySurviveANewProcess(t *testing.T) {
 	}
 }
 
+func TestAgentLoopPromotedRouteSurvivesANewProcess(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("SATGATE_AGENT_PACK_DIR", dir)
+	var hits int
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hits++
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}))
+	defer upstream.Close()
+	cfg := &config.Config{
+		Admin: config.AdminConfig{Token: "admin-secret"},
+		Cloud: &config.CloudConfig{SSRF: &config.CloudSSRFConfig{AllowPrivateIPs: true}},
+	}
+	gw := newTestGateway(t, cfg)
+	staged := agentPost(t, gw, "/api/agent/policy", map[string]string{
+		"name": "orders", "kind": "observe", "path_prefix": "/orders", "upstream_url": upstream.URL, "issuer": "https://issuer.example",
+	})
+	var policy agentPolicy
+	decode(t, staged, &policy)
+	sim := agentPost(t, gw, "/api/agent/simulate", map[string]string{"policy_id": policy.ID})
+	if sim.Code != http.StatusOK {
+		t.Fatalf("simulate %d %s", sim.Code, sim.Body.String())
+	}
+	promoted := agentPost(t, gw, "/api/agent/promote", map[string]string{"policy_id": policy.ID})
+	if promoted.Code != http.StatusOK {
+		t.Fatalf("promote %d %s", promoted.Code, promoted.Body.String())
+	}
+	next := newTestGateway(t, &config.Config{
+		Admin: config.AdminConfig{Token: "admin-secret"},
+		Cloud: &config.CloudConfig{SSRF: &config.CloudSSRFConfig{AllowPrivateIPs: true}},
+	})
+	live := agentGet(t, next, "/orders")
+	if live.Code != http.StatusOK || !strings.Contains(live.Body.String(), `"ok":true`) || live.Header().Get("SatGate-Evidence-Pack") == "" {
+		t.Fatalf("promoted route did not survive: %d %s", live.Code, live.Body.String())
+	}
+	if hits < 2 {
+		t.Fatalf("restarted route did not reach upstream, hits %d", hits)
+	}
+}
+
 func agentJWKSKid(t *testing.T, gw *Gateway) string {
 	t.Helper()
 	rec := httptest.NewRecorder()

@@ -293,6 +293,7 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	start := time.Now()
 	g.metrics.TotalRequests.Add(1)
+	g.restoreAgentRoutes()
 
 	// Find matching route
 	route := g.matchRoute(r)

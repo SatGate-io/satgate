@@ -67,6 +67,13 @@ type agentLoop struct {
 	packDir    string
 }
 
+func (g *Gateway) restoreAgentRoutes() {
+	if os.Getenv("SATGATE_AGENT_PACK_DIR") == "" {
+		return
+	}
+	g.loop()
+}
+
 func (g *Gateway) loop() *agentLoop {
 	g.agentOnce.Do(func() {
 		dir := os.Getenv("SATGATE_AGENT_PACK_DIR")
@@ -80,6 +87,7 @@ func (g *Gateway) loop() *agentLoop {
 			kid:        agentKid(pub),
 			packDir:    dir,
 		}
+		g.restoreAgentPolicies()
 	})
 	return g.agent
 }
@@ -149,6 +157,7 @@ func (g *Gateway) stageAgentPolicy(w http.ResponseWriter, r *http.Request) {
 	}
 	loop.policies[req.ID] = &req
 	loop.mu.Unlock()
+	_ = g.saveAgentPolicy(&req)
 	writeJSON(w, http.StatusCreated, req)
 }
 
@@ -261,13 +270,15 @@ func (g *Gateway) promoteAgentPolicy(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]any{"promoted": true, "policy_id": policy.ID, "pack_id": packID})
 		return
 	}
-	kind := policy.Kind
-	if kind == "observe" {
-		kind = "chargeback"
-	}
-	if kind == "charge" {
-		writeJSON(w, http.StatusConflict, map[string]any{
-			"error":      "price_unknown",
+	if err := g.installPromotedPolicy(policy); err != nil {
+		status := http.StatusBadGateway
+		code := "upstream_invalid"
+		if err.Error() == "price_unknown" {
+			status = http.StatusConflict
+			code = "price_unknown"
+		}
+		writeJSON(w, status, map[string]any{
+			"error":      code,
 			"promoted":   false,
 			"policy_id":  policy.ID,
 			"pack_id":    packID,
@@ -275,12 +286,27 @@ func (g *Gateway) promoteAgentPolicy(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
+	loop.mu.Lock()
+	policy.Promoted = true
+	loop.live[policy.PathPrefix] = policy.ID
+	loop.mu.Unlock()
+	_ = g.saveAgentPolicy(policy)
+	writeJSON(w, http.StatusOK, map[string]any{"promoted": true, "policy_id": policy.ID, "pack_id": packID, "live": true})
+}
+
+func (g *Gateway) installPromotedPolicy(policy *agentPolicy) error {
+	if policy.Kind == "charge" {
+		return errors.New("price_unknown")
+	}
+	kind := policy.Kind
+	if kind == "observe" {
+		kind = "chargeback"
+	}
 	name := "agent-" + policy.ID
 	if policy.UpstreamURL != "" {
 		proxy, err := g.createProxy(policy.UpstreamURL)
 		if err != nil {
-			writeJSON(w, http.StatusBadGateway, map[string]string{"error": "upstream_invalid"})
-			return
+			return err
 		}
 		g.proxyMu.Lock()
 		g.proxies[name] = proxy
@@ -296,11 +322,7 @@ func (g *Gateway) promoteAgentPolicy(w http.ResponseWriter, r *http.Request) {
 		Upstream: name,
 		Policy:   config.RoutePolicy{Kind: kind, Scope: policy.Scope},
 	})
-	loop.mu.Lock()
-	policy.Promoted = true
-	loop.live[policy.PathPrefix] = policy.ID
-	loop.mu.Unlock()
-	writeJSON(w, http.StatusOK, map[string]any{"promoted": true, "policy_id": policy.ID, "pack_id": packID, "live": true})
+	return nil
 }
 
 func (g *Gateway) getAgentPack(w http.ResponseWriter, r *http.Request) {
@@ -519,6 +541,9 @@ func loadAgentKey(dir string) (ed25519.PublicKey, ed25519.PrivateKey) {
 	if err := os.MkdirAll(filepath.Join(dir, "packs"), 0o700); err != nil {
 		panic(err)
 	}
+	if err := os.MkdirAll(filepath.Join(dir, "policies"), 0o700); err != nil {
+		panic(err)
+	}
 	path := filepath.Join(dir, "signing-key.json")
 	raw, err := os.ReadFile(path)
 	if err == nil {
@@ -547,6 +572,57 @@ func loadAgentKey(dir string) (ed25519.PublicKey, ed25519.PrivateKey) {
 		panic(err)
 	}
 	return pub, priv
+}
+
+func (g *Gateway) saveAgentPolicy(policy *agentPolicy) error {
+	if g.agent == nil || g.agent.packDir == "" || policy == nil || !safePolicyID(policy.ID) {
+		return nil
+	}
+	raw, err := json.Marshal(policy)
+	if err != nil {
+		return err
+	}
+	return writeAtomic(filepath.Join(g.agent.packDir, "policies", policy.ID+".json"), raw)
+}
+
+func (g *Gateway) restoreAgentPolicies() {
+	if g.agent == nil || g.agent.packDir == "" {
+		return
+	}
+	dir := filepath.Join(g.agent.packDir, "policies")
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return
+	}
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".json") {
+			continue
+		}
+		raw, err := os.ReadFile(filepath.Join(dir, entry.Name()))
+		if err != nil {
+			continue
+		}
+		var policy agentPolicy
+		if json.Unmarshal(raw, &policy) != nil || !safePolicyID(policy.ID) {
+			continue
+		}
+		g.agent.policies[policy.ID] = &policy
+		if policy.Issuer != "" && g.agent.issuer == "" {
+			g.agent.issuer = policy.Issuer
+		}
+		if !policy.Promoted || policy.Kind == "charge" {
+			continue
+		}
+		if err := g.installPromotedPolicy(&policy); err != nil {
+			policy.Promoted = false
+			continue
+		}
+		g.agent.live[policy.PathPrefix] = policy.ID
+	}
+}
+
+func safePolicyID(id string) bool {
+	return strings.HasPrefix(id, "pol_") && !strings.ContainsAny(id, "/.\\")
 }
 
 func (g *Gateway) saveAgentPack(pack map[string]any) error {
