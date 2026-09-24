@@ -429,6 +429,41 @@ func TestAgentLoopPromotedRouteSurvivesANewProcess(t *testing.T) {
 	}
 }
 
+func TestAgentLoopPromoteAfterRestartUsesTheSavedPack(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("SATGATE_AGENT_PACK_DIR", dir)
+	var hits int
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hits++
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}))
+	defer upstream.Close()
+	cfg := func() *config.Config {
+		return &config.Config{
+			Admin: config.AdminConfig{Token: "admin-secret"},
+			Cloud: &config.CloudConfig{SSRF: &config.CloudSSRFConfig{AllowPrivateIPs: true}},
+		}
+	}
+	gw := newTestGateway(t, cfg())
+	staged := agentPost(t, gw, "/api/agent/policy", map[string]string{
+		"name": "orders", "kind": "observe", "path_prefix": "/orders", "upstream_url": upstream.URL,
+	})
+	var policy agentPolicy
+	decode(t, staged, &policy)
+	if agentPost(t, gw, "/api/agent/simulate", map[string]string{"policy_id": policy.ID}).Code != http.StatusOK {
+		t.Fatal("simulate failed")
+	}
+	next := newTestGateway(t, cfg())
+	promoted := agentPost(t, next, "/api/agent/promote", map[string]string{"policy_id": policy.ID})
+	if promoted.Code != http.StatusOK {
+		t.Fatalf("promote after restart: %d %s", promoted.Code, promoted.Body.String())
+	}
+	live := agentGet(t, next, "/orders")
+	if live.Code != http.StatusOK || hits < 2 {
+		t.Fatalf("live after restarted promote: %d hits %d", live.Code, hits)
+	}
+}
+
 func agentJWKSKid(t *testing.T, gw *Gateway) string {
 	t.Helper()
 	rec := httptest.NewRecorder()

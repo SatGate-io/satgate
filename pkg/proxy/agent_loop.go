@@ -241,6 +241,9 @@ func (g *Gateway) simulateAgentPolicy(w http.ResponseWriter, r *http.Request) {
 		stored.PackID = id
 	}
 	loop.mu.Unlock()
+	if stored := g.loop().policies[policy.ID]; stored != nil {
+		_ = g.saveAgentPolicy(stored)
+	}
 	_ = g.saveAgentPack(pack)
 	writeJSON(w, http.StatusOK, pack)
 }
@@ -261,6 +264,9 @@ func (g *Gateway) promoteAgentPolicy(w http.ResponseWriter, r *http.Request) {
 		pack = loop.packs[policy.PackID]
 	}
 	loop.mu.Unlock()
+	if policy != nil && pack == nil && policy.PackID != "" {
+		pack = g.loadAgentPack(policy.PackID)
+	}
 	if policy == nil || pack == nil {
 		writeJSON(w, http.StatusConflict, map[string]string{"error": "simulate_before_promote"})
 		return
