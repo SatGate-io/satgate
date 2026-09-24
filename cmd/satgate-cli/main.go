@@ -95,7 +95,7 @@ Commands:
   status                       Show gateway health, active agents, and proof status
   mint --subject <name>        Mint a capability token for an agent
   proof export                 Export a signed Evidence Pack from the gateway
-  agent policy|simulate|promote  Stage a policy, run it, then promote it
+  agent policy|simulate|promote|verify  Stage a policy, run it, verify the pack, then promote it
   wrap --token <tok> -- <cmd>  Run any command through SatGate proxy
   token validate <token>       Validate a macaroon token
   version                      Show version info

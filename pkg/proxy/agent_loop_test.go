@@ -1,12 +1,13 @@
 package proxy
 
 import (
-	"crypto/ed25519"
-	"encoding/hex"
 	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -54,27 +55,19 @@ func TestAgentLoopStagesSimulatesAndPromotesARealHTTPCall(t *testing.T) {
 	if sim.Code != http.StatusOK {
 		t.Fatalf("simulate %d %s", sim.Code, sim.Body.String())
 	}
-	var pack agentPack
+	var pack map[string]any
 	decode(t, sim, &pack)
-	if !pack.UpstreamContacted || pack.UpstreamStatus != http.StatusOK || pack.Decision != "allowed" {
+	if pack["decision"] != "allowed" || pack["upstream_contacted"] != true || intFrom(pack["upstream_status"]) != http.StatusOK {
 		t.Fatalf("pack did not record the real call: %+v", pack)
 	}
-	if pack.ProviderPriceStatus != "UNKNOWN" || pack.Settlement || pack.IssuerPinned {
+	if pack["provider_price_status"] != "UNKNOWN" || pack["settlement"] != false || pack["trusted_issuer_valid"] != false {
 		t.Fatalf("pack overclaimed price, settlement, or issuer: %+v", pack)
 	}
 	if hits != 1 {
 		t.Fatalf("upstream hits %d, want 1", hits)
 	}
-	pub, err := hex.DecodeString(pack.PublicKey)
-	if err != nil {
-		t.Fatal(err)
-	}
-	sig, err := hex.DecodeString(pack.Signature)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !ed25519.Verify(pub, []byte(pack.SignedPayload), sig) {
-		t.Fatal("pack signature did not verify")
+	if !verifierAccepts(t, pack) {
+		t.Fatal("public verifier rejected the pack")
 	}
 
 	promoted := agentPost(t, gw, "/api/agent/promote", map[string]string{"policy_id": staged.ID})
@@ -109,9 +102,9 @@ func TestAgentLoopDenyDoesNotContactUpstreamAndMCPRecordsTheTool(t *testing.T) {
 	var denyPolicy agentPolicy
 	decode(t, denied, &denyPolicy)
 	sim := agentPost(t, gw, "/api/agent/simulate", map[string]string{"policy_id": denyPolicy.ID})
-	var pack agentPack
+	var pack map[string]any
 	decode(t, sim, &pack)
-	if pack.Decision != "denied" || pack.UpstreamContacted || hits != 0 {
+	if pack["decision"] != "denied" || pack["upstream_contacted"] != false || hits != 0 {
 		t.Fatalf("deny contacted upstream or was allowed: %+v hits %d", pack, hits)
 	}
 
@@ -124,10 +117,13 @@ func TestAgentLoopDenyDoesNotContactUpstreamAndMCPRecordsTheTool(t *testing.T) {
 	mcpSim := agentPost(t, gw, "/api/agent/simulate", map[string]string{
 		"policy_id": mcpPolicy.ID, "path": "/mcp", "method": "POST", "body": body,
 	})
-	var mcpPack agentPack
+	var mcpPack map[string]any
 	decode(t, mcpSim, &mcpPack)
-	if mcpPack.Surface != "mcp" || mcpPack.Tool != "get_portfolio" || !mcpPack.UpstreamContacted {
+	if mcpPack["route_or_tool"] != "get_portfolio" || mcpPack["upstream_contacted"] != true {
 		t.Fatalf("mcp simulation: %+v", mcpPack)
+	}
+	if !verifierAccepts(t, mcpPack) {
+		t.Fatal("public verifier rejected the mcp pack")
 	}
 }
 
@@ -157,4 +153,38 @@ func decode(t *testing.T, rec *httptest.ResponseRecorder, dest any) {
 	if err := json.Unmarshal(rec.Body.Bytes(), dest); err != nil {
 		t.Fatalf("decode %s: %v", rec.Body.String(), err)
 	}
+}
+
+func intFrom(v any) int {
+	switch n := v.(type) {
+	case float64:
+		return int(n)
+	case int:
+		return n
+	default:
+		return 0
+	}
+}
+
+func verifierAccepts(t *testing.T, pack map[string]any) bool {
+	t.Helper()
+	dir := t.TempDir()
+	path := filepath.Join(dir, "pack.json")
+	raw, err := json.Marshal(pack)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, raw, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	cmd := exec.Command("python3", filepath.Join("..", "..", "tools", "verify_evidence_pack.py"), path)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("verifier failed: %v\n%s", err, out)
+	}
+	var result map[string]any
+	if err := json.Unmarshal(out, &result); err != nil {
+		t.Fatalf("verifier output %s: %v", out, err)
+	}
+	return result["valid"] == true && result["trusted_issuer_valid"] == false
 }

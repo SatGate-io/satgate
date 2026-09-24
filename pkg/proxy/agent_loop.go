@@ -1,17 +1,21 @@
 package proxy
 
 import (
+	"bytes"
 	"crypto/ed25519"
 	"crypto/rand"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"sort"
+	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/satgate-io/satgate/pkg/config"
 )
@@ -49,7 +53,7 @@ type agentPack struct {
 type agentLoop struct {
 	mu         sync.Mutex
 	policies   map[string]*agentPolicy
-	packs      map[string]*agentPack
+	packs      map[string]map[string]any
 	publicKey  ed25519.PublicKey
 	privateKey ed25519.PrivateKey
 }
@@ -62,7 +66,7 @@ func (g *Gateway) loop() *agentLoop {
 		}
 		g.agent = &agentLoop{
 			policies:   map[string]*agentPolicy{},
-			packs:      map[string]*agentPack{},
+			packs:      map[string]map[string]any{},
 			publicKey:  pub,
 			privateKey: priv,
 		}
@@ -189,11 +193,17 @@ func (g *Gateway) simulateAgentPolicy(w http.ResponseWriter, r *http.Request) {
 			decision = "upstream_failed"
 		}
 	}
-	pack := g.signPack(policy, decision, tool, contacted, status)
+	protocolDecision, reason := protocolDecision(policy.Kind, decision)
+	routeOrTool := req.Path
+	if tool != "" {
+		routeOrTool = tool
+	}
+	pack := g.evidencePack(policy, protocolDecision, reason, routeOrTool, contacted, status)
 	loop.mu.Lock()
-	loop.packs[pack.ID] = pack
+	id, _ := pack["evidence_pack_id"].(string)
+	loop.packs[id] = pack
 	if stored := loop.policies[policy.ID]; stored != nil {
-		stored.PackID = pack.ID
+		stored.PackID = id
 	}
 	loop.mu.Unlock()
 	writeJSON(w, http.StatusOK, pack)
@@ -210,7 +220,7 @@ func (g *Gateway) promoteAgentPolicy(w http.ResponseWriter, r *http.Request) {
 	loop := g.loop()
 	loop.mu.Lock()
 	policy := loop.policies[req.PolicyID]
-	var pack *agentPack
+	var pack map[string]any
 	if policy != nil {
 		pack = loop.packs[policy.PackID]
 	}
@@ -219,8 +229,9 @@ func (g *Gateway) promoteAgentPolicy(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusConflict, map[string]string{"error": "simulate_before_promote"})
 		return
 	}
+	packID, _ := pack["evidence_pack_id"].(string)
 	if policy.Promoted {
-		writeJSON(w, http.StatusOK, map[string]any{"promoted": true, "policy_id": policy.ID, "pack_id": pack.ID})
+		writeJSON(w, http.StatusOK, map[string]any{"promoted": true, "policy_id": policy.ID, "pack_id": packID})
 		return
 	}
 	kind := policy.Kind
@@ -254,7 +265,7 @@ func (g *Gateway) promoteAgentPolicy(w http.ResponseWriter, r *http.Request) {
 	loop.mu.Lock()
 	policy.Promoted = true
 	loop.mu.Unlock()
-	writeJSON(w, http.StatusOK, map[string]any{"promoted": true, "policy_id": policy.ID, "pack_id": pack.ID, "live": true})
+	writeJSON(w, http.StatusOK, map[string]any{"promoted": true, "policy_id": policy.ID, "pack_id": packID, "live": true})
 }
 
 func (g *Gateway) getAgentPack(w http.ResponseWriter, r *http.Request) {
@@ -284,26 +295,75 @@ func (g *Gateway) callUpstream(upstream, method, path, body string) (int, bool) 
 	return rec.Code, true
 }
 
-func (g *Gateway) signPack(policy *agentPolicy, decision, tool string, contacted bool, status int) *agentPack {
-	payload := fmt.Sprintf("%s|%s|%s|%s|%t|%d|%s", policy.ID, policy.Kind, policy.Surface, decision, contacted, status, tool)
-	sum := sha256.Sum256([]byte(payload))
-	signed := hex.EncodeToString(sum[:])
-	sig := ed25519.Sign(g.loop().privateKey, []byte(signed))
-	return &agentPack{
-		Schema:              "satgate.agent-loop.v1",
-		ID:                  "ep_" + randHex(8),
-		PolicyID:            policy.ID,
-		Decision:            decision,
-		Surface:             policy.Surface,
-		Tool:                tool,
-		UpstreamContacted:   contacted,
-		UpstreamStatus:      status,
-		ProviderPriceStatus: "UNKNOWN",
-		Settlement:          false,
-		IssuerPinned:        false,
-		PublicKey:           hex.EncodeToString(g.loop().publicKey),
-		Signature:           hex.EncodeToString(sig),
-		SignedPayload:       signed,
+func protocolDecision(kind, raw string) (string, string) {
+	switch raw {
+	case "payment_required", "upstream_failed":
+		return "denied", "policy_denied"
+	case "denied":
+		if kind == "capability" {
+			return "denied", "capability_invalid"
+		}
+		return "denied", "policy_denied"
+	default:
+		return "allowed", "policy_allowed"
+	}
+}
+
+func (g *Gateway) evidencePack(policy *agentPolicy, decision, reason, routeOrTool string, contacted bool, status int) map[string]any {
+	now := time.Now().UTC().Format(time.RFC3339)
+	packID := "ep_" + randHex(8)
+	receiptID := "rcpt_" + randHex(8)
+	sum := sha256.Sum256([]byte(policy.ID))
+	pub := base64.RawURLEncoding.EncodeToString(g.loop().publicKey)
+	receipt := map[string]any{
+		"schema_version":       "satgate.receipt.v1",
+		"schema_url":           "https://satgate.io/.well-known/satgate-receipt.schema.json",
+		"receipt_id":           receiptID,
+		"evidence_pack_id":     packID,
+		"issuer":               "https://satgate.io",
+		"issuer_kid":           "agent-loop-unpinned",
+		"decision":             decision,
+		"decision_reason":      reason,
+		"policy_version":       policy.ID,
+		"timestamp":            now,
+		"issued_at":            now,
+		"canonicalization":     "jcs-rfc8785",
+		"hash_algorithm":       "sha256",
+		"signature_algorithm":  "ed25519",
+		"capability_hash":      "sha256:" + hex.EncodeToString(sum[:]),
+		"route_or_tool":        routeOrTool,
+		"upstream_contacted":   contacted,
+		"upstream_status":      status,
+		"provider_price_status": "UNKNOWN",
+		"settlement":           false,
+		"metadata": map[string]any{
+			"public_key_ed25519_b64": pub,
+		},
+	}
+	payload := jcs(receipt)
+	hash := sha256.Sum256(payload)
+	receiptHash := "sha256:" + base64.RawURLEncoding.EncodeToString(hash[:])
+	sig := ed25519.Sign(g.loop().privateKey, payload)
+	receipt["receipt_hash"] = receiptHash
+	receipt["signature"] = "ed25519:" + base64.RawURLEncoding.EncodeToString(sig)
+	return map[string]any{
+		"schema_version":        "satgate.evidence_pack.v1",
+		"evidence_pack_id":      packID,
+		"receipt_id":            receiptID,
+		"issuer":                "https://satgate.io",
+		"decision":              decision,
+		"decision_reason":       reason,
+		"route_or_tool":         routeOrTool,
+		"capability_hash":       receipt["capability_hash"],
+		"receipt_hash":          receiptHash,
+		"budget_state":          map[string]any{},
+		"environment":           "runtime",
+		"settlement":            false,
+		"provider_price_status": "UNKNOWN",
+		"upstream_contacted":    contacted,
+		"upstream_status":       status,
+		"trusted_issuer_valid":  false,
+		"receipts":              []any{receipt},
 	}
 }
 
@@ -331,4 +391,54 @@ func writeJSON(w http.ResponseWriter, status int, body any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(body)
+}
+
+func jcs(v any) []byte {
+	var buf bytes.Buffer
+	writeJCS(&buf, v)
+	return buf.Bytes()
+}
+
+func writeJCS(buf *bytes.Buffer, v any) {
+	switch x := v.(type) {
+	case map[string]any:
+		keys := make([]string, 0, len(x))
+		for key := range x {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+		buf.WriteByte('{')
+		for i, key := range keys {
+			if i > 0 {
+				buf.WriteByte(',')
+			}
+			writeJCS(buf, key)
+			buf.WriteByte(':')
+			writeJCS(buf, x[key])
+		}
+		buf.WriteByte('}')
+	case []any:
+		buf.WriteByte('[')
+		for i, item := range x {
+			if i > 0 {
+				buf.WriteByte(',')
+			}
+			writeJCS(buf, item)
+		}
+		buf.WriteByte(']')
+	case string:
+		var raw bytes.Buffer
+		enc := json.NewEncoder(&raw)
+		enc.SetEscapeHTML(false)
+		_ = enc.Encode(x)
+		buf.Write(bytes.TrimRight(raw.Bytes(), "\n"))
+	case bool:
+		buf.WriteString(strconv.FormatBool(x))
+	case int:
+		buf.WriteString(strconv.Itoa(x))
+	case nil:
+		buf.WriteString("null")
+	default:
+		buf.WriteString("null")
+	}
 }

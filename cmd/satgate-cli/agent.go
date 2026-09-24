@@ -7,13 +7,18 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"strings"
 )
 
 func cmdAgent() {
 	if len(os.Args) < 3 {
-		fmt.Fprintln(os.Stderr, "Usage: satgate-cli agent policy|simulate|promote")
+		fmt.Fprintln(os.Stderr, "Usage: satgate-cli agent policy|simulate|promote|verify")
 		os.Exit(1)
+	}
+	if os.Args[2] == "verify" {
+		agentVerify(os.Args[3:])
+		return
 	}
 	gateway := envOr("SATGATE_GATEWAY", "http://127.0.0.1:8080")
 	token := os.Getenv("SATGATE_ADMIN_TOKEN")
@@ -74,6 +79,22 @@ func mustRead(args []string) []byte {
 	fmt.Fprintln(os.Stderr, "pass --json '{...}' or JSON on stdin")
 	os.Exit(1)
 	return nil
+}
+
+func agentVerify(args []string) {
+	if len(args) != 1 {
+		fmt.Fprintln(os.Stderr, "Usage: satgate-cli agent verify pack.json")
+		os.Exit(1)
+	}
+	script := os.Getenv("SATGATE_VERIFIER")
+	if script == "" {
+		script = "tools/verify_evidence_pack.py"
+	}
+	out, err := exec.Command("python3", script, args[0]).CombinedOutput()
+	fmt.Print(string(out))
+	if err != nil {
+		os.Exit(1)
+	}
 }
 
 func envOr(key, fallback string) string {
