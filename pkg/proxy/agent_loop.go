@@ -56,6 +56,7 @@ type agentLoop struct {
 	mu         sync.Mutex
 	policies   map[string]*agentPolicy
 	packs      map[string]map[string]any
+	live       map[string]string
 	publicKey  ed25519.PublicKey
 	privateKey ed25519.PrivateKey
 	issuer     string
@@ -71,6 +72,7 @@ func (g *Gateway) loop() *agentLoop {
 		g.agent = &agentLoop{
 			policies:   map[string]*agentPolicy{},
 			packs:      map[string]map[string]any{},
+			live:       map[string]string{},
 			publicKey:  pub,
 			privateKey: priv,
 			kid:        agentKid(pub),
@@ -292,6 +294,7 @@ func (g *Gateway) promoteAgentPolicy(w http.ResponseWriter, r *http.Request) {
 	})
 	loop.mu.Lock()
 	policy.Promoted = true
+	loop.live[policy.PathPrefix] = policy.ID
 	loop.mu.Unlock()
 	writeJSON(w, http.StatusOK, map[string]any{"promoted": true, "policy_id": policy.ID, "pack_id": packID, "live": true})
 }
@@ -392,6 +395,69 @@ func (g *Gateway) evidencePack(policy *agentPolicy, decision, reason, routeOrToo
 		"upstream_status":       status,
 		"receipts":              []any{receipt},
 	}
+}
+
+func (g *Gateway) withLivePack(w http.ResponseWriter, r *http.Request, route *config.Route) http.ResponseWriter {
+	if g.agent == nil {
+		return w
+	}
+	return &livePackWriter{ResponseWriter: w, gw: g, route: route, req: r}
+}
+
+func (g *Gateway) recordLivePack(route *config.Route, r *http.Request, code int) string {
+	if g.agent == nil || route == nil {
+		return ""
+	}
+	loop := g.agent
+	loop.mu.Lock()
+	policy := loop.policies[loop.live[route.Match.PathPrefix]]
+	loop.mu.Unlock()
+	if policy == nil {
+		return ""
+	}
+	decision, reason := "allowed", "policy_allowed"
+	contacted := true
+	status := code
+	if policy.Kind == "deny" || code == http.StatusUnauthorized || code == http.StatusForbidden {
+		decision = "denied"
+		reason = "policy_denied"
+		if policy.Kind == "capability" {
+			reason = "capability_invalid"
+		}
+		contacted = false
+		status = 0
+	}
+	pack := g.evidencePack(policy, decision, reason, r.URL.Path, contacted, status)
+	loop.mu.Lock()
+	id, _ := pack["evidence_pack_id"].(string)
+	loop.packs[id] = pack
+	loop.mu.Unlock()
+	return id
+}
+
+type livePackWriter struct {
+	http.ResponseWriter
+	gw    *Gateway
+	route *config.Route
+	req   *http.Request
+	done  bool
+}
+
+func (p *livePackWriter) WriteHeader(code int) {
+	if !p.done {
+		p.done = true
+		if id := p.gw.recordLivePack(p.route, p.req, code); id != "" {
+			p.Header().Set("SatGate-Evidence-Pack", id)
+		}
+	}
+	p.ResponseWriter.WriteHeader(code)
+}
+
+func (p *livePackWriter) Write(b []byte) (int, error) {
+	if !p.done {
+		p.WriteHeader(http.StatusOK)
+	}
+	return p.ResponseWriter.Write(b)
 }
 
 func (g *Gateway) setAgentIssuer(issuer string) {

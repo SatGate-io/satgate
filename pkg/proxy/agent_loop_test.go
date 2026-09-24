@@ -103,6 +103,22 @@ func TestAgentLoopStagesSimulatesAndPromotesARealHTTPCall(t *testing.T) {
 	if hits != 2 {
 		t.Fatalf("live request did not reach upstream, hits %d", hits)
 	}
+	packID := live.Header().Get("SatGate-Evidence-Pack")
+	if packID == "" {
+		t.Fatal("live request did not return a pack")
+	}
+	req := httptest.NewRequest(http.MethodGet, "/api/agent/pack/"+packID, nil)
+	req.Header.Set("X-Admin-Token", "admin-secret")
+	got := httptest.NewRecorder()
+	gw.ServeHTTP(got, req)
+	var livePack map[string]any
+	decode(t, got, &livePack)
+	if livePack["decision"] != "allowed" || livePack["upstream_contacted"] != true || livePack["settlement"] != false || livePack["provider_price_status"] != "UNKNOWN" {
+		t.Fatalf("live pack: %+v", livePack)
+	}
+	if !verifierAccepts(t, livePack) {
+		t.Fatal("public verifier rejected the live pack")
+	}
 }
 
 func TestAgentLoopDenyDoesNotContactUpstreamAndMCPRecordsTheTool(t *testing.T) {
@@ -128,6 +144,17 @@ func TestAgentLoopDenyDoesNotContactUpstreamAndMCPRecordsTheTool(t *testing.T) {
 	decode(t, sim, &pack)
 	if pack["decision"] != "denied" || pack["upstream_contacted"] != false || hits != 0 {
 		t.Fatalf("deny contacted upstream or was allowed: %+v hits %d", pack, hits)
+	}
+	promoted := agentPost(t, gw, "/api/agent/promote", map[string]string{"policy_id": denyPolicy.ID})
+	if promoted.Code != http.StatusOK {
+		t.Fatalf("deny promote: %d %s", promoted.Code, promoted.Body.String())
+	}
+	blocked := agentGet(t, gw, "/blocked")
+	if blocked.Code != http.StatusForbidden || hits != 0 {
+		t.Fatalf("live deny: %d hits %d", blocked.Code, hits)
+	}
+	if blocked.Header().Get("SatGate-Evidence-Pack") == "" {
+		t.Fatal("live deny did not return a pack")
 	}
 
 	mcp := agentPost(t, gw, "/api/agent/policy", map[string]string{

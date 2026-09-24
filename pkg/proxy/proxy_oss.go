@@ -310,7 +310,7 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create response wrapper to capture status code
-	wrapped := &statusWriter{ResponseWriter: w, statusCode: http.StatusOK}
+	wrapped := &statusWriter{ResponseWriter: g.withLivePack(w, r, route), statusCode: http.StatusOK}
 
 	// Handle based on policy
 	switch policyKind {
