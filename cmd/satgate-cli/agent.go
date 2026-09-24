@@ -90,7 +90,11 @@ func agentVerify(args []string) {
 	if script == "" {
 		script = "tools/verify_evidence_pack.py"
 	}
-	out, err := exec.Command("python3", script, args[0]).CombinedOutput()
+	cmdArgs := []string{script, args[0]}
+	if jwks := os.Getenv("SATGATE_JWKS"); jwks != "" {
+		cmdArgs = append(cmdArgs, "--jwks-file", jwks, "--require-trusted-issuer")
+	}
+	out, err := exec.Command("python3", cmdArgs...).CombinedOutput()
 	fmt.Print(string(out))
 	if err != nil {
 		os.Exit(1)

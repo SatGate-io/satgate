@@ -200,6 +200,11 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if r.URL.Path == "/.well-known/satgate-agent-jwks.json" && r.Method == http.MethodGet {
+		writeJSON(w, http.StatusOK, g.agentJWKS())
+		return
+	}
+
 	// Check payment status endpoint (for polling from frontend)
 	if strings.HasPrefix(r.URL.Path, "/check-payment/") {
 		g.handleCheckPayment(w, r)

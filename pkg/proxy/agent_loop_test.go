@@ -28,6 +28,8 @@ func TestAgentLoopStagesSimulatesAndPromotesARealHTTPCall(t *testing.T) {
 		Cloud: &config.CloudConfig{SSRF: &config.CloudSSRFConfig{AllowPrivateIPs: true}},
 	})
 
+	gw.setAgentIssuer("https://issuer.example")
+
 	stage := agentPost(t, gw, "/api/agent/policy", map[string]string{
 		"name":         "orders",
 		"kind":         "observe",
@@ -60,7 +62,7 @@ func TestAgentLoopStagesSimulatesAndPromotesARealHTTPCall(t *testing.T) {
 	if pack["decision"] != "allowed" || pack["upstream_contacted"] != true || intFrom(pack["upstream_status"]) != http.StatusOK {
 		t.Fatalf("pack did not record the real call: %+v", pack)
 	}
-	if pack["provider_price_status"] != "UNKNOWN" || pack["settlement"] != false || pack["trusted_issuer_valid"] != false {
+	if pack["provider_price_status"] != "UNKNOWN" || pack["settlement"] != false || pack["trusted_issuer_valid"] == true || pack["issuer"] == "https://satgate.io" {
 		t.Fatalf("pack overclaimed price, settlement, or issuer: %+v", pack)
 	}
 	if hits != 1 {
@@ -68,6 +70,26 @@ func TestAgentLoopStagesSimulatesAndPromotesARealHTTPCall(t *testing.T) {
 	}
 	if !verifierAccepts(t, pack) {
 		t.Fatal("public verifier rejected the pack")
+	}
+	jwksRec := httptest.NewRecorder()
+	gw.ServeHTTP(jwksRec, httptest.NewRequest(http.MethodGet, "/.well-known/satgate-agent-jwks.json", nil))
+	if jwksRec.Code != http.StatusOK {
+		t.Fatalf("jwks %d %s", jwksRec.Code, jwksRec.Body.String())
+	}
+	pinned := verifierResult(t, pack, jwksRec.Body.Bytes(), true)
+	if pinned["valid"] != true || pinned["trusted_issuer_valid"] != true {
+		t.Fatalf("pinned issuer was not trusted: %s", jwksRec.Body.String())
+	}
+	var jwks map[string]any
+	if err := json.Unmarshal(jwksRec.Body.Bytes(), &jwks); err != nil {
+		t.Fatal(err)
+	}
+	keys := jwks["keys"].([]any)
+	keys[0].(map[string]any)["kid"] = "not-this-key"
+	wrong, _ := json.Marshal(jwks)
+	rejected := verifierResult(t, pack, wrong, true)
+	if rejected["valid"] == true || rejected["trusted_issuer_valid"] == true {
+		t.Fatalf("wrong pin was trusted: %+v", rejected)
 	}
 
 	promoted := agentPost(t, gw, "/api/agent/promote", map[string]string{"policy_id": staged.ID})
@@ -168,6 +190,12 @@ func intFrom(v any) int {
 
 func verifierAccepts(t *testing.T, pack map[string]any) bool {
 	t.Helper()
+	result := verifierResult(t, pack, nil, false)
+	return result["valid"] == true && result["trusted_issuer_valid"] == false
+}
+
+func verifierResult(t *testing.T, pack map[string]any, jwks []byte, require bool) map[string]any {
+	t.Helper()
 	dir := t.TempDir()
 	path := filepath.Join(dir, "pack.json")
 	raw, err := json.Marshal(pack)
@@ -177,14 +205,28 @@ func verifierAccepts(t *testing.T, pack map[string]any) bool {
 	if err := os.WriteFile(path, raw, 0o600); err != nil {
 		t.Fatal(err)
 	}
-	cmd := exec.Command("python3", filepath.Join("..", "..", "tools", "verify_evidence_pack.py"), path)
+	args := []string{filepath.Join("..", "..", "tools", "verify_evidence_pack.py"), path}
+	if jwks != nil {
+		jwksPath := filepath.Join(dir, "jwks.json")
+		if err := os.WriteFile(jwksPath, jwks, 0o600); err != nil {
+			t.Fatal(err)
+		}
+		args = append(args, "--jwks-file", jwksPath)
+	}
+	if require {
+		args = append(args, "--require-trusted-issuer")
+	}
+	cmd := exec.Command("python3", args...)
 	out, err := cmd.CombinedOutput()
-	if err != nil {
+	var result map[string]any
+	if jsonErr := json.Unmarshal(out, &result); jsonErr != nil {
+		t.Fatalf("verifier output %s: %v", out, jsonErr)
+	}
+	if require && err != nil && result["valid"] == true {
 		t.Fatalf("verifier failed: %v\n%s", err, out)
 	}
-	var result map[string]any
-	if err := json.Unmarshal(out, &result); err != nil {
-		t.Fatalf("verifier output %s: %v", out, err)
+	if !require && err != nil {
+		t.Fatalf("verifier failed: %v\n%s", err, out)
 	}
-	return result["valid"] == true && result["trusted_issuer_valid"] == false
+	return result
 }

@@ -56,6 +56,8 @@ type agentLoop struct {
 	packs      map[string]map[string]any
 	publicKey  ed25519.PublicKey
 	privateKey ed25519.PrivateKey
+	issuer     string
+	kid        string
 }
 
 func (g *Gateway) loop() *agentLoop {
@@ -69,6 +71,7 @@ func (g *Gateway) loop() *agentLoop {
 			packs:      map[string]map[string]any{},
 			publicKey:  pub,
 			privateKey: priv,
+			kid:        agentKid(pub),
 		}
 	})
 	return g.agent
@@ -320,8 +323,8 @@ func (g *Gateway) evidencePack(policy *agentPolicy, decision, reason, routeOrToo
 		"schema_url":           "https://satgate.io/.well-known/satgate-receipt.schema.json",
 		"receipt_id":           receiptID,
 		"evidence_pack_id":     packID,
-		"issuer":               "https://satgate.io",
-		"issuer_kid":           "agent-loop-unpinned",
+		"issuer":               g.loop().issuerOrigin(),
+		"issuer_kid":           g.loop().kid,
 		"decision":             decision,
 		"decision_reason":      reason,
 		"policy_version":       policy.ID,
@@ -350,7 +353,7 @@ func (g *Gateway) evidencePack(policy *agentPolicy, decision, reason, routeOrToo
 		"schema_version":        "satgate.evidence_pack.v1",
 		"evidence_pack_id":      packID,
 		"receipt_id":            receiptID,
-		"issuer":                "https://satgate.io",
+		"issuer":                g.loop().issuerOrigin(),
 		"decision":              decision,
 		"decision_reason":       reason,
 		"route_or_tool":         routeOrTool,
@@ -362,8 +365,37 @@ func (g *Gateway) evidencePack(policy *agentPolicy, decision, reason, routeOrToo
 		"provider_price_status": "UNKNOWN",
 		"upstream_contacted":    contacted,
 		"upstream_status":       status,
-		"trusted_issuer_valid":  false,
 		"receipts":              []any{receipt},
+	}
+}
+
+func (g *Gateway) setAgentIssuer(issuer string) {
+	g.loop().issuer = issuer
+}
+
+func (loop *agentLoop) issuerOrigin() string {
+	if loop.issuer != "" {
+		return loop.issuer
+	}
+	return "https://gateway.invalid"
+}
+
+func agentKid(pub ed25519.PublicKey) string {
+	sum := sha256.Sum256(pub)
+	return "ed25519-" + hex.EncodeToString(sum[:8])
+}
+
+func (g *Gateway) agentJWKS() map[string]any {
+	loop := g.loop()
+	return map[string]any{
+		"keys": []any{map[string]any{
+			"kty": "OKP",
+			"crv": "Ed25519",
+			"alg": "EdDSA",
+			"use": "sig",
+			"kid": loop.kid,
+			"x":   base64.RawURLEncoding.EncodeToString(loop.publicKey),
+		}},
 	}
 }
 
