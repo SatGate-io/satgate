@@ -273,6 +273,37 @@ def contains_unredacted_secret_field(value: Any) -> bool:
     return False
 
 
+CREDIT_USD_FIELDS = {
+    "amount_usd", "attempted_amount_usd", "remaining_budget_usd", "currency",
+    "credit_unit", "cost_credits", "limit_credits", "remaining_before_credits",
+    "remaining_after_credits", "remaining_credits", "projected_cost_credits",
+}
+
+
+def contains_credit_state(value):
+    if isinstance(value, dict):
+        return any(k in CREDIT_USD_FIELDS or contains_credit_state(v) for k, v in value.items())
+    return isinstance(value, list) and any(contains_credit_state(v) for v in value)
+
+
+def valid_paid_rail(receipt):
+    amount = receipt.get("amount_sats")
+    context = receipt.get("paid_rail_context")
+    fields = {"rail", "payment_hash", "invoice_hash", "macaroon_hash", "amount_sats"}
+    return (
+        receipt.get("decision") in {"allowed", "paid"}
+        and receipt.get("rail") == "l402"
+        and type(amount) in (int, float) and 0 < amount < float("inf")
+        and all(isinstance(receipt.get(k), str) and receipt[k].strip()
+                for k in ("payment_hash", "invoice_hash", "macaroon_hash"))
+        and isinstance(context, dict) and set(context) == fields
+        and all(type(context[k]) is type(receipt.get(k)) and context[k] == receipt.get(k) for k in fields)
+        and receipt.get("budget") == {"spend_mode": "paid_rail", "rail": "l402", "amount_sats": amount}
+        and type(receipt["budget"].get("amount_sats")) is type(amount)
+        and not contains_credit_state(receipt)
+    )
+
+
 def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reason_codes: list[str], jwks: dict[str, Any] | None = None, require_trusted_issuer: bool = False, now_dt: datetime | None = None, allow_mock: bool = False) -> tuple[dict[str, bool], str, str, bool]:
     prefix = f"receipt_{index}"
     checks: dict[str, bool] = {}
@@ -304,7 +335,12 @@ def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reas
     if not checks[f"{prefix}_decision"]:
         fail("unknown_decision", f"receipts[{index}].decision is not a supported protocol decision")
 
-    checks[f"{prefix}_decision_reason"] = receipt.get("decision_reason") in ALLOWED_DECISION_REASONS
+    paid_rail = receipt.get("decision_reason") == "payment_verified"
+    if paid_rail:
+        checks[f"{prefix}_paid_rail"] = bool(valid_paid_rail(receipt))
+        if not checks[f"{prefix}_paid_rail"]:
+            fail("invalid_paid_rail_provenance", "Incomplete or contradictory paid-rail receipt")
+    checks[f"{prefix}_decision_reason"] = paid_rail or receipt.get("decision_reason") in ALLOWED_DECISION_REASONS
     if not checks[f"{prefix}_decision_reason"]:
         fail("unknown_decision_reason", f"receipts[{index}].decision_reason is not a supported protocol reason")
 
@@ -403,6 +439,13 @@ def verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requir
         checks[key] = bool(primary) and pack.get(field) == primary.get(field)
         if not checks[key]:
             add_reason(reasons, reason_codes, "pack_primary_mismatch", f"pack.{field} does not match primary embedded receipt.{field}")
+
+    if any(r.get("decision_reason") == "payment_verified" for r in receipts):
+        checks["pack_paid_rail"] = "budget_state" not in pack and not contains_credit_state(pack)
+        for field in ("budget", "policy", "authority"):
+            checks[f"pack_{field}_matches_primary_receipt"] = pack.get(field) == primary.get(field)
+        if not checks["pack_paid_rail"]:
+            add_reason(reasons, reason_codes, "invalid_paid_rail_provenance", "Paid-rail Pack carries budget_state or credit/USD state")
 
     budget = pack.get("budget_state") if isinstance(pack.get("budget_state"), dict) else {}
     checks["budget_state_matches_primary_receipt"] = bool(primary) and budget.get("attempted_amount_usd") == primary.get("attempted_amount_usd") and budget.get("remaining_budget_usd") == primary.get("remaining_budget_usd")
