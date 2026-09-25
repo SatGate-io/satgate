@@ -193,6 +193,21 @@ routes: []
 	}
 }
 
+func TestValidate_AgentGatewayMayStartWithNoRoutes(t *testing.T) {
+	yaml := []byte(`
+agent:
+  enabled: true
+routes: []
+`)
+	cfg, err := ParseYAML(yaml)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Agent == nil || !cfg.Agent.Enabled {
+		t.Fatal("agent mode was not enabled")
+	}
+}
+
 func TestValidate_RouteNoName(t *testing.T) {
 	yaml := []byte(`
 upstreams:

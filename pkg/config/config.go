@@ -33,11 +33,15 @@ type Config struct {
 	GitOps        *GitOpsConfig        `yaml:"gitops,omitempty"`        // Optional GitOps signed config verification
 	Notifications *NotificationsConfig `yaml:"notifications,omitempty"` // Alert webhooks (Slack, Discord, HTTP, Email)
 	Tracing       *TracingConfig       `yaml:"tracing,omitempty"`       // OpenTelemetry distributed tracing
+	Agent         *AgentConfig         `yaml:"agent,omitempty"`          // Agent loop: policies arrive after start
 	Upstreams     map[string]Upstream  `yaml:"upstreams"`
 	Routes        []Route              `yaml:"routes"`
 }
 
-// MintConfig configures the SatGate Mint trust broker
+// AgentConfig lets a gateway start with no routes. The agent adds them.
+type AgentConfig struct {
+	Enabled bool `yaml:"enabled"`
+}
 type MintConfig struct {
 	// Enabled activates the Mint service
 	Enabled bool `yaml:"enabled"`
@@ -700,7 +704,7 @@ func ParseYAML(data []byte) (*Config, error) {
 
 // Validate checks the configuration for errors
 func (c *Config) Validate() error {
-	if len(c.Routes) == 0 {
+	if len(c.Routes) == 0 && (c.Agent == nil || !c.Agent.Enabled) {
 		return fmt.Errorf("no routes defined")
 	}
 

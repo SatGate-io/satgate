@@ -33,6 +33,7 @@ Example usage (OSS Gateway):
 import base64
 import json
 import os
+import sys
 import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Union
@@ -599,12 +600,16 @@ class SatGateAgentClient:
         """Fetch a pack the gateway already signed."""
         return self._admin_json("GET", "/api/agent/pack/" + pack_id)
 
-    def call(self, method: str, path: str, body: Optional[dict] = None) -> dict:
+    def call(self, method: str, path: str, body: Optional[dict] = None, token: Optional[str] = None) -> dict:
         """Call a promoted route. Returns the upstream body and the live pack id."""
+        headers = {}
+        if token:
+            headers["Authorization"] = "Bearer " + token
         resp = self.session.request(
             method,
             self.gateway_url.rstrip("/") + path,
             json=body,
+            headers=headers,
             timeout=self.timeout,
         )
         parsed = None
@@ -618,6 +623,46 @@ class SatGateAgentClient:
             "body": parsed,
             "pack_id": resp.headers.get("SatGate-Evidence-Pack"),
         }
+
+    def mint_capability(self, scope: str, duration: str = "1h") -> str:
+        """Mint a real capability token. This does not call an identity provider."""
+        minted = self._admin_json("POST", "/api/capability/mint", {"scope": scope, "duration": duration})
+        token = minted.get("token")
+        if not token:
+            raise SatGateError("mint returned no token")
+        return token
+
+    def fetch_jwks(self) -> dict:
+        """Fetch the gateway's published signing key."""
+        resp = self.session.get(
+            self.gateway_url.rstrip("/") + "/.well-known/satgate-agent-jwks.json",
+            timeout=self.timeout,
+        )
+        if resp.status_code >= 400:
+            raise SatGateError(f"jwks failed: {resp.status_code} {resp.text}")
+        return resp.json()
+
+    def verify_pack(self, pack: dict, jwks: dict, require_trusted_issuer: bool = True) -> dict:
+        """Verify a pack with the public verifier. SATGATE_VERIFIER must point at that script."""
+        import subprocess
+        import tempfile
+        script = os.environ.get("SATGATE_VERIFIER")
+        if not script:
+            raise SatGateError("SATGATE_VERIFIER is not set")
+        with tempfile.TemporaryDirectory() as tmp:
+            pack_path = os.path.join(tmp, "pack.json")
+            jwks_path = os.path.join(tmp, "jwks.json")
+            with open(pack_path, "w") as handle:
+                json.dump(pack, handle)
+            with open(jwks_path, "w") as handle:
+                json.dump(jwks, handle)
+            cmd = [sys.executable, script, pack_path, "--jwks-file", jwks_path]
+            if require_trusted_issuer:
+                cmd.append("--require-trusted-issuer")
+            verified = subprocess.run(cmd, capture_output=True, text=True)
+        if verified.returncode != 0:
+            raise SatGateError(verified.stdout + verified.stderr)
+        return json.loads(verified.stdout)
 
     def _admin_json(self, method: str, path: str, body: Optional[dict] = None) -> dict:
         if not self.admin_token:
