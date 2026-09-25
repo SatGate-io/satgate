@@ -599,6 +599,26 @@ class SatGateAgentClient:
         """Fetch a pack the gateway already signed."""
         return self._admin_json("GET", "/api/agent/pack/" + pack_id)
 
+    def call(self, method: str, path: str, body: Optional[dict] = None) -> dict:
+        """Call a promoted route. Returns the upstream body and the live pack id."""
+        resp = self.session.request(
+            method,
+            self.gateway_url.rstrip("/") + path,
+            json=body,
+            timeout=self.timeout,
+        )
+        parsed = None
+        if resp.content:
+            try:
+                parsed = resp.json()
+            except ValueError:
+                parsed = resp.text
+        return {
+            "status_code": resp.status_code,
+            "body": parsed,
+            "pack_id": resp.headers.get("SatGate-Evidence-Pack"),
+        }
+
     def _admin_json(self, method: str, path: str, body: Optional[dict] = None) -> dict:
         if not self.admin_token:
             raise AuthenticationError("admin token required")
