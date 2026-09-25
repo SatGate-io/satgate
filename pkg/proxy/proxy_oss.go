@@ -331,6 +331,9 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(wrapped, "denied", http.StatusForbidden)
 		return
 
+	case "identity":
+		g.handleIdentity(wrapped, r, route)
+
 	case "l402":
 		g.metrics.TotalL402.Add(1)
 		g.handleL402(wrapped, r, route)
@@ -487,12 +490,11 @@ func (g *Gateway) issueL402Challenge(w http.ResponseWriter, r *http.Request, rou
 		http.Error(w, "Lightning provider not configured", http.StatusServiceUnavailable)
 		return
 	}
-
-	// Get price from route config
-	priceSats := int64(100) // Default
-	if route.Policy.PriceSats > 0 {
-		priceSats = route.Policy.PriceSats
+	if route.Policy.PriceSats <= 0 {
+		http.Error(w, "price_unknown", http.StatusConflict)
+		return
 	}
+	priceSats := route.Policy.PriceSats
 
 	// Create invoice
 	inv, err := g.lightning.CreateInvoice(priceSats, fmt.Sprintf("SatGate: %s", route.Name))

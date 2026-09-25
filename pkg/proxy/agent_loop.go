@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"bytes"
+	"context"
 	"crypto/ed25519"
 	"crypto/rand"
 	"crypto/sha256"
@@ -10,8 +11,10 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"path/filepath"
 	"sort"
@@ -21,21 +24,25 @@ import (
 	"time"
 
 	"github.com/satgate-io/satgate/pkg/config"
+	"github.com/satgate-io/satgate/pkg/lightning"
 )
 
 // Agent loop: stage a policy, run it against a real upstream, sign that
 // decision, then promote only when the agent asks. Staging does not go live.
 type agentPolicy struct {
-	ID          string `json:"policy_id"`
-	Name        string `json:"name"`
-	Kind        string `json:"kind"`
-	PathPrefix  string `json:"path_prefix"`
-	UpstreamURL string `json:"upstream_url"`
-	Surface     string `json:"surface"`
-	Scope       string `json:"scope,omitempty"`
-	Issuer      string `json:"issuer,omitempty"`
-	PackID      string `json:"pack_id,omitempty"`
-	Promoted    bool   `json:"promoted"`
+	ID             string `json:"policy_id"`
+	Name           string `json:"name"`
+	Kind           string `json:"kind"`
+	PathPrefix     string `json:"path_prefix"`
+	UpstreamURL    string `json:"upstream_url"`
+	Surface        string `json:"surface"`
+	Scope          string `json:"scope,omitempty"`
+	Issuer         string `json:"issuer,omitempty"`
+	PriceSats      int64  `json:"price_sats,omitempty"`
+	IdentityIssuer string `json:"identity_issuer,omitempty"`
+	IdentityJWKS   string `json:"identity_jwks,omitempty"`
+	PackID         string `json:"pack_id,omitempty"`
+	Promoted       bool   `json:"promoted"`
 }
 
 type agentPack struct {
@@ -131,7 +138,7 @@ func (g *Gateway) stageAgentPolicy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	switch req.Kind {
-	case "public", "observe", "deny", "capability", "charge":
+	case "public", "observe", "deny", "capability", "charge", "identity":
 	default:
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "unsupported_kind"})
 		return
@@ -142,6 +149,14 @@ func (g *Gateway) stageAgentPolicy(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.Kind != "deny" && req.UpstreamURL == "" {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "upstream_required"})
+		return
+	}
+	if req.PriceSats < 0 {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_price"})
+		return
+	}
+	if req.Kind == "identity" && (!validIssuerOrigin(req.IdentityIssuer) || req.IdentityJWKS == "") {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_identity"})
 		return
 	}
 	if req.Issuer != "" && !validIssuerOrigin(req.Issuer) {
@@ -216,6 +231,17 @@ func (g *Gateway) simulateAgentPolicy(w http.ResponseWriter, r *http.Request) {
 		if !contacted {
 			decision = "upstream_failed"
 		}
+	case "identity":
+		fp, err := g.verifyAgentIdentity(policy, req.Authorization)
+		if err != nil {
+			decision = "denied"
+			break
+		}
+		identity = fp
+		status, contacted = g.callUpstream(policy.UpstreamURL, req.Method, req.Path, req.Body)
+		if !contacted {
+			decision = "upstream_failed"
+		}
 	default:
 		status, contacted = g.callUpstream(policy.UpstreamURL, req.Method, req.Path, req.Body)
 		if !contacted {
@@ -229,7 +255,11 @@ func (g *Gateway) simulateAgentPolicy(w http.ResponseWriter, r *http.Request) {
 	}
 	pack := g.evidencePack(policy, protocolDecision, reason, routeOrTool, contacted, status)
 	if policy.Kind == "charge" {
-		pack["promote_block"] = "price_unknown"
+		if policy.PriceSats <= 0 {
+			pack["promote_block"] = "price_unknown"
+		} else if !g.realPaymentRail() {
+			pack["promote_block"] = "payment_rail_unavailable"
+		}
 	}
 	if identity != "" {
 		pack["identity_fingerprint"] = identity
@@ -279,9 +309,9 @@ func (g *Gateway) promoteAgentPolicy(w http.ResponseWriter, r *http.Request) {
 	if err := g.installPromotedPolicy(policy); err != nil {
 		status := http.StatusBadGateway
 		code := "upstream_invalid"
-		if err.Error() == "price_unknown" {
+		if err.Error() == "price_unknown" || err.Error() == "payment_rail_unavailable" {
 			status = http.StatusConflict
-			code = "price_unknown"
+			code = err.Error()
 		}
 		writeJSON(w, status, map[string]any{
 			"error":      code,
@@ -301,11 +331,17 @@ func (g *Gateway) promoteAgentPolicy(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g *Gateway) installPromotedPolicy(policy *agentPolicy) error {
-	if policy.Kind == "charge" {
-		return errors.New("price_unknown")
-	}
 	kind := policy.Kind
-	if kind == "observe" {
+	switch kind {
+	case "charge":
+		if policy.PriceSats <= 0 {
+			return errors.New("price_unknown")
+		}
+		if !g.realPaymentRail() {
+			return errors.New("payment_rail_unavailable")
+		}
+		kind = "l402"
+	case "observe":
 		kind = "chargeback"
 	}
 	name := "agent-" + policy.ID
@@ -326,7 +362,7 @@ func (g *Gateway) installPromotedPolicy(policy *agentPolicy) error {
 		Name:     policy.Name,
 		Match:    config.RouteMatch{PathPrefix: policy.PathPrefix},
 		Upstream: name,
-		Policy:   config.RoutePolicy{Kind: kind, Scope: policy.Scope},
+		Policy:   config.RoutePolicy{Kind: kind, Scope: policy.Scope, PriceSats: policy.PriceSats},
 	})
 	return nil
 }
@@ -382,26 +418,26 @@ func (g *Gateway) evidencePack(policy *agentPolicy, decision, reason, routeOrToo
 	sum := sha256.Sum256([]byte(policy.ID))
 	pub := base64.RawURLEncoding.EncodeToString(g.loop().publicKey)
 	receipt := map[string]any{
-		"schema_version":       "satgate.receipt.v1",
-		"schema_url":           "https://satgate.io/.well-known/satgate-receipt.schema.json",
-		"receipt_id":           receiptID,
-		"evidence_pack_id":     packID,
-		"issuer":               g.loop().issuerOrigin(),
-		"issuer_kid":           g.loop().kid,
-		"decision":             decision,
-		"decision_reason":      reason,
-		"policy_version":       policy.ID,
-		"timestamp":            now,
-		"issued_at":            now,
-		"canonicalization":     "jcs-rfc8785",
-		"hash_algorithm":       "sha256",
-		"signature_algorithm":  "ed25519",
-		"capability_hash":      "sha256:" + hex.EncodeToString(sum[:]),
-		"route_or_tool":        routeOrTool,
-		"upstream_contacted":   contacted,
-		"upstream_status":      status,
+		"schema_version":        "satgate.receipt.v1",
+		"schema_url":            "https://satgate.io/.well-known/satgate-receipt.schema.json",
+		"receipt_id":            receiptID,
+		"evidence_pack_id":      packID,
+		"issuer":                g.loop().issuerOrigin(),
+		"issuer_kid":            g.loop().kid,
+		"decision":              decision,
+		"decision_reason":       reason,
+		"policy_version":        policy.ID,
+		"timestamp":             now,
+		"issued_at":             now,
+		"canonicalization":      "jcs-rfc8785",
+		"hash_algorithm":        "sha256",
+		"signature_algorithm":   "ed25519",
+		"capability_hash":       "sha256:" + hex.EncodeToString(sum[:]),
+		"route_or_tool":         routeOrTool,
+		"upstream_contacted":    contacted,
+		"upstream_status":       status,
 		"provider_price_status": "UNKNOWN",
-		"settlement":           false,
+		"settlement":            false,
 		"metadata": map[string]any{
 			"public_key_ed25519_b64": pub,
 		},
@@ -472,11 +508,14 @@ func (g *Gateway) recordLivePack(route *config.Route, r *http.Request, code int,
 	decision, reason := "allowed", "policy_allowed"
 	contacted := true
 	status := code
-	if policy.Kind == "deny" || code == http.StatusUnauthorized || code == http.StatusForbidden {
+	if policy.Kind == "deny" || policy.Kind == "charge" || code == http.StatusUnauthorized || code == http.StatusForbidden || code == http.StatusPaymentRequired {
 		decision = "denied"
 		reason = "policy_denied"
-		if policy.Kind == "capability" {
+		if policy.Kind == "capability" || policy.Kind == "identity" {
 			reason = "capability_invalid"
+		}
+		if code == http.StatusPaymentRequired {
+			reason = "payment_required"
 		}
 		contacted = false
 		status = 0
@@ -486,6 +525,9 @@ func (g *Gateway) recordLivePack(route *config.Route, r *http.Request, code int,
 		routeOrTool = tool
 	}
 	pack := g.evidencePack(policy, decision, reason, routeOrTool, contacted, status)
+	if fp, _ := r.Context().Value(identityFingerprintKey).(string); fp != "" {
+		pack["identity_fingerprint"] = fp
+	}
 	loop.mu.Lock()
 	id, _ := pack["evidence_pack_id"].(string)
 	loop.packs[id] = pack
@@ -693,6 +735,140 @@ func (g *Gateway) agentJWKS() map[string]any {
 			"x":   base64.RawURLEncoding.EncodeToString(loop.publicKey),
 		}},
 	}
+}
+
+type identityCtxKey struct{}
+
+var identityFingerprintKey = identityCtxKey{}
+
+func (g *Gateway) realPaymentRail() bool {
+	if g.lightning == nil {
+		return false
+	}
+	_, mock := g.lightning.(*lightning.MockProvider)
+	return !mock
+}
+
+func (g *Gateway) handleIdentity(w http.ResponseWriter, r *http.Request, route *config.Route) {
+	policy := g.agentPolicyForRoute(route)
+	if policy == nil {
+		http.Error(w, "identity_not_configured", http.StatusForbidden)
+		return
+	}
+	fp, err := g.verifyAgentIdentity(policy, r.Header.Get("Authorization"))
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+	r = r.WithContext(contextWithIdentity(r.Context(), fp))
+	g.proxyRequest(w, r, route)
+}
+
+func (g *Gateway) verifyAgentIdentity(policy *agentPolicy, authorization string) (string, error) {
+	token := strings.TrimPrefix(authorization, "Bearer ")
+	if token == "" || token == authorization || policy == nil {
+		return "", errors.New("identity_invalid")
+	}
+	keys, err := g.fetchIdentityKeys(policy.IdentityJWKS)
+	if err != nil {
+		return "", err
+	}
+	return verifyEdJWT(token, policy.IdentityIssuer, keys)
+}
+
+func (g *Gateway) fetchIdentityKeys(rawURL string) (map[string]ed25519.PublicKey, error) {
+	if err := g.identityURLAllowed(rawURL); err != nil {
+		return nil, err
+	}
+	client := &http.Client{Timeout: 5 * time.Second}
+	resp, err := client.Get(rawURL)
+	if err != nil {
+		return nil, errors.New("identity_provider_unavailable")
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New("identity_provider_unavailable")
+	}
+	var doc struct {
+		Keys []struct {
+			Kty string `json:"kty"`
+			Crv string `json:"crv"`
+			Kid string `json:"kid"`
+			X   string `json:"x"`
+		} `json:"keys"`
+	}
+	if err := json.NewDecoder(io.LimitReader(resp.Body, 1<<20)).Decode(&doc); err != nil {
+		return nil, errors.New("identity_provider_unavailable")
+	}
+	keys := map[string]ed25519.PublicKey{}
+	for _, key := range doc.Keys {
+		if key.Kty != "OKP" || key.Crv != "Ed25519" || key.Kid == "" {
+			continue
+		}
+		raw, err := base64.RawURLEncoding.DecodeString(key.X)
+		if err != nil || len(raw) != ed25519.PublicKeySize {
+			continue
+		}
+		keys[key.Kid] = ed25519.PublicKey(raw)
+	}
+	if len(keys) == 0 {
+		return nil, errors.New("identity_provider_unavailable")
+	}
+	return keys, nil
+}
+
+func (g *Gateway) identityURLAllowed(raw string) error {
+	parsed, err := url.Parse(raw)
+	if err != nil || parsed.Host == "" || parsed.User != nil {
+		return errors.New("identity_jwks_invalid")
+	}
+	allowPrivate := g.config != nil && g.config.Cloud != nil && g.config.Cloud.SSRF != nil && g.config.Cloud.SSRF.AllowPrivateIPs
+	if parsed.Scheme != "https" && !(allowPrivate && parsed.Scheme == "http") {
+		return errors.New("identity_jwks_invalid")
+	}
+	if ip := net.ParseIP(parsed.Hostname()); ip != nil && !allowPrivate && (ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsUnspecified()) {
+		return errors.New("identity_jwks_invalid")
+	}
+	return nil
+}
+
+func verifyEdJWT(token, issuer string, keys map[string]ed25519.PublicKey) (string, error) {
+	parts := strings.Split(token, ".")
+	if len(parts) != 3 {
+		return "", errors.New("identity_invalid")
+	}
+	headerRaw, err := base64.RawURLEncoding.DecodeString(parts[0])
+	if err != nil {
+		return "", errors.New("identity_invalid")
+	}
+	var header struct {
+		Alg string `json:"alg"`
+		Kid string `json:"kid"`
+	}
+	if json.Unmarshal(headerRaw, &header) != nil || header.Alg != "EdDSA" {
+		return "", errors.New("identity_invalid")
+	}
+	pub := keys[header.Kid]
+	sig, err := base64.RawURLEncoding.DecodeString(parts[2])
+	if err != nil || len(pub) == 0 || !ed25519.Verify(pub, []byte(parts[0]+"."+parts[1]), sig) {
+		return "", errors.New("identity_invalid")
+	}
+	payloadRaw, err := base64.RawURLEncoding.DecodeString(parts[1])
+	if err != nil {
+		return "", errors.New("identity_invalid")
+	}
+	var payload struct {
+		Iss string  `json:"iss"`
+		Exp float64 `json:"exp"`
+	}
+	if json.Unmarshal(payloadRaw, &payload) != nil || payload.Iss != issuer || payload.Exp <= float64(time.Now().Unix()) {
+		return "", errors.New("identity_invalid")
+	}
+	return "sha256:" + hex.EncodeToString(mustSHA256(parts[2])), nil
+}
+
+func contextWithIdentity(ctx context.Context, fingerprint string) context.Context {
+	return context.WithValue(ctx, identityFingerprintKey, fingerprint)
 }
 
 func mcpTool(body string) string {

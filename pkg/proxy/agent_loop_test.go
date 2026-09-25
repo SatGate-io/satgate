@@ -1,6 +1,8 @@
 package proxy
 
 import (
+	"crypto/ed25519"
+	"encoding/base64"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -10,8 +12,11 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/satgate-io/satgate/pkg/config"
+	"github.com/satgate-io/satgate/pkg/governance"
+	"github.com/satgate-io/satgate/pkg/lightning"
 )
 
 func TestAgentLoopStagesSimulatesAndPromotesARealHTTPCall(t *testing.T) {
@@ -560,4 +565,124 @@ func verifierResult(t *testing.T, pack map[string]any, jwks []byte, require bool
 		t.Fatalf("verifier failed: %v\n%s", err, out)
 	}
 	return result
+}
+
+func TestAgentLoopIdentityChecksASignedToken(t *testing.T) {
+	pub, priv, err := ed25519.GenerateKey(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	jwks := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = json.NewEncoder(w).Encode(map[string]any{"keys": []any{map[string]any{
+			"kty": "OKP", "crv": "Ed25519", "kid": "idp-1", "x": base64.RawURLEncoding.EncodeToString(pub),
+		}}})
+	}))
+	defer jwks.Close()
+	var hits int
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hits++
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}))
+	defer upstream.Close()
+	gw := newTestGateway(t, &config.Config{Admin: config.AdminConfig{Token: "admin-secret"}})
+	staged := agentPost(t, gw, "/api/agent/policy", map[string]any{
+		"name": "who", "kind": "identity", "path_prefix": "/who", "upstream_url": upstream.URL,
+		"identity_issuer": "https://idp.example", "identity_jwks": jwks.URL, "issuer": "https://issuer.example",
+	})
+	var policy agentPolicy
+	decode(t, staged, &policy)
+	bad := agentPost(t, gw, "/api/agent/simulate", map[string]string{"policy_id": policy.ID, "authorization": "Bearer not-a-jwt"})
+	if bad.Code != http.StatusOK || hits != 0 || strings.Contains(bad.Body.String(), "not-a-jwt") {
+		t.Fatalf("bad identity reached upstream: %d %s hits %d", bad.Code, bad.Body.String(), hits)
+	}
+	token := signTestJWT(t, priv, "idp-1", "https://idp.example")
+	good := agentPost(t, gw, "/api/agent/simulate", map[string]string{"policy_id": policy.ID, "authorization": "Bearer " + token})
+	var pack map[string]any
+	decode(t, good, &pack)
+	if pack["identity_fingerprint"] == "" || pack["upstream_contacted"] != true || strings.Contains(good.Body.String(), token) || hits != 1 {
+		t.Fatalf("identity simulation: %+v hits %d", pack, hits)
+	}
+	if agentPost(t, gw, "/api/agent/promote", map[string]string{"policy_id": policy.ID}).Code != http.StatusOK {
+		t.Fatal("identity promote failed")
+	}
+	missing := agentGet(t, gw, "/who")
+	live := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/who", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	gw.ServeHTTP(live, req)
+	if missing.Code == http.StatusOK || live.Code != http.StatusOK || hits != 2 || strings.Contains(live.Body.String(), token) {
+		t.Fatalf("live identity: missing %d live %d hits %d", missing.Code, live.Code, hits)
+	}
+}
+
+func TestAgentLoopExplicitPriceDoesNotUseTheMockRail(t *testing.T) {
+	var hits int
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { hits++ }))
+	defer upstream.Close()
+	gw := newTestGateway(t, &config.Config{Admin: config.AdminConfig{Token: "admin-secret"}})
+	staged := agentPost(t, gw, "/api/agent/policy", map[string]any{
+		"name": "paid", "kind": "charge", "path_prefix": "/paid", "upstream_url": upstream.URL, "price_sats": 42,
+	})
+	var policy agentPolicy
+	decode(t, staged, &policy)
+	sim := agentPost(t, gw, "/api/agent/simulate", map[string]string{"policy_id": policy.ID})
+	promoted := agentPost(t, gw, "/api/agent/promote", map[string]string{"policy_id": policy.ID})
+	if !strings.Contains(sim.Body.String(), "payment_rail_unavailable") || promoted.Code != http.StatusConflict || hits != 0 {
+		t.Fatalf("mock rail was treated as payment: sim %s promote %d %s", sim.Body.String(), promoted.Code, promoted.Body.String())
+	}
+	if strings.Contains(sim.Body.String(), "amount_sats") || strings.Contains(promoted.Body.String(), "invoice") || strings.Contains(promoted.Body.String(), "100") {
+		t.Fatalf("explicit price invented an invoice: %s %s", sim.Body.String(), promoted.Body.String())
+	}
+}
+
+func TestAgentLoopExplicitPriceIsTheInvoiceAmount(t *testing.T) {
+	var hits int
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { hits++ }))
+	defer upstream.Close()
+	cfg := &config.Config{
+		Admin: config.AdminConfig{Token: "admin-secret"},
+		Cloud: &config.CloudConfig{SSRF: &config.CloudSSRFConfig{AllowPrivateIPs: true}},
+	}
+	gw, err := New(Options{Config: cfg, Macaroon: newTestMacaroonService(t), Governance: governance.NewService(nil), Lightning: quotedRail{}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	staged := agentPost(t, gw, "/api/agent/policy", map[string]any{
+		"name": "paid", "kind": "charge", "path_prefix": "/paid", "upstream_url": upstream.URL, "price_sats": 42,
+	})
+	var policy agentPolicy
+	decode(t, staged, &policy)
+	if agentPost(t, gw, "/api/agent/simulate", map[string]string{"policy_id": policy.ID}).Code != http.StatusOK || hits != 0 {
+		t.Fatal("priced charge contacted upstream during simulation")
+	}
+	if agentPost(t, gw, "/api/agent/promote", map[string]string{"policy_id": policy.ID}).Code != http.StatusOK {
+		t.Fatal("priced charge did not promote onto the quoted rail")
+	}
+	live := agentGet(t, gw, "/paid")
+	var body map[string]any
+	decode(t, live, &body)
+	if live.Code != http.StatusPaymentRequired || body["amount_sats"] != float64(42) || hits != 0 || body["settlement"] == true {
+		t.Fatalf("invoice was not the agent price: %d %+v hits %d", live.Code, body, hits)
+	}
+}
+
+type quotedRail struct{}
+
+func (quotedRail) CreateInvoice(amount int64, memo string) (*lightning.Invoice, error) {
+	return &lightning.Invoice{Bolt11: "lnbc42", PaymentHash: "00112233445566778899aabbccddeeff", Amount: amount, Memo: memo}, nil
+}
+func (quotedRail) CheckPayment(string) (bool, error) { return false, nil }
+func (quotedRail) GetBalance() (int64, error)        { return 0, nil }
+func (quotedRail) GetInfo() (*lightning.NodeInfo, error) {
+	return &lightning.NodeInfo{Alias: "quoted"}, nil
+}
+
+func signTestJWT(t *testing.T, priv ed25519.PrivateKey, kid, issuer string) string {
+	t.Helper()
+	header, _ := json.Marshal(map[string]string{"alg": "EdDSA", "kid": kid, "typ": "JWT"})
+	payload, _ := json.Marshal(map[string]any{"iss": issuer, "sub": "agent-1", "exp": time.Now().Add(time.Hour).Unix()})
+	h := base64.RawURLEncoding.EncodeToString(header)
+	p := base64.RawURLEncoding.EncodeToString(payload)
+	sig := ed25519.Sign(priv, []byte(h+"."+p))
+	return h + "." + p + "." + base64.RawURLEncoding.EncodeToString(sig)
 }
