@@ -6,6 +6,7 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	"crypto/sha256"
+	"crypto/tls"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
@@ -21,6 +22,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/satgate-io/satgate/pkg/config"
@@ -399,7 +401,9 @@ func (g *Gateway) callUpstream(upstream, method, path, body string) (int, bool) 
 
 func protocolDecision(kind, raw string) (string, string) {
 	switch raw {
-	case "payment_required", "upstream_failed":
+	case "payment_required":
+		return "denied", "payment_required"
+	case "upstream_failed":
 		return "denied", "policy_denied"
 	case "denied":
 		if kind == "capability" {
@@ -780,7 +784,7 @@ func (g *Gateway) fetchIdentityKeys(rawURL string) (map[string]ed25519.PublicKey
 	if err := g.identityURLAllowed(rawURL); err != nil {
 		return nil, err
 	}
-	client := &http.Client{Timeout: 5 * time.Second}
+	client := g.identityHTTPClient()
 	resp, err := client.Get(rawURL)
 	if err != nil {
 		return nil, errors.New("identity_provider_unavailable")
@@ -815,6 +819,34 @@ func (g *Gateway) fetchIdentityKeys(rawURL string) (map[string]ed25519.PublicKey
 		return nil, errors.New("identity_provider_unavailable")
 	}
 	return keys, nil
+}
+
+func (g *Gateway) identityHTTPClient() *http.Client {
+	dialer := &net.Dialer{Timeout: 5 * time.Second}
+	allowPrivate := g.config != nil && g.config.Cloud != nil && g.config.Cloud.SSRF != nil && g.config.Cloud.SSRF.AllowPrivateIPs
+	if !allowPrivate {
+		dialer.Control = func(network, address string, _ syscall.RawConn) error {
+			host, _, err := net.SplitHostPort(address)
+			if err != nil {
+				return err
+			}
+			ip := net.ParseIP(host)
+			if ip != nil && (ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsUnspecified()) {
+				return errors.New("identity_jwks_invalid")
+			}
+			return nil
+		}
+	}
+	return &http.Client{
+		Timeout: 5 * time.Second,
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return errors.New("identity_jwks_invalid")
+		},
+		Transport: &http.Transport{
+			DialContext:     dialer.DialContext,
+			TLSClientConfig: &tls.Config{MinVersion: tls.VersionTLS12},
+		},
+	}
 }
 
 func (g *Gateway) identityURLAllowed(raw string) error {

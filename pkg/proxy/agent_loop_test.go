@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"context"
 	"crypto/ed25519"
 	"encoding/base64"
 	"encoding/json"
@@ -615,6 +616,27 @@ func TestAgentLoopIdentityChecksASignedToken(t *testing.T) {
 	}
 }
 
+func TestAgentLoopIdentityJWKSDoesNotFollowRedirectsOrPrivateDials(t *testing.T) {
+	var followed int
+	target := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		followed++
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer target.Close()
+	jwks := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, target.URL, http.StatusFound)
+	}))
+	defer jwks.Close()
+	gw := newTestGateway(t, &config.Config{Admin: config.AdminConfig{Token: "admin-secret"}})
+	if _, err := gw.fetchIdentityKeys(jwks.URL); err == nil || followed != 0 {
+		t.Fatalf("redirect was followed: err %v hits %d", err, followed)
+	}
+	blocked := &Gateway{config: &config.Config{}}
+	if _, err := blocked.identityHTTPClient().Transport.(*http.Transport).DialContext(context.Background(), "tcp", "127.0.0.1:1"); err == nil {
+		t.Fatal("private dial was allowed")
+	}
+}
+
 func TestAgentLoopExplicitPriceDoesNotUseTheMockRail(t *testing.T) {
 	var hits int
 	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { hits++ }))
@@ -663,6 +685,22 @@ func TestAgentLoopExplicitPriceIsTheInvoiceAmount(t *testing.T) {
 	decode(t, live, &body)
 	if live.Code != http.StatusPaymentRequired || body["amount_sats"] != float64(42) || hits != 0 || body["settlement"] == true {
 		t.Fatalf("invoice was not the agent price: %d %+v hits %d", live.Code, body, hits)
+	}
+	packID := live.Header().Get("SatGate-Evidence-Pack")
+	if packID == "" {
+		t.Fatal("live charge did not return a pack")
+	}
+	req := httptest.NewRequest(http.MethodGet, "/api/agent/pack/"+packID, nil)
+	req.Header.Set("X-Admin-Token", "admin-secret")
+	got := httptest.NewRecorder()
+	gw.ServeHTTP(got, req)
+	var pack map[string]any
+	decode(t, got, &pack)
+	if pack["decision"] != "denied" || pack["decision_reason"] != "payment_required" || pack["settlement"] != false {
+		t.Fatalf("live charge pack: %+v", pack)
+	}
+	if !verifierAccepts(t, pack) {
+		t.Fatal("public verifier rejected the live charge pack")
 	}
 }
 
