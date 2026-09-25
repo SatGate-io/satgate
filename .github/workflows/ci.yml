@@ -18,6 +18,14 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Set up verifier Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install verifier dependencies
+        run: python -m pip install 'rfc8785==0.1.4' 'cryptography==50.0.0'
+
       - name: Check formatting
         run: |
           if [ -n "$(gofmt -l .)" ]; then

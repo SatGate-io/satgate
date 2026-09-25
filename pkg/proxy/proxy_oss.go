@@ -56,6 +56,9 @@ type Gateway struct {
 
 	// Optional hooks (set via SetXxx methods)
 	metricsHook MetricsHook
+
+	agentOnce sync.Once
+	agent     *agentLoop
 }
 
 // replayGuard prevents L402 preimage replay attacks using an in-memory
@@ -197,6 +200,11 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if r.URL.Path == "/.well-known/satgate-agent-jwks.json" && r.Method == http.MethodGet {
+		writeJSON(w, http.StatusOK, g.agentJWKS())
+		return
+	}
+
 	// Check payment status endpoint (for polling from frontend)
 	if strings.HasPrefix(r.URL.Path, "/check-payment/") {
 		g.handleCheckPayment(w, r)
@@ -214,6 +222,11 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(map[string]string{"error": "Rate limit exceeded"})
 			return
 		}
+	}
+
+	if strings.HasPrefix(r.URL.Path, "/api/agent/") {
+		g.handleAgentLoop(w, r)
+		return
 	}
 
 	// Admin endpoint: complete a mock L402 payment for local demos and tests.
@@ -280,6 +293,7 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	start := time.Now()
 	g.metrics.TotalRequests.Add(1)
+	g.restoreAgentRoutes()
 
 	// Find matching route
 	route := g.matchRoute(r)
@@ -297,7 +311,7 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create response wrapper to capture status code
-	wrapped := &statusWriter{ResponseWriter: w, statusCode: http.StatusOK}
+	wrapped := &statusWriter{ResponseWriter: g.withLivePack(w, r, route), statusCode: http.StatusOK}
 
 	// Handle based on policy
 	switch policyKind {
@@ -312,6 +326,13 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "chargeback":
 		// chargeback (observe/audit/policy_to_proof) supported in refactor for schema validation
 		g.handlePublic(wrapped, r, route)
+
+	case "deny":
+		http.Error(wrapped, "denied", http.StatusForbidden)
+		return
+
+	case "identity":
+		g.handleIdentity(wrapped, r, route)
 
 	case "l402":
 		g.metrics.TotalL402.Add(1)
@@ -469,12 +490,11 @@ func (g *Gateway) issueL402Challenge(w http.ResponseWriter, r *http.Request, rou
 		http.Error(w, "Lightning provider not configured", http.StatusServiceUnavailable)
 		return
 	}
-
-	// Get price from route config
-	priceSats := int64(100) // Default
-	if route.Policy.PriceSats > 0 {
-		priceSats = route.Policy.PriceSats
+	if route.Policy.PriceSats <= 0 {
+		http.Error(w, "price_unknown", http.StatusConflict)
+		return
 	}
+	priceSats := route.Policy.PriceSats
 
 	// Create invoice
 	inv, err := g.lightning.CreateInvoice(priceSats, fmt.Sprintf("SatGate: %s", route.Name))
@@ -516,7 +536,8 @@ func (g *Gateway) issueL402Challenge(w http.ResponseWriter, r *http.Request, rou
 func isBuiltInAPIEndpoint(path string) bool {
 	return path == "/api/l402/mock-pay" ||
 		strings.HasPrefix(path, "/api/capability/") ||
-		strings.HasPrefix(path, "/api/governance/")
+		strings.HasPrefix(path, "/api/governance/") ||
+		strings.HasPrefix(path, "/api/agent/")
 }
 
 // handleCheckPayment allows frontend to poll for payment status

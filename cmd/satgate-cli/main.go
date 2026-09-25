@@ -71,6 +71,8 @@ func main() {
 		cmdWrap()
 	case "proof":
 		cmdEvidencePack()
+	case "agent":
+		cmdAgent()
 	case "version":
 		fmt.Printf("satgate-cli %s (commit: %s, built: %s)\n", Version, Commit, BuildDate)
 	case "help", "--help", "-h":
@@ -93,6 +95,7 @@ Commands:
   status                       Show gateway health, active agents, and proof status
   mint --subject <name>        Mint a capability token for an agent
   proof export                 Export a signed Evidence Pack from the gateway
+  agent policy|simulate|promote|pack|verify  Stage a policy, run it, fetch the pack, verify it, then promote it
   wrap --token <tok> -- <cmd>  Run any command through SatGate proxy
   token validate <token>       Validate a macaroon token
   version                      Show version info
