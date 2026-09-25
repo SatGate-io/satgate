@@ -33,7 +33,7 @@ type Config struct {
 	GitOps        *GitOpsConfig        `yaml:"gitops,omitempty"`        // Optional GitOps signed config verification
 	Notifications *NotificationsConfig `yaml:"notifications,omitempty"` // Alert webhooks (Slack, Discord, HTTP, Email)
 	Tracing       *TracingConfig       `yaml:"tracing,omitempty"`       // OpenTelemetry distributed tracing
-	Agent         *AgentConfig         `yaml:"agent,omitempty"`          // Agent loop: policies arrive after start
+	Agent         *AgentConfig         `yaml:"agent,omitempty"`         // Agent loop: policies arrive after start
 	Upstreams     map[string]Upstream  `yaml:"upstreams"`
 	Routes        []Route              `yaml:"routes"`
 }
