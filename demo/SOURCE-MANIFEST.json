@@ -87,8 +87,8 @@
       "public_path": "demo/verify_evidence_pack.py",
       "source_path": "demo/verify_evidence_pack.py",
       "source_blob": "76fe89a681d7f15f06a8d941ebef33daabbb7ade",
-      "mode": "exact",
-      "sha256": "e7262f830cf25cdbb563358b62dcfee1ded56f54727c0fcea3074699e95294e1"
+      "mode": "adapted",
+      "sha256": "a6489027a568749464373b057fa25f26d7950b82da66b496de869febe995f988"
     }
   ]
 }

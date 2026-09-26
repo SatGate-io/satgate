@@ -26,6 +26,12 @@ jobs:
       - name: Install verifier dependencies
         run: python -m pip install 'rfc8785==0.1.4' 'cryptography==50.0.0'
 
+      - name: Verifier signed parity and regression tests
+        run: python -B -m unittest discover -s tools -p 'test_*.py' -v
+
+      - name: Public demo static and provenance tests
+        run: python -B -m unittest discover -s demo/tests -p 'test_*.py' -v
+
       - name: Check formatting
         run: |
           if [ -n "$(gofmt -l .)" ]; then
