@@ -189,7 +189,7 @@ export default function EconomicFirewallPage() {
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-3xl leading-relaxed mb-6">
-            An economic firewall protects resources by checking authority and economic conditions before use. External callers face a cost where payment is required. Internal agents work within finite budgets set by their owner.
+            Keep internal agent spending within budget. Make external callers bear the cost of authorized access before consuming protected resources. Retain verifiable evidence for audit.
           </p>
           <p className="max-w-3xl rounded-2xl border border-purple-900/50 bg-purple-950/20 p-5 text-lg leading-relaxed text-purple-100 mb-10">
             Economic defense is the foundation. SatGate uses Observe, Control and Admit to help legitimate agents do useful work within enforced boundaries. Evidence Packs record governed outcomes across those controls.
@@ -227,10 +227,10 @@ export default function EconomicFirewallPage() {
         <h2 className="text-3xl font-bold text-white mb-6">From external deterrence to internal budgets</h2>
         <div className="space-y-5 max-w-4xl text-lg leading-relaxed text-gray-300">
           <p>The economic firewall began with a simple requirement: callers should incur a cost before consuming protected resources. Paid admission can make repeated abuse expensive. It is deterrence, not immunity from funded attackers.</p>
-          <p>Fiat402 adapts that economic gate to internal budget control without requiring Lightning payment. Your agents consume a finite allowance set by the owner. A ledger debit is not external payment settlement.</p>
+          <p>Economic control applies the same principle to your own agents: a finite allowance and permitted scope are checked before work begins. Observe shows usage without blocking; Control enforces the limits. Internal budget control does not require a payment from the agent.</p>
           <p>Owners must control the origin, upstream credentials and egress so callers cannot bypass the gateway. An agent choosing to install a wrapper does not establish that boundary.</p>
           <p>Bound admission costs too: rejection, invoice creation and verification can themselves consume resources. Measure those costs and legitimate-task overhead separately from abuse protection.</p>
-          <p><strong className="text-white">Proof across Observe, Control and Admit.</strong> Signed evidence records governed decisions on HTTP and MCP paths. Verify useful work and denied access separately; a signature alone does not prove either.</p>
+          <p><strong className="text-white">Proof across Observe, Control and Admit.</strong> Signed evidence records governed decisions on HTTP and MCP paths for independent audit review. It does not certify compliance or prove every downstream action. Verify useful work and denied access separately; a signature alone does not prove either.</p>
         </div>
       </section>
 
@@ -292,10 +292,10 @@ export default function EconomicFirewallPage() {
         <div className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-[1fr_0.9fr] gap-8 items-start">
           <div>
             <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Payment and permission</p>
-            <h2 className="text-3xl font-bold text-white mb-5">Why paid agent rails need economic firewalls</h2>
+            <h2 className="text-3xl font-bold text-white mb-5">Paying for access never overrides permission</h2>
             <div className="space-y-4 text-gray-300 text-lg leading-relaxed">
               <p>
-                Paid rails such as x402, L402, AgentCore Payments, Pay.sh, API-key billing, and wallet flows can help value move between agents and services. That is useful, but payment approval is not the same as governing agent behavior.
+                An external caller may be willing to pay and still request something the resource owner has forbidden. Economic admission combines the required payment with access restrictions; neither replaces the other.
               </p>
               <p>
                 An economic firewall sits at the gateway boundary. It decides whether an agent may access an API, consume budget, call an MCP tool, delegate authority, or unlock a paid resource before forwarding.
@@ -339,10 +339,17 @@ export default function EconomicFirewallPage() {
           <div className="rounded-2xl border border-yellow-800/50 bg-yellow-950/10 p-6">
             <h2 className="text-2xl font-bold text-white mb-4">Admit</h2>
             <p className="text-gray-300 leading-relaxed">
-              Authorize external agents with scoped access. Where owner policy requires payment, validate it before protected work. Keep denial and revocation checks in force even for paying callers.
+              Economic admission makes external callers bear the cost of authorized access on paid routes. Validate payment before protected work, and keep scope and revocation checks in force even for paying callers.
             </p>
           </div>
         </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-6 py-12">
+        <details className="rounded-xl border border-gray-800 p-6">
+          <summary className="cursor-pointer text-xl font-bold">Developer details: payment and internal accounting</summary>
+          <p className="mt-4 text-gray-400">L402 is a payment protocol for configured paid access. Fiat402 is internal budget control, not a payment or settlement rail. A ledger debit is not external payment settlement. Check the selected adapter and deployment before relying on it.</p>
+        </details>
       </section>
 
       <section className="border-y border-gray-900 bg-gray-950/60">

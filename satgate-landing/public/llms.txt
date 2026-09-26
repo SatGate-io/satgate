@@ -1,5 +1,5 @@
 # SatGate: economic firewall for agent workloads
-> Give agents bounded authority for useful work. Protect the resources behind it.
+> Keep your agents within budget. Make external callers bear the cost of access. Keep verifiable evidence of the decisions.
 > Observe / Control / Admit, with signed evidence across all three controls.
 
 ## Purpose
@@ -13,12 +13,13 @@ Economic friction is deterrence, not immunity from funded attackers. Operators m
 Meter and attribute agent/API traffic without blocking it.
 
 ### Control
-Enforce budget and scope on requests through the gateway. Fiat402 is internal budget control, not a payment or settlement rail. It does not require Lightning payment; an internal ledger debit is not external settlement.
+Economic control: enforce internal budgets and scope before protected work. Observe reveals usage; Control enforces the owner’s limits.
 
 ### Admit
-Authorize external agents with scoped access. Require and verify payment only where the configured route policy calls for it. Charge/L402 is an optional settlement rail, not a fourth control.
+Economic admission: charge external callers for authorized access on configured paid routes before protected resource consumption. Make repeated abuse costly without letting payment override permissions.
 
 ## Proof across all three controls
+Verifiable evidence for audit supports both internal control and external admission. It does not certify compliance or prove every downstream action.
 Evidence Packs record governed decisions across HTTP and MCP paths. Verify issuer trust, canonical bytes and signatures independently. A valid receipt does not prove answer quality, supplier truth, legal identity or external settlement. A cooperative agent trial does not prove attack deterrence.
 
 ## Agent choice and owner enforcement
@@ -39,7 +40,10 @@ Trust metadata distinguishes supported and planned adapters. AgentCore Payments 
 ## Delegation, refusal and recovery
 Choose a useful task with a finite budget. Delegate narrower authority and reservation capacity to each worker before starting. Test out-of-scope and exhausted-budget refusal separately from answer quality. After an ambiguous result, check whether the selected deployment can recover the same operation before retrying. Test its duplicate-spend handling; an unknown outcome remains unresolved, not a failed call. Evaluate useful completion, abuse protection, voluntary adoption and commercial demand separately.
 
-## L402 flow on a configured paid route
+## Developer details
+Fiat402 is internal budget control, not a payment or settlement rail. It does not require Lightning payment; an internal ledger debit is not external settlement. L402 is a payment protocol for configured external paid access, not the product identity or a fourth control.
+
+### L402 flow on a configured paid route
 1. Request a protected endpoint.
 2. Receive a payment-required challenge when policy requires it.
 3. An authorized payer pays the invoice within the delegated allowance.

@@ -174,16 +174,16 @@ const LandingPage = () => {
               <Zap size={12} /> Economic firewall for agents
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-              Get useful work done.<br/>
+              An economic firewall<br/>
               <span className="sr-only"> </span><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-                Protect the resources behind it.
+                for AI agents.
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              Put budget and scope checks in the path to your APIs, models and tools. Give your agents finite spending authority. Require external callers to meet your access and payment policy before protected work begins.
+              Keep your agents within budget. Make external callers bear the cost of access. Keep verifiable evidence of the decisions.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
-              Agents choose useful tools. Owners set the limits and enforce them at the gateway, independently of that choice. Signed evidence records the outcome.
+              Control internal spending before work begins. Use paid admission to make repeated external abuse costly, while enforcing the owner’s access restrictions. Protect the resources behind useful agent work.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link href="/sandbox#golden-path" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
@@ -310,8 +310,8 @@ const LandingPage = () => {
       <section className="py-20 px-6 border-b border-gray-800 bg-gradient-to-b from-gray-900/30 to-black">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3">Govern, enforce, prove</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">Start with internal agents: scope authority, enforce policy at runtime, and preserve evidence. Then open external rails - on your terms.</p>
+            <h2 className="text-3xl font-bold mb-3">Economic defense for your agents and your services</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">Economic control limits what your agents can spend. Economic admission makes external callers bear a cost before protected work. Verifiable evidence supports both.</p>
           </div>
 
           {/* Default Protection - Foundation */}
@@ -324,16 +324,16 @@ const LandingPage = () => {
                 <Shield className="text-purple-400" size={24} />
               </div>
               <div>
-                <h3 className="text-xl font-bold">Cryptographic Capability Verification</h3>
+                <h3 className="text-xl font-bold">Access stays within the owner’s permission</h3>
                 <p className="text-gray-500 text-sm">Always-on for non-PUBLIC routes</p>
               </div>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              Every protected route requires valid credentials (Macaroons). Capabilities, caveats,
-              delegation, and revocation are built into the protocol, not bolted on.
+              Protected routes check what a caller is allowed to do before forwarding work.
+              Payment does not buy permission to exceed scope, expiry or revocation.
             </p>
             <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-              <span>✓ Capabilities + Caveats</span>
+              <span>✓ Scoped permissions</span>
               <span>✓ Delegation chains</span>
               <span>✓ Next-request revocation</span>
               <span>✓ Tamper-evident Evidence Pack receipts</span>
@@ -342,7 +342,7 @@ const LandingPage = () => {
 
           {/* Your Agents */}
           <div className="mb-4">
-            <p className="text-sm font-mono text-cyan-400 mb-4 uppercase tracking-wider">Your Agents - Govern Authority and Spend</p>
+            <p className="text-sm font-mono text-cyan-400 mb-4 uppercase tracking-wider">Your agents: economic control</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Observe - Free */}
@@ -352,10 +352,10 @@ const LandingPage = () => {
                 <div className="p-2.5 bg-cyan-900/50 rounded-lg">
                   <Eye className="text-cyan-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Observe <span className="text-xs font-normal text-gray-500">(Fiat)</span></h3>
+                <h3 className="font-bold text-lg">Observe <span className="text-xs font-normal text-gray-500">(usage visibility)</span></h3>
               </div>
               <p className="text-gray-400 text-sm mb-3">
-                verify → allow → meter/log
+                See usage and cost without blocking requests.
               </p>
               <p className="text-xs text-cyan-400/80 mb-3 italic">
                 Start here. Keep agent behavior unchanged while you map authority, tools, and spend before enforcing policy.
@@ -375,17 +375,17 @@ const LandingPage = () => {
                 <div className="p-2.5 bg-purple-900/50 rounded-lg">
                   <SlidersHorizontal className="text-purple-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Control <span className="text-xs font-normal text-gray-500">(Fiat402)</span></h3>
+                <h3 className="font-bold text-lg">Control <span className="text-xs font-normal text-gray-500">(internal budgets)</span></h3>
               </div>
               <p className="text-gray-400 text-sm mb-3">
-                verify → enforce budget → allow
+                Economic control: enforce budgets and permissions before work.
               </p>
               <p className="text-xs text-purple-400/80 mb-3 italic">
                 Now enforce it. Policy and budget caps stop agents before unauthorized work executes.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ Real-time budget enforcement</li>
-                <li>✓ Works with Stripe, ERP - no crypto required</li>
+                <li>✓ Internal allowances, without requiring caller payments</li>
                 <li>✓ Per-agent spending caps</li>
               </ul>
             </div>
@@ -394,7 +394,7 @@ const LandingPage = () => {
 
           {/* Their Agents */}
           <div className="mb-4">
-            <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">Their Agents - Prevent Unauthorized Access</p>
+            <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">External callers: economic admission</p>
           </div>
           <div className="grid grid-cols-1 gap-6 mb-6 max-w-lg">
             {/* Admit - external agents above payment rails */}
@@ -404,17 +404,17 @@ const LandingPage = () => {
                 <div className="p-2.5 bg-yellow-900/50 rounded-lg">
                   <Shield className="text-yellow-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Admit <span className="text-xs font-normal text-gray-500">(external agents, above rails)</span></h3>
+                <h3 className="font-bold text-lg">Admit <span className="text-xs font-normal text-gray-500">(external access)</span></h3>
               </div>
               <p className="text-gray-400 text-sm mb-3">
-                verify → authorize → admit
+                Economic admission: charge for authorized access before protected work.
               </p>
               <p className="text-xs text-yellow-400/80 mb-3 italic">
-                Require scoped access for external agents and caller payment where your policy requires it. Payment never overrides scope, expiry or revocation.
+                Make repeated resource consumption costly for external callers on paid routes. Payment never overrides scope, expiry or revocation.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ No long-lived shared secrets for approved external agents</li>
-                <li>✓ Authority evidence above x402, L402, API-key, or enterprise billing rails</li>
+                <li>✓ Caller payment required on configured paid routes</li>
                 <li>✓ Per-request pricing and policy at the gateway before forwarding</li>
                 <li>✓ Scoped access on your terms</li>
               </ul>
@@ -431,13 +431,14 @@ const LandingPage = () => {
                 <CheckCircle className="text-purple-400" size={24} />
               </div>
               <div>
-                <h3 className="text-xl font-bold">Prove</h3>
+                <h3 className="text-xl font-bold">Verifiable evidence for audit</h3>
                 <p className="text-gray-500 text-sm">Proof across all three controls</p>
               </div>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
               Supported allowed, denied, paid, delegated, and revoked decisions can produce signed receipts
-              that reconcile into Evidence Packs your auditor can verify independently.
+              that reconcile into Evidence Packs your auditor can verify independently against trusted issuer keys.
+              This supports audit review; it does not certify compliance or prove every downstream action.
             </p>
             <div className="flex flex-wrap gap-4 text-sm text-gray-500">
               <span>✓ Both agent lanes</span>
@@ -446,6 +447,10 @@ const LandingPage = () => {
               <span>✓ Independently verifiable Evidence Packs</span>
             </div>
           </div>
+
+          <p className="text-sm text-gray-400 mb-8">
+            Paid admission is deterrence, not immunity from funded attackers. It protects the routes behind the gateway, not exposed origins that bypass it. Bound challenge and verification costs too; economic admission complements access controls, rate limits and vulnerability fixes.
+          </p>
 
           {/* Token Delegation Video */}
           <div className="mt-12 mb-8">

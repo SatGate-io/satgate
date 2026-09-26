@@ -313,7 +313,7 @@ export default function BuildPage() {
           <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-cyan-300">Start with the task</p>
           <h2 className="text-3xl font-bold text-white sm:text-4xl">Useful work inside an enforced boundary.</h2>
           <p className="mt-4 text-lg leading-8 text-gray-400">
-            Economic defense protects the resources behind the task. Observe measures activity; Control applies internal budgets and scope; Admit authorizes external access. Proof records decisions across all three.
+            Economic defense protects the resources behind the task. Observe shows usage without blocking; Control enforces internal budgets and scope; Admit charges external callers for authorized access on paid routes. Signed records provide verifiable evidence for audit across all three, not a guarantee of compliance.
           </p>
         </div>
         <div className="grid gap-5 md:grid-cols-3">
@@ -350,11 +350,11 @@ export default function BuildPage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto grid max-w-6xl min-w-0 gap-10 px-6 py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
           <div>
-            <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-purple-300">Rail-neutral by design</p>
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">Authority and evidence sit above the rail.</h2>
+            <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-purple-300">Developer details</p>
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">Payment protocols and internal accounting.</h2>
             <div className="mt-5 space-y-5 text-lg leading-8 text-gray-400">
               <p>
-                Control/Fiat402 enforces internal allowances without requiring payment settlement. Admit checks scoped external access and any payment required by the configured route. Authorization remains separate from settlement.
+                Fiat402 implements internal budget control without requiring payment settlement. L402 is a payment protocol for configured external paid access. Economic admission still checks permission; payment never replaces authorization.
               </p>
               <p>
                 Consult <a href="https://satgate.io/.well-known/satgate" className="text-cyan-300 hover:text-cyan-200">/.well-known/satgate</a> for published adapter status. AgentCore Payments and Pay.sh remain planned. Confirm the chosen adapter in your evaluation rather than assuming that a guide establishes runtime support.

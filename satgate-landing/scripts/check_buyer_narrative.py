@@ -41,7 +41,7 @@ REQUIRED = {
         "humans, platforms, and upstream APIs can trust",
     ],
     "app/components/HomeClient.tsx": [
-        "Agents choose useful tools. Owners set the limits",
+        "Keep your agents within budget. Make external callers bear the cost of access.",
         "Humans and platforms buy. Agents consume bounded primitives.",
         "Economic firewall for agents",
     ],

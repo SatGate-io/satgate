@@ -4,14 +4,14 @@ import HomeClient from "./components/HomeClient";
 export const metadata: Metadata = {
   title: "SatGate | Economic Firewall for AI Agents",
   description:
-    "Protect internal budgets and external access with request-path economic controls. Give agents scoped authority for useful work and verify the recorded decisions.",
+    "Protect internal budgets and external access: keep agents within budget, charge external callers for authorized access and retain verifiable evidence for audit.",
   alternates: {
     canonical: "https://satgate.io",
   },
   openGraph: {
     title: "SatGate | Economic Firewall for AI Agents",
     description:
-      "Economic defense for APIs and tools: enforce internal budgets, scope external access and require payment where policy calls for it. Evidence Pack proof includes decision receipts and paid-call receipts on supported governed paths.",
+      "Keep your agents within budget. Make external callers bear the cost of authorized access. Keep verifiable evidence of gateway decisions.",
     url: "https://satgate.io",
     type: "website",
   },
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SatGate | Economic Firewall for AI Agents",
     description:
-      "Economic defense for APIs and tools: enforce internal budgets, scope external access and require payment where policy calls for it. Evidence Pack proof includes decision receipts and paid-call receipts on supported governed paths.",
+      "Keep your agents within budget. Make external callers bear the cost of authorized access. Keep verifiable evidence of gateway decisions.",
   },
 };
 
@@ -68,7 +68,7 @@ export default function HomePage() {
         name: 'What is SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate is the Agent Authority & Accountability Layer for governed agent execution. It sits in the request path so humans and platforms can delegate bounded authority to agents, enforce policy and budgets, and preserve Evidence Packs for governed API, MCP tool, and paid-rail decisions.',
+          text: 'SatGate is an economic firewall for AI agents. Economic control enforces internal budgets and permissions. Economic admission charges external callers for authorized access on paid routes. Signed decision records support independent audit review.',
         },
       },
       {
