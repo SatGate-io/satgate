@@ -346,10 +346,10 @@ def jwks_key_for_receipt(receipt: dict[str, Any], jwks: dict[str, Any] | None, r
     if key.get("kty") != "OKP" or key.get("crv") != "Ed25519":
         add_reason(reasons, reason_codes, "malformed_jwks_key", f"issuer JWKS key {kid!r} must be OKP/Ed25519")
         return None
-    if key.get("alg") not in {None, "EdDSA"}:
+    if key.get("alg") not in (None, "EdDSA"):
         add_reason(reasons, reason_codes, "malformed_jwks_key", f"issuer JWKS key {kid!r} has unsupported alg {key.get('alg')!r}")
         return None
-    if key.get("use") not in {None, "sig"}:
+    if key.get("use") not in (None, "sig"):
         add_reason(reasons, reason_codes, "malformed_jwks_key", f"issuer JWKS key {kid!r} has unsupported use {key.get('use')!r}")
         return None
     x = key.get("x")
@@ -407,6 +407,32 @@ def contains_unredacted_secret_field(value: Any) -> bool:
     elif isinstance(value, list):
         return any(contains_unredacted_secret_field(child) for child in value)
     return False
+
+
+def contains_credit_state(value):
+    return contains_any_key(value, CREDIT_USD_FIELDS)
+
+
+def valid_paid_rail(receipt):
+    """L402 amounts are positive integer sats within the JCS safe domain.
+
+    Keep this narrow contract aligned with the other distributed verifier;
+    tools/test_paid_rail.py runs the same signed corpus against both copies.
+    """
+    amount = receipt.get("amount_sats")
+    fields = {"rail", "payment_hash", "invoice_hash", "macaroon_hash", "amount_sats"}
+    return (
+        receipt.get("decision") in ("allowed", "paid")
+        and receipt.get("rail") == "l402"
+        and type(amount) is int and 0 < amount <= 2**53 - 1
+        and all(isinstance(receipt.get(k), str) and receipt[k].strip()
+                for k in ("payment_hash", "invoice_hash", "macaroon_hash"))
+        and strict_json_equal(receipt.get("paid_rail_context"),
+                              {k: receipt.get(k) for k in fields})
+        and strict_json_equal(receipt.get("budget"),
+                              {"spend_mode": "paid_rail", "rail": "l402", "amount_sats": amount})
+        and not contains_credit_state(receipt)
+    )
 
 
 def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reason_codes: list[str], jwks: dict[str, Any] | None = None, require_trusted_issuer: bool = False, now_dt: datetime | None = None, allow_mock: bool = False) -> tuple[dict[str, bool], str, str, bool]:
@@ -470,31 +496,7 @@ def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reas
             fail("invalid_not_evaluated_provenance", f"receipts[{index}] no-capability denial carries authority or evaluated budget claims")
 
     if decision_profile == "paid_rail":
-        amount_sats = receipt.get("amount_sats")
-        paid_context_value = receipt.get("paid_rail_context")
-        paid_context = paid_context_value if isinstance(paid_context_value, dict) else {}
-        budget_value = receipt.get("budget")
-        budget = budget_value if isinstance(budget_value, dict) else {}
-        hashes_complete = all(isinstance(receipt.get(field), str) and bool(receipt[field].strip()) for field in ("payment_hash", "invoice_hash", "macaroon_hash"))
-        amount_valid = isinstance(amount_sats, int) and not isinstance(amount_sats, bool) and amount_sats > 0
-        context_matches = (
-            isinstance(paid_context_value, dict)
-            and set(paid_context) == PAID_RAIL_FIELDS
-            and all(paid_context.get(field) == receipt.get(field) for field in PAID_RAIL_FIELDS)
-        )
-        checks[f"{prefix}_paid_rail"] = (
-            decision in {"allowed", "paid"}
-            and receipt.get("rail") == "l402"
-            and hashes_complete
-            and amount_valid
-            and context_matches
-            and isinstance(budget_value, dict)
-            and set(budget) == {"spend_mode", "rail", "amount_sats"}
-            and budget.get("spend_mode") == "paid_rail"
-            and budget.get("rail") == "l402"
-            and budget.get("amount_sats") == amount_sats
-            and not contains_any_key(receipt, CREDIT_USD_FIELDS)
-        )
+        checks[f"{prefix}_paid_rail"] = bool(valid_paid_rail(receipt))
         if not checks[f"{prefix}_paid_rail"]:
             fail("invalid_paid_rail_provenance", f"receipts[{index}] payment_verified L402 context is missing, mismatched, or carries contradictory credit/USD state")
 
@@ -674,7 +676,53 @@ def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reas
     checks[f"{prefix}_trusted_issuer_valid"] = trusted_issuer_valid
     return checks, expected_hash, trust_anchor, trusted_issuer_valid
 
+def validate_input_shapes(pack: Any, jwks: Any) -> None:
+    """Reject malformed shapes and non-JCS data before semantic operations.
+
+    Canonicalize the entire input, including unsigned extensions: otherwise a
+    nonfinite value outside the signed subtree can leak into JSON output.
+    """
+    if not isinstance(pack, dict):
+        raise VerificationError("Evidence Pack must be an object")
+    if jwks is not None and not isinstance(jwks, dict):
+        raise VerificationError("JWKS must be an object")
+    if rfc8785 is None:
+        raise VerificationError("rfc8785 canonicalization module unavailable")
+    rfc8785.dumps(pack)
+    if jwks is not None:
+        rfc8785.dumps(jwks)
+    receipts = pack.get("receipts")
+    records = [pack] + (receipts if isinstance(receipts, list) else [])
+    for record in records:
+        if not isinstance(record, dict):
+            continue  # The normal receipt-presence check reports this shape.
+        for field in ("decision", "decision_reason", "environment", "issuer"):
+            if field in record and not isinstance(record[field], str):
+                raise VerificationError(f"{field} must be a string")
+        for field in ("authority", "budget", "policy", "metadata"):
+            if record is not pack and field in record and not isinstance(record[field], dict):
+                raise VerificationError(f"{field} must be an object")
+        metadata = record.get("metadata") if isinstance(record.get("metadata"), dict) else {}
+        if "environment" in metadata and not isinstance(metadata["environment"], str):
+            raise VerificationError("metadata.environment must be a string")
+
+
 def verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, require_trusted_issuer: bool = False, allow_mock: bool = False, now: str | None = None, discover_jwks: bool = False, jwks_source: str | None = None) -> dict[str, Any]:
+    """Public API: untrusted input failures are verdicts, never tracebacks."""
+    try:
+        validate_input_shapes(pack, jwks)
+        return _verify_pack(pack, jwks, require_trusted_issuer, allow_mock, now, discover_jwks, jwks_source)
+    except (VerificationError, ValueError, OverflowError, RecursionError) as exc:
+        # Do not echo untrusted values (or bearer locators) in the error verdict.
+        return {
+            "valid": False, "trusted_issuer_valid": False,
+            "protocol_profile": "issuer_jwks" if require_trusted_issuer else "artifact_integrity",
+            "reason_codes": ["invalid_input"], "checks": {"input_valid": False},
+            "summary": {}, "reasons": [f"Malformed or non-canonicalizable input ({type(exc).__name__})"],
+        }
+
+
+def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, require_trusted_issuer: bool = False, allow_mock: bool = False, now: str | None = None, discover_jwks: bool = False, jwks_source: str | None = None) -> dict[str, Any]:
     reasons: list[str] = []
     reason_codes: list[str] = []
     checks: dict[str, bool] = {}
@@ -732,6 +780,18 @@ def verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requir
     checks["archive_valid"] = validate_archive(pack, reasons, reason_codes)
 
     primary = receipts[0] if receipts else {}
+    # Optional display mirrors are not new authority. If present, they must
+    # have a signed counterpart and match it recursively in both type and value.
+    for field in ("rail", "amount_sats", "payment_hash", "invoice_hash", "macaroon_hash",
+                  "paid_rail_context", "issued_at", "evidence_url", "timestamp",
+                  "policy_version", "jwks_url", "schema_url", "verify_url"):
+        if field in pack:
+            key = f"pack_optional_{field}_matches_primary_receipt"
+            checks[key] = field in primary and strict_json_equal(pack[field], primary[field])
+            if not checks[key]:
+                add_reason(reasons, reason_codes, "pack_primary_mismatch",
+                           f"pack.{field} does not match primary embedded receipt.{field}")
+
     if primary.get("decision_reason") == "sandbox_no_spend":
         allowed_pack = {
             "archive_profile", "archive_retention", "archive_storage", "archived_at", "authority",
@@ -809,16 +869,16 @@ def verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requir
             and pack.get("request_id") == primary_metadata.get("request_id")
             and ("caveat" not in pack or isinstance(pack.get("caveat"), str))
             and all(
-                field not in pack or pack.get(field) == primary.get(field)
+                field not in pack or strict_json_equal(pack.get(field), primary.get(field))
                 for field in ("issued_at", "jwks_url", "schema_url", "verify_url")
             )
             and all(key in allowed_budget_state for key in budget_state)
             and (correlation_value is None or isinstance(correlation_value, dict))
             and all(key in allowed_correlation for key in correlation)
-            and all(value == expected_correlation[key] for key, value in correlation.items())
+            and all(strict_json_equal(value, expected_correlation[key]) for key, value in correlation.items())
             and (request_context_value is None or isinstance(request_context_value, dict))
             and all(key in allowed_request_context for key in request_context)
-            and all(value == expected_request_context[key] for key, value in request_context.items())
+            and all(strict_json_equal(value, expected_request_context[key]) for key, value in request_context.items())
             and isinstance(redaction_value, dict)
             and all(key in allowed_redaction for key in redaction)
             and all(value == "redacted" for value in redaction.values())
@@ -827,7 +887,7 @@ def verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requir
             and is_zero_amount(budget_state["attempted_amount_usd"])
             and "remaining_budget_usd" in budget_state
             and is_zero_amount(budget_state["remaining_budget_usd"])
-            and budget_state.get("credit_unit") == primary_budget.get("credit_unit")
+            and strict_json_equal(budget_state.get("credit_unit"), primary_budget.get("credit_unit"))
         )
         if not checks["pack_sandbox_no_spend"]:
             add_reason(reasons, reason_codes, "invalid_sandbox_provenance", "sandbox_no_spend pack claims capability, budget, delegation, or payment authority")
@@ -849,8 +909,8 @@ def verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requir
             and isinstance(budget_state_value, dict)
             and set(budget_state) == {"credit_unit", "projected_cost_credits", "spend_mode"}
             and budget_state.get("spend_mode") == "projected_only"
-            and budget_state.get("projected_cost_credits") == projected
-            and budget_state.get("credit_unit") == primary.get("budget", {}).get("credit_unit")
+            and strict_json_equal(budget_state.get("projected_cost_credits"), projected)
+            and strict_json_equal(budget_state.get("credit_unit"), primary.get("budget", {}).get("credit_unit"))
         )
         if not checks["pack_observe_projected"]:
             add_reason(reasons, reason_codes, "invalid_observe_projection", "observe_projected pack carries inconsistent or billable budget state")
@@ -858,7 +918,7 @@ def verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requir
     primary_decision = str(primary.get("decision", ""))
     primary_reason = str(primary.get("decision_reason", ""))
     decision_profile = DECISION_REASON_PROFILES.get((primary_decision, primary_reason))
-    if decision_profile == "paid_rail":
+    if any(r.get("decision_reason") == "payment_verified" for r in receipts):
         checks["pack_paid_rail"] = "budget_state" not in pack and not contains_any_key(pack, CREDIT_USD_FIELDS)
         if not checks["pack_paid_rail"]:
             add_reason(reasons, reason_codes, "invalid_paid_rail_provenance", "payment_verified L402 Pack carries budget_state or contradictory credit/USD fields")
@@ -869,7 +929,7 @@ def verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requir
 
     for field in ["evidence_pack_id", "evidence_url", "receipt_id", "issuer", "issued_at", "decision", "decision_reason", "route_or_tool", "capability_hash"]:
         key = f"pack_{field}_matches_primary_receipt"
-        checks[key] = bool(primary) and pack.get(field) == primary.get(field)
+        checks[key] = bool(primary) and strict_json_equal(pack.get(field), primary.get(field))
         if not checks[key]:
             add_reason(reasons, reason_codes, "pack_primary_mismatch", f"pack.{field} does not match primary embedded receipt.{field}")
 
@@ -904,15 +964,15 @@ def verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requir
             and budget.get("spend_mode") == "projected_only"
             and primary_budget.get("spend_mode") == "projected_only"
             and "projected_cost_credits" in budget
-            and budget["projected_cost_credits"] == primary.get("projected_cost_credits")
-            and budget["projected_cost_credits"] == primary_budget.get("projected_cost_credits")
-            and budget.get("credit_unit") == primary_budget.get("credit_unit")
+            and strict_json_equal(budget["projected_cost_credits"], primary.get("projected_cost_credits"))
+            and strict_json_equal(budget["projected_cost_credits"], primary_budget.get("projected_cost_credits"))
+            and strict_json_equal(budget.get("credit_unit"), primary_budget.get("credit_unit"))
         )
     elif decision_profile == "not_evaluated":
         checks["budget_state_matches_primary_receipt"] = (
             bool(primary)
             and budget == {"spend_mode": "not_evaluated", "cost_credits": 0}
-            and primary_budget == budget
+            and strict_json_equal(primary_budget, budget)
             and primary.get("authority") == {"provenance_level": "no_verified_capability"}
             and pack.get("capability_hash") is None
         )
@@ -921,11 +981,11 @@ def verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requir
             bool(primary)
             and "attempted_amount_usd" in budget
             and "attempted_amount_usd" in primary
-            and budget["attempted_amount_usd"] == primary["attempted_amount_usd"]
+            and strict_json_equal(budget["attempted_amount_usd"], primary["attempted_amount_usd"])
             and "remaining_budget_usd" in budget
             and "remaining_budget_usd" in primary
-            and budget["remaining_budget_usd"] == primary["remaining_budget_usd"]
-            and budget.get("credit_unit") == primary_budget.get("credit_unit")
+            and strict_json_equal(budget["remaining_budget_usd"], primary["remaining_budget_usd"])
+            and strict_json_equal(budget.get("credit_unit"), primary_budget.get("credit_unit"))
         )
     if not checks["budget_state_matches_primary_receipt"]:
         add_reason(reasons, reason_codes, "budget_state_mismatch", "pack.budget_state does not match primary embedded receipt budget fields")
@@ -1074,8 +1134,10 @@ def main(argv: list[str] | None = None) -> int:
                 file=sys.stderr,
             )
         return 0
-    except VerificationError as exc:
-        print(json.dumps({"valid": False, "source": args.source, "error": str(exc)}, indent=2, sort_keys=True))
+    except (VerificationError, ValueError, OSError, OverflowError, RecursionError) as exc:
+        print(json.dumps({"valid": False, "reason_codes": ["invalid_input"],
+                          "error": f"Input could not be loaded or verified ({type(exc).__name__})"},
+                         indent=2, sort_keys=True))
         return 2
 
 

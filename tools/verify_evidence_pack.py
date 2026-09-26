@@ -210,10 +210,10 @@ def jwks_key_for_receipt(receipt: dict[str, Any], jwks: dict[str, Any] | None, r
     if key.get("kty") != "OKP" or key.get("crv") != "Ed25519":
         add_reason(reasons, reason_codes, "malformed_jwks_key", f"issuer JWKS key {kid!r} must be OKP/Ed25519")
         return None
-    if key.get("alg") not in {None, "EdDSA"}:
+    if key.get("alg") not in (None, "EdDSA"):
         add_reason(reasons, reason_codes, "malformed_jwks_key", f"issuer JWKS key {kid!r} has unsupported alg {key.get('alg')!r}")
         return None
-    if key.get("use") not in {None, "sig"}:
+    if key.get("use") not in (None, "sig"):
         add_reason(reasons, reason_codes, "malformed_jwks_key", f"issuer JWKS key {kid!r} has unsupported use {key.get('use')!r}")
         return None
     x = key.get("x")
@@ -286,20 +286,39 @@ def contains_credit_state(value):
     return isinstance(value, list) and any(contains_credit_state(v) for v in value)
 
 
+def strict_json_equal(left: Any, right: Any) -> bool:
+    """Compare JSON recursively without Python's bool/int/float coercion."""
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, dict):
+        return left.keys() == right.keys() and all(
+            strict_json_equal(left[key], right[key]) for key in left
+        )
+    if isinstance(left, list):
+        return len(left) == len(right) and all(
+            strict_json_equal(a, b) for a, b in zip(left, right)
+        )
+    return left == right
+
+
 def valid_paid_rail(receipt):
+    """L402 amounts are positive integer sats within the JCS safe domain.
+
+    Keep this narrow contract aligned with the other distributed verifier;
+    tools/test_paid_rail.py runs the same signed corpus against both copies.
+    """
     amount = receipt.get("amount_sats")
-    context = receipt.get("paid_rail_context")
     fields = {"rail", "payment_hash", "invoice_hash", "macaroon_hash", "amount_sats"}
     return (
-        receipt.get("decision") in {"allowed", "paid"}
+        receipt.get("decision") in ("allowed", "paid")
         and receipt.get("rail") == "l402"
-        and type(amount) in (int, float) and 0 < amount < float("inf")
+        and type(amount) is int and 0 < amount <= 2**53 - 1
         and all(isinstance(receipt.get(k), str) and receipt[k].strip()
                 for k in ("payment_hash", "invoice_hash", "macaroon_hash"))
-        and isinstance(context, dict) and set(context) == fields
-        and all(type(context[k]) is type(receipt.get(k)) and context[k] == receipt.get(k) for k in fields)
-        and receipt.get("budget") == {"spend_mode": "paid_rail", "rail": "l402", "amount_sats": amount}
-        and type(receipt["budget"].get("amount_sats")) is type(amount)
+        and strict_json_equal(receipt.get("paid_rail_context"),
+                              {k: receipt.get(k) for k in fields})
+        and strict_json_equal(receipt.get("budget"),
+                              {"spend_mode": "paid_rail", "rail": "l402", "amount_sats": amount})
         and not contains_credit_state(receipt)
     )
 
@@ -374,7 +393,53 @@ def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reas
     checks[f"{prefix}_trusted_issuer_valid"] = trusted_issuer_valid
     return checks, expected_hash, trust_anchor, trusted_issuer_valid
 
+def validate_input_shapes(pack: Any, jwks: Any) -> None:
+    """Reject malformed shapes and non-JCS data before semantic operations.
+
+    Canonicalize the entire input, including unsigned extensions: otherwise a
+    nonfinite value outside the signed subtree can leak into JSON output.
+    """
+    if not isinstance(pack, dict):
+        raise VerificationError("Evidence Pack must be an object")
+    if jwks is not None and not isinstance(jwks, dict):
+        raise VerificationError("JWKS must be an object")
+    if rfc8785 is None:
+        raise VerificationError("rfc8785 canonicalization module unavailable")
+    rfc8785.dumps(pack)
+    if jwks is not None:
+        rfc8785.dumps(jwks)
+    receipts = pack.get("receipts")
+    records = [pack] + (receipts if isinstance(receipts, list) else [])
+    for record in records:
+        if not isinstance(record, dict):
+            continue  # The normal receipt-presence check reports this shape.
+        for field in ("decision", "decision_reason", "environment", "issuer"):
+            if field in record and not isinstance(record[field], str):
+                raise VerificationError(f"{field} must be a string")
+        for field in ("authority", "budget", "policy", "metadata"):
+            if record is not pack and field in record and not isinstance(record[field], dict):
+                raise VerificationError(f"{field} must be an object")
+        metadata = record.get("metadata") if isinstance(record.get("metadata"), dict) else {}
+        if "environment" in metadata and not isinstance(metadata["environment"], str):
+            raise VerificationError("metadata.environment must be a string")
+
+
 def verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, require_trusted_issuer: bool = False, allow_mock: bool = False, now: str | None = None, discover_jwks: bool = False, jwks_source: str | None = None) -> dict[str, Any]:
+    """Public API: untrusted input failures are verdicts, never tracebacks."""
+    try:
+        validate_input_shapes(pack, jwks)
+        return _verify_pack(pack, jwks, require_trusted_issuer, allow_mock, now, discover_jwks, jwks_source)
+    except (VerificationError, ValueError, OverflowError, RecursionError) as exc:
+        # Do not echo untrusted values (or bearer locators) in the error verdict.
+        return {
+            "valid": False, "trusted_issuer_valid": False,
+            "protocol_profile": "issuer_jwks" if require_trusted_issuer else "artifact_integrity",
+            "reason_codes": ["invalid_input"], "checks": {"input_valid": False},
+            "summary": {}, "reasons": [f"Malformed or non-canonicalizable input ({type(exc).__name__})"],
+        }
+
+
+def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, require_trusted_issuer: bool = False, allow_mock: bool = False, now: str | None = None, discover_jwks: bool = False, jwks_source: str | None = None) -> dict[str, Any]:
     reasons: list[str] = []
     reason_codes: list[str] = []
     checks: dict[str, bool] = {}
@@ -430,25 +495,43 @@ def verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requir
         add_reason(reasons, reason_codes, "trusted_issuer_required", "trusted issuer verification was required but at least one receipt was not issuer-JWKS anchored")
 
     primary = receipts[0] if receipts else {}
+    # Optional display mirrors are not new authority. If present, they must
+    # have a signed counterpart and match it recursively in both type and value.
+    for field in ("rail", "amount_sats", "payment_hash", "invoice_hash", "macaroon_hash",
+                  "paid_rail_context", "issued_at", "evidence_url", "timestamp",
+                  "policy_version", "jwks_url", "schema_url", "verify_url"):
+        if field in pack:
+            key = f"pack_optional_{field}_matches_primary_receipt"
+            checks[key] = field in primary and strict_json_equal(pack[field], primary[field])
+            if not checks[key]:
+                add_reason(reasons, reason_codes, "pack_primary_mismatch",
+                           f"pack.{field} does not match primary embedded receipt.{field}")
+
     checks["pack_hash_matches_primary_receipt"] = bool(primary) and pack.get("receipt_hash") == primary.get("receipt_hash")
     if not checks["pack_hash_matches_primary_receipt"]:
         add_reason(reasons, reason_codes, "pack_receipt_hash_not_primary", "pack.receipt_hash does not match primary embedded receipt.receipt_hash")
 
     for field in ["evidence_pack_id", "receipt_id", "issuer", "decision", "decision_reason", "route_or_tool", "capability_hash"]:
         key = f"pack_{field}_matches_primary_receipt"
-        checks[key] = bool(primary) and pack.get(field) == primary.get(field)
+        checks[key] = bool(primary) and strict_json_equal(pack.get(field), primary.get(field))
         if not checks[key]:
             add_reason(reasons, reason_codes, "pack_primary_mismatch", f"pack.{field} does not match primary embedded receipt.{field}")
 
     if any(r.get("decision_reason") == "payment_verified" for r in receipts):
         checks["pack_paid_rail"] = "budget_state" not in pack and not contains_credit_state(pack)
-        for field in ("budget", "policy", "authority"):
-            checks[f"pack_{field}_matches_primary_receipt"] = pack.get(field) == primary.get(field)
         if not checks["pack_paid_rail"]:
             add_reason(reasons, reason_codes, "invalid_paid_rail_provenance", "Paid-rail Pack carries budget_state or credit/USD state")
 
+    for field in ("budget", "policy", "authority"):
+        if field in pack or any(r.get("decision_reason") == "payment_verified" for r in receipts):
+            key = f"pack_{field}_matches_primary_receipt"
+            checks[key] = strict_json_equal(pack.get(field), primary.get(field))
+            if not checks[key]:
+                add_reason(reasons, reason_codes, "pack_primary_mismatch",
+                           f"pack.{field} does not match primary embedded receipt.{field}")
+
     budget = pack.get("budget_state") if isinstance(pack.get("budget_state"), dict) else {}
-    checks["budget_state_matches_primary_receipt"] = bool(primary) and budget.get("attempted_amount_usd") == primary.get("attempted_amount_usd") and budget.get("remaining_budget_usd") == primary.get("remaining_budget_usd")
+    checks["budget_state_matches_primary_receipt"] = bool(primary) and strict_json_equal(budget.get("attempted_amount_usd"), primary.get("attempted_amount_usd")) and strict_json_equal(budget.get("remaining_budget_usd"), primary.get("remaining_budget_usd"))
     if not checks["budget_state_matches_primary_receipt"]:
         add_reason(reasons, reason_codes, "budget_state_mismatch", "pack.budget_state does not match primary embedded receipt budget fields")
 
@@ -588,8 +671,10 @@ def main(argv: list[str] | None = None) -> int:
         result.update(source_meta)
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0 if result["valid"] else 1
-    except VerificationError as exc:
-        print(json.dumps({"valid": False, "source": args.source, "error": str(exc)}, indent=2, sort_keys=True))
+    except (VerificationError, ValueError, OSError, OverflowError, RecursionError) as exc:
+        print(json.dumps({"valid": False, "reason_codes": ["invalid_input"],
+                          "error": f"Input could not be loaded or verified ({type(exc).__name__})"},
+                         indent=2, sort_keys=True))
         return 2
 
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import unittest
@@ -149,6 +150,9 @@ class PublicDemoStaticTest(unittest.TestCase):
         for entry in entries:
             self.assertIn(entry["mode"], {"exact", "adapted", "new"})
             self.assertRegex(entry["sha256"], r"^[0-9a-f]{64}$")
+            self.assertEqual(entry["sha256"],
+                             hashlib.sha256((REPO / entry["public_path"]).read_bytes()).hexdigest(),
+                             entry["public_path"])
 
 
 if __name__ == "__main__":
