@@ -6,7 +6,7 @@ const metadata = {
   issuer: {
     name: "SatGate",
     issuer_id: "https://satgate.io",
-    product: "Policy-to-Proof governance for enterprise agents",
+    product: "Economic firewall for agent workloads: bounded authority and decision evidence",
     contact: "contact@satgate.io",
     key_discovery: {
       method: "jwks_uri",

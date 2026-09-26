@@ -18,8 +18,8 @@ robots = read('app/robots.ts')
 canonical_org_nodes = home.count("logo: 'https://satgate.io/logo_white_transparent.png'")
 if canonical_org_nodes != 1:
     failures.append('homepage JSON-LD must contain exactly one canonical Organization node with logo in app/page.tsx')
-if "description: 'SatGate is the Agent Authority & Accountability Layer" not in home:
-    failures.append('homepage Organization JSON-LD must use the current Agent Authority description')
+if "description: 'SatGate is an economic firewall for agent workloads." not in home:
+    failures.append('homepage Organization JSON-LD must use the current economic-firewall description')
 for stale in ['Evidence Packs after every decision', 'Evidence Pack receipts after every decision']:
     if stale in home:
         failures.append(f'homepage contains overbroad proof claim: {stale}')

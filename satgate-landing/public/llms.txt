@@ -1,55 +1,50 @@
-# SatGate™ — Agent Authority & Accountability Layer
-> SatGate is the Agent Authority & Accountability Layer for governed agent execution.
-> Observe, Control, and Prove agent/API activity at the gateway before forwarding.
-> Request-path budget enforcement, MCP governance, scoped capabilities, Evidence Packs, and paid-rail context.
+# SatGate: economic firewall for agent workloads
+> Give agents bounded authority for useful work. Protect the resources behind it.
+> Observe / Control / Admit, with signed evidence across all three controls.
 
-## What is SatGate?
-SatGate is an Agent Authority & Accountability Layer for AI agents and APIs. It sits in the request path between autonomous agents and upstream APIs, tools, MCP servers, model providers, or protected resources.
+## Purpose
+SatGate puts applicable economic and authority checks in the path to protected APIs and tools. External paid admission imposes a caller cost before resource consumption where owner policy requires payment. Internal agents consume a finite owner-controlled allowance. Payment never overrides scope, expiry, revocation or tenant boundaries.
 
-SatGate answers the question every autonomous agent request creates:
+Economic friction is deterrence, not immunity from funded attackers. Operators must bound rejection, invoice-creation and verification costs as well as legitimate-task overhead. Observe alone does not block requests.
 
-**Should this agent be allowed to access, spend, route, or pay right now?**
-
-## Core Modes
+## Core controls
 
 ### Observe
-Measure agent/API traffic without blocking production workloads. Attribute spend by tenant, agent, workflow, delegated sub-agent, token, route, model, and tool.
+Meter and attribute agent/API traffic without blocking it.
 
 ### Control
-Enforce budgets, spend caps, route policy, revocation, expiry, per-request ceilings, and kill switches before expensive API or MCP tool calls execute.
+Enforce budget and scope on requests through the gateway. Fiat402 is internal budget control, not a payment or settlement rail. It does not require Lightning payment; an internal ledger debit is not external settlement.
 
-### Prove
-Preserve Evidence Pack receipts for allowed, denied, delegated, revoked, and paid-rail decisions. x402, L402, AgentCore Payments, Pay.sh, and Fiat402 are paid rails; SatGate governs authority and proof above them.
+### Admit
+Authorize external agents with scoped access. Require and verify payment only where the configured route policy calls for it. Charge/L402 is an optional settlement rail, not a fourth control.
 
-## Category Definition
-An economic firewall is a request-path control layer that governs AI agent access, spend, budgets, routing, Evidence Pack receipts, and paid-rail context at the gateway before forwarding to upstream APIs.
+## Proof across all three controls
+Evidence Packs record governed decisions across HTTP and MCP paths. Verify issuer trust, canonical bytes and signatures independently. A valid receipt does not prove answer quality, supplier truth, legal identity or external settlement. A cooperative agent trial does not prove attack deterrence.
 
-Traditional API gateways route traffic. Dashboards report spend after the fact. Economic firewalls enforce economic policy before autonomous agents spend money.
+## Agent choice and owner enforcement
+Agents may choose SatGate for useful work. The resource boundary must remain owner-enforced regardless of that choice. Restrict direct origin access, upstream credentials and egress so callers cannot bypass the gateway. A voluntarily installed wrapper or a pre-run check of an old receipt does not establish that protection.
 
-## Key Concepts
-- **Agent Authority & Accountability Layer**: The layer that governs authority before execution and preserves Evidence Pack receipts afterward.
-- **AI agent spend control**: Per-agent, per-tool, per-route, per-model, per-session, and per-day budget enforcement.
-- **MCP governance**: Budget, access, revocation, risk, and proof controls around Model Context Protocol tool calls.
-- **Agent API governance**: Scoped, expiring, revocable, budget-aware capabilities instead of broad static API keys.
-- **Capability tokens**: Macaroon-style credentials with caveats for route, expiry, budget, calls, delegation, and revocation.
-- **paid-rail context**: HTTP 402 + Lightning invoice + proof + access credential for machine-native API monetization.
-- **Paid agents**: Autonomous agents that discover, evaluate, call, and pay for APIs programmatically.
+## Discovery and availability
+- Start here: https://satgate.io/build
+- Trust metadata and adapter status: https://satgate.io/.well-known/satgate
+- Public source: https://github.com/SatGate-io/satgate
+- Synthetic HTTP demo and cleanup instructions: https://github.com/SatGate-io/satgate/tree/main/demo
+- Browser simulation: https://satgate.io/sandbox#golden-path
+- Request a bounded evaluation: https://satgate.io/design-partners
 
-## L402 Flow
-1. Agent requests a protected endpoint.
-2. SatGate returns `402 Payment Required` with an L402 challenge.
-3. Agent pays the Lightning invoice and receives proof.
-4. Agent retries with `Authorization: L402 <macaroon>:<preimage>`.
-5. SatGate verifies proof and policy before forwarding access.
+The public demo uses simulated traffic and local-only credentials. It does not establish trusted issuer identity, delegated-worker accounting, MCP behavior or live settlement. Installing a public SDK does not grant hosted API access. The issue/pay/verify API namespace is in private beta. Fresh-agent evaluations with delegated workers require separately confirmed setup and authority; these links do not advertise a public evaluation installer.
 
-## Capability Caveats
-Macaroons and capability tokens can constrain agent authority:
-- `scope=/api/premium/*` — limit access to specific routes
-- `exp<=1735689600` — expire credentials automatically
-- `budget<=1000` — cap spend
-- `calls<=10` — cap usage count
-- `tool=repo_search` — constrain MCP tool access
-- `delegate=false` — prevent sub-agent delegation
+Trust metadata distinguishes supported and planned adapters. AgentCore Payments and Pay.sh are planned. A discovery document describes availability; exercise the chosen adapter before making a runtime-support claim.
+
+## Delegation, refusal and recovery
+Choose a useful task with a finite budget. Delegate narrower authority and reservation capacity to each worker before starting. Test out-of-scope and exhausted-budget refusal separately from answer quality. After an ambiguous result, check whether the selected deployment can recover the same operation before retrying. Test its duplicate-spend handling; an unknown outcome remains unresolved, not a failed call. Evaluate useful completion, abuse protection, voluntary adoption and commercial demand separately.
+
+## L402 flow on a configured paid route
+1. Request a protected endpoint.
+2. Receive a payment-required challenge when policy requires it.
+3. An authorized payer pays the invoice within the delegated allowance.
+4. Retry with the required payment proof and scoped credentials.
+5. The gateway validates payment and authorization before forwarding.
 
 ## Free Tools and Calculators
 - AI Agent Cost Control Tools Hub: https://satgate.io/tools
@@ -156,46 +151,13 @@ Agent / App / MCP Client → CDN/WAF → SatGate Policy-to-Proof Gateway → API
 
 SatGate can be deployed as a gateway, sidecar, or MCP proxy. It is designed to add economic governance around existing APIs and agent workflows without forcing every tool implementation to be rewritten.
 
-## Quick Start
+## Development references
+- Gateway quickstart: https://github.com/SatGate-io/satgate/blob/main/docs/getting-started/quickstart.md
+- SDK and beta API documentation: https://github.com/SatGate-io/satgate/blob/main/docs/index.md
+- Capability schema: https://github.com/SatGate-io/satgate/blob/main/docs/reference/capability-schema.md
+- Receipt schema: https://github.com/SatGate-io/satgate/blob/main/docs/reference/receipt-schema.md
 
-### Python Agents
-```python
-pip install satgate
-
-from satgate.langchain import SatGateTool
-from langchain.agents import initialize_agent
-
-tools = [SatGateTool(wallet=my_lnd_node)]
-agent = initialize_agent(tools, llm, agent="openai-functions")
-agent.run("Buy the latest stock report")
-```
-
-### Node.js
-```javascript
-npm install @satgate/sdk
-
-import { SatGate } from '@satgate/sdk';
-const satgate = new SatGate({ apiKey: process.env.SATGATE_API_KEY });
-const capability = await satgate.issue({
-  task: 'fetch premium report',
-  agent: 'research-agent',
-  allow: ['GET /premium'],
-  budgetUsd: 1.00,
-});
-const receipt = await satgate.pay({
-  upstream: 'https://api.example.com/premium',
-  capability,
-  maxUsd: 0.25,
-});
-await satgate.verify(receipt);
-```
-
-### cURL
-```bash
-curl -i https://api.example.com/api/premium
-curl -H "Authorization: L402 <macaroon>:<preimage>" \
-  https://api.example.com/api/premium
-```
+Read prerequisites and access status before running examples. Do not interpret an example command as owner authorization to install software, call a supplier or spend money.
 
 ## Product and Demo Pages
 - Enterprise AI Agent Governance: https://satgate.io/govern
