@@ -22,6 +22,7 @@ REQUIRED = {
         "https://github.com/SatGate-io/satgate/tree/main/demo",
         "Synthetic HTTP demo", "issue/pay/verify API namespace is in private beta",
         "Private-beta examples", "pip install satgate", "npm install @satgate/sdk",
+        "Test same-operation recovery and duplicate-spend handling in the selected deployment",
     ],
     "app/agent-authority-layer/page.tsx": [
         "Authorization and settlement are separate", "planned", "answer quality",
@@ -37,6 +38,7 @@ FORBIDDEN = [
     "legacy SEO/category term", "Rail-neutral is the moat",
     "Observe/Control/Prove", "Observe, Control, and Prove",
     "Fiat402 are paid rails", "whatever comes next", "SatGate fills it once",
+    "without double spending",
 ]
 errors = []
 checks = 0

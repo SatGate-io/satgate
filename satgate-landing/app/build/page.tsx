@@ -458,7 +458,7 @@ export default function BuildPage() {
               </div>
               <h2 className="text-3xl font-bold text-white sm:text-4xl">Delegation, refusal and recovery</h2>
               <p className="mt-5 text-lg leading-8 text-gray-300">
-                Give each worker narrower authority and enough reservation capacity for its task. Exercise an out-of-scope or exhausted-budget refusal. After an ambiguous result, recover the same operation before starting another; do not treat an unknown outcome as a failed call.
+                Give each worker narrower authority and enough reservation capacity for its task. Exercise an out-of-scope or exhausted-budget refusal. After an ambiguous result, check whether the selected deployment can recover the same operation before retrying. Treat an unknown outcome as unresolved, not as a failed call.
               </p>
             </div>
             <div className="grid gap-3 text-sm text-gray-300">
@@ -466,7 +466,7 @@ export default function BuildPage() {
                 "Finite task and worker allowances",
                 "Receipts for allowed, denied, delegated, revoked, and paid decisions",
                 "Useful results graded separately from proof",
-                "Same-operation recovery without double spending",
+                "Test same-operation recovery and duplicate-spend handling in the selected deployment",
                 "Owner-enforced policy on the protected-call path",
               ].map((item) => (
                 <div key={item} className="flex items-start gap-3 rounded-xl border border-gray-800 bg-black/60 p-4">

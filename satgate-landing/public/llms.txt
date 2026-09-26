@@ -37,7 +37,7 @@ The public demo uses simulated traffic and local-only credentials. It does not e
 Trust metadata distinguishes supported and planned adapters. AgentCore Payments and Pay.sh are planned. A discovery document describes availability; exercise the chosen adapter before making a runtime-support claim.
 
 ## Delegation, refusal and recovery
-Choose a useful task with a finite budget. Delegate narrower authority and reservation capacity to each worker before starting. Test out-of-scope and exhausted-budget refusal separately from answer quality. After an ambiguous result, recover the same operation rather than issuing a new operation to hide an unknown outcome. Evaluate useful completion, abuse protection, voluntary adoption and commercial demand separately.
+Choose a useful task with a finite budget. Delegate narrower authority and reservation capacity to each worker before starting. Test out-of-scope and exhausted-budget refusal separately from answer quality. After an ambiguous result, check whether the selected deployment can recover the same operation before retrying. Test its duplicate-spend handling; an unknown outcome remains unresolved, not a failed call. Evaluate useful completion, abuse protection, voluntary adoption and commercial demand separately.
 
 ## L402 flow on a configured paid route
 1. Request a protected endpoint.
