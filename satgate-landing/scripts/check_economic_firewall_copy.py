@@ -36,7 +36,7 @@ REQUIRED = {
 FORBIDDEN = [
     "legacy SEO/category term", "Rail-neutral is the moat",
     "Observe/Control/Prove", "Observe, Control, and Prove",
-    "Fiat402 are paid rails", "whatever comes next",
+    "Fiat402 are paid rails", "whatever comes next", "SatGate fills it once",
 ]
 errors = []
 checks = 0

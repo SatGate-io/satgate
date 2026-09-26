@@ -150,16 +150,16 @@ export default function AgentAuthorityLayerPage() {
         <div className="relative mx-auto grid max-w-6xl gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">
-              <Layers3 size={14} /> Rail-neutral governance
+              <Layers3 size={14} /> Authority on protected calls
             </div>
             <h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">
               Agent Authority & Accountability Layer
             </h1>
             <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
-              Payment rails answer one question: <span className="text-white">can this agent pay?</span> SatGate answers the question that comes first: was this agent authorized, under whose policy, within what budget and scope, and can we prove it later?
+              Useful agent work needs <span className="text-white">bounded authority to act.</span> Set a finite budget and permitted scope, enforce them on the request path, and retain the recorded decision.
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
-              Every rail — x402, L402, Stripe Agent Toolkit, AgentCore, Coinbase, and internal ledgers — has the same governance gap. SatGate fills it once, above the rail.
+              Use internal budget controls for your agents and scoped admission for external callers. Payment adapters have different availability. Confirm the chosen integration before relying on it.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -173,14 +173,14 @@ export default function AgentAuthorityLayerPage() {
 
           <div className="rounded-3xl border border-cyan-300/20 bg-white/[0.03] p-6 shadow-2xl shadow-cyan-950/30">
             <div className="mb-5 flex items-center gap-2 text-emerald-200">
-              <BadgeCheck /> What SatGate proves
+              <BadgeCheck /> What a governed receipt records
             </div>
             <div className="space-y-4">
               {[
-                "This agent had delegated authority before execution.",
-                "The requested action matched policy, budget, tenant, and scope.",
-                "The decision was signed, archived, and externally verifiable.",
-                "The proof travels across rails instead of being trapped inside one provider.",
+                "The authenticated principal and its delegated authority.",
+                "Whether the requested action matched the configured policy.",
+                "The signed decision and associated scope and budget context.",
+                "An artifact to verify against independently trusted issuer keys.",
               ].map((item) => (
                 <div key={item} className="rounded-2xl border border-white/10 bg-black/50 p-4 text-gray-300">
                   {item}
@@ -194,7 +194,7 @@ export default function AgentAuthorityLayerPage() {
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="mb-10 max-w-3xl">
           <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-purple-300">The authority gap</p>
-          <h2 className="text-3xl font-bold text-white sm:text-4xl">Identity proves who. Rails prove value moved. SatGate proves authority.</h2>
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">Check authorization before protected work.</h2>
           <p className="mt-5 text-lg leading-8 text-gray-400">
             Agents now spend money, call APIs, delegate to other agents, and act on behalf of humans and platforms. Infrastructure built for humans clicking buttons does not prove the agent had bounded authority before the action happened.
           </p>
