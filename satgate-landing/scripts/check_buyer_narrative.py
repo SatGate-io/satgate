@@ -36,14 +36,14 @@ TARGETS = [
 
 REQUIRED = {
     "app/page.tsx": [
-        "Economic Firewall for Agentic API Access",
+        "Economic Firewall for AI Agents",
         "bounded economic authority",
         "humans, platforms, and upstream APIs can trust",
     ],
     "app/components/HomeClient.tsx": [
-        "Humans and platforms set policy. Agents consume approved primitives.",
+        "Agents choose useful tools. Owners set the limits",
         "Humans and platforms buy. Agents consume bounded primitives.",
-        "Economic Firewall for agentic API access",
+        "Economic firewall for agents",
     ],
     "app/policy-to-proof/page.tsx": [
         "From policy to proof for agentic API access.",
@@ -62,7 +62,7 @@ REQUIRED = {
         "Build Agents With Bounded Economic Authority",
         "Build agents with bounded economic authority",
         "Consume upstream with max budget",
-        "enforce max budgets at the gateway before forwarding",
+        "Complete a useful task within an explicit budget",
     ],
     "app/paid-agent-payments/page.tsx": [
         "Agents consume. Humans and platforms buy.",

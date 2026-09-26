@@ -2,24 +2,24 @@ import type { Metadata } from "next";
 import HomeClient from "./components/HomeClient";
 
 export const metadata: Metadata = {
-  title: "SatGate — Agent Authority & Accountability Layer",
+  title: "SatGate | Economic Firewall for AI Agents",
   description:
-    "SatGate prevents agent overspend and produces signed receipts your auditor can verify independently. Agent authority is governed before execution.",
+    "Protect internal budgets and external access with request-path economic controls. Give agents scoped authority for useful work and verify the recorded decisions.",
   alternates: {
     canonical: "https://satgate.io",
   },
   openGraph: {
-    title: "SatGate — Agent Authority & Accountability Layer",
+    title: "SatGate | Economic Firewall for AI Agents",
     description:
-      "Policy-to-Proof governance for enterprise agents: bounded economic authority before execution and Evidence Pack proof, decision receipts, and paid-call receipts after governed decisions.",
+      "Economic defense for APIs and tools: enforce internal budgets, scope external access and require payment where policy calls for it. Evidence Pack proof includes decision receipts and paid-call receipts on supported governed paths.",
     url: "https://satgate.io",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "SatGate — Agent Authority & Accountability Layer",
+    title: "SatGate | Economic Firewall for AI Agents",
     description:
-      "Policy-to-Proof governance for enterprise agents: bounded economic authority before execution and Evidence Pack proof, decision receipts, and paid-call receipts after governed decisions.",
+      "Economic defense for APIs and tools: enforce internal budgets, scope external access and require payment where policy calls for it. Evidence Pack proof includes decision receipts and paid-call receipts on supported governed paths.",
   },
 };
 
@@ -32,7 +32,7 @@ export default function HomePage() {
         name: 'SatGate',
         url: 'https://satgate.io',
         logo: 'https://satgate.io/logo_white_transparent.png',
-        description: 'SatGate is the Agent Authority & Accountability Layer for governed agent execution: authority before execution and Evidence Pack proof through decision receipts and paid-call receipts after governed decisions.',
+        description: 'SatGate is an economic firewall for agent workloads. It combines request-path budget and scope controls with signed evidence of governed decisions.',
       },
       {
         '@type': 'WebSite',
@@ -42,18 +42,18 @@ export default function HomePage() {
       },
       {
         '@type': 'WebPage',
-        name: 'SatGate — Agent Authority & Accountability Layer',
+        name: 'SatGate | Economic Firewall for AI Agents',
         url: 'https://satgate.io',
         description: 'SatGate governs agent authority before execution so humans, platforms, and upstream APIs can trust what agents access, spend, and prove.',
         datePublished: '2026-04-30',
-        dateModified: '2026-05-05',
+        dateModified: '2026-09-26',
         isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
         about: [
           { '@type': 'Thing', name: 'Policy-to-Proof governance' },
           { '@type': 'Thing', name: 'Evidence Packs' },
           { '@type': 'Thing', name: 'authority before execution' },
           { '@type': 'Thing', name: 'MCP governance' },
-          { '@type': 'Thing', name: 'rail-neutral paid-rail governance' },
+          { '@type': 'Thing', name: 'economic resource admission' },
         ],
       },
     ],

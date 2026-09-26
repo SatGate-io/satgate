@@ -171,29 +171,29 @@ const LandingPage = () => {
           {/* Left: Copy */}
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-6">
-              <Zap size={12} /> Agent Authority & Accountability Layer
+              <Zap size={12} /> Economic firewall for agents
             </div>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-              Prevent agent overspend.<br/>
+              Get useful work done.<br/>
               <span className="sr-only"> </span><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-                Prove what they did.
+                Protect the resources behind it.
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              One gateway in front of the APIs, models, and tools your agents touch: budgets and scope enforced before execution, and signed receipts your auditor can verify independently.
+              Put budget and scope checks in the path to your APIs, models and tools. Give your agents finite spending authority. Require external callers to meet your access and payment policy before protected work begins.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
-              Humans and platforms set policy. Agents consume approved primitives. Upstreams get receipt-backed proof.
+              Agents choose useful tools. Owners set the limits and enforce them at the gateway, independently of that choice. Signed evidence records the outcome.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link href="/sandbox#golden-path" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
-                Run authority proof <ArrowRight size={16} />
+                Try the simulated demo <ArrowRight size={16} />
               </Link>
               <Link href="/build" className="border border-cyan-700/50 bg-cyan-900/15 px-8 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition flex items-center gap-2 text-cyan-300">
                 Build with SatGate <ArrowRight size={16} />
               </Link>
               <Link href="/sandbox#golden-path" className="border border-purple-700/50 bg-purple-900/20 px-8 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition flex items-center gap-2 text-purple-300">
-                <Play size={16} /> Run the 90-second SatGate proof
+                <Play size={16} /> Explore the demo sequence
               </Link>
               <Link href="/evidence-pack-demo" className="border border-cyan-700/50 bg-cyan-900/15 px-8 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition flex items-center gap-2 text-cyan-300">
                 See an Evidence Pack <ArrowRight size={16} />
@@ -241,7 +241,7 @@ const LandingPage = () => {
             </div>
             <div className="text-center mt-4">
               <p className="text-sm text-gray-500 mb-3">
-                Agents badge in once. Every request - verified, metered, budget-enforced.
+                Illustrative demo. Observe meters traffic; Control and Admit enforce the configured policy.
               </p>
               <Link
                 href="/protect"
@@ -410,7 +410,7 @@ const LandingPage = () => {
                 verify → authorize → admit
               </p>
               <p className="text-xs text-yellow-400/80 mb-3 italic">
-                Let approved external agents consume your APIs with scoped access, without making payment proof equal authorization proof.
+                Require scoped access for external agents and caller payment where your policy requires it. Payment never overrides scope, expiry or revocation.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ No long-lived shared secrets for approved external agents</li>
@@ -432,7 +432,7 @@ const LandingPage = () => {
               </div>
               <div>
                 <h3 className="text-xl font-bold">Prove</h3>
-                <p className="text-gray-500 text-sm">Receipt-backed proof for your agents and theirs</p>
+                <p className="text-gray-500 text-sm">Proof across all three controls</p>
               </div>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
@@ -747,7 +747,7 @@ const LandingPage = () => {
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="max-w-xs text-sm text-gray-500">Agent Authority & Accountability Layer: bounded authority, Evidence Pack receipts, and proof.</p>
+              <p className="max-w-xs text-sm text-gray-500">Economic defense for your resources. Bounded authority for useful agent work.</p>
               <p className="text-gray-600 text-xs mt-3">Humans and platforms buy. Agents consume bounded primitives.</p>
             </div>
             <div>

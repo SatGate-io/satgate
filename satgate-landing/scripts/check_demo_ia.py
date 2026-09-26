@@ -21,7 +21,7 @@ if "Live Demo" in home:
     errors.append("homepage top nav still contains Live Demo")
 if "Open Sandbox" in home or ">Sandbox<" in home:
     errors.append("homepage still exposes Sandbox as public label")
-if 'href="/sandbox#golden-path"' not in home or "Run the 90-second SatGate proof" not in home or ">Demo</Link>" not in home:
+if 'href="/sandbox#golden-path"' not in home or "Explore the demo sequence" not in home or ">Demo</Link>" not in home:
     errors.append("homepage does not route Demo nav/CTA to the deterministic /sandbox#golden-path proof")
 for crowded in ["Capability Auth", "Control Plane", "Tools", "Integrations", "Blog", "GitHub"]:
     desktop_marker = f'>{crowded}</Link>' if crowded != "GitHub" else f'>{crowded}</a>'
