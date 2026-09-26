@@ -47,6 +47,29 @@ traceback. Input errors do not echo attacker-controlled values. This is input
 validation, not a general memory/CPU resource sandbox for arbitrarily large
 artifacts.
 
+## Temporal validation
+
+Every receipt, including secondary receipts, must pass temporal validation.
+Absent or JSON-null `expires_at` deliberately means no expiration constraint.
+A supplied non-null `expires_at` must parse successfully; malformed values
+(including empty strings and non-string values) fail that receipt's time check,
+the aggregate `time_valid` check, and the Pack verdict even when signatures pass.
+Parsed expiration earlier than the evaluation time remains `receipt_expired`;
+equality is not expired. Existing issued-at skew and timestamp rules are retained.
+
+Omitted API `now` (or `None`) and omitted CLI `--now` use the current UTC clock.
+An explicitly supplied non-null API `now` or CLI `--now` must parse successfully,
+including when supplied as an empty string. Parse failure returns structured
+`valid=false`, `checks.time_valid=false` before evaluating receipts, with a
+nonzero CLI exit. Existing parser reason codes (`missing_now`/`malformed_now`,
+`missing_expires_at`/`malformed_expires_at`) are retained; diagnostics alone are
+never a substitute for a failed temporal verdict. Timestamp parser grammar is
+unchanged by this correction.
+
+The shared synthetic signed corpus checks both APIs and actual CLIs with absent,
+null, future, boundary, expired, and malformed expiration on primary and secondary
+receipts, plus malformed explicit clocks and default-clock compatibility.
+
 ## Compatibility boundaries retained
 
 Tools defaults to embedded-key artifact integrity; issuer anchoring is explicit

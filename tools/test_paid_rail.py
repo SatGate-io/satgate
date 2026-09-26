@@ -179,10 +179,10 @@ class PaidRailTests(unittest.TestCase):
         options.update(kwargs)
         return VERIFIERS[surface].verify_pack(copy.deepcopy(pack), **options)
 
-    def cli(self, surface, raw, *args):
+    def cli(self, surface, raw, *args, now: str | None = NOW):
         env = dict(os.environ, PYTHONPATH=str(ROOT / 'demo' / '_vendor'), PYTHONDONTWRITEBYTECODE='1')
         proc = subprocess.run([sys.executable, '-B', str(ROOT / surface / 'verify_evidence_pack.py'),
-                               '-', '--now', NOW, *args], input=raw, text=True,
+                               '-', *(['--now', now] if now is not None else []), *args], input=raw, text=True,
                               capture_output=True, env=env, timeout=20)
         self.assertNotIn('Traceback', proc.stderr, proc.stderr)
         result = json.loads(proc.stdout)
@@ -211,6 +211,85 @@ class PaidRailTests(unittest.TestCase):
                         _, result = self.cli(surface, json.dumps(p), '--jwks-file', str(jwks), '--require-trusted-issuer')
                         self.assertIs(result['valid'], expected, result)
                         self.assertTrue(result['checks']['signature_valid'], result)
+
+    def test_temporal_expiration_apis_and_clis(self):
+        cases = [('absent', {}, True, None), ('null', {'expires_at': None}, True, None),
+                 ('future', {'expires_at': '2026-01-03T00:00:00Z'}, True, None),
+                 ('at-expiry', {'expires_at': NOW}, True, None),
+                 ('expired', {'expires_at': '2026-01-01T12:00:00Z'}, False, 'receipt_expired')]
+        for value in ({}, [], True, False, 17, 0, '', 'not-a-time'):
+            code = 'malformed_expires_at' if value == 'not-a-time' else 'missing_expires_at'
+            cases.append((repr(value), {'expires_at': value}, False, code))
+        with tempfile.TemporaryDirectory() as td:
+            keys = Path(td) / 'synthetic-jwks.json'
+            keys.write_text(json.dumps(self.f.jwks))
+            for label, fields, expected, code in cases:
+                for index in (0, 1):
+                    r = self.f.receipt()
+                    r.update(fields)
+                    p = self.f.pack(r) if index == 0 else self.f.pack()
+                    if index == 1:
+                        r['receipt_id'] = 'synthetic-secondary'
+                        p['receipts'].append(self.f.sign(r))
+                    for surface in VERIFIERS:
+                        with self.subTest(surface=surface, case=label, receipt=index):
+                            api = self.verify(surface, p)
+                            proc, cli = self.cli(surface, json.dumps(p), '--jwks-file', str(keys),
+                                                 '--require-trusted-issuer')
+                            self.assertEqual(proc.returncode, 0 if expected else 1)
+                            for result in (api, cli):
+                                self.assertIs(result['valid'], expected, result)
+                                self.assertTrue(result['checks']['signature_valid'], result)
+                                self.assertTrue(result['trusted_issuer_valid'], result)
+                                self.assertIs(result['checks']['time_valid'], expected, result)
+                                self.assertIs(result['checks'][f'receipt_{index}_time_valid'], expected)
+                                if index == 1:
+                                    self.assertTrue(result['checks']['receipt_0_time_valid'])
+                                if code:
+                                    self.assertIn(code, result['reason_codes'])
+                                else:
+                                    self.assertEqual(result['reason_codes'], [])
+
+    def test_malformed_now_apis_and_clis(self):
+        with tempfile.TemporaryDirectory() as td:
+            keys = Path(td) / 'synthetic-jwks.json'
+            keys.write_text(json.dumps(self.f.jwks))
+            # Reject before receipt evaluation, with or without an expired claim.
+            for expiry in (None, '2026-01-01T12:00:00Z'):
+                r = self.f.receipt()
+                r['expires_at'] = expiry
+                p = self.f.pack(r)
+                for surface, module in VERIFIERS.items():
+                    for now in ('not-a-time', '', ' ', {}, [], True, False, 17, 0):
+                        with self.subTest(surface=surface, expiry=expiry, now=now):
+                            with patch.object(module, 'verify_receipt', side_effect=AssertionError('receipt evaluated')):
+                                result = self.verify(surface, p, now=now)
+                            self.assertFalse(result['valid'], result)
+                            self.assertFalse(result['checks']['time_valid'], result)
+                            self.assertTrue(set(result['reason_codes']) & {'missing_now', 'malformed_now'})
+                            if isinstance(now, str):
+                                proc, cli = self.cli(surface, json.dumps(p), '--jwks-file', str(keys),
+                                                     '--require-trusted-issuer', now=now)
+                                self.assertEqual(proc.returncode, 1)
+                                self.assertEqual({key: cli[key] for key in result}, result)
+
+    def test_default_now_apis_and_clis(self):
+        with tempfile.TemporaryDirectory() as td:
+            keys = Path(td) / 'synthetic-jwks.json'
+            keys.write_text(json.dumps(self.f.jwks))
+            for fields in ({}, {'expires_at': None}):
+                r = self.f.receipt()
+                r.update(fields)
+                p = self.f.pack(r)
+                for surface, module in VERIFIERS.items():
+                    with self.subTest(surface=surface, fields=fields):
+                        self.assertTrue(module.verify_pack(p, jwks=self.f.jwks,
+                                                           require_trusted_issuer=True)['valid'])
+                        self.assertTrue(self.verify(surface, p, now=None)['valid'])
+                        proc, result = self.cli(surface, json.dumps(p), '--jwks-file', str(keys),
+                                                '--require-trusted-issuer', now=None)
+                        self.assertEqual(proc.returncode, 0)
+                        self.assertTrue(result['valid'], result)
 
     def test_no_fixture_aliasing(self):
         r = self.f.receipt()

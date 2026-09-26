@@ -373,7 +373,10 @@ def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reas
     issued_at = parse_rfc3339(receipt.get("issued_at"), reasons, reason_codes, "issued_at")
     timestamp = parse_rfc3339(receipt.get("timestamp"), reasons, reason_codes, "timestamp") if receipt.get("timestamp") is not None else issued_at
     expires_at = parse_rfc3339(receipt.get("expires_at"), reasons, reason_codes, "expires_at") if receipt.get("expires_at") is not None else None
-    checks[f"{prefix}_time_valid"] = issued_at is not None and timestamp is not None
+    checks[f"{prefix}_time_valid"] = (
+        issued_at is not None and timestamp is not None
+        and (receipt.get("expires_at") is None or expires_at is not None)
+    )
     if now_dt and issued_at:
         if issued_at > now_dt + timedelta(seconds=DEFAULT_CLOCK_SKEW_SECONDS):
             checks[f"{prefix}_time_valid"] = False
@@ -443,7 +446,14 @@ def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requi
     reasons: list[str] = []
     reason_codes: list[str] = []
     checks: dict[str, bool] = {}
-    now_dt = parse_rfc3339(now, reasons, reason_codes, "now") if now else datetime.now(timezone.utc)
+    now_dt = parse_rfc3339(now, reasons, reason_codes, "now") if now is not None else datetime.now(timezone.utc)
+    if now_dt is None:
+        return {
+            "valid": False, "trusted_issuer_valid": False,
+            "protocol_profile": "issuer_jwks" if require_trusted_issuer else "artifact_integrity",
+            "reason_codes": reason_codes, "checks": {"time_valid": False},
+            "summary": {}, "reasons": reasons,
+        }
 
     checks["schema_version"] = pack.get("schema_version") == EXPECTED_PACK_SCHEMA
     if not checks["schema_version"]:
