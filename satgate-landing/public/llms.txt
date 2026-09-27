@@ -31,9 +31,11 @@ Agents may choose SatGate for useful work. The resource boundary must remain own
 - Public source: https://github.com/SatGate-io/satgate
 - Synthetic HTTP demo and cleanup instructions: https://github.com/SatGate-io/satgate/tree/main/demo
 - Browser simulation: https://satgate.io/sandbox#golden-path
-- Request a bounded evaluation: https://satgate.io/design-partners
+- Start a 14-day free trial of Pro features, no credit card: https://cloud.satgate.io/cloud/signup
+- Pricing: https://satgate.io/pricing
+- Optional 90-day design-partner pilot for larger teams that want help: https://satgate.io/design-partners
 
-The synthetic demo linked above uses simulated traffic and local-only credentials. It does not establish trusted issuer identity, delegated-worker accounting, MCP behavior or live settlement. A separate live paid route is under "Try it as an agent". Installing a public SDK does not grant hosted API access. The issue/pay/verify API namespace is in private beta. Fresh-agent evaluations with delegated workers require separately confirmed setup and authority; these links do not advertise a public evaluation installer.
+The synthetic demo linked above uses simulated traffic and local-only credentials. It does not establish trusted issuer identity, delegated-worker accounting, MCP behavior or live settlement. A separate live paid route is under "Try it as an agent". Installing a public SDK does not grant hosted API access. Hosted access starts with the 14-day free trial above. The issue/pay/verify API namespace is in private beta. Fresh-agent evaluations with delegated workers require separately confirmed setup and authority; these links do not advertise a public evaluation installer.
 
 Trust metadata distinguishes supported and planned adapters. AgentCore Payments and Pay.sh are planned. A discovery document describes availability; exercise the chosen adapter before making a runtime-support claim.
 
@@ -200,10 +202,18 @@ Read prerequisites and access status before running examples. Do not interpret a
 - Pricing: https://satgate.io/pricing
 - Security: https://satgate.io/security
 - Documentation: https://cloud.satgate.io/docs
-- Cloud: https://cloud.satgate.io/cloud/login
+- Cloud signup: https://cloud.satgate.io/cloud/signup
+- Cloud login: https://cloud.satgate.io/cloud/login
 - GitHub: https://github.com/SatGate-io/satgate
 - Python SDK: https://pypi.org/project/satgate/
 - Node.js SDK: https://www.npmjs.com/package/@satgate/sdk
+
+## Plans
+- Starter: free. Observe (metering) with a fair-use cap, 3 routes, default protection + Observe, community support.
+- Pro: $99/month. 14-day free trial of Pro features, no credit card. Email verification creates the account. Observe with no finite monthly cap, 1M Control/Admit requests per month, 25 routes, unlimited team members, all policies (Observe / Control / Admit — Admit is the Charge policy in the dashboard), budget enforcement, token governance, priority support. Upgrade is self-serve by card in the dashboard (Stripe).
+- Enterprise: custom pricing. Unlimited. Self-host means installing the same SatGate binary that runs SatGate Cloud, in your own environment. SCIM, GitOps signed configs, WORM audit export, dedicated support + SLA. Contact: contact@satgate.io.
+- There is no separate Hybrid gateway product.
+- A 90-day design-partner pilot is an option for larger teams that want help. It is not the only way in.
 
 ## Contact
 - Email: contact@satgate.io

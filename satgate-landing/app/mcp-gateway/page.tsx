@@ -52,7 +52,7 @@ const faqs = [
   ['What is an MCP Evidence Pack?', 'An MCP Evidence Pack is the proof artifact for governed tool activity: who called which MCP tool, through which client and server, under which policy and budget, with which allow or deny decision, and what receipt proves it.'],
   ['Can SatGate govern Claude, Hermes, or Ollama MCP agents?', 'Yes. Claude Desktop, Claude Code, Hermes, Ollama wrappers, Cursor, OpenClaw, and custom MCP-capable clients can route tool calls through SatGate. The agent gets no standing authority; SatGate grants or denies each tool call.'],
   ['How is an MCP gateway different from an API gateway?', 'A traditional API gateway mostly routes HTTP traffic and checks identity. An MCP gateway also understands agent tool calls, capability scope, per-tool cost, budget policy, tenant isolation, delegation lineage, and Evidence Pack outcomes.'],
-  ['Can SatGate host MCP servers?', 'Yes. SatGate supports SaaS MCP for managed hosted deployment. Enterprise buyers needing isolated runtime boundaries can contract for a Dedicated deployment with custody and operations defined during onboarding.'],
+  ['Can SatGate host MCP servers?', 'Yes. SaaS MCP is Fly-hosted. Enterprise self-host installs the same SatGate binary that runs SatGate Cloud, in your own environment.'],
 ];
 
 export const metadata = {
@@ -261,8 +261,8 @@ export default function McpGatewayPage() {
         </div>
         <div className="rounded-2xl border border-gray-800 bg-gray-950 p-7">
           <ShieldCheck className="text-cyan-300 mb-4" size={30} />
-          <h2 className="text-2xl font-bold text-white mb-3">Dedicated MCP is contract-triggered</h2>
-          <p className="text-gray-300 leading-relaxed">Use Dedicated MCP when enterprise requirements call for isolated runtime boundaries and agreed operational controls. Deployment and custody boundaries are defined by contract; it is not a shared hybrid tier.</p>
+          <h2 className="text-2xl font-bold text-white mb-3">Enterprise is self-host</h2>
+          <p className="text-gray-300 leading-relaxed">Enterprise installs the same SatGate binary that runs SatGate Cloud, in your own environment. There is no separate Hybrid gateway product.</p>
         </div>
       </section>
 

@@ -70,7 +70,7 @@ export default function DesignPartnersPage() {
     { q: 'How long is the program?', a: '90 days. At the end, both sides review the governed workload, policy outcomes, Evidence Pack use, support burden, and operating evidence before deciding whether to expand, contract, or stop.' },
     { q: 'Is it really free?', a: 'Yes. The design-partner path starts with an agreed staging lane and no credit card. You get visibility into agent traffic and help shape the authority, budget, revocation, and Evidence Pack workflows that matter in your environment.' },
     { q: 'Do I need to change my code?', a: 'Usually no. Most pilots start with a DNS, proxy, or MCP configuration change around one staging endpoint or tool. We verify the path together before expanding.' },
-    { q: 'Where does my data go?', a: 'The data path, environment, and custody boundaries are documented before activation. Most pilots start in staging or another bounded lane. Dedicated deployment is evaluated separately during enterprise scoping.' },
+    { q: 'Where does my data go?', a: 'The data path, environment, and custody boundaries are documented before activation. Most pilots start in staging or another bounded lane. Enterprise self-host installs the same SatGate binary in your own environment.' },
     { q: 'Is this for production traffic?', a: 'Design partners usually start in staging or a bounded pilot lane. The goal is to verify request-path policy, revocation, budgets, and Evidence Pack proof before expanding scope.' },
   ];
 
@@ -192,7 +192,7 @@ export default function DesignPartnersPage() {
             </span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            SatGate is accepting a small design-partner cohort. Gate one MCP tool, REST API, or LLM endpoint in an agreed staging or bounded pilot lane. Measure which agent had authority, what it spent, what was denied, and what Evidence Pack proof was preserved before either side expands the scope.
+            This page is for larger teams that want help. You can also <a href="https://cloud.satgate.io/cloud/signup" className="text-cyan-300 hover:text-cyan-200 underline underline-offset-4">start a 14-day free trial</a> of Pro features, with no credit card. The pilot gates one MCP tool, REST API, or LLM endpoint in an agreed staging or bounded lane. Measure which agent had authority, what it spent, what was denied, and what Evidence Pack proof was preserved before either side expands the scope.
           </p>
           <a href="#apply" className="inline-flex items-center gap-2 bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
             Apply Now <ArrowRight size={18} />

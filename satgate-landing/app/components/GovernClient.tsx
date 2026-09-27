@@ -624,12 +624,10 @@ export default function GovernPage() {
           <div className="bg-gradient-to-r from-cyan-900/20 to-purple-900/20 border border-cyan-800/30 rounded-xl p-6 text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
               <Network size={18} className="text-cyan-400" />
-              <h4 className="font-semibold text-white">SaaS or Dedicated</h4>
+              <h4 className="font-semibold text-white">SaaS or self-host</h4>
             </div>
             <p className="text-gray-400 text-sm max-w-lg mx-auto">
-              Start on the managed platform at cloud.satgate.io. When requirements call for isolation, the same
-              platform deploys as a single-customer Dedicated environment — deployment and custody boundaries
-              agreed by contract during onboarding, up to fully client-operated.
+              Start on SatGate Cloud at cloud.satgate.io. Enterprise self-host installs the same SatGate binary in your own environment. There is no separate Hybrid gateway product.
             </p>
           </div>
         </div>
@@ -855,6 +853,9 @@ export SATGATE_TOKEN=$TOKEN
             Start with Observe, then move to Control and Policy-to-Proof when you&apos;re ready.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-10 py-4 font-bold text-lg text-white hover:border-purple-400 transition">
+              Start free trial
+            </a>
             <Link href="/design-partners" className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-10 py-4 rounded-full font-bold text-lg hover:opacity-90 transition shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2">
               Book a governance walkthrough <ArrowRight size={20} />
             </Link>

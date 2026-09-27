@@ -28,9 +28,9 @@ REQUIRED_PHRASES = {
         "Export Evidence Pack",
     ],
     "app/pricing/page.tsx": [
-        "Evidence Pack example and verifier",
-        "Instrumentation, weekly review, and Evidence Pack use",
         "Signed receipts + Evidence Pack export",
+        "Start free trial",
+        "Ask about a 90-day design-partner pilot",
     ],
     "app/pay/page.tsx": [
         "paid-call receipts",
