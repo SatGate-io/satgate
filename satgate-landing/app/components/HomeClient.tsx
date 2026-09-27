@@ -180,7 +180,7 @@ const LandingPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              Keep your agents within budget. Make external callers bear the cost of access. Keep verifiable evidence of the decisions.
+              Keep your agents within budget. Make external callers pay before they use your resources. Keep verifiable evidence of the decisions.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
               Control internal spending before work begins. Use paid admission to make repeated external abuse costly, while enforcing the owner’s access restrictions. Protect the resources behind useful agent work.
@@ -407,14 +407,14 @@ const LandingPage = () => {
                 <h3 className="font-bold text-lg">Admit <span className="text-xs font-normal text-gray-500">(external access)</span></h3>
               </div>
               <p className="text-gray-400 text-sm mb-3">
-                Economic admission: charge for authorized access before protected work.
+                Economic admission: scoped access for external agents, with payment where you require it.
               </p>
               <p className="text-xs text-yellow-400/80 mb-3 italic">
-                Make repeated resource consumption costly for external callers on paid routes. Payment never overrides scope, expiry or revocation.
+                On paid routes, callers pay before protected work runs, so repeated abuse gets expensive. Payment never overrides scope, expiry or revocation.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ No long-lived shared secrets for approved external agents</li>
-                <li>✓ Caller payment required on configured paid routes</li>
+                <li>✓ Payment only on the routes you choose</li>
                 <li>✓ Per-request pricing and policy at the gateway before forwarding</li>
                 <li>✓ Scoped access on your terms</li>
               </ul>
@@ -449,7 +449,7 @@ const LandingPage = () => {
           </div>
 
           <p className="text-sm text-gray-400 mb-8">
-            Paid admission is deterrence, not immunity from funded attackers. It protects the routes behind the gateway, not exposed origins that bypass it. Bound challenge and verification costs too; economic admission complements access controls, rate limits and vulnerability fixes.
+            Paid admission raises the cost of abuse. It works alongside rate limits and access controls, not in place of them, and it protects only traffic that goes through the gateway.
           </p>
 
           {/* Token Delegation Video */}

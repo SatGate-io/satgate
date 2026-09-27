@@ -1,11 +1,11 @@
 # SatGate: economic firewall for agent workloads
-> Keep your agents within budget. Make external callers bear the cost of access. Keep verifiable evidence of the decisions.
+> Keep your agents within budget. Make external callers pay before they use your resources. Keep verifiable evidence of the decisions.
 > Observe / Control / Admit, with signed evidence across all three controls.
 
 ## Purpose
 SatGate puts applicable economic and authority checks in the path to protected APIs and tools. External paid admission imposes a caller cost before resource consumption where owner policy requires payment. Internal agents consume a finite owner-controlled allowance. Payment never overrides scope, expiry, revocation or tenant boundaries.
 
-Economic friction is deterrence, not immunity from funded attackers. Operators must bound rejection, invoice-creation and verification costs as well as legitimate-task overhead. Observe alone does not block requests.
+Paid admission raises the cost of abuse; it complements rate limits and access controls rather than replacing them. Observe alone does not block requests.
 
 ## Core controls
 
@@ -16,14 +16,14 @@ Meter and attribute agent/API traffic without blocking it.
 Economic control: enforce internal budgets and scope before protected work. Observe reveals usage; Control enforces the owner’s limits.
 
 ### Admit
-Economic admission: charge external callers for authorized access on configured paid routes before protected resource consumption. Make repeated abuse costly without letting payment override permissions.
+Economic admission: scoped access for external agents, with payment before protected work on the routes you choose. Payment never overrides permissions.
 
 ## Proof across all three controls
 Verifiable evidence for audit supports both internal control and external admission. It does not certify compliance or prove every downstream action.
-Evidence Packs record governed decisions across HTTP and MCP paths. Verify issuer trust, canonical bytes and signatures independently. A valid receipt does not prove answer quality, supplier truth, legal identity or external settlement. A cooperative agent trial does not prove attack deterrence.
+Evidence Packs record governed decisions across HTTP and MCP paths. Verify issuer trust, canonical bytes and signatures independently. A valid receipt does not prove answer quality, supplier truth, legal identity or external settlement.
 
 ## Agent choice and owner enforcement
-Agents may choose SatGate for useful work. The resource boundary must remain owner-enforced regardless of that choice. Restrict direct origin access, upstream credentials and egress so callers cannot bypass the gateway. A voluntarily installed wrapper or a pre-run check of an old receipt does not establish that protection.
+Agents may choose SatGate for useful work. The resource boundary must remain owner-enforced regardless of that choice. Restrict direct origin access, upstream credentials and egress so callers cannot bypass the gateway.
 
 ## Discovery and availability
 - Start here: https://satgate.io/build

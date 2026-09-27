@@ -189,7 +189,7 @@ export default function EconomicFirewallPage() {
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-3xl leading-relaxed mb-6">
-            Keep internal agent spending within budget. Make external callers bear the cost of authorized access before consuming protected resources. Retain verifiable evidence for audit.
+            Keep internal agent spending within budget. Make external callers pay before they use your resources. Retain verifiable evidence for audit.
           </p>
           <p className="max-w-3xl rounded-2xl border border-purple-900/50 bg-purple-950/20 p-5 text-lg leading-relaxed text-purple-100 mb-10">
             Economic defense is the foundation. SatGate uses Observe, Control and Admit to help legitimate agents do useful work within enforced boundaries. Evidence Packs record governed outcomes across those controls.
@@ -226,11 +226,10 @@ export default function EconomicFirewallPage() {
       <section className="max-w-6xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-bold text-white mb-6">From external deterrence to internal budgets</h2>
         <div className="space-y-5 max-w-4xl text-lg leading-relaxed text-gray-300">
-          <p>The economic firewall began with a simple requirement: callers should incur a cost before consuming protected resources. Paid admission can make repeated abuse expensive. It is deterrence, not immunity from funded attackers.</p>
+          <p>The economic firewall began with a simple requirement: callers should incur a cost before consuming protected resources. Paid admission makes repeated abuse expensive. It raises the cost of an attack; it does not make one impossible.</p>
           <p>Economic control applies the same principle to your own agents: a finite allowance and permitted scope are checked before work begins. Observe shows usage without blocking; Control enforces the limits. Internal budget control does not require a payment from the agent.</p>
-          <p>Owners must control the origin, upstream credentials and egress so callers cannot bypass the gateway. An agent choosing to install a wrapper does not establish that boundary.</p>
-          <p>Bound admission costs too: rejection, invoice creation and verification can themselves consume resources. Measure those costs and legitimate-task overhead separately from abuse protection.</p>
-          <p><strong className="text-white">Proof across Observe, Control and Admit.</strong> Signed evidence records governed decisions on HTTP and MCP paths for independent audit review. It does not certify compliance or prove every downstream action. Verify useful work and denied access separately; a signature alone does not prove either.</p>
+          <p>Put the gateway on the only path to your origin and upstream credentials, so callers cannot go around it.</p>
+          <p><strong className="text-white">Proof across Observe, Control and Admit.</strong> Signed evidence records governed decisions on HTTP and MCP paths for independent audit review. It does not certify compliance or prove every downstream action.</p>
         </div>
       </section>
 
@@ -339,7 +338,7 @@ export default function EconomicFirewallPage() {
           <div className="rounded-2xl border border-yellow-800/50 bg-yellow-950/10 p-6">
             <h2 className="text-2xl font-bold text-white mb-4">Admit</h2>
             <p className="text-gray-300 leading-relaxed">
-              Economic admission makes external callers bear the cost of authorized access on paid routes. Validate payment before protected work, and keep scope and revocation checks in force even for paying callers.
+              Admit gives external agents scoped access on your terms. On paid routes, callers pay before protected work runs. Validate payment before protected work, and keep scope and revocation checks in force even for paying callers.
             </p>
           </div>
         </div>

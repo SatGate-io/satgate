@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SatGate | Economic Firewall for AI Agents",
     description:
-      "Keep your agents within budget. Make external callers bear the cost of authorized access. Keep verifiable evidence of gateway decisions.",
+      "Keep your agents within budget. Make external callers pay before they use your resources. Keep verifiable evidence of gateway decisions.",
     url: "https://satgate.io",
     type: "website",
   },
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SatGate | Economic Firewall for AI Agents",
     description:
-      "Keep your agents within budget. Make external callers bear the cost of authorized access. Keep verifiable evidence of gateway decisions.",
+      "Keep your agents within budget. Make external callers pay before they use your resources. Keep verifiable evidence of gateway decisions.",
   },
 };
 
