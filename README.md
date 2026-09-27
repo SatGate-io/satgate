@@ -177,6 +177,14 @@ curl http://localhost:8080/api/micro
 
 Public → Protected → Paid. Three policies, one gateway; paid rails are governed context, not the product boundary.
 
+Hosted paid demo (Admit; Charge in the dashboard). No local Lightning node:
+
+```bash
+curl -i -H "X-SatGate-Tenant: satgate-demo" https://api.satgate.io/paid/agent-demo
+```
+
+Unpaid calls return 402. Price is 10 sats. Show the invoice to the owner, poll payment status, then retry. Poll rules are in [llms.txt](https://satgate.io/llms.txt).
+
 📖 **[Full Quick Start Guide →](docs/getting-started/quickstart.md)**
 
 ### Other Install Methods

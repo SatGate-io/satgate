@@ -33,7 +33,7 @@ Agents may choose SatGate for useful work. The resource boundary must remain own
 - Browser simulation: https://satgate.io/sandbox#golden-path
 - Request a bounded evaluation: https://satgate.io/design-partners
 
-The public demo uses simulated traffic and local-only credentials. It does not establish trusted issuer identity, delegated-worker accounting, MCP behavior or live settlement. Installing a public SDK does not grant hosted API access. The issue/pay/verify API namespace is in private beta. Fresh-agent evaluations with delegated workers require separately confirmed setup and authority; these links do not advertise a public evaluation installer.
+The synthetic demo linked above uses simulated traffic and local-only credentials. It does not establish trusted issuer identity, delegated-worker accounting, MCP behavior or live settlement. A separate live paid route is under "Try it as an agent". Installing a public SDK does not grant hosted API access. The issue/pay/verify API namespace is in private beta. Fresh-agent evaluations with delegated workers require separately confirmed setup and authority; these links do not advertise a public evaluation installer.
 
 Trust metadata distinguishes supported and planned adapters. AgentCore Payments and Pay.sh are planned. A discovery document describes availability; exercise the chosen adapter before making a runtime-support claim.
 
@@ -49,6 +49,21 @@ Fiat402 is internal budget control, not a payment or settlement rail. It does no
 3. The owner pays the invoice from any wallet. If the wallet shows the preimage, the agent retries with `Authorization: L402 <macaroon>:<preimage>`.
 4. If the wallet hides the preimage, the agent polls `GET <status_url>` with `Authorization: L402 <macaroon>` (macaroon only, no preimage; wait at least 10 seconds) until `status` is `paid`, then retries the original route with the returned `authorization` value. POST with JSON `{"macaroon":"<macaroon>"}` is also accepted. A 401 includes `WWW-Authenticate: L402 realm="payment-status"` and a hint to send that header. It does not echo caller input.
 5. SatGate verifies that proof through the normal L402 path before forwarding. The status endpoint does not grant access. A bad, cross-tenant, or wrong-route macaroon reveals nothing.
+
+### Try it as an agent
+
+A public paid route is open. The agent does not need an account, a wallet, or a preimage.
+
+- URL: GET https://api.satgate.io/paid/agent-demo
+- Header: `X-SatGate-Tenant: satgate-demo`
+- Price: 10 sats
+
+1. Call the route. Read the 402 and the terms in the body.
+2. Show the Lightning invoice to the owner. Ask them to pay it from any Lightning wallet, such as Cash App.
+3. Poll payment status using the rules in "L402 flow on a configured paid route" above. Send `Authorization: L402 <macaroon>` only. Do not send a preimage. Wait at least `terms.status.poll_min_interval_secs` between polls.
+4. When status is paid, the status response includes an authorization value. Retry the original request with `Authorization` set to that value. A paid call returns 200.
+
+This route is Admit. In the dashboard, Admit is the Charge policy. The status URL, states, and poll interval are in the 402 body and in the section above.
 
 ## Free Tools and Calculators
 - AI Agent Cost Control Tools Hub: https://satgate.io/tools
