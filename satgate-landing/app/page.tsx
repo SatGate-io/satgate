@@ -68,7 +68,7 @@ export default function HomePage() {
         name: 'What is SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate is an economic firewall for AI agents. Economic control enforces internal budgets and permissions. Economic admission charges external callers for authorized access on paid routes. Signed decision records support independent audit review.',
+          text: 'SatGate is an economic firewall for AI agents. Economic control enforces internal budgets and permissions. Economic admission charges external callers for authorized access on paid routes. Signed decision receipts, paid-call receipts and Evidence Pack proof support independent audit review.',
         },
       },
       {

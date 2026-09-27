@@ -8,13 +8,13 @@ REQUIRED = {
     "app/components/HomeClient.tsx": [
         "Economic firewall for agents", "An economic firewall",
         "for AI agents.", "Economic admission", "Economic control", "Admit",
-        "Verifiable evidence for audit", "funded attackers",
+        "Verifiable evidence for audit", "raises the cost of abuse",
         "Payment never overrides scope", "Proof across all three controls",
     ],
     "app/page.tsx": ["Economic Firewall for AI Agents", "internal budgets", "external access"],
     "app/economic-firewall/page.tsx": [
         "Economic defense is the foundation", "Fiat402", "internal budget control",
-        "funded attackers", "upstream credentials", "admission costs",
+        "raises the cost of an attack", "upstream credentials", "only path to your origin",
         ">Admit</h2>", "Proof across Observe, Control and Admit",
     ],
     "app/build/page.tsx": [
