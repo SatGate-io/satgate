@@ -5,8 +5,8 @@
 <h1 align="center">SatGate</h1>
 
 <p align="center">
-  <strong>The Economic Firewall for AI Agents</strong><br/>
-  <em>Capabilities in · Receipts out · Rails abstracted</em>
+  <strong>Observe, control and admit AI agent traffic</strong><br/>
+  <em>Every allow or deny comes with a signed receipt</em>
 </p>
 
 <p align="center">
@@ -27,6 +27,16 @@
 </p>
 
 ---
+
+SatGate is a gateway in front of APIs and MCP tools. It meters agent and MCP traffic (**Observe**), enforces owner budgets before work runs (**Control**), and charges outside agents on the routes you choose (**Admit**; the Charge policy in the dashboard). Every allow or deny comes with a signed receipt.
+
+Try it as an agent. This hosted route costs 10 sats:
+
+```bash
+curl -i -H "X-SatGate-Tenant: satgate-demo" https://api.satgate.io/paid/agent-demo
+```
+
+The unpaid call returns HTTP 402 with a Lightning invoice and terms. Agent instructions are in [llms.txt](https://satgate.io/llms.txt).
 
 ## Build Agents with SatGate
 
