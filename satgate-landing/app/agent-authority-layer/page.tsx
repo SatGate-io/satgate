@@ -5,7 +5,7 @@ import { ArrowRight, BadgeCheck, FileCheck2, KeyRound, Layers3, ReceiptText, Shi
 export const metadata: Metadata = {
   title: "Agent Authority & Accountability Layer | SatGate",
   description:
-    "SatGate is the rail-neutral authority and accountability layer for AI agents. Signed, verifiable receipts before any rail moves value.",
+    "Give agents scoped authority for useful work. Enforce budget and access policy on governed requests, with signed evidence of the decision.",
   keywords: [
     "agent authority and accountability layer",
     "AI agent accountability",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Agent Authority & Accountability Layer",
     description:
-      "SatGate proves which agent was authorized, under which policy, before any rail or upstream service is touched.",
+      "SatGate records authorization decisions for requests through its gateway. Verify the issuer and signature independently.",
   },
 };
 
@@ -53,8 +53,8 @@ const audiences = [
   ["Enterprises", "Govern agent scope, budgets, revocation, and tenant boundaries before spend or data leaves."],
   ["Payment rails", "Get a recourse trail for autonomous-agent activity without owning every governance question."],
   ["Upstream APIs", "Decide which agents deserve preferential trust, rate limits, and lower fraud friction."],
-  ["Agent platforms", "Plug in one authority model across MCP, AgentCore, LangGraph, Vercel AI SDK, and custom runtimes."],
-  ["Insurers and fraud teams", "Underwrite or score agent behavior from verifiable Evidence Pack artifacts."],
+  ["Agent platforms", "Check protocol and adapter status, then test delegation and recovery in the chosen runtime."],
+  ["Insurers and fraud teams", "Inspect signed decision records alongside other evidence. A receipt alone is not an underwriting or fraud verdict."],
 ];
 
 const publicSpecs = [
@@ -70,12 +70,12 @@ const faqs = [
   {
     question: "Is SatGate a payment processor?",
     answer:
-      "No. SatGate governs authority before any rail moves value. It is rail-neutral and works across L402, x402, Stripe, AgentCore, internal ledgers, and whatever comes next.",
+      "No. Authorization and settlement are separate. Charge/L402 is an optional settlement rail; Fiat402 is internal budget control. Consult trust metadata for adapter status. AgentCore Payments and Pay.sh are planned, not available integrations.",
   },
   {
     question: "How is this different from OAuth or API keys?",
     answer:
-      "OAuth proves identity. API keys prove possession. SatGate proves this agent was authorized under a specific policy, with a specific scope and budget, and produces a signed artifact of that decision.",
+      "OAuth can delegate access, and API keys authenticate callers. SatGate adds request-path budget and scope checks with signed decision evidence. The owner must also prevent direct upstream access from bypassing those checks.",
   },
   {
     question: "Why not just trust the rail authorization?",
@@ -85,7 +85,7 @@ const faqs = [
   {
     question: "How is a SatGate receipt verified?",
     answer:
-      "Fetch the Evidence Pack, discover the issuer JWKS, canonicalize the receipt with RFC8785 JCS, recompute the SHA-256 receipt hash, and verify the Ed25519 signature.",
+      "Fetch the Evidence Pack and verify it against a trusted issuer and independently admitted keys. Check the RFC8785 canonical form, SHA-256 hash and Ed25519 signature. A valid signature does not prove answer quality, legal identity or external settlement.",
   },
 ];
 
@@ -150,16 +150,16 @@ export default function AgentAuthorityLayerPage() {
         <div className="relative mx-auto grid max-w-6xl gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">
-              <Layers3 size={14} /> Rail-neutral governance
+              <Layers3 size={14} /> Authority on protected calls
             </div>
             <h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">
               Agent Authority & Accountability Layer
             </h1>
             <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
-              Payment rails answer one question: <span className="text-white">can this agent pay?</span> SatGate answers the question that comes first: was this agent authorized, under whose policy, within what budget and scope, and can we prove it later?
+              Useful agent work needs <span className="text-white">bounded authority to act.</span> Set a finite budget and permitted scope, enforce them on the request path, and retain the recorded decision.
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
-              Every rail — x402, L402, Stripe Agent Toolkit, AgentCore, Coinbase, and internal ledgers — has the same governance gap. SatGate fills it once, above the rail.
+              Use internal budget controls for your agents and scoped admission for external callers. Payment adapters have different availability. Confirm the chosen integration before relying on it.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -173,14 +173,14 @@ export default function AgentAuthorityLayerPage() {
 
           <div className="rounded-3xl border border-cyan-300/20 bg-white/[0.03] p-6 shadow-2xl shadow-cyan-950/30">
             <div className="mb-5 flex items-center gap-2 text-emerald-200">
-              <BadgeCheck /> What SatGate proves
+              <BadgeCheck /> What a governed receipt records
             </div>
             <div className="space-y-4">
               {[
-                "This agent had delegated authority before execution.",
-                "The requested action matched policy, budget, tenant, and scope.",
-                "The decision was signed, archived, and externally verifiable.",
-                "The proof travels across rails instead of being trapped inside one provider.",
+                "The authenticated principal and its delegated authority.",
+                "Whether the requested action matched the configured policy.",
+                "The signed decision and associated scope and budget context.",
+                "An artifact to verify against independently trusted issuer keys.",
               ].map((item) => (
                 <div key={item} className="rounded-2xl border border-white/10 bg-black/50 p-4 text-gray-300">
                   {item}
@@ -194,7 +194,7 @@ export default function AgentAuthorityLayerPage() {
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="mb-10 max-w-3xl">
           <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-purple-300">The authority gap</p>
-          <h2 className="text-3xl font-bold text-white sm:text-4xl">Identity proves who. Rails prove value moved. SatGate proves authority.</h2>
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">Check authorization before protected work.</h2>
           <p className="mt-5 text-lg leading-8 text-gray-400">
             Agents now spend money, call APIs, delegate to other agents, and act on behalf of humans and platforms. Infrastructure built for humans clicking buttons does not prove the agent had bounded authority before the action happened.
           </p>
@@ -216,10 +216,10 @@ export default function AgentAuthorityLayerPage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="mb-10 max-w-3xl">
-            <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-emerald-300">Rail-neutral is the moat</p>
+            <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-emerald-300">Authorization and settlement are separate</p>
             <h2 className="text-3xl font-bold text-white sm:text-4xl">The governance contract has to travel with the agent.</h2>
             <p className="mt-5 text-lg leading-8 text-gray-400">
-              Stripe cannot govern an L402 payment. Coinbase cannot govern a Stripe Connect transfer. A single-provider rail cannot be neutral across an enterprise agent stack. SatGate sits above the rails and turns authority into portable proof.
+              Payment cannot override scope, expiry, revocation or tenant boundaries. Evaluate SatGate on a workload: can an authorized agent finish its task, and can an unauthorized request reach the protected resource? Receipt verification supports that evaluation; integration breadth alone does not establish protection.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -239,7 +239,7 @@ export default function AgentAuthorityLayerPage() {
             <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-cyan-300">Public proof surface</p>
             <h2 className="text-3xl font-bold text-white sm:text-4xl">Anyone can verify a SatGate receipt. That is the point.</h2>
             <p className="mt-5 text-lg leading-8 text-gray-400">
-              Evidence Packs are signed, hash-linked, and anchored by public JWKS. The open verifier reproduces the receipt hash and validates the Ed25519 signature without trusting a SatGate dashboard.
+              The open verifier checks receipt hashes and Ed25519 signatures using keys admitted from a trusted issuer. Public key discovery alone does not establish that trust. Keep artifact integrity separate from the quality or truth of the work.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a href="https://github.com/SatGate-io/evidence-pack-verifier" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">

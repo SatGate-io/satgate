@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle2, Shield, Gauge, WalletCards, Activity, KeyRoun
 
 export const metadata = {
   title: 'Economic Firewall for AI Agents',
-  description: 'Learn what an economic firewall is and how SatGate governs AI agent authority, spend, paid rails, and revocation before execution, then exports Evidence Pack proof.',
+  description: 'Protect resources with economic conditions before use: finite internal agent budgets and scoped external access with payment where required.',
   alternates: { canonical: 'https://satgate.io/economic-firewall' },
   keywords: [
     'economic firewall',
@@ -51,8 +51,8 @@ const capabilities = [
   },
   {
     icon: WalletCards,
-    title: 'Paid-rail context',
-    body: 'Govern paid calls and agent payments across x402, L402, AgentCore Payments, Pay.sh, API-key billing, or enterprise ledgers when value moves.',
+    title: 'External economic admission',
+    body: 'Require payment before protected work on configured paid routes. Payment does not bypass authorization. Check published adapter status before choosing an integration.',
   },
 ];
 
@@ -65,7 +65,7 @@ export default function EconomicFirewallPage() {
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-25',
-    dateModified: '2026-05-09',
+    dateModified: '2026-09-26',
     mainEntityOfPage: 'https://satgate.io/economic-firewall',
   };
 
@@ -78,7 +78,7 @@ export default function EconomicFirewallPage() {
         name: 'What is an economic firewall?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An economic firewall is an inline control layer that governs what AI agents can access, how much they can spend, what they can delegate, and which Evidence Pack artifacts are captured before each API request reaches the upstream provider.',
+          text: 'An economic firewall checks authority and applicable economic conditions in the request path before protected work begins. Internal agents consume finite owner budgets; external callers must satisfy access policy and payment requirements where configured.',
         },
       },
       {
@@ -154,8 +154,8 @@ export default function EconomicFirewallPage() {
       {
         '@type': 'ListItem',
         position: 3,
-        name: 'Preserve proof across paid rails',
-        description: 'Record payment context across x402, L402, AgentCore Payments, Pay.sh, API-key billing, or enterprise ledgers when external agents unlock protected resources.',
+        name: 'Configure external admission',
+        description: 'Apply scope and any required payment at the resource boundary, then retain evidence of allowed and denied requests.',
       },
     ],
   };
@@ -189,10 +189,10 @@ export default function EconomicFirewallPage() {
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-3xl leading-relaxed mb-6">
-            An economic firewall controls what autonomous agents can access, how much they can spend, what they can delegate, and which Evidence Pack artifacts are captured before each API request reaches the upstream provider.
+            Keep internal agent spending within budget. Make external callers pay before they use your resources. Retain verifiable evidence for audit.
           </p>
           <p className="max-w-3xl rounded-2xl border border-purple-900/50 bg-purple-950/20 p-5 text-lg leading-relaxed text-purple-100 mb-10">
-            Think of this as the legacy SEO/category term. The current SatGate product narrative is Policy-to-Proof governance: authority before execution, Observe/Control/Prove, and signed receipts that can feed Evidence Packs on supported governed paths.
+            Economic defense is the foundation. SatGate uses Observe, Control and Admit to help legitimate agents do useful work within enforced boundaries. Evidence Packs record governed outcomes across those controls.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
@@ -223,6 +223,16 @@ export default function EconomicFirewallPage() {
         </div>
       </section>
 
+      <section className="max-w-6xl mx-auto px-6 py-16">
+        <h2 className="text-3xl font-bold text-white mb-6">From external deterrence to internal budgets</h2>
+        <div className="space-y-5 max-w-4xl text-lg leading-relaxed text-gray-300">
+          <p>The economic firewall began with a simple requirement: callers should incur a cost before consuming protected resources. Paid admission makes repeated abuse expensive. It raises the cost of an attack; it does not make one impossible.</p>
+          <p>Economic control applies the same principle to your own agents: a finite allowance and permitted scope are checked before work begins. Observe shows usage without blocking; Control enforces the limits. Internal budget control does not require a payment from the agent.</p>
+          <p>Put the gateway on the only path to your origin and upstream credentials, so callers cannot go around it.</p>
+          <p><strong className="text-white">Proof across Observe, Control and Admit.</strong> Signed evidence records governed decisions on HTTP and MCP paths for independent audit review. It does not certify compliance or prove every downstream action.</p>
+        </div>
+      </section>
+
       <section className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-start">
         <div>
           <h2 className="text-3xl font-bold text-white mb-6">The problem: agents exercise authority at machine speed</h2>
@@ -234,7 +244,7 @@ export default function EconomicFirewallPage() {
               Rate limits can slow traffic. Dashboards can explain yesterday&apos;s bill. Neither can answer the question that matters before a request happens: <strong className="text-white">is this agent allowed to take this action right now?</strong>
             </p>
             <p>
-              Economic firewalls are the missing control plane between autonomous agents and governed APIs. They combine identity, authority policy, budget enforcement, observability, revocation, provider routing, Evidence Pack capture, and optional payment context into one request-path decision.
+              An external caller can consume resources deliberately; an internal agent can exhaust a budget through retries or delegation. Both need economic limits on the protected-call path. Choosing a tool voluntarily is separate from enforcing the owner’s restrictions.
             </p>
           </div>
         </div>
@@ -280,17 +290,17 @@ export default function EconomicFirewallPage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-[1fr_0.9fr] gap-8 items-start">
           <div>
-            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Paid agent rails validate the category</p>
-            <h2 className="text-3xl font-bold text-white mb-5">Why paid agent rails need economic firewalls</h2>
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Payment and permission</p>
+            <h2 className="text-3xl font-bold text-white mb-5">Paying for access never overrides permission</h2>
             <div className="space-y-4 text-gray-300 text-lg leading-relaxed">
               <p>
-                Paid rails such as x402, L402, AgentCore Payments, Pay.sh, API-key billing, and wallet flows can help value move between agents and services. That is useful, but payment approval is not the same as governing agent behavior.
+                An external caller may be willing to pay and still request something the resource owner has forbidden. Economic admission combines the required payment with access restrictions; neither replaces the other.
               </p>
               <p>
                 An economic firewall sits at the gateway boundary. It decides whether an agent may access an API, consume budget, call an MCP tool, delegate authority, or unlock a paid resource before forwarding.
               </p>
               <p className="font-semibold text-white">
-                Payment rails authorize value movement. Economic firewalls authorize behavior — and preserve the proof.
+                Payment does not grant permission outside policy. A signed receipt records a decision; it does not establish answer quality or attack deterrence.
               </p>
             </div>
           </div>
@@ -326,12 +336,19 @@ export default function EconomicFirewallPage() {
             </p>
           </div>
           <div className="rounded-2xl border border-yellow-800/50 bg-yellow-950/10 p-6">
-            <h2 className="text-2xl font-bold text-white mb-4">Prove</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">Admit</h2>
             <p className="text-gray-300 leading-relaxed">
-              Every authority decision — allowed, denied, delegated, revoked, or paid — feeds the Evidence Pack. Payment proves value moved; SatGate proves the agent was allowed to move it.
+              Admit gives external agents scoped access on your terms. On paid routes, callers pay before protected work runs. Validate payment before protected work, and keep scope and revocation checks in force even for paying callers.
             </p>
           </div>
         </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-6 py-12">
+        <details className="rounded-xl border border-gray-800 p-6">
+          <summary className="cursor-pointer text-xl font-bold">Developer details: payment and internal accounting</summary>
+          <p className="mt-4 text-gray-400">L402 is a payment protocol for configured paid access. Fiat402 is internal budget control, not a payment or settlement rail. A ledger debit is not external payment settlement. Check the selected adapter and deployment before relying on it.</p>
+        </details>
       </section>
 
       <section className="border-y border-gray-900 bg-gray-950/60">
@@ -363,13 +380,13 @@ export default function EconomicFirewallPage() {
         <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Implementation path</p>
         <h2 className="mb-4 text-3xl font-bold text-white">How to roll out an economic firewall</h2>
         <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
-          The safe path is progressive: observe real traffic first, enforce scoped authority on risky routes next, then govern external paid access only after identity, audit, revocation, and Evidence Pack capture are working.
+          Choose one workload and define its resource boundary. Measure useful completion and overhead, exercise denied requests, and verify that callers cannot bypass the gateway. Observe mode alone does not block traffic.
         </p>
         <div className="grid gap-5 md:grid-cols-3">
           {[
             ['1', 'Map agent authority', 'Identify agents, tenants, workflows, routes, models, MCP tools, budgets, caveats, and delegated sub-agents before changing behavior.', '/agent-control-plane'],
             ['2', 'Enforce scoped authority', 'Move risky routes into request-path Control mode with spend caps, scoped credentials, expiry, revocation, and deny decisions.', '/agent-spend-policy-template'],
-            ['3', 'Preserve proof across paid rails', 'For external agents, capture payment context across x402, L402, AgentCore Payments, Pay.sh, API-key billing, or enterprise ledgers.', '/policy-to-proof'],
+            ['3', 'Configure external admission', 'Apply scope and any required payment at the resource boundary. Check adapter status and retain evidence of allowed and denied requests.', '/policy-to-proof'],
           ].map(([step, title, body, href]) => (
             <Link key={step} href={href} className="rounded-2xl border border-gray-800 bg-gray-950 p-6 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
               <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500/15 font-mono text-cyan-200">{step}</div>
@@ -438,7 +455,7 @@ export default function EconomicFirewallPage() {
           <h2 className="mb-8 text-3xl font-bold text-white">Economic firewall questions</h2>
           <div className="grid gap-5 md:grid-cols-2">
             {[
-              ['What is an economic firewall?', 'An economic firewall is an inline control layer that governs what AI agents can access, how much they can spend, what they can delegate, and which Evidence Pack artifacts are captured before each API request reaches the upstream provider.'],
+              ['What is an economic firewall?', 'An economic firewall checks authority and applicable economic conditions in the request path before protected work begins. Internal agents consume finite owner budgets; external callers must satisfy access policy and payment requirements where configured.'],
               ['How is an economic firewall different from rate limiting?', 'Rate limiting counts requests. An economic firewall enforces scoped authority, budgets, revocation, agent identity, tool policy, denial reasons, and payment context in the request path.'],
               ['Why do AI agents need economic firewalls?', 'Autonomous agents can loop, delegate, retry, and call paid tools without a human approving each request. SatGate denies unauthorized actions before execution and preserves auditable proof afterward.'],
               ['Is an economic firewall the same as an API gateway?', 'No. An API gateway can route and secure traffic, but an economic firewall adds per-agent authority, budget caveats, delegated credentials, denial reasons, revocation proof, and rail-aware payment context before requests execute.'],

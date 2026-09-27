@@ -148,9 +148,9 @@ build_text = BUILD.read_text() if BUILD.exists() else ""
 for needle in REQUIRED_BUILD_STRINGS:
     if needle not in build_text:
         errors.append(f"/build missing trust metadata string: {needle}")
-if "governs MCP tools, REST APIs, API-key billing, x402, L402, and enterprise ledgers today" not in build_text:
+if "for published adapter status" not in build_text:
     errors.append("/build should separate supported rails from planned rails")
-if "planned rails such as AgentCore Payments and Pay.sh" not in build_text:
+if "AgentCore Payments and Pay.sh remain planned" not in build_text:
     errors.append("/build should call AgentCore Payments and Pay.sh planned rails")
 
 doc_text = DOC.read_text() if DOC.exists() else ""
