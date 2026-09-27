@@ -44,11 +44,11 @@ Choose a useful task with a finite budget. Delegate narrower authority and reser
 Fiat402 is internal budget control, not a payment or settlement rail. It does not require Lightning payment; an internal ledger debit is not external settlement. L402 is a payment protocol for configured external paid access, not the product identity or a fourth control.
 
 ### L402 flow on a configured paid route
-1. Request a protected endpoint.
-2. Receive a payment-required challenge when policy requires it.
-3. An authorized payer pays the invoice within the delegated allowance.
-4. Retry with the required payment proof and scoped credentials.
-5. The gateway validates payment and authorization before forwarding.
+1. Agent requests the paid route with `X-SatGate-Tenant: <tenant-slug>` on api.satgate.io.
+2. SatGate returns `402 Payment Required` with the L402 challenge, plus JSON `tenant`, `tenant_selector_header`, `status_url`, `terms` (including `terms.status`), and `Link: <status_url>; rel="payment-status"`. `X-SatGate-Spend-Mode: paid_rail` means this is a Lightning quote, not an empty budget.
+3. The owner pays the invoice from any wallet. If the wallet shows the preimage, the agent retries with `Authorization: L402 <macaroon>:<preimage>`.
+4. If the wallet hides the preimage, the agent polls `GET <status_url>` with `Authorization: L402 <macaroon>` (macaroon only, no preimage; wait at least 10 seconds) until `status` is `paid`, then retries the original route with the returned `authorization` value. POST with JSON `{"macaroon":"<macaroon>"}` is also accepted. A 401 includes `WWW-Authenticate: L402 realm="payment-status"` and a hint to send that header. It does not echo caller input.
+5. SatGate verifies that proof through the normal L402 path before forwarding. The status endpoint does not grant access. A bad, cross-tenant, or wrong-route macaroon reveals nothing.
 
 ## Free Tools and Calculators
 - AI Agent Cost Control Tools Hub: https://satgate.io/tools
