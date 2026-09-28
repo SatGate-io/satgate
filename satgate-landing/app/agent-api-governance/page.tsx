@@ -212,7 +212,7 @@ export default function AgentApiGovernancePage() {
           <h2 className="text-3xl font-bold text-white mb-6">The API key model was built for apps, not autonomous workers</h2>
           <div className="space-y-5 text-gray-300 text-lg leading-relaxed">
             <p>
-              Traditional API keys assume the caller is an application, service, or human-operated integration. Once issued, the key often carries broad authority until someone rotates it, revokes it, or discovers it leaked.
+              Traditional API keys assume the client is an application, service, or human-operated integration. Once issued, the key often carries broad authority until someone rotates it, revokes it, or discovers it leaked.
             </p>
             <p>
               AI agents change the risk model. They can receive goals, create sub-tasks, delegate work, retry operations, and use tools without a human approving each request. A single broad key becomes too much authority in too little context.

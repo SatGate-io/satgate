@@ -27,7 +27,7 @@ const capabilities = [
 ];
 
 const faqs = [
-  ['What is capability-based authorization?', 'Capability-based authorization gives a caller a specific, constrained capability: what it can do, where it can do it, for how long, with what budget, and whether it can delegate narrower authority.'],
+  ['What is capability-based authorization?', 'Capability-based authorization gives an agent a specific, constrained capability: what it can do, where it can do it, for how long, with what budget, and whether it can delegate narrower authority.'],
   ['Why are capabilities useful for AI agents?', 'Agents act autonomously, call tools repeatedly, and delegate work. Capabilities limit blast radius by encoding scope, budget, expiry, revocation, and delegation into the authority the agent actually uses.'],
   ['How are capabilities different from API keys?', 'API keys usually prove broad account ownership. Capabilities are narrower: they describe what this agent can access and spend right now, and they can be attenuated or revoked without rotating a shared secret.'],
   ['Can capabilities include budget limits?', 'Yes. SatGate treats economic policy as part of authorization. A capability can carry or reference budget, per-tool pricing, route scope, tenant context, and delegation depth.'],

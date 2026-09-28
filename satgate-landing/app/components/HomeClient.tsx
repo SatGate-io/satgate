@@ -191,7 +191,7 @@ const LandingPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              Keep your agents within budget. Make external callers pay before they use your resources. Keep verifiable evidence of the decisions.
+              Keep your agents within budget. Make outside agents pay before they use your resources. Keep verifiable evidence of the decisions.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
               Control internal spending before work begins. Use paid admission to make repeated external abuse costly, while enforcing the owner’s access restrictions. Protect the resources behind useful agent work.
@@ -326,7 +326,7 @@ const LandingPage = () => {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-3">Economic defense for your agents and your services</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">Economic control limits what your agents can spend. Economic admission makes external callers bear a cost before protected work. Verifiable evidence supports both.</p>
+            <p className="text-gray-400 max-w-2xl mx-auto">Economic control limits what your agents can spend. Economic admission makes outside agents pay before protected work. Verifiable evidence supports both.</p>
           </div>
 
           {/* Default Protection - Foundation */}
@@ -344,7 +344,7 @@ const LandingPage = () => {
               </div>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              Protected routes check what a caller is allowed to do before forwarding work.
+              Protected routes check what an agent is allowed to do before forwarding work.
               Payment does not buy permission to exceed scope, expiry or revocation.
             </p>
             <div className="flex flex-wrap gap-4 text-sm text-gray-500">
@@ -400,7 +400,7 @@ const LandingPage = () => {
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ Real-time budget enforcement</li>
-                <li>✓ Internal allowances, without requiring caller payments</li>
+                <li>✓ Internal allowances, without requiring agents to pay</li>
                 <li>✓ Per-agent spending caps</li>
               </ul>
             </div>
@@ -409,7 +409,7 @@ const LandingPage = () => {
 
           {/* Their Agents */}
           <div className="mb-4">
-            <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">External callers: economic admission</p>
+            <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">Outside agents: economic admission</p>
           </div>
           <div className="grid grid-cols-1 gap-6 mb-6 max-w-lg">
             {/* Admit - external agents above payment rails */}
@@ -425,7 +425,7 @@ const LandingPage = () => {
                 Economic admission: scoped access for external agents, with payment where you require it.
               </p>
               <p className="text-xs text-yellow-400/80 mb-3 italic">
-                On paid routes, callers pay before protected work runs, so repeated abuse gets expensive. Payment never overrides scope, expiry or revocation.
+                On paid routes, agents pay before protected work runs, so repeated abuse gets expensive. Payment never overrides scope, expiry or revocation.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ No long-lived shared secrets for approved external agents</li>
