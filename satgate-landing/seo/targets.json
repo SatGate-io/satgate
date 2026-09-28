@@ -143,7 +143,7 @@
     ],
     "intent": "commercial",
     "funnelStage": "solution-aware",
-    "productAngle": "SatGate provides SaaS MCP on Fly and Hybrid MCP on Hetzner for governed tool access.",
+    "productAngle": "SatGate provides SaaS MCP on Fly. Enterprise self-host installs the same SatGate binary in your own environment.",
     "cta": "Launch an MCP gateway",
     "status": "new"
   },

@@ -6,7 +6,7 @@ const standardAxes = {
   preExecution: 'Deny, scope, meter, or require proof before the expensive call, tool invocation, or paid resource executes.',
   delegation: 'Issue scoped, budgeted, revocable capability for an agent, task, session, tenant, or sub-agent instead of handing out broad static keys.',
   evidence: 'Evidence Packs connect identity, delegated authority, policy, budget, route/tool, decision, and receipt into an audit-ready artifact.',
-  hybrid: 'Run enforcement close to private APIs, regulated data, self-hosted MCP tools, or customer-controlled gateways while keeping a consistent policy plane.',
+  selfHost: 'Self-host the same SatGate binary in your own environment, or use SatGate Cloud. Run enforcement close to private APIs, regulated data, and customer-controlled gateways.',
   mcp: 'Proxy MCP sessions and tool calls at the protocol boundary, with per-tool budget, risk tier, identity, and decision evidence.',
 };
 
@@ -36,7 +36,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
       { axis: 'Pre-execution control', satgate: standardAxes.preExecution, competitor: 'Can help with managed agent access/payment flows, but the center is not provider-neutral policy before every external spend event.', winner: 'SatGate' },
       { axis: 'Delegation', satgate: standardAxes.delegation, competitor: 'AWS identity and agent controls help inside AWS; portability across heterogeneous agents and sub-agents requires additional governance.', winner: 'SatGate' },
       { axis: 'Evidence Packs', satgate: standardAxes.evidence, competitor: 'AWS observability gives logs/traces. SatGate packages the policy decision and economic proof itself.', winner: 'SatGate' },
-      { axis: 'Deployment flexibility', satgate: standardAxes.hybrid, competitor: 'AWS-managed by default; excellent cloud integration, weaker story when enforcement must live beside private non-AWS systems.', winner: 'SatGate' },
+      { axis: 'Deployment flexibility', satgate: standardAxes.selfHost, competitor: 'AWS-managed by default; excellent cloud integration, weaker story when enforcement must live beside private non-AWS systems.', winner: 'SatGate' },
       { axis: 'MCP-native proxying', satgate: standardAxes.mcp, competitor: 'AgentCore has gateway/tool surfaces; SatGate frames MCP as the enforcement boundary for spend and authority.', winner: 'SatGate' },
     ],
     bullets: [
@@ -73,7 +73,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
       { axis: 'Pre-execution control', satgate: standardAxes.preExecution, competitor: 'Rate limits and gateway controls are useful, but they are not delegated economic authority.', winner: 'SatGate' },
       { axis: 'Delegation', satgate: standardAxes.delegation, competitor: 'No native SatGate-style attenuated agent capability and delegation-depth model.', winner: 'SatGate' },
       { axis: 'Evidence Packs', satgate: standardAxes.evidence, competitor: 'Logs and analytics explain traffic; they do not package authority, budget, and proof as the core artifact.', winner: 'SatGate' },
-      { axis: 'Deployment flexibility', satgate: standardAxes.hybrid, competitor: 'Cloudflare-managed edge platform.', winner: 'SatGate' },
+      { axis: 'Deployment flexibility', satgate: standardAxes.selfHost, competitor: 'Cloudflare-managed edge platform.', winner: 'SatGate' },
       { axis: 'MCP-native proxying', satgate: standardAxes.mcp, competitor: 'AI Gateway is not primarily an MCP authority policy proxy.', winner: 'SatGate' },
     ],
     bullets: [
@@ -110,7 +110,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
       { axis: 'Pre-execution control', satgate: standardAxes.preExecution, competitor: 'Primarily after/during execution visibility; some gateway controls exist, but enforcement is not the core category.', winner: 'SatGate' },
       { axis: 'Delegation', satgate: standardAxes.delegation, competitor: 'Users, sessions, traces, and properties are not portable delegated spend authority.', winner: 'SatGate' },
       { axis: 'Evidence Packs', satgate: standardAxes.evidence, competitor: 'Logs and traces are raw material; SatGate packages policy proof as the artifact.', winner: 'SatGate' },
-      { axis: 'Deployment flexibility', satgate: standardAxes.hybrid, competitor: 'Varies by product and enterprise tier; often SaaS/agent-centric observability.', winner: 'SatGate' },
+      { axis: 'Deployment flexibility', satgate: standardAxes.selfHost, competitor: 'Varies by product and enterprise tier; often SaaS/agent-centric observability.', winner: 'SatGate' },
       { axis: 'MCP-native proxying', satgate: standardAxes.mcp, competitor: 'Not primarily MCP economic enforcement proxies.', winner: 'SatGate' },
     ],
     bullets: [
@@ -147,7 +147,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
       { axis: 'Pre-execution control', satgate: 'Semantic policy before spend: who, what, why, budget, route, tool, rail, evidence.', competitor: 'Pre-request count/quota checks. Useful, but blunt.', winner: 'SatGate' },
       { axis: 'Delegation', satgate: standardAxes.delegation, competitor: 'API keys, JWTs, IAM, or usage plans rarely encode agent delegation depth and bounded spend.', winner: 'SatGate' },
       { axis: 'Evidence Packs', satgate: standardAxes.evidence, competitor: 'Access logs exist, but they do not usually explain delegated economic authority.', winner: 'SatGate' },
-      { axis: 'Deployment flexibility', satgate: standardAxes.hybrid, competitor: 'Many gateway stacks can be hybrid; the primary comparison is whether policy follows delegated agent authority across tools, rails, and providers.', winner: 'Tie' },
+      { axis: 'Deployment flexibility', satgate: standardAxes.selfHost, competitor: 'Many gateway stacks can be hybrid; the primary comparison is whether policy follows delegated agent authority across tools, rails, and providers.', winner: 'Tie' },
       { axis: 'MCP-native proxying', satgate: standardAxes.mcp, competitor: 'Generic API gateways are HTTP-aware, not MCP authority-aware by default.', winner: 'SatGate' },
     ],
     bullets: [
@@ -184,7 +184,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
       { axis: 'Pre-execution control', satgate: standardAxes.preExecution, competitor: 'Can stop calls when provider limits are reached, but lacks rich business policy across external tools and rails.', winner: 'SatGate' },
       { axis: 'Delegation', satgate: standardAxes.delegation, competitor: 'Projects, keys, and workspaces are not portable delegated capabilities for autonomous subagents.', winner: 'SatGate' },
       { axis: 'Evidence Packs', satgate: standardAxes.evidence, competitor: 'Usage exports and dashboards help accounting; they do not explain policy and delegation across the full workflow.', winner: 'SatGate' },
-      { axis: 'Deployment flexibility', satgate: standardAxes.hybrid, competitor: 'Provider-side SaaS controls.', winner: 'SatGate' },
+      { axis: 'Deployment flexibility', satgate: standardAxes.selfHost, competitor: 'Provider-side SaaS controls.', winner: 'SatGate' },
       { axis: 'MCP-native proxying', satgate: standardAxes.mcp, competitor: 'Native provider budgets do not govern arbitrary MCP tool calls.', winner: 'SatGate' },
     ],
     bullets: [

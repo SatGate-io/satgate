@@ -436,7 +436,7 @@
         "MCP policy templates teams can start from",
         "Claude, Hermes, and Ollama get scoped MCP authority \u2014 not standing authority",
         "SaaS MCP is Fly-hosted",
-        "Hybrid MCP is Hetzner-hosted",
+        "Enterprise is self-host",
         "MCP gateway questions",
         "Related MCP governance resources",
         "Launch an MCP gateway agents can safely use."
@@ -513,7 +513,7 @@
       "exists": true,
       "title": "SatGate vs AWS AgentCore Payments: Governance Above Paid Rails",
       "titleLength": 62,
-      "metaDescription": "Compare SatGate and AWS AgentCore Payments across cross-provider control, paid rails, MCP proxying, delegated budgets, hybrid deployment, and Evidence Packs.",
+      "metaDescription": "Compare SatGate and AWS AgentCore Payments across cross-provider control, paid rails, MCP proxying, delegated budgets, self-host, and Evidence Packs.",
       "metaDescriptionLength": 157,
       "canonical": "/compare/aws-agentcore-payments",
       "h1": [
@@ -603,7 +603,7 @@
       "exists": true,
       "title": "SatGate vs LangSmith, Helicone, Datadog: Proof Before Postmortems",
       "titleLength": 65,
-      "metaDescription": "Compare LLM observability tools with SatGate pre-execution control: delegated budgets, MCP tool policy, paid rails, hybrid enforcement, and Evidence Packs.",
+      "metaDescription": "Compare LLM observability tools with SatGate pre-execution control: delegated budgets, MCP tool policy, paid rails, self-host, and Evidence Packs.",
       "metaDescriptionLength": 155,
       "canonical": "/compare/langsmith-helicone-datadog",
       "h1": [
@@ -648,7 +648,7 @@
       "exists": true,
       "title": "SatGate vs API Gateway Rate Limits: Authority Beats Quotas",
       "titleLength": 58,
-      "metaDescription": "Compare API Gateway rate limits with SatGate agent authority: delegated budgets, MCP tool policy, paid rails, hybrid enforcement, and Evidence Packs.",
+      "metaDescription": "Compare API Gateway rate limits with SatGate agent authority: delegated budgets, MCP tool policy, paid rails, self-host, and Evidence Packs.",
       "metaDescriptionLength": 149,
       "canonical": "/compare/api-gateway-rate-limits",
       "h1": [
@@ -693,7 +693,7 @@
       "exists": true,
       "title": "SatGate vs OpenAI and Anthropic Budgets: Cross-Provider Authority",
       "titleLength": 65,
-      "metaDescription": "Compare native OpenAI and Anthropic budget controls with SatGate cross-provider agent budgets, MCP policy, paid rails, hybrid control, and Evidence Packs.",
+      "metaDescription": "Compare native OpenAI and Anthropic budget controls with SatGate cross-provider agent budgets, MCP policy, paid rails, self-host, and Evidence Packs.",
       "metaDescriptionLength": 154,
       "canonical": "/compare/openai-anthropic-budget-controls",
       "h1": [

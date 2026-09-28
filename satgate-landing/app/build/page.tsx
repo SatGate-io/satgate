@@ -18,7 +18,7 @@ import {
 export const metadata: Metadata = {
   title: "Build Agents With Bounded Economic Authority",
   description:
-    "Complete useful agent work within an explicit budget. Discover public docs and demos, request a bounded evaluation, and inspect delegated authority and recorded outcomes.",
+    "Complete useful agent work within an explicit budget. Discover public docs and demos, start a 14-day free trial, and inspect delegated authority and recorded outcomes.",
   keywords: [
     "SatGate build",
     "AI agent capabilities",
@@ -303,6 +303,7 @@ export default function BuildPage() {
         <p className="mt-4 max-w-3xl text-lg text-gray-400">The public kit is a Synthetic HTTP demo with simulated traffic and local-only credentials. It demonstrates price discovery, allowed calls and budget exhaustion. It does not establish trusted issuer identity, delegated-worker accounting, MCP behavior or live settlement.</p>
         <div className="mt-6 flex flex-wrap gap-4">
           <a href="https://github.com/SatGate-io/satgate/tree/main/demo" className="rounded-lg bg-white px-6 py-3 font-bold text-black">Read the public demo instructions</a>
+          <a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="rounded-lg border border-gray-700 px-6 py-3 font-bold text-white">Start free trial</a>
           <Link href="/sandbox#golden-path" className="rounded-lg border border-cyan-600 px-6 py-3 font-bold text-cyan-200">Try the browser simulation</Link>
           <Link href="/design-partners" className="rounded-lg border border-gray-700 px-6 py-3 font-bold text-white">Request a bounded evaluation</Link>
         </div>

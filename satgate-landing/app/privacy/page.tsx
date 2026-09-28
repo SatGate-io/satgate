@@ -3,18 +3,18 @@ import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
   title: 'Privacy Policy - SatGate',
-  description: 'SatGate privacy policy for SaaS and Dedicated deployments, including request metadata, telemetry, cookies, retention, and third-party services.',
+  description: 'SatGate privacy policy for SaaS and self-host, including request metadata, telemetry, cookies, retention, and third-party services.',
   alternates: { canonical: 'https://satgate.io/privacy' },
   openGraph: {
     title: 'Privacy Policy - SatGate',
-    description: 'How SatGate handles privacy across SaaS and Dedicated economic-control-plane deployments.',
+    description: 'How SatGate handles privacy across SaaS and self-host.',
     url: 'https://satgate.io/privacy',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Privacy Policy - SatGate',
-    description: 'How SatGate handles privacy across SaaS and Dedicated economic-control-plane deployments.',
+    description: 'How SatGate handles privacy across SaaS and self-host.',
   },
 };
 
@@ -83,9 +83,10 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-white mb-4">Dedicated &amp; Self-Hosted Deployments</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">Self-host</h2>
             <p className="text-gray-400 leading-relaxed">
-              In a Dedicated deployment, custody boundaries are agreed by contract during onboarding. When the
+              Enterprise self-host installs the same SatGate binary that runs SatGate Cloud, in your own environment.
+              Custody boundaries are agreed by contract. When the
               gateway runs in your environment, all proxied traffic stays in your infrastructure. We have no access
               to your server logs, API traffic, or Lightning node data. Where a SatGate-operated dashboard is part
               of the agreed deployment, it receives only aggregated telemetry (request counts, budget status) — never request contents.

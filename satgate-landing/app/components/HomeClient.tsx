@@ -35,6 +35,7 @@ const LandingPage = () => {
             <Link href="/sandbox" className="hover:text-white transition">Demo</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
+            <a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="rounded-full bg-white px-3 py-1.5 font-bold text-black hover:bg-gray-200 transition">Start free trial</a>
             <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="rounded-full border border-purple-500/40 px-3 py-1.5 text-purple-300 hover:border-purple-400 hover:text-purple-200 transition">Cloud login</a>
           </div>
 
@@ -152,6 +153,16 @@ const LandingPage = () => {
               GitHub
             </a>
             <a
+              href="https://cloud.satgate.io/cloud/signup"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block bg-white text-black font-bold transition py-3 px-4 rounded-lg"
+            >
+              Start free trial
+              <span className="block text-xs font-medium text-gray-600">14 days free. No credit card.</span>
+            </a>
+            <a
               href="https://cloud.satgate.io/cloud/login"
               target="_blank"
               rel="noopener noreferrer"
@@ -186,7 +197,10 @@ const LandingPage = () => {
               Control internal spending before work begins. Use paid admission to make repeated external abuse costly, while enforcing the owner’s access restrictions. Protect the resources behind useful agent work.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/sandbox#golden-path" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
+              <a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
+                Start free trial <ArrowRight size={16} />
+              </a>
+              <Link href="/sandbox#golden-path" className="border border-gray-700 px-8 py-3 rounded-lg font-bold hover:bg-gray-800 transition flex items-center gap-2 text-gray-200">
                 Try the simulated demo <ArrowRight size={16} />
               </Link>
               <Link href="/build" className="border border-cyan-700/50 bg-cyan-900/15 px-8 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition flex items-center gap-2 text-cyan-300">
@@ -199,6 +213,7 @@ const LandingPage = () => {
                 See an Evidence Pack <ArrowRight size={16} />
               </Link>
             </div>
+            <p className="mt-3 text-sm text-gray-500">14 days free. No credit card.</p>
 
             {/* Proof strip */}
             <div className="mt-6 space-y-2 text-xs text-gray-500">
@@ -734,13 +749,14 @@ const LandingPage = () => {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-6">Ready to govern what your agents can do?</h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
+              <a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="inline-block bg-white text-black px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-200 transition">
+                Start free trial
+              </a>
               <a href="mailto:contact@satgate.io" className="inline-block bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-10 py-4 rounded-full font-bold text-lg hover:opacity-90 transition shadow-lg shadow-purple-500/20">
                 Get in Touch
               </a>
-              <Link href="/design-partners" className="inline-block bg-white text-black px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-200 transition">
-                Apply for a Pilot →
-              </Link>
             </div>
+            <p className="text-gray-500 text-sm mb-4">14 days free. No credit card. Want help rolling out? <Link href="/design-partners" className="text-purple-400 hover:text-purple-300 transition underline underline-offset-4">Ask about a 90-day design-partner pilot</Link></p>
             <p className="text-gray-500 text-sm">
               Or <Link href="/policy-to-proof" className="text-purple-400 hover:text-purple-300 transition underline underline-offset-4">see the Policy-to-Proof evidence story →</Link>
             </p>
@@ -764,6 +780,7 @@ const LandingPage = () => {
                 <li><Link href="/agent-authority-layer" className="hover:text-white transition">Authority & Accountability</Link></li>
                 <li><Link href="/partners/rails" className="hover:text-white transition">Rail Partners</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
+                <li><a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Start free trial</a></li>
                 <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud login</a></li>
               </ul>
             </div>
