@@ -1,9 +1,9 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.satgate-io/satgate",
-  "description": "API protection, cost control, and monetization gateway for AI agent API calls. MCP-aware proxy with per-tool cost tracking, macaroon-based bearer tokens, budget enforcement, L402 Lightning micropayments, and Fiat402 enterprise budget control.",
+  "description": "Budget, payment and audit controls for AI agent API calls and MCP tool calls.",
   "title": "SatGate \u2013 Economic Firewall for AI Agents",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "websiteUrl": "https://satgate.io",
   "repository": {
     "url": "https://github.com/SatGate-io/satgate",
