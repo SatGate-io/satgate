@@ -52,7 +52,6 @@ SatGate OSS dev
 | Fiat402 billing | `internal/billing` |
 | Web dashboard | `dashboard/` |
 | Support ticketing | `internal/support` |
-| Hybrid mode | `internal/hybrid` |
 | HA coordination | Enterprise HA |
 
 ## Architecture

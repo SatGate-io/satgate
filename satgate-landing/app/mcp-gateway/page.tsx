@@ -262,7 +262,7 @@ export default function McpGatewayPage() {
         <div className="rounded-2xl border border-gray-800 bg-gray-950 p-7">
           <ShieldCheck className="text-cyan-300 mb-4" size={30} />
           <h2 className="text-2xl font-bold text-white mb-3">Enterprise is self-host</h2>
-          <p className="text-gray-300 leading-relaxed">Enterprise installs the same SatGate binary that runs SatGate Cloud, in your own environment. There is no separate Hybrid gateway product.</p>
+          <p className="text-gray-300 leading-relaxed">Enterprise installs the same SatGate binary that runs SatGate Cloud, with its own database, in your own environment.</p>
         </div>
       </section>
 

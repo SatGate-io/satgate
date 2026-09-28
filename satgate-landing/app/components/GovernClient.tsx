@@ -627,7 +627,7 @@ export default function GovernPage() {
               <h4 className="font-semibold text-white">SaaS or self-host</h4>
             </div>
             <p className="text-gray-400 text-sm max-w-lg mx-auto">
-              Start on SatGate Cloud at cloud.satgate.io. Enterprise self-host installs the same SatGate binary in your own environment. There is no separate Hybrid gateway product.
+              Start on SatGate Cloud at cloud.satgate.io. Enterprise self-host runs the same SatGate binary, with its own database, in your own environment.
             </p>
           </div>
         </div>
