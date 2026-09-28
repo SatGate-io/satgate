@@ -13,10 +13,12 @@ pip install -r tools/requirements-verify-evidence-pack.txt
 Verify a public production Evidence Pack against issuer JWKS:
 
 ```bash
-python tools/verify_evidence_pack.py \
-  https://api.satgate.io/v1/evidence/evid_QBBiz-GEI-stsaP6KS01-RL414Csuidv \
+curl -fsS https://satgate.io/evidence/sample-mcp-budget-refusal-20260928.json -o pack.json
+python tools/verify_evidence_pack.py pack.json \
   --discover-jwks \
   --require-trusted-issuer
 ```
+
+The sample is a signed hosted-MCP refusal (`budget_exhausted`) from the homepage demo. `--discover-jwks` fetches the issuer key from the pack's `jwks_url` (`https://satgate-mcp-saas.fly.dev/.well-known/jwks.json`).
 
 The verifier checks RFC 8785/JCS receipt canonicalization, `receipt_hash`, Ed25519 signature, issuer JWKS anchoring, top-level mirror fields, budget-state mirrors, optional pack hash, and obvious secret leakage.
