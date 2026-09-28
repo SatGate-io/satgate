@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.satgate-io/satgate",
+  "name": "io.github.SatGate-io/satgate",
   "description": "Budget, payment and audit controls for AI agent API calls and MCP tool calls.",
   "title": "SatGate \u2013 Economic Firewall for AI Agents",
   "version": "0.5.0",
@@ -27,7 +27,7 @@
     {
       "registryType": "npm",
       "identifier": "satgate-mcp-bridge",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "transport": {
         "type": "stdio"
       },
