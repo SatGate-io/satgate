@@ -129,7 +129,7 @@ const primitives = [
     icon: Route,
     title: "Consume upstream with max budget",
     label: "satgate.pay",
-    body: "Let the agent reach MCP tools, APIs, or paid routes through SatGate while a caller-supplied max budget and policy are enforced before execution or settlement.",
+    body: "Let the agent reach MCP tools, APIs, or paid routes through SatGate while an agent-supplied max budget and policy are enforced before execution or settlement.",
   },
   {
     icon: ReceiptText,
@@ -314,7 +314,7 @@ export default function BuildPage() {
           <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-cyan-300">Start with the task</p>
           <h2 className="text-3xl font-bold text-white sm:text-4xl">Useful work inside an enforced boundary.</h2>
           <p className="mt-4 text-lg leading-8 text-gray-400">
-            Economic defense protects the resources behind the task. Observe shows usage without blocking; Control enforces internal budgets and scope; Admit charges external callers for authorized access on paid routes. Signed records provide verifiable evidence for audit across all three, not a guarantee of compliance.
+            Economic defense protects the resources behind the task. Observe shows usage without blocking; Control enforces internal budgets and scope; Admit charges outside agents for authorized access on paid routes. Signed records provide verifiable evidence for audit across all three, not a guarantee of compliance.
           </p>
         </div>
         <div className="grid gap-5 md:grid-cols-3">

@@ -86,7 +86,7 @@ export default function Page() {
         <div className="relative mx-auto max-w-6xl px-6 py-24">
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-950/30 px-4 py-2 text-sm text-cyan-200"><ShieldCheck size={16} /> Capability-based security for AI agents</div>
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Agent capability tokens say what an agent can do — not just who it is</h1>
-          <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">Identity proves the caller. Capability proves authority. For autonomous agents, the token should encode routes, tools, budgets, expiry, delegation limits, and revocation checks before access is granted.</p>
+          <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">Identity proves who the agent is. Capability proves authority. For autonomous agents, the token should encode routes, tools, budgets, expiry, delegation limits, and revocation checks before access is granted.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/capability-lifecycle-demo" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Walk lifecycle demo <ArrowRight size={18} /></Link>
             <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Generate token policy</Link>
