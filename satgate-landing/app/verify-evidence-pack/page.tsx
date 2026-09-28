@@ -7,7 +7,9 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://satgate.io/verify-evidence-pack' },
 };
 
-const livePackUrl = 'https://api.satgate.io/v1/evidence/evid_QBBiz-GEI-stsaP6KS01-RL414Csuidv';
+const livePackUrl = 'https://satgate-mcp-saas.fly.dev/v1/evidence/evid_MD98srRaolXE1L3rOjWQuFi2M3wgXdXG';
+const samplePackFile = '/evidence/sample-mcp-budget-refusal-20260928.json';
+const samplePackJwks = 'https://satgate-mcp-saas.fly.dev/.well-known/jwks.json';
 
 export default function VerifyEvidencePackPage() {
   return (
@@ -22,9 +24,12 @@ export default function VerifyEvidencePackPage() {
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <a href="https://github.com/SatGate-io/satgate/tree/main/tools" className="rounded-lg bg-white px-5 py-3 text-center font-bold text-black hover:bg-gray-200">Get verifier tool</a>
-            <a href={livePackUrl} className="rounded-lg border border-cyan-300/40 px-5 py-3 text-center font-bold text-cyan-100 hover:border-cyan-200">Open sample production pack</a>
+            <a href={samplePackFile} className="rounded-lg border border-cyan-300/40 px-5 py-3 text-center font-bold text-cyan-100 hover:border-cyan-200">Download sample production pack</a>
             <a href="/evidence/policy-to-proof-closure-20260718.json" className="rounded-lg border border-white/20 px-5 py-3 text-center font-bold text-gray-100 hover:border-white/40">Download sanitized closure</a>
           </div>
+          <p className="mt-4 text-sm leading-6 text-gray-400">
+            The sample is the signed refusal from the demo video on the homepage: a hosted MCP tool call denied with <code>budget_exhausted</code> after a 3¢ budget ran out. Its issuer key is the hosted MCP service&apos;s JWKS. The <a href={livePackUrl} className="text-cyan-200 underline underline-offset-4">live evidence URL</a> works until plan retention removes it; the downloaded file verifies the same way.
+          </p>
         </div>
       </section>
 
@@ -57,8 +62,8 @@ export default function VerifyEvidencePackPage() {
             <pre className="mt-5 overflow-x-auto rounded-xl bg-black p-4 text-sm text-gray-300"><code>{`python3 -m venv .venv-verify
 . .venv-verify/bin/activate
 pip install cryptography rfc8785
-curl -fsS ${livePackUrl} -o pack.json
-curl -fsS https://api.satgate.io/.well-known/jwks.json -o jwks.json
+curl -fsS https://satgate.io${samplePackFile} -o pack.json
+curl -fsS ${samplePackJwks} -o jwks.json
 python tools/verify_evidence_pack.py pack.json \
   --jwks-file jwks.json \
   --require-trusted-issuer`}</code></pre>

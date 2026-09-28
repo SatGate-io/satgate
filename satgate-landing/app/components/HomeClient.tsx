@@ -237,26 +237,26 @@ const LandingPage = () => {
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <div className="text-xs text-gray-500 ml-2 font-mono">hero_demo.py - Demo Preview</div>
+                <div className="text-xs text-gray-500 ml-2 font-mono">live recording · cloud.satgate.io</div>
               </div>
               <video
                 autoPlay
                 loop
                 muted
                 playsInline
+                poster="/satgate-demo-poster.jpg"
                 className="w-full"
+                aria-label="An agent makes three paid MCP tool calls, then its fourth call is refused when the budget runs out"
               >
-                <source src="/satgate-hero-demo.mp4" type="video/mp4" />
-                {/* Fallback for browsers that don't support video */}
-                <img src="/satgate-hero-demo.gif" alt="SatGate Demo" className="w-full" />
+                <source src="/satgate-hero-live.mp4" type="video/mp4" />
               </video>
               <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-gray-300 font-mono">
-                🚗💨 EZ Pass - live metering
+                3¢ budget · call 4 refused
               </div>
             </div>
             <div className="text-center mt-4">
               <p className="text-sm text-gray-500 mb-3">
-                Illustrative demo. Observe meters traffic; Control and Admit enforce the configured policy.
+                Real production recording: three $0.01 tool calls, then the fourth is refused before the tool runs.
               </p>
               <Link
                 href="/protect"
@@ -273,19 +273,20 @@ const LandingPage = () => {
       <section className="py-16 px-6 border-b border-gray-800">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-3">See SatGate in Action</h2>
-          <p className="text-gray-400 mb-8 max-w-2xl mx-auto">Agents act across tools, APIs, and paid rails. SatGate enforces policy before they act — and leaves evidence after. 30 seconds.</p>
+          <p className="text-gray-400 mb-8 max-w-2xl mx-auto">One minute, recorded on production. Mint an agent token with a 3¢ budget, watch each MCP tool call get a signed receipt, see call four refused before the tool runs, then check the receipt with the open-source verifier.</p>
           <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
             <video
               controls
               preload="metadata"
-              poster="/satgate-explainer-poster.jpg"
+              poster="/satgate-demo-poster.jpg"
               className="w-full"
               playsInline
             >
-              <source src="/satgate-explainer.mp4" type="video/mp4" />
+              <source src="/satgate-demo.mp4" type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           </div>
+          <p className="text-xs text-gray-500 mt-3">The agent in the recording is a scripted MCP client using the public <code className="text-gray-400">satgate-mcp-bridge</code> npm package. Tokens are blurred.</p>
         </div>
       </section>
 
@@ -481,7 +482,7 @@ const LandingPage = () => {
                 className="w-full"
                 playsInline
               >
-                <source src="/satgate-delegation.mp4" type="video/mp4" />
+                <source src="/satgate-delegation-v2.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>
