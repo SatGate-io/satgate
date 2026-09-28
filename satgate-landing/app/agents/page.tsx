@@ -178,15 +178,15 @@ export default function AgentsLandingPage() {
                 cost-attributed, and governed — the agent sees standard MCP, your tools see standard MCP.
               </p>
               <div className="bg-black rounded-lg p-4 font-mono text-xs text-gray-400 mb-4">
-                <div className="text-gray-600"># Cursor MCP config</div>
-                <div>{`{`}</div>
-                <div>&nbsp;&nbsp;<span className="text-purple-400">&quot;url&quot;</span>: <span className="text-green-400">&quot;https://satgate.cloud/sse&quot;</span>,</div>
-                <div>&nbsp;&nbsp;<span className="text-purple-400">&quot;headers&quot;</span>: {`{ "Authorization": "Bearer <token>" }`}</div>
-                <div>{`}`}</div>
+                <div className="text-gray-600"># Cursor / Claude Code MCP config (token from Cloud → MCP Setup)</div>
+                <div>{`{ "mcpServers": { "satgate": {`}</div>
+                <div>&nbsp;&nbsp;<span className="text-purple-400">&quot;command&quot;</span>: <span className="text-green-400">&quot;npx&quot;</span>, <span className="text-purple-400">&quot;args&quot;</span>: [<span className="text-green-400">&quot;-y&quot;</span>, <span className="text-green-400">&quot;satgate-mcp-bridge&quot;</span>],</div>
+                <div>&nbsp;&nbsp;<span className="text-purple-400">&quot;env&quot;</span>: {`{ "SATGATE_URL": "https://satgate-mcp-saas.fly.dev", "SATGATE_TOKEN": "<token>" }`}</div>
+                <div>{`} } }`}</div>
               </div>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400 shrink-0" /> Per-tool cost profiles</li>
-                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400 shrink-0" /> SSE + Streamable HTTP transports</li>
+                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400 shrink-0" /> SSE client transport; SSE or Streamable HTTP upstreams</li>
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400 shrink-0" /> Real-time MCP Monitor dashboard</li>
               </ul>
             </div>

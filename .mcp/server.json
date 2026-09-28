@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.satgate-io/satgate",
   "description": "API protection, cost control, and monetization gateway for AI agent API calls. MCP-aware proxy with per-tool cost tracking, macaroon-based bearer tokens, budget enforcement, L402 Lightning micropayments, and Fiat402 enterprise budget control.",
-  "title": "SatGate – Economic Firewall for AI Agents",
+  "title": "SatGate \u2013 Economic Firewall for AI Agents",
   "version": "0.4.0",
   "websiteUrl": "https://satgate.io",
   "repository": {
@@ -11,8 +11,40 @@
   },
   "remotes": [
     {
-      "transportType": "streamable-http",
-      "url": "https://cloud.satgate.io/mcp"
+      "type": "sse",
+      "url": "https://satgate-mcp-saas.fly.dev/sse",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Bearer token minted in SatGate Cloud (MCP Setup)",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "satgate-mcp-bridge",
+      "version": "1.0.4",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "SATGATE_URL",
+          "description": "SatGate Cloud MCP URL",
+          "isRequired": true,
+          "default": "https://satgate-mcp-saas.fly.dev"
+        },
+        {
+          "name": "SATGATE_TOKEN",
+          "description": "Agent token minted in SatGate Cloud (MCP Setup)",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
     }
   ]
 }

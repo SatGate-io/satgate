@@ -693,9 +693,9 @@ const LandingPage = () => {
               },
               {
                 step: "3",
-                title: "Point Your DNS",
-                description: "Use *.satgate.cloud or your custom domain. Traffic flows through SatGate.",
-                code: `# Your domain\napi.yoursite.com\n  CNAME → satgate.cloud\n\n# Or use ours\nyourapp.satgate.cloud`
+                title: "Point Your Agents",
+                description: "Send agent traffic to api.satgate.io with your tenant header. Every request flows through SatGate.",
+                code: `# Agent requests\nGET https://api.satgate.io/v1/...\nX-SatGate-Tenant: your-tenant\n\n# MCP clients\nnpx satgate-mcp-bridge`
               },
               {
                 step: "4",
