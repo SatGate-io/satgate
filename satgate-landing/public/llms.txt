@@ -211,8 +211,7 @@ Read prerequisites and access status before running examples. Do not interpret a
 ## Plans
 - Starter: free. Observe (metering) with a fair-use cap, 3 routes, default protection + Observe, community support.
 - Pro: $99/month. 14-day free trial of Pro features, no credit card. Email verification creates the account. Observe with no finite monthly cap, 1M Control/Admit requests per month, 25 routes, unlimited team members, all policies (Observe / Control / Admit — Admit is the Charge policy in the dashboard), budget enforcement, token governance, priority support. Upgrade is self-serve by card in the dashboard (Stripe).
-- Enterprise: custom pricing. Unlimited. Self-host means installing the same SatGate binary that runs SatGate Cloud, in your own environment. SCIM, GitOps signed configs, WORM audit export, dedicated support + SLA. Contact: contact@satgate.io.
-- There is no separate Hybrid gateway product.
+- Enterprise: custom pricing. Unlimited. Self-host means installing the same SatGate binary that runs SatGate Cloud, with its own database, in your own environment. It does not take policy from SatGate Cloud. SCIM, GitOps signed configs, WORM audit export, dedicated support + SLA. Contact: contact@satgate.io.
 - A 90-day design-partner pilot is an option for larger teams that want help. It is not the only way in.
 
 ## Contact

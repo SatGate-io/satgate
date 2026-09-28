@@ -677,65 +677,8 @@ class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="
 │   • Leader election for singleton jobs                                      │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘</code></pre>
-<h3 id="satgate-cloud-saas-hybrid-gateway">SatGate Cloud (SaaS) + Hybrid
-Gateway</h3>
-<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
-│                    SatGate Cloud + Hybrid Deployment                        │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │                        SatGate Cloud (SaaS)                           │  │
-│  │                    https://cloud.satgate.io                           │  │
-│  │                                                                       │  │
-│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐     │  │
-│  │  │   Control   │ │   Config    │ │  Governance │ │   Billing   │     │  │
-│  │  │   Plane     │ │   Store     │ │    Store    │ │   Service   │     │  │
-│  │  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘     │  │
-│  │                                                                       │  │
-│  │                         WebSocket Control                             │  │
-│  │                    wss://cloud.satgate.io/gateway/v1                  │  │
-│  │                                                                       │  │
-│  └───────────────────────────────────┬───────────────────────────────────┘  │
-│                                      │                                      │
-│                                      │ Config push, Telemetry               │
-│                                      │                                      │
-│  ┌───────────────────────────────────┼───────────────────────────────────┐  │
-│  │                     Customer VPC / Data Center                        │  │
-│  │                                                                       │  │
-│  │  ┌───────────────────────────────────────────────────────────────┐   │  │
-│  │  │                    Hybrid Gateway                              │   │  │
-│  │  │                                                                │   │  │
-│  │  │   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐        │   │  │
-│  │  │   │   Request   │   │   Policy    │   │   Local     │        │   │  │
-│  │  │   │   Pipeline  │   │   Engine    │   │   Cache     │        │   │  │
-│  │  │   └─────────────┘   └─────────────┘   └─────────────┘        │   │  │
-│  │  │                                                                │   │  │
-│  │  │   • Processes all API traffic locally (data never leaves VPC) │   │  │
-│  │  │   • Syncs config from control plane                            │   │  │
-│  │  │   • Reports telemetry (aggregated, no PII)                     │   │  │
-│  │  │   • Operates independently during network partitions           │   │  │
-│  │  │                                                                │   │  │
-│  │  └───────────────────────────────────────────────────────────────┘   │  │
-│  │                                      │                                │  │
-│  │                                      ▼                                │  │
-│  │  ┌───────────────────────────────────────────────────────────────┐   │  │
-│  │  │              Customer Internal APIs (Upstreams)                │   │  │
-│  │  │                                                                │   │  │
-│  │  │   ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐   │   │  │
-│  │  │   │  API 1   │   │  API 2   │   │  API 3   │   │  API N   │   │   │  │
-│  │  │   └──────────┘   └──────────┘   └──────────┘   └──────────┘   │   │  │
-│  │  │                                                                │   │  │
-│  │  └───────────────────────────────────────────────────────────────┘   │  │
-│  │                                                                       │  │
-│  └───────────────────────────────────────────────────────────────────────┘  │
-│                                                                             │
-│   Benefits:                                                                 │
-│   • Data sovereignty: API traffic stays in customer VPC                     │
-│   • Low latency: Local processing, no round-trip to SaaS                    │
-│   • Control plane benefits: Central config, governance, billing             │
-│   • Offline resilience: Gateway operates with cached config                 │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="satgate-cloud-and-self-host">SatGate Cloud and Enterprise self-host</h3>
+<p>SatGate ships one gateway binary. SatGate Cloud runs it as a multi-tenant service at cloud.satgate.io. Enterprise self-host runs the same binary, with its own Postgres and Redis, inside your own environment. A self-hosted gateway does not take its policy from cloud.satgate.io. The earlier Hybrid mode (a data-plane-only gateway fed by the cloud control plane) was retired on 2026-09-28.</p>
 <hr />
 <h2 id="data-flow">Data Flow</h2>
 <h3 id="authentication-flow">Authentication Flow</h3>
@@ -914,7 +857,6 @@ Gateway</h3>
 │  │                       Network Security                                │  │
 │  │                                                                       │  │
 │  │  • TLS 1.3 for all external connections                               │  │
-│  │  • mTLS optional for hybrid gateways                                  │  │
 │  │  • IP allowlist for admin endpoints                                   │  │
 │  │  • Rate limiting at edge (fail-closed)                                │  │
 │  │                                                                       │  │

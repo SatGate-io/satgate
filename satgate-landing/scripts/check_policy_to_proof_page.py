@@ -710,6 +710,7 @@ mcp_authority_forbidden_phrases = {
         "Check, Govern, Prove MCP tool use",
         "Run SaaS or Hybrid MCP",
         "Hybrid MCP is Hetzner-hosted",
+        "Hybrid gateway",
     ],
     "agent-api-governance": [
         "research-bot",
