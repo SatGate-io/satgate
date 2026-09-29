@@ -159,7 +159,7 @@ export default function AgentAuthorityLayerPage() {
               Useful agent work needs <span className="text-white">bounded authority to act.</span> Set a finite budget and permitted scope, enforce them on the request path, and retain the recorded decision.
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
-              Use internal budget controls for your agents and scoped admission for outside agents. Payment adapters have different availability. Confirm the chosen integration before relying on it.
+              Use internal budget controls for your agents and scoped admission for external agents. Payment adapters have different availability. Confirm the chosen integration before relying on it.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">

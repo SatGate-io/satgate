@@ -1,5 +1,5 @@
 # SatGate: economic firewall for agent workloads
-> Keep your agents within budget. Make outside agents pay before they use your resources. Keep verifiable evidence of the decisions.
+> Keep your agents within budget. Make external agents pay before they use your resources. Keep verifiable evidence of the decisions.
 > Observe / Control / Admit, with signed evidence across all three controls.
 
 ## Purpose

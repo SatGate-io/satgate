@@ -191,7 +191,7 @@ const LandingPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              Keep your agents within budget. Make outside agents pay before they use your resources. Keep verifiable evidence of the decisions.
+              Keep your agents within budget. Make external agents pay before they use your resources. Keep verifiable evidence of the decisions.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
               Control internal spending before work begins. Use paid admission to make repeated external abuse costly, while enforcing the owner’s access restrictions. Protect the resources behind useful agent work.
@@ -291,7 +291,7 @@ const LandingPage = () => {
           </div>
           <p className="text-xs text-gray-500 mt-3">The agent in the recording is a scripted MCP client using the public <code className="text-gray-400">satgate-mcp-bridge</code> npm package. Tokens are blurred.</p>
 
-          <h3 className="text-xl font-bold mt-16 mb-2">Outside agents: pay per request</h3>
+          <h3 className="text-xl font-bold mt-16 mb-2">External agents: pay per request</h3>
           <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Set a price on an API route in the dashboard. An agent with no wallet gets 402 Payment Required and never reaches the API. An agent that pays a 10-sat Lightning invoice gets one request. Every decision, refusals included, gets a signed receipt.</p>
           <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-yellow-500/10">
             <video
@@ -300,7 +300,7 @@ const LandingPage = () => {
               poster="/satgate-admit-poster.jpg"
               className="w-full"
               playsInline
-              aria-label="Narrated demo: an outside agent with no wallet is refused with 402 Payment Required, a second agent pays a 10 sat Lightning invoice for one request, and the signed receipts pass the open-source verifier"
+              aria-label="Narrated demo: an external agent with no wallet is refused with 402 Payment Required, a second agent pays a 10 sat Lightning invoice for one request, and the signed receipts pass the open-source verifier"
             >
               <source src="/satgate-admit-demo.mp4" type="video/mp4" />
               Your browser does not support the video tag.
@@ -361,7 +361,7 @@ const LandingPage = () => {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-3">Economic defense for your agents and your services</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">Economic control limits what your agents can spend. Economic admission makes outside agents pay before protected work. Verifiable evidence supports both.</p>
+            <p className="text-gray-400 max-w-2xl mx-auto">Economic control limits what your agents can spend. Economic admission makes external agents pay before protected work. Verifiable evidence supports both.</p>
           </div>
 
           {/* Default Protection - Foundation */}
@@ -444,7 +444,7 @@ const LandingPage = () => {
 
           {/* Their Agents */}
           <div className="mb-4">
-            <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">Outside agents: economic admission</p>
+            <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">External agents: economic admission</p>
           </div>
           <div className="grid grid-cols-1 gap-6 mb-6 max-w-lg">
             {/* Admit - external agents above payment rails */}
