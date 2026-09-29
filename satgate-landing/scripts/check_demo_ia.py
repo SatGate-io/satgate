@@ -21,7 +21,7 @@ if "Live Demo" in home:
     errors.append("homepage top nav still contains Live Demo")
 if "Open Sandbox" in home or ">Sandbox<" in home:
     errors.append("homepage still exposes Sandbox as public label")
-if 'href="/sandbox#golden-path"' not in home or "Explore the demo sequence" not in home or ">Demo</Link>" not in home:
+if 'href="/sandbox#golden-path"' not in home or "Try the 90-second demo" not in home or ">Demo</Link>" not in home:
     errors.append("homepage does not route Demo nav/CTA to the deterministic /sandbox#golden-path proof")
 for crowded in ["Capability Auth", "Control Plane", "Tools", "Integrations", "Blog", "GitHub"]:
     desktop_marker = f'>{crowded}</Link>' if crowded != "GitHub" else f'>{crowded}</a>'
@@ -41,7 +41,7 @@ for required in ["SatGate Demo", "Interactive demo"]:
 for stale in ["SatGate Sandbox", "Demo path", "SatGate sandbox questions", "What does the SatGate sandbox", "Is the sandbox"]:
     if stale in sandbox or stale in layout:
         errors.append(f"demo page still contains stale sandbox label: {stale}")
-ordered = ["Mint Demo", "Capability Control Demo", "Spend Control Demo", "Paid-Rails Demo"]
+ordered = ["Mint Demo", "Access Control Demo", "Spend Control Demo", "Payments Demo"]
 positions = []
 for label in ordered:
     pos = sandbox.find(label)
@@ -49,7 +49,7 @@ for label in ordered:
         errors.append(f"sandbox route missing demo card: {label}")
     positions.append(pos)
 if all(pos != -1 for pos in positions) and positions != sorted(positions):
-    errors.append("demo cards are not ordered Mint → Capability Control → Spend Control → Paid-Rails")
+    errors.append("demo cards are not ordered Mint → Access Control → Spend Control → Payments")
 for href in ["/mint-demo", "/protect", "#spend-control-demo", "/pay"]:
     if href not in sandbox:
         errors.append(f"sandbox route missing demo href: {href}")

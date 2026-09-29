@@ -17,9 +17,8 @@ REPO = ROOT.parent
 
 REQUIRED_PHRASES = {
     "app/page.tsx": [
-        "decision receipts",
-        "paid-call receipts",
-        "Evidence Pack proof",
+        "signs a receipt for each decision",
+        "signed receipt for every decision",
     ],
     "app/components/HomeClient.tsx": [
         "Receipts for allowed, denied, paid, delegated, and revoked decisions",

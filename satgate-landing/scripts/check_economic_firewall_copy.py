@@ -7,11 +7,11 @@ ROOT = Path(__file__).resolve().parents[1]
 REQUIRED = {
     "app/components/HomeClient.tsx": [
         "Economic firewall for agents", "An economic firewall",
-        "for AI agents.", "Economic admission", "Economic control", "Admit",
-        "Verifiable evidence for audit", "raises the cost of abuse",
-        "Payment never overrides scope", "Proof across all three controls",
+        "for AI agents.", "External agents: access and payment", "Your agents: budgets", "Admit",
+        "Receipts anyone can check", "makes abuse more expensive",
+        "Paying never gets an agent past your access rules", "From Observe, Control and Admit",
     ],
-    "app/page.tsx": ["Economic Firewall for AI Agents", "internal budgets", "external access"],
+    "app/page.tsx": ["Economic Firewall for AI Agents", "within budget", "external agents"],
     "app/economic-firewall/page.tsx": [
         "Economic defense is the foundation", "Fiat402", "internal budget control",
         "raises the cost of an attack", "upstream credentials", "only path to your origin",

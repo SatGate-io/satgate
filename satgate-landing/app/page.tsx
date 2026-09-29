@@ -4,14 +4,14 @@ import HomeClient from "./components/HomeClient";
 export const metadata: Metadata = {
   title: "SatGate | Economic Firewall for AI Agents",
   description:
-    "Protect internal budgets and external access: keep agents within budget, charge external agents for authorized access and retain verifiable evidence for audit.",
+    "Keep your AI agents within budget, charge external agents for access to your API, and get a signed receipt for every decision.",
   alternates: {
     canonical: "https://satgate.io",
   },
   openGraph: {
     title: "SatGate | Economic Firewall for AI Agents",
     description:
-      "Keep your agents within budget. Make external agents pay before they use your resources. Keep verifiable evidence of gateway decisions.",
+      "Keep your agents within budget. Make external agents pay before they use your API. Get a signed receipt for every decision.",
     url: "https://satgate.io",
     type: "website",
   },
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SatGate | Economic Firewall for AI Agents",
     description:
-      "Keep your agents within budget. Make external agents pay before they use your resources. Keep verifiable evidence of gateway decisions.",
+      "Keep your agents within budget. Make external agents pay before they use your API. Get a signed receipt for every decision.",
   },
 };
 
@@ -32,7 +32,7 @@ export default function HomePage() {
         name: 'SatGate',
         url: 'https://satgate.io',
         logo: 'https://satgate.io/logo_white_transparent.png',
-        description: 'SatGate is an economic firewall for agent workloads. It combines request-path budget and scope controls with signed evidence of governed decisions.',
+        description: 'SatGate is an economic firewall for agent workloads. It checks budgets and permissions on each request and signs a receipt for every decision.',
       },
       {
         '@type': 'WebSite',
@@ -44,7 +44,7 @@ export default function HomePage() {
         '@type': 'WebPage',
         name: 'SatGate | Economic Firewall for AI Agents',
         url: 'https://satgate.io',
-        description: 'SatGate governs agent authority before execution so humans, platforms, and upstream APIs can trust what agents access, spend, and prove.',
+        description: 'SatGate checks what each AI agent is allowed to do and spend before its request reaches your API, and signs a receipt for every decision.',
         datePublished: '2026-04-30',
         dateModified: '2026-09-26',
         isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -68,23 +68,23 @@ export default function HomePage() {
         name: 'What is SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate is an economic firewall for AI agents. Economic control enforces internal budgets and permissions. Economic admission charges external agents for authorized access on paid routes. Signed decision receipts, paid-call receipts and Evidence Pack proof support independent audit review.',
+          text: 'SatGate is a gateway that sits in front of your APIs and MCP tools. It keeps your own agents within the budgets and permissions you set, charges external agents on the routes you choose, and signs a receipt for each decision.',
         },
       },
       {
         '@type': 'Question',
-        name: 'How does SatGate govern AI agents?',
+        name: 'How does SatGate control what agents do?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate applies scoped authority, per-agent policy, revocation, and budgets before each request reaches an API or MCP tool, so unauthorized actions and expensive calls can be blocked before they happen.',
+          text: 'Before a request reaches your API or MCP tool, SatGate checks the agent’s permissions, its remaining budget and whether its token was revoked. If a check fails, the request stops at SatGate.',
         },
       },
       {
         '@type': 'Question',
-        name: 'How does SatGate give agents bounded economic authority?',
+        name: 'How do I give an agent a budget?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Humans and platforms define policy, budgets, scope, and delegation depth. Agents consume approved API and MCP primitives through SatGate, and allowed, denied, delegated, revoked, and paid-rail decisions leave receipt-backed proof.',
+          text: 'You set the budget, the permissions and how many times it can hand work to a sub-agent. The agent gets a token with those limits built in. Every allow, refusal, payment, handoff and revoke gets a receipt.',
         },
       },
     ],
