@@ -52,7 +52,8 @@ def x402_corpus(f):
                 yield (f'{network}-{decision}-{amount}',
                        f.pack(x402_receipt(f, network, amount, decision)), True)
     mutations = []
-    for value in (True, False, 0, -1, 1.0, 10000.0, '10000', None, 2**53):
+    # 2**53 cannot be signed at all (JCS rejects it), so it is not a corpus case.
+    for value in (True, False, 0, -1, 1.0, 10000.0, '10000', None):
         mutations.append((f'amount-{value!r}', lambda r, v=value: set_amount(r, v)))
     mutations += [
         ('unknown-network', lambda r: set_field(r, 'network', 'eip155:1')),
