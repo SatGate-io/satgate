@@ -273,14 +273,15 @@ const LandingPage = () => {
       <section className="py-16 px-6 border-b border-gray-800">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-3">See SatGate in Action</h2>
-          <p className="text-gray-400 mb-8 max-w-2xl mx-auto">One minute, recorded on production. Mint an agent token with a 3¢ budget, watch each MCP tool call get a signed receipt, see call four refused before the tool runs, then check the receipt with the open-source verifier.</p>
+          <p className="text-gray-400 mb-8 max-w-2xl mx-auto">One minute, recorded on production, with narration. Mint an agent token with a 3¢ budget, watch each MCP tool call get a signed receipt, see call four refused before the tool runs, then check the receipt with the open-source verifier.</p>
           <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
             <video
               controls
               preload="metadata"
-              poster="/satgate-demo-poster.jpg"
+              poster="/satgate-demo-voice-poster.jpg"
               className="w-full"
               playsInline
+              aria-label="Narrated demo: an agent with a 3 cent budget makes three paid MCP tool calls, its fourth call is refused before the tool runs, and the signed receipt is checked with the open-source verifier"
             >
               <source src="/satgate-demo.mp4" type="video/mp4" />
               Your browser does not support the video tag.
