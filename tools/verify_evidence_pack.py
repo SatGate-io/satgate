@@ -320,6 +320,57 @@ def valid_paid_rail(receipt):
         and strict_json_equal(receipt.get("budget"),
                               {"spend_mode": "paid_rail", "rail": "l402", "amount_sats": amount})
         and not contains_credit_state(receipt)
+        # The settled-authorization label belongs to x402 only.
+        and not (isinstance(receipt.get("authority"), dict)
+                 and receipt["authority"].get("provenance_level") == "settled_x402_authorization")
+    )
+
+
+X402_RAIL_FIELDS = {"rail", "transaction", "network", "asset", "payer", "pay_to", "amount_atomic"}
+# The USDC contract per network. An x402 receipt naming any other asset is
+# invalid even when signed.
+X402_USDC = {
+    "eip155:8453": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+    "eip155:84532": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+}
+
+
+def _is_lower_hex(value, length):
+    return (
+        isinstance(value, str) and len(value) == length and value.startswith("0x")
+        and all(c in "0123456789abcdef" for c in value[2:])
+    )
+
+
+def valid_x402_paid_rail(receipt):
+    """x402 (USDC on Base) paid receipts: a settled transaction, the USDC
+    contract for the network, lowercase addresses, a positive integer atomic
+    amount, an authority that claims a settled authorization (never a
+    macaroon), and no L402 or credit/USD fields.
+
+    Keep aligned with the other distributed verifier;
+    tools/test_paid_rail.py runs the same signed corpus against both copies.
+    """
+    amount = receipt.get("amount_atomic")
+    network = receipt.get("network")
+    context_value = receipt.get("paid_rail_context")
+    return (
+        receipt.get("decision") in ("allowed", "paid")
+        and receipt.get("rail") == "x402"
+        and type(amount) is int and 0 < amount <= 2**53 - 1
+        and _is_lower_hex(receipt.get("transaction"), 66)
+        and network in X402_USDC
+        and receipt.get("asset") == X402_USDC.get(network)
+        and all(_is_lower_hex(receipt.get(k), 42) for k in ("asset", "payer", "pay_to"))
+        and strict_json_equal(receipt.get("authority"), {"provenance_level": "settled_x402_authorization"})
+        and "capability_hash" not in receipt
+        and isinstance(context_value, dict)
+        and set(context_value) == X402_RAIL_FIELDS
+        and strict_json_equal(context_value, {k: receipt.get(k) for k in X402_RAIL_FIELDS})
+        and strict_json_equal(receipt.get("budget"),
+                              {"spend_mode": "paid_rail", "rail": "x402", "amount_atomic": amount})
+        and not any(k in receipt for k in ("payment_hash", "invoice_hash", "macaroon_hash", "amount_sats"))
+        and not contains_credit_state(receipt)
     )
 
 
@@ -356,7 +407,7 @@ def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reas
 
     paid_rail = receipt.get("decision_reason") == "payment_verified"
     if paid_rail:
-        checks[f"{prefix}_paid_rail"] = bool(valid_paid_rail(receipt))
+        checks[f"{prefix}_paid_rail"] = bool(valid_paid_rail(receipt) or valid_x402_paid_rail(receipt))
         if not checks[f"{prefix}_paid_rail"]:
             fail("invalid_paid_rail_provenance", "Incomplete or contradictory paid-rail receipt")
     checks[f"{prefix}_decision_reason"] = paid_rail or receipt.get("decision_reason") in ALLOWED_DECISION_REASONS
