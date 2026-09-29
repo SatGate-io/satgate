@@ -62,9 +62,9 @@ REQUIRED_ROUTE_STRINGS = [
 REQUIRED_BUILD_STRINGS = [
     "Trust metadata",
     "/.well-known/satgate",
-    "capability acceptance",
-    "receipt verification fields",
-    "canonical for rail adapter status",
+    "which tokens it accepts",
+    "how to verify receipts",
+    "which payment methods are live",
 ]
 
 REQUIRED_DOC_STRINGS = [

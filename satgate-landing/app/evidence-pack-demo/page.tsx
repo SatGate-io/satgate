@@ -4,9 +4,9 @@ import { ArrowRight, BadgeCheck, ClipboardCheck, Download, FileJson, KeyRound, R
 import evidencePack from '../../public/evidence-packs/sample-evidence-pack.v1.json';
 
 export const metadata: Metadata = {
-  title: 'Evidence Pack Demo: Policy-to-Proof Artifact',
+  title: 'Sample Evidence Pack: Who Allowed What?',
   description:
-    'Open a sample SatGate Evidence Pack and see who authorized what, under which policy, budget, delegation chain, and paid-rail context.',
+    'Open a sample SatGate Evidence Pack and see who allowed what, under which rules and budget, who handed work to whom, and what was paid.',
   alternates: { canonical: 'https://satgate.io/evidence-pack-demo' },
   keywords: [
     'Evidence Pack demo',
@@ -16,17 +16,17 @@ export const metadata: Metadata = {
     'agent paid rail audit evidence',
   ],
   openGraph: {
-    title: 'Evidence Pack Demo: Who Authorized What?',
+    title: 'Sample Evidence Pack: Who Allowed What?',
     description:
-      'A visible Policy-to-Proof artifact showing agent identity, policy, budget, delegation, paid-rail context, receipt chain, and export proof.',
+      'One agent workflow, laid out: which agent acted, the rules and budget it ran under, the handoff to a sub-agent, payments, and every receipt.',
     url: 'https://satgate.io/evidence-pack-demo',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Evidence Pack Demo: Who Authorized What?',
+    title: 'Sample Evidence Pack: Who Allowed What?',
     description:
-      'Open the SatGate sample Evidence Pack: authority before execution, receipts after every decision.',
+      'Open a sample SatGate Evidence Pack: permission checked before each action, a receipt after every decision.',
   },
 };
 
@@ -41,7 +41,7 @@ const delegatedGrant = authorityChain[1];
 const paidEvents = pack.payment_context.events;
 
 if (!rootGrant || !delegatedGrant) {
-  throw new Error('Evidence Pack demo fixture must include root and delegated authority grants.');
+  throw new Error('Evidence Pack demo fixture must include a root grant and a delegated grant.');
 }
 
 const rootIssuerName = rootGrant.issuer?.display_name ?? rootGrant.issuer?.id ?? 'authorized issuer';
@@ -52,8 +52,8 @@ const delegatedSubjectName = delegatedGrant.subject.display_name ?? delegatedGra
 const answerCards = [
   {
     icon: KeyRound,
-    question: 'Who authorized it?',
-    answer: `${rootIssuerName} minted authority for ${rootSubjectName}.`,
+    question: 'Who allowed it?',
+    answer: `${rootIssuerName} issued a token to ${rootSubjectName}.`,
     detail: `Issuer key: ${rootGrant.issuer_kid}`,
   },
   {
@@ -65,26 +65,26 @@ const answerCards = [
   {
     icon: ShieldCheck,
     question: 'Under which policy?',
-    answer: `${policy.policy_name} ${policy.policy_version} enforced authority before execution.`,
+    answer: `${policy.policy_name} ${policy.policy_version}, checked before each action ran.`,
     detail: `Policy ID: ${policy.policy_id}; mode: ${policy.mode}; digest: ${policy.policy_digest}`,
   },
   {
     icon: WalletCards,
     question: 'Under which budget?',
-    answer: `${budget.budget_id} delegated ${budget.delegated_limit} ${budget.currency}; ${budget.spent} spent before denials.`,
+    answer: `${budget.budget_id} allowed ${budget.delegated_limit} ${budget.currency}. ${budget.spent} was spent before requests started being refused.`,
     detail: `Cost center: ${budget.cost_center}; exhausted: ${budget.exhausted ? 'yes' : 'no'}`,
   },
   {
     icon: ReceiptText,
-    question: 'Was it delegated?',
-    answer: `${delegatedParentName} delegated a narrower capability to ${delegatedSubjectName}.`,
-    detail: 'Scope, budget, depth, and expiry are all attenuated in the child grant.',
+    question: 'Was work handed off?',
+    answer: `${delegatedParentName} gave ${delegatedSubjectName} a narrower token.`,
+    detail: 'The sub-agent’s token allows less: fewer permissions, a smaller budget and no further handoffs.',
   },
   {
     icon: ClipboardCheck,
-    question: 'Was a paid rail involved?',
-    answer: `${paidEvents.length} payment-context events are preserved across ${pack.payment_context.internal_rail} and optional paid rails.`,
-    detail: `External rails: ${pack.payment_context.external_rails.join(', ')}`,
+    question: 'Was anything paid?',
+    answer: `${paidEvents.length} payment events are recorded, from the internal budget (${pack.payment_context.internal_rail}) and outside payment methods.`,
+    detail: `Outside payment methods: ${pack.payment_context.external_rails.join(', ')}`,
   },
 ];
 
@@ -107,11 +107,11 @@ const jsonLd = {
   description: metadata.description,
   featureList: [
     'Canonical Evidence Pack v1 schema',
-    'Authority chain viewer',
+    'Token chain viewer',
     'Policy and budget snapshot',
-    'Delegation proof',
-    'Paid-rail context',
-    'Receipt-chain export',
+    'Sub-agent handoffs',
+    'Payment records',
+    'Receipt export',
   ],
 };
 
@@ -124,48 +124,48 @@ export default function EvidencePackDemoPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(34,211,238,0.2),transparent_30%),radial-gradient(circle_at_85%_10%,rgba(168,85,247,0.18),transparent_35%)]" />
         <div className="relative mx-auto max-w-6xl">
           <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-4 py-2 text-sm font-bold text-cyan-100">
-            <FileJson size={16} /> Evidence Pack Demo Artifact
+            <FileJson size={16} /> Sample Evidence Pack
           </p>
           <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
             <div>
               <h1 className="text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">
-                Who authorized what?
+                Who allowed what?
               </h1>
               <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
-                This is the visible SatGate Evidence Pack: a canonical JSON artifact and buyer-readable viewer proving the agent, policy, budget, delegation, paid-rail context, receipts, and export integrity behind one workflow.
+                This is a sample Evidence Pack for one agent workflow. The JSON file is what SatGate exports; this page lays it out so you can read it: which agent acted, the rules and budget it ran under, the handoff to a sub-agent, payments, and every receipt.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <a href="/evidence-packs/sample-evidence-pack.v1.json" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-black transition hover:bg-gray-200">
-                  Download canonical JSON <Download size={18} />
+                  Download the JSON <Download size={18} />
                 </a>
                 <a href="/evidence-packs/evidence-pack.schema.v1.json" className="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-300/40 bg-cyan-300/10 px-5 py-3 font-bold text-cyan-100 transition hover:border-cyan-200">
-                  View schema v1 <ArrowRight size={18} />
+                  See the schema <ArrowRight size={18} />
                 </a>
                 <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-5 py-3 font-bold text-white transition hover:border-white/50">
-                  Policy-to-Proof narrative <ArrowRight size={18} />
+                  How receipts work <ArrowRight size={18} />
                 </Link>
               </div>
             </div>
             <div className="rounded-3xl border border-cyan-300/20 bg-white/[0.04] p-6 shadow-2xl shadow-cyan-950/30">
-              <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-200">Executive summary</p>
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-200">Summary</p>
               <dl className="mt-6 grid gap-4 text-sm">
                 <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
                   <dt className="text-gray-500">Evidence Pack</dt>
                   <dd className="mt-1 font-mono text-cyan-100">{pack.evidence_pack_id}</dd>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
-                  <dt className="text-gray-500">Subject</dt>
+                  <dt className="text-gray-500">Agent</dt>
                   <dd className="mt-1 font-semibold text-white">{subject.display_name}</dd>
                   <dd className="font-mono text-xs text-gray-400">{subject.id}</dd>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
                   <dt className="text-gray-500">Budget</dt>
                   <dd className="mt-1 font-semibold text-white">{budget.spent} / {budget.delegated_limit} {budget.currency} spent</dd>
-                  <dd className="text-xs text-gray-400">Remaining shown as {budget.remaining} after the budget denial event.</dd>
+                  <dd className="text-xs text-gray-400">{budget.remaining} left after the budget ran out and requests were refused.</dd>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
-                  <dt className="text-gray-500">Verification</dt>
-                  <dd className="mt-1 font-semibold text-white">{pack.receipt_chain.receipt_count} linked receipts</dd>
+                  <dt className="text-gray-500">Receipts</dt>
+                  <dd className="mt-1 font-semibold text-white">{pack.receipt_chain.receipt_count} receipts, chained together</dd>
                   <dd className="break-all font-mono text-xs text-gray-400">{pack.chain_root}</dd>
                 </div>
               </dl>
@@ -177,8 +177,8 @@ export default function EvidencePackDemoPage() {
       <section className="border-b border-white/10 px-6 py-20">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
-            <p className="mb-3 text-sm font-bold uppercase tracking-[0.24em] text-cyan-300">Prospect comprehension check</p>
-            <h2 className="text-3xl font-black tracking-tight sm:text-5xl">The artifact answers the buyer's core questions.</h2>
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.24em] text-cyan-300">What the pack tells you</p>
+            <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Six questions, answered from the receipts.</h2>
           </div>
           <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {answerCards.map(({ icon: Icon, question, answer, detail }) => (
@@ -197,10 +197,10 @@ export default function EvidencePackDemoPage() {
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
             <div>
-              <p className="mb-3 text-sm font-bold uppercase tracking-[0.24em] text-purple-300">Authority chain</p>
-              <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Root grant → attenuated worker capability.</h2>
+              <p className="mb-3 text-sm font-bold uppercase tracking-[0.24em] text-purple-300">Token chain</p>
+              <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Main agent → sub-agent with a narrower token.</h2>
               <p className="mt-5 text-lg leading-8 text-gray-400">
-                The child capability is narrower than the parent: less scope, a smaller budget, no customer-data export, and no additional delegation depth.
+                The sub-agent&apos;s token allows less than the main agent&apos;s: fewer permissions, a smaller budget, no customer-data export and no further handoffs.
               </p>
             </div>
             <div className="grid gap-4">
@@ -211,11 +211,11 @@ export default function EvidencePackDemoPage() {
                       <p className="text-sm font-bold text-cyan-300">Step {index + 1}: {grant.kind}</p>
                       <h3 className="mt-2 text-2xl font-black text-white">{grant.subject.display_name}</h3>
                     </div>
-                    <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-gray-400">depth {grant.delegation_depth_current}/{grant.delegation_depth_max}</span>
+                    <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-gray-400">handoff {grant.delegation_depth_current} of {grant.delegation_depth_max}</span>
                   </div>
                   <div className="mt-5 grid gap-3 md:grid-cols-2">
                     <div className="rounded-2xl bg-white/[0.04] p-4">
-                      <p className="text-xs text-gray-500">Effective scope</p>
+                      <p className="text-xs text-gray-500">Allowed</p>
                       <p className="mt-2 text-sm text-gray-200">{grant.effective_scope.join(', ')}</p>
                     </div>
                     <div className="rounded-2xl bg-white/[0.04] p-4">
@@ -234,7 +234,7 @@ export default function EvidencePackDemoPage() {
         <div className="mx-auto max-w-6xl">
           <div className="mb-10 max-w-3xl">
             <p className="mb-3 text-sm font-bold uppercase tracking-[0.24em] text-cyan-300">Receipt timeline</p>
-            <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Every allow, deny, revoke, paid call, and export leaves a receipt.</h2>
+            <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Every allow, refusal, revoke, payment and export gets a receipt.</h2>
           </div>
           <div className="space-y-3">
             {receipts.map((receipt) => (
@@ -263,10 +263,10 @@ export default function EvidencePackDemoPage() {
       <section className="border-b border-white/10 bg-white/[0.02] px-6 py-20">
         <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-2">
           <div className="rounded-3xl border border-cyan-300/20 bg-cyan-300/5 p-7">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-200">Paid-rail context</p>
-            <h2 className="mt-4 text-3xl font-black text-white">Rail-neutral by design.</h2>
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-200">Payments</p>
+            <h2 className="mt-4 text-3xl font-black text-white">Not tied to one payment method.</h2>
             <p className="mt-4 text-sm leading-6 text-gray-300">
-              The pack records internal enterprise ledger spend and the x402 paid document-AI call without making the payment rail the product. Payment proves value moved. SatGate proves the worker had authority to move it.
+              This sample records spending from an internal budget and one paid call to a document-AI service over x402. The payment shows money moved. The receipt shows the sub-agent was allowed to spend it.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {[pack.payment_context.internal_rail, ...pack.payment_context.external_rails].map((rail) => (
@@ -275,13 +275,13 @@ export default function EvidencePackDemoPage() {
             </div>
           </div>
           <div className="rounded-3xl border border-purple-300/20 bg-purple-300/5 p-7">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-purple-200">Verification block</p>
-            <h2 className="mt-4 text-3xl font-black text-white">Machine-readable export.</h2>
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-purple-200">Signature</p>
+            <h2 className="mt-4 text-3xl font-black text-white">How the export is signed.</h2>
             <dl className="mt-6 space-y-4 text-sm">
-              <div><dt className="text-gray-500">Canonicalization</dt><dd className="font-mono text-gray-200">{pack.receipt_chain.canonicalization}</dd></div>
+              <div><dt className="text-gray-500">JSON format signed</dt><dd className="font-mono text-gray-200">{pack.receipt_chain.canonicalization}</dd></div>
               <div><dt className="text-gray-500">Hash algorithm</dt><dd className="font-mono text-gray-200">{pack.receipt_chain.hash_algorithm}</dd></div>
               <div><dt className="text-gray-500">Signature</dt><dd className="break-all font-mono text-gray-200">{pack.signature}</dd></div>
-              <div><dt className="text-gray-500">Demo caveat</dt><dd className="text-gray-300">{pack.verification.reason}</dd></div>
+              <div><dt className="text-gray-500">Note</dt><dd className="text-gray-300">This sample uses placeholder hashes and a placeholder signature, so it won&apos;t pass the verifier. Real exports are signed. <Link href="/verify-evidence-pack" className="text-purple-200 underline underline-offset-4">Check a real one</Link>.</dd></div>
             </dl>
           </div>
         </div>
@@ -291,12 +291,12 @@ export default function EvidencePackDemoPage() {
         <div className="mx-auto max-w-6xl rounded-3xl border border-emerald-300/20 bg-emerald-300/5 p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.2em] text-emerald-200">Buyer takeaway</p>
-              <h2 className="mt-3 max-w-3xl text-3xl font-black text-white">A prospect can see who authorized what, what failed, what spent, what paid rail was involved, and what proof was exported.</h2>
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-emerald-200">In short</p>
+              <h2 className="mt-3 max-w-3xl text-3xl font-black text-white">One file shows who allowed what, what was refused, what was spent and paid, and the receipts to back it up.</h2>
             </div>
             <div className="flex shrink-0 flex-col gap-3">
               <a href="/evidence-packs/sample-evidence-pack.v1.json" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-black transition hover:bg-gray-200">Download JSON <Download size={18} /></a>
-              <a href="/evidence-packs/evidence-pack.schema.v1.json" className="inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-300/40 px-5 py-3 font-bold text-emerald-100 transition hover:border-emerald-200">Schema v1 <ArrowRight size={18} /></a>
+              <a href="/evidence-packs/evidence-pack.schema.v1.json" className="inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-300/40 px-5 py-3 font-bold text-emerald-100 transition hover:border-emerald-200">Schema <ArrowRight size={18} /></a>
             </div>
           </div>
         </div>

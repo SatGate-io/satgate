@@ -8,35 +8,35 @@ import Image from 'next/image';
 const faqs = [
   {
     q: 'How do I start?',
-    a: 'Go to https://cloud.satgate.io/cloud/signup. The trial is 14 days of Pro features, with no credit card. Email verification creates the account.',
+    a: 'Sign up at https://cloud.satgate.io/cloud/signup and confirm your email. You get 14 days of Pro features free, with no credit card.',
   },
   {
     q: 'What is included in Starter?',
-    a: 'Starter is free. It includes Observe (metering) with a fair-use cap, 3 routes, default protection + Observe, and community support.',
+    a: 'Starter is free. You get Observe (usage tracking) up to a fair-use cap, 3 routes, default protection and community support.',
   },
   {
     q: 'What is included in Pro?',
-    a: 'Pro is $99/month. It includes Observe with no finite monthly cap, 1M Control/Admit requests per month, 25 routes, unlimited team members, and all policies (Observe, Control, and Admit — Admit is the Charge policy in the dashboard). It also includes budget enforcement, token governance, and priority support. Upgrade is self-serve by card in the dashboard (Stripe).',
+    a: 'Pro is $99 a month. You get unlimited Observe, 1 million Control and Admit requests a month, 25 routes, unlimited team members and all three controls: Observe, Control and Admit (the dashboard calls Admit “Charge”). It also includes budgets, token management and priority support. Upgrade yourself by card in the dashboard (Stripe).',
   },
   {
-    q: 'Is hosted access available without a sales call?',
-    a: 'Yes. Sign up for a 14-day free trial of Pro features. No credit card. Email verification creates the account. Upgrade to Pro by card in the dashboard.',
+    q: 'Can I start without talking to sales?',
+    a: 'Yes. Sign up, confirm your email and you have 14 days of Pro features free, with no credit card. Upgrade to Pro by card in the dashboard.',
   },
   {
     q: 'What does Enterprise include?',
-    a: 'Enterprise is custom pricing. It is unlimited. Self-host means installing the same SatGate binary that runs SatGate Cloud, in your own environment. It includes SCIM, GitOps signed configs, WORM audit export, and dedicated support with an SLA. Contact contact@satgate.io.',
+    a: 'Enterprise has custom pricing and no usage limits. You run the same SatGate software that powers SatGate Cloud on your own servers. It includes SCIM user provisioning, signed configs managed in Git, write-once (WORM) audit export and dedicated support with an SLA. Email contact@satgate.io.',
   },
   {
     q: 'Does a pilot require code changes?',
-    a: 'Most pilots start with a DNS, proxy, or MCP configuration change around one bounded endpoint or tool. We verify that path before expanding it.',
+    a: 'Usually not. Most pilots start with a DNS, proxy or MCP config change in front of one API endpoint or tool. We make sure that works before adding more.',
   },
   {
     q: 'What does the design-partner pilot cost?',
-    a: 'The initial 90-day design-partner pilot has no charge or credit-card requirement. Any later commercial contract depends on the accepted scope, measured usage, and operating requirements. The pilot is an option for larger teams that want help. It is not required to start.',
+    a: 'The 90-day design-partner pilot is free, with no credit card. If you continue afterward, the price depends on what we agree to cover, your usage and your support needs. The pilot is for larger teams that want hands-on help. You don’t need it to get started.',
   },
   {
     q: 'What happens after the pilot?',
-    a: 'We review the governed workload, policy outcomes, Evidence Pack use, support burden, and operating evidence together. Both sides then decide whether to expand, contract, or stop.',
+    a: 'We look at the results together: what SatGate allowed and blocked, how you used the receipts and how much support you needed. Then we both decide whether to expand, scale back or stop.',
   },
 ];
 
@@ -54,10 +54,10 @@ const PricingPage = () => {
     dateModified: '2026-09-27',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
-      { '@type': 'Thing', name: 'Agent Authority & Accountability Layer' },
+      { '@type': 'Thing', name: 'Economic firewall for AI agents' },
       { '@type': 'Thing', name: 'AI agent budget enforcement' },
       { '@type': 'Thing', name: 'SatGate Economic Firewall' },
-      { '@type': 'Thing', name: 'request-path spend governance' },
+      { '@type': 'Thing', name: 'AI agent spending limits' },
       { '@type': 'Thing', name: 'rail-neutral paid-rail governance' },
     ],
   };
@@ -94,7 +94,7 @@ const PricingPage = () => {
         name: 'SatGate Starter',
         price: '0',
         priceCurrency: 'USD',
-        description: 'Free. Observe (metering) with a fair-use cap, 3 routes, default protection + Observe, community support.',
+        description: 'Free. Observe (usage tracking) up to a fair-use cap, 3 routes, default protection, community support.',
         availability: 'https://schema.org/InStock',
         url: 'https://cloud.satgate.io/cloud/signup',
         itemOffered: { '@type': 'Service', name: 'SatGate Starter', serviceType: 'AI agent governance' },
@@ -104,7 +104,7 @@ const PricingPage = () => {
         name: 'SatGate Pro',
         price: '99',
         priceCurrency: 'USD',
-        description: '14-day free trial of Pro features, no credit card. $99/month. Observe with no finite monthly cap, 1M Control/Admit requests per month, 25 routes, unlimited team members, all policies, budget enforcement, token governance, priority support. Upgrade by card in the dashboard.',
+        description: '14-day free trial of Pro features, no credit card. $99/month. Unlimited Observe, 1M Control and Admit requests per month, 25 routes, unlimited team members, all three controls, budgets, token management, priority support. Upgrade by card in the dashboard.',
         availability: 'https://schema.org/InStock',
         url: 'https://cloud.satgate.io/cloud/signup',
         itemOffered: { '@type': 'Service', name: 'SatGate Pro', serviceType: 'AI agent governance' },
@@ -112,7 +112,7 @@ const PricingPage = () => {
       {
         '@type': 'Offer',
         name: 'SatGate Enterprise',
-        description: 'Custom pricing. Unlimited. Self-host the same SatGate binary that runs SatGate Cloud. SCIM, GitOps signed configs, WORM audit export, dedicated support and SLA.',
+        description: 'Custom pricing, no usage limits. Run the same SatGate software that powers SatGate Cloud on your own servers. SCIM, signed configs in Git, WORM audit export, dedicated support and SLA.',
         availability: 'https://schema.org/InStock',
         url: 'mailto:contact@satgate.io',
         itemOffered: { '@type': 'Service', name: 'SatGate Enterprise', serviceType: 'Self-hosted AI agent governance' },
@@ -182,7 +182,7 @@ const PricingPage = () => {
             </span>
           </h1>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            A 14-day trial of Pro features. No credit card. Email verification creates the account.
+            Try Pro free for 14 days. No credit card; just confirm your email.
           </p>
         </div>
       </header>
@@ -193,19 +193,19 @@ const PricingPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-cyan-900/20 border border-cyan-800/30">
               <span className="text-cyan-400 font-bold text-sm">Observe</span>
-              <span className="text-gray-500 text-xs">Project impact</span>
+              <span className="text-gray-500 text-xs">See usage and cost</span>
             </div>
             <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-purple-900/20 border border-purple-800/30">
               <span className="text-purple-400 font-bold text-sm">Control</span>
-              <span className="text-gray-500 text-xs">Enforce owned-agent authority</span>
+              <span className="text-gray-500 text-xs">Enforce your agents&apos; limits</span>
             </div>
             <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-yellow-900/20 border border-yellow-800/30">
               <span className="text-yellow-400 font-bold text-sm">Admit</span>
-              <span className="text-gray-500 text-xs">Govern external-agent access</span>
+              <span className="text-gray-500 text-xs">Let external agents in, and charge them</span>
             </div>
             <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-green-900/20 border border-green-800/30">
               <span className="text-green-400 font-bold text-sm">Prove</span>
-              <span className="text-gray-500 text-xs">Verify the evidence</span>
+              <span className="text-gray-500 text-xs">Check the receipts</span>
             </div>
           </div>
         </div>
@@ -217,15 +217,15 @@ const PricingPage = () => {
           <div className="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-600 transition flex flex-col">
             <div className="mb-6">
               <h3 className="text-lg font-bold text-cyan-400 mb-1">Starter</h3>
-              <p className="text-gray-500 text-sm">Free. Signup starts a 14-day trial of Pro features.</p>
+              <p className="text-gray-500 text-sm">Free. New accounts start with 14 days of Pro.</p>
             </div>
             <div className="mb-6">
               <span className="text-4xl font-extrabold text-white">Free</span>
             </div>
             <ul className="space-y-3 text-sm text-gray-400 mb-8 flex-1">
-              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Observe (metering) with a fair-use cap</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Observe (usage tracking) up to a fair-use cap</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />3 routes</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Default protection + Observe</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Default protection</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-cyan-400 mt-0.5 shrink-0" />Community support</li>
             </ul>
             <a
@@ -251,12 +251,12 @@ const PricingPage = () => {
               <span className="text-gray-500 text-sm"> / month</span>
             </div>
             <ul className="space-y-3 text-sm text-gray-400 mb-8 flex-1">
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Observe with no finite monthly cap</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />1M Control/Admit requests per month</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Unlimited Observe</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />1M Control and Admit requests per month</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />25 routes</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Unlimited team members</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />All policies: Observe, Control, and Admit (Admit is the Charge policy in the dashboard)</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Budget enforcement and token governance</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />All three controls: Observe, Control and Admit (called &ldquo;Charge&rdquo; in the dashboard)</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Budgets and token management</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Priority support</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Upgrade by card in the dashboard (Stripe)</li>
             </ul>
@@ -273,17 +273,17 @@ const PricingPage = () => {
           <div className="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-600 transition flex flex-col">
             <div className="mb-6">
               <h3 className="text-lg font-bold text-green-400 mb-1">Enterprise</h3>
-              <p className="text-gray-500 text-sm">Self-host the same binary. Custom pricing.</p>
+              <p className="text-gray-500 text-sm">Run it on your own servers. Custom pricing.</p>
             </div>
             <div className="mb-6">
               <span className="text-4xl font-extrabold text-white">Custom</span>
             </div>
             <ul className="space-y-3 text-sm text-gray-400 mb-8 flex-1">
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Unlimited</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Self-host: the same SatGate binary that runs SatGate Cloud, installed in your own environment</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />SCIM</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />GitOps signed configs</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />WORM audit export</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />No usage limits</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />The same software that runs SatGate Cloud, on your own servers</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />SCIM user provisioning</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Signed configs managed in Git</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Write-once (WORM) audit export</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-green-400 mt-0.5 shrink-0" />Dedicated support + SLA</li>
             </ul>
             <a
@@ -310,47 +310,47 @@ const PricingPage = () => {
       {/* Why SatGate Wins */}
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">The Governance Gap</h2>
-          <p className="text-gray-400 text-center mb-12 max-w-2xl mx-auto">Standard MCP is an open tap for your API credits. SatGate adds the meter — and the shutoff valve.</p>
+          <h2 className="text-3xl font-bold text-center mb-4">What plain MCP doesn&apos;t do</h2>
+          <p className="text-gray-400 text-center mb-12 max-w-2xl mx-auto">Out of the box, an MCP server lets agents spend your API credits with nothing to stop them. SatGate adds a meter and a shutoff valve.</p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-800">
-                  <th className="text-left py-3 px-4 text-gray-500 font-medium">Capability</th>
-                  <th className="text-left py-3 px-4 text-gray-500 font-medium">Standard MCP</th>
-                  <th className="text-left py-3 px-4 text-purple-400 font-medium">SatGate-Enabled</th>
+                  <th className="text-left py-3 px-4 text-gray-500 font-medium">&nbsp;</th>
+                  <th className="text-left py-3 px-4 text-gray-500 font-medium">Plain MCP</th>
+                  <th className="text-left py-3 px-4 text-purple-400 font-medium">With SatGate</th>
                 </tr>
               </thead>
               <tbody className="text-gray-400">
                 <tr className="border-b border-gray-800/50">
-                  <td className="py-3 px-4 text-gray-300">Budget Enforcement</td>
-                  <td className="py-3 px-4">&ldquo;Faith-based&rdquo; — wait for the bill</td>
-                  <td className="py-3 px-4 text-white">Real-time hard caps at protocol level</td>
+                  <td className="py-3 px-4 text-gray-300">Budgets</td>
+                  <td className="py-3 px-4">None. You find out when the bill arrives</td>
+                  <td className="py-3 px-4 text-white">Hard caps, checked on every call</td>
                 </tr>
                 <tr className="border-b border-gray-800/50">
-                  <td className="py-3 px-4 text-gray-300">Cost Attribution</td>
-                  <td className="py-3 px-4">Aggregate — one big API bill</td>
-                  <td className="py-3 px-4 text-white">Per-tool / per-agent granularity</td>
+                  <td className="py-3 px-4 text-gray-300">Who spent what</td>
+                  <td className="py-3 px-4">One big API bill</td>
+                  <td className="py-3 px-4 text-white">Broken down by tool and by agent</td>
                 </tr>
                 <tr className="border-b border-gray-800/50">
-                  <td className="py-3 px-4 text-gray-300">Access Control</td>
-                  <td className="py-3 px-4">Static API keys — all or nothing</td>
-                  <td className="py-3 px-4 text-white">Attenuated macaroons — time/tool limited</td>
+                  <td className="py-3 px-4 text-gray-300">Access</td>
+                  <td className="py-3 px-4">Static API keys: all or nothing</td>
+                  <td className="py-3 px-4 text-white">Tokens limited by tool and by time</td>
                 </tr>
                 <tr className="border-b border-gray-800/50">
                   <td className="py-3 px-4 text-gray-300">Visibility</td>
-                  <td className="py-3 px-4">Post-mortem — look back at logs</td>
+                  <td className="py-3 px-4">Dig through logs after the fact</td>
                   <td className="py-3 px-4 text-white">Signed receipts + Evidence Pack export</td>
                 </tr>
                 <tr className="border-b border-gray-800/50">
-                  <td className="py-3 px-4 text-gray-300">Agent Loops</td>
-                  <td className="py-3 px-4">Potentially infinite spend</td>
-                  <td className="py-3 px-4 text-white">Automated kill-switch at threshold</td>
+                  <td className="py-3 px-4 text-gray-300">Runaway agents</td>
+                  <td className="py-3 px-4">No limit on spend</td>
+                  <td className="py-3 px-4 text-white">Cut off automatically at the cap</td>
                 </tr>
                 <tr>
-                  <td className="py-3 px-4 text-gray-300">Authentication</td>
-                  <td className="py-3 px-4">Basic / bearer tokens</td>
-                  <td className="py-3 px-4 text-white">Paid-rail context — L402/x402-aware governance</td>
+                  <td className="py-3 px-4 text-gray-300">Payments</td>
+                  <td className="py-3 px-4">None built in</td>
+                  <td className="py-3 px-4 text-white">Charge external agents per call (L402, x402)</td>
                 </tr>
               </tbody>
             </table>
@@ -364,18 +364,18 @@ const PricingPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="text-3xl mb-3">🛡</div>
-              <h3 className="font-bold text-white mb-2">Cost Avoidance</h3>
-              <p className="text-gray-400 text-sm">Stop the $500 &ldquo;hallucination loop&rdquo; at $2. Automatically revoke access for idle or runaway agents.</p>
+              <h3 className="font-bold text-white mb-2">Save money</h3>
+              <p className="text-gray-400 text-sm">Stop a $500 runaway loop at $2. When an agent hits its cap, SatGate cuts it off.</p>
             </div>
             <div className="text-center">
               <div className="text-3xl mb-3">⚡</div>
-              <h3 className="font-bold text-white mb-2">Operational Efficiency</h3>
-              <p className="text-gray-400 text-sm">Engineers stop acting as manual billing auditors. One proxy to govern all MCP servers.</p>
+              <h3 className="font-bold text-white mb-2">Save time</h3>
+              <p className="text-gray-400 text-sm">Engineers stop combing through bills by hand. One gateway covers all your MCP servers.</p>
             </div>
             <div className="text-center">
               <div className="text-3xl mb-3">💰</div>
-              <h3 className="font-bold text-white mb-2">Revenue Enablement</h3>
-              <p className="text-gray-400 text-sm">Govern paid-rail context such as L402/x402 while SatGate proves agent authority, policy, and budget decisions.</p>
+              <h3 className="font-bold text-white mb-2">Earn money</h3>
+              <p className="text-gray-400 text-sm">Charge external agents per call over L402 or x402, with a signed receipt for every decision.</p>
             </div>
           </div>
         </div>
@@ -384,7 +384,7 @@ const PricingPage = () => {
       {/* FAQ Section */}
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">Questions</h2>
           <div className="space-y-2">
             {faqs.map((faq, i) => (
               <div key={i} className="border border-gray-800 rounded-xl overflow-hidden">
@@ -416,9 +416,9 @@ const PricingPage = () => {
       {/* Bottom CTA */}
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-3">Start a 14-day trial of Pro features.</h2>
+          <h2 className="text-2xl font-bold mb-3">Try Pro free for 14 days.</h2>
           <p className="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
-            No credit card. Email verification creates the account.
+            No credit card. Just confirm your email.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
@@ -448,7 +448,7 @@ const PricingPage = () => {
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="text-gray-500 text-sm">The Agent Authority & Accountability Layer for governed agent requests.</p>
+              <p className="text-gray-500 text-sm">An economic firewall for AI agents.</p>
               <p className="text-gray-600 text-xs mt-3">Non-custodial. We never hold your keys.</p>
             </div>
             <div>
