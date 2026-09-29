@@ -1,49 +1,48 @@
 # SatGate: economic firewall for agent workloads
-> Keep your agents within budget. Make external agents pay before they use your resources. Keep verifiable evidence of the decisions.
-> Observe / Control / Admit, with signed evidence across all three controls.
+> Keep your agents within budget. Make external agents pay before they use your API. Get a signed receipt for every decision.
+> Three controls: Observe, Control and Admit. All three sign receipts.
 
 ## Purpose
-SatGate puts applicable economic and authority checks in the path to protected APIs and tools. External paid admission makes the agent pay before resource consumption where owner policy requires payment. Internal agents consume a finite owner-controlled allowance. Payment never overrides scope, expiry, revocation or tenant boundaries.
+SatGate sits in front of APIs and MCP tools and checks each agent request before it runs. Your own agents spend from a budget you set. External agents pay before the request goes through, on the routes you choose to charge for. Paying never gets an agent past its permissions, an expired or revoked token, or another tenant's data.
 
-Paid admission raises the cost of abuse; it complements rate limits and access controls rather than replacing them. Observe alone does not block requests.
+Charging per request makes abuse expensive. It works alongside rate limits and access controls, not instead of them. Observe on its own does not block anything.
 
 ## Core controls
 
 ### Observe
-Meter and attribute agent/API traffic without blocking it.
+See which agent, route and tool is behind each request, and what it costs, without blocking anything.
 
 ### Control
-Economic control: enforce internal budgets and scope before protected work. Observe reveals usage; Control enforces the owner’s limits.
+Enforce your agents' budgets and permissions before each request runs. Observe shows usage; Control enforces the limits.
 
 ### Admit
-Economic admission: scoped access for external agents, with payment before protected work on the routes you choose. Payment never overrides permissions.
+Let external agents in with limited access, and make them pay first on the routes you choose. Payment never overrides permissions.
 
 ## Proof across all three controls
-Verifiable evidence for audit supports both internal control and external admission. It does not certify compliance or prove every downstream action.
-Evidence Packs record governed decisions across HTTP and MCP paths. Verify issuer trust, canonical bytes and signatures independently. A valid receipt does not prove answer quality, supplier truth, legal identity or external settlement.
+SatGate signs a receipt for every decision, on HTTP APIs and MCP tools, for your own agents and for external ones. Receipts are exported as Evidence Packs. Anyone can check them against SatGate's published keys (JWKS) with the open-source verifier. A receipt shows what SatGate decided. It is not a compliance certificate, and it does not prove answer quality, that a supplier told the truth, anyone's legal identity or that an outside payment settled.
 
 ## Agent choice and owner enforcement
-Agents may choose SatGate for useful work. The resource boundary must remain owner-enforced regardless of that choice. Restrict direct origin access, upstream credentials and egress so callers cannot bypass the gateway.
+Agents may choose SatGate because it helps them get work done. The limits stay owner-enforced either way. Make SatGate the only route to the API: block direct access to the origin, keep upstream API keys behind SatGate and restrict outbound traffic so agents cannot go around it.
 
 ## Discovery and availability
 - Start here: https://satgate.io/build
 - Trust metadata and adapter status: https://satgate.io/.well-known/satgate
 - Public source: https://github.com/SatGate-io/satgate
-- Synthetic HTTP demo and cleanup instructions: https://github.com/SatGate-io/satgate/tree/main/demo
-- Browser simulation: https://satgate.io/sandbox#golden-path
+- Simulated HTTP demo you run locally, with cleanup steps: https://github.com/SatGate-io/satgate/tree/main/demo
+- Demo in the browser: https://satgate.io/sandbox#golden-path
 - Start a 14-day free trial of Pro features, no credit card: https://cloud.satgate.io/cloud/signup
 - Pricing: https://satgate.io/pricing
 - Optional 90-day design-partner pilot for larger teams that want help: https://satgate.io/design-partners
 
-The synthetic demo linked above uses simulated traffic and local-only credentials. It does not establish trusted issuer identity, delegated-worker accounting, MCP behavior or live settlement. A separate live paid route is under "Try it as an agent". Installing a public SDK does not grant hosted API access. Hosted access starts with the 14-day free trial above. The issue/pay/verify API namespace is in private beta. Fresh-agent evaluations with delegated workers require separately confirmed setup and authority; these links do not advertise a public evaluation installer.
+The demo above uses simulated traffic and local test keys. It does not cover trusted issuers, sub-agent budgets, MCP or real payments. For a real paid call, see "Try it as an agent" below. Installing a public SDK does not give you hosted API access; that starts with the 14-day free trial. The issue, pay and verify API is in private beta. Testing a new agent with sub-agents needs a setup and permissions agreed with the owner first; there is no public one-click installer for that.
 
-Trust metadata distinguishes supported and planned adapters. AgentCore Payments and Pay.sh are planned. A discovery document describes availability; exercise the chosen adapter before making a runtime-support claim.
+The trust metadata lists which payment adapters are supported and which are planned. AgentCore Payments and Pay.sh are planned. The metadata says what is available; try an adapter yourself before saying it works.
 
-## Delegation, refusal and recovery
-Choose a useful task with a finite budget. Delegate narrower authority and reservation capacity to each worker before starting. Test out-of-scope and exhausted-budget refusal separately from answer quality. After an ambiguous result, check whether the selected deployment can recover the same operation before retrying. Test its duplicate-spend handling; an unknown outcome remains unresolved, not a failed call. Evaluate useful completion, abuse protection, voluntary adoption and commercial demand separately.
+## Handoffs, refusals and retries
+Pick a task with a set budget. Before starting, give each sub-agent narrower permissions and its own share of the budget. Check that a request outside its permissions and a request past its budget are both refused, and judge that apart from answer quality. If a call times out and you don't know whether it went through, check whether the deployment can look up that same operation before you retry, and check that a retry is not charged twice. An unknown result is unknown, not a failed call. Judge separately: did the task get done, was abuse stopped, would agents choose it on their own, and will people pay for it.
 
 ## Developer details
-Fiat402 is internal budget control, not a payment or settlement rail. It does not require Lightning payment; an internal ledger debit is not external settlement. L402 is a payment protocol for configured external paid access, not the product identity or a fourth control.
+Fiat402 is internal budget control, not a payment or settlement rail. No Lightning payment is involved: SatGate subtracts from the agent's budget and no money moves. L402 is the payment protocol for paid routes that charge external agents. It is one way to pay, not a fourth control.
 
 ### L402 flow on a configured paid route
 1. Agent requests the paid route with `X-SatGate-Tenant: <tenant-slug>` on api.satgate.io.
@@ -167,10 +166,10 @@ This route is Admit. In the dashboard, Admit is the Charge policy. The status UR
 
 ## Architecture
 ```
-Agent / App / MCP Client → CDN/WAF → SatGate Policy-to-Proof Gateway → API / MCP Server / Model Provider
+Agent / App / MCP Client → CDN/WAF → SatGate gateway → API / MCP Server / Model Provider
 ```
 
-SatGate can be deployed as a gateway, sidecar, or MCP proxy. It is designed to add economic governance around existing APIs and agent workflows without forcing every tool implementation to be rewritten.
+SatGate runs as a gateway, a sidecar or an MCP proxy. It adds budgets, permissions and payments in front of the APIs and tools you already have, so you don't have to rewrite them.
 
 ## Development references
 - Gateway quickstart: https://github.com/SatGate-io/satgate/blob/main/docs/getting-started/quickstart.md
@@ -178,7 +177,7 @@ SatGate can be deployed as a gateway, sidecar, or MCP proxy. It is designed to a
 - Capability schema: https://github.com/SatGate-io/satgate/blob/main/docs/reference/capability-schema.md
 - Receipt schema: https://github.com/SatGate-io/satgate/blob/main/docs/reference/receipt-schema.md
 
-Read prerequisites and access status before running examples. Do not interpret an example command as owner authorization to install software, call a supplier or spend money.
+Check the prerequisites and whether you have access before running an example. An example command is not the owner's permission to install software, call a supplier or spend money.
 
 ## Product and Demo Pages
 - Enterprise AI Agent Governance: https://satgate.io/govern
@@ -186,10 +185,10 @@ Read prerequisites and access status before running examples. Do not interpret a
 - SatGate Governance Dashboard: https://satgate.io/dashboard
 - SatGate Control Demo: https://satgate.io/protect
 - SatGate Protect / Scoped Agent Credential Demo: https://satgate.io/crawl
-- SatGate paid-rail governance / L402 Payment Demo: https://satgate.io/pay
+- SatGate Payments / L402 Payment Demo: https://satgate.io/pay
 - SatGate Monetize / L402 API Demo: https://satgate.io/monetize
 - SatGate Mint / Capability Token Demo: https://satgate.io/mint-demo
-- SatGate Sandbox: https://satgate.io/sandbox
+- SatGate Demo: https://satgate.io/sandbox
 - SatGate Design Partners: https://satgate.io/design-partners
 - Pricing: https://satgate.io/pricing
 - Security: https://satgate.io/security
@@ -209,10 +208,10 @@ Read prerequisites and access status before running examples. Do not interpret a
 - Node.js SDK: https://www.npmjs.com/package/@satgate/sdk
 
 ## Plans
-- Starter: free. Observe (metering) with a fair-use cap, 3 routes, default protection + Observe, community support.
-- Pro: $99/month. 14-day free trial of Pro features, no credit card. Email verification creates the account. Observe with no finite monthly cap, 1M Control/Admit requests per month, 25 routes, unlimited team members, all policies (Observe / Control / Admit — Admit is the Charge policy in the dashboard), budget enforcement, token governance, priority support. Upgrade is self-serve by card in the dashboard (Stripe).
-- Enterprise: custom pricing. Unlimited. Self-host means installing the same SatGate binary that runs SatGate Cloud, with its own database, in your own environment. It does not take policy from SatGate Cloud. SCIM, GitOps signed configs, WORM audit export, dedicated support + SLA. Contact: contact@satgate.io.
-- A 90-day design-partner pilot is an option for larger teams that want help. It is not the only way in.
+- Starter: free. Observe (usage tracking) up to a fair-use cap, 3 routes, default protection, community support.
+- Pro: $99/month. 14-day free trial of Pro features, no credit card; the account is created when you confirm your email. Unlimited Observe, 1M Control and Admit requests per month, 25 routes, unlimited team members, all three controls (the dashboard calls Admit "Charge"), budgets, token management, priority support. Upgrade yourself by card in the dashboard (Stripe).
+- Enterprise: custom pricing, no usage limits. You run the same SatGate software that powers SatGate Cloud on your own servers, with your own database. It does not take policy from SatGate Cloud. SCIM, signed configs in Git, WORM audit export, dedicated support + SLA. Contact: contact@satgate.io.
+- A free 90-day design-partner pilot is available for larger teams that want hands-on help. You don't need it to get started.
 
 ## Contact
 - Email: contact@satgate.io

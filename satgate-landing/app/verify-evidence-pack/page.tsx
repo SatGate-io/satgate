@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Verify a SatGate Evidence Pack',
-  description: 'Independently verify SatGate Evidence Packs with RFC 8785 canonicalization, SHA-256 receipt hashes, Ed25519 signatures, and issuer JWKS.',
+  description: 'Check a SatGate receipt yourself, with no SatGate account: download a real Evidence Pack and verify its Ed25519 signature against the published keys.',
   alternates: { canonical: 'https://satgate.io/verify-evidence-pack' },
 };
 
@@ -17,48 +17,41 @@ export default function VerifyEvidencePackPage() {
       <section className="border-b border-white/10 px-6 py-20">
         <div className="mx-auto max-w-4xl">
           <Link href="/" className="text-sm text-gray-400 hover:text-white">← Back to Home</Link>
-          <p className="mt-10 text-sm font-bold uppercase tracking-[0.24em] text-cyan-300">Independent verification</p>
-          <h1 className="mt-4 text-5xl font-black tracking-tight sm:text-6xl">Don&apos;t trust us—verify it yourself.</h1>
+          <p className="mt-10 text-sm font-bold uppercase tracking-[0.24em] text-cyan-300">Check it yourself</p>
+          <h1 className="mt-4 text-5xl font-black tracking-tight sm:text-6xl">Don&apos;t trust us. Check it yourself.</h1>
           <p className="mt-6 text-xl leading-8 text-gray-300">
-            SatGate Evidence Packs are designed to be checked without SatGate credentials. Fetch the pack and issuer JWKS, canonicalize the signed receipt with RFC 8785 JCS, recompute its SHA-256 hash, verify the Ed25519 signature, and compare unsigned pack mirrors against the signed receipt.
+            You don&apos;t need a SatGate account to check an Evidence Pack. Download the pack and SatGate&apos;s published public keys, then run the open-source verifier. It confirms SatGate signed the receipt and that nothing in it was changed afterward.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <a href="https://github.com/SatGate-io/satgate/tree/main/tools" className="rounded-lg bg-white px-5 py-3 text-center font-bold text-black hover:bg-gray-200">Get verifier tool</a>
-            <a href={samplePackFile} className="rounded-lg border border-cyan-300/40 px-5 py-3 text-center font-bold text-cyan-100 hover:border-cyan-200">Download sample production pack</a>
-            <a href="/evidence/policy-to-proof-closure-20260718.json" className="rounded-lg border border-white/20 px-5 py-3 text-center font-bold text-gray-100 hover:border-white/40">Download sanitized closure</a>
+            <a href={samplePackFile} className="rounded-lg border border-cyan-300/40 px-5 py-3 text-center font-bold text-cyan-100 hover:border-cyan-200">Download a real receipt</a>
           </div>
           <p className="mt-4 text-sm leading-6 text-gray-400">
-            The sample is the signed refusal from the demo video on the homepage: a hosted MCP tool call denied with <code>budget_exhausted</code> after a 3¢ budget ran out. Its issuer key is the hosted MCP service&apos;s JWKS. The <a href={livePackUrl} className="text-cyan-200 underline underline-offset-4">live evidence URL</a> works until plan retention removes it; the downloaded file verifies the same way.
+            This is the signed refusal from the demo video on the home page: an MCP tool call refused with <code>budget_exhausted</code> after a 3¢ budget ran out. It&apos;s signed with the hosted MCP service&apos;s key. The <a href={livePackUrl} className="text-cyan-200 underline underline-offset-4">live copy</a> stays up until the plan&apos;s retention period ends; the downloaded file verifies the same way.
           </p>
         </div>
       </section>
 
       <section className="border-b border-white/10 px-6 py-16">
         <div className="mx-auto max-w-5xl">
-          <h2 className="text-3xl font-black">Read the result correctly.</h2>
+          <h2 className="text-3xl font-black">What the result means.</h2>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-5 text-amber-50">
               <h3 className="font-bold"><code>valid=true</code></h3>
-              <p className="mt-2 text-sm leading-6">With an embedded key, this proves only that the artifact is internally self-consistent. It does not establish who controls the issuer.</p>
+              <p className="mt-2 text-sm leading-6">Checked with the key stored inside the pack, this only shows the pack is consistent with itself. It doesn&apos;t show who signed it.</p>
             </div>
             <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-5 text-emerald-50">
               <h3 className="font-bold"><code>trusted_issuer_valid=true</code></h3>
-              <p className="mt-2 text-sm leading-6">Buyer-verifiable proof requires the signature to validate against a separately fetched or pinned issuer JWKS, with trusted-issuer verification required.</p>
+              <p className="mt-2 text-sm leading-6">This is the one that matters: the signature checks out against SatGate&apos;s public keys, downloaded separately from the pack.</p>
             </div>
-          </div>
-          <div className="mt-6 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.06] p-5 text-gray-200">
-            <h3 className="font-bold text-white">Latest bounded closure record</h3>
-            <p className="mt-2 text-sm leading-6">The July 18 record is sanitized, staging-only evidence. It records strict verifier and trusted-issuer success, verifier-copy parity, restart parity, and containment of historical staging bearer links. It does not authorize production promotion.</p>
-            <p className="mt-3 break-all font-mono text-xs text-cyan-100">Source manifest SHA-256: 62d00ac4bff91e56fea8f5e8e42ceb0bb46461c46ba5d5a8c9645047baba4f5a</p>
-            <p className="mt-2 break-all font-mono text-xs text-cyan-100">Public record SHA-256: 162f523d054feb99c2d65fadad7ecb3aa2d5127f1748160ca97424b73215eb7c</p>
           </div>
         </div>
       </section>
 
       <section className="px-6 py-16">
         <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
-          <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-            <h2 className="text-2xl font-black">Clean-room verification</h2>
+          <article className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+            <h2 className="text-2xl font-black">Run the verifier</h2>
             <pre className="mt-5 overflow-x-auto rounded-xl bg-black p-4 text-sm text-gray-300"><code>{`python3 -m venv .venv-verify
 . .venv-verify/bin/activate
 pip install cryptography rfc8785
@@ -69,15 +62,15 @@ python tools/verify_evidence_pack.py pack.json \
   --require-trusted-issuer`}</code></pre>
           </article>
 
-          <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+          <article className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
             <h2 className="text-2xl font-black">What the verifier checks</h2>
             <ul className="mt-5 space-y-3 text-gray-300">
-              <li>• Receipt schema version and production/mock markers.</li>
-              <li>• RFC 8785 canonical payload excluding <code>receipt_hash</code> and <code>signature</code>.</li>
-              <li>• SHA-256 <code>receipt_hash</code> and Ed25519 signature.</li>
-              <li>• Issuer JWKS at <code>/.well-known/jwks.json</code>; embedded public keys are fallback evidence, not issuer trust.</li>
-              <li>• Top-level pack mirrors and budget-state mirrors match the signed receipt.</li>
-              <li>• Optional <code>evidence_pack_hash</code> and secret redaction markers.</li>
+              <li>• The receipt format version, and whether it&apos;s marked as real or a test.</li>
+              <li>• It rebuilds the signed content in a standard form (RFC 8785), leaving out <code>receipt_hash</code> and <code>signature</code>.</li>
+              <li>• The SHA-256 <code>receipt_hash</code> and the Ed25519 signature.</li>
+              <li>• The signature against SatGate&apos;s public keys at <code>/.well-known/jwks.json</code>. A key stored in the pack is only a fallback and doesn&apos;t prove who signed.</li>
+              <li>• The copies of the result and budget at the top of the pack match the signed receipt.</li>
+              <li>• The optional <code>evidence_pack_hash</code>, and that tokens and secrets are blanked out.</li>
             </ul>
           </article>
         </div>
@@ -87,25 +80,25 @@ python tools/verify_evidence_pack.py pack.json \
         <div className="mx-auto max-w-4xl">
           <h2 className="text-3xl font-black">Current limits</h2>
           <ul className="mt-6 space-y-3 text-gray-300">
-            <li>• Receipt signing keys are platform-secret-managed; this page does not claim KMS/HSM custody or external assessment.</li>
-            <li>• The evidence archive is durable platform storage, not externally anchored or WORM-assured.</li>
-            <li>• Evidence URLs are bearer-by-ID links. Anyone holding a URL can fetch that Pack until retention or targeted deletion removes it.</li>
-            <li>• Verifier success establishes artifact integrity and issuer anchoring—not upstream behavior, settlement, or regulatory compliance.</li>
+            <li>• Signing keys are stored as platform secrets. We don&apos;t claim they sit in a hardware security module, and no outside firm has audited them.</li>
+            <li>• Receipts are kept in durable storage. They aren&apos;t anchored anywhere outside SatGate, and the storage isn&apos;t write-once.</li>
+            <li>• Anyone with an Evidence Pack link can open it, until the retention period ends or the pack is deleted. Share links with care.</li>
+            <li>• A pass means the receipt is intact and SatGate signed it. It says nothing about what your API did next, whether a payment settled, or regulatory compliance.</li>
           </ul>
         </div>
       </section>
 
       <section className="border-t border-white/10 px-6 py-16">
         <div className="mx-auto max-w-4xl">
-          <h2 className="text-3xl font-black">What this proves — and what it does not.</h2>
+          <h2 className="text-3xl font-black">What a pass proves, and what it doesn&apos;t.</h2>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-5 text-emerald-50">
               <h3 className="font-bold">Proves</h3>
-              <p className="mt-2 text-sm leading-6">The signed receipt was emitted by the issuer key identified by <code>issuer_kid</code>; signed-field tampering fails; the pack mirrors agree with the signed receipt; bearer/capability secrets are redacted.</p>
+              <p className="mt-2 text-sm leading-6">The key named in <code>issuer_kid</code> signed the receipt. Any change to a signed field makes the check fail. The rest of the pack agrees with the signed receipt, and tokens and secrets are blanked out.</p>
             </div>
             <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-5 text-amber-50">
               <h3 className="font-bold">Does not prove by itself</h3>
-              <p className="mt-2 text-sm leading-6">Billing settlement, upstream counter reconciliation, MCP or deployment parity, instant revocation propagation, or broad production readiness unless those claims are separately evidenced.</p>
+              <p className="mt-2 text-sm leading-6">That a payment settled, that your API&apos;s own logs agree, that a revoke took effect everywhere instantly, or anything else beyond this one receipt.</p>
             </div>
           </div>
         </div>

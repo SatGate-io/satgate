@@ -51,15 +51,13 @@ REQUIRED_PHRASES = {
         "decision_reason",
     ],
     "app/verify-evidence-pack/page.tsx": [
-        "Don&apos;t trust us—verify it yourself.",
+        "Don&apos;t trust us. Check it yourself.",
         "valid=true",
         "trusted_issuer_valid=true",
         "--jwks-file jwks.json",
         "--require-trusted-issuer",
         "Current limits",
-        "/evidence/policy-to-proof-closure-20260718.json",
-        "62d00ac4bff91e56fea8f5e8e42ceb0bb46461c46ba5d5a8c9645047baba4f5a",
-        "162f523d054feb99c2d65fadad7ecb3aa2d5127f1748160ca97424b73215eb7c",
+        "/evidence/sample-mcp-budget-refusal-20260928.json",
     ],
     "app/openai-budget-policy-generator/page.tsx": [
         "receipt_id",

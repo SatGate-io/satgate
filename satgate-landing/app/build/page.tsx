@@ -16,9 +16,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Build Agents With Bounded Economic Authority",
+  title: "Build Agents That Work Within a Budget",
   description:
-    "Complete useful agent work within an explicit budget. Discover public docs and demos, start a 14-day free trial, and inspect delegated authority and recorded outcomes.",
+    "Give each agent a task, a budget and a list of tools it may use. Read the public docs and demo, start a 14-day free trial, and check every decision with a signed receipt.",
   keywords: [
     "SatGate build",
     "AI agent capabilities",
@@ -32,21 +32,21 @@ export const metadata: Metadata = {
     canonical: "https://satgate.io/build",
   },
   openGraph: {
-    title: "Build agents with bounded economic authority",
+    title: "Build agents that work within a budget",
     description:
-      "Start with a useful task and a finite budget. Check access, delegation, refusal and recovery on the path to your tools.",
+      "Give an agent a task and a budget. SatGate checks every tool call, lets you hand smaller budgets to sub-agents, and signs a receipt when it says no.",
     url: "https://satgate.io/build",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Build agents with bounded economic authority",
+    title: "Build agents that work within a budget",
     description:
-      "Build useful agent workflows with scoped authority and finite budgets. Explore public documentation and distinguish demonstrations from private-beta APIs.",
+      "Give agents a task, a budget and a list of allowed tools. Read the public docs, and see which APIs are public and which are in private beta.",
   },
 };
 
-const discovery = `# Read public discovery metadata; no account or installation required
+const discovery = `# Public metadata. No account or install needed
 curl -fsS https://satgate.io/.well-known/satgate
 curl -fsS https://satgate.io/llms.txt`;
 
@@ -121,50 +121,50 @@ curl https://api.satgate.io/v1/verify \
 const primitives = [
   {
     icon: KeyRound,
-    title: "Issue scoped capabilities",
+    title: "Issue a token",
     label: "satgate.issue",
-    body: "Give an agent bounded authority for one task, budget, route set, expiry window, and delegation depth.",
+    body: "Give an agent a token for one task: its budget, the routes it may call, when it expires and how many times it can hand work off.",
   },
   {
     icon: Route,
-    title: "Consume upstream with max budget",
+    title: "Make the call",
     label: "satgate.pay",
-    body: "Let the agent reach MCP tools, APIs, or paid routes through SatGate while an agent-supplied max budget and policy are enforced before execution or settlement.",
+    body: "The agent calls MCP tools, APIs or paid routes through SatGate. SatGate checks your rules and the agent’s spending cap before the call runs or any money moves.",
   },
   {
     icon: ReceiptText,
-    title: "Verify receipts",
+    title: "Check the receipt",
     label: "satgate.verify",
-    body: "Verify the receipt returned by pay, then attach or fetch Evidence Pack proof for audits, incidents, billing review, or revocation proof.",
+    body: "Verify the receipt the call returned. Add it to an Evidence Pack for audits, incident reviews, billing questions or proof of a revoke.",
   },
 ];
 
 const docsBase = "https://github.com/SatGate-io/satgate/blob/main/docs";
 
 const voiceCards = [
-  { title: "Agent task", label: "useful work", body: "Choose a bounded comparison or research task. Assess the result separately from its authorization evidence." },
-  { title: "Owner boundary", label: "budget and scope", body: "Define a finite allowance and permitted tools. Prevent direct upstream access from bypassing the gateway." },
-  { title: "Independent evidence", label: "verify the outcome", body: "Verify the recorded authority and accounting against independently admitted trust. A receipt does not establish answer quality." },
+  { title: "The task", label: "the task", body: "Pick a task with a clear finish, like comparing prices or researching a topic. Judge the result on its own. The receipt only shows what was allowed." },
+  { title: "Your limits", label: "budget and tools", body: "Set a budget and the tools the agent may use. Make sure the agent can’t reach the API directly and skip SatGate." },
+  { title: "Receipts anyone can check", label: "check the result", body: "Check the receipts against SatGate’s published keys. A receipt shows what was allowed and what it cost, not whether the answer was right." },
 ];
 
-const trustMetadataNote = 'Trust metadata documents capability acceptance, receipt verification fields, and is canonical for rail adapter status.';
+const trustMetadataNote = 'What SatGate publishes for machines: which tokens it accepts, how to verify receipts, and which payment methods are live.';
 
 const buildDocLinks = [
-  { title: "Gateway quickstart", href: `${docsBase}/getting-started/quickstart.md`, body: "Local OSS gateway instructions. Read prerequisites and separate the optional paid-route examples from internal budget control." },
-  { title: "Capability schema", href: `${docsBase}/reference/capability-schema.md`, body: "The bounded authority contract: issuer, subject, allowlist, budget, expiry, caveats, and delegation depth." },
-  { title: "Receipt schema", href: `${docsBase}/reference/receipt-schema.md`, body: "The signed decision artifact for allowed, denied, delegated, revoked, and paid outcomes." },
+  { title: "Gateway quickstart", href: `${docsBase}/getting-started/quickstart.md`, body: "Run the open-source gateway on your own machine. Paid routes are optional; you can start with budgets only." },
+  { title: "Capability schema", href: `${docsBase}/reference/capability-schema.md`, body: "What a token holds: who issued it, who it’s for, allowed tools, budget, expiry, extra limits and how far it can be handed off." },
+  { title: "Receipt schema", href: `${docsBase}/reference/receipt-schema.md`, body: "The signed record SatGate writes when it allows, refuses, hands off, revokes or charges." },
   { title: "Trust metadata", href: `${docsBase}/reference/satgate-trust-metadata.md`, body: trustMetadataNote },
-  { title: "Open verifier", href: "https://github.com/SatGate-io/evidence-pack-verifier", body: "Verify a live Evidence Pack from the issuer JWKS with RFC8785 canonicalization and Ed25519 signatures." },
-  { title: "MCP integration", href: `${docsBase}/guides/mcp-gateway.md`, body: "Put SatGate in front of MCP tools and preserve a receipt per tool invocation." },
-  { title: "Raw HTTP", href: `${docsBase}/guides/raw-http.md`, body: "Copy-paste curl for issue, pay, and verify without an SDK." },
-  { title: "OpenAI tools", href: `${docsBase}/guides/openai-tools.md`, body: "Wrap OpenAI tool execution with SatGate authority and receipt verification." },
-  { title: "Anthropic tools", href: `${docsBase}/guides/anthropic-tools.md`, body: "Govern Anthropic tool use outside the provider boundary." },
-  { title: "LangChain", href: `${docsBase}/guides/langchain-integration.md`, body: "Keep LangChain orchestration, add SatGate at the tool authority boundary." },
-  { title: "CrewAI", href: `${docsBase}/guides/crewai.md`, body: "Give each CrewAI tool wrapper scoped authority and Evidence Pack proof." },
+  { title: "Open verifier", href: "https://github.com/SatGate-io/evidence-pack-verifier", body: "Check a live Evidence Pack against the issuer’s published keys (JWKS). Uses RFC 8785 canonical JSON and Ed25519 signatures." },
+  { title: "MCP integration", href: `${docsBase}/guides/mcp-gateway.md`, body: "Put SatGate in front of MCP tools and get a receipt for each tool call." },
+  { title: "Raw HTTP", href: `${docsBase}/guides/raw-http.md`, body: "Copy-paste curl commands for issue, pay and verify. No SDK needed." },
+  { title: "OpenAI tools", href: `${docsBase}/guides/openai-tools.md`, body: "Run OpenAI tool calls through SatGate and verify the receipts." },
+  { title: "Anthropic tools", href: `${docsBase}/guides/anthropic-tools.md`, body: "Enforce limits on Anthropic tool use in your own gateway, not inside the model provider." },
+  { title: "LangChain", href: `${docsBase}/guides/langchain-integration.md`, body: "Keep LangChain for orchestration and add SatGate where the tools are called." },
+  { title: "CrewAI", href: `${docsBase}/guides/crewai.md`, body: "Give each CrewAI tool its own token and a receipt for every call." },
 
-  { title: "API overview", href: `${docsBase}/api/overview.md`, body: "Low-level gateway compatibility APIs and how they relate to issue/pay/verify." },
-  { title: "Python SDK", href: `${docsBase}/sdks/python.md`, body: "Python SDK setup and compatibility paths." },
-  { title: "Node.js SDK", href: `${docsBase}/sdks/nodejs.md`, body: "Node.js SDK setup and compatibility paths." },
+  { title: "API overview", href: `${docsBase}/api/overview.md`, body: "The lower-level gateway APIs and how they map to issue, pay and verify." },
+  { title: "Python SDK", href: `${docsBase}/sdks/python.md`, body: "Install and set up the Python SDK." },
+  { title: "Node.js SDK", href: `${docsBase}/sdks/nodejs.md`, body: "Install and set up the Node.js SDK." },
 ];
 
 const runtimeChips = [
@@ -209,7 +209,7 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "WebPage",
-      name: "Build agents with bounded economic authority",
+      name: "Build agents that work within a budget",
       url: "https://satgate.io/build",
       description: metadata.description,
       datePublished: "2026-05-12",
@@ -219,7 +219,7 @@ const jsonLd = {
         { "@type": "Thing", name: "Agent Authority & Accountability Layer" },
         { "@type": "Thing", name: "agent capabilities" },
         { "@type": "Thing", name: "verifiable receipts" },
-        { "@type": "Thing", name: "rail-neutral payment governance" },
+        { "@type": "Thing", name: "agent payment controls" },
       ],
     },
     {
@@ -248,16 +248,16 @@ export default function BuildPage() {
         <div className="relative mx-auto grid max-w-6xl min-w-0 gap-12 px-6 py-24 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.22em] text-cyan-200">
-              <Code2 size={16} /> Agent starting point
+              <Code2 size={16} /> For developers
             </div>
             <h1 className="max-w-4xl text-5xl font-black tracking-tight text-white sm:text-6xl lg:text-7xl">
-              Build agents with bounded economic authority
+              Build agents that work within a budget
             </h1>
             <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
-              Complete a useful task within an explicit budget. Discover the available tools, delegate narrower allowances, and handle refusal without bypassing your owner’s policy.
+              Give your agent a task and a budget. It can see which tools it may use, hand smaller budgets to sub-agents, and handle a refusal without working around your rules.
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
-              Agents can choose SatGate for a useful workflow. Owners still need an enforced boundary on the protected-call path, independent of that choice.
+              Agents may choose SatGate because it helps them get work done. Your limits have to hold either way, so SatGate sits between the agent and the tools it calls.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a
@@ -284,14 +284,14 @@ export default function BuildPage() {
               <div className="h-3 w-3 rounded-full bg-red-500" />
               <div className="h-3 w-3 rounded-full bg-yellow-500" />
               <div className="h-3 w-3 rounded-full bg-green-500" />
-              <span className="ml-2 text-xs font-mono text-gray-500">Discover before installing</span>
+              <span className="ml-2 text-xs font-mono text-gray-500">Look before you install</span>
             </div>
             <pre className="max-w-full overflow-x-auto p-5 text-sm leading-6 text-gray-300"><code>{discovery}</code></pre>
             <div className="border-t border-gray-800 p-5">
               <p className="mb-2 text-xs font-mono uppercase tracking-[0.18em] text-cyan-300">SDK access</p>
               <pre className="max-w-full overflow-x-auto rounded-xl bg-black p-4 text-sm leading-6 text-gray-300"><code>{installCommands}</code></pre>
               <p className="mt-3 text-sm leading-6 text-gray-500">
-                The issue/pay/verify API namespace is in private beta. <a href="https://github.com/SatGate-io/satgate/blob/main/docs/index.md" target="_blank" rel="noopener noreferrer" className="text-cyan-300 hover:text-cyan-200">Request access →</a>
+                The issue, pay and verify API is in private beta. <a href="https://github.com/SatGate-io/satgate/blob/main/docs/index.md" target="_blank" rel="noopener noreferrer" className="text-cyan-300 hover:text-cyan-200">Request access →</a>
               </p>
             </div>
           </div>
@@ -299,22 +299,22 @@ export default function BuildPage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 pt-16">
-        <h2 className="text-3xl font-bold text-white">Public paths you can inspect today</h2>
-        <p className="mt-4 max-w-3xl text-lg text-gray-400">The public kit is a Synthetic HTTP demo with simulated traffic and local-only credentials. It demonstrates price discovery, allowed calls and budget exhaustion. It does not establish trusted issuer identity, delegated-worker accounting, MCP behavior or live settlement.</p>
+        <h2 className="text-3xl font-bold text-white">What you can try today</h2>
+        <p className="mt-4 max-w-3xl text-lg text-gray-400">The public demo is a simulated HTTP demo that runs on your machine with local test keys. It shows an agent finding the price, making allowed calls and running out of budget. It doesn’t cover trusted issuers, sub-agent budgets, MCP or real payments.</p>
         <div className="mt-6 flex flex-wrap gap-4">
-          <a href="https://github.com/SatGate-io/satgate/tree/main/demo" className="rounded-lg bg-white px-6 py-3 font-bold text-black">Read the public demo instructions</a>
+          <a href="https://github.com/SatGate-io/satgate/tree/main/demo" className="rounded-lg bg-white px-6 py-3 font-bold text-black">Read the demo instructions</a>
           <a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="rounded-lg border border-gray-700 px-6 py-3 font-bold text-white">Start free trial</a>
-          <Link href="/sandbox#golden-path" className="rounded-lg border border-cyan-600 px-6 py-3 font-bold text-cyan-200">Try the browser simulation</Link>
-          <Link href="/design-partners" className="rounded-lg border border-gray-700 px-6 py-3 font-bold text-white">Request a bounded evaluation</Link>
+          <Link href="/sandbox#golden-path" className="rounded-lg border border-cyan-600 px-6 py-3 font-bold text-cyan-200">Try the demo in your browser</Link>
+          <Link href="/design-partners" className="rounded-lg border border-gray-700 px-6 py-3 font-bold text-white">Talk to us about a pilot</Link>
         </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="mb-10 max-w-3xl">
           <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-cyan-300">Start with the task</p>
-          <h2 className="text-3xl font-bold text-white sm:text-4xl">Useful work inside an enforced boundary.</h2>
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">Real work, within limits you set.</h2>
           <p className="mt-4 text-lg leading-8 text-gray-400">
-            Economic defense protects the resources behind the task. Observe shows usage without blocking; Control enforces internal budgets and scope; Admit charges external agents for authorized access on paid routes. Signed records provide verifiable evidence for audit across all three, not a guarantee of compliance.
+            SatGate protects the APIs and tools the task depends on. Observe shows usage without blocking. Control enforces your agents’ budgets and permissions. Admit charges external agents on paid routes, after checking they’re allowed in. All three sign receipts anyone can check. A receipt is a record, not a compliance guarantee.
           </p>
         </div>
         <div className="grid gap-5 md:grid-cols-3">
@@ -333,7 +333,7 @@ export default function BuildPage() {
           <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-emerald-300">Private-beta API</p>
           <h2 className="text-3xl font-bold text-white sm:text-4xl">Issue. Pay. Verify.</h2>
           <p className="mt-4 text-lg leading-8 text-gray-400">
-            The issue/pay/verify API namespace is in private beta. The examples below illustrate that API, not an available end-to-end fresh-agent installation. Public SDK packages can be installed separately.
+            The issue, pay and verify API is in private beta. The examples below show how it works; you can’t run them end to end without beta access. The public SDK packages install on their own.
           </p>
         </div>
         <div className="grid gap-5 md:grid-cols-3">
@@ -352,22 +352,22 @@ export default function BuildPage() {
         <div className="mx-auto grid max-w-6xl min-w-0 gap-10 px-6 py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
           <div>
             <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-purple-300">Developer details</p>
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">Payment protocols and internal accounting.</h2>
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">Payments and internal budgets.</h2>
             <div className="mt-5 space-y-5 text-lg leading-8 text-gray-400">
               <p>
-                Fiat402 implements internal budget control without requiring payment settlement. L402 is a payment protocol for configured external paid access. Economic admission still checks permission; payment never replaces authorization.
+                Fiat402 handles internal budgets: your agent spends from its budget and no money moves. L402 handles paid access for external agents: a Lightning payment unlocks the route. Either way, SatGate still checks permissions. Paying never replaces them.
               </p>
               <p>
-                Consult <a href="https://satgate.io/.well-known/satgate" className="text-cyan-300 hover:text-cyan-200">/.well-known/satgate</a> for published adapter status. AgentCore Payments and Pay.sh remain planned. Confirm the chosen adapter in your evaluation rather than assuming that a guide establishes runtime support.
+                See <a href="https://satgate.io/.well-known/satgate" className="text-cyan-300 hover:text-cyan-200">/.well-known/satgate</a> for published adapter status, meaning which payment methods are live. AgentCore Payments and Pay.sh remain planned. A guide for a payment method doesn’t mean it’s live, so check before you build on it.
               </p>
               <p>
-                Humans and platforms deploy the policies. Agents consume capabilities. Upstreams receive verifiable proof that the action was authorized, bounded, and recorded.
+                You set the rules. Agents use the tokens you give them. The APIs they call get proof that each request was allowed, within budget and recorded.
               </p>
             </div>
           </div>
           <div className="min-w-0 rounded-2xl border border-gray-800 bg-black p-6">
             <div className="mb-4 flex items-center gap-2 text-emerald-200">
-              <BadgeCheck size={20} /> Illustrative receipt previews
+              <BadgeCheck size={20} /> Example receipts
             </div>
             <div className="grid gap-4">
               <div>
@@ -391,7 +391,7 @@ export default function BuildPage() {
         <div className="mb-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <div>
             <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-cyan-300">Private-beta examples</p>
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">Illustrative calls for accounts with beta access.</h2>
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">Example calls for accounts with beta access.</h2>
           </div>
         </div>
 
@@ -415,9 +415,9 @@ export default function BuildPage() {
         <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="mb-10 max-w-3xl">
             <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-emerald-300">Agent integrations</p>
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">Give every runtime bounded authority.</h2>
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">Works with the framework you already use.</h2>
             <p className="mt-4 text-lg leading-8 text-gray-400">
-              The runtime changes. The contract stays the same: capability before action, receipt after decision. The machine-readable trust metadata lives at <a href="https://satgate.io/.well-known/satgate" className="text-cyan-300 hover:text-cyan-200">/.well-known/satgate</a>.
+              Whatever framework you use, the pattern is the same: the agent gets a token before it acts and a receipt after SatGate decides. The machine-readable details are at <a href="https://satgate.io/.well-known/satgate" className="text-cyan-300 hover:text-cyan-200">/.well-known/satgate</a>.
             </p>
             <div className="mt-6 flex flex-wrap gap-2 text-sm text-gray-300">
               <span className="mr-1 py-1 text-gray-500">Integration guides:</span>
@@ -455,20 +455,20 @@ export default function BuildPage() {
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-300">
-                <ShieldCheck size={16} /> Not a new marketplace. Not a separate brand.
+                <ShieldCheck size={16} /> What to test
               </div>
-              <h2 className="text-3xl font-bold text-white sm:text-4xl">Delegation, refusal and recovery</h2>
+              <h2 className="text-3xl font-bold text-white sm:text-4xl">Handoffs, refusals and retries</h2>
               <p className="mt-5 text-lg leading-8 text-gray-300">
-                Give each worker narrower authority and enough reservation capacity for its task. Exercise an out-of-scope or exhausted-budget refusal. After an ambiguous result, check whether the selected deployment can recover the same operation before retrying. Treat an unknown outcome as unresolved, not as a failed call.
+                Give each sub-agent a smaller budget and fewer permissions, with enough set aside to finish its part. Try a request it isn’t allowed to make and one that runs past its budget, and check that both are refused. If a call times out and you don’t know whether it went through, check whether your setup can look up that same call before you retry. Treat an unknown result as unknown, not as a failure.
               </p>
             </div>
             <div className="grid gap-3 text-sm text-gray-300">
               {[
-                "Finite task and worker allowances",
-                "Receipts for allowed, denied, delegated, revoked, and paid decisions",
-                "Useful results graded separately from proof",
-                "Test same-operation recovery and duplicate-spend handling in the selected deployment",
-                "Owner-enforced policy on the protected-call path",
+                "A set budget for the task and for each sub-agent",
+                "Receipts for every allow, refusal, handoff, revoke and payment",
+                "The result judged on its own, apart from the receipts",
+                "Check that a retried call isn’t charged twice",
+                "Your rules enforced between the agent and your tools",
               ].map((item) => (
                 <div key={item} className="flex items-start gap-3 rounded-xl border border-gray-800 bg-black/60 p-4">
                   <Layers3 className="mt-0.5 text-cyan-300" size={18} />
@@ -482,16 +482,16 @@ export default function BuildPage() {
 
       <section className="border-t border-gray-900 bg-black px-6 py-20 text-center">
         <Braces className="mx-auto mb-6 text-cyan-300" size={36} />
-        <h2 className="mx-auto max-w-3xl text-3xl font-bold text-white sm:text-4xl">Evaluate one useful workflow.</h2>
+        <h2 className="mx-auto max-w-3xl text-3xl font-bold text-white sm:text-4xl">Try it on one real workflow.</h2>
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-gray-400">
-          For a fresh-agent evaluation with delegated workers, request a bounded evaluation. Confirm setup, available integrations and authority before starting. Public demo results and private-beta examples are not a complete evaluation package.
+          To test a new agent with sub-agents, talk to us about a pilot. We’ll agree on the setup, the integrations and the limits before you start. The public demo and the beta examples alone won’t give you the full picture.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a href="https://github.com/SatGate-io/satgate/blob/main/docs/index.md" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
             Open docs <ArrowRight size={18} />
           </a>
           <Link href="/capability-auth" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-400">
-            Capability auth model <ArrowRight size={18} />
+            How tokens work <ArrowRight size={18} />
           </Link>
         </div>
       </section>

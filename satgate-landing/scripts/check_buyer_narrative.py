@@ -56,13 +56,13 @@ REQUIRED = {
     ],
     "app/pricing/layout.tsx": [
         "Economic Firewall for AI Agents",
-        "bounded agent authority",
+        "Per-agent budgets",
     ],
     "app/build/page.tsx": [
-        "Build Agents With Bounded Economic Authority",
-        "Build agents with bounded economic authority",
-        "Consume upstream with max budget",
-        "Complete a useful task within an explicit budget",
+        "Build Agents That Work Within a Budget",
+        "Build agents that work within a budget",
+        "Make the call",
+        "Give your agent a task and a budget",
     ],
     "app/paid-agent-payments/page.tsx": [
         "Agents consume. Humans and platforms buy.",
