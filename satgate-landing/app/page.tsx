@@ -4,14 +4,14 @@ import HomeClient from "./components/HomeClient";
 export const metadata: Metadata = {
   title: "SatGate | Economic Firewall for AI Agents",
   description:
-    "Protect internal budgets and external access: keep agents within budget, charge outside agents for authorized access and retain verifiable evidence for audit.",
+    "Protect internal budgets and external access: keep agents within budget, charge external agents for authorized access and retain verifiable evidence for audit.",
   alternates: {
     canonical: "https://satgate.io",
   },
   openGraph: {
     title: "SatGate | Economic Firewall for AI Agents",
     description:
-      "Keep your agents within budget. Make outside agents pay before they use your resources. Keep verifiable evidence of gateway decisions.",
+      "Keep your agents within budget. Make external agents pay before they use your resources. Keep verifiable evidence of gateway decisions.",
     url: "https://satgate.io",
     type: "website",
   },
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SatGate | Economic Firewall for AI Agents",
     description:
-      "Keep your agents within budget. Make outside agents pay before they use your resources. Keep verifiable evidence of gateway decisions.",
+      "Keep your agents within budget. Make external agents pay before they use your resources. Keep verifiable evidence of gateway decisions.",
   },
 };
 
@@ -68,7 +68,7 @@ export default function HomePage() {
         name: 'What is SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate is an economic firewall for AI agents. Economic control enforces internal budgets and permissions. Economic admission charges outside agents for authorized access on paid routes. Signed decision receipts, paid-call receipts and Evidence Pack proof support independent audit review.',
+          text: 'SatGate is an economic firewall for AI agents. Economic control enforces internal budgets and permissions. Economic admission charges external agents for authorized access on paid routes. Signed decision receipts, paid-call receipts and Evidence Pack proof support independent audit review.',
         },
       },
       {

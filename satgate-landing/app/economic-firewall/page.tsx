@@ -78,7 +78,7 @@ export default function EconomicFirewallPage() {
         name: 'What is an economic firewall?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An economic firewall checks authority and applicable economic conditions in the request path before protected work begins. Internal agents consume finite owner budgets; outside agents must satisfy access policy and payment requirements where configured.',
+          text: 'An economic firewall checks authority and applicable economic conditions in the request path before protected work begins. Internal agents consume finite owner budgets; external agents must satisfy access policy and payment requirements where configured.',
         },
       },
       {
@@ -189,7 +189,7 @@ export default function EconomicFirewallPage() {
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-3xl leading-relaxed mb-6">
-            Keep internal agent spending within budget. Make outside agents pay before they use your resources. Retain verifiable evidence for audit.
+            Keep internal agent spending within budget. Make external agents pay before they use your resources. Retain verifiable evidence for audit.
           </p>
           <p className="max-w-3xl rounded-2xl border border-purple-900/50 bg-purple-950/20 p-5 text-lg leading-relaxed text-purple-100 mb-10">
             Economic defense is the foundation. SatGate uses Observe, Control and Admit to help legitimate agents do useful work within enforced boundaries. Evidence Packs record governed outcomes across those controls.
@@ -244,7 +244,7 @@ export default function EconomicFirewallPage() {
               Rate limits can slow traffic. Dashboards can explain yesterday&apos;s bill. Neither can answer the question that matters before a request happens: <strong className="text-white">is this agent allowed to take this action right now?</strong>
             </p>
             <p>
-              An outside agent can consume resources deliberately; an internal agent can exhaust a budget through retries or delegation. Both need economic limits on the protected-call path. Choosing a tool voluntarily is separate from enforcing the owner’s restrictions.
+              An external agent can consume resources deliberately; an internal agent can exhaust a budget through retries or delegation. Both need economic limits on the protected-call path. Choosing a tool voluntarily is separate from enforcing the owner’s restrictions.
             </p>
           </div>
         </div>
@@ -294,7 +294,7 @@ export default function EconomicFirewallPage() {
             <h2 className="text-3xl font-bold text-white mb-5">Paying for access never overrides permission</h2>
             <div className="space-y-4 text-gray-300 text-lg leading-relaxed">
               <p>
-                An outside agent may be willing to pay and still request something the resource owner has forbidden. Economic admission combines the required payment with access restrictions; neither replaces the other.
+                An external agent may be willing to pay and still request something the resource owner has forbidden. Economic admission combines the required payment with access restrictions; neither replaces the other.
               </p>
               <p>
                 An economic firewall sits at the gateway boundary. It decides whether an agent may access an API, consume budget, call an MCP tool, delegate authority, or unlock a paid resource before forwarding.
@@ -338,7 +338,7 @@ export default function EconomicFirewallPage() {
           <div className="rounded-2xl border border-yellow-800/50 bg-yellow-950/10 p-6">
             <h2 className="text-2xl font-bold text-white mb-4">Admit</h2>
             <p className="text-gray-300 leading-relaxed">
-              Admit gives outside agents scoped access on your terms. On paid routes, agents pay before protected work runs. Validate payment before protected work, and keep scope and revocation checks in force even for paying callers.
+              Admit gives external agents scoped access on your terms. On paid routes, agents pay before protected work runs. Validate payment before protected work, and keep scope and revocation checks in force even for paying callers.
             </p>
           </div>
         </div>
@@ -455,7 +455,7 @@ export default function EconomicFirewallPage() {
           <h2 className="mb-8 text-3xl font-bold text-white">Economic firewall questions</h2>
           <div className="grid gap-5 md:grid-cols-2">
             {[
-              ['What is an economic firewall?', 'An economic firewall checks authority and applicable economic conditions in the request path before protected work begins. Internal agents consume finite owner budgets; outside agents must satisfy access policy and payment requirements where configured.'],
+              ['What is an economic firewall?', 'An economic firewall checks authority and applicable economic conditions in the request path before protected work begins. Internal agents consume finite owner budgets; external agents must satisfy access policy and payment requirements where configured.'],
               ['How is an economic firewall different from rate limiting?', 'Rate limiting counts requests. An economic firewall enforces scoped authority, budgets, revocation, agent identity, tool policy, denial reasons, and payment context in the request path.'],
               ['Why do AI agents need economic firewalls?', 'Autonomous agents can loop, delegate, retry, and call paid tools without a human approving each request. SatGate denies unauthorized actions before execution and preserves auditable proof afterward.'],
               ['Is an economic firewall the same as an API gateway?', 'No. An API gateway can route and secure traffic, but an economic firewall adds per-agent authority, budget caveats, delegated credentials, denial reasons, revocation proof, and rail-aware payment context before requests execute.'],

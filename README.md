@@ -28,7 +28,7 @@
 
 ---
 
-SatGate is a gateway in front of APIs and MCP tools. It meters agent and MCP traffic (**Observe**), enforces owner budgets before work runs (**Control**), and charges outside agents on the routes you choose (**Admit**; the Charge policy in the dashboard). Every allow or deny comes with a signed receipt.
+SatGate is a gateway in front of APIs and MCP tools. It meters agent and MCP traffic (**Observe**), enforces owner budgets before work runs (**Control**), and charges external agents on the routes you choose (**Admit**; the Charge policy in the dashboard). Every allow or deny comes with a signed receipt.
 
 Try it as an agent. This hosted route costs 10 sats:
 
