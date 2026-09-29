@@ -549,7 +549,7 @@ def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reas
     if decision_profile == "paid_rail":
         checks[f"{prefix}_paid_rail"] = bool(valid_paid_rail(receipt) or valid_x402_paid_rail(receipt))
         if not checks[f"{prefix}_paid_rail"]:
-            fail("invalid_paid_rail_provenance", f"receipts[{index}] payment_verified L402 context is missing, mismatched, or carries contradictory credit/USD state")
+            fail("invalid_paid_rail_provenance", f"receipts[{index}] payment_verified L402 or x402 context is missing, mismatched, or carries contradictory credit/USD state")
 
     if receipt.get("decision_reason") == "sandbox_no_spend":
         authority_value = receipt.get("authority")
@@ -844,6 +844,7 @@ def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requi
     # Optional display mirrors are not new authority. If present, they must
     # have a signed counterpart and match it recursively in both type and value.
     for field in ("rail", "amount_sats", "payment_hash", "invoice_hash", "macaroon_hash",
+                  "transaction", "network", "asset", "payer", "pay_to", "amount_atomic",
                   "paid_rail_context", "issued_at", "evidence_url", "timestamp",
                   "policy_version", "jwks_url", "schema_url", "verify_url"):
         if field in pack:

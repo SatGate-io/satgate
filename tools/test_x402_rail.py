@@ -135,6 +135,21 @@ class X402PaidRailTests(unittest.TestCase):
             with self.subTest(surface=surface):
                 self.assertFalse(self.verify(surface, p)['valid'])
 
+    def test_x402_pack_display_mirrors_must_match_receipt(self):
+        good = self.f.pack(x402_receipt(self.f))
+        for field, wrong in (('transaction', '0x' + 'cd' * 32), ('network', 'eip155:8453'),
+                             ('asset', USDC['eip155:8453']), ('payer', PAY_TO), ('pay_to', PAYER),
+                             ('amount_atomic', 1)):
+            p = copy.deepcopy(good)
+            p[field] = copy.deepcopy(p['receipts'][0][field])
+            for surface in VERIFIERS:
+                with self.subTest(field=field, surface=surface, mirror='equal'):
+                    self.assertTrue(self.verify(surface, p)['valid'])
+            p[field] = wrong
+            for surface in VERIFIERS:
+                with self.subTest(field=field, surface=surface, mirror='different'):
+                    self.assertFalse(self.verify(surface, p)['valid'])
+
 
 if __name__ == '__main__':
     unittest.main()
