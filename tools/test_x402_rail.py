@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from test_paid_rail import NOW, VERIFIERS, Fixture, PaidRailTests
+from test_paid_rail import VERIFIERS, PaidRailTests
 
 TX = '0x' + 'ab' * 32
 PAYER = '0x70997970c51812dc3a010c7d01b50e0d17dc79c8'
@@ -81,13 +81,12 @@ def x402_corpus(f):
         yield label, f.pack(r), False
 
 
-class X402PaidRailTests(PaidRailTests):
-    """Reuses PaidRailTests' verify/cli helpers; the L402 tests are not rerun here."""
+class X402PaidRailTests(unittest.TestCase):
+    """Borrows PaidRailTests' fixture and verify/cli helpers without rerunning its L402 tests."""
 
-    def __getattribute__(self, name):
-        if name.startswith('test_') and name not in X402PaidRailTests.__dict__:
-            raise AttributeError(name)
-        return super().__getattribute__(name)
+    setUp = PaidRailTests.setUp
+    verify = PaidRailTests.verify
+    cli = PaidRailTests.cli
 
     def test_x402_signed_corpus(self):
         for label, p, expected in x402_corpus(self.f):
