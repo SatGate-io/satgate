@@ -273,7 +273,9 @@ const LandingPage = () => {
       <section className="py-16 px-6 border-b border-gray-800">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-3">See SatGate in Action</h2>
-          <p className="text-gray-400 mb-8 max-w-2xl mx-auto">One minute, recorded on production, with narration. Mint an agent token with a 3¢ budget, watch each MCP tool call get a signed receipt, see call four refused before the tool runs, then check the receipt with the open-source verifier.</p>
+          <p className="text-gray-400 mb-10 max-w-2xl mx-auto">Two short recordings from production, with narration.</p>
+          <h3 className="text-xl font-bold mb-2">Your agents: a budget they can&apos;t overspend</h3>
+          <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Mint an agent token with a 3¢ budget, watch each MCP tool call get a signed receipt, see call four refused before the tool runs, then check the receipt with the open-source verifier.</p>
           <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
             <video
               controls
@@ -288,6 +290,37 @@ const LandingPage = () => {
             </video>
           </div>
           <p className="text-xs text-gray-500 mt-3">The agent in the recording is a scripted MCP client using the public <code className="text-gray-400">satgate-mcp-bridge</code> npm package. Tokens are blurred.</p>
+
+          <h3 className="text-xl font-bold mt-16 mb-2">Outside agents: pay per request</h3>
+          <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Set a price on an API route in the dashboard. An agent with no wallet gets 402 Payment Required and never reaches the API. An agent that pays a 10-sat Lightning invoice gets one request. Every decision, refusals included, gets a signed receipt.</p>
+          <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-yellow-500/10">
+            <video
+              controls
+              preload="metadata"
+              poster="/satgate-admit-poster.jpg"
+              className="w-full"
+              playsInline
+              aria-label="Narrated demo: an outside agent with no wallet is refused with 402 Payment Required, a second agent pays a 10 sat Lightning invoice for one request, and the signed receipts pass the open-source verifier"
+            >
+              <source src="/satgate-admit-demo.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <p className="text-xs text-gray-500 mt-3">The agents in the recording are scripted HTTP clients. The invoice was paid from a separate Lightning wallet while the recording was paused. Emails are blurred.</p>
+          <div className="mt-6 text-left max-w-2xl mx-auto rounded-lg border border-gray-800 bg-black/60 p-4">
+            <p className="text-sm text-gray-300 mb-3">
+              Check the refusal from the start of the video yourself. Fetch the{' '}
+              <a href="https://api.satgate.io/v1/evidence/evid_GrXvKUgtdqNbuQ5lZzqRMpZrOoU2VAnE" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">live receipt</a>{' '}
+              or the{' '}
+              <a href="/evidence/admit-payment-refusal-20260929.json" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">downloaded copy</a>, then run the{' '}
+              <a href="https://github.com/SatGate-io/satgate/tree/main/tools" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">open-source verifier</a>{' '}
+              against SatGate&apos;s public key:
+            </p>
+            <pre className="text-xs text-gray-400 font-mono whitespace-pre-wrap break-all">python3 tools/verify_evidence_pack.py https://api.satgate.io/v1/evidence/evid_GrXvKUgtdqNbuQ5lZzqRMpZrOoU2VAnE --jwks-url https://api.satgate.io/.well-known/jwks.json --require-trusted-issuer</pre>
+            <p className="text-xs text-gray-500 mt-3">
+              <Link href="/verify-evidence-pack" className="hover:text-gray-300 underline underline-offset-2">What the verifier checks</Link>
+            </p>
+          </div>
         </div>
       </section>
 
