@@ -64,7 +64,21 @@ const metadata = {
   rails_adapters: {
     supported: [
       { id: "mcp", type: "protocol", role: "tool_transport", status: "supported" },
-      { id: "x402", type: "payment_rail", role: "external_paid_access", status: "supported" },
+      {
+        id: "x402",
+        type: "payment_rail",
+        role: "external_paid_access",
+        status: "supported",
+        x402_version: 2,
+        schemes: ["exact"],
+        networks: ["eip155:8453", "eip155:84532"],
+        assets: {
+          "eip155:8453": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+          "eip155:84532": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+        },
+        payment_scope: "one_request",
+        receipt_authority: "settled_x402_authorization",
+      },
       { id: "l402", type: "payment_rail", role: "external_paid_access", status: "supported" },
       { id: "api_key_billing", type: "billing_adapter", role: "existing_vendor_billing", status: "supported" },
       { id: "enterprise_ledger", type: "ledger_adapter", role: "internal_chargeback", status: "supported" },

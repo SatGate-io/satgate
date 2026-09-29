@@ -118,6 +118,8 @@ Current adapter catalog:
 - `agentcore_payments`: `payment_rail` / `external_paid_access` / `planned`
 - `pay_sh`: `payment_rail` / `external_paid_access` / `planned`
 
+The `x402` entry also says how to pay on that rail: x402 version 2, scheme `exact`, USDC on Base (`eip155:8453`) or Base Sepolia (`eip155:84532`) with the USDC contract for each network, one payment per request (`payment_scope: "one_request"`), and the authority label its receipts carry (`settled_x402_authorization`). A route only offers x402 when its owner turns it on; the 402 response for that route is the source of truth for price and receiving address.
+
 Rails sit below authority and receipt verification. SatGate proof is the receipt/Evidence Pack layer around the rail. Marketing copy may mention planned rails, but the well-known artifact is canonical for whether a rail is currently supported or planned.
 
 ## Signing key discovery
