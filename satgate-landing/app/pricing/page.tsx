@@ -350,7 +350,7 @@ const PricingPage = () => {
                 <tr>
                   <td className="py-3 px-4 text-gray-300">Payments</td>
                   <td className="py-3 px-4">None built in</td>
-                  <td className="py-3 px-4 text-white">Charge external agents per call (L402, x402)</td>
+                  <td className="py-3 px-4 text-white">Charge external agents per call (L402; USDC via x402 in beta)</td>
                 </tr>
               </tbody>
             </table>
@@ -375,7 +375,7 @@ const PricingPage = () => {
             <div className="text-center">
               <div className="text-3xl mb-3">💰</div>
               <h3 className="font-bold text-white mb-2">Earn money</h3>
-              <p className="text-gray-400 text-sm">Charge external agents per call over L402 or x402, with a signed receipt for every decision.</p>
+              <p className="text-gray-400 text-sm">Charge external agents per call over L402, or in USDC via x402 (in beta), with a signed receipt for every decision.</p>
             </div>
           </div>
         </div>

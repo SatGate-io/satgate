@@ -126,7 +126,7 @@ export default function GovernPage() {
                 </div>
               </div>
               <h3 className="text-xl font-bold text-white mb-2">Admit <span className="text-yellow-400">External Agents</span></h3>
-              <p className="text-gray-400 text-sm mb-3">Approved external agents consume your APIs with scoped, expiring access instead of long-lived shared secrets, with per-request policy and pricing above L402, x402, API-key billing, or enterprise ledgers.</p>
+              <p className="text-gray-400 text-sm mb-3">Approved external agents consume your APIs with scoped, expiring access instead of long-lived shared secrets, with per-request policy and pricing above L402, x402 (USDC, in beta), API-key billing, or enterprise ledgers.</p>
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <Zap size={12} className="text-yellow-400" />
                 <span>Authorized before admission</span>
