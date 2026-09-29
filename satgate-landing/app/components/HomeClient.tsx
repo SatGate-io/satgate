@@ -191,23 +191,20 @@ const LandingPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              Keep your agents within budget. Make external agents pay before they use your resources. Keep verifiable evidence of the decisions.
+              Keep your agents within budget. Make external agents pay before they use your API. Get a signed receipt for every decision.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
-              Control internal spending before work begins. Use paid admission to make repeated external abuse costly, while enforcing the owner’s access restrictions. Protect the resources behind useful agent work.
+              SatGate checks each request before it reaches your API or MCP tool. Your own agents stop when their budget runs out. External agents pay on the routes you choose, so hammering your API gets expensive, and paying never gets them past your access rules.
             </p>
             <div className="flex flex-wrap gap-4">
               <a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
                 Start free trial <ArrowRight size={16} />
               </a>
-              <Link href="/sandbox#golden-path" className="border border-gray-700 px-8 py-3 rounded-lg font-bold hover:bg-gray-800 transition flex items-center gap-2 text-gray-200">
-                Try the simulated demo <ArrowRight size={16} />
-              </Link>
               <Link href="/build" className="border border-cyan-700/50 bg-cyan-900/15 px-8 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition flex items-center gap-2 text-cyan-300">
                 Build with SatGate <ArrowRight size={16} />
               </Link>
               <Link href="/sandbox#golden-path" className="border border-purple-700/50 bg-purple-900/20 px-8 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition flex items-center gap-2 text-purple-300">
-                <Play size={16} /> Explore the demo sequence
+                <Play size={16} /> Try the 90-second demo
               </Link>
               <Link href="/evidence-pack-demo" className="border border-cyan-700/50 bg-cyan-900/15 px-8 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition flex items-center gap-2 text-cyan-300">
                 See an Evidence Pack <ArrowRight size={16} />
@@ -220,10 +217,10 @@ const LandingPage = () => {
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
                 <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> REST · GraphQL · MCP</span>
                 <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Gateway · Sidecar · MCP Proxy</span>
-                <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Request-path verification</span>
+                <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Checks each request first</span>
               </div>
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-                <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> MCP · API keys · x402-aware governance</span>
+                <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> MCP · HTTP APIs · Lightning payments</span>
                 <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> <a href="https://github.com/SatGate-io/satgate" className="text-gray-400 hover:text-white transition underline underline-offset-2">Open source</a></span>
               </div>
             </div>
@@ -256,7 +253,7 @@ const LandingPage = () => {
             </div>
             <div className="text-center mt-4">
               <p className="text-sm text-gray-500 mb-3">
-                Real production recording: three $0.01 tool calls, then the fourth is refused before the tool runs.
+                Recorded on production: three $0.01 tool calls, then the fourth is refused before the tool runs.
               </p>
               <Link
                 href="/protect"
@@ -270,7 +267,7 @@ const LandingPage = () => {
       </header>
 
       {/* Explainer Video Section */}
-      <section className="py-16 px-6 border-b border-gray-800">
+      <section id="see-it-live" className="py-16 px-6 border-b border-gray-800 scroll-mt-20">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-3">See SatGate in Action</h2>
           <p className="text-gray-400 mb-10 max-w-2xl mx-auto">Two short recordings from production, with narration.</p>
@@ -300,7 +297,7 @@ const LandingPage = () => {
               poster="/satgate-admit-poster.jpg"
               className="w-full"
               playsInline
-              aria-label="Narrated demo: an external agent with no wallet is refused with 402 Payment Required, a second agent pays a 10 sat Lightning invoice for one request, and the signed receipts pass the open-source verifier"
+              aria-label="Narrated demo: an external agent with no wallet is refused with 402 Payment Required, a second agent gets one request through after paying a 10 sat Lightning invoice, and the signed receipts pass the open-source verifier"
             >
               <source src="/satgate-admit-demo.mp4" type="video/mp4" />
               Your browser does not support the video tag.
@@ -328,22 +325,22 @@ const LandingPage = () => {
       <section className="py-20 px-6 border-b border-gray-800 bg-black">
         <div className="max-w-6xl mx-auto">
           <div className="mb-10 max-w-3xl">
-            <p className="mb-3 text-sm font-mono uppercase tracking-wide text-cyan-300">Free agent governance tools</p>
-            <h2 className="mb-4 text-3xl md:text-4xl font-bold text-white">Measure authority and spend risk before agents run wild</h2>
+            <p className="mb-3 text-sm font-mono uppercase tracking-wide text-cyan-300">Free tools</p>
+            <h2 className="mb-4 text-3xl md:text-4xl font-bold text-white">See what a runaway agent could cost you</h2>
             <p className="text-gray-400 text-lg leading-relaxed">
-              Start with the flagship tools and benchmark. The full tools hub has the calculators, policy generators, and readiness checks for deeper planning.
+              Start with these three. The tools page has more calculators and policy generators.
             </p>
           </div>
           <div className="mb-6">
             <Link href="/tools" className="inline-flex items-center gap-2 text-cyan-300 hover:text-cyan-200 font-semibold transition">
-              View all free AI agent governance tools <ArrowRight size={16} />
+              See all free tools <ArrowRight size={16} />
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
-              { href: '/runaway-agent-cost-calculator', title: 'Runaway Agent Cost Calculator', body: 'Model loop, retry, fanout, and paid tool-call exposure before detection.', icon: Activity },
-              { href: '/ai-agent-runaway-spend-benchmark', title: 'AI Agent Runaway Spend Benchmark', body: 'Use original JSON/CSV benchmark data to quantify agent loops, retry storms, and avoidable spend.', icon: BarChart3 },
-              { href: '/economic-firewall-readiness-grader', title: 'Economic Firewall Readiness Grader', body: 'Score identity, budgets, MCP tools, revocation, Evidence Packs, routing, and paid-rail governance.', icon: Shield },
+              { href: '/runaway-agent-cost-calculator', title: 'Runaway Agent Cost Calculator', body: 'Estimate what loops, retries and fan-out could cost before anyone notices.', icon: Activity },
+              { href: '/ai-agent-runaway-spend-benchmark', title: 'AI Agent Runaway Spend Benchmark', body: 'Our benchmark data on agent loops, retry storms and wasted spend, as JSON and CSV.', icon: BarChart3 },
+              { href: '/economic-firewall-readiness-grader', title: 'Economic Firewall Readiness Grader', body: 'Grade your setup on budgets, permissions, revocation, MCP tools and audit records.', icon: Shield },
             ].map(({ href, title, body, icon: Icon }) => (
               <Link key={href} href={href} className="group rounded-xl border border-gray-800 bg-gray-950 p-6 transition hover:border-cyan-500/50 hover:bg-cyan-950/10">
                 <Icon className="mb-4 text-cyan-300 transition group-hover:text-cyan-200" size={28} />
@@ -360,39 +357,39 @@ const LandingPage = () => {
       <section className="py-20 px-6 border-b border-gray-800 bg-gradient-to-b from-gray-900/30 to-black">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3">Economic defense for your agents and your services</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">Economic control limits what your agents can spend. Economic admission makes external agents pay before protected work. Verifiable evidence supports both.</p>
+            <h2 className="text-3xl font-bold mb-3">Budgets for your agents. Payment from external agents.</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">Control caps what your own agents can spend. Admit makes external agents pay before their request reaches you. Both leave signed receipts.</p>
           </div>
 
           {/* Default Protection - Foundation */}
           <div className="p-8 rounded-xl bg-black border-2 border-purple-500/50 mb-6 relative">
             <div className="absolute -top-3 left-6 bg-purple-600 text-xs font-bold px-3 py-1 rounded">
-              DEFAULT PROTECTION
+              ON BY DEFAULT
             </div>
             <div className="flex items-center gap-3 mb-4 mt-2">
               <div className="p-3 bg-purple-900/30 rounded-lg">
                 <Shield className="text-purple-400" size={24} />
               </div>
               <div>
-                <h3 className="text-xl font-bold">Access stays within the owner’s permission</h3>
-                <p className="text-gray-500 text-sm">Always-on for non-PUBLIC routes</p>
+                <h3 className="text-xl font-bold">Agents only get what you allow</h3>
+                <p className="text-gray-500 text-sm">Every route except the ones you mark PUBLIC</p>
               </div>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              Protected routes check what an agent is allowed to do before forwarding work.
-              Payment does not buy permission to exceed scope, expiry or revocation.
+              Before SatGate forwards a request, it checks what that agent is allowed to do.
+              Paying doesn&apos;t change that: a paid request still can&apos;t go past its permissions, use an expired token or get around a revoke.
             </p>
             <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-              <span>✓ Scoped permissions</span>
-              <span>✓ Delegation chains</span>
-              <span>✓ Next-request revocation</span>
-              <span>✓ Tamper-evident Evidence Pack receipts</span>
+              <span>✓ Permissions per agent</span>
+              <span>✓ Narrower tokens for sub-agents</span>
+              <span>✓ Revoke works on the next request</span>
+              <span>✓ Signed receipts</span>
             </div>
           </div>
 
           {/* Your Agents */}
           <div className="mb-4">
-            <p className="text-sm font-mono text-cyan-400 mb-4 uppercase tracking-wider">Your agents: economic control</p>
+            <p className="text-sm font-mono text-cyan-400 mb-4 uppercase tracking-wider">Your agents: budgets</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Observe - Free */}
@@ -402,19 +399,19 @@ const LandingPage = () => {
                 <div className="p-2.5 bg-cyan-900/50 rounded-lg">
                   <Eye className="text-cyan-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Observe <span className="text-xs font-normal text-gray-500">(usage visibility)</span></h3>
+                <h3 className="font-bold text-lg">Observe <span className="text-xs font-normal text-gray-500">(see usage)</span></h3>
               </div>
               <p className="text-gray-400 text-sm mb-3">
                 See usage and cost without blocking requests.
               </p>
               <p className="text-xs text-cyan-400/80 mb-3 italic">
-                Start here. Keep agent behavior unchanged while you map authority, tools, and spend before enforcing policy.
+                Start here. Nothing is blocked while you see which agents call what, and what it costs.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
-                <li>✓ Observe mode - no enforcement changes to existing agent workflows</li>
-                <li>✓ Usage attribution by team and cost center</li>
-                <li>✓ See exactly which agents, tools, and routes create risk before you change anything</li>
-                <li>✓ Designed for low-overhead observation</li>
+                <li>✓ Nothing is blocked; your agents work as before</li>
+                <li>✓ Usage broken down by team and cost center</li>
+                <li>✓ See which agents, tools and routes cost the most before you change anything</li>
+                <li>✓ Built to add little overhead</li>
               </ul>
             </div>
 
@@ -425,17 +422,17 @@ const LandingPage = () => {
                 <div className="p-2.5 bg-purple-900/50 rounded-lg">
                   <SlidersHorizontal className="text-purple-400" size={22} />
                 </div>
-                <h3 className="font-bold text-lg">Control <span className="text-xs font-normal text-gray-500">(internal budgets)</span></h3>
+                <h3 className="font-bold text-lg">Control <span className="text-xs font-normal text-gray-500">(budgets)</span></h3>
               </div>
               <p className="text-gray-400 text-sm mb-3">
-                Economic control: enforce budgets and permissions before work.
+                Enforce budgets and permissions before a request runs.
               </p>
               <p className="text-xs text-purple-400/80 mb-3 italic">
-                Now enforce it. Policy and budget caps stop agents before unauthorized work executes.
+                Then turn on limits. An agent that is out of budget or asks for something it isn&apos;t allowed is stopped before the request runs.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
-                <li>✓ Real-time budget enforcement</li>
-                <li>✓ Internal allowances, without requiring agents to pay</li>
+                <li>✓ Budget checked on every request</li>
+                <li>✓ Your agents spend from a budget you set; nobody pays per call</li>
                 <li>✓ Per-agent spending caps</li>
               </ul>
             </div>
@@ -444,7 +441,7 @@ const LandingPage = () => {
 
           {/* Their Agents */}
           <div className="mb-4">
-            <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">External agents: economic admission</p>
+            <p className="text-sm font-mono text-yellow-400 mb-4 uppercase tracking-wider">External agents: access and payment</p>
           </div>
           <div className="grid grid-cols-1 gap-6 mb-6 max-w-lg">
             {/* Admit - external agents above payment rails */}
@@ -457,16 +454,16 @@ const LandingPage = () => {
                 <h3 className="font-bold text-lg">Admit <span className="text-xs font-normal text-gray-500">(external access)</span></h3>
               </div>
               <p className="text-gray-400 text-sm mb-3">
-                Economic admission: scoped access for external agents, with payment where you require it.
+                Give external agents limited access, and charge them where you want to.
               </p>
               <p className="text-xs text-yellow-400/80 mb-3 italic">
-                On paid routes, agents pay before protected work runs, so repeated abuse gets expensive. Payment never overrides scope, expiry or revocation.
+                On a paid route, payment comes first, before the request reaches your API, so hammering it gets expensive. Paying never gets an agent past your access rules.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
-                <li>✓ No long-lived shared secrets for approved external agents</li>
+                <li>✓ No shared API keys to hand out</li>
                 <li>✓ Payment only on the routes you choose</li>
-                <li>✓ Per-request pricing and policy at the gateway before forwarding</li>
-                <li>✓ Scoped access on your terms</li>
+                <li>✓ You set the price and how many requests one payment buys</li>
+                <li>✓ You decide what each agent can reach</li>
               </ul>
             </div>
           </div>
@@ -474,39 +471,39 @@ const LandingPage = () => {
           {/* Prove - spans both agent lanes */}
           <div className="p-8 rounded-xl bg-black border-2 border-purple-500/50 mb-6 relative">
             <div className="absolute -top-3 left-6 bg-purple-600 text-xs font-bold px-3 py-1 rounded">
-              PROOF SPANS BOTH LANES
+              RECEIPTS FOR BOTH
             </div>
             <div className="flex items-center gap-3 mb-4 mt-2">
               <div className="p-3 bg-purple-900/30 rounded-lg">
                 <CheckCircle className="text-purple-400" size={24} />
               </div>
               <div>
-                <h3 className="text-xl font-bold">Verifiable evidence for audit</h3>
-                <p className="text-gray-500 text-sm">Proof across all three controls</p>
+                <h3 className="text-xl font-bold">Receipts anyone can check</h3>
+                <p className="text-gray-500 text-sm">From Observe, Control and Admit</p>
               </div>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              Supported allowed, denied, paid, delegated, and revoked decisions can produce signed receipts
-              that reconcile into Evidence Packs your auditor can verify independently against trusted issuer keys.
-              This supports audit review; it does not certify compliance or prove every downstream action.
+              When SatGate allows, refuses, charges or revokes, it signs a receipt. Receipts roll up into Evidence Packs.
+              Your auditor can check the signatures with the open-source verifier, without having to trust us.
+              A receipt shows what SatGate decided. It is not a compliance certificate.
             </p>
             <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-              <span>✓ Both agent lanes</span>
-              <span>✓ Supported governed decisions</span>
-              <span>✓ Signed, tamper-evident receipts</span>
-              <span>✓ Independently verifiable Evidence Packs</span>
+              <span>✓ Your agents and external agents</span>
+              <span>✓ Refusals too</span>
+              <span>✓ Any edit breaks the signature</span>
+              <span>✓ Open-source verifier</span>
             </div>
           </div>
 
           <p className="text-sm text-gray-400 mb-8">
-            Paid admission raises the cost of abuse. It works alongside rate limits and access controls, not in place of them, and it protects only traffic that goes through the gateway.
+            Charging for access makes abuse more expensive. It doesn&apos;t replace rate limits or access controls, and it only covers traffic that goes through SatGate.
           </p>
 
           {/* Token Delegation Video */}
           <div className="mt-12 mb-8">
             <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold mb-2">Why API Keys Break in Agent Chains</h3>
-              <p className="text-gray-400 max-w-xl mx-auto text-sm">API keys are all-or-nothing. Delegated capability tokens let you set any budget, scope, and expiry per agent - and agents can&apos;t escalate beyond what they&apos;re given. Trust flows down, never up.</p>
+              <h3 className="text-2xl font-bold mb-2">Why API keys don&apos;t work when agents hand off work</h3>
+              <p className="text-gray-400 max-w-xl mx-auto text-sm">An API key gives full access or none. A SatGate token carries its own budget, permissions and expiry. An agent can hand a sub-agent a narrower token, never a broader one.</p>
             </div>
             <div className="max-w-3xl mx-auto relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
               <video
@@ -525,9 +522,9 @@ const LandingPage = () => {
           {/* PUBLIC callout */}
           <div className="p-4 rounded-lg bg-green-950/20 border border-green-900/30">
             <p className="text-sm text-gray-400">
-              <span className="text-green-400 font-medium">PUBLIC</span> is the explicit opt-out for
-              probes (<code className="bg-gray-800 px-1 rounded text-gray-300">/healthz</code>), docs, and webhooks.
-              Everything else is protected by default.
+              Mark a route <span className="text-green-400 font-medium">PUBLIC</span> to leave it open, for health checks
+              (<code className="bg-gray-800 px-1 rounded text-gray-300">/healthz</code>), docs and webhooks.
+              Every other route is protected by default.
             </p>
           </div>
 
@@ -548,7 +545,7 @@ const LandingPage = () => {
             </span>
             <h2 className="text-2xl font-bold mb-2">Badge in once. Fly through every gate.</h2>
             <p className="text-gray-400 text-sm max-w-xl mx-auto">
-              Agents get a credential at startup - like mounting an EZ Pass. Every request after that flows through the gateway to be verified and metered under policy.
+              An agent gets a token when it starts, like putting an E-ZPass on the windshield. After that, SatGate checks and meters each request as it passes.
             </p>
           </div>
           <div className="flex items-center justify-center gap-2 md:gap-4 flex-wrap text-sm mt-8">
@@ -583,7 +580,7 @@ const LandingPage = () => {
             </div>
           </div>
           <p className="text-xs text-gray-600 text-center mt-6">
-            Capability verification stays on the request path without per-request identity round-trips.
+            SatGate checks the token itself, so it doesn&apos;t call your identity provider on every request.
           </p>
         </div>
       </section>
@@ -593,43 +590,43 @@ const LandingPage = () => {
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-900/30 border border-blue-500/30 text-blue-300 text-xs font-mono mb-3">
-              <BookOpen size={12} /> RESEARCH ALIGNMENT
+              <BookOpen size={12} /> THE RESEARCH
             </span>
-            <h2 className="text-2xl font-bold mb-3">Built for the agent delegation era</h2>
+            <h2 className="text-2xl font-bold mb-3">Built for agents that hand work to other agents</h2>
             <p className="text-gray-400 text-sm max-w-2xl mx-auto">
-              Recent research on intelligent AI delegation points to a control problem we see in practice: agents need bounded authority,
-              clear caveats, and safe ways to delegate across trust boundaries. One proposed path is attenuated capability tokens,
-              including <span className="text-blue-300">macaroons</span>, that restrict what each sub-agent can access.
+              A 2026 paper on AI delegation describes a problem we see in practice: when agents hand work to other agents,
+              each one needs clear limits on what it can do and spend. One approach it proposes is tokens that can only be
+              narrowed as they are passed down, such as <span className="text-blue-300">macaroons</span>.
             </p>
             <p className="text-gray-300 text-sm mt-3 font-medium">
-              SatGate implements one version of that control layer.
+              SatGate&apos;s tokens are macaroons.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-4 mb-6">
             <div className="p-4 rounded-lg bg-gray-800/50 border border-gray-700">
               <Lock className="text-cyan-400 mb-2" size={20} />
-              <h3 className="font-bold text-sm mb-1">Scoped Authority</h3>
+              <h3 className="font-bold text-sm mb-1">Limited permissions</h3>
               <p className="text-gray-400 text-xs">
-                Agents only get the permissions they need, attenuated at each delegation layer.
+                Each agent gets only the permissions it needs, and each handoff can only narrow them.
               </p>
             </div>
             <div className="p-4 rounded-lg bg-gray-800/50 border border-gray-700">
               <DollarSign className="text-green-400 mb-2" size={20} />
-              <h3 className="font-bold text-sm mb-1">Budget Ceilings</h3>
+              <h3 className="font-bold text-sm mb-1">Budget caps</h3>
               <p className="text-gray-400 text-xs">
-                Per-agent and per-route economic policy, checked at the gateway before forwarding.
+                Set budgets per agent and per route. SatGate checks them before forwarding.
               </p>
             </div>
             <div className="p-4 rounded-lg bg-gray-800/50 border border-gray-700">
               <Zap className="text-yellow-400 mb-2" size={20} />
-              <h3 className="font-bold text-sm mb-1">Immediate Enforcement</h3>
+              <h3 className="font-bold text-sm mb-1">Stops on the next request</h3>
               <p className="text-gray-400 text-xs">
-                When limits hit, the gateway denies the next governed request before forwarding.
+                Once an agent hits a limit, SatGate refuses its next request.
               </p>
             </div>
           </div>
           <p className="text-gray-500 text-xs text-center">
-            We built SatGate because standing API keys and after-the-fact alerts are a bad fit for autonomous systems. The research gives useful language for a problem we were already seeing in deployed agent workflows.{' '}
+            We built SatGate because standing API keys and after-the-fact alerts are a bad fit for autonomous systems. The paper put words to a problem we were already seeing in agent deployments.{' '}
             <span className="text-gray-600 ml-1">
               - <a href="https://arxiv.org/abs/2602.11865" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400 underline underline-offset-2">Tomasev et al., 2026</a>
             </span>
@@ -640,8 +637,8 @@ const LandingPage = () => {
       {/* Where It Fits Section - Clean diagrams */}
       <section className="py-16 px-6 border-b border-gray-800">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-3">Where It Fits</h2>
-          <p className="text-gray-500 text-center mb-10">Three integration patterns. Start with one bounded route or tool.</p>
+          <h2 className="text-2xl font-bold text-center mb-3">Where it fits</h2>
+          <p className="text-gray-500 text-center mb-10">Three ways to set it up. Start with one route or one tool.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Standard */}
@@ -695,7 +692,7 @@ const LandingPage = () => {
                 <span className="text-gray-600">↓</span>
                 <div className="w-full px-3 py-2 rounded bg-green-900/30 border border-green-800/50 text-center text-green-400 text-xs">MCP Servers / Tools</div>
               </div>
-              <p className="text-gray-600 text-xs text-center mt-4">Per-tool budgets, delegation trees</p>
+              <p className="text-gray-600 text-xs text-center mt-4">Budgets per tool, including for sub-agents</p>
             </div>
           </div>
         </div>
@@ -706,9 +703,9 @@ const LandingPage = () => {
       <section className="py-20 px-6 border-b border-gray-800 bg-gradient-to-b from-gray-900/30 to-black">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-3">How It Works</h2>
+            <h2 className="text-3xl font-bold mb-3">How it works</h2>
             <p className="text-gray-400 max-w-xl mx-auto">
-              Most pilots start with a proxy, DNS, or MCP configuration change around one bounded endpoint or tool.
+              Most teams start by pointing one endpoint or one MCP tool at SatGate.
             </p>
           </div>
 
@@ -716,27 +713,27 @@ const LandingPage = () => {
             {[
               {
                 step: "1",
-                title: "Pick Your Policy",
-                description: "Define routes with economic policies. PUBLIC for probes/docs, protected for everything else.",
+                title: "Pick a policy",
+                description: "Set a policy per route: public for health checks and docs, protected for everything else.",
                 code: `routes:\n  - path: /healthz\n    policy: public\n  - path: /v1/*\n    policy: observe\n  - path: /premium/*\n    policy: charge`
               },
               {
                 step: "2",
-                title: "Apply Config",
-                description: "Apply when ready. Version history + policy receipt trail. Rollback if needed.",
+                title: "Apply it",
+                description: "Apply it when you are ready. Every version is kept, with a receipt for who changed what, so you can roll back.",
                 code: `v3 (applied) ← current\nv2 (available)\nv1 (available)\n\nReceipt: who, when, diff`
               },
               {
                 step: "3",
-                title: "Point Your Agents",
-                description: "Send agent traffic to api.satgate.io with your tenant header. Every request flows through SatGate.",
+                title: "Point your agents",
+                description: "Send agent traffic to api.satgate.io with your tenant header, so every request goes through SatGate.",
                 code: `# Agent requests\nGET https://api.satgate.io/v1/...\nX-SatGate-Tenant: your-tenant\n\n# MCP clients\nnpx satgate-mcp-bridge`
               },
               {
                 step: "4",
-                title: "Prove What Happened",
-                description: "Receipts for allowed, denied, paid, delegated, and revoked decisions — ready to export as an Evidence Pack.",
-                code: `Illustrative sample — not live customer data\nAllowed receipts: 1,203\nDenied receipts: 12,847\nPaid receipts:   $847 settled\nDelegations:     42\nRevocations:     9\n\n→ Export Evidence Pack`
+                title: "Check what happened",
+                description: "Receipts for allowed, denied, paid, delegated, and revoked decisions, ready to export as an Evidence Pack.",
+                code: `Illustrative sample, not live customer data\nAllowed receipts: 1,203\nDenied receipts: 12,847\nPaid receipts:   $847 settled\nDelegations:     42\nRevocations:     9\n\n→ Export Evidence Pack`
               }
             ].map((item, i) => (
               <div key={i} className="relative">
@@ -762,12 +759,12 @@ const LandingPage = () => {
       <section className="py-20 px-6 border-t border-gray-900 bg-gray-950/40">
         <div className="max-w-4xl mx-auto rounded-2xl border border-gray-800 bg-black p-8 md:p-10">
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">FAQ</p>
-          <h2 className="mb-8 text-3xl font-bold text-white">Agent governance questions</h2>
+          <h2 className="mb-8 text-3xl font-bold text-white">Questions</h2>
           <div className="space-y-6">
             {[
-              ['What is SatGate?', 'SatGate is the Agent Authority & Accountability Layer for governed agent execution. Humans and platforms use it to delegate bounded economic authority to agents, enforce policy and budgets, prove revocation, and preserve evidence across APIs, MCP tools, and paid external calls.'],
-              ['How does SatGate govern AI agents?', 'SatGate applies scoped authority, per-agent policy, revocation, and budgets before each request reaches an API or MCP tool, so unauthorized actions and expensive calls can be blocked before they happen.'],
-              ['How does SatGate give agents bounded economic authority?', 'Humans and platforms define policy, budgets, scope, and delegation depth. Agents consume approved API and MCP primitives through SatGate, and every approval, denial, spend event, delegation, and revocation leaves receipt-backed proof.'],
+              ['What is SatGate?', 'SatGate is a gateway that sits in front of your APIs and MCP tools. It keeps your own agents within the budgets and permissions you set, charges external agents on the routes you choose, and signs a receipt for each decision.'],
+              ['How does SatGate control what agents do?', 'Before a request reaches your API or MCP tool, SatGate checks the agent’s permissions, its remaining budget and whether its token was revoked. If a check fails, the request stops at SatGate.'],
+              ['How do I give an agent a budget?', 'You set the budget, the permissions and how many times it can hand work to a sub-agent. The agent gets a token with those limits built in. Every allow, refusal, payment, handoff and revoke gets a receipt.'],
             ].map(([question, answer]) => (
               <div key={question} className="border-t border-gray-800 pt-6 first:border-t-0 first:pt-0">
                 <h3 className="mb-2 text-xl font-bold text-white">{question}</h3>
@@ -782,7 +779,7 @@ const LandingPage = () => {
       <footer className="py-20 border-t border-gray-800">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-6">Ready to govern what your agents can do?</h2>
+            <h2 className="text-3xl font-bold mb-6">Ready to set limits for your agents?</h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
               <a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="inline-block bg-white text-black px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-200 transition">
                 Start free trial
@@ -793,7 +790,7 @@ const LandingPage = () => {
             </div>
             <p className="text-gray-500 text-sm mb-4">14 days free. No credit card. Want help rolling out? <Link href="/design-partners" className="text-purple-400 hover:text-purple-300 transition underline underline-offset-4">Ask about a 90-day design-partner pilot</Link></p>
             <p className="text-gray-500 text-sm">
-              Or <Link href="/policy-to-proof" className="text-purple-400 hover:text-purple-300 transition underline underline-offset-4">see the Policy-to-Proof evidence story →</Link>
+              Or <Link href="/policy-to-proof" className="text-purple-400 hover:text-purple-300 transition underline underline-offset-4">see how the receipts work →</Link>
             </p>
           </div>
 
@@ -803,8 +800,8 @@ const LandingPage = () => {
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="max-w-xs text-sm text-gray-500">Economic defense for your resources. Bounded authority for useful agent work.</p>
-              <p className="text-gray-600 text-xs mt-3">Humans and platforms buy. Agents consume bounded primitives.</p>
+              <p className="max-w-xs text-sm text-gray-500">Limits for your agents, payment from external agents, and a receipt for every decision.</p>
+              <p className="text-gray-600 text-xs mt-3">You set the rules. SatGate enforces them on every request.</p>
             </div>
             <div>
               <h4 className="mb-4 font-bold text-white">Start here</h4>

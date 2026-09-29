@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: "SatGate Demo | Try AI Agent Budget Enforcement Free",
   alternates: { canonical: "https://satgate.io/sandbox" },
   description:
-    "Try SatGate without signup. Test economic access control, AI agent budget enforcement, MCP tool governance, capability tokens, and request-path policy decisions live.",
+    "Try SatGate without signing up. Watch it give an agent a budget, block calls the agent is not allowed to make, revoke its token and charge external agents.",
   keywords: [
     "SatGate demo",
     "AI agent budget enforcement demo",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SatGate Demo | Try AI Agent Budget Enforcement Free",
     description:
-      "Interactive demo for economic access control, AI agent budgets, MCP governance, capability tokens, and request-path policy decisions.",
+      "Watch SatGate give an agent a budget, block calls it is not allowed to make and revoke its token.",
     url: "https://satgate.io/sandbox",
     type: "website",
   },
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SatGate Demo | Try AI Agent Budget Enforcement Free",
     description:
-      "Test AI agent budget enforcement, MCP governance, and capability-token controls live.",
+      "Watch SatGate cap an agent's budget, block calls and revoke its token.",
   },
 };
 

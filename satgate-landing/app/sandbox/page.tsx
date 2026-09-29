@@ -52,29 +52,29 @@ const sandboxDemos = [
     title: 'Mint Demo',
     href: '/mint-demo',
     icon: Key,
-    eyebrow: '1 · Issue authority',
-    body: 'Create scoped capability for an agent before it touches a tool, API, or paid resource.',
+    eyebrow: '1 · Create a token',
+    body: 'Give an agent a token with its own permissions and budget before it calls anything.',
   },
   {
-    title: 'Capability Control Demo',
+    title: 'Access Control Demo',
     href: '/protect',
     icon: Shield,
-    eyebrow: '2 · Control authority',
-    body: 'See scope, delegation, and revocation in the request path without making spend the center of the demo.',
+    eyebrow: '2 · Limit access',
+    body: 'Limit what an agent can call, hand a narrower token to a sub-agent, then revoke it.',
   },
   {
     title: 'Spend Control Demo',
     href: '#spend-control-demo',
     icon: DollarSign,
-    eyebrow: '3 · Constrain spend',
-    body: 'Run the budget-enforcement simulation and watch SatGate deny runaway agent spend before value moves.',
+    eyebrow: '3 · Cap spending',
+    body: 'Run the simulation below and watch SatGate refuse an agent once its budget runs out.',
   },
   {
-    title: 'Paid-Rails Demo',
+    title: 'Payments Demo',
     href: '/pay',
     icon: Zap,
-    eyebrow: '4 · Govern rails',
-    body: 'Put paid-rail context behind policy and receipts without making L402/x402 the product center.',
+    eyebrow: '4 · Charge external agents',
+    body: 'Make an external agent pay before its request goes through, with a receipt either way.',
   },
 ];
 const goldenPathSteps: Array<{
@@ -88,27 +88,27 @@ const goldenPathSteps: Array<{
   tone: GoldenStepTone;
 }> = [
   {
-    label: '1 · No authority',
+    label: '1 · No token',
     status: 'HTTP 401',
     decision: 'denied',
     reason: 'DEFAULT_PROTECTION: no capability token presented',
     route: '/v1/invoices/search',
-    budget: 'No budget consumed',
+    budget: 'Nothing spent',
     receipt: 'rcpt_demo_unauth_001',
     tone: 'blocked',
   },
   {
-    label: '2 · Scoped authority issued',
-    status: 'capability minted',
+    label: '2 · Token issued',
+    status: 'token created',
     decision: 'issued',
     reason: 'tenant=acme-finance; scope=/v1/invoices/*; budget<=3.00 USD',
     route: 'agent:invoice-reconciler-worker',
-    budget: '3.00 USD delegated budget',
+    budget: '3.00 USD budget',
     receipt: 'rcpt_demo_001 / rcpt_demo_002',
     tone: 'issued',
   },
   {
-    label: '3 · Allowed action',
+    label: '3 · Allowed',
     status: 'HTTP 200',
     decision: 'allowed',
     reason: 'allowed_under_policy',
@@ -118,32 +118,32 @@ const goldenPathSteps: Array<{
     tone: 'allowed',
   },
   {
-    label: '4 · Out-of-scope denial',
+    label: '4 · Blocked: not allowed',
     status: 'HTTP 403',
     decision: 'blocked',
     reason: 'scope_violation:no_customer_data_export',
     route: '/v1/invoices/export',
-    budget: 'No export spend allowed',
+    budget: 'Nothing spent',
     receipt: 'rcpt_demo_006',
     tone: 'denied',
   },
   {
-    label: '5 · Budget denial',
+    label: '5 · Blocked: out of budget',
     status: 'HTTP 402',
     decision: 'blocked',
     reason: 'budget_exhausted',
     route: '/v1/invoices/reconcile',
-    budget: '0.78 / 3.00 USD spent; remaining shown as 0.00 after denial',
+    budget: '0.78 of 3.00 USD spent when refused',
     receipt: 'rcpt_demo_007',
     tone: 'denied',
   },
   {
-    label: '6 · Revoke / replay denial',
+    label: '6 · Blocked: token revoked',
     status: 'HTTP 401/403',
     decision: 'blocked',
     reason: 'capability_revoked',
     route: 'mcp:invoices.search',
-    budget: 'No additional spend after revoke',
+    budget: 'Nothing spent after the revoke',
     receipt: 'rcpt_demo_008 / rcpt_demo_009',
     tone: 'revoked',
   },
@@ -169,7 +169,7 @@ function ProofCtas({ compact = false }: { compact?: boolean }) {
         Download JSON <ArrowRight size={16} />
       </a>
       <a href="/evidence-packs/evidence-pack.schema.v1.json" className={`${base} inline-flex items-center justify-center gap-2 rounded-lg border border-purple-400/40 bg-purple-400/10 font-bold text-purple-100 transition hover:border-purple-200`}>
-        Verify schema <ArrowRight size={16} />
+        View schema <ArrowRight size={16} />
       </a>
     </div>
   );
@@ -179,18 +179,15 @@ function GoldenPathSection() {
   return (
     <section id="golden-path" className="border-b border-cyan-500/20 bg-[radial-gradient(circle_at_20%_0%,rgba(34,211,238,0.16),transparent_30%),radial-gradient(circle_at_85%_20%,rgba(168,85,247,0.16),transparent_35%)]">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-        <p className="mb-3 text-sm font-mono uppercase tracking-[0.24em] text-cyan-300">90-second SatGate proof</p>
+        <p className="mb-3 text-sm font-mono uppercase tracking-[0.24em] text-cyan-300">90-second walkthrough</p>
         <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
           <div>
             <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-5xl">
-              Run authority proof: allow, deny, revoke, then inspect the Evidence Pack.
+              One agent, allowed, blocked and revoked, with a receipt for every step.
             </h2>
             <p className="mt-5 text-lg leading-8 text-gray-300">
-              This public proof path is deterministic and uses the same sample Evidence Pack shown in the viewer. It is a buyer-comprehension demo, not a production-promotion claim.
+              This walkthrough is a simulation with sample data, so it runs the same way every time. The receipts match the sample Evidence Pack in the viewer. To see SatGate on production, watch the <Link href="/#see-it-live" className="text-cyan-300 underline hover:text-cyan-200">two recordings on the home page</Link>.
             </p>
-            <div className="mt-6 rounded-2xl border border-yellow-500/30 bg-yellow-950/20 p-4 text-sm leading-6 text-yellow-100">
-              <strong>Caveat:</strong> budget-before-upstream here is a response-shape proof path. Do not describe it as keyed upstream counter/log-delta proof unless that instrumentation is added separately.
-            </div>
             <div className="mt-6">
               <ProofCtas />
             </div>
@@ -205,15 +202,15 @@ function GoldenPathSection() {
                 <dl className="mt-3 grid gap-2 text-xs text-gray-300 sm:grid-cols-2">
                   <div><dt className="text-gray-500">decision</dt><dd className="font-mono text-white">{step.decision}</dd></div>
                   <div><dt className="text-gray-500">reason</dt><dd className="font-mono text-white">{step.reason}</dd></div>
-                  <div><dt className="text-gray-500">route/tool</dt><dd className="font-mono text-white">{step.route}</dd></div>
+                  <div><dt className="text-gray-500">route or tool</dt><dd className="font-mono text-white">{step.route}</dd></div>
                   <div><dt className="text-gray-500">budget impact</dt><dd className="font-mono text-white">{step.budget}</dd></div>
                   <div className="sm:col-span-2"><dt className="text-gray-500">receipt</dt><dd className="font-mono text-white">{step.receipt}</dd></div>
                 </dl>
               </article>
             ))}
             <article className={`rounded-2xl border p-4 ${goldenToneClasses.proof}`}>
-              <h3 className="font-bold text-white">7 · Proof artifact exported</h3>
-              <p className="mt-2 text-sm text-gray-300">Evidence Pack <code className="text-cyan-200">ep_demo_2026_05_10_001</code> links every receipt and explains the policy, subject, tenant, route/tool, budget state, receipt chain, hash, and demo signature caveat.</p>
+              <h3 className="font-bold text-white">7 · Evidence Pack exported</h3>
+              <p className="mt-2 text-sm text-gray-300">Evidence Pack <code className="text-cyan-200">ep_demo_2026_05_10_001</code> bundles every receipt above with the policy, the agent, the budget and the hashes. It is sample data with a placeholder signature, so it will not pass a signature check.</p>
               <div className="mt-4"><ProofCtas compact /></div>
             </article>
           </div>
@@ -288,8 +285,8 @@ export default function SandboxPage() {
     setPhase('alpha');
 
     addEvent({ id: 'alpha-header', agent: 'alpha', type: 'summary', status: 'running',
-      label: '🔴 Agent Alpha — Admin Kill Switch',
-      detail: 'Can an admin deny a rogue agent at the next governed request? Watch.' });
+      label: '🔴 Agent Alpha: an admin revokes it',
+      detail: 'An admin revokes this agent. Its next request should fail.' });
 
     // Step 1: Auth
     const authId = 'alpha-auth';
@@ -307,12 +304,12 @@ export default function SandboxPage() {
     // Step 2: Mint
     const mintId = 'alpha-mint';
     addEvent({ id: mintId, agent: 'alpha', type: 'mint', status: 'running',
-      label: 'Step 2 → Exchanging identity for budget-scoped macaroon' });
+      label: 'Step 2 → Trading the login for a SatGate token with a budget' });
     await sleep(jitter(500));
     if (abortRef.current) return;
     setAlphaBudget({ spent: 0, limit: 50 });
     updateEvent(mintId, { status: 'success', latencyMs: jitter(38),
-      detail: '✓ Macaroon issued — Policy: "agent-standard" • Budget: 50 credits. Agent can now call APIs.' });
+      detail: '✓ Token issued. Policy "agent-standard", budget 50 credits. The agent can now call APIs.' });
 
     await sleep(600);
     if (abortRef.current) return;
@@ -338,7 +335,7 @@ export default function SandboxPage() {
     await sleep(jitter(300));
     if (abortRef.current) return;
     updateEvent(revokeId, { status: 'revoked', latencyMs: jitter(12),
-      detail: '✓ Token revoked — next governed request should be denied.' });
+      detail: '✓ Token revoked. The next request should fail.' });
 
     await sleep(600);
     if (abortRef.current) return;
@@ -350,10 +347,10 @@ export default function SandboxPage() {
     await sleep(jitter(400));
     if (abortRef.current) return;
     updateEvent(verifyId, { status: 'blocked', latencyMs: jitter(8),
-      detail: 'HTTP 401 — Blocked on the next governed request after revocation.' });
+      detail: 'HTTP 401: blocked, because the token was revoked.' });
 
     addEvent({ id: 'alpha-done', agent: 'alpha', type: 'summary', status: 'success',
-      label: '✓ Kill switch works: Authenticate → Call API → Admin Revoke → Next request blocked' });
+      label: '✓ Revoke works: sign in → call API → admin revokes → next request blocked' });
 
     return true;
   }, []);
@@ -364,7 +361,7 @@ export default function SandboxPage() {
     setPhase('bravo');
 
     addEvent({ id: 'bravo-header', agent: 'bravo', type: 'summary', status: 'running',
-      label: '🟡 Agent Bravo — Economic Firewall',
+      label: '🟡 Agent Bravo: a budget cap',
       detail: 'Agent gets a 50-credit budget. Each call costs 10. What happens on call #6?' });
 
     // Step 1: Auth
@@ -383,12 +380,12 @@ export default function SandboxPage() {
     // Step 2: Mint
     const mintId = 'bravo-mint';
     addEvent({ id: mintId, agent: 'bravo', type: 'mint', status: 'running',
-      label: 'Step 2 → Exchanging identity for budget-scoped macaroon' });
+      label: 'Step 2 → Trading the login for a SatGate token with a budget' });
     await sleep(jitter(500));
     if (abortRef.current) return;
     setBravoBudget({ spent: 0, limit: 50 });
     updateEvent(mintId, { status: 'success', latencyMs: jitter(41),
-      detail: '✓ Macaroon issued — Policy: "agent-standard" • Budget: 50 credits. Agent can now call APIs.' });
+      detail: '✓ Token issued. Policy "agent-standard", budget 50 credits. The agent can now call APIs.' });
 
     await sleep(600);
 
@@ -409,9 +406,9 @@ export default function SandboxPage() {
 
       if (isBlocked) {
         updateEvent(callId, { status: 'blocked', latencyMs: jitter(6),
-          detail: `🚫 HTTP 402 Payment Required — Budget exhausted (${spent}/${50} credits spent)` });
+          detail: `🚫 HTTP 402 Payment Required: budget used up (${spent}/${50} credits spent)` });
         addEvent({ id: 'bravo-blocked', agent: 'bravo', type: 'summary', status: 'blocked',
-          label: `💰 Budget Exhausted — HTTP 402`,
+          label: `💰 Out of budget: HTTP 402`,
           detail: `Spent ${spent}/50 credits. Call #${i + 1} blocked automatically.` });
       } else {
         spent += 10;
@@ -424,7 +421,7 @@ export default function SandboxPage() {
     }
 
     addEvent({ id: 'bravo-done', agent: 'bravo', type: 'summary', status: 'success',
-      label: '✓ Economic firewall works: Budget enforced automatically — no human needed' });
+      label: '✓ Budget cap works: the agent was stopped without anyone stepping in' });
 
     return true;
   }, []);
@@ -450,8 +447,8 @@ export default function SandboxPage() {
     }
 
     addEvent({ id: 'proof-exported', agent: 'bravo', type: 'summary', status: 'success',
-      label: '✓ Evidence Pack ready: inspect receipt chain, JSON export, schema, hash, and signature caveat',
-      detail: 'Open /evidence-pack-demo or download /evidence-packs/sample-evidence-pack.v1.json to verify the proof artifact.' });
+      label: '✓ Evidence Pack ready: every receipt, the JSON file, the schema and the hashes',
+      detail: 'Open /evidence-pack-demo, or download /evidence-packs/sample-evidence-pack.v1.json and look through it yourself.' });
     setPhase('done');
     setRunning(false);
   }, [selectedMode, runAlpha, runBravo]);
@@ -490,7 +487,7 @@ export default function SandboxPage() {
     '@type': 'WebPage',
     name: 'SatGate Demo',
     url: 'https://satgate.io/sandbox',
-    description: 'Interactive SatGate demo for Mint, Capability Control, Spend Control, and Paid-Rails.',
+    description: 'Try SatGate in your browser: agent tokens, access limits, budget caps and payments.',
     datePublished: '2026-04-12',
     dateModified: '2026-05-03',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -512,15 +509,15 @@ export default function SandboxPage() {
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/sandbox',
-    description: 'Interactive SatGate demo for Mint, Capability Control, Spend Control, and Paid-Rails.',
+    description: 'Try SatGate in your browser: agent tokens, access limits, budget caps and payments.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-03',
     featureList: [
       'Mint Demo',
-      'Capability Control Demo',
+      'Access Control Demo',
       'Spend Control Demo',
-      'Paid-Rails Demo',
-      'Request-path policy decisions',
+      'Payments Demo',
+      'Checks before each request',
     ],
   };
 
@@ -540,18 +537,18 @@ export default function SandboxPage() {
     mainEntity: [
       {
         '@type': 'Question',
-        name: 'What does the SatGate demo demonstrate?',
-        acceptedAnswer: { '@type': 'Answer', text: 'The demo page collects the SatGate demo path: Mint for scoped authority, Capability Control for scope/delegation/revocation, Spend Control for budget enforcement, and Paid-Rails for governed payment context.' },
+        name: 'What does the SatGate demo show?',
+        acceptedAnswer: { '@type': 'Answer', text: 'Four things: creating a token for an agent, limiting what it can call, capping what it can spend, and charging external agents before they get in.' },
       },
       {
         '@type': 'Question',
         name: 'How does SatGate stop unauthorized agent spend?',
-        acceptedAnswer: { '@type': 'Answer', text: 'SatGate checks each agent request against identity, capability-token caveats, budget, policy, and revocation state before forwarding the request upstream.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'Before SatGate forwards a request, it checks who the agent is, what its token allows, how much budget is left and whether the token was revoked. If any check fails, the request stops at SatGate.' },
       },
       {
         '@type': 'Question',
         name: 'Is the demo for AI agent cost control or security?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Both. SatGate treats spend as an enforceable security boundary, combining scoped authority, revocation, audit, and budget limits into an economic firewall for AI agents.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'Both. SatGate checks permissions and budget on the same request, so one gateway handles access limits and spending limits, with a receipt for each decision.' },
       },
     ],
   };
@@ -590,14 +587,14 @@ export default function SandboxPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 text-center">
           <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-purple-300">Interactive demo</p>
           <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
-            Mint. Control. Constrain. Govern.
+            Try SatGate in your browser.
           </h2>
           <p className="mx-auto max-w-3xl text-lg leading-relaxed text-gray-400">
-            Start with the 90-second authority proof, then move through capability control, spend control, and paid-rail context. Every proof moment links to the Evidence Pack or receipt export.
+            Start with the 90-second walkthrough, then try each part on its own: tokens, access limits, budgets and payments. Every step links to its receipt.
           </p>
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="#golden-path" className="text-purple-300 hover:text-purple-200 text-sm font-semibold underline underline-offset-4 transition">
-              Run the 90-second SatGate proof →
+              Start the 90-second walkthrough →
             </Link>
             <Link href="/evidence-pack-demo" className="text-cyan-300 hover:text-cyan-200 text-sm font-semibold underline underline-offset-4 transition">
               See an Evidence Pack →
@@ -625,12 +622,12 @@ export default function SandboxPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold mb-4">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400">
-              Watch SatGate Stop Unauthorized Spend
+              Watch SatGate stop an agent
             </span>
           </h2>
           <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
-            Two scenarios CFOs care about: a rogue agent gets denied at the next governed request, and an agent
-            hits its budget ceiling and stops — before the bill arrives.
+            Two cases: an admin revokes an agent and its next request fails, and an agent
+            runs out of budget and stops before the bill arrives.
           </p>
         </div>
       </div>
@@ -645,9 +642,9 @@ export default function SandboxPage() {
               disabled={running}
               className="bg-gray-800 border border-gray-700 text-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500"
             >
-              <option value="both">Both Scenarios</option>
-              <option value="kill-switch">🔴 Kill Switch Only</option>
-              <option value="budget">🟡 Economic Firewall Only</option>
+              <option value="both">Both</option>
+              <option value="kill-switch">🔴 Revoke only</option>
+              <option value="budget">🟡 Budget only</option>
             </select>
             <span className="text-gray-600 text-xs hidden sm:inline">
               {selectedMode === 'both' ? '~30 seconds' : '~15 seconds'}
@@ -689,8 +686,8 @@ export default function SandboxPage() {
           {events.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-[400px] text-gray-600">
               <Shield size={48} className="mb-4 opacity-30" />
-              <p className="text-lg font-medium mb-2">Ready to simulate</p>
-              <p className="text-sm">Click &quot;Run Simulation&quot; to watch SatGate enforce access controls in real-time.</p>
+              <p className="text-lg font-medium mb-2">Ready</p>
+              <p className="text-sm">Click &quot;Run Simulation&quot; to watch it step by step.</p>
             </div>
           ) : (
             <div className="divide-y divide-gray-800/50">
@@ -737,8 +734,8 @@ export default function SandboxPage() {
 
         {phase === 'done' && !running && (
           <div className="mt-6 rounded-2xl border border-cyan-500/30 bg-cyan-950/20 p-5">
-            <h3 className="mb-2 text-lg font-bold text-white">Proof artifact ready</h3>
-            <p className="mb-4 text-sm text-gray-300">The simulation is the explainer; the Evidence Pack is the buyer-visible proof artifact.</p>
+            <h3 className="mb-2 text-lg font-bold text-white">Evidence Pack ready</h3>
+            <p className="mb-4 text-sm text-gray-300">The simulation shows the steps. The Evidence Pack is the record you can check.</p>
             <ProofCtas />
           </div>
         )}
@@ -751,7 +748,7 @@ export default function SandboxPage() {
           >
             <div className="flex items-center gap-3">
               <Server size={18} className="text-purple-400" />
-              <span className="text-sm font-semibold text-white">Under the Hood — How It Works</span>
+              <span className="text-sm font-semibold text-white">How it works</span>
             </div>
             <ChevronDown size={18} className={`text-gray-500 transition-transform ${showArchitecture ? 'rotate-180' : ''}`} />
           </button>
@@ -759,11 +756,11 @@ export default function SandboxPage() {
             <div className="px-6 py-6 border-t border-gray-800 bg-gray-950/50">
               <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
                 {[
-                  { icon: <Bot size={24} />, label: 'AI Agent', sub: 'Presents workload identity', color: 'text-blue-400' },
+                  { icon: <Bot size={24} />, label: 'AI Agent', sub: 'Signs in', color: 'text-blue-400' },
                   { icon: <ArrowRight size={20} />, label: '', sub: '', color: 'text-gray-600' },
-                  { icon: <Key size={24} />, label: 'SatGate Mint', sub: 'Identity → Macaroon exchange', color: 'text-purple-400' },
+                  { icon: <Key size={24} />, label: 'SatGate Mint', sub: 'Trades the login for a token', color: 'text-purple-400' },
                   { icon: <ArrowRight size={20} />, label: '', sub: '', color: 'text-gray-600' },
-                  { icon: <Shield size={24} />, label: 'SatGate Gateway', sub: 'Enforce budget + revocation', color: 'text-cyan-400' },
+                  { icon: <Shield size={24} />, label: 'SatGate Gateway', sub: 'Checks budget and revocation', color: 'text-cyan-400' },
                   { icon: <ArrowRight size={20} />, label: '', sub: '', color: 'text-gray-600' },
                   { icon: <Zap size={24} />, label: 'Upstream API', sub: 'Only reached if allowed', color: 'text-green-400' },
                 ].map((item, i) => (
@@ -783,9 +780,9 @@ export default function SandboxPage() {
           <h2 className="mb-8 text-center text-2xl font-bold text-white">SatGate demo questions</h2>
           <div className="grid gap-4 md:grid-cols-3">
             {[
-              ['What does the SatGate demo demonstrate?', 'The demo page collects the SatGate demo path: Mint for scoped authority, Capability Control for scope/delegation/revocation, Spend Control for budget enforcement, and Paid-Rails for governed payment context.'],
-              ['How does SatGate stop unauthorized agent spend?', 'SatGate checks each agent request against identity, capability-token caveats, budget, policy, and revocation state before forwarding the request upstream.'],
-              ['Is the demo for AI agent cost control or security?', 'Both. SatGate treats spend as an enforceable security boundary, combining scoped authority, revocation, audit, and budget limits into an economic firewall for AI agents.'],
+              ['What does the SatGate demo show?', 'Four things: creating a token for an agent, limiting what it can call, capping what it can spend, and charging external agents before they get in.'],
+              ['How does SatGate stop unauthorized agent spend?', 'Before SatGate forwards a request, it checks who the agent is, what its token allows, how much budget is left and whether the token was revoked. If any check fails, the request stops at SatGate.'],
+              ['Is the demo for AI agent cost control or security?', 'Both. SatGate checks permissions and budget on the same request, so one gateway handles access limits and spending limits, with a receipt for each decision.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
                 <h3 className="mb-2 font-bold text-white">{question}</h3>
@@ -798,14 +795,14 @@ export default function SandboxPage() {
         {/* CTA */}
         <div className="mt-12 text-center">
           <p className="text-gray-500 text-sm mb-4">
-            This was a deterministic public proof demo. The production path still requires a separate promotion decision.
+            This demo is a simulation with sample data. The recordings on the home page show SatGate running on production.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="#golden-path"
               className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-bold transition shadow-lg shadow-purple-500/20"
             >
-              Run authority proof <ArrowRight size={16} />
+              Start the walkthrough <ArrowRight size={16} />
             </Link>
             <Link
               href="/evidence-pack-demo"

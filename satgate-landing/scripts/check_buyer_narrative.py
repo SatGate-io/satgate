@@ -37,12 +37,12 @@ TARGETS = [
 REQUIRED = {
     "app/page.tsx": [
         "Economic Firewall for AI Agents",
-        "bounded economic authority",
-        "humans, platforms, and upstream APIs can trust",
+        "within budget",
+        "signed receipt for every decision",
     ],
     "app/components/HomeClient.tsx": [
-        "Keep your agents within budget. Make external callers pay before they use your resources.",
-        "Humans and platforms buy. Agents consume bounded primitives.",
+        "Keep your agents within budget. Make external agents pay before they use your API.",
+        "You set the rules. SatGate enforces them on every request.",
         "Economic firewall for agents",
     ],
     "app/policy-to-proof/page.tsx": [
@@ -100,7 +100,7 @@ FORBIDDEN_PATTERNS = [
     r"Observe, Control, Charge",
     r"autonomous spend platform",
     r"agents buy",
-    r"agents pay",
+    r"(?<!external )agents pay",  # "external agents pay" is the approved Admit framing
     r"AI agents pay",
     r"paid agents pay",
     r"agents can pay",
