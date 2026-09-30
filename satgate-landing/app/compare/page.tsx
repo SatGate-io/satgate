@@ -57,21 +57,21 @@ const comparisons = [
   {
     href: '/compare/aws-agentcore-payments',
     title: 'SatGate vs AWS AgentCore Payments',
-    description: 'Managed AWS agent payments vs cross-provider economic firewall. SatGate governs authority, spend, MCP tools, paid rails, and Evidence Packs before execution.',
+    description: 'Managed AWS agent payments vs cross-provider economic firewall. SatGate governs authority, spend, MCP tools, payment methods, and signed receipts before execution.',
     icon: Cloud,
     color: 'yellow',
   },
   {
     href: '/compare/cloudflare-ai-gateway',
     title: 'SatGate vs Cloudflare AI Gateway',
-    description: 'AI traffic gateway vs pre-execution economic governance. Cloudflare routes and observes AI traffic; SatGate controls delegated spend and authority.',
+    description: 'AI traffic gateway vs spending controls before the agent acts. Cloudflare routes and observes AI traffic; SatGate controls delegated spend and authority.',
     icon: Cloud,
     color: 'yellow',
   },
   {
     href: '/compare/langsmith-helicone-datadog',
     title: 'SatGate vs LangSmith, Helicone, Datadog',
-    description: 'Observability explains what agents did. SatGate controls what they are allowed to do before they spend, call MCP tools, or cross paid rails.',
+    description: 'Observability explains what agents did. SatGate controls what they are allowed to do before they spend, call MCP tools, or use payment methods.',
     icon: Eye,
     color: 'blue',
   },
@@ -85,7 +85,7 @@ const comparisons = [
   {
     href: '/compare/openai-anthropic-budget-controls',
     title: 'SatGate vs OpenAI / Anthropic Budgets',
-    description: 'Native provider budgets are useful guardrails. SatGate adds one cross-provider control layer for agents, MCP tools, APIs, and paid rails.',
+    description: 'Native provider budgets are useful guardrails. SatGate adds one cross-provider control layer for agents, MCP tools, APIs, and payment methods.',
     icon: KeyRound,
     color: 'purple',
   },
@@ -100,14 +100,14 @@ const comparisons = [
   {
     href: '/compare/apigee',
     title: 'SatGate vs Apigee',
-    description: 'Enterprise API management vs agent economic governance. Apigee manages APIs; SatGate enforces spend, authority, and payments.',
+    description: 'Enterprise API management vs spending controls for AI agents. Apigee manages APIs; SatGate enforces spend, authority, and payments.',
     icon: Shield,
     color: 'blue',
   },
   {
     href: '/compare/tyk',
     title: 'SatGate vs Tyk',
-    description: 'API management vs request-path agent economics. Tyk operates APIs; SatGate controls what agents can spend or access.',
+    description: 'API management vs agent economics before the request goes through. Tyk operates APIs; SatGate controls what agents can spend or access.',
     icon: KeyRound,
     color: 'green',
   },
@@ -121,7 +121,7 @@ const comparisons = [
   {
     href: '/compare/bifrost',
     title: 'SatGate vs Bifrost',
-    description: 'LLM routing vs economic governance. Both have MCP — only one enforces per-tool budgets on agent tool calls.',
+    description: 'LLM routing vs spending controls. Both have MCP — only one enforces per-tool budgets on agent tool calls.',
     icon: Zap,
     color: 'purple',
   },
@@ -162,7 +162,7 @@ export default function ComparePage() {
     about: [
       { '@type': 'Thing', name: 'AI gateway comparison' },
       { '@type': 'Thing', name: 'economic firewall comparison' },
-      { '@type': 'Thing', name: 'request-path economic governance' },
+      { '@type': 'Thing', name: 'spending controls before the request goes through' },
       { '@type': 'Thing', name: 'MCP tool cost policy' },
       { '@type': 'Thing', name: 'L402 API payments' },
     ],
@@ -202,7 +202,7 @@ export default function ComparePage() {
         name: 'How is SatGate different from AI gateways?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Most AI gateways focus on routing, provider abstraction, caching, rate limits, observability, or prompt operations. SatGate focuses on request-path economic governance: hard budgets, scoped agent authority, MCP tool cost policy, audit evidence, revocation, and paid-rail context at the gateway before forwarding.',
+          text: 'Most AI gateways focus on routing, provider abstraction, caching, rate limits, observability, or prompt operations. SatGate focuses on spending controls before the request goes through: hard budgets, scoped agent permissions, MCP tool cost policy, audit evidence, revocation, and payment details at the gateway before forwarding.',
         },
       },
       {
@@ -218,7 +218,7 @@ export default function ComparePage() {
         name: 'When should teams use SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Use SatGate when the core problem is autonomous agent risk: runaway spend, MCP tool costs, delegated authority, static API keys, missing revocation, audit gaps, or machine customers that need to pay for API access at request time.',
+          text: 'Use SatGate when the core problem is autonomous agent risk: runaway spend, MCP tool costs, permissions passed down to a sub-agent, static API keys, missing revocation, audit gaps, or machine customers that need to pay for API access at request time.',
         },
       },
       {
@@ -250,7 +250,7 @@ export default function ComparePage() {
           </div>
           <h1 className="mb-5 text-5xl font-extrabold tracking-tight md:text-7xl">Compare SatGate</h1>
           <p className="text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Most AI gateways help route, observe, or expose model/API traffic. SatGate focuses on economic governance: hard budgets, MCP tool cost attribution, scoped agent authority, Evidence Packs, and paid-rail context at the gateway before forwarding.
+            Most AI gateways help route, observe, or expose model/API traffic. SatGate focuses on spending controls: hard budgets, MCP tool cost attribution, scoped agent permissions, signed receipts, and payment details at the gateway before forwarding.
           </p>
         </div>
 
@@ -279,7 +279,7 @@ export default function ComparePage() {
         <section className="mt-12 rounded-2xl border border-cyan-800/30 bg-gradient-to-r from-cyan-950/20 to-purple-950/20 p-8">
           <h2 className="mb-4 text-2xl font-bold text-white">The short version</h2>
           <p className="max-w-4xl leading-relaxed text-gray-300">
-            LiteLLM, Portkey, Helicone, Cloudflare AI Gateway, Kong AI Gateway, Apigee, Tyk, Langfuse, Bifrost, and Zuplo are useful infrastructure. The difference is category: SatGate is the economic firewall — the request-path layer that decides what autonomous agents can spend, access, delegate, revoke, audit, or pay for before the next call executes.
+            LiteLLM, Portkey, Helicone, Cloudflare AI Gateway, Kong AI Gateway, Apigee, Tyk, Langfuse, Bifrost, and Zuplo are useful infrastructure. The difference is category: SatGate is the economic firewall: the layer that decides, before the request goes through, what autonomous agents can spend, access, delegate, revoke, audit, or pay for before the next call executes.
           </p>
         </section>
 
@@ -289,7 +289,7 @@ export default function ComparePage() {
             {[
               [
                 'How is SatGate different from AI gateways?',
-                'Most AI gateways focus on routing, provider abstraction, caching, rate limits, observability, or prompt operations. SatGate focuses on request-path economic governance: hard budgets, scoped agent authority, MCP tool cost policy, audit evidence, revocation, and paid-rail context at the gateway before forwarding.',
+                'Most AI gateways focus on routing, provider abstraction, caching, rate limits, observability, or prompt operations. SatGate focuses on spending controls before the request goes through: hard budgets, scoped agent permissions, MCP tool cost policy, audit evidence, revocation, and payment details at the gateway before forwarding.',
               ],
               [
                 'Does SatGate replace LiteLLM, Portkey, Helicone, or Cloudflare AI Gateway?',
@@ -297,7 +297,7 @@ export default function ComparePage() {
               ],
               [
                 'When should teams use SatGate?',
-                'Use SatGate when the core problem is autonomous agent risk: runaway spend, MCP tool costs, delegated authority, static API keys, missing revocation, audit gaps, or machine customers that need to pay for API access at request time.',
+                'Use SatGate when the core problem is autonomous agent risk: runaway spend, MCP tool costs, permissions passed down to a sub-agent, static API keys, missing revocation, audit gaps, or machine customers that need to pay for API access at request time.',
               ],
               [
                 'What should teams look for in an AI gateway comparison?',

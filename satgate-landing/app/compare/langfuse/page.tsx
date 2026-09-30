@@ -8,11 +8,11 @@ export const metadata = {
   keywords: [
     'SatGate vs Langfuse',
     'Langfuse alternative',
-    'LLM observability vs Policy-to-Proof governance',
+    'LLM observability vs rules and receipts for AI agents',
     'AI agent spend control',
     'Langfuse comparison',
     'SatGate comparison',
-    'Policy-to-Proof governance',
+    'rules and receipts for AI agents',
     'AI agent cost control',
     'MCP budget enforcement',
   ],
@@ -31,21 +31,21 @@ export const metadata = {
 };
 
 const rows: Array<[string, string, string]> = [
-  ['Primary job', 'Policy-to-Proof governance for enterprise agents', 'LLM observability, traces, prompt management, evaluations, metrics, debugging, and product analytics for AI applications'],
-  ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped credentials, revocation, Evidence Packs, and paid-rail context', 'LLM observability, traces, prompt management, evaluations, metrics, debugging, and product analytics for AI applications'],
-  ['Request-path hard budget enforcement', 'Yes: at the gateway before forwarding to an upstream API, model, or MCP tool', 'Partial / depends on gateway policy and traffic type'],
+  ['Primary job', 'Rules and receipts for AI agents', 'LLM observability, traces, prompt management, evaluations, metrics, debugging, and product analytics for AI applications'],
+  ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped credentials, revocation, signed receipts, and charging external agents', 'LLM observability, traces, prompt management, evaluations, metrics, debugging, and product analytics for AI applications'],
+  ['Hard budgets before the request goes through', 'Yes: at the gateway before forwarding to an upstream API, model, or MCP tool', 'Partial / depends on gateway policy and traffic type'],
   ['MCP tool budget enforcement', 'Yes: per-tool budgets, cost attribution, and deny decisions', 'Not the primary category focus'],
-  ['Scoped revocable agent capabilities', 'Yes: route, tool, call, budget, expiry, delegation, and revocation caveats', 'Typically API keys, policies, tokens, or platform auth primitives'],
+  ['Scoped revocable agent capabilities', 'Yes: route, tool, call, budget, expiry, delegation, and revocation caveats', 'Typically API keys, policies, tokens, or platform auth building blocks'],
   ['Runaway agent spend benchmark/data', 'Yes: benchmark page plus JSON/CSV dataset', 'No direct equivalent'],
-  ['L402 paid-agent API payments', 'Yes: governs paid-rail context before access and preserves Evidence Pack proof', 'No native SatGate-style paid-rail governance focus'],
-  ['Broad API/AI platform management', 'Focused on economic governance layer', 'Yes / stronger fit'],
+  ['L402 paid-agent API payments', 'Yes: checks payment details before access and preserves a signed receipt (Evidence Pack)', 'No native SatGate-style payment rules focus'],
+  ['Broad API/AI platform management', 'Focused on spending controls', 'Yes / stronger fit'],
 ];
 
 const satgateWins = [
-  { icon: ShieldCheck, title: 'Policy-to-Proof for agents', body: 'SatGate decides whether an autonomous agent can spend, access, delegate, route, revoke, or pay before the next request executes.' },
+  { icon: ShieldCheck, title: 'Rules and Receipts', body: 'SatGate decides whether an autonomous agent can spend, access, delegate, route, revoke, or pay before the next request executes.' },
   { icon: Gauge, title: 'Budgets beyond LLM tokens', body: 'Enforce cost controls across APIs, MCP tools, models, routes, workflows, tenants, agents, and delegated sub-agents.' },
   { icon: KeyRound, title: 'Scoped, revocable authority', body: 'Replace broad static keys with expiring capabilities constrained by route, tool, budget, calls, expiry, and delegation.' },
-  { icon: Zap, title: 'Govern paid-rail access', body: 'Govern paid-rail context before external agents access APIs, tools, datasets, or premium capabilities at request time.' },
+  { icon: Zap, title: 'Govern payment access', body: 'Check payment details before external agents access APIs, tools, datasets, or premium capabilities at request time.' },
 ];
 
 const competitorWins = [
@@ -70,9 +70,9 @@ export default function ComparePage() {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
-      { '@type': 'Question', name: 'Is SatGate a Langfuse replacement?', acceptedAnswer: { '@type': 'Answer', text: 'Not directly. Langfuse is an LLM observability and evaluation platform. SatGate is an Policy-to-Proof governance for AI agents, API spend, MCP tools, scoped capabilities, revocation, Evidence Packs, and paid-rail context.' } },
+      { '@type': 'Question', name: 'Is SatGate a Langfuse replacement?', acceptedAnswer: { '@type': 'Answer', text: 'Not directly. Langfuse is an LLM observability and evaluation platform. SatGate is rules and receipts for AI agents: API spend, MCP tools, scoped capabilities, revocation, signed receipts, and payment details.' } },
       { '@type': 'Question', name: 'Can SatGate and Langfuse work together?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics at the gateway before forwarding.' } },
-      { '@type': 'Question', name: 'When should I choose SatGate?', acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when the core problem is autonomous agent economic governance: hard budgets, MCP tool spend, revocable credentials, delegated authority, Evidence Packs, and paid-agent payment.' } },
+      { '@type': 'Question', name: 'When should I choose SatGate?', acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, permissions passed down to a sub-agent, signed receipts, and paid-agent payment.' } },
       { '@type': 'Question', name: 'When should I choose Langfuse?', acceptedAnswer: { '@type': 'Answer', text: 'Choose Langfuse when the primary need is tracing, prompt management, evaluations, metrics, and AI application observability.' } },
     ],
   };
@@ -87,7 +87,7 @@ export default function ComparePage() {
         <div className="mb-12 max-w-4xl">
           <div className="mb-6 inline-flex rounded-full border border-cyan-500/30 bg-cyan-950/25 px-4 py-2 text-sm text-cyan-200">Comparison</div>
           <h1 className="mb-5 text-5xl font-extrabold tracking-tight md:text-7xl">SatGate vs Langfuse</h1>
-          <p className="text-xl leading-relaxed text-gray-300 md:text-2xl">Langfuse is an LLM observability and evaluation platform. SatGate is different: it is the request-path Policy-to-Proof governance layer for autonomous agents, API spend, MCP tools, scoped credentials, Evidence Packs, and paid-rail context.</p>
+          <p className="text-xl leading-relaxed text-gray-300 md:text-2xl">Langfuse is an LLM observability and evaluation platform. SatGate is different: it is the rules-and-receipts layer for AI agents, checked before the request goes through, covering API spend, MCP tools, scoped credentials, signed receipts, and payment details.</p>
         </div>
 
         <section className="mb-14 overflow-hidden rounded-2xl border border-gray-800">
@@ -106,9 +106,9 @@ export default function ComparePage() {
           <h2 className="mb-6 text-3xl font-bold text-white">SatGate vs Langfuse FAQ</h2>
           <div className="grid gap-5 md:grid-cols-2">
             {[
-              ['Is SatGate a Langfuse replacement?', 'Not directly. Langfuse is an LLM observability and evaluation platform. SatGate is an Policy-to-Proof governance for AI agents, API spend, MCP tools, scoped capabilities, revocation, Evidence Packs, and paid-rail context.'],
+              ['Is SatGate a Langfuse replacement?', 'Not directly. Langfuse is an LLM observability and evaluation platform. SatGate is rules and receipts for AI agents: API spend, MCP tools, scoped capabilities, revocation, signed receipts, and payment details.'],
               ['Can SatGate and Langfuse work together?', 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics at the gateway before forwarding.'],
-              ['When should I choose SatGate?', 'Choose SatGate when the core problem is autonomous agent economic governance: hard budgets, MCP tool spend, revocable credentials, delegated authority, Evidence Packs, and paid-agent payment.'],
+              ['When should I choose SatGate?', 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, permissions passed down to a sub-agent, signed receipts, and paid-agent payment.'],
               ['When should I choose Langfuse?', 'Choose Langfuse when the primary need is tracing, prompt management, evaluations, metrics, and AI application observability.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">
@@ -123,7 +123,7 @@ export default function ComparePage() {
           <h2 className="mb-4 text-3xl font-bold text-white">Use the right layer.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">Gateways, API management, and observability tools are useful. They do not automatically solve agent economics. SatGate adds the pre-request decision layer: should this agent spend, access, delegate, revoke, route, or pay right now?</p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Policy-to-Proof <ArrowRight size={18} /></Link>
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Rules and Receipts <ArrowRight size={18} /></Link>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">AI agent cost control</Link>
           </div>
         </section>
