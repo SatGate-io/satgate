@@ -197,7 +197,7 @@ export default function SatGateIntegrationPage() {
           <h2 className="mb-4 text-3xl font-bold text-white">Make Claude Code agent activity governable.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate gives agent teams the missing economic layer: budgets, scoped authority, revocation, audit, and paid-rail context where machine customers need to pay for APIs.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-300 px-6 py-3 font-bold text-black transition hover:bg-cyan-200">
+            <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-300 px-6 py-3 font-bold text-black transition hover:bg-cyan-200">
               MCP budget enforcement <Gauge size={18} />
             </Link>
             <Link href="/paid-agent-payments" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">

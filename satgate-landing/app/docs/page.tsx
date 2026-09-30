@@ -11,7 +11,7 @@ const docs = [
   ['Verify Evidence Packs', '/verify-evidence-pack', 'Independently verify signed receipts, JWKS, pack mirrors, and tamper evidence.'],
   ['Policy-to-Proof', '/policy-to-proof', 'How SatGate turns authority decisions into portable evidence.'],
   ['Evidence Pack Demo', '/evidence-pack-demo', 'Explore a buyer-readable sample artifact and schema.'],
-  ['MCP Gateway', '/mcp-gateway', 'Govern MCP tool calls with scoped authority and budget evidence.'],
+  ['MCP Gateway', '/mcp', 'Govern MCP tool calls with scoped authority and budget evidence.'],
   ['Build with SatGate', '/build', 'SDK and developer starting point.'],
 ];
 

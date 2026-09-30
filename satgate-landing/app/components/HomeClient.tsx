@@ -29,7 +29,6 @@ const LandingPage = () => {
           {/* Desktop menu */}
           <div className="hidden xl:flex items-center gap-5 text-sm font-medium text-gray-400">
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
-            <Link href="/mcp-gateway" className="hover:text-white transition">MCP Gateway</Link>
             <Link href="/mcp" className="hover:text-white transition">MCP</Link>
             <Link href="/build" className="hover:text-white transition">Build</Link>
             <Link href="/sandbox" className="hover:text-white transition">Demo</Link>
@@ -63,13 +62,6 @@ const LandingPage = () => {
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Enterprise
-            </Link>
-            <Link
-              href="/mcp-gateway"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
-            >
-              MCP Gateway
             </Link>
             <Link
               href="/mcp"
@@ -112,13 +104,6 @@ const LandingPage = () => {
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               Tools
-            </Link>
-            <Link
-              href="/integrations"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
-            >
-              Integrations
             </Link>
             <Link
               href="/blog"
@@ -812,9 +797,7 @@ const LandingPage = () => {
                 <li><Link href="/build" className="hover:text-white transition">Build</Link></li>
                 <li><a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Documentation</a></li>
                 <li><a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
-                <li><Link href="/mcp" className="hover:text-white transition">MCP Governance Hub</Link></li>
-                <li><Link href="/mcp-gateway" className="hover:text-white transition">MCP Gateway</Link></li>
-                <li><Link href="/integrations" className="hover:text-white transition">Integrations</Link></li>
+                <li><Link href="/mcp" className="hover:text-white transition">MCP quickstart</Link></li>
               </ul>
             </div>
             <div>

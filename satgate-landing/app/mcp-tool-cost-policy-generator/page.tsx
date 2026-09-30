@@ -142,7 +142,7 @@ export default function McpToolCostPolicyGeneratorPage() {
             Generate request-path policy for MCP tools: per-tool prices, session budgets, expensive-tool caps, denial rules, revocation behavior, and Evidence Pack receipts before agents execute paid work.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+            <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               See MCP governance <ArrowRight size={18} />
             </Link>
             <Link href="/blog/mcp-budget-enforcement-guide" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
@@ -245,7 +245,7 @@ export default function McpToolCostPolicyGeneratorPage() {
             Route MCP traffic through SatGate to observe, control, and preserve Evidence Pack receipts before autonomous agents trigger paid or risky work.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+            <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Govern MCP tools <ArrowRight size={18} />
             </Link>
             <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">

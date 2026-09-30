@@ -37,9 +37,7 @@ SPEND_LONGTAIL_PAGES = {
     "ai-agent-cost-control": ROOT / "app" / "ai-agent-cost-control" / "page.tsx",
     "ai-api-budget-enforcement": ROOT / "app" / "ai-api-budget-enforcement" / "page.tsx",
     "agent-spending-limits": ROOT / "app" / "agent-spending-limits" / "page.tsx",
-    "mcp-cost-control": ROOT / "app" / "mcp-cost-control" / "page.tsx",
     "agent-payment-controls": ROOT / "app" / "agent-payment-controls" / "page.tsx",
-    "mcp-budget-enforcement": ROOT / "app" / "mcp-budget-enforcement" / "page.tsx",
     "ai-agent-runaway-spend-benchmark": ROOT / "app" / "ai-agent-runaway-spend-benchmark" / "page.tsx",
 }
 
@@ -49,8 +47,6 @@ L402_RAIL_PAGES = {
 }
 
 MCP_AUTHORITY_PAGES = {
-    "mcp-governance": ROOT / "app" / "mcp-governance" / "page.tsx",
-    "mcp-gateway": ROOT / "app" / "mcp-gateway" / "page.tsx",
     "agent-api-governance": ROOT / "app" / "agent-api-governance" / "page.tsx",
 }
 

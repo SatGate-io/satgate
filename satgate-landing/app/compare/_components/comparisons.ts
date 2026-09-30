@@ -87,7 +87,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
       { question: 'What does SatGate add?', answer: 'Delegated budgets, pre-execution policy, cross-rail enforcement, MCP tool governance, revocation, and Evidence Packs.' },
       { question: 'When does Cloudflare win?', answer: 'When the problem is edge-native AI traffic analytics, caching, routing, rate limits, retries, or fallback. SatGate wins when the problem is agent authority and spend.' },
     ],
-    ctaPrimary: { href: '/mcp-governance', label: 'Govern MCP tools' },
+    ctaPrimary: { href: '/mcp', label: 'Govern MCP tools' },
     ctaSecondary: { href: '/ai-agent-cost-control', label: 'Control agent spend' },
   },
   'langsmith-helicone-datadog': {
@@ -162,7 +162,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
       { question: 'Can SatGate run with existing gateways?', answer: 'Yes. SatGate can sit before, beside, or behind existing gateway infrastructure depending on where enforcement belongs.' },
     ],
     ctaPrimary: { href: '/agent-capability-tokens', label: 'Use capability tokens' },
-    ctaSecondary: { href: '/mcp-budget-enforcement', label: 'Enforce MCP budgets' },
+    ctaSecondary: { href: '/mcp', label: 'Enforce MCP budgets' },
   },
   'openai-anthropic-budget-controls': {
     slug: 'openai-anthropic-budget-controls',

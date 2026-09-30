@@ -108,10 +108,10 @@ curl -i http://localhost:8080/premium/anything
 Hosted paid demo (Admit; Charge in the dashboard). No local gateway:
 
 ```bash
-curl -i -H "X-SatGate-Tenant: satgate-demo" https://api.satgate.io/paid/agent-demo
+curl -i https://mcp-prod-final.satgate.cloud/paid/premium
 ```
 
-Unpaid calls return 402. Price is 10 sats. Show the invoice to the owner, poll payment status, then retry. Poll rules are in [llms.txt](https://satgate.io/llms.txt).
+Unpaid calls return 402. Price is 10 sats, or 0.01 USDC on Base, for one request. For Lightning, show the invoice to the owner, poll payment status, then retry. Poll rules and the USDC steps are in [llms.txt](https://satgate.io/llms.txt).
 
 ## Next Steps
 

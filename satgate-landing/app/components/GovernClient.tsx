@@ -810,7 +810,7 @@ export SATGATE_TOKEN=$TOKEN
               ['/agent-api-key-risk-assessment', 'Agent API key risk assessment', 'Find static-key blast radius before autonomous agents inherit unlimited API access.'],
               ['/economic-firewall-readiness-grader', 'Agent governance readiness grader', 'Score identity, budgets, MCP governance, revocation, delegation, Evidence Pack proof, routing, and rail-aware readiness.'],
               ['/build', 'Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.'],
-              ['/mcp-cost-control', 'MCP cost control', 'Treat MCP tool calls as governed events with per-tool prices, caps, denial reasons, and evidence.'],
+              ['/mcp', 'MCP cost control', 'Treat MCP tool calls as governed events with per-tool prices, caps, denial reasons, and evidence.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black/50 p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
                 <h3 className="mb-2 font-bold text-white">{title}</h3>
@@ -890,7 +890,7 @@ export SATGATE_TOKEN=$TOKEN
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><Link href="/policy-to-proof" className="hover:text-white transition">Policy-to-Proof</Link></li>
                 <li><Link href="/agent-control-plane" className="hover:text-white transition">Agent Control Plane</Link></li>
-                <li><Link href="/mcp-governance" className="hover:text-white transition">MCP Governance</Link></li>
+                <li><Link href="/mcp" className="hover:text-white transition">MCP Governance</Link></li>
                 <li><Link href="/agent-api-governance" className="hover:text-white transition">Agent API Governance</Link></li>
                 <li><Link href="/economic-firewall" className="hover:text-white transition">Economic Firewall</Link></li>
                 <li><Link href="/ai-agent-cost-control" className="hover:text-white transition">AI Agent Cost Control</Link></li>

@@ -132,7 +132,7 @@
     "status": "existing"
   },
   {
-    "path": "/mcp-gateway",
+    "path": "/mcp",
     "cluster": "mcp-gateway",
     "primaryKeyword": "mcp gateway",
     "secondaryKeywords": [

@@ -112,7 +112,7 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-800 px-6 py-3 font-bold text-gray-300 transition hover:border-cyan-500 hover:text-white">
               Policy-to-Proof
             </Link>
-            <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-800 px-6 py-3 font-bold text-gray-300 transition hover:border-cyan-500 hover:text-white">
+            <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-800 px-6 py-3 font-bold text-gray-300 transition hover:border-cyan-500 hover:text-white">
               MCP governance
             </Link>
             <Link href="/evidence-pack-demo" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-800 px-6 py-3 font-bold text-gray-300 transition hover:border-cyan-500 hover:text-white">

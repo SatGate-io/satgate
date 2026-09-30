@@ -58,78 +58,52 @@ A route owner can also accept USDC on Base. When they do, the same 402 also carr
 2. Retry the same request with the signed payload in the `PAYMENT-SIGNATURE` header.
 3. SatGate settles the payment, checks the transfer on-chain, and forwards the request. The `PAYMENT-RESPONSE` header carries the transaction hash.
 
-One USDC payment buys one request. A signed payment is accepted once; sending it again returns 402. The receipt records the rail as x402 with the network, amount and transaction. The public demo route above takes Lightning only.
+One USDC payment buys one request. A signed payment is accepted once; sending it again returns 402. The receipt records the rail as x402 with the network, amount and transaction. The public demo route below takes both.
 
 ### Try it as an agent
 
-A public paid route is open. The agent does not need an account, a wallet, or a preimage.
+A public paid route is open. The agent does not need an account.
 
-- URL: GET https://api.satgate.io/paid/agent-demo
-- Header: `X-SatGate-Tenant: satgate-demo`
-- Price: 10 sats
-- `terms.uses` is 0 on this route: one payment buys access until `credential_expires_at`, not one request. Read `terms` on the 402 before you multiply price by volume.
+- URL: GET https://mcp-prod-final.satgate.cloud/paid/premium
+- Price: 10 sats over Lightning, or 0.01 USDC on Base (x402)
+- `terms.uses` is 1: each payment buys one request.
 
 1. Call the route. Read the 402 and the terms in the body.
-2. Show the Lightning invoice to the owner. Ask them to pay it from any Lightning wallet, such as Cash App.
-3. Poll payment status using the rules in "L402 flow on a configured paid route" above. Send `Authorization: L402 <macaroon>` only. Do not send a preimage. Wait at least `terms.status.poll_min_interval_secs` between polls.
-4. When status is paid, the status response includes an authorization value. Retry the original request with `Authorization` set to that value. A paid call returns 200.
+2. To pay with Lightning: show the invoice to the owner and ask them to pay it from any Lightning wallet, such as Cash App. Poll payment status using the rules in "L402 flow on a configured paid route" above. Send `Authorization: L402 <macaroon>` only, without a preimage, and wait at least `terms.status.poll_min_interval_secs` between polls. When status is paid, retry the original request with `Authorization` set to the returned value.
+3. To pay with USDC: follow "USDC (x402) on a paid route" above, using the `accepts` entry in the same 402.
+4. A paid call returns 200 and a signed receipt.
 
-This route is Admit. In the dashboard, Admit is the Charge policy. The status URL, states, and poll interval are in the 402 body and in the section above.
+This route is Admit. In the dashboard, Admit is the Charge policy.
 
 ## Free Tools and Calculators
 - AI Agent Cost Control Tools Hub: https://satgate.io/tools
-- AI Agent ROI Calculator: https://satgate.io/roi-calculator
 - Runaway Agent Cost Calculator: https://satgate.io/runaway-agent-cost-calculator
 - AI Agent Runaway Spend Benchmark: https://satgate.io/ai-agent-runaway-spend-benchmark
-- AI Agent Runaway Spend Index: https://satgate.io/ai-agent-runaway-spend-index
 - Runaway Spend Index JSON Data: https://satgate.io/data/ai-agent-runaway-spend-index-2026-04.json
 - Runaway Spend Index CSV Data: https://satgate.io/data/ai-agent-runaway-spend-index-2026-04.csv
 - Benchmark JSON Data: https://satgate.io/data/ai-agent-runaway-spend-benchmark.json
 - Benchmark CSV Data: https://satgate.io/data/ai-agent-runaway-spend-benchmark.csv
-- L402 API Pricing Calculator: https://satgate.io/l402-api-pricing-calculator
-- MCP Proxy Config Generator: https://satgate.io/mcp-proxy-config-generator
+- MCP connect snippet: https://satgate.io/mcp-proxy-config-generator
 - MCP Evidence Pack Sample: https://satgate.io/policy-templates/mcp-governance/mcp-evidence-pack.sample.v1.json
 - MCP Spend Caps Template: https://satgate.io/policy-templates/mcp-governance/spend-caps.v1.yaml
 - MCP Tool Allowlist Template: https://satgate.io/policy-templates/mcp-governance/tool-allowlist.v1.yaml
 - MCP Tenant Isolation Template: https://satgate.io/policy-templates/mcp-governance/tenant-isolation.v1.yaml
 - MCP Delegation Depth Template: https://satgate.io/policy-templates/mcp-governance/delegation-depth.v1.yaml
 - Economic Firewall Readiness Grader: https://satgate.io/economic-firewall-readiness-grader
-- Agent API Key Risk Assessment: https://satgate.io/agent-api-key-risk-assessment
 
 ## Category Pages
 - Economic Firewall: https://satgate.io/economic-firewall
-- Stripe Link for Agents vs SatGate: https://satgate.io/stripe-link-agents-vs-satgate
-- Agent Payment Controls: https://satgate.io/agent-payment-controls
-- HTTP 402 for AI Agents: https://satgate.io/http-402-for-ai-agents
 - AI Agent Cost Control: https://satgate.io/ai-agent-cost-control
 - LLM Cost Dashboard: https://satgate.io/llm-cost-dashboard
-- LLM Cost Monitoring: https://satgate.io/llm-cost-monitoring
-- AI API Budget Enforcement: https://satgate.io/ai-api-budget-enforcement
 - Agent Spending Limits: https://satgate.io/agent-spending-limits
-- MCP Governance Hub: https://satgate.io/mcp
-- MCP Gateway: https://satgate.io/mcp-gateway
-- MCP Governance: https://satgate.io/mcp-governance
-- MCP Budget Enforcement: https://satgate.io/mcp-budget-enforcement
-- MCP Cost Control: https://satgate.io/mcp-cost-control
-- Agent API Governance: https://satgate.io/agent-api-governance
+- MCP quickstart (Cursor, Claude Code, Claude Desktop, OpenClaw): https://satgate.io/mcp
 - Agent Control Plane: https://satgate.io/agent-control-plane
 - Evidence Pack Demo: https://satgate.io/evidence-pack-demo
 - Evidence Pack JSON v1: https://satgate.io/evidence-packs/sample-evidence-pack.v1.json
 - Evidence Pack Schema v1: https://satgate.io/evidence-packs/evidence-pack.schema.v1.json
-- Revocable Agent Credentials: https://satgate.io/revocable-agent-credentials
 - Capability Auth: https://satgate.io/capability-auth
 - Agent Capability Tokens: https://satgate.io/agent-capability-tokens
 - Capability Lifecycle Demo: https://satgate.io/capability-lifecycle-demo
-- L402 Agent Payments: https://satgate.io/l402-agent-payments
-- Paid Agent Payments: https://satgate.io/paid-agent-payments
-
-## Integration Pages
-- SatGate Integrations Hub: https://satgate.io/integrations
-- SatGate for Cursor: https://satgate.io/satgate-for-cursor
-- SatGate for Claude Code: https://satgate.io/satgate-for-claude-code
-- SatGate for Claude Desktop MCP: https://satgate.io/satgate-for-claude-desktop
-- SatGate for OpenClaw Agents: https://satgate.io/satgate-for-openclaw
-- SatGate for Hermes Agent: https://satgate.io/satgate-for-hermes-agent
 
 ## Comparison Pages
 - SatGate vs LiteLLM: https://satgate.io/compare/litellm
@@ -154,7 +128,6 @@ This route is Admit. In the dashboard, Admit is the Charge policy. The status UR
 - API Monetization for AI Agents: https://satgate.io/blog/api-monetization-ai
 - LLM Cost Management: https://satgate.io/blog/llm-cost-management
 - LLM cost dashboard checklist: https://satgate.io/llm-cost-dashboard
-- LLM cost monitoring vs enforcement: https://satgate.io/llm-cost-monitoring
 - Macaroon Tokens vs API Keys: https://satgate.io/blog/macaroon-tokens-vs-api-keys
 - Zero Trust for AI Agents: https://satgate.io/blog/zero-trust-for-ai-agents
 - Intelligent AI Delegation and Capability Tokens: https://satgate.io/blog/deepmind-intelligent-delegation-satgate
@@ -184,8 +157,6 @@ Check the prerequisites and whether you have access before running an example. A
 
 ## Product and Demo Pages
 - Enterprise AI Agent Governance: https://satgate.io/govern
-- AI Agent Management: https://satgate.io/agents
-- SatGate Payments demo: https://satgate.io/pay
 - SatGate Demo: https://satgate.io/sandbox
 - SatGate Mint / Capability Token Demo: https://satgate.io/mint-demo
 - SatGate Design Partners: https://satgate.io/design-partners
@@ -196,7 +167,6 @@ Check the prerequisites and whether you have access before running an example. A
 - Website: https://satgate.io
 - Blog: https://satgate.io/blog
 - Tools: https://satgate.io/tools
-- Integrations: https://satgate.io/integrations
 - Pricing: https://satgate.io/pricing
 - Security: https://satgate.io/security
 - Documentation: https://cloud.satgate.io/docs

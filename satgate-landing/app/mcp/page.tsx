@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { ArrowRight, Bot, Gauge, KeyRound, ShieldCheck, Terminal, Wrench } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bot, Gauge, ShieldCheck, Terminal } from 'lucide-react';
 
 export const metadata = {
-  title: 'MCP Governance for AI Agents',
-  description: 'Govern MCP tool calls with per-tool budgets, scoped capabilities, revocation, Evidence Packs, and economic firewall controls for Cursor, Claude, and OpenClaw.',
+  title: 'MCP Gateway for AI Agents: Budgets, Permissions, Receipts',
+  description: 'Put SatGate in front of MCP tools: per-tool budgets, scoped permissions, revocation, and a signed receipt for every allowed or refused call.',
   alternates: { canonical: 'https://satgate.io/mcp' },
   keywords: [
     'MCP governance',
@@ -16,7 +16,7 @@ export const metadata = {
     'Claude Desktop MCP governance',
   ],
   openGraph: {
-    title: 'MCP Governance for AI Agents',
+    title: 'MCP Gateway for AI Agents: Budgets, Permissions, Receipts',
     description: 'Budgets and permissions for MCP tools, and a signed receipt when a call is allowed or refused.',
     url: 'https://satgate.io/mcp',
     type: 'website',
@@ -24,35 +24,29 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MCP Governance for AI Agents',
-    description: 'Control MCP tool spend, authority, revocation, and audit evidence before agent tool calls execute.',
+    title: 'MCP Gateway for AI Agents: Budgets, Permissions, Receipts',
+    description: 'Budgets and permissions for MCP tools, and a signed receipt when a call is allowed or refused.',
   },
 };
 
 const cards = [
   {
-    href: '/mcp-governance',
-    title: 'MCP Governance',
-    description: 'The pillar guide for budget, identity, revocation, audit, and risk controls around MCP tool use.',
-    icon: ShieldCheck,
-  },
-  {
-    href: '/mcp-budget-enforcement',
-    title: 'MCP Budget Enforcement',
-    description: 'How to enforce session, workflow, tool, and per-call spend limits before expensive tools execute.',
-    icon: Gauge,
-  },
-  {
-    href: '/mcp-cost-control',
-    title: 'MCP Cost Control',
-    description: 'Turn MCP tool calls into priced, attributed, and governed economic events.',
-    icon: Wrench,
-  },
-  {
     href: '/mcp-proxy-config-generator',
     title: 'MCP connect snippet',
     description: 'The npx satgate-mcp-bridge snippet for Cursor and Claude Code. Credits, not a dollar budget.',
     icon: Terminal,
+  },
+  {
+    href: '/blog/mcp-budget-enforcement-guide',
+    title: 'MCP budget enforcement guide',
+    description: 'How per-tool costs, session caps and delegated budgets stop a tool call before it runs.',
+    icon: Gauge,
+  },
+  {
+    href: '/verify-evidence-pack',
+    title: 'Verify an Evidence Pack',
+    description: 'Check signed MCP receipts against the published keys with the open-source verifier.',
+    icon: ShieldCheck,
   },
 ];
 
@@ -60,11 +54,11 @@ export default function MCPPage() {
   const webPageJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'MCP Governance for AI Agents',
+    name: 'MCP Gateway for AI Agents: Budgets, Permissions, Receipts',
     url: 'https://satgate.io/mcp',
     description: metadata.description,
     datePublished: '2026-05-01',
-    dateModified: '2026-05-03',
+    dateModified: '2026-09-30',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'MCP governance' },
@@ -94,7 +88,7 @@ export default function MCPPage() {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
-      { '@type': 'ListItem', position: 2, name: 'MCP Governance', item: 'https://satgate.io/mcp' },
+      { '@type': 'ListItem', position: 2, name: 'MCP', item: 'https://satgate.io/mcp' },
     ],
   };
 
@@ -136,6 +130,11 @@ export default function MCPPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
+      <div className="mx-auto max-w-6xl px-6 pt-8">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-white">
+          <ArrowLeft size={16} /> Back to Home
+        </Link>
+      </div>
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(168,85,247,0.2),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(34,211,238,0.16),transparent_32%)]" />
         <div className="relative mx-auto max-w-6xl px-6 py-24">
@@ -203,6 +202,18 @@ export default function MCPPage() {
             </Link>
           ))}
         </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-4">
+        <h2 className="mb-6 text-3xl font-bold text-white">Three controls, one gateway</h2>
+        <ul className="grid gap-5 md:grid-cols-3">
+          <li className="rounded-2xl border border-gray-800 bg-black p-6 text-gray-400"><span className="font-bold text-white">Observe.</span> See which agent called which tool, and what each call would cost, without blocking anything.</li>
+          <li className="rounded-2xl border border-gray-800 bg-black p-6 text-gray-400"><span className="font-bold text-white">Control.</span> Give each agent token a credit budget and a tool allowlist. A call past either limit is refused before it reaches the MCP server.</li>
+          <li className="rounded-2xl border border-gray-800 bg-black p-6 text-gray-400"><span className="font-bold text-white">Admit.</span> Charge external agents per request on the HTTP routes you choose, in sats or USDC. See <Link href="/pricing" className="text-purple-300 hover:text-purple-200">pricing</Link>.</li>
+        </ul>
+        <p className="mt-6 max-w-4xl text-gray-400">
+          Each allowed or refused call gets a signed receipt, so you can prove what an agent was allowed to do. Export receipts as an Evidence Pack and <Link href="/verify-evidence-pack" className="text-purple-300 hover:text-purple-200">verify them yourself</Link>. For the budget model in detail, read the <Link href="/blog/mcp-budget-enforcement-guide" className="text-purple-300 hover:text-purple-200">MCP budget enforcement guide</Link>, or start from the <Link href="/build" className="text-purple-300 hover:text-purple-200">developer page</Link>.
+        </p>
       </section>
 
       <section className="border-y border-gray-900 bg-gray-950/60">

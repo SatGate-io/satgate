@@ -12,7 +12,7 @@ TARGETS = [
     "app/govern/page.tsx",
     "app/components/GovernClient.tsx",
     "app/build/page.tsx",
-    "app/mcp-gateway/page.tsx",
+    "app/mcp/page.tsx",
     "app/pricing/page.tsx",
     "app/pricing/layout.tsx",
     "app/monetize/page.tsx",

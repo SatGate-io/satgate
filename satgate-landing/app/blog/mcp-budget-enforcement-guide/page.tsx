@@ -387,7 +387,7 @@ curl -X POST http://localhost:9090/admin/mint \\
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">Connect MCP to SatGate →</Link>
               <Link href="/mcp-proxy-config-generator" className="text-cyan-300 hover:text-cyan-200">MCP connect snippet →</Link>
-              <Link href="/mcp-cost-control" className="text-cyan-300 hover:text-cyan-200">MCP cost control →</Link>
+              <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">MCP cost control →</Link>
             </div>
           </div>
           <RoiCta

@@ -175,7 +175,7 @@ export default function CapabilityAuthPage() {
         <h2 className="text-3xl font-bold text-white mb-6">Related authorization resources</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            ['/mcp-gateway', 'MCP gateway', 'Apply capabilities to tool calls.'],
+            ['/mcp', 'MCP gateway', 'Apply capabilities to tool calls.'],
             ['/agent-capability-tokens', 'Agent capability tokens', 'See how scoped authority is encoded.'],
             ['/govern', 'AI agent governance', 'Observe, Control, and Prove agent actions.'],
             ['/blog/how-to-add-budget-limits-to-openai-api-calls', 'Budget limits', 'Attach spend policy to access.'],

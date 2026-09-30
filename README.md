@@ -30,13 +30,13 @@
 
 SatGate is a gateway in front of APIs and MCP tools. It meters agent and MCP traffic (**Observe**), enforces owner budgets before work runs (**Control**), and charges external agents on the routes you choose (**Admit**; the Charge policy in the dashboard). Every allow or deny comes with a signed receipt.
 
-Try it as an agent. This hosted route costs 10 sats:
+Try it as an agent. This hosted route costs 10 sats or 0.01 USDC, and each payment buys one request:
 
 ```bash
-curl -i -H "X-SatGate-Tenant: satgate-demo" https://api.satgate.io/paid/agent-demo
+curl -i https://mcp-prod-final.satgate.cloud/paid/premium
 ```
 
-The unpaid call returns HTTP 402 with a Lightning invoice and terms. Agent instructions are in [llms.txt](https://satgate.io/llms.txt).
+The unpaid call returns HTTP 402 with a Lightning invoice, a USDC-on-Base (x402) offer and the terms. Agent instructions are in [llms.txt](https://satgate.io/llms.txt).
 
 ## Build Agents with SatGate
 
@@ -190,10 +190,10 @@ Public → Protected → Paid. Three policies, one gateway; paid rails are gover
 Hosted paid demo (Admit; Charge in the dashboard). No local Lightning node:
 
 ```bash
-curl -i -H "X-SatGate-Tenant: satgate-demo" https://api.satgate.io/paid/agent-demo
+curl -i https://mcp-prod-final.satgate.cloud/paid/premium
 ```
 
-Unpaid calls return 402. Price is 10 sats. Show the invoice to the owner, poll payment status, then retry. Poll rules are in [llms.txt](https://satgate.io/llms.txt).
+Unpaid calls return 402. Price is 10 sats, or 0.01 USDC on Base, for one request. For Lightning, show the invoice to the owner, poll payment status, then retry. Poll rules and the USDC steps are in [llms.txt](https://satgate.io/llms.txt).
 
 📖 **[Full Quick Start Guide →](docs/getting-started/quickstart.md)**
 

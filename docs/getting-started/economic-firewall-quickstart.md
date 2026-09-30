@@ -73,10 +73,10 @@ Agents pay per request via the L402 protocol (HTTP 402 + Lightning invoice). In 
 A public Charge route is live:
 
 ```bash
-curl -i -H "X-SatGate-Tenant: satgate-demo" https://api.satgate.io/paid/agent-demo
+curl -i https://mcp-prod-final.satgate.cloud/paid/premium
 ```
 
-Unpaid calls return 402. Price is 10 sats. Show the invoice to the owner, poll payment status, then retry. Poll rules are in [llms.txt](https://satgate.io/llms.txt).
+Unpaid calls return 402. Price is 10 sats, or 0.01 USDC on Base, for one request. For Lightning, show the invoice to the owner, poll payment status, then retry. Poll rules and the USDC steps are in [llms.txt](https://satgate.io/llms.txt).
 
 ## Mix and Match
 
