@@ -66,7 +66,7 @@ A public paid route is open. The agent does not need an account.
 
 - URL: GET https://mcp-prod-final.satgate.cloud/paid/premium
 - Price: 10 sats over Lightning, or 0.01 USDC on Base (x402)
-- `terms.uses` is 1: each payment buys one request.
+- `terms.buys.uses` is 1 (and `terms.x402.buys.uses` is 1): each payment buys one request.
 
 1. Call the route. Read the 402 and the terms in the body.
 2. To pay with Lightning: show the invoice to the owner and ask them to pay it from any Lightning wallet, such as Cash App. Poll payment status using the rules in "L402 flow on a configured paid route" above. Send `Authorization: L402 <macaroon>` only, without a preimage, and wait at least `terms.status.poll_min_interval_secs` between polls. When status is paid, retry the original request with `Authorization` set to the returned value.
