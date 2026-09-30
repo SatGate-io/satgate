@@ -22,7 +22,7 @@ export const metadata = {
     description: 'Understand L402 as one paid rail for protected API access, governed by SatGate policy and Evidence Packs.',
     url: 'https://satgate.io/l402-agent-payments',
     type: 'article',
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',

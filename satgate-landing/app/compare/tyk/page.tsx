@@ -21,7 +21,7 @@ export const metadata = {
     description: 'Compare SatGate and Tyk for API management, AI agent spend governance, MCP tools, scoped authority, revocation, and paid-rail governance.',
     url: 'https://satgate.io/compare/tyk',
     type: 'article',
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',

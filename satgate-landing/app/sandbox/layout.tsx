@@ -20,7 +20,7 @@ export const metadata: Metadata = {
       "Watch SatGate give an agent a budget, block calls it is not allowed to make and revoke its token.",
     url: "https://satgate.io/sandbox",
     type: "website",
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: "summary_large_image",

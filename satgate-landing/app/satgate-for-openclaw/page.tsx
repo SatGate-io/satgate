@@ -18,7 +18,7 @@ export const metadata = {
     description: 'Use SatGate as the Agent Authority & Accountability Layer for governed OpenClaw execution across sub-agents, tools, MCP calls, model routes, and API spend.',
     url: 'https://satgate.io/satgate-for-openclaw',
     type: 'website',
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',

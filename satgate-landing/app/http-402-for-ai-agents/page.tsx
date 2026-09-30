@@ -20,7 +20,7 @@ export const metadata = {
     description: 'Understand how HTTP 402 lets APIs quote payment to agents — and why payment challenges still need economic firewall policy.',
     url: 'https://satgate.io/http-402-for-ai-agents',
     type: 'article',
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',

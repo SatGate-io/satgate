@@ -20,7 +20,7 @@ export const metadata: Metadata = {
       "Free Starter, Pro at $99 a month, and Enterprise. Per-agent budgets, MCP tool controls and signed receipts. 14-day free trial.",
     url: "https://satgate.io/pricing",
     type: "website",
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: "summary_large_image",

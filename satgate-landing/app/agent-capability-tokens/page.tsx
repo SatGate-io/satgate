@@ -19,7 +19,7 @@ export const metadata = {
     description: 'Use capability tokens for AI agents to encode scope, budget, route, expiry, delegation, and revocation into request-path access decisions.',
     url: 'https://satgate.io/agent-capability-tokens',
     type: 'article',
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',

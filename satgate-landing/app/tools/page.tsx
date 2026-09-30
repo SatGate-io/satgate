@@ -23,7 +23,7 @@ export const metadata = {
     description: 'Calculators and benchmarks for agent spend, runaway loops, L402 pricing and economic firewall readiness, plus the MCP connect snippet.',
     url: 'https://satgate.io/tools',
     type: 'website',
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
       "Keep your agents within budget. Make external agents pay before they use your API. Get a signed receipt for every decision.",
     url: "https://satgate.io",
     type: "website",
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: "summary_large_image",

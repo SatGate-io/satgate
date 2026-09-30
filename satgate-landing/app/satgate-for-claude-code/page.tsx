@@ -18,7 +18,7 @@ export const metadata = {
     description: 'Add budget enforcement, revocable credentials, and MCP governance around Claude Code workflows and autonomous coding-agent API calls.',
     url: 'https://satgate.io/satgate-for-claude-code',
     type: 'website',
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',

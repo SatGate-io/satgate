@@ -22,7 +22,7 @@ export const metadata: Metadata = {
       "A rail-neutral Economic Firewall for partners that need authorization, scope, budget, and Evidence Pack proof around agent-initiated transactions.",
     url: "https://satgate.io/partners/rails",
     type: "website",
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: "summary_large_image",
