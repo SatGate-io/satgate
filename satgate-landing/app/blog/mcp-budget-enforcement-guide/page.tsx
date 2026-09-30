@@ -382,11 +382,11 @@ curl -X POST http://localhost:9090/admin/mint \\
             </div>
           </div>
           <div className="my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
-            <h3 className="mb-3 text-xl font-bold text-white">Generate an MCP budget policy</h3>
-            <p className="mb-4 text-gray-300">Turn this guide into copyable policy: price MCP tools, set per-agent budgets, and generate proxy config for Cursor, Claude, OpenClaw, or custom clients.</p>
+            <h3 className="mb-3 text-xl font-bold text-white">Put a budget on your MCP tools</h3>
+            <p className="mb-4 text-gray-300">Connect Cursor, Claude Code, Claude Desktop or OpenClaw to SatGate, give the agent a credit budget, and set per-tool costs in the dashboard.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
-              <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">MCP tool cost policy generator →</Link>
-              <Link href="/mcp-proxy-config-generator" className="text-cyan-300 hover:text-cyan-200">MCP proxy config generator →</Link>
+              <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">Connect MCP to SatGate →</Link>
+              <Link href="/mcp-proxy-config-generator" className="text-cyan-300 hover:text-cyan-200">MCP connect snippet →</Link>
               <Link href="/mcp-cost-control" className="text-cyan-300 hover:text-cyan-200">MCP cost control →</Link>
             </div>
           </div>

@@ -389,8 +389,7 @@ export default function BlogPage() {
             {[
               ['/roi-calculator', 'AI Agent ROI Calculator', 'Estimate ghost spend, loop waste, payback period, and enforcement ROI.'],
               ['/runaway-agent-cost-calculator', 'Runaway Agent Cost Calculator', 'Model loop, retry, fanout, and paid tool-call exposure.'],
-              ['/openai-budget-policy-generator', 'OpenAI Budget Policy Generator', 'Generate OpenAI spend caps, routing, revocation, and Evidence Pack policy.'],
-              ['/mcp-tool-cost-policy-generator', 'MCP Tool Cost Policy Generator', 'Create per-tool MCP budgets, risk actions, and proof rules.'],
+              ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with one npx command.'],
               ['/economic-firewall-readiness-grader', 'Economic Firewall Readiness Grader', 'Score identity, budgets, MCP tools, revocation, routing, and Evidence Pack proof.'],
               ['/economic-firewall', 'Economic Firewall Definition', 'Learn the request-path category for AI agent economic governance.'],
             ].map(([href, title, body]) => (

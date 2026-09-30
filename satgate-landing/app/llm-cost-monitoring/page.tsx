@@ -209,9 +209,9 @@ export default function LlmCostMonitoringPage() {
           </p>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {[
-              ['/agent-spend-policy-template', 'Agent spend policy', 'Budgets, delegation, revocation, MCP tool caps, and Evidence Pack fields.'],
-              ['/mcp-tool-cost-policy-generator', 'MCP tool cost policy', 'Per-tool prices, risk tiers, limits, and deny behavior.'],
-              ['/revocable-capability-token-policy-template', 'Capability-token policy', 'Scoped, expiring, revocable agent authority with budget caveats.'],
+              ['/build', 'Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.'],
+              ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with one npx command.'],
+              ['/policy-to-proof', 'Policy-to-Proof', 'How each decision becomes a signed receipt.'],
               ['/economic-firewall-readiness-grader', 'Readiness grader', 'Find gaps across identity, budgets, routing, revocation, Evidence Pack proof, and paid-rail context.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-purple-500/50 hover:bg-purple-950/20">

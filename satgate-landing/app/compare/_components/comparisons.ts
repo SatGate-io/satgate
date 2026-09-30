@@ -198,7 +198,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
       { question: 'What does SatGate add above native budgets?', answer: 'Delegated capabilities, per-agent and per-tool budgets, MCP-native enforcement, paid-rail policy, flexible deployment, and Evidence Packs.' },
       { question: 'Why not just set lower provider limits?', answer: 'Lower limits reduce blast radius inside one vendor. They do not govern the agent’s full workflow across other models, APIs, tools, and payment rails.' },
     ],
-    ctaPrimary: { href: '/openai-budget-policy-generator', label: 'Generate an OpenAI policy' },
+    ctaPrimary: { href: '/build', label: 'Build with SatGate' },
     ctaSecondary: { href: '/ai-api-budget-enforcement', label: 'Enforce AI API budgets' },
   },
 };

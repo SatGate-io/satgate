@@ -190,7 +190,7 @@ export default function SatGateForHermesAgentPage() {
             Put SatGate in front of paid MCP servers, model routes, data APIs, and internal tools so Hermes Agent can act autonomously without receiving a blank check.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Generate spend policy <ArrowRight size={18} /></Link>
+            <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Build with SatGate <ArrowRight size={18} /></Link>
             <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Grade readiness</Link>
           </div>
         </div>

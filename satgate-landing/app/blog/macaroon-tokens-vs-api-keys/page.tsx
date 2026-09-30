@@ -604,7 +604,7 @@ attenuated_token = agent_a_token.add_caveats([
             <p className="mb-4 text-gray-300">Static API keys become dangerous when autonomous agents can spend, delegate, and retry. Start with a risk assessment, then move to revocable capabilities.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/agent-api-key-risk-assessment" className="text-cyan-300 hover:text-cyan-200">API key risk assessment →</Link>
-              <Link href="/build" className="text-cyan-300 hover:text-cyan-200">Generate capability-token policy →</Link>
+              <Link href="/build" className="text-cyan-300 hover:text-cyan-200">Mint a capability token →</Link>
               <Link href="/revocable-agent-credentials" className="text-cyan-300 hover:text-cyan-200">Revocable credentials →</Link>
               <Link href="/agent-capability-tokens" className="text-cyan-300 hover:text-cyan-200">Capability tokens →</Link>
               <Link href="/agent-control-plane" className="text-cyan-300 hover:text-cyan-200">Agent control plane →</Link>

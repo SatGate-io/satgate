@@ -21,7 +21,7 @@ const desktopNote = `Claude Desktop and OpenClaw do not use this npx command.
 Open MCP Setup in the dashboard and copy the tenant /sse URL.
 Send it with this header:
 
-Authorization: Bearer paste-the-token-from-cloud.satgate.io`;
+Authorization: Bearer <your agent token from MCP Setup>`;
 
 type ClientKey = 'cursor' | 'claudeCode' | 'claudeDesktop' | 'openclaw';
 

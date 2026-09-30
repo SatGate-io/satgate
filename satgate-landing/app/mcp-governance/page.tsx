@@ -357,7 +357,7 @@ evidence:
               ['/govern', 'Govern AI agents', 'Govern MCP authority before tool execution.'],
               ['/mcp-budget-enforcement', 'MCP budget enforcement', 'Hard caps, per-tool prices, and request-path budget decisions for MCP servers.'],
               ['/mcp-cost-control', 'MCP cost control', 'Control paid tool calls, retries, SaaS actions, cloud tasks, and data lookups before MCP tools execute.'],
-              ['/mcp-tool-cost-policy-generator', 'MCP tool cost policy generator', 'Generate practical policy for Cursor, Claude Desktop, Claude Code, OpenClaw, and custom clients.'],
+              ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with one npx command.'],
               ['/satgate-for-cursor', 'SatGate for Cursor', 'Govern Cursor MCP/tool workflows with budgets and audit.'],
               ['/satgate-for-openclaw', 'SatGate for OpenClaw', 'Apply economic policy to proactive agents, sub-agents, and tools.'],
             ].map(([href, title, body]) => (

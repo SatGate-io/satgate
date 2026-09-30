@@ -109,7 +109,7 @@ export default function Page() {
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">MCP moves agent cost beyond LLM tokens. Tool calls can trigger search, data, cloud, code, SaaS, or premium API spend. SatGate attaches authority, budget, revocation, and receipt policy to the tool call before it executes.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Govern MCP tool spend <ArrowRight size={18} /></Link>
-            <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Generate MCP policy</Link>
+            <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Connect MCP</Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">See Policy-to-Proof</Link>
           </div>
         </div>
