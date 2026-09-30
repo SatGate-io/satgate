@@ -21,6 +21,7 @@ export const metadata = {
     description: 'Compare SatGate and Tyk for API management, AI agent spend governance, MCP tools, scoped authority, revocation, and paid-rail governance.',
     url: 'https://satgate.io/compare/tyk',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -30,8 +31,8 @@ export const metadata = {
 };
 
 const rows: Array<[string, string, string]> = [
-  ['Primary job', 'Policy-to-Proof governance for enterprise agents', 'API gateway, API management, policies, developer portal, analytics, self-managed/hybrid/cloud deployment, AI-native APIM'],
-  ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped credentials, revocation, Evidence Packs, and paid-rail context', 'API gateway, API management, policies, developer portal, analytics, self-managed/hybrid/cloud deployment, AI-native APIM'],
+  ['Primary job', 'Policy-to-Proof governance for enterprise agents', 'API gateway, API management, policies, developer portal, analytics, their cloud or their own servers, AI-native APIM'],
+  ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped credentials, revocation, Evidence Packs, and paid-rail context', 'API gateway, API management, policies, developer portal, analytics, their cloud or their own servers, AI-native APIM'],
   ['Request-path hard budget enforcement', 'Yes: at the gateway before forwarding to an upstream API, model, or MCP tool', 'Partial / depends on gateway policy and traffic type'],
   ['MCP tool budget enforcement', 'Yes: per-tool budgets, cost attribution, and deny decisions', 'Not the primary category focus'],
   ['Scoped revocable agent capabilities', 'Yes: route, tool, call, budget, expiry, delegation, and revocation caveats', 'Typically API keys, policies, tokens, or platform auth primitives'],
@@ -48,7 +49,7 @@ const satgateWins = [
 ];
 
 const competitorWins = [
-  { icon: Check, title: 'Flexible API management', body: 'Tyk offers API gateway and management features across self-managed, hybrid, and cloud deployment models.' },
+  { icon: Check, title: 'Flexible API management', body: 'Tyk offers API gateway and management features in their cloud or on their own servers.' },
   { icon: Check, title: 'API policy and portal workflows', body: 'Tyk fits teams managing API products, access policy, analytics, developer portals, and multi-protocol API operations.' },
 ];
 

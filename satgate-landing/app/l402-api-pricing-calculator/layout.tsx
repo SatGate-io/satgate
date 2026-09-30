@@ -19,6 +19,7 @@ export const metadata: Metadata = {
       'Model L402 API pricing and margin while preserving paid-rail context for governed AI agent access.',
     url: 'https://satgate.io/l402-api-pricing-calculator',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

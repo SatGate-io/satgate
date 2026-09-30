@@ -11,6 +11,7 @@ export const metadata = {
     description: 'Give agents scoped, revocable capabilities and Evidence Pack proof instead of broad static API keys.',
     url: 'https://satgate.io/capability-auth',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -85,7 +86,7 @@ export default function CapabilityAuthPage() {
             Identity tells you who is calling. Capability auth tells you what this agent can access, spend, delegate, and revoke before every API or MCP request.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
+            <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
               Generate capability policy <ArrowRight size={18} />
             </Link>
             <Link href="/blog/macaroon-tokens-vs-api-keys" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-emerald-500 transition">

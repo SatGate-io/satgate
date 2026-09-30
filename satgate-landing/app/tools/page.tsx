@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, BarChart3, Calculator, ClipboardList, Gauge, KeyRound, Megaphone, ShieldCheck, Wrench, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BarChart3, Calculator, Gauge, KeyRound, ShieldCheck, Wrench, Zap } from 'lucide-react';
 import ToolLeadCaptureCta from '../components/ToolLeadCaptureCta';
 
 export const metadata = {
@@ -27,6 +27,7 @@ export const metadata = {
     description: 'Calculators, benchmarks, policy templates, and generators for agent spend, runaway loops, OpenAI budgets, MCP tool costs, and economic firewall readiness.',
     url: 'https://satgate.io/tools',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -73,15 +74,9 @@ const tools = [
     icon: BarChart3,
   },
   {
-    href: '/openai-budget-policy-generator',
-    title: 'OpenAI API Budget Limit Generator',
-    description: 'Generate daily, session, per-request, model-routing, revocation, and audit policy for OpenAI API calls.',
-    icon: ClipboardList,
-  },
-  {
-    href: '/mcp-tool-cost-policy-generator',
-    title: 'MCP Tool Cost Policy Generator',
-    description: 'Create per-tool budgets, prices, risk tiers, revocation behavior, and audit fields for MCP agents.',
+    href: '/mcp-proxy-config-generator',
+    title: 'MCP connect snippet',
+    description: 'The real Cloud MCP snippet for Cursor and Claude Code. Credits, not a dollar budget.',
     icon: Wrench,
   },
   {
@@ -101,30 +96,6 @@ const tools = [
     title: 'L402 API Pricing Calculator',
     description: 'Estimate per-request paid-agent pricing, gross margin, paid demand, and Lightning sats per API request.',
     icon: Zap,
-  },
-  {
-    href: '/seo-distribution-kit',
-    title: 'SEO Distribution Kit',
-    description: 'Launch copy, social snippets, and backlink targets for distributing SatGate cost-control tools and data assets.',
-    icon: Megaphone,
-  },
-  {
-    href: '/revocable-capability-token-policy-template',
-    title: 'Revocable Capability Token Policy Template',
-    description: 'Generate scoped, expiring, revocable capability-token policy for agents, sub-agents, MCP tools, budgets, and audit.',
-    icon: KeyRound,
-  },
-  {
-    href: '/agent-spend-policy-template',
-    title: 'Agent Spend Policy Template',
-    description: 'Generate copyable YAML and JSON policy for budgets, MCP tool costs, delegation, revocation, and audit fields.',
-    icon: ClipboardList,
-  },
-  {
-    href: '/mcp-proxy-config-generator',
-    title: 'MCP Proxy Config Generator',
-    description: 'Generate MCP proxy config for Cursor, Claude Desktop, Claude Code, OpenClaw, and custom clients.',
-    icon: Wrench,
   },
 ];
 

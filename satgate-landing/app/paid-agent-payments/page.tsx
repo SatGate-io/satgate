@@ -21,6 +21,7 @@ export const metadata = {
     description: 'How API companies can support delegated paid agent consumption with paid-rail context, scoped access, and Evidence Packs.',
     url: 'https://satgate.io/paid-agent-payments',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -352,7 +353,7 @@ export default function RobotCustomerPaymentsPage() {
             If agents are going to consume paid API primitives, monetization has to stay tied to human or platform authority, identity, budget, access, and audit.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/monetize" className="inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-300 text-black px-6 py-3 font-bold hover:bg-yellow-200 transition">
+            <Link href="/pay" className="inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-300 text-black px-6 py-3 font-bold hover:bg-yellow-200 transition">
               Monetize APIs with SatGate <ArrowRight size={18} />
             </Link>
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">

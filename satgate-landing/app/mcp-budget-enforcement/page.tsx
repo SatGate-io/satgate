@@ -22,6 +22,7 @@ export const metadata = {
     description: 'Set enforceable budgets, prices, risk tiers, revocation, and Evidence Pack receipts before autonomous agents execute MCP tools.',
     url: 'https://satgate.io/mcp-budget-enforcement',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

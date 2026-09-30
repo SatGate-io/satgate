@@ -22,6 +22,7 @@ export const metadata: Metadata = {
       "A rail-neutral Economic Firewall for partners that need authorization, scope, budget, and Evidence Pack proof around agent-initiated transactions.",
     url: "https://satgate.io/partners/rails",
     type: "website",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -53,7 +54,7 @@ const railQuestions = [
 
 const publicArtifacts = [
   ["Public verifier", "https://github.com/SatGate-io/evidence-pack-verifier"],
-  ["Live Evidence Pack", "https://api.satgate.io/v1/evidence/evid_LrlgUSR1R3SEYtxy0npX7mgneWZFa5ek"],
+  ["Live Evidence Pack", "https://api.satgate.io/v1/evidence/evid_GrXvKUgtdqNbuQ5lZzqRMpZrOoU2VAnE"],
   ["Receipt schema", "https://satgate.io/.well-known/satgate-receipt.schema.json"],
   ["Partner brief PDF", "/briefs/satgate-agent-authority-rails-brief.pdf"],
 ];
@@ -111,7 +112,7 @@ export default function RailPartnersPage() {
               <a href="/briefs/satgate-agent-authority-rails-brief.pdf" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
                 Download partner brief <FileText size={18} />
               </a>
-              <Link href="/agent-authority-layer" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
                 See the authority and accountability layer <ArrowRight size={18} />
               </Link>
               <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">

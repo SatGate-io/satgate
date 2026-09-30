@@ -20,6 +20,7 @@ export const metadata = {
     description: 'LiteLLM gives teams model access, routing, fallbacks, budgets, and spend tracking. SatGate governs agent/API economics in the request path.',
     url: 'https://satgate.io/compare/litellm',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

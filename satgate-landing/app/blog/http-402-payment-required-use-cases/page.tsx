@@ -12,6 +12,7 @@ export const metadata = {
     url: 'https://satgate.io/blog/http-402-payment-required-use-cases',
     type: 'article',
     publishedTime: '2026-04-02T00:00:00Z',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -486,7 +487,7 @@ HTTP 402 was reserved for future use in 1997. For agent systems, the useful vers
               <Link href="/l402-agent-payments" className="text-cyan-300 hover:text-cyan-200">L402 agent payments →</Link>
               <Link href="/http-402-for-ai-agents" className="text-cyan-300 hover:text-cyan-200">HTTP 402 for AI agents →</Link>
               <Link href="/agent-payment-controls" className="text-cyan-300 hover:text-cyan-200">Agent payment controls →</Link>
-              <Link href="/partners/rails" className="text-cyan-300 hover:text-cyan-200">Paid-rail governance →</Link>
+              <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">Paid-rail governance →</Link>
             </div>
           </div>
 
@@ -510,7 +511,7 @@ HTTP 402 was reserved for future use in 1997. For agent systems, the useful vers
               Start by observing paid-agent and API usage. Move to Control when budgets, scopes, and payment authority need to stop bad calls before value moves. Preserve Evidence Packs so each paid-rail decision can be verified later.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
-              <Link href="/partners/rails" className="text-cyan-300 hover:text-cyan-200">Paid-rail partner brief →</Link>
+              <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">Paid-rail partner brief →</Link>
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>
@@ -526,7 +527,7 @@ HTTP 402 was reserved for future use in 1997. For agent systems, the useful vers
               <a href="https://github.com/SatGate-io/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
                 View on GitHub
               </a>
-              <Link href="/partners/rails" className="inline-flex items-center gap-2 border border-blue-500 text-blue-300 px-6 py-3 rounded-lg font-bold hover:bg-blue-900/30 transition text-sm">
+              <Link href="/mcp" className="inline-flex items-center gap-2 border border-blue-500 text-blue-300 px-6 py-3 rounded-lg font-bold hover:bg-blue-900/30 transition text-sm">
                 Read: Paid-Rail Partner Brief →
               </Link>
             </div>

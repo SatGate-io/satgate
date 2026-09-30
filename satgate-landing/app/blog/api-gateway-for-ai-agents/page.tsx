@@ -13,6 +13,7 @@ export const metadata = {
     url: 'https://satgate.io/blog/api-gateway-for-ai-agents',
     type: 'article',
     publishedTime: '2026-03-12T00:00:00Z',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

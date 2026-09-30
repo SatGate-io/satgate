@@ -5,7 +5,7 @@
 ## Purpose
 SatGate sits in front of APIs and MCP tools and checks each agent request before it runs. Your own agents spend from a budget you set. External agents pay before the request goes through, on the routes you choose to charge for. Paying never gets an agent past its permissions, an expired or revoked token, or another tenant's data.
 
-Charging per request makes abuse expensive. It works alongside rate limits and access controls, not instead of them. Observe on its own does not block anything.
+Charging for access makes abuse more expensive. It works alongside rate limits and access controls, not instead of them. Observe on its own does not block anything.
 
 ## Core controls
 
@@ -67,6 +67,7 @@ A public paid route is open. The agent does not need an account, a wallet, or a 
 - URL: GET https://api.satgate.io/paid/agent-demo
 - Header: `X-SatGate-Tenant: satgate-demo`
 - Price: 10 sats
+- `terms.uses` is 0 on this route: one payment buys access until `credential_expires_at`, not one request. Read `terms` on the 402 before you multiply price by volume.
 
 1. Call the route. Read the 402 and the terms in the body.
 2. Show the Lightning invoice to the owner. Ask them to pay it from any Lightning wallet, such as Cash App.
@@ -85,22 +86,15 @@ This route is Admit. In the dashboard, Admit is the Charge policy. The status UR
 - Runaway Spend Index CSV Data: https://satgate.io/data/ai-agent-runaway-spend-index-2026-04.csv
 - Benchmark JSON Data: https://satgate.io/data/ai-agent-runaway-spend-benchmark.json
 - Benchmark CSV Data: https://satgate.io/data/ai-agent-runaway-spend-benchmark.csv
-- OpenAI API Budget Limit Generator: https://satgate.io/openai-budget-policy-generator
-- MCP Tool Cost Policy Generator: https://satgate.io/mcp-tool-cost-policy-generator
-- MCP Governance Policy Bundle: https://satgate.io/policy-templates/mcp-governance/mcp-governance-policy-bundle.v1.json
+- L402 API Pricing Calculator: https://satgate.io/l402-api-pricing-calculator
+- MCP Proxy Config Generator: https://satgate.io/mcp-proxy-config-generator
 - MCP Evidence Pack Sample: https://satgate.io/policy-templates/mcp-governance/mcp-evidence-pack.sample.v1.json
 - MCP Spend Caps Template: https://satgate.io/policy-templates/mcp-governance/spend-caps.v1.yaml
 - MCP Tool Allowlist Template: https://satgate.io/policy-templates/mcp-governance/tool-allowlist.v1.yaml
 - MCP Tenant Isolation Template: https://satgate.io/policy-templates/mcp-governance/tenant-isolation.v1.yaml
 - MCP Delegation Depth Template: https://satgate.io/policy-templates/mcp-governance/delegation-depth.v1.yaml
-- MCP Proxy Config Generator: https://satgate.io/mcp-proxy-config-generator
 - Economic Firewall Readiness Grader: https://satgate.io/economic-firewall-readiness-grader
 - Agent API Key Risk Assessment: https://satgate.io/agent-api-key-risk-assessment
-- Agent Spend Policy Template: https://satgate.io/agent-spend-policy-template
-- Revocable Capability Token Policy Template: https://satgate.io/revocable-capability-token-policy-template
-- SEO Distribution Kit: https://satgate.io/seo-distribution-kit
-- Distribution Markdown Kit: https://satgate.io/distribution/satgate-seo-machine-launch-kit.md
-- L402 API Pricing Calculator: https://satgate.io/l402-api-pricing-calculator
 
 ## Category Pages
 - Economic Firewall: https://satgate.io/economic-firewall
@@ -191,13 +185,9 @@ Check the prerequisites and whether you have access before running an example. A
 ## Product and Demo Pages
 - Enterprise AI Agent Governance: https://satgate.io/govern
 - AI Agent Management: https://satgate.io/agents
-- SatGate Governance Dashboard: https://satgate.io/dashboard
-- SatGate Control Demo: https://satgate.io/protect
-- SatGate Protect / Scoped Agent Credential Demo: https://satgate.io/crawl
-- SatGate Payments / L402 Payment Demo: https://satgate.io/pay
-- SatGate Monetize / L402 API Demo: https://satgate.io/monetize
-- SatGate Mint / Capability Token Demo: https://satgate.io/mint-demo
+- SatGate Payments demo: https://satgate.io/pay
 - SatGate Demo: https://satgate.io/sandbox
+- SatGate Mint / Capability Token Demo: https://satgate.io/mint-demo
 - SatGate Design Partners: https://satgate.io/design-partners
 - Pricing: https://satgate.io/pricing
 - Security: https://satgate.io/security

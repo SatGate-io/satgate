@@ -20,6 +20,7 @@ export const metadata = {
     description: 'A practical benchmark for agent loops, retries, MCP tool fanout, detection delay, and request-path budget enforcement.',
     url: 'https://satgate.io/ai-agent-runaway-spend-benchmark',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

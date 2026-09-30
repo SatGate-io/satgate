@@ -21,6 +21,7 @@ export const metadata: Metadata = {
       'One agent workflow, laid out: which agent acted, the rules and budget it ran under, the handoff to a sub-agent, payments, and every receipt.',
     url: 'https://satgate.io/evidence-pack-demo',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

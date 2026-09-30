@@ -30,7 +30,7 @@ const LandingPage = () => {
           <div className="hidden xl:flex items-center gap-5 text-sm font-medium text-gray-400">
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/mcp-gateway" className="hover:text-white transition">MCP Gateway</Link>
-            <Link href="/agent-authority-layer" className="hover:text-white transition">Authority & Accountability</Link>
+            <Link href="/mcp" className="hover:text-white transition">MCP</Link>
             <Link href="/build" className="hover:text-white transition">Build</Link>
             <Link href="/sandbox" className="hover:text-white transition">Demo</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
@@ -72,11 +72,11 @@ const LandingPage = () => {
               MCP Gateway
             </Link>
             <Link
-              href="/agent-authority-layer"
+              href="/mcp"
               onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
-              Authority & Accountability
+              MCP
             </Link>
             <Link
               href="/build"
@@ -93,18 +93,11 @@ const LandingPage = () => {
               Demo
             </Link>
             <Link
-              href="/capability-auth"
+              href="/security"
               onClick={() => setMobileMenuOpen(false)}
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
-              Capability Auth
-            </Link>
-            <Link
-              href="/agent-control-plane"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
-            >
-              Agent Control Plane
+              Security
             </Link>
             <Link
               href="/pricing"
@@ -200,17 +193,16 @@ const LandingPage = () => {
               <a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
                 Start free trial <ArrowRight size={16} />
               </a>
-              <Link href="/build" className="border border-cyan-700/50 bg-cyan-900/15 px-8 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition flex items-center gap-2 text-cyan-300">
-                Build with SatGate <ArrowRight size={16} />
-              </Link>
               <Link href="/sandbox#golden-path" className="border border-purple-700/50 bg-purple-900/20 px-8 py-3 rounded-lg font-bold hover:bg-purple-900/40 transition flex items-center gap-2 text-purple-300">
                 <Play size={16} /> Try the 90-second demo
               </Link>
-              <Link href="/evidence-pack-demo" className="border border-cyan-700/50 bg-cyan-900/15 px-8 py-3 rounded-lg font-bold hover:bg-cyan-900/30 transition flex items-center gap-2 text-cyan-300">
-                See an Evidence Pack <ArrowRight size={16} />
-              </Link>
             </div>
-            <p className="mt-3 text-sm text-gray-500">14 days free. No credit card.</p>
+            <p className="mt-3 text-sm text-gray-500">
+              <Link href="/build" className="text-gray-400 hover:text-white underline underline-offset-2">Build with SatGate</Link>
+              <span className="mx-2 text-gray-700">·</span>
+              <Link href="/evidence-pack-demo" className="text-gray-400 hover:text-white underline underline-offset-2">See an Evidence Pack</Link>
+            </p>
+            <p className="mt-2 text-sm text-gray-500">14 days free. No credit card.</p>
 
             {/* Proof strip */}
             <div className="mt-6 space-y-2 text-xs text-gray-500">
@@ -288,8 +280,8 @@ const LandingPage = () => {
           </div>
           <p className="text-xs text-gray-500 mt-3">The agent in the recording is a scripted MCP client using the public <code className="text-gray-400">satgate-mcp-bridge</code> npm package. Tokens are blurred.</p>
 
-          <h3 className="text-xl font-bold mt-16 mb-2">External agents: pay per request</h3>
-          <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Set a price on an API route in the dashboard. An agent with no wallet gets 402 Payment Required and never reaches the API. An agent that pays a 10-sat Lightning invoice gets one request. Every decision, refusals included, gets a signed receipt.</p>
+          <h3 className="text-xl font-bold mt-16 mb-2">External agents: pay before they get in</h3>
+          <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Set a price on a route in the dashboard. An agent with no wallet gets 402 Payment Required and never reaches your API. Pay with Lightning, or with USDC on Base where each payment buys one request. On Lightning routes you choose how many requests one payment buys. On the public demo, 10 sats buys access for about a day. On sat routes you can let the price rise under load, up to a ceiling you set. Unpaid 402s do not raise the price. Paying never gets an agent past your access rules, and every decision, refusals included, gets a signed receipt.</p>
           <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-yellow-500/10">
             <video
               controls
@@ -297,7 +289,7 @@ const LandingPage = () => {
               poster="/satgate-admit-poster.jpg"
               className="w-full"
               playsInline
-              aria-label="Narrated demo: an external agent with no wallet is refused with 402 Payment Required, a second agent gets one request through after paying a 10 sat Lightning invoice, and the signed receipts pass the open-source verifier"
+              aria-label="Narrated demo: an external agent with no wallet is refused with 402 Payment Required, a second external agent settles a 10 sat Lightning invoice and is allowed through, and the signed receipts pass the open-source verifier"
             >
               <source src="/satgate-admit-demo.mp4" type="video/mp4" />
               Your browser does not support the video tag.
@@ -809,8 +801,6 @@ const LandingPage = () => {
                 <li><Link href="/economic-firewall" className="hover:text-white transition">Economic Firewall</Link></li>
                 <li><Link href="/govern" className="hover:text-white transition">Enterprise</Link></li>
                 <li><Link href="/policy-to-proof" className="hover:text-white transition">Policy-to-Proof</Link></li>
-                <li><Link href="/agent-authority-layer" className="hover:text-white transition">Authority & Accountability</Link></li>
-                <li><Link href="/partners/rails" className="hover:text-white transition">Rail Partners</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
                 <li><a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Start free trial</a></li>
                 <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud login</a></li>
@@ -834,7 +824,7 @@ const LandingPage = () => {
                 <li><Link href="/compare" className="hover:text-white transition">Compare</Link></li>
                 <li><Link href="/blog" className="hover:text-white transition">Blog</Link></li>
                 <li><Link href="/ai-agent-cost-control" className="hover:text-white transition">Cost Control</Link></li>
-                <li><Link href="/capability-auth" className="hover:text-white transition">Capability Auth</Link></li>
+                <li><Link href="/partners/rails" className="hover:text-white transition">Rail Partners</Link></li>
               </ul>
             </div>
             <div>

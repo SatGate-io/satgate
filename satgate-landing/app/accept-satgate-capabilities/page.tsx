@@ -21,6 +21,7 @@ export const metadata: Metadata = {
       "A precise upstream acceptance story: scoped capability verification in, receipt emission out. No marketplace, no reputation claim.",
     url: "https://satgate.io/accept-satgate-capabilities",
     type: "website",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: "summary_large_image",

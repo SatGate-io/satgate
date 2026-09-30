@@ -21,6 +21,7 @@ export const metadata = {
     description: 'Replace unlimited API keys with scoped, revocable, budget-aware agent capabilities enforced in the request path.',
     url: 'https://satgate.io/agent-api-governance',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

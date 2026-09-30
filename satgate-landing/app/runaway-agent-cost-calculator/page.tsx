@@ -182,7 +182,7 @@ export default function RunawayAgentCostCalculatorPage() {
         <div className="space-y-4">
           <Slider label="Active agents in loop" value={agents} min={1} max={500} step={1} onChange={setAgents} />
           <Slider label="Paid calls per agent per minute" value={callsPerMinute} min={1} max={120} step={1} onChange={setCallsPerMinute} />
-          <Slider label="Average cost per API/tool call" value={costPerCallCents} min={1} max={500} step={1} prefix="$" suffix="¢" onChange={setCostPerCallCents} />
+          <Slider label="Average cost per API/tool call" value={costPerCallCents} min={1} max={500} step={1} suffix="¢" onChange={setCostPerCallCents} />
           <Slider label="Minutes before discovery" value={loopMinutes} min={1} max={240} step={1} suffix=" min" onChange={setLoopMinutes} />
           <Slider label="Delegation fanout multiplier" value={fanout} min={1} max={20} step={1} suffix="×" onChange={setFanout} />
           <Slider label="Incidents per month" value={incidentsPerMonth} min={1} max={30} step={1} onChange={setIncidentsPerMonth} />
@@ -190,7 +190,8 @@ export default function RunawayAgentCostCalculatorPage() {
 
         <div className="space-y-6">
           <div className="rounded-2xl border border-orange-900/50 bg-orange-950/10 p-6 md:p-8">
-            <h2 className="mb-6 text-2xl font-bold text-white">Estimated runaway exposure</h2>
+            <h2 className="mb-2 text-2xl font-bold text-white">Estimated runaway exposure</h2>
+            <p className="mb-6 text-sm text-gray-400">A model, not a measurement. The minute count is a scenario input. It is not how long SatGate waits before it stops a call.</p>
             <div className="grid gap-4 sm:grid-cols-2">
               {[
                 ['Calls per incident', number.format(calc.callsPerIncident)],
@@ -207,9 +208,9 @@ export default function RunawayAgentCostCalculatorPage() {
           </div>
 
           <div className="rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-6 md:p-8">
-            <h2 className="mb-4 text-2xl font-bold text-white">If enforcement stops the loop at 5 minutes</h2>
+            <h2 className="mb-4 text-2xl font-bold text-white">Scenario: if a cap stopped the loop at 5 minutes</h2>
             <p className="mb-6 leading-relaxed text-gray-300">
-              Request-path authority checks can block new calls once a budget, per-tool cap, route policy, or revocation rule is hit. In this model, stopping the loop at five minutes reduces each incident from <strong className="text-white">{money.format(calc.incidentCost)}</strong> to <strong className="text-white">{money.format(calc.blockedAtFiveMinutes)}</strong>.
+              Five minutes is an input in this model, not a product setting. If a budget was set so new calls stop after five minutes, each incident in this model falls from <strong className="text-white">{money.format(calc.incidentCost)}</strong> to <strong className="text-white">{money.format(calc.blockedAtFiveMinutes)}</strong>.
             </p>
             <div className="rounded-xl border border-gray-800 bg-black p-5">
               <div className="mb-2 text-sm text-gray-400">Avoidable cost per incident</div>

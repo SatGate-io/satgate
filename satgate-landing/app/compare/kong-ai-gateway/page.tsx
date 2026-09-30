@@ -21,6 +21,7 @@ export const metadata = {
     description: 'Compare SatGate and Kong AI Gateway for gateway infrastructure, agent economics, MCP tool controls, scoped credentials, and paid-rail context.',
     url: 'https://satgate.io/compare/kong-ai-gateway',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

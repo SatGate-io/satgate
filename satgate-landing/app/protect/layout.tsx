@@ -20,6 +20,7 @@ export const metadata: Metadata = {
       "Watch SatGate enforce per-agent budgets, MCP tool limits, delegation controls, policy decisions, and revocation at the gateway policy check.",
     url: "https://satgate.io/protect",
     type: "website",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: "summary_large_image",

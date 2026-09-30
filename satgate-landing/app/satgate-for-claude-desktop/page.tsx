@@ -18,6 +18,7 @@ export const metadata = {
     description: 'Govern Claude Desktop MCP tool calls with SatGate budgets, scoped capabilities, revocation, and request-path Evidence Packs.',
     url: 'https://satgate.io/satgate-for-claude-desktop',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

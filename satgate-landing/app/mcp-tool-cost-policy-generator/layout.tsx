@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     description: 'Create budget and Evidence Pack policy for MCP tools before agents trigger paid APIs, searches, browser sessions, or cloud tasks.',
     url: 'https://satgate.io/mcp-tool-cost-policy-generator',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

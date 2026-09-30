@@ -13,6 +13,7 @@ export const metadata = {
     url: 'https://satgate.io/blog/mcp-budget-enforcement-guide',
     type: 'article',
     publishedTime: '2026-03-05T00:00:00Z',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -384,7 +385,7 @@ curl -X POST http://localhost:9090/admin/mint \\
             <h3 className="mb-3 text-xl font-bold text-white">Generate an MCP budget policy</h3>
             <p className="mb-4 text-gray-300">Turn this guide into copyable policy: price MCP tools, set per-agent budgets, and generate proxy config for Cursor, Claude, OpenClaw, or custom clients.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
-              <Link href="/mcp-tool-cost-policy-generator" className="text-cyan-300 hover:text-cyan-200">MCP tool cost policy generator →</Link>
+              <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">MCP tool cost policy generator →</Link>
               <Link href="/mcp-proxy-config-generator" className="text-cyan-300 hover:text-cyan-200">MCP proxy config generator →</Link>
               <Link href="/mcp-cost-control" className="text-cyan-300 hover:text-cyan-200">MCP cost control →</Link>
             </div>

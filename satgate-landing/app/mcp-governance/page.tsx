@@ -21,6 +21,7 @@ export const metadata = {
     description: 'Control Model Context Protocol tool calls with authority policy, scoped budgets, revocation, Evidence Pack receipts, and Evidence Pack proof.',
     url: 'https://satgate.io/mcp-governance',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

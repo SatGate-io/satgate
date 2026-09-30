@@ -17,6 +17,7 @@ export const metadata = {
     description: 'Monthly benchmark for runaway AI agent spend, MCP tool cost failures, and avoided cost from request-path controls.',
     url: 'https://satgate.io/ai-agent-runaway-spend-index',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -219,7 +220,7 @@ export default function AiAgentRunawaySpendIndexPage() {
             The pattern is consistent: agent spend incidents are not solved by better dashboards. They are solved by request-path budget enforcement, MCP tool cost policy, revocable capabilities, delegation caps, and kill switches at the gateway before forwarding to upstream services.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/agent-spend-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Generate spend policy <ArrowRight size={18} /></Link>
+            <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Generate spend policy <ArrowRight size={18} /></Link>
             <Link href="/ai-agent-runaway-spend-benchmark" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">Read benchmark methodology</Link>
           </div>
         </div>

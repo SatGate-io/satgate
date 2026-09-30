@@ -19,6 +19,7 @@ export const metadata = {
     description: 'Give Hermes Agent workflows request-path budgets, MCP tool cost policy, scoped credentials, revocation, and Evidence Packs with SatGate.',
     url: 'https://satgate.io/satgate-for-hermes-agent',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -189,7 +190,7 @@ export default function SatGateForHermesAgentPage() {
             Put SatGate in front of paid MCP servers, model routes, data APIs, and internal tools so Hermes Agent can act autonomously without receiving a blank check.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/agent-spend-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Generate spend policy <ArrowRight size={18} /></Link>
+            <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Generate spend policy <ArrowRight size={18} /></Link>
             <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Grade readiness</Link>
           </div>
         </div>

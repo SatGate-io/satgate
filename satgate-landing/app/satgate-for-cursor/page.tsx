@@ -18,6 +18,7 @@ export const metadata = {
     description: 'Control Cursor agent spend, MCP tool access, and API credentials with SatGate request-path budgets, revocation, and Evidence Packs.',
     url: 'https://satgate.io/satgate-for-cursor',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

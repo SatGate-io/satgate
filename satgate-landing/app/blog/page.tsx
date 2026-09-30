@@ -20,6 +20,7 @@ export const metadata = {
     description: 'Guides on AI agent governance, Policy-to-Proof governance, MCP budget enforcement, paid-rail context, capability tokens, API monetization, and cost control.',
     url: 'https://satgate.io/blog',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

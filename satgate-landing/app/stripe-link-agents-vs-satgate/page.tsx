@@ -20,6 +20,7 @@ export const metadata = {
     description: 'Stripe Link can provide payment credentials and approval flows. SatGate controls what agents may access, spend, meter, delegate, and monetize at the gateway before forwarding to upstream APIs.',
     url: 'https://satgate.io/stripe-link-agents-vs-satgate',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

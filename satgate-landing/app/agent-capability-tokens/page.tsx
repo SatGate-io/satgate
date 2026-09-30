@@ -19,6 +19,7 @@ export const metadata = {
     description: 'Use capability tokens for AI agents to encode scope, budget, route, expiry, delegation, and revocation into request-path access decisions.',
     url: 'https://satgate.io/agent-capability-tokens',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -89,7 +90,7 @@ export default function Page() {
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">Identity proves who the agent is. Capability proves authority. For autonomous agents, the token should encode routes, tools, budgets, expiry, delegation limits, and revocation checks before access is granted.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/capability-lifecycle-demo" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Walk lifecycle demo <ArrowRight size={18} /></Link>
-            <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Generate token policy</Link>
+            <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Generate token policy</Link>
             <Link href="/blog/macaroon-tokens-vs-api-keys" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Macaroons vs API keys</Link>
           </div>
         </div>
@@ -160,7 +161,7 @@ export default function Page() {
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <h2 className="text-3xl font-bold text-white">Credential policy example</h2>
-          <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center gap-2 font-semibold text-cyan-300 transition hover:text-cyan-200">
+          <Link href="/build" className="inline-flex items-center gap-2 font-semibold text-cyan-300 transition hover:text-cyan-200">
             Generate a scoped token policy <ArrowRight size={16} />
           </Link>
         </div>

@@ -20,6 +20,7 @@ export const metadata = {
     description: 'A gateway that checks what each AI agent may do and spend before its request reaches your API, and signs a receipt for every decision.',
     url: 'https://satgate.io/economic-firewall',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -428,7 +429,7 @@ export default function EconomicFirewallPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               ['/policy-to-proof', 'Policy-to-Proof', 'How each token, handoff, payment, refusal and revoke becomes a signed receipt.'],
-              ['/agent-authority-layer', 'Agent Authority & Accountability Layer', 'Agent permissions that don’t depend on one payment method, with signed receipts.'],
+              ['/mcp', 'MCP', 'Budgets and permissions for MCP tools, and a signed receipt when a call is allowed or refused.'],
               ['/govern', 'Control AI agents', 'Budgets and permissions for your own agents, with receipts you can export.'],
               ['/agent-control-plane', 'Agent control plane', 'Permissions, handoffs, spend, audit and revokes for large fleets of agents.'],
               ['/mcp-governance', 'MCP governance', 'Budgets, revokes and receipts for MCP tool calls.'],

@@ -20,6 +20,7 @@ export const metadata = {
     description: 'A practical checklist for LLM cost dashboards — and why dashboards still need request-path budget enforcement for AI agents.',
     url: 'https://satgate.io/llm-cost-dashboard',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

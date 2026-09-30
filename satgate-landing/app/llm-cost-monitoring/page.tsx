@@ -20,6 +20,7 @@ export const metadata = {
     description: 'A practical guide to monitoring LLM cost and converting observability into request-path budget enforcement for AI agents.',
     url: 'https://satgate.io/llm-cost-monitoring',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -258,7 +259,7 @@ export default function LlmCostMonitoringPage() {
               <h3 className="mb-2 text-lg font-bold text-white">ROI calculator →</h3>
               <p className="text-gray-400">Estimate loop waste, ghost spend, payback, and avoided cost.</p>
             </Link>
-            <Link href="/agent-spend-policy-template" className="rounded-2xl border border-gray-800 bg-black/70 p-6 transition hover:border-purple-600">
+            <Link href="/build" className="rounded-2xl border border-gray-800 bg-black/70 p-6 transition hover:border-purple-600">
               <h3 className="mb-2 text-lg font-bold text-white">Agent spend policy →</h3>
               <p className="text-gray-400">Turn monitoring signals into budget, revocation, and Evidence Pack policy.</p>
             </Link>

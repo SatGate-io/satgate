@@ -20,6 +20,7 @@ export const metadata: Metadata = {
     description: "Why your cloud provider's built-in tools aren't enough for the Agentic Web",
     type: 'website',
     url: 'https://satgate.io/compare/cloud-native',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
 };
 

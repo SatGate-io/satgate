@@ -20,6 +20,7 @@ export const metadata = {
     description: 'Connect SatGate to Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP agent workflows for request-path spend control.',
     url: 'https://satgate.io/integrations',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

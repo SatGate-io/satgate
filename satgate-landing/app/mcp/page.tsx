@@ -17,9 +17,10 @@ export const metadata = {
   ],
   openGraph: {
     title: 'MCP Governance for AI Agents',
-    description: 'Request-path budgets, scoped capabilities, revocation, and Evidence Packs for MCP tool calls.',
+    description: 'Budgets and permissions for MCP tools, and a signed receipt when a call is allowed or refused.',
     url: 'https://satgate.io/mcp',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -48,9 +49,9 @@ const cards = [
     icon: Wrench,
   },
   {
-    href: '/mcp-tool-cost-policy-generator',
-    title: 'MCP Tool Cost Policy Generator',
-    description: 'Generate YAML and JSON policy for MCP tool budgets, risk actions, audit fields, and revocation.',
+    href: '/mcp-proxy-config-generator',
+    title: 'MCP connect snippet',
+    description: 'The npx satgate-mcp-bridge snippet for Cursor and Claude Code. Credits, not a dollar budget.',
     icon: Terminal,
   },
 ];
@@ -141,20 +142,53 @@ export default function MCPPage() {
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-950/30 px-4 py-2 text-sm text-purple-200">
             <Bot size={16} /> Economic firewall for MCP tools
           </div>
-          <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">
-            MCP Governance for AI Agents
+          <h1 className="mb-6 max-w-5xl text-5xl font-extrabold tracking-tight md:text-6xl">
+            Connect MCP in four steps
           </h1>
-          <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            MCP gives agents tools. SatGate gives teams the economic firewall around those tools: per-tool budgets, scoped capabilities, revocation, Evidence Packs, and policy before execution.
-          </p>
+          <ol className="mb-8 max-w-3xl list-decimal space-y-3 pl-5 text-lg leading-relaxed text-gray-300">
+            <li>Start a 14-day trial. No card.</li>
+            <li>Open MCP Setup in the dashboard and copy the connect snippet. Cursor uses this:</li>
+          </ol>
+          <pre className="mb-6 max-w-3xl overflow-x-auto rounded-xl border border-gray-800 bg-black p-4 text-sm leading-6 text-gray-300">{`{
+  "mcpServers": {
+    "satgate": {
+      "command": "npx",
+      "args": ["-y", "satgate-mcp-bridge"],
+      "env": {
+        "SATGATE_URL": "https://satgate-mcp-saas.fly.dev",
+        "SATGATE_TOKEN": "paste-the-token-from-cloud.satgate.io"
+      }
+    }
+  }
+}`}</pre>
+          <ol className="mb-8 max-w-3xl list-decimal space-y-3 pl-5 text-lg leading-relaxed text-gray-300" start={3}>
+            <li>A new token starts at 1,000 credits. A tool call costs 1 credit unless you set per-tool costs.</li>
+            <li>Watch calls in the MCP Monitor.</li>
+          </ol>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/mcp-tool-cost-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-              Generate MCP policy <ArrowRight size={18} />
-            </Link>
-            <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
-              Read the governance guide
-            </Link>
+            <a href="https://cloud.satgate.io/cloud/signup" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+              Start free trial <ArrowRight size={18} />
+            </a>
+            <a href="https://cloud.satgate.io/cloud/mcp/onboarding" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              Open MCP Setup
+            </a>
           </div>
+          <p className="mt-4 text-sm text-gray-500">Claude Code uses the same npx snippet. Claude Desktop and OpenClaw use the tenant /sse URL with an Authorization Bearer header, copied from MCP Setup.</p>
+        </div>
+      </section>
+
+      <section className="relative overflow-hidden border-b border-gray-900">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(168,85,247,0.2),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(34,211,238,0.16),transparent_32%)]" />
+        <div className="relative mx-auto max-w-6xl px-6 py-24">
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-950/30 px-4 py-2 text-sm text-purple-200">
+            <Bot size={16} /> Economic firewall for MCP tools
+          </div>
+          <h2 className="mb-8 max-w-5xl text-4xl font-extrabold tracking-tight md:text-5xl">
+            MCP for your agents, with a budget
+          </h2>
+          <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300">
+            SatGate sits in front of MCP tools. You see what each agent calls, you cap it, and you get a signed receipt when a call is allowed or refused.
+          </p>
         </div>
       </section>
 

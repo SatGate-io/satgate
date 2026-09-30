@@ -13,6 +13,7 @@ export const metadata = {
     url: 'https://satgate.io/blog/llm-cost-management',
     type: 'article',
     publishedTime: '2026-03-17T00:00:00Z',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -447,7 +448,7 @@ satgate mint \\
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">AI agent governance →</Link>
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
-              <Link href="/agent-spend-policy-template" className="text-cyan-300 hover:text-cyan-200">Spend policy template →</Link>
+              <Link href="/build" className="text-cyan-300 hover:text-cyan-200">Spend policy template →</Link>
               <Link href="/mcp-cost-control" className="text-cyan-300 hover:text-cyan-200">MCP cost control →</Link>
               <Link href="/mcp-proxy-config-generator" className="text-cyan-300 hover:text-cyan-200">MCP proxy config generator →</Link>
               <Link href="/economic-firewall-readiness-grader" className="text-cyan-300 hover:text-cyan-200">Readiness grader →</Link>
@@ -461,7 +462,7 @@ satgate mint \\
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/llm-cost-dashboard" className="text-cyan-300 hover:text-cyan-200">LLM cost dashboard checklist →</Link>
               <Link href="/llm-cost-monitoring" className="text-cyan-300 hover:text-cyan-200">LLM cost monitoring guide →</Link>
-              <Link href="/agent-spend-policy-template" className="text-cyan-300 hover:text-cyan-200">Agent spend policy template →</Link>
+              <Link href="/build" className="text-cyan-300 hover:text-cyan-200">Agent spend policy template →</Link>
             </div>
           </div>
 

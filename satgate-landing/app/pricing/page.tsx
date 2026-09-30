@@ -187,10 +187,10 @@ const PricingPage = () => {
         </div>
       </header>
 
-      {/* Observe, Control, Admit, Prove */}
+      {/* Observe, Control, Admit. Receipts span all three. */}
       <section className="pb-10 px-6">
         <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-cyan-900/20 border border-cyan-800/30">
               <span className="text-cyan-400 font-bold text-sm">Observe</span>
               <span className="text-gray-500 text-xs">See usage and cost</span>
@@ -203,11 +203,8 @@ const PricingPage = () => {
               <span className="text-yellow-400 font-bold text-sm">Admit</span>
               <span className="text-gray-500 text-xs">Let external agents in, and charge them</span>
             </div>
-            <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-green-900/20 border border-green-800/30">
-              <span className="text-green-400 font-bold text-sm">Prove</span>
-              <span className="text-gray-500 text-xs">Check the receipts</span>
-            </div>
           </div>
+          <p className="mt-4 text-center text-sm text-gray-400">Receipts for all three. Anyone can check a signed receipt with the open-source verifier.</p>
         </div>
       </section>
 
@@ -350,7 +347,7 @@ const PricingPage = () => {
                 <tr>
                   <td className="py-3 px-4 text-gray-300">Payments</td>
                   <td className="py-3 px-4">None built in</td>
-                  <td className="py-3 px-4 text-white">Charge external agents per call (L402, or USDC via x402)</td>
+                  <td className="py-3 px-4 text-white">Charge external agents on the routes you choose. Lightning, or USDC on Base (x402). You set how many requests one Lightning payment buys. One USDC payment buys one request. A signed receipt either way.</td>
                 </tr>
               </tbody>
             </table>
@@ -375,7 +372,7 @@ const PricingPage = () => {
             <div className="text-center">
               <div className="text-3xl mb-3">💰</div>
               <h3 className="font-bold text-white mb-2">Earn money</h3>
-              <p className="text-gray-400 text-sm">Charge external agents per call over L402, or in USDC on Base via x402, with a signed receipt for every decision.</p>
+              <p className="text-gray-400 text-sm">Charge external agents on the routes you choose. One USDC payment on Base buys one request. On Lightning routes you choose how many requests one payment buys. A signed receipt either way.</p>
             </div>
           </div>
         </div>

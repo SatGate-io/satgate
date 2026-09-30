@@ -20,6 +20,7 @@ export const metadata: Metadata = {
       "Optional 90-day design-partner pilot for larger teams that want help. A 14-day self-serve trial is also open.",
     url: "https://satgate.io/design-partners",
     type: "website",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: "summary_large_image",

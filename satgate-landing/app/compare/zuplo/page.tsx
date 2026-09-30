@@ -10,6 +10,7 @@ export const metadata = {
     description: 'Compare Zuplo API gateway controls with SatGate economic governance for AI agent budgets, MCP tool costs, and L402 monetization.',
     url: 'https://satgate.io/compare/zuplo',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

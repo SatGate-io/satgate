@@ -20,6 +20,7 @@ export const metadata = {
     description: 'Wallet approval is necessary but not sufficient. SatGate adds request-path budgets, scoped authority, metering, revocation, and Evidence Pack receipts.',
     url: 'https://satgate.io/agent-payment-controls',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

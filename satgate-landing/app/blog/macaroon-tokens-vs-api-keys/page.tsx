@@ -12,6 +12,7 @@ export const metadata = {
     url: 'https://satgate.io/blog/macaroon-tokens-vs-api-keys',
     type: 'article',
     publishedTime: '2026-03-31T00:00:00Z',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -603,7 +604,7 @@ attenuated_token = agent_a_token.add_caveats([
             <p className="mb-4 text-gray-300">Static API keys become dangerous when autonomous agents can spend, delegate, and retry. Start with a risk assessment, then move to revocable capabilities.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/agent-api-key-risk-assessment" className="text-cyan-300 hover:text-cyan-200">API key risk assessment →</Link>
-              <Link href="/revocable-capability-token-policy-template" className="text-cyan-300 hover:text-cyan-200">Generate capability-token policy →</Link>
+              <Link href="/build" className="text-cyan-300 hover:text-cyan-200">Generate capability-token policy →</Link>
               <Link href="/revocable-agent-credentials" className="text-cyan-300 hover:text-cyan-200">Revocable credentials →</Link>
               <Link href="/agent-capability-tokens" className="text-cyan-300 hover:text-cyan-200">Capability tokens →</Link>
               <Link href="/agent-control-plane" className="text-cyan-300 hover:text-cyan-200">Agent control plane →</Link>
@@ -631,7 +632,7 @@ attenuated_token = agent_a_token.add_caveats([
               SatGate implements macaroon authentication with budget enforcement and delegation support. Deploy in minutes, test with your first AI agent, and scale to autonomous workloads.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
+              <Link href="/build" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
                 Generate Token Policy
               </Link>
               <a href="https://github.com/SatGate-io/satgate" className="inline-flex items-center gap-2 border border-blue-500 text-blue-300 px-6 py-3 rounded-lg font-bold hover:bg-blue-900/30 transition text-sm">

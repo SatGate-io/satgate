@@ -10,6 +10,14 @@ const nextConfig: NextConfig = {
       { source: '/contact', destination: '/design-partners', permanent: true },
       { source: '/demo', destination: '/sandbox', permanent: true },
       { source: '/api', destination: '/', permanent: true },
+      { source: '/dashboard', destination: '/sandbox', permanent: true },
+      { source: '/crawl', destination: '/sandbox', permanent: true },
+      { source: '/monetize', destination: '/pay', permanent: true },
+      { source: '/seo-distribution-kit', destination: '/', permanent: true },
+      { source: '/openai-budget-policy-generator', destination: '/build', permanent: true },
+      { source: '/mcp-tool-cost-policy-generator', destination: '/mcp', permanent: true },
+      { source: '/agent-spend-policy-template', destination: '/build', permanent: true },
+      { source: '/revocable-capability-token-policy-template', destination: '/build', permanent: true },
     ];
   },
   async headers() {
