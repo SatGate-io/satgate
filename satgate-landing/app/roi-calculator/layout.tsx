@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: "AI Agent ROI Calculator: Budget Enforcement Savings",
   alternates: { canonical: "https://satgate.io/roi-calculator" },
   description:
-    "Estimate AI agent loop exposure and map budget controls to signed receipts and signed receipt (Evidence Pack) evidence with SatGate.",
+    "Estimate AI agent loop exposure and map budget controls to signed receipts (Evidence Pack) with SatGate.",
   keywords: [
     "AI agent ROI calculator",
     "AI agent cost calculator",

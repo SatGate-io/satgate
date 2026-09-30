@@ -118,7 +118,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
           <h1 className="text-4xl font-bold mb-4">How to Add OpenAI API Budget Limits Before Calls Run</h1>
           <div className="mb-6 rounded-2xl border border-green-900/60 bg-green-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-green-300">Direct answer</p>
-            <p className="text-gray-300">OpenAI usage limits are account-level. Controls that run before the request goes through enforce per-agent, per-team, and per-workflow budgets before a GPT call reaches OpenAI, then Prove each allow, deny, or downgrade with an signed receipt.</p>
+            <p className="text-gray-300">OpenAI usage limits are account-level. Controls that run before the request goes through enforce per-agent, per-team, and per-workflow budgets before a GPT call reaches OpenAI, then Prove each allow, deny, or downgrade with a signed receipt.</p>
           </div>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row">
             <Link href="/build" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Add a budget with SatGate</Link>

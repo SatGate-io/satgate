@@ -137,7 +137,7 @@ export default function GovernPage() {
           <div className="max-w-3xl mx-auto mt-6 p-6 rounded-xl bg-black border-2 border-purple-500/40">
             <p className="text-xs font-mono text-purple-400 uppercase tracking-wider mb-3">Proof spans both lanes</p>
             <h3 className="text-xl font-bold text-white mb-2">Prove <span className="text-purple-400">Across Both Agent Lanes</span></h3>
-            <p className="text-gray-400 text-sm">Internal or external, supported governed decisions can produce signed receipts. Payment proves value moved; SatGate proves authority was evaluated. Where receipt export is enabled, receipts reconcile into signed receipts (Evidence Packs) your auditor can verify independently.</p>
+            <p className="text-gray-400 text-sm">Internal or external, supported governed decisions can produce signed receipts. Payment proves value moved; SatGate proves authority was evaluated. Where receipt export is enabled, receipts reconcile into Evidence Packs your auditor can verify independently.</p>
           </div>
 
           <div className="text-center mt-8">
@@ -455,7 +455,7 @@ export default function GovernPage() {
       {/* Dashboard Screenshots */}
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">Receipts that roll up into signed receipts (Evidence Packs).</h2>
+          <h2 className="text-3xl font-bold text-center mb-4">Receipts that roll up into an Evidence Pack.</h2>
           <p className="text-gray-500 text-center mb-12">Real-time visibility into every governed agent, API call, policy decision, revocation, and dollar — with exports when proof matters.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -704,7 +704,7 @@ export default function GovernPage() {
             <div className="p-5 rounded-xl bg-gray-900 border border-gray-800 text-center">
               <div className="text-3xl mb-3">💰</div>
               <h4 className="font-semibold text-white mb-2">Evidence export</h4>
-              <p className="text-gray-500 text-sm">Every mint, delegation, paid call, denial, and revocation produces receipts that can land in a signed receipt (Evidence Pack).</p>
+              <p className="text-gray-500 text-sm">Every mint, delegation, paid call, denial, and revocation produces receipts that can land in an Evidence Pack.</p>
             </div>
           </div>
 
@@ -850,7 +850,7 @@ export SATGATE_TOKEN=$TOKEN
           </h2>
           <p className="text-gray-400 text-lg mb-8">
             We&apos;re working with enterprise teams that need scoped authority, runtime enforcement, and evidence before agents scale.
-            Start with Observe, then move to Control and Prove when you&apos;re ready.
+            Start with Observe, then move to Control and export receipts when you&apos;re ready.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-10 py-4 font-bold text-lg text-white hover:border-purple-400 transition">

@@ -48,7 +48,7 @@ const capabilities = [
   {
     icon: Activity,
     title: 'Receipts',
-    body: 'Sign a receipt for each decision: who allowed it, why a request was refused, what it cost. Export them as a signed receipt (Evidence Pack).',
+    body: 'Sign a receipt for each decision: who allowed it, why a request was refused, what it cost. Export them as an Evidence Pack.',
   },
   {
     icon: WalletCards,

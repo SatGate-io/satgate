@@ -863,7 +863,7 @@ export default function ProtectDemoPage() {
               <div>
                 <h3 className="text-2xl font-bold text-white">Need the buyer-safe allow/deny/revoke proof?</h3>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-300">
-                  The one-click Control scenes are useful for protocol exploration. The deterministic buyer proof lives on the public demo path and shows 401 no authority, 200 allowed, 402/403 denial, revoke/replay denial, and receipt export, as a signed receipt (Evidence Pack), without auth or hidden shortcuts.
+                  The one-click Control scenes are useful for protocol exploration. The deterministic buyer proof lives on the public demo path and shows 401 no authority, 200 allowed, 402/403 denial, revoke/replay denial, and Evidence Pack export without auth or hidden shortcuts.
                 </p>
               </div>
               <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">

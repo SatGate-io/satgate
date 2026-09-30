@@ -135,7 +135,7 @@ export default function AiAgentCostControlPage() {
         name: 'What is the difference between AI agent cost control and LLM cost management?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'LLM cost management usually tracks model and token spend after usage occurs. AI agent cost control adds checks, before the request goes through, across agents, MCP tools, paid APIs, delegated sub-agents, budgets, revocation, and audit, before cost is created.',
+          text: 'LLM cost management usually tracks model and token spend after usage occurs. AI agent cost control adds checks before the request goes through, across agents, MCP tools, paid APIs, delegated sub-agents, budgets, revocation, and audit, before cost is created.',
         },
       },
       {
@@ -151,7 +151,7 @@ export default function AiAgentCostControlPage() {
         name: 'Can rate limits control AI agent costs?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Rate limits control request frequency, not economic exposure. AI agent cost control needs per-request pricing, remaining-budget checks, tool-level caps, and decisions, before the request goes through, that account for expensive model or MCP tool calls.',
+          text: 'Rate limits control request frequency, not economic exposure. AI agent cost control needs per-request pricing, remaining-budget checks, tool-level caps, and decisions before the request goes through that account for expensive model or MCP tool calls.',
         },
       },
       {
@@ -487,13 +487,13 @@ export default function AiAgentCostControlPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is the difference between AI agent cost control and LLM cost management?</h3>
               <p className="text-gray-400 leading-relaxed">
-                LLM cost management usually tracks model and token spend after usage occurs. AI agent cost control adds checks, before the request goes through, across agents, MCP tools, paid APIs, delegated sub-agents, budgets, revocation, and audit, before cost is created.
+                LLM cost management usually tracks model and token spend after usage occurs. AI agent cost control adds checks before the request goes through, across agents, MCP tools, paid APIs, delegated sub-agents, budgets, revocation, and audit, before cost is created.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Can rate limits control AI agent costs?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Rate limits control request frequency, not economic exposure. AI agent cost control needs per-request pricing, remaining-budget checks, tool-level caps, and decisions, before the request goes through, that account for expensive model or MCP tool calls.
+                Rate limits control request frequency, not economic exposure. AI agent cost control needs per-request pricing, remaining-budget checks, tool-level caps, and decisions before the request goes through that account for expensive model or MCP tool calls.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

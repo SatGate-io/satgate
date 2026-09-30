@@ -86,7 +86,7 @@ export default function LlmCostDashboardPage() {
         name: 'Is an LLM cost dashboard enough to stop runaway spend?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. Dashboards and alerts show spend after or during usage. Autonomous agents need budget checks, before the request goes through, that can block, downgrade, route, or revoke requests before expensive calls execute.',
+          text: 'No. Dashboards and alerts show spend after or during usage. Autonomous agents need budget checks before the request goes through that can block, downgrade, route, or revoke requests before expensive calls execute.',
         },
       },
       {
@@ -245,7 +245,7 @@ export default function LlmCostDashboardPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Is an LLM cost dashboard enough to stop runaway spend?</h3>
-              <p className="leading-relaxed text-gray-400">No. Dashboards and alerts show spend after or during usage. Autonomous agents need budget checks, before the request goes through, that can block, downgrade, route, or revoke requests before expensive calls execute.</p>
+              <p className="leading-relaxed text-gray-400">No. Dashboards and alerts show spend after or during usage. Autonomous agents need budget checks before the request goes through that can block, downgrade, route, or revoke requests before expensive calls execute.</p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate turn LLM cost dashboards into enforcement?</h3>

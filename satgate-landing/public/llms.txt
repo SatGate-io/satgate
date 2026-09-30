@@ -19,7 +19,7 @@ Enforce your agents' budgets and permissions before each request runs. Observe s
 Let external agents in with limited access, and make them pay first on the routes you choose. Payment never overrides permissions.
 
 ## Proof across all three controls
-SatGate signs a receipt for every decision, on HTTP APIs and MCP tools, for your own agents and for external ones. Receipts are exported as signed receipts (Evidence Packs). Anyone can check them against SatGate's published keys (JWKS) with the open-source verifier. A receipt shows what SatGate decided. It is not a compliance certificate, and it does not prove answer quality, that a supplier told the truth, anyone's legal identity or that an outside payment settled.
+SatGate signs a receipt for every decision, on HTTP APIs and MCP tools, for your own agents and for external ones. Receipts are exported together as an Evidence Pack. Anyone can check them against SatGate's published keys (JWKS) with the open-source verifier. A receipt shows what SatGate decided. It is not a compliance certificate, and it does not prove answer quality, that a supplier told the truth, anyone's legal identity or that an outside payment settled.
 
 ## Agent choice and owner enforcement
 Agents may choose SatGate because it helps them get work done. The limits stay owner-enforced either way. Make SatGate the only route to the API: block direct access to the origin, keep upstream API keys behind SatGate and restrict outbound traffic so agents cannot go around it.

@@ -46,7 +46,7 @@ const layers = [
   {
     icon: ReceiptText,
     title: "Evidence — after the call",
-    body: "Every allow, deny, delegation, revocation, and paid event leaves a signed receipt (Evidence Pack).",
+    body: "Every allow, deny, delegation, revocation, and paid event leaves a signed receipt, rolled into an Evidence Pack.",
   },
 ];
 

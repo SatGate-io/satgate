@@ -460,7 +460,7 @@ const LandingPage = () => {
               </div>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              When SatGate allows, refuses, charges or revokes, it signs a receipt. Receipts roll up into signed receipts (Evidence Packs).
+              When SatGate allows, refuses, charges or revokes, it signs a receipt. Receipts roll up into an Evidence Pack.
               Your auditor can check the signatures with the open-source verifier, without having to trust us.
               A receipt shows what SatGate decided. It is not a compliance certificate.
             </p>
@@ -709,7 +709,7 @@ const LandingPage = () => {
               {
                 step: "4",
                 title: "Check what happened",
-                description: "Receipts for allowed, denied, paid, delegated, and revoked decisions, ready to export as a signed receipt (Evidence Pack).",
+                description: "Receipts for allowed, denied, paid, delegated, and revoked decisions, ready to export as an Evidence Pack.",
                 code: `Illustrative sample, not live customer data\nAllowed receipts: 1,203\nDenied receipts: 12,847\nPaid receipts:   $847 settled\nDelegations:     42\nRevocations:     9\n\n→ Export Evidence Pack`
               }
             ].map((item, i) => (

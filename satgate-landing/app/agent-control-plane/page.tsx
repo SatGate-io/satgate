@@ -120,7 +120,7 @@ const controlPlaneCapabilities = [
 const comparisons = [
   ["Connection", "Agents can reach models, APIs, and MCP tools."],
   ["Control", "SatGate decides what authority, budget, and delegation each agent receives."],
-  ["Proof", "Every allowed, denied, charged, or revoked action leaves a receipt that feeds the signed receipt (Evidence Pack)."],
+  ["Proof", "Every allowed, denied, charged, or revoked action leaves a receipt that feeds the exported receipt bundle (Evidence Pack)."],
   ["Revenue", "The same control path governs paid calls across x402, L402, AgentCore Payments, and Pay.sh while preserving proof of agent permissions."],
 ];
 

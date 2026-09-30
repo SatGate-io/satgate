@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'MCP Proxy Config Generator',
     description:
-      'Generate MCP proxy configs with scoped authority, budgets, signed receipts, revocation, and signed receipt (Evidence Pack) fields.',
+      'Generate MCP proxy configs with scoped authority, budgets, revocation, and Evidence Pack fields.',
     url: 'https://satgate.io/mcp-proxy-config-generator',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],

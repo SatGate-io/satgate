@@ -42,7 +42,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     bullets: [
       { title: 'AWS is strongest inside AWS-native architectures', body: 'That is valuable. It is also the limitation. Most enterprises will not put every agent, model, API, MCP server, and payment method inside one AWS-native box.' },
       { title: 'Payments are not permission', body: 'A payment session does not answer whether this agent, task, tenant, budget, route, or delegated child should be allowed to act right now.' },
-      { title: 'Receipts need policy context', body: 'Finance and security need more than “a payment happened.” They need who passed permissions down to a sub-agent, what policy applied, why it was allowed, and what evidence remains.' },
+      { title: 'Receipts need policy context', body: 'Finance and security need more than “a payment happened.” They need who delegated the permissions, what policy applied, why it was allowed, and what evidence remains.' },
       { title: 'Deployment flexibility matters', body: 'Regulated APIs, private MCP tools, and customer-controlled gateways need enforcement near the trust boundary, not only in a managed cloud console.' },
     ],
     faqs: [
@@ -178,7 +178,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     ],
     satgateGoodAt: [standardAxes.crossProvider, standardAxes.crossRail, standardAxes.delegation, standardAxes.mcp],
     rows: [
-      { axis: 'Primary job', satgate: 'One layer for permissions passed down to sub-agents across agents, providers, APIs, MCP tools, and payment methods.', competitor: 'Provider-specific spend caps, rate limits, usage dashboards, and keys.', winner: 'SatGate' },
+      { axis: 'Primary job', satgate: 'One layer for delegated permissions across agents, providers, APIs, MCP tools, and payment methods.', competitor: 'Provider-specific spend caps, rate limits, usage dashboards, and keys.', winner: 'SatGate' },
       { axis: 'Cross-provider', satgate: standardAxes.crossProvider, competitor: 'OpenAI controls OpenAI. Anthropic controls Anthropic.', winner: 'SatGate' },
       { axis: 'Cross-rail', satgate: standardAxes.crossRail, competitor: 'Model-provider usage only; not internal APIs, SaaS tools, MCP servers, or payment-style access rails.', winner: 'SatGate' },
       { axis: 'Before the agent acts', satgate: standardAxes.preExecution, competitor: 'Can stop calls when provider limits are reached, but lacks rich business policy across external tools and rails.', winner: 'SatGate' },

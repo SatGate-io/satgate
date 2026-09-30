@@ -255,7 +255,7 @@ export default function AiSpendGovernanceBlogPage() {
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Prove what happened</h3>
           <p className="text-gray-300 leading-relaxed">
-            Preserve signed receipts that show who passed permissions down to a sub-agent, which policy applied, what budget constrained the action, what decision was made, and why it was allowed or denied. Finance needs the cost trail. Security and compliance need the authority trail.
+            Preserve signed receipts that show who delegated the permissions, which policy applied, what budget constrained the action, what decision was made, and why it was allowed or denied. Finance needs the cost trail. Security and compliance need the authority trail.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">What enterprises should require</h2>

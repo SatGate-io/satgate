@@ -42,7 +42,7 @@ const flow = [
   ["1", "Permission", "The principal or platform passes down a bounded capability: agent, tenant, route/tool, budget, expiry, policy version, and delegation depth."],
   ["2", "Decision", "SatGate enforces policy before the request goes through to the upstream API, MCP tool, or payment method."],
   ["3", "Receipt", "Every allowed, denied, delegated, revoked, or paid decision emits a signed receipt with the policy basis and payment details."],
-  ["4", "Signed receipt", "Receipts roll into a verifiable signed receipt (Evidence Pack), anchored by issuer JWKS and independently checked by the open verifier."],
+  ["4", "Signed receipt", "Receipts roll into a verifiable bundle (Evidence Pack), anchored by issuer JWKS and independently checked by the open verifier."],
 ];
 
 const railQuestions = [

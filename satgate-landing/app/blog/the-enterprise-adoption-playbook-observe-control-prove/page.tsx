@@ -220,7 +220,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            Prove is the stage where governance stops being a dashboard claim and becomes an artifact. SatGate preserves the policy basis, requesting agent, delegated scope, budget state, route, payment details when present, and final decision as an signed receipt that finance, security, and compliance can inspect later.
+            Prove is the stage where governance stops being a dashboard claim and becomes an artifact. SatGate preserves the policy basis, requesting agent, delegated scope, budget state, route, payment details when present, and final decision as a signed receipt that finance, security, and compliance can inspect later.
           </p>
           <p className="text-gray-300 leading-relaxed">
             Payment methods such as L402 can still matter, but they are not the center of the framework. They are one context SatGate can govern before value moves. The product job is broader: prove why an autonomous agent was allowed, denied, downgraded, routed, or required to seek approval before execution.

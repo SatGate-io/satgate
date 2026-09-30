@@ -65,7 +65,7 @@ const evidenceQuestions = [
   {
     question: "What did it spend?",
     artifact: "Per-token spend ledger",
-    body: "Spend on each request that goes through SatGate, and on MCP tools, by worker, token, tenant, route, amount, and policy mode.",
+    body: "Attribution of each request that goes through SatGate, and of MCP tools, by worker, token, tenant, route, amount, and policy mode.",
   },
   {
     question: "What was denied?",

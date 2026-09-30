@@ -108,7 +108,7 @@ export default function LlmCostManagementBlogPage() {
           <h1 className="text-4xl font-bold mb-4">LLM Cost Management Needs More Than Dashboards</h1>
           <div className="mb-6 rounded-2xl border border-yellow-900/60 bg-yellow-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-yellow-300">Short answer</p>
-            <p className="text-gray-300">Dashboards explain token spend after the fact. Real LLM cost management connects every model, tool, agent, and workflow to a budget decision before the next request runs, then Proves the decision with an signed receipt.</p>
+            <p className="text-gray-300">Dashboards explain token spend after the fact. Real LLM cost management connects every model, tool, agent, and workflow to a budget decision before the next request runs, then Proves the decision with a signed receipt.</p>
           </div>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row">
             <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Use the LLM cost dashboard checklist</Link>

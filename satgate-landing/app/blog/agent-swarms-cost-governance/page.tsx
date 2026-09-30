@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Clock, ArrowRight, AlertTriangle, CheckCircle, Bot
 
 export const metadata = {
   title: 'Agent Swarm Cost Control: Hierarchical Budgets for Multi-Agent Systems',
-  description: 'Control agent swarm costs with hierarchical budgets, scoped delegation tokens, cascade revocation, and enforcement, before the request goes through, for multi-agent systems.',
+  description: 'Control agent swarm costs with hierarchical budgets, scoped delegation tokens, cascade revocation, and enforcement before the request goes through for multi-agent systems.',
   alternates: { canonical: 'https://satgate.io/blog/agent-swarms-cost-governance' },
   keywords: ['AI agent swarm cost control', 'multi-agent API governance', 'agent orchestration budget', 'AI agent delegation', 'autonomous agent spend'],
   openGraph: {

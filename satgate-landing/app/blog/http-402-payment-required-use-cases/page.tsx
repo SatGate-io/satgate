@@ -113,7 +113,7 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
           <h1 className="text-4xl font-bold mb-4">HTTP 402 Payment Required: Meaning, Reserved Use, and AI Agent Payments</h1>
           <div className="mb-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Quick answer</p>
-            <p className="text-gray-300">HTTP 402 means access is available after payment. For AI agents, 402 and L402 are how you charge external agents: authority, budget, and policy should be checked before value moves, with signed receipt proof after the request.</p>
+            <p className="text-gray-300">HTTP 402 means access is available after payment. For AI agents, 402 and L402 are the payment step, not the control: check authority, budget, and policy before value moves, and keep a signed receipt after the request.</p>
           </div>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Govern paid agent access</Link>
@@ -474,7 +474,7 @@ Parent Agent ($50 macaroon)
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-HTTP 402 was reserved for future use in 1997. For agent systems, the useful version is narrower: 402 is how you charge external agents around an authority decision, with policy checked before value moves and signed receipts available after the call.
+HTTP 402 was reserved for future use in 1997. For agent systems, the useful version is narrower: 402 is the payment step around a permission decision, with policy checked before value moves and a signed receipt after the call.
           </p>
 
           <div className="my-10 rounded-2xl border border-yellow-900/60 bg-yellow-950/20 p-6">
