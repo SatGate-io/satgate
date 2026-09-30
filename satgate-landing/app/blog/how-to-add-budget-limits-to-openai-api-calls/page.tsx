@@ -4,12 +4,12 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "OpenAI API Budget Limits: Stop Runaway Spend Before Calls",
-  description: "Set OpenAI API budget limits by agent, team, or workflow. Stop runaway GPT spend before the call runs and keep Evidence Pack proof.",
+  description: "Set OpenAI API budget limits by agent, team, or workflow. Stop runaway GPT spend before the call runs and keep signed receipt proof.",
   alternates: { canonical: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls' },
   keywords: ['OpenAI API budget limits', 'OpenAI cost control', 'API gateway OpenAI', 'GPT-4 spending limits', 'OpenAI API costs', 'prevent OpenAI overspending', 'hard cap OpenAI spend', 'per-agent OpenAI budget'],
   openGraph: {
     title: 'OpenAI API Budget Limits: Stop Runaway Spend Before Calls',
-    description: 'Set OpenAI API budget limits by agent, team, or workflow. Stop runaway GPT spend before the call runs and keep Evidence Pack proof.',
+    description: 'Set OpenAI API budget limits by agent, team, or workflow. Stop runaway GPT spend before the call runs and keep signed receipt proof.',
     url: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls',
     type: 'article',
     publishedTime: '2026-04-07T00:00:00Z',
@@ -38,10 +38,10 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
       { '@type': 'Thing', name: 'OpenAI API budget limits' },
       { '@type': 'Thing', name: 'hard caps for GPT spend' },
       { '@type': 'Thing', name: 'per-agent OpenAI budgets' },
-      { '@type': 'Thing', name: 'request-path budget enforcement' },
+      { '@type': 'Thing', name: 'budget enforcement before the request goes through' },
       { '@type': 'Thing', name: 'runaway LLM spend prevention' },
       { '@type': 'Thing', name: 'Observe Control Prove' },
-      { '@type': 'Thing', name: 'Evidence Pack receipts' },
+      { '@type': 'Thing', name: 'signed receipts' },
     ],
   };
 
@@ -54,7 +54,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
         name: 'Does OpenAI have built-in spending limits?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'OpenAI has account-level usage limits, but they are not the same as request-path budget enforcement. They are coarse, can lag behind real usage, and usually cannot isolate spend by agent, user, session, workflow, or tool before a request executes.',
+          text: 'OpenAI has account-level usage limits, but they are not the same as budget enforcement before the request goes through. They are coarse, can lag behind real usage, and usually cannot isolate spend by agent, user, session, workflow, or tool before a request executes.',
         },
       },
       {
@@ -78,7 +78,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
         name: 'Can you set OpenAI API budget limits by team or customer?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes. A request-path budget gateway can attach spend policy to a team, customer, environment, workflow, or agent token, then enforce separate OpenAI API budgets before each request executes.',
+          text: 'Yes. A budget gateway that checks before the request goes through can attach spend policy to a team, customer, environment, workflow, or agent token, then enforce separate OpenAI API budgets before each request executes.',
         },
       },
       {
@@ -118,11 +118,11 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
           <h1 className="text-4xl font-bold mb-4">How to Add OpenAI API Budget Limits Before Calls Run</h1>
           <div className="mb-6 rounded-2xl border border-green-900/60 bg-green-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-green-300">Direct answer</p>
-            <p className="text-gray-300">OpenAI usage limits are account-level. Request-path controls enforce per-agent, per-team, and per-workflow budgets before a GPT call reaches OpenAI, then Prove each allow, deny, or downgrade with an Evidence Pack receipt.</p>
+            <p className="text-gray-300">OpenAI usage limits are account-level. Controls that run before the request goes through enforce per-agent, per-team, and per-workflow budgets before a GPT call reaches OpenAI, then Prove each allow, deny, or downgrade with an signed receipt.</p>
           </div>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row">
             <Link href="/build" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Add a budget with SatGate</Link>
-            <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-purple-500">See Policy-to-Proof for agent spend</Link>
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-purple-500">See how rules and receipts work</Link>
           </div>
           
           <p className="text-xl text-gray-400 mb-6">
@@ -526,7 +526,7 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
           <div className="my-10 rounded-2xl border border-green-900/60 bg-green-950/20 p-6">
             <h2 className="text-2xl font-bold text-white mb-4">OpenAI API Budget Limit: The Click-Intent Answer</h2>
             <p className="text-gray-300 leading-relaxed">
-              If you searched for an OpenAI API budget, the distinction is simple: account-level usage limits protect the vendor account; request-path budget limits protect each agent, team, session, customer, and workflow before the next GPT call runs.
+              If you searched for an OpenAI API budget, the distinction is simple: account-level usage limits protect the vendor account; budget limits checked before the request goes through protect each agent, team, session, customer, and workflow before the next GPT call runs.
             </p>
             <ol className="list-decimal list-inside space-y-2 text-gray-300 my-4">
               <li>Tag every OpenAI request with agent, team, customer, session, and workflow.</li>
@@ -554,7 +554,7 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
 
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">Does OpenAI have built-in spending limits?</h3>
           <p className="text-gray-300 leading-relaxed">
-            OpenAI has account-level usage limits, but they are not the same as request-path budget enforcement. They are coarse, can lag behind real usage, and usually cannot isolate spend by agent, user, session, workflow, or tool before a request executes.
+            OpenAI has account-level usage limits, but they are not the same as budget enforcement before the request goes through. They are coarse, can lag behind real usage, and usually cannot isolate spend by agent, user, session, workflow, or tool before a request executes.
           </p>
 
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">What is the difference between a rate limit and a budget limit for OpenAI?</h3>
@@ -569,7 +569,7 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
 
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">Can you set OpenAI API budget limits by team or customer?</h3>
           <p className="text-gray-300 leading-relaxed">
-            Yes. A request-path budget gateway can attach spend policy to a team, customer, environment, workflow, or agent token, then enforce separate OpenAI API budgets before each request executes.
+            Yes. A budget gateway that checks before the request goes through can attach spend policy to a team, customer, environment, workflow, or agent token, then enforce separate OpenAI API budgets before each request executes.
           </p>
 
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">How do you enforce an OpenAI API budget limit before GPT calls run?</h3>
@@ -584,7 +584,7 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
               <Link href="/build" className="text-cyan-300 hover:text-cyan-200">Build with SatGate →</Link>
               <Link href="/ai-agent-cost-control" className="text-cyan-300 hover:text-cyan-200">AI agent cost control →</Link>
               <Link href="/tools" className="text-cyan-300 hover:text-cyan-200">Cost-control tools →</Link>
-              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
+              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">See how rules and receipts work →</Link>
               <Link href="/agent-api-key-risk-assessment" className="text-cyan-300 hover:text-cyan-200">API key risk assessment →</Link>
               <Link href="/ai-agent-runaway-spend-index" className="text-cyan-300 hover:text-cyan-200">Runaway spend index →</Link>
               <Link href="/blog/llm-cost-management" className="text-cyan-300 hover:text-cyan-200">LLM cost management →</Link>
@@ -596,10 +596,10 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">SatGate path: Observe → Control → Prove</h3>
             <p className="mb-4 text-gray-300">
-              Start by observing agent, API, and MCP usage. Move to request-path control when budgets, scopes, and revocation need to stop bad calls before they run. Preserve Evidence Packs so every allow, deny, and budget decision can be verified later.
+              Start by observing agent, API, and MCP usage. Move to checks before the request goes through when budgets, scopes, and revocation need to stop bad calls before they run. Preserve signed receipts so every allow, deny, and budget decision can be verified later.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
-              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
+              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">See how rules and receipts work →</Link>
               <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>

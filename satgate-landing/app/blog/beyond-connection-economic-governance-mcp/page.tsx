@@ -2,11 +2,11 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: 'Economic Governance in MCP: Beyond Tool Connection',
+  title: 'Spending Controls in MCP: Beyond Tool Connection',
   description: 'The MCP ecosystem talks about capability. Nobody talks about cost. Here\'s why economic policy is the missing layer — and how to enforce it at the protocol level.',
   alternates: { canonical: 'https://satgate.io/blog/beyond-connection-economic-governance-mcp' },
   openGraph: {
-    title: 'Economic Governance in MCP: Beyond Tool Connection',
+    title: 'Spending Controls in MCP: Beyond Tool Connection',
     description: 'MCP agents need more than connection: enforce cost, budget, revocation, delegation, and audit policy before tool calls.',
     url: 'https://satgate.io/blog/beyond-connection-economic-governance-mcp',
     type: 'article',
@@ -15,8 +15,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Economic Governance in MCP: Beyond Tool Connection',
-    description: 'Move MCP from tool connection to economic governance with per-tool costs, scoped budgets, revocation, and audit.',
+    title: 'Spending Controls in MCP: Beyond Tool Connection',
+    description: 'Move MCP from tool connection to spending controls with per-tool costs, scoped budgets, revocation, and audit.',
   },
 };
 
@@ -24,15 +24,15 @@ export default function BeyondConnectionPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'Beyond Connection: The Case for Economic Governance in MCP',
-    description: 'The MCP ecosystem talks about capability. Economic governance adds cost, budget, revocation, delegation, and audit policy to MCP tool calls.',
+    headline: 'Beyond Connection: The Case for Spending Controls in MCP',
+    description: 'The MCP ecosystem talks about capability. Spending controls add cost, budget, revocation, delegation, and audit policy to MCP tool calls.',
     url: 'https://satgate.io/blog/beyond-connection-economic-governance-mcp',
     datePublished: '2026-02-12',
     dateModified: '2026-05-04',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
-      { '@type': 'Thing', name: 'MCP economic governance' },
+      { '@type': 'Thing', name: 'MCP spending controls' },
       { '@type': 'Thing', name: 'MCP tool cost policy' },
       { '@type': 'Thing', name: 'economic firewall for MCP' },
       { '@type': 'Thing', name: 'AI agent tool spend control' },
@@ -45,10 +45,10 @@ export default function BeyondConnectionPage() {
     mainEntity: [
       {
         '@type': 'Question',
-        name: 'What is economic governance in MCP?',
+        name: 'What are spending controls in MCP?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Economic governance in MCP means assigning cost, budget, revocation, delegation, and audit policy to MCP tool calls so agents can use tools safely without unbounded spend.',
+          text: 'Spending controls in MCP mean assigning cost, budget, revocation, delegation, and audit policy to MCP tool calls so agents can use tools safely without unbounded spend.',
         },
       },
       {
@@ -64,7 +64,7 @@ export default function BeyondConnectionPage() {
         name: 'Where should MCP economic policy be enforced?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'MCP economic policy should be enforced in the request path at an MCP proxy or economic firewall before the tool call reaches the upstream server or paid API.',
+          text: 'MCP economic policy should be enforced before the request goes through, at an MCP proxy or economic firewall before the tool call reaches the upstream server or paid API.',
         },
       },
     ],
@@ -96,7 +96,7 @@ export default function BeyondConnectionPage() {
             </span>
           </div>
           
-          <h1 className="text-4xl font-bold mb-4">Beyond Connection: The Case for Economic Governance in MCP</h1>
+          <h1 className="text-4xl font-bold mb-4">Beyond Connection: The Case for Spending Controls in MCP</h1>
           
           <p className="text-xl text-gray-400 mb-6 italic">
             Your AI agent just connected to 12 tools. Who&apos;s watching the bill?
@@ -389,7 +389,7 @@ routes:
             </div>
 
             <p>
-              Each level can only attenuate — add restrictions, reduce budgets, narrow scope. A division token 
+              Each level can only narrow — add restrictions, reduce budgets, narrow scope. A division token 
               can&apos;t grant more than its parent allocated. An agent token can&apos;t exceed its division&apos;s budget. 
               This is enforced cryptographically, not by policy checks in a database.
             </p>
@@ -513,7 +513,7 @@ X-SatGate-Budget-Limit: 2500
                 </p>
               </div>
               <div className="bg-gray-900 border border-yellow-500/30 rounded-xl p-4">
-                <p className="font-bold text-yellow-300 mb-1">💲 Paid Rails (Custom)</p>
+                <p className="font-bold text-yellow-300 mb-1">💲 Payment Methods (Custom)</p>
                 <p className="text-gray-400">
                   Monetize your APIs with L402 micropayments over Lightning. Agents pay per-call with 
                   cryptographic proof of payment. Your MCP tools become revenue generators, not cost centers.
@@ -582,12 +582,12 @@ satgate spend`}</pre>
 
             <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
               <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">FAQ</p>
-              <h2 className="mb-6 text-2xl font-bold text-white">MCP economic governance questions</h2>
+              <h2 className="mb-6 text-2xl font-bold text-white">MCP spending controls questions</h2>
               <div className="space-y-5">
                 {[
-                  ['What is economic governance in MCP?', 'Economic governance in MCP means assigning cost, budget, revocation, delegation, and audit policy to MCP tool calls so agents can use tools safely without unbounded spend.'],
+                  ['What are spending controls in MCP?', 'Spending controls in MCP mean assigning cost, budget, revocation, delegation, and audit policy to MCP tool calls so agents can use tools safely without unbounded spend.'],
                   ['Why is MCP connection not enough for production agents?', 'Connection only tells an agent which tools exist and how to call them. Production teams also need to know what each call costs, which agent is responsible, and when to block or revoke expensive behavior.'],
-                  ['Where should MCP economic policy be enforced?', 'MCP economic policy should be enforced in the request path at an MCP proxy or economic firewall before the tool call reaches the upstream server or paid API.'],
+                  ['Where should MCP economic policy be enforced?', 'MCP economic policy should be enforced before the request goes through, at an MCP proxy or economic firewall before the tool call reaches the upstream server or paid API.'],
                 ].map(([question, answer]) => (
                   <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                     <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

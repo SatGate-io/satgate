@@ -50,7 +50,7 @@ export default function AiAgentSpendingLimitsBlogPage() {
         name: 'What are AI agent spending limits?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'AI agent spending limits are request-path policies that cap how much an autonomous agent can spend by agent, tool, model, route, workflow, or time window at the gateway before forwarding to upstream APIs or MCP tools.',
+          text: 'AI agent spending limits are policies, checked before the request goes through, that cap how much an autonomous agent can spend by agent, tool, model, route, workflow, or time window at the gateway before forwarding to upstream APIs or MCP tools.',
         },
       },
       {
@@ -66,7 +66,7 @@ export default function AiAgentSpendingLimitsBlogPage() {
         name: 'Where should teams enforce AI agent spend limits?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Teams should enforce spending limits in the request path at an economic firewall or MCP proxy so budget, revocation, routing, and audit policy are checked before a costly call executes.',
+          text: 'Teams should enforce spending limits before the request goes through, at an economic firewall or MCP proxy so budget, revocation, routing, and audit policy are checked before a costly call executes.',
         },
       },
       {
@@ -197,8 +197,8 @@ export default function AiAgentSpendingLimitsBlogPage() {
 
           <ul className="text-gray-300 space-y-2">
             <li><strong className="text-white">_RedisBudgetEnforcer_</strong>: Atomic spend tracking across replicas</li>
-            <li><strong className="text-white">_Postgres Evidence Pack_</strong>: Spend attribution for chargebacks</li>
-            <li><strong className="text-white">_paid-rail governance_</strong>: paid-rail context for external agent/API monetization</li>
+            <li><strong className="text-white">_Postgres signed receipt (Evidence Pack)_</strong>: Spend attribution for chargebacks</li>
+            <li><strong className="text-white">_payment rules_</strong>: charging external agents</li>
           </ul>
 
           <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
@@ -206,9 +206,9 @@ export default function AiAgentSpendingLimitsBlogPage() {
             <h2 className="mb-6 text-2xl font-bold text-white">AI agent spending limit questions</h2>
             <div className="space-y-5">
               {[
-                ['What are AI agent spending limits?', 'AI agent spending limits are request-path policies that cap how much an autonomous agent can spend by agent, tool, model, route, workflow, or time window at the gateway before forwarding to upstream APIs or MCP tools.'],
+                ['What are AI agent spending limits?', 'AI agent spending limits are policies, checked before the request goes through, that cap how much an autonomous agent can spend by agent, tool, model, route, workflow, or time window at the gateway before forwarding to upstream APIs or MCP tools.'],
                 ['Why are rate limits not enough for AI agent cost control?', 'Rate limits control request volume, not money. AI agents can still choose expensive tools, retry costly calls, or fan out across subtasks while staying under a request-per-minute limit.'],
-                ['Where should teams enforce AI agent spend limits?', 'Enforce spending limits in the request path at an economic firewall or MCP proxy so budget, revocation, routing, and audit policy are checked before a costly call executes.'],
+                ['Where should teams enforce AI agent spend limits?', 'Enforce spending limits before the request goes through, at an economic firewall or MCP proxy so budget, revocation, routing, and audit policy are checked before a costly call executes.'],
                 ['Can AI agent spending limits be set per workflow or time window?', 'Yes. AI agent spending limits can be scoped by workflow, task, agent, sub-agent, model, MCP tool, route, customer, environment, day, week, or token expiry window so each workload receives a precise hard budget.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
