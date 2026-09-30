@@ -75,14 +75,14 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
     '@type': 'WebPage',
     name: 'OpenAI API Budget Limit Generator',
     url: 'https://satgate.io/openai-budget-policy-generator',
-    description: 'Generate request-path OpenAI API budget policy for autonomous agents, model routing, spend caps, revocation, and Evidence Pack receipts.',
+    description: 'Generate OpenAI API budget policy, checked before the request goes through, for autonomous agents, model routing, spend caps, revocation, and signed receipts.',
     datePublished: '2026-04-29',
     dateModified: '2026-05-02',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'OpenAI API budget limits' },
       { '@type': 'Thing', name: 'AI agent cost control' },
-      { '@type': 'Thing', name: 'request-path budget enforcement' },
+      { '@type': 'Thing', name: 'budget enforcement before the request goes through' },
     ],
   };
 
@@ -93,7 +93,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/openai-budget-policy-generator',
-    description: 'Generate OpenAI API budget policy for autonomous agents, workflows, model routes, per-request caps, daily budgets, and Evidence Pack receipts.',
+    description: 'Generate OpenAI API budget policy for autonomous agents, workflows, model routes, per-request caps, daily budgets, and signed receipts.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     featureList: [
@@ -110,13 +110,13 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
     name: 'How to create OpenAI API budget limits for AI agents',
-    description: 'Use the generator to produce request-path budget policy for OpenAI API calls made by autonomous agents.',
+    description: 'Use the generator to produce budget policy, checked before the request goes through, for OpenAI API calls made by autonomous agents.',
     totalTime: 'PT5M',
     step: [
       { '@type': 'HowToStep', name: 'Name the workflow', text: 'Identify the agent, task, tenant, or workflow that should receive its own OpenAI budget policy.' },
       { '@type': 'HowToStep', name: 'Choose Observe or Control', text: 'Use Observe to measure spend first, or Control to block and route calls when budget policy is exceeded.' },
       { '@type': 'HowToStep', name: 'Set budget limits', text: 'Define daily, session, per-request, and premium-model budget ceilings for the workflow.' },
-      { '@type': 'HowToStep', name: 'Copy policy into the control plane', text: 'Use the generated YAML or JSON as a starting policy for SatGate request-path enforcement.' },
+      { '@type': 'HowToStep', name: 'Copy policy into the control plane', text: 'Use the generated YAML or JSON as a starting policy for SatGate enforcement before the request goes through.' },
     ],
   };
 
@@ -129,7 +129,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
         name: 'What OpenAI API budget limits should AI agents have?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'AI agents should have OpenAI API limits by workflow, tenant, agent, model, session, day, and per request, plus premium-model routing rules, revocation triggers, and Evidence Pack receipt fields.',
+          text: 'AI agents should have OpenAI API limits by workflow, tenant, agent, model, session, day, and per request, plus premium-model routing rules, revocation triggers, and signed receipt fields.',
         },
       },
       {
@@ -137,7 +137,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
         name: 'Can OpenAI spend alerts stop runaway agents?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Spend alerts notify teams after usage has happened. Request-path OpenAI budget policy checks estimated cost, remaining budget, model route, and agent identity before each call executes.',
+          text: 'Spend alerts notify teams after usage has happened. OpenAI budget policy checks estimated cost, remaining budget, model route, and agent identity before the request goes through.',
         },
       },
       {
@@ -178,14 +178,14 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
             OpenAI API Budget Limit Generator
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Generate request-path authority policy for AI agents calling OpenAI: per-request caps, daily spend limits, session budgets, model routing, revocation, and Evidence Pack receipts.
+            Generate authority policy, checked before the request goes through, for AI agents calling OpenAI: per-request caps, daily spend limits, session budgets, model routing, revocation, and signed receipts.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/blog/how-to-add-budget-limits-to-openai-api-calls" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Read the OpenAI budget guide <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
-              See Policy-to-Proof governance
+              See how rules and receipts work
             </Link>
           </div>
         </div>
@@ -236,7 +236,7 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
               [Gauge, 'Spend ceilings', 'Daily, session, per-request, and premium-model limits by agent or workflow.'],
               [Route, 'Model routing', 'Route routine calls to economy models and require justification for premium models.'],
               [KeyRound, 'Scoped capability', 'Expire and revoke agent credentials without rotating broad provider keys.'],
-              [ShieldCheck, 'Inline enforcement', 'Block, route, revoke, or create Evidence Pack receipts before OpenAI API calls execute.'],
+              [ShieldCheck, 'Inline enforcement', 'Block, route, revoke, or create signed receipts before OpenAI API calls execute.'],
             ].map(([Icon, title, body]) => {
               const TypedIcon = Icon as typeof Gauge;
               return (
@@ -259,13 +259,13 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What OpenAI API budget limits should AI agents have?</h3>
               <p className="text-gray-400 leading-relaxed">
-                AI agents should have OpenAI API limits by workflow, tenant, agent, model, session, day, and per request, plus premium-model routing rules, revocation triggers, and Evidence Pack receipt fields.
+                AI agents should have OpenAI API limits by workflow, tenant, agent, model, session, day, and per request, plus premium-model routing rules, revocation triggers, and signed receipt fields.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Can OpenAI spend alerts stop runaway agents?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Spend alerts notify teams after usage has happened. Request-path OpenAI budget policy checks estimated cost, remaining budget, model route, and agent identity before each call executes.
+                Spend alerts notify teams after usage has happened. OpenAI budget policy checks estimated cost, remaining budget, model route, and agent identity before the request goes through.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -280,9 +280,9 @@ export default function OpenAiBudgetPolicyGeneratorPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-purple-950/30 p-8 md:p-12">
-          <h2 className="mb-4 text-3xl font-bold text-white">Budget policy belongs in the request path</h2>
+          <h2 className="mb-4 text-3xl font-bold text-white">Budget policy runs before the request goes through</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            Provider dashboards explain the bill after the fact. SatGate checks agent identity, model route, estimated cost, remaining budget, and revocation status before forwarding OpenAI requests, then preserves the decision in an Evidence Pack receipt.
+            Provider dashboards explain the bill after the fact. SatGate checks agent identity, model route, estimated cost, remaining budget, and revocation status before forwarding OpenAI requests, then preserves the decision in a signed receipt.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">

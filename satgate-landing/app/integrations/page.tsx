@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Bot, BrainCircuit, Code2, Monitor, MousePointer2
 
 export const metadata = {
   title: 'SatGate Integrations for AI Agent Tools',
-  description: 'Deploy SatGate economic governance with Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP-based AI agent workflows.',
+  description: 'Deploy SatGate spending controls with Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP-based AI agent workflows.',
   alternates: { canonical: 'https://satgate.io/integrations' },
   keywords: [
     'SatGate integrations',
@@ -17,7 +17,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate Integrations for AI Agent Tools',
-    description: 'Connect SatGate to Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP agent workflows for request-path spend control.',
+    description: 'Connect SatGate to Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP agent workflows for spend control before the request goes through.',
     url: 'https://satgate.io/integrations',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -25,7 +25,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate Integrations for AI Agent Tools',
-    description: 'Economic governance guides for Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP agent workflows.',
+    description: 'Spending controls guides for Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP agent workflows.',
   },
 };
 
@@ -39,13 +39,13 @@ const integrations = [
   {
     href: '/satgate-for-claude-code',
     title: 'SatGate for Claude Code',
-    description: 'Govern coding-agent API calls, delegated tool use, and expensive automation with request-path budgets.',
+    description: 'Govern coding-agent API calls, delegated tool use, and expensive automation with budgets checked before the request goes through.',
     icon: Code2,
   },
   {
     href: '/satgate-for-claude-desktop',
     title: 'SatGate for Claude Desktop',
-    description: 'Add MCP server budgets, scoped capabilities, and Evidence Packs to Claude Desktop workflows.',
+    description: 'Add MCP server budgets, scoped capabilities, and signed receipts (Evidence Packs) to Claude Desktop workflows.',
     icon: Monitor,
   },
   {
@@ -76,7 +76,7 @@ export default function IntegrationsPage() {
       { '@type': 'Thing', name: 'SatGate integrations' },
       { '@type': 'Thing', name: 'AI agent tool governance' },
       { '@type': 'Thing', name: 'MCP budget enforcement integrations' },
-      { '@type': 'Thing', name: 'request-path economic governance' },
+      { '@type': 'Thing', name: 'spending controls on each request that goes through SatGate' },
       { '@type': 'Thing', name: 'Cursor and Claude agent workflows' },
     ],
     audience: { '@type': 'Audience', audienceType: 'AI engineering, platform, API, and security teams' },
@@ -114,7 +114,7 @@ export default function IntegrationsPage() {
         name: 'What SatGate integrations are available for AI agent tools?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate has integration guides for Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP-based workflows so teams can add request-path economic governance to agent tools.',
+          text: 'SatGate has integration guides for Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP-based workflows so teams can add spending controls on each request that goes through SatGate to agent tools.',
         },
       },
       {
@@ -122,7 +122,7 @@ export default function IntegrationsPage() {
         name: 'How does SatGate govern MCP integrations?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate can sit between agent clients and MCP servers to enforce per-tool budgets, scoped capabilities, revocation, risk actions, and Evidence Packs before expensive tool calls execute.',
+          text: 'SatGate can sit between agent clients and MCP servers to enforce per-tool budgets, scoped capabilities, revocation, risk actions, and signed receipts (Evidence Packs) before expensive tool calls execute.',
         },
       },
       {
@@ -130,7 +130,7 @@ export default function IntegrationsPage() {
         name: 'Do teams need to replace Cursor, Claude, or OpenClaw to use SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. SatGate is designed to sit in the request path around existing agent tools, APIs, and MCP servers, adding Observe, Control, and Prove modes without replacing the client workflow.',
+          text: 'No. SatGate is designed to sit around existing agent tools, APIs, and MCP servers and check each request before it goes through, adding Observe, Control, and Prove modes without replacing the client workflow.',
         },
       },
     ],
@@ -182,15 +182,15 @@ export default function IntegrationsPage() {
             {[
               [
                 'What SatGate integrations are available for AI agent tools?',
-                'SatGate has integration guides for Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP-based workflows so teams can add request-path economic governance to agent tools.',
+                'SatGate has integration guides for Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP-based workflows so teams can add spending controls on each request that goes through SatGate to agent tools.',
               ],
               [
                 'How does SatGate govern MCP integrations?',
-                'SatGate can sit between agent clients and MCP servers to enforce per-tool budgets, scoped capabilities, revocation, risk actions, and Evidence Packs before expensive tool calls execute.',
+                'SatGate can sit between agent clients and MCP servers to enforce per-tool budgets, scoped capabilities, revocation, risk actions, and signed receipts (Evidence Packs) before expensive tool calls execute.',
               ],
               [
                 'Do teams need to replace Cursor, Claude, or OpenClaw to use SatGate?',
-                'No. SatGate is designed to sit in the request path around existing agent tools, APIs, and MCP servers, adding Observe, Control, and Prove modes without replacing the client workflow.',
+                'No. SatGate is designed to sit around existing agent tools, APIs, and MCP servers and check each request before it goes through, adding Observe, Control, and Prove modes without replacing the client workflow.',
               ],
             ].map(([question, answer]) => (
               <div key={question}>

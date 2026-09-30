@@ -14,7 +14,7 @@ const webPageJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
   name: 'Economic Firewall for AI Agents',
-  description: 'Protect HTTP APIs and MCP tools that AI agents call with request-path budget enforcement, revocation, audit, and delegated capability controls.',
+  description: 'Protect HTTP APIs and MCP tools that AI agents call with budget enforcement before the request goes through, revocation, audit, and delegated capability controls.',
   url: 'https://satgate.io/agents',
   dateModified: '2026-05-04',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -36,7 +36,7 @@ const faqJsonLd = {
       name: 'What is an economic firewall for AI agents?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'An economic firewall for AI agents sits in the request path to observe, control, and audit every governed API or MCP tool call before autonomous agents create cost or access risk.',
+        text: 'An economic firewall for AI agents checks each request before it goes through so it can observe, control, and audit every governed API or MCP tool call before autonomous agents create cost or access risk.',
       },
     },
     {
@@ -44,7 +44,7 @@ const faqJsonLd = {
       name: 'Can SatGate protect both HTTP APIs and MCP tools?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. SatGate protects HTTP APIs and MCP tool servers with the same request-path policies for identity, budgets, revocation, audit, and tool-cost enforcement.',
+        text: 'Yes. SatGate protects HTTP APIs and MCP tool servers with the same policies, checked before the request goes through, for identity, budgets, revocation, audit, and tool-cost enforcement.',
       },
     },
     {
@@ -74,7 +74,7 @@ export default function AgentsLandingPage() {
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
             <Link href="/mint-demo" className="hover:text-white transition">Mint Demo</Link>
             <Link href="/protect" className="hover:text-white transition">Control Demo</Link>
-            <Link href="/pay" className="hover:text-white transition">Paid-Rail Demo</Link>
+            <Link href="/pay" className="hover:text-white transition">Payment methods</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
@@ -234,7 +234,7 @@ export default function AgentsLandingPage() {
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-cyan-400 shrink-0" /> Per-agent credit budgets</li>
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-cyan-400 shrink-0" /> Budget exhaustion alerts</li>
-                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-cyan-400 shrink-0" /> Request-path budget enforcement</li>
+                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-cyan-400 shrink-0" /> Budget checks before the request goes through</li>
               </ul>
             </div>
 
@@ -245,10 +245,10 @@ export default function AgentsLandingPage() {
               <p className="text-gray-400 text-sm leading-relaxed">
                 Monetize your APIs. Approved external agents are admitted under a charge policy
                 (<code className="text-xs">policy: charge</code>): scoped, paid access per request
-                via paid rails (L402), without sharing long-lived API keys or requiring a subscription.
+                via payment methods (L402), without sharing long-lived API keys or requiring a subscription.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
-                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> paid-rail context</li>
+                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> charging external agents</li>
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> Per-request pricing</li>
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> Agent-native monetization</li>
               </ul>
@@ -374,8 +374,8 @@ export default function AgentsLandingPage() {
           <h2 className="text-3xl font-bold text-center text-white mb-10">AI agent economic firewall questions</h2>
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              ['What is an economic firewall for AI agents?', 'An economic firewall for AI agents sits in the request path to observe, control, and audit every governed API or MCP tool call before autonomous agents create cost or access risk.'],
-              ['Can SatGate protect both HTTP APIs and MCP tools?', 'Yes. SatGate protects HTTP APIs and MCP tool servers with the same request-path policies for identity, budgets, revocation, audit, and tool-cost enforcement.'],
+              ['What is an economic firewall for AI agents?', 'An economic firewall for AI agents checks each request before it goes through so it can observe, control, and audit every governed API or MCP tool call before autonomous agents create cost or access risk.'],
+              ['Can SatGate protect both HTTP APIs and MCP tools?', 'Yes. SatGate protects HTTP APIs and MCP tool servers with the same policies, checked before the request goes through, for identity, budgets, revocation, audit, and tool-cost enforcement.'],
               ['How does SatGate stop runaway agent spend?', 'SatGate enforces per-agent budgets, per-tool caps, request attribution, delegation limits, and revocable capabilities before the next upstream call executes.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-2xl border border-gray-800 bg-gray-900/50 p-6">

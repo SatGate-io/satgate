@@ -24,7 +24,7 @@ SatGate now has a full public resource library for this category:
 - Protect / scoped credential demo
 - L402 monetization demo
 
-The core idea: cost governance has to happen in the request path, before the agent spends.
+The core idea: cost governance has to happen before the request goes through, before the agent spends.
 
 https://satgate.io/tools
 
@@ -82,4 +82,4 @@ Start here: https://satgate.io/tools
 - L402 API pricing calculator
 - AI agent governance dashboard
 - scoped agent credential demo
-- rail-neutral paid-rail governance demo
+- payment rules demo that works with any payment method

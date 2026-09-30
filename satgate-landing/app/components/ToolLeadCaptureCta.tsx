@@ -31,7 +31,7 @@ export default function ToolLeadCaptureCta({
         <div className="rounded-2xl border border-gray-800 bg-black/50 p-5">
           <ClipboardCheck className="mb-3 text-green-300" size={24} />
           <h3 className="mb-2 font-bold text-white">Enforce</h3>
-          <p className="text-sm leading-relaxed text-gray-400">Convert the model into request-path controls for agents, MCP tools, model routes, and paid API access.</p>
+          <p className="text-sm leading-relaxed text-gray-400">Convert the model into controls that run before the request goes through, for agents, MCP tools, model routes, and paid API access.</p>
         </div>
       </div>
       <div className="mt-8 flex flex-col gap-4 sm:flex-row">

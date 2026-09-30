@@ -19,7 +19,7 @@ Enforce your agents' budgets and permissions before each request runs. Observe s
 Let external agents in with limited access, and make them pay first on the routes you choose. Payment never overrides permissions.
 
 ## Proof across all three controls
-SatGate signs a receipt for every decision, on HTTP APIs and MCP tools, for your own agents and for external ones. Receipts are exported as Evidence Packs. Anyone can check them against SatGate's published keys (JWKS) with the open-source verifier. A receipt shows what SatGate decided. It is not a compliance certificate, and it does not prove answer quality, that a supplier told the truth, anyone's legal identity or that an outside payment settled.
+SatGate signs a receipt for every decision, on HTTP APIs and MCP tools, for your own agents and for external ones. Receipts are exported as signed receipts (Evidence Packs). Anyone can check them against SatGate's published keys (JWKS) with the open-source verifier. A receipt shows what SatGate decided. It is not a compliance certificate, and it does not prove answer quality, that a supplier told the truth, anyone's legal identity or that an outside payment settled.
 
 ## Agent choice and owner enforcement
 Agents may choose SatGate because it helps them get work done. The limits stay owner-enforced either way. Make SatGate the only route to the API: block direct access to the origin, keep upstream API keys behind SatGate and restrict outbound traffic so agents cannot go around it.
@@ -84,7 +84,7 @@ This route is Admit. In the dashboard, Admit is the Charge policy.
 - Benchmark JSON Data: https://satgate.io/data/ai-agent-runaway-spend-benchmark.json
 - Benchmark CSV Data: https://satgate.io/data/ai-agent-runaway-spend-benchmark.csv
 - MCP connect snippet: https://satgate.io/mcp-proxy-config-generator
-- MCP Evidence Pack Sample: https://satgate.io/policy-templates/mcp-governance/mcp-evidence-pack.sample.v1.json
+- MCP signed receipt (Evidence Pack) sample: https://satgate.io/policy-templates/mcp-governance/mcp-evidence-pack.sample.v1.json
 - MCP Spend Caps Template: https://satgate.io/policy-templates/mcp-governance/spend-caps.v1.yaml
 - MCP Tool Allowlist Template: https://satgate.io/policy-templates/mcp-governance/tool-allowlist.v1.yaml
 - MCP Tenant Isolation Template: https://satgate.io/policy-templates/mcp-governance/tenant-isolation.v1.yaml
@@ -98,9 +98,9 @@ This route is Admit. In the dashboard, Admit is the Charge policy.
 - Agent Spending Limits: https://satgate.io/agent-spending-limits
 - MCP quickstart (Cursor, Claude Code, Claude Desktop, OpenClaw): https://satgate.io/mcp
 - Agent Control Plane: https://satgate.io/agent-control-plane
-- Evidence Pack Demo: https://satgate.io/evidence-pack-demo
-- Evidence Pack JSON v1: https://satgate.io/evidence-packs/sample-evidence-pack.v1.json
-- Evidence Pack Schema v1: https://satgate.io/evidence-packs/evidence-pack.schema.v1.json
+- Signed receipt (Evidence Pack) demo: https://satgate.io/evidence-pack-demo
+- Signed receipt (Evidence Pack) JSON v1: https://satgate.io/evidence-packs/sample-evidence-pack.v1.json
+- Signed receipt (Evidence Pack) schema v1: https://satgate.io/evidence-packs/evidence-pack.schema.v1.json
 - Capability Auth: https://satgate.io/capability-auth
 - Agent Capability Tokens: https://satgate.io/agent-capability-tokens
 - Capability Lifecycle Demo: https://satgate.io/capability-lifecycle-demo
@@ -138,7 +138,7 @@ This route is Admit. In the dashboard, Admit is the Charge policy.
 - Why Economic Firewalls Enable Autonomous Agents: https://satgate.io/blog/why-economic-firewalls-are-the-prerequisite-for-autonomous-ai-agents
 - AI Agent Spending Limits: https://satgate.io/blog/ai-agent-spending-limits
 - MCP Gateway Guide: https://satgate.io/blog/mcp-gateway-guide
-- Beyond Connection: Economic Governance in MCP: https://satgate.io/blog/beyond-connection-economic-governance-mcp
+- Beyond Connection: Spending Controls in MCP: https://satgate.io/blog/beyond-connection-economic-governance-mcp
 
 ## Architecture
 ```

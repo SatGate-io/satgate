@@ -81,7 +81,7 @@ const webPageJsonLd = {
   '@type': 'WebPage',
   name: 'SatGate Control Demo',
   url: 'https://satgate.io/protect',
-  description: 'Interactive SatGate Control demo showing scoped capability tokens, budgets, delegation limits, revocation, and request-path policy for AI agents.',
+  description: 'Interactive SatGate Control demo showing scoped capability tokens, budgets, delegation limits, revocation, and policy checked before the request goes through for AI agents.',
   datePublished: '2026-04-12',
   dateModified: '2026-05-03',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -89,8 +89,8 @@ const webPageJsonLd = {
     { '@type': 'Thing', name: 'SatGate Control' },
     { '@type': 'Thing', name: 'revocable capability tokens' },
     { '@type': 'Thing', name: 'AI agent budget enforcement' },
-    { '@type': 'Thing', name: 'delegated agent authority' },
-    { '@type': 'Thing', name: 'request-path policy enforcement' },
+    { '@type': 'Thing', name: 'permissions passed down to a sub-agent' },
+    { '@type': 'Thing', name: 'policy enforcement before the request goes through' },
   ],
 };
 
@@ -104,7 +104,7 @@ const softwareJsonLd = {
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
   dateModified: '2026-05-03',
-  featureList: ['Scoped capability token minting', 'Budget enforcement simulation', 'Delegated token limits', 'Revocation testing', 'Policy Evidence Pack'],
+  featureList: ['Scoped capability token minting', 'Budget enforcement simulation', 'Delegated token limits', 'Revocation testing', 'signed receipt (Evidence Pack)'],
 };
 
 const faqJsonLd = {
@@ -132,7 +132,7 @@ const faqJsonLd = {
       name: 'How does Control differ from Prove?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Control enforces scopes, budgets, and revocation before execution. Prove exports Evidence Packs containing signed receipts for supported receipt-producing decisions across internal and external agent lanes, so an auditor can verify what happened without trusting SatGate.',
+        text: 'Control enforces scopes, budgets, and revocation before execution. Prove exports signed receipts (Evidence Packs) for supported receipt-producing decisions across internal and external agent lanes, so an auditor can verify what happened without trusting SatGate.',
       },
     },
   ],
@@ -350,7 +350,7 @@ export default function ProtectDemoPage() {
         
         addLog('', 'info');
         addLog('🎯 [NETWORK] Requests sent: 0 ← OFFLINE OPERATION', 'success');
-        addLog('🔐 [CRYPTO] Token attenuated mathematically', 'success');
+        addLog('🔐 [CRYPTO] Token narrowed mathematically', 'success');
         addLog('', 'info');
         
         // Generate a mock hex signature for simulation
@@ -395,7 +395,7 @@ export default function ProtectDemoPage() {
       
       addLog('', 'info');
       addLog('🎯 [NETWORK] Requests sent: 0 ← OFFLINE OPERATION', 'success');
-      addLog('🔐 [CRYPTO] Token attenuated mathematically', 'success');
+      addLog('🔐 [CRYPTO] Token narrowed mathematically', 'success');
       addLog('', 'info');
       
       // Backend returns { token, caveats } - convert to expected format
@@ -847,7 +847,7 @@ export default function ProtectDemoPage() {
             All non-PUBLIC routes have <strong className="text-white">Default Protection</strong> — cryptographic 
             verification, caveats, delegation, revocation. Then choose your economic policy: 
             <strong className="text-purple-400"> observe</strong> (audit), <strong className="text-cyan-400">control</strong> (budget), 
-            or <strong className="text-yellow-400">charge</strong> (paid-rail policy for admitting external agents).
+            or <strong className="text-yellow-400">charge</strong> (payment rules for admitting external agents).
           </p>
           <p className="text-gray-500 text-sm mt-3">
             Protection is the starting state. Economics are configurable.
@@ -863,7 +863,7 @@ export default function ProtectDemoPage() {
               <div>
                 <h3 className="text-2xl font-bold text-white">Need the buyer-safe allow/deny/revoke proof?</h3>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-300">
-                  The one-click Control scenes are useful for protocol exploration. The deterministic buyer proof lives on the public demo path and shows 401 no authority, 200 allowed, 402/403 denial, revoke/replay denial, and Evidence Pack export without auth or hidden shortcuts.
+                  The one-click Control scenes are useful for protocol exploration. The deterministic buyer proof lives on the public demo path and shows 401 no authority, 200 allowed, 402/403 denial, revoke/replay denial, and receipt export, as a signed receipt (Evidence Pack), without auth or hidden shortcuts.
                 </p>
               </div>
               <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
@@ -871,7 +871,7 @@ export default function ProtectDemoPage() {
                   Run the 90-second proof <ArrowRight size={16} />
                 </Link>
                 <Link href="/evidence-pack-demo" className="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-400/40 bg-cyan-400/10 px-5 py-3 text-sm font-bold text-cyan-100 transition hover:border-cyan-200">
-                  View Evidence Pack <ArrowRight size={16} />
+                  View receipt <ArrowRight size={16} />
                 </Link>
               </div>
             </div>
@@ -1525,7 +1525,7 @@ export default function ProtectDemoPage() {
                         href="/evidence-pack-demo"
                         className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-xl font-bold hover:opacity-90 transition flex items-center justify-center gap-2"
                       >
-                        View Evidence Pack <ChevronRight size={18} />
+                        View receipt <ChevronRight size={18} />
                       </Link>
                     </div>
                     {!useSimulation && adminToken && (
@@ -1808,7 +1808,7 @@ export default function ProtectDemoPage() {
             {[
               ['What does SatGate Control protect?', 'SatGate Control protects agent API and MCP tool calls by enforcing scoped capability tokens, budgets, delegation limits, revocation, and audit policy before requests reach upstream services.'],
               ['Why use revocable capability tokens for agents?', 'Revocable capability tokens give agents narrow, expiring authority that can be delegated safely and denied at policy check without rotating global API keys or service-account credentials.'],
-              ['How does Control differ from Prove?', 'Control enforces scopes, budgets, and revocation before execution. Prove exports Evidence Packs containing signed receipts for supported receipt-producing decisions across internal and external agent lanes, so an auditor can verify what happened without trusting SatGate.'],
+              ['How does Control differ from Prove?', 'Control enforces scopes, budgets, and revocation before execution. Prove exports signed receipts (Evidence Packs) for supported receipt-producing decisions across internal and external agent lanes, so an auditor can verify what happened without trusting SatGate.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
                 <h3 className="mb-2 font-bold text-white">{question}</h3>
@@ -1836,7 +1836,7 @@ export default function ProtectDemoPage() {
               href="/pay"
               className="text-cyan-400 hover:text-cyan-300 text-sm underline underline-offset-4 transition"
             >
-              Try the Paid-Rail Demo →
+              Try the payment methods demo →
             </Link>
           </div>
         </div>

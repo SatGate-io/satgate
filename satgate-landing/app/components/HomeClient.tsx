@@ -185,7 +185,7 @@ const LandingPage = () => {
             <p className="mt-3 text-sm text-gray-500">
               <Link href="/build" className="text-gray-400 hover:text-white underline underline-offset-2">Build with SatGate</Link>
               <span className="mx-2 text-gray-700">·</span>
-              <Link href="/evidence-pack-demo" className="text-gray-400 hover:text-white underline underline-offset-2">See an Evidence Pack</Link>
+              <Link href="/evidence-pack-demo" className="text-gray-400 hover:text-white underline underline-offset-2">See a signed receipt (Evidence Pack)</Link>
             </p>
             <p className="mt-2 text-sm text-gray-500">14 days free. No credit card.</p>
 
@@ -460,7 +460,7 @@ const LandingPage = () => {
               </div>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              When SatGate allows, refuses, charges or revokes, it signs a receipt. Receipts roll up into Evidence Packs.
+              When SatGate allows, refuses, charges or revokes, it signs a receipt. Receipts roll up into signed receipts (Evidence Packs).
               Your auditor can check the signatures with the open-source verifier, without having to trust us.
               A receipt shows what SatGate decided. It is not a compliance certificate.
             </p>
@@ -709,7 +709,7 @@ const LandingPage = () => {
               {
                 step: "4",
                 title: "Check what happened",
-                description: "Receipts for allowed, denied, paid, delegated, and revoked decisions, ready to export as an Evidence Pack.",
+                description: "Receipts for allowed, denied, paid, delegated, and revoked decisions, ready to export as a signed receipt (Evidence Pack).",
                 code: `Illustrative sample, not live customer data\nAllowed receipts: 1,203\nDenied receipts: 12,847\nPaid receipts:   $847 settled\nDelegations:     42\nRevocations:     9\n\n→ Export Evidence Pack`
               }
             ].map((item, i) => (
@@ -785,7 +785,7 @@ const LandingPage = () => {
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><Link href="/economic-firewall" className="hover:text-white transition">Economic Firewall</Link></li>
                 <li><Link href="/govern" className="hover:text-white transition">Enterprise</Link></li>
-                <li><Link href="/policy-to-proof" className="hover:text-white transition">Policy-to-Proof</Link></li>
+                <li><Link href="/policy-to-proof" className="hover:text-white transition">Rules and Receipts</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
                 <li><a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Start free trial</a></li>
                 <li><a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud login</a></li>
