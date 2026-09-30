@@ -301,7 +301,7 @@ export default function AgentApiGovernancePage() {
 
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-8">
-          <div>
+          <div className="min-w-0">
             <h2 className="text-3xl font-bold text-white mb-6">Observe, Control, Prove agent API use</h2>
             <div className="space-y-4">
               {[
@@ -317,7 +317,7 @@ export default function AgentApiGovernancePage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
+          <div className="min-w-0 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h2 className="text-2xl font-bold text-white mb-4">Example capability policy</h2>
             <pre className="bg-black border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm text-gray-300"><code>{`parent_agent: finance-automation
 worker_agent: invoice-reconciler
