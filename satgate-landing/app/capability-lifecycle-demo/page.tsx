@@ -2,7 +2,7 @@ import CapabilityLifecycleDemo from './CapabilityLifecycleDemo';
 
 export const metadata = {
   title: 'Capability Lifecycle Control | Issue, Delegate, Revoke, Prove',
-  description: 'Observe, control, and prove the capability lifecycle: issue, delegate, attenuate, revoke, enforce caveats, cap child spend, and export Evidence Packs.',
+  description: 'Observe, control, and prove the capability lifecycle: issue, delegate, narrow, revoke, enforce caveats, cap child spend, and export signed receipts (Evidence Packs).',
   alternates: { canonical: 'https://satgate.io/capability-lifecycle-demo' },
   keywords: [
     'capability lifecycle control',
@@ -11,11 +11,11 @@ export const metadata = {
     'delegation depth AI agents',
     'revocable agent capability',
     'child spend caps',
-    'Evidence Pack proof',
+    'signed receipt proof',
   ],
   openGraph: {
     title: 'SatGate Capability Lifecycle Control',
-    description: 'Issue capability → delegate → attenuate → revoke → prove, with customer-visible caveats, delegation depth, child spend caps, next-request revocation, and Evidence Pack audit records.',
+    description: 'Issue capability → delegate → narrow → revoke → prove, with customer-visible caveats, delegation depth, child spend caps, next-request revocation, and signed receipt audit records.',
     url: 'https://satgate.io/capability-lifecycle-demo',
     type: 'article',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -23,7 +23,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate Capability Lifecycle Control',
-    description: 'Issue capability → delegate → attenuate → revoke → prove, with scoped authority, child spend caps, next-request revocation, and Evidence Pack proof.',
+    description: 'Issue capability → delegate → narrow → revoke → prove, with scoped authority, child spend caps, next-request revocation, and signed receipt proof.',
   },
 };
 
@@ -43,7 +43,7 @@ export default function CapabilityLifecycleDemoPage() {
       { '@type': 'Thing', name: 'delegation depth' },
       { '@type': 'Thing', name: 'child spend caps' },
       { '@type': 'Thing', name: 'next-request revocation' },
-      { '@type': 'Thing', name: 'Evidence Pack proof' },
+      { '@type': 'Thing', name: 'signed receipt proof' },
     ],
   };
 
@@ -56,7 +56,7 @@ export default function CapabilityLifecycleDemoPage() {
         name: 'What is a capability lifecycle for AI agents?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'A capability lifecycle shows how agent authority is issued, delegated to a child, attenuated with caveats, revoked before the next request, and preserved as Evidence Pack proof.',
+          text: 'A capability lifecycle shows how agent permissions are issued, delegated to a child, narrowed with caveats, revoked before the next request, and preserved as signed receipt proof.',
         },
       },
       {
@@ -64,7 +64,7 @@ export default function CapabilityLifecycleDemoPage() {
         name: 'How do caveats translate into customer controls?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Caveats are enforceable limits: tenant, task, route, tool, budget, child spend cap, delegation depth, expiry, and revocation rules evaluated before execution.',
+          text: 'Caveats are enforceable limits: tenant, task, route, tool, budget, child spend cap, delegation depth, expiry, and revocation rules evaluated before the call runs.',
         },
       },
       {

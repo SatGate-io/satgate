@@ -3,30 +3,30 @@ import Link from "next/link";
 import { ArrowRight, BadgeCheck, FileCheck2, KeyRound, Layers3, ReceiptText, ShieldCheck } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Agent Authority & Accountability Layer | SatGate",
+  title: "Agent Permissions and Receipts | SatGate",
   description:
     "Give agents scoped authority for useful work. Enforce budget and access policy on governed requests, with signed evidence of the decision.",
   keywords: [
-    "agent authority and accountability layer",
+    "agent permissions and receipts",
     "AI agent accountability",
     "AI agent receipts",
-    "Evidence Pack verifier",
-    "rail-neutral agent governance",
+    "signed receipt (Evidence Pack) verifier",
+    "works with any payment method",
     "x402 governance",
     "L402 governance",
   ],
   alternates: { canonical: "https://satgate.io/agent-authority-layer" },
   openGraph: {
-    title: "Agent Authority & Accountability Layer | SatGate",
+    title: "Agent Permissions and Receipts | SatGate",
     description:
-      "Rail-neutral authority, pre-flight policy enforcement, and signed Evidence Pack proof for autonomous agents.",
+      "Works with any payment method, with pre-flight policy enforcement and signed receipts for autonomous agents.",
     url: "https://satgate.io/agent-authority-layer",
     type: "website",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Agent Authority & Accountability Layer",
+    title: "Agent Permissions and Receipts",
     description:
       "SatGate records authorization decisions for requests through its gateway. Verify the issuer and signature independently.",
   },
@@ -41,12 +41,12 @@ const layers = [
   {
     icon: ShieldCheck,
     title: "Decision — at the call",
-    body: "SatGate sits in the request path and enforces policy before APIs, MCP tools, or paid rails execute.",
+    body: "SatGate checks policy on each request that goes through it, before APIs, MCP tools, or payment methods run.",
   },
   {
     icon: ReceiptText,
     title: "Evidence — after the call",
-    body: "Every allow, deny, delegation, revocation, and paid event leaves a signed receipt rolled into an Evidence Pack.",
+    body: "Every allow, deny, delegation, revocation, and paid event leaves a signed receipt (Evidence Pack).",
   },
 ];
 
@@ -59,8 +59,8 @@ const audiences = [
 ];
 
 const publicSpecs = [
-  ["Evidence Pack schema", "https://github.com/SatGate-io/satgate/blob/main/docs/reference/receipt-schema.md"],
-  ["Live Evidence Pack example", "https://api.satgate.io/v1/evidence/evid_GrXvKUgtdqNbuQ5lZzqRMpZrOoU2VAnE"],
+  ["signed receipt (Evidence Pack) schema", "https://github.com/SatGate-io/satgate/blob/main/docs/reference/receipt-schema.md"],
+  ["Live signed receipt (Evidence Pack) example", "https://api.satgate.io/v1/evidence/evid_GrXvKUgtdqNbuQ5lZzqRMpZrOoU2VAnE"],
   ["Receipt JSON schema", "https://satgate.io/.well-known/satgate-receipt.schema.json"],
   ["Issuer JWKS", "https://api.satgate.io/.well-known/jwks.json"],
   ["Open verifier", "https://github.com/SatGate-io/evidence-pack-verifier"],
@@ -76,7 +76,7 @@ const faqs = [
   {
     question: "How is this different from OAuth or API keys?",
     answer:
-      "OAuth can delegate access, and API keys identify who is calling. SatGate adds request-path budget and scope checks with signed decision evidence. The owner must also prevent direct upstream access from bypassing those checks.",
+      "OAuth can delegate access, and API keys identify who is calling. SatGate adds budget and scope checks on each request that goes through SatGate, with signed decision evidence. The owner must also prevent direct upstream access from bypassing those checks.",
   },
   {
     question: "Why not just trust the rail authorization?",
@@ -86,7 +86,7 @@ const faqs = [
   {
     question: "How is a SatGate receipt verified?",
     answer:
-      "Fetch the Evidence Pack and verify it against a trusted issuer and independently admitted keys. Check the RFC8785 canonical form, SHA-256 hash and Ed25519 signature. A valid signature does not prove answer quality, legal identity or external settlement.",
+      "Fetch the signed receipt (Evidence Pack) and verify it against a trusted issuer and independently admitted keys. Check the RFC8785 canonical form, SHA-256 hash and Ed25519 signature. A valid signature does not prove answer quality, legal identity or external settlement.",
   },
 ];
 
@@ -95,14 +95,14 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "WebPage",
-      name: "Agent Authority & Accountability Layer",
+      name: "Agent Permissions and Receipts",
       url: "https://satgate.io/agent-authority-layer",
       description: metadata.description,
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
       about: [
-        { "@type": "Thing", name: "AI agent authority" },
-        { "@type": "Thing", name: "Evidence Pack" },
-        { "@type": "Thing", name: "rail-neutral agent governance" },
+        { "@type": "Thing", name: "agent permissions" },
+        { "@type": "Thing", name: "signed receipt (Evidence Pack)" },
+        { "@type": "Thing", name: "works with any payment method" },
         { "@type": "Thing", name: "Ed25519 receipt verification" },
       ],
     },
@@ -111,10 +111,10 @@ const jsonLd = {
       name: "SatGate",
       applicationCategory: "BusinessApplication",
       featureList: [
-        "Delegated agent authority",
+        "permissions passed down to a sub-agent",
         "Pre-flight policy enforcement",
-        "Signed Evidence Packs",
-        "Rail-neutral receipt verification",
+        "Signed receipts",
+        "Receipt checks that work with any payment method",
       ],
     },
     {
@@ -133,7 +133,7 @@ const jsonLd = {
         {
           "@type": "ListItem",
           position: 3,
-          name: "Agent Authority & Accountability Layer",
+          name: "Agent Permissions and Receipts",
           item: "https://satgate.io/agent-authority-layer",
         },
       ],
@@ -154,10 +154,10 @@ export default function AgentAuthorityLayerPage() {
               <Layers3 size={14} /> Authority on protected calls
             </div>
             <h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">
-              Agent Authority & Accountability Layer
+              Agent Permissions and Receipts
             </h1>
             <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
-              Useful agent work needs <span className="text-white">bounded authority to act.</span> Set a finite budget and permitted scope, enforce them on the request path, and retain the recorded decision.
+              Useful agent work needs <span className="text-white">bounded authority to act.</span> Set a finite budget and permitted scope, enforce them on each request that goes through SatGate, and retain the recorded decision.
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
               Use internal budget controls for your agents and scoped admission for external agents. Payment adapters have different availability. Confirm the chosen integration before relying on it.
@@ -178,7 +178,7 @@ export default function AgentAuthorityLayerPage() {
             </div>
             <div className="space-y-4">
               {[
-                "The authenticated principal and its delegated authority.",
+                "The authenticated principal and the permissions passed down to a sub-agent.",
                 "Whether the requested action matched the configured policy.",
                 "The signed decision and associated scope and budget context.",
                 "An artifact to verify against independently trusted issuer keys.",
@@ -247,7 +247,7 @@ export default function AgentAuthorityLayerPage() {
                 Open verifier <ArrowRight size={18} />
               </a>
               <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
-                See Policy-to-Proof
+                See how rules and receipts work
               </Link>
             </div>
           </div>
@@ -288,14 +288,14 @@ export default function AgentAuthorityLayerPage() {
         <div className="rounded-3xl border border-cyan-400/20 bg-cyan-400/10 p-8 text-center">
           <h2 className="text-3xl font-bold text-white">Agents should not get standing authority.</h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-gray-300">
-            Give them scoped authority, enforce it before execution, and leave signed Evidence Pack proof for every decision.
+            Give them scoped authority, enforce it before the agent acts, and leave a signed receipt for every decision.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Build with SatGate <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
-              See Policy-to-Proof
+              See how rules and receipts work
             </Link>
           </div>
         </div>

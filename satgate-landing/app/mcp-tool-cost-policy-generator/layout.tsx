@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'MCP Tool Cost Policy Generator',
-  description: 'Generate MCP tool spend policy with per-tool prices, session budgets, risk tiers, revocation rules, and Evidence Pack receipts for AI agents.',
+  description: 'Generate MCP tool spend policy with per-tool prices, session budgets, risk tiers, revocation rules, and signed receipts for AI agents.',
   alternates: { canonical: 'https://satgate.io/mcp-tool-cost-policy-generator' },
   keywords: [
     'MCP tool cost policy generator',
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: 'MCP Tool Cost Policy Generator',
-    description: 'Create budget and Evidence Pack policy for MCP tools before agents trigger paid APIs, searches, browser sessions, or cloud tasks.',
+    description: 'Create budget and signed receipt policy for MCP tools before agents trigger paid APIs, searches, browser sessions, or cloud tasks.',
     url: 'https://satgate.io/mcp-tool-cost-policy-generator',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'MCP Tool Cost Policy Generator',
-    description: 'Generate MCP per-tool cost limits, budgets, risk tiers, revocation, and Evidence Pack policy for AI agents.',
+    description: 'Generate MCP per-tool cost limits, budgets, risk tiers, revocation, and signed receipt policy for AI agents.',
   },
 };
 

@@ -2,31 +2,31 @@ import Link from 'next/link';
 import { ArrowRight, Bot, Coins, KeyRound, LockKeyhole, ReceiptText, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'L402 Paid-Rail Governance for APIs',
-  description: 'Understand L402 as one paid rail for agent/API access. SatGate gives delegated clients bounded economic authority, applies Policy-to-Proof before execution, and preserves Evidence Pack receipts after payment.',
+  title: 'L402 Payment Rules for APIs',
+  description: 'Understand L402 as one payment method for agent/API access. SatGate gives delegated clients bounded economic authority, applies rules and receipts before the call runs, and preserves signed receipts after payment.',
   alternates: { canonical: 'https://satgate.io/l402-agent-payments' },
   keywords: [
-    'L402 paid-rail governance',
-    'paid-rail agent governance',
+    'L402 payment rules',
+    'payment rules for agents',
     'AI agent payment governance',
     'Lightning API payments',
     'HTTP 402 payment governance',
     'API monetization for AI agents',
     'delegated agent payment proof',
-    'agents consuming paid APIs under delegated authority',
+    'agents consuming paid APIs under permissions passed down to a sub-agent',
     'machine payment rail governance',
-    'L402 paid rail governance',
+    'L402 payment rules',
   ],
   openGraph: {
-    title: 'L402 Paid-Rail Governance for APIs',
-    description: 'Understand L402 as one paid rail for protected API access, governed by SatGate policy and Evidence Packs.',
+    title: 'L402 Payment Rules for APIs',
+    description: 'Understand L402 as one payment method for protected API access, governed by SatGate policy and signed receipts.',
     url: 'https://satgate.io/l402-agent-payments',
     type: 'article',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'L402 Paid-Rail Governance for APIs',
+    title: 'L402 Payment Rules for APIs',
     description: 'L402 can carry Lightning payment proof for agent/API access. SatGate checks the action, budget, rail, and receipt at the gateway before forwarding.',
   },
 };
@@ -45,7 +45,7 @@ const steps = [
   {
     icon: Zap,
     title: 'Payment proof is presented',
-    body: 'A wallet, platform, or delegated payment primitive satisfies the invoice through SaturnZap or another L402-capable client.',
+    body: 'A wallet, platform, or delegated payment building block satisfies the invoice through SaturnZap or another L402-capable client.',
   },
   {
     icon: KeyRound,
@@ -55,7 +55,7 @@ const steps = [
   {
     icon: ReceiptText,
     title: 'Usage is attributed',
-    body: 'Every paid request is tied to delegated authority, agent identity, route, price, policy, and settlement evidence.',
+    body: 'Every paid request is tied to permissions passed down to a sub-agent, agent identity, route, price, policy, and settlement evidence.',
   },
   {
     icon: Coins,
@@ -68,7 +68,7 @@ export default function L402AgentPaymentsPage() {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'L402 Paid-Rail Governance for APIs',
+    headline: 'L402 Payment Rules for APIs',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
@@ -76,11 +76,11 @@ export default function L402AgentPaymentsPage() {
     dateModified: '2026-05-03',
     mainEntityOfPage: 'https://satgate.io/l402-agent-payments',
     about: [
-      { '@type': 'Thing', name: 'L402 paid-rail governance' },
-      { '@type': 'Thing', name: 'paid-rail agent governance' },
+      { '@type': 'Thing', name: 'L402 payment rules' },
+      { '@type': 'Thing', name: 'payment rules for agents' },
       { '@type': 'Thing', name: 'Lightning API payments' },
       { '@type': 'Thing', name: 'HTTP 402 payment governance' },
-      { '@type': 'Thing', name: 'Policy-to-Proof for paid agent access' },
+      { '@type': 'Thing', name: 'rules and receipts for paid agent access' },
     ],
   };
 
@@ -90,10 +90,10 @@ export default function L402AgentPaymentsPage() {
     mainEntity: [
       {
         '@type': 'Question',
-        name: 'What is L402 paid-rail governance?',
+        name: 'What are L402 payment rules?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'L402 paid-rail governance lets an API return an HTTP 402 challenge while SatGate verifies delegated authority, budget, scope, and payment proof before access.',
+          text: 'L402 payment rules let an API return an HTTP 402 challenge while SatGate verifies permissions passed down to a sub-agent, budget, scope, and payment proof before access.',
         },
       },
       {
@@ -109,7 +109,7 @@ export default function L402AgentPaymentsPage() {
         name: 'Is L402 enough to govern paid agent access?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. L402 is a payment/access rail. SatGate Policy-to-Proof governs authority, scope, budget, revocation, and Evidence Pack evidence.',
+          text: 'No. L402 is a payment/access rail. SatGate rules and receipts cover authority, scope, budget, revocation, and signed receipts.',
         },
       },
       {
@@ -130,10 +130,10 @@ export default function L402AgentPaymentsPage() {
       },
       {
         '@type': 'Question',
-        name: 'Can paid-rail context include budget and access policy?',
+        name: 'Can payment details include budget and access policy?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes. SatGate can combine L402 payment proof with request-path policy for identity, route, tool, quota, expiry, revocation, and audit so paid access is still governed.',
+          text: 'Yes. SatGate can combine L402 payment proof with checks before the request goes through, covering identity, route, tool, quota, expiry, revocation, and audit, so paid access is still governed.',
         },
       },
     ],
@@ -142,7 +142,7 @@ export default function L402AgentPaymentsPage() {
   const howToJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
-    name: 'How to monetize APIs with L402 paid-rail governance',
+    name: 'How to monetize APIs with L402 payment rules',
     description: 'Use SatGate to govern an HTTP 402/L402 paid-access flow, verify Lightning payment proof, preserve receipts, and unlock scoped API access for delegated agents.',
     totalTime: 'PT20M',
     step: [
@@ -159,7 +159,7 @@ export default function L402AgentPaymentsPage() {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://satgate.io' },
-      { '@type': 'ListItem', position: 2, name: 'L402 Paid-Rail Governance', item: 'https://satgate.io/l402-agent-payments' },
+      { '@type': 'ListItem', position: 2, name: 'L402 Payment Rules', item: 'https://satgate.io/l402-agent-payments' },
     ],
   };
 
@@ -174,15 +174,15 @@ export default function L402AgentPaymentsPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(250,204,21,0.17),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(34,211,238,0.15),transparent_32%)]" />
         <div className="relative max-w-6xl mx-auto px-6 py-24">
           <div className="inline-flex items-center gap-2 rounded-full border border-yellow-500/30 bg-yellow-950/20 px-4 py-2 text-sm text-yellow-200 mb-8">
-            <Zap size={16} /> paid-rail context for delegated agents
+            <Zap size={16} /> payment details for delegated agents
           </div>
 
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight max-w-5xl mb-8">
-            L402 Paid-Rail Governance, Enforced Before Access
+            L402 Payment Rules, Enforced Before Access
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-10">
-            paid-rail context can carry HTTP 402 payment proof. SatGate gives delegated clients bounded economic authority: it decides whether a human or platform delegated enough authority, unlocks only scoped access, and preserves proof for every paid action.
+            Payment details can carry HTTP 402 payment proof. SatGate gives delegated clients bounded economic authority: it decides whether a human or platform delegated enough authority, unlocks only scoped access, and preserves proof for every paid action.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
@@ -190,7 +190,7 @@ export default function L402AgentPaymentsPage() {
               Govern L402 access <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
-              See Policy-to-Proof
+              See how rules and receipts work
             </Link>
           </div>
         </div>
@@ -207,13 +207,13 @@ export default function L402AgentPaymentsPage() {
               Traditional API monetization assumes a human signs up, enters a card, picks a plan, stores a key, and then integrates. Delegated agent/API access needs a request-native flow: request resource, receive price, present proof, unlock scoped access, continue task.
             </p>
             <p>
-              L402 gives that flow an internet-native shape. SatGate treats it as paid-rail context governed by request-path policy and proof.
+              L402 gives that flow an internet-native shape. SatGate treats it as payment details, governed by policy and proof before the request goes through.
             </p>
           </div>
         </div>
 
         <div className="rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-6">
-          <h3 className="text-xl font-bold text-white mb-4">Good fits for L402 paid-rail governance</h3>
+          <h3 className="text-xl font-bold text-white mb-4">Good fits for L402 payment rules</h3>
           <ul className="space-y-3 text-gray-300">
             <li className="rounded-lg border border-gray-800 bg-black/50 p-3">Premium search, research, or enrichment endpoints.</li>
             <li className="rounded-lg border border-gray-800 bg-black/50 p-3">Datasets agents query occasionally but value highly.</li>
@@ -226,9 +226,9 @@ export default function L402AgentPaymentsPage() {
 
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="max-w-6xl mx-auto px-6 py-20">
-          <h2 className="text-3xl font-bold text-white mb-4">How L402 paid-rail governance works with SatGate</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">How L402 payment rules work with SatGate</h2>
           <p className="text-gray-400 max-w-3xl mb-10 text-lg">
-            SatGate sits in the request path. The API stays protected while the delegated client receives a machine-readable price and payment challenge.
+            SatGate checks each request before it goes through. The API stays protected while the delegated client receives a machine-readable price and payment challenge.
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -250,10 +250,10 @@ export default function L402AgentPaymentsPage() {
             <h2 className="text-3xl font-bold text-white mb-5">L402, shared payment tokens, and payment credentials are different layers</h2>
             <div className="space-y-4 text-gray-300 text-lg leading-relaxed">
               <p>
-                HTTP 402 can carry different payment challenges. Some flows use card credentials or shared payment tokens. paid-rail context is one paid rail for request-native API access. Other paid rails — x402, AgentCore Payments, and Pay.sh — also use HTTP 402 as their surface but settle differently.
+                HTTP 402 can carry different payment challenges. Some flows use card credentials or shared payment tokens. L402 is one payment method for request-native API access. Other payment methods (x402, AgentCore Payments, and Pay.sh) also use HTTP 402 as their surface but settle differently.
               </p>
               <p>
-                The important control-plane question is broader than payment: whether the request has delegated authority, budget, scope, and policy approval before paid access is unlocked.
+                The important control-plane question is broader than payment: whether the request has permissions passed down to a sub-agent, plus budget, scope, and policy approval, before paid access is unlocked.
               </p>
             </div>
           </div>
@@ -279,9 +279,9 @@ export default function L402AgentPaymentsPage() {
         <div className="grid md:grid-cols-2 gap-5 mb-16">
           {[
             ['Machine-readable price', 'Delegated clients need a price and payment challenge in the protocol flow, not a human checkout page or sales form.'],
-            ['Payment before access', 'SatGate verifies paid-rail context payment proof before forwarding the protected API request upstream.'],
+            ['Payment before access', 'SatGate verifies payment details before forwarding the protected API request upstream.'],
             ['Scoped unlocks', 'Payment should unlock the requested route, tool, dataset, or capability — not a broad reusable API key.'],
-            ['Evidence Pack receipts', 'Every paid request should record delegated authority, agent identity, route, price, payment proof, policy decision, and Evidence Pack receipt.'],
+            ['Signed receipts', 'Every paid request should record permissions passed down to a sub-agent, agent identity, route, price, payment proof, policy decision, and a signed receipt.'],
           ].map(([title, body]) => (
             <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
@@ -321,9 +321,9 @@ HTTP/1.1 200 OK
             <p className="text-gray-400 leading-relaxed">Limit which agents, routes, prices, budgets, and proofs are accepted before unlocking protected resources.</p>
           </div>
           <div className="rounded-2xl border border-gray-800 bg-black p-6">
-            <div className="text-yellow-300 font-mono text-sm mb-3">PROVE</div>
+            <div className="text-yellow-300 font-mono text-sm mb-3">RECEIPT</div>
             <h3 className="text-xl font-bold text-white mb-3">Preserve the receipt</h3>
-            <p className="text-gray-400 leading-relaxed">Use L402 payment proof as one input to a Policy-to-Proof receipt that records authority, rail, price, and decision.</p>
+            <p className="text-gray-400 leading-relaxed">Use L402 payment proof as one input to a signed receipt that records authority, rail, price, and decision.</p>
           </div>
         </div>
       </section>
@@ -331,12 +331,12 @@ HTTP/1.1 200 OK
       <section className="border-t border-gray-900 bg-black">
         <div className="max-w-6xl mx-auto px-6 py-20">
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-yellow-300">FAQ</p>
-          <h2 className="mb-8 text-3xl font-bold text-white">L402 paid-rail governance questions</h2>
+          <h2 className="mb-8 text-3xl font-bold text-white">L402 payment rules questions</h2>
           <div className="grid gap-5 md:grid-cols-2 mb-16">
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
-              <h3 className="mb-2 text-xl font-bold text-white">What is L402 paid-rail governance?</h3>
+              <h3 className="mb-2 text-xl font-bold text-white">What are L402 payment rules?</h3>
               <p className="text-gray-400 leading-relaxed">
-                L402 paid-rail governance lets an API return an HTTP 402 challenge while SatGate verifies delegated authority, budget, scope, and payment proof before access.
+                L402 payment rules let an API return an HTTP 402 challenge while SatGate verifies permissions passed down to a sub-agent, budget, scope, and payment proof before access.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -348,7 +348,7 @@ HTTP/1.1 200 OK
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Is L402 enough to govern paid agent access?</h3>
               <p className="text-gray-400 leading-relaxed">
-                No. L402 is a payment/access rail. SatGate Policy-to-Proof governs authority, scope, budget, revocation, and Evidence Pack evidence.
+                No. L402 is a payment/access rail. SatGate rules and receipts cover authority, scope, budget, revocation, and signed receipts.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -364,9 +364,9 @@ HTTP/1.1 200 OK
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
-              <h3 className="mb-2 text-xl font-bold text-white">Can paid-rail context include budget and access policy?</h3>
+              <h3 className="mb-2 text-xl font-bold text-white">Can payment details include budget and access policy?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Yes. SatGate can combine L402 payment proof with request-path policy for identity, route, tool, quota, expiry, revocation, and audit so paid access is still governed.
+                Yes. SatGate can combine L402 payment proof with checks before the request goes through, covering identity, route, tool, quota, expiry, revocation, and audit, so paid access is still governed.
               </p>
             </div>
           </div>
@@ -376,13 +376,13 @@ HTTP/1.1 200 OK
             {[
               ['/http-402-for-ai-agents', 'HTTP 402 for AI agents', 'Compare payment challenges, shared payment tokens, and L402 for autonomous agents.'],
               ['/agent-payment-controls', 'Agent payment governance', 'Govern budgets, approval, payment rails, audit, and access policy.'],
-              ['/stripe-link-agents-vs-satgate', 'Stripe Link for Agents vs SatGate', 'See how payment credentials differ from SatGate economic governance.'],
-              ['/policy-to-proof', 'Policy-to-Proof', 'See how paid access becomes Evidence Pack proof.'],
-              ['/govern', 'Govern AI agents', 'Govern paid agent actions before execution.'],
+              ['/stripe-link-agents-vs-satgate', 'Stripe Link for Agents vs SatGate', 'See how payment credentials differ from SatGate spending controls.'],
+              ['/policy-to-proof', 'Rules and Receipts', 'See how paid access becomes a signed receipt.'],
+              ['/govern', 'Govern AI agents', 'Govern paid agent actions before the call runs.'],
               ['/agent-capability-tokens', 'Agent capability tokens', 'Scope paid access with route, budget, expiry, delegation, and revocation caveats.'],
               ['/blog/l402-protocol-explained', 'L402 protocol explained', 'How HTTP 402, Lightning, and macaroons enable API payments.'],
               ['/l402-api-pricing-calculator', 'L402 API pricing calculator', 'Estimate per-request agent/API paid-access pricing.'],
-              ['/govern', 'AI agent governance', 'Bound delegated agent authority before paid-rail execution.'],
+              ['/govern', 'AI agent governance', 'Limit permissions passed down to a sub-agent before a payment method runs.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">
                 <h3 className="font-bold text-white mb-2">{title}</h3>
@@ -395,7 +395,7 @@ HTTP/1.1 200 OK
 
       <section className="max-w-6xl mx-auto px-6 py-20">
         <div className="rounded-3xl border border-yellow-900/60 bg-gradient-to-br from-yellow-950/20 to-cyan-950/30 p-8 md:p-12">
-          <h2 className="text-3xl font-bold text-white mb-4">Govern L402-paid access with Policy-to-Proof</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">Govern L402-paid access with Rules and Receipts</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
             L402 can prove payment. SatGate proves the action was authorized: who acted, what policy applied, which rail was used, what was paid, and why access was allowed or denied.
           </p>
@@ -404,7 +404,7 @@ HTTP/1.1 200 OK
               Govern paid agent actions <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
-              View Policy-to-Proof
+              See how rules and receipts work
             </Link>
           </div>
         </div>

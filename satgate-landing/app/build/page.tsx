@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     "agent governance receipts",
     "MCP capability tokens",
     "AI agent SDK",
-    "Agent Authority & Accountability Layer",
+    "Agent Permissions and Receipts",
   ],
   alternates: {
     canonical: "https://satgate.io/build",
@@ -136,7 +136,7 @@ const primitives = [
     icon: ReceiptText,
     title: "Check the receipt",
     label: "satgate.verify",
-    body: "Verify the receipt the call returned. Add it to an Evidence Pack for audits, incident reviews, billing questions or proof of a revoke.",
+    body: "Verify the receipt the call returned. Add it to a signed receipt (Evidence Pack) for audits, incident reviews, billing questions or proof of a revoke.",
   },
 ];
 
@@ -155,7 +155,7 @@ const buildDocLinks = [
   { title: "Capability schema", href: `${docsBase}/reference/capability-schema.md`, body: "What a token holds: who issued it, who it’s for, allowed tools, budget, expiry, extra limits and how far it can be handed off." },
   { title: "Receipt schema", href: `${docsBase}/reference/receipt-schema.md`, body: "The signed record SatGate writes when it allows, refuses, hands off, revokes or charges." },
   { title: "Trust metadata", href: `${docsBase}/reference/satgate-trust-metadata.md`, body: trustMetadataNote },
-  { title: "Open verifier", href: "https://github.com/SatGate-io/evidence-pack-verifier", body: "Check a live Evidence Pack against the issuer’s published keys (JWKS). Uses RFC 8785 canonical JSON and Ed25519 signatures." },
+  { title: "Open verifier", href: "https://github.com/SatGate-io/evidence-pack-verifier", body: "Check a live receipt against the issuer’s published keys (JWKS). Uses RFC 8785 canonical JSON and Ed25519 signatures." },
   { title: "MCP integration", href: `${docsBase}/guides/mcp-gateway.md`, body: "Put SatGate in front of MCP tools and get a receipt for each tool call." },
   { title: "Raw HTTP", href: `${docsBase}/guides/raw-http.md`, body: "Copy-paste curl commands for issue, pay and verify. No SDK needed." },
   { title: "OpenAI tools", href: `${docsBase}/guides/openai-tools.md`, body: "Run OpenAI tool calls through SatGate and verify the receipts." },
@@ -217,7 +217,7 @@ const jsonLd = {
       dateModified: "2026-09-26",
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
       about: [
-        { "@type": "Thing", name: "Agent Authority & Accountability Layer" },
+        { "@type": "Thing", name: "Agent Permissions and Receipts" },
         { "@type": "Thing", name: "agent capabilities" },
         { "@type": "Thing", name: "verifiable receipts" },
         { "@type": "Thing", name: "agent payment controls" },

@@ -3,7 +3,7 @@ import { ArrowRight, Bot, DollarSign, Gauge, KeyRound, ShieldCheck, Terminal, Wo
 
 export const metadata = {
   title: 'SatGate for Cursor AI Agents',
-  description: 'Control Cursor agent spend, MCP tool access, and API credentials with SatGate request-path budgets, revocation, and Evidence Packs.',
+  description: 'Control Cursor agent spend, MCP tool access, and API credentials with SatGate budgets before the request goes through, revocation, and signed receipts.',
   alternates: { canonical: 'https://satgate.io/satgate-for-cursor' },
   keywords: [
     'SatGate for Cursor',
@@ -15,7 +15,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate for Cursor AI Agents',
-    description: 'Control Cursor agent spend, MCP tool access, and API credentials with SatGate request-path budgets, revocation, and Evidence Packs.',
+    description: 'Control Cursor agent spend, MCP tool access, and API credentials with SatGate budgets before the request goes through, revocation, and signed receipts.',
     url: 'https://satgate.io/satgate-for-cursor',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -23,12 +23,12 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate for Cursor AI Agents',
-    description: 'Control Cursor agent spend, MCP tool access, and API credentials with SatGate request-path budgets, revocation, and Evidence Packs.',
+    description: 'Control Cursor agent spend, MCP tool access, and API credentials with SatGate budgets before the request goes through, revocation, and signed receipts.',
   },
 };
 
 const controls = [
-  { icon: DollarSign, title: 'Budget before execution', body: 'Check remaining spend, request ceilings, route cost, and policy before forwarding the call.' },
+  { icon: DollarSign, title: 'Budget before the call runs', body: 'Check remaining spend, request ceilings, route cost, and policy before forwarding the call.' },
   { icon: KeyRound, title: 'Scoped capabilities', body: 'Replace broad static keys with expiring, revocable credentials constrained by route, tool, calls, and spend.' },
   { icon: ShieldCheck, title: 'Revocation and kill switches', body: 'Stop a risky task, tool, or agent session immediately without rotating every shared secret.' },
   { icon: Workflow, title: 'MCP and API governance', body: 'Apply the same economic policy across MCP servers, internal APIs, model providers, and paid tools.' },
@@ -48,7 +48,7 @@ export default function SatGateIntegrationPage() {
       { '@type': 'Thing', name: 'Cursor MCP budget enforcement' },
       { '@type': 'Thing', name: 'economic firewall for coding agents' },
       { '@type': 'Thing', name: 'revocable agent credentials' },
-      { '@type': 'Thing', name: 'request-path Evidence Packs' },
+      { '@type': 'Thing', name: 'signed receipts before the request goes through' },
     ],
   };
 
@@ -63,7 +63,7 @@ export default function SatGateIntegrationPage() {
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-04',
     about: webPageJsonLd.about,
-    featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'Request-path Evidence Packs', 'rail-neutral paid-rail governance'],
+    featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'Signed receipts before the request goes through', 'payment rules that work with any payment method'],
   };
 
   const faqJsonLd = {
@@ -78,7 +78,7 @@ export default function SatGateIntegrationPage() {
       {
         '@type': 'Question',
         name: 'Is SatGate just another observability dashboard?',
-        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, audit, and L402 payment at the gateway before forwarding.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate can observe traffic, but its core role is enforcement before the request goes through: budgets, revocation, route policy, capabilities, audit, and L402 payment at the gateway before forwarding.' },
       },
       {
         '@type': 'Question',
@@ -116,7 +116,7 @@ export default function SatGateIntegrationPage() {
 
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-              See Policy-to-Proof <ArrowRight size={18} />
+              See how rules and receipts work <ArrowRight size={18} />
             </Link>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               AI agent cost control
@@ -127,7 +127,7 @@ export default function SatGateIntegrationPage() {
 
       <section className="mx-auto grid max-w-6xl gap-12 px-6 py-20 lg:grid-cols-[1fr_0.9fr]">
         <div>
-          <h2 className="mb-6 text-3xl font-bold text-white">Why Cursor workflows need request-path economics</h2>
+          <h2 className="mb-6 text-3xl font-bold text-white">Why Cursor workflows need checks before the request goes through</h2>
           <div className="space-y-5 text-lg leading-relaxed text-gray-300">
             <p>Autonomous agents are not normal SaaS users. They can retry, loop, delegate, and call tools faster than a human operator can review a bill.</p>
             <p>SatGate sits between those agents and the upstream API, MCP server, model provider, or protected resource. Every request gets an economic decision before access is granted.</p>
@@ -147,7 +147,7 @@ export default function SatGateIntegrationPage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-bold text-white">SatGate controls for Cursor</h2>
-          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the governance layer around agentic tool use: Observe first, Control when limits are known, and Prove every approval, denial, and paid-access decision with Evidence Pack receipts.</p>
+          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the governance layer around agentic tool use: Observe first, Control when limits are known, and record every approval, denial, and paid-access decision with signed receipts.</p>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {controls.map(({ icon: Icon, title, body }) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-black p-6 transition hover:border-cyan-900/70">
@@ -179,7 +179,7 @@ export default function SatGateIntegrationPage() {
           <div className="grid gap-5 md:grid-cols-3">
             {[
               ['Can SatGate control Cursor MCP tools?', 'Yes. SatGate can sit in front of MCP servers or paid API tools used by Cursor and enforce budgets, allowed routes, tool scopes, expiry, and revocation before the tool call executes.'],
-              ['Is SatGate just another observability dashboard?', 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, audit, and L402 payment at the gateway before forwarding.'],
+              ['Is SatGate just another observability dashboard?', 'No. SatGate can observe traffic, but its core role is enforcement before the request goes through: budgets, revocation, route policy, capabilities, audit, and L402 payment at the gateway before forwarding.'],
               ['Can SatGate start in observe-only mode?', 'Yes. Teams can start with Observe to map agent and tool spend, then graduate to Control policies once safe limits are clear.'],
             ].map(([question, answer]) => (
               <div key={question}>
@@ -193,9 +193,9 @@ export default function SatGateIntegrationPage() {
 
       <section className="mx-auto max-w-6xl px-6 pb-24">
         <div className="rounded-3xl border border-purple-900/40 bg-gradient-to-br from-purple-950/40 to-cyan-950/20 p-8 md:p-10">
-          <div className="mb-4 flex items-center gap-3 text-purple-200"><Bot size={24} /><span className="font-semibold">Observe → Control → Prove</span></div>
+          <div className="mb-4 flex items-center gap-3 text-purple-200"><Bot size={24} /><span className="font-semibold">Observe, Control, receipts</span></div>
           <h2 className="mb-4 text-3xl font-bold text-white">Make Cursor agent activity governable.</h2>
-          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate gives agent teams the missing economic layer: budgets, scoped authority, revocation, audit, and paid-rail context where machine customers need to pay for APIs.</p>
+          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate gives agent teams the missing economic layer: budgets, scoped authority, revocation, audit, and charging external agents where machine customers need to pay for APIs.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-300 px-6 py-3 font-bold text-black transition hover:bg-cyan-200">
               MCP budget enforcement <Gauge size={18} />
