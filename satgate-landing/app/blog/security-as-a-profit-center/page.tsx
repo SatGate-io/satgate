@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Clock, ExternalLink } from 'lucide-react';
 
 export const metadata = {
   title: 'Security as a Profit Center: Economic Firewall ROI',
-  description: 'SatGate shows how many dollars security saved, not just attacks blocked. Learn why economic governance can become a profit center.',
+  description: 'SatGate shows how many dollars security saved, not just attacks blocked. Learn why spending controls can become a profit center.',
   openGraph: {
     title: 'Security as a Profit Center: Economic Firewall ROI',
     description: 'Your security stack is a cost center. Your economic firewall is a profit center. Here\'s the CFO math.',
@@ -27,7 +27,7 @@ export default function SecurityAsAProfitCenterPage() {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
     headline: 'Security as a Profit Center: Economic Firewall ROI',
-    description: 'SatGate shows how many dollars security saved, not just attacks blocked. Learn why economic governance can become a profit center.',
+    description: 'SatGate shows how many dollars security saved, not just attacks blocked. Learn why spending controls can become a profit center.',
     url: 'https://satgate.io/blog/security-as-a-profit-center',
     datePublished: '2026-02-14',
     dateModified: '2026-05-02',
@@ -205,7 +205,7 @@ export default function SecurityAsAProfitCenterPage() {
           </p>
           <ul className="text-gray-300 space-y-2">
             <li><strong className="text-white">Micropayment monetization</strong> — L402 enables pay-per-tool-call pricing. Expose your internal APIs to partner agents and charge per request, settled instantly via Lightning Network. Your tools become revenue-generating products.</li>
-            <li><strong className="text-white">Trust-as-a-Service</strong> — Enterprise buyers won&apos;t deploy third-party agents without governance guarantees. Governed agents — with provable budget constraints and Evidence Packs — close deals that ungoverned agents can&apos;t.</li>
+            <li><strong className="text-white">Trust-as-a-Service</strong> — Enterprise buyers won&apos;t deploy third-party agents without governance guarantees. Governed agents — with provable budget constraints and signed receipts — close deals that ungoverned agents can&apos;t.</li>
             <li><strong className="text-white">Faster deployment velocity</strong> — Lower blast radius means lower risk. Lower risk means faster approval. Faster approval means faster time-to-revenue. The governance layer becomes an accelerator, not a gate.</li>
           </ul>
 
@@ -300,7 +300,7 @@ Example:
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            The enterprises that win the AI agent era won&apos;t be the ones that deploy the most agents. They&apos;ll be the ones that govern them best. Economic governance isn&apos;t the brake pedal. It&apos;s the steering wheel.
+            The enterprises that win the AI agent era won&apos;t be the ones that deploy the most agents. They&apos;ll be the ones that govern them best. Spending controls aren&apos;t the brake pedal. They&apos;re the steering wheel.
           </p>
 
           <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">

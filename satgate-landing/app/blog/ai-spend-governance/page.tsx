@@ -4,7 +4,7 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 export const metadata = {
   title: 'AI Spend Governance: Control Usage-Based AI Costs Before They Scale',
   description:
-    'Why usage-based AI pricing, agentic workflows, and tool-calling systems require request-path spend governance, not just dashboards after the bill arrives.',
+    'Why usage-based AI pricing, agentic workflows, and tool-calling systems require spend governance before the request goes through, not just dashboards after the bill arrives.',
   alternates: { canonical: 'https://satgate.io/blog/ai-spend-governance' },
   keywords: [
     'AI spend governance',
@@ -16,7 +16,7 @@ export const metadata = {
     'AI model spend management',
     'AI cost observability',
     'AI FinOps',
-    'request-path budget enforcement',
+    'budget enforcement before the request goes through',
   ],
   openGraph: {
     title: 'AI Spend Governance: Control Usage-Based AI Costs Before They Scale',
@@ -31,7 +31,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'AI Spend Governance: Control Usage-Based AI Costs Before They Scale',
     description:
-      'Usage-based AI pricing makes cost an operating risk. The answer is request-path governance: Observe, Control, Prove.',
+      'Usage-based AI pricing makes cost an operating risk. The answer is governance before the request goes through: Observe, Control, Prove.',
   },
 };
 
@@ -51,9 +51,9 @@ export default function AiSpendGovernanceBlogPage() {
       { '@type': 'Thing', name: 'usage-based AI pricing' },
       { '@type': 'Thing', name: 'enterprise AI cost control' },
       { '@type': 'Thing', name: 'AI agent cost management' },
-      { '@type': 'Thing', name: 'request-path budget enforcement' },
+      { '@type': 'Thing', name: 'budget enforcement before the request goes through' },
       { '@type': 'Thing', name: 'AI FinOps' },
-      { '@type': 'Thing', name: 'Policy-to-Proof' },
+      { '@type': 'Thing', name: 'Rules and Receipts' },
     ],
   };
 
@@ -82,7 +82,7 @@ export default function AiSpendGovernanceBlogPage() {
         name: 'Are dashboards enough for AI cost control?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Dashboards are necessary but not enough. They explain spend after it happens. Agentic AI also needs request-path controls that can allow, block, downgrade, route, or escalate expensive actions before the bill is created.',
+          text: 'Dashboards are necessary but not enough. They explain spend after it happens. Agentic AI also needs controls before the request goes through that can allow, block, downgrade, route, or escalate expensive actions before the bill is created.',
         },
       },
       {
@@ -90,7 +90,7 @@ export default function AiSpendGovernanceBlogPage() {
         name: 'What should enterprises require from an AI spend governance layer?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Enterprises should require usage attribution by user, agent, workflow, model, API, and tool; request-path policy enforcement; budget controls; routing decisions; approval flows; and Evidence Pack receipts that prove which policy allowed or denied each important action.',
+          text: 'Enterprises should require usage attribution by user, agent, workflow, model, API, and tool; policy enforcement before the request goes through; budget controls; routing decisions; approval flows; and signed receipts that prove which policy allowed or denied each important action.',
         },
       },
     ],
@@ -123,7 +123,7 @@ export default function AiSpendGovernanceBlogPage() {
           </div>
 
           <p className="text-xl text-gray-400 mb-6 italic">
-            The next AI budget problem will not be solved by another dashboard. It needs governance in the request path.
+            The next AI budget problem will not be solved by another dashboard. It needs governance before the request goes through.
           </p>
 
           <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -187,7 +187,7 @@ export default function AiSpendGovernanceBlogPage() {
             <h2 className="text-2xl font-bold text-white mb-4">AI governance has to answer harder questions</h2>
             <ul className="text-gray-300 space-y-2">
               <li>Which user, team, agent, workflow, model, API, and tool drove the spend?</li>
-              <li>Was the action inside the delegated authority for that user or agent?</li>
+              <li>Was the action inside the permissions passed down for that user or agent?</li>
               <li>Was the model choice appropriate for the task and risk?</li>
               <li>Was there budget left before the request executed?</li>
               <li>Should the request have been allowed, downgraded, routed, escalated, or denied?</li>
@@ -210,7 +210,7 @@ export default function AiSpendGovernanceBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            The missing layer sits in the request path. Before the model, tool, API, or paid rail executes, the system should check authority, policy, budget, route, risk, and evidence requirements. Then it should make a decision.
+            The missing layer checks each request before it goes through. Before the model, tool, API, or a payment method is used, the system should check authority, policy, budget, route, risk, and evidence requirements. Then it should make a decision.
           </p>
 
           <div className="bg-gray-900/70 border border-gray-800 rounded-lg p-6 my-6">
@@ -223,7 +223,7 @@ export default function AiSpendGovernanceBlogPage() {
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            That difference matters. Reporting helps explain the bill. Request-path governance changes the bill before it exists. For enterprise AI cost control and AI agent cost management, that is the line between accounting and enforcement.
+            That difference matters. Reporting helps explain the bill. Controls before the request goes through change the bill before it exists. For enterprise AI cost control and AI agent cost management, that is the line between accounting and enforcement.
           </p>
 
           <div className="my-8 rounded-2xl border border-gray-800 bg-gray-950/70 p-6">
@@ -255,7 +255,7 @@ export default function AiSpendGovernanceBlogPage() {
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Prove what happened</h3>
           <p className="text-gray-300 leading-relaxed">
-            Preserve Evidence Pack receipts that show who delegated authority, which policy applied, what budget constrained the action, what decision was made, and why it was allowed or denied. Finance needs the cost trail. Security and compliance need the authority trail.
+            Preserve signed receipts that show who passed permissions down to a sub-agent, which policy applied, what budget constrained the action, what decision was made, and why it was allowed or denied. Finance needs the cost trail. Security and compliance need the authority trail.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">What enterprises should require</h2>
@@ -269,7 +269,7 @@ export default function AiSpendGovernanceBlogPage() {
             <li>Set budgets by task, team, agent, capability, tenant, or workflow.</li>
             <li>Route work to the right model or tool based on cost, risk, and policy.</li>
             <li>Block, downgrade, approve, or escalate requests before execution.</li>
-            <li>Enforce delegated authority instead of relying on broad API keys.</li>
+            <li>Enforce permissions passed down to a sub-agent instead of relying on broad API keys.</li>
             <li>Create receipts for allowed and denied actions.</li>
             <li>Export evidence for finance, security, compliance, and leadership review.</li>
           </ul>
@@ -295,14 +295,14 @@ export default function AiSpendGovernanceBlogPage() {
           <div className="my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
             <h2 className="text-2xl font-bold text-white mb-4">SatGate&apos;s view</h2>
             <p className="text-gray-300 leading-relaxed">
-              SatGate is Economic Firewall infrastructure for enterprise agents. It gives teams a Policy-to-Proof control layer for AI, API, MCP, and paid-tool usage: observe the call, control the policy before execution, and prove what happened afterward with Evidence Pack receipts.
+              SatGate is Economic Firewall infrastructure for enterprise agents. It gives teams a rules-and-receipts layer for AI, API, MCP, and paid-tool usage: observe the call, control the policy before execution, and prove what happened afterward with signed receipts.
             </p>
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
               <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg bg-cyan-400 px-5 py-3 font-bold text-black transition hover:bg-cyan-300">
-                See Policy-to-Proof governance
+                See how rules and receipts work
               </Link>
               <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 font-bold text-white transition hover:border-cyan-500">
-                See Policy-to-Proof
+                See how rules and receipts work
               </Link>
             </div>
           </div>

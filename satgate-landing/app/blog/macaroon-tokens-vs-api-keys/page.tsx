@@ -5,7 +5,7 @@ export const metadata = {
   title: "Macaroon Tokens vs API Keys for Agent Access",
   description: "Compare macaroon tokens and API keys for scoped authorization, delegated access, and safer AI agent permissions.",
   alternates: { canonical: 'https://satgate.io/blog/macaroon-tokens-vs-api-keys' },
-  keywords: ['macaroon tokens vs API keys', 'capability-based authentication', 'API authentication AI agents', 'delegated authority tokens', 'macaroon authentication', 'AI agent security', 'capability tokens'],
+  keywords: ['macaroon tokens vs API keys', 'capability-based authentication', 'API authentication AI agents', 'tokens for permissions passed down to a sub-agent', 'macaroon authentication', 'AI agent security', 'capability tokens'],
   openGraph: {
     title: 'Macaroon Tokens vs API Keys for AI Agents',
     description: 'Compare macaroon authentication and API keys for scoped AI agent credentials, revocation, delegation, and budget limits.',
@@ -37,7 +37,7 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
       { '@type': 'Thing', name: 'capability-based authentication for AI agents' },
       { '@type': 'Thing', name: 'scoped agent credentials' },
       { '@type': 'Thing', name: 'budget caveats for agent tokens' },
-      { '@type': 'Thing', name: 'revocable delegated authority' },
+      { '@type': 'Thing', name: 'revocable permissions passed down to a sub-agent' },
     ],
   };
 
@@ -58,7 +58,7 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
         name: 'Why are macaroons better for AI agents than API keys?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'AI agents delegate work, call tools autonomously, and can spend money quickly. Macaroons let teams issue scoped and attenuated authority so each agent or sub-agent can only use specific APIs, within explicit budgets and time windows.',
+          text: 'AI agents delegate work, call tools autonomously, and can spend money quickly. Macaroons let teams issue scoped and narrowed authority so each agent or sub-agent can only use specific APIs, within explicit budgets and time windows.',
         },
       },
       {
@@ -167,7 +167,7 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            There's no cryptographic way for Agent A to create a "sub-key" that has fewer permissions than the original. The API key model has no concept of attenuated delegation — giving someone less access than you have.
+            There's no cryptographic way for Agent A to create a "sub-key" that has fewer permissions than the original. The API key model has no concept of narrowed delegation — giving someone less access than you have.
           </p>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Problem 3: No Context About Authority</h3>
@@ -222,10 +222,10 @@ macaroon.add_first_party_caveat("rate_limit = 100/hour")
             The critical insight: <strong className="text-white">these constraints are enforced by the authentication system, not by the application code.</strong> The API gateway validates the macaroon, checks each caveat, and either allows or denies the request based on the embedded constraints. The API itself never has to think about budgets, rate limits, or expiration — it's all handled at the auth layer.
           </p>
 
-          <h3 className="text-xl font-bold text-white mt-8 mb-3">Attenuation: The Secret Sauce of Delegation</h3>
+          <h3 className="text-xl font-bold text-white mt-8 mb-3">Narrowing: The Secret Sauce of Delegation</h3>
 
           <p className="text-gray-300 leading-relaxed">
-            Here's where macaroons get powerful: <strong className="text-white">anyone holding a macaroon can add more caveats to create a more restricted token.</strong> This is called attenuation, and it's the foundation of safe delegation.
+            Here's where macaroons get powerful: <strong className="text-white">anyone holding a macaroon can add more caveats to create a more restricted token.</strong> This is called narrowing, and it's the foundation of safe delegation.
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
@@ -251,7 +251,7 @@ agent_c_macaroon = attenuate(agent_b_macaroon, [
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            This solves the delegation problem elegantly. Any agent can safely create more restrictive tokens for sub-agents without involving the original API provider. The cryptography constrains delegation: attenuated tokens can only have fewer permissions, never more.
+            This solves the delegation problem elegantly. Any agent can safely create more restrictive tokens for sub-agents without involving the original API provider. The cryptography constrains delegation: narrowed tokens can only have fewer permissions, never more.
           </p>
 
           <div className="my-8 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-6">
@@ -266,7 +266,7 @@ agent_c_macaroon = attenuate(agent_b_macaroon, [
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">Why are macaroons better for AI agents than API keys?</h3>
                 <p className="text-gray-300 leading-relaxed mb-0">
-                  AI agents delegate work, call tools autonomously, and can spend money quickly. Macaroons let teams issue scoped and attenuated authority so each agent or sub-agent can only use specific APIs within explicit budgets and time windows.
+                  AI agents delegate work, call tools autonomously, and can spend money quickly. Macaroons let teams issue scoped and narrowed authority so each agent or sub-agent can only use specific APIs within explicit budgets and time windows.
                 </p>
               </div>
               <div>
@@ -330,7 +330,7 @@ agent_c_macaroon = attenuate(agent_b_macaroon, [
           <div className="bg-green-900/20 border border-green-800/30 rounded-lg p-6 my-6">
             <h4 className="text-white font-bold mb-2">✅ Macaroon Approach</h4>
             <p className="text-gray-300 text-sm">
-              Main agent attenuates its macaroon three ways:
+              Main agent narrows its macaroon three ways:
               <br />• Research agent: <code className="text-green-300 bg-black/50 px-1 rounded">budget_max = 10.00, endpoints = /search/*</code>
               <br />• Writing agent: <code className="text-green-300 bg-black/50 px-1 rounded">budget_max = 15.00, endpoints = /generate/*</code>
               <br />• Fact-check agent: <code className="text-green-300 bg-black/50 px-1 rounded">budget_max = 5.00, endpoints = /verify/*</code>
@@ -382,7 +382,7 @@ agent_c_macaroon = attenuate(agent_b_macaroon, [
             Macaroons can embed context into the authorization decision. A caveat like <code className="text-green-300 bg-black/50 px-1 rounded">time_of_day = business_hours</code> or <code className="text-green-300 bg-black/50 px-1 rounded">request_rate &lt; 10/min</code> lets you enforce policies that API keys can't express.
           </p>
 
-          <h3 className="text-xl font-bold text-white mt-8 mb-3">4. Cryptographic Evidence Pack</h3>
+          <h3 className="text-xl font-bold text-white mt-8 mb-3">4. Cryptographic Signed Receipt</h3>
 
           <p className="text-gray-300 leading-relaxed">
             Every macaroon embeds its delegation history. You can cryptographically verify not just that a request is authorized, but how many delegation steps led to that authorization and what constraints were added at each step.
@@ -493,7 +493,7 @@ demo_macaroon.addFirstPartyCaveat('endpoints = /translate/*');
 const token = demo_macaroon.serialize();`}</code>
           </pre>
 
-          <h3 className="text-xl font-bold text-white mt-8 mb-3">Step 4: Enable Agent Self-Attenuation</h3>
+          <h3 className="text-xl font-bold text-white mt-8 mb-3">Step 4: Enable Agent Self-Narrowing</h3>
 
           <p className="text-gray-300 leading-relaxed">
             Agents can create more restricted tokens for delegation. Provide simple SDK methods:
@@ -616,10 +616,10 @@ attenuated_token = agent_a_token.add_caveats([
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">SatGate path: Observe → Control → Prove</h3>
             <p className="mb-4 text-gray-300">
-              Start by observing agent, API, and MCP usage. Move to request-path control when budgets, scopes, and revocation need to stop bad calls before they run. Preserve Evidence Packs so every allow, deny, and budget decision can be verified later.
+              Start by observing agent, API, and MCP usage. Move to control before the request goes through when budgets, scopes, and revocation need to stop bad calls before they run. Preserve signed receipts (Evidence Packs) so every allow, deny, and budget decision can be verified later.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
-              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
+              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">See how rules and receipts work</Link>
               <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>

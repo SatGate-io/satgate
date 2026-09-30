@@ -58,7 +58,7 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
         name: 'Why was HTTP 402 reserved for future use?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'HTTP 402 was reserved because the web did not yet have a standard, low-friction payment rail for small digital transactions. Credit cards were too expensive for micropayments, and clients were human-operated. paid-rail context, macaroon tokens, and autonomous agents make the original intent usable.',
+          text: 'HTTP 402 was reserved because the web did not yet have a standard, low-friction payment rail for small digital transactions. Credit cards were too expensive for micropayments, and clients were human-operated. Charging external agents, macaroon tokens, and autonomous agents make the original intent usable.',
         },
       },
       {
@@ -113,11 +113,11 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
           <h1 className="text-4xl font-bold mb-4">HTTP 402 Payment Required: Meaning, Reserved Use, and AI Agent Payments</h1>
           <div className="mb-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Quick answer</p>
-            <p className="text-gray-300">HTTP 402 means access is available after payment. For AI agents, 402 and L402 are paid-rail context: authority, budget, and policy should be checked before value moves, with Evidence Pack proof after the request.</p>
+            <p className="text-gray-300">HTTP 402 means access is available after payment. For AI agents, 402 and L402 are how you charge external agents: authority, budget, and policy should be checked before value moves, with signed receipt proof after the request.</p>
           </div>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Govern paid agent access</Link>
-            <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">See Policy-to-Proof</Link>
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">See how rules and receipts work</Link>
           </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
@@ -315,7 +315,7 @@ Content-Type: application/json
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">How 402 enables it:</strong> The parent agent pre-pays for a macaroon with a $50 budget. It attenuates that macaroon into sub-tokens: $20 for the research agent, $15 for the writing agent, $10 for the review agent, $5 reserve. Each sub-agent uses its token to pay for 402-gated APIs. When a sub-agent&apos;s budget runs out, it gets 402 responses with no valid payment path &mdash; a hard stop enforced by cryptography.
+            <strong className="text-white">How 402 enables it:</strong> The parent agent pre-pays for a macaroon with a $50 budget. It narrows that macaroon into sub-tokens: $20 for the research agent, $15 for the writing agent, $10 for the review agent, $5 reserve. Each sub-agent uses its token to pay for 402-gated APIs. When a sub-agent&apos;s budget runs out, it gets 402 responses with no valid payment path &mdash; a hard stop enforced by cryptography.
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
@@ -463,7 +463,7 @@ Parent Agent ($50 macaroon)
             The pattern is consistent: wherever monthly subscriptions create friction for machine consumers, 402 with L402 provides a smoother alternative. Agents don&apos;t want to manage subscriptions. They want to pay for what they use, when they use it.
           </p>
 
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Future: 402 as a Paid Rail Under Authority</h2>
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Future: 402 as a Payment Method Under Authority</h2>
 
           <p className="text-gray-300 leading-relaxed">
             HTTP 402 is evolving from a curiosity into a fundamental building block of the agent economy. As more APIs expose 402 endpoints, agents will develop increasingly sophisticated payment strategies: comparing prices across providers, pre-funding budgets for anticipated workflows, and negotiating bulk rates through macaroon caveats.
@@ -474,7 +474,7 @@ Parent Agent ($50 macaroon)
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-HTTP 402 was reserved for future use in 1997. For agent systems, the useful version is narrower: 402 is paid-rail context around an authority decision, with policy checked before value moves and Evidence Packs available after the call.
+HTTP 402 was reserved for future use in 1997. For agent systems, the useful version is narrower: 402 is how you charge external agents around an authority decision, with policy checked before value moves and signed receipts available after the call.
           </p>
 
           <div className="my-10 rounded-2xl border border-yellow-900/60 bg-yellow-950/20 p-6">
@@ -487,7 +487,7 @@ HTTP 402 was reserved for future use in 1997. For agent systems, the useful vers
               <Link href="/l402-agent-payments" className="text-cyan-300 hover:text-cyan-200">L402 agent payments →</Link>
               <Link href="/http-402-for-ai-agents" className="text-cyan-300 hover:text-cyan-200">HTTP 402 for AI agents →</Link>
               <Link href="/agent-payment-controls" className="text-cyan-300 hover:text-cyan-200">Agent payment controls →</Link>
-              <Link href="/partners/rails" className="text-cyan-300 hover:text-cyan-200">Paid-rail governance →</Link>
+              <Link href="/partners/rails" className="text-cyan-300 hover:text-cyan-200">Payment rules →</Link>
             </div>
           </div>
 
@@ -495,7 +495,7 @@ HTTP 402 was reserved for future use in 1997. For agent systems, the useful vers
           <div className="my-10 rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">Related 402 and agent-payment controls</h3>
             <p className="mb-4 text-gray-300">
-              If you are evaluating HTTP 402 for agent-facing APIs, connect the paid rail to pricing, MCP gateway policy, capability authority, and API monetization controls before exposing it to autonomous callers.
+              If you are evaluating HTTP 402 for agent-facing APIs, connect the payment method to pricing, MCP gateway policy, capability authority, and API monetization controls before exposing it to autonomous agents.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/pay" className="text-cyan-300 hover:text-cyan-200">SatGate Pay →</Link>
@@ -508,11 +508,11 @@ HTTP 402 was reserved for future use in 1997. For agent systems, the useful vers
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">SatGate path: Observe → Control → Prove</h3>
             <p className="mb-4 text-gray-300">
-              Start by observing paid-agent and API usage. Move to Control when budgets, scopes, and payment authority need to stop bad calls before value moves. Preserve Evidence Packs so each paid-rail decision can be verified later.
+              Start by observing paid-agent and API usage. Move to Control when budgets, scopes, and payment authority need to stop bad calls before value moves. Preserve signed receipts (Evidence Packs) so each payment method decision can be verified later.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
-              <Link href="/partners/rails" className="text-cyan-300 hover:text-cyan-200">Paid-rail partner brief →</Link>
-              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
+              <Link href="/partners/rails" className="text-cyan-300 hover:text-cyan-200">Payment method partner brief →</Link>
+              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">See how rules and receipts work</Link>
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>
           </div>
@@ -521,14 +521,14 @@ HTTP 402 was reserved for future use in 1997. For agent systems, the useful vers
           <div className="mt-16 bg-gradient-to-r from-blue-900/20 to-cyan-900/20 border border-blue-800/30 rounded-xl p-8">
             <h3 className="text-xl font-bold text-white mb-3">Govern 402 payments before value moves</h3>
             <p className="text-gray-300 mb-4">
-              SatGate treats HTTP 402 and L402 as paid rails around authority decisions. Deploy it in front of APIs to enforce scope, budget, and payment policy before execution, then preserve Evidence Packs for later verification.
+              SatGate treats HTTP 402 and L402 as payment methods around authority decisions. Deploy it in front of APIs to enforce scope, budget, and payment policy before execution, then preserve receipts for later verification.
             </p>
             <div className="flex flex-wrap gap-3">
               <a href="https://github.com/SatGate-io/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
                 View on GitHub
               </a>
               <Link href="/partners/rails" className="inline-flex items-center gap-2 border border-blue-500 text-blue-300 px-6 py-3 rounded-lg font-bold hover:bg-blue-900/30 transition text-sm">
-                Read: Paid-Rail Partner Brief →
+                Read: Payment Method Partner Brief →
               </Link>
             </div>
           </div>

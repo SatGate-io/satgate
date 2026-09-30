@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "L402 Protocol Explained: HTTP 402 for Machine API Payments",
-  description: "L402 combines HTTP 402, paid-rail context, and macaroon tokens so delegated agents can present payment proof for API access in real time.",
+  description: "L402 combines HTTP 402, payment details, and macaroon tokens so delegated agents can present payment proof for API access in real time.",
   alternates: { canonical: 'https://satgate.io/blog/l402-protocol-explained' },
   keywords: ['L402 protocol explained', 'L402 protocol', 'HTTP 402 Payment Required', 'Lightning API payments', 'machine-to-machine payments', 'L402 macaroons', 'API micropayments'],
   openGraph: {
@@ -26,7 +26,7 @@ export default function L402ProtocolExplainedBlogPage() {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
     headline: 'L402 Protocol Explained: How HTTP 402 Enables Machine-Native API Payments',
-    description: 'L402 combines HTTP 402, paid-rail context, and macaroon tokens so delegated agents can present payment proof for API access in real time.',
+    description: 'L402 combines HTTP 402, payment details, and macaroon tokens so delegated agents can present payment proof for API access in real time.',
     url: 'https://satgate.io/blog/l402-protocol-explained',
     datePublished: '2026-04-02',
     dateModified: '2026-05-04',
@@ -213,7 +213,7 @@ budget_id = "budget-xyz-789"
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            This is what makes L402 fundamentally different from simple pay-per-request schemes. The macaroon carries <em>capabilities</em>, not just payment proof. And because macaroons support attenuation, an agent can create more restricted tokens for sub-agents — enabling the kind of delegated authority that multi-agent systems require.
+            This is what makes L402 fundamentally different from simple pay-per-request schemes. The macaroon carries <em>capabilities</em>, not just payment proof. And because macaroons support narrowing, an agent can create more restricted tokens for sub-agents, enabling the kind of permissions passed down to a sub-agent that multi-agent systems require.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Why Existing Payment Models Fail for AI Agents</h2>
@@ -376,7 +376,7 @@ routes:
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Delegation becomes safe.</strong> Because L402 uses macaroons, agents can create attenuated tokens for sub-agents — granting limited access that can never exceed the parent&apos;s authority. Multi-agent workflows can operate with proper economic boundaries at every level.
+            <strong className="text-white">Delegation becomes safe.</strong> Because L402 uses macaroons, agents can create narrowed tokens for sub-agents — granting limited access that can never exceed the parent&apos;s authority. Multi-agent workflows can operate with proper economic boundaries at every level.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
