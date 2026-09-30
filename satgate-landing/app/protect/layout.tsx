@@ -4,12 +4,12 @@ export const metadata: Metadata = {
   title: "AI Agent Budget Enforcement Demo | SatGate Control",
   alternates: { canonical: "https://satgate.io/protect" },
   description:
-    "See request-path AI agent budget enforcement in action. Control API and MCP tool spend with per-agent caps, delegation limits, policy decisions, and next-request revocation.",
+    "See AI agent budget enforcement before the request goes through. Control API and MCP tool spend with per-agent caps, delegation limits, policy decisions, and next-request revocation.",
   keywords: [
     "AI agent budget enforcement demo",
     "AI agent cost control demo",
     "MCP tool spend control",
-    "request-path budget enforcement",
+    "budget enforcement before the request goes through",
     "agent spend revocation",
     "economic firewall demo",
     "SatGate Control",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "AI Agent Budget Enforcement Demo | SatGate Control",
     description:
-      "Request-path budget enforcement for AI agent API and MCP tool spend.",
+      "Budget enforcement before the request goes through, for AI agent API and MCP tool spend.",
   },
 };
 

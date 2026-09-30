@@ -4,7 +4,7 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: 'AI Agent API Cost Control: Stop Runaway Spend Before API Calls Execute',
-  description: 'Control AI agent API costs with request-path budget checks, tool pricing, delegated spend limits, revocation, and economic firewalls before calls execute.',
+  description: 'Control AI agent API costs with budget checks before the request goes through, tool pricing, delegated spend limits, revocation, and economic firewalls before calls execute.',
   alternates: { canonical: 'https://satgate.io/blog/ai-agent-api-cost-control' },
   keywords: [
     'AI agent API cost control',
@@ -15,7 +15,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'AI Agent API Cost Control: Stop Runaway Spend Before Calls',
-    description: 'Control AI agent API costs with request-path budget checks, tool pricing, spend limits, revocation, and economic firewalls.',
+    description: 'Control AI agent API costs with budget checks before the request goes through, tool pricing, spend limits, revocation, and economic firewalls.',
     url: 'https://satgate.io/blog/ai-agent-api-cost-control',
     type: 'article',
     publishedTime: '2026-03-05T00:00:00Z',
@@ -41,7 +41,7 @@ export default function AiAgentApiCostControlPage() {
     mainEntityOfPage: 'https://satgate.io/blog/ai-agent-api-cost-control',
     about: [
       { '@type': 'Thing', name: 'AI agent API cost control' },
-      { '@type': 'Thing', name: 'request-path budget checks' },
+      { '@type': 'Thing', name: 'budget checks before the request goes through' },
       { '@type': 'Thing', name: 'rate limiting versus budget enforcement' },
       { '@type': 'Thing', name: 'delegated agent spend limits' },
       { '@type': 'Thing', name: 'economic firewalls for API calls' },
@@ -57,7 +57,7 @@ export default function AiAgentApiCostControlPage() {
         name: 'How do you control AI agent API costs?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Control AI agent API costs by putting an enforcement layer in the request path. The layer should identify the agent, price the API or tool call, check remaining budget, apply route/model policy, and deny or downgrade requests at the gateway before forwarding.',
+          text: 'Control AI agent API costs by putting an enforcement layer before the request goes through. The layer should identify the agent, price the API or tool call, check remaining budget, apply route/model policy, and deny or downgrade requests at the gateway before forwarding.',
         },
       },
       {
@@ -129,7 +129,7 @@ export default function AiAgentApiCostControlPage() {
             The real question is no longer <strong className="text-white">how many requests are allowed?</strong> It is <strong className="text-white">how much is this agent allowed to spend?</strong>
           </p>
 
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4">Why rate limits are the wrong primitive</h2>
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">Why rate limits are the wrong building block</h2>
 
           <p className="text-gray-300 leading-relaxed">
             Rate limits are useful, but they are not economic controls. They usually answer questions like:
@@ -155,7 +155,7 @@ export default function AiAgentApiCostControlPage() {
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">What AI agent API cost control requires</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            AI agent cost control has to happen in the request path, before the upstream API is called. That enforcement layer needs to understand agent identity, policy, budget, tool cost, provider route, and delegated authority.
+            AI agent cost control has to happen before the request goes through to the upstream API. That enforcement layer needs to understand agent identity, policy, budget, tool cost, provider route, and delegated permissions.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -168,7 +168,7 @@ export default function AiAgentApiCostControlPage() {
             <li><strong className="text-white">What will this cost?</strong> Estimate or assign request/tool/provider cost before forwarding.</li>
             <li><strong className="text-white">What budget remains?</strong> Check per-agent, per-tool, per-session, or per-day limits.</li>
             <li><strong className="text-white">Should this route change?</strong> Route cheap tasks to lower-cost providers and reserve premium models for high-value work.</li>
-            <li><strong className="text-white">What should be recorded?</strong> Produce an Evidence Pack with identity, spend, policy decision, and outcome.</li>
+            <li><strong className="text-white">What should be recorded?</strong> Produce a signed receipt (Evidence Pack) with identity, spend, policy decision, and outcome.</li>
           </ol>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Economic firewalls: budget enforcement at the gateway layer</h2>
@@ -217,7 +217,7 @@ audit:
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            Then move the riskiest paths into Control mode. Add per-agent budgets, per-request ceilings, and revocation. Finally, when you expose APIs to external autonomous agents, add paid-rail admission (<code>policy: charge</code>) so the same request path can collect payment before access.
+            Then move the riskiest paths into Control mode. Add per-agent budgets, per-request ceilings, and revocation. Finally, when you expose APIs to external autonomous agents, add admission on a payment method (<code>policy: charge</code>) so payment can be collected before the request goes through.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -230,7 +230,7 @@ audit:
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">How do you control AI agent API costs?</h3>
                 <p className="text-gray-300 leading-relaxed mb-0">
-                  Put an enforcement layer in the request path. It should identify the agent, price the API or tool call, check remaining budget, apply route/model policy, and deny or downgrade requests at the gateway before forwarding.
+                  Put an enforcement layer before the request goes through. It should identify the agent, price the API or tool call, check remaining budget, apply route/model policy, and deny or downgrade requests at the gateway before forwarding.
                 </p>
               </div>
               <div>

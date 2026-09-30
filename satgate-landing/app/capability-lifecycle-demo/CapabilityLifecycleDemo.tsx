@@ -25,7 +25,7 @@ const lifecycle = [
   },
   {
     id: 'attenuate',
-    label: '3. Attenuate',
+    label: '3. Narrow',
     title: 'Shrink what the child can do',
     buyer: 'The child receives narrower authority than the parent: fewer tools, less budget, and a shorter time window.',
     technical: 'Enforce caveats: max_depth=1, child_budget_usd=5, tools=[repo_search], denied_tools=[payment_release], ttl=15m.',
@@ -46,9 +46,9 @@ const lifecycle = [
     label: '5. Prove',
     title: 'Export the proof trail',
     buyer: 'Security, finance, and compliance receive the receipt: who authorized what, which limits applied, why the request was blocked, and what spend remained.',
-    technical: 'The Evidence Pack includes parent/child lineage, caveats, policy version, decision, remaining budget, revocation state, and receipt IDs.',
+    technical: 'The signed receipt (Evidence Pack) includes parent/child lineage, caveats, policy version, decision, remaining budget, revocation state, and receipt IDs.',
     status: 'Proved',
-    evidence: 'Evidence Pack ready',
+    evidence: 'Receipt ready',
   },
 ] as const;
 
@@ -72,7 +72,7 @@ const proofRows = [
   ['parent_token_id', 'cap_parent_1042', 'Shows who delegated the authority.'],
   ['child_token_id', 'cap_child_77ac', 'Shows which worker tried to act.'],
   ['delegation_depth', '1 / 1', 'Shows this governed child is at the configured delegation limit.'],
-  ['decision', 'deny_after_revoke', 'Shows the gateway blocked before execution.'],
+  ['decision', 'deny_after_revoke', 'Shows the gateway blocked before the call runs.'],
   ['remaining_budget_usd', '4.72', 'Shows spend left when revoked.'],
   ['policy_version', 'capability-lifecycle-v3', 'Shows the exact rule set used.'],
   ['evidence_pack_id', 'evp_agent_authority_20260510', 'Bundles the proof for audit.'],
@@ -81,10 +81,10 @@ const proofRows = [
 const controlTranslations = [
   ['Macaroon', 'A portable credential that carries bounded-authority caveats.'],
   ['Caveat', 'An enforceable limit on budget, tool, route, tenant, time, delegation depth, or revocation state.'],
-  ['Attenuation', 'Making a child capability narrower than the parent. Delegation adds caveats without removing or widening parent limits; gateway policy enforces the result.'],
+  ['Narrowing', 'Making a child capability narrower than the parent. Delegation adds caveats without removing or widening parent limits; gateway policy enforces the result.'],
   ['Delegation depth', 'How many handoffs are allowed before the chain must stop.'],
   ['Revocation check', 'A revocation control evaluated before the next model, API, or MCP tool call.'],
-  ['Evidence Pack', 'An audit bundle showing who authorized what, which limits were evaluated, and why SatGate allowed or denied the request.'],
+  ['Signed receipt', 'An audit bundle showing who authorized what, which limits were evaluated, and why SatGate allowed or denied the request.'],
 ];
 
 export default function CapabilityLifecycleDemo() {
@@ -101,10 +101,10 @@ export default function CapabilityLifecycleDemo() {
             <ShieldCheck size={16} /> Capability lifecycle control
           </div>
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">
-            Control the full authority lifecycle: issue, delegate, attenuate, revoke, prove
+            Control the full authority lifecycle: issue, delegate, narrow, revoke, prove
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            SatGate turns macaroons and caveats into auditable controls: scoped authority, child spend caps, delegation depth, next-request revocation, and Evidence Pack audit records before governed access to paid APIs, models, or MCP tools. Observe who is acting, control what can happen, and prove the decision trail.
+            SatGate turns macaroons and caveats into auditable controls: scoped authority, child spend caps, delegation depth, next-request revocation, and signed receipt audit records before governed access to paid APIs, models, or MCP tools. Observe who is acting, control what can happen, and prove the decision trail.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <a href="#demo" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -191,7 +191,7 @@ export default function CapabilityLifecycleDemo() {
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-bold text-white">Macaroons and caveats, translated into enterprise controls</h2>
           <p className="mb-10 max-w-4xl text-lg leading-relaxed text-gray-400">
-            Attenuation becomes bounded authority: what the agent may do, how far it may delegate, how much the child may spend, when authority expires or is revoked, and what proof remains.
+            Narrowing becomes bounded authority: what the agent may do, how far it may delegate, how much the child may spend, when authority expires or is revoked, and what proof remains.
           </p>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {controlTranslations.map(([term, translation]) => (
@@ -207,7 +207,7 @@ export default function CapabilityLifecycleDemo() {
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
-            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Evidence Pack preview</p>
+            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Receipt preview</p>
             <h2 className="mb-4 text-3xl font-bold text-white">Proof after revocation</h2>
             <p className="mb-6 text-lg leading-relaxed text-gray-400">
               A complete lifecycle record does not stop at “token issued.” It captures the child capability’s narrower caveats, visible depth limit, next-request revocation result, and receipt context.
@@ -217,7 +217,7 @@ export default function CapabilityLifecycleDemo() {
                 [KeyRound, 'Scoped authority', 'route, tool, budget, tenant, task'],
                 [GitBranch, 'Delegation lineage', 'parent → child with depth visible'],
                 [Ban, 'Next-request revocation', 'blocked before the next request'],
-                [ReceiptText, 'Audit proof', 'receipt and Evidence Pack IDs'],
+                [ReceiptText, 'Audit proof', 'signed receipt (Evidence Pack) IDs'],
               ].map(([Icon, title, body]) => {
                 const CardIcon = Icon as typeof KeyRound;
                 return (
@@ -249,14 +249,14 @@ export default function CapabilityLifecycleDemo() {
         <div className="rounded-3xl border border-purple-900/60 bg-gradient-to-br from-purple-950/30 to-cyan-950/25 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">This is the capability lifecycle enterprises can govern.</h2>
           <p className="mb-8 max-w-4xl text-lg leading-relaxed text-gray-300">
-            Issue the capability, delegate a narrower child, express the caveats in plain language, revoke before the next governed request, and export the proof. That is how macaroon-style caveats become enterprise-ready agent authority controls.
+            Issue the capability, delegate a narrower child, express the caveats in plain language, revoke before the next governed request, and export the proof. That is how macaroon-style caveats become enterprise-ready controls on what an agent is allowed to do.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Generate capability policy <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
-              See Policy-to-Proof
+              See how rules and receipts work
             </Link>
           </div>
         </div>

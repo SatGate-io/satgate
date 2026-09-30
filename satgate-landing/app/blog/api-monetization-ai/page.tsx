@@ -3,12 +3,12 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "API Monetization for AI Agents: Pricing, Billing, L402, and Metering",
-  description: "How to monetize APIs for AI agents with machine-readable pricing, request-path metering, budget enforcement, and paid-rail context.",
+  description: "How to monetize APIs for AI agents with machine-readable pricing, metering before the request goes through, budget enforcement, and charging external agents.",
   alternates: { canonical: 'https://satgate.io/blog/api-monetization-ai' },
-  keywords: ['API monetization AI', 'API monetization for AI agents', 'monetize API AI', 'AI agent billing', 'machine-to-machine payments', 'API pricing AI agents', 'rail-neutral paid-rail governance'],
+  keywords: ['API monetization AI', 'API monetization for AI agents', 'monetize API AI', 'AI agent billing', 'machine-to-machine payments', 'API pricing AI agents', 'payment rules that work with any payment method'],
   openGraph: {
     title: 'API Monetization for AI Agents: Pricing, Billing, and L402',
-    description: 'Monetize APIs for AI agents with machine-readable pricing, request-path metering, budget enforcement, and paid-rail context.',
+    description: 'Monetize APIs for AI agents with machine-readable pricing, metering before the request goes through, budget enforcement, and charging external agents.',
     url: 'https://satgate.io/blog/api-monetization-ai',
     type: 'article',
     publishedTime: '2026-03-26T00:00:00Z',
@@ -17,7 +17,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'API Monetization for AI Agents: Pricing, Billing, and L402',
-    description: 'Turn APIs into paid-agent products with machine-readable prices, request-path metering, and L402 payment flows.',
+    description: 'Turn APIs into paid-agent products with machine-readable prices, metering before the request goes through, and L402 payment flows.',
   },
 };
 
@@ -35,7 +35,7 @@ export default function ApiMonetizationAiBlogPage() {
     about: [
       { '@type': 'Thing', name: 'API monetization for AI agents' },
       { '@type': 'Thing', name: 'machine-readable API pricing' },
-      { '@type': 'Thing', name: 'request-path API metering' },
+      { '@type': 'Thing', name: 'API metering before the request goes through' },
       { '@type': 'Thing', name: 'L402 API payments' },
       { '@type': 'Thing', name: 'paid agent billing' },
     ],
@@ -50,7 +50,7 @@ export default function ApiMonetizationAiBlogPage() {
         name: 'How do you monetize an API for AI agents?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Monetize APIs for AI agents by exposing machine-readable prices, enforcing per-call budgets in the request path, and accepting machine-native payment flows such as L402 instead of relying only on monthly subscriptions and static API keys.',
+          text: 'Monetize APIs for AI agents by exposing machine-readable prices, enforcing per-call budgets before the request goes through, and accepting machine-native payment flows such as L402 instead of relying only on monthly subscriptions and static API keys.',
         },
       },
       {
@@ -74,7 +74,7 @@ export default function ApiMonetizationAiBlogPage() {
         name: 'Is API monetization for AI agents the same as usage-based SaaS billing?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. Usage-based SaaS billing usually measures consumption after the fact and invoices a human account later. AI agent monetization needs machine-readable prices, request-path authorization, real-time budget checks, and machine-native payment or proof-of-payment before access is granted.',
+          text: 'No. Usage-based SaaS billing usually measures consumption after the fact and invoices a human account later. AI agent monetization needs machine-readable prices, authorization before the request goes through, real-time budget checks, and machine-native payment or proof-of-payment before access is granted.',
         },
       },
     ],
@@ -169,7 +169,7 @@ export default function ApiMonetizationAiBlogPage() {
           <h3 className="text-xl font-bold text-white mt-8 mb-3">The Delegation Problem</h3>
 
           <p className="text-gray-300 leading-relaxed">
-            In the agent economy, the entity consuming your API isn't the entity paying for it. Agent A might call your API on behalf of Agent B, which is operating under a budget set by Agent C's human operator. The payment chain involves delegation — and traditional API monetization has no concept of delegated authority.
+            In the agent economy, the entity consuming your API isn't the entity paying for it. Agent A might call your API on behalf of Agent B, which is operating under a budget set by Agent C's human operator. The payment chain involves delegation — and traditional API monetization has no concept of delegated permissions.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -224,7 +224,7 @@ X-Budget-Remaining: 4.50 USD
           <h3 className="text-xl font-bold text-white mt-8 mb-3">3. Delegated Spending Authority via Capability Tokens</h3>
 
           <p className="text-gray-300 leading-relaxed">
-            The delegation problem requires a token that carries spending authority, not just identity. <strong className="text-white">Macaroon tokens</strong> solve this by embedding attenuating caveats directly into the credential:
+            The delegation problem requires a token that carries spending authority, not just identity. <strong className="text-white">Macaroon tokens</strong> solve this by embedding narrowing caveats directly into the credential:
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
@@ -313,7 +313,7 @@ sub_agent_token = attenuate(agent_a_token, [
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Implementation: Adding AI Monetization to Your API</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            You don't need to rebuild your API to monetize it for AI. The economic governance layer sits in front of your existing infrastructure — a gateway that handles pricing, payment, and budget enforcement at the protocol level.
+            You don't need to rebuild your API to monetize it for AI. Spending controls sit in front of your existing infrastructure: a gateway that handles pricing, payment, and budget enforcement at the protocol level.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -393,7 +393,7 @@ sub_agent_token = attenuate(agent_a_token, [
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Bottom Line</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            API monetization for AI isn't a future problem — it's a present one. Every week, more agents connect to more tools via MCP. Every week, the gap between human-designed billing and machine-speed consumption grows wider. The API providers who add economic governance now will own the revenue infrastructure for the agent economy. The ones who wait will be competing on price with zero margin.
+            API monetization for AI isn't a future problem — it's a present one. Every week, more agents connect to more tools via MCP. Every week, the gap between human-designed billing and machine-speed consumption grows wider. The API providers who add spending controls now will own the revenue infrastructure for the agent economy. The ones who wait will be competing on price with zero margin.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -405,10 +405,10 @@ sub_agent_token = attenuate(agent_a_token, [
             <h2 className="mb-6 text-2xl font-bold text-white">AI API monetization questions</h2>
             <div className="space-y-5">
               {[
-                ['How do you monetize an API for AI agents?', 'Expose machine-readable prices, enforce per-call budgets in the request path, and accept machine-native payment flows such as L402 instead of relying only on monthly subscriptions and static API keys.'],
+                ['How do you monetize an API for AI agents?', 'Expose machine-readable prices, enforce per-call budgets before the request goes through, and accept machine-native payment flows such as L402 instead of relying only on monthly subscriptions and static API keys.'],
                 ['Why do traditional API pricing models break for AI workloads?', 'They assume a human signs up, manages an account, and reviews invoices. AI agents discover tools dynamically, call APIs at machine speed, delegate work to sub-agents, and can create large bills before monthly billing catches up.'],
                 ['What role does L402 play in AI API monetization?', 'L402 lets APIs return HTTP 402 Payment Required with a Lightning invoice and macaroon so an agent can pay per request and receive proof-of-payment access without human signup or credit-card billing.'],
-                ['Is API monetization for AI agents the same as usage-based SaaS billing?', 'No. Usage-based SaaS billing measures consumption after the fact and invoices a human account later. AI agent monetization needs machine-readable prices, request-path authorization, real-time budget checks, and machine-native payment or proof-of-payment before access is granted.'],
+                ['Is API monetization for AI agents the same as usage-based SaaS billing?', 'No. Usage-based SaaS billing measures consumption after the fact and invoices a human account later. AI agent monetization needs machine-readable prices, authorization before the request goes through, real-time budget checks, and machine-native payment or proof-of-payment before access is granted.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
@@ -422,7 +422,7 @@ sub_agent_token = attenuate(agent_a_token, [
           <div className="mt-16 bg-gradient-to-r from-purple-900/20 to-cyan-900/20 border border-purple-800/30 rounded-xl p-8">
             <h3 className="text-xl font-bold text-white mb-3">Ready to Monetize Your API for AI?</h3>
             <p className="text-gray-300 mb-4">
-              SatGate adds economic governance — pricing, budgets, and machine-readable payments — to any API in minutes. Start with observe mode and go live when you're ready.
+              SatGate adds spending controls (pricing, budgets, and machine-readable payments) to any API in minutes. Start with observe mode and go live when you're ready.
             </p>
             <div className="flex flex-wrap gap-3">
               <a href="https://github.com/SatGate-io/satgate" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">

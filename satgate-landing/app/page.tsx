@@ -50,9 +50,9 @@ export default function HomePage() {
         dateModified: '2026-09-26',
         isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
         about: [
-          { '@type': 'Thing', name: 'Policy-to-Proof governance' },
-          { '@type': 'Thing', name: 'Evidence Packs' },
-          { '@type': 'Thing', name: 'authority before execution' },
+          { '@type': 'Thing', name: 'rules and receipts for AI agents' },
+          { '@type': 'Thing', name: 'signed receipts (Evidence Packs)' },
+          { '@type': 'Thing', name: 'permission before the agent acts' },
           { '@type': 'Thing', name: 'MCP governance' },
           { '@type': 'Thing', name: 'economic resource admission' },
         ],

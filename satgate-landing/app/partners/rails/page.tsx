@@ -3,50 +3,50 @@ import Link from "next/link";
 import { ArrowRight, BadgeCheck, FileText, GitBranch, Handshake, Layers3, ReceiptText, ShieldCheck } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "SatGate for Payment Rails | Agent Authority & Accountability",
+  title: "SatGate for Payment Methods | Agent Permissions and Receipts",
   description:
-    "SatGate gives payment rails, API platforms, and agent ecosystems a rail-neutral authority and accountability layer: policy before action, receipts after action, and Evidence Packs for dispute-ready proof.",
+    "SatGate gives payment methods, API platforms, and agent ecosystems a permissions-and-receipts layer that works with any payment method: policy before action, receipts after action, and signed receipts (Evidence Packs) for dispute-ready proof.",
   keywords: [
-    "agent payment rail governance",
-    "AI agent authority and accountability layer",
+    "agent payment method governance",
+    "AI agent permissions and receipts",
     "x402 governance",
     "L402 governance",
     "agent payment receipts",
-    "Evidence Pack verifier",
+    "signed receipt (Evidence Pack) verifier",
     "agent accountability layer",
   ],
   alternates: { canonical: "https://satgate.io/partners/rails" },
   openGraph: {
-    title: "SatGate for Payment Rails | Agent Authority & Accountability",
+    title: "SatGate for Payment Methods | Agent Permissions and Receipts",
     description:
-      "A rail-neutral Economic Firewall for partners that need authorization, scope, budget, and Evidence Pack proof around agent-initiated transactions.",
+      "An Economic Firewall that works with any payment method, for partners that need authorization, scope, budget, and signed receipt proof around agent-initiated transactions.",
     url: "https://satgate.io/partners/rails",
     type: "website",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SatGate for Payment Rails",
+    title: "SatGate for Payment Methods",
     description:
-      "Policy before agent action. Receipts after action. Evidence Packs for partner review.",
+      "Policy before agent action. Receipts after action. Signed receipts for partner review.",
   },
 };
 
 const partnerFit = [
-  ["Payment rails", "x402, L402, Stripe, AgentCore Payments, Pay.sh, card, wallet, and ledger teams that need proof around autonomous-agent payment attempts."],
+  ["Payment methods", "x402, L402, Stripe, AgentCore Payments, Pay.sh, card, wallet, and ledger teams that need proof around autonomous-agent payment attempts."],
   ["API platforms", "Marketplaces and API providers that want scoped agent acceptance without inheriting every identity, delegation, or dispute question."],
-  ["Agent platforms", "Runtimes, MCP gateways, and orchestration layers that need one authority contract across many paid and unpaid rails."],
+  ["Agent platforms", "Runtimes, MCP gateways, and orchestration layers that need one permissions contract across payment methods and unpaid APIs."],
 ];
 
 const flow = [
-  ["1", "Authority", "The principal or platform delegates bounded capability: agent, tenant, route/tool, budget, expiry, policy version, and delegation depth."],
-  ["2", "Decision", "SatGate enforces policy in the request path before the upstream API, MCP tool, or payment rail executes."],
-  ["3", "Receipt", "Every allowed, denied, delegated, revoked, or paid decision emits a signed receipt with policy basis and rail context."],
-  ["4", "Evidence Pack", "Receipts roll into a verifiable Evidence Pack anchored by issuer JWKS and independently checked by the open verifier."],
+  ["1", "Permission", "The principal or platform passes down a bounded capability: agent, tenant, route/tool, budget, expiry, policy version, and delegation depth."],
+  ["2", "Decision", "SatGate enforces policy before the request goes through to the upstream API, MCP tool, or payment method."],
+  ["3", "Receipt", "Every allowed, denied, delegated, revoked, or paid decision emits a signed receipt with the policy basis and payment details."],
+  ["4", "Signed receipt", "Receipts roll into a verifiable bundle (Evidence Pack), anchored by issuer JWKS and independently checked by the open verifier."],
 ];
 
 const railQuestions = [
-  "Was this agent delegated authority before the transaction?",
+  "Were permissions passed down to this agent before the transaction?",
   "Which policy, tenant, budget, route, tool, and delegation chain applied?",
   "Did the decision happen before value moved or an upstream action executed?",
   "Can a partner, customer, auditor, or fraud team verify the artifact without trusting a dashboard screenshot?",
@@ -54,7 +54,7 @@ const railQuestions = [
 
 const publicArtifacts = [
   ["Public verifier", "https://github.com/SatGate-io/evidence-pack-verifier"],
-  ["Live Evidence Pack", "https://api.satgate.io/v1/evidence/evid_GrXvKUgtdqNbuQ5lZzqRMpZrOoU2VAnE"],
+  ["Live signed receipt (Evidence Pack)", "https://api.satgate.io/v1/evidence/evid_GrXvKUgtdqNbuQ5lZzqRMpZrOoU2VAnE"],
   ["Receipt schema", "https://satgate.io/.well-known/satgate-receipt.schema.json"],
   ["Partner brief PDF", "/briefs/satgate-agent-authority-rails-brief.pdf"],
 ];
@@ -64,15 +64,15 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "WebPage",
-      name: "SatGate for Payment Rails",
+      name: "SatGate for Payment Methods",
       url: "https://satgate.io/partners/rails",
       description: metadata.description,
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
       about: [
-        { "@type": "Thing", name: "agent payment rail governance" },
-        { "@type": "Thing", name: "Agent Authority & Accountability Layer" },
-        { "@type": "Thing", name: "Evidence Pack verification" },
-        { "@type": "Thing", name: "rail-neutral Economic Firewall" },
+        { "@type": "Thing", name: "agent payment method governance" },
+        { "@type": "Thing", name: "Agent Permissions and Receipts" },
+        { "@type": "Thing", name: "signed receipt (Evidence Pack) verification" },
+        { "@type": "Thing", name: "Economic Firewall that works with any payment method" },
       ],
     },
     {
@@ -80,7 +80,7 @@ const jsonLd = {
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: "https://satgate.io" },
         { "@type": "ListItem", position: 2, name: "Partners", item: "https://satgate.io/partners/rails" },
-        { "@type": "ListItem", position: 3, name: "Rails", item: "https://satgate.io/partners/rails" },
+        { "@type": "ListItem", position: 3, name: "Payment methods", item: "https://satgate.io/partners/rails" },
       ],
     },
   ],
@@ -100,23 +100,23 @@ export default function RailPartnersPage() {
               <Handshake size={14} /> Partner brief
             </div>
             <h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">
-              Agent authority for every payment rail.
+              Agent permissions for every payment method.
             </h1>
             <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
-              Rails can authorize value movement. SatGate proves the agent was allowed to attempt it: who delegated authority, which policy applied, what budget was left, and what evidence exists after the decision.
+              Payment methods can authorize value movement. SatGate proves the agent was allowed to attempt it: who passed permissions down, which policy applied, what budget was left, and what evidence exists after the decision.
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
-              Paid rails keep changing. SatGate’s Agent Authority & Accountability Layer sits above x402, L402, Stripe, AgentCore Payments, Pay.sh, API-key billing, and enterprise ledgers.
+              Payment methods keep changing. SatGate’s Agent Permissions and Receipts layer sits above x402, L402, Stripe, AgentCore Payments, Pay.sh, API-key billing, and enterprise ledgers.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a href="/briefs/satgate-agent-authority-rails-brief.pdf" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
                 Download partner brief <FileText size={18} />
               </a>
               <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
-                See the authority and accountability layer <ArrowRight size={18} />
+                See agent permissions and receipts <ArrowRight size={18} />
               </Link>
               <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
-                See Policy-to-Proof <ArrowRight size={18} />
+                See how rules and receipts work <ArrowRight size={18} />
               </Link>
             </div>
           </div>
@@ -139,9 +139,9 @@ export default function RailPartnersPage() {
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="mb-10 max-w-3xl">
           <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-purple-300">Partner fit</p>
-          <h2 className="text-3xl font-bold text-white sm:text-4xl">SatGate is useful when a rail does not want to become the whole governance stack.</h2>
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">SatGate is useful when a payment method does not want to become the whole governance stack.</h2>
           <p className="mt-5 text-lg leading-8 text-gray-400">
-            A single rail sees the transaction. Enterprises need proof across tools, APIs, delegations, budgets, denials, and retries. SatGate preserves that authority chain and gives partners a verifiable artifact to evaluate.
+            A single payment method sees the transaction. Enterprises need proof across tools, APIs, delegations, budgets, denials, and retries. SatGate preserves that chain of permissions and gives partners a verifiable artifact to evaluate.
           </p>
         </div>
         <div className="grid gap-6 md:grid-cols-3">
@@ -158,7 +158,7 @@ export default function RailPartnersPage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="mb-10 max-w-3xl">
-            <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-emerald-300">Policy-to-Proof</p>
+            <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-emerald-300">Rules and Receipts</p>
             <h2 className="text-3xl font-bold text-white sm:text-4xl">The handoff is simple: policy in, receipt out.</h2>
           </div>
           <div className="grid gap-4 md:grid-cols-4">
@@ -178,14 +178,14 @@ export default function RailPartnersPage() {
           <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-cyan-300">Public proof</p>
           <h2 className="text-3xl font-bold text-white sm:text-4xl">Partners should not have to trust a screenshot.</h2>
           <p className="mt-5 text-lg leading-8 text-gray-400">
-            Evidence Packs are signed and externally verifiable. A partner, customer, or reviewer can fetch the pack, discover issuer keys, recompute receipt hashes, and verify the signature with the open-source verifier.
+            A signed receipt (Evidence Pack) can be checked outside SatGate. A partner, customer, or reviewer can fetch it, discover issuer keys, recompute receipt hashes, and verify the signature with the open-source verifier.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <a href="https://github.com/SatGate-io/evidence-pack-verifier" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Open verifier <ArrowRight size={18} />
             </a>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
-              See Policy-to-Proof
+              See how rules and receipts work
             </Link>
           </div>
         </div>
@@ -206,16 +206,16 @@ export default function RailPartnersPage() {
 
       <section className="border-t border-gray-900 px-6 py-20 text-center">
         <ShieldCheck className="mx-auto mb-6 text-cyan-300" size={36} />
-        <h2 className="mx-auto max-w-3xl text-3xl font-bold text-white sm:text-4xl">Build the rail. Let SatGate carry agent authority and evidence across it.</h2>
+        <h2 className="mx-auto max-w-3xl text-3xl font-bold text-white sm:text-4xl">Build the payment method. Let SatGate carry agent permissions and evidence across it.</h2>
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-gray-400">
-          The partner conversation starts with receipts: what the rail sees, what SatGate proves, and what the ecosystem can verify later.
+          The partner conversation starts with receipts: what the payment method sees, what SatGate proves, and what the ecosystem can verify later.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a href="mailto:contact@satgate.io?subject=SatGate%20rail%20partner%20brief" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
             Talk to SatGate <ArrowRight size={18} />
           </a>
           <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-400">
-            Developer primitives <GitBranch size={18} />
+            Developer building blocks <GitBranch size={18} />
           </Link>
         </div>
       </section>

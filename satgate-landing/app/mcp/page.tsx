@@ -39,12 +39,12 @@ const cards = [
   {
     href: '/blog/mcp-budget-enforcement-guide',
     title: 'MCP budget enforcement guide',
-    description: 'How per-tool costs, session caps and delegated budgets stop a tool call before it runs.',
+    description: 'How per-tool costs, session caps and budgets for sub-agents stop a tool call before it runs.',
     icon: Gauge,
   },
   {
     href: '/verify-evidence-pack',
-    title: 'Verify an Evidence Pack',
+    title: 'Verify a signed receipt (Evidence Pack)',
     description: 'Check signed MCP receipts against the published keys with the open-source verifier.',
     icon: ShieldCheck,
   },
@@ -101,7 +101,7 @@ export default function MCPPage() {
         name: 'What is MCP governance?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'MCP governance is the control layer around Model Context Protocol tool calls: budgets, scoped authority, revocation, Evidence Packs, and risk actions before agents execute tools.',
+          text: 'MCP governance is the control layer around Model Context Protocol tool calls: budgets, scoped authority, revocation, signed receipts, and risk actions before agents execute tools.',
         },
       },
       {
@@ -109,7 +109,7 @@ export default function MCPPage() {
         name: 'Why do MCP tools need budget enforcement?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Autonomous agents can call paid or risky tools repeatedly, delegate work, or loop. MCP budget enforcement stops over-budget tool calls in the request path instead of discovering spend after the fact.',
+          text: 'Autonomous agents can call paid or risky tools repeatedly, delegate work, or loop. MCP budget enforcement stops over-budget tool calls before the request goes through instead of discovering spend after the fact.',
         },
       },
       {
@@ -212,7 +212,7 @@ export default function MCPPage() {
           <li className="rounded-2xl border border-gray-800 bg-black p-6 text-gray-400"><span className="font-bold text-white">Admit.</span> Charge external agents on the HTTP routes you choose. You set how many requests a Lightning payment buys; a USDC payment buys one. See <Link href="/pricing" className="text-purple-300 hover:text-purple-200">pricing</Link>.</li>
         </ul>
         <p className="mt-6 max-w-4xl text-gray-400">
-          Each allowed or refused call gets a signed receipt, so you can prove what an agent was allowed to do. Export receipts as an Evidence Pack and <Link href="/verify-evidence-pack" className="text-purple-300 hover:text-purple-200">verify them yourself</Link>. For the budget model in detail, read the <Link href="/blog/mcp-budget-enforcement-guide" className="text-purple-300 hover:text-purple-200">MCP budget enforcement guide</Link>, or start from the <Link href="/build" className="text-purple-300 hover:text-purple-200">developer page</Link>.
+          Each allowed or refused call gets a signed receipt, so you can prove what an agent was allowed to do. Export those receipts as an Evidence Pack and <Link href="/verify-evidence-pack" className="text-purple-300 hover:text-purple-200">verify them yourself</Link>. For the budget model in detail, read the <Link href="/blog/mcp-budget-enforcement-guide" className="text-purple-300 hover:text-purple-200">MCP budget enforcement guide</Link>, or start from the <Link href="/build" className="text-purple-300 hover:text-purple-200">developer page</Link>.
         </p>
       </section>
 
@@ -220,7 +220,7 @@ export default function MCPPage() {
         <div className="mx-auto grid max-w-6xl gap-8 px-6 py-20 lg:grid-cols-3">
           {[
             ['Price every tool', 'Assign cost profiles to MCP tools so agents cannot treat expensive operations like free function calls.'],
-            ['Enforce before execution', 'Block over-budget or out-of-scope tool calls before they reach the upstream MCP server.'],
+            ['Enforce before the call runs', 'Block over-budget or out-of-scope tool calls before they reach the upstream MCP server.'],
             ['Audit every decision', 'Emit receipt-backed proof for agent, workflow, tool, policy, budget, paid-call, denial, delegation, and revocation decisions.'],
           ].map(([title, body]) => (
             <div key={title} className="rounded-2xl border border-gray-800 bg-black p-6">
@@ -235,8 +235,8 @@ export default function MCPPage() {
         <h2 className="mb-8 text-3xl font-bold text-white">MCP governance FAQ</h2>
         <div className="space-y-5">
           {[
-            ['What is MCP governance?', 'MCP governance is the control layer around Model Context Protocol tool calls: budgets, scoped authority, revocation, Evidence Packs, and risk actions before agents execute tools.'],
-            ['Why do MCP tools need budget enforcement?', 'Autonomous agents can call paid or risky tools repeatedly, delegate work, or loop. MCP budget enforcement stops over-budget tool calls in the request path instead of discovering spend after the fact.'],
+            ['What is MCP governance?', 'MCP governance is the control layer around Model Context Protocol tool calls: budgets, scoped authority, revocation, signed receipts, and risk actions before agents execute tools.'],
+            ['Why do MCP tools need budget enforcement?', 'Autonomous agents can call paid or risky tools repeatedly, delegate work, or loop. MCP budget enforcement stops over-budget tool calls before the request goes through instead of discovering spend after the fact.'],
             ['How does SatGate control MCP spend?', 'SatGate can proxy MCP traffic and enforce per-tool prices, session caps, workflow budgets, capability caveats, revocation, and audit requirements before tool calls reach the upstream MCP server.'],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">

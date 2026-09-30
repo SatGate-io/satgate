@@ -3,19 +3,19 @@ import { ArrowRight, Bot, DollarSign, Gauge, KeyRound, ShieldCheck, Terminal, Wo
 
 export const metadata = {
   title: 'SatGate for OpenClaw Agents',
-  description: 'Use SatGate as the Agent Authority & Accountability Layer for governed OpenClaw execution across sub-agents, tools, MCP calls, model routes, and API spend.',
+  description: 'Use SatGate as the Agent Permissions and Receipts for governed OpenClaw execution across sub-agents, tools, MCP calls, model routes, and API spend.',
   alternates: { canonical: 'https://satgate.io/satgate-for-openclaw' },
   keywords: [
     'SatGate for OpenClaw',
     'OpenClaw agent spend control',
     'OpenClaw MCP budget enforcement',
     'AI agent cost control',
-    'Agent Authority & Accountability Layer',
+    'Agent Permissions and Receipts',
     'revocable agent credentials',
   ],
   openGraph: {
     title: 'SatGate for OpenClaw Agents',
-    description: 'Use SatGate as the Agent Authority & Accountability Layer for governed OpenClaw execution across sub-agents, tools, MCP calls, model routes, and API spend.',
+    description: 'Use SatGate as the Agent Permissions and Receipts for governed OpenClaw execution across sub-agents, tools, MCP calls, model routes, and API spend.',
     url: 'https://satgate.io/satgate-for-openclaw',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -23,7 +23,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate for OpenClaw Agents',
-    description: 'Use SatGate as the Agent Authority & Accountability Layer for governed OpenClaw execution across sub-agents, tools, MCP calls, model routes, and API spend.',
+    description: 'Use SatGate as the Agent Permissions and Receipts for governed OpenClaw execution across sub-agents, tools, MCP calls, model routes, and API spend.',
   },
 };
 
@@ -63,7 +63,7 @@ export default function SatGateIntegrationPage() {
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-04',
     about: webPageJsonLd.about,
-    featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'Request-path Evidence Packs', 'rail-neutral paid-rail governance'],
+    featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'signed receipts before the request goes through', 'payment rules that work with any payment method'],
   };
 
   const faqJsonLd = {
@@ -73,12 +73,12 @@ export default function SatGateIntegrationPage() {
       {
         '@type': 'Question',
         name: 'How does SatGate fit with OpenClaw?',
-        acceptedAnswer: { '@type': 'Answer', text: 'OpenClaw coordinates agents and tools. SatGate governs the economics of those requests: who can spend, on what, under which budget, and with which Evidence Pack.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'OpenClaw coordinates agents and tools. SatGate governs the economics of those requests: who can spend, on what, under which budget, and with which signed receipt.' },
       },
       {
         '@type': 'Question',
         name: 'Is SatGate just another observability dashboard?',
-        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, Evidence Pack receipts, and paid-rail context at the gateway before forwarding.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate can observe traffic, but its core role is to check before the request goes through. Those checks cover budgets, revocation, route policy, capabilities, signed receipts, and payment details at the gateway before forwarding.' },
       },
       {
         '@type': 'Question',
@@ -111,12 +111,12 @@ export default function SatGateIntegrationPage() {
             <Terminal size={16} /> OpenClaw agent spend control
           </div>
 
-          <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Give OpenClaw agents authority before execution</h1>
-          <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">OpenClaw agents can run tools, spawn sub-agents, call MCP servers, route through models, and act across workflows. SatGate adds the Agent Authority & Accountability Layer underneath: Observe, Control, and Prove agent/API activity at the gateway before forwarding.</p>
+          <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Give OpenClaw agents permission before they act</h1>
+          <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">OpenClaw agents can run tools, spawn sub-agents, call MCP servers, route through models, and act across workflows. SatGate adds Agent Permissions and Receipts underneath: Observe and Control for agent activity, plus a signed receipt, at the gateway before forwarding.</p>
 
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-              See Policy-to-Proof <ArrowRight size={18} />
+              See how rules and receipts work <ArrowRight size={18} />
             </Link>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               AI agent cost control
@@ -127,7 +127,7 @@ export default function SatGateIntegrationPage() {
 
       <section className="mx-auto grid max-w-6xl gap-12 px-6 py-20 lg:grid-cols-[1fr_0.9fr]">
         <div>
-          <h2 className="mb-6 text-3xl font-bold text-white">Why OpenClaw workflows need request-path economics</h2>
+          <h2 className="mb-6 text-3xl font-bold text-white">Why OpenClaw workflows need spend checks before the request goes through</h2>
           <div className="space-y-5 text-lg leading-relaxed text-gray-300">
             <p>Autonomous agents are not normal SaaS users. They can retry, loop, delegate, and call tools faster than a human operator can review a bill.</p>
             <p>SatGate sits between those agents and the upstream API, MCP server, model provider, or protected resource. Every request gets an economic decision before access is granted.</p>
@@ -147,7 +147,7 @@ export default function SatGateIntegrationPage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-bold text-white">SatGate controls for OpenClaw</h2>
-          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the governance layer around agentic tool use: Observe first, Control when limits are known, and Prove every approval, denial, and paid-access decision with Evidence Pack receipts.</p>
+          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the governance layer around agentic tool use: Observe first, Control when limits are known, and keep a signed receipt for every approval, denial, and paid-access decision.</p>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {controls.map(({ icon: Icon, title, body }) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-black p-6 transition hover:border-cyan-900/70">
@@ -169,7 +169,7 @@ export default function SatGateIntegrationPage() {
               <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">1</span><span>Route OpenClaw tool/API/model traffic through SatGate where spend or access matters.</span></li>
               <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">2</span><span>Mint scoped capabilities per agent, session, task, route, or MCP server.</span></li>
               <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">3</span><span>Apply Observe first, then Control budgets, revocation, and kill switches.</span></li>
-              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">4</span><span>Use paid-rail governance for external paid-agent access to protected APIs.</span></li>
+              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">4</span><span>Use payment rules for external paid-agent access to protected APIs.</span></li>
         </ol>
       </section>
 
@@ -178,8 +178,8 @@ export default function SatGateIntegrationPage() {
           <h2 className="mb-6 text-3xl font-bold text-white">OpenClaw governance FAQ</h2>
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              ['How does SatGate fit with OpenClaw?', 'OpenClaw coordinates agents and tools. SatGate governs the economics of those requests: who can spend, on what, under which budget, and with which Evidence Pack.'],
-              ['Is SatGate just another observability dashboard?', 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, Evidence Pack receipts, and paid-rail context at the gateway before forwarding.'],
+              ['How does SatGate fit with OpenClaw?', 'OpenClaw coordinates agents and tools. SatGate governs the economics of those requests: who can spend, on what, under which budget, and with which signed receipt.'],
+              ['Is SatGate just another observability dashboard?', 'No. SatGate can observe traffic, but its core role is to check before the request goes through. Those checks cover budgets, revocation, route policy, capabilities, signed receipts, and payment details at the gateway before forwarding.'],
               ['Can SatGate start in observe-only mode?', 'Yes. Teams can start with Observe to map agent and tool spend, then graduate to Control policies once safe limits are clear.'],
             ].map(([question, answer]) => (
               <div key={question}>
@@ -195,7 +195,7 @@ export default function SatGateIntegrationPage() {
         <div className="rounded-3xl border border-purple-900/40 bg-gradient-to-br from-purple-950/40 to-cyan-950/20 p-8 md:p-10">
           <div className="mb-4 flex items-center gap-3 text-purple-200"><Bot size={24} /><span className="font-semibold">Observe → Control → Prove</span></div>
           <h2 className="mb-4 text-3xl font-bold text-white">Make OpenClaw agent activity governable.</h2>
-          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate gives agent teams the missing economic layer: budgets, scoped authority, revocation, Evidence Pack receipts, and paid-rail context where external agents need governed API access.</p>
+          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate gives agent teams the missing economic layer: budgets, scoped authority, revocation, signed receipts, and payment details where external agents need governed API access.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-300 px-6 py-3 font-bold text-black transition hover:bg-cyan-200">
               MCP budget enforcement <Gauge size={18} />

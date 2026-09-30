@@ -4,12 +4,12 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "LLM Cost Management: Dashboards, Budgets, and Hard Controls",
-  description: "Compare LLM cost dashboards, monitoring, budgets, and request-path enforcement. Move from Observe to Control to Evidence Pack proof.",
+  description: "Compare LLM cost dashboards, monitoring, budgets, and enforcement before the request goes through. Move from Observe to Control to signed receipt proof.",
   alternates: { canonical: 'https://satgate.io/blog/llm-cost-management' },
-  keywords: ['LLM cost dashboard', 'LLM monitoring dashboard', 'LLM cost management', 'LLM cost control', 'LLM tracing dashboard', 'cost latency per request', 'AI budget enforcement', 'AI agent cost control', 'request-path budget enforcement'],
+  keywords: ['LLM cost dashboard', 'LLM monitoring dashboard', 'LLM cost management', 'LLM cost control', 'LLM tracing dashboard', 'cost latency per request', 'AI budget enforcement', 'AI agent cost control', 'budget enforcement before the request goes through'],
   openGraph: {
     title: 'LLM Cost Management: Dashboards, Budgets, and Hard Controls',
-    description: 'Compare LLM cost dashboards, monitoring, budgets, and request-path enforcement. Move from Observe to Control to Evidence Pack proof.',
+    description: 'Compare LLM cost dashboards, monitoring, budgets, and enforcement before the request goes through. Move from Observe to Control to signed receipt proof.',
     url: 'https://satgate.io/blog/llm-cost-management',
     type: 'article',
     publishedTime: '2026-03-17T00:00:00Z',
@@ -18,7 +18,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'LLM Cost Management: Dashboards, Budgets, and Hard Controls',
-    description: 'LLM cost dashboards are only the first step. Add budgets, request-path controls, and Evidence Pack proof for agent spend.',
+    description: 'LLM cost dashboards are only the first step. Add budgets, checks before the request goes through, and signed receipt proof for agent spend.',
   },
 };
 
@@ -39,7 +39,7 @@ export default function LlmCostManagementBlogPage() {
       { '@type': 'Thing', name: 'LLM monitoring dashboard design patterns' },
       { '@type': 'Thing', name: 'cost and latency per request tracing' },
       { '@type': 'Thing', name: 'AI agent spend enforcement' },
-      { '@type': 'Thing', name: 'request-path budget enforcement' },
+      { '@type': 'Thing', name: 'budget enforcement before the request goes through' },
       { '@type': 'Thing', name: 'runaway token and tool spend control' },
     ],
   };
@@ -61,7 +61,7 @@ export default function LlmCostManagementBlogPage() {
         name: 'Is an LLM monitoring dashboard enough to control agent spend?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. Monitoring dashboards explain what happened after calls execute. Autonomous agents also need request-path budget enforcement so expensive LLM, API, and MCP tool calls can be blocked, downgraded, or charged before spend occurs.',
+          text: 'No. Monitoring dashboards explain what happened after calls execute. Autonomous agents also need budget enforcement before the request goes through so expensive LLM, API, and MCP tool calls can be blocked, downgraded, or charged before spend occurs.',
         },
       },
       {
@@ -77,7 +77,7 @@ export default function LlmCostManagementBlogPage() {
         name: 'What platforms provide an LLM cost dashboard with cost and latency per request?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'LLM observability platforms can show cost and latency per trace, but teams running autonomous agents should also require request-path budget enforcement. The dashboard should expose token cost, latency, customer account, trace ID, agent, tool, and the allow/block/downgrade budget decision for every request.',
+          text: 'LLM observability platforms can show cost and latency per trace, but teams running autonomous agents should also require budget enforcement before the request goes through. The dashboard should expose token cost, latency, customer account, trace ID, agent, tool, and the allow/block/downgrade budget decision for every request.',
         },
       },
     ],
@@ -102,17 +102,17 @@ export default function LlmCostManagementBlogPage() {
           <div className="flex flex-wrap gap-2 mb-4">
             <span className="px-2 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono">Cost Control</span>
             <span className="px-2 py-1 rounded-full bg-cyan-900/30 border border-cyan-500/30 text-cyan-300 text-xs font-mono">LLM</span>
-            <span className="px-2 py-1 rounded-full bg-yellow-900/30 border border-yellow-500/30 text-yellow-300 text-xs font-mono">Policy-to-Proof</span>
+            <span className="px-2 py-1 rounded-full bg-yellow-900/30 border border-yellow-500/30 text-yellow-300 text-xs font-mono">Rules and Receipts</span>
           </div>
           
           <h1 className="text-4xl font-bold mb-4">LLM Cost Management Needs More Than Dashboards</h1>
           <div className="mb-6 rounded-2xl border border-yellow-900/60 bg-yellow-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-yellow-300">Short answer</p>
-            <p className="text-gray-300">Dashboards explain token spend after the fact. Real LLM cost management connects every model, tool, agent, and workflow to a budget decision before the next request runs, then Proves the decision with an Evidence Pack.</p>
+            <p className="text-gray-300">Dashboards explain token spend after the fact. Real LLM cost management connects every model, tool, agent, and workflow to a budget decision before the next request runs, then Proves the decision with a signed receipt.</p>
           </div>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row">
             <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Use the LLM cost dashboard checklist</Link>
-            <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-yellow-500">Turn monitoring into Policy-to-Proof controls</Link>
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-yellow-500">Turn monitoring into rules and receipts</Link>
           </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
@@ -340,10 +340,10 @@ Authorization: Bearer macaroon_v1_agent42_budget500
             With capability-based budgets, the orchestrator <em>delegates a portion</em> of its budget to each sub-agent. The research agent gets 2,000 credits. Each scraper gets 200. Summarizers get 50. The total can never exceed the parent's allocation. It's hierarchical and cryptographically enforced — the constraint lives in the credential, not in a policy document.
           </p>
 
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Policy-to-Proof Approach</h2>
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Rules and Receipts Approach</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            SatGate implements these four capabilities as request-path governance: a policy enforcement point between your agents and the LLM providers they call, plus Evidence Packs that prove what was allowed or denied later.
+            SatGate implements these four capabilities as governance that checks before the request goes through: a policy enforcement point between your agents and the LLM providers they call, plus signed receipts that prove what was allowed or denied later.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -398,7 +398,7 @@ satgate mint \\
             <div>
               <h3 className="text-xl font-bold text-white mb-2">Is an LLM monitoring dashboard enough to control agent spend?</h3>
               <p className="text-gray-300 leading-relaxed mb-0">
-                No. Monitoring dashboards explain what happened after calls execute. Autonomous agents also need request-path budget enforcement so expensive LLM, API, and MCP tool calls can be blocked, downgraded, or charged before spend occurs.
+                No. Monitoring dashboards explain what happened after calls execute. Autonomous agents also need budget enforcement before the request goes through so expensive LLM, API, and MCP tool calls can be blocked, downgraded, or charged before spend occurs.
               </p>
             </div>
             <div>
@@ -447,7 +447,7 @@ satgate mint \\
             <p className="mb-4 text-gray-300">If a page is already earning LLM cost management impressions, route that intent into the pages that convert: tools and comparison pages.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">AI agent governance →</Link>
-              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
+              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">See how rules and receipts work →</Link>
               <Link href="/build" className="text-cyan-300 hover:text-cyan-200">Build with SatGate →</Link>
               <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">MCP cost control →</Link>
               <Link href="/mcp-proxy-config-generator" className="text-cyan-300 hover:text-cyan-200">MCP proxy config generator →</Link>
@@ -458,7 +458,7 @@ satgate mint \\
 
           <div className="my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">Turn monitoring into a dashboard and policy loop</h3>
-            <p className="mb-4 text-gray-300">If you are comparing LLM cost dashboards or monitoring tools, start with the visibility checklist — then turn the risky signals into request-path controls.</p>
+            <p className="mb-4 text-gray-300">If you are comparing LLM cost dashboards or monitoring tools, start with the visibility checklist — then turn the risky signals into checks before the request goes through.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/llm-cost-dashboard" className="text-cyan-300 hover:text-cyan-200">LLM cost dashboard checklist →</Link>
               <Link href="/llm-cost-monitoring" className="text-cyan-300 hover:text-cyan-200">LLM cost monitoring guide →</Link>
@@ -469,10 +469,10 @@ satgate mint \\
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">SatGate path: Observe → Control → Prove</h3>
             <p className="mb-4 text-gray-300">
-              Start by observing agent, API, and MCP usage. Move to request-path control when budgets, scopes, and revocation need to stop bad calls before they run. Preserve Evidence Packs so every allow, deny, and budget decision can be verified later.
+              Start by observing agent, API, and MCP usage. Move to checks before the request goes through when budgets, scopes, and revocation need to stop bad calls before they run. Preserve signed receipts so every allow, deny, and budget decision can be verified later.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
-              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
+              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">See how rules and receipts work →</Link>
               <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>

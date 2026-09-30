@@ -73,15 +73,15 @@ export default function ROICalculatorPage() {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     name: 'AI Agent ROI Calculator',
-    description: 'Estimate runaway AI agent loop exposure, budget-control ROI, and the receipts needed for Policy-to-Proof evidence across paid APIs and MCP tools.',
+    description: 'Estimate runaway AI agent loop exposure, budget-control ROI, and signed receipts across paid APIs and MCP tools.',
     url: 'https://satgate.io/roi-calculator',
     dateModified: '2026-05-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent ROI calculator' },
       { '@type': 'Thing', name: 'runaway AI agent loop exposure' },
-      { '@type': 'Thing', name: 'request-path budget enforcement ROI' },
-      { '@type': 'Thing', name: 'Policy-to-Proof receipts' },
+      { '@type': 'Thing', name: 'budget enforcement ROI before the request goes through' },
+      { '@type': 'Thing', name: 'signed receipts' },
       { '@type': 'Thing', name: 'MCP tool spend risk' },
       { '@type': 'Thing', name: 'economic firewall payback period' },
     ],
@@ -94,14 +94,14 @@ export default function ROICalculatorPage() {
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/roi-calculator',
-    description: 'Estimate runaway agent loop exposure, budget-control ROI, and the receipts needed for Policy-to-Proof evidence.',
+    description: 'Estimate runaway agent loop exposure, budget-control ROI, and signed receipts.',
     featureList: [
       'Monthly AI agent tool spend estimate',
       'Runaway loop ghost spend exposure',
       'Annual AI agent cost-risk model',
-      'Request-path budget enforcement savings estimate',
+      'Savings from budget checks before the request goes through',
       'Payback period and annual ROI estimate',
-      'Links from ROI exposure to Policy-to-Proof controls and Evidence Pack receipts',
+      'Links from ROI exposure to rules and receipts, and to signed receipts',
     ],
     audience: [
       { '@type': 'Audience', audienceType: 'Platform engineering teams' },
@@ -156,7 +156,7 @@ export default function ROICalculatorPage() {
         name: 'What should I do after estimating runaway agent spend?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Turn the exposure model into Policy-to-Proof controls: define authority, budget limits, MCP tool caps, scoped capability-token policy, receipts, and Evidence Pack exports.',
+          text: 'Turn the exposure model into rules and receipts: define authority, budget limits, MCP tool caps, scoped capability-token policy, receipts, and receipt exports.',
         },
       },
       {
@@ -172,7 +172,7 @@ export default function ROICalculatorPage() {
         name: 'How do ROI results become evidence?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Use Policy-to-Proof to connect budget policy, request decisions, receipts, and Evidence Pack exports for audit-ready agent governance.',
+          text: 'Use rules and receipts to connect budget policy, request decisions, receipts, and receipt exports for audit-ready agent governance.',
         },
       },
       {
@@ -180,7 +180,7 @@ export default function ROICalculatorPage() {
         name: 'What is a good payback period for AI agent budget enforcement?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'For agentic systems with paid tool access, payback can be measured in days when a small number of runaway loops or expensive MCP calls would exceed the monthly cost of request-path budget enforcement.',
+          text: 'For agentic systems with paid tool access, payback can be measured in days when a small number of runaway loops or expensive MCP calls would exceed the monthly cost of budget enforcement before the request goes through.',
         },
       },
       {
@@ -198,7 +198,7 @@ export default function ROICalculatorPage() {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
     name: 'How to estimate AI agent budget enforcement ROI',
-    description: 'Use the SatGate ROI calculator to estimate unmanaged AI agent loop exposure, budget-control ROI, and Policy-to-Proof receipt coverage.',
+    description: 'Use the SatGate ROI calculator to estimate unmanaged AI agent loop exposure, budget-control ROI, and signed receipt coverage.',
     totalTime: 'PT3M',
     tool: [{ '@type': 'HowToTool', name: 'SatGate AI Agent ROI Calculator' }],
     step: [
@@ -220,7 +220,7 @@ export default function ROICalculatorPage() {
       {
         '@type': 'HowToStep',
         name: 'Review enforcement savings',
-        text: 'Compare unmanaged cost exposure with SatGate request-path budget enforcement to estimate savings, payback period, and annual ROI.',
+        text: 'Compare unmanaged cost exposure with SatGate budget enforcement before the request goes through to estimate savings, payback period, and annual ROI.',
       },
     ],
   };
@@ -235,7 +235,7 @@ export default function ROICalculatorPage() {
         '@type': 'ListItem',
         position: 1,
         name: 'Runaway MCP tool loop',
-        description: 'An agent repeatedly calls a paid MCP tool until request-path budget enforcement blocks the loop.',
+        description: 'An agent repeatedly calls a paid MCP tool until budget enforcement before the request goes through blocks the loop.',
       },
       {
         '@type': 'ListItem',
@@ -256,7 +256,7 @@ export default function ROICalculatorPage() {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: 'AI agent budget enforcement break-even examples',
-    description: 'Examples that show when request-path budget enforcement can pay for itself by enforcing authority, budget, and receipt policy before agent execution.',
+    description: 'Examples that show when budget enforcement before the request goes through can pay for itself by enforcing authority, budget, and receipt policy before the agent acts.',
     itemListElement: [
       {
         '@type': 'ListItem',
@@ -307,7 +307,7 @@ export default function ROICalculatorPage() {
           </Link>
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
             <Link href="/govern" className="hover:text-white transition">Govern</Link>
-            <Link href="/policy-to-proof" className="hover:text-white transition">Policy-to-Proof</Link>
+            <Link href="/policy-to-proof" className="hover:text-white transition">Rules and Receipts</Link>
             <Link href="/tools" className="hover:text-white transition">Tools</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
             <Link href="/roi-calculator" className="text-white transition">ROI Calculator</Link>
@@ -326,7 +326,7 @@ export default function ROICalculatorPage() {
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
             {[
               { href: '/govern', label: 'Govern' },
-              { href: '/policy-to-proof', label: 'Policy-to-Proof' },
+              { href: '/policy-to-proof', label: 'Rules and Receipts' },
               { href: '/tools', label: 'Tools' },
               { href: '/pricing', label: 'Pricing' },
               { href: '/roi-calculator', label: 'ROI Calculator' },
@@ -446,15 +446,15 @@ export default function ROICalculatorPage() {
         <div className="max-w-5xl mx-auto rounded-2xl border border-gray-800 bg-gray-900/60 p-6 md:p-8">
           <div className="mb-6 max-w-3xl">
             <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Go deeper</p>
-            <h2 className="mb-3 text-2xl md:text-3xl font-bold text-white">Turn the ROI model into Policy-to-Proof</h2>
+            <h2 className="mb-3 text-2xl md:text-3xl font-bold text-white">Turn the ROI model into Rules and Receipts</h2>
             <p className="text-gray-400">
-              The calculator shows the exposure. SatGate maps it to enforceable authority checks, receipts, and an Evidence Pack before agents execute.
+              The calculator shows the exposure. SatGate maps it to enforceable authority checks, receipts, and a signed receipt (Evidence Pack) before agents execute.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
-              { href: '/policy-to-proof', title: 'Map ROI to Policy-to-Proof', body: 'Connect exposure to enforceable checks, receipts, and an Evidence Pack.' },
-              { href: '/govern', title: 'Govern agent execution', body: 'Put authority, budget, and audit policy in the request path before execution.' },
+              { href: '/policy-to-proof', title: 'Map ROI to Rules and Receipts', body: 'Connect exposure to enforceable checks, receipts, and a signed receipt (Evidence Pack).' },
+              { href: '/govern', title: 'Govern agent execution', body: 'Put authority, budget, and audit policy in place before the request goes through.' },
               { href: '/build', title: 'Build with SatGate', body: 'Mint an agent token with a budget, expiry and revoke.' },
             ].map((item) => (
               <Link key={item.href} href={item.href} className="block rounded-xl border border-gray-800 bg-black/40 p-5 transition hover:border-cyan-500/40 hover:bg-cyan-950/20">
@@ -482,7 +482,7 @@ export default function ROICalculatorPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-black/40 p-5">
               <h3 className="mb-2 font-bold text-white">SatGate savings model</h3>
-              <p className="text-sm leading-relaxed text-gray-400">Request-path budget enforcement denies over-budget requests at the gateway before forwarding to upstream APIs or MCP tools.</p>
+              <p className="text-sm leading-relaxed text-gray-400">Budget enforcement before the request goes through denies over-budget requests at the gateway before forwarding to upstream APIs or MCP tools.</p>
             </div>
           </div>
         </div>
@@ -494,7 +494,7 @@ export default function ROICalculatorPage() {
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-red-300">Risk scenarios</p>
           <h2 className="mb-4 text-2xl md:text-3xl font-bold text-white">Where runaway agent ROI usually comes from</h2>
           <p className="mb-8 max-w-3xl text-gray-400 leading-relaxed">
-            The model is most useful when teams connect it to a concrete failure mode. These are the three agent-spend patterns that usually make request-path budget enforcement pay back fastest.
+            The model is most useful when teams connect it to a concrete failure mode. These are the three agent-spend patterns that usually make budget enforcement before the request goes through pay back fastest.
           </p>
           <div className="grid gap-5 md:grid-cols-3">
             {[
@@ -515,7 +515,7 @@ export default function ROICalculatorPage() {
       <section className="pb-20 px-6">
         <div className="max-w-5xl mx-auto rounded-2xl border border-green-900/50 bg-green-950/10 p-6 md:p-8">
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-green-300">Break-even examples</p>
-          <h2 className="mb-4 text-2xl md:text-3xl font-bold text-white">When request-path budget enforcement pays for itself</h2>
+          <h2 className="mb-4 text-2xl md:text-3xl font-bold text-white">When enforcement before the request goes through pays for itself</h2>
           <p className="mb-8 max-w-3xl text-gray-400 leading-relaxed">
             The calculator is most persuasive when it ties avoided waste to a specific operating model: internal agents, MCP tools, or externally exposed agent access.
           </p>
@@ -592,7 +592,7 @@ export default function ROICalculatorPage() {
             <div>
               <h3 className="mb-2 text-xl font-bold text-white">What should I do after estimating runaway agent spend?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Turn the exposure model into Policy-to-Proof controls: define authority, budget limits, MCP tool caps, scoped capability-token policy, receipts, and Evidence Pack exports.
+                Turn the exposure model into rules and receipts: define authority, budget limits, MCP tool caps, scoped capability-token policy, receipts, and receipt exports.
               </p>
             </div>
             <div>
@@ -604,7 +604,7 @@ export default function ROICalculatorPage() {
             <div>
               <h3 className="mb-2 text-xl font-bold text-white">What is a good payback period for AI agent budget enforcement?</h3>
               <p className="text-gray-400 leading-relaxed">
-                For agentic systems with paid tool access, payback can be measured in days when a small number of runaway loops or expensive MCP calls would exceed the monthly cost of request-path budget enforcement.
+                For agentic systems with paid tool access, payback can be measured in days when a small number of runaway loops or expensive MCP calls would exceed the monthly cost of budget enforcement before the request goes through.
               </p>
             </div>
             <div>
@@ -622,7 +622,7 @@ export default function ROICalculatorPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Turn this ROI model into proof</h2>
           <p className="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
-            SatGate checks authority before execution, records every policy decision as a receipt, and packages the evidence for review.
+            SatGate checks permission before the agent acts, records every policy decision as a receipt, and packages the evidence for review.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
@@ -635,7 +635,7 @@ export default function ROICalculatorPage() {
               href="/policy-to-proof"
               className="inline-block border border-gray-700 text-gray-300 px-10 py-4 rounded-full font-bold text-lg hover:border-gray-500 hover:bg-gray-800 transition"
             >
-              See Policy-to-Proof
+              See how rules and receipts work
             </Link>
           </div>
         </div>

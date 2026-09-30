@@ -427,7 +427,7 @@ export default function EconomicFirewallPage() {
           <h2 className="text-3xl font-bold text-white mb-8">Related topics</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              ['/policy-to-proof', 'Policy-to-Proof', 'How each token, handoff, payment, refusal and revoke becomes a signed receipt.'],
+              ['/policy-to-proof', 'Rules and Receipts', 'How each token, handoff, payment, refusal and revoke becomes a signed receipt.'],
               ['/mcp', 'MCP', 'Budgets and permissions for MCP tools, and a signed receipt when a call is allowed or refused.'],
               ['/govern', 'Control AI agents', 'Budgets and permissions for your own agents, with receipts you can export.'],
               ['/agent-control-plane', 'Agent control plane', 'Permissions, handoffs, spend, audit and revokes for large fleets of agents.'],

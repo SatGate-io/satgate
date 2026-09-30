@@ -162,7 +162,7 @@ function ProofCtas({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
       <Link href="/evidence-pack-demo" className={`${base} inline-flex items-center justify-center gap-2 rounded-lg bg-white font-bold text-black transition hover:bg-gray-200`}>
-        View Evidence Pack <ArrowRight size={16} />
+        View receipt <ArrowRight size={16} />
       </Link>
       <a href="/evidence-packs/sample-evidence-pack.v1.json" className={`${base} inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-400/40 bg-cyan-400/10 font-bold text-cyan-100 transition hover:border-cyan-200`}>
         Download JSON <ArrowRight size={16} />
@@ -185,7 +185,7 @@ function GoldenPathSection() {
               One agent, allowed, blocked and revoked, with a receipt for every step.
             </h2>
             <p className="mt-5 text-lg leading-8 text-gray-300">
-              This walkthrough is a simulation with sample data, so it runs the same way every time. The receipts match the sample Evidence Pack in the viewer. To see SatGate on production, watch the <Link href="/#see-it-live" className="text-cyan-300 underline hover:text-cyan-200">two recordings on the home page</Link>.
+              This walkthrough is a simulation with sample data, so it runs the same way every time. The receipts match the sample signed receipt (Evidence Pack) in the viewer. To see SatGate on production, watch the <Link href="/#see-it-live" className="text-cyan-300 underline hover:text-cyan-200">two recordings on the home page</Link>.
             </p>
             <div className="mt-6">
               <ProofCtas />
@@ -208,8 +208,8 @@ function GoldenPathSection() {
               </article>
             ))}
             <article className={`rounded-2xl border p-4 ${goldenToneClasses.proof}`}>
-              <h3 className="font-bold text-white">7 · Evidence Pack exported</h3>
-              <p className="mt-2 text-sm text-gray-300">Evidence Pack <code className="text-cyan-200">ep_demo_2026_05_10_001</code> bundles every receipt above with the policy, the agent, the budget and the hashes. It is sample data with a placeholder signature, so it will not pass a signature check.</p>
+              <h3 className="font-bold text-white">7 · Receipt exported</h3>
+              <p className="mt-2 text-sm text-gray-300">Signed receipt (Evidence Pack) <code className="text-cyan-200">ep_demo_2026_05_10_001</code> bundles every receipt above with the policy, the agent, the budget and the hashes. It is sample data with a placeholder signature, so it will not pass a signature check.</p>
               <div className="mt-4"><ProofCtas compact /></div>
             </article>
           </div>
@@ -446,7 +446,7 @@ export default function SandboxPage() {
     }
 
     addEvent({ id: 'proof-exported', agent: 'bravo', type: 'summary', status: 'success',
-      label: '✓ Evidence Pack ready: every receipt, the JSON file, the schema and the hashes',
+      label: '✓ Receipt ready: every receipt, the JSON file, the schema and the hashes',
       detail: 'Open /evidence-pack-demo, or download /evidence-packs/sample-evidence-pack.v1.json and look through it yourself.' });
     setPhase('done');
     setRunning(false);
@@ -494,7 +494,7 @@ export default function SandboxPage() {
       { '@type': 'Thing', name: 'SatGate demo' },
       { '@type': 'Thing', name: 'capability control demo' },
       { '@type': 'Thing', name: 'AI agent spend control demo' },
-      { '@type': 'Thing', name: 'paid-rail governance demo' },
+      { '@type': 'Thing', name: 'payment rules demo' },
       { '@type': 'Thing', name: 'macaroon capability verification' },
       { '@type': 'Thing', name: 'agent kill-switch revocation' },
       { '@type': 'Thing', name: 'runaway spend blocking simulation' },
@@ -574,7 +574,7 @@ export default function SandboxPage() {
             href="#golden-path"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-medium transition"
           >
-            View Evidence Pack <ArrowRight size={14} />
+            View receipt <ArrowRight size={14} />
           </Link>
         </div>
       </div>
@@ -596,7 +596,7 @@ export default function SandboxPage() {
               Start the 90-second walkthrough →
             </Link>
             <Link href="/evidence-pack-demo" className="text-cyan-300 hover:text-cyan-200 text-sm font-semibold underline underline-offset-4 transition">
-              See an Evidence Pack →
+              See a signed receipt (Evidence Pack) →
             </Link>
           </div>
           <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4 text-left">
@@ -733,8 +733,8 @@ export default function SandboxPage() {
 
         {phase === 'done' && !running && (
           <div className="mt-6 rounded-2xl border border-cyan-500/30 bg-cyan-950/20 p-5">
-            <h3 className="mb-2 text-lg font-bold text-white">Evidence Pack ready</h3>
-            <p className="mb-4 text-sm text-gray-300">The simulation shows the steps. The Evidence Pack is the record you can check.</p>
+            <h3 className="mb-2 text-lg font-bold text-white">Receipt ready</h3>
+            <p className="mb-4 text-sm text-gray-300">The simulation shows the steps. The signed receipt (Evidence Pack) is the record you can check.</p>
             <ProofCtas />
           </div>
         )}
@@ -807,7 +807,7 @@ export default function SandboxPage() {
               href="/evidence-pack-demo"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-sm font-medium text-gray-300 transition"
             >
-              See Evidence Pack
+              See the receipt
             </Link>
           </div>
         </div>

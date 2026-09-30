@@ -17,14 +17,14 @@ const ENDPOINTS = [
 const webPageJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
-  name: 'SatGate paid-rail governance Demo',
+  name: 'SatGate Payment Rules Demo',
   url: 'https://satgate.io/pay',
-  description: 'Interactive paid-rail demo showing HTTP 402 challenges, Lightning invoices, paid-call receipts, Evidence Pack proof, and request-path API access for paid agents.',
+  description: 'Interactive payment-rules demo showing HTTP 402 challenges, Lightning invoices, paid-call receipts, a signed receipt, and API access checked before the request goes through for paid agents.',
   datePublished: '2026-04-12',
   dateModified: '2026-05-03',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
-    { '@type': 'Thing', name: 'SatGate paid-rail governance' },
+    { '@type': 'Thing', name: 'SatGate payment rules' },
     { '@type': 'Thing', name: 'L402 payment flow' },
     { '@type': 'Thing', name: 'HTTP 402 Payment Required' },
     { '@type': 'Thing', name: 'Lightning invoices for APIs' },
@@ -35,14 +35,14 @@ const webPageJsonLd = {
 const softwareJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'SatGate paid-rail governance Demo',
+  name: 'SatGate Payment Rules Demo',
   applicationCategory: 'DeveloperApplication',
   operatingSystem: 'Web',
   url: 'https://satgate.io/pay',
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
   dateModified: '2026-05-03',
-  featureList: ['HTTP 402 challenge simulation', 'paid-rail context invoice flow', 'Payment proof retry', 'Paid-call receipt creation', 'Evidence Pack proof'],
+  featureList: ['HTTP 402 challenge simulation', 'invoice flow with payment details', 'Payment proof retry', 'Paid-call receipt creation', 'signed receipt'],
 };
 
 const faqJsonLd = {
@@ -54,7 +54,7 @@ const faqJsonLd = {
       name: 'What happens during an L402 payment flow?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment; SatGate returns a paid-call receipt and records the decision for the Evidence Pack.',
+        text: 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment; SatGate returns a paid-call receipt and records the decision in the exported receipt bundle (Evidence Pack).',
       },
     },
     {
@@ -62,15 +62,15 @@ const faqJsonLd = {
       name: 'Why use L402 for agent API access?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'L402 can carry payment proof at request time, but SatGate keeps the buyer-safe control layer around it: delegated authority, max budgets, scoped access, and receipts before protected APIs unlock.',
+        text: 'L402 can carry payment proof at request time, but SatGate keeps the buyer-safe control layer around it: delegated permissions, max budgets, scoped access, and receipts before protected APIs unlock.',
       },
     },
     {
       '@type': 'Question',
-      name: 'Can paid-rail context be combined with access policy?',
+      name: 'Can payment details be combined with access policy?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. SatGate can combine L402 payment with capability tokens, scoped authorization, budget policy, receipt fields, Evidence Pack export, and revocation so payment does not become unrestricted access.',
+        text: 'Yes. SatGate can combine L402 payment with capability tokens, scoped authorization, budget policy, receipt fields, receipt export, and revocation so payment does not become unrestricted access.',
       },
     },
   ],
@@ -347,7 +347,7 @@ export default function PayDemoPage() {
                   const finalRes = await realClient.get(TARGET_URL, token);
                   addLog('✅ 200 OK: Request Authorized + Receipt Returned.', 'success');
                   addLog(`📦 Payload: ${JSON.stringify(finalRes)}`, 'success');
-                  addLog('🧾 Paid-call receipt queued for Evidence Pack.', 'success');
+                  addLog('🧾 Paid-call receipt queued for export.', 'success');
                   success = true;
                   break;
               } catch (e: any) {
@@ -378,7 +378,7 @@ export default function PayDemoPage() {
           await new Promise(r => setTimeout(r, 800));
           addLog('✅ 200 OK: Request Authorized + Receipt Returned.', 'success');
           addLog('📦 Payload: { "market_sentiment": "bullish", "confidence": 0.98, "receipt_id": "rcpt_paid_demo_001" }', 'success');
-          addLog('🧾 Paid-call receipt queued for Evidence Pack.', 'success');
+          addLog('🧾 Paid-call receipt queued for export.', 'success');
       }
       
       setStatus('success');
@@ -429,7 +429,7 @@ export default function PayDemoPage() {
           <h1 className="text-lg sm:text-xl font-bold flex items-center gap-2">
             <Zap className="text-yellow-400" size={24} />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-400">
-              Paid-Rail Demo
+              Payments Demo
             </span>
           </h1>
           <div className="w-[120px]"></div>
@@ -447,7 +447,7 @@ export default function PayDemoPage() {
           <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
             Watch an AI agent <strong className="text-white">pay for API access</strong> in this Bitcoin
             Lightning demo. SatGate verifies payment and configured authority before access, then returns
-            a receipt that can feed an Evidence Pack. Settlement behavior depends on the selected rail.
+            a receipt that goes into the exported receipt bundle (Evidence Pack). How settlement works depends on the payment method you pick.
           </p>
         </div>
       </div>
@@ -552,9 +552,9 @@ export default function PayDemoPage() {
         <h2 className="mb-8 text-center text-2xl font-bold text-white">L402 payment flow questions</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            ['What happens during an L402 payment flow?', 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment; SatGate returns a paid-call receipt and records the decision for the Evidence Pack.'],
-            ['Why use L402 for agent API access?', 'L402 can carry payment proof at request time, but SatGate keeps the buyer-safe control layer around it: delegated authority, max budgets, scoped access, and receipts before protected APIs unlock.'],
-            ['Can paid-rail context be combined with access policy?', 'Yes. SatGate can combine L402 payment with capability tokens, scoped authorization, budget policy, receipt fields, Evidence Pack export, and revocation so payment does not become unrestricted access.'],
+            ['What happens during an L402 payment flow?', 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment; SatGate returns a paid-call receipt and records the decision in the exported receipt bundle (Evidence Pack).'],
+            ['Why use L402 for agent API access?', 'L402 can carry payment proof at request time, but SatGate keeps the buyer-safe control layer around it: delegated permissions, max budgets, scoped access, and receipts before protected APIs unlock.'],
+            ['Can payment details be combined with access policy?', 'Yes. SatGate can combine L402 payment with capability tokens, scoped authorization, budget policy, receipt fields, receipt export, and revocation so payment does not become unrestricted access.'],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
               <h3 className="mb-2 font-bold text-white">{question}</h3>

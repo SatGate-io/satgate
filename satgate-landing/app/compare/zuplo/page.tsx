@@ -25,7 +25,7 @@ export default function CompareZuploPage() {
     '@type': 'WebPage',
     name: 'SatGate vs Zuplo',
     url: 'https://satgate.io/compare/zuplo',
-    description: 'Compare SatGate and Zuplo API gateways for AI agent traffic, MCP exposure, budget enforcement, and rail-neutral paid-rail governance.',
+    description: 'Compare SatGate and Zuplo API gateways for AI agent traffic, MCP exposure, budget enforcement, and payment rules that work with any payment method.',
     datePublished: '2026-04-30',
     dateModified: '2026-05-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -46,7 +46,7 @@ export default function CompareZuploPage() {
         name: 'What is the main difference between SatGate and Zuplo?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Zuplo is a traditional API gateway with MCP support for exposing APIs to agents. SatGate adds economic governance: per-tool cost attribution, hard budget enforcement, scoped delegation, and L402 monetization.',
+          text: 'Zuplo is a traditional API gateway with MCP support for exposing APIs to agents. SatGate adds spending controls: per-tool cost attribution, hard budget enforcement, scoped delegation, and L402 monetization.',
         },
       },
       {
@@ -330,7 +330,7 @@ export default function CompareZuploPage() {
           <h2 className="text-xl font-bold mb-6">SatGate vs Zuplo questions</h2>
           <div className="space-y-5">
             {[
-              ['What is the main difference between SatGate and Zuplo?', 'Zuplo is a traditional API gateway with MCP support for exposing APIs to agents. SatGate adds economic governance: per-tool cost attribution, hard budget enforcement, scoped delegation, and L402 monetization.'],
+              ['What is the main difference between SatGate and Zuplo?', 'Zuplo is a traditional API gateway with MCP support for exposing APIs to agents. SatGate adds spending controls: per-tool cost attribution, hard budget enforcement, scoped delegation, and L402 monetization.'],
               ['Does rate limiting replace economic controls for AI agents?', 'No. Rate limits control request volume, not business cost. AI agents need dollar-denominated, per-agent, and per-tool controls so expensive calls can be capped before spend occurs.'],
               ['Can SatGate work with an existing API gateway like Zuplo?', 'Yes. SatGate can be deployed as the economic policy layer in front of, behind, or alongside an existing API gateway so teams can keep API management while adding agent spend governance.'],
             ].map(([question, answer]) => (

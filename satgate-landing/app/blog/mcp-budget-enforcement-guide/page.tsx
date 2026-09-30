@@ -18,7 +18,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'MCP Budget Enforcement: Per-Tool Costs and Hard Spend Caps',
-    description: 'Practical MCP budget enforcement for per-tool pricing, delegated spend caps, and request-path blocks.',
+    description: 'Practical MCP budget enforcement for per-tool pricing, delegated spend caps, and blocks before the request goes through.',
   },
 };
 
@@ -36,9 +36,9 @@ export default function McpBudgetEnforcementGuidePage() {
     about: [
       { '@type': 'Thing', name: 'MCP budget enforcement' },
       { '@type': 'Thing', name: 'per-tool MCP costs' },
-      { '@type': 'Thing', name: 'request-path budget checks' },
+      { '@type': 'Thing', name: 'budget checks before the request goes through' },
       { '@type': 'Thing', name: 'runaway agent spend control' },
-      { '@type': 'Thing', name: 'MCP gateway economic governance' },
+      { '@type': 'Thing', name: 'MCP gateway spending controls' },
     ],
   };
 
@@ -67,7 +67,7 @@ export default function McpBudgetEnforcementGuidePage() {
         name: 'Where should MCP budget checks happen?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Budget checks should happen in the request path, before the MCP server executes the tool. Post-hoc dashboards and alerts are useful for reporting, but they cannot stop runaway tool calls once an autonomous agent has already spent the money.',
+          text: 'Budget checks should happen before the request goes through, and before the MCP server executes the tool. Post-hoc dashboards and alerts are useful for reporting, but they cannot stop runaway tool calls once an autonomous agent has already spent the money.',
         },
       },
       {
@@ -121,7 +121,7 @@ export default function McpBudgetEnforcementGuidePage() {
             MCP (Model Context Protocol) is becoming the standard way AI agents interact with tools. But MCP 
             has no built-in concept of cost. A <code className="bg-gray-800 px-1.5 rounded text-purple-300">tools/call</code> request 
             to a cheap lookup function and a $2 code execution tool look identical at the protocol level. 
-            This guide shows how to add economic governance to any MCP server.
+            This guide shows how to add spending controls to any MCP server.
           </p>
 
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">The Problem with Unmetered MCP</h2>
@@ -319,7 +319,7 @@ satgate delegate \\
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">Where should MCP budget checks happen?</h3>
                 <p className="text-gray-300 leading-relaxed mb-0">
-                  Budget checks should happen in the request path, before the MCP server executes the tool. Dashboards and alerts are useful for reporting, but they cannot stop runaway tool calls after an autonomous agent has already spent the money.
+                  Budget checks should happen before the request goes through, and before the MCP server executes the tool. Dashboards and alerts are useful for reporting, but they cannot stop runaway tool calls after an autonomous agent has already spent the money.
                 </p>
               </div>
               <div>

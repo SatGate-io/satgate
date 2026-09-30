@@ -18,16 +18,16 @@ const webPageJsonLd = {
   '@type': 'WebPage',
   name: 'SatGate API Monetization Demo',
   url: 'https://satgate.io/monetize',
-  description: 'Interactive SatGate paid-rail governance demo for monetizing APIs with paid-rail context, HTTP 402 challenges, paid-agent access, and request-path proof verification.',
+  description: 'Interactive SatGate payment-rules demo for monetizing APIs with charging external agents, HTTP 402 challenges, paid-agent access, and proof checks before the request goes through.',
   datePublished: '2026-04-12',
   dateModified: '2026-05-03',
   isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
   about: [
     { '@type': 'Thing', name: 'API monetization for AI agents' },
-    { '@type': 'Thing', name: 'SatGate paid-rail governance' },
-    { '@type': 'Thing', name: 'paid-rail context' },
+    { '@type': 'Thing', name: 'SatGate payment rules' },
+    { '@type': 'Thing', name: 'charging external agents' },
     { '@type': 'Thing', name: 'paid agent workflows' },
-    { '@type': 'Thing', name: 'request-path payment proof verification' },
+    { '@type': 'Thing', name: 'payment proof checks before the request goes through' },
   ],
 };
 
@@ -41,7 +41,7 @@ const softwareJsonLd = {
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
   dateModified: '2026-05-03',
-  featureList: ['HTTP 402 challenge simulation', 'Per-request Lightning pricing', 'L402 payment proof retry', 'Paid-call receipt creation', 'Evidence Pack proof'],
+  featureList: ['HTTP 402 challenge simulation', 'Per-request Lightning pricing', 'L402 payment proof retry', 'Paid-call receipt creation', 'signed receipt (Evidence Pack) proof'],
 };
 
 const faqJsonLd = {
@@ -50,10 +50,10 @@ const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'What is SatGate paid-rail governance?',
+      name: 'What are SatGate payment rules?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'SatGate governs paid API access by enforcing delegated authority, budgets, and policy in the request path before protected data or tools are unlocked.',
+        text: 'SatGate governs paid API access by enforcing delegated permissions, budgets, and policy before the request goes through to protected data or tools.',
       },
     },
     {
@@ -66,10 +66,10 @@ const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: 'When should an API use per-request paid-rail context?',
+      name: 'When should an API use per-request payment details?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Per-request paid-rail context fit API products used by autonomous agents, paid tools, data endpoints, premium insights, and paid-agent workflows where access and payment should clear instantly.',
+        text: 'Per-request payment details fit API products used by autonomous agents, paid tools, data endpoints, premium insights, and paid-agent workflows where access and payment should clear instantly.',
       },
     },
   ],
@@ -383,8 +383,8 @@ export default function MonetizeDemoPage() {
         </h2>
         <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-xl mx-auto">
           Watch an AI agent <strong className="text-white">pay for API access</strong> in this Bitcoin
-          Lightning demo. SatGate verifies payment and configured authority before access, then returns
-          a receipt that can feed an Evidence Pack. Settlement behavior depends on the selected rail.
+          Lightning demo. SatGate verifies payment and the configured permission before access, then returns
+          a receipt that goes into the exported receipt bundle (Evidence Pack). Settlement behavior depends on the selected payment method.
         </p>
       </div>
 
@@ -483,12 +483,12 @@ export default function MonetizeDemoPage() {
 
       <section className="w-full max-w-3xl mt-12 border-t border-gray-800 pt-10">
         <p className="mb-2 text-center text-xs font-mono uppercase tracking-wide text-yellow-300">FAQ</p>
-        <h2 className="mb-8 text-center text-2xl font-bold text-white">rail-neutral paid-rail governance questions</h2>
+        <h2 className="mb-8 text-center text-2xl font-bold text-white">Payment rules for any payment method</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            ['What is SatGate paid-rail governance?', 'SatGate governs paid API access by enforcing delegated authority, budgets, and policy in the request path before protected data or tools are unlocked.'],
+            ['What are SatGate payment rules?', 'SatGate governs paid API access by enforcing delegated permissions, budgets, and policy before the request goes through to protected data or tools.'],
             ['How is L402 different from a subscription API key?', 'A subscription API key grants ongoing access and bills later. L402 lets each agent request receive a payment challenge, pay the invoice, retry with proof, and receive a paid-call receipt before access is granted.'],
-            ['When should an API use per-request paid-rail context?', 'Per-request paid-rail context fit API products used by autonomous agents, paid tools, data endpoints, premium insights, and paid-agent workflows where access and payment should clear instantly.'],
+            ['When should an API use per-request payment details?', 'Per-request payment details fit API products used by autonomous agents, paid tools, data endpoints, premium insights, and paid-agent workflows where access and payment should clear instantly.'],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
               <h3 className="mb-2 font-bold text-white">{question}</h3>

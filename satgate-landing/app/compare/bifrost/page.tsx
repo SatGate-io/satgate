@@ -25,7 +25,7 @@ export default function CompareBifrostPage() {
     '@type': 'WebPage',
     name: 'SatGate vs Bifrost',
     url: 'https://satgate.io/compare/bifrost',
-    description: 'Compare SatGate and Bifrost AI gateways for LLM routing, agent spend governance, per-tool budgets, and rail-neutral paid-rail governance.',
+    description: 'Compare SatGate and Bifrost AI gateways for LLM routing, agent spend governance, per-tool budgets, and payment rules that work with any payment method.',
     datePublished: '2026-04-30',
     dateModified: '2026-05-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -46,7 +46,7 @@ export default function CompareBifrostPage() {
         name: 'What is the main difference between SatGate and Bifrost?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Bifrost focuses on routing LLM traffic across providers. SatGate focuses on economic governance: hard budget enforcement, per-tool cost attribution, scoped agent credentials, and rail-neutral paid-rail governance.',
+          text: 'Bifrost focuses on routing LLM traffic across providers. SatGate focuses on spending controls: hard budget enforcement, per-tool cost attribution, scoped agent credentials, and payment rules that work with any payment method.',
         },
       },
       {
@@ -92,7 +92,7 @@ export default function CompareBifrostPage() {
           <h2 className="text-lg font-bold text-white mb-3">TL;DR</h2>
           <p className="text-gray-400 leading-relaxed">
             <strong className="text-white">Bifrost</strong> is excellent at routing LLM calls efficiently across providers with minimal latency. 
-            <strong className="text-white"> SatGate</strong> is built for <em>economic governance</em> — hard budget enforcement, 
+            <strong className="text-white"> SatGate</strong> is built for <em>spending controls</em>: hard budget enforcement, 
             per-tool cost attribution, and monetization. If your agents need to call LLMs fast, use Bifrost. 
             If you need to control what they spend, use SatGate.
           </p>
@@ -247,7 +247,7 @@ export default function CompareBifrostPage() {
                 <div className="bg-gray-800/50 rounded-lg p-4">
                   <p className="text-cyan-400 font-medium text-sm mb-2">SatGate</p>
                   <p className="text-gray-400 text-sm">
-                    <strong className="text-white">Economic governance.</strong> Protect APIs from runaway agent spend. 
+                    <strong className="text-white">Spending controls.</strong> Protect APIs from runaway agent spend. 
                     Monetize API access. Control budgets at the request level.
                   </p>
                 </div>
@@ -341,7 +341,7 @@ export default function CompareBifrostPage() {
           <h2 className="text-xl font-bold mb-6">SatGate vs Bifrost questions</h2>
           <div className="space-y-5">
             {[
-              ['What is the main difference between SatGate and Bifrost?', 'Bifrost focuses on routing LLM traffic across providers. SatGate focuses on economic governance: hard budget enforcement, per-tool cost attribution, scoped agent credentials, and rail-neutral paid-rail governance.'],
+              ['What is the main difference between SatGate and Bifrost?', 'Bifrost focuses on routing LLM traffic across providers. SatGate focuses on spending controls: hard budget enforcement, per-tool cost attribution, scoped agent credentials, and payment rules that work with any payment method.'],
               ['Can SatGate and Bifrost be used together?', 'Yes. SatGate can sit before Bifrost to enforce budget and policy controls, while Bifrost handles downstream LLM routing, failover, and provider optimization.'],
               ['When should teams choose SatGate over an LLM router?', 'Choose SatGate when the priority is preventing runaway agent spend, enforcing per-agent or per-tool budgets, attributing costs to teams, or charging external agents for API access.'],
             ].map(([question, answer]) => (

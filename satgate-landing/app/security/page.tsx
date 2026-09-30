@@ -3,7 +3,7 @@ import { ArrowLeft, Shield, Lock, Eye, Key, Zap, CheckCircle, Code, GitBranch, B
 
 export const metadata = {
   title: 'SatGate Security | Capability Tokens for AI Agent Governance',
-  description: 'SatGate security model for AI agent API governance: capability tokens, scoped budgets, delegation limits, revocation, audit, and request-path policy.',
+  description: 'SatGate security model for AI agent API governance: capability tokens, scoped budgets, delegation limits, revocation, audit, and policy before the request goes through.',
   alternates: { canonical: 'https://satgate.io/security' },
   keywords: [
     'SatGate security',
@@ -13,11 +13,11 @@ export const metadata = {
     'revocable agent credentials',
     'AI agent API governance',
     'economic access control',
-    'request-path policy enforcement',
+    'policy enforcement before the request goes through',
   ],
   openGraph: {
     title: 'SatGate Security | Capability Tokens for AI Agent Governance',
-    description: 'Capability tokens, macaroons, scoped budgets, delegation limits, revocation, audit, and request-path enforcement for AI agent APIs.',
+    description: 'Capability tokens, macaroons, scoped budgets, delegation limits, revocation, audit, and enforcement before the request goes through for AI agent APIs.',
     url: 'https://satgate.io/security',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -44,7 +44,7 @@ export default function SecurityPage() {
       { '@type': 'Thing', name: 'capability tokens for AI agents' },
       { '@type': 'Thing', name: 'macaroons for AI agents' },
       { '@type': 'Thing', name: 'revocable agent credentials' },
-      { '@type': 'Thing', name: 'request-path policy enforcement' },
+      { '@type': 'Thing', name: 'policy enforcement before the request goes through' },
     ],
   };
 
@@ -64,7 +64,7 @@ export default function SecurityPage() {
       {
         '@type': 'Question',
         name: 'How does SatGate secure AI agent API access?',
-        acceptedAnswer: { '@type': 'Answer', text: 'SatGate secures AI agent API access with request-path policy enforcement, capability tokens, macaroon caveats, scoped budgets, expiry, delegation limits, revocation, and audit evidence at the gateway before forwarding.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'SatGate secures AI agent API access with policy enforcement before the request goes through, capability tokens, macaroon caveats, scoped budgets, expiry, delegation limits, revocation, and audit evidence at the gateway before forwarding.' },
       },
       {
         '@type': 'Question',
@@ -74,7 +74,7 @@ export default function SecurityPage() {
       {
         '@type': 'Question',
         name: 'What role do macaroons play in SatGate?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Macaroons let SatGate attach cryptographic caveats to agent authority so delegated credentials can only become narrower, shorter-lived, or lower-budget as they move through agent workflows.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'Macaroons let SatGate attach cryptographic caveats to agent permissions so delegated credentials can only become narrower, shorter-lived, or lower-budget as they move through agent workflows.' },
       },
     ],
   };
@@ -174,7 +174,7 @@ export default function SecurityPage() {
                 </p>
               </div>
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
-                <h4 className="text-white text-sm font-bold mb-2">The Right Primitive for Agents</h4>
+                <h4 className="text-white text-sm font-bold mb-2">The Right Building Block for Agents</h4>
                 <p className="text-gray-500 text-xs">
                   Agents can&apos;t do OAuth flows or sign up for accounts. But they can hold a bearer token
                   that encodes exactly what they&apos;re allowed to do and spend. That&apos;s a macaroon.
@@ -218,8 +218,8 @@ export default function SecurityPage() {
               <div className="bg-gray-900/50 border border-yellow-800/30 rounded-lg p-4 flex items-start gap-4">
                 <Zap size={20} className="text-yellow-400 mt-1 flex-shrink-0" />
                 <div>
-                  <h4 className="text-white text-sm font-bold">Charge (paid-rail policy)</h4>
-                  <p className="text-gray-500 text-xs mb-0">Verify → Payment Proof → Allow. Admits approved external agents through configured paid rails with per-request pricing and scoped policy. Settlement, invoicing, and disputes depend on the selected rail.</p>
+                  <h4 className="text-white text-sm font-bold">Admit (payment rules)</h4>
+                  <p className="text-gray-500 text-xs mb-0">Verify → Payment Proof → Allow. Admits approved external agents through configured payment methods with per-request pricing and scoped policy. Settlement, invoicing, and disputes depend on the selected rail.</p>
                 </div>
               </div>
             </div>
@@ -235,7 +235,7 @@ export default function SecurityPage() {
               <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Never stores upstream credentials.</strong> SatGate verifies tokens at the gateway. Your API keys, secrets, and upstream credentials stay in your infrastructure.</span></li>
               <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">No request body inspection.</strong> Gateway inspects only token and routing metadata. Request payloads pass through opaque (MCP proxy reads method/tool name for cost attribution only).</span></li>
               <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Tenant-isolated data.</strong> All data scoped by tenant_id and enforced at the data layer — no shared query paths across tenants.</span></li>
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Non-custodial paid-rail context.</strong> In the Lightning demo, payment moves from payer to the configured recipient without SatGate taking custody. Other rails follow their own settlement and dispute rules.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Non-custodial payment details.</strong> In the Lightning demo, payment moves from payer to the configured recipient without SatGate taking custody. Other rails follow their own settlement and dispute rules.</span></li>
             </ul>
           </section>
 
@@ -319,7 +319,7 @@ export default function SecurityPage() {
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
                 <h3 className="text-white text-sm font-bold mb-2">How does SatGate secure AI agent API access?</h3>
                 <p className="text-gray-500 text-xs mb-0">
-                  SatGate secures AI agent API access with request-path policy enforcement, capability tokens, macaroon caveats, scoped budgets, expiry, delegation limits, revocation, and audit evidence at the gateway before forwarding.
+                  SatGate secures AI agent API access with policy enforcement before the request goes through, capability tokens, macaroon caveats, scoped budgets, expiry, delegation limits, revocation, and audit evidence at the gateway before forwarding.
                 </p>
               </div>
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
@@ -331,7 +331,7 @@ export default function SecurityPage() {
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
                 <h3 className="text-white text-sm font-bold mb-2">What role do macaroons play in SatGate?</h3>
                 <p className="text-gray-500 text-xs mb-0">
-                  Macaroons let SatGate attach cryptographic caveats to agent authority so delegated credentials can only become narrower, shorter-lived, or lower-budget as they move through agent workflows.
+                  Macaroons let SatGate attach cryptographic caveats to agent permissions so delegated credentials can only become narrower, shorter-lived, or lower-budget as they move through agent workflows.
                 </p>
               </div>
             </div>

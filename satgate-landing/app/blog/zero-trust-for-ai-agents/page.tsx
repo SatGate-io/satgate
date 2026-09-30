@@ -3,12 +3,12 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "Zero Trust for AI Agents: Capability Tokens, Revocation, and Budgets",
-  description: "Zero Trust for AI agents needs more than identity: scoped capability tokens, revocation, delegation limits, and request-path budget enforcement.",
+  description: "Zero Trust for AI agents needs more than identity: scoped capability tokens, revocation, delegation limits, and budget enforcement before the request goes through.",
   alternates: { canonical: 'https://satgate.io/blog/zero-trust-for-ai-agents' },
   keywords: ['Zero Trust AI agents', 'Zero Trust for AI', 'AI agent security', 'capability-based security', 'API security AI agents', 'macaroon tokens', 'agent delegation security'],
   openGraph: {
     title: 'Zero Trust for AI Agents: Tokens, Revocation, and Budgets',
-    description: 'Zero Trust for AI agents needs scoped capability tokens, revocation, delegation limits, and request-path budget enforcement.',
+    description: 'Zero Trust for AI agents needs scoped capability tokens, revocation, delegation limits, and budget enforcement before the request goes through.',
     url: 'https://satgate.io/blog/zero-trust-for-ai-agents',
     type: 'article',
     publishedTime: '2026-04-03T00:00:00Z',
@@ -17,7 +17,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Zero Trust for AI Agents: Tokens, Revocation, and Budgets',
-    description: 'Extend Zero Trust for AI agents with capability tokens, delegated budgets, revocation, and economic firewalls.',
+    description: 'Extend Zero Trust for AI agents with capability tokens, budgets for sub-agents, revocation, and economic firewalls.',
   },
 };
 
@@ -66,15 +66,15 @@ export default function ZeroTrustForAIAgentsBlogPage() {
         name: 'How does an economic firewall extend Zero Trust for AI agents?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An economic firewall enforces cost, scope, and delegation in the request path before forwarding to upstream APIs, giving teams budget-aware authorization that identity systems alone cannot provide.',
+          text: 'An economic firewall enforces cost, scope, and delegation before the request goes through to upstream APIs, giving teams budget-aware authorization that identity systems alone cannot provide.',
         },
       },
       {
         '@type': 'Question',
-        name: 'Can Zero Trust policies express agent budgets and delegated authority?',
+        name: 'Can Zero Trust policies express agent budgets and delegated permissions?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Most Zero Trust policies can express identity, device posture, location, and application access, but they usually cannot express per-agent spend limits, delegated budget attenuation, MCP tool costs, or proof-of-payment requirements before each request.',
+          text: 'Most Zero Trust policies can express identity, device posture, location, and application access, but they usually cannot express per-agent spend limits, narrowing of budgets for sub-agents, MCP tool costs, or proof-of-payment requirements before each request.',
         },
       },
     ],
@@ -170,7 +170,7 @@ export default function ZeroTrustForAIAgentsBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            Traditional identity systems don&apos;t model this. RBAC gives you roles. ABAC gives you attributes. Neither gives you <em>delegated authority that attenuates at each level</em>. You can&apos;t express &ldquo;this agent has a $100 budget, and it can give sub-agents portions of that budget, but the total can never exceed $100&rdquo; in an IAM policy.
+            Traditional identity systems don&apos;t model this. RBAC gives you roles. ABAC gives you attributes. Neither gives you <em>delegated permissions that narrow at each level</em>. You can&apos;t express &ldquo;this agent has a $100 budget, and it can give sub-agents portions of that budget, but the total can never exceed $100&rdquo; in an IAM policy.
           </p>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Agent Identity Is Ephemeral</h3>
@@ -263,7 +263,7 @@ export default function ZeroTrustForAIAgentsBlogPage() {
             <p className="text-gray-300 text-sm">
               <br />• What token do you hold? → Verify the token&apos;s constraints → Allow/deny
               <br />• Permissions travel <em>with</em> the token (embedded as caveats)
-              <br />• Delegation = create an attenuated copy of the token (weaker, never stronger)
+              <br />• Delegation = create a narrowed copy of the token (weaker, never stronger)
               <br />• Budget is a first-class constraint inside the token
               <br />• Validation is local — no external lookup required
             </p>
@@ -276,7 +276,7 @@ export default function ZeroTrustForAIAgentsBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            This property — called <strong className="text-white">attenuation</strong> — solves the agent delegation problem elegantly:
+            This property — called <strong className="text-white">narrowing</strong> — solves the agent delegation problem elegantly:
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
@@ -321,14 +321,14 @@ Token: search-worker-12
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Audit the chain, not the session.</strong> Traditional Evidence Packs track user sessions. Agent Evidence Packs need to track delegation chains — who minted the token, who attenuated it, what was spent at each level, and which specific API calls were made.
+            <strong className="text-white">Audit the chain, not the session.</strong> Traditional signed receipts track user sessions. Agent signed receipts need to track delegation chains — who minted the token, who narrowed it, what was spent at each level, and which specific API calls were made.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
             <strong className="text-white">Make policy decisions at mint time.</strong> Instead of evaluating policy on every request, encode the policy decision into the token when it&apos;s minted. The runtime check becomes: &ldquo;is this token valid and within its constraints?&rdquo; — a local, fast, scalable operation.
           </p>
 
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4">SatGate&apos;s Approach: Economic Governance as the Security Layer</h2>
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">SatGate&apos;s Approach: Spending Controls as the Security Layer</h2>
 
           <p className="text-gray-300 leading-relaxed">
             SatGate implements this capability-based model as an HTTP gateway that sits in front of your APIs. Instead of integrating with your identity provider to evaluate who&apos;s calling, it evaluates <em>what token they hold</em> and <em>what that token permits</em>.
@@ -347,7 +347,7 @@ Token: search-worker-12
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Admit mode (paid rails, <code className="text-sm">policy: charge</code>)</strong> — requires payment before access. Payment is one policy input; SatGate still evaluates scoped authority and configured access policy. Approved external agents can pay per request and receive scoped access without a subscription. On supported receipt paths, admission can produce a signed receipt: payment proves value moved, while the receipt records the authority decision.
+            <strong className="text-white">Admit mode (payment methods, <code className="text-sm">policy: charge</code>)</strong> — requires payment before access. Payment is one policy input; SatGate still evaluates scoped authority and configured access policy. Approved external agents can pay per request and receive scoped access without a subscription. On supported receipt paths, admission can produce a signed receipt: payment proves value moved, while the receipt records the authority decision.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -369,7 +369,7 @@ Token: search-worker-12
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Phase 3: Enable delegation.</strong> Allow orchestrator agents to attenuate tokens for sub-agents. This is where the model pays off — multi-agent workflows operate with proper economic boundaries at every level, without your security team manually provisioning identities for ephemeral sub-agents.
+            <strong className="text-white">Phase 3: Enable delegation.</strong> Allow orchestrator agents to narrow tokens for sub-agents. This is where the model pays off — multi-agent workflows operate with proper economic boundaries at every level, without your security team manually provisioning identities for ephemeral sub-agents.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -383,7 +383,7 @@ Token: search-worker-12
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            The next evolution isn&apos;t &ldquo;better Zero Trust.&rdquo; It&apos;s recognizing that for machine-to-machine interactions, <strong className="text-white">what a requester holds</strong> matters more than <strong className="text-white">who a requester is</strong>. Capability tokens that carry permissions, budgets, and expiration — verifiable locally, delegatable safely, attenuatable mathematically — are how you secure a world where agents outnumber humans 1,000 to 1.
+            The next evolution isn&apos;t &ldquo;better Zero Trust.&rdquo; It&apos;s recognizing that for machine-to-machine interactions, <strong className="text-white">what a requester holds</strong> matters more than <strong className="text-white">who a requester is</strong>. Capability tokens that carry permissions, budgets, and expiration — verifiable locally, delegatable safely, able to be narrowed mathematically — are how you secure a world where agents outnumber humans 1,000 to 1.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -397,8 +397,8 @@ Token: search-worker-12
               {[
                 ['Why does traditional Zero Trust break down for AI agents?', 'Traditional Zero Trust assumes stable human identities, managed devices, and predictable access patterns. AI agents are ephemeral, delegate to sub-agents, and can generate thousands of API calls from one task.'],
                 ['What replaces identity-based security for autonomous agents?', 'Autonomous agents need capability-based security: scoped, revocable tokens that encode what the agent can do, how much it can spend, where it can call, and when authority expires.'],
-                ['How does an economic firewall extend Zero Trust for AI agents?', 'An economic firewall enforces cost, scope, and delegation in the request path before forwarding to upstream APIs, giving teams budget-aware authorization that identity systems alone cannot provide.'],
-                ['Can Zero Trust policies express agent budgets and delegated authority?', 'Most Zero Trust policies can express identity, device posture, location, and application access, but they usually cannot express per-agent spend limits, delegated budget attenuation, MCP tool costs, or proof-of-payment requirements before each request.'],
+                ['How does an economic firewall extend Zero Trust for AI agents?', 'An economic firewall enforces cost, scope, and delegation before the request goes through to upstream APIs, giving teams budget-aware authorization that identity systems alone cannot provide.'],
+                ['Can Zero Trust policies express agent budgets and delegated permissions?', 'Most Zero Trust policies can express identity, device posture, location, and application access, but they usually cannot express per-agent spend limits, narrowing of budgets for sub-agents, MCP tool costs, or proof-of-payment requirements before each request.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

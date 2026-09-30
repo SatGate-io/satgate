@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "AI agent API governance demo",
     "MCP governance demo",
     "capability token demo",
-    "request-path policy enforcement",
+    "policy enforcement before the request goes through",
   ],
   openGraph: {
     title: "SatGate Demo | Try AI Agent Budget Enforcement Free",

@@ -71,7 +71,7 @@ export default function RunawayAgentCostCalculatorPage() {
       { '@type': 'Thing', name: 'AI agent loop cost' },
       { '@type': 'Thing', name: 'delegated sub-agent fanout' },
       { '@type': 'Thing', name: 'MCP tool budget exposure' },
-      { '@type': 'Thing', name: 'request-path budget enforcement ROI' },
+      { '@type': 'Thing', name: 'budget enforcement ROI before the request goes through' },
     ],
   };
 
@@ -107,7 +107,7 @@ export default function RunawayAgentCostCalculatorPage() {
       {
         '@type': 'Question',
         name: 'How does SatGate reduce runaway agent costs?',
-        acceptedAnswer: { '@type': 'Answer', text: 'SatGate enforces request-path budgets, scoped authority, per-tool spend caps, revocation, and route policy at the gateway before forwarding to upstream APIs or MCP tools, then records the decision in the Evidence Pack.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'SatGate enforces budgets on each request that goes through SatGate, plus scoped authority, per-tool spend caps, revocation, and route policy at the gateway before forwarding to upstream APIs or MCP tools, then records the decision in the signed receipt (Evidence Pack).' },
       },
       {
         '@type': 'Question',
@@ -134,7 +134,7 @@ export default function RunawayAgentCostCalculatorPage() {
       { '@type': 'HowToStep', name: 'Enter active agents', text: 'Set the number of autonomous agents or delegated sub-agents that could participate in a runaway loop.' },
       { '@type': 'HowToStep', name: 'Set paid call velocity', text: 'Enter paid calls per agent per minute and the average API, model, or MCP tool-call cost.' },
       { '@type': 'HowToStep', name: 'Model detection lag and fanout', text: 'Estimate minutes before discovery, delegation fanout, and incident frequency to calculate monthly and annual exposure.' },
-      { '@type': 'HowToStep', name: 'Compare enforcement savings', text: 'Compare unmanaged loop cost against request-path budget enforcement that blocks or revokes over-budget calls early.' },
+      { '@type': 'HowToStep', name: 'Compare enforcement savings', text: 'Compare unmanaged loop cost against budget enforcement before the request goes through that blocks or revokes over-budget calls early.' },
     ],
   };
 
@@ -165,7 +165,7 @@ export default function RunawayAgentCostCalculatorPage() {
             Runaway Agent Cost Calculator
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Estimate how fast autonomous agents can burn through API, model, and MCP tool budgets when loops, retries, or delegated sub-agents run without request-path budget enforcement.
+            Estimate how fast autonomous agents can burn through API, model, and MCP tool budgets when loops, retries, or delegated sub-agents run without budget enforcement before the request goes through.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -263,7 +263,7 @@ export default function RunawayAgentCostCalculatorPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate reduce runaway agent costs?</h3>
               <p className="text-gray-400 leading-relaxed">
-                SatGate enforces request-path budgets, scoped authority, per-tool spend caps, revocation, and route policy at the gateway before forwarding to upstream APIs or MCP tools, then records the decision in the Evidence Pack.
+                SatGate enforces budgets on each request that goes through SatGate, plus scoped authority, per-tool spend caps, revocation, and route policy at the gateway before forwarding to upstream APIs or MCP tools, then records the decision in the signed receipt (Evidence Pack).
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -284,16 +284,16 @@ export default function RunawayAgentCostCalculatorPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-3xl border border-orange-900/60 bg-gradient-to-br from-orange-950/30 to-yellow-950/20 p-8 md:p-12">
-          <h2 className="mb-4 text-3xl font-bold text-white">Stop runaway spend in the request path</h2>
+          <h2 className="mb-4 text-3xl font-bold text-white">Stop runaway spend before the request goes through</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            SatGate puts authority before execution for agent/API spend: control budgets before paid calls execute, revoke unsafe authority, and preserve Evidence Pack receipts for every allowed, denied, routed, or paid decision.
+            SatGate puts permission before the agent acts for agent/API spend: control budgets before paid calls execute, revoke unsafe authority, and preserve signed receipts for every allowed, denied, routed, or paid decision.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Govern runaway spend <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">
-              See Policy-to-Proof
+              See how rules and receipts work
             </Link>
           </div>
         </div>

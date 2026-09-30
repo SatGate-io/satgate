@@ -7,7 +7,7 @@ export const metadata = {
   title: 'SatGate vs Cloudflare AI Gateway: Rules Before Agents Spend',
   description: 'Compare Cloudflare AI Gateway and SatGate: AI routing, rate limits, checks before an agent spends, MCP tool limits, budgets for sub-agents, and signed receipts.',
   alternates: { canonical: 'https://satgate.io/compare/cloudflare-ai-gateway' },
-  keywords: ['SatGate vs Cloudflare AI Gateway', 'Cloudflare AI Gateway alternative', 'AI gateway budget enforcement', 'MCP tool governance', 'agent authority governance'],
+  keywords: ['SatGate vs Cloudflare AI Gateway', 'Cloudflare AI Gateway alternative', 'AI gateway budget enforcement', 'MCP tool governance', 'agent permissions'],
   openGraph: { title: config.title, description: 'Compare Cloudflare AI Gateway and SatGate: AI routing, rate limits, checks before an agent spends, MCP tool limits, budgets for sub-agents, and signed receipts.', url: 'https://satgate.io/compare/cloudflare-ai-gateway', type: 'article', images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }] },
   twitter: { card: 'summary_large_image', title: config.title, description: config.verdict },
 };

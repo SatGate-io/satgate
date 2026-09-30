@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowRight, Bot, DollarSign, Gauge, ShieldCheck, Workflow, BarChart3 } from 'lucide-react';
 
 export const metadata = {
-  title: 'AI Agent Cost Control | Request-Path Budget Enforcement',
-  description: 'Control AI agent API spend before it happens. SatGate enforces budgets, revocation, routing, and Evidence Pack receipts in the request path.',
+  title: 'AI Agent Cost Control | Before the Request Goes Through',
+  description: 'Control AI agent API spend before it happens. SatGate enforces budgets, revocation, routing, and signed receipts before the request goes through.',
   alternates: { canonical: 'https://satgate.io/ai-agent-cost-control' },
   keywords: [
     'AI agent cost control',
@@ -16,16 +16,16 @@ export const metadata = {
     'AI cost governance',
   ],
   openGraph: {
-    title: 'AI Agent Cost Control | Request-Path Budget Enforcement',
-    description: 'Enforce per-agent budgets, spend caps, revocation, routing, and Evidence Pack receipts before autonomous API calls execute.',
+    title: 'AI Agent Cost Control | Before the Request Goes Through',
+    description: 'Enforce per-agent budgets, spend caps, revocation, routing, and signed receipts before autonomous API calls execute.',
     url: 'https://satgate.io/ai-agent-cost-control',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AI Agent Cost Control | Request-Path Budget Enforcement',
-    description: 'Stop runaway AI agent spend with request-path budget enforcement, revocation, routing, and Evidence Pack receipts.',
+    title: 'AI Agent Cost Control | Before the Request Goes Through',
+    description: 'Stop runaway AI agent spend with budget checks before the request goes through, revocation, routing, and signed receipts.',
   },
 };
 
@@ -58,7 +58,7 @@ const controls = [
   {
     icon: BarChart3,
     title: 'Audit and attribution',
-    body: 'Emit receipts showing who spent what, on which tool, through which route, why policy allowed or denied it, and which Evidence Pack preserves the proof.',
+    body: 'Emit receipts showing who spent what, on which tool, through which route, why policy allowed or denied it, and which signed receipt preserves the proof.',
   },
 ];
 
@@ -66,7 +66,7 @@ export default function AiAgentCostControlPage() {
   const webPageJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'AI Agent Cost Control | Request-Path Budget Enforcement',
+    name: 'AI Agent Cost Control | Before the Request Goes Through',
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-cost-control',
     dateModified: '2026-05-05',
@@ -74,7 +74,7 @@ export default function AiAgentCostControlPage() {
     about: [
       { '@type': 'Thing', name: 'AI agent cost control' },
       { '@type': 'Thing', name: 'AI agent spend control' },
-      { '@type': 'Thing', name: 'request-path budget enforcement' },
+      { '@type': 'Thing', name: 'budget checks before the request goes through' },
       { '@type': 'Thing', name: 'MCP budget enforcement' },
       { '@type': 'Thing', name: 'runaway AI agent spend prevention' },
     ],
@@ -97,8 +97,8 @@ export default function AiAgentCostControlPage() {
       'Per-tool cost attribution',
       'MCP budget enforcement',
       'Revocable agent credentials',
-      'Request-path Evidence Pack receipts',
-      'Policy-to-Proof Evidence Packs',
+      'signed receipts before the request goes through',
+      'signed receipts',
     ],
   };
 
@@ -127,7 +127,7 @@ export default function AiAgentCostControlPage() {
         name: 'How does SatGate enforce AI agent budgets?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate sits in the request path and checks agent identity, route, tool cost, remaining budget, revocation status, and policy before forwarding each request.',
+          text: 'On each request that goes through SatGate, it checks agent identity, route, tool cost, remaining budget, revocation status, and policy before forwarding.',
         },
       },
       {
@@ -135,7 +135,7 @@ export default function AiAgentCostControlPage() {
         name: 'What is the difference between AI agent cost control and LLM cost management?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'LLM cost management usually tracks model and token spend after usage occurs. AI agent cost control adds request-path enforcement across agents, MCP tools, paid APIs, delegated sub-agents, budgets, revocation, and audit before cost is created.',
+          text: 'LLM cost management usually tracks model and token spend after usage occurs. AI agent cost control adds checks before the request goes through, across agents, MCP tools, paid APIs, delegated sub-agents, budgets, revocation, and audit, before cost is created.',
         },
       },
       {
@@ -151,7 +151,7 @@ export default function AiAgentCostControlPage() {
         name: 'Can rate limits control AI agent costs?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Rate limits control request frequency, not economic exposure. AI agent cost control needs per-request pricing, remaining-budget checks, tool-level caps, and request-path decisions that account for expensive model or MCP tool calls.',
+          text: 'Rate limits control request frequency, not economic exposure. AI agent cost control needs per-request pricing, remaining-budget checks, tool-level caps, and decisions before the request goes through that account for expensive model or MCP tool calls.',
         },
       },
       {
@@ -192,7 +192,7 @@ export default function AiAgentCostControlPage() {
       {
         '@type': 'ListItem',
         position: 4,
-        name: 'Evidence Pack capture',
+        name: 'Signed receipt capture',
         description: 'Allowed, denied, delegated, routed, paid, and revoked requests leave receipts finance and security can review.',
       },
     ],
@@ -202,7 +202,7 @@ export default function AiAgentCostControlPage() {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: '90-day AI agent cost-control rollout plan',
-    description: 'A practical rollout path for moving AI agent spend from visibility to request-path budget enforcement.',
+    description: 'A practical rollout path for moving AI agent spend from visibility to budget checks before the request goes through.',
     itemListElement: [
       {
         '@type': 'ListItem',
@@ -220,7 +220,7 @@ export default function AiAgentCostControlPage() {
         '@type': 'ListItem',
         position: 3,
         name: 'Enforce scoped budgets',
-        description: 'Apply per-agent budgets, MCP tool caps, route ceilings, expiry, delegation limits, and revocation policies in the request path.',
+        description: 'Apply per-agent budgets, MCP tool caps, route ceilings, expiry, delegation limits, and revocation policies before the request goes through.',
       },
       {
         '@type': 'ListItem',
@@ -261,7 +261,7 @@ export default function AiAgentCostControlPage() {
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-10">
-            SatGate puts authority before execution: budget enforcement, revocation, routing, and Evidence Pack receipts run in the request path before autonomous agents can spend against OpenAI, Claude, MCP, or paid API budgets.
+            SatGate checks permission before the agent acts. Budget enforcement, revocation, routing, and signed receipts run on each request that goes through SatGate, before autonomous agents can spend against OpenAI, Claude, MCP, or paid API budgets.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
@@ -269,7 +269,7 @@ export default function AiAgentCostControlPage() {
               Govern agent spend <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
-              See Policy-to-Proof
+              See how rules and receipts work
             </Link>
             <Link href="/roi-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               Estimate avoided spend
@@ -310,7 +310,7 @@ export default function AiAgentCostControlPage() {
         <div className="max-w-6xl mx-auto px-6 py-20">
           <h2 className="text-3xl font-bold text-white mb-4">What SatGate controls</h2>
           <p className="text-gray-400 max-w-3xl mb-10 text-lg">
-            SatGate is not just an observability dashboard. It is the request-path authority and proof layer for agent/API activity.
+            SatGate is not just an observability dashboard. It checks what an agent is allowed to do, and keeps a signed receipt, on each request that goes through SatGate.
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -341,7 +341,7 @@ export default function AiAgentCostControlPage() {
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
             <div className="text-yellow-300 font-mono text-sm mb-3">03 / PROVE</div>
             <h3 className="text-xl font-bold text-white mb-3">Preserve decision evidence</h3>
-            <p className="text-gray-400 leading-relaxed">Record every authority decision — allowed, denied, delegated, revoked, or paid — in the Evidence Pack. Payment proves value moved; SatGate proves the agent was allowed to move it.</p>
+            <p className="text-gray-400 leading-relaxed">Record every authority decision (allowed, denied, delegated, revoked, or paid) in the signed receipt (Evidence Pack). Payment proves value moved; SatGate proves the agent was allowed to move it.</p>
           </div>
         </div>
       </section>
@@ -380,7 +380,7 @@ export default function AiAgentCostControlPage() {
               ['Inline enforcement', 'Budget policy runs before model, API, or MCP tool execution — not after a billing export.'],
               ['Agent-level attribution', 'Every request maps to tenant, workflow, agent, delegated sub-agent, token, route, and tool.'],
               ['Revocable authority', 'Credentials can expire, narrow, delegate safely, or be killed without rotating shared API keys.'],
-              ['Evidence Pack capture', 'Allowed, denied, delegated, routed, paid, and revoked requests leave receipts finance and security can review.'],
+              ['Signed receipt capture', 'Allowed, denied, delegated, routed, paid, and revoked requests leave receipts finance and security can review.'],
             ].map(([title, body]) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-5">
                 <h3 className="mb-2 font-bold text-white">{title}</h3>
@@ -397,7 +397,7 @@ export default function AiAgentCostControlPage() {
           <div className="grid md:grid-cols-2 gap-5">
             {[
               ['Attribute spend before optimizing it', 'Every request should carry tenant, agent, workflow, token, route, model, and tool context so finance and platform teams can see who created the cost.'],
-              ['Enforce budgets before API calls execute', 'Budget policy belongs in the request path. Alerts, dashboards, and billing exports are useful, but they are too late to stop runaway loops.'],
+              ['Enforce budgets before API calls execute', 'Budget policy is checked before the request goes through. Alerts, dashboards, and billing exports are useful, but they are too late to stop runaway loops.'],
               ['Use scoped, revocable credentials', 'Autonomous agents should not hold unlimited API keys. Capabilities need expiry, caveats, spend ceilings, route limits, and emergency revocation.'],
               ['Treat MCP tools as economic resources', 'MCP tool calls can trigger paid APIs, searches, code agents, or data lookups. Cost policy has to follow the tool call, not just the LLM token bill.'],
             ].map(([title, body]) => (
@@ -421,7 +421,7 @@ export default function AiAgentCostControlPage() {
             {[
               ['Inventory exposure', 'Map agents, shared API keys, MCP tools, paid APIs, premium models, and workflows that can create cost.', '/agent-api-key-risk-assessment'],
               ['Observe first', 'Route traffic through SatGate to attribute spend by tenant, agent, workflow, route, model, and tool before blocking.', '/llm-cost-monitoring'],
-              ['Enforce budgets', 'Apply per-agent budgets, MCP caps, route ceilings, expiry, delegation limits, and revocation in the request path.', '/build'],
+              ['Enforce budgets', 'Apply per-agent budgets, MCP caps, route ceilings, expiry, delegation limits, and revocation before the request goes through.', '/build'],
               ['Preserve paid-access proof', 'Record policy decisions, payment context, and receipts before granting paid external access.', '/policy-to-proof'],
             ].map(([title, body, href]) => (
               <Link key={title} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
@@ -433,7 +433,7 @@ export default function AiAgentCostControlPage() {
           </div>
           <div className="mt-8 rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6">
             <h3 className="mb-2 text-xl font-bold text-white">Need a readiness score first?</h3>
-            <p className="mb-4 text-gray-400">Use the grader to see whether identity, budget policy, MCP governance, revocation, audit, routing, and paid-rail evidence are ready for autonomous agents.</p>
+            <p className="mb-4 text-gray-400">Use the grader to see whether identity, budget policy, MCP governance, revocation, audit, routing, and payment details are ready for autonomous agents.</p>
             <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center gap-2 font-semibold text-purple-300 hover:text-purple-200">Run the economic firewall readiness grader <ArrowRight size={16} /></Link>
           </div>
         </div>
@@ -444,7 +444,7 @@ export default function AiAgentCostControlPage() {
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Cost-control toolkit</p>
           <h2 className="mb-4 text-3xl font-bold text-white">Turn spend exposure into enforceable controls</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
-            The commercial page should lead buyers from awareness to action: estimate the risk, generate the policy, then enforce it in the request path.
+            The commercial page should lead buyers from awareness to action: estimate the risk, generate the policy, then enforce it before the request goes through.
           </p>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {[
@@ -481,19 +481,19 @@ export default function AiAgentCostControlPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate enforce AI agent budgets?</h3>
               <p className="text-gray-400 leading-relaxed">
-                SatGate checks agent identity, route, tool cost, remaining budget, revocation status, and policy in the request path before forwarding each request.
+                SatGate checks agent identity, route, tool cost, remaining budget, revocation status, and policy on each request that goes through SatGate, before forwarding.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is the difference between AI agent cost control and LLM cost management?</h3>
               <p className="text-gray-400 leading-relaxed">
-                LLM cost management usually tracks model and token spend after usage occurs. AI agent cost control adds request-path enforcement across agents, MCP tools, paid APIs, delegated sub-agents, budgets, revocation, and audit before cost is created.
+                LLM cost management usually tracks model and token spend after usage occurs. AI agent cost control adds checks before the request goes through, across agents, MCP tools, paid APIs, delegated sub-agents, budgets, revocation, and audit, before cost is created.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Can rate limits control AI agent costs?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Rate limits control request frequency, not economic exposure. AI agent cost control needs per-request pricing, remaining-budget checks, tool-level caps, and request-path decisions that account for expensive model or MCP tool calls.
+                Rate limits control request frequency, not economic exposure. AI agent cost control needs per-request pricing, remaining-budget checks, tool-level caps, and decisions before the request goes through that account for expensive model or MCP tool calls.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -516,7 +516,7 @@ export default function AiAgentCostControlPage() {
         <div className="rounded-3xl border border-purple-900/60 bg-gradient-to-br from-purple-950/30 to-cyan-950/30 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">Find your avoidable agent spend</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            Use the SatGate ROI calculator to model ghost spend, runaway loops, wasted tool calls, and the payback period for request-path budget enforcement with Policy-to-Proof receipt coverage.
+            Use the SatGate ROI calculator to model ghost spend, runaway loops, wasted tool calls, and the payback period for budget checks before the request goes through, with signed receipts.
           </p>
           <Link href="/roi-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
             Open the ROI calculator <ArrowRight size={18} />

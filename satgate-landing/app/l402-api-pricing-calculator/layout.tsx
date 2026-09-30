@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'L402 API Pricing Calculator',
   description:
-    'Estimate L402 API pricing, per-request margins, free allowances, and paid-rail context for governed AI agent access.',
+    'Estimate L402 API pricing, per-request margins, free allowances, and payment details for governed AI agent access.',
   alternates: { canonical: 'https://satgate.io/l402-api-pricing-calculator' },
   keywords: [
     'L402 API pricing calculator',
@@ -11,12 +11,12 @@ export const metadata: Metadata = {
     'paid API access calculator',
     'Lightning API pricing',
     'agent payment controls',
-    'paid-rail context',
+    'payment details',
   ],
   openGraph: {
     title: 'L402 API Pricing Calculator',
     description:
-      'Model L402 API pricing and margin while preserving paid-rail context for governed AI agent access.',
+      'Model L402 API pricing and margin while preserving payment details for governed AI agent access.',
     url: 'https://satgate.io/l402-api-pricing-calculator',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'L402 API Pricing Calculator',
     description:
-      'Estimate per-request L402 API pricing, margins, free allowances, and paid-rail context for AI agent access.',
+      'Estimate per-request L402 API pricing, margins, free allowances, and payment details for AI agent access.',
   },
 };
 

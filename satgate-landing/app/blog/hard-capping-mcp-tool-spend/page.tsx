@@ -3,10 +3,10 @@ import { ArrowLeft, Calendar, Clock, ExternalLink } from 'lucide-react';
 
 export const metadata = {
   title: 'Hard-Cap MCP Tool Spend: Stop Runaway Claude Code and Cursor Agents',
-  description: 'Hard-cap MCP tool spend for Claude Code, Cursor, and agent loops with request-path budget enforcement, per-tool costs, L402, and macaroons.',
+  description: 'Hard-cap MCP tool spend for Claude Code, Cursor, and agent loops with budget enforcement before the request goes through, per-tool costs, L402, and macaroons.',
   openGraph: {
     title: 'Hard-Cap MCP Tool Spend: Stop Runaway Claude Code and Cursor Agents',
-    description: 'Hard-cap MCP tool spend for Claude Code, Cursor, and agent loops with request-path budget enforcement.',
+    description: 'Hard-cap MCP tool spend for Claude Code, Cursor, and agent loops with budget enforcement before the request goes through.',
     url: 'https://satgate.io/blog/hard-capping-mcp-tool-spend',
     type: 'article',
     authors: ['Matt Dean'],
@@ -16,7 +16,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Hard-Cap MCP Tool Spend: Stop Runaway Claude Code and Cursor Agents',
-    description: 'Hard-cap MCP tool spend for Claude Code, Cursor, and agent loops with request-path budget enforcement.',
+    description: 'Hard-cap MCP tool spend for Claude Code, Cursor, and agent loops with budget enforcement before the request goes through.',
   },
   keywords: ['MCP tool cost', 'Claude Code spending limit', 'MCP budget control', 'AI agent cost management', 'MCP proxy', 'L402', 'macaroons'],
   alternates: { canonical: 'https://satgate.io/blog/hard-capping-mcp-tool-spend' },
@@ -37,7 +37,7 @@ export default function HardCappingMcpToolSpendPage() {
       { '@type': 'Thing', name: 'hard-capping MCP tool spend' },
       { '@type': 'Thing', name: 'Claude Code spending limits' },
       { '@type': 'Thing', name: 'Cursor MCP budget control' },
-      { '@type': 'Thing', name: 'request-path MCP proxy enforcement' },
+      { '@type': 'Thing', name: 'MCP proxy enforcement before the request goes through' },
       { '@type': 'Thing', name: 'L402 and macaroons for MCP tools' },
     ],
   };
@@ -51,7 +51,7 @@ export default function HardCappingMcpToolSpendPage() {
         name: 'How do you hard-cap MCP tool spend?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Hard-cap MCP tool spend by putting an MCP proxy or economic firewall in the request path, assigning costs to tools, and blocking tools/call requests when the agent, workflow, or token budget is exhausted.',
+          text: 'Hard-cap MCP tool spend by putting an MCP proxy or economic firewall before the request goes through, assigning costs to tools, and blocking tools/call requests when the agent, workflow, or token budget is exhausted.',
         },
       },
       {
@@ -150,7 +150,7 @@ export default function HardCappingMcpToolSpendPage() {
           </div>
 
           {/* The Solution */}
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Solution: Economic Governance at the Protocol Level</h2>
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Solution: Spending Controls at the Protocol Level</h2>
           
           <p className="text-gray-300 leading-relaxed">
             SatGate MCP Proxy sits between your MCP client and your MCP servers. It intercepts every <code className="text-purple-300">tools/call</code>, tracks cost in real-time, and enforces hard budget caps — not soft alerts, not warnings, actual enforcement.
@@ -166,7 +166,7 @@ export default function HardCappingMcpToolSpendPage() {
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Governance Gap</h2>
           
           <p className="text-gray-300 leading-relaxed mb-6">
-            Here&apos;s what changes when you add economic governance to MCP:
+            Here&apos;s what changes when you add spending controls to MCP:
           </p>
           
           <div className="overflow-x-auto my-8">
@@ -192,12 +192,12 @@ export default function HardCappingMcpToolSpendPage() {
                 <tr className="border-b border-gray-800">
                   <td className="py-3 px-4 font-medium text-white">Access Control</td>
                   <td className="py-3 px-4 text-red-400">Static API keys</td>
-                  <td className="py-3 px-4 text-green-400">Attenuated macaroons</td>
+                  <td className="py-3 px-4 text-green-400">Narrowed macaroons</td>
                 </tr>
                 <tr className="border-b border-gray-800">
                   <td className="py-3 px-4 font-medium text-white">Visibility</td>
                   <td className="py-3 px-4 text-red-400">Post-mortem logs</td>
-                  <td className="py-3 px-4 text-green-400">Signed receipts + Evidence Pack export</td>
+                  <td className="py-3 px-4 text-green-400">Signed receipts + receipt export</td>
                 </tr>
                 <tr className="border-b border-gray-800">
                   <td className="py-3 px-4 font-medium text-white">Agent Loops</td>
@@ -276,7 +276,7 @@ export default function HardCappingMcpToolSpendPage() {
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Macaroon Delegation</h3>
           <p className="text-gray-300 leading-relaxed">
-            This is where it gets powerful. L402 macaroons support <em>attenuation</em> — you can take a token and add restrictions to it, but never remove them. This lets you create delegation chains:
+            This is where it gets powerful. L402 macaroons support <em>narrowing</em> — you can take a token and add restrictions to it, but never remove them. This lets you create delegation chains:
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
@@ -337,7 +337,7 @@ satgate token attenuate <root-token> \\
             <h2 className="mb-6 text-2xl font-bold text-white">MCP hard-cap questions</h2>
             <div className="space-y-5">
               {[
-                ['How do you hard-cap MCP tool spend?', 'Put an MCP proxy or economic firewall in the request path, assign costs to tools, and block tools/call requests when the agent, workflow, or token budget is exhausted.'],
+                ['How do you hard-cap MCP tool spend?', 'Put an MCP proxy or economic firewall before the request goes through, assign costs to tools, and block tools/call requests when the agent, workflow, or token budget is exhausted.'],
                 ['Why are alerts not enough for MCP cost control?', 'Alerts fire after spend has already happened. Hard caps prevent the expensive MCP tool call from reaching the upstream server once the budget is exhausted.'],
                 ['Can MCP budgets be scoped per tool or agent?', 'Yes. MCP budgets can be scoped by agent, delegated sub-agent, tool, route, workflow, time window, and token caveat so each agent receives only the spend authority it needs.'],
                 ['How do you stop Claude Code or Cursor from running up MCP tool bills?', 'Put a budget-aware MCP proxy between Claude Code, Cursor, or another MCP client and the upstream tool servers. The proxy prices each tool call, deducts from the agent budget, and blocks requests once the cap is exhausted.'],

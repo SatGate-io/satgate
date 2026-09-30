@@ -35,7 +35,7 @@ export default function WhyProcessWontScaleBlogPage() {
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent cost control' },
-      { '@type': 'Thing', name: 'request-path economic governance' },
+      { '@type': 'Thing', name: 'spending controls before the request goes through' },
       { '@type': 'Thing', name: 'agent budget enforcement' },
       { '@type': 'Thing', name: 'AI cost management automation' },
     ],
@@ -66,7 +66,7 @@ export default function WhyProcessWontScaleBlogPage() {
         name: 'What is the alternative to manual AI cost governance?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'The alternative is request-path economic governance: every agent request is checked against budget, routing, revocation, and audit policy at the gateway before forwarding to upstream APIs, models, or MCP tools.',
+          text: 'The alternative is spending controls before the request goes through: every agent request is checked against budget, routing, revocation, and audit policy at the gateway before forwarding to upstream APIs, models, or MCP tools.',
         },
       },
     ],
@@ -163,7 +163,7 @@ export default function WhyProcessWontScaleBlogPage() {
             InformationWeek suggests using one LLM to predict what another will cost. It&apos;s clever, but it&apos;s a <em>forecasting</em> approach — you get an estimate, then hope actual costs match.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            The infrastructure-level version is <strong>pre-execution budget enforcement</strong>. Don&apos;t predict the cost after the fact. Check the budget <em>before</em> every call. If the budget is exhausted, the call doesn&apos;t execute. No prediction needed — just a hard check at wire speed, every time.
+            The infrastructure-level version is <strong>budget enforcement before the call runs</strong>. Don&apos;t predict the cost after the fact. Check the budget <em>before</em> every call. If the budget is exhausted, the call doesn&apos;t execute. No prediction needed — just a hard check at wire speed, every time.
           </p>
 
           <h3 className="text-xl font-semibold text-white mt-8 mb-3">#4: Track Actual Costs Per Workflow</h3>
@@ -204,7 +204,7 @@ export default function WhyProcessWontScaleBlogPage() {
             <a href="/blog/what-is-an-economic-firewall" className="text-cyan-400 hover:text-cyan-300">policy and a control</a>.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            <a href="/blog/can-adversaries-game-your-economic-firewall" className="text-cyan-400 hover:text-cyan-300">Macaroon-based caveats</a> make this possible. The budget is attenuated — delegated downward and never inflated. A sub-agent can receive a fraction of the parent&apos;s budget, but never more than the parent has. The math is cryptographic, not organizational.
+            <a href="/blog/can-adversaries-game-your-economic-firewall" className="text-cyan-400 hover:text-cyan-300">Macaroon-based caveats</a> make this possible. The budget is narrowed — delegated downward and never inflated. A sub-agent can receive a fraction of the parent&apos;s budget, but never more than the parent has. The math is cryptographic, not organizational.
           </p>
 
           <h3 className="text-xl font-semibold text-white mt-8 mb-3">#9: Avoid Unnecessary Deployments</h3>
@@ -276,7 +276,7 @@ export default function WhyProcessWontScaleBlogPage() {
               {[
                 ['Why does process-based AI agent cost control fail at scale?', 'Process-based cost control fails because autonomous agents make API and tool calls faster than humans can review dashboards, spreadsheets, or invoices. Controls need to execute before each costly request.'],
                 ['Which AI agent cost controls should be automated?', 'Budget checks, model routing, per-tool cost attribution, workflow spend tracking, policy templates, token quotas, and real-time denials should be automated at the gateway or economic firewall layer.'],
-                ['What is the alternative to manual AI cost governance?', 'The alternative is request-path economic governance: every agent request is checked against budget, routing, revocation, and audit policy at the gateway before forwarding to upstream APIs, models, or MCP tools.'],
+                ['What is the alternative to manual AI cost governance?', 'The alternative is spending controls before the request goes through: every agent request is checked against budget, routing, revocation, and audit policy at the gateway before forwarding to upstream APIs, models, or MCP tools.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

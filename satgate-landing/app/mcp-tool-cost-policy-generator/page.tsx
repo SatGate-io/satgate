@@ -73,7 +73,7 @@ export default function McpToolCostPolicyGeneratorPage() {
     '@type': 'WebPage',
     name: 'MCP Tool Cost Policy Generator',
     url: 'https://satgate.io/mcp-tool-cost-policy-generator',
-    description: 'Generate MCP tool cost policy for per-tool budgets, session caps, risk actions, revocation, and Evidence Pack receipts.',
+    description: 'Generate MCP tool cost policy for per-tool budgets, session caps, risk actions, revocation, and signed receipts.',
     datePublished: '2026-04-12',
     dateModified: '2026-05-03',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -82,7 +82,7 @@ export default function McpToolCostPolicyGeneratorPage() {
       { '@type': 'Thing', name: 'per-tool MCP budgets' },
       { '@type': 'Thing', name: 'MCP session budget enforcement' },
       { '@type': 'Thing', name: 'unknown tool cost risk actions' },
-      { '@type': 'Thing', name: 'request-path MCP Evidence Pack receipts' },
+      { '@type': 'Thing', name: 'MCP signed receipts before the request goes through' },
     ],
     audience: { '@type': 'Audience', audienceType: 'AI engineering, platform, API, security, and FinOps teams using MCP' },
   };
@@ -94,11 +94,11 @@ export default function McpToolCostPolicyGeneratorPage() {
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/mcp-tool-cost-policy-generator',
-    description: 'Generate MCP tool cost policy for per-tool budgets, session caps, risk actions, revocation, and Evidence Pack receipts.',
+    description: 'Generate MCP tool cost policy for per-tool budgets, session caps, risk actions, revocation, and signed receipts.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-03',
     audience: webPageJsonLd.audience,
-    featureList: ['MCP policy YAML generation', 'MCP policy JSON generation', 'Per-tool budget controls', 'Unknown cost risk actions', 'Revocation and Evidence Pack policy templates'],
+    featureList: ['MCP policy YAML generation', 'MCP policy JSON generation', 'Per-tool budget controls', 'Unknown cost risk actions', 'Revocation and signed receipt policy templates'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
@@ -106,7 +106,7 @@ export default function McpToolCostPolicyGeneratorPage() {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
-      { '@type': 'Question', name: 'What is an MCP tool cost policy?', acceptedAnswer: { '@type': 'Answer', text: 'An MCP tool cost policy assigns spend limits, allowed actions, risk rules, revocation behavior, and Evidence Pack receipt fields to tool calls made through Model Context Protocol.' } },
+      { '@type': 'Question', name: 'What is an MCP tool cost policy?', acceptedAnswer: { '@type': 'Answer', text: 'An MCP tool cost policy assigns spend limits, allowed actions, risk rules, revocation behavior, and signed receipt fields to tool calls made through Model Context Protocol.' } },
       { '@type': 'Question', name: 'Why do MCP tools need per-tool prices?', acceptedAnswer: { '@type': 'Answer', text: 'MCP tools can hide paid APIs, searches, browser sessions, compute jobs, or data calls. Pricing each tool lets budget enforcement happen before expensive work executes.' } },
       { '@type': 'Question', name: 'Can SatGate govern Cursor or Claude MCP tool use?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit around MCP-capable clients such as Cursor, Claude Desktop, Claude Code, OpenClaw, and custom agents to enforce budgets and audit tool calls.' } },
       { '@type': 'Question', name: 'What should happen when an MCP tool cost is unknown?', acceptedAnswer: { '@type': 'Answer', text: 'Unknown MCP tool costs should trigger a conservative policy action such as observe-only logging, explicit budget review, blocking, or revoking the session capability depending on risk tier.' } },
@@ -139,7 +139,7 @@ export default function McpToolCostPolicyGeneratorPage() {
           </div>
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">MCP Tool Cost Policy Generator</h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Generate request-path policy for MCP tools: per-tool prices, session budgets, expensive-tool caps, denial rules, revocation behavior, and Evidence Pack receipts before agents execute paid work.
+            Generate policy before the request goes through for MCP tools: per-tool prices, session budgets, expensive-tool caps, denial rules, revocation behavior, and signed receipts before agents execute paid work.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -183,7 +183,7 @@ export default function McpToolCostPolicyGeneratorPage() {
             {[
               [DollarSign, 'Per-tool economics', 'Attach cost to searches, browser sessions, cloud tasks, code agents, and paid APIs.'],
               [ShieldAlert, 'Risk actions', 'Block, route, revoke, or require explicit policy when unknown or sensitive tools appear.'],
-              [Eye, 'Evidence Pack receipts', 'Record agent, MCP server, tool, cost, remaining budget, policy decision, outcome, and paid-rail context.'],
+              [Eye, 'Signed receipts', 'Record agent, MCP server, tool, cost, remaining budget, policy decision, outcome, and payment details.'],
               [Wrench, 'Server unchanged', 'Wrap governance around existing MCP servers without rewriting every tool implementation.'],
             ].map(([Icon, title, body]) => {
               const TypedIcon = Icon as typeof DollarSign;
@@ -207,7 +207,7 @@ export default function McpToolCostPolicyGeneratorPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is an MCP tool cost policy?</h3>
               <p className="text-gray-400 leading-relaxed">
-                An MCP tool cost policy assigns spend limits, allowed actions, risk rules, revocation behavior, and Evidence Pack receipt fields to tool calls made through Model Context Protocol.
+                An MCP tool cost policy assigns spend limits, allowed actions, risk rules, revocation behavior, and signed receipt fields to tool calls made through Model Context Protocol.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -242,7 +242,7 @@ export default function McpToolCostPolicyGeneratorPage() {
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-purple-950/30 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">MCP makes tools easy. SatGate makes them governable.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            Route MCP traffic through SatGate to observe, control, and preserve Evidence Pack receipts before autonomous agents trigger paid or risky work.
+            Route MCP traffic through SatGate to observe, control, and preserve signed receipts before autonomous agents trigger paid or risky work.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">

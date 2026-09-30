@@ -2,13 +2,13 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "MCP Gateway Guide: From Routing to Economic Governance",
+  title: "MCP Gateway Guide: From Routing to Spending Controls",
   description: "A complete MCP gateway guide covering architecture, auth, tool aggregation, and budget enforcement for AI agent tool calls.",
   alternates: { canonical: 'https://satgate.io/blog/mcp-gateway-guide' },
   keywords: ['MCP gateway guide', 'MCP gateway', 'Model Context Protocol gateway', 'MCP proxy', 'MCP server gateway', 'MCP budget enforcement', 'MCP gateway setup'],
   openGraph: {
-    title: 'MCP Gateway Guide: From Routing to Economic Governance',
-    description: 'A practical MCP gateway guide for routing, auth, tool aggregation, observability, and request-path budget enforcement.',
+    title: 'MCP Gateway Guide: From Routing to Spending Controls',
+    description: 'A practical MCP gateway guide for routing, auth, tool aggregation, observability, and budget enforcement before the request goes through.',
     url: 'https://satgate.io/blog/mcp-gateway-guide',
     type: 'article',
     publishedTime: '2026-03-24T00:00:00Z',
@@ -16,7 +16,7 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MCP Gateway Guide: From Routing to Economic Governance',
+    title: 'MCP Gateway Guide: From Routing to Spending Controls',
     description: 'Learn why MCP gateways need more than routing: per-tool budgets, revocation, delegation, and audit controls.',
   },
 };
@@ -25,8 +25,8 @@ export default function McpGatewayGuideBlogPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'MCP Gateway Guide: From Traffic Routing to Economic Governance',
-    description: 'A complete MCP gateway guide covering architecture, authentication, tool aggregation, observability, and request-path budget enforcement for AI agent tool calls.',
+    headline: 'MCP Gateway Guide: From Traffic Routing to Spending Controls',
+    description: 'A complete MCP gateway guide covering architecture, authentication, tool aggregation, observability, and budget enforcement before the request goes through for AI agent tool calls.',
     url: 'https://satgate.io/blog/mcp-gateway-guide',
     datePublished: '2026-03-24',
     dateModified: '2026-05-04',
@@ -35,8 +35,8 @@ export default function McpGatewayGuideBlogPage() {
     about: [
       { '@type': 'Thing', name: 'MCP gateway' },
       { '@type': 'Thing', name: 'MCP budget enforcement' },
-      { '@type': 'Thing', name: 'economic governance for AI agents' },
-      { '@type': 'Thing', name: 'request-path policy enforcement' },
+      { '@type': 'Thing', name: 'spending controls for AI agents' },
+      { '@type': 'Thing', name: 'policy enforcement before the request goes through' },
     ],
   };
 
@@ -49,7 +49,7 @@ export default function McpGatewayGuideBlogPage() {
         name: 'What is an MCP gateway?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An MCP gateway sits between AI agents and MCP servers to centralize routing, authentication, tool discovery, policy enforcement, observability, and economic governance for tool calls.',
+          text: 'An MCP gateway sits between AI agents and MCP servers to centralize routing, authentication, tool discovery, policy enforcement, observability, and spending controls for tool calls.',
         },
       },
       {
@@ -65,7 +65,7 @@ export default function McpGatewayGuideBlogPage() {
         name: 'How is an economic MCP gateway different from a routing gateway?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'A routing gateway connects agents to tools. An economic MCP gateway also applies per-agent, per-tool, per-workflow budgets, revocation, delegation, and audit controls in the request path.',
+          text: 'A routing gateway connects agents to tools. An economic MCP gateway also applies per-agent, per-tool, per-workflow budgets, revocation, delegation, and audit controls before the request goes through.',
         },
       },
     ],
@@ -87,7 +87,7 @@ export default function McpGatewayGuideBlogPage() {
             <span className="px-2 py-1 rounded-full bg-yellow-900/30 border border-yellow-500/30 text-yellow-300 text-xs font-mono">Guide</span>
           </div>
           
-          <h1 className="text-4xl font-bold mb-4">MCP Gateway Guide: From Traffic Routing to Economic Governance</h1>
+          <h1 className="text-4xl font-bold mb-4">MCP Gateway Guide: From Traffic Routing to Spending Controls</h1>
           
           <p className="text-xl text-gray-400 mb-6 italic">
             Every MCP gateway guide stops at routing and auth. Here's what comes after — and why it determines whether your agents stay under budget or burn through it.
@@ -114,7 +114,7 @@ export default function McpGatewayGuideBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            This guide goes further. We'll cover the standard gateway architecture, then address the layer that determines whether your MCP deployment stays financially viable: <strong className="text-white">economic governance</strong>.
+            This guide goes further. We'll cover the standard gateway architecture, then address the layer that determines whether your MCP deployment stays financially viable: <strong className="text-white">spending controls</strong>.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">What Is an MCP Gateway?</h2>
@@ -297,13 +297,13 @@ policies:
           </ul>
 
           <p className="text-gray-300 leading-relaxed">
-            This is the economic governance gap. It's not a hypothetical — it's the reason teams who deploy MCP at scale inevitably add a cost control layer, either proactively or after the first surprise bill.
+            This is the gap in spending controls. It's not a hypothetical — it's the reason teams who deploy MCP at scale inevitably add a cost control layer, either proactively or after the first surprise bill.
           </p>
 
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4">Layer 5: Economic Governance</h2>
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">Layer 5: Spending Controls</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            Economic governance adds three capabilities to your MCP gateway that the standard four layers don't provide:
+            Spending controls add three capabilities to your MCP gateway that the standard four layers don't provide:
           </p>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">1. Per-Tool Cost Modeling</h3>
@@ -364,7 +364,7 @@ satgate mint \\
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            The critical property: macaroons support <strong className="text-white">attenuation</strong>. A parent token can mint child tokens with <em>fewer</em> permissions, never more. An orchestrator with 10,000 credits can delegate 2,000 to a research sub-agent. That sub-agent can delegate 500 to a search specialist. The total never exceeds the parent. Authority flows downward and diminishes — exactly the pattern multi-agent architectures need.
+            The critical property: macaroons support <strong className="text-white">narrowing</strong>. A parent token can mint child tokens with <em>fewer</em> permissions, never more. An orchestrator with 10,000 credits can delegate 2,000 to a research sub-agent. That sub-agent can delegate 500 to a search specialist. The total never exceeds the parent. Authority flows downward and diminishes — exactly the pattern multi-agent architectures need.
           </p>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">3. Pre-Call Enforcement</h3>
@@ -398,10 +398,10 @@ satgate mint \\
             The denial is <em>structured</em>. The agent gets machine-readable context: how much it has, how much it needs, and what cheaper alternatives exist. A well-designed agent can adapt — switch to a cheaper tool, request more budget from its parent, or gracefully inform the user. Compare this to a rate-limit 429, which just says "try again later" and triggers a retry loop.
           </p>
 
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4">Setting Up an MCP Gateway with Economic Governance</h2>
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">Setting Up an MCP Gateway with Spending Controls</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            Here's a practical setup that combines the standard gateway stack with SatGate's economic governance layer.
+            Here's a practical setup that combines the standard gateway stack with SatGate's spending controls.
           </p>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Step 1: Define Your Tool Catalog</h3>
@@ -590,7 +590,7 @@ Orchestrator (10,000 credits)
 # Total delegated: 9,000 ≤ 10,000 ✓
 # Each sub-token is cryptographically derived
 # Gateway enforces each agent's ceiling independently
-# Full Evidence Pack traces back to orchestrator`}</code>
+# Full receipt chain traces back to orchestrator`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
@@ -638,7 +638,7 @@ Orchestrator (10,000 credits)
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            Economic governance isn't about distrust — it's about enabling autonomy safely. Agents with clear budget boundaries can operate more independently, because the organization knows the blast radius is contained. The gateway doesn't slow agents down. It lets you give them a longer leash.
+            Spending controls aren't about distrust. They're about enabling autonomy safely. Agents with clear budget boundaries can operate more independently, because the organization knows the blast radius is contained. The gateway doesn't slow agents down. It lets you give them a longer leash.
           </p>
 
           <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
@@ -646,9 +646,9 @@ Orchestrator (10,000 credits)
             <h2 className="mb-6 text-2xl font-bold text-white">MCP gateway questions</h2>
             <div className="space-y-5">
               {[
-                ['What is an MCP gateway?', 'An MCP gateway sits between AI agents and MCP servers to centralize routing, authentication, tool discovery, policy enforcement, observability, and economic governance for tool calls.'],
+                ['What is an MCP gateway?', 'An MCP gateway sits between AI agents and MCP servers to centralize routing, authentication, tool discovery, policy enforcement, observability, and spending controls for tool calls.'],
                 ['Why does an MCP gateway need budget enforcement?', 'MCP tools can trigger paid APIs, model calls, database queries, or external services. Budget enforcement stops runaway loops and tool fanout before expensive calls execute, instead of reporting the spend after the fact.'],
-                ['How is an economic MCP gateway different from a routing gateway?', 'A routing gateway connects agents to tools. An economic MCP gateway also applies per-agent, per-tool, per-workflow budgets, revocation, delegation, and audit controls in the request path.'],
+                ['How is an economic MCP gateway different from a routing gateway?', 'A routing gateway connects agents to tools. An economic MCP gateway also applies per-agent, per-tool, per-workflow budgets, revocation, delegation, and audit controls before the request goes through.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
@@ -660,7 +660,7 @@ Orchestrator (10,000 credits)
 
           <div className="mt-12 p-6 bg-gray-900/50 border border-gray-800 rounded-lg">
             <p className="text-gray-300 mb-4">
-              SatGate adds economic governance to your MCP gateway. Open source, deploys in minutes:
+              SatGate adds spending controls to your MCP gateway. Open source, deploys in minutes:
             </p>
             <pre className="bg-gray-900/70 rounded p-3 text-sm overflow-x-auto">
               <code className="text-green-300">{`go install github.com/satgate-io/satgate/cmd/satgate-mcp@latest`}</code>

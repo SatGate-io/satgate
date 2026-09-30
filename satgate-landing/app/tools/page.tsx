@@ -42,13 +42,13 @@ const tools = [
   {
     href: '/llm-cost-monitoring',
     title: 'LLM Cost Monitoring Guide',
-    description: 'Compare dashboards, alerts, budget policy, routing, revocation, and request-path enforcement.',
+    description: 'Compare dashboards, alerts, budget policy, routing, revocation, and checks before the request goes through.',
     icon: BarChart3,
   },
   {
     href: '/roi-calculator',
     title: 'AI Agent ROI Calculator',
-    description: 'Estimate ghost spend, loop waste, payback period, and ROI from request-path budget enforcement.',
+    description: 'Estimate ghost spend, loop waste, payback period, and ROI from budget checks before the request goes through.',
     icon: Calculator,
   },
   {
@@ -66,7 +66,7 @@ const tools = [
   {
     href: '/ai-agent-runaway-spend-index',
     title: 'AI Agent Runaway Spend Index',
-    description: 'Track monthly modeled runaway spend exposure, MCP tool cost failures, fanout risk, and avoided cost from request-path controls.',
+    description: 'Track monthly modeled runaway spend exposure, MCP tool cost failures, fanout risk, and avoided cost from controls before the request goes through.',
     icon: BarChart3,
   },
   {
@@ -78,7 +78,7 @@ const tools = [
   {
     href: '/economic-firewall-readiness-grader',
     title: 'Economic Firewall Readiness Grader',
-    description: 'Score readiness across identity, budgets, MCP tools, revocation, delegation, audit, routing, and paid-rail context.',
+    description: 'Score readiness across identity, budgets, MCP tools, revocation, delegation, audit, routing, and charging external agents.',
     icon: ShieldCheck,
   },
   {
@@ -163,7 +163,7 @@ export default function ToolsPage() {
         name: 'How do these tools relate to an economic firewall?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'The calculators estimate the risk. SatGate enforces budgets, permissions and revocation in the request path, and signs a receipt for each decision.',
+          text: 'The calculators estimate the risk. SatGate enforces budgets, permissions and revocation before the request goes through, and signs a receipt for each decision.',
         },
       },
     ],
@@ -223,7 +223,7 @@ export default function ToolsPage() {
           {[
             ['Measure', 'Start with calculators to estimate ghost spend, runaway loop exposure, and payback period.'],
             ['Generate', 'Turn risk models into concrete OpenAI and MCP budget policies your control plane can enforce.'],
-            ['Govern', 'Use readiness scoring to prioritize identity, revocation, audit, routing, and paid-rail governance gaps.'],
+            ['Govern', 'Use readiness scoring to prioritize identity, revocation, audit, routing, and payment rules gaps.'],
           ].map(([title, body]) => (
             <div key={title} className="rounded-2xl border border-gray-800 bg-black p-6">
               <h2 className="mb-3 text-2xl font-bold text-white">{title}</h2>
@@ -243,7 +243,7 @@ export default function ToolsPage() {
           {[
             [
               'What are AI agent cost control tools?',
-              'They quantify autonomous agent spend risk, model runaway loops, and assess whether economic controls can stop expensive requests before execution.',
+              'They quantify autonomous agent spend risk, model runaway loops, and assess whether economic controls can stop expensive requests before the agent acts.',
             ],
             [
               'Which SatGate tool should I start with?',
@@ -251,7 +251,7 @@ export default function ToolsPage() {
             ],
             [
               'How do these tools relate to an economic firewall?',
-              'The calculators estimate the risk. SatGate enforces budgets, permissions and revocation in the request path, and signs a receipt for each decision.',
+              'The calculators estimate the risk. SatGate enforces budgets, permissions and revocation before the request goes through, and signs a receipt for each decision.',
             ],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">

@@ -35,7 +35,7 @@ export default function WhatIsEconomicFirewallPage() {
     about: [
       { '@type': 'Thing', name: 'economic firewall for AI agents' },
       { '@type': 'Thing', name: 'AI agent budget limits' },
-      { '@type': 'Thing', name: 'request-path cost enforcement' },
+      { '@type': 'Thing', name: 'cost enforcement before the request goes through' },
       { '@type': 'Thing', name: 'MCP cost control' },
     ],
   };
@@ -49,7 +49,7 @@ export default function WhatIsEconomicFirewallPage() {
         name: 'What is an economic firewall?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An economic firewall is a request-path control layer that decides whether an autonomous AI agent can afford an API, model, or MCP tool call before that call executes. It enforces budgets, tool prices, scopes, delegation rules, revocation, and audit requirements.',
+          text: 'An economic firewall is a control layer that checks before the request goes through and decides whether an autonomous AI agent can afford an API, model, or MCP tool call before that call executes. It enforces budgets, tool prices, scopes, delegation rules, revocation, and audit requirements.',
         },
       },
       {
@@ -95,7 +95,7 @@ export default function WhatIsEconomicFirewallPage() {
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
             What Is an Economic Firewall?
           </h1>
-          <p className="text-xl text-gray-400 mb-4">The missing security primitive for autonomous AI agents</p>
+          <p className="text-xl text-gray-400 mb-4">The missing security building block for autonomous AI agents</p>
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <span className="flex items-center gap-1"><Calendar size={14} /> March 18, 2026</span>
             <span className="flex items-center gap-1"><Clock size={14} /> 8 min read</span>
@@ -115,7 +115,7 @@ export default function WhatIsEconomicFirewallPage() {
             With SatGate in front of those same APIs, the agent would have hit its budget cap and received an HTTP 402 &mdash; Payment Required. Hard stop. No soft alert buried in a dashboard. No email that arrives three hours after the damage is done. The request is blocked, and the agent gets a clear, actionable signal: <em>you&rsquo;re out of budget</em>.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            That&rsquo;s an economic firewall. And it&rsquo;s the security primitive that the entire API stack is missing.
+            That&rsquo;s an economic firewall. And it&rsquo;s the security building block that the entire API stack is missing.
           </p>
 
           {/* --- The Problem --- */}
@@ -214,7 +214,7 @@ export default function WhatIsEconomicFirewallPage() {
             Here&rsquo;s a scenario that breaks traditional access control: Agent A needs to delegate a subtask to Agent B. Agent A has $500 of budget and full read-write access. It wants to give Agent B $50 and read-only access.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            With API keys, you&rsquo;d need to provision a new key with the right scopes, register it in your identity provider, and manage its lifecycle. With an economic firewall using <strong>macaroon-based tokens</strong>, Agent A simply attenuates its own credential:
+            With API keys, you&rsquo;d need to provision a new key with the right scopes, register it in your identity provider, and manage its lifecycle. With an economic firewall using <strong>macaroon-based tokens</strong>, Agent A simply narrows its own credential:
           </p>
 
           <pre className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-sm font-mono text-gray-300 overflow-x-auto my-8">
@@ -237,7 +237,7 @@ const agentBToken = attenuate(agentAToken, {
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            The constraints are cryptographic, not policy-based. Agent B can&rsquo;t modify or forge the token to escalate its privileges. It can only further attenuate &mdash; passing an even more restricted token to Agent C. This creates a natural delegation hierarchy where capabilities only flow downward.
+            The constraints are cryptographic, not policy-based. Agent B can&rsquo;t modify or forge the token to escalate its privileges. It can only further narrow &mdash; passing an even more restricted token to Agent C. This creates a natural delegation hierarchy where capabilities only flow downward.
           </p>
           <p className="text-gray-300 leading-relaxed">
             No central policy server. No admin portal. No RBAC matrix to maintain. The token <em>is</em> the policy.
@@ -274,20 +274,20 @@ const agentBToken = attenuate(agentAToken, {
               </div>
               <div>
                 <p className="text-white font-semibold text-lg">Prove</p>
-                <p className="text-gray-400">Preserve Evidence Pack receipts for allowed, denied, delegated, revoked, and paid-rail decisions. Paid rails such as L402 or x402 can move value; the governance layer proves why access was allowed.</p>
+                <p className="text-gray-400">Preserve signed receipts for allowed, denied, delegated, revoked, and payment-method decisions. Payment methods such as L402 or x402 can move value; the governance layer proves why access was allowed.</p>
               </div>
             </div>
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            A critical distinction: <strong>paid rails are context, not the product center.</strong> Enterprises need request-path authority before execution and Evidence Pack proof after the decision, whether the call is internal or crosses a paid rail.
+            A critical distinction: <strong>payment methods are context, not the product center.</strong> Enterprises need permission before the agent acts, checked before the request goes through, and signed receipt proof after the decision, whether the call is internal or uses a payment method.
           </p>
           <ul className="text-gray-300 space-y-2">
             <li><strong>Observe → Control</strong> is the enterprise path: identify the agent, bind budget and scope, and block over-budget work before it executes.</li>
-            <li><strong>Observe → Prove</strong> is the accountability path: preserve receipts for policy decisions, spend, delegation, denials, revocation, and paid-rail context.</li>
+            <li><strong>Observe → Prove</strong> is the accountability path: preserve receipts for policy decisions, spend, delegation, denials, revocation, and payment details.</li>
           </ul>
           <p className="text-gray-300 leading-relaxed">
-            Most organizations will start with Observe, then move high-risk routes into Control and export Evidence Packs when security, finance, or compliance asks what happened.
+            Most organizations will start with Observe, then move high-risk routes into Control and export a signed receipt (Evidence Pack) when security, finance, or compliance asks what happened.
           </p>
 
           {/* --- Why Now --- */}
@@ -299,7 +299,7 @@ const agentBToken = attenuate(agentAToken, {
             Every one of these agents is spending someone&rsquo;s money on API calls. And the question isn&rsquo;t whether runaway spend will happen &mdash; it&rsquo;s whether you&rsquo;ll catch it in real time or on the monthly invoice.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            Economic governance is becoming a prerequisite for safe agentic AI deployment. Not a nice-to-have. Not a future concern. A prerequisite &mdash; the same way you wouldn&rsquo;t deploy a web application without authentication, or expose an API without rate limiting. The cost dimension is now a first-class security concern.
+            Spending controls are becoming a prerequisite for safe agentic AI deployment. Not a nice-to-have. Not a future concern. A prerequisite &mdash; the same way you wouldn&rsquo;t deploy a web application without authentication, or expose an API without rate limiting. The cost dimension is now a first-class security concern.
           </p>
 
           <div className="my-8 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-6">
@@ -308,7 +308,7 @@ const agentBToken = attenuate(agentAToken, {
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">What is an economic firewall?</h3>
                 <p className="text-gray-300 leading-relaxed mb-0">
-                  An economic firewall is a request-path control layer that decides whether an autonomous AI agent can afford an API, model, or MCP tool call before that call executes. It enforces budgets, tool prices, scopes, delegation rules, revocation, and audit requirements.
+                  An economic firewall is a control layer that checks before the request goes through and decides whether an autonomous AI agent can afford an API, model, or MCP tool call before that call executes. It enforces budgets, tool prices, scopes, delegation rules, revocation, and audit requirements.
                 </p>
               </div>
               <div>

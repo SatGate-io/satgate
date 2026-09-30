@@ -71,16 +71,16 @@ export default function AgentSpendPolicyTemplatePage() {
     '@type': 'WebPage',
     name: 'Agent Budget Policy Template',
     url: 'https://satgate.io/agent-spend-policy-template',
-    description: 'Generate copyable YAML and JSON policy templates for AI agent authority, budgets, MCP tool caps, revocation, receipts, and Evidence Pack fields.',
+    description: 'Generate copyable YAML and JSON policy templates for AI agent permissions, budgets, MCP tool caps, revocation, receipts, and signed receipt (Evidence Pack) fields.',
     datePublished: '2026-04-12',
     dateModified: '2026-05-03',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent budget policy template' },
-      { '@type': 'Thing', name: 'request-path budget enforcement' },
+      { '@type': 'Thing', name: 'budget enforcement before the request goes through' },
       { '@type': 'Thing', name: 'MCP tool cost policy' },
       { '@type': 'Thing', name: 'agent delegation limits' },
-      { '@type': 'Thing', name: 'receipt and Evidence Pack policy' },
+      { '@type': 'Thing', name: 'receipt policy' },
     ],
     audience: { '@type': 'Audience', audienceType: 'AI engineering, platform, API, security, and FinOps teams' },
   };
@@ -92,11 +92,11 @@ export default function AgentSpendPolicyTemplatePage() {
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/agent-spend-policy-template',
-    description: 'Generate copyable YAML and JSON policy templates for AI agent authority, budgets, MCP tool caps, revocation, receipts, and Evidence Pack fields.',
+    description: 'Generate copyable YAML and JSON policy templates for AI agent permissions, budgets, MCP tool caps, revocation, receipts, and signed receipt (Evidence Pack) fields.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-03',
     audience: webPageJsonLd.audience,
-    featureList: ['YAML budget policy generation', 'JSON budget policy generation', 'MCP tool cost caps', 'Delegation limit templates', 'Receipt and Evidence Pack field templates'],
+    featureList: ['YAML budget policy generation', 'JSON budget policy generation', 'MCP tool cost caps', 'Delegation limit templates', 'Signed receipt field templates'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
@@ -119,15 +119,15 @@ export default function AgentSpendPolicyTemplatePage() {
         name: 'What is an agent budget policy?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An agent budget policy defines the budgets, per-request limits, route rules, MCP tool caps, delegation limits, revocation behavior, receipts, and Evidence Pack fields that should be checked before autonomous agent requests execute.',
+          text: 'An agent budget policy defines the budgets, per-request limits, route rules, MCP tool caps, delegation limits, revocation behavior, receipts, and receipt fields that should be checked before autonomous agent requests execute.',
         },
       },
       {
         '@type': 'Question',
-        name: 'Why should budget policy be enforced in the request path?',
+        name: 'Why should budget policy be enforced before the request goes through?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Autonomous agents can loop, retry, delegate, and call expensive tools faster than dashboards or alerts can react. Request-path enforcement blocks over-budget activity before cost is created.',
+          text: 'Autonomous agents can loop, retry, delegate, and call expensive tools faster than dashboards or alerts can react. Checks before the request goes through block over-budget activity before cost is created.',
         },
       },
       {
@@ -135,7 +135,7 @@ export default function AgentSpendPolicyTemplatePage() {
         name: 'How does this template relate to SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate is the economic firewall that can enforce authority and budget policy in the request path across model calls, APIs, MCP tools, revocable credentials, delegation, Evidence Pack receipts, and Evidence Pack exports.',
+          text: 'SatGate is the economic firewall that can enforce authority and budget policy before the request goes through, across model calls, APIs, MCP tools, revocable credentials, delegation, signed receipts, and receipt exports.',
         },
       },
       {
@@ -143,7 +143,7 @@ export default function AgentSpendPolicyTemplatePage() {
         name: 'What fields should every AI agent budget policy include?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Every AI agent budget policy should include tenant, agent, task, route, model, tool, per-request cap, session budget, daily budget, delegation limits, credential expiry, revocation triggers, receipt ids, policy versions, and Evidence Pack fields.',
+          text: 'Every AI agent budget policy should include tenant, agent, task, route, model, tool, per-request cap, session budget, daily budget, delegation limits, credential expiry, revocation triggers, receipt ids, policy versions, and receipt fields.',
         },
       },
       {
@@ -174,14 +174,14 @@ export default function AgentSpendPolicyTemplatePage() {
             Agent Budget Policy Template
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Generate practical YAML or JSON policy for AI agent authority, budgets, per-request caps, MCP tool costs, delegation limits, revocation, receipts, and Evidence Pack fields.
+            Generate practical YAML or JSON policy for AI agent permissions, budgets, per-request caps, MCP tool costs, delegation limits, revocation, receipts, and receipt fields.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <a href="#template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Generate template <ArrowRight size={18} />
             </a>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
-              See Policy-to-Proof
+              See how rules and receipts work
             </Link>
           </div>
         </div>
@@ -243,10 +243,10 @@ export default function AgentSpendPolicyTemplatePage() {
           <div className="grid gap-5 md:grid-cols-3">
             {[
               [Gauge, 'Budgets', 'Daily, session, per-request, route, model, and MCP tool caps.'],
-              [Wrench, 'Tools', 'Per-tool price, risk tier, deny behavior, receipt fields, and Evidence Pack ids for MCP servers.'],
+              [Wrench, 'Tools', 'Per-tool price, risk tier, deny behavior, receipt fields, and receipt ids for MCP servers.'],
               [KeyRound, 'Credentials', 'Scoped capabilities with expiry, revocation, and loop-kill behavior.'],
-              [ShieldCheck, 'Delegation', 'Sub-agent budget percentages, shorter expiry, and attenuated authority.'],
-              [ReceiptText, 'Audit', 'Tenant, agent, task, route, model, tool, spend context, budget, decision, receipt id, and Evidence Pack id.'],
+              [ShieldCheck, 'Delegation', 'Sub-agent budget percentages, shorter expiry, and narrowed authority.'],
+              [ReceiptText, 'Audit', 'Tenant, agent, task, route, model, tool, spend context, budget, decision, receipt id, and signed receipt (Evidence Pack) id.'],
               [ClipboardList, 'Mode', 'Observe first, Control when trusted thresholds are clear, and capture receipts for every policy decision.'],
             ].map(([Icon, title, body]) => {
               const CardIcon = Icon as typeof Gauge;
@@ -270,25 +270,25 @@ export default function AgentSpendPolicyTemplatePage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is an agent budget policy?</h3>
               <p className="text-gray-400 leading-relaxed">
-                An agent budget policy defines the budgets, per-request limits, route rules, MCP tool caps, delegation limits, revocation behavior, receipts, and Evidence Pack fields that should be checked before autonomous agent requests execute.
+                An agent budget policy defines the budgets, per-request limits, route rules, MCP tool caps, delegation limits, revocation behavior, receipts, and receipt fields that should be checked before autonomous agent requests execute.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
-              <h3 className="mb-2 text-xl font-bold text-white">Why should budget policy be enforced in the request path?</h3>
+              <h3 className="mb-2 text-xl font-bold text-white">Why should budget policy be enforced before the request goes through?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Autonomous agents can loop, retry, delegate, and call expensive tools faster than dashboards or alerts can react. Request-path enforcement blocks over-budget activity before cost is created.
+                Autonomous agents can loop, retry, delegate, and call expensive tools faster than dashboards or alerts can react. Checks before the request goes through block over-budget activity before cost is created.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does this template relate to SatGate?</h3>
               <p className="text-gray-400 leading-relaxed">
-                SatGate is the economic firewall that can enforce authority and budget policy in the request path across model calls, APIs, MCP tools, revocable credentials, delegation, Evidence Pack receipts, and Evidence Pack exports.
+                SatGate is the economic firewall that can enforce authority and budget policy before the request goes through, across model calls, APIs, MCP tools, revocable credentials, delegation, signed receipts, and receipt exports.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What fields should every AI agent budget policy include?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Every AI agent budget policy should include tenant, agent, task, route, model, tool, per-request cap, session budget, daily budget, delegation limits, credential expiry, revocation triggers, receipt ids, policy versions, and Evidence Pack fields.
+                Every AI agent budget policy should include tenant, agent, task, route, model, tool, per-request cap, session budget, daily budget, delegation limits, credential expiry, revocation triggers, receipt ids, policy versions, and receipt fields.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -305,14 +305,14 @@ export default function AgentSpendPolicyTemplatePage() {
         <div className="rounded-3xl border border-purple-900/60 bg-gradient-to-br from-purple-950/30 to-cyan-950/25 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Turn this policy into proof.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            SatGate checks authority before execution, records every policy decision as a receipt, and packages evidence for review in an Evidence Pack.
+            SatGate checks permission before the agent acts, records every policy decision as a receipt, and packages evidence for review in an Evidence Pack.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Govern agent execution <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
-              Create Evidence Pack trail
+              Create a receipt trail
             </Link>
           </div>
         </div>

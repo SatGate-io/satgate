@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Clock, User } from 'lucide-react';
 
 export const metadata = {
   title: 'Why Routing Isn\'t Governance - SatGate Blog',
-  description: 'AI gateways excel at routing LLM calls. But when agents control spend autonomously, routing isn\'t enough. You need economic governance.',
+  description: 'AI gateways excel at routing LLM calls. But when agents control spend autonomously, routing isn\'t enough. You need spending controls.',
   alternates: { canonical: 'https://satgate.io/blog/why-routing-isnt-governance' },
   openGraph: {
     title: "Why Routing Isn't Governance for AI Agents",
@@ -25,7 +25,7 @@ export default function WhyRoutingIsntGovernancePage() {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
     headline: "Why Routing Isn't Governance",
-    description: "AI gateways excel at routing LLM calls. But when agents control spend autonomously, routing isn't enough. You need economic governance.",
+    description: "AI gateways excel at routing LLM calls. But when agents control spend autonomously, routing isn't enough. You need spending controls.",
     url: 'https://satgate.io/blog/why-routing-isnt-governance',
     datePublished: '2026-02-06',
     dateModified: '2026-05-04',
@@ -33,9 +33,9 @@ export default function WhyRoutingIsntGovernancePage() {
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI gateway routing' },
-      { '@type': 'Thing', name: 'economic governance for AI agents' },
+      { '@type': 'Thing', name: 'spending controls for AI agents' },
       { '@type': 'Thing', name: 'agent spend control' },
-      { '@type': 'Thing', name: 'request-path policy enforcement' },
+      { '@type': 'Thing', name: 'policy enforcement before the request goes through' },
     ],
   };
 
@@ -56,15 +56,15 @@ export default function WhyRoutingIsntGovernancePage() {
         name: 'What is the difference between an AI gateway and an economic gateway?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An AI gateway usually focuses on model routing, failover, caching, and observability. An economic gateway sits in the request path to enforce budgets, scoped authority, delegation rules, spend attribution, and payment policy before agent spend occurs.',
+          text: 'An AI gateway usually focuses on model routing, failover, caching, and observability. An economic gateway checks before the request goes through to enforce budgets, scoped authority, delegation rules, spend attribution, and payment policy before agent spend occurs.',
         },
       },
       {
         '@type': 'Question',
-        name: 'Can routing gateways and economic governance work together?',
+        name: 'Can routing gateways and spending controls work together?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes. The economic governance layer can check policy and budget first, then pass approved requests to a routing gateway for provider selection, failover, or caching. They solve different layers of the agent infrastructure problem.',
+          text: 'Yes. The spending controls layer can check policy and budget first, then pass approved requests to a routing gateway for provider selection, failover, or caching. They solve different layers of the agent infrastructure problem.',
         },
       },
     ],
@@ -103,7 +103,7 @@ export default function WhyRoutingIsntGovernancePage() {
           
           <p className="text-xl text-gray-400 mb-6">
             AI gateways excel at routing LLM calls. But when agents control spend autonomously, 
-            routing isn't enough. You need economic governance.
+            routing isn't enough. You need spending controls.
           </p>
           
           <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -226,7 +226,7 @@ export default function WhyRoutingIsntGovernancePage() {
             <h2 className="text-2xl font-bold text-white mt-12 mb-4">What Governance Looks Like</h2>
 
             <p>
-              Economic governance for AI agents isn't just "budget tracking." It's enforcement:
+              Spending controls for AI agents are not just "budget tracking." They are enforcement:
             </p>
 
             <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 my-6">
@@ -310,13 +310,13 @@ export default function WhyRoutingIsntGovernancePage() {
                 <div>
                   <h3 className="text-xl font-bold text-white mb-2">What is the difference between an AI gateway and an economic gateway?</h3>
                   <p className="text-gray-300 leading-relaxed mb-0">
-                    An AI gateway usually focuses on model routing, failover, caching, and observability. An economic gateway sits in the request path to enforce budgets, scoped authority, delegation rules, spend attribution, and payment policy before agent spend occurs.
+                    An AI gateway usually focuses on model routing, failover, caching, and observability. An economic gateway checks before the request goes through to enforce budgets, scoped authority, delegation rules, spend attribution, and payment policy before agent spend occurs.
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-2">Can routing gateways and economic governance work together?</h3>
+                  <h3 className="text-xl font-bold text-white mb-2">Can routing gateways and spending controls work together?</h3>
                   <p className="text-gray-300 leading-relaxed mb-0">
-                    Yes. The economic governance layer can check policy and budget first, then pass approved requests to a routing gateway for provider selection, failover, or caching. They solve different layers of the agent infrastructure problem.
+                    Yes. The spending controls layer can check policy and budget first, then pass approved requests to a routing gateway for provider selection, failover, or caching. They solve different layers of the agent infrastructure problem.
                   </p>
                 </div>
               </div>
@@ -331,7 +331,7 @@ export default function WhyRoutingIsntGovernancePage() {
 
         {/* CTA */}
         <section className="mt-16 bg-gradient-to-r from-cyan-900/20 to-purple-900/20 border border-cyan-800/30 rounded-xl p-8 text-center">
-          <h2 className="text-2xl font-bold mb-3">Ready to add economic governance?</h2>
+          <h2 className="text-2xl font-bold mb-3">Ready to add spending controls?</h2>
           <p className="text-gray-400 mb-6">
             Start with free Observe mode. See what your agents are actually spending.
           </p>

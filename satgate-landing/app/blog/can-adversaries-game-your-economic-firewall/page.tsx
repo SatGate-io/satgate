@@ -49,7 +49,7 @@ export default function AdversarialBlogPage() {
         name: 'Can attackers game an economic firewall?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Attackers can try to game weak economic controls through prompt injection, tool confusion, budget spreading, or token misuse. A well-designed economic firewall resists this by enforcing policy below the agent layer in the request path.',
+          text: 'Attackers can try to game weak economic controls through prompt injection, tool confusion, budget spreading, or token misuse. A well-designed economic firewall resists this by enforcing policy below the agent layer, before the request goes through.',
         },
       },
       {
@@ -57,7 +57,7 @@ export default function AdversarialBlogPage() {
         name: 'What makes an economic firewall resistant to adversarial AI?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Adversarial resistance comes from per-tool cost attribution, cryptographic capability tokens, non-escalatable caveats, revocation, Evidence Packs, and fail-closed enforcement at the gateway before forwarding to upstream services.',
+          text: 'Adversarial resistance comes from per-tool cost attribution, cryptographic capability tokens, non-escalatable caveats, revocation, signed receipts, and fail-closed enforcement at the gateway before forwarding to upstream services.',
         },
       },
       {
@@ -367,8 +367,8 @@ export default function AdversarialBlogPage() {
             <h2 className="mb-6 text-2xl font-bold text-white">Economic firewall adversarial security questions</h2>
             <div className="space-y-5">
               {[
-                ['Can attackers game an economic firewall?', 'Attackers can try to game weak economic controls through prompt injection, tool confusion, budget spreading, or token misuse. A well-designed economic firewall resists this by enforcing policy below the agent layer in the request path.'],
-                ['What makes an economic firewall resistant to adversarial AI?', 'Adversarial resistance comes from per-tool cost attribution, cryptographic capability tokens, non-escalatable caveats, revocation, Evidence Packs, and fail-closed enforcement at the gateway before forwarding to upstream services.'],
+                ['Can attackers game an economic firewall?', 'Attackers can try to game weak economic controls through prompt injection, tool confusion, budget spreading, or token misuse. A well-designed economic firewall resists this by enforcing policy below the agent layer, before the request goes through.'],
+                ['What makes an economic firewall resistant to adversarial AI?', 'Adversarial resistance comes from per-tool cost attribution, cryptographic capability tokens, non-escalatable caveats, revocation, signed receipts, and fail-closed enforcement at the gateway before forwarding to upstream services.'],
                 ['Why are macaroons useful for economic firewall security?', 'Macaroons let teams encode scope, expiry, budget, delegation, and revocation constraints directly into credentials. Child tokens can only add stricter caveats, never expand authority.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">

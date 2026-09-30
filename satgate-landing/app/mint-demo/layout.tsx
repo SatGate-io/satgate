@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: "Agent Capability Token Minting Demo | SatGate Mint",
   alternates: { canonical: "https://satgate.io/mint-demo" },
   description:
-    "Mint budget-aware capability tokens and macaroons for AI agents. Set request-path budgets, scopes, expiry, delegation limits, and revocation policy in seconds.",
+    "Mint budget-aware capability tokens and macaroons for AI agents. Set budgets before the request goes through, plus scopes, expiry, delegation limits, and revocation policy.",
   keywords: [
     "agent capability token demo",
     "AI agent macaroons",

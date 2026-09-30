@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: "AI Agent Management | Budgets, Capabilities, and MCP Governance",
   alternates: { canonical: "https://satgate.io/agents" },
   description:
-    "Manage AI agents with request-path budgets, scoped capability tokens, delegation trees, MCP tool governance, revocation, and real-time spend tracking.",
+    "Manage AI agents with budgets checked before the request goes through, scoped capability tokens, delegation trees, MCP tool governance, revocation, and real-time spend tracking.",
   keywords: [
     "AI agent management",
     "AI agent budgets",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "AI Agent Management | Budgets, Capabilities, and MCP Governance",
     description:
-      "Manage AI agents with request-path budgets, scoped capabilities, delegation controls, MCP tool governance, revocation, and spend tracking.",
+      "Manage AI agents with budgets checked before the request goes through, scoped capabilities, delegation controls, MCP tool governance, revocation, and spend tracking.",
     url: "https://satgate.io/agents",
     type: "website",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "AI Agent Management | Budgets, Capabilities, and MCP Governance",
     description:
-      "Request-path budgets, scoped capabilities, MCP tool governance, revocation, and spend tracking for autonomous agents.",
+      "Budgets checked before the request goes through, scoped capabilities, MCP tool governance, revocation, and spend tracking for autonomous agents.",
   },
 };
 

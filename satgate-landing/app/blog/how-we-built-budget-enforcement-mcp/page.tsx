@@ -7,7 +7,7 @@ export const metadata = {
   alternates: { canonical: 'https://satgate.io/blog/how-we-built-budget-enforcement-mcp' },
   openGraph: {
     title: 'How We Built Budget Enforcement for MCP Tool Calls',
-    description: 'Inside SatGate’s MCP proxy architecture for per-tool budgets, cryptographic delegation, and request-path enforcement.',
+    description: 'Inside SatGate’s MCP proxy architecture for per-tool budgets, cryptographic delegation, and enforcement before the request goes through.',
     url: 'https://satgate.io/blog/how-we-built-budget-enforcement-mcp',
     type: 'article',
     publishedTime: '2026-02-13T00:00:00Z',
@@ -56,7 +56,7 @@ export default function McpProxyBlogPage() {
         name: 'Why use macaroons for MCP delegation?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Macaroons support attenuated delegation: each child token can add stricter caveats for budget, scope, expiry, and tools, but cannot remove parent constraints or expand authority.',
+          text: 'Macaroons support narrowed delegation: each child token can add stricter caveats for budget, scope, expiry, and tools, but cannot remove parent constraints or expand authority.',
         },
       },
       {
@@ -163,7 +163,7 @@ export default function McpProxyBlogPage() {
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            OSS provides <code>InMemoryBudgetEnforcer</code> — a mutex-protected map. Simple, fast, not durable across restarts. Enterprise provides <code>RedisBudgetEnforcer</code> — atomic Lua scripts, idempotent spend tracking, Postgres Evidence Pack.
+            OSS provides <code>InMemoryBudgetEnforcer</code> — a mutex-protected map. Simple, fast, not durable across restarts. Enterprise provides <code>RedisBudgetEnforcer</code> — atomic Lua scripts, idempotent spend tracking, Postgres signed receipt (Evidence Pack).
           </p>
 
           <p className="text-gray-300 leading-relaxed">When budget hits zero:</p>
@@ -238,7 +238,7 @@ Result:
             <div className="space-y-5">
               {[
                 ['How does MCP budget enforcement work?', 'It intercepts tools/call messages, resolves the tool cost, checks the agent or token budget, and only forwards the request to the upstream MCP server when budget remains.'],
-                ['Why use macaroons for MCP delegation?', 'Macaroons support attenuated delegation: each child token can add stricter caveats for budget, scope, expiry, and tools, but cannot remove parent constraints or expand authority.'],
+                ['Why use macaroons for MCP delegation?', 'Macaroons support narrowed delegation: each child token can add stricter caveats for budget, scope, expiry, and tools, but cannot remove parent constraints or expand authority.'],
                 ['What happens when an MCP agent exhausts its budget?', 'The proxy returns a structured budget_exhausted error instead of forwarding the tool call, giving the agent a clear failure it can handle without creating an infinite retry or surprise bill.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">

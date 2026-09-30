@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: "SatGate Design Partners | Economic Firewall for AI Agents",
   alternates: { canonical: "https://satgate.io/design-partners" },
   description:
-    "Optional 90-day design-partner pilot for larger teams that want help with Policy-to-Proof governance. A 14-day self-serve trial is also open.",
+    "Optional 90-day design-partner pilot for larger teams that want help with rules and receipts for AI agents. A 14-day self-serve trial is also open.",
   keywords: [
     "SatGate design partners",
     "economic firewall design partner",
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "AI agent cost control pilot",
     "MCP governance pilot",
     "agent API governance",
-    "Policy-to-Proof pilot",
+    "rules and receipts pilot",
   ],
   openGraph: {
     title: "SatGate Design Partners | Economic Firewall for AI Agents",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SatGate Design Partners | Economic Firewall for AI Agents",
     description:
-      "Shape Policy-to-Proof governance for enterprise AI agents with SatGate.",
+      "Shape rules and receipts for AI agents with SatGate.",
   },
 };
 

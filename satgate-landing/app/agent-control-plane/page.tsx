@@ -19,7 +19,7 @@ import {
 export const metadata: Metadata = {
   title: "SatGate Agent Control Plane | Govern Enterprise AI Agents",
   description:
-    "SatGate is an agent control plane for enterprise AI agents: scoped capabilities, delegation lineage, request-path budget enforcement, Evidence Pack exports, and next-request revocation.",
+    "SatGate is an agent control plane for enterprise AI agents: scoped capabilities, delegation lineage, budget enforcement before the request goes through, receipt exports, and next-request revocation.",
   keywords: [
     "agent control plane",
     "AI agent control plane",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     "agent capability management",
     "revocable agent credentials",
     "agent kill switch",
-    "agent Evidence Pack",
+    "agent signed receipt",
     "AI agent spend governance",
     "economic firewall for AI agents",
   ],
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SatGate Agent Control Plane | Govern Enterprise AI Agents",
     description:
-      "Govern enterprise AI agents with scoped capabilities, delegation lineage, request-path budgets, Evidence Pack exports, and next-request revocation.",
+      "Govern enterprise AI agents with scoped capabilities, delegation lineage, budgets checked before the request goes through, receipt exports, and next-request revocation.",
     url: "https://satgate.io/agent-control-plane",
     type: "website",
     images: [
@@ -84,7 +84,7 @@ const proofPoints = [
 
 const enforcementOutcomes = [
   ["Approved work", "The agent completes authorized tasks through SatGate, with policy and tenant context attached."],
-  ["Budget protected", "Spend caps stop runaway loops before the next expensive call leaves the request path."],
+  ["Budget protected", "Spend caps stop runaway loops before the next expensive call goes through."],
   ["Access revoked", "A kill switch cuts off a risky agent or delegated worker immediately."],
   ["Tenant isolated", "Customer boundaries stay intact even when agents call shared tools or APIs."],
   ["Delegation contained", "A worker can only receive the narrower authority the parent was allowed to hand off."],
@@ -120,12 +120,12 @@ const controlPlaneCapabilities = [
 const comparisons = [
   ["Connection", "Agents can reach models, APIs, and MCP tools."],
   ["Control", "SatGate decides what authority, budget, and delegation each agent receives."],
-  ["Proof", "Every allowed, denied, charged, or revoked action leaves a receipt that feeds the Evidence Pack."],
-  ["Revenue", "The same control path governs paid calls across x402, L402, AgentCore Payments, and Pay.sh while preserving proof of agent authority."],
+  ["Proof", "Every allowed, denied, charged, or revoked action leaves a receipt that feeds the exported receipt bundle (Evidence Pack)."],
+  ["Revenue", "The same control path governs paid calls across x402, L402, AgentCore Payments, and Pay.sh while preserving proof of agent permissions."],
 ];
 
 const personaCards = [
-  ["Platform team", "Gets a control plane for enterprise agents across APIs, MCP tools, models, and paid rails."],
+  ["Platform team", "Gets a control plane for enterprise agents across APIs, MCP tools, models, and payment methods."],
   ["Security team", "Gets revocation with evidence: the authority chain, denial reason, and first blocked call after revoke."],
   ["FinOps team", "Gets spend attributed to the agent, token, route, tool, and policy before finance has to reconstruct it."],
 ];
@@ -137,7 +137,7 @@ const faqs = [
   ],
   [
     "How is an agent control plane different from an API gateway?",
-    "An API gateway protects services. An agent control plane governs the agents using those services: their budget, customer boundary, delegation rights, Evidence Pack, and ability to have governed requests denied after revocation.",
+    "An API gateway protects services. An agent control plane governs the agents using those services: their budget, customer boundary, delegation rights, signed receipt (Evidence Pack), and ability to have governed requests denied after revocation.",
   ],
   [
     "Why do enterprise AI agents need no standing authority?",
@@ -150,15 +150,15 @@ const faqs = [
 ];
 
 const relatedTopics = [
-  ["/policy-to-proof", "Policy-to-Proof", "Turn every mint, delegation, paid call, denial, and revocation into receipts and exportable Evidence Pack proof."],
+  ["/policy-to-proof", "Rules and Receipts", "Turn every mint, delegation, paid call, denial, and revocation into receipts and an exportable signed receipt (Evidence Pack)."],
   ["/mcp", "MCP governance", "Apply budget, revocation, and audit controls to agent tool calls."],
-  ["/agent-api-governance", "Agent API governance", "Replace broad API keys with policy-bound, auditable agent authority."],
+  ["/agent-api-governance", "Agent API governance", "Replace broad API keys with policy-bound, auditable agent permissions."],
   ["/agent-capability-tokens", "Agent capability tokens", "Encode route, budget, expiry, delegation, and revocation into agent access."],
   ["/revocable-agent-credentials", "Revocable agent credentials", "Kill agent access without rotating every upstream provider secret."],
-  ["/economic-firewall", "Economic firewall", "The request-path enforcement layer for agent access, spend, and governed paid calls."],
+  ["/economic-firewall", "Economic firewall", "Enforcement before the request goes through, for agent access, spend, and governed paid calls."],
   ["/ai-agent-cost-control", "AI agent cost control", "Control model, API, MCP, and delegated sub-agent spend before cost is created."],
   ["/economic-firewall-readiness-grader", "Economic firewall readiness grader", "Score identity, budgets, revocation, audit, routing, MCP, and paid-call governance readiness."],
-  ["/satgate-for-hermes-agent", "SatGate for Hermes Agent", "Govern local Hermes/Open WebUI agent workflows with SatGate in the request path."],
+  ["/satgate-for-hermes-agent", "SatGate for Hermes Agent", "Govern local Hermes/Open WebUI agent workflows with SatGate checking each request before it goes through."],
 ];
 
 const jsonLd = {
@@ -169,7 +169,7 @@ const jsonLd = {
       name: "SatGate Agent Control Plane",
       url: "https://satgate.io/agent-control-plane",
       description:
-        "An agent control plane for enterprise AI agents: scoped capabilities, delegation lineage, request-path budget enforcement, Evidence Pack exports, and revocation without standing API keys.",
+        "An agent control plane for enterprise AI agents: scoped capabilities, delegation lineage, budget enforcement before the request goes through, receipt exports, and revocation without standing API keys.",
       datePublished: "2026-04-27",
       dateModified: "2026-05-05",
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
@@ -177,7 +177,7 @@ const jsonLd = {
         { "@type": "Thing", name: "AI agent control plane" },
         { "@type": "Thing", name: "AI agent delegation control" },
         { "@type": "Thing", name: "agent capability management" },
-        { "@type": "Thing", name: "request-path budget enforcement" },
+        { "@type": "Thing", name: "budget enforcement before the request goes through" },
       ],
     },
     {
@@ -200,9 +200,9 @@ const jsonLd = {
         "No standing API keys for enterprise AI agents",
         "Scoped agent capabilities",
         "Delegation lineage proof",
-        "Request-path budget enforcement",
+        "Budget enforcement before the request goes through",
         "MCP tool governance",
-        "Agent Evidence Packs",
+        "Agent signed receipts (Evidence Packs)",
         "Next-request revocation and kill switch",
       ],
     },
@@ -349,7 +349,7 @@ export default function AgentControlPlanePage() {
               One control plane for internal agents and governed paid calls.
             </h2>
             <p className="mt-5 text-lg leading-8 text-slate-300">
-              Internal agent calls and governed external paid calls move through the same authority model — same scoped capability, same delegation chain, one Evidence Pack.
+              Internal agent calls and governed external paid calls move through the same authority model: same scoped capability, same delegation chain, one signed receipt (Evidence Pack).
             </p>
           </div>
           <div className="grid gap-5 md:grid-cols-2">
@@ -385,7 +385,7 @@ export default function AgentControlPlanePage() {
               AI agents are starting to call APIs, use paid tools, delegate work, and act across customer environments. A production team needs more than connection and logs — it needs a way to decide what each agent is allowed to do before the action happens.
             </p>
             <p className="mt-4 text-lg leading-8 text-slate-300">
-              SatGate turns agent authority into a governed business object: scoped, budgeted, delegated, metered, audited, and revocable. The agent can move fast, but it never gets unlimited power.
+              SatGate turns agent permissions into a governed business object: scoped, budgeted, delegated, metered, audited, and revocable. The agent can move fast, but it never gets unlimited power.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -432,7 +432,7 @@ export default function AgentControlPlanePage() {
               Delegation without runaway authority
             </div>
             <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
-              See exactly how agent authority moves.
+              See exactly how agent permissions move.
             </h2>
             <p className="mt-5 text-lg leading-8 text-slate-300">
               When one agent delegates work to another, SatGate keeps the child narrower than the parent. Security teams can see the chain of authority, the budget attached to it, and where policy stopped the handoff.
@@ -522,7 +522,7 @@ export default function AgentControlPlanePage() {
             </div>
             <h2 className="text-4xl font-black tracking-[-0.04em] text-white">See the control loop end to end.</h2>
             <p className="mt-5 text-lg leading-8 text-slate-300">
-              The walkthrough shows the control loop end to end: an agent receives bounded authority, delegates safely, hits real policy checks, leaves an Evidence Pack, and can be shut down immediately.
+              The walkthrough shows the control loop end to end: an agent receives bounded authority, delegates safely, hits real policy checks, leaves a signed receipt (Evidence Pack), and can be shut down immediately.
             </p>
           </div>
         </div>
@@ -535,12 +535,12 @@ export default function AgentControlPlanePage() {
               <FileText size={15} />
               Security proof card
             </div>
-            <h2 className="text-4xl font-black tracking-[-0.04em] text-white">A one-page proof card. The full lifecycle exports as an Evidence Pack.</h2>
+            <h2 className="text-4xl font-black tracking-[-0.04em] text-white">A one-page proof card. The full lifecycle exports as a signed receipt (Evidence Pack).</h2>
             <p className="mt-5 text-lg leading-8 text-slate-300">
-              Use the proof card to explain the Agent Control Plane in a security review: no permanent keys, bounded authority, controlled delegation, visible spend, next-request revocation, and an exportable Evidence Pack for the full Policy-to-Proof lifecycle.
+              Use the proof card to explain the Agent Control Plane in a security review: no permanent keys, bounded authority, controlled delegation, visible spend, next-request revocation, and an exportable signed receipt (Evidence Pack) for the full rules and receipts lifecycle.
             </p>
             <Link href="/policy-to-proof" className="mt-5 inline-flex text-sm font-bold text-cyan-200 hover:text-cyan-100">
-              See the full Evidence Pack lifecycle →
+              See the full receipt lifecycle →
             </Link>
             <a
               href="/acp-demo/satgate-acp-security-proof-card.pdf"

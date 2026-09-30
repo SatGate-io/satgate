@@ -24,13 +24,13 @@ const questions: Question[] = [
     id: 'budgets',
     category: 'Budget enforcement',
     prompt: 'Can you block or route requests before they exceed per-agent, per-session, per-tool, daily, or per-request budgets?',
-    fix: 'Move high-risk routes from dashboard-only monitoring to request-path Control policy.',
+    fix: 'Move high-risk routes from dashboard-only monitoring to a Control policy checked before the request goes through.',
   },
   {
     id: 'mcp',
     category: 'MCP governance',
-    prompt: 'Do MCP tool calls have prices, authority scope, risk tiers, denial reasons, and Evidence Pack trails before tools execute?',
-    fix: 'Proxy MCP traffic and assign explicit policy, price, risk, and Evidence Pack fields to search, browser, cloud, code, data, and premium API tools.',
+    prompt: 'Do MCP tool calls have prices, authority scope, risk tiers, denial reasons, and signed receipt trails before tools execute?',
+    fix: 'Proxy MCP traffic and assign explicit policy, price, risk, and signed receipt (Evidence Pack) fields to search, browser, cloud, code, data, and premium API tools.',
   },
   {
     id: 'revocation',
@@ -41,14 +41,14 @@ const questions: Question[] = [
   {
     id: 'delegation',
     category: 'Delegation',
-    prompt: 'When agents spawn sub-agents, does delegated authority shrink by budget, scope, tool list, route, and expiry?',
-    fix: 'Require attenuation: child agents should inherit less power, not a copy of parent credentials.',
+    prompt: 'When agents spawn sub-agents, do delegated permissions shrink by budget, scope, tool list, route, and expiry?',
+    fix: 'Require narrowing: child agents should inherit less power, not a copy of parent credentials.',
   },
   {
     id: 'audit',
     category: 'Audit evidence',
     prompt: 'Can finance/security/platform teams reconstruct who had authority, what happened, why it was allowed or denied, and which policy decided?',
-    fix: 'Record the authority chain, policy decision, denial reason, estimated cost, remaining budget, route, tool, credential, and upstream outcome for Evidence Pack export.',
+    fix: 'Record the authority chain, policy decision, denial reason, estimated cost, remaining budget, route, tool, credential, and upstream outcome for receipt export.',
   },
   {
     id: 'routing',
@@ -58,8 +58,8 @@ const questions: Question[] = [
   },
   {
     id: 'paidRails',
-    category: 'Paid-rail context',
-    prompt: 'When value moves across paid rails, can you preserve payment context alongside authority, denial, delegation, and revocation evidence?',
+    category: 'Payment details',
+    prompt: 'When value moves across payment methods, can you preserve payment context alongside authority, denial, delegation, and revocation evidence?',
     fix: 'Govern paid calls across x402, L402, AgentCore Payments, Pay.sh, API-key billing, or enterprise ledgers without making payment the center of the control model.',
   },
 ];
@@ -71,11 +71,11 @@ const labels: Record<Answer, string> = {
 };
 
 function grade(score: number) {
-  if (score >= 85) return { label: 'A', title: 'Economically governable', color: 'text-green-400', summary: 'Your stack has the core controls for autonomous agent authority, spend, and Evidence Pack proof.' };
-  if (score >= 70) return { label: 'B', title: 'Close, with gaps', color: 'text-cyan-300', summary: 'You have real governance primitives, but a few request-path controls need tightening.' };
+  if (score >= 85) return { label: 'A', title: 'Economically governable', color: 'text-green-400', summary: 'Your stack has the core controls for what an autonomous agent may do and spend, plus signed receipts.' };
+  if (score >= 70) return { label: 'B', title: 'Close, with gaps', color: 'text-cyan-300', summary: 'You have real building blocks, but a few checks before the request goes through need tightening.' };
   if (score >= 50) return { label: 'C', title: 'Observable but fragile', color: 'text-yellow-300', summary: 'You can probably explain activity after the fact, but agents can still outrun authority policy.' };
   if (score >= 30) return { label: 'D', title: 'High authority risk', color: 'text-orange-400', summary: 'Agents can likely access, spend, delegate, or call tools faster than you can stop them.' };
-  return { label: 'F', title: 'Not ready for autonomous authority', color: 'text-red-400', summary: 'This is static-key/dashboard territory. Put governance in the request path before scaling agents.' };
+  return { label: 'F', title: 'Not ready for autonomous authority', color: 'text-red-400', summary: 'This is static-key/dashboard territory. Check each request that goes through SatGate before scaling agents.' };
 }
 
 export default function EconomicFirewallReadinessGraderPage() {
@@ -94,15 +94,15 @@ export default function EconomicFirewallReadinessGraderPage() {
     '@type': 'WebPage',
     name: 'Economic Firewall Readiness Grader',
     url: 'https://satgate.io/economic-firewall-readiness-grader',
-    description: 'Grade AI agent economic governance readiness across identity, request-path budgets, MCP tools, revocation, delegation, audit, routing, and paid-rail context.',
+    description: 'Grade spending controls for AI agents across identity, budgets checked before the request goes through, MCP tools, revocation, delegation, audit, routing, and payment details.',
     dateModified: '2026-05-05',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'economic firewall readiness' },
-      { '@type': 'Thing', name: 'AI agent economic governance' },
-      { '@type': 'Thing', name: 'request-path budget controls' },
+      { '@type': 'Thing', name: 'spending controls for AI agents' },
+      { '@type': 'Thing', name: 'budget checks before the request goes through' },
       { '@type': 'Thing', name: 'MCP governance assessment' },
-      { '@type': 'Thing', name: 'paid-rail governance readiness' },
+      { '@type': 'Thing', name: 'payment rules readiness' },
     ],
   };
 
@@ -113,11 +113,11 @@ export default function EconomicFirewallReadinessGraderPage() {
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     url: 'https://satgate.io/economic-firewall-readiness-grader',
-    description: 'Grade AI agent economic governance readiness across identity, budgets, MCP tools, revocation, delegation, audit, routing, and payments.',
+    description: 'Grade spending controls for AI agents across identity, budgets, MCP tools, revocation, delegation, audit, routing, and payments.',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-05',
     about: webPageJsonLd.about,
-    featureList: ['Agent identity attribution scoring', 'Request-path budget readiness scoring', 'MCP tool cost governance checks', 'Revocation and delegation readiness checks', 'Audit, routing, and paid-rail context readiness checks'],
+    featureList: ['Agent identity attribution scoring', 'budget readiness scoring before the request goes through', 'MCP tool cost governance checks', 'Revocation and delegation readiness checks', 'Audit, routing, and payment details readiness checks'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   };
 
@@ -125,11 +125,11 @@ export default function EconomicFirewallReadinessGraderPage() {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
-      { '@type': 'Question', name: 'What is economic firewall readiness?', acceptedAnswer: { '@type': 'Answer', text: 'Economic firewall readiness measures whether an organization can observe, control, audit, revoke, route, budget, and preserve paid-rail context for AI agent/API activity before requests execute.' } },
-      { '@type': 'Question', name: 'What score means we are ready for autonomous agents?', acceptedAnswer: { '@type': 'Answer', text: 'A score above 85 means most core request-path controls are in place. Lower scores indicate gaps in identity, budget enforcement, MCP governance, revocation, audit, routing, or payment.' } },
-      { '@type': 'Question', name: 'How does SatGate improve readiness?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate sits in the request path to observe agent/API activity, enforce budget and access policy, revoke scoped capabilities, preserve Evidence Pack proof, route economically, and govern paid rails when value moves.' } },
-      { '@type': 'Question', name: 'Which gaps should teams fix first?', acceptedAnswer: { '@type': 'Answer', text: 'Teams should fix request attribution, hard budget enforcement, MCP tool policy, scoped revocable credentials, and Evidence Pack capture first because those controls stop unauthorized actions before execution.' } },
-      { '@type': 'Question', name: 'Is a dashboard enough for economic firewall readiness?', acceptedAnswer: { '@type': 'Answer', text: 'No. Dashboards help explain activity after it happens, but economic firewall readiness requires request-path controls that can allow, deny, route, revoke, delegate, or preserve paid-rail context before agents execute work.' } },
+      { '@type': 'Question', name: 'What is economic firewall readiness?', acceptedAnswer: { '@type': 'Answer', text: 'Economic firewall readiness measures whether an organization can observe, control, audit, revoke, route, budget, and preserve payment details for AI agent/API activity before requests execute.' } },
+      { '@type': 'Question', name: 'What score means we are ready for autonomous agents?', acceptedAnswer: { '@type': 'Answer', text: 'A score above 85 means most core checks before the request goes through are in place. Lower scores indicate gaps in identity, budget enforcement, MCP governance, revocation, audit, routing, or payment.' } },
+      { '@type': 'Question', name: 'How does SatGate improve readiness?', acceptedAnswer: { '@type': 'Answer', text: 'On each request that goes through SatGate, it can observe agent/API activity, enforce budget and access policy, revoke scoped capabilities, preserve a signed receipt, route economically, and apply payment rules when value moves.' } },
+      { '@type': 'Question', name: 'Which gaps should teams fix first?', acceptedAnswer: { '@type': 'Answer', text: 'Teams should fix request attribution, hard budget enforcement, MCP tool policy, scoped revocable credentials, and signed receipt capture first because those controls stop unauthorized actions before execution.' } },
+      { '@type': 'Question', name: 'Is a dashboard enough for economic firewall readiness?', acceptedAnswer: { '@type': 'Answer', text: 'No. Dashboards help explain activity after it happens, but economic firewall readiness requires checks before the request goes through that can allow, deny, route, revoke, delegate, or preserve payment details before agents execute work.' } },
     ],
   };
 
@@ -137,7 +137,7 @@ export default function EconomicFirewallReadinessGraderPage() {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: 'Economic firewall readiness criteria',
-    description: 'Eight readiness checks for governing AI agent authority, spend, MCP tools, scoped authority, Evidence Pack capture, routing, and paid-rail context before requests execute.',
+    description: 'Eight readiness checks for governing what an AI agent may do and spend: MCP tools, scoped permissions, signed receipt capture, routing, and payment details before requests execute.',
     itemListElement: questions.map((question, index) => ({
       '@type': 'ListItem',
       position: index + 1,
@@ -171,7 +171,7 @@ export default function EconomicFirewallReadinessGraderPage() {
           </div>
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Economic Firewall Readiness Grader</h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Grade whether your agent/API stack can handle autonomous authority: identity, request-path budgets, MCP tool policy, revocation, delegation, Evidence Pack capture, routing, and paid-rail context.
+            Grade whether your agent/API stack can handle autonomous authority: identity, budgets checked before the request goes through, MCP tool policy, revocation, delegation, signed receipt capture, routing, and payment details.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/economic-firewall" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -243,10 +243,10 @@ export default function EconomicFirewallReadinessGraderPage() {
           <h2 className="mb-8 text-3xl font-bold text-white">What the grader measures</h2>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {[
-              [KeyRound, 'Authority', 'Agent identity, scoped credentials, expiry, attenuation, and revocation.'],
-              [Gauge, 'Budget and authority limits', 'Request-path budgets, scoped authority, per-tool caps, model routing, and loop prevention.'],
-              [ReceiptText, 'Evidence', 'Evidence Pack trails that explain authority, spend context, policy decision, denial reason, route, and outcome.'],
-              [BadgeCheck, 'Paid-rail context', 'Observe, Control, and Prove paths for internal agents and rail-aware paid calls.'],
+              [KeyRound, 'Authority', 'Agent identity, scoped credentials, expiry, narrowing, and revocation.'],
+              [Gauge, 'Budget and authority limits', 'Budgets checked before the request goes through, scoped permissions, per-tool caps, model routing, and loop prevention.'],
+              [ReceiptText, 'Evidence', 'Signed receipt trails that explain authority, spend context, policy decision, denial reason, route, and outcome.'],
+              [BadgeCheck, 'Payment details', 'Observe, Control, and Prove paths for internal agents and paid calls.'],
             ].map(([Icon, title, body]) => {
               const TypedIcon = Icon as typeof KeyRound;
               return (
@@ -267,11 +267,11 @@ export default function EconomicFirewallReadinessGraderPage() {
           <h2 className="mb-8 text-3xl font-bold text-white">Economic firewall readiness questions</h2>
           <div className="grid gap-5 md:grid-cols-2">
             {[
-              ['What is economic firewall readiness?', 'Economic firewall readiness measures whether an organization can observe, control, audit, revoke, route, budget, and preserve paid-rail context for AI agent/API activity before requests execute.'],
-              ['What score means we are ready for autonomous agents?', 'A score above 85 means most core request-path controls are in place. Lower scores indicate gaps in identity, budget enforcement, MCP governance, revocation, audit, routing, or payment.'],
-              ['How does SatGate improve readiness?', 'SatGate sits in the request path to observe agent/API activity, enforce budget and access policy, revoke scoped capabilities, preserve Evidence Pack proof, route economically, and govern paid rails when value moves.'],
-              ['Which gaps should teams fix first?', 'Teams should fix request attribution, hard budget enforcement, MCP tool policy, scoped revocable credentials, and Evidence Pack capture first because those controls stop unauthorized actions before execution.'],
-              ['Is a dashboard enough for economic firewall readiness?', 'No. Dashboards help explain activity after it happens, but economic firewall readiness requires request-path controls that can allow, deny, route, revoke, delegate, or preserve paid-rail context before agents execute work.'],
+              ['What is economic firewall readiness?', 'Economic firewall readiness measures whether an organization can observe, control, audit, revoke, route, budget, and preserve payment details for AI agent/API activity before requests execute.'],
+              ['What score means we are ready for autonomous agents?', 'A score above 85 means most core checks before the request goes through are in place. Lower scores indicate gaps in identity, budget enforcement, MCP governance, revocation, audit, routing, or payment.'],
+              ['How does SatGate improve readiness?', 'On each request that goes through SatGate, it can observe agent/API activity, enforce budget and access policy, revoke scoped capabilities, preserve a signed receipt, route economically, and apply payment rules when value moves.'],
+              ['Which gaps should teams fix first?', 'Teams should fix request attribution, hard budget enforcement, MCP tool policy, scoped revocable credentials, and signed receipt capture first because those controls stop unauthorized actions before execution.'],
+              ['Is a dashboard enough for economic firewall readiness?', 'No. Dashboards help explain activity after it happens, but economic firewall readiness requires checks before the request goes through that can allow, deny, route, revoke, delegate, or preserve payment details before agents execute work.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
                 <h3 className="mb-2 text-xl font-bold text-white">{question}</h3>
@@ -284,16 +284,16 @@ export default function EconomicFirewallReadinessGraderPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-purple-950/30 p-8 md:p-12">
-          <h2 className="mb-4 text-3xl font-bold text-white">Move weak areas into request-path control</h2>
+          <h2 className="mb-4 text-3xl font-bold text-white">Move weak areas to checks before the request goes through</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            SatGate governs agent authority before execution: Observe every agent call, Control risky requests before they execute, and Prove allowed, denied, delegated, revoked, or paid decisions with an Evidence Pack.
+            SatGate checks permission before the agent acts: Observe every agent call, Control risky requests before they execute, and keep a signed receipt for allowed, denied, delegated, revoked, or paid decisions.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               See SatGate governance <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
-              See the Evidence Pack
+              See how rules and receipts work
             </Link>
           </div>
         </div>

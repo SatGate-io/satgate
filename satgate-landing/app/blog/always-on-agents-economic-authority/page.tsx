@@ -59,8 +59,8 @@ export default function AlwaysOnAgentsEconomicAuthorityBlogPage() {
       { '@type': 'Thing', name: 'economic authority' },
       { '@type': 'Thing', name: 'Economic Firewall' },
       { '@type': 'Thing', name: 'MCP governance' },
-      { '@type': 'Thing', name: 'Policy-to-Proof' },
-      { '@type': 'Thing', name: 'Evidence Packs' },
+      { '@type': 'Thing', name: 'Rules and Receipts' },
+      { '@type': 'Thing', name: 'signed receipts' },
       { '@type': 'Thing', name: 'Microsoft Scout' },
     ],
   };
@@ -201,7 +201,7 @@ export default function AlwaysOnAgentsEconomicAuthorityBlogPage() {
               Scout handles identity, access, and data movement inside Microsoft 365.
             </p>
             <p className="text-gray-300 leading-relaxed mb-0">
-              The Economic Firewall handles economic authority across external APIs, MCP tools, SaaS actions, paid rails, and delegation chains: what actions are allowed, who pays, and what proof exists.
+              The Economic Firewall handles economic authority across external APIs, MCP tools, SaaS actions, payment methods, and delegation chains: what actions are allowed, who pays, and what proof exists.
             </p>
           </div>
 
@@ -281,9 +281,9 @@ export default function AlwaysOnAgentsEconomicAuthorityBlogPage() {
           </p>
 
           <div className="my-8 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-6">
-            <h2 className="text-2xl font-bold text-white mb-4">Policy-to-Proof for agent action</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">Rules and Receipts for agent action</h2>
             <ol className="text-gray-300 space-y-2">
-              <li>Define authority before execution.</li>
+              <li>Define permission before the agent acts.</li>
               <li>Enforce it at runtime.</li>
               <li>Preserve proof after the decision.</li>
             </ol>
@@ -333,7 +333,7 @@ export default function AlwaysOnAgentsEconomicAuthorityBlogPage() {
           <p className={paragraphClass}>Scout handles identity, access, and data movement inside Microsoft 365.</p>
 
           <p className={paragraphClass}>
-            The Economic Firewall handles economic authority across external APIs, MCP tools, SaaS actions, paid rails, and delegation chains.
+            The Economic Firewall handles economic authority across external APIs, MCP tools, SaaS actions, payment methods, and delegation chains.
           </p>
 
           <p className={paragraphClass}>One answers who can act and what data can move.</p>
@@ -354,14 +354,14 @@ export default function AlwaysOnAgentsEconomicAuthorityBlogPage() {
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Next step</p>
             <h2 className="text-2xl font-bold text-white mb-3">Govern external agent actions before they execute</h2>
             <p className="text-gray-300 leading-relaxed mb-5">
-              If your agents are starting to call MCP tools, paid APIs, SaaS workflows, or delegated agent systems, put policy and proof in the request path before autonomy scales.
+              If your agents are starting to call MCP tools, paid APIs, SaaS workflows, or delegated agent systems, put policy and proof before the request goes through, before autonomy scales.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link href="/govern" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">
                 See agent governance <ArrowRight size={16} className="ml-2" />
               </Link>
               <Link href="/policy-to-proof" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
-                See Policy-to-Proof
+                See how rules and receipts work
               </Link>
             </div>
           </div>

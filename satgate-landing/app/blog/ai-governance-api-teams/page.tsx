@@ -3,12 +3,12 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "AI Governance for API Teams: Gateway Policy, Not Just Routing",
-  description: "API teams need AI governance for budgets, permissions, and Evidence Packs — not just routing. Learn where traditional API management falls short.",
+  description: "API teams need AI governance for budgets, permissions, and signed receipts — not just routing. Learn where traditional API management falls short.",
   alternates: { canonical: 'https://satgate.io/blog/ai-governance-api-teams' },
   keywords: ['AI governance API teams', 'API governance AI agents', 'AI API management', 'API team governance', 'AI agent policy enforcement', 'API governance framework'],
   openGraph: {
     title: 'AI Governance for API Teams: Gateway Policy, Not Just Routing',
-    description: 'API teams need AI governance for budgets, permissions, revocation, and Evidence Packs — not just gateway routing.',
+    description: 'API teams need AI governance for budgets, permissions, revocation, and signed receipts — not just gateway routing.',
     url: 'https://satgate.io/blog/ai-governance-api-teams',
     type: 'article',
     publishedTime: '2026-03-19T00:00:00Z',
@@ -17,7 +17,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'AI Governance for API Teams: Gateway Policy, Not Just Routing',
-    description: 'Learn how API teams can enforce AI agent budgets, permissions, audit, revocation, and request-path policy.',
+    description: 'Learn how API teams can enforce AI agent budgets, permissions, audit, revocation, and policy before the request goes through.',
   },
 };
 
@@ -26,7 +26,7 @@ export default function AiGovernanceApiTeamsBlogPage() {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
     headline: 'AI Governance for API Teams: Why Your Gateway Needs Policy, Not Just Routing',
-    description: 'API teams need AI governance for budgets, permissions, and Evidence Packs — not just routing. Learn where traditional API management falls short.',
+    description: 'API teams need AI governance for budgets, permissions, and signed receipts — not just routing. Learn where traditional API management falls short.',
     url: 'https://satgate.io/blog/ai-governance-api-teams',
     datePublished: '2026-03-19',
     dateModified: '2026-05-04',
@@ -36,7 +36,7 @@ export default function AiGovernanceApiTeamsBlogPage() {
       { '@type': 'Thing', name: 'AI governance for API teams' },
       { '@type': 'Thing', name: 'AI API management' },
       { '@type': 'Thing', name: 'agent policy enforcement' },
-      { '@type': 'Thing', name: 'request-path API governance' },
+      { '@type': 'Thing', name: 'API governance before the request goes through' },
     ],
   };
 
@@ -65,7 +65,7 @@ export default function AiGovernanceApiTeamsBlogPage() {
         name: 'Where should API teams enforce AI agent policy?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'API teams should enforce AI agent policy in the request path at an economic firewall, gateway, or MCP proxy so budget, permission, revocation, and audit checks happen at the gateway policy check before forwarding.',
+          text: 'API teams should enforce AI agent policy at an economic firewall, gateway, or MCP proxy, before the request goes through, so budget, permission, revocation, and audit checks happen at the gateway policy check before forwarding.',
         },
       },
     ],
@@ -226,7 +226,7 @@ Authorization: Bearer macaroon_v1_agent42_budget500
           </ul>
 
           <p className="text-gray-300 leading-relaxed">
-            What you actually need is delegation with attenuation. The orchestrator has 10,000 credits. It mints a sub-token for each worker agent: 2,000 credits for research, 1,000 for summarization, 500 for formatting. Each sub-token is cryptographically derived from the parent — you can always trace the chain of authority. And the total can never exceed the parent's allocation.
+            What you actually need is delegation with narrowing. The orchestrator has 10,000 credits. It mints a sub-token for each worker agent: 2,000 credits for research, 1,000 for summarization, 500 for formatting. Each sub-token is cryptographically derived from the parent — you can always trace the chain of authority. And the total can never exceed the parent's allocation.
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
@@ -243,7 +243,7 @@ satgate mint --parent orchestrator_token \\
 
 # Each sub-agent operates within its slice
 # Total delegation ≤ parent budget
-# Full Evidence Pack from leaf to root`}</code>
+# Full receipt chain from leaf to root`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
@@ -257,7 +257,7 @@ satgate mint --parent orchestrator_token \\
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            Economic governance uses HTTP 402: Payment Required. This status code has existed since HTTP/1.1 but was "reserved for future use." The future is here.
+            Spending controls use HTTP 402: Payment Required. This status code has existed since HTTP/1.1 but was "reserved for future use." The future is here.
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
@@ -354,7 +354,7 @@ GET /api/governance/costs?period=2026-03-01..2026-03-19
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            It's the same argument as TLS termination, authentication, and rate limiting — all things that moved from application code to gateway infrastructure over the past decade. Economic governance is the next capability making that move.
+            It's the same argument as TLS termination, authentication, and rate limiting — all things that moved from application code to gateway infrastructure over the past decade. Spending controls are the next capability making that move.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">What SatGate Adds to Your API Stack</h2>
@@ -368,12 +368,12 @@ GET /api/governance/costs?period=2026-03-01..2026-03-19
             <li><strong className="text-white">Per-endpoint cost modeling</strong> so every API call has an economic weight</li>
             <li><strong className="text-white">Real-time budget enforcement</strong> — pre-call checks, not post-hoc billing</li>
             <li><strong className="text-white">HTTP 402 responses</strong> that give agents structured denial with actionable alternatives</li>
-            <li><strong className="text-white">Full Evidence Packs</strong> from agent leaf to orchestrator root</li>
+            <li><strong className="text-white">Full signed receipts</strong> from agent leaf to orchestrator root</li>
             <li><strong className="text-white">MCP-native support</strong> for teams building with the Model Context Protocol</li>
           </ul>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`# Add economic governance to your existing API
+            <code className="text-green-300">{`# Add spending controls to your existing API
 # No changes to your agents or backend
 
 # 1. Define your cost model
@@ -403,7 +403,7 @@ export API_BASE_URL=https://gateway.satgate.io/v1
           </ol>
 
           <p className="text-gray-300 leading-relaxed">
-            If you answered "no" to more than two of these, your API platform has a governance gap. The good news: it's fixable without rearchitecting your stack. Economic governance layers on top of your existing infrastructure.
+            If you answered "no" to more than two of these, your API platform has a governance gap. The good news: it's fixable without rearchitecting your stack. Spending controls sit on top of your existing infrastructure.
           </p>
 
           <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">
@@ -413,7 +413,7 @@ export API_BASE_URL=https://gateway.satgate.io/v1
               {[
                 ['What does AI governance mean for API teams?', 'For API teams, AI governance means enforcing who can call an API, what each agent can spend, which tools or routes are allowed, when access should be revoked, and how every autonomous request is audited.'],
                 ['Why is routing not enough for AI API governance?', 'Routing moves traffic to the right upstream service, but it does not decide whether an autonomous agent is allowed to spend money, use a high-risk tool, exceed a workflow budget, or delegate access to a sub-agent.'],
-                ['Where should API teams enforce AI agent policy?', 'Enforce AI agent policy in the request path at an economic firewall, gateway, or MCP proxy so budget, permission, revocation, and audit checks happen at the gateway policy check before forwarding.'],
+                ['Where should API teams enforce AI agent policy?', 'Enforce AI agent policy at an economic firewall, gateway, or MCP proxy, before the request goes through, so budget, permission, revocation, and audit checks happen at the gateway policy check before forwarding.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>
@@ -425,7 +425,7 @@ export API_BASE_URL=https://gateway.satgate.io/v1
 
           <div className="mt-12 p-6 bg-gray-900/50 border border-gray-800 rounded-lg">
             <p className="text-gray-300 mb-4">
-              SatGate is open-source economic governance for API teams. Add budget enforcement to your APIs in minutes:
+              SatGate provides open-source spending controls for API teams. Add budget enforcement to your APIs in minutes:
             </p>
             <pre className="bg-gray-900/70 rounded p-3 text-sm overflow-x-auto">
               <code className="text-green-300">{`go install github.com/satgate-io/satgate/cmd/satgate-mcp@latest`}</code>

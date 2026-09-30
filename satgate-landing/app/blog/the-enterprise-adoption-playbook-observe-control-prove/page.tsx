@@ -3,10 +3,10 @@ import { ArrowLeft, Calendar, Clock, Eye, Shield, Zap, CheckCircle, ArrowRight }
 
 export const metadata = {
   title: 'Enterprise Adoption Playbook: Observe, Control, Prove',
-  description: 'Observe, Control, Prove is the enterprise rollout path for Policy-to-Proof governance: start with visibility, add controls, then preserve Evidence Pack proof.',
+  description: 'Observe, Control, Prove is the enterprise rollout path for rules and receipts for AI agents: start with visibility, add controls, then preserve signed receipt proof.',
   openGraph: {
     title: 'The Enterprise Adoption Playbook: Observe, Control, Prove',
-    description: 'A three-stage framework for adopting Policy-to-Proof governance for AI agents — without breaking anything along the way.',
+    description: 'A three-stage framework for adopting rules and receipts for AI agents — without breaking anything along the way.',
     url: 'https://satgate.io/blog/the-enterprise-adoption-playbook-observe-control-prove',
     type: 'article',
 
@@ -16,7 +16,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'The Enterprise Adoption Playbook: Observe, Control, Prove',
-    description: 'A three-stage framework for adopting Policy-to-Proof governance for AI agents — without breaking anything along the way.',
+    description: 'A three-stage framework for adopting rules and receipts for AI agents — without breaking anything along the way.',
   },
   keywords: ['AI agent governance', 'enterprise AI adoption', 'economic firewall', 'AI cost control', 'AI agent budget enforcement', 'L402', 'macaroons', 'MCP governance', 'agent economy', 'AI change management'],
   alternates: { canonical: 'https://satgate.io/blog/the-enterprise-adoption-playbook-observe-control-prove' },
@@ -27,17 +27,17 @@ export default function EnterpriseAdoptionPlaybookPage() {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
     headline: 'The Enterprise Adoption Playbook: Observe, Control, Prove',
-    description: 'A three-stage framework for adopting Policy-to-Proof governance for AI agents: observe agent activity, control authority before execution, then prove every decision with Evidence Packs.',
+    description: 'A three-stage framework for adopting rules and receipts for AI agents: observe agent activity, control permission before the agent acts, then prove every decision with signed receipts.',
     url: 'https://satgate.io/blog/the-enterprise-adoption-playbook-observe-control-prove',
     datePublished: '2026-03-20',
     dateModified: '2026-06-01',
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     about: [
-      { '@type': 'Thing', name: 'Policy-to-Proof governance for AI agents' },
+      { '@type': 'Thing', name: 'rules and receipts for AI agents' },
       { '@type': 'Thing', name: 'Observe Control Prove' },
       { '@type': 'Thing', name: 'AI agent budget enforcement' },
-      { '@type': 'Thing', name: 'Policy-to-Proof governance' },
+      { '@type': 'Thing', name: 'rules and receipts for AI agents' },
     ],
   };
 
@@ -50,7 +50,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
         name: 'What are Observe, Control, and Prove in AI agent governance?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Prove preserves Evidence Pack receipts for allow, deny, budget, delegation, and paid-rail decisions.',
+          text: 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Prove preserves signed receipts for allow, deny, budget, delegation, and payment-method decisions.',
         },
       },
       {
@@ -66,7 +66,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
         name: 'Is Prove the same as internal budget enforcement?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. Internal budget enforcement controls spend for agents you own. Prove is the evidence layer that preserves receipts for budget, authority, delegation, revocation, and paid-rail decisions.',
+          text: 'No. Internal budget enforcement controls spend for agents you own. Prove is the evidence layer that preserves receipts for budget, authority, delegation, revocation, and payment-method decisions.',
         },
       },
     ],
@@ -92,7 +92,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
           <h1 className="text-4xl font-bold mb-4">The Enterprise Adoption Playbook: Observe, Control, Prove</h1>
           
           <p className="text-xl text-gray-400 mb-6 italic">
-            You wouldn&apos;t deploy a firewall in enforcement mode on day one. Why would you do that with economic governance?
+            You wouldn&apos;t deploy a firewall in enforcement mode on day one. Why would you do that with spending controls?
           </p>
           
           <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -214,16 +214,16 @@ export default function EnterpriseAdoptionPlaybookPage() {
             <div className="flex items-center gap-3 mb-4">
               <Zap className="text-yellow-400" size={28} />
               <h2 className="text-2xl font-bold text-white m-0">Stage 3: Prove</h2>
-              <span className="px-3 py-1 rounded-full bg-yellow-900/40 border border-yellow-500/30 text-yellow-300 text-sm font-mono">Evidence Pack Mode</span>
+              <span className="px-3 py-1 rounded-full bg-yellow-900/40 border border-yellow-500/30 text-yellow-300 text-sm font-mono">Signed Receipt Mode</span>
             </div>
-            <p className="text-yellow-200 text-lg font-medium mb-0">Every allow, deny, budget, delegation, and paid-rail decision leaves a receipt.</p>
+            <p className="text-yellow-200 text-lg font-medium mb-0">Every allow, deny, budget, delegation, and payment-method decision leaves a receipt.</p>
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            Prove is the stage where governance stops being a dashboard claim and becomes an artifact. SatGate preserves the policy basis, requesting agent, delegated scope, budget state, route, paid-rail context when present, and final decision as an Evidence Pack receipt that finance, security, and compliance can inspect later.
+            Prove is the stage where governance stops being a dashboard claim and becomes an artifact. SatGate preserves the policy basis, requesting agent, delegated scope, budget state, route, payment details when present, and final decision as a signed receipt that finance, security, and compliance can inspect later.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            Paid rails such as L402 can still matter, but they are not the center of the framework. They are one context SatGate can govern before value moves. The product job is broader: prove why an autonomous agent was allowed, denied, downgraded, routed, or required to seek approval before execution.
+            Payment methods such as L402 can still matter, but they are not the center of the framework. They are one context SatGate can govern before value moves. The product job is broader: prove why an autonomous agent was allowed, denied, downgraded, routed, or required to seek approval before execution.
           </p>
           <p className="text-gray-300 leading-relaxed">
             This unlocks proof models that traditional API governance rarely captures:
@@ -231,7 +231,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
           <ul className="text-gray-300 space-y-2">
             <li><strong>Budget receipts:</strong> show which cap, tenant, workflow, or delegated token authorized the spend.</li>
             <li><strong>Delegation receipts:</strong> preserve parent/child authority, caveats, expiration, and revocation state.</li>
-            <li><strong>Paid-rail receipts:</strong> record when payment context was checked before access without making payment the product center.</li>
+            <li><strong>Payment-method receipts:</strong> record when payment context was checked before access without making payment the product center.</li>
           </ul>
           <p className="text-gray-300 leading-relaxed">
             The result is accountability that survives vendor dashboards and postmortem guesswork. You can answer not just what happened, but who had authority, which policy applied, and what proof was preserved when the agent acted.
@@ -250,14 +250,14 @@ export default function EnterpriseAdoptionPlaybookPage() {
                 <CheckCircle className="text-green-400" size={18} />
                 <h4 className="font-bold text-white m-0">Incremental Trust Building</h4>
               </div>
-              <p className="text-gray-400 text-sm m-0">Each stage produces evidence that justifies the next. Observe proves the need for Control. Control produces the receipts that make Prove credible. You&apos;re not asking leadership to trust a theoretical model — you&apos;re showing them data and Evidence Packs from your own environment.</p>
+              <p className="text-gray-400 text-sm m-0">Each stage produces evidence that justifies the next. Observe proves the need for Control. Control produces the receipts that make Prove credible. You&apos;re not asking leadership to trust a theoretical model — you&apos;re showing them data and signed receipts from your own environment.</p>
             </div>
             <div className="p-4 bg-gray-900 border border-gray-800 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle className="text-green-400" size={18} />
                 <h4 className="font-bold text-white m-0">Policy Refinement from Real Data</h4>
               </div>
-              <p className="text-gray-400 text-sm m-0">Budgets set from Observe-mode data are defensible. They&apos;re based on measured consumption, not vendor benchmarks or educated guesses. When an agent owner pushes back on a limit, you have the Evidence Pack to show why it was set where it was.</p>
+              <p className="text-gray-400 text-sm m-0">Budgets set from Observe-mode data are defensible. They&apos;re based on measured consumption, not vendor benchmarks or educated guesses. When an agent owner pushes back on a limit, you have the signed receipt to show why it was set where it was.</p>
             </div>
             <div className="p-4 bg-gray-900 border border-gray-800 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
@@ -271,7 +271,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
                 <CheckCircle className="text-green-400" size={18} />
                 <h4 className="font-bold text-white m-0">Future-Proofing for the Agent Economy</h4>
               </div>
-              <p className="text-gray-400 text-sm m-0">The organizations that figure out Policy-to-Proof governance first will be the ones positioned to let agents act with real autonomy. Paid rails can be added where useful, but the durable advantage is proof: every request has authority, policy, decision, and receipt context.</p>
+              <p className="text-gray-400 text-sm m-0">The organizations that figure out rules and receipts for AI agents first will be the ones positioned to let agents act with real autonomy. Payment methods can be added where useful, but the durable advantage is proof: every request has authority, policy, decision, and receipt context.</p>
             </div>
           </div>
 
@@ -300,20 +300,20 @@ export default function EnterpriseAdoptionPlaybookPage() {
                 <span className="text-yellow-300 font-mono text-sm">Admit</span>
               </div>
               <p className="text-gray-400 text-sm">
-                For external agents consuming your APIs, the path is governed admission. Paid rails such as L402 may handle value movement, but SatGate decides whether access is allowed before any of it happens.
+                For external agents consuming your APIs, the path is governed admission. Payment methods such as L402 may handle value movement, but SatGate decides whether access is allowed before any of it happens.
               </p>
             </div>
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            Prove can span both lanes. Where receipt export is enabled, supported governed decisions record authority, policy, decision, and outcome in Evidence Packs an auditor can verify independently.
+            Prove can span both lanes. Where receipt export is enabled, supported governed decisions record authority, policy, decision, and outcome in a signed receipt (Evidence Pack) an auditor can verify independently.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
             The principle is straightforward: <strong>first, govern your own house. Then expand access — with proof.</strong>
           </p>
           <p className="text-gray-300 leading-relaxed">
-            Organizations that expose agent-facing APIs before they can prove internal governance are building on a shaky foundation. If you don&apos;t know what your own agents cost, delegate, and touch, you can&apos;t safely govern external agents either. If you haven&apos;t stress-tested budget enforcement and Evidence Pack proof, you can&apos;t trust the same controls when external traffic scales.
+            Organizations that expose agent-facing APIs before they can prove internal governance are building on a shaky foundation. If you don&apos;t know what your own agents cost, delegate, and touch, you can&apos;t safely govern external agents either. If you haven&apos;t stress-tested budget enforcement and signed receipt proof, you can&apos;t trust the same controls when external traffic scales.
           </p>
 
           {/* Getting Started */}
@@ -327,7 +327,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
             <li><strong>Let it run for two weeks.</strong> Collect baseline data. Identify your top spenders, noisiest agents, and most expensive tool calls.</li>
             <li><strong>Present the data to stakeholders.</strong> You now have an evidence-based case for budget enforcement — with specific numbers, not hypotheticals.</li>
             <li><strong>Activate Fiat402 (Control) mode.</strong> Set budgets based on your observed baselines plus a reasonable margin. Monitor for the first week and adjust.</li>
-            <li><strong>Activate Prove mode.</strong> Preserve Evidence Pack receipts for allow, deny, budget, delegation, revocation, and paid-rail decisions.</li>
+            <li><strong>Activate Prove mode.</strong> Preserve signed receipts for allow, deny, budget, delegation, revocation, and payment-method decisions.</li>
           </ol>
 
           <p className="text-gray-300 leading-relaxed mt-6">
@@ -342,9 +342,9 @@ export default function EnterpriseAdoptionPlaybookPage() {
             <h2 className="mb-6 text-2xl font-bold text-white">Observe, Control, Prove adoption questions</h2>
             <div className="space-y-5">
               {[
-                ['What are Observe, Control, and Prove in AI agent governance?', 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Prove preserves Evidence Pack receipts for allow, deny, budget, delegation, and paid-rail decisions.'],
+                ['What are Observe, Control, and Prove in AI agent governance?', 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Prove preserves signed receipts for allow, deny, budget, delegation, and payment-method decisions.'],
                 ['Why should enterprises start AI agent governance in Observe mode?', 'Observe mode gives teams real baseline data on agent spend, tool usage, retry loops, and cost outliers before hard caps are introduced, making later enforcement safer and easier to justify.'],
-                ['Is Prove the same as internal budget enforcement?', 'No. Internal budget enforcement controls spend for agents you own. Prove is the evidence layer that preserves receipts for budget, authority, delegation, revocation, and paid-rail decisions.'],
+                ['Is Prove the same as internal budget enforcement?', 'No. Internal budget enforcement controls spend for agents you own. Prove is the evidence layer that preserves receipts for budget, authority, delegation, revocation, and payment-method decisions.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

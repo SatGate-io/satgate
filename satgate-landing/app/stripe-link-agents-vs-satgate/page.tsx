@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle2, CreditCard, Gauge, KeyRound, ShieldCheck, Wal
 
 export const metadata = {
   title: 'Stripe Link for Agents vs SatGate',
-  description: 'Compare Stripe Link for Agents and SatGate: agent wallets and payment credentials vs request-path economic control, budgets, audit, and L402.',
+  description: 'Compare Stripe Link for Agents and SatGate: agent wallets and payment credentials vs spending checks before the request goes through, budgets, audit, and L402.',
   alternates: { canonical: 'https://satgate.io/stripe-link-agents-vs-satgate' },
   keywords: [
     'Stripe Link for Agents vs SatGate',
@@ -30,12 +30,12 @@ export const metadata = {
 };
 
 const comparison = [
-  ['Primary job', 'Provide payment credentials and approval flows', 'Govern agent/API economic activity in the request path'],
+  ['Primary job', 'Provide payment credentials and approval flows', 'Govern agent/API spending on each request that goes through SatGate'],
   ['Best fit', 'Purchases on merchant sites and payment-token flows', 'APIs, models, MCP tools, delegated agents, budgets, and monetization'],
   ['Control point', 'Wallet / credential issuance', 'Gateway policy check before forwarding to an upstream API, model, or tool'],
   ['Budget enforcement', 'User approval and future granular controls', 'Per-agent, route, tool, tenant, workflow, and time-window budgets'],
   ['API metering', 'Not the core product', 'Core Observe capability'],
-  ['Payment rail', 'Cards and shared payment tokens', 'SatGate paid-rail governance uses paid-rail context for API monetization'],
+  ['Payment method', 'Cards and shared payment tokens', 'SatGate payment rules record payment details for API monetization'],
   ['Governance question', 'Can this agent pay?', 'Should this agent access, spend, delegate, route, or pay now?'],
 ];
 
@@ -59,7 +59,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
       {
         '@type': 'Question',
         name: 'Is Stripe Link for Agents a competitor to SatGate?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Stripe Link for Agents and SatGate operate at different layers. Link provides payment credentials and approval flows. SatGate governs request-path access, budgets, metering, revocation, audit, and API monetization.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'Stripe Link for Agents and SatGate operate at different layers. Link provides payment credentials and approval flows. SatGate governs access before the request goes through, budgets, metering, revocation, audit, and API monetization.' },
       },
       {
         '@type': 'Question',
@@ -68,8 +68,8 @@ export default function StripeLinkAgentsVsSatGatePage() {
       },
       {
         '@type': 'Question',
-        name: 'Does SatGate paid-rail governance use Stripe shared payment tokens?',
-        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate paid-rail governance is paid-rail context-native API monetization. Stripe shared payment tokens are a separate payment-credential flow.' },
+        name: 'Do SatGate payment rules use Stripe shared payment tokens?',
+        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate payment rules record payment details for API monetization. Stripe shared payment tokens are a separate payment-credential flow.' },
       },
       {
         '@type': 'Question',
@@ -140,7 +140,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
             SatGate is the economic firewall in front of APIs, models, MCP tools, and delegated agent workflows. It observes traffic, enforces policy, meters usage, revokes access, and charges for API access when needed.
           </p>
           <ul className="space-y-3 text-gray-300">
-            {['Request-path budget enforcement', 'Per-agent and per-tool metering', 'Revocable capability and API access', 'paid-rail context-native API monetization'].map((item) => (
+            {['budget checks before the request goes through', 'Per-agent and per-tool metering', 'Revocable capability and API access', 'charging external agents'].map((item) => (
               <li key={item} className="flex gap-3"><CheckCircle2 className="text-cyan-300 shrink-0 mt-1" size={18} />{item}</li>
             ))}
           </ul>
@@ -173,7 +173,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
             ['Budgets', 'A paid credential does not prove the agent is within route, tenant, model, or workflow budget.'],
             ['Scope', 'Agents need scoped authority, not broad long-lived access just because a payment method exists.'],
             ['Audit', 'Finance and security need to know which agent, tool, route, policy, and proof were involved.'],
-            ['Monetization', 'API providers need request-native pricing and paid-rail governance when agents become customers.'],
+            ['Monetization', 'API providers need request-native pricing and payment rules when agents become customers.'],
           ].map(([title, body]) => (
             <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
@@ -207,9 +207,9 @@ export default function StripeLinkAgentsVsSatGatePage() {
         <h2 className="mb-8 text-3xl font-bold text-white">Stripe Link for Agents and SatGate questions</h2>
         <div className="grid md:grid-cols-2 gap-5">
           {[
-            ['Is Stripe Link for Agents a competitor to SatGate?', 'Stripe Link for Agents and SatGate operate at different layers. Link provides payment credentials and approval flows. SatGate governs request-path access, budgets, metering, revocation, audit, and API monetization.'],
+            ['Is Stripe Link for Agents a competitor to SatGate?', 'Stripe Link for Agents and SatGate operate at different layers. Link provides payment credentials and approval flows. SatGate governs access before the request goes through, budgets, metering, revocation, audit, and API monetization.'],
             ['What is the difference between an agent wallet and an economic firewall?', 'An agent wallet authorizes payment. An economic firewall authorizes behavior: whether an agent may access an API, spend budget, call an MCP tool, delegate authority, or unlock paid access.'],
-            ['Does SatGate paid-rail governance use Stripe shared payment tokens?', 'No. SatGate paid-rail governance is paid-rail context-native API monetization. Stripe shared payment tokens are a separate payment-credential flow.'],
+            ['Do SatGate payment rules use Stripe shared payment tokens?', 'No. SatGate payment rules record payment details for API monetization. Stripe shared payment tokens are a separate payment-credential flow.'],
             ['Can companies need both Link and SatGate?', 'Yes. A wallet can help an agent pay at checkout. SatGate helps API providers and enterprises control what agents can access, meter usage, enforce budgets, and charge for API or MCP activity.'],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -224,7 +224,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-yellow-950/20 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">Control agent economics before payment becomes risk</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            SatGate gives API teams the request-path Economic Firewall: meter every agent call, enforce budgets, revoke authority, and monetize with L402 when APIs expose paid-rail access for delegated agents.
+            SatGate gives API teams an economic firewall that checks before the request goes through: meter every agent call, enforce budgets, revoke authority, and monetize with L402 when APIs expose a payment method for delegated agents.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">

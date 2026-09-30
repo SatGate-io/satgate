@@ -36,10 +36,10 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
     dateModified: '2026-05-10',
     mainEntityOfPage: `https://satgate.io/compare/${config.slug}`,
     about: [
-      { '@type': 'Thing', name: 'agent authority governance' },
-      { '@type': 'Thing', name: 'pre-execution policy enforcement' },
+      { '@type': 'Thing', name: 'agent permissions' },
+      { '@type': 'Thing', name: 'policy enforcement before the agent acts' },
       { '@type': 'Thing', name: 'MCP-native proxying' },
-      { '@type': 'Thing', name: 'Evidence Packs' },
+      { '@type': 'Thing', name: 'signed receipts' },
       { '@type': 'Thing', name: config.competitor },
     ],
   };
@@ -100,7 +100,7 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
           </ul>
         </div>
         <div className="rounded-2xl border border-cyan-900/60 bg-cyan-950/10 p-8">
-          <h2 className="mb-5 text-2xl font-bold text-white">Where SatGate evaluates agent authority</h2>
+          <h2 className="mb-5 text-2xl font-bold text-white">Where SatGate evaluates agent permissions</h2>
           <ul className="space-y-3 text-gray-300">
             {config.satgateGoodAt.map((item) => (
               <li key={item} className="flex gap-3 leading-relaxed">
@@ -110,13 +110,13 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
           </ul>
           <div className="mt-6 flex flex-col gap-4 sm:flex-row">
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-800 px-6 py-3 font-bold text-gray-300 transition hover:border-cyan-500 hover:text-white">
-              Policy-to-Proof
+              Rules and Receipts
             </Link>
             <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-800 px-6 py-3 font-bold text-gray-300 transition hover:border-cyan-500 hover:text-white">
               MCP governance
             </Link>
             <Link href="/evidence-pack-demo" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-800 px-6 py-3 font-bold text-gray-300 transition hover:border-cyan-500 hover:text-white">
-              Evidence Pack demo
+              Signed receipt demo
             </Link>
           </div>
         </div>
@@ -126,7 +126,7 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
         <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="mb-4 text-3xl font-bold text-white">What to compare for agent governance</h2>
           <p className="mb-10 max-w-4xl text-lg leading-relaxed text-gray-400">
-            Routing, dashboards, billing caps, and rate limits are useful. They are not the same as cross-provider, cross-rail, pre-execution authority for autonomous agents. SatGate makes the operational loop explicit: Observe the request, Control the delegated budget before execution, and Prove the outcome with an Evidence Pack receipt.
+            Routing, dashboards, billing caps, and rate limits are useful. They are not the same as permission before the agent acts across providers and rails. SatGate makes the operational loop explicit: Observe the request, Control the budget for a sub-agent before execution, and Prove the outcome with a signed receipt.
           </p>
           <div className="overflow-hidden rounded-2xl border border-gray-800">
             <div className="grid gap-4 bg-gray-900/80 px-5 py-4 text-sm font-bold uppercase tracking-wide text-gray-400 md:grid-cols-[1.1fr_1.4fr_1.4fr_.7fr]">
@@ -166,22 +166,22 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
       <section className="border-y border-gray-900 bg-black">
         <div className="mx-auto grid max-w-6xl gap-8 px-6 py-16 lg:grid-cols-[1.1fr_.9fr]">
           <div>
-            <p className="mb-3 text-sm font-mono uppercase tracking-wide text-cyan-300">Policy-to-Proof layer</p>
-            <h2 className="mb-5 text-3xl font-bold text-white">The hard question is not routing. It is who had authority before execution.</h2>
+            <p className="mb-3 text-sm font-mono uppercase tracking-wide text-cyan-300">The rules-and-receipts layer</p>
+            <h2 className="mb-5 text-3xl font-bold text-white">The hard question is not routing. It is who had permission before the agent acts.</h2>
             <div className="space-y-4 text-lg leading-relaxed text-gray-300">
               <p>
-                Most gateways, observability tools, and payment rails explain a narrow part of the transaction: where a request went, how much it cost, or whether a token was valid. Enterprise agent governance needs a pre-execution decision that binds identity, tenant, delegated scope, budget, tool, payment context, and revocation state before the upstream system sees the call.
+                Most gateways, observability tools, and payment rails explain a narrow part of the transaction: where a request went, how much it cost, or whether a token was valid. Enterprise agent governance needs a decision, before the agent acts, that binds identity, tenant, delegated scope, budget, tool, payment context, and revocation state before the upstream system sees the call.
               </p>
               <p>
-                That is the SatGate distinction in these comparisons. SatGate is not trying to replace every model router, tracing stack, API gateway, or paid rail. It sits above them as an Agent Authority &amp; Accountability Layer: Observe the agent request, Control what it is allowed to do, and Prove the decision with an Evidence Pack that security, finance, and compliance can inspect later.
+                That is the SatGate distinction in these comparisons. SatGate is not trying to replace every model router, tracing stack, API gateway, or payment method. It sits above them as Agent Permissions and Receipts: Observe the agent request, Control what it is allowed to do, and Prove the decision with a signed receipt (Evidence Pack) that security, finance, and compliance can inspect later.
               </p>
             </div>
           </div>
           <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
-            <h3 className="mb-4 text-xl font-bold text-white">What an Evidence Pack should preserve</h3>
+            <h3 className="mb-4 text-xl font-bold text-white">What a receipt should preserve</h3>
             <ul className="space-y-3 text-gray-300">
               <li><strong className="text-white">Authority:</strong> the agent, user, tenant, token caveats, and delegated depth behind the request.</li>
-              <li><strong className="text-white">Policy:</strong> the budget, tool, paid-rail, allowlist, and revocation checks evaluated before execution.</li>
+              <li><strong className="text-white">Policy:</strong> the budget, tool, payment method, allowlist, and revocation checks evaluated before execution.</li>
               <li><strong className="text-white">Decision:</strong> whether SatGate allowed, denied, downgraded, routed, or required additional approval.</li>
               <li><strong className="text-white">Proof:</strong> signed receipt metadata that can survive dashboards, vendor logs, and postmortem guesswork.</li>
             </ul>
@@ -208,7 +208,7 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
           <div className="mb-5 flex items-center gap-3 text-cyan-300"><XCircle size={22} /> <span className="font-mono text-sm uppercase tracking-wide">The governance gap</span></div>
           <h2 className="mb-4 max-w-4xl text-3xl font-bold text-white">Dashboards explain what happened. SatGate controls what agents are allowed to do.</h2>
           <p className="mb-8 max-w-4xl text-lg leading-relaxed text-gray-300">
-            Put SatGate before the paid API call, MCP tool invocation, delegated sub-agent, or model spend. Give agents bounded authority, enforce it before execution, and leave an Evidence Pack when finance, security, or compliance asks why it happened.
+            Put SatGate before the paid API call, MCP tool invocation, delegated sub-agent, or model spend. Give agents bounded authority, enforce it before execution, and leave a receipt when finance, security, or compliance asks why it happened.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href={config.ctaPrimary.href} className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">

@@ -4,12 +4,12 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "API Gateway for AI Agents: Control Tool and API Access",
-  description: "Learn how AI agent gateways enforce authority before execution with Observe/Control/Prove, budgets, MCP governance, Evidence Packs, and paid rails.",
+  description: "Learn how AI agent gateways enforce permission before the agent acts with Observe/Control/Prove, budgets, MCP governance, signed receipts, and payment methods.",
   alternates: { canonical: 'https://satgate.io/blog/api-gateway-for-ai-agents' },
   keywords: ['API gateway for AI agents', 'AI agent gateway', 'API gateway comparison', 'agent economy gateway', 'AI API management', 'economic firewall gateway'],
   openGraph: {
     title: 'API Gateway for AI Agents: Budgets, MCP, and Tool Costs',
-    description: 'Agent-aware API gateways need Observe/Control/Prove, budgets, MCP tool controls, scoped tokens, revocation, and Evidence Packs.',
+    description: 'Agent-aware API gateways need Observe/Control/Prove, budgets, MCP tool controls, scoped tokens, revocation, and signed receipts.',
     url: 'https://satgate.io/blog/api-gateway-for-ai-agents',
     type: 'article',
     publishedTime: '2026-03-12T00:00:00Z',
@@ -18,7 +18,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'API Gateway for AI Agents: Budgets, MCP, and Tool Costs',
-    description: 'Traditional gateways route traffic. AI agent gateways must observe, control, and prove authority, MCP tool scope, revocation, and paid-rail context.',
+    description: 'Traditional gateways route traffic. AI agent gateways must observe, control, and prove authority, MCP tool scope, revocation, and payment details.',
   },
 };
 
@@ -38,9 +38,9 @@ export default function ApiGatewayForAiAgentsBlogPage() {
       { '@type': 'Thing', name: 'agent-aware budget enforcement' },
       { '@type': 'Thing', name: 'MCP tool cost control' },
       { '@type': 'Thing', name: 'scoped capability tokens for APIs' },
-      { '@type': 'Thing', name: 'rail-neutral paid-rail governance' },
+      { '@type': 'Thing', name: 'payment rules that work with any payment method' },
       { '@type': 'Thing', name: 'Observe Control Prove' },
-      { '@type': 'Thing', name: 'Evidence Packs' },
+      { '@type': 'Thing', name: 'signed receipts' },
     ],
   };
 
@@ -69,7 +69,7 @@ export default function ApiGatewayForAiAgentsBlogPage() {
         name: 'What should an agent-aware API gateway enforce?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'An agent-aware gateway should enforce per-agent and per-tool budgets, atomic spend checks, scoped and revocable capability tokens, delegation-chain attribution, economic Evidence Packs, and optional paid-rail context for paid agents.',
+          text: 'An agent-aware gateway should enforce per-agent and per-tool budgets, atomic spend checks, scoped and revocable capability tokens, delegation-chain attribution, signed receipts, and optional payment details for paid agents.',
         },
       },
       {
@@ -108,7 +108,7 @@ export default function ApiGatewayForAiAgentsBlogPage() {
           <h1 className="text-4xl font-bold mb-4">API Gateway for AI Agents: Budgets, MCP Tools, and Economic Control</h1>
           <div className="mb-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Search answer</p>
-            <p className="text-gray-300">An API gateway for AI agents must do more than authenticate and route. It needs Observe/Control/Prove: request-path authority checks, agent-scoped capability tokens, MCP governance, revocation, paid-rail context, and Evidence Packs.</p>
+            <p className="text-gray-300">An API gateway for AI agents must do more than authenticate and route. It needs Observe/Control/Prove: authority checks before the request goes through, agent-scoped capability tokens, MCP governance, revocation, payment details, and signed receipts.</p>
           </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
@@ -189,7 +189,7 @@ Rate Limiting         RPM/RPS                 Budget (dollar-denominated)
 Cost Tracking         None (just counters)    Per-call cost attribution
 Delegation            N/A                     Cryptographic trust chains
 Spend Enforcement     N/A                     Real-time budget hard caps
-Evidence Pack           Request logs            Economic audit (who spent what)
+Audit trail           Request logs            Signed receipts (who spent what)
 Monetization          Subscription tiers      Per-call micropayments (L402)`}</code>
             </pre>
           </div>
@@ -198,7 +198,7 @@ Monetization          Subscription tiers      Per-call micropayments (L402)`}</c
             The gap isn't in routing, load balancing, or TLS termination. Every gateway handles that. The gap is in <strong className="text-white">economic awareness</strong> — understanding that API calls have variable costs, that agents need budgets (not rate limits), and that delegation requires cryptographic trust chains.
           </p>
 
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Missing Layer: Request-Path Governance</h2>
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Missing Layer: Before the Request Goes Through</h2>
           
           <p className="text-gray-300 leading-relaxed">
             An API gateway for AI agents needs three capabilities that traditional gateways lack entirely:
@@ -223,7 +223,7 @@ agents:
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Capability-Based Authentication (Not API Keys)</h3>
           <p className="text-gray-300 leading-relaxed">
-            API keys are all-or-nothing. A key either works or it doesn't. Macaroon tokens — the authentication primitive SatGate uses — support <strong className="text-white">attenuated delegation</strong>. You can take a token and add restrictions before passing it to another agent:
+            API keys are all-or-nothing. A key either works or it doesn't. Macaroon tokens — the authentication building block SatGate uses — support <strong className="text-white">narrowed delegation</strong>. You can take a token and add restrictions before passing it to another agent:
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
@@ -280,7 +280,7 @@ satgate mint \\
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">How SatGate Approaches It</h2>
           
           <p className="text-gray-300 leading-relaxed">
-            SatGate isn't competing with Kong or Gravitee on routing and load balancing. Those are solved problems. Instead, SatGate sits as a <strong className="text-white">request-path governance layer</strong> — either as a standalone proxy or alongside your existing gateway.
+            SatGate isn't competing with Kong or Gravitee on routing and load balancing. Those are solved problems. Instead, SatGate sits as a <strong className="text-white">governance layer that checks before the request goes through</strong> — either as a standalone proxy or alongside your existing gateway.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -293,12 +293,12 @@ satgate mint \\
 └──────────────┬───────────────────────────┘
                │
 ┌──────────────▼───────────────────────────┐
-│  SatGate Policy-to-Proof Layer           │
+│  SatGate rules and receipts layer        │
 │  ├─ Verify capability + caveats          │
 │  ├─ Check policy and budget atomically   │
 │  ├─ Resolve tool cost                    │
 │  ├─ Allow, deny, or require approval     │
-│  └─ Emit Evidence Pack                   │
+│  └─ Emit signed receipt                  │
 └──────────────┬───────────────────────────┘
                │
 ┌──────────────▼───────────────────────────┐
@@ -308,7 +308,7 @@ satgate mint \\
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            This means you don't rip and replace your existing infrastructure. SatGate adds the Policy-to-Proof layer that agents need while your current gateway continues handling TLS, routing, and load balancing.
+            This means you don't rip and replace your existing infrastructure. SatGate adds the rules-and-receipts layer that agents need while your current gateway continues handling TLS, routing, and load balancing.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Enterprise Path: Observe → Control → Prove</h2>
@@ -319,12 +319,12 @@ satgate mint \\
 
           <ul className="text-gray-300 space-y-3">
             <li><strong className="text-white">Observe:</strong> Deploy in audit mode. See what agents are calling, spending, and delegating. No enforcement yet, just structured visibility.</li>
-            <li><strong className="text-white">Control:</strong> Enable request-path policy. Set budget, scope, route, tenant, and MCP-tool limits that block bad calls before they execute.</li>
-            <li><strong className="text-white">Prove:</strong> Preserve Evidence Packs for allow, deny, spend, delegation, and revocation decisions so security, finance, and auditors can verify what happened later.</li>
+            <li><strong className="text-white">Control:</strong> Enable policy checked before the request goes through. Set budget, scope, route, tenant, and MCP-tool limits that block bad calls before they execute.</li>
+            <li><strong className="text-white">Prove:</strong> Preserve signed receipts for allow, deny, spend, delegation, and revocation decisions so security, finance, and auditors can verify what happened later.</li>
           </ul>
 
           <p className="text-gray-300 leading-relaxed">
-            Each stage builds on the last. By the time paid rails enter the flow, they are governed context, not the control plane. Humans set policy and budgets; agents execute within those boundaries; SatGate preserves the proof.
+            Each stage builds on the last. By the time payment methods enter the flow, they are governed context, not the control plane. Humans set policy and budgets; agents execute within those boundaries; SatGate preserves the proof.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">What to Look For in an Agent-Aware Gateway</h2>
@@ -337,9 +337,9 @@ satgate mint \\
             <li>✅ <strong className="text-white">Dollar-denominated budget limits</strong> (not just request counts)</li>
             <li>✅ <strong className="text-white">Per-tool cost resolution</strong> (different calls cost different amounts)</li>
             <li>✅ <strong className="text-white">Atomic budget enforcement</strong> (no race conditions at scale)</li>
-            <li>✅ <strong className="text-white">Capability-based tokens</strong> (attenuated delegation, not all-or-nothing keys)</li>
+            <li>✅ <strong className="text-white">Capability-based tokens</strong> (narrowed delegation, not all-or-nothing keys)</li>
             <li>✅ <strong className="text-white">Delegation chain tracking</strong> (who delegated to whom, and whose budget pays)</li>
-            <li>✅ <strong className="text-white">Evidence Packs</strong> (signed proof of allow, deny, spend, and delegation decisions)</li>
+            <li>✅ <strong className="text-white">Signed receipts</strong> (signed proof of allow, deny, spend, and delegation decisions)</li>
             <li>✅ <strong className="text-white">Structured budget exhaustion errors</strong> (agents need to reason about limits)</li>
             <li>✅ <strong className="text-white">Progressive adoption</strong> (observe → control → prove)</li>
           </ul>
@@ -351,7 +351,7 @@ satgate mint \\
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            You don't need to replace your gateway. You need to add request-path governance that understands authority, budgets, delegation, and variable costs, then proves each decision. That's the difference between an API gateway that routes traffic and one that governs autonomous agent activity.
+            You don't need to replace your gateway. You need to add governance that checks before the request goes through and understands authority, budgets, delegation, and variable costs, then proves each decision. That's the difference between an API gateway that routes traffic and one that governs autonomous agent activity.
           </p>
 
           <div className="my-8 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
@@ -372,7 +372,7 @@ satgate mint \\
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">What should an agent-aware API gateway enforce?</h3>
                 <p className="text-gray-300 leading-relaxed mb-0">
-                  It should enforce per-agent and per-tool budgets, atomic spend checks, scoped and revocable capability tokens, delegation-chain attribution, economic Evidence Packs, and optional paid-rail context for paid agents.
+                  It should enforce per-agent and per-tool budgets, atomic spend checks, scoped and revocable capability tokens, delegation-chain attribution, signed receipts, and optional payment details for paid agents.
                 </p>
               </div>
               <div>
@@ -405,12 +405,12 @@ satgate mint \\
           </div>
 
           <div className="my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
-            <h3 className="mb-3 text-xl font-bold text-white">Compare routing gateways against Policy-to-Proof</h3>
-            <p className="mb-4 text-gray-300">Use the comparison hub and MCP governance pages to map where existing gateways stop and SatGate&apos;s authority, budget, and Evidence Pack controls begin.</p>
+            <h3 className="mb-3 text-xl font-bold text-white">Compare routing gateways against Rules and Receipts</h3>
+            <p className="mb-4 text-gray-300">Use the comparison hub and MCP governance pages to map where existing gateways stop and SatGate&apos;s authority, budget, and signed receipt controls begin.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/compare" className="text-cyan-300 hover:text-cyan-200">Comparison hub →</Link>
               <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
-              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
+              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">See how rules and receipts work →</Link>
             </div>
           </div>
 
@@ -418,10 +418,10 @@ satgate mint \\
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">SatGate path: Observe → Control → Prove</h3>
             <p className="mb-4 text-gray-300">
-              Start by observing agent, API, and MCP usage. Move to request-path control when budgets, scopes, and revocation need to stop bad calls before they run. Preserve Evidence Packs so every allow, deny, and budget decision can be verified later.
+              Start by observing agent, API, and MCP usage. Move to checks before the request goes through when budgets, scopes, and revocation need to stop bad calls before they run. Preserve signed receipts so every allow, deny, and budget decision can be verified later.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
-              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
+              <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">See how rules and receipts work →</Link>
               <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>

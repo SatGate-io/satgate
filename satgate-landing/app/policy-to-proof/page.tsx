@@ -14,15 +14,15 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "SatGate Policy-to-Proof | Evidence for Enterprise Agent Authority",
+  title: "SatGate Rules and Receipts | Evidence for Enterprise Agent Permissions",
   description:
     "Define what an agent is allowed to do, enforce it at the gateway, and produce evidence humans and upstreams can trust.",
   keywords: [
-    "policy-to-proof",
-    "AI agent Evidence Pack",
-    "agent authority evidence",
+    "rules and receipts",
+    "AI agent signed receipt (Evidence Pack)",
+    "agent permissions evidence",
     "agent control plane evidence",
-    "tamper-evident Evidence Pack",
+    "tamper-evident signed receipt",
     "AI agent revocation proof",
     "AI agent spend ledger",
     "macaroon delegation audit",
@@ -31,16 +31,16 @@ export const metadata: Metadata = {
     canonical: "https://satgate.io/policy-to-proof",
   },
   openGraph: {
-    title: "SatGate Policy-to-Proof",
+    title: "SatGate Rules and Receipts | Evidence for Enterprise Agent Permissions",
     description:
-      "Every grant, paid call, denial, delegation, and revocation produces receipts and Evidence Pack proof your CISO, finance team, and auditor can trust.",
+      "Every grant, paid call, denial, delegation, and revocation produces signed receipts your CISO, finance team, and auditor can trust.",
     url: "https://satgate.io/policy-to-proof",
     type: "website",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SatGate Policy-to-Proof",
+    title: "SatGate Rules and Receipts | Evidence for Enterprise Agent Permissions",
     description:
       "Run agents without permanent credentials, unlimited spend, or unobservable authority — and export the proof.",
   },
@@ -55,7 +55,7 @@ const evidenceQuestions = [
   {
     question: "Which agent got access?",
     artifact: "Capability token + delegation chain",
-    body: "The root capability, parent agent, invoice-reconciler worker, and every attenuation in the handoff path.",
+    body: "The root capability, parent agent, invoice-reconciler worker, and every narrowing in the handoff path.",
   },
   {
     question: "What exactly could it do?",
@@ -65,7 +65,7 @@ const evidenceQuestions = [
   {
     question: "What did it spend?",
     artifact: "Per-token spend ledger",
-    body: "Request-path and MCP-tool attribution by worker, token, tenant, route, amount, and policy mode.",
+    body: "Attribution of each request that goes through SatGate, and of MCP tools, by worker, token, tenant, route, amount, and policy mode.",
   },
   {
     question: "What was denied?",
@@ -85,13 +85,13 @@ const demoSteps = [
   ["Spend", "The worker calls invoice APIs or MCP tools under budget; the ledger updates by token and path."],
   ["Deny", "Export and over-budget calls return reason-coded receipts before data or spend escapes."],
   ["Revoke", "Security kills the worker capability without rotating every upstream provider key."],
-  ["Export", "The lifecycle becomes one Evidence Pack a CISO, auditor, or incident reviewer can read."],
+  ["Export", "The lifecycle becomes one signed receipt (Evidence Pack) a CISO, auditor, or incident reviewer can read."],
 ];
 
 const standardsMappings = [
   ["Mint receipt — US SOC 2", "SOC 2 CC6.1", "Logical access provisioning tied to identity, policy, issuer, and timestamp."],
-  ["Mint receipt — ISO 27001", "ISO 27001 A.9.2.1", "User registration and de-registration evidence for agent authority issuance."],
-  ["Delegation chain", "SOC 2 CC6.3 / NIST AC-3", "Least-privilege attenuation across parent and worker authority."],
+  ["Mint receipt — ISO 27001", "ISO 27001 A.9.2.1", "User registration and de-registration evidence for issuing agent permissions."],
+  ["Delegation chain", "SOC 2 CC6.3 / NIST AC-3", "Least-privilege narrowing across parent and worker permissions."],
   ["Revocation receipt", "SOC 2 CC6.2/CC6.3 / NIST AC-2(3)", "Deprovisioning event plus first post-revoke denial trail."],
   ["Spend ledger", "SOC 2 CC1.4 / FinOps attribution", "Governance evidence for who created spend, on which route/tool, under which token."],
 ];
@@ -164,22 +164,22 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "WebPage",
-      name: "SatGate Policy-to-Proof",
+      name: "SatGate Rules and Receipts | Evidence for Enterprise Agent Permissions",
       url: "https://satgate.io/policy-to-proof",
       description: metadata.description,
       datePublished: "2026-05-09",
       dateModified: "2026-05-09",
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
       about: [
-        { "@type": "Thing", name: "AI agent authority evidence" },
-        { "@type": "Thing", name: "tamper-evident Evidence Pack" },
+        { "@type": "Thing", name: "agent permissions evidence" },
+        { "@type": "Thing", name: "tamper-evident signed receipt" },
         { "@type": "Thing", name: "agent control plane" },
         { "@type": "Thing", name: "macaroon delegation chain" },
       ],
     },
     {
       "@type": "ItemList",
-      name: "Policy-to-Proof evidence questions",
+      name: "Rules and receipts questions",
       itemListElement: evidenceQuestions.map((item, index) => ({
         "@type": "ListItem",
         position: index + 1,
@@ -202,7 +202,7 @@ export default function PolicyToProofPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.20),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.18),transparent_40%)]" />
         <div className="relative mx-auto max-w-6xl">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">
-            <FileText size={14} /> Policy-to-Proof
+            <FileText size={14} /> Rules and Receipts
           </div>
           <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
             <div>
@@ -223,7 +223,7 @@ export default function PolicyToProofPage() {
                   href="/evidence-pack-demo"
                   className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-black transition hover:bg-gray-200"
                 >
-                  Open Evidence Pack viewer <ArrowRight size={18} />
+                  Open signed receipt (Evidence Pack) viewer <ArrowRight size={18} />
                 </Link>
                 <a
                   href="/evidence-packs/sample-evidence-pack.v1.json"
@@ -265,7 +265,7 @@ export default function PolicyToProofPage() {
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-cyan-300">Internal first, rail-aware when needed</p>
             <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Built for internal enterprise agents. Extends across paid external calls.</h2>
             <p className="mt-5 text-lg leading-8 text-gray-400">
-              Most enterprise agents do not need a wallet to call internal APIs. They need bounded delegated authority, budget controls, revocation, and audit evidence around the credentials they already have.
+              Most enterprise agents do not need a wallet to call internal APIs. They need bounded delegated permissions, budget controls, revocation, and audit evidence around the credentials they already have.
             </p>
             <p className="mt-4 text-base leading-7 text-gray-500">
               When that same internal workflow crosses into an external paid API, SatGate keeps the proof intact: internal scope and delegation, plus spend attribution above x402 rails, L402, API-key billing, or enterprise ledgers. Payment proves value moved. SatGate proves the agent was allowed to move it.
@@ -333,9 +333,9 @@ export default function PolicyToProofPage() {
             </div>
             <div className="rounded-3xl border border-emerald-400/20 bg-emerald-400/5 p-7">
               <p className="text-sm font-bold uppercase tracking-[0.22em] text-emerald-200">SatGate</p>
-              <h3 className="mt-4 text-2xl font-black text-white">Signed mint receipt, attenuation chain, spend ledger, denial reason, revocation proof — one export.</h3>
+              <h3 className="mt-4 text-2xl font-black text-white">Signed mint receipt, narrowing chain, spend ledger, denial reason, revocation proof: one export.</h3>
               <p className="mt-4 text-base leading-7 text-gray-400">
-                The Evidence Pack is not a logging afterthought. It is generated by the same authority path that enforces the decision.
+                The signed receipt (Evidence Pack) is not a logging afterthought. It is generated by the same authority path that enforces the decision.
               </p>
             </div>
           </div>
@@ -352,7 +352,7 @@ export default function PolicyToProofPage() {
               <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Answer the audit questions after the invoice-reconciler acts.</h2>
             </div>
             <p className="max-w-md text-sm leading-6 text-gray-500">
-              The Evidence Pack bundles these artifacts into one export instead of sending teams on a forensics project across logs, invoices, and gateway dashboards. Authority-chain entries preserve lineage; matching receipts preserve the allow, deny, pay, delegate, and revoke sequence, so auditors can verify both structure and chronology.
+              The receipt bundles these artifacts into one export instead of sending teams on a forensics project across logs, invoices, and gateway dashboards. Authority-chain entries preserve lineage; matching receipts preserve the allow, deny, pay, delegate, and revoke sequence, so auditors can verify both structure and chronology.
             </p>
           </div>
 
@@ -374,7 +374,7 @@ export default function PolicyToProofPage() {
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-purple-300">Maps to audit controls</p>
             <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Audit-fluent, not just audit-flavored.</h2>
             <p className="mt-5 text-lg leading-8 text-gray-400">
-              The Evidence Pack gives security and audit teams a starting control map instead of making them translate raw gateway logs without receipt hashes, policy versions, and decision reasons.
+              The receipt gives security and audit teams a starting control map instead of making them translate raw gateway logs without receipt hashes, policy versions, and decision reasons.
             </p>
           </div>
           <div className="mt-10 grid gap-4 md:grid-cols-2">
@@ -434,7 +434,7 @@ export default function PolicyToProofPage() {
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-purple-300">Demo path</p>
             <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Mint → Delegate → Spend → Deny → Revoke → Export.</h2>
             <p className="mt-5 text-lg leading-8 text-gray-400">
-              The demo ends on the exported Evidence Pack: one artifact proving authority, spend, denial, and revocation across the invoice-reconciler lifecycle. Even producing the Evidence Pack is itself an auditable event.
+              The demo ends on the exported signed receipt (Evidence Pack): one artifact proving authority, spend, denial, and revocation across the invoice-reconciler lifecycle. Even producing the receipt is itself an auditable event.
             </p>
             <p className="mt-4 text-sm leading-6 text-gray-500">
               Read the six-step lifecycle below, or watch the 90-second cut.
@@ -467,11 +467,11 @@ export default function PolicyToProofPage() {
             <div className="rounded-3xl border border-cyan-300/20 bg-cyan-300/5 p-7">
               <div className="mb-4 flex items-center gap-2 text-cyan-200">
                 <PlayCircle size={22} />
-                <span className="text-sm font-bold uppercase tracking-[0.2em]">Evidence Pack walkthrough</span>
+                <span className="text-sm font-bold uppercase tracking-[0.2em]">Receipt walkthrough</span>
               </div>
-              <h3 className="text-2xl font-black text-white">See how agent authority becomes audit-ready proof.</h3>
+              <h3 className="text-2xl font-black text-white">See how agent permissions become audit-ready proof.</h3>
               <p className="mt-4 text-sm leading-6 text-gray-400">
-                Watch a governed agent receive scoped authority, delegate work, hit policy decisions, and export a signed Evidence Pack your security and audit teams can review.
+                Watch a governed agent receive scoped authority, delegate work, hit policy decisions, and export a signed receipt your security and audit teams can review.
               </p>
               <div className="mt-6 flex flex-col gap-3 text-sm font-bold sm:flex-row sm:flex-wrap">
                 <a href="/evidence-packs/satgate-evidence-pack-walkthrough-audio.mp4" className="inline-flex items-center gap-2 text-cyan-200 hover:text-cyan-100">
@@ -499,7 +499,7 @@ export default function PolicyToProofPage() {
                     href="/evidence-pack-demo"
                     className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-black transition hover:bg-gray-200"
                   >
-                    Open Evidence Pack viewer <ArrowRight size={18} />
+                    Open signed receipt (Evidence Pack) viewer <ArrowRight size={18} />
                   </a>
                   <a
                     href="/evidence-packs/sample-evidence-pack.v1.json"

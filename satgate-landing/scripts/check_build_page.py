@@ -20,7 +20,7 @@ required_page_strings = [
     "import os",
     "os.getenv(\"SATGATE_API_KEY\")",
     "SatGate protects the APIs and tools the task depends on",
-    "Agent Authority & Accountability Layer",
+    "Agent Permissions and Receipts",
     "https://github.com/SatGate-io/satgate/blob/main/docs/index.md",
     "the task",
     "budget and tools",

@@ -33,8 +33,8 @@ const controls = [
   { icon: KeyRound, title: 'Scoped authority', body: 'Limit routes, tools, methods, customers, delegation, and request types instead of issuing broad API keys.' },
   { icon: Clock, title: 'Expiry by default', body: 'Make credentials expire with the work: minutes, sessions, jobs, customers, or delegated sub-tasks.' },
   { icon: Ban, title: 'Revocation checks', body: 'Block the next request when a token, task, agent, route, or budget is no longer allowed.' },
-  { icon: ReceiptText, title: 'Budget caveats', body: 'Attach spend caps, call ceilings, per-tool limits, and remaining-budget checks to the request path.' },
-  { icon: GitBranch, title: 'Attenuated delegation', body: 'Let agents delegate narrower credentials to sub-agents without expanding parent authority.' },
+  { icon: ReceiptText, title: 'Budget caveats', body: 'Attach spend caps, call ceilings, per-tool limits, and remaining-budget checks before the request goes through.' },
+  { icon: GitBranch, title: 'Narrowed delegation', body: 'Let agents delegate narrower credentials to sub-agents without expanding parent authority.' },
 ];
 
 export default function Page() {
@@ -57,7 +57,7 @@ export default function Page() {
     mainEntity: [
       { '@type': 'Question', name: 'What is a revocable agent credential?', acceptedAnswer: { '@type': 'Answer', text: 'A revocable agent credential is a scoped, expiring capability issued to an autonomous agent for a specific task, workflow, route, tool, budget, or time window. It can be invalidated before the next request without rotating global API keys.' } },
       { '@type': 'Question', name: 'Why are static API keys risky for AI agents?', acceptedAnswer: { '@type': 'Answer', text: 'Static API keys are broad, long-lived, and hard to delegate safely. Autonomous agents need credentials with scoped authority, budget limits, expiry, revocation, and audit context.' } },
-      { '@type': 'Question', name: 'How does SatGate enforce agent credentials?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate sits in the request path and checks identity, token scope, route, tool, budget, expiry, delegation rules, and revocation state before forwarding upstream.' } },
+      { '@type': 'Question', name: 'How does SatGate enforce agent credentials?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate checks each request before it goes through: identity, token scope, route, tool, budget, expiry, delegation rules, and revocation state, before forwarding upstream.' } },
     ],
   };
 
@@ -95,7 +95,7 @@ export default function Page() {
           <h2 className="mb-6 text-3xl font-bold text-white">Credentials have to carry economic policy</h2>
           <div className="space-y-5 text-lg leading-relaxed text-gray-300">
             <p>Human access systems assume stable users, managed devices, predictable sessions, and human-scale request rates. Agent systems are different: credentials can be copied into tools, delegated to sub-agents, retried in loops, and used faster than a billing alert can fire.</p>
-            <p>The safe model is not a single permanent secret. It is a request-path capability that answers: what can this agent do, on which route, for how long, with what budget, and can it still be revoked right now?</p>
+            <p>The safe model is not a single permanent secret. It is a capability checked before the request goes through. It answers: what can this agent do, on which route, for how long, with what budget, and can it still be revoked right now?</p>
             <p>SatGate turns those answers into enforceable policy at the gateway before forwarding to an upstream API, model, or MCP tool happens.</p>
           </div>
         </div>
@@ -104,7 +104,7 @@ export default function Page() {
           <div className="space-y-4">
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Static keys are too broad</h3><p className="leading-relaxed text-gray-400">A leaked or copied key usually carries account-level authority until someone rotates it.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Agent tasks are short lived</h3><p className="leading-relaxed text-gray-400">A credential should die with the session, task, workflow, or customer it was minted for.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Revocation must be request-path</h3><p className="leading-relaxed text-gray-400">If a loop is already spending money, revocation has to block the next request, not a future deploy.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Revocation must happen before the request goes through</h3><p className="leading-relaxed text-gray-400">If a loop is already spending money, revocation has to block the next request, not a future deploy.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Delegation needs shrinking authority</h3><p className="leading-relaxed text-gray-400">Sub-agents should inherit less scope, less budget, and shorter expiry than their parent.</p></div>
           </div>
         </div>
@@ -158,7 +158,7 @@ audit:
             {[
               ['What is a revocable agent credential?', 'A revocable agent credential is a scoped, expiring capability issued to an autonomous agent for a specific task, workflow, route, tool, budget, or time window. It can be invalidated before the next request without rotating global API keys.'],
               ['Why are static API keys risky for AI agents?', 'Static API keys are broad, long-lived, and hard to delegate safely. Autonomous agents need credentials with scoped authority, budget limits, expiry, revocation, and audit context.'],
-              ['How does SatGate enforce agent credentials?', 'SatGate sits in the request path and checks identity, token scope, route, tool, budget, expiry, delegation rules, and revocation state before forwarding upstream.'],
+              ['How does SatGate enforce agent credentials?', 'SatGate checks each request before it goes through: identity, token scope, route, tool, budget, expiry, delegation rules, and revocation state, before forwarding upstream.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">
                 <h3 className="mb-2 font-bold text-white">{question}</h3>

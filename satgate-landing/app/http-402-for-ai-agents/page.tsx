@@ -3,7 +3,7 @@ import { ArrowRight, BadgeDollarSign, Bot, Braces, CheckCircle2, Network, Shield
 
 export const metadata = {
   title: 'HTTP 402 for AI Agents',
-  description: 'A practical guide to HTTP 402 for AI agents: payment challenges, Stripe-style shared payment tokens, paid-rail context, and SatGate economic firewall policy.',
+  description: 'A practical guide to HTTP 402 for AI agents: payment challenges, Stripe-style shared payment tokens, payment details, and SatGate economic firewall policy.',
   alternates: { canonical: 'https://satgate.io/http-402-for-ai-agents' },
   keywords: [
     'HTTP 402 for AI agents',
@@ -12,7 +12,7 @@ export const metadata = {
     'shared payment token agents',
     'L402 agent payments',
     'HTTP 402 API monetization',
-    'paid-rail agent governance',
+    'payment rules for agents',
     'agent payment controls',
   ],
   openGraph: {
@@ -25,16 +25,16 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'HTTP 402 for AI Agents',
-    description: 'HTTP 402 can describe paid access for AI agents. SatGate adds authority checks, policy decisions, budgets, receipts, and Evidence Packs before execution.',
+    description: 'HTTP 402 can describe paid access for AI agents. SatGate adds permission checks, policy decisions, budgets, receipts, and signed receipts before the agent acts.',
   },
 };
 
 const flows = [
   ['Card checkout', 'Agent receives a temporary card credential and fills a merchant checkout.', 'Good for web purchases, but not request-native API monetization.'],
-  ['x402', 'API returns a 402 payment challenge for stablecoin settlement across supported chains and clients.', 'x402, AgentCore Payments, and Pay.sh still need SatGate authority checks and Evidence Pack receipts above the rail.'],
-  ['Shared payment token', 'Agent receives a payment token for a supported 402 machine-payment flow.', 'Rail-specific; treat it as a subpattern of paid-rail context that still needs governance.'],
-  ['paid-rail context', 'API returns a Lightning-backed 402 challenge and verifies proof before access.', 'paid-rail context can support request-native paid API access; SatGate governs the decision and receipt.'],
-  ['Policy-only 402 observation', 'SatGate records and evaluates payment challenges even when another rail completes payment.', 'Useful for audit, deny/allow rules, and spend governance.'],
+  ['x402', 'API returns a 402 payment challenge for stablecoin settlement across supported chains and clients.', 'x402, AgentCore Payments, and Pay.sh still need SatGate permission checks and signed receipts above the payment method.'],
+  ['Shared payment token', 'Agent receives a payment token for a supported 402 machine-payment flow.', 'Specific to one payment method; treat it as a subpattern of payment details that still needs governance.'],
+  ['payment details', 'API returns a Lightning-backed 402 challenge and verifies proof before access.', 'Payment details can support request-native paid API access; SatGate governs the decision and receipt.'],
+  ['Policy-only 402 observation', 'SatGate records and evaluates payment challenges even when another payment method completes payment.', 'Useful for audit, deny/allow rules, and spend governance.'],
 ];
 
 export default function Http402ForAiAgentsPage() {
@@ -50,8 +50,8 @@ export default function Http402ForAiAgentsPage() {
     mainEntityOfPage: 'https://satgate.io/http-402-for-ai-agents',
     about: [
       { '@type': 'Thing', name: 'HTTP 402 for AI agents' },
-      { '@type': 'Thing', name: 'paid-rail agent governance' },
-      { '@type': 'Thing', name: 'paid-rail context paid rail' },
+      { '@type': 'Thing', name: 'payment rules for agents' },
+      { '@type': 'Thing', name: 'payment details' },
       { '@type': 'Thing', name: 'AI agent payment policy' },
     ],
   };
@@ -61,9 +61,9 @@ export default function Http402ForAiAgentsPage() {
     '@type': 'FAQPage',
     mainEntity: [
       { '@type': 'Question', name: 'What is HTTP 402 for AI agents?', acceptedAnswer: { '@type': 'Answer', text: 'HTTP 402 lets an API tell an AI agent that payment is required before access. The response can include a machine-readable challenge describing how to pay.' } },
-      { '@type': 'Question', name: 'Is HTTP 402 the same as L402?', acceptedAnswer: { '@type': 'Answer', text: 'No. HTTP 402 is the status code. L402 is a Lightning-based payment and access pattern that uses HTTP 402. paid-rail context is one rail SatGate can govern in the request path.' } },
-      { '@type': 'Question', name: 'How are Stripe shared payment tokens different from L402?', acceptedAnswer: { '@type': 'Answer', text: 'Stripe-style shared payment tokens are a payment-credential method for supported 402 flows. L402 uses Lightning payment proof to unlock scoped API access. They are separate rails.' } },
-      { '@type': 'Question', name: 'Why do 402 payment challenges need policy?', acceptedAnswer: { '@type': 'Answer', text: 'A payment challenge tells the agent how to pay, but it does not decide whether the agent should be allowed to spend, which budget applies, whether the route is in scope, or how the event should feed the Evidence Pack.' } },
+      { '@type': 'Question', name: 'Is HTTP 402 the same as L402?', acceptedAnswer: { '@type': 'Answer', text: 'No. HTTP 402 is the status code. L402 is a Lightning payment and access method that uses HTTP 402, and SatGate can govern it before the request goes through.' } },
+      { '@type': 'Question', name: 'How are Stripe shared payment tokens different from L402?', acceptedAnswer: { '@type': 'Answer', text: 'Stripe-style shared payment tokens are a payment-credential method for supported 402 flows. L402 uses Lightning payment proof to unlock scoped API access. They are separate payment methods.' } },
+      { '@type': 'Question', name: 'Why do 402 payment challenges need policy?', acceptedAnswer: { '@type': 'Answer', text: 'A payment challenge tells the agent how to pay, but it does not decide whether the agent should be allowed to spend, which budget applies, whether the route is in scope, or how the event should feed the signed receipt (Evidence Pack).' } },
     ],
   };
 
@@ -86,7 +86,7 @@ export default function Http402ForAiAgentsPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(250,204,21,0.18),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(34,211,238,0.15),transparent_32%)]" />
         <div className="relative max-w-6xl mx-auto px-6 py-24">
           <div className="inline-flex items-center gap-2 rounded-full border border-yellow-500/30 bg-yellow-950/20 px-4 py-2 text-sm text-yellow-200 mb-8">
-            <BadgeDollarSign size={16} /> Payment Required, governed before execution
+            <BadgeDollarSign size={16} /> Payment Required, governed before the agent acts
           </div>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight max-w-5xl mb-8">
             HTTP 402 for AI Agents
@@ -99,7 +99,7 @@ export default function Http402ForAiAgentsPage() {
               Govern paid agent actions <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
-              See Policy-to-Proof
+              See how rules and receipts work
             </Link>
           </div>
         </div>
@@ -112,16 +112,16 @@ export default function Http402ForAiAgentsPage() {
             For years, HTTP 402 Payment Required was mostly dormant. AI agents make it useful: a paid API can respond with a machine-readable challenge instead of forcing a human through checkout.
           </p>
           <p>
-            That challenge may point to different rails: card-based credentials, shared payment tokens, paid-rail context invoices, or future protocols. But the payment challenge is not the governance layer.
+            That challenge may point to different payment methods: card-based credentials, shared payment tokens, invoices with payment details, or future protocols. But the payment challenge is not the governance layer.
           </p>
           <p>
-            SatGate sits at the gateway before forwarding and applies policy: identify the agent, confirm authority, estimate cost, enforce budgets, decide whether the rail is allowed, record the challenge, and unlock only scoped access after proof.
+            SatGate sits at the gateway before forwarding and applies policy: identify the agent, confirm authority, estimate cost, enforce budgets, decide whether the payment method is allowed, record the challenge, and unlock only scoped access after proof.
           </p>
         </div>
         <div className="rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-6">
           <h3 className="text-xl font-bold text-white mb-4">A 402-aware control plane asks</h3>
           <div className="space-y-3 text-sm">
-            {['Which payment method is being requested?', 'Is this route approved for delegated paid access?', 'Does the agent have authority and budget?', 'Should policy require human approval?', 'Which paid rail is being requested, and is it allowed by policy?', 'What Evidence Pack receipt should be recorded before forwarding?'].map((item) => (
+            {['Which payment method is being requested?', 'Is this route approved for delegated paid access?', 'Does the agent have authority and budget?', 'Should policy require human approval?', 'Which payment method is being requested, and is it allowed by policy?', 'What signed receipt should be recorded before forwarding?'].map((item) => (
               <div key={item} className="flex items-start gap-3 rounded-lg border border-gray-800 bg-black/50 p-3">
                 <CheckCircle2 className="text-yellow-300 mt-0.5" size={18} />
                 <span className="text-gray-300">{item}</span>
@@ -135,7 +135,7 @@ export default function Http402ForAiAgentsPage() {
         <div className="max-w-6xl mx-auto px-6 py-20">
           <h2 className="text-3xl font-bold text-white mb-4">HTTP 402 flow types</h2>
           <p className="text-gray-400 max-w-3xl mb-10 text-lg">
-            Treat 402 as a protocol surface, not a single payment system. paid-rail context is one paid rail; x402, AgentCore Payments, Pay.sh, and payment-token flows are separate rails that still need governance.
+            Treat 402 as a protocol surface, not a single payment system. L402 is one payment method; x402, AgentCore Payments, Pay.sh, and payment-token flows are separate payment methods that still need governance.
           </p>
           <div className="overflow-hidden rounded-2xl border border-gray-800">
             <div className="grid md:grid-cols-3 bg-gray-900/70 text-sm font-bold text-white">
@@ -155,7 +155,7 @@ export default function Http402ForAiAgentsPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
           {[
             { icon: Bot, title: 'Agent requests', body: 'An agent calls a paid API, model endpoint, MCP tool, or dataset.' },
-            { icon: Network, title: 'SatGate evaluates', body: 'Policy checks identity, scope, budget, route, tenant, and allowed payment rail.' },
+            { icon: Network, title: 'SatGate evaluates', body: 'Policy checks identity, scope, budget, route, tenant, and allowed payment method.' },
             { icon: Braces, title: '402 is handled', body: 'SatGate can issue, observe, or audit a payment challenge depending on the route.' },
             { icon: ShieldCheck, title: 'Access is governed', body: 'Only approved, scoped, metered, auditable access proceeds upstream.' },
           ].map(({ icon: Icon, title, body }) => (
@@ -172,16 +172,16 @@ export default function Http402ForAiAgentsPage() {
         <div className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-8">
           <div className="rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-8">
             <Zap className="text-yellow-300 mb-5" size={34} />
-            <h2 className="text-2xl font-bold text-white mb-4">L402 is a paid rail, not the governance layer</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">L402 is a payment method, not the governance layer</h2>
             <p className="text-gray-300 leading-relaxed">
-              paid-rail context can carry payment proof: an API returns a 402 challenge, the agent or wallet client pays a Lightning invoice, and proof unlocks scoped access. SatGate evaluates the action before payment/access and records proof after the decision.
+              Payment details can carry payment proof: an API returns a 402 challenge, the agent or wallet client pays a Lightning invoice, and proof unlocks scoped access. SatGate evaluates the action before payment/access and records proof after the decision.
             </p>
           </div>
           <div className="rounded-2xl border border-cyan-900/60 bg-cyan-950/10 p-8">
             <ShieldCheck className="text-cyan-300 mb-5" size={34} />
-            <h2 className="text-2xl font-bold text-white mb-4">Other 402 rails still need policy</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">Other 402 payment methods still need policy</h2>
             <p className="text-gray-300 leading-relaxed">
-              Stripe-style shared payment tokens, card credentials, and future payment protocols can help platforms delegate paid access to agents. They do not replace request-path controls for budget, scope, revocation, metering, receipts, or Evidence Pack proof.
+              Stripe-style shared payment tokens, card credentials, and future payment protocols can help platforms delegate paid access to agents. They do not replace controls before the request goes through for budget, scope, revocation, metering, receipts, or signed receipt proof.
             </p>
           </div>
         </div>
@@ -198,15 +198,15 @@ export default function Http402ForAiAgentsPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="text-xl font-bold text-white mb-2">Is HTTP 402 the same as L402?</h3>
-              <p className="text-gray-400 leading-relaxed">No. HTTP 402 is the status code. L402 is a Lightning-based payment and access pattern that uses HTTP 402. paid-rail context is one rail SatGate can govern in the request path.</p>
+              <p className="text-gray-400 leading-relaxed">No. HTTP 402 is the status code. L402 is a Lightning payment and access method that uses HTTP 402, and SatGate can govern it before the request goes through.</p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="text-xl font-bold text-white mb-2">How are Stripe shared payment tokens different from L402?</h3>
-              <p className="text-gray-400 leading-relaxed">Stripe-style shared payment tokens are a payment-credential method for supported 402 flows. L402 uses Lightning payment proof to unlock scoped API access. They are separate rails.</p>
+              <p className="text-gray-400 leading-relaxed">Stripe-style shared payment tokens are a payment-credential method for supported 402 flows. L402 uses Lightning payment proof to unlock scoped API access. They are separate payment methods.</p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="text-xl font-bold text-white mb-2">Why do 402 payment challenges need policy?</h3>
-              <p className="text-gray-400 leading-relaxed">A payment challenge tells the agent how to pay, but it does not decide whether the agent should be allowed to spend, which budget applies, whether the route is in scope, or how the event should feed the Evidence Pack.</p>
+              <p className="text-gray-400 leading-relaxed">A payment challenge tells the agent how to pay, but it does not decide whether the agent should be allowed to spend, which budget applies, whether the route is in scope, or how the event should feed the signed receipt (Evidence Pack).</p>
             </div>
           </div>
         </div>
@@ -216,11 +216,11 @@ export default function Http402ForAiAgentsPage() {
         <h2 className="text-3xl font-bold text-white mb-8">Related guides</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[
-            ['/policy-to-proof', 'Policy-to-Proof', 'See how paid access decisions become Evidence Pack proof.'],
-            ['/govern', 'Govern AI agents', 'Govern paid agent actions before execution.'],
-            ['/l402-agent-payments', 'L402 agent payments', 'Understand paid-rail context as one paid rail for governed agent/API access.'],
-            ['/agent-payment-controls', 'Agent payment controls', 'Policy, budgets, approval, receipts, and payment rails for AI agents.'],
-            ['/policy-to-proof', 'Policy-to-Proof', 'Turn paid-rail context into governed authority decisions and Evidence Pack proof.'],
+            ['/policy-to-proof', 'Rules and Receipts', 'See how paid access decisions become signed receipt proof.'],
+            ['/govern', 'Govern AI agents', 'Govern paid agent actions before the agent acts.'],
+            ['/l402-agent-payments', 'L402 agent payments', 'Understand payment details as one payment method for governed agent/API access.'],
+            ['/agent-payment-controls', 'Agent payment controls', 'Policy, budgets, approval, receipts, and payment methods for AI agents.'],
+            ['/policy-to-proof', 'Rules and Receipts', 'Turn payment details into permission decisions and signed receipt proof.'],
             ['/l402-api-pricing-calculator', 'L402 API pricing calculator', 'Estimate request-native pricing for agent/API paid-access scenarios.'],
           ].map(([href, title, body]) => (
             <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">
@@ -233,16 +233,16 @@ export default function Http402ForAiAgentsPage() {
 
       <section className="max-w-6xl mx-auto px-6 py-20">
         <div className="rounded-3xl border border-yellow-900/60 bg-gradient-to-br from-yellow-950/20 to-cyan-950/30 p-8 md:p-12">
-          <h2 className="text-3xl font-bold text-white mb-4">Govern paid agent access before execution</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">Govern paid agent access before the agent acts</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            HTTP 402 can carry payment context. SatGate turns that context into governed action: authority, policy, budget, proof, and an Evidence Pack receipt for every paid request.
+            HTTP 402 can carry payment context. SatGate turns that context into governed action: authority, policy, budget, proof, and a signed receipt for every paid request.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
               Govern agent actions <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
-              See Policy-to-Proof
+              See how rules and receipts work
             </Link>
           </div>
         </div>
