@@ -37,7 +37,7 @@ export const metadata: Metadata = {
       "Give an agent a task and a budget. SatGate checks every tool call, lets you hand smaller budgets to sub-agents, and signs a receipt when it says no.",
     url: "https://satgate.io/build",
     type: "website",
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: "summary_large_image",

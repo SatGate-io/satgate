@@ -20,7 +20,7 @@ export const metadata = {
     description: 'A gateway that checks what each AI agent may do and spend before its request reaches your API, and signs a receipt for every decision.',
     url: 'https://satgate.io/economic-firewall',
     type: 'article',
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',

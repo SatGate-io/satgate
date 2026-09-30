@@ -36,7 +36,7 @@ export const metadata: Metadata = {
       "Every grant, paid call, denial, delegation, and revocation produces receipts and Evidence Pack proof your CISO, finance team, and auditor can trust.",
     url: "https://satgate.io/policy-to-proof",
     type: "website",
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: "summary_large_image",

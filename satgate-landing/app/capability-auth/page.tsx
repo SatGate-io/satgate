@@ -11,7 +11,7 @@ export const metadata = {
     description: 'Give agents scoped, revocable capabilities and Evidence Pack proof instead of broad static API keys.',
     url: 'https://satgate.io/capability-auth',
     type: 'website',
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',
