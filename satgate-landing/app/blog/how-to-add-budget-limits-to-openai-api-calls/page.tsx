@@ -578,13 +578,12 @@ satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
           </p>
 
           <div className="my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
-            <h3 className="mb-3 text-xl font-bold text-white">Turn OpenAI limits into enforceable policy</h3>
-            <p className="mb-4 text-gray-300">Use the policy generator and spend template to convert this guide into per-agent, per-session, per-request, and model-route controls.</p>
+            <h3 className="mb-3 text-xl font-bold text-white">Put a budget in front of OpenAI calls</h3>
+            <p className="mb-4 text-gray-300">Give each agent a token with a credit budget, route its OpenAI calls through SatGate, and see every allow and refusal with a signed receipt.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/build" className="text-cyan-300 hover:text-cyan-200">Build with SatGate →</Link>
               <Link href="/ai-agent-cost-control" className="text-cyan-300 hover:text-cyan-200">AI agent cost control →</Link>
               <Link href="/tools" className="text-cyan-300 hover:text-cyan-200">Cost-control tools →</Link>
-              <Link href="/build" className="text-cyan-300 hover:text-cyan-200">Agent spend policy template →</Link>
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
               <Link href="/agent-api-key-risk-assessment" className="text-cyan-300 hover:text-cyan-200">API key risk assessment →</Link>
               <Link href="/ai-agent-runaway-spend-index" className="text-cyan-300 hover:text-cyan-200">Runaway spend index →</Link>

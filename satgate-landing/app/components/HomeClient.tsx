@@ -320,7 +320,7 @@ const LandingPage = () => {
             <p className="mb-3 text-sm font-mono uppercase tracking-wide text-cyan-300">Free tools</p>
             <h2 className="mb-4 text-3xl md:text-4xl font-bold text-white">See what a runaway agent could cost you</h2>
             <p className="text-gray-400 text-lg leading-relaxed">
-              Start with these three. The tools page has more calculators and policy generators.
+              Start with these three. The tools page has more calculators.
             </p>
           </div>
           <div className="mb-6">

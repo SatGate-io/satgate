@@ -444,11 +444,11 @@ satgate mint \\
 
           <div className="my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">From dashboard to control plane</h3>
-            <p className="mb-4 text-gray-300">If a page is already earning LLM cost management impressions, route that intent into the pages that convert: tools, policy templates, and comparison pages.</p>
+            <p className="mb-4 text-gray-300">If a page is already earning LLM cost management impressions, route that intent into the pages that convert: tools and comparison pages.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">AI agent governance →</Link>
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
-              <Link href="/build" className="text-cyan-300 hover:text-cyan-200">Spend policy template →</Link>
+              <Link href="/build" className="text-cyan-300 hover:text-cyan-200">Build with SatGate →</Link>
               <Link href="/mcp-cost-control" className="text-cyan-300 hover:text-cyan-200">MCP cost control →</Link>
               <Link href="/mcp-proxy-config-generator" className="text-cyan-300 hover:text-cyan-200">MCP proxy config generator →</Link>
               <Link href="/economic-firewall-readiness-grader" className="text-cyan-300 hover:text-cyan-200">Readiness grader →</Link>
@@ -462,7 +462,6 @@ satgate mint \\
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/llm-cost-dashboard" className="text-cyan-300 hover:text-cyan-200">LLM cost dashboard checklist →</Link>
               <Link href="/llm-cost-monitoring" className="text-cyan-300 hover:text-cyan-200">LLM cost monitoring guide →</Link>
-              <Link href="/build" className="text-cyan-300 hover:text-cyan-200">Agent spend policy template →</Link>
             </div>
           </div>
 

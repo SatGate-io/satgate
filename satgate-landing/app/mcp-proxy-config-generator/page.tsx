@@ -19,9 +19,9 @@ const cursorSnippet = `{
 
 const desktopNote = `Claude Desktop and OpenClaw do not use this npx command.
 Open MCP Setup in the dashboard and copy the tenant /sse URL.
-Send it with this header:
+Send it with this header, replacing YOUR_AGENT_TOKEN with the agent token from MCP Setup:
 
-Authorization: Bearer <your agent token from MCP Setup>`;
+Authorization: Bearer YOUR_AGENT_TOKEN`;
 
 type ClientKey = 'cursor' | 'claudeCode' | 'claudeDesktop' | 'openclaw';
 

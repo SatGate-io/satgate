@@ -202,10 +202,10 @@ export default function LlmCostMonitoringPage() {
 
       <section className="border-t border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Policy generators</p>
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Next steps</p>
           <h2 className="mb-4 text-3xl font-bold text-white">Make monitoring actionable</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
-            When monitoring exposes a risky agent, model route, or MCP tool, the next step is not another chart. Generate the request-path policy that can stop the next bad call.
+            When monitoring shows a risky agent, model route or MCP tool, put a budget on it in the request path so the next bad call is refused.
           </p>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {[
