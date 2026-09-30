@@ -3,7 +3,7 @@ import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptTe
 
 export const metadata = {
   title: 'Agent Spending Limits | Spend Caps for Autonomous AI Agents',
-  description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day. Enforce authority, revocation, and Evidence Pack receipts before spend occurs.',
+  description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day. Enforce authority, revocation, and signed receipts before spend occurs.',
   alternates: { canonical: 'https://satgate.io/agent-spending-limits' },
   keywords: [
     'agent spending limits',
@@ -18,7 +18,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Agent Spending Limits | Spend Caps for Autonomous AI Agents',
-    description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day with authority and Evidence Pack receipts before spend occurs.',
+    description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day with authority and signed receipts before spend occurs.',
     url: 'https://satgate.io/agent-spending-limits',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -26,7 +26,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Agent Spending Limits | Spend Caps for Autonomous AI Agents',
-    description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day with authority and Evidence Pack receipts before spend occurs.',
+    description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day with authority and signed receipts before spend occurs.',
   },
 };
 
@@ -54,7 +54,7 @@ export default function Page() {
       { '@type': 'Thing', name: 'autonomous agent budget caps' },
       { '@type': 'Thing', name: 'delegated sub-agent limits' },
       { '@type': 'Thing', name: 'economic firewall controls' },
-      { '@type': 'Thing', name: 'request-path spend enforcement' },
+      { '@type': 'Thing', name: 'spend checks before the request goes through' },
     ],
   };
 
@@ -68,7 +68,7 @@ export default function Page() {
     url: 'https://satgate.io/agent-spending-limits',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-03',
-    featureList: ['Request-path budget enforcement', 'AI agent spend caps', 'MCP tool cost control', 'Revocable credentials', 'Audit receipts', 'Policy-to-Proof evidence'],
+    featureList: ['budget checks before the request goes through', 'AI agent spend caps', 'MCP tool cost control', 'Revocable credentials', 'Audit receipts', 'signed receipts'],
     audience: { '@type': 'Audience', audienceType: 'AI platform, API, finance, and security teams' },
   };
 
@@ -76,9 +76,9 @@ export default function Page() {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
-      { '@type': 'Question', name: 'What are agent spending limits?', acceptedAnswer: { '@type': 'Answer', text: 'Agent spending limits are request-path budgets and caps that constrain what autonomous AI agents can spend by task, route, tool, model, workflow, tenant, session, or day before requests execute.' } },
+      { '@type': 'Question', name: 'What are agent spending limits?', acceptedAnswer: { '@type': 'Answer', text: 'Agent spending limits are budgets and caps, checked before the request goes through, that constrain what autonomous AI agents can spend by task, route, tool, model, workflow, tenant, session, or day.' } },
       { '@type': 'Question', name: 'Why are dashboards not enough?', acceptedAnswer: { '@type': 'Answer', text: 'Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced at the gateway before forwarding.' } },
-      { '@type': 'Question', name: 'How does SatGate help?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate sits in the request path and checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before forwarding the request.' } },
+      { '@type': 'Question', name: 'How does SatGate help?', acceptedAnswer: { '@type': 'Answer', text: 'On each request that goes through SatGate, it checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before forwarding.' } },
       { '@type': 'Question', name: 'What spending limits should AI agents have?', acceptedAnswer: { '@type': 'Answer', text: 'AI agents should have spending limits by tenant, agent, task, workflow, session, model, tool, route, delegated sub-agent, and time window, with per-request ceilings and emergency revocation.' } },
       { '@type': 'Question', name: 'Are spending limits better than rate limits for AI agents?', acceptedAnswer: { '@type': 'Answer', text: 'They solve different problems. Rate limits control frequency, while spending limits control economic exposure by checking request price, remaining budget, scope, and policy before cost is created.' } },
     ],
@@ -106,11 +106,11 @@ export default function Page() {
         <div className="relative mx-auto max-w-6xl px-6 py-24">
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-950/30 px-4 py-2 text-sm text-cyan-200"><Gauge size={16} /> Spend caps for autonomous workers</div>
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Agent spending limits should stop the next request, not explain the last bill</h1>
-          <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">Autonomous agents need hard spending limits that apply per task, workflow, delegated sub-agent, model, tool, API route, and time window. SatGate enforces authority before execution and records a receipt for every budget decision.</p>
+          <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">Autonomous agents need hard spending limits that apply per task, workflow, delegated sub-agent, model, tool, API route, and time window. SatGate checks permission before the agent acts and records a receipt for every budget decision.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Govern agent spending limits <ArrowRight size={18} /></Link>
             <Link href="/runaway-agent-cost-calculator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Model runaway spend</Link>
-            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">See Policy-to-Proof</Link>
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">See how rules and receipts work</Link>
           </div>
         </div>
       </section>
@@ -128,7 +128,7 @@ export default function Page() {
           <h3 className="mb-4 text-xl font-bold text-white">What good policy includes</h3>
           <div className="space-y-4">
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Per-agent budgets</h3><p className="leading-relaxed text-gray-400">Track and limit spend by agent identity, tenant, task, workflow, route, model, and MCP tool.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Delegated sub-agent limits</h3><p className="leading-relaxed text-gray-400">Give sub-agents smaller budgets, narrower tools, shorter expiry, and separate Evidence Packs than their parent.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Delegated sub-agent limits</h3><p className="leading-relaxed text-gray-400">Give sub-agents smaller budgets, narrower tools, shorter expiry, and separate signed receipts than their parent.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Kill switches and revocation</h3><p className="leading-relaxed text-gray-400">Stop future spend by revoking or narrowing credentials before the next API or MCP request.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">From Observe to Control</h3><p className="leading-relaxed text-gray-400">Start by measuring real agent spend, then enforce hard caps where risk, cost, or autonomy justifies it.</p></div>
           </div>
@@ -159,7 +159,7 @@ export default function Page() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What are agent spending limits?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Agent spending limits are request-path budgets and caps that constrain what autonomous AI agents can spend by task, route, tool, model, workflow, tenant, session, or day before requests execute.
+                Agent spending limits are budgets and caps, checked before the request goes through, that constrain what autonomous AI agents can spend by task, route, tool, model, workflow, tenant, session, or day.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -171,7 +171,7 @@ export default function Page() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate help?</h3>
               <p className="text-gray-400 leading-relaxed">
-                SatGate sits in the request path and checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before forwarding the request.
+                On each request that goes through SatGate, it checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before forwarding.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -196,7 +196,7 @@ export default function Page() {
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate is the economic firewall for AI agents: observe every request, enforce spending limits before execution, and preserve receipts for budget, revocation, and access decisions.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Govern agent spending limits <ArrowRight size={18} /></Link>
-            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Review Policy-to-Proof</Link>
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">See how rules and receipts work</Link>
           </div>
         </div>
       </section>

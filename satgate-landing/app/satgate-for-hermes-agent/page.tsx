@@ -3,7 +3,7 @@ import { ArrowRight, Bot, BrainCircuit, DollarSign, KeyRound, ShieldCheck, Termi
 
 export const metadata = {
   title: 'SatGate for Hermes Agent MCP Workflows',
-  description: 'Add request-path budgets, MCP tool cost policy, scoped capabilities, revocation, and Evidence Packs to Hermes Agent workflows with SatGate.',
+  description: 'Add budgets checked before the request goes through, MCP tool cost policy, scoped capabilities, revocation, and signed receipts to Hermes Agent workflows with SatGate.',
   alternates: { canonical: 'https://satgate.io/satgate-for-hermes-agent' },
   keywords: [
     'SatGate for Hermes Agent',
@@ -16,7 +16,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate for Hermes Agent MCP Workflows',
-    description: 'Give Hermes Agent workflows request-path budgets, MCP tool cost policy, scoped credentials, revocation, and Evidence Packs with SatGate.',
+    description: 'Give Hermes Agent workflows budgets checked before the request goes through, MCP tool cost policy, scoped credentials, revocation, and signed receipts with SatGate.',
     url: 'https://satgate.io/satgate-for-hermes-agent',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -24,7 +24,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate for Hermes Agent MCP Workflows',
-    description: 'Economic governance for Hermes Agent MCP tools, API calls, credentials, and autonomous workflows.',
+    description: 'Spending controls for Hermes Agent MCP tools, API calls, credentials, and autonomous workflows.',
   },
 };
 
@@ -47,7 +47,7 @@ export default function SatGateForHermesAgentPage() {
     about: [
       { '@type': 'Thing', name: 'Hermes Agent MCP budget enforcement' },
       { '@type': 'Thing', name: 'Hermes Agent spend control' },
-      { '@type': 'Thing', name: 'persistent agent economic governance' },
+      { '@type': 'Thing', name: 'spending controls for persistent agents' },
       { '@type': 'Thing', name: 'MCP tool cost policy' },
       { '@type': 'Thing', name: 'revocable agent credentials' },
     ],
@@ -64,7 +64,7 @@ export default function SatGateForHermesAgentPage() {
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-04',
     about: webPageJsonLd.about,
-    featureList: ['Hermes Agent MCP budget enforcement', 'AI agent spend control', 'MCP tool cost policy', 'Revocable capability tokens', 'Request-path Evidence Packs'],
+    featureList: ['Hermes Agent MCP budget enforcement', 'AI agent spend control', 'MCP tool cost policy', 'Revocable capability tokens', 'signed receipts before the request goes through'],
   };
 
   const faqJsonLd = {
@@ -74,12 +74,12 @@ export default function SatGateForHermesAgentPage() {
       {
         '@type': 'Question',
         name: 'Can SatGate govern Hermes Agent MCP tools?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit between Hermes Agent workflows and MCP servers or upstream APIs to enforce budgets, allowed tools, scoped credentials, revocation, and Evidence Packs before tool calls execute.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit between Hermes Agent workflows and MCP servers or upstream APIs to enforce budgets, allowed tools, scoped credentials, revocation, and signed receipts before tool calls execute.' },
       },
       {
         '@type': 'Question',
-        name: 'Why does a self-improving agent need economic governance?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Persistent or learning agents can reuse skills, retry workflows, call tools, and delegate work over time. SatGate adds request-path economic policy so those actions have budgets, scopes, expiry, and kill switches.' },
+        name: 'Why does a self-improving agent need spending controls?',
+        acceptedAnswer: { '@type': 'Answer', text: 'Persistent or learning agents can reuse skills, retry workflows, call tools, and delegate work over time. SatGate adds spending checks before the request goes through, so those actions have budgets, scopes, expiry, and kill switches.' },
       },
       {
         '@type': 'Question',
@@ -131,7 +131,7 @@ export default function SatGateForHermesAgentPage() {
 
       <section className="mx-auto grid max-w-6xl gap-12 px-6 py-20 lg:grid-cols-[1fr_0.9fr]">
         <div>
-          <h2 className="mb-6 text-3xl font-bold text-white">Why Hermes Agent workflows need request-path economics</h2>
+          <h2 className="mb-6 text-3xl font-bold text-white">Why Hermes Agent workflows need spend checks before the request goes through</h2>
           <div className="space-y-5 text-lg leading-relaxed text-gray-300">
             <p>Persistent agents can learn patterns, reuse skills, chain tools, and act across sessions. That is powerful — and it makes static API keys and delayed spend dashboards a bad control model.</p>
             <p>SatGate sits between Hermes Agent and upstream APIs, MCP servers, model providers, or paid resources. Every request gets an economic decision before access is granted.</p>
@@ -169,8 +169,8 @@ export default function SatGateForHermesAgentPage() {
           <h2 className="mb-6 text-3xl font-bold text-white">Hermes Agent governance FAQ</h2>
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              ['Can SatGate govern Hermes Agent MCP tools?', 'Yes. SatGate can sit between Hermes Agent workflows and MCP servers or upstream APIs to enforce budgets, allowed tools, scoped credentials, revocation, and Evidence Packs before tool calls execute.'],
-              ['Why does a self-improving agent need economic governance?', 'Persistent or learning agents can reuse skills, retry workflows, call tools, and delegate work over time. SatGate adds request-path economic policy so those actions have budgets, scopes, expiry, and kill switches.'],
+              ['Can SatGate govern Hermes Agent MCP tools?', 'Yes. SatGate can sit between Hermes Agent workflows and MCP servers or upstream APIs to enforce budgets, allowed tools, scoped credentials, revocation, and signed receipts before tool calls execute.'],
+              ['Why does a self-improving agent need spending controls?', 'Persistent or learning agents can reuse skills, retry workflows, call tools, and delegate work over time. SatGate adds spending checks before the request goes through, so those actions have budgets, scopes, expiry, and kill switches.'],
               ['Does SatGate replace Hermes Agent?', 'No. Hermes Agent remains the agent workflow. SatGate adds the economic firewall around MCP tools, APIs, model routes, paid data sources, and credentials.'],
             ].map(([question, answer]) => (
               <div key={question}>

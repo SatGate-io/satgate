@@ -90,7 +90,7 @@ const webPageJsonLd = {
     { '@type': 'Thing', name: 'scoped AI agent capability tokens' },
     { '@type': 'Thing', name: 'crawler and agent access governance' },
     { '@type': 'Thing', name: 'token delegation enforcement' },
-    { '@type': 'Thing', name: 'request-path credential revocation' },
+    { '@type': 'Thing', name: 'credential revocation before the request goes through' },
   ],
 };
 
@@ -104,7 +104,7 @@ const softwareJsonLd = {
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
   dateModified: '2026-05-03',
-  featureList: ['Capability token minting', 'Agent credential delegation', 'Policy enforcement simulation', 'Credential revocation flow', 'Request Evidence Pack'],
+  featureList: ['Capability token minting', 'Agent credential delegation', 'Policy enforcement simulation', 'Credential revocation flow', 'Request a signed receipt'],
 };
 
 const faqJsonLd = {
@@ -116,7 +116,7 @@ const faqJsonLd = {
       name: 'What does Protect mode demonstrate?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Protect mode demonstrates request-path control for AI agent access: scoped capability tokens, delegation, policy enforcement, revocation, and audit before protected APIs or tools execute.',
+        text: 'Protect mode demonstrates control before the request goes through, for AI agent access: scoped capability tokens, delegation, policy enforcement, revocation, and audit before protected APIs or tools execute.',
       },
     },
     {
@@ -132,7 +132,7 @@ const faqJsonLd = {
       name: 'How does Protect mode reduce AI agent blast radius?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Protect mode reduces blast radius by narrowing scope, shortening lifetime, attenuating delegated tokens, blocking policy violations, and revoking compromised credentials before the next request.',
+        text: 'Protect mode reduces blast radius by narrowing scope, shortening lifetime, narrowing delegated tokens, blocking policy violations, and revoking compromised credentials before the next request.',
       },
     },
   ],
@@ -350,7 +350,7 @@ export default function ProtectDemoPage() {
         
         addLog('', 'info');
         addLog('🎯 [NETWORK] Requests sent: 0 ← OFFLINE OPERATION', 'success');
-        addLog('🔐 [CRYPTO] Token attenuated mathematically', 'success');
+        addLog('🔐 [CRYPTO] Token narrowed mathematically', 'success');
         addLog('', 'info');
         
         // Generate a mock hex signature for simulation
@@ -391,7 +391,7 @@ export default function ProtectDemoPage() {
       
       addLog('', 'info');
       addLog('🎯 [NETWORK] Requests sent: 0 ← OFFLINE OPERATION', 'success');
-      addLog('🔐 [CRYPTO] Token attenuated mathematically', 'success');
+      addLog('🔐 [CRYPTO] Token narrowed mathematically', 'success');
       addLog('', 'info');
       
       setDelegationResult(data);
@@ -1725,9 +1725,9 @@ export default function ProtectDemoPage() {
           <h2 className="mb-8 text-center text-2xl font-bold text-white">Protect-mode questions</h2>
           <div className="grid gap-4 md:grid-cols-3">
             {[
-              ['What does Protect mode demonstrate?', 'Protect mode demonstrates request-path control for AI agent access: scoped capability tokens, delegation, policy enforcement, revocation, and audit before protected APIs or tools execute.'],
+              ['What does Protect mode demonstrate?', 'Protect mode demonstrates control before the request goes through, for AI agent access: scoped capability tokens, delegation, policy enforcement, revocation, and audit before protected APIs or tools execute.'],
               ['Why should crawler or agent traffic use scoped credentials?', 'Crawler and agent traffic should use scoped credentials so each workflow has bounded authority, expiry, budget limits, traceability, and immediate revocation instead of broad shared API keys.'],
-              ['How does Protect mode reduce AI agent blast radius?', 'Protect mode reduces blast radius by narrowing scope, shortening lifetime, attenuating delegated tokens, blocking policy violations, and revoking compromised credentials before the next request.'],
+              ['How does Protect mode reduce AI agent blast radius?', 'Protect mode reduces blast radius by narrowing scope, shortening lifetime, narrowing delegated tokens, blocking policy violations, and revoking compromised credentials before the next request.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
                 <h3 className="mb-2 font-bold text-white">{question}</h3>
