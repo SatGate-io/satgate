@@ -354,7 +354,7 @@ export default function AiAgentCostControlPage() {
               ['AI API budget enforcement', 'Enforce per-agent and per-workflow spend caps before OpenAI, Claude, MCP, or paid API requests leave your environment.', '/ai-api-budget-enforcement'],
               ['Agent spending limits', 'Set hard caps by task, route, model, tool, tenant, session, and delegated sub-agent.', '/agent-spending-limits'],
               ['Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.', '/build'],
-              ['MCP tool spend control', 'Attach cost to tool calls and stop runaway Cursor, Claude Desktop, Claude Code, or OpenClaw workflows.', '/mcp-cost-control'],
+              ['MCP tool spend control', 'Attach cost to tool calls and stop runaway Cursor, Claude Desktop, Claude Code, or OpenClaw workflows.', '/mcp'],
               ['Revocable agent credentials', 'Replace broad static keys with scoped, expiring credentials and kill switches for autonomous workers.', '/revocable-agent-credentials'],
               ['Agent payment controls', 'Govern wallet approval, payment context, budgets, and audit before protected API access.', '/agent-payment-controls'],
             ].map(([title, body, href]) => (

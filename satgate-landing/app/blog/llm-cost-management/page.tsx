@@ -449,7 +449,7 @@ satgate mint \\
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">AI agent governance →</Link>
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
               <Link href="/build" className="text-cyan-300 hover:text-cyan-200">Build with SatGate →</Link>
-              <Link href="/mcp-cost-control" className="text-cyan-300 hover:text-cyan-200">MCP cost control →</Link>
+              <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">MCP cost control →</Link>
               <Link href="/mcp-proxy-config-generator" className="text-cyan-300 hover:text-cyan-200">MCP proxy config generator →</Link>
               <Link href="/economic-firewall-readiness-grader" className="text-cyan-300 hover:text-cyan-200">Readiness grader →</Link>
               <Link href="/compare" className="text-cyan-300 hover:text-cyan-200">Compare gateways →</Link>
@@ -473,7 +473,7 @@ satgate mint \\
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
-              <Link href="/mcp-governance" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
+              <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>
           </div>

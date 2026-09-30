@@ -203,7 +203,7 @@ export default function EconomicFirewallPage() {
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               Control your agents
             </Link>
-            <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
+            <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-cyan-500 transition">
               Control MCP tools
             </Link>
           </div>
@@ -431,12 +431,12 @@ export default function EconomicFirewallPage() {
               ['/mcp', 'MCP', 'Budgets and permissions for MCP tools, and a signed receipt when a call is allowed or refused.'],
               ['/govern', 'Control AI agents', 'Budgets and permissions for your own agents, with receipts you can export.'],
               ['/agent-control-plane', 'Agent control plane', 'Permissions, handoffs, spend, audit and revokes for large fleets of agents.'],
-              ['/mcp-governance', 'MCP governance', 'Budgets, revokes and receipts for MCP tool calls.'],
+              ['/mcp', 'MCP governance', 'Budgets, revokes and receipts for MCP tool calls.'],
               ['/agent-api-governance', 'Agent API governance', 'Identity, handoffs, revokes and audit for agent API calls.'],
               ['/ai-agent-cost-control', 'AI agent cost control', 'Stop runaway agent spend with hard budgets.'],
               ['/ai-api-budget-enforcement', 'AI API budget enforcement', 'Check the budget before a model, tool or API call goes out.'],
               ['/agent-spending-limits', 'Agent spending limits', 'Spending caps by task, workflow, sub-agent, route, model and tool.'],
-              ['/mcp-cost-control', 'MCP cost control', 'Control paid tool calls, retries, SaaS actions, cloud tasks, and data lookups.'],
+              ['/mcp', 'MCP cost control', 'Control paid tool calls, retries, SaaS actions, cloud tasks, and data lookups.'],
               ['/agent-payment-controls', 'Agent payment controls', 'Rules for agent wallets, budgets and 402 payment requests.'],
               ['/http-402-for-ai-agents', 'HTTP 402 for AI agents', 'Understand payment challenges, shared payment tokens, and L402.'],
               ['/l402-agent-payments', 'L402 agent payments', 'How L402 ties a Lightning payment to API access.'],

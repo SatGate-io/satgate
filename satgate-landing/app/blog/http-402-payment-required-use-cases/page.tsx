@@ -499,7 +499,7 @@ HTTP 402 was reserved for future use in 1997. For agent systems, the useful vers
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/pay" className="text-cyan-300 hover:text-cyan-200">SatGate Pay →</Link>
-              <Link href="/mcp-gateway" className="text-cyan-300 hover:text-cyan-200">MCP gateway controls →</Link>
+              <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">MCP gateway controls →</Link>
               <Link href="/capability-auth" className="text-cyan-300 hover:text-cyan-200">Capability auth →</Link>
               <Link href="/blog/api-monetization-ai" className="text-cyan-300 hover:text-cyan-200">API monetization for AI →</Link>
             </div>

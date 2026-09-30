@@ -151,7 +151,7 @@ const faqs = [
 
 const relatedTopics = [
   ["/policy-to-proof", "Policy-to-Proof", "Turn every mint, delegation, paid call, denial, and revocation into receipts and exportable Evidence Pack proof."],
-  ["/mcp-governance", "MCP governance", "Apply budget, revocation, and audit controls to agent tool calls."],
+  ["/mcp", "MCP governance", "Apply budget, revocation, and audit controls to agent tool calls."],
   ["/agent-api-governance", "Agent API governance", "Replace broad API keys with policy-bound, auditable agent authority."],
   ["/agent-capability-tokens", "Agent capability tokens", "Encode route, budget, expiry, delegation, and revocation into agent access."],
   ["/revocable-agent-credentials", "Revocable agent credentials", "Kill agent access without rotating every upstream provider secret."],

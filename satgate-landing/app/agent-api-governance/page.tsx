@@ -390,7 +390,7 @@ evidence:
               ['/blog/macaroon-tokens-vs-api-keys', 'Macaroons vs API keys', 'Why attenuated capabilities beat static API keys for agents.'],
               ['/agent-control-plane', 'Agent control plane', 'Govern enterprise agent authority, delegation lineage, spend, audit, and revocation.'],
               ['/evidence-pack-demo', 'Evidence Pack demo', 'Show how allow, deny, budget, delegation, and revocation decisions become receipts.'],
-              ['/mcp-governance', 'MCP governance', 'Apply authority, budgets, revocation, and Evidence Pack receipts to agent tool calls.'],
+              ['/mcp', 'MCP governance', 'Apply authority, budgets, revocation, and Evidence Pack receipts to agent tool calls.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">
                 <h3 className="font-bold text-white mb-2">{title}</h3>

@@ -8,7 +8,7 @@ PRICING = ROOT / "app" / "pricing" / "page.tsx"
 SANDBOX = ROOT / "app" / "sandbox" / "page.tsx"
 SANDBOX_LAYOUT = ROOT / "app" / "sandbox" / "layout.tsx"
 BACK_LINK_PAGES = [
-    ROOT / "app" / "mcp-gateway" / "page.tsx",
+    ROOT / "app" / "mcp" / "page.tsx",
     ROOT / "app" / "build" / "page.tsx",
     ROOT / "app" / "capability-auth" / "page.tsx",
     ROOT / "app" / "tools" / "page.tsx",

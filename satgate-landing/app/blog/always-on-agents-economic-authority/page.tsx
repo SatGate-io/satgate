@@ -129,7 +129,7 @@ export default function AlwaysOnAgentsEconomicAuthorityBlogPage() {
             <Link href="/economic-firewall" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
               Economic Firewall
             </Link>
-            <Link href="/mcp-governance" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
+            <Link href="/mcp" className="inline-flex items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-500">
               MCP governance
             </Link>
           </div>
@@ -261,7 +261,7 @@ export default function AlwaysOnAgentsEconomicAuthorityBlogPage() {
           </p>
 
           <p className={paragraphClass}>
-            This is why <Link href="/mcp-governance" className="text-cyan-300 hover:text-cyan-200">MCP governance</Link> matters. The gateway between agents and tools is becoming the natural place to check policy, budget, tenant, delegation depth, and evidence requirements before the action goes out.
+            This is why <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">MCP governance</Link> matters. The gateway between agents and tools is becoming the natural place to check policy, budget, tenant, delegation depth, and evidence requirements before the action goes out.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Logs are not proof.</h2>

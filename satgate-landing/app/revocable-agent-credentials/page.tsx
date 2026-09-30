@@ -175,7 +175,7 @@ audit:
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate provides the economic firewall underneath agent credentials: observe who is calling, control what they can spend and access, and revoke authority before the next request.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Grade readiness <ArrowRight size={18} /></Link>
-            <Link href="/mcp-budget-enforcement" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">MCP budget enforcement</Link>
+            <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">MCP budget enforcement</Link>
           </div>
         </div>
       </section>

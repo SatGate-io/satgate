@@ -620,7 +620,7 @@ attenuated_token = agent_a_token.add_caveats([
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
-              <Link href="/mcp-governance" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
+              <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>
           </div>

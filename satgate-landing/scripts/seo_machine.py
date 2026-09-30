@@ -45,9 +45,9 @@ RECOMMENDED_META = {
  '/blog/api-gateway-for-ai-agents': {
    'title': 'API Gateway for AI Agents: Control Tool and API Access',
    'description': 'Learn how an API gateway for AI agents can enforce authority before execution, budgets, MCP governance, and Evidence Packs across APIs and paid rails.'},
- '/mcp-gateway': {
-   'title': 'MCP Gateway for Agent Governance and Evidence Packs',
-   'description': 'Use SatGate as an MCP gateway to check authority before tool execution, enforce policy, and export Evidence Packs.'},
+ '/mcp': {
+   'title': 'MCP Gateway for AI Agents: Budgets, Permissions, Receipts',
+   'description': 'Put SatGate in front of MCP tools: per-tool budgets, scoped permissions, revocation, and a signed receipt for every allowed or refused call.'},
  '/capability-auth': {
    'title': 'Capability-Based Authorization for AI Agents',
    'description': 'Replace broad API keys with scoped, revocable, budget-aware capabilities for AI agents using SatGate.'},
@@ -84,7 +84,7 @@ def score_item(row: dict[str, Any], target: dict[str, Any]) -> dict[str, Any]:
     impression_score=math.log10(imps+1)*20 if imps else 0
     ranking_boost=5 if pos<=3 else 30 if pos<=10 else 15 if pos<=20 else 5
     new_boost=20 if target.get('status')=='new' else 0
-    strategic_boost=25 if target.get('path') in ['/mcp-gateway','/capability-auth'] else 0
+    strategic_boost=25 if target.get('path') in ['/mcp','/capability-auth'] else 0
     score=round(impression_score + gap*100 + ranking_boost + new_boost + strategic_boost)
     priority='P0' if score>=90 else 'P1' if score>=70 else 'P2' if score>=50 else 'P3'
     return {**target, 'clicks': row.get('clicks',0), 'impressions': int(imps), 'ctr': ctr, 'position': pos,
@@ -165,7 +165,7 @@ def recommendation(item: dict[str, Any], audit: dict[str, Any], link_map: dict[s
         changes.append('Route the first CTA into a tool, signup, or commercial product page instead of letting the article dead-end.')
     if audit.get('issues'):
         changes.append('Fix SEO audit issues: ' + '; '.join(audit['issues']))
-    if path == '/mcp-gateway':
+    if path == '/mcp':
         changes.append('Make this the commercial MCP gateway hub and link all MCP blog/tool pages into it.')
     if path == '/capability-auth':
         changes.append('Use identity-vs-capability framing and link macaroon/API-key content into this page.')

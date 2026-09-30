@@ -122,7 +122,7 @@ export default function SatGateForHermesAgentPage() {
             <Link href="/mcp-proxy-config-generator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Generate MCP proxy config <ArrowRight size={18} />
             </Link>
-            <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+            <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               MCP governance
             </Link>
           </div>

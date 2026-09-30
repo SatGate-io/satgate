@@ -409,7 +409,7 @@ satgate mint \\
             <p className="mb-4 text-gray-300">Use the comparison hub and MCP governance pages to map where existing gateways stop and SatGate&apos;s authority, budget, and Evidence Pack controls begin.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/compare" className="text-cyan-300 hover:text-cyan-200">Comparison hub →</Link>
-              <Link href="/mcp-governance" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
+              <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
             </div>
           </div>
@@ -422,7 +422,7 @@ satgate mint \\
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">Policy-to-Proof →</Link>
-              <Link href="/mcp-governance" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
+              <Link href="/mcp" className="text-cyan-300 hover:text-cyan-200">MCP governance →</Link>
               <Link href="/govern" className="text-cyan-300 hover:text-cyan-200">See SatGate governance →</Link>
             </div>
           </div>

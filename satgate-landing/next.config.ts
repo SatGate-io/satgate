@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
       { source: '/seo-distribution-kit', destination: '/', permanent: true },
       { source: '/openai-budget-policy-generator', destination: '/build', permanent: true },
       { source: '/mcp-tool-cost-policy-generator', destination: '/mcp', permanent: true },
+      { source: '/mcp-gateway', destination: '/mcp', permanent: true },
+      { source: '/mcp-governance', destination: '/mcp', permanent: true },
+      { source: '/mcp-budget-enforcement', destination: '/mcp', permanent: true },
+      { source: '/mcp-cost-control', destination: '/mcp', permanent: true },
       { source: '/agent-spend-policy-template', destination: '/build', permanent: true },
       { source: '/revocable-capability-token-policy-template', destination: '/build', permanent: true },
     ];
