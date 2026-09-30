@@ -39,7 +39,7 @@ export default function ToolLeadCaptureCta({
           Get a SatGate policy review <ArrowRight size={18} />
         </Link>
         <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
-          Generate policy template
+          See how to build with SatGate
         </Link>
       </div>
     </section>
