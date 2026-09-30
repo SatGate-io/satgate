@@ -3,7 +3,7 @@ import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptTe
 
 export const metadata = {
   title: 'AI API Budget Enforcement | Hard Caps for Agent API Spend',
-  description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with request-path controls, revocation, and Evidence Pack receipts.',
+  description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with checks before the request goes through, revocation, and signed receipts.',
   alternates: { canonical: 'https://satgate.io/ai-api-budget-enforcement' },
   keywords: [
     'AI API budget enforcement',
@@ -18,7 +18,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'AI API Budget Enforcement | Hard Caps for Agent API Spend',
-    description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with Evidence Pack receipts.',
+    description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with signed receipts.',
     url: 'https://satgate.io/ai-api-budget-enforcement',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -26,7 +26,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'AI API Budget Enforcement | Hard Caps for Agent API Spend',
-    description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with Evidence Pack receipts.',
+    description: 'Enforce AI API budgets before agents call OpenAI, Claude, MCP tools, paid APIs, or internal services with signed receipts.',
   },
 };
 
@@ -54,7 +54,7 @@ export default function Page() {
       { '@type': 'Thing', name: 'agent API spend caps' },
       { '@type': 'Thing', name: 'OpenAI API budget enforcement' },
       { '@type': 'Thing', name: 'MCP tool cost control' },
-      { '@type': 'Thing', name: 'request-path economic policy' },
+      { '@type': 'Thing', name: 'spending policy before the request goes through' },
     ],
   };
 
@@ -68,7 +68,7 @@ export default function Page() {
     url: 'https://satgate.io/ai-api-budget-enforcement',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-03',
-    featureList: ['Request-path budget enforcement', 'AI agent spend caps', 'MCP tool cost control', 'Revocable credentials', 'Audit receipts', 'Policy-to-Proof evidence'],
+    featureList: ['Budget checks before the request goes through', 'AI agent spend caps', 'MCP tool cost control', 'Revocable credentials', 'Audit receipts', 'Signed receipts'],
     audience: { '@type': 'Audience', audienceType: 'AI platform, API, finance, and security teams' },
   };
 
@@ -76,9 +76,9 @@ export default function Page() {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
-      { '@type': 'Question', name: 'What is AI API budget enforcement?', acceptedAnswer: { '@type': 'Answer', text: 'AI API budget enforcement is the request-path control that checks budgets, per-request cost, route policy, tool scope, expiry, and revocation before an autonomous agent can spend against an API or model provider.' } },
+      { '@type': 'Question', name: 'What is AI API budget enforcement?', acceptedAnswer: { '@type': 'Answer', text: 'AI API budget enforcement checks budgets, per-request cost, route policy, tool scope, expiry, and revocation on each request that goes through SatGate, before an autonomous agent can spend against an API or model provider.' } },
       { '@type': 'Question', name: 'Why are dashboards not enough?', acceptedAnswer: { '@type': 'Answer', text: 'Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced at the gateway before forwarding.' } },
-      { '@type': 'Question', name: 'How does SatGate help?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate sits in the request path and checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before forwarding the request.' } },
+      { '@type': 'Question', name: 'How does SatGate help?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before the request goes through.' } },
       { '@type': 'Question', name: 'How is AI API budget enforcement different from provider spend alerts?', acceptedAnswer: { '@type': 'Answer', text: 'Provider spend alerts notify teams after usage crosses a threshold. AI API budget enforcement checks request cost, remaining budget, identity, route, and policy before the API call executes.' } },
       { '@type': 'Question', name: 'What should happen when an AI agent exceeds its API budget?', acceptedAnswer: { '@type': 'Answer', text: 'The request should be blocked, downgraded, routed to a cheaper provider, sent for approval, or challenged for payment depending on policy, with an audit record explaining the decision.' } },
     ],
@@ -105,11 +105,11 @@ export default function Page() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_0%,rgba(34,211,238,0.18),transparent_34%),radial-gradient(circle_at_80%_10%,rgba(168,85,247,0.14),transparent_32%)]" />
         <div className="relative mx-auto max-w-6xl px-6 py-24">
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-950/30 px-4 py-2 text-sm text-cyan-200"><Gauge size={16} /> Hard caps before API spend happens</div>
-          <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">AI API budget enforcement belongs in the request path</h1>
-          <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">AI agents can call APIs faster than finance, dashboards, or alerts can react. SatGate puts authority before execution by enforcing budget, route, scope, revocation, and audit policy at the gateway before forwarding to upstream APIs, models, or MCP tools.</p>
+          <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">AI API budget enforcement belongs before the request goes through</h1>
+          <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">AI agents can call APIs faster than finance, dashboards, or alerts can react. SatGate puts permission before the agent acts by enforcing budget, route, scope, revocation, and audit policy at the gateway before forwarding to upstream APIs, models, or MCP tools.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Govern AI API budgets <ArrowRight size={18} /></Link>
-            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">See Policy-to-Proof</Link>
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">See how rules and receipts work</Link>
           </div>
         </div>
       </section>
@@ -158,7 +158,7 @@ export default function Page() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is AI API budget enforcement?</h3>
               <p className="text-gray-400 leading-relaxed">
-                AI API budget enforcement is the request-path control that checks budgets, per-request cost, route policy, tool scope, expiry, and revocation before an autonomous agent can spend against an API or model provider.
+                AI API budget enforcement checks budgets, per-request cost, route policy, tool scope, expiry, and revocation on each request that goes through SatGate, before an autonomous agent can spend against an API or model provider.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -170,7 +170,7 @@ export default function Page() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate help?</h3>
               <p className="text-gray-400 leading-relaxed">
-                SatGate sits in the request path and checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before forwarding the request.
+                SatGate checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before the request goes through.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -192,10 +192,10 @@ export default function Page() {
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-3xl border border-purple-900/60 bg-gradient-to-br from-purple-950/35 to-cyan-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Make agent economics enforceable.</h2>
-          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate is the economic firewall for AI agents: observe every request, enforce spend before execution, and preserve Policy-to-Proof receipts when paid access or budget decisions occur.</p>
+          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate is the economic firewall for AI agents: observe every request, enforce spend before the agent acts, and preserve signed receipts when paid access or budget decisions occur.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Govern AI API spend <ArrowRight size={18} /></Link>
-            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Review Policy-to-Proof</Link>
+            <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">See how rules and receipts work</Link>
           </div>
         </div>
       </section>

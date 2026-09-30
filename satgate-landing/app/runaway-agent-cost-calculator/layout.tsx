@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Runaway Agent Cost Calculator',
-    description: 'Estimate AI agent loop, retry, and tool-call cost exposure before request-path budget enforcement.',
+    description: 'Estimate AI agent loop, retry, and tool-call cost exposure before budget checks on each request that goes through SatGate.',
   },
 };
 

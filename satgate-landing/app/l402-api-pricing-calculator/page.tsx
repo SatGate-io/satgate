@@ -77,7 +77,7 @@ export default function L402ApiPricingCalculatorPage() {
       { '@type': 'Thing', name: 'paid-agent access revenue' },
       { '@type': 'Thing', name: 'Lightning sats per request' },
       { '@type': 'Thing', name: 'governed AI agent paid access' },
-      { '@type': 'Thing', name: 'request-path paid access' },
+      { '@type': 'Thing', name: 'paid access before the request goes through' },
     ],
   };
 
@@ -114,7 +114,7 @@ export default function L402ApiPricingCalculatorPage() {
         name: 'What is L402 API pricing?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'L402 API pricing is per-request API pricing where access is unlocked through an HTTP 402 challenge and Lightning payment proof. SatGate keeps that access tied to delegated authority, budget, scope, and receipts at request time.',
+          text: 'L402 API pricing is per-request API pricing where access is unlocked through an HTTP 402 challenge and Lightning payment proof. SatGate keeps that access tied to permissions passed down to a sub-agent, budget, scope, and receipts at request time.',
         },
       },
       {
@@ -122,7 +122,7 @@ export default function L402ApiPricingCalculatorPage() {
         name: 'How should APIs price paid agent access?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Start from marginal cost per request, add target gross margin, account for free allowances or trial traffic, and enforce payment or budget policy at the gateway before forwarding. L402 is one paid rail; SatGate preserves the authority and receipt context around access.',
+          text: 'Start from marginal cost per request, add target gross margin, account for free allowances or trial traffic, and enforce payment or budget policy at the gateway before forwarding. L402 is one payment method; SatGate preserves the authority and receipt context around access.',
         },
       },
       {
@@ -130,7 +130,7 @@ export default function L402ApiPricingCalculatorPage() {
         name: 'Is L402 the same as Fiat402?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. L402 is Lightning-based payment for API access. Fiat402 is separate. x402, AgentCore Payments, and Pay.sh are also separate paid rails. SatGate can preserve paid-rail context without conflating the rails.',
+          text: 'No. L402 is Lightning-based payment for API access. Fiat402 is separate. x402, AgentCore Payments, and Pay.sh are also separate payment methods. SatGate can preserve payment details without conflating them.',
         },
       },
       {
@@ -146,7 +146,7 @@ export default function L402ApiPricingCalculatorPage() {
         name: 'Should paid agent access pricing include free allowances?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Usually yes. Free allowances help agents test value before paying, but paid access should still be enforced with request-path pricing, budget checks, scoped access, and audit records.',
+          text: 'Usually yes. Free allowances help agents test value before paying, but paid access should still be enforced with pricing before the request goes through, budget checks, scoped access, and audit records.',
         },
       },
     ],
@@ -212,7 +212,7 @@ export default function L402ApiPricingCalculatorPage() {
 
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className="mb-4 text-3xl font-bold text-white">Pricing is only safe with request-path control</h2>
+          <h2 className="mb-4 text-3xl font-bold text-white">Pricing is only safe with control before the request goes through</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
             Paid agent-access pricing cannot be just a billing table. Autonomous agents need a challenge, proof, budget, scope, and audit decision before each protected resource unlocks.
           </p>
@@ -220,7 +220,7 @@ export default function L402ApiPricingCalculatorPage() {
             {[
               [Bot, 'Identify the agent', 'Know which agent, tenant, route, resource, and workflow is asking to spend.'],
               [Coins, 'Price the resource', 'Attach a per-request price or pricing tier to the protected API route.'],
-              [ReceiptText, 'Verify proof', 'Accept paid-rail context payment proof before forwarding the paid API request.'],
+              [ReceiptText, 'Verify proof', 'Accept payment details as proof before forwarding the paid API request.'],
               [Gauge, 'Respect budget', 'Check remaining budget and policy so an agent cannot spend beyond its allowed task.'],
               [Zap, 'Unlock instantly', 'Let software customers pay and proceed without account setup or invoice friction.'],
               [Calculator, 'Audit economics', 'Record route, price, payment proof, budget, and outcome for analysis.'],
@@ -246,19 +246,19 @@ export default function L402ApiPricingCalculatorPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is L402 API pricing?</h3>
               <p className="text-gray-400 leading-relaxed">
-                L402 API pricing is per-request API pricing where access is unlocked through an HTTP 402 challenge and Lightning payment proof. SatGate keeps that access tied to delegated authority, budget, scope, and receipts at request time.
+                L402 API pricing is per-request API pricing where access is unlocked through an HTTP 402 challenge and Lightning payment proof. SatGate keeps that access tied to permissions passed down to a sub-agent, budget, scope, and receipts at request time.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How should APIs price paid agent access?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Start from marginal cost per request, add target gross margin, account for free allowances or trial traffic, and enforce payment or budget policy at the gateway before forwarding. L402 is one paid rail; SatGate preserves the authority and receipt context around access.
+                Start from marginal cost per request, add target gross margin, account for free allowances or trial traffic, and enforce payment or budget policy at the gateway before forwarding. L402 is one payment method; SatGate preserves the authority and receipt context around access.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Is L402 the same as Fiat402?</h3>
               <p className="text-gray-400 leading-relaxed">
-                No. L402 is Lightning-based payment for API access. Fiat402 is separate. x402, AgentCore Payments, and Pay.sh are also separate paid rails. SatGate can preserve paid-rail context without conflating the rails.
+                No. L402 is Lightning-based payment for API access. Fiat402 is separate. x402, AgentCore Payments, and Pay.sh are also separate payment methods. SatGate can preserve payment details without conflating them.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -270,7 +270,7 @@ export default function L402ApiPricingCalculatorPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Should paid agent access pricing include free allowances?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Usually yes. Free allowances help agents test value before paying, but paid access should still be enforced with request-path pricing, budget checks, scoped access, and audit records.
+                Usually yes. Free allowances help agents test value before paying, but paid access should still be enforced with pricing before the request goes through, budget checks, scoped access, and audit records.
               </p>
             </div>
           </div>
@@ -281,7 +281,7 @@ export default function L402ApiPricingCalculatorPage() {
         <div className="rounded-3xl border border-yellow-900/60 bg-gradient-to-br from-yellow-950/25 to-cyan-950/25 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Model L402 paid access with policy proof.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            L402 can challenge and verify payment for protected API access. SatGate keeps authority, budget, revocation, paid-rail context, and Evidence Pack receipts in the request path.
+            L402 can challenge and verify payment for protected API access. Before the request goes through, SatGate keeps authority, budget, revocation, payment details, and signed receipts.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/http-402-for-ai-agents" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">

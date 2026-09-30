@@ -58,7 +58,7 @@ const PricingPage = () => {
       { '@type': 'Thing', name: 'AI agent budget enforcement' },
       { '@type': 'Thing', name: 'SatGate Economic Firewall' },
       { '@type': 'Thing', name: 'AI agent spending limits' },
-      { '@type': 'Thing', name: 'rail-neutral paid-rail governance' },
+      { '@type': 'Thing', name: 'payment rules that work with any payment method' },
     ],
   };
 
@@ -337,7 +337,7 @@ const PricingPage = () => {
                 <tr className="border-b border-gray-800/50">
                   <td className="py-3 px-4 text-gray-300">Visibility</td>
                   <td className="py-3 px-4">Dig through logs after the fact</td>
-                  <td className="py-3 px-4 text-white">Signed receipts + Evidence Pack export</td>
+                  <td className="py-3 px-4 text-white">Signed receipts + receipt export</td>
                 </tr>
                 <tr className="border-b border-gray-800/50">
                   <td className="py-3 px-4 text-gray-300">Runaway agents</td>

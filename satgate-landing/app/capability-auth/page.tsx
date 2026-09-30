@@ -3,12 +3,12 @@ import { ArrowLeft, ArrowRight, BadgeCheck, KeyRound, Layers3, ShieldCheck, Time
 
 export const metadata = {
   title: 'Capability-Based Authorization for AI Agents',
-  description: 'Replace broad API keys with scoped, revocable capabilities, authority before execution, and Evidence Pack proof.',
+  description: 'Replace broad API keys with scoped, revocable capabilities, permission before the agent acts, and signed receipts.',
   alternates: { canonical: 'https://satgate.io/capability-auth' },
   keywords: ['capability based authorization', 'capability auth', 'agent authorization', 'capability tokens', 'macaroon tokens', 'delegated authorization', 'AI agent permissions'],
   openGraph: {
     title: 'Capability-Based Authorization for AI Agents',
-    description: 'Give agents scoped, revocable capabilities and Evidence Pack proof instead of broad static API keys.',
+    description: 'Give agents scoped, revocable capabilities and signed receipts instead of broad static API keys.',
     url: 'https://satgate.io/capability-auth',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -16,7 +16,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Capability-Based Authorization for AI Agents',
-    description: 'Use SatGate to scope agent authority before execution and prove decisions with Evidence Packs.',
+    description: 'Use SatGate to scope what an agent is allowed to do before the agent acts, and prove decisions with signed receipts.',
   },
 };
 
@@ -30,9 +30,9 @@ const capabilities = [
 const faqs = [
   ['What is capability-based authorization?', 'Capability-based authorization gives an agent a specific, constrained capability: what it can do, where it can do it, for how long, with what budget, and whether it can delegate narrower authority.'],
   ['Why are capabilities useful for AI agents?', 'Agents act autonomously, call tools repeatedly, and delegate work. Capabilities limit blast radius by encoding scope, budget, expiry, revocation, and delegation into the authority the agent actually uses.'],
-  ['How are capabilities different from API keys?', 'API keys usually prove broad account ownership. Capabilities are narrower: they describe what this agent can access and spend right now, and they can be attenuated or revoked without rotating a shared secret.'],
+  ['How are capabilities different from API keys?', 'API keys usually prove broad account ownership. Capabilities are narrower: they describe what this agent can access and spend right now, and they can be narrowed or revoked without rotating a shared secret.'],
   ['Can capabilities include budget limits?', 'Yes. SatGate treats economic policy as part of authorization. A capability can carry or reference budget, per-tool pricing, route scope, tenant context, and delegation depth.'],
-  ['Are macaroons capability tokens?', 'Macaroons are a practical way to implement attenuated capability-style authority because caveats can constrain scope, time, budget, route, and delegation.'],
+  ['Are macaroons capability tokens?', 'Macaroons are a practical way to implement narrowed capability-style authority because caveats can constrain scope, time, budget, route, and delegation.'],
 ];
 
 export default function CapabilityAuthPage() {
@@ -104,7 +104,7 @@ export default function CapabilityAuthPage() {
               Traditional identity-based auth asks, “who is this?” That works for humans and stable apps, but autonomous agents need narrower authority. They need credentials that say which tool is allowed, what task it is for, how much it can spend, how long it lasts, and whether it can delegate.
             </p>
             <p>
-              SatGate puts that capability check in the request path. The result is not just authentication. It is Policy-to-Proof governance: Observe the call, Control authority and budget before execution, and Prove each decision with an Evidence Pack receipt.
+              SatGate puts that capability check before the request goes through. The result is not just authentication. It is rules and receipts for AI agents: Observe the call, Control the budget and what the agent is allowed to do before the agent acts, and Prove each decision with a signed receipt.
             </p>
           </div>
         </div>
@@ -147,7 +147,7 @@ export default function CapabilityAuthPage() {
           {[
             ['API keys', 'Useful for simple server-to-server access, but usually too broad for autonomous agents and weak at scoped delegation.'],
             ['OAuth', 'Strong for user consent and identity delegation, but often too heavyweight and human-centered for short-lived agent tool authority.'],
-            ['Macaroons', 'A practical token format for attenuated capabilities because caveats can narrow scope, time, budget, route, and delegation.'],
+            ['Macaroons', 'A practical token format for narrowed capabilities because caveats can narrow scope, time, budget, route, and delegation.'],
           ].map(([title, body]) => (
             <div key={title} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="text-2xl font-bold text-white mb-3">{title}</h3>
@@ -192,7 +192,7 @@ export default function CapabilityAuthPage() {
         <div className="max-w-4xl mx-auto px-6 py-20 text-center">
           <BadgeCheck className="mx-auto mb-6 text-emerald-300" size={36} />
           <h2 className="text-3xl font-bold text-white mb-4">Stop handing agents broad API keys.</h2>
-          <p className="text-gray-300 mb-8">Use capabilities that expire, attenuate, meter, delegate safely, stop spend before the next request, and leave Evidence Pack proof.</p>
+          <p className="text-gray-300 mb-8">Use capabilities that expire, narrow, meter, delegate safely, stop spend before the next request, and leave a signed receipt.</p>
           <Link href="/design-partners" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black hover:bg-gray-200 transition">
             Work with SatGate <ArrowRight size={18} />
           </Link>

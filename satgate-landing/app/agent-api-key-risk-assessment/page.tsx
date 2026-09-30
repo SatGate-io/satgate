@@ -46,7 +46,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
     const score = risks.reduce((sum, risk) => sum + (answers[risk.key] ? risk.weight : 0), 0);
     const grade = score >= 75 ? 'Critical' : score >= 50 ? 'High' : score >= 25 ? 'Medium' : 'Low';
     const summary = score >= 75
-      ? 'Your agents are holding broad economic authority. Move this workflow behind request-path budget enforcement before expanding autonomy.'
+      ? 'Your agents are holding broad economic authority. Move this workflow behind budget checks on each request that goes through SatGate before expanding autonomy.'
       : score >= 50
         ? 'This key model will create attribution, revocation, and spend-control gaps as agents scale.'
         : score >= 25
@@ -69,7 +69,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
       { '@type': 'Thing', name: 'static API key blast radius' },
       { '@type': 'Thing', name: 'revocable agent credentials' },
       { '@type': 'Thing', name: 'budget-aware capability tokens' },
-      { '@type': 'Thing', name: 'request-path agent API governance' },
+      { '@type': 'Thing', name: 'agent API checks before the request goes through' },
     ],
     audience: { '@type': 'Audience', audienceType: 'Security, API, platform, and AI engineering teams' },
   };
@@ -129,7 +129,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
         name: 'What should replace broad API keys for agents?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Use scoped, revocable, budget-aware agent capabilities enforced in the request path. Each capability should limit route, tool, spend, delegation, expiry, and audit requirements for one task or workflow.',
+          text: 'Use scoped, revocable, budget-aware agent capabilities enforced before the request goes through. Each capability should limit route, tool, spend, delegation, expiry, and audit requirements for one task or workflow.',
         },
       },
       {
@@ -137,7 +137,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
         name: 'How does SatGate reduce API key risk?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate sits in the request path and checks identity, budget, route, scope, expiry, revocation, and policy at the gateway before forwarding to an upstream API or MCP tool.',
+          text: 'SatGate checks identity, budget, route, scope, expiry, revocation, and policy at the gateway before the request goes through to an upstream API or MCP tool.',
         },
       },
     ],
@@ -209,9 +209,9 @@ export default function AgentApiKeyRiskAssessmentPage() {
 
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className="mb-4 text-3xl font-bold text-white">What safer agent authority looks like</h2>
+          <h2 className="mb-4 text-3xl font-bold text-white">What safer agent permissions look like</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
-            API keys were designed for applications. Autonomous agents need attenuated, revocable, budget-aware capabilities enforced before the request reaches the upstream API or MCP server.
+            API keys were designed for applications. Autonomous agents need narrowed, revocable, budget-aware capabilities enforced before the request reaches the upstream API or MCP server.
           </p>
           <div className="grid gap-5 md:grid-cols-3">
             {[
@@ -243,11 +243,11 @@ export default function AgentApiKeyRiskAssessmentPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What should replace broad API keys for agents?</h3>
-              <p className="leading-relaxed text-gray-400">Use scoped, revocable, budget-aware agent capabilities enforced in the request path. Each capability should limit route, tool, spend, delegation, expiry, and audit requirements for one task or workflow.</p>
+              <p className="leading-relaxed text-gray-400">Use scoped, revocable, budget-aware agent capabilities enforced before the request goes through. Each capability should limit route, tool, spend, delegation, expiry, and audit requirements for one task or workflow.</p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate reduce API key risk?</h3>
-              <p className="leading-relaxed text-gray-400">SatGate sits in the request path and checks identity, budget, route, scope, expiry, revocation, and policy at the gateway before forwarding to an upstream API or MCP tool.</p>
+              <p className="leading-relaxed text-gray-400">SatGate checks identity, budget, route, scope, expiry, revocation, and policy at the gateway before the request goes through to an upstream API or MCP tool.</p>
             </div>
           </div>
         </div>
@@ -257,7 +257,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-orange-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Move from API keys to economic capabilities.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            SatGate turns agent access into request-path policy: scoped authority, spend limits, revocation, audit, and payment controls at the gateway before forwarding.
+            SatGate turns agent access into policy on each request that goes through SatGate: scoped authority, spend limits, revocation, audit, and payment controls at the gateway before forwarding.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
