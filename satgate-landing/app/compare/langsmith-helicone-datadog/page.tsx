@@ -8,7 +8,7 @@ export const metadata = {
   description: 'Compare LLM observability tools with SatGate pre-execution control: delegated budgets, MCP tool policy, paid rails, flexible deployment, and Evidence Packs.',
   alternates: { canonical: 'https://satgate.io/compare/langsmith-helicone-datadog' },
   keywords: ['SatGate vs LangSmith', 'SatGate vs Helicone', 'SatGate vs Datadog LLM Observability', 'LLM observability vs control', 'agent Evidence Packs'],
-  openGraph: { title: config.title, description: 'Compare LLM observability tools with SatGate pre-execution control: delegated budgets, MCP tool policy, paid rails, flexible deployment, and Evidence Packs.', url: 'https://satgate.io/compare/langsmith-helicone-datadog', type: 'article' },
+  openGraph: { title: config.title, description: 'Compare LLM observability tools with SatGate pre-execution control: delegated budgets, MCP tool policy, paid rails, flexible deployment, and Evidence Packs.', url: 'https://satgate.io/compare/langsmith-helicone-datadog', type: 'article', images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }] },
   twitter: { card: 'summary_large_image', title: config.title, description: config.verdict },
 };
 

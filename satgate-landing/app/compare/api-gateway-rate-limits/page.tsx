@@ -8,7 +8,7 @@ export const metadata = {
   description: 'Compare API Gateway rate limits with SatGate agent authority: delegated budgets, MCP tool policy, paid rails, flexible deployment, and Evidence Packs.',
   alternates: { canonical: 'https://satgate.io/compare/api-gateway-rate-limits' },
   keywords: ['SatGate vs API Gateway rate limits', 'agent API rate limits', 'API gateway budget enforcement', 'MCP rate limits', 'agent spend policy'],
-  openGraph: { title: config.title, description: 'Compare API Gateway rate limits with SatGate agent authority: delegated budgets, MCP tool policy, paid rails, flexible deployment, and Evidence Packs.', url: 'https://satgate.io/compare/api-gateway-rate-limits', type: 'article' },
+  openGraph: { title: config.title, description: 'Compare API Gateway rate limits with SatGate agent authority: delegated budgets, MCP tool policy, paid rails, flexible deployment, and Evidence Packs.', url: 'https://satgate.io/compare/api-gateway-rate-limits', type: 'article', images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }] },
   twitter: { card: 'summary_large_image', title: config.title, description: config.verdict },
 };
 

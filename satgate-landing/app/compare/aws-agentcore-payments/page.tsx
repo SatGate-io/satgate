@@ -8,7 +8,7 @@ export const metadata = {
   description: 'Compare SatGate and AWS AgentCore Payments across cross-provider control, paid rails, MCP proxying, delegated budgets, flexible deployment, and Evidence Packs.',
   alternates: { canonical: 'https://satgate.io/compare/aws-agentcore-payments' },
   keywords: ['SatGate vs AWS AgentCore Payments', 'AWS AgentCore Payments alternative', 'agent payments governance', 'x402 agent payments', 'MCP agent policy', 'agent authority governance'],
-  openGraph: { title: config.title, description: 'Compare SatGate and AWS AgentCore Payments across cross-provider control, paid rails, MCP proxying, delegated budgets, flexible deployment, and Evidence Packs.', url: 'https://satgate.io/compare/aws-agentcore-payments', type: 'article' },
+  openGraph: { title: config.title, description: 'Compare SatGate and AWS AgentCore Payments across cross-provider control, paid rails, MCP proxying, delegated budgets, flexible deployment, and Evidence Packs.', url: 'https://satgate.io/compare/aws-agentcore-payments', type: 'article', images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }] },
   twitter: { card: 'summary_large_image', title: config.title, description: config.verdict },
 };
 
