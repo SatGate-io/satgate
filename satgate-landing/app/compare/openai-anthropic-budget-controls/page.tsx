@@ -8,7 +8,7 @@ export const metadata = {
   description: 'Compare native OpenAI and Anthropic budget controls with SatGate cross-provider agent budgets, MCP policy, paid rails, flexible deployment, and Evidence Packs.',
   alternates: { canonical: 'https://satgate.io/compare/openai-anthropic-budget-controls' },
   keywords: ['OpenAI budget controls alternative', 'Anthropic budget controls alternative', 'cross-provider AI budgets', 'agent budget enforcement', 'SatGate vs OpenAI budgets'],
-  openGraph: { title: config.title, description: 'Compare native OpenAI and Anthropic budget controls with SatGate cross-provider agent budgets, MCP policy, paid rails, flexible deployment, and Evidence Packs.', url: 'https://satgate.io/compare/openai-anthropic-budget-controls', type: 'article' },
+  openGraph: { title: config.title, description: 'Compare native OpenAI and Anthropic budget controls with SatGate cross-provider agent budgets, MCP policy, paid rails, flexible deployment, and Evidence Packs.', url: 'https://satgate.io/compare/openai-anthropic-budget-controls', type: 'article', images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }] },
   twitter: { card: 'summary_large_image', title: config.title, description: config.verdict },
 };
 
