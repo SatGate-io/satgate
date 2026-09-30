@@ -3,7 +3,7 @@ import { ArrowRight, Bot, DollarSign, Gauge, KeyRound, ShieldCheck, Terminal, Wo
 
 export const metadata = {
   title: 'SatGate for Claude Desktop MCP',
-  description: 'Govern Claude Desktop MCP tool calls with SatGate budgets, scoped capabilities, revocation, and request-path Evidence Packs.',
+  description: 'Govern Claude Desktop MCP tool calls with SatGate budgets, scoped capabilities, revocation, and signed receipts before the request goes through.',
   alternates: { canonical: 'https://satgate.io/satgate-for-claude-desktop' },
   keywords: [
     'SatGate for Claude Desktop',
@@ -15,7 +15,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate for Claude Desktop MCP',
-    description: 'Govern Claude Desktop MCP tool calls with SatGate budgets, scoped capabilities, revocation, and request-path Evidence Packs.',
+    description: 'Govern Claude Desktop MCP tool calls with SatGate budgets, scoped capabilities, revocation, and signed receipts before the request goes through.',
     url: 'https://satgate.io/satgate-for-claude-desktop',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -23,12 +23,12 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate for Claude Desktop MCP',
-    description: 'Govern Claude Desktop MCP tool calls with SatGate budgets, scoped capabilities, revocation, and request-path Evidence Packs.',
+    description: 'Govern Claude Desktop MCP tool calls with SatGate budgets, scoped capabilities, revocation, and signed receipts before the request goes through.',
   },
 };
 
 const controls = [
-  { icon: DollarSign, title: 'Budget before execution', body: 'Check remaining spend, request ceilings, route cost, and policy before forwarding the call.' },
+  { icon: DollarSign, title: 'Budget before the call runs', body: 'Check remaining spend, request ceilings, route cost, and policy before forwarding the call.' },
   { icon: KeyRound, title: 'Scoped capabilities', body: 'Replace broad static keys with expiring, revocable credentials constrained by route, tool, calls, and spend.' },
   { icon: ShieldCheck, title: 'Revocation and kill switches', body: 'Stop a risky task, tool, or agent session immediately without rotating every shared secret.' },
   { icon: Workflow, title: 'MCP and API governance', body: 'Apply the same economic policy across MCP servers, internal APIs, model providers, and paid tools.' },
@@ -48,7 +48,7 @@ export default function SatGateIntegrationPage() {
       { '@type': 'Thing', name: 'Claude Desktop MCP budget enforcement' },
       { '@type': 'Thing', name: 'SatGate for Claude Desktop' },
       { '@type': 'Thing', name: 'MCP tool spend governance' },
-      { '@type': 'Thing', name: 'request-path economic firewall' },
+      { '@type': 'Thing', name: 'economic firewall before the request goes through' },
       { '@type': 'Thing', name: 'revocable agent credentials for MCP' },
     ],
     audience: { '@type': 'Audience', audienceType: 'AI engineering, platform, API, and security teams using Claude Desktop' },
@@ -65,7 +65,7 @@ export default function SatGateIntegrationPage() {
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-03',
     audience: webPageJsonLd.audience,
-    featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'Request-path Evidence Packs', 'rail-neutral paid-rail governance'],
+    featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'signed receipts before the request goes through', 'payment rules that work with any payment method'],
   };
 
   const faqJsonLd = {
@@ -80,7 +80,7 @@ export default function SatGateIntegrationPage() {
       {
         '@type': 'Question',
         name: 'Is SatGate just another observability dashboard?',
-        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, audit, and L402 payment at the gateway before forwarding.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate can observe traffic, but its core role is enforcement before the request goes through: budgets, revocation, route policy, capabilities, audit, and L402 payment at the gateway before forwarding.' },
       },
       {
         '@type': 'Question',
@@ -113,12 +113,12 @@ export default function SatGateIntegrationPage() {
             <Terminal size={16} /> Claude Desktop MCP budget enforcement
           </div>
 
-          <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Put authority controls around Claude Desktop MCP tools</h1>
+          <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Put permission controls around Claude Desktop MCP tools</h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">Claude Desktop plus MCP gives assistants access to real tools. That is exactly where static keys and best-effort prompts break down. SatGate enforces budget, scope, expiry, revocation, and audit at the request layer around MCP servers and paid APIs.</p>
 
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-              See Policy-to-Proof <ArrowRight size={18} />
+              See how rules and receipts work <ArrowRight size={18} />
             </Link>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               AI agent cost control
@@ -129,7 +129,7 @@ export default function SatGateIntegrationPage() {
 
       <section className="mx-auto grid max-w-6xl gap-12 px-6 py-20 lg:grid-cols-[1fr_0.9fr]">
         <div>
-          <h2 className="mb-6 text-3xl font-bold text-white">Why Claude Desktop workflows need request-path economics</h2>
+          <h2 className="mb-6 text-3xl font-bold text-white">Why Claude Desktop workflows need checks before the request goes through</h2>
           <div className="space-y-5 text-lg leading-relaxed text-gray-300">
             <p>Autonomous agents are not normal SaaS users. They can retry, loop, delegate, and call tools faster than a human operator can review a bill.</p>
             <p>SatGate sits between those agents and the upstream API, MCP server, model provider, or protected resource. Every request gets an economic decision before access is granted.</p>
@@ -149,7 +149,7 @@ export default function SatGateIntegrationPage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-bold text-white">SatGate controls for Claude Desktop</h2>
-          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the governance layer around agentic tool use: Observe first, Control when limits are known, and Prove every approval, denial, and paid-access decision with Evidence Pack receipts.</p>
+          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the governance layer around agentic tool use: Observe first, Control when limits are known, and keep a signed receipt for every approval, denial, and paid-access decision.</p>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {controls.map(({ icon: Icon, title, body }) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-black p-6 transition hover:border-cyan-900/70">
@@ -186,7 +186,7 @@ export default function SatGateIntegrationPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Is SatGate just another observability dashboard?</h3>
-              <p className="leading-relaxed text-gray-400">No. SatGate can observe traffic, but its core role is request-path enforcement: budgets, revocation, route policy, capabilities, audit, and L402 payment at the gateway before forwarding.</p>
+              <p className="leading-relaxed text-gray-400">No. SatGate can observe traffic, but its core role is enforcement before the request goes through: budgets, revocation, route policy, capabilities, audit, and L402 payment at the gateway before forwarding.</p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Can SatGate start in observe-only mode?</h3>
@@ -198,9 +198,9 @@ export default function SatGateIntegrationPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-3xl border border-purple-900/40 bg-gradient-to-br from-purple-950/40 to-cyan-950/20 p-8 md:p-10">
-          <div className="mb-4 flex items-center gap-3 text-purple-200"><Bot size={24} /><span className="font-semibold">Observe → Control → Prove</span></div>
+          <div className="mb-4 flex items-center gap-3 text-purple-200"><Bot size={24} /><span className="font-semibold">Observe, Control, and a signed receipt</span></div>
           <h2 className="mb-4 text-3xl font-bold text-white">Make Claude Desktop agent activity governable.</h2>
-          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate gives agent teams the missing economic layer: budgets, scoped authority, revocation, audit, and paid-rail context where machine customers need to pay for APIs.</p>
+          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate gives agent teams the missing economic layer: budgets, scoped permissions, revocation, audit, and charging external agents where those agents need to pay for APIs.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-300 px-6 py-3 font-bold text-black transition hover:bg-cyan-200">
               MCP budget enforcement <Gauge size={18} />

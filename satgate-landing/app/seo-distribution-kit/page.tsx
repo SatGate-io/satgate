@@ -51,7 +51,7 @@ export default function SeoDistributionKitPage() {
       { '@type': 'Thing', name: 'economic firewall launch positioning' },
       { '@type': 'Thing', name: 'MCP governance backlink strategy' },
       { '@type': 'Thing', name: 'runaway agent spend data assets' },
-      { '@type': 'Thing', name: 'rail-neutral paid-rail governance promotion' },
+      { '@type': 'Thing', name: 'payment rules that work with any payment method' },
     ],
     audience: { '@type': 'Audience', audienceType: 'Founders, developer advocates, content teams, sales engineers, and partners' },
   };

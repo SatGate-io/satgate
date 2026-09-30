@@ -2,36 +2,36 @@ import type { Metadata } from "next";
 import GovernClient from "../components/GovernClient";
 
 export const metadata: Metadata = {
-  title: "Enterprise AI Agent Governance: Policy-to-Proof Controls",
+  title: "Enterprise AI Agent Governance: Rules and Receipts",
   description:
-    "Govern AI agents before execution: Observe usage, Control budgets and access, and Prove decisions with Evidence Packs across APIs, MCP, and paid rails.",
+    "Govern AI agents before they act: Observe usage, Control budgets and access, and keep signed receipts across APIs, MCP, and payment methods.",
   alternates: {
     canonical: "https://satgate.io/govern",
   },
   keywords: [
     "enterprise AI agent governance",
-    "AI agent authority governance",
-    "Agent Authority & Accountability Layer",
-    "Policy-to-Proof governance for AI agents",
+    "AI agent permissions",
+    "Agent Permissions and Receipts",
+    "rules and receipts for AI agents",
     "MCP governance for enterprises",
     "AI agent budget enforcement",
     "agent delegation controls",
-    "Policy-to-Proof for AI agents",
-    "Evidence Packs for AI agents",
+    "rules and receipts",
+    "signed receipts for AI agents",
   ],
   openGraph: {
-    title: "Enterprise AI Agent Governance: Policy-to-Proof Controls",
+    title: "Enterprise AI Agent Governance: Rules and Receipts",
     description:
-      "Govern AI agents before execution: Observe usage, Control budgets and access, and Prove decisions with Evidence Packs across APIs, MCP, and paid rails.",
+      "Govern AI agents before they act: Observe usage, Control budgets and access, and keep signed receipts across APIs, MCP, and payment methods.",
     url: "https://satgate.io/govern",
     type: "website",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Enterprise AI Agent Governance: Policy-to-Proof Controls",
+    title: "Enterprise AI Agent Governance: Rules and Receipts",
     description:
-      "Observe agent usage, Control access and budgets before execution, and Prove every decision with Evidence Packs.",
+      "Observe agent usage, Control access and budgets before the agent acts, and keep a signed receipt for every decision.",
   },
 };
 
@@ -45,11 +45,11 @@ const webPageSchema = {
   isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
   about: [
     { "@type": "Thing", name: "AI agent governance" },
-    { "@type": "Thing", name: "Agent Authority & Accountability Layer" },
-    { "@type": "Thing", name: "Policy-to-Proof governance for AI agents" },
+    { "@type": "Thing", name: "Agent Permissions and Receipts" },
+    { "@type": "Thing", name: "rules and receipts for AI agents" },
     { "@type": "Thing", name: "MCP governance for enterprises" },
     { "@type": "Thing", name: "agent delegation controls" },
-    { "@type": "Thing", name: "Policy-to-Proof for AI agents" },
+    { "@type": "Thing", name: "rules and receipts" },
   ],
 };
 
@@ -62,15 +62,15 @@ const faqSchema = {
       name: "What is AI agent governance?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "AI agent governance is the set of controls that determines which agents can call which APIs, tools, and models; how much they can spend; what authority they can delegate; and when access must be revoked. For autonomous agents, governance needs request-path enforcement, not just logs, dashboards, and postmortems.",
+        text: "AI agent governance is the set of controls that determines which agents can call which APIs, tools, and models; how much they can spend; what permissions they can pass down; and when access must be revoked. For autonomous agents, governance needs a check before the request goes through, not just logs, dashboards, and postmortems.",
       },
     },
     {
       "@type": "Question",
-      name: "What is Policy-to-Proof governance for AI agents?",
+      name: "What are rules and receipts for AI agents?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Policy-to-Proof governance for AI agents sits in the request path, applies scopes, budgets, delegation rules, and revocation before an agent reaches an upstream API, model, or MCP tool, then preserves an Evidence Pack so the decision can be verified later.",
+        text: "Rules and receipts for AI agents apply before the request goes through. They apply scopes, budgets, delegation rules, and revocation before an agent reaches an upstream API, model, or MCP tool, then keep a signed receipt (Evidence Pack) so the decision can be verified later.",
       },
     },
     {
@@ -78,7 +78,7 @@ const faqSchema = {
       name: "How should enterprises govern MCP tool usage?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Enterprises should govern MCP tools with per-tool budgets, scoped capability tokens, task and tenant attribution, Evidence Packs, revocation, and hard request-path policy decisions. Rate limits and dashboards are useful, but they do not replace enforcement before tool calls execute.",
+        text: "Enterprises should govern MCP tools with per-tool budgets, scoped capability tokens, task and tenant attribution, signed receipts, revocation, and hard policy decisions before the request goes through. Rate limits and dashboards are useful, but they do not replace enforcement before tool calls execute.",
       },
     },
     {
@@ -86,7 +86,7 @@ const faqSchema = {
       name: "What is the difference between AI governance and AI agent governance?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "AI governance usually covers model risk, data policy, compliance, and human review. AI agent governance adds request-path controls for autonomous actions: scopes, budgets, delegated authority, revocation, denial reasons, spend attribution, and proof before APIs or MCP tools execute.",
+        text: "AI governance usually covers model risk, data policy, compliance, and human review. AI agent governance adds controls before the request goes through for autonomous actions: scopes, budgets, permissions passed down to a sub-agent, revocation, denial reasons, spend attribution, and proof before APIs or MCP tools execute.",
       },
     },
     {

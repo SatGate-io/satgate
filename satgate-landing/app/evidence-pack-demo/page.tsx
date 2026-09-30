@@ -4,19 +4,19 @@ import { ArrowRight, BadgeCheck, ClipboardCheck, Download, FileJson, KeyRound, R
 import evidencePack from '../../public/evidence-packs/sample-evidence-pack.v1.json';
 
 export const metadata: Metadata = {
-  title: 'Sample Evidence Pack: Who Allowed What?',
+  title: 'Sample signed receipt: Who Allowed What?',
   description:
-    'Open a sample SatGate Evidence Pack and see who allowed what, under which rules and budget, who handed work to whom, and what was paid.',
+    'Open a sample SatGate signed receipt (Evidence Pack) and see who allowed what, under which rules and budget, who handed work to whom, and what was paid.',
   alternates: { canonical: 'https://satgate.io/evidence-pack-demo' },
   keywords: [
-    'Evidence Pack demo',
-    'Policy-to-Proof artifact',
+    'signed receipt demo',
+    'signed receipt',
     'AI agent authorization evidence',
     'agent delegation proof',
-    'agent paid rail audit evidence',
+    'agent payment method audit evidence',
   ],
   openGraph: {
-    title: 'Sample Evidence Pack: Who Allowed What?',
+    title: 'Sample signed receipt: Who Allowed What?',
     description:
       'One agent workflow, laid out: which agent acted, the rules and budget it ran under, the handoff to a sub-agent, payments, and every receipt.',
     url: 'https://satgate.io/evidence-pack-demo',
@@ -25,9 +25,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Sample Evidence Pack: Who Allowed What?',
+    title: 'Sample signed receipt: Who Allowed What?',
     description:
-      'Open a sample SatGate Evidence Pack: permission checked before each action, a receipt after every decision.',
+      'Open a sample SatGate signed receipt: permission checked before each action, a receipt after every decision.',
   },
 };
 
@@ -42,7 +42,7 @@ const delegatedGrant = authorityChain[1];
 const paidEvents = pack.payment_context.events;
 
 if (!rootGrant || !delegatedGrant) {
-  throw new Error('Evidence Pack demo fixture must include a root grant and a delegated grant.');
+  throw new Error('Receipt demo fixture must include a root grant and a delegated grant.');
 }
 
 const rootIssuerName = rootGrant.issuer?.display_name ?? rootGrant.issuer?.id ?? 'authorized issuer';
@@ -101,13 +101,13 @@ const resultStyles: Record<string, string> = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'SatGate Evidence Pack Demo',
+  name: 'SatGate signed receipt demo',
   applicationCategory: 'SecurityApplication',
   operatingSystem: 'Web',
   url: 'https://satgate.io/evidence-pack-demo',
   description: metadata.description,
   featureList: [
-    'Canonical Evidence Pack v1 schema',
+    'Canonical signed receipt (Evidence Pack) v1 schema',
     'Token chain viewer',
     'Policy and budget snapshot',
     'Sub-agent handoffs',
@@ -125,7 +125,7 @@ export default function EvidencePackDemoPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(34,211,238,0.2),transparent_30%),radial-gradient(circle_at_85%_10%,rgba(168,85,247,0.18),transparent_35%)]" />
         <div className="relative mx-auto max-w-6xl">
           <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-4 py-2 text-sm font-bold text-cyan-100">
-            <FileJson size={16} /> Sample Evidence Pack
+            <FileJson size={16} /> Sample signed receipt
           </p>
           <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
             <div>
@@ -133,7 +133,7 @@ export default function EvidencePackDemoPage() {
                 Who allowed what?
               </h1>
               <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
-                This is a sample Evidence Pack for one agent workflow. The JSON file is what SatGate exports; this page lays it out so you can read it: which agent acted, the rules and budget it ran under, the handoff to a sub-agent, payments, and every receipt.
+                This is a sample signed receipt (Evidence Pack) for one agent workflow. The JSON file is what SatGate exports; this page lays it out so you can read it: which agent acted, the rules and budget it ran under, the handoff to a sub-agent, payments, and every receipt.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <a href="/evidence-packs/sample-evidence-pack.v1.json" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -151,7 +151,7 @@ export default function EvidencePackDemoPage() {
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-200">Summary</p>
               <dl className="mt-6 grid gap-4 text-sm">
                 <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
-                  <dt className="text-gray-500">Evidence Pack</dt>
+                  <dt className="text-gray-500">Receipt</dt>
                   <dd className="mt-1 font-mono text-cyan-100">{pack.evidence_pack_id}</dd>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-black/40 p-4">

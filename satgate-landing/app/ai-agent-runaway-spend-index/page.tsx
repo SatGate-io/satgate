@@ -3,7 +3,7 @@ import { ArrowRight, BarChart3, Download, Gauge, ShieldCheck, Zap } from 'lucide
 
 export const metadata = {
   title: 'AI Agent Runaway Spend Index: Monthly Cost Risk Benchmark',
-  description: 'Monthly SatGate index tracking modeled runaway AI agent spend, MCP tool cost failures, retry loops, fanout risk, and avoided cost from request-path controls.',
+  description: 'Monthly SatGate index tracking modeled runaway AI agent spend, MCP tool cost failures, retry loops, fanout risk, and avoided cost from controls before the request goes through.',
   alternates: { canonical: 'https://satgate.io/ai-agent-runaway-spend-index' },
   keywords: [
     'AI agent runaway spend index',
@@ -14,7 +14,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'AI Agent Runaway Spend Index',
-    description: 'Monthly benchmark for runaway AI agent spend, MCP tool cost failures, and avoided cost from request-path controls.',
+    description: 'Monthly benchmark for runaway AI agent spend, MCP tool cost failures, and avoided cost from controls before the request goes through.',
     url: 'https://satgate.io/ai-agent-runaway-spend-index',
     type: 'article',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -46,7 +46,7 @@ const webPageJsonLd = {
     { '@type': 'Thing', name: 'AI agent runaway spend' },
     { '@type': 'Thing', name: 'AI agent cost benchmark' },
     { '@type': 'Thing', name: 'MCP tool cost failures' },
-    { '@type': 'Thing', name: 'request-path cost controls' },
+    { '@type': 'Thing', name: 'cost controls before the request goes through' },
     { '@type': 'Thing', name: 'delegated sub-agent fanout risk' },
   ],
 };
@@ -55,7 +55,7 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Dataset',
   name: 'SatGate AI Agent Runaway Spend Index — April 2026',
-  description: 'Monthly benchmark of modeled runaway AI agent spend, MCP tool cost failure modes, retry loops, fanout risk, and avoided cost from request-path controls.',
+  description: 'Monthly benchmark of modeled runaway AI agent spend, MCP tool cost failure modes, retry loops, fanout risk, and avoided cost from controls before the request goes through.',
   url: 'https://satgate.io/ai-agent-runaway-spend-index',
   creator: { '@type': 'Organization', name: 'SatGate' },
   datePublished: '2026-04-26',
@@ -86,7 +86,7 @@ const faqJsonLd = {
       name: 'What is the AI Agent Runaway Spend Index?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'The AI Agent Runaway Spend Index is a recurring benchmark of modeled autonomous agent cost failures, including retry loops, MCP tool storms, delegated fanout, paid API polling, and avoided spend from request-path controls.',
+        text: 'The AI Agent Runaway Spend Index is a recurring benchmark of modeled autonomous agent cost failures, including retry loops, MCP tool storms, delegated fanout, paid API polling, and avoided spend from controls before the request goes through.',
       },
     },
     {
@@ -94,7 +94,7 @@ const faqJsonLd = {
       name: 'Why do runaway AI agents create cost risk?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Agents can loop, retry, delegate, and call paid tools or APIs much faster than humans. Without request-path budgets and kill switches, small mistakes can become expensive incidents before dashboards report the damage.',
+        text: 'Agents can loop, retry, delegate, and call paid tools or APIs much faster than humans. Without budgets checked before the request goes through and kill switches, small mistakes can become expensive incidents before dashboards report the damage.',
       },
     },
     {
@@ -118,7 +118,7 @@ const faqJsonLd = {
       name: 'How should teams use the index?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Teams should use the index as a control-plan checklist: price expensive tools, set per-request and session budgets, cap delegation, require revocable capabilities, and block loops in the request path.',
+        text: 'Teams should use the index as a control-plan checklist: price expensive tools, set per-request and session budgets, cap delegation, require revocable capabilities, and block loops before the request goes through.',
       },
     },
   ],
@@ -142,7 +142,7 @@ export default function AiAgentRunawaySpendIndexPage() {
             AI Agent Runaway Spend Index
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            A recurring benchmark for autonomous agent cost failures: retry loops, MCP tool storms, delegated sub-agent fanout, paid data API polling, and the spend avoided by request-path controls.
+            A recurring benchmark for autonomous agent cost failures: retry loops, MCP tool storms, delegated sub-agent fanout, paid data API polling, and the spend avoided by controls before the request goes through.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <a href="/data/ai-agent-runaway-spend-index-2026-04.json" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -199,11 +199,11 @@ export default function AiAgentRunawaySpendIndexPage() {
         <h2 className="mb-8 text-3xl font-bold text-white">Runaway spend index FAQ</h2>
         <div className="space-y-5">
           {[
-            ['What is the AI Agent Runaway Spend Index?', 'The AI Agent Runaway Spend Index is a recurring benchmark of modeled autonomous agent cost failures, including retry loops, MCP tool storms, delegated fanout, paid API polling, and avoided spend from request-path controls.'],
-            ['Why do runaway AI agents create cost risk?', 'Agents can loop, retry, delegate, and call paid tools or APIs much faster than humans. Without request-path budgets and kill switches, small mistakes can become expensive incidents before dashboards report the damage.'],
+            ['What is the AI Agent Runaway Spend Index?', 'The AI Agent Runaway Spend Index is a recurring benchmark of modeled autonomous agent cost failures, including retry loops, MCP tool storms, delegated fanout, paid API polling, and avoided spend from controls before the request goes through.'],
+            ['Why do runaway AI agents create cost risk?', 'Agents can loop, retry, delegate, and call paid tools or APIs much faster than humans. Without budgets checked before the request goes through and kill switches, small mistakes can become expensive incidents before dashboards report the damage.'],
             ['How does SatGate reduce runaway agent spend?', 'SatGate reduces runaway agent spend by enforcing per-request budgets, MCP tool cost policy, revocable capabilities, delegation caps, audit requirements, and kill switches at the gateway before forwarding to upstream services.'],
             ['Which failure modes does the index track?', 'The index tracks OpenAI retry loops, MCP browser automation loops, sub-agent research fanout, paid data API polling loops, and multi-tenant agent swarms.'],
-            ['How should teams use the index?', 'Teams should use the index as a control-plan checklist: price expensive tools, set per-request and session budgets, cap delegation, require revocable capabilities, and block loops in the request path.'],
+            ['How should teams use the index?', 'Teams should use the index as a control-plan checklist: price expensive tools, set per-request and session budgets, cap delegation, require revocable capabilities, and block loops before the request goes through.'],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-3 text-xl font-bold text-white">{question}</h3>
@@ -217,7 +217,7 @@ export default function AiAgentRunawaySpendIndexPage() {
         <div className="rounded-3xl border border-orange-900/60 bg-gradient-to-br from-orange-950/40 to-cyan-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Use the index as a control-plan checklist</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            The pattern is consistent: agent spend incidents are not solved by better dashboards. They are solved by request-path budget enforcement, MCP tool cost policy, revocable capabilities, delegation caps, and kill switches at the gateway before forwarding to upstream services.
+            The pattern is consistent: agent spend incidents are not solved by better dashboards. They are solved by budget checks before the request goes through, MCP tool cost policy, revocable capabilities, delegation caps, and kill switches at the gateway before forwarding to upstream services.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Build with SatGate <ArrowRight size={18} /></Link>

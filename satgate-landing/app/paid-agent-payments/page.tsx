@@ -3,22 +3,22 @@ import { ArrowRight, Bot, CircleDollarSign, KeyRound, Network, ReceiptText, Shie
 
 export const metadata = {
   title: 'Governed Paid API Access for Agents',
-  description: 'A practical guide to letting platforms delegate paid API access to agents with L402, scoped authority, request-path policy, and Evidence Packs.',
+  description: 'A practical guide to letting platforms delegate paid API access to agents with L402, scoped permissions, policy before the request goes through, and signed receipts.',
   alternates: { canonical: 'https://satgate.io/paid-agent-payments' },
   keywords: [
     'paid agent payments',
     'delegated paid API access',
     'AI agent payment governance',
-    'bounded agent authority',
+    'what an agent is allowed to do',
     'governed agent API access',
-    'paid-rail context',
+    'payment details',
     'HTTP 402 API payments',
     'Lightning API monetization',
     'agent API monetization',
   ],
   openGraph: {
     title: 'Governed Paid API Access for Agents',
-    description: 'How API companies can support delegated paid agent consumption with paid-rail context, scoped access, and Evidence Packs.',
+    description: 'How API companies can support delegated paid agent consumption with payment details, scoped access, and signed receipts.',
     url: 'https://satgate.io/paid-agent-payments',
     type: 'article',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -26,7 +26,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Governed Paid API Access for Agents',
-    description: 'Support delegated paid API consumption with request-path policy, paid-rail context, and proof.',
+    description: 'Support delegated paid API consumption with policy before the request goes through, payment details, and proof.',
   },
 };
 
@@ -44,7 +44,7 @@ const paymentFlow = [
   {
     icon: Zap,
     title: 'Delegated payment proof arrives',
-    body: 'A wallet, platform, or delegated payment primitive satisfies the L402 challenge within the authority and budget policy already in force.',
+    body: 'A wallet, platform, or delegated payment building block satisfies the L402 challenge within the authority and budget policy already in force.',
   },
   {
     icon: KeyRound,
@@ -84,7 +84,7 @@ export default function RobotCustomerPaymentsPage() {
     mainEntityOfPage: 'https://satgate.io/paid-agent-payments',
     about: [
       { '@type': 'Thing', name: 'delegated paid API access' },
-      { '@type': 'Thing', name: 'bounded agent authority' },
+      { '@type': 'Thing', name: 'what an agent is allowed to do' },
       { '@type': 'Thing', name: 'AI agent payment governance' },
       { '@type': 'Thing', name: 'HTTP 402 API payments' },
       { '@type': 'Thing', name: 'Lightning API monetization' },
@@ -108,7 +108,7 @@ export default function RobotCustomerPaymentsPage() {
         name: 'How does delegated paid access work?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate paid-rail governance uses paid-rail context: an API returns an HTTP 402 payment challenge, a wallet or platform satisfies it under delegated authority, and SatGate verifies proof before forwarding or unlocking access.',
+          text: 'SatGate payment rules use payment details: an API returns an HTTP 402 payment challenge, a wallet or platform satisfies it under permissions passed down to a sub-agent, and SatGate verifies proof before forwarding or unlocking access.',
         },
       },
       {
@@ -124,7 +124,7 @@ export default function RobotCustomerPaymentsPage() {
         name: 'Is delegated paid access only about payments?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. Payments need governance around identity, budgets, scoped access, revocation, routing, and audit. SatGate enforces policy and produces receipts in the request path.',
+          text: 'No. Payments need governance around identity, budgets, scoped access, revocation, routing, and audit. SatGate enforces policy and produces receipts before the request goes through.',
         },
       },
       {
@@ -132,15 +132,15 @@ export default function RobotCustomerPaymentsPage() {
         name: 'Who buys and who consumes?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Humans, developers, and platforms buy and configure access. Agents consume approved API primitives through scoped capabilities, budget limits, and audit evidence inside the request path.',
+          text: 'Humans, developers, and platforms buy and configure access. Agents consume approved API building blocks through scoped capabilities, budget limits, and audit evidence before the request goes through.',
         },
       },
       {
         '@type': 'Question',
-        name: 'Does SatGate paid-rail governance use L402?',
+        name: 'Do SatGate payment rules use L402?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes. SatGate can use L402-style paid-rail context for external agent/API monetization. Payment proof unlocks only the scoped capability, route, quota, or expiry allowed by policy.',
+          text: 'Yes. SatGate can use L402-style payment details for external agent/API monetization. Payment proof unlocks only the scoped capability, route, quota, or expiry allowed by policy.',
         },
       },
     ],
@@ -171,11 +171,11 @@ export default function RobotCustomerPaymentsPage() {
             Governed Paid API Access for Agents
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-10">
-            AI agents should not become unmanaged customers. They need bounded economic authority from a human or platform, plus APIs that can verify price, policy, scope, and Evidence Pack proof in the request path.
+            AI agents should not become unmanaged customers. They need bounded economic authority from a human or platform, plus APIs that can verify price, policy, scope, and signed receipt (Evidence Pack) proof before the request goes through.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/l402-agent-payments" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              See L402 paid-rail governance <ArrowRight size={18} />
+              See L402 payment rules <ArrowRight size={18} />
             </Link>
             <Link href="/blog/api-monetization-ai" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-yellow-500 transition">
               API monetization guide
@@ -194,7 +194,7 @@ export default function RobotCustomerPaymentsPage() {
             Agents behave differently from human buyers. An agent may need one premium search, one enrichment call, one specialized tool execution, or one dataset lookup while completing a delegated workflow. The value is immediate, contextual, and often small enough that a subscription is absurd.
           </p>
           <p>
-            SatGate paid-rail governance makes payment proof part of the same control plane that governs agent/API activity. A human or platform delegates the authority, SatGate verifies proof, and the API can be paid without surrendering control.
+            SatGate payment rules make payment proof part of the same control plane that governs agent/API activity. A human or platform passes permissions down, SatGate verifies proof, and the API can be paid without surrendering control.
           </p>
         </div>
         <div className="rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-6">
@@ -235,7 +235,7 @@ export default function RobotCustomerPaymentsPage() {
                 Wallets and payment credentials can help platforms delegate value movement to autonomous software. API companies still need the control plane around those payments: identity, budgets, scoped access, revocation, metering, and audit.
               </p>
               <p>
-                SatGate paid-rail governance is policy-native API monetization. Stripe-style shared payment tokens and card credentials are separate payment rails; SatGate&apos;s durable role is governing delegated agent economic behavior before access.
+                SatGate payment rules are policy-native API monetization. Stripe-style shared payment tokens and card credentials are separate payment methods; SatGate&apos;s durable role is governing delegated agent spending before access.
               </p>
             </div>
           </div>
@@ -273,10 +273,10 @@ export default function RobotCustomerPaymentsPage() {
           <ShieldCheck className="text-green-300 mb-5" size={34} />
           <h2 className="text-2xl font-bold text-white mb-4">Where governance still matters</h2>
           <p className="text-gray-300 leading-relaxed mb-5">
-            Payment alone is not governance. An agent can still be on the wrong route, exceeding its delegated budget, using stale authority, or chaining calls in ways finance cannot explain.
+            Payment alone is not governance. An agent can still be on the wrong route, exceeding the budget passed down to it, using stale authority, or chaining calls in ways finance cannot explain.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            That is why SatGate treats paid-rail context as one enforcement option inside a broader Economic Firewall: observe every request, control risky activity, and unlock access only when policy permits.
+            That is why SatGate treats payment details as one enforcement option inside a broader Economic Firewall: observe each request, control risky activity, and unlock access only when policy permits.
           </p>
         </div>
       </section>
@@ -295,7 +295,7 @@ export default function RobotCustomerPaymentsPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does delegated paid access work?</h3>
               <p className="text-gray-400 leading-relaxed">
-                SatGate paid-rail governance uses paid-rail context: an API returns an HTTP 402 payment challenge, a wallet or platform satisfies it under delegated authority, and SatGate verifies proof before forwarding or unlocking access.
+                SatGate payment rules use payment details: an API returns an HTTP 402 payment challenge, a wallet or platform satisfies it under permissions passed down to a sub-agent, and SatGate verifies proof before forwarding or unlocking access.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -307,19 +307,19 @@ export default function RobotCustomerPaymentsPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Is delegated paid access only about payments?</h3>
               <p className="text-gray-400 leading-relaxed">
-                No. Payments need governance around identity, budgets, scoped access, revocation, routing, and audit. SatGate enforces policy and produces receipts in the request path.
+                No. Payments need governance around identity, budgets, scoped access, revocation, routing, and audit. SatGate enforces policy and produces receipts before the request goes through.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Who buys and who consumes?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Humans, developers, and platforms buy and configure access. Agents consume approved API primitives through scoped capabilities, budget limits, and audit evidence inside the request path.
+                Humans, developers, and platforms buy and configure access. Agents consume approved API building blocks through scoped capabilities, budget limits, and audit evidence before the request goes through.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
-              <h3 className="mb-2 text-xl font-bold text-white">Does SatGate paid-rail governance use L402?</h3>
+              <h3 className="mb-2 text-xl font-bold text-white">Do SatGate payment rules use L402?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Yes. SatGate paid-rail governance is based on paid-rail context for external agent/API monetization. Payment proof unlocks only the scoped capability, route, quota, or expiry allowed by policy.
+                Yes. SatGate payment rules are based on payment details for external agent/API monetization. Payment proof unlocks only the scoped capability, route, quota, or expiry allowed by policy.
               </p>
             </div>
           </div>
@@ -327,13 +327,13 @@ export default function RobotCustomerPaymentsPage() {
           <h2 className="text-3xl font-bold text-white mb-8">Related delegated access controls</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              ['/stripe-link-agents-vs-satgate', 'Stripe Link for Agents vs SatGate', 'Compare agent wallets with request-path economic governance.'],
-              ['/agent-payment-controls', 'Agent payment governance', 'Govern approval, budget, audit, payment rails, and access policy.'],
+              ['/stripe-link-agents-vs-satgate', 'Stripe Link for Agents vs SatGate', 'Compare agent wallets with spending controls before the request goes through.'],
+              ['/agent-payment-controls', 'Agent payment governance', 'Govern approval, budget, audit, payment methods, and access policy.'],
               ['/http-402-for-ai-agents', 'HTTP 402 for AI agents', 'Understand payment challenges for delegated paid access.'],
-              ['/l402-agent-payments', 'L402 paid-rail governance', 'Govern Lightning payment proof before protected API access.'],
+              ['/l402-agent-payments', 'L402 payment rules', 'Govern Lightning payment proof before protected API access.'],
               ['/agent-capability-tokens', 'Agent capability tokens', 'Give agents scoped, budgeted, expiring access after proof.'],
               ['/revocable-agent-credentials', 'Revocable agent credentials', 'Revoke delegated access when policy, budget, or risk changes.'],
-              ['/govern', 'AI agent governance', 'Bound delegated agent authority before paid-rail execution.'],
+              ['/govern', 'AI agent governance', 'Bound permissions passed down to a sub-agent before the payment method runs.'],
               ['/mcp', 'MCP budget enforcement', 'Apply the same budget logic to paid tools and MCP servers.'],
               ['/ai-agent-cost-control', 'AI agent cost control', 'Stop agent overspend at the gateway policy check.'],
             ].map(([href, title, body]) => (
@@ -350,7 +350,7 @@ export default function RobotCustomerPaymentsPage() {
         <div className="max-w-5xl mx-auto px-6 py-20 text-center">
           <h2 className="text-4xl font-bold text-white mb-5">Turn API monetization into governed delegation</h2>
           <p className="text-xl text-gray-300 leading-relaxed mb-8">
-            If agents are going to consume paid API primitives, monetization has to stay tied to human or platform authority, identity, budget, access, and audit.
+            If agents are going to consume paid API building blocks, monetization has to stay tied to human or platform authority, identity, budget, access, and audit.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/pay" className="inline-flex items-center justify-center gap-2 rounded-lg bg-yellow-300 text-black px-6 py-3 font-bold hover:bg-yellow-200 transition">

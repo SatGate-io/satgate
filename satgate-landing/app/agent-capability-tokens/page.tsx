@@ -2,46 +2,46 @@ import Link from 'next/link';
 import { ArrowRight, Ban, Clock, Fingerprint, GitBranch, KeyRound, ReceiptText, ShieldCheck } from 'lucide-react';
 
 export const metadata = {
-  title: 'Agent Capability Tokens | Scoped Authority for AI Agents',
-  description: 'Use capability tokens for AI agents to encode scope, budget, route, expiry, delegation, and revocation into request-path access decisions.',
+  title: 'Agent Capability Tokens | Scoped Permissions for AI Agents',
+  description: 'Use capability tokens for AI agents to encode scope, budget, route, expiry, delegation, and revocation into access decisions before the request goes through.',
   alternates: { canonical: 'https://satgate.io/agent-capability-tokens' },
   keywords: [
     'agent capability tokens',
     'capability tokens for AI agents',
     'macaroon tokens AI agents',
-    'scoped agent authority',
+    'scoped agent permissions',
     'delegated API access',
     'agent API governance',
     'budget-aware credentials',
   ],
   openGraph: {
-    title: 'Agent Capability Tokens | Scoped Authority for AI Agents',
-    description: 'Use capability tokens for AI agents to encode scope, budget, route, expiry, delegation, and revocation into request-path access decisions.',
+    title: 'Agent Capability Tokens | Scoped Permissions for AI Agents',
+    description: 'Use capability tokens for AI agents to encode scope, budget, route, expiry, delegation, and revocation into access decisions before the request goes through.',
     url: 'https://satgate.io/agent-capability-tokens',
     type: 'article',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Agent Capability Tokens | Scoped Authority for AI Agents',
-    description: 'Use capability tokens for AI agents to encode scope, budget, route, expiry, delegation, and revocation into request-path access decisions.',
+    title: 'Agent Capability Tokens | Scoped Permissions for AI Agents',
+    description: 'Use capability tokens for AI agents to encode scope, budget, route, expiry, delegation, and revocation into access decisions before the request goes through.',
   },
 };
 
 const controls = [
   { icon: Fingerprint, title: 'Agent identity', body: 'Bind each credential to an agent, task, tenant, workflow, route, model, or MCP server.' },
-  { icon: KeyRound, title: 'Scoped authority', body: 'Limit routes, tools, methods, customers, delegation, and request types instead of issuing broad API keys.' },
+  { icon: KeyRound, title: 'Scoped permissions', body: 'Limit routes, tools, methods, customers, delegation, and request types instead of issuing broad API keys.' },
   { icon: Clock, title: 'Expiry by default', body: 'Make credentials expire with the work: minutes, sessions, jobs, customers, or delegated sub-tasks.' },
   { icon: Ban, title: 'Revocation checks', body: 'Block the next request when a token, task, agent, route, or budget is no longer allowed.' },
-  { icon: ReceiptText, title: 'Budget caveats', body: 'Attach spend caps, call ceilings, per-tool limits, and remaining-budget checks to the request path.' },
-  { icon: GitBranch, title: 'Attenuated delegation', body: 'Let agents delegate narrower credentials to sub-agents without expanding parent authority.' },
+  { icon: ReceiptText, title: 'Budget caveats', body: 'Attach spend caps, call ceilings, per-tool limits, and remaining-budget checks on each request that goes through SatGate.' },
+  { icon: GitBranch, title: 'Narrowed delegation', body: 'Let agents delegate narrower credentials to sub-agents without expanding parent authority.' },
 ];
 
 export default function Page() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'Agent Capability Tokens | Scoped Authority for AI Agents',
+    headline: 'Agent Capability Tokens | Scoped Permissions for AI Agents',
     description: metadata.description,
     url: 'https://satgate.io/agent-capability-tokens',
     author: { '@type': 'Organization', name: 'SatGate' },
@@ -52,8 +52,8 @@ export default function Page() {
       { '@type': 'Thing', name: 'agent capability tokens' },
       { '@type': 'Thing', name: 'capability tokens for AI agents' },
       { '@type': 'Thing', name: 'budget-aware credentials' },
-      { '@type': 'Thing', name: 'attenuated delegation' },
-      { '@type': 'Thing', name: 'revocable request-path authority' },
+      { '@type': 'Thing', name: 'narrowed delegation' },
+      { '@type': 'Thing', name: 'revocable permissions before the request goes through' },
     ],
   };
 
@@ -63,7 +63,7 @@ export default function Page() {
     mainEntity: [
       { '@type': 'Question', name: 'What is an agent capability token?', acceptedAnswer: { '@type': 'Answer', text: 'An agent capability token is a credential that carries constrained authority for an autonomous agent, such as allowed routes, tools, budget, expiry, delegation, and revocation behavior. Macaroons are one implementation pattern for capability-based tokens.' } },
       { '@type': 'Question', name: 'Why are static API keys risky for AI agents?', acceptedAnswer: { '@type': 'Answer', text: 'Static API keys are broad, long-lived, and hard to delegate safely. Autonomous agents need credentials with scoped authority, budget limits, expiry, revocation, and audit context.' } },
-      { '@type': 'Question', name: 'How does SatGate enforce agent credentials?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate sits in the request path and checks identity, token scope, route, tool, budget, expiry, delegation rules, and revocation state before forwarding upstream.' } },
+      { '@type': 'Question', name: 'How does SatGate enforce agent credentials?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate checks identity, token scope, route, tool, budget, expiry, delegation rules, and revocation state before the request goes through.' } },
     ],
   };
 
@@ -101,17 +101,17 @@ export default function Page() {
           <h2 className="mb-6 text-3xl font-bold text-white">Credentials have to carry economic policy</h2>
           <div className="space-y-5 text-lg leading-relaxed text-gray-300">
             <p>Human access systems assume stable users, managed devices, predictable sessions, and human-scale request rates. Agent systems are different: credentials can be copied into tools, delegated to sub-agents, retried in loops, and used faster than a billing alert can fire.</p>
-            <p>The safe model is not a single permanent secret. It is a request-path capability that answers: what can this agent do, on which route, for how long, with what budget, and can it still be revoked right now?</p>
+            <p>The safe model is not a single permanent secret. It is a capability, checked before the request goes through, that answers: what can this agent do, on which route, for how long, with what budget, and can it still be revoked right now?</p>
             <p>SatGate turns those answers into enforceable policy at the gateway before forwarding to an upstream API, model, or MCP tool happens.</p>
           </div>
         </div>
         <div className="rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-6">
           <h3 className="mb-4 text-xl font-bold text-white">Why static keys fail</h3>
           <div className="space-y-4">
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Identity is not authority</h3><p className="leading-relaxed text-gray-400">A verified agent can still be overpowered if the token does not constrain what it can do.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Identity is not permission</h3><p className="leading-relaxed text-gray-400">A verified agent can still be overpowered if the token does not constrain what it can do.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Budgets belong in the credential path</h3><p className="leading-relaxed text-gray-400">Spend limits, call ceilings, and route policy need to be evaluated before forwarding traffic.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Delegation should attenuate</h3><p className="leading-relaxed text-gray-400">A parent agent should be able to create a narrower child token, never a broader one.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Audit needs token context</h3><p className="leading-relaxed text-gray-400">Every decision should emit a receipt with identity, capability, caveats, remaining budget, route, outcome, decision_reason, policy_version, and Evidence Pack id.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Delegation should narrow</h3><p className="leading-relaxed text-gray-400">A parent agent should be able to create a narrower child token, never a broader one.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Audit needs token context</h3><p className="leading-relaxed text-gray-400">Every decision should emit a receipt with identity, capability, caveats, remaining budget, route, outcome, decision_reason, policy_version, and signed receipt (Evidence Pack) id.</p></div>
           </div>
         </div>
       </section>
@@ -120,7 +120,7 @@ export default function Page() {
         <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
             <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Lifecycle demo</p>
-            <h2 className="text-3xl font-bold text-white">Issue → delegate → attenuate → revoke → prove</h2>
+            <h2 className="text-3xl font-bold text-white">Issue → delegate → narrow → revoke → receipt</h2>
           </div>
           <Link href="/capability-lifecycle-demo" className="inline-flex items-center gap-2 font-semibold text-cyan-300 transition hover:text-cyan-200">
             Walk the visible lifecycle <ArrowRight size={16} />
@@ -130,9 +130,9 @@ export default function Page() {
           {[
             ['Issue', 'Parent gets scoped authority for one tenant, task, budget, and tool set.'],
             ['Delegate', 'A child worker receives linked authority from the parent.'],
-            ['Attenuate', 'Child authority shrinks: lower spend cap, fewer tools, shorter TTL, visible depth.'],
+            ['Narrow', 'Child authority shrinks: lower spend cap, fewer tools, shorter TTL, visible depth.'],
             ['Revoke', 'SatGate rejects the next governed request at the gateway policy check.'],
-            ['Prove', 'Evidence Pack shows lineage, caveats, decision, spend, and receipt IDs.'],
+            ['Receipt', 'The signed receipt shows lineage, caveats, decision, spend, and receipt IDs.'],
           ].map(([title, body]) => (
             <Link key={title} href="/capability-lifecycle-demo" className="rounded-2xl border border-gray-800 bg-gray-950 p-5 transition hover:border-cyan-500/60 hover:bg-cyan-950/10">
               <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
@@ -203,7 +203,7 @@ audit:
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate enforce agent credentials?</h3>
               <p className="leading-relaxed text-gray-400">
-                SatGate sits in the request path and checks identity, token scope, route, tool, budget, expiry, delegation rules, and revocation state before forwarding upstream.
+                SatGate checks identity, token scope, route, tool, budget, expiry, delegation rules, and revocation state before the request goes through.
               </p>
             </div>
           </div>
