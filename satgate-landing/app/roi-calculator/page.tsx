@@ -6,7 +6,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
-const fmtPct = new Intl.NumberFormat('en-US', { style: 'percent', maximumFractionDigits: 0 });
 
 interface SliderInputProps {
   label: string;
@@ -58,15 +57,16 @@ export default function ROICalculatorPage() {
     const monthlyToolSpend = agents * callsPerDay * costPerCall * 30;
     const monthlyLoopWaste = agents * callsPerDay * 30 * (loopFreq / 100) * loopDuration * costPerCall;
     const annualRisk = monthlyLoopWaste * 12;
-    const satgateSavings = monthlyLoopWaste * 0.98;
+    // Stated assumption: a hard cap stops the extra loop calls after N calls.
+    // N is the "calls before a cap stops them" slider. This is not a measured capture rate.
+    const satgateSavings = monthlyLoopWaste;
     const paybackDays = satgateSavings > 0 ? (99 / satgateSavings) * 30 : Infinity;
-    const annualROI = satgateSavings > 0 ? ((satgateSavings * 12 - 99 * 12) / (99 * 12)) : 0;
-    return { monthlyToolSpend, monthlyLoopWaste, annualRisk, satgateSavings, paybackDays, annualROI };
+    return { monthlyToolSpend, monthlyLoopWaste, annualRisk, satgateSavings, paybackDays };
   }, [agents, costPerCall, callsPerDay, loopFreq, loopDuration]);
 
   const maxBar = calc.monthlyToolSpend + calc.monthlyLoopWaste;
   const withoutSatgate = maxBar;
-  const withSatgate = calc.monthlyToolSpend + (calc.monthlyLoopWaste * 0.02);
+  const withSatgate = calc.monthlyToolSpend;
   const barMax = Math.max(withoutSatgate, 1);
 
   const webPageJsonLd = {
@@ -350,7 +350,7 @@ export default function ROICalculatorPage() {
             Costing You?
           </h1>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Adjust the sliders below to see your hidden &ldquo;ghost spend&rdquo; — and how fast SatGate pays for itself.
+            Adjust the sliders. Every number below is an estimate, not a measurement. We assume a hard cap stops the extra calls after N calls. N is the slider, not a hidden capture rate.
           </p>
         </div>
       </header>
@@ -365,14 +365,15 @@ export default function ROICalculatorPage() {
             <SliderInput label="Average Cost per Tool Call" value={costPerCall} min={0.01} max={1} step={0.01} format={(v) => `$${v.toFixed(2)}`} onChange={setCostPerCall} />
             <SliderInput label="Tool Calls per Agent per Day" value={callsPerDay} min={10} max={1000} step={10} onChange={setCallsPerDay} />
             <SliderInput label="Loop / Error Frequency" value={loopFreq} min={0.1} max={10} step={0.1} format={(v) => `${v.toFixed(1)}%`} onChange={setLoopFreq} />
-            <SliderInput label="Avg Loop Duration (calls before discovery)" value={loopDuration} min={10} max={500} step={5} onChange={setLoopDuration} />
+            <SliderInput label="Calls before a cap stops them (N)" value={loopDuration} min={10} max={500} step={5} onChange={setLoopDuration} />
           </div>
 
           {/* Results */}
           <div className="space-y-6">
             {/* Metrics */}
             <div className="p-6 md:p-8 rounded-2xl bg-gray-900 border border-gray-800">
-              <h2 className="text-lg font-bold text-white mb-6">Unmanaged Cost Exposure</h2>
+              <h2 className="text-lg font-bold text-white mb-2">Unmanaged cost exposure (estimate)</h2>
+              <p className="text-xs text-gray-500 mb-6">Formula: extra calls = agents × calls/day × 30 × loop frequency × N × cost per call. Savings assume a hard cap stops those extra calls. Pro is modeled at $99/month. Not a measurement.</p>
               <div className="space-y-4">
                 <div className="flex justify-between items-baseline">
                   <span className="text-gray-400 text-sm">Monthly Tool Spend</span>
@@ -388,19 +389,13 @@ export default function ROICalculatorPage() {
                 </div>
                 <hr className="border-gray-800" />
                 <div className="flex justify-between items-baseline">
-                  <span className="text-gray-400 text-sm">SatGate Monthly Savings</span>
+                  <span className="text-gray-400 text-sm">Estimated extra spend a cap would stop</span>
                   <span className="text-green-400 font-extrabold text-2xl tabular-nums transition-all duration-300">{fmt.format(calc.satgateSavings)}</span>
                 </div>
                 <div className="flex justify-between items-baseline">
-                  <span className="text-gray-400 text-sm">Payback Period</span>
+                  <span className="text-gray-400 text-sm">Estimated payback if Pro is $99/month</span>
                   <span className="text-cyan-400 font-bold text-lg tabular-nums transition-all duration-300">
                     {calc.paybackDays === Infinity ? '—' : calc.paybackDays < 1 ? '< 1 day' : `${Math.ceil(calc.paybackDays)} days`}
-                  </span>
-                </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-gray-400 text-sm">Annual ROI</span>
-                  <span className="text-green-400 font-extrabold text-2xl tabular-nums transition-all duration-300">
-                    {calc.annualROI > 100 ? `${Math.round(calc.annualROI * 100).toLocaleString()}%` : fmtPct.format(calc.annualROI)}
                   </span>
                 </div>
               </div>
@@ -460,7 +455,7 @@ export default function ROICalculatorPage() {
             {[
               { href: '/policy-to-proof', title: 'Map ROI to Policy-to-Proof', body: 'Connect exposure to enforceable checks, receipts, and an Evidence Pack.' },
               { href: '/govern', title: 'Govern agent execution', body: 'Put authority, budget, and audit policy in the request path before execution.' },
-              { href: '/agent-spend-policy-template', title: 'Generate budget policy', body: 'Convert ROI exposure into YAML and JSON budget policy with receipt fields.' },
+              { href: '/build', title: 'Build with SatGate', body: 'Mint an agent token with a budget, expiry and revoke.' },
             ].map((item) => (
               <Link key={item.href} href={item.href} className="block rounded-xl border border-gray-800 bg-black/40 p-5 transition hover:border-cyan-500/40 hover:bg-cyan-950/20">
                 <h3 className="mb-2 font-bold text-white">{item.title}</h3>

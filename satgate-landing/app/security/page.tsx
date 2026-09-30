@@ -20,6 +20,7 @@ export const metadata = {
     description: 'Capability tokens, macaroons, scoped budgets, delegation limits, revocation, audit, and request-path enforcement for AI agent APIs.',
     url: 'https://satgate.io/security',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

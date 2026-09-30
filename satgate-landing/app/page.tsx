@@ -2,22 +2,23 @@ import type { Metadata } from "next";
 import HomeClient from "./components/HomeClient";
 
 export const metadata: Metadata = {
-  title: "SatGate | Economic Firewall for AI Agents",
+  title: { absolute: "SatGate: an economic firewall for AI agents" },
   description:
     "Keep your AI agents within budget, charge external agents for access to your API, and get a signed receipt for every decision.",
   alternates: {
     canonical: "https://satgate.io",
   },
   openGraph: {
-    title: "SatGate | Economic Firewall for AI Agents",
+    title: "SatGate: an economic firewall for AI agents",
     description:
       "Keep your agents within budget. Make external agents pay before they use your API. Get a signed receipt for every decision.",
     url: "https://satgate.io",
     type: "website",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SatGate | Economic Firewall for AI Agents",
+    title: "SatGate: an economic firewall for AI agents",
     description:
       "Keep your agents within budget. Make external agents pay before they use your API. Get a signed receipt for every decision.",
   },

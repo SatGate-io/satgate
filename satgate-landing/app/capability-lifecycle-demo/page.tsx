@@ -18,6 +18,7 @@ export const metadata = {
     description: 'Issue capability → delegate → attenuate → revoke → prove, with customer-visible caveats, delegation depth, child spend caps, next-request revocation, and Evidence Pack audit records.',
     url: 'https://satgate.io/capability-lifecycle-demo',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

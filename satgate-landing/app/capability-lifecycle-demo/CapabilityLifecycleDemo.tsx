@@ -252,7 +252,7 @@ export default function CapabilityLifecycleDemo() {
             Issue the capability, delegate a narrower child, express the caveats in plain language, revoke before the next governed request, and export the proof. That is how macaroon-style caveats become enterprise-ready agent authority controls.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+            <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Generate capability policy <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">

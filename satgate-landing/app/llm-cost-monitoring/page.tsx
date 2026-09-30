@@ -20,6 +20,7 @@ export const metadata = {
     description: 'A practical guide to monitoring LLM cost and converting observability into request-path budget enforcement for AI agents.',
     url: 'https://satgate.io/llm-cost-monitoring',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -201,16 +202,16 @@ export default function LlmCostMonitoringPage() {
 
       <section className="border-t border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Policy generators</p>
+          <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Next steps</p>
           <h2 className="mb-4 text-3xl font-bold text-white">Make monitoring actionable</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
-            When monitoring exposes a risky agent, model route, or MCP tool, the next step is not another chart. Generate the request-path policy that can stop the next bad call.
+            When monitoring shows a risky agent, model route or MCP tool, put a budget on it in the request path so the next bad call is refused.
           </p>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {[
-              ['/agent-spend-policy-template', 'Agent spend policy', 'Budgets, delegation, revocation, MCP tool caps, and Evidence Pack fields.'],
-              ['/mcp-tool-cost-policy-generator', 'MCP tool cost policy', 'Per-tool prices, risk tiers, limits, and deny behavior.'],
-              ['/revocable-capability-token-policy-template', 'Capability-token policy', 'Scoped, expiring, revocable agent authority with budget caveats.'],
+              ['/build', 'Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.'],
+              ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with one npx command.'],
+              ['/policy-to-proof', 'Policy-to-Proof', 'How each decision becomes a signed receipt.'],
               ['/economic-firewall-readiness-grader', 'Readiness grader', 'Find gaps across identity, budgets, routing, revocation, Evidence Pack proof, and paid-rail context.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-purple-500/50 hover:bg-purple-950/20">
@@ -258,7 +259,7 @@ export default function LlmCostMonitoringPage() {
               <h3 className="mb-2 text-lg font-bold text-white">ROI calculator →</h3>
               <p className="text-gray-400">Estimate loop waste, ghost spend, payback, and avoided cost.</p>
             </Link>
-            <Link href="/agent-spend-policy-template" className="rounded-2xl border border-gray-800 bg-black/70 p-6 transition hover:border-purple-600">
+            <Link href="/build" className="rounded-2xl border border-gray-800 bg-black/70 p-6 transition hover:border-purple-600">
               <h3 className="mb-2 text-lg font-bold text-white">Agent spend policy →</h3>
               <p className="text-gray-400">Turn monitoring signals into budget, revocation, and Evidence Pack policy.</p>
             </Link>

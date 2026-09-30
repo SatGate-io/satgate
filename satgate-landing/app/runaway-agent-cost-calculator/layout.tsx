@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     description: 'Model how fast autonomous agents can burn API, model, and MCP tool budgets when loops or retries go unchecked.',
     url: 'https://satgate.io/runaway-agent-cost-calculator',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

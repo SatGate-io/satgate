@@ -12,6 +12,7 @@ export const metadata = {
     url: 'https://satgate.io/blog/start-at-1-credit-economic-policy',
     type: 'article',
     publishedTime: '2026-04-07T00:00:00Z',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

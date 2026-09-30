@@ -25,6 +25,7 @@ export const metadata = {
     url: 'https://satgate.io/blog/ai-spend-governance',
     type: 'article',
     publishedTime: '2026-05-22T00:00:00Z',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

@@ -36,6 +36,7 @@ export const metadata: Metadata = {
       "Every grant, paid call, denial, delegation, and revocation produces receipts and Evidence Pack proof your CISO, finance team, and auditor can trust.",
     url: "https://satgate.io/policy-to-proof",
     type: "website",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -147,7 +148,7 @@ const evidencePack = {
     { receipt_id: "rcpt_delegation_002", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "delegation", ts: "2026-05-09T14:23:04Z", decision_reason: "scope_budget_and_depth_attenuated", result: "attenuated", receipt_hash: "sha256:95f1..." },
     { receipt_id: "rcpt_spend_search_003", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "spend", ts: "2026-05-09T14:23:18Z", route: "/v1/invoices/search", amount_usd: "0.18", payment_protocol: "internal_api", settlement: { rail: "internal_ledger", cost_center: "FIN-AP-042" }, decision_reason: "allowed_under_policy", result: "allowed", receipt_hash: "sha256:01d8..." },
     { receipt_id: "rcpt_spend_compare_004", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "spend", ts: "2026-05-09T14:24:02Z", route: "/v1/invoices/compare", amount_usd: "0.42", payment_protocol: "internal_api", settlement: { rail: "internal_ledger", cost_center: "FIN-AP-042" }, decision_reason: "allowed_under_policy", result: "allowed", receipt_hash: "sha256:a923..." },
-    { receipt_id: "rcpt_paid_ocr_005", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "spend", ts: "2026-05-09T14:24:44Z", route: "/v1/invoices/ocr", mcp_tool: "document_ai.ocr", amount_usd: "0.18", payment_protocol: "x402", settlement: { chain: "solana", tx: "REDACTED_DEMO_SAMPLE", ms: 187 }, decision_reason: "allowed_under_policy", result: "allowed", receipt_hash: "sha256:deb5..." },
+    { receipt_id: "rcpt_paid_ocr_005", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "spend", ts: "2026-05-09T14:24:44Z", route: "/v1/invoices/ocr", mcp_tool: "document_ai.ocr", amount_usd: "0.18", payment_protocol: "x402", settlement: { chain: "base", tx: "REDACTED_DEMO_SAMPLE", ms: 187 }, decision_reason: "allowed_under_policy", result: "allowed", receipt_hash: "sha256:deb5..." },
     { receipt_id: "rcpt_denial_scope_006", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "denial", ts: "2026-05-09T14:25:08Z", decision_reason: "scope_violation:no_customer_data_export", reason_code: "scope_violation:no_customer_data_export", result: "blocked", receipt_hash: "sha256:9b0f..." },
     { receipt_id: "rcpt_denial_budget_007", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "denial", ts: "2026-05-09T14:25:33Z", decision_reason: "budget_exhausted", reason_code: "budget_exhausted", result: "blocked", receipt_hash: "sha256:c3f6..." },
     { receipt_id: "rcpt_revocation_008", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "revocation", ts: "2026-05-09T14:26:11Z", revoked_by: "security-admin", decision_reason: "capability_revoked_by_security_admin", result: "revoked", receipt_hash: "sha256:37d1..." },
@@ -242,8 +243,8 @@ export default function PolicyToProofPage() {
             <div className="rounded-3xl border border-cyan-300/20 bg-white/[0.03] p-5 shadow-2xl shadow-cyan-950/30">
               <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-3">
                 <div>
-                  <p className="text-sm font-semibold text-cyan-200">Evidence Pack</p>
-                  <p className="text-xs text-gray-500">Signed lifecycle export preview</p>
+                  <p className="text-sm font-semibold text-cyan-200">Sample, not a live receipt</p>
+                  <p className="text-xs text-gray-500">x402 in this sample is USDC on Base</p>
                 </div>
                 <BadgeCheck className="text-emerald-300" />
               </div>

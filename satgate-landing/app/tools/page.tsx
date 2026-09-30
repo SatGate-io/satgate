@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, BarChart3, Calculator, ClipboardList, Gauge, KeyRound, Megaphone, ShieldCheck, Wrench, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BarChart3, Calculator, Gauge, KeyRound, ShieldCheck, Wrench, Zap } from 'lucide-react';
 import ToolLeadCaptureCta from '../components/ToolLeadCaptureCta';
 
 export const metadata = {
   title: 'AI Agent Cost Control Tools',
-  description: 'Free calculators and policy generators for AI agent spend control, MCP governance, OpenAI budget limits, and economic firewall readiness.',
+  description: 'Free calculators for AI agent spend, runaway loops, L402 pricing and economic firewall readiness, plus the MCP connect snippet.',
   alternates: { canonical: 'https://satgate.io/tools' },
   keywords: [
     'AI agent cost control tools',
@@ -12,26 +12,23 @@ export const metadata = {
     'AI agent runaway spend index',
     'LLM cost dashboard',
     'LLM cost monitoring',
-    'OpenAI budget policy generator',
-    'MCP tool cost policy generator',
     'MCP proxy config generator',
-    'agent spend policy template',
     'agent API key risk assessment',
-    'revocable capability token policy template',
     'L402 API pricing calculator',
     'economic firewall readiness grader',
     'agent budget enforcement tools',
   ],
   openGraph: {
     title: 'AI Agent Cost Control Tools',
-    description: 'Calculators, benchmarks, policy templates, and generators for agent spend, runaway loops, OpenAI budgets, MCP tool costs, and economic firewall readiness.',
+    description: 'Calculators and benchmarks for agent spend, runaway loops, L402 pricing and economic firewall readiness, plus the MCP connect snippet.',
     url: 'https://satgate.io/tools',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'AI Agent Cost Control Tools',
-    description: 'Free calculators, benchmarks, and policy generators for AI agent spend control, MCP governance, and economic firewall readiness.',
+    description: 'Free calculators and benchmarks for AI agent spend, runaway loops and economic firewall readiness.',
   },
 };
 
@@ -73,15 +70,9 @@ const tools = [
     icon: BarChart3,
   },
   {
-    href: '/openai-budget-policy-generator',
-    title: 'OpenAI API Budget Limit Generator',
-    description: 'Generate daily, session, per-request, model-routing, revocation, and audit policy for OpenAI API calls.',
-    icon: ClipboardList,
-  },
-  {
-    href: '/mcp-tool-cost-policy-generator',
-    title: 'MCP Tool Cost Policy Generator',
-    description: 'Create per-tool budgets, prices, risk tiers, revocation behavior, and audit fields for MCP agents.',
+    href: '/mcp-proxy-config-generator',
+    title: 'MCP connect snippet',
+    description: 'The real Cloud MCP snippet for Cursor and Claude Code. Credits, not a dollar budget.',
     icon: Wrench,
   },
   {
@@ -102,30 +93,6 @@ const tools = [
     description: 'Estimate per-request paid-agent pricing, gross margin, paid demand, and Lightning sats per API request.',
     icon: Zap,
   },
-  {
-    href: '/seo-distribution-kit',
-    title: 'SEO Distribution Kit',
-    description: 'Launch copy, social snippets, and backlink targets for distributing SatGate cost-control tools and data assets.',
-    icon: Megaphone,
-  },
-  {
-    href: '/revocable-capability-token-policy-template',
-    title: 'Revocable Capability Token Policy Template',
-    description: 'Generate scoped, expiring, revocable capability-token policy for agents, sub-agents, MCP tools, budgets, and audit.',
-    icon: KeyRound,
-  },
-  {
-    href: '/agent-spend-policy-template',
-    title: 'Agent Spend Policy Template',
-    description: 'Generate copyable YAML and JSON policy for budgets, MCP tool costs, delegation, revocation, and audit fields.',
-    icon: ClipboardList,
-  },
-  {
-    href: '/mcp-proxy-config-generator',
-    title: 'MCP Proxy Config Generator',
-    description: 'Generate MCP proxy config for Cursor, Claude Desktop, Claude Code, OpenClaw, and custom clients.',
-    icon: Wrench,
-  },
 ];
 
 export default function ToolsPage() {
@@ -141,7 +108,7 @@ export default function ToolsPage() {
     about: [
       { '@type': 'Thing', name: 'AI agent cost control tools' },
       { '@type': 'Thing', name: 'economic firewall readiness' },
-      { '@type': 'Thing', name: 'MCP governance policy generators' },
+      { '@type': 'Thing', name: 'MCP connect snippet' },
       { '@type': 'Thing', name: 'OpenAI budget limits' },
       { '@type': 'Thing', name: 'runaway agent spend calculators' },
     ],
@@ -188,7 +155,7 @@ export default function ToolsPage() {
         name: 'Which SatGate tool should I start with?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Start with the AI Agent ROI Calculator if you need a business case, the Runaway Agent Cost Calculator if you need incident exposure, the OpenAI or MCP policy generators if you need enforceable policy, and the Economic Firewall Readiness Grader if you need a gap assessment.',
+          text: 'Start with the AI Agent ROI Calculator if you need a business case, the Runaway Agent Cost Calculator if you need incident exposure, the MCP connect snippet if you want to route Cursor or Claude Code through SatGate, and the Economic Firewall Readiness Grader if you need a gap assessment.',
         },
       },
       {
@@ -196,7 +163,7 @@ export default function ToolsPage() {
         name: 'How do these tools relate to an economic firewall?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'The calculators quantify economic risk. The policy generators turn that risk into budget, routing, revocation, and audit controls. SatGate enforces those controls in the request path as an economic firewall for AI agents.',
+          text: 'The calculators estimate the risk. SatGate enforces budgets, permissions and revocation in the request path, and signs a receipt for each decision.',
         },
       },
     ],
@@ -219,7 +186,7 @@ export default function ToolsPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(34,211,238,0.18),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(168,85,247,0.14),transparent_32%)]" />
         <div className="relative mx-auto max-w-6xl px-6 py-24">
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-950/30 px-4 py-2 text-sm text-cyan-200">
-            <Calculator size={16} /> Free calculators and policy generators
+            <Calculator size={16} /> Free calculators
           </div>
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">
             AI Agent Cost Control Tools
@@ -276,15 +243,15 @@ export default function ToolsPage() {
           {[
             [
               'What are AI agent cost control tools?',
-              'They quantify autonomous agent spend risk, model runaway loops, generate enforceable budget policy, and assess whether economic controls can stop expensive requests before execution.',
+              'They quantify autonomous agent spend risk, model runaway loops, and assess whether economic controls can stop expensive requests before execution.',
             ],
             [
               'Which SatGate tool should I start with?',
-              'Start with the AI Agent ROI Calculator if you need a business case, the Runaway Agent Cost Calculator if you need incident exposure, the OpenAI or MCP policy generators if you need enforceable policy, and the Economic Firewall Readiness Grader if you need a gap assessment.',
+              'Start with the AI Agent ROI Calculator if you need a business case, the Runaway Agent Cost Calculator if you need incident exposure, the MCP connect snippet if you want to route Cursor or Claude Code through SatGate, and the Economic Firewall Readiness Grader if you need a gap assessment.',
             ],
             [
               'How do these tools relate to an economic firewall?',
-              'The calculators quantify economic risk. The policy generators turn that risk into budget, routing, revocation, and audit controls. SatGate enforces those controls in the request path as an economic firewall for AI agents.',
+              'The calculators estimate the risk. SatGate enforces budgets, permissions and revocation in the request path, and signs a receipt for each decision.',
             ],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">

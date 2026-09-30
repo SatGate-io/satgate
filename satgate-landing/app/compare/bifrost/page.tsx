@@ -10,6 +10,7 @@ export const metadata = {
     description: 'Compare Bifrost LLM routing with SatGate economic controls for AI agent budgets, MCP tool costs, and L402 monetization.',
     url: 'https://satgate.io/compare/bifrost',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

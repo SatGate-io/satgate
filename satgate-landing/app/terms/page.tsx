@@ -10,6 +10,7 @@ export const metadata = {
     description: 'SatGate terms for SaaS and self-host, paid-rail context, and licensing.',
     url: 'https://satgate.io/terms',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

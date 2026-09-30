@@ -187,19 +187,20 @@ export default function L402ApiPricingCalculatorPage() {
           <h2 className="mb-6 text-3xl font-bold text-white">Model paid agent/API demand</h2>
           <div className="grid gap-4">
             <Slider label="Agent/API requests per day" value={requestsPerDay} min={100} max={100000} step={100} onChange={setRequestsPerDay} />
-            <Slider label="Marginal cost per request" value={costPerRequestCents} min={1} max={250} step={1} prefix="$0." onChange={setCostPerRequestCents} />
+            <Slider label="Marginal cost per request" value={costPerRequestCents} min={1} max={250} step={1} suffix="¢" onChange={setCostPerRequestCents} />
             <Slider label="Target gross margin" value={marginPct} min={20} max={95} step={1} suffix="%" onChange={setMarginPct} />
             <Slider label="Paying agent conversion" value={conversionPct} min={1} max={80} step={1} suffix="%" onChange={setConversionPct} />
             <Slider label="Free/trial allowance" value={freeAllowancePct} min={0} max={90} step={1} suffix="%" onChange={setFreeAllowancePct} />
             <Slider label="Monthly agent demand growth" value={agentGrowthPct} min={0} max={100} step={1} suffix="%" onChange={setAgentGrowthPct} />
-            <Slider label="BTC/USD reference assumption" value={btcReferenceUsd} min={50000} max={200000} step={5000} prefix="$" onChange={setBtcReferenceUsd} />
+            <Slider label="Example exchange rate, used only to show sats. Not a prediction." value={btcReferenceUsd} min={50000} max={200000} step={5000} prefix="$" onChange={setBtcReferenceUsd} />
           </div>
         </div>
 
         <aside className="sticky top-6 h-fit rounded-3xl border border-yellow-900/50 bg-yellow-950/10 p-8">
-          <div className="mb-3 flex items-center gap-2 text-yellow-300"><Calculator size={22} /> Suggested pricing</div>
+          <div className="mb-3 flex items-center gap-2 text-yellow-300"><Calculator size={22} /> Suggested price per payment (estimate)</div>
           <div className="mb-2 text-5xl font-extrabold text-white">{usd.format(calc.pricePerRequest)}</div>
-          <div className="mb-6 text-sm text-gray-400">~{number.format(calc.satsPerRequest)} sats/request using your {usd0.format(btcReferenceUsd)} BTC/USD reference assumption</div>
+          <div className="mb-2 text-sm text-gray-400">Per request only if one payment buys one request. If one payment buys N requests, divide this price by N.</div>
+          <div className="mb-6 text-sm text-gray-400">About {number.format(calc.satsPerRequest)} sats at the example rate above. The rate is only for this conversion. It is not a forecast.</div>
           <div className="grid gap-4">
             <div className="rounded-xl border border-gray-800 bg-black p-4"><div className="text-sm text-gray-500">Paid requests/day</div><div className="text-2xl font-bold text-white">{number.format(calc.paidRequestsPerDay)}</div></div>
             <div className="rounded-xl border border-gray-800 bg-black p-4"><div className="text-sm text-gray-500">Monthly revenue</div><div className="text-2xl font-bold text-white">{usd0.format(calc.monthlyRevenue)}</div></div>

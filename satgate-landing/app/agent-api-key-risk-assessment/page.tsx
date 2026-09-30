@@ -167,7 +167,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
             <a href="#assessment" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Run assessment <ArrowRight size={18} />
             </a>
-            <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">
+            <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">
               Generate token policy
             </Link>
             <Link href="/agent-api-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">
@@ -260,7 +260,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
             SatGate turns agent access into request-path policy: scoped authority, spend limits, revocation, audit, and payment controls at the gateway before forwarding.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/revocable-capability-token-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+            <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Generate token policy <ArrowRight size={18} />
             </Link>
             <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">

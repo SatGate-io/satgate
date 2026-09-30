@@ -809,7 +809,7 @@ export SATGATE_TOKEN=$TOKEN
             {[
               ['/agent-api-key-risk-assessment', 'Agent API key risk assessment', 'Find static-key blast radius before autonomous agents inherit unlimited API access.'],
               ['/economic-firewall-readiness-grader', 'Agent governance readiness grader', 'Score identity, budgets, MCP governance, revocation, delegation, Evidence Pack proof, routing, and rail-aware readiness.'],
-              ['/agent-spend-policy-template', 'Agent spend policy template', 'Generate YAML/JSON policy for per-agent budgets, MCP caps, delegation, revocation, and Evidence Pack fields.'],
+              ['/build', 'Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.'],
               ['/mcp-cost-control', 'MCP cost control', 'Treat MCP tool calls as governed events with per-tool prices, caps, denial reasons, and evidence.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black/50 p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
@@ -831,7 +831,7 @@ export SATGATE_TOKEN=$TOKEN
               ['What is Policy-to-Proof governance for AI agents?', 'Policy-to-Proof governance sits in the request path, applies scopes, budgets, delegation rules, and revocation before an agent reaches an upstream API, model, or MCP tool, then preserves Evidence Packs so the decision can be verified later.'],
               ['How should enterprises govern MCP tool usage?', 'Enterprises should govern MCP tools with per-tool budgets, scoped capability tokens, task and tenant attribution, Evidence Packs, revocation, and hard request-path policy decisions. Rate limits and dashboards are useful, but they do not replace enforcement before tool calls execute.'],
               ['What is the difference between AI governance and AI agent governance?', 'AI governance usually covers model risk, data policy, compliance, and human review. AI agent governance adds request-path controls for autonomous actions: scopes, budgets, delegated authority, revocation, denial reasons, spend attribution, and proof before APIs or MCP tools execute.'],
-              ['Is SatGate tied to x402, L402, AgentCore Payments, or Pay.sh?', 'No. x402, L402, AgentCore Payments, Pay.sh, and related rails make it easier for agents to call paid services. SatGate is protocol-independent: it records the requesting agent, allowed action, policy basis, spend context, and Evidence Pack receipts needed for accountability and control — payment or not.'],
+              ['Is SatGate tied to x402, L402, AgentCore Payments, or Pay.sh?', 'Lightning (L402) and USDC on Base (x402) are live, and each route opts in. AgentCore Payments and Pay.sh are planned. Payment never overrides permissions.'],
             ].map(([question, answer]) => (
               <div key={question} className="border-t border-gray-800 pt-6 first:border-t-0 first:pt-0">
                 <h3 className="mb-2 text-xl font-bold text-white">{question}</h3>

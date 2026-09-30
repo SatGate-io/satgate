@@ -21,6 +21,7 @@ export const metadata: Metadata = {
       "Mint scoped, budget-aware, revocable capability tokens for AI agents with budgets, expiry, scopes, and delegation limits.",
     url: "https://satgate.io/mint-demo",
     type: "website",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: "summary_large_image",

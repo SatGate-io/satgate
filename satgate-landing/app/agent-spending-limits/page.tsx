@@ -21,6 +21,7 @@ export const metadata = {
     description: 'Set AI agent spending limits by task, route, tool, model, tenant, workflow, session, and day with authority and Evidence Pack receipts before spend occurs.',
     url: 'https://satgate.io/agent-spending-limits',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

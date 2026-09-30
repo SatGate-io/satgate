@@ -42,7 +42,6 @@ const BRAVO_RESPONSES = [
   '→ Kong, Apigee, AWS API Gateway — key features: rate limiting, auth, analytics.',
   '→ Kong starts free (OSS), Apigee ~$10K/yr, AWS pay-per-request.',
   '→ WAF, IAM policies, mutual TLS, request validation, usage plans.',
-  '→ Strong DDoS + edge caching, but no per-agent cost controls.',
   '→ No gateway today enforces per-agent budgets with cryptographic tokens.',
   '→ Market gap: identity-aware economic controls for autonomous agents.',
 ];

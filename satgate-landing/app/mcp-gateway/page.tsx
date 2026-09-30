@@ -77,6 +77,7 @@ export const metadata = {
     description: 'Put SatGate in the MCP request path: check authority before tool execution, enforce policy, and export Evidence Pack receipts.',
     url: 'https://satgate.io/mcp-gateway',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -286,7 +287,7 @@ export default function McpGatewayPage() {
           {[
             ['/mcp-governance', 'MCP governance', 'Govern MCP tool calls with authority, policy, revocation, and Evidence Pack receipts.'],
             ['/mcp-budget-enforcement', 'MCP budget enforcement', 'Hard-cap per-tool spend before MCP tools execute.'],
-            ['/mcp-tool-cost-policy-generator', 'MCP tool policy generator', 'Generate MCP tool cost and Evidence Pack policy.'],
+            ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with one npx command.'],
             ['/evidence-pack-demo', 'Evidence Pack demo', 'See the machine-readable proof artifact.'],
           ].map(([href, title, body]) => (
             <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 hover:border-cyan-700 transition">

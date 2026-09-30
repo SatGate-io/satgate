@@ -17,6 +17,7 @@ export const metadata = {
     description: 'Compare SatGate and Portkey for AI gateway, observability, guardrails, MCP access, agent economics, and paid-rail context.',
     url: 'https://satgate.io/compare/portkey',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

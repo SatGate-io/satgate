@@ -19,6 +19,7 @@ export const metadata: Metadata = {
       "Estimate runaway agent loop exposure, budget-control ROI, and Policy-to-Proof receipt coverage.",
     url: "https://satgate.io/roi-calculator",
     type: "website",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: "summary_large_image",

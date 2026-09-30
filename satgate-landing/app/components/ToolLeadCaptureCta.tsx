@@ -38,8 +38,8 @@ export default function ToolLeadCaptureCta({
         <Link href="/design-partners" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
           Get a SatGate policy review <ArrowRight size={18} />
         </Link>
-        <Link href="/agent-spend-policy-template" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
-          Generate policy template
+        <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+          See how to build with SatGate
         </Link>
       </div>
     </section>

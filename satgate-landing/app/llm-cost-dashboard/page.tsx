@@ -20,6 +20,7 @@ export const metadata = {
     description: 'A practical checklist for LLM cost dashboards — and why dashboards still need request-path budget enforcement for AI agents.',
     url: 'https://satgate.io/llm-cost-dashboard',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -219,10 +220,10 @@ export default function LlmCostDashboardPage() {
           </p>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {[
-              ['/agent-spend-policy-template', 'Agent spend policy', 'Budgets, MCP caps, delegation, revocation, and receipt and Evidence Pack fields.'],
-              ['/mcp-tool-cost-policy-generator', 'MCP tool cost policy', 'Per-tool prices, risk tiers, limits, and deny behavior.'],
-              ['/revocable-capability-token-policy-template', 'Capability-token policy', 'Scoped, expiring, revocable authority for agents and sub-agents.'],
-              ['/openai-budget-policy-generator', 'OpenAI budget policy', 'Model, route, session, daily, and per-request budget limits.'],
+              ['/build', 'Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.'],
+              ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with one npx command.'],
+              ['/policy-to-proof', 'Policy-to-Proof', 'How each decision becomes a signed receipt.'],
+              ['/runaway-agent-cost-calculator', 'Runaway cost calculator', 'Estimate what a looping or retrying agent can spend in an hour.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
                 <h3 className="mb-2 font-bold text-white">{title}</h3>

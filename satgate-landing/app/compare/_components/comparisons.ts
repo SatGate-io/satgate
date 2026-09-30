@@ -147,7 +147,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
       { axis: 'Pre-execution control', satgate: 'Semantic policy before spend: who, what, why, budget, route, tool, rail, evidence.', competitor: 'Pre-request count/quota checks. Useful, but blunt.', winner: 'SatGate' },
       { axis: 'Delegation', satgate: standardAxes.delegation, competitor: 'API keys, JWTs, IAM, or usage plans rarely encode agent delegation depth and bounded spend.', winner: 'SatGate' },
       { axis: 'Evidence Packs', satgate: standardAxes.evidence, competitor: 'Access logs exist, but they do not usually explain delegated economic authority.', winner: 'SatGate' },
-      { axis: 'Deployment flexibility', satgate: standardAxes.selfHost, competitor: 'Many gateway stacks can be hybrid; the primary comparison is whether policy follows delegated agent authority across tools, rails, and providers.', winner: 'Tie' },
+      { axis: 'Deployment flexibility', satgate: standardAxes.selfHost, competitor: 'They can run in their cloud or on their own servers. The comparison is whether policy follows delegated agent authority across tools, rails, and providers.', winner: 'Tie' },
       { axis: 'MCP-native proxying', satgate: standardAxes.mcp, competitor: 'Generic API gateways are HTTP-aware, not MCP authority-aware by default.', winner: 'SatGate' },
     ],
     bullets: [
@@ -198,7 +198,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
       { question: 'What does SatGate add above native budgets?', answer: 'Delegated capabilities, per-agent and per-tool budgets, MCP-native enforcement, paid-rail policy, flexible deployment, and Evidence Packs.' },
       { question: 'Why not just set lower provider limits?', answer: 'Lower limits reduce blast radius inside one vendor. They do not govern the agent’s full workflow across other models, APIs, tools, and payment rails.' },
     ],
-    ctaPrimary: { href: '/openai-budget-policy-generator', label: 'Generate an OpenAI policy' },
+    ctaPrimary: { href: '/build', label: 'Build with SatGate' },
     ctaSecondary: { href: '/ai-api-budget-enforcement', label: 'Enforce AI API budgets' },
   },
 };

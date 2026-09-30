@@ -20,6 +20,7 @@ export const metadata = {
     description: 'Enforce per-agent budgets, spend caps, revocation, routing, and Evidence Pack receipts before autonomous API calls execute.',
     url: 'https://satgate.io/ai-agent-cost-control',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -352,10 +353,9 @@ export default function AiAgentCostControlPage() {
             {[
               ['AI API budget enforcement', 'Enforce per-agent and per-workflow spend caps before OpenAI, Claude, MCP, or paid API requests leave your environment.', '/ai-api-budget-enforcement'],
               ['Agent spending limits', 'Set hard caps by task, route, model, tool, tenant, session, and delegated sub-agent.', '/agent-spending-limits'],
-              ['Agent spend policy template', 'Generate copyable YAML/JSON policy for budgets, tools, delegation, revocation, and audit fields.', '/agent-spend-policy-template'],
+              ['Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.', '/build'],
               ['MCP tool spend control', 'Attach cost to tool calls and stop runaway Cursor, Claude Desktop, Claude Code, or OpenClaw workflows.', '/mcp-cost-control'],
               ['Revocable agent credentials', 'Replace broad static keys with scoped, expiring credentials and kill switches for autonomous workers.', '/revocable-agent-credentials'],
-              ['Capability-token policy template', 'Generate scoped, expiring, revocable capability-token policy with budget, delegation, and audit caveats.', '/revocable-capability-token-policy-template'],
               ['Agent payment controls', 'Govern wallet approval, payment context, budgets, and audit before protected API access.', '/agent-payment-controls'],
             ].map(([title, body, href]) => (
               <Link key={title} href={href} className="rounded-xl border border-gray-800 bg-black p-6 hover:border-cyan-800/70 transition block">
@@ -421,7 +421,7 @@ export default function AiAgentCostControlPage() {
             {[
               ['Inventory exposure', 'Map agents, shared API keys, MCP tools, paid APIs, premium models, and workflows that can create cost.', '/agent-api-key-risk-assessment'],
               ['Observe first', 'Route traffic through SatGate to attribute spend by tenant, agent, workflow, route, model, and tool before blocking.', '/llm-cost-monitoring'],
-              ['Enforce budgets', 'Apply per-agent budgets, MCP caps, route ceilings, expiry, delegation limits, and revocation policy in the request path.', '/agent-spend-policy-template'],
+              ['Enforce budgets', 'Apply per-agent budgets, MCP caps, route ceilings, expiry, delegation limits, and revocation in the request path.', '/build'],
               ['Preserve paid-access proof', 'Record policy decisions, payment context, and receipts before granting paid external access.', '/policy-to-proof'],
             ].map(([title, body, href]) => (
               <Link key={title} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
@@ -450,8 +450,7 @@ export default function AiAgentCostControlPage() {
             {[
               ['/roi-calculator', 'ROI calculator', 'Estimate ghost spend, loop waste, payback period, and annual ROI.'],
               ['/runaway-agent-cost-calculator', 'Runaway cost calculator', 'Model retry storms, fanout, MCP tool calls, and detection delay.'],
-              ['/agent-spend-policy-template', 'Spend policy template', 'Generate YAML/JSON budgets, MCP caps, revocation, and audit policy.'],
-              ['/openai-budget-policy-generator', 'OpenAI budget policy', 'Create per-model, per-route, per-agent, and per-session OpenAI limits.'],
+              ['/build', 'Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-purple-500/50 hover:bg-purple-950/20">
                 <h3 className="mb-2 font-bold text-white">{title}</h3>

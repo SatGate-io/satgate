@@ -22,6 +22,7 @@ export const metadata = {
     description: 'Set enforceable budgets, prices, risk tiers, revocation, and Evidence Pack receipts before autonomous agents execute MCP tools.',
     url: 'https://satgate.io/mcp-budget-enforcement',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -295,7 +296,7 @@ export default function McpBudgetEnforcementPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               ['/mcp-governance', 'MCP governance', 'Control, audit, and revoke MCP tool activity.'],
-              ['/mcp-tool-cost-policy-generator', 'MCP policy generator', 'Generate a concrete tool-cost policy.'],
+              ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with one npx command.'],
               ['/blog/mcp-budget-enforcement-guide', 'Budget enforcement guide', 'Deep dive on MCP budgets and spend controls.'],
               ['/blog/hard-capping-mcp-tool-spend', 'Hard-cap MCP spend', 'How to stop runaway tool loops.'],
             ].map(([href, title, body]) => (

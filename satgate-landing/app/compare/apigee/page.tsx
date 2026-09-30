@@ -21,6 +21,7 @@ export const metadata = {
     description: 'Compare SatGate and Google Apigee for API management, AI agent economic governance, MCP budgets, revocation, and paid-rail context.',
     url: 'https://satgate.io/compare/apigee',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

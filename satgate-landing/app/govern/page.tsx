@@ -25,6 +25,7 @@ export const metadata: Metadata = {
       "Govern AI agents before execution: Observe usage, Control budgets and access, and Prove decisions with Evidence Packs across APIs, MCP, and paid rails.",
     url: "https://satgate.io/govern",
     type: "website",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -93,7 +94,7 @@ const faqSchema = {
       name: "Is SatGate tied to x402, L402, AgentCore Payments, or Pay.sh?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "No. x402, L402, AgentCore Payments, Pay.sh, and related rails make it easier for agents to call paid services. SatGate is protocol-independent: it records the requesting agent, allowed action, policy basis, spend context, and Evidence Pack receipts needed for accountability and control — payment or not.",
+        text: "Lightning (L402) and USDC on Base (x402) are live, and each route opts in. AgentCore Payments and Pay.sh are planned. Payment never overrides permissions.",
       },
     },
   ],

@@ -10,6 +10,7 @@ export const metadata = {
     description: 'How SatGate handles privacy across SaaS and self-host.',
     url: 'https://satgate.io/privacy',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

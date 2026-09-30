@@ -21,6 +21,7 @@ export const metadata: Metadata = {
       "Watch delegated paid API access pass through policy, budget, payment proof, and receipt checks before protected requests are forwarded upstream.",
     url: "https://satgate.io/pay",
     type: "website",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: "summary_large_image",

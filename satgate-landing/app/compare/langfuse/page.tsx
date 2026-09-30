@@ -21,6 +21,7 @@ export const metadata = {
     description: 'Compare SatGate and Langfuse for LLM observability, traces, evaluations, and request-path agent budget enforcement.',
     url: 'https://satgate.io/compare/langfuse',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

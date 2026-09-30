@@ -248,7 +248,7 @@ export default function McpToolCostPolicyGeneratorPage() {
             <Link href="/mcp-governance" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Govern MCP tools <ArrowRight size={18} />
             </Link>
-            <Link href="/openai-budget-policy-generator" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+            <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Generate OpenAI budget policy
             </Link>
           </div>

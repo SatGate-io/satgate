@@ -20,6 +20,7 @@ export const metadata = {
     description: 'A gateway that checks what each AI agent may do and spend before its request reaches your API, and signs a receipt for every decision.',
     url: 'https://satgate.io/economic-firewall',
     type: 'article',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -386,7 +387,7 @@ export default function EconomicFirewallPage() {
         <div className="grid gap-5 md:grid-cols-3">
           {[
             ['1', 'See what your agents do', 'List which agents, sub-agents, routes, models and MCP tools are in use, and what they cost, before you change anything.', '/agent-control-plane'],
-            ['2', 'Set limits', 'Turn on Control for the risky routes: budget caps, narrower tokens, expiry and revokes.', '/agent-spend-policy-template'],
+            ['2', 'Set limits', 'Turn on Control for the risky routes: budget caps, narrower tokens, expiry and revokes.', '/build'],
             ['3', 'Charge external agents', 'Decide what external agents can reach and which routes they pay for. Keep the receipts for allowed and refused requests.', '/policy-to-proof'],
           ].map(([step, title, body, href]) => (
             <Link key={step} href={href} className="rounded-2xl border border-gray-800 bg-gray-950 p-6 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
@@ -410,8 +411,7 @@ export default function EconomicFirewallPage() {
             {[
               ['/economic-firewall-readiness-grader', 'Readiness grader', 'Grade your setup on identity, budgets, revokes, audit records, MCP tools and payments.'],
               ['/roi-calculator', 'ROI calculator', 'Estimate runaway agent spend, wasted cost and payback.'],
-              ['/agent-spend-policy-template', 'Spend policy template', 'Write a starting policy for budgets, MCP tools, handoffs and revokes.'],
-              ['/revocable-capability-token-policy-template', 'Capability-token policy', 'Write token rules: what an agent can do, when its token expires, and its budget.'],
+              ['/build', 'Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
                 <h3 className="mb-2 font-bold text-white">{title}</h3>
@@ -428,7 +428,7 @@ export default function EconomicFirewallPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               ['/policy-to-proof', 'Policy-to-Proof', 'How each token, handoff, payment, refusal and revoke becomes a signed receipt.'],
-              ['/agent-authority-layer', 'Agent Authority & Accountability Layer', 'Agent permissions that don’t depend on one payment method, with signed receipts.'],
+              ['/mcp', 'MCP', 'Budgets and permissions for MCP tools, and a signed receipt when a call is allowed or refused.'],
               ['/govern', 'Control AI agents', 'Budgets and permissions for your own agents, with receipts you can export.'],
               ['/agent-control-plane', 'Agent control plane', 'Permissions, handoffs, spend, audit and revokes for large fleets of agents.'],
               ['/mcp-governance', 'MCP governance', 'Budgets, revokes and receipts for MCP tool calls.'],

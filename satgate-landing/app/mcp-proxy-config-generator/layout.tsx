@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'MCP Proxy Config Generator',
   description:
-    'Generate MCP proxy configuration for Cursor, Claude Desktop, Claude Code, OpenClaw, and custom MCP clients with scoped authority, budgets, Evidence Pack receipts, and revocation.',
+    'Copy the Cloud MCP connect snippet for Cursor and Claude Code. A new token starts at 1,000 credits.',
   alternates: { canonical: 'https://satgate.io/mcp-proxy-config-generator' },
   keywords: [
     'MCP proxy config generator',
@@ -19,6 +19,7 @@ export const metadata: Metadata = {
       'Generate MCP proxy configs with scoped authority, budgets, Evidence Pack receipts, revocation, and Evidence Pack-ready policy fields.',
     url: 'https://satgate.io/mcp-proxy-config-generator',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

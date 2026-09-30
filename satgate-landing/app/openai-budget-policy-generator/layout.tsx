@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     description: 'Create request-path budget policy for OpenAI API calls, agent workflows, model routing, and Evidence Pack receipts.',
     url: 'https://satgate.io/openai-budget-policy-generator',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

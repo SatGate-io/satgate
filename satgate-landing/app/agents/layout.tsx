@@ -20,6 +20,7 @@ export const metadata: Metadata = {
       "Manage AI agents with request-path budgets, scoped capabilities, delegation controls, MCP tool governance, revocation, and spend tracking.",
     url: "https://satgate.io/agents",
     type: "website",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: "summary_large_image",

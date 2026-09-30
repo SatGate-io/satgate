@@ -11,6 +11,7 @@ export const metadata = {
     url: 'https://satgate.io/blog/how-we-built-budget-enforcement-mcp',
     type: 'article',
     publishedTime: '2026-02-13T00:00:00Z',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',

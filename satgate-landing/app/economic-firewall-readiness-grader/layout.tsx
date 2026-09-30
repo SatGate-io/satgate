@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     description: 'Assess whether your agent/API stack is ready for autonomous authority, delegated tools, budget enforcement, revocation, Evidence Pack capture, and paid-rail context.',
     url: 'https://satgate.io/economic-firewall-readiness-grader',
     type: 'website',
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "SatGate" }],
   },
   twitter: {
     card: 'summary_large_image',
