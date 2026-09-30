@@ -17,7 +17,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate vs LiteLLM - AI Gateway vs Economic Firewall',
-    description: 'LiteLLM gives teams model access, routing, fallbacks, budgets, and spend tracking. SatGate enforces agent and API spending on every request.',
+    description: 'LiteLLM gives teams model access, routing, fallbacks, budgets, and spend tracking. SatGate checks agent and API spending before the request goes through.',
     url: 'https://satgate.io/compare/litellm',
     type: 'article',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],

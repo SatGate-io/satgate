@@ -17,7 +17,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     eyebrow: 'Managed agent payments vs spending rules you control',
     title: 'SatGate vs AWS AgentCore Payments: Agent Spending Rules Beyond AWS',
     description: 'AWS AgentCore Payments helps agents transact inside AWS. SatGate governs authority, Evidence Pack proof, MCP tools, and paid rails before execution across the multi-provider enterprise environment.',
-    verdict: 'If everything runs inside AWS AgentCore, AWS handles agent payments for you. If your agents also use OpenAI, Anthropic, local models, MCP tools, internal APIs, your own gateways or more than one payment method, SatGate applies one set of rules across all of them.',
+    verdict: 'If everything runs inside AWS AgentCore, AWS handles agent payments for you. If your agents also use OpenAI, Anthropic, local agents, MCP tools, internal APIs, your own gateways or more than one payment method, SatGate applies one set of rules across all of them.',
     competitorGoodAt: [
       'Managed payment enablement for agents built around AWS AgentCore patterns.',
       'Tight fit for teams standardizing agent runtime, identity, tools, and observability inside AWS.',
@@ -94,7 +94,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     slug: 'langsmith-helicone-datadog',
     competitor: 'LangSmith, Helicone, and Datadog',
     eyebrow: 'Seeing what happened vs deciding what is allowed',
-    title: 'SatGate vs LangSmith, Helicone, and Datadog: Stop Overspend Before It Happens',
+    title: 'SatGate vs LangSmith, Helicone, Datadog: Check Before Agents Spend',
     description: 'LangSmith, Helicone, and Datadog help teams trace, debug, monitor, evaluate, and analyze LLM systems. SatGate sits before execution to enforce agent budgets, delegated authority, MCP tool policy, paid-rail access, and Evidence Packs.',
     verdict: 'Observability tells you what agents did. SatGate controls what agents are allowed to do before they do it.',
     competitorGoodAt: [

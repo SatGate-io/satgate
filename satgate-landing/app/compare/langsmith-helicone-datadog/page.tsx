@@ -4,7 +4,7 @@ import { brutalComparisons } from '../_components/comparisons';
 const config = brutalComparisons['langsmith-helicone-datadog'];
 
 export const metadata = {
-  title: 'SatGate vs LangSmith, Helicone, Datadog: Stop Overspend Before It Happens',
+  title: 'SatGate vs LangSmith, Helicone, Datadog: Check Before Agents Spend',
   description: 'Compare LLM monitoring tools with SatGate, which checks agents before they spend: budgets for agents and sub-agents, MCP tool rules, payments, cloud or self-hosted, and signed receipts.',
   alternates: { canonical: 'https://satgate.io/compare/langsmith-helicone-datadog' },
   keywords: ['SatGate vs LangSmith', 'SatGate vs Helicone', 'SatGate vs Datadog LLM Observability', 'LLM observability vs control', 'agent Evidence Packs'],
