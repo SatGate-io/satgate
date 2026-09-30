@@ -53,7 +53,7 @@ const faqJsonLd = {
       name: 'What are SatGate payment rules?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'SatGate governs paid API access by enforcing permissions passed down to a sub-agent, budgets, and policy before the request goes through to protected data or tools.',
+        text: 'SatGate governs paid API access by enforcing delegated permissions, budgets, and policy before the request goes through to protected data or tools.',
       },
     },
     {
@@ -384,7 +384,7 @@ export default function MonetizeDemoPage() {
         <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-xl mx-auto">
           Watch an AI agent <strong className="text-white">pay for API access</strong> in this Bitcoin
           Lightning demo. SatGate verifies payment and the configured permission before access, then returns
-          a receipt that can feed a signed receipt (Evidence Pack). Settlement behavior depends on the selected payment method.
+          a receipt that goes into the exported receipt bundle (Evidence Pack). Settlement behavior depends on the selected payment method.
         </p>
       </div>
 
@@ -486,7 +486,7 @@ export default function MonetizeDemoPage() {
         <h2 className="mb-8 text-center text-2xl font-bold text-white">Payment rules for any payment method</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            ['What are SatGate payment rules?', 'SatGate governs paid API access by enforcing permissions passed down to a sub-agent, budgets, and policy before the request goes through to protected data or tools.'],
+            ['What are SatGate payment rules?', 'SatGate governs paid API access by enforcing delegated permissions, budgets, and policy before the request goes through to protected data or tools.'],
             ['How is L402 different from a subscription API key?', 'A subscription API key grants ongoing access and bills later. L402 lets each agent request receive a payment challenge, pay the invoice, retry with proof, and receive a paid-call receipt before access is granted.'],
             ['When should an API use per-request payment details?', 'Per-request payment details fit API products used by autonomous agents, paid tools, data endpoints, premium insights, and paid-agent workflows where access and payment should clear instantly.'],
           ].map(([question, answer]) => (

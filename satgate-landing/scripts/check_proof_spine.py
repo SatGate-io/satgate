@@ -27,24 +27,24 @@ REQUIRED_PHRASES = {
         "Export Evidence Pack",
     ],
     "app/pricing/page.tsx": [
-        "Signed receipts + Evidence Pack export",
+        "Signed receipts + receipt export",
         "Start free trial",
         "Ask about a 90-day design-partner pilot",
     ],
     "app/pay/page.tsx": [
         "paid-call receipts",
         "Receipt Returned",
-        "Paid-call receipt queued for Evidence Pack",
+        "Paid-call receipt queued for export",
         "receipt_id",
     ],
     "app/dashboard/page.tsx": [
         "Receipt-backed Governance Dashboard",
         "receipt-backed decisions",
-        "Evidence Packs are the exportable proof artifact",
+        "Evidence Pack) is the exportable proof artifact",
         "Denied-call receipts",
     ],
     "app/policy-to-proof/page.tsx": [
-        "paid call, denial, delegation, and revocation produces receipts",
+        "paid call, denial, delegation, and revocation produces signed receipts",
         "receipt_id",
         "evidence_pack_id",
         "policy_version",

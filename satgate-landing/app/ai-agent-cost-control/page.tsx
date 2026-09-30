@@ -339,7 +339,7 @@ export default function AiAgentCostControlPage() {
             <p className="text-gray-400 leading-relaxed">Apply hard caps, per-request ceilings, route policy, revocation, expiry, and kill switches before the expensive call happens.</p>
           </div>
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
-            <div className="text-yellow-300 font-mono text-sm mb-3">03 / RECEIPT</div>
+            <div className="text-yellow-300 font-mono text-sm mb-3">03 / PROVE</div>
             <h3 className="text-xl font-bold text-white mb-3">Preserve decision evidence</h3>
             <p className="text-gray-400 leading-relaxed">Record every authority decision (allowed, denied, delegated, revoked, or paid) in the signed receipt (Evidence Pack). Payment proves value moved; SatGate proves the agent was allowed to move it.</p>
           </div>

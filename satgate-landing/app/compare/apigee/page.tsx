@@ -72,7 +72,7 @@ export default function ComparePage() {
     mainEntity: [
       { '@type': 'Question', name: 'Is SatGate a Google Apigee replacement?', acceptedAnswer: { '@type': 'Answer', text: 'Not directly. Apigee is a full enterprise API management platform. SatGate is rules and receipts for AI agents: API spend, MCP tools, scoped capabilities, revocation, signed receipts, and payment details.' } },
       { '@type': 'Question', name: 'Can SatGate and Google Apigee work together?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics at the gateway before forwarding.' } },
-      { '@type': 'Question', name: 'When should I choose SatGate?', acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, permissions passed down to a sub-agent, signed receipts, and paid-agent payment.' } },
+      { '@type': 'Question', name: 'When should I choose SatGate?', acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, delegated permissions, signed receipts, and paid-agent payment.' } },
       { '@type': 'Question', name: 'When should I choose Google Apigee?', acceptedAnswer: { '@type': 'Answer', text: 'Choose Apigee when the primary need is broad enterprise API management across human and application consumers.' } },
     ],
   };
@@ -108,7 +108,7 @@ export default function ComparePage() {
             {[
               ['Is SatGate a Google Apigee replacement?', 'Not directly. Apigee is a full enterprise API management platform. SatGate is rules and receipts for AI agents: API spend, MCP tools, scoped capabilities, revocation, signed receipts, and payment details.'],
               ['Can SatGate and Google Apigee work together?', 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics at the gateway before forwarding.'],
-              ['When should I choose SatGate?', 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, permissions passed down to a sub-agent, signed receipts, and paid-agent payment.'],
+              ['When should I choose SatGate?', 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, delegated permissions, signed receipts, and paid-agent payment.'],
               ['When should I choose Google Apigee?', 'Choose Apigee when the primary need is broad enterprise API management across human and application consumers.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">

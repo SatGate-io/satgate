@@ -13,7 +13,7 @@ export const metadata = {
     'HTTP 402 payment governance',
     'API monetization for AI agents',
     'delegated agent payment proof',
-    'agents consuming paid APIs under permissions passed down to a sub-agent',
+    'agents consuming paid APIs under delegated permissions',
     'machine payment rail governance',
     'L402 payment rules',
   ],
@@ -55,7 +55,7 @@ const steps = [
   {
     icon: ReceiptText,
     title: 'Usage is attributed',
-    body: 'Every paid request is tied to permissions passed down to a sub-agent, agent identity, route, price, policy, and settlement evidence.',
+    body: 'Every paid request is tied to delegated permissions, agent identity, route, price, policy, and settlement evidence.',
   },
   {
     icon: Coins,
@@ -93,7 +93,7 @@ export default function L402AgentPaymentsPage() {
         name: 'What are L402 payment rules?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'L402 payment rules let an API return an HTTP 402 challenge while SatGate verifies permissions passed down to a sub-agent, budget, scope, and payment proof before access.',
+          text: 'L402 payment rules let an API return an HTTP 402 challenge while SatGate verifies delegated permissions, budget, scope, and payment proof before access.',
         },
       },
       {
@@ -253,7 +253,7 @@ export default function L402AgentPaymentsPage() {
                 HTTP 402 can carry different payment challenges. Some flows use card credentials or shared payment tokens. L402 is one payment method for request-native API access. Other payment methods (x402, AgentCore Payments, and Pay.sh) also use HTTP 402 as their surface but settle differently.
               </p>
               <p>
-                The important control-plane question is broader than payment: whether the request has permissions passed down to a sub-agent, plus budget, scope, and policy approval, before paid access is unlocked.
+                The important control-plane question is broader than payment: whether the request has delegated permissions, plus budget, scope, and policy approval, before paid access is unlocked.
               </p>
             </div>
           </div>
@@ -281,7 +281,7 @@ export default function L402AgentPaymentsPage() {
             ['Machine-readable price', 'Delegated clients need a price and payment challenge in the protocol flow, not a human checkout page or sales form.'],
             ['Payment before access', 'SatGate verifies payment details before forwarding the protected API request upstream.'],
             ['Scoped unlocks', 'Payment should unlock the requested route, tool, dataset, or capability — not a broad reusable API key.'],
-            ['Signed receipts', 'Every paid request should record permissions passed down to a sub-agent, agent identity, route, price, payment proof, policy decision, and a signed receipt.'],
+            ['Signed receipts', 'Every paid request should record delegated permissions, agent identity, route, price, payment proof, policy decision, and a signed receipt.'],
           ].map(([title, body]) => (
             <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
@@ -336,7 +336,7 @@ HTTP/1.1 200 OK
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What are L402 payment rules?</h3>
               <p className="text-gray-400 leading-relaxed">
-                L402 payment rules let an API return an HTTP 402 challenge while SatGate verifies permissions passed down to a sub-agent, budget, scope, and payment proof before access.
+                L402 payment rules let an API return an HTTP 402 challenge while SatGate verifies delegated permissions, budget, scope, and payment proof before access.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -382,7 +382,7 @@ HTTP/1.1 200 OK
               ['/agent-capability-tokens', 'Agent capability tokens', 'Scope paid access with route, budget, expiry, delegation, and revocation caveats.'],
               ['/blog/l402-protocol-explained', 'L402 protocol explained', 'How HTTP 402, Lightning, and macaroons enable API payments.'],
               ['/l402-api-pricing-calculator', 'L402 API pricing calculator', 'Estimate per-request agent/API paid-access pricing.'],
-              ['/govern', 'AI agent governance', 'Limit permissions passed down to a sub-agent before a payment method runs.'],
+              ['/govern', 'AI agent governance', 'Limit delegated permissions before a payment method runs.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">
                 <h3 className="font-bold text-white mb-2">{title}</h3>

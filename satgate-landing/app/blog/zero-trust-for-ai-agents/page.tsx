@@ -71,7 +71,7 @@ export default function ZeroTrustForAIAgentsBlogPage() {
       },
       {
         '@type': 'Question',
-        name: 'Can Zero Trust policies express agent budgets and permissions passed down to a sub-agent?',
+        name: 'Can Zero Trust policies express agent budgets and delegated permissions?',
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'Most Zero Trust policies can express identity, device posture, location, and application access, but they usually cannot express per-agent spend limits, narrowing of budgets for sub-agents, MCP tool costs, or proof-of-payment requirements before each request.',
@@ -170,7 +170,7 @@ export default function ZeroTrustForAIAgentsBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            Traditional identity systems don&apos;t model this. RBAC gives you roles. ABAC gives you attributes. Neither gives you <em>permissions passed down to a sub-agent that narrow at each level</em>. You can&apos;t express &ldquo;this agent has a $100 budget, and it can give sub-agents portions of that budget, but the total can never exceed $100&rdquo; in an IAM policy.
+            Traditional identity systems don&apos;t model this. RBAC gives you roles. ABAC gives you attributes. Neither gives you <em>delegated permissions that narrow at each level</em>. You can&apos;t express &ldquo;this agent has a $100 budget, and it can give sub-agents portions of that budget, but the total can never exceed $100&rdquo; in an IAM policy.
           </p>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Agent Identity Is Ephemeral</h3>
@@ -398,7 +398,7 @@ Token: search-worker-12
                 ['Why does traditional Zero Trust break down for AI agents?', 'Traditional Zero Trust assumes stable human identities, managed devices, and predictable access patterns. AI agents are ephemeral, delegate to sub-agents, and can generate thousands of API calls from one task.'],
                 ['What replaces identity-based security for autonomous agents?', 'Autonomous agents need capability-based security: scoped, revocable tokens that encode what the agent can do, how much it can spend, where it can call, and when authority expires.'],
                 ['How does an economic firewall extend Zero Trust for AI agents?', 'An economic firewall enforces cost, scope, and delegation before the request goes through to upstream APIs, giving teams budget-aware authorization that identity systems alone cannot provide.'],
-                ['Can Zero Trust policies express agent budgets and permissions passed down to a sub-agent?', 'Most Zero Trust policies can express identity, device posture, location, and application access, but they usually cannot express per-agent spend limits, narrowing of budgets for sub-agents, MCP tool costs, or proof-of-payment requirements before each request.'],
+                ['Can Zero Trust policies express agent budgets and delegated permissions?', 'Most Zero Trust policies can express identity, device posture, location, and application access, but they usually cannot express per-agent spend limits, narrowing of budgets for sub-agents, MCP tool costs, or proof-of-payment requirements before each request.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

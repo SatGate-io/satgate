@@ -213,7 +213,7 @@ budget_id = "budget-xyz-789"
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            This is what makes L402 fundamentally different from simple pay-per-request schemes. The macaroon carries <em>capabilities</em>, not just payment proof. And because macaroons support narrowing, an agent can create more restricted tokens for sub-agents, enabling the kind of permissions passed down to a sub-agent that multi-agent systems require.
+            This is what makes L402 fundamentally different from simple pay-per-request schemes. The macaroon carries <em>capabilities</em>, not just payment proof. And because macaroons support narrowing, an agent can create more restricted tokens for sub-agents, enabling the kind of delegated permissions that multi-agent systems require.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Why Existing Payment Models Fail for AI Agents</h2>

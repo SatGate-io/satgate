@@ -86,7 +86,7 @@ const faqSchema = {
       name: "What is the difference between AI governance and AI agent governance?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "AI governance usually covers model risk, data policy, compliance, and human review. AI agent governance adds controls before the request goes through for autonomous actions: scopes, budgets, permissions passed down to a sub-agent, revocation, denial reasons, spend attribution, and proof before APIs or MCP tools execute.",
+        text: "AI governance usually covers model risk, data policy, compliance, and human review. AI agent governance adds controls before the request goes through for autonomous actions: scopes, budgets, delegated permissions, revocation, denial reasons, spend attribution, and proof before APIs or MCP tools execute.",
       },
     },
     {

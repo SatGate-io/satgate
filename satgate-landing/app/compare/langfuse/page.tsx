@@ -72,7 +72,7 @@ export default function ComparePage() {
     mainEntity: [
       { '@type': 'Question', name: 'Is SatGate a Langfuse replacement?', acceptedAnswer: { '@type': 'Answer', text: 'Not directly. Langfuse is an LLM observability and evaluation platform. SatGate is rules and receipts for AI agents: API spend, MCP tools, scoped capabilities, revocation, signed receipts, and payment details.' } },
       { '@type': 'Question', name: 'Can SatGate and Langfuse work together?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics at the gateway before forwarding.' } },
-      { '@type': 'Question', name: 'When should I choose SatGate?', acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, permissions passed down to a sub-agent, signed receipts, and paid-agent payment.' } },
+      { '@type': 'Question', name: 'When should I choose SatGate?', acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, delegated permissions, signed receipts, and paid-agent payment.' } },
       { '@type': 'Question', name: 'When should I choose Langfuse?', acceptedAnswer: { '@type': 'Answer', text: 'Choose Langfuse when the primary need is tracing, prompt management, evaluations, metrics, and AI application observability.' } },
     ],
   };
@@ -108,7 +108,7 @@ export default function ComparePage() {
             {[
               ['Is SatGate a Langfuse replacement?', 'Not directly. Langfuse is an LLM observability and evaluation platform. SatGate is rules and receipts for AI agents: API spend, MCP tools, scoped capabilities, revocation, signed receipts, and payment details.'],
               ['Can SatGate and Langfuse work together?', 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics at the gateway before forwarding.'],
-              ['When should I choose SatGate?', 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, permissions passed down to a sub-agent, signed receipts, and paid-agent payment.'],
+              ['When should I choose SatGate?', 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, delegated permissions, signed receipts, and paid-agent payment.'],
               ['When should I choose Langfuse?', 'Choose Langfuse when the primary need is tracing, prompt management, evaluations, metrics, and AI application observability.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">

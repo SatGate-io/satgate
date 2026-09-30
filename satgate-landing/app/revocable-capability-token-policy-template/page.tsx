@@ -300,7 +300,7 @@ export default function RevocableCapabilityTokenPolicyTemplatePage() {
         <div className="rounded-3xl border border-purple-900/60 bg-gradient-to-br from-purple-950/30 to-cyan-950/25 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Turn agent permissions into signed receipts.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            Every scoped token decision should produce a receipt that can be exported into a signed receipt (Evidence Pack).
+            Every scoped token decision should produce a receipt that can be exported in a receipt bundle (Evidence Pack).
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">

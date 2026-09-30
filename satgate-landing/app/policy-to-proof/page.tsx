@@ -265,7 +265,7 @@ export default function PolicyToProofPage() {
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-cyan-300">Internal first, rail-aware when needed</p>
             <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Built for internal enterprise agents. Extends across paid external calls.</h2>
             <p className="mt-5 text-lg leading-8 text-gray-400">
-              Most enterprise agents do not need a wallet to call internal APIs. They need bounded permissions passed down to a sub-agent, budget controls, revocation, and audit evidence around the credentials they already have.
+              Most enterprise agents do not need a wallet to call internal APIs. They need bounded delegated permissions, budget controls, revocation, and audit evidence around the credentials they already have.
             </p>
             <p className="mt-4 text-base leading-7 text-gray-500">
               When that same internal workflow crosses into an external paid API, SatGate keeps the proof intact: internal scope and delegation, plus spend attribution above x402 rails, L402, API-key billing, or enterprise ledgers. Payment proves value moved. SatGate proves the agent was allowed to move it.

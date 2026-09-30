@@ -193,7 +193,7 @@ export default function SatGateIntegrationPage() {
 
       <section className="mx-auto max-w-6xl px-6 pb-24">
         <div className="rounded-3xl border border-purple-900/40 bg-gradient-to-br from-purple-950/40 to-cyan-950/20 p-8 md:p-10">
-          <div className="mb-4 flex items-center gap-3 text-purple-200"><Bot size={24} /><span className="font-semibold">Observe, Control, receipts</span></div>
+          <div className="mb-4 flex items-center gap-3 text-purple-200"><Bot size={24} /><span className="font-semibold">Observe → Control → Prove</span></div>
           <h2 className="mb-4 text-3xl font-bold text-white">Make Cursor agent activity governable.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate gives agent teams the missing economic layer: budgets, scoped authority, revocation, audit, and charging external agents where machine customers need to pay for APIs.</p>
           <div className="flex flex-col gap-4 sm:flex-row">

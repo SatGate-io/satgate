@@ -5,7 +5,7 @@ const standardAxes = {
   crossRail: 'Model tokens, API credits, paid MCP tools, L402/x402-style access, prepaid budgets, and internal chargeback are policy inputs, not separate silos.',
   preExecution: 'Deny, scope, meter, or require proof before the expensive call, tool invocation, or paid resource executes.',
   delegation: 'Issue scoped, budgeted, revocable capability for an agent, task, session, tenant, or sub-agent instead of handing out broad static keys.',
-  evidence: 'Signed receipts (Evidence Packs) connect identity, permissions passed down to a sub-agent, policy, budget, route/tool, decision, and receipt into an audit-ready artifact.',
+  evidence: 'Signed receipts (Evidence Packs) connect identity, delegated permissions, policy, budget, route/tool, decision, and receipt into an audit-ready artifact.',
   selfHost: 'Self-host the same SatGate binary in your own environment, or use SatGate Cloud. Run enforcement close to private APIs, regulated data, and customer-controlled gateways.',
   mcp: 'Proxy MCP sessions and tool calls at the protocol boundary, with per-tool budget, risk tier, identity, and decision evidence.',
 };
@@ -78,7 +78,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     ],
     bullets: [
       { title: 'Gateway is not governance', body: 'Routing, caching, and retry logic do not decide whether a delegated agent should be allowed to spend on a protected tool.' },
-      { title: 'Rate limits are blunt', body: 'A request count does not encode tenant budget, tool risk, permissions passed down to a sub-agent, evidence requirements, or how a payment method settles.' },
+      { title: 'Rate limits are blunt', body: 'A request count does not encode tenant budget, tool risk, delegated permissions, evidence requirements, or how a payment method settles.' },
       { title: 'MCP changes the boundary', body: 'Agents spend through tools. SatGate treats the MCP tool call as the enforcement event, not just raw AI HTTP traffic.' },
       { title: 'Complement, do not confuse', body: 'Use Cloudflare for AI traffic operations. Put SatGate where the security and finance question is “should this agent be allowed?”' },
     ],
@@ -95,7 +95,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     competitor: 'LangSmith, Helicone, and Datadog',
     eyebrow: 'Seeing what happened vs deciding what is allowed',
     title: 'SatGate vs LangSmith, Helicone, Datadog: Check Before Agents Spend',
-    description: 'LangSmith, Helicone, and Datadog help teams trace, debug, monitor, evaluate, and analyze LLM systems. SatGate sits before execution to enforce agent budgets, permissions passed down to a sub-agent, MCP tool policy, payment method access, and signed receipts.',
+    description: 'LangSmith, Helicone, and Datadog help teams trace, debug, monitor, evaluate, and analyze LLM systems. SatGate sits before execution to enforce agent budgets, delegated permissions, MCP tool policy, payment method access, and signed receipts.',
     verdict: 'Observability tells you what agents did. SatGate controls what agents are allowed to do before they do it.',
     competitorGoodAt: [
       'Tracing, debugging, monitoring, evaluations, usage analytics, latency, errors, and cost dashboards.',
@@ -158,7 +158,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     ],
     faqs: [
       { question: 'Should I remove API Gateway rate limits?', answer: 'No. Keep them. SatGate adds agent-aware economic policy above blunt traffic controls.' },
-      { question: 'What does SatGate know that a rate limit does not?', answer: 'Permissions passed down to a sub-agent, remaining budget, MCP tool identity, route policy, payment details, tenant, agent lineage, and evidence requirements.' },
+      { question: 'What does SatGate know that a rate limit does not?', answer: 'Delegated permissions, remaining budget, MCP tool identity, route policy, payment details, tenant, agent lineage, and evidence requirements.' },
       { question: 'Can SatGate run with existing gateways?', answer: 'Yes. SatGate can sit before, beside, or behind existing gateway infrastructure depending on where enforcement belongs.' },
     ],
     ctaPrimary: { href: '/agent-capability-tokens', label: 'Use capability tokens' },

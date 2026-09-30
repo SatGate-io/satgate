@@ -67,18 +67,18 @@ REQUIRED = {
     "app/paid-agent-payments/page.tsx": [
         "Agents consume. Humans and platforms buy.",
         "Governed Paid API Access for Agents",
-        "A human or platform delegates the authority",
+        "A human or platform passes permissions down",
     ],
     "app/robot-customer-payments/page.tsx": [
         "redirect('/paid-agent-payments')",
     ],
     "app/pay/layout.tsx": [
-        "L402 Paid-Rail Governance Demo",
+        "L402 Payment Rules Demo",
         "delegated paid API access",
     ],
     "app/l402-agent-payments/page.tsx": [
-        "L402 Paid-Rail Governance",
-        "delegated authority, budget, scope, and payment proof before access",
+        "L402 Payment Rules",
+        "delegated permissions, budget, scope, and payment proof before access",
     ],
 }
 

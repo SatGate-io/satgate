@@ -41,7 +41,7 @@ const questions: Question[] = [
   {
     id: 'delegation',
     category: 'Delegation',
-    prompt: 'When agents spawn sub-agents, do permissions passed down to a sub-agent shrink by budget, scope, tool list, route, and expiry?',
+    prompt: 'When agents spawn sub-agents, do delegated permissions shrink by budget, scope, tool list, route, and expiry?',
     fix: 'Require narrowing: child agents should inherit less power, not a copy of parent credentials.',
   },
   {
@@ -71,7 +71,7 @@ const labels: Record<Answer, string> = {
 };
 
 function grade(score: number) {
-  if (score >= 85) return { label: 'A', title: 'Economically governable', color: 'text-green-400', summary: 'Your stack has the core controls for what an autonomous agent is allowed to do, spend, and a signed receipt.' };
+  if (score >= 85) return { label: 'A', title: 'Economically governable', color: 'text-green-400', summary: 'Your stack has the core controls for what an autonomous agent may do and spend, plus signed receipts.' };
   if (score >= 70) return { label: 'B', title: 'Close, with gaps', color: 'text-cyan-300', summary: 'You have real building blocks, but a few checks before the request goes through need tightening.' };
   if (score >= 50) return { label: 'C', title: 'Observable but fragile', color: 'text-yellow-300', summary: 'You can probably explain activity after the fact, but agents can still outrun authority policy.' };
   if (score >= 30) return { label: 'D', title: 'High authority risk', color: 'text-orange-400', summary: 'Agents can likely access, spend, delegate, or call tools faster than you can stop them.' };
@@ -137,7 +137,7 @@ export default function EconomicFirewallReadinessGraderPage() {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: 'Economic firewall readiness criteria',
-    description: 'Eight readiness checks for governing what an AI agent is allowed to do, spend, MCP tools, scoped permissions, signed receipt capture, routing, and payment details before requests execute.',
+    description: 'Eight readiness checks for governing what an AI agent may do and spend: MCP tools, scoped permissions, signed receipt capture, routing, and payment details before requests execute.',
     itemListElement: questions.map((question, index) => ({
       '@type': 'ListItem',
       position: index + 1,
@@ -246,7 +246,7 @@ export default function EconomicFirewallReadinessGraderPage() {
               [KeyRound, 'Authority', 'Agent identity, scoped credentials, expiry, narrowing, and revocation.'],
               [Gauge, 'Budget and authority limits', 'Budgets checked before the request goes through, scoped permissions, per-tool caps, model routing, and loop prevention.'],
               [ReceiptText, 'Evidence', 'Signed receipt trails that explain authority, spend context, policy decision, denial reason, route, and outcome.'],
-              [BadgeCheck, 'Payment details', 'Receipts for internal agents and for paid calls.'],
+              [BadgeCheck, 'Payment details', 'Observe, Control, and Prove paths for internal agents and paid calls.'],
             ].map(([Icon, title, body]) => {
               const TypedIcon = Icon as typeof KeyRound;
               return (

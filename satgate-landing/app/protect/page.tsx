@@ -89,7 +89,7 @@ const webPageJsonLd = {
     { '@type': 'Thing', name: 'SatGate Control' },
     { '@type': 'Thing', name: 'revocable capability tokens' },
     { '@type': 'Thing', name: 'AI agent budget enforcement' },
-    { '@type': 'Thing', name: 'permissions passed down to a sub-agent' },
+    { '@type': 'Thing', name: 'delegated permissions' },
     { '@type': 'Thing', name: 'policy enforcement before the request goes through' },
   ],
 };

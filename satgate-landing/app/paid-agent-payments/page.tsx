@@ -108,7 +108,7 @@ export default function RobotCustomerPaymentsPage() {
         name: 'How does delegated paid access work?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate payment rules use payment details: an API returns an HTTP 402 payment challenge, a wallet or platform satisfies it under permissions passed down to a sub-agent, and SatGate verifies proof before forwarding or unlocking access.',
+          text: 'SatGate payment rules use payment details: an API returns an HTTP 402 payment challenge, a wallet or platform satisfies it under delegated permissions, and SatGate verifies proof before forwarding or unlocking access.',
         },
       },
       {
@@ -295,7 +295,7 @@ export default function RobotCustomerPaymentsPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does delegated paid access work?</h3>
               <p className="text-gray-400 leading-relaxed">
-                SatGate payment rules use payment details: an API returns an HTTP 402 payment challenge, a wallet or platform satisfies it under permissions passed down to a sub-agent, and SatGate verifies proof before forwarding or unlocking access.
+                SatGate payment rules use payment details: an API returns an HTTP 402 payment challenge, a wallet or platform satisfies it under delegated permissions, and SatGate verifies proof before forwarding or unlocking access.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -333,7 +333,7 @@ export default function RobotCustomerPaymentsPage() {
               ['/l402-agent-payments', 'L402 payment rules', 'Govern Lightning payment proof before protected API access.'],
               ['/agent-capability-tokens', 'Agent capability tokens', 'Give agents scoped, budgeted, expiring access after proof.'],
               ['/revocable-agent-credentials', 'Revocable agent credentials', 'Revoke delegated access when policy, budget, or risk changes.'],
-              ['/govern', 'AI agent governance', 'Bound permissions passed down to a sub-agent before the payment method runs.'],
+              ['/govern', 'AI agent governance', 'Limit delegated permissions before the payment method runs.'],
               ['/mcp', 'MCP budget enforcement', 'Apply the same budget logic to paid tools and MCP servers.'],
               ['/ai-agent-cost-control', 'AI agent cost control', 'Stop agent overspend at the gateway policy check.'],
             ].map(([href, title, body]) => (

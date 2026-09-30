@@ -21,10 +21,10 @@ for path in required_files:
 if RAILS.exists():
     rails = RAILS.read_text()
     for needle in [
-        "Agent authority for every payment rail.",
+        "Agent permissions for every payment method.",
         "Economic Firewall category stays durable while rails change",
-        "Agent Authority & Accountability Layer",
-        "Policy-to-Proof",
+        "Agent Permissions and Receipts layer",
+        "Rules and Receipts",
         "Evidence Pack",
         "https://github.com/SatGate-io/evidence-pack-verifier",
         "/briefs/satgate-agent-authority-rails-brief.pdf",

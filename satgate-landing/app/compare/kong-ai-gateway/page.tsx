@@ -72,7 +72,7 @@ export default function ComparePage() {
     mainEntity: [
       { '@type': 'Question', name: 'Is SatGate a Kong AI Gateway replacement?', acceptedAnswer: { '@type': 'Answer', text: 'Not directly. Kong AI Gateway is the AI-facing extension of a mature API gateway platform. SatGate is rules and receipts for AI agents: API spend, MCP tools, scoped capabilities, revocation, signed receipts, and payment details.' } },
       { '@type': 'Question', name: 'Can SatGate and Kong AI Gateway work together?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics at the gateway before forwarding.' } },
-      { '@type': 'Question', name: 'When should I choose SatGate?', acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, permissions passed down to a sub-agent, signed receipts, and paid-agent payment.' } },
+      { '@type': 'Question', name: 'When should I choose SatGate?', acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, delegated permissions, signed receipts, and paid-agent payment.' } },
       { '@type': 'Question', name: 'When should I choose Kong AI Gateway?', acceptedAnswer: { '@type': 'Answer', text: 'Choose Kong when the primary need is a broad API gateway/API management platform with AI traffic support.' } },
     ],
   };
@@ -108,7 +108,7 @@ export default function ComparePage() {
             {[
               ['Is SatGate a Kong AI Gateway replacement?', 'Not directly. Kong AI Gateway is the AI-facing extension of a mature API gateway platform. SatGate is rules and receipts for AI agents: API spend, MCP tools, scoped capabilities, revocation, signed receipts, and payment details.'],
               ['Can SatGate and Kong AI Gateway work together?', 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics at the gateway before forwarding.'],
-              ['When should I choose SatGate?', 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, permissions passed down to a sub-agent, signed receipts, and paid-agent payment.'],
+              ['When should I choose SatGate?', 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, delegated permissions, signed receipts, and paid-agent payment.'],
               ['When should I choose Kong AI Gateway?', 'Choose Kong when the primary need is a broad API gateway/API management platform with AI traffic support.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">

@@ -169,7 +169,7 @@ export default function ApiMonetizationAiBlogPage() {
           <h3 className="text-xl font-bold text-white mt-8 mb-3">The Delegation Problem</h3>
 
           <p className="text-gray-300 leading-relaxed">
-            In the agent economy, the entity consuming your API isn't the entity paying for it. Agent A might call your API on behalf of Agent B, which is operating under a budget set by Agent C's human operator. The payment chain involves delegation — and traditional API monetization has no concept of permissions passed down to a sub-agent.
+            In the agent economy, the entity consuming your API isn't the entity paying for it. Agent A might call your API on behalf of Agent B, which is operating under a budget set by Agent C's human operator. The payment chain involves delegation — and traditional API monetization has no concept of delegated permissions.
           </p>
 
           <p className="text-gray-300 leading-relaxed">

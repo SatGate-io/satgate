@@ -218,7 +218,7 @@ export default function ComparePage() {
         name: 'When should teams use SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Use SatGate when the core problem is autonomous agent risk: runaway spend, MCP tool costs, permissions passed down to a sub-agent, static API keys, missing revocation, audit gaps, or machine customers that need to pay for API access at request time.',
+          text: 'Use SatGate when the core problem is autonomous agent risk: runaway spend, MCP tool costs, delegated permissions, static API keys, missing revocation, audit gaps, or machine customers that need to pay for API access at request time.',
         },
       },
       {
@@ -297,7 +297,7 @@ export default function ComparePage() {
               ],
               [
                 'When should teams use SatGate?',
-                'Use SatGate when the core problem is autonomous agent risk: runaway spend, MCP tool costs, permissions passed down to a sub-agent, static API keys, missing revocation, audit gaps, or machine customers that need to pay for API access at request time.',
+                'Use SatGate when the core problem is autonomous agent risk: runaway spend, MCP tool costs, delegated permissions, static API keys, missing revocation, audit gaps, or machine customers that need to pay for API access at request time.',
               ],
               [
                 'What should teams look for in an AI gateway comparison?',

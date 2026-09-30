@@ -234,7 +234,7 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
         <div className="mx-auto grid max-w-6xl gap-8 px-6 py-20 lg:grid-cols-3">
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Zap className="mb-4 text-yellow-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Observe</h2><p className="leading-relaxed text-gray-400">Route agent traffic through SatGate to attribute cost by agent, workflow, route, tool, tenant, and MCP server before enforcing hard limits.</p></div>
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Gauge className="mb-4 text-cyan-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Control</h2><p className="leading-relaxed text-gray-400">Enforce per-agent budgets, per-tool caps, route policy, revocation, expiry, and kill switches at the gateway before forwarding to upstream APIs.</p></div>
-          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Bot className="mb-4 text-purple-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Receipts</h2><p className="leading-relaxed text-gray-400">Record the policy decision, budget state, payment details, and upstream outcome in a signed receipt before anyone argues about the bill.</p></div>
+          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Bot className="mb-4 text-purple-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Prove</h2><p className="leading-relaxed text-gray-400">Record the policy decision, budget state, payment details, and upstream outcome in a signed receipt before anyone argues about the bill.</p></div>
         </div>
       </section>
 

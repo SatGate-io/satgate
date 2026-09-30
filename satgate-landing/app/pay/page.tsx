@@ -54,7 +54,7 @@ const faqJsonLd = {
       name: 'What happens during an L402 payment flow?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment; SatGate returns a paid-call receipt and records the decision for the signed receipt (Evidence Pack).',
+        text: 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment; SatGate returns a paid-call receipt and records the decision in the exported receipt bundle (Evidence Pack).',
       },
     },
     {
@@ -62,7 +62,7 @@ const faqJsonLd = {
       name: 'Why use L402 for agent API access?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'L402 can carry payment proof at request time, but SatGate keeps the buyer-safe control layer around it: permissions passed down to a sub-agent, max budgets, scoped access, and receipts before protected APIs unlock.',
+        text: 'L402 can carry payment proof at request time, but SatGate keeps the buyer-safe control layer around it: delegated permissions, max budgets, scoped access, and receipts before protected APIs unlock.',
       },
     },
     {
@@ -347,7 +347,7 @@ export default function PayDemoPage() {
                   const finalRes = await realClient.get(TARGET_URL, token);
                   addLog('✅ 200 OK: Request Authorized + Receipt Returned.', 'success');
                   addLog(`📦 Payload: ${JSON.stringify(finalRes)}`, 'success');
-                  addLog('🧾 Paid-call receipt queued for the receipt.', 'success');
+                  addLog('🧾 Paid-call receipt queued for export.', 'success');
                   success = true;
                   break;
               } catch (e: any) {
@@ -378,7 +378,7 @@ export default function PayDemoPage() {
           await new Promise(r => setTimeout(r, 800));
           addLog('✅ 200 OK: Request Authorized + Receipt Returned.', 'success');
           addLog('📦 Payload: { "market_sentiment": "bullish", "confidence": 0.98, "receipt_id": "rcpt_paid_demo_001" }', 'success');
-          addLog('🧾 Paid-call receipt queued for the receipt.', 'success');
+          addLog('🧾 Paid-call receipt queued for export.', 'success');
       }
       
       setStatus('success');
@@ -447,7 +447,7 @@ export default function PayDemoPage() {
           <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
             Watch an AI agent <strong className="text-white">pay for API access</strong> in this Bitcoin
             Lightning demo. SatGate verifies payment and configured authority before access, then returns
-            a receipt that can go into a signed receipt (Evidence Pack). How settlement works depends on the payment method you pick.
+            a receipt that goes into the exported receipt bundle (Evidence Pack). How settlement works depends on the payment method you pick.
           </p>
         </div>
       </div>
@@ -552,8 +552,8 @@ export default function PayDemoPage() {
         <h2 className="mb-8 text-center text-2xl font-bold text-white">L402 payment flow questions</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            ['What happens during an L402 payment flow?', 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment; SatGate returns a paid-call receipt and records the decision for the signed receipt (Evidence Pack).'],
-            ['Why use L402 for agent API access?', 'L402 can carry payment proof at request time, but SatGate keeps the buyer-safe control layer around it: permissions passed down to a sub-agent, max budgets, scoped access, and receipts before protected APIs unlock.'],
+            ['What happens during an L402 payment flow?', 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment; SatGate returns a paid-call receipt and records the decision in the exported receipt bundle (Evidence Pack).'],
+            ['Why use L402 for agent API access?', 'L402 can carry payment proof at request time, but SatGate keeps the buyer-safe control layer around it: delegated permissions, max budgets, scoped access, and receipts before protected APIs unlock.'],
             ['Can payment details be combined with access policy?', 'Yes. SatGate can combine L402 payment with capability tokens, scoped authorization, budget policy, receipt fields, receipt export, and revocation so payment does not become unrestricted access.'],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">

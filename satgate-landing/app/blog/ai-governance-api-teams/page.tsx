@@ -243,7 +243,7 @@ satgate mint --parent orchestrator_token \\
 
 # Each sub-agent operates within its slice
 # Total delegation ≤ parent budget
-# Full Evidence Pack from leaf to root`}</code>
+# Full receipt chain from leaf to root`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
@@ -373,7 +373,7 @@ GET /api/governance/costs?period=2026-03-01..2026-03-19
           </ul>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`# Add economic governance to your existing API
+            <code className="text-green-300">{`# Add spending controls to your existing API
 # No changes to your agents or backend
 
 # 1. Define your cost model

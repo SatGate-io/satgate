@@ -189,7 +189,7 @@ Rate Limiting         RPM/RPS                 Budget (dollar-denominated)
 Cost Tracking         None (just counters)    Per-call cost attribution
 Delegation            N/A                     Cryptographic trust chains
 Spend Enforcement     N/A                     Real-time budget hard caps
-Evidence Pack           Request logs            Economic audit (who spent what)
+Audit trail           Request logs            Signed receipts (who spent what)
 Monetization          Subscription tiers      Per-call micropayments (L402)`}</code>
             </pre>
           </div>
@@ -293,12 +293,12 @@ satgate mint \\
 └──────────────┬───────────────────────────┘
                │
 ┌──────────────▼───────────────────────────┐
-│  SatGate Policy-to-Proof Layer           │
+│  SatGate rules and receipts layer        │
 │  ├─ Verify capability + caveats          │
 │  ├─ Check policy and budget atomically   │
 │  ├─ Resolve tool cost                    │
 │  ├─ Allow, deny, or require approval     │
-│  └─ Emit Evidence Pack                   │
+│  └─ Emit signed receipt                  │
 └──────────────┬───────────────────────────┘
                │
 ┌──────────────▼───────────────────────────┐

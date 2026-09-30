@@ -155,7 +155,7 @@ export default function AiAgentApiCostControlPage() {
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">What AI agent API cost control requires</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            AI agent cost control has to happen before the request goes through to the upstream API. That enforcement layer needs to understand agent identity, policy, budget, tool cost, provider route, and permissions passed down to a sub-agent.
+            AI agent cost control has to happen before the request goes through to the upstream API. That enforcement layer needs to understand agent identity, policy, budget, tool cost, provider route, and delegated permissions.
           </p>
 
           <p className="text-gray-300 leading-relaxed">

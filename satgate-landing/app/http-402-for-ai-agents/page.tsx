@@ -135,7 +135,7 @@ export default function Http402ForAiAgentsPage() {
         <div className="max-w-6xl mx-auto px-6 py-20">
           <h2 className="text-3xl font-bold text-white mb-4">HTTP 402 flow types</h2>
           <p className="text-gray-400 max-w-3xl mb-10 text-lg">
-            Treat 402 as a protocol surface, not a single payment system. Payment details are one payment method; x402, AgentCore Payments, Pay.sh, and payment-token flows are separate payment methods that still need governance.
+            Treat 402 as a protocol surface, not a single payment system. L402 is one payment method; x402, AgentCore Payments, Pay.sh, and payment-token flows are separate payment methods that still need governance.
           </p>
           <div className="overflow-hidden rounded-2xl border border-gray-800">
             <div className="grid md:grid-cols-3 bg-gray-900/70 text-sm font-bold text-white">

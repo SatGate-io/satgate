@@ -92,7 +92,7 @@ export default function AgentApiGovernancePage() {
         name: 'What is agent API governance?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Agent API governance checks identity, permissions passed down to a sub-agent, budgets, revocation, routing, and signed receipts before the request goes through.',
+          text: 'Agent API governance checks identity, delegated permissions, budgets, revocation, routing, and signed receipts before the request goes through.',
         },
       },
       {
@@ -232,7 +232,7 @@ export default function AgentApiGovernancePage() {
             <li className="rounded-lg border border-gray-800 bg-black/50 p-3">What spend budget remains?</li>
             <li className="rounded-lg border border-gray-800 bg-black/50 p-3">Can authority be delegated, and how far?</li>
             <li className="rounded-lg border border-gray-800 bg-black/50 p-3">When does it expire or become invalid?</li>
-            <li className="rounded-lg border border-gray-800 bg-black/50 p-3">What audit receipt proves the decision and goes into the signed receipt (Evidence Pack)?</li>
+            <li className="rounded-lg border border-gray-800 bg-black/50 p-3">What audit receipt proves the decision and goes into the exported receipt bundle (Evidence Pack)?</li>
           </ul>
         </div>
       </section>
@@ -351,7 +351,7 @@ evidence:
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is agent API governance?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Agent API governance checks identity, permissions passed down to a sub-agent, budgets, revocation, routing, and signed receipts before the request goes through.
+                Agent API governance checks identity, delegated permissions, budgets, revocation, routing, and signed receipts before the request goes through.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

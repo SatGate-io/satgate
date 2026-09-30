@@ -5,7 +5,7 @@ export const metadata = {
   title: "Macaroon Tokens vs API Keys for Agent Access",
   description: "Compare macaroon tokens and API keys for scoped authorization, delegated access, and safer AI agent permissions.",
   alternates: { canonical: 'https://satgate.io/blog/macaroon-tokens-vs-api-keys' },
-  keywords: ['macaroon tokens vs API keys', 'capability-based authentication', 'API authentication AI agents', 'tokens for permissions passed down to a sub-agent', 'macaroon authentication', 'AI agent security', 'capability tokens'],
+  keywords: ['macaroon tokens vs API keys', 'capability-based authentication', 'API authentication AI agents', 'tokens for delegated permissions', 'macaroon authentication', 'AI agent security', 'capability tokens'],
   openGraph: {
     title: 'Macaroon Tokens vs API Keys for AI Agents',
     description: 'Compare macaroon authentication and API keys for scoped AI agent credentials, revocation, delegation, and budget limits.',
@@ -37,7 +37,7 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
       { '@type': 'Thing', name: 'capability-based authentication for AI agents' },
       { '@type': 'Thing', name: 'scoped agent credentials' },
       { '@type': 'Thing', name: 'budget caveats for agent tokens' },
-      { '@type': 'Thing', name: 'revocable permissions passed down to a sub-agent' },
+      { '@type': 'Thing', name: 'revocable delegated permissions' },
     ],
   };
 

@@ -72,7 +72,7 @@ export default function ComparePage() {
     mainEntity: [
       { '@type': 'Question', name: 'Is SatGate a Tyk replacement?', acceptedAnswer: { '@type': 'Answer', text: 'Not directly. Tyk is an API management platform with gateway, governance, analytics, and portal capabilities. SatGate is rules and receipts for AI agents: API spend, MCP tools, scoped capabilities, revocation, signed receipts, and payment details.' } },
       { '@type': 'Question', name: 'Can SatGate and Tyk work together?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics at the gateway before forwarding.' } },
-      { '@type': 'Question', name: 'When should I choose SatGate?', acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, permissions passed down to a sub-agent, signed receipts, and paid-agent payment.' } },
+      { '@type': 'Question', name: 'When should I choose SatGate?', acceptedAnswer: { '@type': 'Answer', text: 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, delegated permissions, signed receipts, and paid-agent payment.' } },
       { '@type': 'Question', name: 'When should I choose Tyk?', acceptedAnswer: { '@type': 'Answer', text: 'Choose Tyk when the primary need is a flexible API management platform for publishing and operating APIs.' } },
     ],
   };
@@ -108,7 +108,7 @@ export default function ComparePage() {
             {[
               ['Is SatGate a Tyk replacement?', 'Not directly. Tyk is an API management platform with gateway, governance, analytics, and portal capabilities. SatGate is rules and receipts for AI agents: API spend, MCP tools, scoped capabilities, revocation, signed receipts, and payment details.'],
               ['Can SatGate and Tyk work together?', 'Yes. SatGate can sit in front of or alongside gateway, API management, or observability infrastructure to enforce agent economics at the gateway before forwarding.'],
-              ['When should I choose SatGate?', 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, permissions passed down to a sub-agent, signed receipts, and paid-agent payment.'],
+              ['When should I choose SatGate?', 'Choose SatGate when the core problem is spending controls for AI agents: hard budgets, MCP tool spend, revocable credentials, delegated permissions, signed receipts, and paid-agent payment.'],
               ['When should I choose Tyk?', 'Choose Tyk when the primary need is a flexible API management platform for publishing and operating APIs.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">

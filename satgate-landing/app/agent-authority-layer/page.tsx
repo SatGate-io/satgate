@@ -111,7 +111,7 @@ const jsonLd = {
       name: "SatGate",
       applicationCategory: "BusinessApplication",
       featureList: [
-        "permissions passed down to a sub-agent",
+        "delegated permissions",
         "Pre-flight policy enforcement",
         "Signed receipts",
         "Receipt checks that work with any payment method",
@@ -178,7 +178,7 @@ export default function AgentAuthorityLayerPage() {
             </div>
             <div className="space-y-4">
               {[
-                "The authenticated principal and the permissions passed down to a sub-agent.",
+                "The authenticated principal and the delegated permissions.",
                 "Whether the requested action matched the configured policy.",
                 "The signed decision and associated scope and budget context.",
                 "An artifact to verify against independently trusted issuer keys.",

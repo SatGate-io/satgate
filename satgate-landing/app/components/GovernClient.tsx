@@ -774,7 +774,7 @@ export default function GovernPage() {
             <div className="bg-[#12121a] border border-gray-800 rounded-xl p-6">
               <div className="text-2xl font-bold text-green-400 mb-2">3</div>
               <h3 className="text-white font-semibold mb-2">Export the evidence</h3>
-              <p className="text-gray-400 text-sm">Every grant, paid call, denial, delegation, and revocation produces a receipt for the signed receipt (Evidence Pack) when you need to prove what happened.</p>
+              <p className="text-gray-400 text-sm">Every grant, paid call, denial, delegation, and revocation produces a receipt for the exported receipt bundle (Evidence Pack) when you need to prove what happened.</p>
             </div>
           </div>
 
@@ -830,7 +830,7 @@ export SATGATE_TOKEN=$TOKEN
               ['What is AI agent governance?', 'AI agent governance is the set of controls that determines which agents can call which APIs, tools, and models; how much they can spend; what authority they can delegate; and when access must be revoked. For autonomous agents, governance needs enforcement before the request goes through, not just logs and dashboards.'],
               ['What are rules and receipts for AI agents?', 'Rules and receipts for AI agents sit before the request goes through. They apply scopes, budgets, delegation rules, and revocation before an agent reaches an upstream API, model, or MCP tool, then preserve signed receipts (Evidence Packs) so the decision can be verified later.'],
               ['How should enterprises govern MCP tool usage?', 'Enterprises should govern MCP tools with per-tool budgets, scoped capability tokens, task and tenant attribution, signed receipts (Evidence Packs), revocation, and hard policy decisions before the request goes through. Rate limits and dashboards are useful, but they do not replace enforcement before tool calls execute.'],
-              ['What is the difference between AI governance and AI agent governance?', 'AI governance usually covers model risk, data policy, compliance, and human review. AI agent governance adds controls on each request that goes through SatGate for autonomous actions: scopes, budgets, permissions passed down to a sub-agent, revocation, denial reasons, spend attribution, and proof before APIs or MCP tools execute.'],
+              ['What is the difference between AI governance and AI agent governance?', 'AI governance usually covers model risk, data policy, compliance, and human review. AI agent governance adds controls on each request that goes through SatGate for autonomous actions: scopes, budgets, delegated permissions, revocation, denial reasons, spend attribution, and proof before APIs or MCP tools execute.'],
               ['Is SatGate tied to x402, L402, AgentCore Payments, or Pay.sh?', 'Lightning (L402) and USDC on Base (x402) are live, and each route opts in. AgentCore Payments and Pay.sh are planned. Payment never overrides permissions.'],
             ].map(([question, answer]) => (
               <div key={question} className="border-t border-gray-800 pt-6 first:border-t-0 first:pt-0">
@@ -850,7 +850,7 @@ export SATGATE_TOKEN=$TOKEN
           </h2>
           <p className="text-gray-400 text-lg mb-8">
             We&apos;re working with enterprise teams that need scoped authority, runtime enforcement, and evidence before agents scale.
-            Start with Observe, then move to Control and rules and receipts when you&apos;re ready.
+            Start with Observe, then move to Control and Prove when you&apos;re ready.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-10 py-4 font-bold text-lg text-white hover:border-purple-400 transition">
