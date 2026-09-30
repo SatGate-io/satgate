@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Check, DollarSign, Gauge, KeyRound, Minus, ShieldCheck, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate vs Kong AI Gateway - AI Gateway vs Policy-to-Proof',
-  description: 'Compare SatGate and Kong AI Gateway. Kong is API/AI gateway infrastructure; SatGate governs agent spend, MCP tools, scoped credentials, and paid-rail context.',
+  title: 'SatGate vs Kong AI Gateway - AI Gateway vs Agent Spending Controls',
+  description: 'Compare SatGate and Kong AI Gateway. Kong is API/AI gateway infrastructure; SatGate controls agent spend, MCP tools, scoped credentials, and charging external agents.',
   alternates: { canonical: 'https://satgate.io/compare/kong-ai-gateway' },
   keywords: [
     'SatGate vs Kong AI Gateway',
@@ -17,16 +17,16 @@ export const metadata = {
     'MCP budget enforcement',
   ],
   openGraph: {
-    title: 'SatGate vs Kong AI Gateway - AI Gateway vs Policy-to-Proof',
-    description: 'Compare SatGate and Kong AI Gateway for gateway infrastructure, agent economics, MCP tool controls, scoped credentials, and paid-rail context.',
+    title: 'SatGate vs Kong AI Gateway - AI Gateway vs Agent Spending Controls',
+    description: 'Compare SatGate and Kong AI Gateway for gateway infrastructure, agent spending, MCP tool controls, scoped credentials, and charging external agents.',
     url: 'https://satgate.io/compare/kong-ai-gateway',
     type: 'article',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SatGate vs Kong AI Gateway - Gateway vs Policy-to-Proof',
-    description: 'Kong runs API gateway infrastructure. SatGate enforces agent budgets, MCP tool costs, scoped credentials, and paid-rail context.',
+    title: 'SatGate vs Kong AI Gateway - Gateway vs Agent Spending Controls',
+    description: 'Kong runs API gateway infrastructure. SatGate enforces agent budgets, MCP tool costs, scoped credentials, and charging external agents.',
   },
 };
 
@@ -57,7 +57,7 @@ export default function ComparePage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'SatGate vs Kong AI Gateway - AI Gateway vs Policy-to-Proof',
+    headline: 'SatGate vs Kong AI Gateway - AI Gateway vs Agent Spending Controls',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },

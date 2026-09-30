@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Check, DollarSign, Gauge, KeyRound, Minus, ShieldCheck, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate vs Apigee: API Management vs Policy-to-Proof',
-  description: 'Compare SatGate and Google Apigee. Apigee is enterprise API management; SatGate adds economic governance for AI agents, MCP budgets, and paid-rail context.',
+  title: 'SatGate vs Apigee: API Management vs Agent Spending Controls',
+  description: 'Compare SatGate and Google Apigee. Apigee is enterprise API management; SatGate adds spending controls for AI agents, MCP tool budgets, and charging external agents.',
   alternates: { canonical: 'https://satgate.io/compare/apigee' },
   keywords: [
     'SatGate vs Apigee',
@@ -17,16 +17,16 @@ export const metadata = {
     'MCP budget enforcement',
   ],
   openGraph: {
-    title: 'SatGate vs Apigee: API Management vs Policy-to-Proof',
-    description: 'Compare SatGate and Google Apigee for API management, AI agent economic governance, MCP budgets, revocation, and paid-rail context.',
+    title: 'SatGate vs Apigee: API Management vs Agent Spending Controls',
+    description: 'Compare SatGate and Google Apigee for API management, AI agent spending controls, MCP tool budgets, revoking access, and charging external agents.',
     url: 'https://satgate.io/compare/apigee',
     type: 'article',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SatGate vs Apigee: API Management vs Policy-to-Proof',
-    description: 'Apigee manages APIs. SatGate enforces AI agent budgets, MCP tool costs, scoped credentials, revocation, and paid-rail context.',
+    title: 'SatGate vs Apigee: API Management vs Agent Spending Controls',
+    description: 'Apigee manages APIs. SatGate enforces AI agent budgets, MCP tool costs, scoped credentials, revocation, and charging external agents.',
   },
 };
 
@@ -57,7 +57,7 @@ export default function ComparePage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'SatGate vs Apigee: API Management vs Policy-to-Proof',
+    headline: 'SatGate vs Apigee: API Management vs Agent Spending Controls',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },

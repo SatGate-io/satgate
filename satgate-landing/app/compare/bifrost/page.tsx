@@ -6,7 +6,7 @@ export const metadata = {
   description: 'Compare SatGate and Bifrost AI gateways. See why economic controls matter for the agent economy.',
   alternates: { canonical: 'https://satgate.io/compare/bifrost' },
   openGraph: {
-    title: 'SatGate vs Bifrost: LLM Routing vs Economic Governance',
+    title: 'SatGate vs Bifrost: LLM Routing vs Agent Spending Controls',
     description: 'Compare Bifrost LLM routing with SatGate economic controls for AI agent budgets, MCP tool costs, and L402 monetization.',
     url: 'https://satgate.io/compare/bifrost',
     type: 'website',
@@ -14,8 +14,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SatGate vs Bifrost: LLM Routing vs Economic Governance',
-    description: 'Bifrost routes LLM traffic. SatGate enforces AI agent budgets, MCP tool costs, scoped credentials, and paid-rail context.',
+    title: 'SatGate vs Bifrost: LLM Routing vs Agent Spending Controls',
+    description: 'Bifrost routes LLM traffic. SatGate enforces AI agent budgets, MCP tool costs, scoped credentials, and charging external agents.',
   },
 };
 
