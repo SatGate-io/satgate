@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Check, Gauge, KeyRound, Minus, ShieldCheck, Zap 
 
 export const metadata = {
   title: 'SatGate vs Helicone - LLM Observability vs Economic Firewall',
-  description: 'Compare SatGate and Helicone. Helicone helps teams debug and analyze AI apps; SatGate adds economic governance for agents, MCP budgets, and paid-rail context.',
+  description: 'Compare SatGate and Helicone. Helicone helps teams debug and analyze AI apps; SatGate adds spending controls for agents, MCP tool budgets, and charging external agents.',
   alternates: { canonical: 'https://satgate.io/compare/helicone' },
   keywords: [
     'SatGate vs Helicone',
@@ -14,7 +14,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate vs Helicone - LLM Observability vs Economic Firewall',
-    description: 'Compare SatGate and Helicone for LLM observability, AI agent economic governance, MCP budgets, capabilities, and paid-rail context.',
+    description: 'Compare SatGate and Helicone for LLM monitoring, AI agent spending controls, MCP tool budgets, scoped tokens, and charging external agents.',
     url: 'https://satgate.io/compare/helicone',
     type: 'article',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -22,7 +22,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate vs Helicone - Observability vs Economic Firewall',
-    description: 'Helicone observes LLM apps. SatGate enforces AI agent budgets, MCP tool costs, scoped authority, audit, and paid-rail context.',
+    description: 'Helicone monitors LLM apps. SatGate enforces AI agent budgets, MCP tool costs, scoped permissions, audit trails, and charging external agents.',
   },
 };
 

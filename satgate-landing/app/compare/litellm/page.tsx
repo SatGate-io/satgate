@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Check, DollarSign, Gauge, KeyRound, Minus, Route
 
 export const metadata = {
   title: 'SatGate vs LiteLLM - AI Gateway vs Economic Firewall',
-  description: 'Compare SatGate and LiteLLM. LiteLLM handles model routing, budgets, and spend tracking; SatGate governs agent spend, MCP tools, and paid-rail context.',
+  description: 'Compare SatGate and LiteLLM. LiteLLM handles model routing, budgets, and spend tracking; SatGate controls agent spend, MCP tools, and charging external agents.',
   alternates: { canonical: 'https://satgate.io/compare/litellm' },
   keywords: [
     'SatGate vs LiteLLM',
@@ -17,7 +17,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate vs LiteLLM - AI Gateway vs Economic Firewall',
-    description: 'LiteLLM gives teams model access, routing, fallbacks, budgets, and spend tracking. SatGate governs agent/API economics in the request path.',
+    description: 'LiteLLM gives teams model access, routing, fallbacks, budgets, and spend tracking. SatGate checks agent and API spending before the request goes through.',
     url: 'https://satgate.io/compare/litellm',
     type: 'article',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -25,7 +25,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate vs LiteLLM - LLM Gateway vs Economic Firewall',
-    description: 'LiteLLM routes model calls. SatGate enforces agent budgets, MCP tool costs, scoped authority, audit, and paid-rail context.',
+    description: 'LiteLLM routes model calls. SatGate enforces agent budgets, MCP tool costs, scoped permissions, audit trails, and charging external agents.',
   },
 };
 

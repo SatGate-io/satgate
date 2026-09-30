@@ -20,7 +20,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Compare SatGate - AI Gateway and Economic Firewall Comparisons',
-    description: 'Routing, observability, and API gateways are useful. SatGate focuses on request-path economic governance for autonomous agents.',
+    description: 'Routing, observability, and API gateways are useful. SatGate controls what autonomous agents can spend on each request.',
     url: 'https://satgate.io/compare',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],

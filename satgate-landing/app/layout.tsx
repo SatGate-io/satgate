@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     template: "%s | SatGate",
   },
   description:
-    "SatGate governs AI agent authority before execution across MCP, APIs, API keys, and paid rails, then exports Evidence Packs for every decision.",
+    "Budgets and permissions for your AI agents, paid access for external agents where you choose, and a signed receipt for every decision.",
   keywords: [
     "Policy-to-Proof",
     "Evidence Packs",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SatGate: an economic firewall for AI agents",
     description:
-      "Authority before execution. Evidence Packs after every decision across MCP, APIs, API keys, and rail-neutral paid-rail governance.",
+      "Budgets and permissions for your AI agents, paid access for external agents where you choose, and a signed receipt for every decision.",
     url: "https://satgate.io",
     siteName: "SatGate",
     images: [
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SatGate: an economic firewall for AI agents",
     description:
-      "Policy-to-Proof governance for enterprise agents across MCP, APIs, API keys, and paid rails.",
+      "Budgets and permissions for your AI agents, paid access for external agents where you choose, and a signed receipt for every decision.",
     images: ["/og.png"],
   },
   robots: {
@@ -90,7 +90,7 @@ const jsonLd = {
       url: "https://satgate.io",
       logo: "https://satgate.io/logo.png",
       description:
-        "Policy-to-Proof governance for AI agent authority. SatGate checks scope, budgets, delegation, MCP access, and paid-rail policy before execution, then exports Evidence Packs.",
+        "SatGate is an economic firewall for AI agents. Before a request reaches your API or MCP tool, it checks the agent's budget and permissions, and payment where you charge for access. Each decision gets a signed receipt.",
       sameAs: ["https://github.com/SatGate-io/satgate"],
       contactPoint: {
         "@type": "ContactPoint",

@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Check, Gauge, KeyRound, Minus, ShieldCheck, Zap 
 
 export const metadata = {
   title: 'SatGate vs Portkey - AI Gateway vs Economic Firewall',
-  description: 'Compare SatGate and Portkey. Portkey is a GenAI gateway and observability stack; SatGate governs agent spend, MCP tools, and paid-rail context.',
+  description: 'Compare SatGate and Portkey. Portkey is a GenAI gateway and observability stack; SatGate controls agent spend, MCP tools, and charging external agents.',
   alternates: { canonical: 'https://satgate.io/compare/portkey' },
   keywords: [
     'SatGate vs Portkey',
@@ -14,7 +14,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate vs Portkey - AI Gateway vs Economic Firewall',
-    description: 'Compare SatGate and Portkey for AI gateway, observability, guardrails, MCP access, agent economics, and paid-rail context.',
+    description: 'Compare SatGate and Portkey for AI gateway, observability, guardrails, MCP access, agent spending, and charging external agents.',
     url: 'https://satgate.io/compare/portkey',
     type: 'article',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -22,7 +22,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate vs Portkey - GenAI Gateway vs Economic Firewall',
-    description: 'Portkey runs GenAI gateway ops. SatGate enforces agent budgets, MCP tool costs, scoped authority, audit, and paid-rail context.',
+    description: 'Portkey runs GenAI gateway ops. SatGate enforces agent budgets, MCP tool costs, scoped permissions, audit trails, and charging external agents.',
   },
 };
 

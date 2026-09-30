@@ -6,16 +6,16 @@ export const metadata = {
   description: 'Compare SatGate and Zuplo API gateways. See why economic controls matter for the agent economy.',
   alternates: { canonical: 'https://satgate.io/compare/zuplo' },
   openGraph: {
-    title: 'SatGate vs Zuplo: API Gateway vs Economic Governance',
-    description: 'Compare Zuplo API gateway controls with SatGate economic governance for AI agent budgets, MCP tool costs, and L402 monetization.',
+    title: 'SatGate vs Zuplo: API Gateway vs Agent Spending Controls',
+    description: 'Compare Zuplo API gateway controls with SatGate spending controls for AI agent budgets, MCP tool costs, and L402 monetization.',
     url: 'https://satgate.io/compare/zuplo',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SatGate vs Zuplo: API Gateway vs Economic Governance',
-    description: 'Zuplo exposes APIs to agents. SatGate enforces budgets, MCP tool costs, scoped delegation, and paid-rail context.',
+    title: 'SatGate vs Zuplo: API Gateway vs Agent Spending Controls',
+    description: 'Zuplo exposes APIs to agents. SatGate enforces budgets, MCP tool costs, scoped delegation, and charging external agents.',
   },
 };
 

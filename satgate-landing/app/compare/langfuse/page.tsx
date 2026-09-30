@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Check, DollarSign, Gauge, KeyRound, Minus, ShieldCheck, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate vs Langfuse - LLM Observability vs Policy-to-Proof',
-  description: 'Compare SatGate and Langfuse. Langfuse is strong for LLM observability and traces; SatGate enforces budgets and authority before agents spend.',
+  title: 'SatGate vs Langfuse - LLM Observability vs Agent Spending Controls',
+  description: 'Compare SatGate and Langfuse. Langfuse is strong for LLM observability and traces; SatGate enforces budgets and permissions before agents spend.',
   alternates: { canonical: 'https://satgate.io/compare/langfuse' },
   keywords: [
     'SatGate vs Langfuse',
@@ -17,16 +17,16 @@ export const metadata = {
     'MCP budget enforcement',
   ],
   openGraph: {
-    title: 'SatGate vs Langfuse - LLM Observability vs Policy-to-Proof',
-    description: 'Compare SatGate and Langfuse for LLM observability, traces, evaluations, and request-path agent budget enforcement.',
+    title: 'SatGate vs Langfuse - LLM Observability vs Agent Spending Controls',
+    description: 'Compare SatGate and Langfuse for LLM observability, traces, evaluations, and agent budgets enforced on each request.',
     url: 'https://satgate.io/compare/langfuse',
     type: 'article',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SatGate vs Langfuse - Observability vs Policy-to-Proof',
-    description: 'Langfuse traces AI apps. SatGate enforces agent budgets, MCP tool costs, scoped credentials, revocation, and paid-rail context.',
+    title: 'SatGate vs Langfuse - Observability vs Agent Spending Controls',
+    description: 'Langfuse traces AI apps. SatGate enforces agent budgets, MCP tool costs, scoped credentials, revocation, and charging external agents.',
   },
 };
 
@@ -57,7 +57,7 @@ export default function ComparePage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'SatGate vs Langfuse - LLM Observability vs Policy-to-Proof',
+    headline: 'SatGate vs Langfuse - LLM Observability vs Agent Spending Controls',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },

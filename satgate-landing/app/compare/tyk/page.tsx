@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Check, DollarSign, Gauge, KeyRound, Minus, ShieldCheck, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate vs Tyk - API Management vs Agent Economic Governance',
-  description: 'Compare SatGate and Tyk. Tyk is API management infrastructure; SatGate governs AI agent spend, MCP tools, scoped authority, revocation, and payments.',
+  title: 'SatGate vs Tyk - API Management vs Agent Spending Controls',
+  description: 'Compare SatGate and Tyk. Tyk is API management infrastructure; SatGate controls AI agent spend, MCP tools, scoped permissions, revocation, and payments.',
   alternates: { canonical: 'https://satgate.io/compare/tyk' },
   keywords: [
     'SatGate vs Tyk',
@@ -17,16 +17,16 @@ export const metadata = {
     'MCP budget enforcement',
   ],
   openGraph: {
-    title: 'SatGate vs Tyk - API Management vs Agent Economic Governance',
-    description: 'Compare SatGate and Tyk for API management, AI agent spend governance, MCP tools, scoped authority, revocation, and paid-rail governance.',
+    title: 'SatGate vs Tyk - API Management vs Agent Spending Controls',
+    description: 'Compare SatGate and Tyk for API management, AI agent spending controls, MCP tools, scoped permissions, revocation, and charging external agents.',
     url: 'https://satgate.io/compare/tyk',
     type: 'article',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SatGate vs Tyk: API Management vs Policy-to-Proof',
-    description: 'Tyk manages API programs. SatGate enforces AI agent budgets, MCP tool costs, scoped authority, revocation, and paid-rail context.',
+    title: 'SatGate vs Tyk: API Management vs Agent Spending Controls',
+    description: 'Tyk manages API programs. SatGate enforces AI agent budgets, MCP tool costs, scoped permissions, revocation, and charging external agents.',
   },
 };
 
@@ -57,7 +57,7 @@ export default function ComparePage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'SatGate vs Tyk - API Management vs Agent Economic Governance',
+    headline: 'SatGate vs Tyk - API Management vs Agent Spending Controls',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },

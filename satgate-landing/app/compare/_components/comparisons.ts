@@ -14,10 +14,10 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
   'aws-agentcore-payments': {
     slug: 'aws-agentcore-payments',
     competitor: 'AWS AgentCore Payments',
-    eyebrow: 'Managed agent payments vs Policy-to-Proof governance',
-    title: 'SatGate vs AWS AgentCore Payments: Governance Above Paid Rails',
+    eyebrow: 'Managed agent payments vs spending rules you control',
+    title: 'SatGate vs AWS AgentCore Payments: Agent Spending Rules Beyond AWS',
     description: 'AWS AgentCore Payments helps agents transact inside AWS. SatGate governs authority, Evidence Pack proof, MCP tools, and paid rails before execution across the multi-provider enterprise environment.',
-    verdict: 'If your world is AWS AgentCore, AWS gives you managed payments. If your environment spans OpenAI, Anthropic, local agents, MCP tools, internal APIs, customer-controlled gateways, and multiple payment rails, SatGate is the control layer.',
+    verdict: 'If everything runs inside AWS AgentCore, AWS handles agent payments for you. If your agents also use OpenAI, Anthropic, local agents, MCP tools, internal APIs, your own gateways or more than one payment method, SatGate applies one set of rules across all of them.',
     competitorGoodAt: [
       'Managed payment enablement for agents built around AWS AgentCore patterns.',
       'Tight fit for teams standardizing agent runtime, identity, tools, and observability inside AWS.',
@@ -56,10 +56,10 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
   'cloudflare-ai-gateway': {
     slug: 'cloudflare-ai-gateway',
     competitor: 'Cloudflare AI Gateway',
-    eyebrow: 'AI traffic gateway vs Policy-to-Proof governance',
-    title: 'SatGate vs Cloudflare AI Gateway: Policy-to-Proof for Agent Actions',
+    eyebrow: 'AI traffic gateway vs agent spending rules',
+    title: 'SatGate vs Cloudflare AI Gateway: Rules Before Agents Spend',
     description: 'Cloudflare AI Gateway is strong AI traffic infrastructure. SatGate is Policy-to-Proof governance for agent authority, MCP tools, delegated spend, paid rails, and Evidence Packs.',
-    verdict: 'Cloudflare helps move and observe AI traffic. SatGate decides whether an autonomous agent is authorized to spend before that traffic exists.',
+    verdict: 'Cloudflare helps you route and watch AI traffic. SatGate decides whether an agent is allowed to spend before the request goes out.',
     competitorGoodAt: [
       'Edge-native AI traffic analytics, logging, caching, rate limits, retries, and fallback.',
       'Great fit for teams already building AI applications on Cloudflare Workers and Cloudflare’s network.',
@@ -93,8 +93,8 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
   'langsmith-helicone-datadog': {
     slug: 'langsmith-helicone-datadog',
     competitor: 'LangSmith, Helicone, and Datadog',
-    eyebrow: 'Observability vs pre-execution control',
-    title: 'SatGate vs LangSmith, Helicone, and Datadog: Proof Before Postmortems',
+    eyebrow: 'Seeing what happened vs deciding what is allowed',
+    title: 'SatGate vs LangSmith, Helicone, Datadog: Check Before Agents Spend',
     description: 'LangSmith, Helicone, and Datadog help teams trace, debug, monitor, evaluate, and analyze LLM systems. SatGate sits before execution to enforce agent budgets, delegated authority, MCP tool policy, paid-rail access, and Evidence Packs.',
     verdict: 'Observability tells you what agents did. SatGate controls what agents are allowed to do before they do it.',
     competitorGoodAt: [
@@ -130,8 +130,8 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
   'api-gateway-rate-limits': {
     slug: 'api-gateway-rate-limits',
     competitor: 'API Gateway rate limits',
-    eyebrow: 'Traffic primitive vs authority primitive',
-    title: 'SatGate vs API Gateway Rate Limits: Authority Beats Quotas',
+    eyebrow: 'Counting requests vs deciding what is allowed',
+    title: 'SatGate vs API Gateway Rate Limits: Budgets, Not Just Request Counts',
     description: 'API Gateway rate limits throttle request volume. SatGate governs delegated agent authority: budget, route, tool, tenant, payment rail, evidence requirement, and revocation before the request executes.',
     verdict: 'Rate limits answer “how many requests?” SatGate answers “is this agent allowed to spend this budget on this resource right now, and can we prove why?”',
     competitorGoodAt: [
@@ -168,9 +168,9 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     slug: 'openai-anthropic-budget-controls',
     competitor: 'native OpenAI and Anthropic budget controls',
     eyebrow: 'Provider caps vs cross-provider control',
-    title: 'SatGate vs OpenAI and Anthropic Budgets: Cross-Provider Authority',
+    title: 'SatGate vs OpenAI and Anthropic Budgets: One Budget Across Providers',
     description: 'OpenAI and Anthropic budget controls are useful provider-specific guardrails. SatGate is the cross-provider Agent Authority & Accountability Layer above them: delegated budgets, MCP tool governance, paid API access, flexible deployment, and Evidence Packs.',
-    verdict: 'Native budgets are necessary last-mile guardrails. They are not a portable agent authorization layer across providers, tools, APIs, rails, and customer-controlled systems.',
+    verdict: 'Built-in provider budgets are a useful last line of defense. They cannot give an agent one set of permissions across providers, tools, APIs, payment methods and systems you run yourself.',
     competitorGoodAt: [
       'Capping or tracking spend inside a single model provider account, project, workspace, or organization.',
       'Provider-native usage dashboards, API keys, rate limits, and admin controls.',
