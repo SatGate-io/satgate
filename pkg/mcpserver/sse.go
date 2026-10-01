@@ -26,6 +26,15 @@ type SSEServer struct {
 
 	mu       sync.Mutex
 	sessions map[string]*sseSession
+
+	// Streamable HTTP (MCP 2025-03-26 / 2025-06-18) sessions. Separate from
+	// SSE sessions so an SSE sessionId cannot be presented as Mcp-Session-Id.
+	streamMu        sync.Mutex
+	streamSessions  map[string]*streamSession
+	streamTTL       time.Duration
+	streamMax       int
+	streamLastSweep time.Time
+	allowedOrigins  map[string]struct{}
 }
 
 // sseSession represents one connected MCP client over SSE.
@@ -116,8 +125,10 @@ func WithBasePath(path string) SSEOption {
 // NewSSEServer creates an SSE transport server for the given proxy.
 func NewSSEServer(proxy *Proxy, addr string, opts ...SSEOption) *SSEServer {
 	s := &SSEServer{
-		proxy:    proxy,
-		sessions: make(map[string]*sseSession),
+		proxy:          proxy,
+		sessions:       make(map[string]*sseSession),
+		streamSessions: make(map[string]*streamSession),
+		streamTTL:      defaultStreamableSessionTTL,
 	}
 	for _, opt := range opts {
 		opt(s)
@@ -129,9 +140,11 @@ func NewSSEServer(proxy *Proxy, addr string, opts ...SSEOption) *SSEServer {
 	mux.HandleFunc("/health", s.handleHealth)
 
 	s.mux = mux
+	// Handler is the SSEServer itself so Streamable HTTP at the mount root
+	// and the legacy SSE routes share one entry point. See ServeHTTP.
 	s.server = &http.Server{
 		Addr:         addr,
-		Handler:      mux,
+		Handler:      s,
 		ReadTimeout:  0, // SSE needs no read timeout
 		WriteTimeout: 0, // SSE needs no write timeout
 		IdleTimeout:  0,
@@ -145,10 +158,11 @@ func (s *SSEServer) Handle(pattern string, handler http.Handler) {
 	s.mux.Handle(pattern, handler)
 }
 
-// Handler returns the SSE server's HTTP handler (mux) without starting a listener.
-// This is useful for embedding the SSE server in another HTTP server.
+// Handler returns the HTTP handler for embedding in another server.
+// It serves legacy SSE at /sse and /message and Streamable HTTP at the
+// mount root (public .../mcp). See IsStreamableHTTPPath.
 func (s *SSEServer) Handler() http.Handler {
-	return s.mux
+	return s
 }
 
 // HandleFunc registers an additional handler function on the SSE server's mux.
