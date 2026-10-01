@@ -29,10 +29,12 @@ type SSEServer struct {
 
 	// Streamable HTTP (MCP 2025-03-26 / 2025-06-18) sessions. Separate from
 	// SSE sessions so an SSE sessionId cannot be presented as Mcp-Session-Id.
-	streamMu       sync.Mutex
-	streamSessions map[string]*streamSession
-	streamTTL      time.Duration
-	allowedOrigins map[string]struct{}
+	streamMu        sync.Mutex
+	streamSessions  map[string]*streamSession
+	streamTTL       time.Duration
+	streamMax       int
+	streamLastSweep time.Time
+	allowedOrigins  map[string]struct{}
 }
 
 // sseSession represents one connected MCP client over SSE.

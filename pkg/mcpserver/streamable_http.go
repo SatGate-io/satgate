@@ -37,6 +37,12 @@ const (
 	protocolVersion20250618 = "2025-06-18"
 
 	defaultStreamableSessionTTL = 30 * time.Minute
+
+	// defaultMaxStreamableSessions bounds the in-memory session map. A full
+	// map is swept for expired entries first; if it is still full, initialize
+	// is refused with 503 rather than growing without limit.
+	defaultMaxStreamableSessions = 10000
+	streamableSweepInterval      = time.Minute
 )
 
 // IsStreamableHTTPPath reports whether path is the agent-facing Streamable
@@ -86,6 +92,16 @@ func WithStreamableSessionTTL(ttl time.Duration) SSEOption {
 	return func(s *SSEServer) {
 		if ttl > 0 {
 			s.streamTTL = ttl
+		}
+	}
+}
+
+// WithMaxStreamableSessions overrides the cap on concurrent Streamable HTTP
+// sessions held in memory.
+func WithMaxStreamableSessions(n int) SSEOption {
+	return func(s *SSEServer) {
+		if n > 0 {
+			s.streamMax = n
 		}
 	}
 }
@@ -220,7 +236,26 @@ func (s *SSEServer) handleStreamablePost(w http.ResponseWriter, r *http.Request)
 		if denied := s.rejectHardAuthFailure(w, r, authToken); denied {
 			return
 		}
-		sess = s.createStreamSession(authToken, negotiated)
+		// In header auth mode a session is only created for a token that
+		// verifies. A tokenless or unverifiable initialize gets 401 and leaves
+		// nothing in the session map.
+		if s.requiresVerifiedStreamToken() {
+			if authToken == "" {
+				http.Error(w, "authentication required", http.StatusUnauthorized)
+				return
+			}
+			if _, err := s.proxy.auth.Verify(r.Context(), authToken); err != nil {
+				http.Error(w, "authentication failed", http.StatusUnauthorized)
+				return
+			}
+		}
+		var created bool
+		sess, created = s.createStreamSession(r.Context(), authToken, negotiated)
+		if !created {
+			w.Header().Set("Retry-After", "60")
+			http.Error(w, "too many sessions", http.StatusServiceUnavailable)
+			return
+		}
 	default:
 		var found bool
 		sess, found = s.lookupStreamSession(sid)
@@ -309,7 +344,39 @@ func isStreamableNotification(req *Request) bool {
 	return len(req.ID) == 0
 }
 
-func (s *SSEServer) createStreamSession(token, protocol string) *streamSession {
+// requiresVerifiedStreamToken reports whether initialize must carry a token
+// that verifies before a session is created (header auth mode).
+func (s *SSEServer) requiresVerifiedStreamToken() bool {
+	return s.proxy != nil && s.proxy.config != nil && s.proxy.auth != nil &&
+		s.proxy.config.Auth.Mode == "header"
+}
+
+func (s *SSEServer) streamMaxSessions() int {
+	if s.streamMax > 0 {
+		return s.streamMax
+	}
+	return defaultMaxStreamableSessions
+}
+
+// sweepExpiredStreamSessionsLocked drops expired sessions. Caller holds
+// streamMu. It runs at most once per streamableSweepInterval unless force is
+// set (the map is full).
+func (s *SSEServer) sweepExpiredStreamSessionsLocked(now time.Time, force bool) []*streamSession {
+	if !force && !s.streamLastSweep.IsZero() && now.Sub(s.streamLastSweep) < streamableSweepInterval {
+		return nil
+	}
+	s.streamLastSweep = now
+	var closed []*streamSession
+	for id, sess := range s.streamSessions {
+		if !sess.expiresAt.IsZero() && now.After(sess.expiresAt) {
+			delete(s.streamSessions, id)
+			closed = append(closed, sess)
+		}
+	}
+	return closed
+}
+
+func (s *SSEServer) createStreamSession(ctx context.Context, token, protocol string) (*streamSession, bool) {
 	now := time.Now()
 	sess := &streamSession{
 		id:        generateSessionID(),
@@ -318,7 +385,7 @@ func (s *SSEServer) createStreamSession(token, protocol string) *streamSession {
 		expiresAt: now.Add(s.streamIdleTTL()),
 	}
 	if token != "" && s.proxy != nil && s.proxy.auth != nil {
-		if info, err := s.proxy.auth.Verify(context.Background(), token); err == nil && info != nil {
+		if info, err := s.proxy.auth.Verify(ctx, token); err == nil && info != nil {
 			copyInfo := *info
 			sess.verified = &copyInfo
 			sess.identity = sseSessionIdentity{
@@ -333,8 +400,21 @@ func (s *SSEServer) createStreamSession(token, protocol string) *streamSession {
 	if s.streamSessions == nil {
 		s.streamSessions = make(map[string]*streamSession)
 	}
+	full := len(s.streamSessions) >= s.streamMaxSessions()
+	closed := s.sweepExpiredStreamSessionsLocked(now, full)
+	if len(s.streamSessions) >= s.streamMaxSessions() {
+		s.streamMu.Unlock()
+		for _, c := range closed {
+			s.publishStreamClose(c)
+		}
+		log.Warn().Int("sessions", s.streamMaxSessions()).Msg("streamable HTTP session cap reached")
+		return nil, false
+	}
 	s.streamSessions[sess.id] = sess
 	s.streamMu.Unlock()
+	for _, c := range closed {
+		s.publishStreamClose(c)
+	}
 
 	if s.proxy != nil && s.proxy.events != nil {
 		s.proxy.events.Publish(Event{
@@ -347,7 +427,7 @@ func (s *SSEServer) createStreamSession(token, protocol string) *streamSession {
 		})
 	}
 	log.Info().Str("session", sess.id).Str("protocol", protocol).Msg("streamable HTTP session established")
-	return sess
+	return sess, true
 }
 
 func (s *SSEServer) lookupStreamSession(id string) (*streamSession, bool) {

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -444,15 +445,110 @@ func TestStreamableHTTPHeaderModeNoTokenCannotCallTools(t *testing.T) {
 	srv := httptest.NewServer(NewSSEServer(proxy, ":0").Handler())
 	defer srv.Close()
 
+	// Header mode refuses a tokenless initialize outright (no session).
 	status, hdr, body := streamablePost(t, srv.URL+"/mcp", "", "", initializeBody("2025-03-26"))
-	sid := hdr.Get("Mcp-Session-Id")
-	if status == http.StatusOK && sid != "" {
-		status, _, body = streamablePost(t, srv.URL+"/mcp", sid, "", toolCallBody(2, "echo"))
-		if status == http.StatusOK && !strings.Contains(body, `"error"`) {
-			t.Fatalf("tokenless tools/call succeeded in header mode: status=%d body=%s", status, body)
-		}
+	if status != http.StatusUnauthorized || hdr.Get("Mcp-Session-Id") != "" {
+		t.Fatalf("tokenless initialize status=%d sid=%q body=%s", status, hdr.Get("Mcp-Session-Id"), body)
+	}
+	// Belt and braces: even if a tokenless request reached the proxy, the
+	// header-mode check in Proxy.authenticate refuses the tool call.
+	req := &Request{JSONRPC: "2.0", ID: json.RawMessage(`9`), Method: MethodToolsCall, Params: json.RawMessage(`{"name":"echo"}`)}
+	resp, err := proxy.handleRequest(context.Background(), req)
+	if err == nil && resp != nil && resp.Error == nil {
+		t.Fatalf("tokenless tools/call succeeded in header mode: %+v", resp)
 	}
 	if got := streamableForwardCount(proxy); got != 0 {
 		t.Fatalf("tokenless session reached upstream %d times", got)
+	}
+}
+
+// fixedTokenAuth verifies exactly one token value.
+type fixedTokenAuth struct{ good string }
+
+func (a fixedTokenAuth) Verify(_ context.Context, token string) (*TokenInfo, error) {
+	if token != "" && token == a.good {
+		return &TokenInfo{TokenID: "tok-good", BudgetID: "tok-good", Scope: "*"}, nil
+	}
+	return nil, fmt.Errorf("invalid token")
+}
+
+func newHeaderModeStreamable(t *testing.T, opts ...SSEOption) (*SSEServer, *Proxy) {
+	t.Helper()
+	cfg := &Config{
+		Server:      ServerConfig{Transport: "sse", Name: "streamable-test", Version: "test"},
+		Auth:        AuthConfig{Mode: "header", RootKey: "streamable-header-test-root"},
+		Budget:      BudgetConfig{Limit: 5, FailMode: "closed"},
+		Tools:       ToolsConfig{DefaultCost: 1},
+		Enforcement: EnforcementConfig{Mode: "control"},
+		Logging:     LoggingConfig{Level: "error"},
+	}
+	proxy, err := New(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	proxy.SetAuthenticator(fixedTokenAuth{good: "good-token"})
+	proxy.SetUpstreamRouter(&countingForwardRouter{})
+	return NewSSEServer(proxy, ":0", opts...), proxy
+}
+
+func streamSessionCount(s *SSEServer) int {
+	s.streamMu.Lock()
+	defer s.streamMu.Unlock()
+	return len(s.streamSessions)
+}
+
+// In header mode, initialize without a token or with a token that does not
+// verify is refused with 401 and creates no session.
+func TestStreamableHTTPHeaderModeInitializeNeedsVerifiedToken(t *testing.T) {
+	sse, _ := newHeaderModeStreamable(t)
+	srv := httptest.NewServer(sse.Handler())
+	defer srv.Close()
+
+	for _, tok := range []string{"", "bad-token"} {
+		status, hdr, body := streamablePost(t, srv.URL+"/mcp", "", tok, initializeBody("2025-03-26"))
+		if status != http.StatusUnauthorized || hdr.Get("Mcp-Session-Id") != "" {
+			t.Fatalf("token %q: initialize status=%d sid=%q body=%s", tok, status, hdr.Get("Mcp-Session-Id"), body)
+		}
+	}
+	if n := streamSessionCount(sse); n != 0 {
+		t.Fatalf("refused initialize left %d sessions", n)
+	}
+	status, hdr, body := streamablePost(t, srv.URL+"/mcp", "", "good-token", initializeBody("2025-03-26"))
+	if status != http.StatusOK || hdr.Get("Mcp-Session-Id") == "" {
+		t.Fatalf("verified initialize status=%d body=%s", status, body)
+	}
+}
+
+// The session map is capped. A full map is swept for expired sessions first;
+// if it is still full, initialize gets 503 and the map does not grow.
+func TestStreamableHTTPSessionCapAndSweep(t *testing.T) {
+	sse, _ := newHeaderModeStreamable(t, WithMaxStreamableSessions(2))
+	srv := httptest.NewServer(sse.Handler())
+	defer srv.Close()
+
+	first := mustInitSession(t, srv.URL, "good-token")
+	_ = mustInitSession(t, srv.URL, "good-token")
+	status, _, body := streamablePost(t, srv.URL+"/mcp", "", "good-token", initializeBody("2025-03-26"))
+	if status != http.StatusServiceUnavailable {
+		t.Fatalf("over cap status=%d body=%s", status, body)
+	}
+	if n := streamSessionCount(sse); n != 2 {
+		t.Fatalf("sessions=%d after refused create, want 2", n)
+	}
+
+	// An expired session is swept to make room even though nobody looks it up.
+	sse.expireStreamableSession(first)
+	status, _, body = streamablePost(t, srv.URL+"/mcp", "", "good-token", initializeBody("2025-03-26"))
+	if status != http.StatusOK {
+		t.Fatalf("after expiry status=%d body=%s", status, body)
+	}
+	if n := streamSessionCount(sse); n != 2 {
+		t.Fatalf("sessions=%d after sweep, want 2", n)
+	}
+	sse.streamMu.Lock()
+	_, stillThere := sse.streamSessions[first]
+	sse.streamMu.Unlock()
+	if stillThere {
+		t.Fatal("expired session was not swept")
 	}
 }
