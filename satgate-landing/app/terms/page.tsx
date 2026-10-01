@@ -84,8 +84,8 @@ export default function TermsPage() {
             <p className="text-gray-400 leading-relaxed">
               When using L402 (Lightning) payment features, SatGate is non-custodial. We do not hold, control,
               or have access to your Bitcoin, Lightning funds, or private keys. All Lightning payments settle
-              directly between payers and your Lightning node. You are solely responsible for the security
-              of your node and credentials.
+              directly between payers and your Lightning node or wallet. You are solely responsible for the security
+              of your node or wallet and its credentials.
             </p>
           </section>
 
