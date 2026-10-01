@@ -3,11 +3,11 @@ import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
   title: 'Terms of Service - SatGate',
-  description: 'SatGate terms of service for SaaS and self-host, including economic access control, paid-rail context, licensing, and prohibited uses.',
+  description: 'SatGate terms of service for SaaS and self-host, including economic access control, L402 payments, licensing, and prohibited uses.',
   alternates: { canonical: 'https://satgate.io/terms' },
   openGraph: {
     title: 'Terms of Service - SatGate',
-    description: 'SatGate terms for SaaS and self-host, paid-rail context, and licensing.',
+    description: 'SatGate terms for SaaS and self-host, L402 payments, and licensing.',
     url: 'https://satgate.io/terms',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -15,7 +15,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Terms of Service - SatGate',
-    description: 'SatGate terms for SaaS and self-host, paid-rail context, and licensing.',
+    description: 'SatGate terms for SaaS and self-host, L402 payments, and licensing.',
   },
 };
 
@@ -31,7 +31,7 @@ export default function TermsPage() {
     about: [
       { '@type': 'Thing', name: 'SatGate terms of service' },
       { '@type': 'Thing', name: 'economic access control' },
-      { '@type': 'Thing', name: 'paid-rail context' },
+      { '@type': 'Thing', name: 'L402 Lightning payments' },
       { '@type': 'Thing', name: 'self-hosted Economic Firewall' },
       { '@type': 'Thing', name: 'Apache 2.0 open source license' },
     ],
@@ -83,9 +83,9 @@ export default function TermsPage() {
             <h2 className="text-2xl font-bold text-white mb-4">4. Non-Custodial Nature</h2>
             <p className="text-gray-400 leading-relaxed">
               When using L402 (Lightning) payment features, SatGate is non-custodial. We do not hold, control,
-              or have access to your Bitcoin, Lightning funds, or private keys. All paid-rail context settle
-              directly between payers and your Lightning node. You are solely responsible for the security
-              of your node and credentials.
+              or have access to your Bitcoin, Lightning funds, or private keys. All Lightning payments settle
+              directly between payers and your Lightning node or wallet. You are solely responsible for the security
+              of your node or wallet and its credentials.
             </p>
           </section>
 
