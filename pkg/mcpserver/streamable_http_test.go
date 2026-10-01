@@ -423,3 +423,36 @@ func mustJSON(t *testing.T, v any) []byte {
 	}
 	return b
 }
+
+// In header auth mode (production), a Streamable HTTP session opened without
+// a token must not be able to reach an upstream: tools/call fails closed in
+// Proxy.authenticate, exactly as it does on the SSE /message path.
+func TestStreamableHTTPHeaderModeNoTokenCannotCallTools(t *testing.T) {
+	cfg := &Config{
+		Server:      ServerConfig{Transport: "sse", Name: "streamable-test", Version: "test"},
+		Auth:        AuthConfig{Mode: "header", RootKey: "streamable-header-test-root"},
+		Budget:      BudgetConfig{Limit: 5, FailMode: "closed"},
+		Tools:       ToolsConfig{DefaultCost: 1},
+		Enforcement: EnforcementConfig{Mode: "control"},
+		Logging:     LoggingConfig{Level: "error"},
+	}
+	proxy, err := New(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	proxy.SetUpstreamRouter(&countingForwardRouter{})
+	srv := httptest.NewServer(NewSSEServer(proxy, ":0").Handler())
+	defer srv.Close()
+
+	status, hdr, body := streamablePost(t, srv.URL+"/mcp", "", "", initializeBody("2025-03-26"))
+	sid := hdr.Get("Mcp-Session-Id")
+	if status == http.StatusOK && sid != "" {
+		status, _, body = streamablePost(t, srv.URL+"/mcp", sid, "", toolCallBody(2, "echo"))
+		if status == http.StatusOK && !strings.Contains(body, `"error"`) {
+			t.Fatalf("tokenless tools/call succeeded in header mode: status=%d body=%s", status, body)
+		}
+	}
+	if got := streamableForwardCount(proxy); got != 0 {
+		t.Fatalf("tokenless session reached upstream %d times", got)
+	}
+}
