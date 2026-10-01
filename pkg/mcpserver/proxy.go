@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"math"
 	"os"
 	"strings"
 	"time"
@@ -56,6 +57,7 @@ type Proxy struct {
 	events            EventPublisher
 	evidence          EvidenceRecorder
 	revocation        RevocationChecker // optional, checks if token is revoked
+	limiter           RequestLimiter    // optional, per-token request rate limit
 	toolsListEnricher ToolsListEnricher // optional, enriches tools/list with cost metadata
 	taskTracker       *TaskTracker      // MCP task-level cost aggregation (SEP-1686)
 	tokenID           string            // default session token (from config or first auth)
@@ -241,6 +243,35 @@ func (p *Proxy) SetRevocationChecker(rc RevocationChecker) {
 	p.revocation = rc
 }
 
+// RequestLimiter bounds how often one verified token may make authenticated
+// requests (tools/call, satgate/delegate, satgate/budget). The proxy asks it
+// after authentication and revocation and before cost resolution, budget
+// spend, event publication or any upstream call, so a refused request costs
+// nothing and records nothing. toolName is set for tools/call only.
+// retryAfter is the suggested wait before the next request may succeed.
+type RequestLimiter interface {
+	Allow(ctx context.Context, info *TokenInfo, method, toolName string) (allowed bool, retryAfter time.Duration)
+}
+
+// SetRequestLimiter installs a per-token request limiter. Nil (the default)
+// leaves requests unlimited.
+func (p *Proxy) SetRequestLimiter(l RequestLimiter) {
+	p.limiter = l
+}
+
+// rateLimitedResponse is the JSON-RPC refusal for a request the limiter
+// refused. retry_after_seconds is at least 1.
+func rateLimitedResponse(id json.RawMessage, retryAfter time.Duration) *Response {
+	secs := int64(math.Ceil(retryAfter.Seconds()))
+	if secs < 1 {
+		secs = 1
+	}
+	return NewErrorResponseWithData(id, CodeRateLimited, "rate limit exceeded", map[string]interface{}{
+		"error":               "rate_limited",
+		"retry_after_seconds": secs,
+	})
+}
+
 // ToolsListEnricher transforms the tools list before returning to clients.
 // Used by enterprise layer to inject cost metadata, budget info, etc.
 type ToolsListEnricher func(ctx context.Context, tenantID string, tools []json.RawMessage) []json.RawMessage
@@ -397,6 +428,19 @@ func (p *Proxy) handleRequest(ctx context.Context, req *Request) (*Response, err
 		if p.revocation != nil && tokenInfo.BudgetID != "" {
 			if p.revocation.IsRevoked(ctx, tokenInfo.BudgetID) {
 				return NewErrorResponse(req.ID, CodePolicyDenied, "token revoked"), nil
+			}
+		}
+		// Per-token rate limit, before any cost, spend, event or upstream call.
+		if p.limiter != nil {
+			toolName := ""
+			if req.Method == MethodToolsCall {
+				if tc, err := ParseToolCall(req.Params); err == nil {
+					toolName = tc.Name
+				}
+			}
+			if ok, retryAfter := p.limiter.Allow(ctx, tokenInfo, req.Method, toolName); !ok {
+				log.Debug().Str("method", req.Method).Str("tool", toolName).Str("tokenId", tokenInfo.TokenID).Msg("request rate limited")
+				return rateLimitedResponse(req.ID, retryAfter), nil
 			}
 		}
 		switch req.Method {
