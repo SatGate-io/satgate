@@ -3,8 +3,11 @@ package proxy
 import (
 	"context"
 	"crypto/ed25519"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -713,6 +716,149 @@ func (quotedRail) CheckPayment(string) (bool, error) { return false, nil }
 func (quotedRail) GetBalance() (int64, error)        { return 0, nil }
 func (quotedRail) GetInfo() (*lightning.NodeInfo, error) {
 	return &lightning.NodeInfo{Alias: "quoted"}, nil
+}
+
+type confirmRail struct {
+	hash   string
+	paid   bool
+	err    error
+	checks int
+}
+
+func (c *confirmRail) CreateInvoice(amount int64, memo string) (*lightning.Invoice, error) {
+	return &lightning.Invoice{Bolt11: "lnbc42", PaymentHash: c.hash, Amount: amount, Memo: memo}, nil
+}
+func (c *confirmRail) CheckPayment(hash string) (bool, error) {
+	c.checks++
+	if hash != c.hash {
+		return false, nil
+	}
+	return c.paid, c.err
+}
+func (c *confirmRail) GetBalance() (int64, error) { return 0, nil }
+func (c *confirmRail) GetInfo() (*lightning.NodeInfo, error) {
+	return &lightning.NodeInfo{Alias: "confirm"}, nil
+}
+
+func TestAgentLoopPaidRetrySettlesOnlyWhenTheNodeConfirms(t *testing.T) {
+	preimage := strings.Repeat("11", 32)
+	raw, err := hex.DecodeString(preimage)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sum := sha256.Sum256(raw)
+	hash := hex.EncodeToString(sum[:])
+	cases := []struct {
+		name string
+		paid bool
+		err  error
+		want bool
+	}{
+		{name: "unpaid", paid: false, want: false},
+		{name: "paid", paid: true, want: true},
+		{name: "check_error", paid: true, err: errors.New("node_down"), want: false},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			var hits int
+			upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				hits++
+				_, _ = w.Write([]byte(`{"ok":true}`))
+			}))
+			defer upstream.Close()
+			rail := &confirmRail{hash: hash, paid: tc.paid, err: tc.err}
+			gw, err := New(Options{
+				Config: &config.Config{
+					Admin: config.AdminConfig{Token: "admin-secret"},
+					Cloud: &config.CloudConfig{SSRF: &config.CloudSSRFConfig{AllowPrivateIPs: true}},
+				},
+				Macaroon:   newTestMacaroonService(t),
+				Governance: governance.NewService(nil),
+				Lightning:  rail,
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			staged := agentPost(t, gw, "/api/agent/policy", map[string]any{
+				"name": "paid", "kind": "charge", "path_prefix": "/paid", "upstream_url": upstream.URL, "price_sats": 42,
+			})
+			var policy agentPolicy
+			decode(t, staged, &policy)
+			if agentPost(t, gw, "/api/agent/simulate", map[string]string{"policy_id": policy.ID}).Code != http.StatusOK {
+				t.Fatal("simulate failed")
+			}
+			if agentPost(t, gw, "/api/agent/promote", map[string]string{"policy_id": policy.ID}).Code != http.StatusOK {
+				t.Fatal("promote failed")
+			}
+			challenge := agentGet(t, gw, "/paid")
+			var body map[string]any
+			decode(t, challenge, &body)
+			if challenge.Code != http.StatusPaymentRequired || body["amount_sats"] != float64(42) || body["payment_hash"] != hash || rail.checks != 0 || hits != 0 {
+				t.Fatalf("challenge: %d %+v checks %d hits %d", challenge.Code, body, rail.checks, hits)
+			}
+			unpaid := fetchPack(t, gw, challenge.Header().Get("SatGate-Evidence-Pack"))
+			if unpaid["settlement"] != false || unpaid["price_sats"] != float64(42) || unpaid["provider_price_status"] != "QUOTED" || unpaid["upstream_contacted"] != false {
+				t.Fatalf("unpaid pack lost the quote or settled early: %+v", unpaid)
+			}
+			mac := macaroonFromChallenge(t, challenge.Header().Get("WWW-Authenticate"))
+			retry := httptest.NewRequest(http.MethodGet, "/paid", nil)
+			retry.Header.Set("Authorization", "L402 "+mac+":"+preimage)
+			paid := httptest.NewRecorder()
+			gw.ServeHTTP(paid, retry)
+			if paid.Code != http.StatusOK || hits != 1 || rail.checks != 1 {
+				t.Fatalf("retry: %d %s hits %d checks %d", paid.Code, paid.Body.String(), hits, rail.checks)
+			}
+			pack := fetchPack(t, gw, paid.Header().Get("SatGate-Evidence-Pack"))
+			if pack["settlement"] != tc.want || pack["price_sats"] != float64(42) || pack["provider_price_status"] != "QUOTED" || pack["decision"] != "allowed" || pack["upstream_contacted"] != true {
+				t.Fatalf("paid retry pack: %+v want settlement %v", pack, tc.want)
+			}
+			receipts, _ := pack["receipts"].([]any)
+			if len(receipts) != 1 || receipts[0].(map[string]any)["settlement"] != tc.want || receipts[0].(map[string]any)["price_sats"] != float64(42) {
+				t.Fatalf("signed receipt did not keep the quote: %+v", pack["receipts"])
+			}
+			if !verifierAccepts(t, pack) {
+				t.Fatal("verifier rejected the paid retry pack")
+			}
+		})
+	}
+}
+
+func TestAgentLoopMockRailCannotSettleAPaidRetry(t *testing.T) {
+	gw := newTestGateway(t, &config.Config{Admin: config.AdminConfig{Token: "admin-secret"}})
+	req := httptest.NewRequest(http.MethodGet, "/paid", nil)
+	req.Header.Set("Authorization", "L402 macaroon:preimage")
+	if gw.paidInvoice(req, &agentPolicy{Kind: "charge", PriceSats: 1}) {
+		t.Fatal("mock rail recorded settlement")
+	}
+}
+
+func fetchPack(t *testing.T, gw *Gateway, id string) map[string]any {
+	t.Helper()
+	if id == "" {
+		t.Fatal("missing pack id")
+	}
+	req := httptest.NewRequest(http.MethodGet, "/api/agent/pack/"+id, nil)
+	req.Header.Set("X-Admin-Token", "admin-secret")
+	rec := httptest.NewRecorder()
+	gw.ServeHTTP(rec, req)
+	var pack map[string]any
+	decode(t, rec, &pack)
+	return pack
+}
+
+func macaroonFromChallenge(t *testing.T, header string) string {
+	t.Helper()
+	const key = `macaroon="`
+	i := strings.Index(header, key)
+	if i < 0 {
+		t.Fatalf("no macaroon in %q", header)
+	}
+	rest := header[i+len(key):]
+	j := strings.Index(rest, `"`)
+	if j < 0 {
+		t.Fatal("unclosed macaroon")
+	}
+	return rest[:j]
 }
 
 func signTestJWT(t *testing.T, priv ed25519.PrivateKey, kid, issuer string) string {
