@@ -36,6 +36,10 @@ const (
 	protocolVersion20250326 = "2025-03-26"
 	protocolVersion20250618 = "2025-06-18"
 
+	// latestStreamableProtocolVersion is offered to clients that ask for a
+	// version this server does not support.
+	latestStreamableProtocolVersion = protocolVersion20250618
+
 	defaultStreamableSessionTTL = 30 * time.Minute
 
 	// defaultMaxStreamableSessions bounds the in-memory session map. A full
@@ -556,34 +560,32 @@ func protocolVersionFromInit(req *Request) string {
 	return params.ProtocolVersion
 }
 
+// negotiateProtocolVersion picks the version to answer an initialize with.
+// MCP lifecycle rule: if the server supports the version the client asked
+// for, it answers with that version; otherwise it answers with another
+// version it supports, preferably its latest, and the client decides whether
+// to continue. Initialize is never refused for its version, because newer
+// clients (MCP SDKs ask for 2025-11-25) must be able to negotiate down.
+// The MCP-Protocol-Version header on later requests is still checked
+// strictly (protocolVersionAllowed): an unsupported value there is 400.
 func negotiateProtocolVersion(bodyVersion, headerVersion string) (string, bool) {
 	bodyVersion = strings.TrimSpace(bodyVersion)
-	headerVersion = strings.TrimSpace(headerVersion)
-	if headerVersion != "" {
-		if _, ok := supportedProtocolVersion(headerVersion); !ok {
-			return "", false
-		}
+	if v, ok := supportedProtocolVersion(bodyVersion); ok {
+		return v, true
 	}
 	switch bodyVersion {
 	case "":
-		if headerVersion != "" {
-			return headerVersion, true
+		if v, ok := supportedProtocolVersion(headerVersion); ok {
+			return v, true
 		}
 		return protocolVersion20250326, true
-	case protocolVersion20250326, protocolVersion20250618:
-		if headerVersion != "" && headerVersion != bodyVersion {
-			return "", false
-		}
-		return bodyVersion, true
 	case "2024-11-05":
 		// Legacy SSE clients may POST initialize here before falling back.
 		// Answer with the oldest Streamable HTTP version; do not claim 2024-11-05.
-		if headerVersion != "" && headerVersion != protocolVersion20250326 {
-			return "", false
-		}
 		return protocolVersion20250326, true
 	default:
-		return "", false
+		// Newer or unknown version: offer our latest.
+		return latestStreamableProtocolVersion, true
 	}
 }
 

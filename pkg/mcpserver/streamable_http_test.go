@@ -231,13 +231,42 @@ func TestStreamableHTTPRejectsForeignOrigin(t *testing.T) {
 	}
 }
 
+// Initialize with a version the server does not support is answered with a
+// supported version (MCP lifecycle negotiation), not refused. Current MCP
+// SDKs ask for 2025-11-25; refusing it broke real clients on staging.
+func TestStreamableHTTPNegotiatesUnsupportedInitVersion(t *testing.T) {
+	srv, _ := newStreamableTestServer(t, 5)
+	defer srv.Close()
+	cases := map[string]string{
+		"2025-11-25": "2025-06-18",
+		"2099-01-01": "2025-06-18",
+		"2025-06-18": "2025-06-18",
+		"2025-03-26": "2025-03-26",
+		"2024-11-05": "2025-03-26",
+	}
+	for asked, want := range cases {
+		status, hdr, body := streamablePost(t, srv.URL+"/mcp", "", "", initializeBody(asked))
+		if status != http.StatusOK || hdr.Get("Mcp-Session-Id") == "" {
+			t.Fatalf("init %s: status=%d body=%s", asked, status, body)
+		}
+		var resp struct {
+			Result struct {
+				ProtocolVersion string `json:"protocolVersion"`
+			} `json:"result"`
+		}
+		if err := json.Unmarshal([]byte(body), &resp); err != nil {
+			t.Fatalf("init %s: decode: %v body=%s", asked, err, body)
+		}
+		if resp.Result.ProtocolVersion != want {
+			t.Fatalf("init %s: negotiated %q, want %q", asked, resp.Result.ProtocolVersion, want)
+		}
+	}
+}
+
+// After initialize, an unsupported MCP-Protocol-Version header is 400.
 func TestStreamableHTTPRejectsUnsupportedProtocolVersion(t *testing.T) {
 	srv, _ := newStreamableTestServer(t, 5)
 	defer srv.Close()
-	status, _, _ := streamablePost(t, srv.URL+"/mcp", "", "", initializeBody("1999-01-01"))
-	if status != http.StatusBadRequest {
-		t.Fatalf("bad init version status=%d", status)
-	}
 	sid := mustInitSession(t, srv.URL, "")
 	req, err := http.NewRequest(http.MethodPost, srv.URL+"/mcp", bytes.NewReader(mustJSON(t, toolCallBody(2, "echo"))))
 	if err != nil {
