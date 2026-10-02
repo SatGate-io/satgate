@@ -46,6 +46,9 @@ const (
 	CodePolicyDenied    = -32001
 	CodeUpstreamError   = -32002
 	CodeUpstreamTimeout = -32003
+	// CodeRateLimited: the token made too many requests. data.error is
+	// "rate_limited" and data.retry_after_seconds says when to retry.
+	CodeRateLimited = -32004
 )
 
 // ToolCallParams extracts tool name and arguments from a tools/call request.
