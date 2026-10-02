@@ -42,9 +42,9 @@ The trust metadata lists which payment adapters are supported and which are plan
 Pick a task with a set budget. Before starting, give each sub-agent narrower permissions and its own share of the budget. Check that a request outside its permissions and a request past its budget are both refused, and judge that apart from answer quality. If a call times out and you don't know whether it went through, check whether the deployment can look up that same operation before you retry, and check that a retry is not charged twice. An unknown result is unknown, not a failed call. Judge separately: did the task get done, was abuse stopped, would agents choose it on their own, and will people pay for it.
 
 ## Developer details
-Fiat402 is internal budget control, not a payment or settlement rail. No Lightning payment is involved: SatGate subtracts from the agent's budget and no money moves. L402 is the payment protocol for paid routes that charge external agents. It is one way to pay, not a fourth control.
+Fiat402 is internal budget control, not a payment or settlement rail. No Lightning payment is involved: SatGate subtracts from the agent's budget and no money moves. Paid routes that charge external agents take L402 (Lightning), x402 (USDC on Base), or both. These are ways to pay, not a fourth control.
 
-### L402 flow on a configured paid route
+### Lightning (L402) flow on a paid route that takes Lightning
 1. Agent requests the paid route with `X-SatGate-Tenant: <tenant-slug>` on api.satgate.io.
 2. SatGate returns `402 Payment Required` with the L402 challenge, plus JSON `tenant`, `tenant_selector_header`, `status_url`, `terms` (including `terms.status`), and `Link: <status_url>; rel="payment-status"`. `X-SatGate-Spend-Mode: paid_rail` means this is a Lightning quote, not an empty budget.
 3. The owner pays the invoice from any wallet. If the wallet shows the preimage, the agent retries with `Authorization: L402 <macaroon>:<preimage>`.
