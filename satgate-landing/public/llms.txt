@@ -13,7 +13,7 @@ Charging for access makes abuse more expensive. It works alongside rate limits a
 See which agent, route and tool is behind each request, and what it costs, without blocking anything.
 
 ### Control
-Enforce your agents' budgets and permissions before each request runs. Observe shows usage; Control enforces the limits.
+Enforce your agents' budgets and permissions before each request runs. Limit which APIs and tools each agent can use. Observe shows usage; Control enforces the limits.
 
 ### Admit
 Let external agents in with limited access, and make them pay first on the routes you choose. Payment never overrides permissions.
