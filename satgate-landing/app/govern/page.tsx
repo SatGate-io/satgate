@@ -94,7 +94,7 @@ const faqSchema = {
       name: "Is SatGate tied to x402, L402, AgentCore Payments, or Pay.sh?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Lightning (L402) and USDC on Base (x402) are live, and each route opts in. AgentCore Payments and Pay.sh are planned. Payment never overrides permissions.",
+        text: "Lightning (L402) and USDC on Base (x402) are live. On each paid route, the owner picks Lightning, USDC, or both. AgentCore Payments and Pay.sh are planned. Payment never overrides permissions.",
       },
     },
   ],

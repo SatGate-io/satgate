@@ -347,7 +347,7 @@ const PricingPage = () => {
                 <tr>
                   <td className="py-3 px-4 text-gray-300">Payments</td>
                   <td className="py-3 px-4">None built in</td>
-                  <td className="py-3 px-4 text-white">Charge external agents on the routes you choose. Lightning, or USDC on Base (x402). You set how many requests one Lightning payment buys. One USDC payment buys one request. A signed receipt either way.</td>
+                  <td className="py-3 px-4 text-white">Charge external agents on the routes you choose. Each route takes Lightning, USDC on Base (x402), or both. You set how many requests one Lightning payment buys. One USDC payment buys one request. A signed receipt either way.</td>
                 </tr>
               </tbody>
             </table>
@@ -372,7 +372,7 @@ const PricingPage = () => {
             <div className="text-center">
               <div className="text-3xl mb-3">💰</div>
               <h3 className="font-bold text-white mb-2">Earn money</h3>
-              <p className="text-gray-400 text-sm">Charge external agents on the routes you choose. One USDC payment on Base buys one request. On Lightning routes you choose how many requests one payment buys. A signed receipt either way.</p>
+              <p className="text-gray-400 text-sm">Charge external agents on the routes you choose. Each route takes Lightning, USDC on Base, or both. One USDC payment on Base buys one request. On Lightning routes you choose how many requests one payment buys. A signed receipt either way.</p>
             </div>
           </div>
         </div>
