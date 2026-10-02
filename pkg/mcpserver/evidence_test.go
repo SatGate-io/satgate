@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"strings"
 	"testing"
 	"time"
 )
@@ -187,5 +188,96 @@ func TestMCPToolsCallEvidenceFailureCompensatesDebitAndSkipsUpstream(t *testing.
 	}
 	if router.called {
 		t.Fatal("upstream should not be called when evidence generation fails")
+	}
+}
+
+func TestMCPToolsCallScopeDenialRecordsSignedDecisionAndLeavesInScopeCallAlone(t *testing.T) {
+	ctx := context.Background()
+	proxy := newEvidenceTestProxy(t)
+	recorder := &fakeEvidenceRecorder{}
+	proxy.SetEvidenceRecorder(recorder)
+	router := &fakeMCPRouter{}
+	proxy.router = router
+	if err := proxy.budget.Initialize(ctx, "budget-1", 20); err != nil {
+		t.Fatal(err)
+	}
+	token := &TokenInfo{TokenID: "token-1", BudgetID: "budget-1", BudgetLimit: 20, TenantID: "tenant-1", Scope: "search"}
+
+	allowedReq := &Request{JSONRPC: "2.0", ID: json.RawMessage(`1`), Method: MethodToolsCall, Params: json.RawMessage(`{"name":"search"}`)}
+	allowed, err := proxy.handleToolsCall(ctx, allowedReq, token)
+	if err != nil {
+		t.Fatalf("in-scope handleToolsCall: %v", err)
+	}
+	if allowed.Error != nil {
+		t.Fatalf("in-scope call denied: %+v", allowed.Error)
+	}
+	if !router.called {
+		t.Fatal("in-scope call did not reach upstream")
+	}
+	if len(recorder.decisions) != 1 || recorder.decisions[0].Decision != "allowed" {
+		t.Fatalf("in-scope decision: %+v", recorder.decisions)
+	}
+
+	router.called = false
+	deniedReq := &Request{JSONRPC: "2.0", ID: json.RawMessage(`2`), Method: MethodToolsCall, Params: json.RawMessage(`{"name":"generate"}`)}
+	denied, err := proxy.handleToolsCall(ctx, deniedReq, token)
+	if err != nil {
+		t.Fatalf("out-of-scope handleToolsCall: %v", err)
+	}
+	if denied.Error == nil || denied.Error.Code != CodePolicyDenied {
+		t.Fatalf("expected policy denied, got %+v", denied)
+	}
+	if !strings.Contains(denied.Error.Message, `tool "generate" not in scope "search"`) {
+		t.Fatalf("scope message changed: %q", denied.Error.Message)
+	}
+	if router.called {
+		t.Fatal("out-of-scope call reached upstream")
+	}
+	if len(recorder.decisions) != 2 {
+		t.Fatalf("expected allowed plus scope denial, got %+v", recorder.decisions)
+	}
+	decision := recorder.decisions[1]
+	if decision.Decision != "denied" || decision.DecisionReason != "policy_denied" || decision.ToolName != "generate" || decision.CostCredits != 0 {
+		t.Fatalf("scope denial decision: %+v", decision)
+	}
+	if decision.TokenID != "token-1" || decision.BudgetID != "budget-1" || decision.TenantID != "tenant-1" {
+		t.Fatalf("scope denial missing verified capability fields: %+v", decision)
+	}
+	if decision.RemainingCredits != 10 {
+		t.Fatalf("scope denial spent or invented remaining: %+v", decision)
+	}
+	var data map[string]interface{}
+	if err := json.Unmarshal(denied.Error.Data, &data); err != nil {
+		t.Fatal(err)
+	}
+	if data["error"] != "policy_denied" || data["receipt_id"] == "" || data["evidence_url"] == "" || data["receipt_hash"] == "" {
+		t.Fatalf("scope denial data missing signed proof: %#v", data)
+	}
+}
+
+func TestMCPToolsCallScopeDenialFailsClosedWhenProofUnavailable(t *testing.T) {
+	ctx := context.Background()
+	proxy := newEvidenceTestProxy(t)
+	router := &fakeMCPRouter{}
+	proxy.router = router
+	proxy.SetEvidenceRecorder(&fakeEvidenceRecorder{recordErr: errors.New("archive down")})
+
+	req := &Request{JSONRPC: "2.0", ID: json.RawMessage(`3`), Method: MethodToolsCall, Params: json.RawMessage(`{"name":"generate"}`)}
+	resp, err := proxy.handleToolsCall(ctx, req, &TokenInfo{TokenID: "token-1", BudgetID: "budget-1", Scope: "search"})
+	if err != nil {
+		t.Fatalf("handleToolsCall: %v", err)
+	}
+	if resp.Error == nil || resp.Error.Code != CodeInternalError {
+		t.Fatalf("expected proof_unavailable refusal, got %+v", resp)
+	}
+	var data map[string]interface{}
+	if err := json.Unmarshal(resp.Error.Data, &data); err != nil {
+		t.Fatal(err)
+	}
+	if data["error"] != "proof_unavailable" {
+		t.Fatalf("expected proof_unavailable, got %#v", data)
+	}
+	if router.called {
+		t.Fatal("upstream called after scope denial proof failure")
 	}
 }

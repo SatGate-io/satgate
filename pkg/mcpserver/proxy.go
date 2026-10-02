@@ -580,8 +580,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	// Note: scope may be tenant-prefixed (e.g., "tenant-uuid:*") — matchScope handles stripping
 	if tokenInfo.Scope != "" && tokenInfo.Scope != "*" && tokenInfo.Scope != "api:*" && tokenInfo.Scope != "mcp:*" {
 		if !matchScope(tokenInfo.Scope, tc.Name) {
-			return NewErrorResponse(req.ID, CodePolicyDenied,
-				fmt.Sprintf("tool %q not in scope %q", tc.Name, tokenInfo.Scope)), nil
+			return p.scopeDeniedResponse(ctx, req, tokenInfo, tc.Name), nil
 		}
 	}
 
@@ -894,6 +893,57 @@ func (p *Proxy) recordMCPDecision(ctx context.Context, req *Request, tokenInfo *
 		decision.RemainingBeforeCredits = decision.RemainingCredits
 	}
 	return p.evidence.RecordMCPDecision(ctx, decision)
+}
+
+// scopeDeniedResponse refuses a verified token whose scope does not cover the
+// tool. The refusal is the same policy-denied error as before, plus a signed
+// denied decision when an evidence recorder is configured. Recording failure
+// stays a refusal (proof_unavailable). It never forwards the tool call.
+// decision_reason is policy_denied: the capability was verified, so the
+// receipt can honestly use the evaluated profile (verified macaroon caveats,
+// redacted raw fields, cost 0 because budget was not spent).
+func (p *Proxy) scopeDeniedResponse(ctx context.Context, req *Request, tokenInfo *TokenInfo, toolName string) *Response {
+	message := fmt.Sprintf("tool %q not in scope %q", toolName, tokenInfo.Scope)
+	if p.evidence != nil {
+		if err := p.evidence.Preflight(ctx); err != nil {
+			log.Error().Err(err).Str("tool", toolName).Msg("MCP scope denial evidence preflight failed")
+			return NewErrorResponseWithData(req.ID, CodeInternalError, "Evidence proof unavailable", map[string]interface{}{
+				"error": "proof_unavailable",
+				"tool":  toolName,
+			})
+		}
+	}
+	remaining := int64(0)
+	if tokenInfo.BudgetID != "" && p.budget != nil {
+		if got, err := p.budget.Remaining(ctx, tokenInfo.BudgetID); err == nil && got >= 0 {
+			remaining = got
+		}
+	}
+	evidence, evidenceErr := p.recordMCPDecision(ctx, req, tokenInfo, toolName, MCPDecision{
+		Decision:         "denied",
+		DecisionReason:   "policy_denied",
+		CostCredits:      0,
+		RemainingCredits: remaining,
+	})
+	if evidenceErr != nil {
+		log.Error().Err(evidenceErr).Str("tool", toolName).Msg("MCP scope denial evidence recording failed")
+		return NewErrorResponseWithData(req.ID, CodeInternalError, "Evidence proof unavailable", map[string]interface{}{
+			"error": "proof_unavailable",
+			"tool":  toolName,
+		})
+	}
+	data := map[string]interface{}{
+		"error":        "policy_denied",
+		"tool":         toolName,
+		"cost_credits": int64(0),
+		"token_id":     tokenInfo.TokenID,
+	}
+	if tokenInfo.BudgetID != "" {
+		data["budget_id"] = tokenInfo.BudgetID
+		data["remaining_credits"] = remaining
+	}
+	mergeEvidenceData(data, evidence)
+	return NewErrorResponseWithData(req.ID, CodePolicyDenied, message, data)
 }
 
 func budgetSpendEventData(tool string, cost, remaining, budgetLimit int64, requestIdentity, callerRequestID, mode string) map[string]interface{} {
