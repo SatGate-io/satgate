@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"github.com/satgate-io/satgate/pkg/denial"
 )
 
 // ContextKey type for context values.
@@ -919,12 +920,18 @@ func (p *Proxy) scopeDeniedResponse(ctx context.Context, req *Request, tokenInfo
 			remaining = got
 		}
 	}
-	evidence, evidenceErr := p.recordMCPDecision(ctx, req, tokenInfo, toolName, MCPDecision{
-		Decision:         "denied",
-		DecisionReason:   "policy_denied",
-		CostCredits:      0,
-		RemainingCredits: remaining,
-	})
+	// Same helper the HTTP proxy uses. Signing and storage happen in the
+	// recorder, off any process-wide lock. Do not call this while holding one.
+	recorded, evidenceErr := denial.RecordSignedDenial(ctx, mcpScopeDenialRecorder{
+		proxy:     p,
+		req:       req,
+		tokenInfo: tokenInfo,
+		remaining: remaining,
+	}, "policy_denied", tokenInfo.TokenID, toolName, time.Now().UTC())
+	var evidence *MCPEvidence
+	if recorded != nil {
+		evidence, _ = recorded.(*MCPEvidence)
+	}
 	if evidenceErr != nil {
 		log.Error().Err(evidenceErr).Str("tool", toolName).Msg("MCP scope denial evidence recording failed")
 		return NewErrorResponseWithData(req.ID, CodeInternalError, "Evidence proof unavailable", map[string]interface{}{
@@ -944,6 +951,39 @@ func (p *Proxy) scopeDeniedResponse(ctx context.Context, req *Request, tokenInfo
 	}
 	mergeEvidenceData(data, evidence)
 	return NewErrorResponseWithData(req.ID, CodePolicyDenied, message, data)
+}
+
+// mcpScopeDenialRecorder adapts the MCP evidence recorder to the shared helper.
+// It does not take a lock. The enterprise recorder must honor denial.SkipsGlobalLock.
+type mcpScopeDenialRecorder struct {
+	proxy     *Proxy
+	req       *Request
+	tokenInfo *TokenInfo
+	remaining int64
+}
+
+func (m mcpScopeDenialRecorder) RecordSignedDenial(ctx context.Context, in denial.SignedDenial) (any, error) {
+	toolName := in.Target
+	if toolName == "" && m.req != nil {
+		if tc, err := ParseToolCall(m.req.Params); err == nil {
+			toolName = tc.Name
+		}
+	}
+	identity := in.Identity
+	if m.tokenInfo != nil && identity == "" {
+		identity = m.tokenInfo.TokenID
+	}
+	evidence, err := m.proxy.recordMCPDecision(ctx, m.req, m.tokenInfo, toolName, MCPDecision{
+		Decision:         "denied",
+		DecisionReason:   in.ReasonCode,
+		CostCredits:      0,
+		RemainingCredits: m.remaining,
+		TokenID:          identity,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return evidence, nil
 }
 
 func budgetSpendEventData(tool string, cost, remaining, budgetLimit int64, requestIdentity, callerRequestID, mode string) map[string]interface{} {
