@@ -920,8 +920,9 @@ func (p *Proxy) scopeDeniedResponse(ctx context.Context, req *Request, tokenInfo
 			remaining = got
 		}
 	}
-	// Same helper the HTTP proxy uses. Signing and storage happen in the
-	// recorder, off any process-wide lock. Do not call this while holding one.
+	// Same helper the HTTP proxy uses. Signing takes no lock; the recorder's
+	// archive append is serialized by the archive itself. Do not call this
+	// while holding a lock of your own.
 	recorded, evidenceErr := denial.RecordSignedDenial(ctx, mcpScopeDenialRecorder{
 		proxy:     p,
 		req:       req,
@@ -954,7 +955,7 @@ func (p *Proxy) scopeDeniedResponse(ctx context.Context, req *Request, tokenInfo
 }
 
 // mcpScopeDenialRecorder adapts the MCP evidence recorder to the shared helper.
-// It does not take a lock. The enterprise recorder must honor denial.SkipsGlobalLock.
+// It takes no lock of its own.
 type mcpScopeDenialRecorder struct {
 	proxy     *Proxy
 	req       *Request

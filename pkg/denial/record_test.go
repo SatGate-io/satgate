@@ -17,7 +17,7 @@ func (c *captureRecorder) RecordSignedDenial(ctx context.Context, in SignedDenia
 	return "proof", nil
 }
 
-func TestRecordSignedDenialPassesFieldsAndSkipsGlobalLock(t *testing.T) {
+func TestRecordSignedDenialPassesFieldsAndDecisionTime(t *testing.T) {
 	at := time.Date(2026, 10, 2, 12, 0, 0, 0, time.UTC)
 	rec := &captureRecorder{}
 	proof, err := RecordSignedDenial(context.Background(), rec, "policy_denied", "token-1", "mcp:tools/call:search", at)
@@ -29,9 +29,6 @@ func TestRecordSignedDenialPassesFieldsAndSkipsGlobalLock(t *testing.T) {
 	}
 	if rec.in.ReasonCode != "policy_denied" || rec.in.Identity != "token-1" || rec.in.Target != "mcp:tools/call:search" || !rec.in.At.Equal(at) {
 		t.Fatalf("recorded %+v", rec.in)
-	}
-	if !SkipsGlobalLock(rec.ctx) {
-		t.Fatal("recorder context still takes the global archive lock")
 	}
 	stamped, ok := IssuedAt(rec.ctx)
 	if !ok || !stamped.Equal(at) {

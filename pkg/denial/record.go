@@ -1,7 +1,13 @@
 // Package denial is the single signed-denial entry the HTTP proxy and MCP both call.
-// A later change can call RecordSignedDenial from a rate limiter. This package
-// takes no lock. The recorder must sign and store without a process-wide mutex,
-// so a caller that still holds a limiter lock cannot deadlock on evidence.
+// A later change can call RecordSignedDenial from a rate limiter.
+//
+// Locking: this package takes no lock, and receipt signing takes no lock.
+// Durable storage is the recorder's job. The enterprise filesystem archive
+// appends every pack to one hash chain (previous_evidence_pack_hash plus
+// .archive_head), so that append is serialized by the archive's own mutex.
+// A pack written outside that chain is rejected by the archive collector, so
+// this package does not offer a way to skip it. Callers must not hold their own
+// locks (for example a limiter lock) while calling RecordSignedDenial.
 package denial
 
 import (
@@ -19,8 +25,8 @@ type SignedDenial struct {
 	At         time.Time
 }
 
-// ProofRecorder signs and stores one denial. Implementations must not acquire a
-// process-wide lock around signing or evidence storage.
+// ProofRecorder signs and stores one denial and returns the caller's proof
+// handle (a receipt map for HTTP, *MCPEvidence for MCP).
 type ProofRecorder interface {
 	RecordSignedDenial(ctx context.Context, in SignedDenial) (any, error)
 }
@@ -30,18 +36,7 @@ type ProofRecorder interface {
 // should not call RecordSignedDenial.
 var ErrNoRecorder = errors.New("signed denial recorder is not configured")
 
-type lockFreeKey struct{}
 type issuedAtKey struct{}
-
-// SkipsGlobalLock reports whether this context was created by RecordSignedDenial.
-// Archive code uses it to write the pack without the process-wide archive mutex.
-func SkipsGlobalLock(ctx context.Context) bool {
-	if ctx == nil {
-		return false
-	}
-	v, _ := ctx.Value(lockFreeKey{}).(bool)
-	return v
-}
 
 // IssuedAt is the decision time RecordSignedDenial stored on the context.
 // Receipt builders stamp this instead of a second clock read.
@@ -58,8 +53,8 @@ func IssuedAt(ctx context.Context) (time.Time, bool) {
 
 // RecordSignedDenial is the one function the HTTP proxy and MCP use to record a
 // signed denial. reasonCode, identity, target, and at are the reusable inputs.
-// It does not sign, store, or lock. The recorder does that, on a context that
-// asks storage to skip any process-wide archive lock.
+// It does not sign, store, or lock. The recorder signs and stores, on a context
+// that carries at so the receipt's issued_at equals the decision time.
 func RecordSignedDenial(ctx context.Context, rec ProofRecorder, reasonCode, identity, target string, at time.Time) (any, error) {
 	if ctx == nil {
 		ctx = context.Background()
@@ -70,7 +65,6 @@ func RecordSignedDenial(ctx context.Context, rec ProofRecorder, reasonCode, iden
 	if rec == nil {
 		return nil, ErrNoRecorder
 	}
-	ctx = context.WithValue(ctx, lockFreeKey{}, true)
 	ctx = context.WithValue(ctx, issuedAtKey{}, at.UTC())
 	return rec.RecordSignedDenial(ctx, SignedDenial{
 		ReasonCode: reasonCode,
