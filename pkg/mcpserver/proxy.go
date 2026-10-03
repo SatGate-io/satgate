@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"os"
@@ -887,6 +888,14 @@ func (p *Proxy) recordMCPDecision(ctx context.Context, req *Request, tokenInfo *
 	if decision.PolicyMode == "" {
 		decision.PolicyMode = normalizeEnforcementMode(p.config.Enforcement.Mode)
 	}
+	if decision.BudgetNotEvaluated {
+		// No balance was read: carry identity only, never a limit or balance.
+		decision.BudgetLimitCredits = 0
+		decision.CostCredits = 0
+		decision.RemainingCredits = 0
+		decision.RemainingBeforeCredits = 0
+		return p.evidence.RecordMCPDecision(ctx, decision)
+	}
 	if decision.RemainingBeforeCredits == 0 && decision.Decision == "allowed" {
 		decision.RemainingBeforeCredits = decision.RemainingCredits + decision.CostCredits
 	}
@@ -897,59 +906,44 @@ func (p *Proxy) recordMCPDecision(ctx context.Context, req *Request, tokenInfo *
 }
 
 // scopeDeniedResponse refuses a verified token whose scope does not cover the
-// tool. The refusal is the same policy-denied error as before, plus a signed
-// denied decision when an evidence recorder is configured. Recording failure
-// stays a refusal (proof_unavailable). It never forwards the tool call.
-// decision_reason is policy_denied: the capability was verified, so the
-// receipt can honestly use the evaluated profile (verified macaroon caveats,
-// redacted raw fields, cost 0 because budget was not spent).
+// tool. It never forwards the call and never reads or spends budget.
+//
+// Without an evidence recorder the reply is byte-for-byte the refusal main
+// has always sent. With a recorder, the same code and message carry only the
+// signed receipt handles as error data; recording failure stays a refusal
+// (proof_unavailable). The signed decision is policy_denied with
+// BudgetNotEvaluated, so the receipt claims no limit or balance.
 func (p *Proxy) scopeDeniedResponse(ctx context.Context, req *Request, tokenInfo *TokenInfo, toolName string) *Response {
 	message := fmt.Sprintf("tool %q not in scope %q", toolName, tokenInfo.Scope)
-	if p.evidence != nil {
-		if err := p.evidence.Preflight(ctx); err != nil {
-			log.Error().Err(err).Str("tool", toolName).Msg("MCP scope denial evidence preflight failed")
-			return NewErrorResponseWithData(req.ID, CodeInternalError, "Evidence proof unavailable", map[string]interface{}{
-				"error": "proof_unavailable",
-				"tool":  toolName,
-			})
-		}
+	if p.evidence == nil {
+		return NewErrorResponse(req.ID, CodePolicyDenied, message)
 	}
-	remaining := int64(0)
-	if tokenInfo.BudgetID != "" && p.budget != nil {
-		if got, err := p.budget.Remaining(ctx, tokenInfo.BudgetID); err == nil && got >= 0 {
-			remaining = got
-		}
-	}
-	// Same helper the HTTP proxy uses. Signing takes no lock; the recorder's
-	// archive append is serialized by the archive itself. Do not call this
-	// while holding a lock of your own.
-	recorded, evidenceErr := denial.RecordSignedDenial(ctx, mcpScopeDenialRecorder{
-		proxy:     p,
-		req:       req,
-		tokenInfo: tokenInfo,
-		remaining: remaining,
-	}, "policy_denied", tokenInfo.TokenID, toolName, time.Now().UTC())
-	var evidence *MCPEvidence
-	if recorded != nil {
-		evidence, _ = recorded.(*MCPEvidence)
-	}
-	if evidenceErr != nil {
-		log.Error().Err(evidenceErr).Str("tool", toolName).Msg("MCP scope denial evidence recording failed")
+	proofUnavailable := func(err error, stage string) *Response {
+		log.Error().Err(err).Str("tool", toolName).Str("stage", stage).Msg("MCP scope denial evidence unavailable")
 		return NewErrorResponseWithData(req.ID, CodeInternalError, "Evidence proof unavailable", map[string]interface{}{
 			"error": "proof_unavailable",
 			"tool":  toolName,
 		})
 	}
-	data := map[string]interface{}{
-		"error":        "policy_denied",
-		"tool":         toolName,
-		"cost_credits": int64(0),
-		"token_id":     tokenInfo.TokenID,
+	if err := p.evidence.Preflight(ctx); err != nil {
+		return proofUnavailable(err, "preflight")
 	}
-	if tokenInfo.BudgetID != "" {
-		data["budget_id"] = tokenInfo.BudgetID
-		data["remaining_credits"] = remaining
+	// Same helper the HTTP proxy uses. Signing takes no lock; the recorder's
+	// archive append is serialized by the archive itself. Do not call this
+	// while holding a lock of your own.
+	recorded, err := denial.RecordSignedDenial(ctx, mcpScopeDenialRecorder{
+		proxy:     p,
+		req:       req,
+		tokenInfo: tokenInfo,
+	}, "policy_denied", tokenInfo.TokenID, toolName, time.Now().UTC())
+	if err != nil {
+		return proofUnavailable(err, "record")
 	}
+	evidence, _ := recorded.(*MCPEvidence)
+	if evidence == nil || evidence.ReceiptID == "" {
+		return proofUnavailable(errors.New("recorder returned no receipt"), "record")
+	}
+	data := map[string]interface{}{}
 	mergeEvidenceData(data, evidence)
 	return NewErrorResponseWithData(req.ID, CodePolicyDenied, message, data)
 }
@@ -960,7 +954,6 @@ type mcpScopeDenialRecorder struct {
 	proxy     *Proxy
 	req       *Request
 	tokenInfo *TokenInfo
-	remaining int64
 }
 
 func (m mcpScopeDenialRecorder) RecordSignedDenial(ctx context.Context, in denial.SignedDenial) (any, error) {
@@ -970,16 +963,10 @@ func (m mcpScopeDenialRecorder) RecordSignedDenial(ctx context.Context, in denia
 			toolName = tc.Name
 		}
 	}
-	identity := in.Identity
-	if m.tokenInfo != nil && identity == "" {
-		identity = m.tokenInfo.TokenID
-	}
 	evidence, err := m.proxy.recordMCPDecision(ctx, m.req, m.tokenInfo, toolName, MCPDecision{
-		Decision:         "denied",
-		DecisionReason:   in.ReasonCode,
-		CostCredits:      0,
-		RemainingCredits: m.remaining,
-		TokenID:          identity,
+		Decision:           "denied",
+		DecisionReason:     in.ReasonCode,
+		BudgetNotEvaluated: true,
 	})
 	if err != nil {
 		return nil, err

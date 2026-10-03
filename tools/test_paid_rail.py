@@ -170,6 +170,34 @@ def signed_corpus(f):
         yield label, f.pack(r), False
 
 
+def verified_not_evaluated(f, **extra):
+    """A verified capability refused by policy (scope miss) before any budget
+    lookup: verified authority, redacted raw fields, and no balance claims."""
+    r = f.receipt('denied', 'policy_denied')
+    for k in ('attempted_amount_usd', 'remaining_budget_usd'):
+        r.pop(k, None)
+    r['budget'] = {'spend_mode': 'not_evaluated', 'cost_credits': 0}
+    r['capability_hash'] = 'sha256:verified-capability'
+    r['authority'] = {'provenance_level': 'verified_macaroon_caveats',
+                      'capability_hash': 'sha256:verified-capability',
+                      'raw_capability_token': 'redacted', 'raw_budget_id': 'redacted',
+                      'raw_token_id': 'redacted', 'raw_parent_token_id': 'redacted'}
+    r.update(extra)
+    return r
+
+
+def verified_not_evaluated_pack(f, r, budget_state=None):
+    s = f.sign(r)
+    fields = ('issuer', 'decision', 'decision_reason', 'evidence_pack_id', 'evidence_url',
+              'issued_at', 'receipt_id', 'receipt_hash', 'route_or_tool', 'capability_hash',
+              'authority', 'budget', 'policy')
+    p = {k: copy.deepcopy(s[k]) for k in fields if k in s}
+    p.update(schema_version='satgate.evidence_pack.v1', receipts=[s])
+    p['budget_state'] = (copy.deepcopy(budget_state) if budget_state is not None
+                         else {'spend_mode': 'not_evaluated', 'cost_credits': 0})
+    return p
+
+
 class PaidRailTests(unittest.TestCase):
     def setUp(self):
         self.f = Fixture()
@@ -189,6 +217,56 @@ class PaidRailTests(unittest.TestCase):
         self.assertIs(type(result['valid']), bool)
         self.assertEqual(proc.returncode == 0, result['valid'], proc.stderr)
         return proc, result
+
+    def test_verified_policy_denial_without_budget_evaluation(self):
+        good = verified_not_evaluated_pack(self.f, verified_not_evaluated(self.f))
+        for surface in VERIFIERS:
+            with self.subTest(case='positive', surface=surface):
+                result = self.verify(surface, good)
+                self.assertTrue(result['valid'], result['reason_codes'])
+                self.assertTrue(result['trusted_issuer_valid'], result)
+        self.assertTrue(self.verify('demo', good)['checks']['receipt_0_verified_not_evaluated'])
+        # A balance the gateway never read must not be signed or mirrored.
+        balance_claims = {
+            'receipt_remaining': verified_not_evaluated_pack(
+                self.f, verified_not_evaluated(self.f, remaining_budget_usd='0.000000')),
+            'receipt_attempted': verified_not_evaluated_pack(
+                self.f, verified_not_evaluated(self.f, attempted_amount_usd='0.000000')),
+            'budget_state_remaining': verified_not_evaluated_pack(
+                self.f, verified_not_evaluated(self.f),
+                {'spend_mode': 'not_evaluated', 'cost_credits': 0, 'remaining_budget_usd': '0.000000'}),
+        }
+        for label, pack in balance_claims.items():
+            for surface in VERIFIERS:
+                with self.subTest(case=label, surface=surface):
+                    result = self.verify(surface, pack)
+                    self.assertTrue(result['checks']['signature_valid'], result)
+                    self.assertFalse(result['valid'], result)
+        # The strict demo verifier also rejects limits, nonzero cost, and an
+        # unverified authority dressed up as this profile.
+        strict_only = {
+            'budget_limit': {'budget': {'spend_mode': 'not_evaluated', 'cost_credits': 0, 'limit_credits': 25}},
+            'budget_remaining_after': {'budget': {'spend_mode': 'not_evaluated', 'cost_credits': 0, 'remaining_after_credits': 0}},
+            'nonzero_cost': {'budget': {'spend_mode': 'not_evaluated', 'cost_credits': 1}},
+            'raw_token_unredacted': {'authority': {'provenance_level': 'verified_macaroon_caveats',
+                                                   'capability_hash': 'sha256:verified-capability',
+                                                   'raw_token_id': 'token-1'}},
+            'no_capability': {'authority': {'provenance_level': 'no_verified_capability'}},
+        }
+        for label, extra in strict_only.items():
+            with self.subTest(case=label, surface='demo'):
+                r = verified_not_evaluated(self.f, **extra)
+                bs = {'spend_mode': 'not_evaluated', 'cost_credits': 0}
+                result = self.verify('demo', verified_not_evaluated_pack(self.f, r, bs))
+                self.assertTrue(result['checks']['signature_valid'], result)
+                self.assertFalse(result['valid'], result)
+                self.assertIn('invalid_not_evaluated_provenance', result['reason_codes'])
+        # The new budget shape is legal only for a verified policy denial.
+        for decision, reason in (('denied', 'budget_exhausted'), ('allowed', 'policy_allowed')):
+            with self.subTest(case=reason, surface='demo'):
+                r = verified_not_evaluated(self.f, decision=decision, decision_reason=reason)
+                result = self.verify('demo', verified_not_evaluated_pack(self.f, r))
+                self.assertFalse(result['valid'], result)
 
     def test_shared_signed_corpus(self):
         for label, p, expected in signed_corpus(self.f):
