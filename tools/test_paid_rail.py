@@ -268,6 +268,33 @@ class PaidRailTests(unittest.TestCase):
                 result = self.verify('demo', verified_not_evaluated_pack(self.f, r))
                 self.assertFalse(result['valid'], result)
 
+    def test_verified_not_evaluated_rejects_balance_keys_everywhere(self):
+        # R2-1: no limit, remaining, used, or spent key may ride along with the
+        # verified not_evaluated shape, wherever it is placed. Each receipt is
+        # signed after the edit, so only the profile check can reject it.
+        keys = ('limit', 'limit_credits', 'remaining_after_credits', 'remaining_before_credits',
+                'remaining_credits', 'spent_credits', 'used', 'used_credits', 'budget_remaining_balance')
+        locations = {
+            'receipt_root': lambda r, p, k: r.update({k: 0}),
+            'receipt_metadata': lambda r, p, k: r['metadata'].update({k: 0}),
+            'receipt_policy': lambda r, p, k: r['policy'].update({k: 0}),
+            'receipt_nested': lambda r, p, k: r['metadata'].update(context={k: 0}),
+            'pack_wrapper': lambda r, p, k: p.update({k: 0}),
+            'pack_policy': lambda r, p, k: p['policy'].update({k: 0}),
+        }
+        for key in keys:
+            for where, mutate in locations.items():
+                with self.subTest(key=key, where=where, surface='demo'):
+                    r = verified_not_evaluated(self.f)
+                    if where.startswith('receipt'):
+                        mutate(r, None, key)
+                    p = verified_not_evaluated_pack(self.f, r)
+                    if where.startswith('pack'):
+                        mutate(r, p, key)
+                    result = self.verify('demo', p)
+                    self.assertTrue(result['checks']['signature_valid'], result)
+                    self.assertFalse(result['valid'], result)
+
     def test_shared_signed_corpus(self):
         for label, p, expected in signed_corpus(self.f):
             for surface in VERIFIERS:

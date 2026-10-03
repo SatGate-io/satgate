@@ -91,6 +91,19 @@ VERIFIED_NOT_EVALUATED_FORBIDDEN_FIELDS = {
     "invoice_hash", "macaroon_hash", "paid_rail_context", "payment_hash",
     "projected_cost_credits", "rail", "remaining_budget_usd",
 }
+# A scope refusal reads no balance, so no key that states a limit, remaining,
+# used, spent, attempted or projected amount may appear anywhere in the receipt
+# outside the strict budget object, or anywhere on the Pack wrapper. Matching is
+# by exact name and by marker so a renamed or nested balance field still fails.
+VERIFIED_NOT_EVALUATED_BALANCE_FIELDS = {
+    "attempted_amount_usd", "limit", "limit_credits", "projected_cost_credits",
+    "remaining_after_credits", "remaining_before_credits", "remaining_budget_usd",
+    "remaining_credits", "spent_credits", "used", "used_credits",
+}
+VERIFIED_NOT_EVALUATED_BALANCE_MARKERS = (
+    "attempted_amount", "balance", "limit_credits", "projected_cost", "remaining",
+    "spent", "used_credits",
+)
 
 
 def decision_profile_for(receipt: Any) -> str | None:
@@ -124,6 +137,21 @@ def is_zero_amount(value):
         return Decimal(str(value)) == 0
     except (InvalidOperation, ValueError):
         return False
+
+
+def contains_balance_claim(value: Any) -> bool:
+    if isinstance(value, dict):
+        return any(
+            (isinstance(key, str) and (
+                key in VERIFIED_NOT_EVALUATED_BALANCE_FIELDS
+                or any(marker in key for marker in VERIFIED_NOT_EVALUATED_BALANCE_MARKERS)
+            ))
+            or contains_balance_claim(child)
+            for key, child in value.items()
+        )
+    if isinstance(value, list):
+        return any(contains_balance_claim(child) for child in value)
+    return False
 
 
 def contains_any_key(value: Any, forbidden: set[str]) -> bool:
@@ -577,6 +605,7 @@ def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reas
             and authority.get("capability_hash") == capability_hash
             and strict_json_equal(receipt.get("budget"), VERIFIED_NOT_EVALUATED_BUDGET)
             and not any(field in receipt for field in VERIFIED_NOT_EVALUATED_FORBIDDEN_FIELDS)
+            and not contains_balance_claim({k: v for k, v in receipt.items() if k != "budget"})
             and isinstance(metadata_value, dict)
             and not any(field in metadata for field in ("cost_credits", "credit_unit", "limit", "limit_credits", "projected_cost_credits", "remaining_credits", "used"))
             and not contains_any_key(policy_value, {"limit_credits", "remaining_after_credits", "remaining_before_credits", "remaining_budget_usd", "remaining_credits"})
@@ -1109,6 +1138,7 @@ def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requi
             and isinstance(primary.get("capability_hash"), str)
             and pack.get("capability_hash") == primary.get("capability_hash")
             and not contains_any_key({k: v for k, v in pack.items() if k != "receipts"}, VERIFIED_NOT_EVALUATED_FORBIDDEN_FIELDS)
+            and not contains_balance_claim({k: v for k, v in pack.items() if k != "receipts"})
         )
     else:
         checks["budget_state_matches_primary_receipt"] = (
