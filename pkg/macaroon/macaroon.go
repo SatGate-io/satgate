@@ -393,15 +393,20 @@ func (s *Service) verifyCaveat(caveat string) error {
 	}
 }
 
-// HasScope checks if the macaroon has a specific scope
+// HasScope reports whether the macaroon grants requiredScope.
+//
+// Every scope caveat must grant it. An additional scope caveat can only narrow
+// access. Each caveat is compared as one string. A token with no scope caveat
+// keeps full access.
 func (m *Macaroon) HasScope(requiredScope string) bool {
 	for _, caveat := range m.Caveats {
-		if strings.HasPrefix(caveat, "scope = ") {
-			tokenScope := strings.TrimPrefix(caveat, "scope = ")
-			return scopeMatches(tokenScope, requiredScope)
+		if !strings.HasPrefix(caveat, "scope = ") {
+			continue
+		}
+		if !scopeMatches(strings.TrimPrefix(caveat, "scope = "), requiredScope) {
+			return false
 		}
 	}
-	// No scope caveat means full access
 	return true
 }
 
