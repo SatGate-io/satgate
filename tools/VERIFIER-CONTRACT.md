@@ -96,6 +96,17 @@ implementation over the other:
 | denied / token_revoked | reject | accept |
 | denied / payment_required | accept | accept |
 
+`denied / policy_denied` has a second accepted demo shape: a verified capability
+refused by policy before any budget lookup (for example a scope miss). Authority
+is `verified_macaroon_caveats` with the capability hash bound and raw token,
+budget, and parent fields redacted. Budget is exactly
+`{"spend_mode": "not_evaluated", "cost_credits": 0}`, and `budget_state` mirrors
+it exactly. Any limit, remaining, attempted, used, or projected amount anywhere
+in the receipt or Pack fails, as do a nonzero cost, unredacted raw fields, and
+`no_verified_capability` authority. The `not_evaluated` budget stays illegal on
+every other evaluated pair. Tools already accepts `policy_denied` by enum and
+rejects the remaining and attempted balance fields on this shape.
+
 Tools still validates non-paid enum membership rather than adopting demo's
 paired-profile matrix (for example, the historical tools acceptance and demo
 rejection of paid / budget_authorized are covered). Unknown enums and unsigned
