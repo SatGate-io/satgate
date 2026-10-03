@@ -295,6 +295,41 @@ class PaidRailTests(unittest.TestCase):
                     self.assertTrue(result['checks']['signature_valid'], result)
                     self.assertFalse(result['valid'], result)
 
+    def test_verified_not_evaluated_rejects_balance_key_spellings(self):
+        # R3-1: the ban compares keys after folding case and dropping
+        # separators, so camelCase, kebab-case, upper-case and full-width
+        # spellings of a banned key fail like the snake_case name.
+        keys = ('limitCredits', 'usedCredits', 'remainingCredits', 'spentCredits', 'Limit', 'USED',
+                'remaining-budget-usd', 'Remaining_Budget_USD', 'attemptedAmountUsd',
+                'projectedCostCredits', 'budgetRemainingBalance', 'Balance', 'LIMIT_CREDITS',
+                'used.credits', '\uff4c\uff49\uff4d\uff49\uff54_credits')
+        locations = {
+            'receipt_root': lambda r, p, k: r.update({k: 0}),
+            'receipt_metadata': lambda r, p, k: r['metadata'].update({k: 0}),
+            'receipt_nested': lambda r, p, k: r['metadata'].update(context=[{k: 0}]),
+            'pack_wrapper': lambda r, p, k: p.update({k: 0}),
+        }
+        for key in keys:
+            for where, mutate in locations.items():
+                with self.subTest(key=key, where=where, surface='demo'):
+                    r = verified_not_evaluated(self.f)
+                    if where.startswith('receipt'):
+                        mutate(r, None, key)
+                    p = verified_not_evaluated_pack(self.f, r)
+                    if where.startswith('pack'):
+                        mutate(r, p, key)
+                    result = self.verify('demo', p)
+                    self.assertTrue(result['checks']['signature_valid'], result)
+                    self.assertFalse(result['valid'], result)
+        # Folding must not turn ordinary keys into balance claims.
+        demo = VERIFIERS['demo']
+        for key in ('decision_reason', 'route', 'request_id', 'policyMode', 'costCredits',
+                    'spend_mode', 'provenance_level', 'capability_hash', 'issuer', 'kid'):
+            with self.subTest(ordinary=key):
+                self.assertFalse(demo.contains_balance_claim({key: 0}))
+        good = verified_not_evaluated_pack(self.f, verified_not_evaluated(self.f))
+        self.assertTrue(self.verify('demo', good)['valid'])
+
     def test_shared_signed_corpus(self):
         for label, p, expected in signed_corpus(self.f):
             for surface in VERIFIERS:
