@@ -14,9 +14,9 @@ type TokenInfo struct {
 	// TokenID is a stable identifier for the token (hash of identifier + caveats).
 	TokenID string
 
-	// BudgetID is the budget subject. A single budget_id caveat is used as-is.
-	// A later different budget_id is used only when the server sealed that
-	// chain prefix; otherwise verification fails. With no budget_id caveat
+	// BudgetID is the budget subject. A budget_id is used only when a
+	// budget_bind seals the caveat that carries it, including the first one.
+	// A repeated copy of that sealed id is kept. With no budget_id caveat
 	// this falls back to TokenID.
 	BudgetID string
 	// BudgetLimit is the minimum budget_limit caveat, 0 if none is set.

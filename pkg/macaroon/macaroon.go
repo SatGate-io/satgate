@@ -464,8 +464,8 @@ func (m *Macaroon) AddCaveat(key, value string) {
 // GetCaveat retrieves a caveat value by key
 func (m *Macaroon) GetCaveat(key string) string {
 	prefix := key + " = "
-	// Return LAST match — delegation appends caveats, so most recent wins.
-	// This ensures child tokens use their own budget_id, not the parent's.
+	// Return LAST match. Spend does not use this for budget_id; see
+	// ResolveIssuedBudgetID. Delegation caps use the narrowest positive value.
 	result := ""
 	for _, caveat := range m.Caveats {
 		if strings.HasPrefix(caveat, prefix) {

@@ -37,8 +37,9 @@ func ConsistentCaveat(mac *macaroon.Macaroon, key string) (string, error) {
 
 // FillTokenInfo builds the verified identity. Scope, tenant, and budget
 // caveats can only narrow the token: every scope caveat must allow a tool,
-// tenant_id values must agree, budget_limit is the minimum, and a later
-// different budget_id must be sealed by the server that holds the root key.
+// tenant_id values must agree, budget_limit is the minimum, a budget_id is
+// spent only when a budget_bind seals it, and delegation caps are the
+// minimum positive value. A non-numeric or zero caveat does not clear a cap.
 func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) (*TokenInfo, error) {
 	if mac == nil {
 		return nil, fmt.Errorf("macaroon required")
@@ -70,16 +71,8 @@ func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) 
 	if limit, ok := narrowestBudgetLimit(mac); ok {
 		info.BudgetLimit = limit
 	}
-	if depth := mac.GetCaveat("delegation_depth"); depth != "" {
-		if v, err := strconv.Atoi(depth); err == nil {
-			info.DelegationDepth = v
-		}
-	}
-	if budget := mac.GetCaveat("delegation_budget"); budget != "" {
-		if v, err := strconv.ParseFloat(budget, 64); err == nil {
-			info.DelegationBudget = int64(v)
-		}
-	}
+	info.DelegationDepth = narrowestPositiveInt(mac, "delegation_depth")
+	info.DelegationBudget = narrowestPositiveAmount(mac, "delegation_budget")
 	for _, caveat := range mac.Caveats {
 		if strings.HasPrefix(caveat, "parent = ") {
 			info.Depth++
@@ -161,6 +154,62 @@ func displayScope(mac *macaroon.Macaroon) string {
 		}
 	}
 	return scopes[0]
+}
+
+// narrowestPositiveInt is the minimum successfully parsed positive integer.
+// A non-numeric value, zero, or a negative value does not set or clear a cap.
+// Zero means unlimited only when no positive cap was parsed.
+func narrowestPositiveInt(mac *macaroon.Macaroon, key string) int {
+	found := false
+	min := 0
+	prefix := key + " = "
+	for _, caveat := range mac.Caveats {
+		if !strings.HasPrefix(caveat, prefix) {
+			continue
+		}
+		v, err := strconv.Atoi(strings.TrimPrefix(caveat, prefix))
+		if err != nil || v <= 0 {
+			continue
+		}
+		if !found || v < min {
+			min = v
+			found = true
+		}
+	}
+	if !found {
+		return 0
+	}
+	return min
+}
+
+// narrowestPositiveAmount is the minimum successfully parsed positive amount.
+// Parse failures and non-positive values are ignored, so they cannot clear
+// an earlier cap.
+func narrowestPositiveAmount(mac *macaroon.Macaroon, key string) int64 {
+	found := false
+	var min int64
+	prefix := key + " = "
+	for _, caveat := range mac.Caveats {
+		if !strings.HasPrefix(caveat, prefix) {
+			continue
+		}
+		v, err := strconv.ParseFloat(strings.TrimPrefix(caveat, prefix), 64)
+		if err != nil {
+			continue
+		}
+		iv := int64(v)
+		if iv <= 0 {
+			continue
+		}
+		if !found || iv < min {
+			min = iv
+			found = true
+		}
+	}
+	if !found {
+		return 0
+	}
+	return min
 }
 
 func narrowestBudgetLimit(mac *macaroon.Macaroon) (int64, bool) {
