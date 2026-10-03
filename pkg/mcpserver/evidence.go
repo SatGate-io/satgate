@@ -30,6 +30,11 @@ type MCPDecision struct {
 	// verification succeeds. Recorders must not project token, capability, or
 	// evaluated-budget authority for this profile.
 	NoVerifiedCapability bool `json:"no_verified_capability,omitempty"`
+	// BudgetNotEvaluated marks a verified capability refused by policy before
+	// any budget lookup (for example a scope miss). Recorders must sign
+	// spend_mode not_evaluated and must not project a limit, remaining, or
+	// attempted balance, because none was read.
+	BudgetNotEvaluated bool `json:"budget_not_evaluated,omitempty"`
 }
 
 // MCPEvidence is the verifier-facing handle returned after recording an MCP

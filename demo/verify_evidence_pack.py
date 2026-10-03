@@ -72,6 +72,50 @@ DECISION_REASON_PROFILES = {
 }
 ALLOWED_DECISIONS = {decision for decision, _ in DECISION_REASON_PROFILES}
 ALLOWED_DECISION_REASONS = {reason for _, reason in DECISION_REASON_PROFILES}
+# A verified capability refused by policy before any budget lookup (for example
+# a scope miss). The capability is real, so authority stays the verified form;
+# no balance was read, so the receipt makes no limit, remaining, or spend claim.
+# Only these decision/reason pairs may use it, and only when the signed budget
+# says spend_mode not_evaluated. Every other policy_denied receipt keeps the
+# evaluated profile unchanged.
+VERIFIED_NOT_EVALUATED_PAIRS = {("denied", "policy_denied")}
+VERIFIED_NOT_EVALUATED_BUDGET = {"spend_mode": "not_evaluated", "cost_credits": 0}
+VERIFIED_CAPABILITY_AUTHORITY_FIELDS = {
+    "budget_id_hash", "budget_subject_hash", "capability_hash", "delegation_budget",
+    "delegation_depth", "parent_token_id_hash", "provenance_level", "raw_budget_id",
+    "raw_capability_token", "raw_parent_token_id", "raw_token_id", "token_id_hash",
+}
+VERIFIED_CAPABILITY_RAW_FIELDS = ("raw_budget_id", "raw_capability_token", "raw_parent_token_id", "raw_token_id")
+VERIFIED_NOT_EVALUATED_FORBIDDEN_FIELDS = {
+    "amount_atomic", "amount_sats", "amount_usd", "attempted_amount_usd", "currency",
+    "invoice_hash", "macaroon_hash", "paid_rail_context", "payment_hash",
+    "projected_cost_credits", "rail", "remaining_budget_usd",
+}
+# A scope refusal reads no balance, so no key that states a limit, remaining,
+# used, spent, attempted or projected amount may appear anywhere in the receipt
+# outside the strict budget object, or anywhere on the Pack wrapper. Matching is
+# by exact name and by marker so a renamed or nested balance field still fails.
+VERIFIED_NOT_EVALUATED_BALANCE_FIELDS = {
+    "attempted_amount_usd", "limit", "limit_credits", "projected_cost_credits",
+    "remaining_after_credits", "remaining_before_credits", "remaining_budget_usd",
+    "remaining_credits", "spent_credits", "used", "used_credits",
+}
+VERIFIED_NOT_EVALUATED_BALANCE_MARKERS = (
+    "attempted_amount", "balance", "limit_credits", "projected_cost", "remaining",
+    "spent", "used_credits",
+)
+
+
+def decision_profile_for(receipt: Any) -> str | None:
+    if not isinstance(receipt, dict):
+        return None
+    decision = str(receipt.get("decision", ""))
+    reason = str(receipt.get("decision_reason", ""))
+    profile = DECISION_REASON_PROFILES.get((decision, reason))
+    budget = receipt.get("budget")
+    if (decision, reason) in VERIFIED_NOT_EVALUATED_PAIRS and isinstance(budget, dict) and budget.get("spend_mode") == "not_evaluated":
+        return "verified_not_evaluated"
+    return profile
 DEFAULT_CLOCK_SKEW_SECONDS = 300
 SECRET_PATTERNS = [
     re.compile(r"Bearer\s+[A-Za-z0-9._~+/=-]+", re.IGNORECASE),
@@ -93,6 +137,21 @@ def is_zero_amount(value):
         return Decimal(str(value)) == 0
     except (InvalidOperation, ValueError):
         return False
+
+
+def contains_balance_claim(value: Any) -> bool:
+    if isinstance(value, dict):
+        return any(
+            (isinstance(key, str) and (
+                key in VERIFIED_NOT_EVALUATED_BALANCE_FIELDS
+                or any(marker in key for marker in VERIFIED_NOT_EVALUATED_BALANCE_MARKERS)
+            ))
+            or contains_balance_claim(child)
+            for key, child in value.items()
+        )
+    if isinstance(value, list):
+        return any(contains_balance_claim(child) for child in value)
+    return False
 
 
 def contains_any_key(value: Any, forbidden: set[str]) -> bool:
@@ -523,10 +582,36 @@ def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reas
 
     decision = str(receipt.get("decision", ""))
     decision_reason = str(receipt.get("decision_reason", ""))
-    decision_profile = DECISION_REASON_PROFILES.get((decision, decision_reason))
+    decision_profile = decision_profile_for(receipt)
     checks[f"{prefix}_decision_reason_combination"] = decision_profile is not None
     if not checks[f"{prefix}_decision_reason_combination"]:
         fail("invalid_decision_reason_combination", f"receipts[{index}] decision/reason combination is not legal")
+
+    if decision_profile == "verified_not_evaluated":
+        authority_value = receipt.get("authority")
+        metadata_value = receipt.get("metadata")
+        policy_value = receipt.get("policy")
+        authority = authority_value if isinstance(authority_value, dict) else {}
+        metadata = metadata_value if isinstance(metadata_value, dict) else {}
+        capability_hash = receipt.get("capability_hash")
+        checks[f"{prefix}_verified_not_evaluated"] = (
+            decision == "denied"
+            and isinstance(authority_value, dict)
+            and authority.get("provenance_level") == "verified_macaroon_caveats"
+            and set(authority) <= VERIFIED_CAPABILITY_AUTHORITY_FIELDS
+            and all(authority.get(field) == "redacted" for field in VERIFIED_CAPABILITY_RAW_FIELDS)
+            and isinstance(capability_hash, str)
+            and bool(capability_hash.strip())
+            and authority.get("capability_hash") == capability_hash
+            and strict_json_equal(receipt.get("budget"), VERIFIED_NOT_EVALUATED_BUDGET)
+            and not any(field in receipt for field in VERIFIED_NOT_EVALUATED_FORBIDDEN_FIELDS)
+            and not contains_balance_claim({k: v for k, v in receipt.items() if k != "budget"})
+            and isinstance(metadata_value, dict)
+            and not any(field in metadata for field in ("cost_credits", "credit_unit", "limit", "limit_credits", "projected_cost_credits", "remaining_credits", "used"))
+            and not contains_any_key(policy_value, {"limit_credits", "remaining_after_credits", "remaining_before_credits", "remaining_budget_usd", "remaining_credits"})
+        )
+        if not checks[f"{prefix}_verified_not_evaluated"]:
+            fail("invalid_not_evaluated_provenance", f"receipts[{index}] verified policy denial without budget evaluation carries budget, spend, payment, or unredacted capability claims")
 
     if decision_profile == "not_evaluated":
         authority_value = receipt.get("authority")
@@ -979,7 +1064,7 @@ def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requi
 
     primary_decision = str(primary.get("decision", ""))
     primary_reason = str(primary.get("decision_reason", ""))
-    decision_profile = DECISION_REASON_PROFILES.get((primary_decision, primary_reason))
+    decision_profile = decision_profile_for(primary)
     if any(r.get("decision_reason") == "payment_verified" for r in receipts):
         checks["pack_paid_rail"] = "budget_state" not in pack and not contains_any_key(pack, CREDIT_USD_FIELDS)
         if not checks["pack_paid_rail"]:
@@ -1009,7 +1094,7 @@ def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requi
     primary_budget: dict[str, Any] = primary_budget_value if isinstance(primary_budget_value, dict) else {}
     primary_decision = str(primary.get("decision", ""))
     primary_reason = str(primary.get("decision_reason", ""))
-    decision_profile = DECISION_REASON_PROFILES.get((primary_decision, primary_reason))
+    decision_profile = decision_profile_for(primary)
     if decision_profile == "paid_rail":
         checks["budget_state_matches_primary_receipt"] = (
             bool(primary)
@@ -1044,6 +1129,16 @@ def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requi
             and strict_json_equal(primary_budget, budget)
             and primary.get("authority") == {"provenance_level": "no_verified_capability"}
             and pack.get("capability_hash") is None
+        )
+    elif decision_profile == "verified_not_evaluated":
+        checks["budget_state_matches_primary_receipt"] = (
+            bool(primary)
+            and strict_json_equal(budget_value, VERIFIED_NOT_EVALUATED_BUDGET)
+            and strict_json_equal(primary_budget_value, VERIFIED_NOT_EVALUATED_BUDGET)
+            and isinstance(primary.get("capability_hash"), str)
+            and pack.get("capability_hash") == primary.get("capability_hash")
+            and not contains_any_key({k: v for k, v in pack.items() if k != "receipts"}, VERIFIED_NOT_EVALUATED_FORBIDDEN_FIELDS)
+            and not contains_balance_claim({k: v for k, v in pack.items() if k != "receipts"})
         )
     else:
         checks["budget_state_matches_primary_receipt"] = (
