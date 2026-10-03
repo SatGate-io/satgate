@@ -33,6 +33,7 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+import unicodedata
 from pathlib import Path
 from typing import Any
 
@@ -139,16 +140,34 @@ def is_zero_amount(value):
         return False
 
 
+def balance_key_form(key: str) -> str:
+    """Fold a key to lower-case letters and digits only, so camelCase, kebab-case,
+    upper-case and full-width spellings of a balance key ("limitCredits",
+    "Remaining-Budget", "USED_CREDITS") compare like their snake_case names."""
+    folded = unicodedata.normalize("NFKC", key).casefold()
+    return "".join(ch for ch in folded if ch.isalnum())
+
+
+VERIFIED_NOT_EVALUATED_BALANCE_FIELD_FORMS = frozenset(
+    balance_key_form(key) for key in VERIFIED_NOT_EVALUATED_BALANCE_FIELDS
+)
+VERIFIED_NOT_EVALUATED_BALANCE_MARKER_FORMS = tuple(
+    balance_key_form(marker) for marker in VERIFIED_NOT_EVALUATED_BALANCE_MARKERS
+)
+
+
 def contains_balance_claim(value: Any) -> bool:
     if isinstance(value, dict):
-        return any(
-            (isinstance(key, str) and (
-                key in VERIFIED_NOT_EVALUATED_BALANCE_FIELDS
-                or any(marker in key for marker in VERIFIED_NOT_EVALUATED_BALANCE_MARKERS)
-            ))
-            or contains_balance_claim(child)
-            for key, child in value.items()
-        )
+        for key, child in value.items():
+            if isinstance(key, str):
+                form = balance_key_form(key)
+                if form in VERIFIED_NOT_EVALUATED_BALANCE_FIELD_FORMS or any(
+                    marker in form for marker in VERIFIED_NOT_EVALUATED_BALANCE_MARKER_FORMS
+                ):
+                    return True
+            if contains_balance_claim(child):
+                return True
+        return False
     if isinstance(value, list):
         return any(contains_balance_claim(child) for child in value)
     return False
