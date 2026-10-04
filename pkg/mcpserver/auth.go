@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/subtle"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/satgate-io/satgate/pkg/macaroon"
@@ -15,9 +14,13 @@ type TokenInfo struct {
 	// TokenID is a stable identifier for the token (hash of identifier + caveats).
 	TokenID string
 
-	// BudgetID is the budget subject — either from a "budget_id" caveat or derived from TokenID.
+	// BudgetID is the budget subject. A budget_id is used only when a
+	// budget_bind seals the caveat that carries it, including the first one.
+	// A repeated copy of that sealed id is kept. With no budget_id caveat
+	// this falls back to TokenID.
 	BudgetID string
-	// BudgetLimit is the token's budget cap (from "budget_limit" caveat), 0 if not set.
+	// BudgetLimit is the minimum budget_limit caveat, 0 if none is set.
+	// A later caveat can only lower the cap.
 	BudgetLimit int64
 
 	// TenantID from the "tenant_id" caveat (for multi-tenant routing).
@@ -118,61 +121,7 @@ func (a *MacaroonAuthenticator) Verify(_ context.Context, token string) (*TokenI
 		return nil, fmt.Errorf("invalid macaroon: %w", err)
 	}
 
-	// TokenID must be unique per token — use identifier + signature
-	// (delegated tokens share the same identifier but have different signatures)
-	tokenID := hashToken(mac.Identifier + mac.Signature)
-
-	info := &TokenInfo{
-		TokenID:  tokenID,
-		Scope:    mac.GetScope(),
-		Raw:      mac,
-		RawToken: token,
-	}
-
-	// Check for budget_id caveat.
-	// If present, use it. Otherwise fall back to tokenID for backward compat
-	// (OSS delegation doesn't add budget_id caveats).
-	if budgetID := mac.GetCaveat("budget_id"); budgetID != "" {
-		info.BudgetID = budgetID
-	} else {
-		info.BudgetID = info.TokenID
-	}
-	if bl := mac.GetCaveat("budget_limit"); bl != "" {
-		if v, err := strconv.ParseFloat(bl, 64); err == nil {
-			info.BudgetLimit = int64(v)
-		}
-	}
-
-	// Check for tenant_id caveat (multi-tenant routing)
-	if tenantID := mac.GetCaveat("tenant_id"); tenantID != "" {
-		info.TenantID = tenantID
-	}
-
-	// Delegation constraints
-	if dd := mac.GetCaveat("delegation_depth"); dd != "" {
-		if v, err := strconv.Atoi(dd); err == nil {
-			info.DelegationDepth = v
-		}
-	}
-	if db := mac.GetCaveat("delegation_budget"); db != "" {
-		if v, err := strconv.ParseFloat(db, 64); err == nil {
-			info.DelegationBudget = int64(v)
-		}
-	}
-
-	// Count depth by counting "parent" caveats in the chain
-	for _, c := range mac.Caveats {
-		if strings.HasPrefix(c, "parent = ") {
-			info.Depth++
-		}
-	}
-
-	// Check for parent caveat
-	if parent := mac.GetCaveat("parent"); parent != "" {
-		info.ParentTokenID = parent
-	}
-
-	return info, nil
+	return FillTokenInfo(a.Service, mac, token)
 }
 
 // NewAuthenticator creates the appropriate authenticator from config.

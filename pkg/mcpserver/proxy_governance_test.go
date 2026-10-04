@@ -33,6 +33,11 @@ func TestProxy_AgentGovernanceProofPath(t *testing.T) {
 	tokenBuilder.AddCaveat("budget_limit", "60")
 	tokenBuilder.AddCaveat("delegation_depth", "2")
 	token := wrapper.Encode(tokenBuilder)
+	sealed, err := svc.AppendBudgetBind(token)
+	if err != nil {
+		t.Fatal(err)
+	}
+	token = svc.Encode(sealed)
 
 	cfg := &Config{
 		Server: ServerConfig{Transport: "stdio", Name: "satgate-mcp-proof", Version: "1.0"},

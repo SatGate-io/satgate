@@ -108,7 +108,11 @@ func TestMacaroonAuthenticator_WithBudgetID(t *testing.T) {
 	}
 	mac.AddCaveat("budget_id", "budget-abc")
 	mac.Signature = svc.RecalculateSignature(mac)
-	token := svc.Encode(mac)
+	sealed, err := svc.AppendBudgetBind(svc.Encode(mac))
+	if err != nil {
+		t.Fatal(err)
+	}
+	token := svc.Encode(sealed)
 
 	info, err := auth.Verify(context.Background(), token)
 	if err != nil {

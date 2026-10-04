@@ -578,12 +578,10 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		return NewErrorResponse(req.ID, CodeInvalidParams, err.Error()), nil
 	}
 
-	// Scope enforcement: if token has a restricted scope, check the tool is allowed
-	// Note: scope may be tenant-prefixed (e.g., "tenant-uuid:*") — matchScope handles stripping
-	if tokenInfo.Scope != "" && tokenInfo.Scope != "*" && tokenInfo.Scope != "api:*" && tokenInfo.Scope != "mcp:*" {
-		if !matchScope(tokenInfo.Scope, tc.Name) {
-			return p.scopeDeniedResponse(ctx, req, tokenInfo, tc.Name), nil
-		}
+	// Every scope caveat must allow the tool. A later caveat can only narrow.
+	// matchScope strips a tenant UUID prefix and ORs words inside one caveat.
+	if !tokenInfo.AllowsTool(tc.Name) {
+		return p.scopeDeniedResponse(ctx, req, tokenInfo, tc.Name), nil
 	}
 
 	// Resolve cost (per-tenant if available, else global)

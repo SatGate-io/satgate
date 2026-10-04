@@ -157,6 +157,18 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		_ = d.budget.Initialize(ctx, parent.BudgetID, parentResult.Remaining+params.Budget)
 		return nil, fmt.Errorf("macaroon delegation failed: %w", err)
 	}
+	// Seal the child budget_id with the shared writer. A budget_id is
+	// accepted only when this seal covers it.
+	if childBudgetID != "" {
+		sealed, sealErr := d.macaroonSvc.AppendBudgetBind(d.macaroonSvc.Encode(childMac))
+		if sealErr != nil {
+			if parentResult != nil {
+				_ = d.budget.Initialize(ctx, parent.BudgetID, parentResult.Remaining+params.Budget)
+			}
+			return nil, fmt.Errorf("macaroon delegation failed: %w", sealErr)
+		}
+		childMac = sealed
+	}
 
 	childToken := d.macaroonSvc.Encode(childMac)
 	childTokenID := hashToken(childMac.Identifier + childMac.Signature)
