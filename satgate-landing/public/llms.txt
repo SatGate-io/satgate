@@ -58,7 +58,7 @@ A route owner can accept USDC on Base next to Lightning, or USDC only. When a ro
 2. Retry the same request with the signed payload in the `PAYMENT-SIGNATURE` header.
 3. SatGate settles the payment, checks the transfer on-chain, and forwards the request. The `PAYMENT-RESPONSE` header carries the transaction hash.
 
-One USDC payment buys one request. A signed payment is accepted once; sending it again returns 402. A USDC-only route's 402 has no Lightning invoice and no L402 challenge, so pay it with USDC. The receipt records the rail as x402 with the network, amount and transaction. The public demo route below takes both.
+One USDC payment buys one request. A signed payment is accepted once; sending it again returns 402. A USDC-only route's 402 has no Lightning invoice and no L402 challenge, so pay it with USDC. The receipt records the rail as x402 with the network, amount and transaction. The USDC on Base route under "Try it as an agent" below takes both.
 
 ### Try it as an agent
 
@@ -84,7 +84,7 @@ Two public paid routes are open. The agent does not need an account.
 
 Call the route and read the 402. Follow "USDC (x402) on a paid route" above, using the `accepts` entry in the same 402. A paid call returns 200 and a signed receipt.
 
-This route also offers a 10-sat Lightning invoice. Paying that one needs a wallet that shows the preimage, so for Cash App use the Lightning route above.
+The 402 on this route also carries a 10-sat Lightning invoice, with the same `terms.status` poll contract as the Lightning route above. Here `terms.buys.uses` is 1 for Lightning too, so each Lightning payment buys one request.
 
 Both routes are Admit. In the dashboard, Admit is the Charge policy.
 
