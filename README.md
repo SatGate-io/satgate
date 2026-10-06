@@ -30,13 +30,13 @@
 
 SatGate is a gateway in front of APIs and MCP tools. It meters agent and MCP traffic (**Observe**), enforces owner budgets before work runs (**Control**), and charges external agents on the routes you choose (**Admit**; the Charge policy in the dashboard). Every allow or deny comes with a signed receipt.
 
-Try it as an agent. This hosted route costs 10 sats or 0.01 USDC, and each payment buys one request:
+Try it as an agent. This hosted route returns HTTP 402 with a Lightning invoice and a macaroon. The price in that response is 10 sats for one request:
 
 ```bash
-curl -i https://mcp-prod-final.satgate.cloud/paid/premium
+curl -i -H "X-SatGate-Tenant: satgate-demo" https://api.satgate.io/paid/agent-demo
 ```
 
-The unpaid call returns HTTP 402 with a Lightning invoice, a USDC-on-Base (x402) offer and the terms. Agent instructions are in [llms.txt](https://satgate.io/llms.txt).
+Agent instructions are in [llms.txt](https://satgate.io/llms.txt).
 
 ## Build Agents with SatGate
 
@@ -155,11 +155,17 @@ Agent → SatGate (economic governance) → Routing Gateway → LLM Providers
 ### 60-Second Demo
 
 ```bash
-# Download the binary (macOS Apple Silicon — see Releases for other platforms)
-curl -L https://github.com/satgate-io/satgate/releases/latest/download/satgate-darwin-arm64 -o satgate
+# Run from a clone. The example config is examples/gateway.yaml in this repo.
+# macOS Apple Silicon. Other v0.5.2 assets: satgate-darwin-amd64, satgate-linux-amd64,
+# satgate-linux-arm64, satgate-windows-amd64.exe
+git clone https://github.com/SatGate-io/satgate.git
+cd satgate
+curl -L https://github.com/SatGate-io/satgate/releases/download/v0.5.2/satgate-darwin-arm64 -o satgate
 chmod +x satgate
 
-# Start with example config (mock Lightning, auto-generated keys)
+# Mock Lightning. Demo mode prints:
+# SECURITY WARNING: Using ephemeral root key. Set CAPABILITY_ROOT_KEY for production use.
+# That warning is expected. Tokens do not persist across restarts.
 export ADMIN_TOKEN=my-secret-token
 export LIGHTNING_BACKEND=mock
 ./satgate --config examples/gateway.yaml
@@ -190,23 +196,24 @@ Public → Protected → Paid. Three policies, one gateway; paid rails are gover
 Hosted paid demo (Admit; Charge in the dashboard). No local Lightning node:
 
 ```bash
-curl -i https://mcp-prod-final.satgate.cloud/paid/premium
+curl -i -H "X-SatGate-Tenant: satgate-demo" https://api.satgate.io/paid/agent-demo
 ```
 
-Unpaid calls return 402. Price is 10 sats, or 0.01 USDC on Base, for one request. For Lightning, show the invoice to the owner, poll payment status, then retry. Poll rules and the USDC steps are in [llms.txt](https://satgate.io/llms.txt).
+Unpaid calls return 402 with a Lightning invoice and a macaroon. The price in that response is 10 sats for one request. For Lightning, show the invoice to the owner, poll payment status, then retry. Poll rules are in [llms.txt](https://satgate.io/llms.txt).
 
 📖 **[Full Quick Start Guide →](docs/getting-started/quickstart.md)**
 
 ### Other Install Methods
 
 ```bash
-# Docker
-docker run -v $(pwd)/gateway.yaml:/etc/satgate/gateway.yaml \
-  -e ADMIN_TOKEN=my-secret-token -e LIGHTNING_BACKEND=mock \
-  -p 8080:8080 ghcr.io/satgate-io/satgate:latest
+# Release binary. ghcr.io/satgate-io/satgate:latest is private; anonymous pulls get 401.
+# Assets: satgate-darwin-arm64, satgate-darwin-amd64, satgate-linux-amd64,
+# satgate-linux-arm64, satgate-windows-amd64.exe
+curl -L https://github.com/SatGate-io/satgate/releases/download/v0.5.2/satgate-darwin-arm64 -o satgate
+chmod +x satgate
 
 # Build from source
-git clone https://github.com/satgate-io/satgate.git
+git clone https://github.com/SatGate-io/satgate.git
 cd satgate && go build -o satgate ./cmd/satgate
 ```
 
@@ -345,7 +352,7 @@ The open-source gateway handles protection, budgets, and paid-rail enforcement. 
 - 🏢 **Multi-tenant** — Team isolation, RBAC, SSO/SCIM
 - 📝 **Audit** — Tamper-evident logging, compliance exports
 
-<a href="https://cloud.satgate.io"><strong>Start Free →</strong></a> (Observe mode is free, unlimited, forever)
+<a href="https://cloud.satgate.io"><strong>Start Free →</strong></a> (Observe is free, up to a fair-use cap)
 
 ## Contributing
 
