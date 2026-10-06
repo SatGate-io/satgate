@@ -173,7 +173,7 @@ const LandingPage = () => {
               Keep your agents within budget. Make external agents pay before they use your API. Get a signed receipt for every decision.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
-              SatGate checks each request before it reaches your API or MCP tool. Your own agents stop when their budget runs out. External agents pay on the routes you choose, so hammering your API gets expensive, and paying never gets them past your access rules.
+              SatGate checks each request before it reaches your API or MCP tool. Limit which APIs and tools each agent can use. Your own agents stop when their budget runs out. External agents pay on the routes you choose, so hammering your API gets expensive, and paying never gets them past your access rules.
             </p>
             <div className="flex flex-wrap gap-4">
               <a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
