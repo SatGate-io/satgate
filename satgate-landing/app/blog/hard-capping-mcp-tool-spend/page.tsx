@@ -128,7 +128,7 @@ export default function HardCappingMcpToolSpendPage() {
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Problem: MCP Has No Credit Card Limit</h2>
           
           <p className="text-gray-300 leading-relaxed">
-            The <a href="https://spec.modelcontextprotocol.io" className="text-purple-400 hover:text-purple-300 underline" target="_blank" rel="noopener noreferrer">Model Context Protocol</a> is brilliant at what it does: giving AI agents structured access to tools. Search engines, databases, code execution, image generation — MCP makes it all available through a clean JSON-RPC interface.
+            The <a href="https://modelcontextprotocol.io/specification/2026-07-28" className="text-purple-400 hover:text-purple-300 underline" target="_blank" rel="noopener noreferrer">Model Context Protocol</a> is brilliant at what it does: giving AI agents structured access to tools. Search engines, databases, code execution, image generation — MCP makes it all available through a clean JSON-RPC interface.
           </p>
           <p className="text-gray-300 leading-relaxed">
             What MCP doesn&apos;t do is care about cost. Every <code className="text-purple-300">tools/call</code> request flows through to the upstream server with no budget awareness whatsoever. The spec has no concept of &quot;you&apos;ve spent too much&quot; or &quot;stop here.&quot;
@@ -260,13 +260,9 @@ export default function HardCappingMcpToolSpendPage() {
           </ol>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-red-300">{`// What the agent sees when budget is exhausted:
+            <code className="text-red-300">{`HTTP 402
 {
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32000,
-    "message": "Budget exceeded: 500/500 sats used. Reset in 23m."
-  }
+  "error": "budget_exhausted"
 }`}</code>
           </pre>
 
@@ -280,17 +276,10 @@ export default function HardCappingMcpToolSpendPage() {
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-cyan-300">{`# Create a root macaroon with $10 budget
-satgate token create --budget 1000 --tools "web_search,database_query"
-
-# Delegate to an agent: $5 budget, expires in 1 hour
-satgate token attenuate <root-token> \\
-  --max-budget 500 \\
-  --expires 1h \\
-  --tools "web_search"
-
-# Result: agent can spend up to $5 on web_search only, for 1 hour
-# No way to escalate beyond these constraints`}</code>
+            <code className="text-cyan-300">{`Mint a token with a budget in the SatGate dashboard: Cloud, then Tokens or MCP setup.
+Send the agent's calls through the gateway with that token.
+There is no satgate token create or satgate token attenuate command.
+There is no daily limit. A spent budget returns HTTP 402 with code budget_exhausted.`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
@@ -311,7 +300,7 @@ satgate token attenuate <root-token> \\
               </div>
             </a>
             
-            <a href="https://github.com/nicethings/satgate" target="_blank" rel="noopener noreferrer" className="block bg-gray-900 border border-gray-800 rounded-lg p-6 hover:border-purple-600/50 transition no-underline">
+            <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="block bg-gray-900 border border-gray-800 rounded-lg p-6 hover:border-purple-600/50 transition no-underline">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-bold text-white mb-1">🔧 Self-Hosted</h3>

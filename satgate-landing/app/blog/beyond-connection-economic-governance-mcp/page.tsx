@@ -553,15 +553,9 @@ X-SatGate-Budget-Limit: 2500
             </p>
 
             <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 my-6 font-mono text-sm overflow-x-auto">
-              <pre className="text-gray-300">{`# Install the CLI
-clawhub install satgate
-
-# Or via Claude Code
-claude plugin marketplace add SatGate-io/satgate-cli
-
-# Check your agent spend
-satgate tokens
-satgate spend`}</pre>
+              <pre className="text-gray-300">{`Mint a token with a budget in the SatGate dashboard: Cloud, then Tokens or MCP setup.
+Send calls through the gateway with that token.
+There is no satgate tokens or satgate spend command.`}</pre>
             </div>
 
             <p>
