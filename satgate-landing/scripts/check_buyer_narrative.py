@@ -41,7 +41,7 @@ REQUIRED = {
         "signed receipt for every decision",
     ],
     "app/components/HomeClient.tsx": [
-        "Keep your agents within budget. Make external agents pay before they use your API.",
+        "Keep your AI agents within budget on the paid services they use. Make outside agents pay before they use yours.",
         "You set the rules. SatGate enforces them on every request.",
         "Economic firewall for agents",
     ],
@@ -100,7 +100,7 @@ FORBIDDEN_PATTERNS = [
     r"Observe, Control, Charge",
     r"autonomous spend platform",
     r"agents buy",
-    r"(?<!external )agents pay",  # "external agents pay" is the approved Admit framing
+    r"(?<!external )(?<!outside )agents pay",  # "external/outside agents pay" is the approved Admit framing
     r"AI agents pay",
     r"paid agents pay",
     r"agents can pay",

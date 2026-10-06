@@ -190,7 +190,7 @@ export default function EconomicFirewallPage() {
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-3xl leading-relaxed mb-6">
-            Keep your agents within budget. Make external agents pay before they use your API. Get a signed receipt for every decision.
+            Keep your AI agents within budget on the paid services they use. Make outside agents pay before they use yours. Get a signed receipt for every decision.
           </p>
           <p className="max-w-3xl rounded-2xl border border-purple-900/50 bg-purple-950/20 p-5 text-lg leading-relaxed text-purple-100 mb-10">
             SatGate has three controls. Observe shows what your agents do and spend. Control enforces their budgets. Admit decides what external agents can reach and charges them where you choose. All three sign receipts.

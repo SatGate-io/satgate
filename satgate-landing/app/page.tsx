@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SatGate: an economic firewall for AI agents",
     description:
-      "Keep your agents within budget. Make external agents pay before they use your API. Get a signed receipt for every decision.",
+      "Keep your AI agents within budget on the paid services they use. Make outside agents pay before they use yours. Get a signed receipt for every decision.",
     url: "https://satgate.io",
     type: "website",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SatGate: an economic firewall for AI agents",
     description:
-      "Keep your agents within budget. Make external agents pay before they use your API. Get a signed receipt for every decision.",
+      "Keep your AI agents within budget on the paid services they use. Make outside agents pay before they use yours. Get a signed receipt for every decision.",
   },
 };
 
