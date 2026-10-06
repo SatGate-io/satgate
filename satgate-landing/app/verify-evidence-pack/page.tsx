@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://satgate.io/verify-evidence-pack' },
 };
 
-const livePackUrl = 'https://satgate-mcp-saas.fly.dev/v1/evidence/evid_MD98srRaolXE1L3rOjWQuFi2M3wgXdXG';
-const samplePackFile = '/evidence/sample-mcp-budget-refusal-20260928.json';
+const livePackUrl = 'https://satgate-mcp-saas.fly.dev/v1/evidence/evid_65RDOGL30IHpIRyugWFOLFKgew_wK-QK';
+const samplePackFile = '/evidence/mcp-budget-refusal-20261005.json';
 const samplePackJwks = 'https://satgate-mcp-saas.fly.dev/.well-known/jwks.json';
 
 export default function VerifyEvidencePackPage() {
@@ -27,7 +27,7 @@ export default function VerifyEvidencePackPage() {
             <a href={samplePackFile} className="rounded-lg border border-cyan-300/40 px-5 py-3 text-center font-bold text-cyan-100 hover:border-cyan-200">Download a real receipt</a>
           </div>
           <p className="mt-4 text-sm leading-6 text-gray-400">
-            This is the signed refusal from the demo video on the home page: an MCP tool call refused with <code>budget_exhausted</code> after a 3¢ budget ran out. It&apos;s signed with the hosted MCP service&apos;s key. The <a href={livePackUrl} className="text-cyan-200 underline underline-offset-4">live copy</a> stays up until the plan&apos;s retention period ends; the downloaded file verifies the same way.
+            This is the budget refusal from the MCP demo video on the home page: a tool call refused with <code>budget_exhausted</code> after the agent&apos;s 3-credit budget ran out. It&apos;s signed with the hosted MCP service&apos;s key. The <a href={livePackUrl} className="text-cyan-200 underline underline-offset-4">live copy</a> stays up until the plan&apos;s retention period ends; the downloaded file verifies the same way.
           </p>
         </div>
       </section>

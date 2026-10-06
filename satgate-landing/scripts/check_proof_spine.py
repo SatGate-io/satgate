@@ -57,7 +57,7 @@ REQUIRED_PHRASES = {
         "--jwks-file jwks.json",
         "--require-trusted-issuer",
         "Current limits",
-        "/evidence/sample-mcp-budget-refusal-20260928.json",
+        "/evidence/mcp-budget-refusal-20261005.json",
     ],
     "app/openai-budget-policy-generator/page.tsx": [
         "receipt_id",
