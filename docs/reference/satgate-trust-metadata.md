@@ -95,6 +95,8 @@ Evidence Packs use the public schema at:
 https://satgate.io/evidence-packs/evidence-pack.schema.v1.json
 ```
 
+Public verification does not use `https://api.satgate.io/v1/verify`. That route returns `400 TENANT_REQUIRED` without a tenant. Outsiders verify with the open-source tool at `tools/verify_evidence_pack.py` in [SatGate-io/satgate](https://github.com/SatGate-io/satgate/blob/main/tools/verify_evidence_pack.py).
+
 ## Rails/adapters
 
 The artifact lists rail/protocol/billing adapters as an array of objects, not free strings:
@@ -130,7 +132,7 @@ The `issuer` block exposes key discovery for the manifest publisher as:
 {
   "method": "jwks_uri",
   "key_id_field": "issuer_kid",
-  "jwks_uri": "https://satgate.io/.well-known/jwks.json"
+  "jwks_uri": "https://api.satgate.io/.well-known/jwks.json"
 }
 ```
 
@@ -140,9 +142,7 @@ The federation rule is:
 {issuer_id}/.well-known/jwks.json
 ```
 
-Receipts reference both an issuer and an `issuer_kid`. Verifiers must first authorize the issuer origin against configured trust anchors, then fetch that issuer's JWKS, select the key by `issuer_kid`, and verify the receipt signature. Tenant or deployment issuers may publish their own JWKS endpoint. The public `satgate.io` JWKS route currently publishes an empty `keys` array instead of placeholder production tenant keys.
-
-Do **not** treat the top-level `https://satgate.io/.well-known/jwks.json` as the universal key source for every receipt. It only represents the `https://satgate.io` issuer. Also do **not** trust any issuer URL found in a receipt until it matches an acceptor-configured trust anchor; otherwise an attacker can publish their own JWKS and sign their own fake receipt.
+Receipts reference both an issuer and an `issuer_kid`. Hosted receipts are signed by `https://api.satgate.io` (kid `satgate-gateway-ed25519-2026-05`). Verifiers must first authorize the issuer origin against configured trust anchors, then fetch that issuer's JWKS, select the key by `issuer_kid`, and verify the receipt signature. `https://satgate.io/.well-known/jwks.json` redirects to `https://api.satgate.io/.well-known/jwks.json` so an old bookmark does not publish an empty key set. It is not a second issuer. Do **not** trust any issuer URL found in a receipt until it matches an acceptor-configured trust anchor; otherwise an attacker can publish their own JWKS and sign their own fake receipt.
 
 Verifiers should respect the advertised JWKS TTL during normal operation, but on signature failure for a previously trusted issuer they should force a fresh JWKS fetch before rejecting the receipt. This handles key rotation without training implementations to ignore cache policy entirely. If the issuer remains trusted and the refreshed JWKS still lacks the `issuer_kid`, fail closed.
 
@@ -157,7 +157,7 @@ import json
 from urllib.request import urlopen
 
 
-TRUSTED_ISSUERS = {"https://satgate.io"}
+TRUSTED_ISSUERS = {"https://api.satgate.io"}
 
 
 def load_jwks_for_receipt(receipt: dict) -> dict:
@@ -179,7 +179,7 @@ def load_jwks_for_receipt(receipt: dict) -> dict:
 def verify_receipt(receipt: dict) -> bool:
     key = load_jwks_for_receipt(receipt)
     # Verify receipt["signature"] over the canonical receipt payload with `key`.
-    # Keep this line explicit so implementers do not accidentally fetch satgate.io's empty JWKS for tenant receipts.
+    # Hosted receipts use issuer https://api.satgate.io, not https://satgate.io.
     return bool(key)
 ```
 
@@ -192,7 +192,7 @@ type Receipt = {
   signature: string;
 };
 
-const trustedIssuers = new Set(["https://satgate.io"]);
+const trustedIssuers = new Set(["https://api.satgate.io"]);
 
 export async function loadJwksKeyForReceipt(receipt: Receipt) {
   const issuer = receipt.issuer.replace(/\/$/, "");
@@ -210,7 +210,7 @@ export async function loadJwksKeyForReceipt(receipt: Receipt) {
 export async function verifyReceipt(receipt: Receipt) {
   const key = await loadJwksKeyForReceipt(receipt);
   // Verify receipt.signature over the canonical receipt payload with `key`.
-  // Do not fetch satgate.io's empty JWKS unless receipt.issuer === "https://satgate.io".
+  // Hosted receipts use issuer https://api.satgate.io, not https://satgate.io.
   return Boolean(key);
 }
 ```

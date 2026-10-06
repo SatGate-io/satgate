@@ -49,7 +49,9 @@ REQUIRED_ROUTE_STRINGS = [
     "type: \"payment_rail\"",
     "role: \"external_paid_access\"",
     "key_discovery",
-    "jwks_uri: \"https://satgate.io/.well-known/jwks.json\"",
+    "jwks_uri: \"https://api.satgate.io/.well-known/jwks.json\"",
+    "issuer_id: \"https://api.satgate.io\"",
+    "tools/verify_evidence_pack.py",
     "signing_key_discovery",
     "jwks_uri_template",
     "Response.json",
@@ -106,6 +108,10 @@ else:
     for pattern in FORBIDDEN_ROUTE_PATTERNS:
         if re.search(pattern, route_text, flags=re.IGNORECASE):
             errors.append(f"route has forbidden claim language: {pattern}")
+    if "verification_endpoint" in route_text:
+        errors.append("route must not advertise verification_endpoint; hosted /v1/verify requires a tenant")
+    if "https://api.satgate.io/v1/verify" in route_text:
+        errors.append("route must not point outsiders at the tenant-gated verify endpoint")
     if re.search(r"\bnote\s*:", route_text):
         errors.append("route should not contain prose-only note fields; keep human explanations in docs")
     if '"issuer_kid"' not in route_text or '"issuer"' not in route_text:
@@ -116,7 +122,7 @@ else:
             errors.append(f"route must mark {planned_id} as planned, not supported")
 
 
-for path, label in [(SCHEMA_ROUTE, "schema route"), (JWKS_ROUTE, "JWKS route"), (RECEIPT_SCHEMA_ROUTE, "receipt schema route")]:
+for path, label in [(SCHEMA_ROUTE, "schema route"), (RECEIPT_SCHEMA_ROUTE, "receipt schema route")]:
     if not path.exists():
         errors.append(f"missing {label}: {path.relative_to(ROOT)}")
     else:
@@ -139,10 +145,19 @@ if RECEIPT_SCHEMA_ROUTE.exists():
 
 if JWKS_ROUTE.exists():
     jwks_text = JWKS_ROUTE.read_text()
-    if "keys: []" not in jwks_text:
-        errors.append("JWKS route should currently expose an empty keys array rather than placeholder signing keys")
+    if "keys: []" in jwks_text:
+        errors.append("JWKS route must not publish an empty key set")
+    if "status: 308" not in jwks_text:
+        errors.append("JWKS route must redirect with status 308")
+    if "https://api.satgate.io/.well-known/jwks.json" not in jwks_text:
+        errors.append("JWKS route must redirect to the api issuer key set")
+    for needle in ["Cache-Control", "Access-Control-Allow-Origin", "X-Content-Type-Options"]:
+        if needle not in jwks_text:
+            errors.append(f"JWKS route missing required header string: {needle}")
     if re.search(r"\bnote\s*:", jwks_text):
         errors.append("JWKS route should not contain prose-only note fields")
+else:
+    errors.append(f"missing JWKS route: {JWKS_ROUTE.relative_to(ROOT)}")
 
 build_text = BUILD.read_text() if BUILD.exists() else ""
 for needle in REQUIRED_BUILD_STRINGS:

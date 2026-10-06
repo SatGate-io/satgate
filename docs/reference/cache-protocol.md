@@ -67,7 +67,7 @@ Candidate body:
       "refresh_after": "2026-05-14T00:01:00Z"
     },
     {
-      "url": "https://satgate.io/.well-known/jwks.json",
+      "url": "https://api.satgate.io/.well-known/jwks.json",
       "kind": "jwks",
       "version": 4,
       "digest": "sha256:...",
