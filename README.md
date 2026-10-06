@@ -30,7 +30,7 @@
 
 SatGate is a gateway in front of APIs and MCP tools. It meters agent and MCP traffic (**Observe**), enforces owner budgets before work runs (**Control**), and charges external agents on the routes you choose (**Admit**; the Charge policy in the dashboard). Every allow or deny comes with a signed receipt.
 
-Try it as an agent. This hosted route returns HTTP 402 with a Lightning invoice and a macaroon. The price in that response is 10 sats for one request:
+Try it as an agent. This hosted route returns HTTP 402 with a Lightning invoice and a macaroon. The price is 10 sats, and one payment buys access until the `credential_expires_at` time in that response, not just one request:
 
 ```bash
 curl -i -H "X-SatGate-Tenant: satgate-demo" https://api.satgate.io/paid/agent-demo
@@ -199,7 +199,7 @@ Hosted paid demo (Admit; Charge in the dashboard). No local Lightning node:
 curl -i -H "X-SatGate-Tenant: satgate-demo" https://api.satgate.io/paid/agent-demo
 ```
 
-Unpaid calls return 402 with a Lightning invoice and a macaroon. The price in that response is 10 sats for one request. For Lightning, show the invoice to the owner, poll payment status, then retry. Poll rules are in [llms.txt](https://satgate.io/llms.txt).
+Unpaid calls return 402 with a Lightning invoice and a macaroon. The price is 10 sats, and one payment buys access until the `credential_expires_at` time in that response, not just one request. For Lightning, show the invoice to the owner, poll payment status, then retry. Poll rules are in [llms.txt](https://satgate.io/llms.txt).
 
 📖 **[Full Quick Start Guide →](docs/getting-started/quickstart.md)**
 

@@ -68,7 +68,7 @@ routes:
       priceSats: 5
 ```
 
-Agents pay per request via the L402 protocol (HTTP 402 + Lightning invoice). In the dashboard this policy is Charge. The product name for it is Admit.
+Agents pay through the L402 protocol (HTTP 402 + Lightning invoice). The `terms.buys` field in the 402 says what one payment buys: a set number of requests, or access until the credential expires. In the dashboard this policy is Charge. The product name for it is Admit.
 
 A public Charge route is live:
 
@@ -76,7 +76,7 @@ A public Charge route is live:
 curl -i -H "X-SatGate-Tenant: satgate-demo" https://api.satgate.io/paid/agent-demo
 ```
 
-Unpaid calls return 402 with a Lightning invoice and a macaroon. The price in that response is 10 sats for one request. For Lightning, show the invoice to the owner, poll payment status, then retry. Poll rules are in [llms.txt](https://satgate.io/llms.txt).
+Unpaid calls return 402 with a Lightning invoice and a macaroon. The price is 10 sats, and one payment buys access until the `credential_expires_at` time in that response, not just one request. For Lightning, show the invoice to the owner, poll payment status, then retry. Poll rules are in [llms.txt](https://satgate.io/llms.txt).
 
 ## Mix and Match
 

@@ -111,7 +111,7 @@ Hosted paid demo (Admit; Charge in the dashboard). No local gateway:
 curl -i -H "X-SatGate-Tenant: satgate-demo" https://api.satgate.io/paid/agent-demo
 ```
 
-Unpaid calls return 402 with a Lightning invoice and a macaroon. The price in that response is 10 sats for one request. For Lightning, show the invoice to the owner, poll payment status, then retry. Poll rules are in [llms.txt](https://satgate.io/llms.txt).
+Unpaid calls return 402 with a Lightning invoice and a macaroon. The price is 10 sats, and one payment buys access until the `credential_expires_at` time in that response, not just one request. For Lightning, show the invoice to the owner, poll payment status, then retry. Poll rules are in [llms.txt](https://satgate.io/llms.txt).
 
 ## Next Steps
 
