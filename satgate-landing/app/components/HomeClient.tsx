@@ -228,7 +228,7 @@ const LandingPage = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-3">See SatGate in Action</h2>
           <p className="text-gray-400 mb-10 max-w-2xl mx-auto">Three recordings from production, with narration.</p>
-          <h3 className="text-xl font-bold mb-2">Your agents on your API: a budget they can&apos;t overspend</h3>
+          <h3 className="text-xl font-bold mb-2">Your agents&apos; API calls: a budget they can&apos;t overspend</h3>
           <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Connect an API, set a route to Control, and mint a token with a 100-credit budget. Without the token the route returns 401; with it, 200. A demo agent spends the budget at 10 credits a call until SatGate blocks its next call. Then the open-source verifier checks the signed receipt for that refusal.</p>
           <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
             <video
