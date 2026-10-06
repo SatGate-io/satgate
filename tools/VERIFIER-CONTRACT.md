@@ -78,22 +78,32 @@ to issuer anchoring and automatic discovery, with `--allow-embedded-key` as its
 explicit opt-out and warning. Existing flag precedence is unchanged. The API
 `verify_pack` default remains artifact-integrity mode in both copies.
 
-Demo has richer paired decision/reason profiles and provenance validation. The
-following pre-existing differences are intentionally not erased by copying one
-implementation over the other:
+Demo has richer paired decision/reason profiles and provenance validation. Tools
+validates non-paid enum membership rather than adopting demo's paired-profile
+matrix (for example, the historical tools acceptance and demo rejection of
+paid / budget_authorized are covered). Both surfaces accept every
+`decision_reason` the gateway writes. Unknown reasons still fail. These
+differences are legacy behavior, not a claim that the two surfaces are fully
+equivalent outside paid rail.
+
+If the `cryptography` package cannot be imported, both CLIs print that
+signatures could not be checked and how to install the package, then exit 3.
+That is not a receipt verdict: exit 0 is a valid pack, exit 1 is an invalid
+pack, and exit 2 is input that could not be loaded.
 
 | Non-paid pair | Tools | Demo, with proper provenance |
 | --- | --- | --- |
 | allowed / budget_authorized | accept | accept |
 | allowed / policy_allowed | accept | accept |
-| allowed / sandbox_no_spend | reject | accept |
-| allowed / observe_projected | reject | accept |
+| allowed / sandbox_no_spend | accept | accept |
+| allowed / observe_projected | accept | accept |
 | denied / budget_exhausted | accept | accept |
+| denied / insufficient_budget | accept | accept |
 | denied / policy_denied | accept | accept |
 | denied / capability_invalid | accept | accept |
 | denied / capability_expired | accept | accept |
-| denied / auth_missing | reject | accept |
-| denied / token_revoked | reject | accept |
+| denied / auth_missing | accept | accept |
+| denied / token_revoked | accept | accept |
 | denied / payment_required | accept | accept |
 
 `denied / policy_denied` has a second accepted demo shape: a verified capability

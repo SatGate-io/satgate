@@ -54,7 +54,27 @@ EXPECTED_PACK_SCHEMA = "satgate.evidence_pack.v1"
 EXPECTED_RECEIPT_SCHEMA = "satgate.receipt.v1"
 SUPPORTED_CANONICALIZATION = "jcs-rfc8785"
 ALLOWED_DECISIONS = {"allowed", "paid", "denied"}
-ALLOWED_DECISION_REASONS = {"budget_authorized", "budget_exhausted", "policy_allowed", "policy_denied", "payment_required", "capability_invalid", "capability_expired"}
+# Reasons the gateway writes into receipt.decision_reason. payment_verified is
+# checked by the paid-rail validator, not this set. Unknown reasons still fail.
+ALLOWED_DECISION_REASONS = {
+    "auth_missing",
+    "budget_authorized",
+    "budget_exhausted",
+    "capability_expired",
+    "capability_invalid",
+    "insufficient_budget",
+    "observe_projected",
+    "payment_required",
+    "policy_allowed",
+    "policy_denied",
+    "sandbox_no_spend",
+    "token_revoked",
+}
+CRYPTO_MISSING_EXIT = 3
+CRYPTO_MISSING_MESSAGE = (
+    "Signatures could not be checked because the Python package 'cryptography' is not installed. "
+    "Install it with: pip install 'cryptography>=42'"
+)
 DEFAULT_CLOCK_SKEW_SECONDS = 300
 SECRET_PATTERNS = [
     re.compile(r"Bearer\s+[A-Za-z0-9._~+/=-]+", re.IGNORECASE),
@@ -151,7 +171,7 @@ def sha256_receipt_hash(receipt: dict[str, Any]) -> str:
 
 def verify_ed25519_signature_with_public_key(receipt: dict[str, Any], public_key_value: str, reasons: list[str], reason_codes: list[str] | None, label: str) -> bool:
     if Ed25519PublicKey is None:
-        add_reason(reasons, reason_codes, "crypto_unavailable", "cryptography package is required for Ed25519 verification")
+        add_reason(reasons, reason_codes, "crypto_unavailable", CRYPTO_MISSING_MESSAGE)
         return False
 
     signature_value = receipt.get("signature")
@@ -723,6 +743,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--allow-mock", action="store_true", help="allow packs or receipts marked mock/demo/test")
     parser.add_argument("--now", help="RFC3339 timestamp to use for temporal verification (tests/reproducibility)")
     args = parser.parse_args(argv)
+    if Ed25519PublicKey is None:
+        print(CRYPTO_MISSING_MESSAGE)
+        return CRYPTO_MISSING_EXIT
 
     try:
         if args.jwks_url and args.jwks_file:
