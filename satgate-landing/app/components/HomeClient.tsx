@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Terminal, Code, Cpu, Zap, ArrowRight, CheckCircle, Copy, Check, Shield, Key, Lock, Clock, DollarSign, Bot, GitBranch, Activity, RefreshCw, Menu, X, Eye, SlidersHorizontal, Play, BookOpen, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import HeroVideo from './HeroVideo';
 
 const LandingPage = () => {
   const [copied, setCopied] = useState(false);
@@ -203,34 +204,13 @@ const LandingPage = () => {
             </div>
           </div>
 
-          {/* Right: Hero Demo Video */}
+          {/* Right: Hero Overview Video */}
           <div className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 pointer-events-none"></div>
-            <div className="relative bg-gray-900 rounded-xl border border-gray-800 overflow-hidden shadow-2xl">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-800 bg-gray-900/80">
-                <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <div className="text-xs text-gray-500 ml-2 font-mono">live recording · cloud.satgate.io</div>
-              </div>
-              <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                poster="/satgate-demo-poster.jpg"
-                className="w-full"
-                aria-label="An agent makes three paid MCP tool calls, then its fourth call is refused when the budget runs out"
-              >
-                <source src="/satgate-hero-live.mp4" type="video/mp4" />
-              </video>
-              <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-gray-300 font-mono">
-                3¢ budget · call 4 refused
-              </div>
-            </div>
+            <HeroVideo />
             <div className="text-center mt-4">
               <p className="text-sm text-gray-500 mb-3">
-                Recorded on production: three $0.01 tool calls, then the fourth is refused before the tool runs.
+                The product shots come from the production recordings below.
               </p>
               <Link
                 href="/protect"
