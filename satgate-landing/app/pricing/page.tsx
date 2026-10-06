@@ -308,7 +308,7 @@ const PricingPage = () => {
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">What plain MCP doesn&apos;t do</h2>
-          <p className="text-gray-400 text-center mb-12 max-w-2xl mx-auto">Out of the box, an MCP server lets agents spend your API credits with nothing to stop them. SatGate adds a meter and a shutoff valve.</p>
+          <p className="text-gray-400 text-center mb-12 max-w-2xl mx-auto">Left alone, an AI agent can keep running up your bill. SatGate adds a meter and a shutoff valve.</p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
