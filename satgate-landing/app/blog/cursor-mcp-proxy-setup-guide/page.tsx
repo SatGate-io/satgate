@@ -184,13 +184,11 @@ satgate-gateway --config ./satgate.yaml`}</code>
     url: https://mcp.internal/github-read
     policy:
       price: 1
-      dailyLimit: 100
 
   web-fetch:
     url: https://mcp.internal/web-fetch
     policy:
       price: 2
-      dailyLimit: 50
 
   ci-actions:
     url: https://mcp.internal/ci
@@ -210,13 +208,9 @@ satgate-gateway --config ./satgate.yaml`}</code>
           </p>
 
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
-            <code>{`satgate token create \
-  --name "cursor-dev" \
-  --audience "cursor" \
-  --daily-limit 25 \
-  --allow-tool "github-read" \
-  --allow-tool "web-fetch" \
-  --deny-tool "ci-actions"`}</code>
+            <code>{`Mint a token with a budget in the SatGate dashboard: Cloud, then Tokens or MCP setup.
+Send Cursor's calls through the gateway with that token.
+There is no satgate token create command, and no daily limit.`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">

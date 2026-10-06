@@ -251,11 +251,10 @@ class OpenAIBudgetWrapper:
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Step 1: Install the Gateway</h2>
           
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
-            <code>{`# Install SatGate
-npm install -g @satgate/gateway
-
-# Start with OpenAI proxy
-satgate start --proxy openai`}</code>
+            <code>{`Mint a token with a budget in the SatGate dashboard: Cloud, then Tokens or MCP setup.
+Send the agent's calls through the gateway with that token.
+The gateway holds the upstream key. The agent only holds the SatGate token.
+There is no daily limit yet. A spent budget returns HTTP 402 with code budget_exhausted.`}</code>
           </pre>
           
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Step 2: Create Budget-Limited Tokens</h2>
@@ -265,25 +264,9 @@ satgate start --proxy openai`}</code>
           </p>
           
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
-            <code>{`# Development token: $10/day for testing
-satgate token create \\
-  --name "dev-token" \\
-  --daily-limit 10 \\
-  --upstream openai
-
-# Production token: $100/day with alerts at 80%
-satgate token create \\
-  --name "prod-token" \\
-  --daily-limit 100 \\
-  --alert-threshold 0.8 \\
-  --upstream openai
-
-# High-priority token: $500/day for critical paths
-satgate token create \\
-  --name "priority-token" \\
-  --daily-limit 500 \\
-  --hourly-limit 50 \\
-  --upstream openai`}</code>
+            <code>{`Mint a token with a budget in the SatGate dashboard: Cloud, then Tokens or MCP setup.
+Use that token on calls you send through the gateway.
+Do not set a daily limit. That control does not exist yet.`}</code>
           </pre>
           
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Step 3: Update Your Code</h2>
@@ -293,24 +276,9 @@ satgate token create \\
           </p>
           
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
-            <code>{`import OpenAI from 'openai';
-
-// Before: Direct OpenAI connection
-// const openai = new OpenAI({
-//   apiKey: process.env.OPENAI_API_KEY
-// });
-
-// After: Route through SatGate
-const openai = new OpenAI({
-  apiKey: process.env.SATGATE_TOKEN,  // Your budget-limited token
-  baseURL: 'http://localhost:8000/v1' // SatGate proxy
-});
-
-// Everything else stays the same
-const response = await openai.chat.completions.create({
-  model: "gpt-4",
-  messages: [{ role: "user", content: "Hello" }]
-});`}</code>
+            <code>{`Send calls through the gateway URL shown in the dashboard, with the token you minted.
+The agent does not hold the upstream API key.
+A spent budget returns HTTP 402 with code budget_exhausted, not 429.`}</code>
           </pre>
           
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Step 4: Configure Team Budgets</h2>
@@ -320,22 +288,8 @@ const response = await openai.chat.completions.create({
           </p>
           
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
-            <code>{`# Create team buckets
-satgate budget create --name "engineering" --monthly 5000
-satgate budget create --name "marketing" --monthly 2000
-satgate budget create --name "support" --monthly 1000
-
-# Create tokens within team budgets
-satgate token create \\
-  --name "eng-dev" \\
-  --budget "engineering" \\
-  --daily-limit 50
-
-satgate token create \\
-  --name "marketing-automation" \\
-  --budget "marketing" \\
-  --daily-limit 100 \\
-  --model "gpt-3.5-turbo" # Restrict to cheaper models`}</code>
+            <code>{`# Create tokens within a budget in the dashboard (Cloud, then Tokens or MCP setup).
+# There is no satgate budget create command, and no daily limit.`}</code>
           </pre>
           
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Real-World Example: Preventing Retry Storms</h2>
@@ -398,74 +352,22 @@ async function processDocument(doc) {
           </p>
           
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
-            <code>{`// Middleware to inject user-specific tokens
-app.use(async (req, res, next) => {
-  const userId = req.user.id;
-  
-  // Get or create user token
-  let token = await cache.get(\`token:\${userId}\`);
-  if (!token) {
-    token = await satgate.tokens.create({
-      name: \`user-\${userId}\`,
-      daily_limit: 10,  // $10/day per user
-      upstream: 'openai'
-    });
-    await cache.set(\`token:\${userId}\`, token, 86400);
-  }
-  
-  // Inject token for OpenAI client
-  req.openaiToken = token;
-  next();
-});
-
-// Route handler uses user-specific token
-app.post('/chat', async (req, res) => {
-  const openai = new OpenAI({
-    apiKey: req.openaiToken,
-    baseURL: 'http://localhost:8000/v1'
-  });
-  
-  try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: req.body.messages
-    });
-    res.json(response);
-  } catch (error) {
-    if (error.type === 'budget_exceeded') {
-      res.status(429).json({
-        error: "Daily limit reached. Upgrade for more credits."
-      });
-    }
-  }
-});`}</code>
+            <code>{`Mint one token per user, with a budget, in the SatGate dashboard (Cloud, then Tokens or MCP setup).
+Send that user's calls through the gateway with their token.
+There is no daily limit, and no satgate.tokens.create API.
+A spent budget returns HTTP 402 with code budget_exhausted.`}</code>
           </pre>
           
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Monitoring and Alerts</h2>
           
           <p className="text-gray-300 leading-relaxed">
-            Unlike OpenAI&apos;s &ldquo;email after overspend&rdquo; approach, SatGate alerts you before problems:
+            A spent budget is enforced on the token, not by a CLI. There is no satgate alerts command.
           </p>
           
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
-            <code>{`# Configure alerts
-satgate alerts add \\
-  --type webhook \\
-  --url https://your-app.com/webhooks/budget-alerts \\
-  --events "budget.80_percent,budget.exceeded,anomaly.detected"
-
-# Alert payload when 80% spent
-{
-  "event": "budget.80_percent",
-  "token": "prod-token",
-  "spent": 80.00,
-  "limit": 100.00,
-  "period": "daily",
-  "top_consumers": [
-    { "endpoint": "/api/chat", "spent": 45.00 },
-    { "endpoint": "/api/summarize", "spent": 35.00 }
-  ]
-}`}</code>
+            <code>{`Mint the token in the SatGate dashboard (Cloud, then Tokens or MCP setup).
+There is no satgate alerts add command, and no daily period.
+A spent budget returns HTTP 402 with code budget_exhausted.`}</code>
           </pre>
           
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">The Results</h2>
@@ -492,18 +394,18 @@ satgate alerts add \\
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">What happens when limits are hit?</h3>
           
           <p className="text-gray-300 leading-relaxed">
-            Requests are immediately rejected with a 429 status and clear error message. Your app can handle this gracefully - offer upgrades, queue for later, or fall back to cached responses.
+            Requests are immediately rejected with HTTP 402 and code budget_exhausted. That is not a rate-limit 429. Your app can handle the 402 without retrying it as if the limit would clear on its own.
           </p>
           
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">Can I override limits in emergencies?</h3>
           
           <p className="text-gray-300 leading-relaxed">
-            Yes. Create emergency tokens with higher limits or use temporary overrides:
+            Mint another token with a larger budget in the dashboard if you need more room. There is no satgate token update command, and no daily limit to raise.
           </p>
           
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
-            <code>{`# Temporary override for incident response
-satgate token update incident-token --daily-limit 1000 --expires 1h`}</code>
+            <code>{`A spent budget returns HTTP 402 with code budget_exhausted.
+Do not treat that as HTTP 429.`}</code>
           </pre>
           
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Start Small, Scale Safely</h2>

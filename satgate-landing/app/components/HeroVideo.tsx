@@ -1,27 +1,16 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Pause, Play, Volume2, VolumeX } from 'lucide-react';
 
-// The overview commercial loops silently at the top of the homepage; its captions carry the story.
+// The overview commercial stays on its poster until the visitor presses play, so the mp4 is not downloaded on load.
 // "Sound on" restarts it from the beginning with the voice, plays it once, then it returns to the silent loop.
-// It doesn't autoplay for visitors who prefer reduced motion, and the pause button can stop it at any time
-// (content that moves for more than five seconds needs a way to pause).
+// The pause button can stop it at any time (content that moves for more than five seconds needs a way to pause).
 // Play state comes only from the video's own play/pause events.
 export default function HeroVideo() {
   const ref = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
-
-  useEffect(() => {
-    const v = ref.current;
-    if (!v) return;
-    v.muted = true;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    v.play().catch(() => {
-      // Autoplay blocked (e.g. low-power mode): the poster and Play button stay up.
-    });
-  }, []);
 
   const play = () => {
     ref.current?.play().catch(() => {});
@@ -85,7 +74,7 @@ export default function HeroVideo() {
           loop
           muted
           playsInline
-          preload="metadata"
+          preload="none"
           poster="/satgate-overview-poster.jpg"
           className="block w-full"
           aria-label="SatGate overview with captions: an agent stuck in a loop at 3 AM, a meter for agent spend, a budget the agent can't go past, a front door that charges external agents, and signed receipts anyone can check"

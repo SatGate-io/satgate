@@ -178,7 +178,7 @@ export default function DeepMindDelegationPage() {
                   <p className="text-gray-300 text-sm">
                     <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Every token is a macaroon.
                     Caveats enforce route restrictions, budget limits, time windows, and MCP tool scopes.
-                    Tokens are minted with <code className="text-purple-300 bg-gray-800 px-1.5 py-0.5 rounded text-xs">satgate token mint</code> and
+                    Tokens are minted in the SatGate dashboard (Cloud, then Tokens or MCP setup) and
                     carry their constraints cryptographically — no database lookup required for verification.
                   </p>
                 </div>

@@ -5,13 +5,13 @@ const metadata = {
   roles: ["issuer"],
   issuer: {
     name: "SatGate",
-    issuer_id: "https://satgate.io",
+    issuer_id: "https://api.satgate.io",
     product: "Economic firewall for AI agents: budgets for your own agents, payment from external agents on the routes you choose, and a signed receipt for every decision.",
     contact: "contact@satgate.io",
     key_discovery: {
       method: "jwks_uri",
       key_id_field: "issuer_kid",
-      jwks_uri: "https://satgate.io/.well-known/jwks.json",
+      jwks_uri: "https://api.satgate.io/.well-known/jwks.json",
     },
   },
   capability_acceptance: {
@@ -58,7 +58,12 @@ const metadata = {
       "signature",
     ],
     decisions: ["allowed", "denied", "delegated", "revoked", "paid"],
-    verification_endpoint: "https://api.satgate.io/v1/verify",
+    verifier: {
+      mode: "offline",
+      repository: "https://github.com/SatGate-io/satgate",
+      path: "tools/verify_evidence_pack.py",
+      url: "https://github.com/SatGate-io/satgate/blob/main/tools/verify_evidence_pack.py",
+    },
     evidence_pack_schema_url: "https://satgate.io/evidence-packs/evidence-pack.schema.v1.json",
   },
   rails_adapters: {

@@ -76,8 +76,11 @@ export const metadata: Metadata = {
     follow: true,
   },
   icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/icon-32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: { url: "/apple-touch-icon.png", sizes: "180x180" },
   },
 };
 
@@ -88,7 +91,7 @@ const jsonLd = {
       "@type": "Organization",
       name: "SatGate",
       url: "https://satgate.io",
-      logo: "https://satgate.io/logo.png",
+      logo: "https://satgate.io/apple-touch-icon.png",
       description:
         "SatGate is an economic firewall for AI agents. Before a request reaches your API or MCP tool, it checks the agent's budget and permissions, and payment where you charge for access. Each decision gets a signed receipt.",
       sameAs: ["https://github.com/SatGate-io/satgate"],

@@ -69,8 +69,8 @@ The compatibility rule is the same: clients must ignore unknown fields, and brea
   ],
   "trust_anchors": [
     {
-      "issuer_id": "https://satgate.io",
-      "jwks_uri": "https://satgate.io/.well-known/jwks.json",
+      "issuer_id": "https://api.satgate.io",
+      "jwks_uri": "https://api.satgate.io/.well-known/jwks.json",
       "status": "accepted"
     }
   ],

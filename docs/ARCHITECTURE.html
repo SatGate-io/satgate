@@ -241,7 +241,7 @@ compliance</li>
 │  │    │ • No auth    │ │ • Token req  │ │ • Token req  │ │ • Token req  │  ││
 │  │    │ • No meter   │ │ • Metering   │ │ • Metering   │ │ • Metering   │  ││
 │  │    │ • Pass-thru  │ │ • No enforce │ │ • Budget chk │ │ • Payment chk│  ││
-│  │    │              │ │              │ │ • 429 on fail│ │ • 402 on fail│  ││
+│  │    │              │ │              │ │ • 402 on fail│ │ • 402 on fail│  ││
 │  │    └──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘  ││
 │  │                                                                          ││
 │  └──────────────────────────────────────────────────────────────────────────┘│
@@ -269,8 +269,8 @@ compliance</li>
 │  │    • Check: current_usage &lt; budget_limit                                 ││
 │  │    • Add X-Budget-Remaining header                                       ││
 │  │                                                                          ││
-│  │    ❌ Budget exceeded? → 429 Too Many Requests                            ││
-│  │       └── Retry-After header included                                    ││
+│  │    ❌ Budget exceeded? → 402 budget_exhausted                             ││
+│  │       └── code budget_exhausted, not 429                                 ││
 │  └──────────────────────────────────────────────────────────────────────────┘│
 │                                    │                                          │
 │                                    ▼                                          │
@@ -358,7 +358,7 @@ compliance</li>
 │  │  Responsibilities:                                                  │   │
 │  │  • Manage budget allocations per tenant/token                       │   │
 │  │  • Track usage against budgets                                      │   │
-│  │  • Enforce limits (429 when exceeded)                               │   │
+│  │  • Enforce limits (402 budget_exhausted)                            │   │
 │  │  • Support budget delegation (child budgets)                        │   │
 │  │  • Alert on threshold warnings (80%, 90%, 100%)                     │   │
 │  │                                                                     │   │
@@ -553,7 +553,7 @@ processed:</p>
 <td><strong>Fail Response</strong></td>
 <td>N/A</td>
 <td>401</td>
-<td>401 / 429</td>
+<td>401 / 402</td>
 <td>401 / 402</td>
 </tr>
 <tr>
@@ -1206,7 +1206,7 @@ class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb16-1"><a href=
 <ul>
 <li><a href="https://satgate.io/docs">SatGate Gateway
 Documentation</a></li>
-<li><a href="https://github.com/SatGate-io/satgate-gateway">GitHub
+<li><a href="https://github.com/SatGate-io/satgate">GitHub
 Repository</a></li>
 <li><a href="./CAPABILITY_TOKENS.md">Capability Tokens</a></li>
 <li><a href="./POLICY_MODES.md">Policy Modes</a></li>

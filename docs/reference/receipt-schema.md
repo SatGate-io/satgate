@@ -126,7 +126,7 @@ These fields are evidence handles. They do not create a reputation claim by them
 
 - Issuer metadata: `https://satgate.io/.well-known/satgate`
 - Issuer schema: `https://satgate.io/.well-known/satgate.schema.json`
-- Issuer JWKS: `https://satgate.io/.well-known/jwks.json`
+- Issuer JWKS: `https://api.satgate.io/.well-known/jwks.json` (`https://satgate.io/.well-known/jwks.json` redirects there)
 - Acceptor schema: `https://satgate.io/.well-known/satgate-acceptor.schema.json`
 - Mock acceptor receipt: `https://satgate.io/examples/mock-accepted-satgate-receipt.v1.json`
 

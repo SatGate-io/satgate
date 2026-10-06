@@ -233,7 +233,7 @@ const LandingPage = () => {
           <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
             <video
               controls
-              preload="metadata"
+              preload="none"
               poster="/satgate-demo-http-poster.jpg"
               className="w-full"
               playsInline
@@ -250,7 +250,7 @@ const LandingPage = () => {
           <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
             <video
               controls
-              preload="metadata"
+              preload="none"
               poster="/satgate-demo-mcp-poster.jpg"
               className="w-full"
               playsInline
@@ -267,7 +267,7 @@ const LandingPage = () => {
           <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-yellow-500/10">
             <video
               controls
-              preload="metadata"
+              preload="none"
               poster="/satgate-admit-poster.jpg"
               className="w-full"
               playsInline
@@ -485,7 +485,7 @@ const LandingPage = () => {
             <div className="max-w-3xl mx-auto relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
               <video
                 controls
-                preload="metadata"
+                preload="none"
                 poster="/satgate-delegation-poster.jpg"
                 className="w-full"
                 playsInline
