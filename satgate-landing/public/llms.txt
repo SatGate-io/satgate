@@ -62,18 +62,31 @@ One USDC payment buys one request. A signed payment is accepted once; sending it
 
 ### Try it as an agent
 
-A public paid route is open. The agent does not need an account.
+Two public paid routes are open. The agent does not need an account.
 
-- URL: GET https://mcp-prod-final.satgate.cloud/paid/premium
-- Price: 10 sats over Lightning, or 0.01 USDC on Base (x402)
-- `terms.buys.uses` is 1 (and `terms.x402.buys.uses` is 1): each payment buys one request.
+#### Lightning, paid from any wallet (such as Cash App)
+
+- URL: GET https://api.satgate.io/paid/agent-demo
+- Header: `X-SatGate-Tenant: satgate-demo`
+- Price: 10 sats
+- `terms.buys.uses` is 0 on this route: one payment buys access until `credential_expires_at`, not one request. Read `terms` on the 402 before you multiply price by volume.
 
 1. Call the route. Read the 402 and the terms in the body.
-2. To pay with Lightning: show the invoice to the owner and ask them to pay it from any Lightning wallet, such as Cash App. Poll payment status using the rules in "Lightning (L402) flow on a paid route that takes Lightning" above. Send `Authorization: L402 <macaroon>` only, without a preimage, and wait at least `terms.status.poll_min_interval_secs` between polls. When status is paid, retry the original request with `Authorization` set to the returned value.
-3. To pay with USDC: follow "USDC (x402) on a paid route" above, using the `accepts` entry in the same 402.
-4. A paid call returns 200 and a signed receipt.
+2. Show the Lightning invoice to the owner. Ask them to pay it from any Lightning wallet, such as Cash App.
+3. Poll payment status using the rules in "Lightning (L402) flow on a paid route that takes Lightning" above. Send `Authorization: L402 <macaroon>` only. Do not send a preimage. Wait at least `terms.status.poll_min_interval_secs` between polls.
+4. When status is paid, the status response includes an authorization value. Retry the original request with `Authorization` set to that value. A paid call returns 200 and a signed receipt.
 
-This route is Admit. In the dashboard, Admit is the Charge policy.
+#### USDC on Base
+
+- URL: GET https://mcp-prod-final.satgate.cloud/paid/premium
+- Price: 0.01 USDC on Base (x402)
+- `terms.x402.buys.uses` is 1: each payment buys one request.
+
+Call the route and read the 402. Follow "USDC (x402) on a paid route" above, using the `accepts` entry in the same 402. A paid call returns 200 and a signed receipt.
+
+This route also offers a 10-sat Lightning invoice. Paying that one needs a wallet that shows the preimage, so for Cash App use the Lightning route above.
+
+Both routes are Admit. In the dashboard, Admit is the Charge policy.
 
 ## Free Tools and Calculators
 - AI Agent Cost Control Tools Hub: https://satgate.io/tools
