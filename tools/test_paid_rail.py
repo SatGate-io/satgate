@@ -39,14 +39,15 @@ PAID_FIELDS = ('rail', 'amount_sats', 'payment_hash', 'invoice_hash', 'macaroon_
 LEGACY_PROFILES = (
     ('allowed', 'budget_authorized', True),
     ('allowed', 'policy_allowed', True),
-    ('allowed', 'sandbox_no_spend', False),
-    ('allowed', 'observe_projected', False),
+    ('allowed', 'sandbox_no_spend', True),
+    ('allowed', 'observe_projected', True),
     ('denied', 'budget_exhausted', True),
+    ('denied', 'insufficient_budget', True),
     ('denied', 'policy_denied', True),
     ('denied', 'capability_invalid', True),
     ('denied', 'capability_expired', True),
-    ('denied', 'auth_missing', False),
-    ('denied', 'token_revoked', False),
+    ('denied', 'auth_missing', True),
+    ('denied', 'token_revoked', True),
     ('denied', 'payment_required', True),
 )
 

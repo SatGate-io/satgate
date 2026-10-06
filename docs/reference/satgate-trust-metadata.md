@@ -89,6 +89,22 @@ Decision labels are a closed enum in v1:
 - `revoked`
 - `paid`
 
+Gateway receipts use a closed `decision_reason` vocabulary. The public verifier accepts these values and rejects any other reason:
+
+- `auth_missing`
+- `budget_authorized`
+- `budget_exhausted`
+- `capability_expired`
+- `capability_invalid`
+- `insufficient_budget`
+- `observe_projected`
+- `payment_required`
+- `payment_verified`
+- `policy_allowed`
+- `policy_denied`
+- `sandbox_no_spend`
+- `token_revoked`
+
 Evidence Packs use the public schema at:
 
 ```text

@@ -64,6 +64,7 @@ DECISION_REASON_PROFILES = {
     ("allowed", "payment_verified"): "paid_rail",
     ("paid", "payment_verified"): "paid_rail",
     ("denied", "budget_exhausted"): "evaluated",
+    ("denied", "insufficient_budget"): "evaluated",
     ("denied", "policy_denied"): "evaluated",
     ("denied", "capability_invalid"): "not_evaluated",
     ("denied", "capability_expired"): "not_evaluated",
@@ -365,7 +366,7 @@ def strict_json_equal(left: Any, right: Any) -> bool:
 
 def verify_ed25519_signature_with_public_key(receipt: dict[str, Any], public_key_value: str, reasons: list[str], reason_codes: list[str] | None, label: str) -> bool:
     if Ed25519PublicKey is None:
-        add_reason(reasons, reason_codes, "crypto_unavailable", "cryptography package is required for Ed25519 verification")
+        add_reason(reasons, reason_codes, "crypto_unavailable", "Signatures could not be checked because the Python package 'cryptography' is not installed. Install it with: pip install 'cryptography>=42'")
         return False
 
     signature_value = receipt.get("signature")
@@ -1290,6 +1291,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--allow-mock", action="store_true", help="allow packs or receipts marked mock/demo/test")
     parser.add_argument("--now", help="RFC3339 timestamp to use for temporal verification (tests/reproducibility)")
     args = parser.parse_args(argv)
+    if Ed25519PublicKey is None:
+        print(
+            "Signatures could not be checked because the Python package 'cryptography' is not installed. "
+            "Install it with: pip install 'cryptography>=42'"
+        )
+        return 3
 
     try:
         if args.jwks_url and args.jwks_file:

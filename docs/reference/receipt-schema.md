@@ -46,6 +46,22 @@ The global receipt decision enum is closed for v1:
 
 Specific profiles can emit a subset. For example, acceptor metadata v0 emits only `allowed`, `denied`, and `paid`; delegation and revocation remain issuer-side authority lifecycle decisions unless a future acceptor profile defines upstream delegation/revocation semantics.
 
+Gateway receipts use a closed `decision_reason` vocabulary. The public verifier accepts these values and rejects any other reason:
+
+- `auth_missing`
+- `budget_authorized`
+- `budget_exhausted`
+- `capability_expired`
+- `capability_invalid`
+- `insufficient_budget`
+- `observe_projected`
+- `payment_required`
+- `payment_verified`
+- `policy_allowed`
+- `policy_denied`
+- `sandbox_no_spend`
+- `token_revoked`
+
 ## Verification sequence
 
 1. Parse the receipt as JSON.
