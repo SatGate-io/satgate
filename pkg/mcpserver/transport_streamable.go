@@ -89,6 +89,9 @@ func (t *StreamableHTTPTransport) Connect(ctx context.Context) error {
 	// is started lazily after the first successful POST that returns a session ID.
 	_, err := http.NewRequest("GET", t.url, nil)
 	if err != nil {
+		if t.redact {
+			return fmt.Errorf("streamable HTTP: invalid URL")
+		}
 		return fmt.Errorf("streamable HTTP: invalid URL %q: %w", t.url, err)
 	}
 
@@ -127,7 +130,11 @@ func (t *StreamableHTTPTransport) maybeStartNotificationListener() {
 
 		resp, err := t.do(req)
 		if err != nil {
-			log.Debug().Err(err).Msg("streamable HTTP: notification stream not available")
+			if t.redact {
+				log.Debug().Msg("streamable HTTP: notification stream not available")
+			} else {
+				log.Debug().Err(err).Msg("streamable HTTP: notification stream not available")
+			}
 			return
 		}
 
@@ -163,6 +170,9 @@ func (t *StreamableHTTPTransport) ReadMessage(ctx context.Context) (json.RawMess
 func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.RawMessage) error {
 	req, err := http.NewRequestWithContext(ctx, "POST", t.url, bytes.NewReader(msg))
 	if err != nil {
+		if t.redact {
+			return fmt.Errorf("streamable HTTP POST create: request could not be built")
+		}
 		return fmt.Errorf("streamable HTTP POST create: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
@@ -178,7 +188,7 @@ func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.Raw
 
 	resp, err := t.do(req)
 	if err != nil {
-		return wrapUpstreamError("streamable HTTP POST", t.url, err)
+		return wrapUpstreamErrorRedacted("streamable HTTP POST", t.url, err, t.redact)
 	}
 
 	// Capture session ID from response and start notification listener once
@@ -201,9 +211,9 @@ func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.Raw
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
 		resp.Body.Close()
 		if t.redact {
-			return fmt.Errorf("streamable HTTP POST %s: status %d", t.url, resp.StatusCode)
+			return newUpstreamStatusError(resp.StatusCode, "streamable HTTP POST %s: status %d", displayOriginOf(t.url), resp.StatusCode)
 		}
-		return fmt.Errorf("streamable HTTP POST %s: status %d: %s", t.url, resp.StatusCode, string(body))
+		return newUpstreamStatusError(resp.StatusCode, "streamable HTTP POST %s: status %d: %s", t.url, resp.StatusCode, string(body))
 	}
 
 	ct := resp.Header.Get("Content-Type")
@@ -219,7 +229,11 @@ func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.Raw
 		go func() {
 			defer resp.Body.Close()
 			if err := t.readSSEStream(resp.Body); err != nil && t.ctx.Err() == nil {
-				log.Debug().Err(err).Msg("streamable HTTP: SSE response stream ended")
+				if t.redact {
+					log.Debug().Msg("streamable HTTP: SSE response stream ended")
+				} else {
+					log.Debug().Err(err).Msg("streamable HTTP: SSE response stream ended")
+				}
 			}
 		}()
 		return nil
@@ -229,6 +243,10 @@ func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.Raw
 		defer resp.Body.Close()
 		body, err := io.ReadAll(io.LimitReader(resp.Body, 10*1024*1024)) // 10MB max
 		if err != nil {
+			if t.redact {
+				// A chunked-body or framing error quotes upstream bytes.
+				return fmt.Errorf("streamable HTTP: read response body: the body could not be read")
+			}
 			return fmt.Errorf("streamable HTTP: read response body: %w", err)
 		}
 
@@ -304,6 +322,9 @@ func (t *StreamableHTTPTransport) readSSEStream(body io.Reader) error {
 	}
 
 	if err := scanner.Err(); err != nil {
+		if t.redact {
+			return fmt.Errorf("SSE scanner: the stream could not be read")
+		}
 		return fmt.Errorf("SSE scanner: %w", err)
 	}
 	return io.EOF
@@ -366,7 +387,11 @@ func (t *StreamableHTTPTransport) Close() error {
 			}
 			resp, err := t.do(req)
 			if err != nil {
-				log.Debug().Err(err).Msg("streamable HTTP: session DELETE failed")
+				if t.redact {
+					log.Debug().Msg("streamable HTTP: session DELETE failed")
+				} else {
+					log.Debug().Err(err).Msg("streamable HTTP: session DELETE failed")
+				}
 			} else {
 				io.Copy(io.Discard, io.LimitReader(resp.Body, 1024))
 				resp.Body.Close()

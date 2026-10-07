@@ -2,7 +2,6 @@ package mcpserver
 
 import (
 	"crypto/tls"
-	"fmt"
 	"net"
 	"net/http"
 	"syscall"
@@ -25,7 +24,7 @@ func SSRFSafeTransport(tlsSkipVerify, allowPrivate bool) *http.Transport {
 			}
 			ip := net.ParseIP(host)
 			if ip != nil && (ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsUnspecified()) {
-				return fmt.Errorf("SSRF blocked: upstream resolved to private/internal IP %s", host)
+				return &ssrfBlockedError{host: host}
 			}
 			return nil
 		}

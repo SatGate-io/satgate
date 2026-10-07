@@ -51,6 +51,7 @@ type Proxy struct {
 	client            Transport // client-facing transport
 	upstream          *UpstreamManager
 	router            UpstreamRouter // per-tenant routing (nil = use shared upstream)
+	guard             ResponseGuard  // optional, wraps every answer (nil = none)
 	budget            BudgetEnforcer
 	costs             CostResolver
 	tenantCosts       TenantCostResolver // optional, per-tenant cost resolution
@@ -65,6 +66,20 @@ type Proxy struct {
 	tokenID           string            // default session token (from config or first auth)
 	rootToken         string            // auto-minted root token (for delegation demos)
 }
+
+// ResponseGuard wraps the handling of every request the proxy answers: the
+// SSE message endpoint, the Streamable HTTP endpoint and the stdio loop all
+// call it, so it is the single point where an answer leaves for the agent.
+//
+// handle runs the request and returns what the proxy would send. The guard may
+// pass a derived context to handle (to collect per-request state that code
+// below the proxy, such as an UpstreamRouter, records), and may rewrite the
+// response or the error that handle returns before they go out. Off by
+// default: with no guard set the proxy behaves as before.
+type ResponseGuard func(ctx context.Context, req *Request, handle func(ctx context.Context) (*Response, error)) (*Response, error)
+
+// SetResponseGuard installs g. Call it before the proxy serves requests.
+func (p *Proxy) SetResponseGuard(g ResponseGuard) { p.guard = g }
 
 // defaultRouter wraps the shared UpstreamManager for non-multi-tenant use.
 type defaultRouter struct {
@@ -391,8 +406,19 @@ func (p *Proxy) Run(ctx context.Context, clientTransport Transport) error {
 	}
 }
 
-// handleRequest dispatches a JSON-RPC request to the appropriate handler.
+// handleRequest answers a JSON-RPC request. It is the one place every
+// agent-facing transport calls; an installed ResponseGuard wraps it.
 func (p *Proxy) handleRequest(ctx context.Context, req *Request) (*Response, error) {
+	if p.guard == nil {
+		return p.dispatchRequest(ctx, req)
+	}
+	return p.guard(ctx, req, func(ctx context.Context) (*Response, error) {
+		return p.dispatchRequest(ctx, req)
+	})
+}
+
+// dispatchRequest dispatches a JSON-RPC request to the appropriate handler.
+func (p *Proxy) dispatchRequest(ctx context.Context, req *Request) (*Response, error) {
 	switch req.Method {
 	case MethodInitialize:
 		return p.handleInitialize(req)
