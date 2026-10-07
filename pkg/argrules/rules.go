@@ -55,7 +55,7 @@ const (
 	MaxRulesPerToken   = 16       // rules over all caveats
 	MaxShapesPerRule   = 16
 	MaxFieldsPerShape  = 8
-	MaxOneOfValues     = 64
+	MaxOneOfValues     = 128
 	MaxOneOfValueBytes = 256
 	MaxURLHosts        = 8
 	MaxURLPorts        = 4
