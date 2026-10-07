@@ -14,14 +14,26 @@ package argrules
 //
 // The rules ride inside a scope caveat:
 //
-//	scope = argrules:v1:<base64url(JSON)>
+//	scope = argrules:v1:<nonce>:<base64url(JSON)>
 //
-// A verifier that does not know about rules reads that as a scope word that
-// matches no tool name. Every scope caveat must allow a tool, so such a
-// verifier denies every tools/call. A new caveat name would be ignored by
-// today's verifiers ("Unknown caveats are ignored"), which would drop the
-// limit silently, so no new caveat name is used. macaroon.Service.Verify also
-// refuses a token carrying this caveat, so HTTP routes cannot ignore it.
+// <nonce> is 32 hex characters (128 random bits), fresh for every rule caveat
+// minted, so two tokens with the same rules carry different words.
+//
+// What this gives an older verifier, exactly: it splits a scope on commas and
+// compares each word to the tool name. The rule word is not "*", "api:*" or
+// "mcp:*", and it does not end in ":*", so it matches a real tool name only
+// by exact equality, and the older code compares the whole word. Every scope
+// caveat must allow a tool, so the older verifier denies every real tool on a
+// rule-carrying token. The one case it would allow is a tool named exactly
+// like the whole word. The word holds 128 random bits that only the token's
+// holder and issuer see, so an upstream cannot advertise a name that matches
+// a token it has never seen. New runtimes also refuse any upstream tool whose
+// name starts with the reserved prefix (see macaroon.ArgumentRulesScopePrefix).
+//
+// A new caveat name would be ignored by today's verifiers ("Unknown caveats
+// are ignored"), which would drop the limit silently, so no new caveat name is
+// used. macaroon.Service.Verify also refuses a token carrying this caveat, so
+// HTTP routes cannot ignore it.
 //
 // JSON document (version 1):
 //
@@ -37,7 +49,9 @@ package argrules
 
 import (
 	"bytes"
+	"crypto/rand"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -548,13 +562,30 @@ func Marshal(rules []Rule) ([]byte, error) {
 	return doc, nil
 }
 
-// ScopeValue is the scope caveat value that carries rules.
+// nonceHexLen is the length of the nonce in a rule word: 16 random bytes in hex.
+const nonceHexLen = 32
+
+// newNonce returns 128 fresh random bits as 32 lowercase hex characters.
+func newNonce() (string, error) {
+	var b [16]byte
+	if _, err := rand.Read(b[:]); err != nil {
+		return "", fmt.Errorf("argument rules: no random nonce available: %w", err)
+	}
+	return hex.EncodeToString(b[:]), nil
+}
+
+// ScopeValue is the scope caveat value that carries rules. Each call draws a
+// fresh 128-bit nonce, so the same rules give a different word every time.
 func ScopeValue(rules []Rule) (string, error) {
 	doc, err := Marshal(rules)
 	if err != nil {
 		return "", err
 	}
-	return scopePrefix + base64.RawURLEncoding.EncodeToString(doc), nil
+	nonce, err := newNonce()
+	if err != nil {
+		return "", err
+	}
+	return scopePrefix + nonce + ":" + base64.RawURLEncoding.EncodeToString(doc), nil
 }
 
 // Caveat is the full caveat string, "scope = argrules:v1:...".
@@ -571,7 +602,17 @@ func ParseScopeValue(value string) ([]Rule, error) {
 	if !strings.HasPrefix(value, scopePrefix) {
 		return nil, ruleErr("unsupported rule version")
 	}
-	enc := strings.TrimPrefix(value, scopePrefix)
+	rest := strings.TrimPrefix(value, scopePrefix)
+	nonce, enc, ok := strings.Cut(rest, ":")
+	if !ok || len(nonce) != nonceHexLen {
+		return nil, ruleErr("rule word has no nonce")
+	}
+	for i := 0; i < len(nonce); i++ {
+		c := nonce[i]
+		if !(c >= '0' && c <= '9' || c >= 'a' && c <= 'f') {
+			return nil, ruleErr("rule word has no nonce")
+		}
+	}
 	if len(enc) > base64.RawURLEncoding.EncodedLen(MaxDocBytes) {
 		return nil, ruleErr("document is larger than %d bytes", MaxDocBytes)
 	}

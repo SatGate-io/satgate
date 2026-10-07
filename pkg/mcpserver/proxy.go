@@ -15,6 +15,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/satgate-io/satgate/pkg/argrules"
 	"github.com/satgate-io/satgate/pkg/denial"
+	"github.com/satgate-io/satgate/pkg/macaroon"
 )
 
 // ContextKey type for context values.
@@ -557,6 +558,8 @@ func (p *Proxy) handleToolsListWithCtx(ctx context.Context, req *Request) (*Resp
 		tools = p.toolsListEnricher(ctx, tenantID, tools)
 	}
 
+	tools = dropReservedTools(tools)
+
 	result, err := json.Marshal(map[string]interface{}{
 		"tools": tools,
 	})
@@ -571,12 +574,45 @@ func (p *Proxy) handleToolsListWithCtx(ctx context.Context, req *Request) (*Resp
 	}, nil
 }
 
+// dropReservedTools removes every tool whose name starts with the reserved
+// argument-rules prefix. An upstream can advertise any name; one that starts
+// with the prefix is never offered to an agent by a runtime that knows rules.
+// A tool entry that cannot be read is dropped too: it could hide such a name.
+func dropReservedTools(tools []json.RawMessage) []json.RawMessage {
+	kept := make([]json.RawMessage, 0, len(tools))
+	for _, t := range tools {
+		var probe struct {
+			Name json.RawMessage `json:"name"`
+		}
+		if err := json.Unmarshal(t, &probe); err != nil {
+			continue
+		}
+		var name string
+		if len(probe.Name) > 0 {
+			if err := json.Unmarshal(probe.Name, &name); err != nil {
+				continue
+			}
+		}
+		if macaroon.IsReservedToolName(name) {
+			continue
+		}
+		kept = append(kept, t)
+	}
+	return kept
+}
+
 // handleToolsCall is the hot path — intercepts tool calls for budget enforcement.
 func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *TokenInfo) (*Response, error) {
 	// Parse tool call
 	tc, err := ParseToolCall(req.Params)
 	if err != nil {
-		return NewErrorResponse(req.ID, CodeInvalidParams, err.Error()), nil
+		return NewErrorResponse(req.ID, CodeInvalidParams, toolCallParseMessage(err)), nil
+	}
+
+	// A tool whose name starts with the reserved argument-rules prefix is never
+	// forwarded, whatever the token allows: see macaroon.ArgumentRulesScopePrefix.
+	if macaroon.IsReservedToolName(tc.Name) {
+		return NewErrorResponse(req.ID, CodePolicyDenied, "tool name uses a reserved prefix and is not available"), nil
 	}
 
 	// Every scope caveat must allow the tool. A later caveat can only narrow.

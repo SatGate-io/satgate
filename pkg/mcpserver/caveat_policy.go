@@ -108,8 +108,9 @@ func (t *TokenInfo) AllowsTool(toolName string) bool {
 			}
 			if argrules.IsRuleScope(strings.TrimPrefix(caveat, "scope = ")) {
 				// A rule caveat limits arguments, not tool names. The
-				// tool-name check of an older verifier reads it as a word
-				// that matches nothing, which is how it fails closed.
+				// tool-name check of an older verifier compares the whole
+				// word to the tool name, which no real tool equals, so it
+				// denies every real tool; that is how it fails closed.
 				continue
 			}
 			saw = true

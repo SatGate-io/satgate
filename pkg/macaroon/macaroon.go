@@ -48,10 +48,22 @@ type Service struct {
 // ArgumentRulesScopePrefix starts every scope word that carries tool argument
 // rules, for example "scope = argrules:v1:<base64url JSON>". The rules are not
 // a new caveat name on purpose. Unknown caveat names are ignored by every
-// verifier built before rules existed, which would drop the limit silently. A
-// scope word that names no tool matches nothing there, so those verifiers
-// deny every tool call instead.
+// verifier built before rules existed, which would drop the limit silently.
+// Those verifiers match a scope word to a tool name by exact equality of the
+// whole word, so the word denies every real tool. It would allow a tool named
+// exactly like the whole word; the word carries a fresh 128-bit nonce (see
+// pkg/argrules), so no upstream can advertise that name for a token it never
+// saw. New runtimes refuse every tool whose name starts with this prefix
+// (IsReservedToolName), in tools/list and in tools/call.
 const ArgumentRulesScopePrefix = "argrules:"
+
+// IsReservedToolName reports whether a tool name starts with the reserved
+// argument-rules prefix. An upstream tool with such a name is hidden from
+// tools/list and refused on tools/call by runtimes that know about rules.
+func IsReservedToolName(name string) bool {
+	return len(name) >= len(ArgumentRulesScopePrefix) &&
+		strings.EqualFold(name[:len(ArgumentRulesScopePrefix)], ArgumentRulesScopePrefix)
+}
 
 // IsArgumentRulesScope reports whether any word of a scope caveat value uses
 // the reserved argument-rules prefix. A word counts when it appears in a

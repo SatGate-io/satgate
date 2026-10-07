@@ -550,12 +550,15 @@ func injectMetaToken(params json.RawMessage, token string) json.RawMessage {
 
 	// Check if _meta already has a token
 	if metaRaw, ok := m["_meta"]; ok {
-		var meta map[string]interface{}
+		// RawMessage values: a number in _meta is carried as written, never
+		// converted to float64 and back.
+		var meta map[string]json.RawMessage
 		if err := json.Unmarshal(metaRaw, &meta); err == nil {
 			if _, hasToken := meta["token"]; hasToken {
 				return params // already has token, don't override
 			}
-			meta["token"] = token
+			tokenJSON, _ := json.Marshal(token)
+			meta["token"] = tokenJSON
 			metaJSON, _ := json.Marshal(meta)
 			m["_meta"] = metaJSON
 		}
