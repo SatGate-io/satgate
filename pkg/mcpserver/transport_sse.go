@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -34,6 +35,15 @@ type SSETransport struct {
 	endpointReady     chan struct{}
 	endpointReadyOnce sync.Once
 
+	// failed is the terminal error set when an endpoint event is refused.
+	// Once set, the stream reader stops, no later endpoint event is stored,
+	// and Connect returns this error. Guarded by mu.
+	failed error
+
+	// Test hooks. Both are nil outside tests.
+	onStreamEnd   func() // called when runSSEStream returns
+	beforeConnect func() // called in Connect before it waits for a result
+
 	// inbound messages from SSE stream
 	inbox  chan json.RawMessage
 	errors chan error
@@ -52,13 +62,10 @@ func NewSSETransport(baseURL string, headers map[string]string, tlsSkipVerify bo
 	ctx, cancel := context.WithCancel(context.Background())
 
 	ap := len(allowPrivate) > 0 && allowPrivate[0]
-	httpClient := &http.Client{
-		Timeout:   0, // no global timeout — SSE streams are long-lived
-		Transport: SSRFSafeTransport(tlsSkipVerify, ap),
-	}
+	httpClient := newUpstreamHTTPClient(tlsSkipVerify, ap)
 
 	return &SSETransport{
-		baseURL:       strings.TrimRight(baseURL, "/"),
+		baseURL:       baseURL,
 		headers:       headers,
 		httpClient:    httpClient,
 		endpointReady: make(chan struct{}),
@@ -74,10 +81,18 @@ func (t *SSETransport) Connect(ctx context.Context) error {
 	t.wg.Add(1)
 	go t.sseLoop()
 
+	if t.beforeConnect != nil {
+		t.beforeConnect()
+	}
+
 	// Wait for endpoint event or timeout
 	select {
 	case <-t.endpointReady:
-		log.Debug().Str("endpoint", t.messageEndpoint).Msg("SSE transport: endpoint received")
+		// A refused endpoint is terminal and wins over any ready signal.
+		if err := t.terminalError(); err != nil {
+			return fmt.Errorf("SSE connect failed: %w", err)
+		}
+		log.Debug().Msg("SSE transport: endpoint received")
 		return nil
 	case err := <-t.errors:
 		return fmt.Errorf("SSE connect failed: %w", err)
@@ -122,6 +137,9 @@ func (t *SSETransport) sseLoop() {
 
 // runSSEStream connects to the SSE endpoint and reads events until error or close.
 func (t *SSETransport) runSSEStream() error {
+	if t.onStreamEnd != nil {
+		defer t.onStreamEnd()
+	}
 	req, err := http.NewRequestWithContext(t.ctx, "GET", t.baseURL, nil)
 	if err != nil {
 		return fmt.Errorf("create SSE request: %w", err)
@@ -132,9 +150,9 @@ func (t *SSETransport) runSSEStream() error {
 		req.Header.Set(k, v)
 	}
 
-	resp, err := t.httpClient.Do(req)
+	resp, err := t.do(req)
 	if err != nil {
-		t.sendError(fmt.Errorf("SSE GET %s: %w", t.baseURL, err))
+		t.sendError(wrapUpstreamError("SSE GET", t.baseURL, err))
 		return err
 	}
 	defer resp.Body.Close()
@@ -153,6 +171,15 @@ func (t *SSETransport) runSSEStream() error {
 		return err
 	}
 
+	// The configured upstream URL is the origin reference. The final request
+	// URL of this stream (after any followed same-origin redirect) is the base
+	// for relative endpoint events.
+	upstreamURL := req.URL
+	streamURL := upstreamURL
+	if resp.Request != nil && resp.Request.URL != nil {
+		streamURL = resp.Request.URL
+	}
+
 	// Parse SSE stream
 	scanner := bufio.NewScanner(resp.Body)
 	scanner.Buffer(make([]byte, 0, 64*1024), 10*1024*1024) // 10MB max line
@@ -167,7 +194,10 @@ func (t *SSETransport) runSSEStream() error {
 			// Empty line = end of event
 			if len(dataLines) > 0 {
 				data := strings.Join(dataLines, "\n")
-				t.handleSSEEvent(eventType, data)
+				t.handleSSEEvent(upstreamURL, streamURL, eventType, data)
+				if err := t.terminalError(); err != nil {
+					return err
+				}
 				eventType = ""
 				dataLines = nil
 			}
@@ -190,34 +220,42 @@ func (t *SSETransport) runSSEStream() error {
 	return io.EOF
 }
 
-func (t *SSETransport) handleSSEEvent(eventType, data string) {
+func (t *SSETransport) handleSSEEvent(upstreamURL, streamURL *url.URL, eventType, data string) {
 	switch eventType {
 	case "endpoint":
-		// Server provides the POST endpoint URL
+		// Server provides the POST endpoint URL. A relative value resolves
+		// against the URL of the stream that delivered it. An endpoint whose
+		// origin differs from the configured upstream is refused and not
+		// stored; the refusal is terminal for the transport.
 		endpoint := strings.TrimSpace(data)
 		if endpoint == "" {
 			return
 		}
-		// Handle relative URLs
-		if strings.HasPrefix(endpoint, "/") {
-			// Extract scheme + host from baseURL
-			parts := strings.SplitN(t.baseURL, "://", 2)
-			if len(parts) == 2 {
-				hostEnd := strings.Index(parts[1], "/")
-				if hostEnd == -1 {
-					endpoint = parts[0] + "://" + parts[1] + endpoint
-				} else {
-					endpoint = parts[0] + "://" + parts[1][:hostEnd] + endpoint
-				}
-			}
+		t.mu.Lock()
+		skip := t.messageEndpoint != "" || t.failed != nil
+		t.mu.Unlock()
+		if skip {
+			return
+		}
+		resolved, err := resolveUpstreamReference(streamURL, endpoint)
+		if err == nil {
+			err = endpointOriginError(upstreamURL, resolved)
+		}
+		if err != nil {
+			t.failConnect(fmt.Errorf("SSE endpoint rejected: %w", err))
+			return
 		}
 		t.mu.Lock()
-		t.messageEndpoint = endpoint
+		if t.failed != nil {
+			t.mu.Unlock()
+			return
+		}
+		t.messageEndpoint = resolved.String()
 		t.mu.Unlock()
 		t.endpointReadyOnce.Do(func() {
 			close(t.endpointReady)
 		})
-		log.Debug().Str("endpoint", endpoint).Msg("SSE: received message endpoint")
+		log.Debug().Str("origin", displayOrigin(resolved)).Msg("SSE: received message endpoint")
 
 	case "message", "":
 		// JSON-RPC message from server
@@ -234,6 +272,29 @@ func (t *SSETransport) handleSSEEvent(eventType, data string) {
 		log.Debug().Str("event", eventType).Str("data", data[:min(len(data), 200)]).
 			Msg("SSE: unknown event type")
 	}
+}
+
+func (t *SSETransport) do(req *http.Request) (*http.Response, error) {
+	return doUpstream(t.httpClient, req, len(t.headers) > 0)
+}
+
+// failConnect records a refused endpoint as the terminal error, reports it to
+// Connect, and stops the stream so the endpoint is not retried and nothing is
+// sent to another origin.
+func (t *SSETransport) failConnect(err error) {
+	t.mu.Lock()
+	if t.failed == nil {
+		t.failed = err
+	}
+	t.mu.Unlock()
+	t.sendError(err)
+	t.cancel()
+}
+
+func (t *SSETransport) terminalError() error {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	return t.failed
 }
 
 func (t *SSETransport) sendError(err error) {
@@ -274,9 +335,9 @@ func (t *SSETransport) WriteMessage(ctx context.Context, msg json.RawMessage) er
 		req.Header.Set(k, v)
 	}
 
-	resp, err := t.httpClient.Do(req)
+	resp, err := t.do(req)
 	if err != nil {
-		return fmt.Errorf("SSE POST %s: %w", endpoint, err)
+		return wrapUpstreamError("SSE POST", endpoint, err)
 	}
 	defer resp.Body.Close()
 
