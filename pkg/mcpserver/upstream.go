@@ -47,6 +47,17 @@ type UpstreamClient struct {
 	tools     []json.RawMessage
 	toolNames []string
 	ready     bool
+
+	// closed is set before the manager closes the transport on purpose, so
+	// readLoop treats the read error that follows as the end of the client
+	// and does not reconnect.
+	closed atomic.Bool
+}
+
+// shutdown closes the client's transport on purpose.
+func (c *UpstreamClient) shutdown() error {
+	c.closed.Store(true)
+	return c.transport.Close()
 }
 
 // NewUpstreamManager creates a new upstream manager.
@@ -90,12 +101,12 @@ func (m *UpstreamManager) Start(ctx context.Context) error {
 			}
 			go m.readLoop(ctx, client)
 			if err := m.initializeUpstream(ctx, client); err != nil {
-				client.transport.Close()
+				client.shutdown()
 				results <- result{n, nil, fmt.Errorf("upstream %q initialize: %w", n, err)}
 				return
 			}
 			if err := m.discoverTools(ctx, client); err != nil {
-				client.transport.Close()
+				client.shutdown()
 				results <- result{n, nil, fmt.Errorf("upstream %q tools/list: %w", n, err)}
 				return
 			}
@@ -265,8 +276,8 @@ func (m *UpstreamManager) readLoop(ctx context.Context, client *UpstreamClient) 
 	for {
 		msg, err := client.transport.ReadMessage(ctx)
 		if err != nil {
-			if ctx.Err() != nil {
-				return // context cancelled, clean shutdown
+			if ctx.Err() != nil || client.closed.Load() {
+				return // context cancelled or client closed on purpose: clean shutdown
 			}
 			log.Error().Err(err).Str("upstream", client.name).Msg("upstream read error")
 
@@ -648,7 +659,7 @@ func (m *UpstreamManager) Close() error {
 
 	var firstErr error
 	for name, client := range m.clients {
-		if err := client.transport.Close(); err != nil {
+		if err := client.shutdown(); err != nil {
 			log.Error().Err(err).Str("upstream", name).Msg("close upstream")
 			if firstErr == nil {
 				firstErr = err

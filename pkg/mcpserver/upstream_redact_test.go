@@ -18,26 +18,34 @@ import (
 
 const redactMarker = "UPSTREAM-TEXT-9c1e"
 
-func captureLogs(t *testing.T) *bytes.Buffer {
+func captureLogs(t *testing.T) *syncBuffer {
 	t.Helper()
-	var buf bytes.Buffer
+	buf := &syncBuffer{}
 	old := log.Logger
 	oldLevel := zerolog.GlobalLevel()
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	log.Logger = zerolog.New(&syncWriter{w: &buf})
+	log.Logger = zerolog.New(buf)
 	t.Cleanup(func() { log.Logger = old; zerolog.SetGlobalLevel(oldLevel) })
-	return &buf
+	return buf
 }
 
-type syncWriter struct {
+// syncBuffer is a log sink that goroutines of the code under test may write
+// while the test reads it.
+type syncBuffer struct {
 	mu sync.Mutex
-	w  *bytes.Buffer
+	b  bytes.Buffer
 }
 
-func (s *syncWriter) Write(p []byte) (int, error) {
+func (s *syncBuffer) Write(p []byte) (int, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	return s.w.Write(p)
+	return s.b.Write(p)
+}
+
+func (s *syncBuffer) String() string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.b.String()
 }
 
 var redactModes = map[string]func(w http.ResponseWriter, method string, id json.RawMessage){
@@ -61,7 +69,7 @@ var redactModes = map[string]func(w http.ResponseWriter, method string, id json.
 	},
 }
 
-func runRedactStart(t *testing.T, redact bool, names ...string) (string, *bytes.Buffer) {
+func runRedactStart(t *testing.T, redact bool, names ...string) (string, *syncBuffer) {
 	t.Helper()
 	buf := captureLogs(t)
 	cfg := map[string]UpstreamConfig{}
@@ -138,5 +146,48 @@ func TestRedactUpstreamTextRedirectRefusalNamesNoTarget(t *testing.T) {
 		if has == redact {
 			t.Fatalf("redact=%v but target present=%v: %v", redact, has, err)
 		}
+	}
+}
+
+// Closing a manager ends its read loops: a transport closed on purpose is not
+// a failure to reconnect from, and nothing logs after Close returns.
+func TestClosedManagerReadLoopsEndWithoutReconnecting(t *testing.T) {
+	for _, n := range []int{1, 2} {
+		t.Run(fmt.Sprintf("%d upstreams", n), func(t *testing.T) {
+			buf := captureLogs(t)
+			cfg := map[string]UpstreamConfig{}
+			for i := 0; i < n; i++ {
+				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					var env struct {
+						Method string          `json:"method"`
+						ID     json.RawMessage `json:"id"`
+					}
+					_ = json.NewDecoder(r.Body).Decode(&env)
+					switch env.Method {
+					case "initialize":
+						w.Header().Set("Content-Type", "application/json")
+						fmt.Fprintf(w, `{"jsonrpc":"2.0","id":%s,"result":{}}`, env.ID)
+					case "tools/list":
+						w.Header().Set("Content-Type", "application/json")
+						fmt.Fprintf(w, `{"jsonrpc":"2.0","id":%s,"result":{"tools":[]}}`, env.ID)
+					default:
+						w.WriteHeader(http.StatusAccepted)
+					}
+				}))
+				t.Cleanup(srv.Close)
+				cfg[fmt.Sprintf("up%d", i)] = UpstreamConfig{Transport: "http", URL: srv.URL, Timeout: 5 * time.Second}
+			}
+			m := NewUpstreamManager(cfg, nil, "", true)
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			if err := m.Start(ctx); err != nil {
+				t.Fatal(err)
+			}
+			_ = m.Close()
+			time.Sleep(300 * time.Millisecond)
+			if out := buf.String(); strings.Contains(out, "upstream read error") || strings.Contains(out, "reconnecting upstream") {
+				t.Fatalf("read loop kept running after Close:\n%s", out)
+			}
+		})
 	}
 }
