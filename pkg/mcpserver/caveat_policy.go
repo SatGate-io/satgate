@@ -273,3 +273,18 @@ func (t *TokenInfo) CheckToolArguments(toolName string, params json.RawMessage) 
 	}
 	return argrules.Check(rules, toolName, params)
 }
+
+// CollectArgumentRules reads and validates the argument rules in a caveat
+// list, with the same checks a verifier applies: each rule must parse, name a
+// tool the scope caveats allow, and stay inside the size limits. A minting
+// service calls it on the caveats it is about to sign, so a token it cannot
+// verify is never issued.
+func CollectArgumentRules(caveats []string) ([]argrules.Rule, error) {
+	return argrules.Collect(caveats, matchScope)
+}
+
+// ScopeValueAllowsTool reports whether one scope caveat value (the text after
+// "scope = ") allows toolName, by the same matching AllowsTool uses.
+func ScopeValueAllowsTool(scope, toolName string) bool {
+	return matchScope(scope, toolName)
+}
