@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/satgate-io/satgate/pkg/argrules"
 	"github.com/satgate-io/satgate/pkg/macaroon"
 )
 
@@ -38,6 +39,11 @@ type TokenInfo struct {
 
 	// ParentTokenID from "parent" caveat (for delegated tokens).
 	ParentTokenID string
+
+	// ArgumentRules are the tool argument rules the token carries, from every
+	// rule caveat in order. A tool with no rule here is limited only by scope.
+	// Nil for a token with none.
+	ArgumentRules []argrules.Rule
 
 	// Raw macaroon (for delegation).
 	Raw *macaroon.Macaroon
@@ -113,7 +119,9 @@ func (a *MacaroonAuthenticator) Verify(_ context.Context, token string) (*TokenI
 	// Strip "Bearer " prefix if present
 	token = strings.TrimPrefix(token, "Bearer ")
 
-	mac, err := a.Service.Verify(token)
+	// The proxy enforces argument rules (FillTokenInfo, handleToolsCall), so
+	// it is the one verifier that may accept a token that carries them.
+	mac, err := a.Service.AcceptingArgumentRules().Verify(token)
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid signature") {
 			return nil, fmt.Errorf("invalid macaroon (possible root key mismatch — check that the gateway and the token issuer use the same capability root key): %w", err)

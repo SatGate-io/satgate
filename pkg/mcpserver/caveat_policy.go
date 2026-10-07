@@ -1,10 +1,12 @@
 package mcpserver
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
 
+	"github.com/satgate-io/satgate/pkg/argrules"
 	"github.com/satgate-io/satgate/pkg/macaroon"
 )
 
@@ -51,6 +53,13 @@ func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) 
 	if err := rejectWideningScope(mac); err != nil {
 		return nil, err
 	}
+	// Rules are read here so a token with rules that do not parse, that name
+	// a tool the scope does not allow, or that are over the size limits is
+	// refused at verify, not at the first call.
+	rules, err := argrules.Collect(mac.Caveats, matchScope)
+	if err != nil {
+		return nil, err
+	}
 	budgetID, err := svc.ResolveIssuedBudgetID(mac)
 	if err != nil {
 		return nil, err
@@ -58,12 +67,13 @@ func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) 
 
 	tokenID := hashToken(mac.Identifier + mac.Signature)
 	info := &TokenInfo{
-		TokenID:  tokenID,
-		BudgetID: tokenID,
-		Scope:    displayScope(mac),
-		TenantID: tenantID,
-		Raw:      mac,
-		RawToken: token,
+		TokenID:       tokenID,
+		BudgetID:      tokenID,
+		Scope:         displayScope(mac),
+		TenantID:      tenantID,
+		ArgumentRules: rules,
+		Raw:           mac,
+		RawToken:      token,
 	}
 	if budgetID != "" {
 		info.BudgetID = budgetID
@@ -84,7 +94,8 @@ func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) 
 
 // AllowsTool reports whether every scope caveat on the token allows toolName.
 // A token with no scope caveat, and a non-macaroon identity, keeps the
-// previous Scope-string check.
+// previous Scope-string check. Argument rules are not read here; see
+// CheckToolArguments.
 func (t *TokenInfo) AllowsTool(toolName string) bool {
 	if t == nil {
 		return false
@@ -93,6 +104,12 @@ func (t *TokenInfo) AllowsTool(toolName string) bool {
 		saw := false
 		for _, caveat := range t.Raw.Caveats {
 			if !strings.HasPrefix(caveat, "scope = ") {
+				continue
+			}
+			if argrules.IsRuleScope(strings.TrimPrefix(caveat, "scope = ")) {
+				// A rule caveat limits arguments, not tool names. The
+				// tool-name check of an older verifier reads it as a word
+				// that matches nothing, which is how it fails closed.
 				continue
 			}
 			saw = true
@@ -117,6 +134,9 @@ func rejectWideningScope(mac *macaroon.Macaroon) error {
 			continue
 		}
 		value := strings.TrimPrefix(caveat, "scope = ")
+		if argrules.IsRuleScope(value) {
+			continue
+		}
 		if scopeCaveatUniversal(value) && sawRestricted {
 			return fmt.Errorf("scope caveat widens an earlier restriction")
 		}
@@ -141,7 +161,7 @@ func scopeCaveatUniversal(scope string) bool {
 func displayScope(mac *macaroon.Macaroon) string {
 	var scopes []string
 	for _, caveat := range mac.Caveats {
-		if strings.HasPrefix(caveat, "scope = ") {
+		if strings.HasPrefix(caveat, "scope = ") && !argrules.IsRuleScope(strings.TrimPrefix(caveat, "scope = ")) {
 			scopes = append(scopes, strings.TrimPrefix(caveat, "scope = "))
 		}
 	}
@@ -231,4 +251,25 @@ func narrowestBudgetLimit(mac *macaroon.Macaroon) (int64, bool) {
 		}
 	}
 	return min, found
+}
+
+// CheckToolArguments applies the token's argument rules to a tools/call and
+// returns nil when the call may go on. params is the exact params object that
+// will be forwarded; nothing is rewritten, so what is checked is what the
+// upstream reads. A token with no rules is not parsed at all.
+func (t *TokenInfo) CheckToolArguments(toolName string, params json.RawMessage) *argrules.Denial {
+	if t == nil {
+		return nil
+	}
+	rules := t.ArgumentRules
+	if t.Raw != nil {
+		// Recollect from the caveats, so a TokenInfo whose field was not
+		// filled (a hand-built or older constructor) cannot skip its rules.
+		var err error
+		rules, err = argrules.Collect(t.Raw.Caveats, matchScope)
+		if err != nil {
+			return &argrules.Denial{Reason: argrules.ReasonRulesInvalid}
+		}
+	}
+	return argrules.Check(rules, toolName, params)
 }

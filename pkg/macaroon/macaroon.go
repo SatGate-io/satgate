@@ -37,6 +37,47 @@ type Macaroon struct {
 // Service handles macaroon operations
 type Service struct {
 	rootKey []byte
+
+	// acceptArgumentRules is set only on the copy returned by
+	// AcceptingArgumentRules. A default Service refuses a token that carries
+	// argument rules (see ArgumentRulesScopePrefix), because a verifier that
+	// does not enforce the rules must not honour the token.
+	acceptArgumentRules bool
+}
+
+// ArgumentRulesScopePrefix starts every scope word that carries tool argument
+// rules, for example "scope = argrules:v1:<base64url JSON>". The rules are not
+// a new caveat name on purpose. Unknown caveat names are ignored by every
+// verifier built before rules existed, which would drop the limit silently. A
+// scope word that names no tool matches nothing there, so those verifiers
+// deny every tool call instead.
+const ArgumentRulesScopePrefix = "argrules:"
+
+// IsArgumentRulesScope reports whether any word of a scope caveat value uses
+// the reserved argument-rules prefix. A word counts when it appears in a
+// comma or space separated list too, so rules cannot hide inside a list.
+func IsArgumentRulesScope(value string) bool {
+	for _, part := range strings.Split(value, ",") {
+		for _, word := range strings.Fields(part) {
+			if strings.HasPrefix(word, ArgumentRulesScopePrefix) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// AcceptingArgumentRules returns a copy of the service that verifies tokens
+// carrying argument rules. Only a caller that goes on to enforce the rules
+// (the MCP proxy) may use it. The default Service refuses such tokens, so an
+// HTTP route or any other verifier fails closed instead of ignoring the rules.
+func (s *Service) AcceptingArgumentRules() *Service {
+	if s == nil {
+		return nil
+	}
+	c := *s
+	c.acceptArgumentRules = true
+	return &c
 }
 
 // NewService creates a new macaroon service
@@ -384,7 +425,11 @@ func (s *Service) verifyCaveat(caveat string) error {
 		return fmt.Errorf("invalid expires value: %s", value)
 
 	case "scope":
-		// Scope is checked at request time, not here
+		// Scope is checked at request time, not here. Argument rules ride in
+		// a scope word, and only an enforcing verifier may accept them.
+		if !s.acceptArgumentRules && IsArgumentRulesScope(value) {
+			return fmt.Errorf("token carries tool argument rules this verifier does not enforce")
+		}
 		return nil
 
 	default:

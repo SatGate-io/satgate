@@ -72,8 +72,10 @@ type Delegator struct {
 
 // NewDelegator creates a new delegator. Requires macaroon auth mode.
 func NewDelegator(macaroonSvc *macaroon.Service, budget BudgetEnforcer) *Delegator {
+	// A delegating parent may carry argument rules; the child keeps them
+	// because caveats are cumulative. Only the enforcing proxy builds this.
 	return &Delegator{
-		macaroonSvc: macaroonSvc,
+		macaroonSvc: macaroonSvc.AcceptingArgumentRules(),
 		budget:      budget,
 		events:      &NoOpPublisher{},
 	}
