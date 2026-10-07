@@ -470,7 +470,8 @@ func TestOldVerifierDeniesRuleCarryingToken(t *testing.T) {
 		t.Fatal("control failed: old AllowsTool should allow the token without rules")
 	}
 	// A rule-carrying token: the old code denies every tool, including the
-	// ones the first scope caveat names: no real tool name equals the whole rule word.
+	// ones the first scope caveat names. Only a tool named exactly like the whole
+	// word (which holds a fresh nonce) could match; see the nonce tests.
 	old := &oldTokenInfo{Scope: "CallWixSiteAPI,ManageWixSite", Raw: ruled}
 	for _, tool := range []string{"CallWixSiteAPI", "ManageWixSite", "ExecuteWixAPI", "anything", "*", "mcp:*", ""} {
 		if old.AllowsTool(tool) {
