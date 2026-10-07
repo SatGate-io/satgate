@@ -90,10 +90,12 @@ func (m *UpstreamManager) Start(ctx context.Context) error {
 			}
 			go m.readLoop(ctx, client)
 			if err := m.initializeUpstream(ctx, client); err != nil {
+				client.transport.Close()
 				results <- result{n, nil, fmt.Errorf("upstream %q initialize: %w", n, err)}
 				return
 			}
 			if err := m.discoverTools(ctx, client); err != nil {
+				client.transport.Close()
 				results <- result{n, nil, fmt.Errorf("upstream %q tools/list: %w", n, err)}
 				return
 			}
