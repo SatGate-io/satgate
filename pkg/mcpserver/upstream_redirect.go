@@ -61,6 +61,13 @@ func wrapUpstreamError(prefix, rawURL string, err error) error {
 // redirect returns an error naming the status code and the target origin
 // (scheme, host, and port only).
 func doUpstream(client *http.Client, req *http.Request, hasStoredHeaders bool) (*http.Response, error) {
+	return doUpstreamRedacted(client, req, hasStoredHeaders, false)
+}
+
+// doUpstreamRedacted is doUpstream. With redact set, a refusal names only the
+// status code: the target origin is chosen by the upstream, so it is not
+// repeated.
+func doUpstreamRedacted(client *http.Client, req *http.Request, hasStoredHeaders, redact bool) (*http.Response, error) {
 	if client == nil || client.Transport == nil {
 		return nil, fmt.Errorf("upstream HTTP client is not configured")
 	}
@@ -82,13 +89,18 @@ func doUpstream(client *http.Client, req *http.Request, hasStoredHeaders bool) (
 		if !ok {
 			return nil, refusalf("upstream redirect status %d has an invalid location", status)
 		}
-		origin := displayOrigin(loc)
+		refused := func() error {
+			if redact {
+				return refusalf("upstream redirect status %d refused", status)
+			}
+			return refusalf("upstream redirect status %d to %s refused", status, displayOrigin(loc))
+		}
 		if hasStoredHeaders || requestHasStoredHeader(req) || !sameOrigin(upstream, loc) || followed >= maxSameOriginRedirects {
-			return nil, refusalf("upstream redirect status %d to %s refused", status, origin)
+			return nil, refused()
 		}
 		next, err := redirectRequest(req, loc, status)
 		if err != nil {
-			return nil, refusalf("upstream redirect status %d to %s refused", status, origin)
+			return nil, refused()
 		}
 		req = next
 	}
@@ -226,7 +238,16 @@ func resolveUpstreamReference(base *url.URL, refRaw string) (*url.URL, error) {
 // endpointOriginError refuses an endpoint whose origin differs from the
 // configured upstream's origin.
 func endpointOriginError(upstream, resolved *url.URL) error {
+	return endpointOriginErrorRedacted(upstream, resolved, false)
+}
+
+// endpointOriginErrorRedacted is endpointOriginError. With redact set it does
+// not name the endpoint's origin, which the upstream chose.
+func endpointOriginErrorRedacted(upstream, resolved *url.URL, redact bool) error {
 	if !sameOrigin(upstream, resolved) {
+		if redact {
+			return refusalf("SSE endpoint origin does not match upstream origin")
+		}
 		return refusalf("SSE endpoint origin %s does not match upstream origin %s", displayOrigin(resolved), displayOrigin(upstream))
 	}
 	return nil

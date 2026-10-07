@@ -47,7 +47,16 @@ type StreamableHTTPTransport struct {
 	cancel context.CancelFunc
 	closed bool
 	mu     sync.Mutex
+
+	// redact keeps upstream-supplied text out of errors and logs.
+	redact bool
 }
+
+// SetRedactUpstreamText makes the transport leave upstream-supplied text (a
+// response body, a session id, event data, a redirect origin) out of the
+// errors it returns and the logs it writes. Call it before Connect. Off by
+// default.
+func (t *StreamableHTTPTransport) SetRedactUpstreamText(on bool) { t.redact = on }
 
 // NewStreamableHTTPTransport creates a transport for the MCP Streamable HTTP protocol.
 // allowPrivate bypasses SSRF protection (for local dev/testing).
@@ -179,7 +188,11 @@ func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.Raw
 		t.sessionID = sid
 		t.sessionMu.Unlock()
 		if isNew {
-			log.Debug().Str("sessionId", sid).Msg("streamable HTTP: session established")
+			if t.redact {
+				log.Debug().Msg("streamable HTTP: session established")
+			} else {
+				log.Debug().Str("sessionId", sid).Msg("streamable HTTP: session established")
+			}
 			t.maybeStartNotificationListener()
 		}
 	}
@@ -187,6 +200,9 @@ func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.Raw
 	if resp.StatusCode >= 400 {
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
 		resp.Body.Close()
+		if t.redact {
+			return fmt.Errorf("streamable HTTP POST %s: status %d", t.url, resp.StatusCode)
+		}
 		return fmt.Errorf("streamable HTTP POST %s: status %d: %s", t.url, resp.StatusCode, string(body))
 	}
 
@@ -302,6 +318,10 @@ func (t *StreamableHTTPTransport) handleStreamEvent(eventType, data string) {
 	case "message", "":
 		t.deliverMessage(json.RawMessage(data))
 	default:
+		if t.redact {
+			log.Debug().Msg("streamable HTTP: unknown SSE event")
+			return
+		}
 		log.Debug().Str("event", eventType).Str("data", data[:minInt(len(data), 200)]).
 			Msg("streamable HTTP: unknown SSE event")
 	}
@@ -360,7 +380,7 @@ func (t *StreamableHTTPTransport) Close() error {
 }
 
 func (t *StreamableHTTPTransport) do(req *http.Request) (*http.Response, error) {
-	return doUpstream(t.httpClient, req, t.hasStoredHeaders())
+	return doUpstreamRedacted(t.httpClient, req, t.hasStoredHeaders(), t.redact)
 }
 
 func (t *StreamableHTTPTransport) hasStoredHeaders() bool {

@@ -54,7 +54,16 @@ type SSETransport struct {
 	wg     sync.WaitGroup
 	closed bool
 	mu     sync.Mutex
+
+	// redact keeps upstream-supplied text out of errors and logs.
+	redact bool
 }
+
+// SetRedactUpstreamText makes the transport leave upstream-supplied text (a
+// response body, a content type, event data, an endpoint or redirect origin)
+// out of the errors it returns and the logs it writes. Call it before Connect.
+// Off by default.
+func (t *SSETransport) SetRedactUpstreamText(on bool) { t.redact = on }
 
 // NewSSETransport creates a transport for the legacy MCP SSE protocol.
 // allowPrivate bypasses SSRF protection (for local dev/testing).
@@ -160,6 +169,9 @@ func (t *SSETransport) runSSEStream() error {
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 1024))
 		err := fmt.Errorf("SSE GET %s: status %d: %s", t.baseURL, resp.StatusCode, string(body))
+		if t.redact {
+			err = fmt.Errorf("SSE GET %s: status %d", t.baseURL, resp.StatusCode)
+		}
 		t.sendError(err)
 		return err
 	}
@@ -167,6 +179,9 @@ func (t *SSETransport) runSSEStream() error {
 	ct := resp.Header.Get("Content-Type")
 	if !strings.HasPrefix(ct, "text/event-stream") {
 		err := fmt.Errorf("SSE GET %s: unexpected content-type %q (expected text/event-stream)", t.baseURL, ct)
+		if t.redact {
+			err = fmt.Errorf("SSE GET %s: unexpected content-type (expected text/event-stream)", t.baseURL)
+		}
 		t.sendError(err)
 		return err
 	}
@@ -239,7 +254,7 @@ func (t *SSETransport) handleSSEEvent(upstreamURL, streamURL *url.URL, eventType
 		}
 		resolved, err := resolveUpstreamReference(streamURL, endpoint)
 		if err == nil {
-			err = endpointOriginError(upstreamURL, resolved)
+			err = endpointOriginErrorRedacted(upstreamURL, resolved, t.redact)
 		}
 		if err != nil {
 			t.failConnect(fmt.Errorf("SSE endpoint rejected: %w", err))
@@ -269,13 +284,17 @@ func (t *SSETransport) handleSSEEvent(upstreamURL, streamURL *url.URL, eventType
 		}
 
 	default:
+		if t.redact {
+			log.Debug().Msg("SSE: unknown event type")
+			return
+		}
 		log.Debug().Str("event", eventType).Str("data", data[:min(len(data), 200)]).
 			Msg("SSE: unknown event type")
 	}
 }
 
 func (t *SSETransport) do(req *http.Request) (*http.Response, error) {
-	return doUpstream(t.httpClient, req, len(t.headers) > 0)
+	return doUpstreamRedacted(t.httpClient, req, len(t.headers) > 0, t.redact)
 }
 
 // failConnect records a refused endpoint as the terminal error, reports it to

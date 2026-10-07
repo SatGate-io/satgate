@@ -24,7 +24,19 @@ type UpstreamManager struct {
 	mu        sync.Mutex
 	clients   map[string]*UpstreamClient
 	idCounter atomic.Int64
+
+	// redact keeps upstream-supplied text out of errors and logs. See
+	// SetRedactUpstreamText.
+	redact bool
 }
+
+// SetRedactUpstreamText makes the manager and the transports it builds leave
+// upstream-supplied text out of the errors they return and the logs they
+// write: JSON-RPC error messages (the code is kept), response bodies, content
+// types, event data, session ids, tool names and redirect or endpoint origins.
+// Failures keep their kind and their HTTP status. Call it before Start. Off by
+// default; when unset nothing changes.
+func (m *UpstreamManager) SetRedactUpstreamText(on bool) { m.redact = on }
 
 // UpstreamClient wraps a transport to an upstream MCP server
 // with request/response correlation.
@@ -100,8 +112,7 @@ func (m *UpstreamManager) Start(ctx context.Context) error {
 			continue
 		}
 		m.clients[r.name] = r.client
-		log.Info().Str("upstream", r.name).Int("tools", len(r.client.toolNames)).
-			Strs("tools", r.client.toolNames).Msg("upstream connected")
+		m.logConnected(r.name, r.client)
 	}
 
 	// Fail only if ALL upstreams failed; partial success is OK
@@ -128,9 +139,19 @@ func (m *UpstreamManager) startOne(ctx context.Context, name string, cfg Upstrea
 		return fmt.Errorf("upstream %q tools/list: %w", name, err)
 	}
 
+	m.logConnected(name, client)
+	return nil
+}
+
+// logConnected logs a successful connect. Tool names come from the upstream,
+// so they are left out when text is redacted.
+func (m *UpstreamManager) logConnected(name string, client *UpstreamClient) {
+	if m.redact {
+		log.Info().Str("upstream", name).Int("tools", len(client.toolNames)).Msg("upstream connected")
+		return
+	}
 	log.Info().Str("upstream", name).Int("tools", len(client.toolNames)).
 		Strs("tools", client.toolNames).Msg("upstream connected")
-	return nil
 }
 
 func (m *UpstreamManager) connect(ctx context.Context, name string, cfg UpstreamConfig) (*UpstreamClient, error) {
@@ -152,6 +173,7 @@ func (m *UpstreamManager) connectSSE(ctx context.Context, name string, cfg Upstr
 	}
 
 	transport := NewSSETransport(cfg.URL, cfg.Headers, cfg.TLSSkipVerify, m.allowPrivateUpstreams)
+	transport.SetRedactUpstreamText(m.redact)
 
 	connectCtx := ctx
 	if cfg.Timeout > 0 {
@@ -177,6 +199,7 @@ func (m *UpstreamManager) connectStreamable(ctx context.Context, name string, cf
 	}
 
 	transport := NewStreamableHTTPTransport(cfg.URL, cfg.Headers, cfg.TLSSkipVerify, m.allowPrivateUpstreams)
+	transport.SetRedactUpstreamText(m.redact)
 
 	connectCtx := ctx
 	if cfg.Timeout > 0 {
@@ -330,14 +353,22 @@ func (m *UpstreamManager) readLoop(ctx context.Context, client *UpstreamClient) 
 
 		_, resp, err := ParseMessage(msg)
 		if err != nil {
-			log.Debug().Err(err).Str("upstream", client.name).Msg("unparseable upstream message")
+			if m.redact {
+				log.Debug().Str("upstream", client.name).Msg("unparseable upstream message")
+			} else {
+				log.Debug().Err(err).Str("upstream", client.name).Msg("unparseable upstream message")
+			}
 			continue
 		}
 
 		if resp == nil {
 			// Upstream sent a request/notification to us (e.g., tools/list_changed)
 			// For now, log and ignore. Future: propagate to client.
-			log.Debug().RawJSON("msg", msg).Str("upstream", client.name).Msg("upstream notification")
+			if m.redact {
+				log.Debug().Str("upstream", client.name).Msg("upstream notification")
+			} else {
+				log.Debug().RawJSON("msg", msg).Str("upstream", client.name).Msg("upstream notification")
+			}
 			continue
 		}
 
@@ -346,7 +377,11 @@ func (m *UpstreamManager) readLoop(ctx context.Context, client *UpstreamClient) 
 		if ch, ok := client.pending.LoadAndDelete(idStr); ok {
 			ch.(chan *Response) <- resp
 		} else {
-			log.Debug().RawJSON("id", resp.ID).Str("upstream", client.name).Msg("orphan response")
+			if m.redact {
+				log.Debug().Str("upstream", client.name).Msg("orphan response")
+			} else {
+				log.Debug().RawJSON("id", resp.ID).Str("upstream", client.name).Msg("orphan response")
+			}
 		}
 	}
 }
@@ -424,6 +459,9 @@ func (m *UpstreamManager) initializeUpstream(ctx context.Context, client *Upstre
 		return err
 	}
 	if resp.Error != nil {
+		if m.redact {
+			return fmt.Errorf("initialize error: server returned a JSON-RPC error (code %d)", resp.Error.Code)
+		}
 		return fmt.Errorf("initialize error: %s", resp.Error.Message)
 	}
 
@@ -442,6 +480,9 @@ func (m *UpstreamManager) discoverTools(ctx context.Context, client *UpstreamCli
 		return err
 	}
 	if resp.Error != nil {
+		if m.redact {
+			return fmt.Errorf("tools/list error: server returned a JSON-RPC error (code %d)", resp.Error.Code)
+		}
 		return fmt.Errorf("tools/list error: %s", resp.Error.Message)
 	}
 
@@ -450,6 +491,9 @@ func (m *UpstreamManager) discoverTools(ctx context.Context, client *UpstreamCli
 		Tools []json.RawMessage `json:"tools"`
 	}
 	if err := json.Unmarshal(resp.Result, &result); err != nil {
+		if m.redact {
+			return fmt.Errorf("parse tools/list result: reply could not be parsed")
+		}
 		return fmt.Errorf("parse tools/list result: %w", err)
 	}
 
