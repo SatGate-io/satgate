@@ -52,10 +52,7 @@ func NewSSETransport(baseURL string, headers map[string]string, tlsSkipVerify bo
 	ctx, cancel := context.WithCancel(context.Background())
 
 	ap := len(allowPrivate) > 0 && allowPrivate[0]
-	httpClient := &http.Client{
-		Timeout:   0, // no global timeout — SSE streams are long-lived
-		Transport: SSRFSafeTransport(tlsSkipVerify, ap),
-	}
+	httpClient := newUpstreamHTTPClient(tlsSkipVerify, ap)
 
 	return &SSETransport{
 		baseURL:       strings.TrimRight(baseURL, "/"),
@@ -132,7 +129,7 @@ func (t *SSETransport) runSSEStream() error {
 		req.Header.Set(k, v)
 	}
 
-	resp, err := t.httpClient.Do(req)
+	resp, err := t.do(req)
 	if err != nil {
 		t.sendError(fmt.Errorf("SSE GET %s: %w", t.baseURL, err))
 		return err
@@ -193,31 +190,34 @@ func (t *SSETransport) runSSEStream() error {
 func (t *SSETransport) handleSSEEvent(eventType, data string) {
 	switch eventType {
 	case "endpoint":
-		// Server provides the POST endpoint URL
+		// Server provides the POST endpoint URL. A relative value resolves
+		// against the SSE URL. A different origin is refused and not stored.
 		endpoint := strings.TrimSpace(data)
 		if endpoint == "" {
 			return
 		}
-		// Handle relative URLs
-		if strings.HasPrefix(endpoint, "/") {
-			// Extract scheme + host from baseURL
-			parts := strings.SplitN(t.baseURL, "://", 2)
-			if len(parts) == 2 {
-				hostEnd := strings.Index(parts[1], "/")
-				if hostEnd == -1 {
-					endpoint = parts[0] + "://" + parts[1] + endpoint
-				} else {
-					endpoint = parts[0] + "://" + parts[1][:hostEnd] + endpoint
-				}
-			}
+		t.mu.Lock()
+		already := t.messageEndpoint != ""
+		t.mu.Unlock()
+		if already {
+			return
+		}
+		resolved, err := resolveUpstreamReference(t.baseURL, endpoint)
+		if err != nil {
+			t.failConnect(fmt.Errorf("SSE endpoint rejected: %w", err))
+			return
+		}
+		if err := endpointOriginError(t.baseURL, resolved); err != nil {
+			t.failConnect(err)
+			return
 		}
 		t.mu.Lock()
-		t.messageEndpoint = endpoint
+		t.messageEndpoint = resolved.String()
 		t.mu.Unlock()
 		t.endpointReadyOnce.Do(func() {
 			close(t.endpointReady)
 		})
-		log.Debug().Str("endpoint", endpoint).Msg("SSE: received message endpoint")
+		log.Debug().Str("origin", displayOrigin(resolved)).Msg("SSE: received message endpoint")
 
 	case "message", "":
 		// JSON-RPC message from server
@@ -234,6 +234,17 @@ func (t *SSETransport) handleSSEEvent(eventType, data string) {
 		log.Debug().Str("event", eventType).Str("data", data[:min(len(data), 200)]).
 			Msg("SSE: unknown event type")
 	}
+}
+
+func (t *SSETransport) do(req *http.Request) (*http.Response, error) {
+	return doUpstream(t.httpClient, req, len(t.headers) > 0)
+}
+
+// failConnect reports a connect error and stops the stream so a rejected
+// endpoint is not retried and nothing is sent to another origin.
+func (t *SSETransport) failConnect(err error) {
+	t.sendError(err)
+	t.cancel()
 }
 
 func (t *SSETransport) sendError(err error) {
@@ -274,7 +285,7 @@ func (t *SSETransport) WriteMessage(ctx context.Context, msg json.RawMessage) er
 		req.Header.Set(k, v)
 	}
 
-	resp, err := t.httpClient.Do(req)
+	resp, err := t.do(req)
 	if err != nil {
 		return fmt.Errorf("SSE POST %s: %w", endpoint, err)
 	}

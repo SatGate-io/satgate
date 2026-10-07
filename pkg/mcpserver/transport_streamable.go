@@ -56,10 +56,7 @@ func NewStreamableHTTPTransport(url string, headers map[string]string, tlsSkipVe
 	notifCtx, notifCancel := context.WithCancel(ctx)
 
 	ap := len(allowPrivate) > 0 && allowPrivate[0]
-	httpClient := &http.Client{
-		Transport: SSRFSafeTransport(tlsSkipVerify, ap),
-		Timeout:   0, // per-request timeouts via context
-	}
+	httpClient := newUpstreamHTTPClient(tlsSkipVerify, ap)
 
 	return &StreamableHTTPTransport{
 		url:         strings.TrimRight(url, "/"),
@@ -119,7 +116,7 @@ func (t *StreamableHTTPTransport) maybeStartNotificationListener() {
 		}
 		t.sessionMu.RUnlock()
 
-		resp, err := t.httpClient.Do(req)
+		resp, err := t.do(req)
 		if err != nil {
 			log.Debug().Err(err).Msg("streamable HTTP: notification stream not available")
 			return
@@ -170,7 +167,7 @@ func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.Raw
 	}
 	t.sessionMu.RUnlock()
 
-	resp, err := t.httpClient.Do(req)
+	resp, err := t.do(req)
 	if err != nil {
 		return fmt.Errorf("streamable HTTP POST %s: %w", t.url, err)
 	}
@@ -347,7 +344,7 @@ func (t *StreamableHTTPTransport) Close() error {
 			for k, v := range t.headers {
 				req.Header.Set(k, v)
 			}
-			resp, err := t.httpClient.Do(req)
+			resp, err := t.do(req)
 			if err != nil {
 				log.Debug().Err(err).Msg("streamable HTTP: session DELETE failed")
 			} else {
@@ -360,6 +357,20 @@ func (t *StreamableHTTPTransport) Close() error {
 
 	t.cancel()
 	return nil
+}
+
+func (t *StreamableHTTPTransport) do(req *http.Request) (*http.Response, error) {
+	return doUpstream(t.httpClient, req, t.hasStoredHeaders())
+}
+
+func (t *StreamableHTTPTransport) hasStoredHeaders() bool {
+	if len(t.headers) > 0 {
+		return true
+	}
+	t.sessionMu.RLock()
+	sid := t.sessionID
+	t.sessionMu.RUnlock()
+	return sid != ""
 }
 
 func minInt(a, b int) int {
