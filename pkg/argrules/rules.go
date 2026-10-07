@@ -139,8 +139,7 @@ func ParseJSON(doc []byte) ([]Rule, error) {
 	for k, v := range top {
 		switch k {
 		case "v":
-			var n json.Number
-			if err := json.Unmarshal(v, &n); err != nil || n.String() != "1" {
+			if string(bytes.TrimSpace(v)) != "1" {
 				return nil, ruleErr("unsupported version")
 			}
 			sawV = true
