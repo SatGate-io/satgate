@@ -162,7 +162,7 @@ func (m *UpstreamManager) connectSSE(ctx context.Context, name string, cfg Upstr
 
 	if err := transport.Connect(connectCtx); err != nil {
 		transport.Close()
-		return nil, fmt.Errorf("SSE connect to %s: %w", cfg.URL, err)
+		return nil, wrapUpstreamError("SSE connect to", cfg.URL, err)
 	}
 
 	return &UpstreamClient{
@@ -187,7 +187,7 @@ func (m *UpstreamManager) connectStreamable(ctx context.Context, name string, cf
 
 	if err := transport.Connect(connectCtx); err != nil {
 		transport.Close()
-		return nil, fmt.Errorf("streamable HTTP connect to %s: %w", cfg.URL, err)
+		return nil, wrapUpstreamError("streamable HTTP connect to", cfg.URL, err)
 	}
 
 	return &UpstreamClient{

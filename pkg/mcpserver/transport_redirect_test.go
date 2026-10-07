@@ -26,7 +26,7 @@ func TestStreamableRedirect_CrossOriginRefused(t *testing.T) {
 	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sawAuth = r.Header.Get("Authorization") == "Bearer super-secret-token"
 		sawCustom = r.Header.Get("X-Custom-Token") == "custom-secret-value"
-		http.Redirect(w, r, other.URL+"/sink?token=leak", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, other.URL+"/sink?token=t1", http.StatusTemporaryRedirect)
 	}))
 	defer upstream.Close()
 
@@ -45,11 +45,11 @@ func TestStreamableRedirect_CrossOriginRefused(t *testing.T) {
 		"jsonrpc": "2.0", "id": 1, "method": "ping",
 	}))
 	assertRedirectRefused(t, err, http.StatusTemporaryRedirect, other.URL)
-	if strings.Contains(err.Error(), "/sink") || strings.Contains(err.Error(), "token=leak") {
-		t.Fatalf("error leaked target path or query: %v", err)
+	if strings.Contains(err.Error(), "/sink") || strings.Contains(err.Error(), "token=t1") {
+		t.Fatalf("error contains target path or query: %v", err)
 	}
 	if strings.Contains(err.Error(), "super-secret-token") || strings.Contains(err.Error(), "custom-secret-value") {
-		t.Fatalf("error leaked stored header: %v", err)
+		t.Fatalf("error contains stored header: %v", err)
 	}
 	if !sawAuth || !sawCustom {
 		t.Fatalf("configured origin did not receive stored headers auth=%v custom=%v", sawAuth, sawCustom)
@@ -85,7 +85,7 @@ func TestStreamableRedirect_SameOriginWithStoredHeadersRefused(t *testing.T) {
 	}))
 	assertRedirectRefused(t, err, http.StatusTemporaryRedirect, server.URL)
 	if strings.Contains(err.Error(), "/mcp/next") || strings.Contains(err.Error(), "x=1") {
-		t.Fatalf("error leaked target path or query: %v", err)
+		t.Fatalf("error contains target path or query: %v", err)
 	}
 	waitNoHits(t, &nextHits)
 }
@@ -179,7 +179,7 @@ func TestStreamableRedirect_OtherPortIsDifferentOrigin(t *testing.T) {
 	}))
 	assertRedirectRefused(t, err, http.StatusTemporaryRedirect, other.URL)
 	if strings.Contains(err.Error(), "/elsewhere") || strings.Contains(err.Error(), "q=secret") || strings.Contains(err.Error(), "port-secret-token") {
-		t.Fatalf("error leaked target or token: %v", err)
+		t.Fatalf("error contains target or token: %v", err)
 	}
 	if upstreamHost == "" {
 		t.Fatal("configured origin received no request")
@@ -227,7 +227,7 @@ func TestStreamableRedirect_SessionIDRefusesLaterRedirect(t *testing.T) {
 	}))
 	assertRedirectRefused(t, err, http.StatusTemporaryRedirect, other.URL)
 	if strings.Contains(err.Error(), "sess-1") || strings.Contains(err.Error(), "/nope") {
-		t.Fatalf("error leaked session or path: %v", err)
+		t.Fatalf("error contains session or path: %v", err)
 	}
 	waitNoHits(t, &otherHits)
 }
@@ -334,10 +334,10 @@ func TestSSEEndpoint_OtherOriginRefused(t *testing.T) {
 		t.Fatalf("missing %q in %v", want, err)
 	}
 	if strings.Contains(err.Error(), "/message") || strings.Contains(err.Error(), "session=secret") {
-		t.Fatalf("error leaked path or query: %v", err)
+		t.Fatalf("error contains path or query: %v", err)
 	}
 	if strings.Contains(err.Error(), "sse-secret-token") || strings.Contains(err.Error(), "sse-custom-value") {
-		t.Fatalf("error leaked stored header: %v", err)
+		t.Fatalf("error contains stored header: %v", err)
 	}
 	if transport.messageEndpoint != "" {
 		t.Fatalf("message endpoint set to %q", transport.messageEndpoint)
@@ -377,9 +377,9 @@ func TestUpstreamOriginDiffersForSubdomainPortAndScheme(t *testing.T) {
 	if !sameOrigin(base, mustURL(t, "https://Agent.Example.com:443/other")) {
 		t.Fatal("host case, default port, and path must not change origin")
 	}
-	shown := displayOrigin(mustURL(t, "https://evil.example/sink?token=leak"))
+	shown := displayOrigin(mustURL(t, "https://evil.example/sink?token=t1"))
 	if strings.Contains(shown, "/sink") || strings.Contains(shown, "token") || strings.Contains(shown, "?") {
-		t.Fatalf("display origin leaked path or query: %s", shown)
+		t.Fatalf("display origin contains path or query: %s", shown)
 	}
 }
 

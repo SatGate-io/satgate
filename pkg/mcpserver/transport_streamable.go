@@ -169,7 +169,7 @@ func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.Raw
 
 	resp, err := t.do(req)
 	if err != nil {
-		return fmt.Errorf("streamable HTTP POST %s: %w", t.url, err)
+		return wrapUpstreamError("streamable HTTP POST", t.url, err)
 	}
 
 	// Capture session ID from response and start notification listener once

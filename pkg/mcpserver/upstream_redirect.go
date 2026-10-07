@@ -1,6 +1,7 @@
 package mcpserver
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -25,6 +26,31 @@ func newUpstreamHTTPClient(tlsSkipVerify, allowPrivate bool) *http.Client {
 			return http.ErrUseLastResponse
 		},
 	}
+}
+
+// upstreamRefusal is a redirect or endpoint refusal. Its text names only a
+// status and an origin, so callers can show it without further filtering.
+type upstreamRefusal struct{ msg string }
+
+func (e *upstreamRefusal) Error() string { return e.msg }
+
+func refusalf(format string, args ...any) error {
+	return &upstreamRefusal{msg: fmt.Sprintf(format, args...)}
+}
+
+// wrapUpstreamError prefixes err with context naming rawURL. When err is a
+// refusal, the context carries only the origin of rawURL (no userinfo, path,
+// or query). Other errors keep the full URL as before.
+func wrapUpstreamError(prefix, rawURL string, err error) error {
+	var refusal *upstreamRefusal
+	if errors.As(err, &refusal) {
+		origin := "unknown-origin"
+		if u, perr := url.Parse(rawURL); perr == nil {
+			origin = displayOrigin(u)
+		}
+		return fmt.Errorf("%s %s: %w", prefix, origin, err)
+	}
+	return fmt.Errorf("%s %s: %w", prefix, rawURL, err)
 }
 
 // doUpstream performs req and applies the upstream redirect rule.
@@ -54,15 +80,15 @@ func doUpstream(client *http.Client, req *http.Request, hasStoredHeaders bool) (
 		loc, ok := redirectLocation(resp)
 		discardBody(resp.Body)
 		if !ok {
-			return nil, fmt.Errorf("upstream redirect status %d has an invalid location", status)
+			return nil, refusalf("upstream redirect status %d has an invalid location", status)
 		}
 		origin := displayOrigin(loc)
 		if hasStoredHeaders || requestHasStoredHeader(req) || !sameOrigin(upstream, loc) || followed >= maxSameOriginRedirects {
-			return nil, fmt.Errorf("upstream redirect status %d to %s refused", status, origin)
+			return nil, refusalf("upstream redirect status %d to %s refused", status, origin)
 		}
 		next, err := redirectRequest(req, loc, status)
 		if err != nil {
-			return nil, fmt.Errorf("upstream redirect status %d to %s refused", status, origin)
+			return nil, refusalf("upstream redirect status %d to %s refused", status, origin)
 		}
 		req = next
 	}
@@ -177,30 +203,31 @@ func discardBody(body io.ReadCloser) {
 	body.Close()
 }
 
-// resolveUpstreamReference resolves ref against the upstream URL.
-// A relative ref is resolved against that URL. Userinfo and fragment are dropped.
-func resolveUpstreamReference(baseRaw, refRaw string) (*url.URL, error) {
-	base, err := url.Parse(baseRaw)
-	if err != nil || base.Scheme == "" || base.Host == "" {
-		return nil, fmt.Errorf("invalid upstream URL")
+// resolveUpstreamReference resolves ref against base, the URL of the stream
+// that delivered it. A relative ref follows RFC 3986. Userinfo and fragment
+// are dropped.
+func resolveUpstreamReference(base *url.URL, refRaw string) (*url.URL, error) {
+	if base == nil || base.Scheme == "" || base.Host == "" {
+		return nil, refusalf("invalid upstream URL")
 	}
 	ref, err := url.Parse(strings.TrimSpace(refRaw))
 	if err != nil {
-		return nil, fmt.Errorf("invalid endpoint URL")
+		return nil, refusalf("invalid endpoint URL")
 	}
 	resolved := base.ResolveReference(ref)
 	resolved.User = nil
 	resolved.Fragment = ""
-	if resolved.Scheme == "" || resolved.Host == "" {
-		return nil, fmt.Errorf("endpoint URL has no origin")
+	if resolved.Scheme == "" || resolved.Hostname() == "" {
+		return nil, refusalf("endpoint URL has no origin")
 	}
 	return resolved, nil
 }
 
-func endpointOriginError(baseRaw string, resolved *url.URL) error {
-	base, err := url.Parse(baseRaw)
-	if err != nil || !sameOrigin(base, resolved) {
-		return fmt.Errorf("SSE endpoint origin %s does not match upstream origin %s", displayOrigin(resolved), displayOrigin(base))
+// endpointOriginError refuses an endpoint whose origin differs from the
+// configured upstream's origin.
+func endpointOriginError(upstream, resolved *url.URL) error {
+	if !sameOrigin(upstream, resolved) {
+		return refusalf("SSE endpoint origin %s does not match upstream origin %s", displayOrigin(resolved), displayOrigin(upstream))
 	}
 	return nil
 }
