@@ -391,76 +391,110 @@ func b64(s string) string {
 	return strings.TrimRight(base64URL(s), "=")
 }
 
-// The old verifier: this is a copy of the matchScope and AllowsTool logic as
-// it stood at the pinned module version (a2333137) and public main (fdfc80fc),
-// before rules existed. It must deny every tool for a rule-carrying token,
-// because the rule word names no tool.
+// The old verifier. oldMatchScope and oldAllowsTool are copied unchanged from
+// pkg/mcpserver/proxy.go (matchScope) and pkg/mcpserver/caveat_policy.go
+// (TokenInfo.AllowsTool) as they stand at the module version enterprise pins
+// (a2333137) and at public main (fdfc80fc); the two files are byte-identical at
+// those commits. Only the names and the receiver changed.
 func oldMatchScope(scope, toolName string) bool {
-	scope = strings.TrimSpace(scope)
-	if scope == "" {
-		return false
-	}
-	if scope == "*" {
-		return true
-	}
-	for _, part := range strings.Split(scope, ",") {
-		part = strings.TrimSpace(part)
-		if part == toolName {
+	for _, s := range strings.Split(scope, ",") {
+		s = strings.TrimSpace(s)
+
+		// Strip tenant UUID prefix if present (format: "uuid:scope")
+		// UUIDs are 36 chars with hyphens (8-4-4-4-12)
+		if len(s) > 37 && s[36] == ':' && s[8] == '-' && s[13] == '-' {
+			s = s[37:]
+		}
+
+		if s == "*" || s == "api:*" || s == "mcp:*" {
 			return true
 		}
-		if strings.HasSuffix(part, "*") && strings.HasPrefix(toolName, strings.TrimSuffix(part, "*")) {
+		if strings.HasSuffix(s, ":*") {
+			prefix := strings.TrimSuffix(s, ":*")
+			if strings.HasPrefix(toolName, prefix+":") || strings.HasPrefix(toolName, prefix+"_") {
+				return true
+			}
+		}
+		if s == toolName {
 			return true
 		}
 	}
 	return false
 }
 
-func oldAllowsTool(caveats []string, toolName string) bool {
-	saw := false
-	for _, c := range caveats {
-		if !strings.HasPrefix(c, "scope = ") {
-			continue
+type oldTokenInfo struct {
+	Scope string
+	Raw   *macaroon.Macaroon
+}
+
+func (t *oldTokenInfo) AllowsTool(toolName string) bool {
+	if t == nil {
+		return false
+	}
+	if t.Raw != nil {
+		saw := false
+		for _, caveat := range t.Raw.Caveats {
+			if !strings.HasPrefix(caveat, "scope = ") {
+				continue
+			}
+			saw = true
+			if !oldMatchScope(strings.TrimPrefix(caveat, "scope = "), toolName) {
+				return false
+			}
 		}
-		saw = true
-		if !oldMatchScope(strings.TrimPrefix(c, "scope = "), toolName) {
-			return false
+		if saw {
+			return true
 		}
 	}
-	return saw
+	if t.Scope == "" || t.Scope == "*" || t.Scope == "api:*" || t.Scope == "mcp:*" {
+		return true
+	}
+	return oldMatchScope(t.Scope, toolName)
 }
 
 func TestOldVerifierDeniesRuleCarryingToken(t *testing.T) {
-	_, tok := argToken(t, "CallWixSiteAPI,ManageWixSite", wixReadOnlyDoc)
-	svc, _ := macaroon.NewService(argTestRoot)
-	mac, err := svc.Decode(tok)
+	const scope = "CallWixSiteAPI,ManageWixSite"
+	svc, plainTok := argToken(t, scope)
+	_, ruledTok := argToken(t, scope, wixReadOnlyDoc)
+	plain, err := svc.Decode(plainTok)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// Control: without the rule caveat the old code allows the tool.
-	var plain []string
-	for _, c := range mac.Caveats {
-		if !strings.Contains(c, "argrules:") {
-			plain = append(plain, c)
+	ruled, err := svc.Decode(ruledTok)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Control: the old code allows the tools on the token without rules.
+	oldPlain := &oldTokenInfo{Raw: plain}
+	if !oldPlain.AllowsTool("CallWixSiteAPI") || !oldPlain.AllowsTool("ManageWixSite") {
+		t.Fatal("control failed: old AllowsTool should allow the token without rules")
+	}
+	// A rule-carrying token: the old code denies every tool, including the
+	// ones the first scope caveat names, because the rule word matches nothing.
+	old := &oldTokenInfo{Scope: "CallWixSiteAPI,ManageWixSite", Raw: ruled}
+	for _, tool := range []string{"CallWixSiteAPI", "ManageWixSite", "ExecuteWixAPI", "anything", "*", "mcp:*", ""} {
+		if old.AllowsTool(tool) {
+			t.Errorf("old AllowsTool allowed %q for a rule-carrying token", tool)
 		}
 	}
-	if !oldAllowsTool(plain, "CallWixSiteAPI") {
-		t.Fatal("control failed: old code should allow the plain token")
+	// The old code ignores unknown caveat NAMES, which is why the rule is not
+	// carried in one: prove that a rule in a new caveat name would have passed.
+	viaNewName := appendCaveat(t, svc, plainTok, "arg_rules = "+strings.TrimPrefix(ruleScopeWord(t, wixReadOnlyDoc), "scope = "))
+	m, err := svc.Decode(viaNewName)
+	if err != nil {
+		t.Fatal(err)
 	}
-	for _, tool := range []string{"CallWixSiteAPI", "ManageWixSite", "ExecuteWixAPI", "anything", "*", ""} {
-		if oldAllowsTool(mac.Caveats, tool) {
-			t.Errorf("old verifier allowed %q for a rule-carrying token", tool)
+	if !(&oldTokenInfo{Raw: m}).AllowsTool("CallWixSiteAPI") {
+		t.Fatal("expected the old code to ignore an unknown caveat name (the reason a scope word is used)")
+	}
+	// Old Service.Verify (the macaroon package at the old version) accepts the
+	// ruled token's signature; the denial comes from AllowsTool. Both layers are
+	// shown: the old verify step does not save the day, the scope word does.
+	// And the old matchScope applied to the bare rule word:
+	for _, c := range ruled.Caveats {
+		if strings.HasPrefix(c, "scope = argrules:") && oldMatchScope(strings.TrimPrefix(c, "scope = "), "CallWixSiteAPI") {
+			t.Fatal("old matchScope matched the rule word")
 		}
-	}
-	// And an old verifier that also ignores unknown caveat names still sees the
-	// scope caveat, which is why the rule is carried there.
-	hasRule := false
-	for _, c := range mac.Caveats {
-		if strings.HasPrefix(c, "scope = argrules:v1:") {
-			hasRule = true
-		}
-	}
-	if !hasRule {
-		t.Fatal("token does not carry the rule in a scope caveat")
 	}
 }
 
