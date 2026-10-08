@@ -7,13 +7,14 @@ import (
 )
 
 func TestRunsScriptsListAndForms(t *testing.T) {
-	yes := []string{"ExecuteWixAPI", "executewixapi", "EXECUTEWIXAPI", "wix:ExecuteWixAPI", "wix/ExecuteWixAPI", "wix.ExecuteWixAPI", "wix_ExecuteWixAPI", "wix-executewixapi", "mcp_wix_ExecuteWixAPI"}
+	yes := []string{"ExecuteWixAPI", "executewixapi", "EXECUTEWIXAPI", "wix:ExecuteWixAPI", "wix/ExecuteWixAPI", "wix.ExecuteWixAPI", "wix_ExecuteWixAPI", "wix-executewixapi", "mcp_wix_ExecuteWixAPI",
+		"SearchWixAPISpec", "searchwixapispec", "SEARCHWIXAPISPEC", "wix:SearchWixAPISpec", "wix/SearchWixAPISpec", "wix.SearchWixAPISpec", "wix_SearchWixAPISpec", "wix-searchwixapispec", "mcp_wix_SearchWixAPISpec"}
 	for _, n := range yes {
 		if !RunsScripts(n) {
 			t.Errorf("RunsScripts(%q) = false, want true", n)
 		}
 	}
-	no := []string{"", "CallWixSiteAPI", "ManageWixSite", "ListWixSites", "make_api_request", "place_equity_order", "MyExecuteWixAPI", "ExecuteWixAPIs", "ExecuteWix", "Execute"}
+	no := []string{"", "CallWixSiteAPI", "ManageWixSite", "ListWixSites", "make_api_request", "place_equity_order", "MyExecuteWixAPI", "ExecuteWixAPIs", "ExecuteWix", "Execute", "SearchWixAPISpecs", "MySearchWixAPISpec", "SearchWix", "SearchWixAPI"}
 	for _, n := range no {
 		if RunsScripts(n) {
 			t.Errorf("RunsScripts(%q) = true, want false", n)
@@ -35,6 +36,35 @@ func TestRunsScriptsListAndForms(t *testing.T) {
 	l[0].Name = "changed"
 	if !RunsScripts("ExecuteWixAPI") {
 		t.Fatal("editing the returned list changed the list")
+	}
+}
+
+// AR3-2: Wix's documentation-search tool runs JavaScript too, so it is on the
+// list by name, with its own reason.
+func TestSearchWixAPISpecIsOnTheScriptToolList(t *testing.T) {
+	var found bool
+	for _, st := range ScriptTools() {
+		if st.Name == "SearchWixAPISpec" {
+			found = true
+			if !strings.Contains(st.Reason, "JavaScript") || !strings.Contains(st.Reason, "sandbox") {
+				t.Errorf("reason = %q", st.Reason)
+			}
+		}
+	}
+	if !found {
+		t.Fatal("SearchWixAPISpec is not on the script-tool list")
+	}
+	rules, err := ParseJSON([]byte(`{"v":1,"rules":[{"tool":"SearchWixAPISpec","shapes":[{"method":{"one_of":["GET"]}}]}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	e := ScriptToolRuleError(rules)
+	if e == nil || e.Error() != "SearchWixAPISpec runs scripts, so a limit on it can't be enforced; leave it out of a limited key" {
+		t.Fatalf("error = %v", e)
+	}
+	params, _ := json.Marshal(map[string]any{"name": "SearchWixAPISpec", "arguments": map[string]any{"code": "x", "reason": "y"}})
+	if d := Check(rules, "SearchWixAPISpec", params); d == nil || d.Reason != ReasonScriptToolRule {
+		t.Errorf("call-time denial = %+v", d)
 	}
 }
 

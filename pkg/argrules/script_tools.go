@@ -27,6 +27,10 @@ var scriptTools = []ScriptTool{
 		Name:   "ExecuteWixAPI",
 		Reason: "takes a JavaScript function as its code argument and runs it against the Wix APIs; the script can chain any call, including writes and deletes, whatever the top-level method field says",
 	},
+	{
+		Name:   "SearchWixAPISpec",
+		Reason: "Wix's documentation-search tool; it takes JavaScript in its code argument (with a reason field) and runs it in a sandbox, so what it does is set by the script, not by any top-level field",
+	},
 }
 
 // ScriptTools returns the list, a copy the caller may keep.
