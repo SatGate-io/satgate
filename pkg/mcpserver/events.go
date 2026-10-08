@@ -5,6 +5,16 @@ import (
 	"time"
 )
 
+// Event fields a delegation publishes so the gateway writer can store the
+// child's own authority, not a routes-only stand-in (B4-1). An older
+// publisher omits EventInheritedRulesKnown; the writer then keeps the
+// parent copy.
+const (
+	EventInheritedRulesKnown    = "inheritedRulesKnown"
+	EventInheritedArgumentRules = "inheritedArgumentRules"
+	EventChildScopes            = "childScopes"
+)
+
 // EventType identifies the kind of MCP proxy event.
 type EventType string
 

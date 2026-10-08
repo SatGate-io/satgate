@@ -7,9 +7,11 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"github.com/satgate-io/satgate/pkg/argrules"
 	"github.com/satgate-io/satgate/pkg/macaroon"
 )
 
@@ -174,6 +176,7 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 
 	childToken := d.macaroonSvc.Encode(childMac)
 	childTokenID := hashToken(childMac.Identifier + childMac.Signature)
+	inheritedRules, rulesKnown, childScopes := childAuthorityForEvent(d.macaroonSvc, childMac, childToken)
 
 	// Initialize child budget (skip for observe-only 0-budget tokens)
 	if params.Budget > 0 && childBudgetID != "" {
@@ -204,12 +207,15 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		BudgetID:  parent.BudgetID,
 		TenantID:  parent.TenantID,
 		Data: map[string]interface{}{
-			"childTokenId":    childTokenID,
-			"childBudgetId":   childBudgetID,
-			"childBudget":     params.Budget,
-			"parentRemaining": parentRemaining,
-			"label":           params.Label,
-			"scope":           params.Scope,
+			"childTokenId":              childTokenID,
+			"childBudgetId":             childBudgetID,
+			"childBudget":               params.Budget,
+			"parentRemaining":           parentRemaining,
+			"label":                     params.Label,
+			"scope":                     params.Scope,
+			EventInheritedRulesKnown:    rulesKnown,
+			EventInheritedArgumentRules: inheritedRules,
+			EventChildScopes:            childScopes,
 		},
 	})
 
@@ -266,4 +272,37 @@ func HandleBudget(ctx context.Context, req *Request, budget BudgetEnforcer, toke
 		ID:      req.ID,
 		Result:  result,
 	}, nil
+}
+
+// childAuthorityForEvent is what the gateway persistence writer needs in
+// order to store the child's own rules and scope, not a routes-only row.
+// rulesKnown is false when the child could not be read; the writer then
+// keeps the parent copy rather than dropping rules it could not see.
+func childAuthorityForEvent(svc *macaroon.Service, child *macaroon.Macaroon, token string) (rules string, known bool, scopes []string) {
+	if child == nil || svc == nil {
+		return "", false, nil
+	}
+	info, err := FillTokenInfo(svc, child, token)
+	if err != nil || info == nil {
+		return "", false, nil
+	}
+	known = true
+	if len(info.ArgumentRules) > 0 {
+		raw, mErr := argrules.Marshal(info.ArgumentRules)
+		if mErr != nil {
+			return "", false, nil
+		}
+		rules = string(raw)
+	}
+	for _, c := range child.Caveats {
+		if !strings.HasPrefix(c, "scope = ") {
+			continue
+		}
+		v := strings.TrimPrefix(c, "scope = ")
+		if argrules.IsRuleScope(v) {
+			continue
+		}
+		scopes = append(scopes, v)
+	}
+	return rules, known, scopes
 }
