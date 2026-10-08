@@ -554,6 +554,10 @@ func injectMetaToken(params json.RawMessage, token string) json.RawMessage {
 		// converted to float64 and back.
 		var meta map[string]json.RawMessage
 		if err := json.Unmarshal(metaRaw, &meta); err == nil {
+			if meta == nil {
+				// "_meta": null decodes to a nil map. Treat it as absent.
+				meta = map[string]json.RawMessage{}
+			}
 			if _, hasToken := meta["token"]; hasToken {
 				return params // already has token, don't override
 			}

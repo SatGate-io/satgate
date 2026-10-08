@@ -729,6 +729,10 @@ const (
 	ReasonRulesInvalid   = "token argument rules are not valid"
 	ReasonNoShape        = "arguments are outside what this token allows"
 
+	// ReasonScriptToolRule: the token carries a rule for a tool that runs
+	// scripts. That rule cannot be enforced, so the call is refused.
+	ReasonScriptToolRule = "this tool runs scripts, so a limit on it cannot be enforced"
+
 	// maxCallJSONDepth bounds nesting while looking for duplicate keys.
 	maxCallJSONDepth = 64
 )

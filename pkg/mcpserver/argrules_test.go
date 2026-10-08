@@ -211,19 +211,14 @@ func remainingFor2(t *testing.T, p *Proxy, token string) int64 {
 }
 
 func TestWixReadOnlyPresetEndToEnd(t *testing.T) {
-	const scope = "CallWixSiteAPI,ExecuteWixAPI,ManageWixSite,ListWixSites"
-	// ExecuteWixAPI carries the same rule as CallWixSiteAPI.
-	doc := strings.Replace(wixReadOnlyDoc, `{"tool":"ManageWixSite"`, `{"tool":"ExecuteWixAPI","shapes":[
-	  {"method":{"one_of":["GET"],"ascii_case_insensitive":true}},
-	  {"method":{"one_of":["POST"],"ascii_case_insensitive":true},"url":{"url":{"hosts":["www.wixapis.com"],"path_suffixes":["/query","/search"]}}}]},
-	 {"tool":"ManageWixSite"`, 1)
+	// ExecuteWixAPI runs scripts and cannot carry a rule (B1); it is not here.
+	const scope = "CallWixSiteAPI,ManageWixSite,ListWixSites"
+	doc := wixReadOnlyDoc
 	site := "https://www.wixapis.com/stores/v1/products"
 	cases := []argCase{
 		{"GET reads", "CallWixSiteAPI", `{"method":"GET","url":"` + site + `/abc"}`, true, ""},
 		{"get lower case", "CallWixSiteAPI", `{"method":"get","url":"` + site + `/abc"}`, true, ""},
 		{"POST query reads", "CallWixSiteAPI", `{"method":"POST","url":"` + site + `/query","body":"{}"}`, true, ""},
-		{"POST search reads", "ExecuteWixAPI", `{"method":"POST","url":"https://www.wixapis.com/stores-reader/v1/products/search","body":"{}"}`, true, ""},
-		{"GET via Execute", "ExecuteWixAPI", `{"method":"GET","url":"` + site + `"}`, true, ""},
 		{"ListWixSites has no rule", "ListWixSites", `{}`, true, ""},
 		{"POST write path", "CallWixSiteAPI", `{"method":"POST","url":"` + site + `","body":"{}"}`, false, "url"},
 		{"POST delete path", "CallWixSiteAPI", `{"method":"POST","url":"` + site + `/abc/delete"}`, false, "url"},
@@ -235,8 +230,6 @@ func TestWixReadOnlyPresetEndToEnd(t *testing.T) {
 		{"POST relative", "CallWixSiteAPI", `{"method":"POST","url":"/stores/v1/products/query"}`, false, "url"},
 		{"DELETE", "CallWixSiteAPI", `{"method":"DELETE","url":"` + site + `/abc"}`, false, "method"},
 		{"PATCH", "CallWixSiteAPI", `{"method":"PATCH","url":"` + site + `/abc","body":"{}"}`, false, "method"},
-		{"PUT", "ExecuteWixAPI", `{"method":"PUT","url":"` + site + `/abc","body":"{}"}`, false, "method"},
-		{"DELETE via Execute", "ExecuteWixAPI", `{"method":"DELETE","url":"` + site + `/abc"}`, false, "method"},
 		{"method missing", "CallWixSiteAPI", `{"url":"` + site + `/abc"}`, false, "method"},
 		{"method not a string", "CallWixSiteAPI", `{"method":["GET"],"url":"` + site + `/abc"}`, false, "method"},
 		{"no arguments", "CallWixSiteAPI", ``, false, "method"},

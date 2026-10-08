@@ -1161,6 +1161,12 @@ func (p *Proxy) forwardToDefault(ctx context.Context, req *Request) (*Response, 
 // Handles tenant-prefixed scopes (e.g., "tenant-uuid:*" or "tenant-uuid:mcp:*")
 // by stripping the tenant prefix before matching.
 func matchScope(scope, toolName string) bool {
+	// No scope, wildcard included, allows a tool whose name starts with the
+	// reserved argument-rules prefix. An older runtime allows a tool whose name
+	// equals a rule word; this one cannot, in the scope check itself.
+	if macaroon.IsReservedToolName(toolName) {
+		return false
+	}
 	for _, s := range strings.Split(scope, ",") {
 		s = strings.TrimSpace(s)
 

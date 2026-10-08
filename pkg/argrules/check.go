@@ -28,6 +28,13 @@ func Check(rules []Rule, toolName string, params json.RawMessage) *Denial {
 	if len(rules) == 0 {
 		return nil
 	}
+	// A rule on a tool that runs scripts cannot be enforced (see RunsScripts).
+	// Mint never produces one, so a token that carries one was built some other
+	// way. It is not trusted at all: every call on it is refused, so the rule
+	// can never look like a limit that is being applied.
+	if ScriptToolRuleError(rules) != nil {
+		return &Denial{Reason: ReasonScriptToolRule}
+	}
 	// The top level is read strictly whenever the token has any rule: the
 	// tool name checked must be the tool name the upstream reads.
 	if !utf8.Valid(params) {

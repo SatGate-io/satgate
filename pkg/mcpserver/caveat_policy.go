@@ -100,6 +100,11 @@ func (t *TokenInfo) AllowsTool(toolName string) bool {
 	if t == nil {
 		return false
 	}
+	// A name with the reserved rule prefix is never a tool a token allows,
+	// whatever its scope says: see macaroon.ArgumentRulesScopePrefix.
+	if macaroon.IsReservedToolName(toolName) {
+		return false
+	}
 	if t.Raw != nil {
 		saw := false
 		for _, caveat := range t.Raw.Caveats {
