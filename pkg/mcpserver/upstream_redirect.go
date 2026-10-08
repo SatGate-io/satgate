@@ -53,6 +53,20 @@ func wrapUpstreamError(prefix, rawURL string, err error) error {
 	return fmt.Errorf("%s %s: %w", prefix, rawURL, err)
 }
 
+// wrapUpstreamErrorRedacted is wrapUpstreamError. With redact set the context
+// names the origin of rawURL only: rawURL is configuration, but it can carry a
+// credential in its userinfo or query, and the error may be shown to a caller.
+func wrapUpstreamErrorRedacted(prefix, rawURL string, err error, redact bool) error {
+	if !redact {
+		return wrapUpstreamError(prefix, rawURL, err)
+	}
+	origin := "unknown-origin"
+	if u, perr := url.Parse(rawURL); perr == nil {
+		origin = displayOrigin(u)
+	}
+	return fmt.Errorf("%s %s: %w", prefix, origin, err)
+}
+
 // doUpstream performs req and applies the upstream redirect rule.
 //
 // A stored header is a tenant-configured header (including Authorization) or
@@ -61,6 +75,14 @@ func wrapUpstreamError(prefix, rawURL string, err error) error {
 // redirect returns an error naming the status code and the target origin
 // (scheme, host, and port only).
 func doUpstream(client *http.Client, req *http.Request, hasStoredHeaders bool) (*http.Response, error) {
+	return doUpstreamRedacted(client, req, hasStoredHeaders, false)
+}
+
+// doUpstreamRedacted is doUpstream. With redact set, a refusal names only the
+// status code (the target origin is chosen by the upstream, so it is not
+// repeated), and a failure of the HTTP exchange itself is reduced to a fixed
+// sentence by kind: its own text can quote the bytes the upstream sent.
+func doUpstreamRedacted(client *http.Client, req *http.Request, hasStoredHeaders, redact bool) (*http.Response, error) {
 	if client == nil || client.Transport == nil {
 		return nil, fmt.Errorf("upstream HTTP client is not configured")
 	}
@@ -71,6 +93,10 @@ func doUpstream(client *http.Client, req *http.Request, hasStoredHeaders bool) (
 	for followed := 0; ; followed++ {
 		resp, err := client.Transport.RoundTrip(req)
 		if err != nil {
+			if redact {
+				// net/http parser errors quote the bytes the upstream sent.
+				return nil, redactTransportError(err)
+			}
 			return nil, err
 		}
 		if !isRedirectStatus(resp.StatusCode) {
@@ -82,13 +108,18 @@ func doUpstream(client *http.Client, req *http.Request, hasStoredHeaders bool) (
 		if !ok {
 			return nil, refusalf("upstream redirect status %d has an invalid location", status)
 		}
-		origin := displayOrigin(loc)
+		refused := func() error {
+			if redact {
+				return refusalf("upstream redirect status %d refused", status)
+			}
+			return refusalf("upstream redirect status %d to %s refused", status, displayOrigin(loc))
+		}
 		if hasStoredHeaders || requestHasStoredHeader(req) || !sameOrigin(upstream, loc) || followed >= maxSameOriginRedirects {
-			return nil, refusalf("upstream redirect status %d to %s refused", status, origin)
+			return nil, refused()
 		}
 		next, err := redirectRequest(req, loc, status)
 		if err != nil {
-			return nil, refusalf("upstream redirect status %d to %s refused", status, origin)
+			return nil, refused()
 		}
 		req = next
 	}
@@ -226,7 +257,16 @@ func resolveUpstreamReference(base *url.URL, refRaw string) (*url.URL, error) {
 // endpointOriginError refuses an endpoint whose origin differs from the
 // configured upstream's origin.
 func endpointOriginError(upstream, resolved *url.URL) error {
+	return endpointOriginErrorRedacted(upstream, resolved, false)
+}
+
+// endpointOriginErrorRedacted is endpointOriginError. With redact set it does
+// not name the endpoint's origin, which the upstream chose.
+func endpointOriginErrorRedacted(upstream, resolved *url.URL, redact bool) error {
 	if !sameOrigin(upstream, resolved) {
+		if redact {
+			return refusalf("SSE endpoint origin does not match upstream origin")
+		}
 		return refusalf("SSE endpoint origin %s does not match upstream origin %s", displayOrigin(resolved), displayOrigin(upstream))
 	}
 	return nil
@@ -271,4 +311,13 @@ func displayOrigin(u *url.URL) string {
 		origin += ":" + port
 	}
 	return origin
+}
+
+// displayOriginOf is displayOrigin for a raw URL string.
+func displayOriginOf(rawURL string) string {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return "unknown-origin"
+	}
+	return displayOrigin(u)
 }

@@ -54,7 +54,16 @@ type SSETransport struct {
 	wg     sync.WaitGroup
 	closed bool
 	mu     sync.Mutex
+
+	// redact keeps upstream-supplied text out of errors and logs.
+	redact bool
 }
+
+// SetRedactUpstreamText makes the transport leave upstream-supplied text (a
+// response body, a content type, event data, an endpoint or redirect origin)
+// out of the errors it returns and the logs it writes. Call it before Connect.
+// Off by default.
+func (t *SSETransport) SetRedactUpstreamText(on bool) { t.redact = on }
 
 // NewSSETransport creates a transport for the legacy MCP SSE protocol.
 // allowPrivate bypasses SSRF protection (for local dev/testing).
@@ -120,8 +129,13 @@ func (t *SSETransport) sseLoop() {
 			return // clean shutdown
 		}
 
-		log.Warn().Err(err).Str("url", t.baseURL).Dur("backoff", backoff).
-			Msg("SSE stream disconnected, reconnecting")
+		if t.redact {
+			log.Warn().Str("url", displayOriginOf(t.baseURL)).Dur("backoff", backoff).
+				Msg("SSE stream disconnected, reconnecting")
+		} else {
+			log.Warn().Err(err).Str("url", t.baseURL).Dur("backoff", backoff).
+				Msg("SSE stream disconnected, reconnecting")
+		}
 
 		select {
 		case <-time.After(backoff):
@@ -152,14 +166,17 @@ func (t *SSETransport) runSSEStream() error {
 
 	resp, err := t.do(req)
 	if err != nil {
-		t.sendError(wrapUpstreamError("SSE GET", t.baseURL, err))
+		t.sendError(wrapUpstreamErrorRedacted("SSE GET", t.baseURL, err, t.redact))
 		return err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 1024))
-		err := fmt.Errorf("SSE GET %s: status %d: %s", t.baseURL, resp.StatusCode, string(body))
+		err := newUpstreamStatusError(resp.StatusCode, "SSE GET %s: status %d: %s", t.baseURL, resp.StatusCode, string(body))
+		if t.redact {
+			err = newUpstreamStatusError(resp.StatusCode, "SSE GET %s: status %d", displayOriginOf(t.baseURL), resp.StatusCode)
+		}
 		t.sendError(err)
 		return err
 	}
@@ -167,6 +184,9 @@ func (t *SSETransport) runSSEStream() error {
 	ct := resp.Header.Get("Content-Type")
 	if !strings.HasPrefix(ct, "text/event-stream") {
 		err := fmt.Errorf("SSE GET %s: unexpected content-type %q (expected text/event-stream)", t.baseURL, ct)
+		if t.redact {
+			err = fmt.Errorf("SSE GET %s: unexpected content-type (expected text/event-stream)", displayOriginOf(t.baseURL))
+		}
 		t.sendError(err)
 		return err
 	}
@@ -215,6 +235,9 @@ func (t *SSETransport) runSSEStream() error {
 	}
 
 	if err := scanner.Err(); err != nil {
+		if t.redact {
+			return fmt.Errorf("SSE scanner: the stream could not be read")
+		}
 		return fmt.Errorf("SSE scanner: %w", err)
 	}
 	return io.EOF
@@ -239,7 +262,7 @@ func (t *SSETransport) handleSSEEvent(upstreamURL, streamURL *url.URL, eventType
 		}
 		resolved, err := resolveUpstreamReference(streamURL, endpoint)
 		if err == nil {
-			err = endpointOriginError(upstreamURL, resolved)
+			err = endpointOriginErrorRedacted(upstreamURL, resolved, t.redact)
 		}
 		if err != nil {
 			t.failConnect(fmt.Errorf("SSE endpoint rejected: %w", err))
@@ -255,7 +278,12 @@ func (t *SSETransport) handleSSEEvent(upstreamURL, streamURL *url.URL, eventType
 		t.endpointReadyOnce.Do(func() {
 			close(t.endpointReady)
 		})
-		log.Debug().Str("origin", displayOrigin(resolved)).Msg("SSE: received message endpoint")
+		if t.redact {
+			// The endpoint is chosen by the upstream, so its origin is not logged.
+			log.Debug().Msg("SSE: received message endpoint")
+		} else {
+			log.Debug().Str("origin", displayOrigin(resolved)).Msg("SSE: received message endpoint")
+		}
 
 	case "message", "":
 		// JSON-RPC message from server
@@ -269,13 +297,17 @@ func (t *SSETransport) handleSSEEvent(upstreamURL, streamURL *url.URL, eventType
 		}
 
 	default:
+		if t.redact {
+			log.Debug().Msg("SSE: unknown event type")
+			return
+		}
 		log.Debug().Str("event", eventType).Str("data", data[:min(len(data), 200)]).
 			Msg("SSE: unknown event type")
 	}
 }
 
 func (t *SSETransport) do(req *http.Request) (*http.Response, error) {
-	return doUpstream(t.httpClient, req, len(t.headers) > 0)
+	return doUpstreamRedacted(t.httpClient, req, len(t.headers) > 0, t.redact)
 }
 
 // failConnect records a refused endpoint as the terminal error, reports it to
@@ -328,6 +360,9 @@ func (t *SSETransport) WriteMessage(ctx context.Context, msg json.RawMessage) er
 
 	req, err := http.NewRequestWithContext(ctx, "POST", endpoint, bytes.NewReader(msg))
 	if err != nil {
+		if t.redact {
+			return fmt.Errorf("SSE POST create: request could not be built")
+		}
 		return fmt.Errorf("SSE POST create: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
@@ -337,6 +372,10 @@ func (t *SSETransport) WriteMessage(ctx context.Context, msg json.RawMessage) er
 
 	resp, err := t.do(req)
 	if err != nil {
+		if t.redact {
+			// The POST endpoint (path and query) is chosen by the upstream.
+			return wrapUpstreamErrorRedacted("SSE POST", t.baseURL, err, true)
+		}
 		return wrapUpstreamError("SSE POST", endpoint, err)
 	}
 	defer resp.Body.Close()
@@ -345,7 +384,10 @@ func (t *SSETransport) WriteMessage(ctx context.Context, msg json.RawMessage) er
 	io.Copy(io.Discard, io.LimitReader(resp.Body, 64*1024))
 
 	if resp.StatusCode >= 400 {
-		return fmt.Errorf("SSE POST %s: status %d", endpoint, resp.StatusCode)
+		if t.redact {
+			return newUpstreamStatusError(resp.StatusCode, "SSE POST %s: status %d", displayOriginOf(t.baseURL), resp.StatusCode)
+		}
+		return newUpstreamStatusError(resp.StatusCode, "SSE POST %s: status %d", endpoint, resp.StatusCode)
 	}
 
 	return nil

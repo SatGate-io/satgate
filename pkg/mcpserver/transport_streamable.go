@@ -47,7 +47,16 @@ type StreamableHTTPTransport struct {
 	cancel context.CancelFunc
 	closed bool
 	mu     sync.Mutex
+
+	// redact keeps upstream-supplied text out of errors and logs.
+	redact bool
 }
+
+// SetRedactUpstreamText makes the transport leave upstream-supplied text (a
+// response body, a session id, event data, a redirect origin) out of the
+// errors it returns and the logs it writes. Call it before Connect. Off by
+// default.
+func (t *StreamableHTTPTransport) SetRedactUpstreamText(on bool) { t.redact = on }
 
 // NewStreamableHTTPTransport creates a transport for the MCP Streamable HTTP protocol.
 // allowPrivate bypasses SSRF protection (for local dev/testing).
@@ -80,6 +89,9 @@ func (t *StreamableHTTPTransport) Connect(ctx context.Context) error {
 	// is started lazily after the first successful POST that returns a session ID.
 	_, err := http.NewRequest("GET", t.url, nil)
 	if err != nil {
+		if t.redact {
+			return fmt.Errorf("streamable HTTP: invalid URL")
+		}
 		return fmt.Errorf("streamable HTTP: invalid URL %q: %w", t.url, err)
 	}
 
@@ -118,7 +130,11 @@ func (t *StreamableHTTPTransport) maybeStartNotificationListener() {
 
 		resp, err := t.do(req)
 		if err != nil {
-			log.Debug().Err(err).Msg("streamable HTTP: notification stream not available")
+			if t.redact {
+				log.Debug().Msg("streamable HTTP: notification stream not available")
+			} else {
+				log.Debug().Err(err).Msg("streamable HTTP: notification stream not available")
+			}
 			return
 		}
 
@@ -154,6 +170,9 @@ func (t *StreamableHTTPTransport) ReadMessage(ctx context.Context) (json.RawMess
 func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.RawMessage) error {
 	req, err := http.NewRequestWithContext(ctx, "POST", t.url, bytes.NewReader(msg))
 	if err != nil {
+		if t.redact {
+			return fmt.Errorf("streamable HTTP POST create: request could not be built")
+		}
 		return fmt.Errorf("streamable HTTP POST create: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
@@ -169,7 +188,7 @@ func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.Raw
 
 	resp, err := t.do(req)
 	if err != nil {
-		return wrapUpstreamError("streamable HTTP POST", t.url, err)
+		return wrapUpstreamErrorRedacted("streamable HTTP POST", t.url, err, t.redact)
 	}
 
 	// Capture session ID from response and start notification listener once
@@ -179,7 +198,11 @@ func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.Raw
 		t.sessionID = sid
 		t.sessionMu.Unlock()
 		if isNew {
-			log.Debug().Str("sessionId", sid).Msg("streamable HTTP: session established")
+			if t.redact {
+				log.Debug().Msg("streamable HTTP: session established")
+			} else {
+				log.Debug().Str("sessionId", sid).Msg("streamable HTTP: session established")
+			}
 			t.maybeStartNotificationListener()
 		}
 	}
@@ -187,7 +210,10 @@ func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.Raw
 	if resp.StatusCode >= 400 {
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
 		resp.Body.Close()
-		return fmt.Errorf("streamable HTTP POST %s: status %d: %s", t.url, resp.StatusCode, string(body))
+		if t.redact {
+			return newUpstreamStatusError(resp.StatusCode, "streamable HTTP POST %s: status %d", displayOriginOf(t.url), resp.StatusCode)
+		}
+		return newUpstreamStatusError(resp.StatusCode, "streamable HTTP POST %s: status %d: %s", t.url, resp.StatusCode, string(body))
 	}
 
 	ct := resp.Header.Get("Content-Type")
@@ -203,7 +229,11 @@ func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.Raw
 		go func() {
 			defer resp.Body.Close()
 			if err := t.readSSEStream(resp.Body); err != nil && t.ctx.Err() == nil {
-				log.Debug().Err(err).Msg("streamable HTTP: SSE response stream ended")
+				if t.redact {
+					log.Debug().Msg("streamable HTTP: SSE response stream ended")
+				} else {
+					log.Debug().Err(err).Msg("streamable HTTP: SSE response stream ended")
+				}
 			}
 		}()
 		return nil
@@ -213,6 +243,10 @@ func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.Raw
 		defer resp.Body.Close()
 		body, err := io.ReadAll(io.LimitReader(resp.Body, 10*1024*1024)) // 10MB max
 		if err != nil {
+			if t.redact {
+				// A chunked-body or framing error quotes upstream bytes.
+				return fmt.Errorf("streamable HTTP: read response body: the body could not be read")
+			}
 			return fmt.Errorf("streamable HTTP: read response body: %w", err)
 		}
 
@@ -288,6 +322,9 @@ func (t *StreamableHTTPTransport) readSSEStream(body io.Reader) error {
 	}
 
 	if err := scanner.Err(); err != nil {
+		if t.redact {
+			return fmt.Errorf("SSE scanner: the stream could not be read")
+		}
 		return fmt.Errorf("SSE scanner: %w", err)
 	}
 	return io.EOF
@@ -302,6 +339,10 @@ func (t *StreamableHTTPTransport) handleStreamEvent(eventType, data string) {
 	case "message", "":
 		t.deliverMessage(json.RawMessage(data))
 	default:
+		if t.redact {
+			log.Debug().Msg("streamable HTTP: unknown SSE event")
+			return
+		}
 		log.Debug().Str("event", eventType).Str("data", data[:minInt(len(data), 200)]).
 			Msg("streamable HTTP: unknown SSE event")
 	}
@@ -346,7 +387,11 @@ func (t *StreamableHTTPTransport) Close() error {
 			}
 			resp, err := t.do(req)
 			if err != nil {
-				log.Debug().Err(err).Msg("streamable HTTP: session DELETE failed")
+				if t.redact {
+					log.Debug().Msg("streamable HTTP: session DELETE failed")
+				} else {
+					log.Debug().Err(err).Msg("streamable HTTP: session DELETE failed")
+				}
 			} else {
 				io.Copy(io.Discard, io.LimitReader(resp.Body, 1024))
 				resp.Body.Close()
@@ -360,7 +405,7 @@ func (t *StreamableHTTPTransport) Close() error {
 }
 
 func (t *StreamableHTTPTransport) do(req *http.Request) (*http.Response, error) {
-	return doUpstream(t.httpClient, req, t.hasStoredHeaders())
+	return doUpstreamRedacted(t.httpClient, req, t.hasStoredHeaders(), t.redact)
 }
 
 func (t *StreamableHTTPTransport) hasStoredHeaders() bool {
