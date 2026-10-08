@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"crypto/subtle"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -100,6 +101,91 @@ func WithStreamableSessionTTL(ttl time.Duration) SSEOption {
 	}
 }
 
+// WithOAuthChallenge makes the header-auth transport answer a missing,
+// invalid, expired or revoked bearer token with
+//
+//	401 WWW-Authenticate: Bearer resource_metadata="<metadataURL>"
+//
+// (RFC 9728 section 5.1, MCP authorization spec), so hosted agent apps that
+// only speak OAuth can discover the authorization server. metadataURL must
+// pass ValidateOAuthResourceMetadataURL; an invalid value is ignored and the
+// historical bare 401 stays. Without this option nothing changes.
+func WithOAuthChallenge(metadataURL string) SSEOption {
+	return func(s *SSEServer) {
+		if ValidateOAuthResourceMetadataURL(metadataURL) == nil {
+			s.oauthMetadataURL = metadataURL
+		}
+	}
+}
+
+// ValidateOAuthResourceMetadataURL accepts an absolute https URL with a host
+// and no userinfo, fragment, quote, backslash or control character, so it can
+// be placed inside a quoted-string header parameter verbatim.
+func ValidateOAuthResourceMetadataURL(raw string) error {
+	if raw == "" {
+		return fmt.Errorf("resource metadata URL is empty")
+	}
+	for _, r := range raw {
+		if r <= 0x20 || r == 0x7f || r == '"' || r == '\\' {
+			return fmt.Errorf("resource metadata URL contains a forbidden character")
+		}
+	}
+	u, err := url.Parse(raw)
+	if err != nil || u.Scheme != "https" || u.Host == "" || u.User != nil || u.Fragment != "" || u.RawQuery != "" {
+		return fmt.Errorf("resource metadata URL must be an absolute https URL without userinfo, query or fragment")
+	}
+	return nil
+}
+
+func (s *SSEServer) oauthChallengeEnabled() bool { return s.oauthMetadataURL != "" }
+
+func (s *SSEServer) bearerChallenge() string {
+	return `Bearer resource_metadata="` + s.oauthMetadataURL + `"`
+}
+
+// writeAuthChallenge writes the 401 for a missing or unverifiable token. With
+// the challenge off it is exactly http.Error(w, msg, 401).
+func (s *SSEServer) writeAuthChallenge(w http.ResponseWriter, msg string) {
+	if s.oauthChallengeEnabled() {
+		w.Header().Set("WWW-Authenticate", s.bearerChallenge())
+	}
+	http.Error(w, msg, http.StatusUnauthorized)
+}
+
+// rejectStreamSessionToken checks the token presented on an existing
+// Streamable HTTP session and writes the refusal. It reports true when the
+// request was refused.
+//
+// Challenge off: a token whose hash differs from the session's gets 403, as
+// before. Challenge on (hosted-app sign-in): no token or a token that no
+// longer verifies gets 401 + challenge so the app refreshes or signs in again;
+// a different token that verifies gets 404, which tells the client to start a
+// new session (MCP spec, session management), since a refreshed access token
+// is a different token than the one the session was opened with.
+func (s *SSEServer) rejectStreamSessionToken(w http.ResponseWriter, r *http.Request, sess *streamSession) bool {
+	tok := extractAuthToken(r)
+	if s.oauthChallengeEnabled() && s.requiresVerifiedStreamToken() {
+		if tok == "" {
+			s.writeAuthChallenge(w, "authentication required")
+			return true
+		}
+		if _, err := s.proxy.auth.Verify(r.Context(), tok); err != nil {
+			s.writeAuthChallenge(w, "authentication failed")
+			return true
+		}
+		if !s.streamSessionAllowsToken(sess, tok) {
+			http.Error(w, "session not found", http.StatusNotFound)
+			return true
+		}
+		return false
+	}
+	if !s.streamSessionAllowsToken(sess, tok) {
+		http.Error(w, "session_token_mismatch", http.StatusForbidden)
+		return true
+	}
+	return false
+}
+
 // WithMaxStreamableSessions overrides the cap on concurrent Streamable HTTP
 // sessions held in memory.
 func WithMaxStreamableSessions(n int) SSEOption {
@@ -172,8 +258,7 @@ func (s *SSEServer) handleStreamableDelete(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "session not found", http.StatusNotFound)
 		return
 	}
-	if !s.streamSessionAllowsToken(sess, extractAuthToken(r)) {
-		http.Error(w, "session_token_mismatch", http.StatusForbidden)
+	if s.rejectStreamSessionToken(w, r, sess) {
 		return
 	}
 	if !s.protocolVersionAllowed(r) {
@@ -245,11 +330,11 @@ func (s *SSEServer) handleStreamablePost(w http.ResponseWriter, r *http.Request)
 		// nothing in the session map.
 		if s.requiresVerifiedStreamToken() {
 			if authToken == "" {
-				http.Error(w, "authentication required", http.StatusUnauthorized)
+				s.writeAuthChallenge(w, "authentication required")
 				return
 			}
 			if _, err := s.proxy.auth.Verify(r.Context(), authToken); err != nil {
-				http.Error(w, "authentication failed", http.StatusUnauthorized)
+				s.writeAuthChallenge(w, "authentication failed")
 				return
 			}
 		}
@@ -267,8 +352,7 @@ func (s *SSEServer) handleStreamablePost(w http.ResponseWriter, r *http.Request)
 			http.Error(w, "session not found", http.StatusNotFound)
 			return
 		}
-		if !s.streamSessionAllowsToken(sess, extractAuthToken(r)) {
-			http.Error(w, "session_token_mismatch", http.StatusForbidden)
+		if s.rejectStreamSessionToken(w, r, sess) {
 			return
 		}
 		if !s.protocolVersionAllowed(r) {

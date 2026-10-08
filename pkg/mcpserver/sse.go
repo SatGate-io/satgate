@@ -35,6 +35,11 @@ type SSEServer struct {
 	streamMax       int
 	streamLastSweep time.Time
 	allowedOrigins  map[string]struct{}
+
+	// oauthMetadataURL, when set, turns every 401 from the header-auth
+	// transport paths into an RFC 9728 / MCP authorization challenge.
+	// Empty (the default) keeps the historical bare 401 byte for byte.
+	oauthMetadataURL string
 }
 
 // sseSession represents one connected MCP client over SSE.
@@ -223,6 +228,16 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 	// Capture auth token from header before writing response.
 	authToken := extractAuthToken(r)
 
+	// Hosted-app sign-in: a tokenless or unverifiable SSE connect gets the
+	// OAuth challenge instead of a stream. Off (default) changes nothing.
+	if s.oauthChallengeEnabled() && s.requiresVerifiedStreamToken() {
+		if authToken == "" {
+			s.writeAuthChallenge(w, "authentication required")
+			cancel()
+			return
+		}
+	}
+
 	// Pre-connect auth check: reject tokens that fail hard verification
 	// (e.g., enterprise tokens hitting the SaaS proxy).
 	// Soft failures (unknown key, fallback extraction) are deferred to post-connect.
@@ -234,6 +249,11 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 			if strings.Contains(errMsg, "enterprise deployment") || strings.Contains(errMsg, "token revoked") {
 				log.Warn().Msg("SSE connection rejected at pre-connect")
 				s.writePreConnectDenial(w, r, errMsg)
+				cancel()
+				return
+			}
+			if s.oauthChallengeEnabled() && s.requiresVerifiedStreamToken() {
+				s.writeAuthChallenge(w, "authentication failed")
 				cancel()
 				return
 			}
@@ -509,7 +529,14 @@ func (s *SSEServer) writePreConnectDenial(w http.ResponseWriter, r *http.Request
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusForbidden)
+	status := http.StatusForbidden
+	if isRevoked && s.oauthChallengeEnabled() {
+		// A revoked token is an invalid token: the hosted-app flow needs the
+		// 401 + challenge to know it must sign in again.
+		w.Header().Set("WWW-Authenticate", s.bearerChallenge())
+		status = http.StatusUnauthorized
+	}
+	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(response)
 }
 
