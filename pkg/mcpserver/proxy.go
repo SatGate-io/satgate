@@ -13,7 +13,9 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"github.com/satgate-io/satgate/pkg/argrules"
 	"github.com/satgate-io/satgate/pkg/denial"
+	"github.com/satgate-io/satgate/pkg/macaroon"
 )
 
 // ContextKey type for context values.
@@ -582,6 +584,8 @@ func (p *Proxy) handleToolsListWithCtx(ctx context.Context, req *Request) (*Resp
 		tools = p.toolsListEnricher(ctx, tenantID, tools)
 	}
 
+	tools = dropReservedTools(tools)
+
 	result, err := json.Marshal(map[string]interface{}{
 		"tools": tools,
 	})
@@ -596,18 +600,60 @@ func (p *Proxy) handleToolsListWithCtx(ctx context.Context, req *Request) (*Resp
 	}, nil
 }
 
+// dropReservedTools removes every tool whose name starts with the reserved
+// argument-rules prefix. An upstream can advertise any name; one that starts
+// with the prefix is never offered to an agent by a runtime that knows rules.
+// A tool entry that cannot be read is dropped too: it could hide such a name.
+func dropReservedTools(tools []json.RawMessage) []json.RawMessage {
+	kept := make([]json.RawMessage, 0, len(tools))
+	for _, t := range tools {
+		var probe struct {
+			Name json.RawMessage `json:"name"`
+		}
+		if err := json.Unmarshal(t, &probe); err != nil {
+			continue
+		}
+		var name string
+		if len(probe.Name) > 0 {
+			if err := json.Unmarshal(probe.Name, &name); err != nil {
+				continue
+			}
+		}
+		if macaroon.IsReservedToolName(name) {
+			continue
+		}
+		kept = append(kept, t)
+	}
+	return kept
+}
+
 // handleToolsCall is the hot path — intercepts tool calls for budget enforcement.
 func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *TokenInfo) (*Response, error) {
 	// Parse tool call
 	tc, err := ParseToolCall(req.Params)
 	if err != nil {
-		return NewErrorResponse(req.ID, CodeInvalidParams, err.Error()), nil
+		return NewErrorResponse(req.ID, CodeInvalidParams, toolCallParseMessage(err)), nil
+	}
+
+	// A tool whose name starts with the reserved argument-rules prefix is never
+	// forwarded, whatever the token allows: see macaroon.ArgumentRulesScopePrefix.
+	if macaroon.IsReservedToolName(tc.Name) {
+		return NewErrorResponse(req.ID, CodePolicyDenied, "tool name uses a reserved prefix and is not available"), nil
 	}
 
 	// Every scope caveat must allow the tool. A later caveat can only narrow.
 	// matchScope strips a tenant UUID prefix and ORs words inside one caveat.
 	if !tokenInfo.AllowsTool(tc.Name) {
 		return p.scopeDeniedResponse(ctx, req, tokenInfo, tc.Name), nil
+	}
+
+	// Argument rules: the token may allow the tool but limit what it can do.
+	// This runs on the exact params that are forwarded below, before cost,
+	// budget, events or any upstream call, so a refusal charges nothing and
+	// never reaches the upstream. Every path to an upstream tools/call goes
+	// through this function.
+	if denied := tokenInfo.CheckToolArguments(tc.Name, req.Params); denied != nil {
+		return p.argumentDeniedResponse(ctx, req, tokenInfo, tc.Name, denied), nil
 	}
 
 	// Resolve cost (per-tenant if available, else global)
@@ -939,11 +985,41 @@ func (p *Proxy) recordMCPDecision(ctx context.Context, req *Request, tokenInfo *
 // BudgetNotEvaluated, so the receipt claims no limit or balance.
 func (p *Proxy) scopeDeniedResponse(ctx context.Context, req *Request, tokenInfo *TokenInfo, toolName string) *Response {
 	message := fmt.Sprintf("tool %q not in scope %q", toolName, tokenInfo.Scope)
+	return p.policyDeniedResponse(ctx, req, tokenInfo, toolName, message, nil)
+}
+
+// argumentDeniedResponse refuses a call whose arguments are outside the
+// token's argument rules. It uses the scope refusal shape (CodePolicyDenied,
+// the same signed policy_denied decision) and adds the stable code
+// TOOL_ARGUMENT_DENIED, the tool name and the field name as error data. It
+// never echoes an argument value: the field name comes from the rule.
+func (p *Proxy) argumentDeniedResponse(ctx context.Context, req *Request, tokenInfo *TokenInfo, toolName string, denied *argrules.Denial) *Response {
+	message := fmt.Sprintf("tool %q: %s", toolName, denied.Reason)
+	if denied.Field != "" {
+		message = fmt.Sprintf("tool %q argument %q: %s", toolName, denied.Field, denied.Reason)
+	}
+	data := map[string]interface{}{
+		"error": argrules.DenialCode,
+		"tool":  toolName,
+	}
+	if denied.Field != "" {
+		data["field"] = denied.Field
+	}
+	return p.policyDeniedResponse(ctx, req, tokenInfo, toolName, message, data)
+}
+
+// policyDeniedResponse is the shared refusal. extra is merged into the error
+// data next to any evidence handles; nil extra and no recorder gives a reply
+// with no data.
+func (p *Proxy) policyDeniedResponse(ctx context.Context, req *Request, tokenInfo *TokenInfo, toolName, message string, extra map[string]interface{}) *Response {
 	if p.evidence == nil {
-		return NewErrorResponse(req.ID, CodePolicyDenied, message)
+		if len(extra) == 0 {
+			return NewErrorResponse(req.ID, CodePolicyDenied, message)
+		}
+		return NewErrorResponseWithData(req.ID, CodePolicyDenied, message, extra)
 	}
 	proofUnavailable := func(err error, stage string) *Response {
-		log.Error().Err(err).Str("tool", toolName).Str("stage", stage).Msg("MCP scope denial evidence unavailable")
+		log.Error().Err(err).Str("tool", toolName).Str("stage", stage).Msg("MCP policy denial evidence unavailable")
 		return NewErrorResponseWithData(req.ID, CodeInternalError, "Evidence proof unavailable", map[string]interface{}{
 			"error": "proof_unavailable",
 			"tool":  toolName,
@@ -968,6 +1044,9 @@ func (p *Proxy) scopeDeniedResponse(ctx context.Context, req *Request, tokenInfo
 		return proofUnavailable(errors.New("recorder returned no receipt"), "record")
 	}
 	data := map[string]interface{}{}
+	for k, v := range extra {
+		data[k] = v
+	}
 	mergeEvidenceData(data, evidence)
 	return NewErrorResponseWithData(req.ID, CodePolicyDenied, message, data)
 }
@@ -1085,6 +1164,12 @@ func (p *Proxy) handleDelegate(ctx context.Context, req *Request, tokenInfo *Tok
 
 // forwardToDefault forwards an unrecognized method to the default upstream.
 func (p *Proxy) forwardToDefault(ctx context.Context, req *Request) (*Response, error) {
+	// A tools/call never takes this path: handleRequest sends it through
+	// authentication, scope and argument rules first. Refuse it here too, so
+	// no later edit to the dispatch can forward one unchecked.
+	if IsToolCall(req.Method) {
+		return NewErrorResponse(req.ID, CodePolicyDenied, "tools/call must go through the governed path"), nil
+	}
 	timeout := 30 * time.Second
 
 	resp, err := p.upstream.ForwardRequest(ctx, req.Method, req.Params, timeout)
@@ -1102,6 +1187,12 @@ func (p *Proxy) forwardToDefault(ctx context.Context, req *Request) (*Response, 
 // Handles tenant-prefixed scopes (e.g., "tenant-uuid:*" or "tenant-uuid:mcp:*")
 // by stripping the tenant prefix before matching.
 func matchScope(scope, toolName string) bool {
+	// No scope, wildcard included, allows a tool whose name starts with the
+	// reserved argument-rules prefix. An older runtime allows a tool whose name
+	// equals a rule word; this one cannot, in the scope check itself.
+	if macaroon.IsReservedToolName(toolName) {
+		return false
+	}
 	for _, s := range strings.Split(scope, ",") {
 		s = strings.TrimSpace(s)
 

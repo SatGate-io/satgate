@@ -14,8 +14,8 @@ func TestParseToolCall(t *testing.T) {
 	if tc.Name != "db_query" {
 		t.Errorf("expected db_query, got %s", tc.Name)
 	}
-	if tc.Arguments["sql"] != "SELECT 1" {
-		t.Errorf("unexpected arguments: %v", tc.Arguments)
+	if string(tc.Arguments) != `{"sql":"SELECT 1"}` {
+		t.Errorf("unexpected arguments: %s", tc.Arguments)
 	}
 }
 

@@ -1,8 +1,9 @@
 package mcpserver
 
 import (
+	"bytes"
 	"encoding/json"
-	"fmt"
+	"errors"
 )
 
 // JSON-RPC 2.0 types for MCP protocol handling.
@@ -52,24 +53,74 @@ const (
 )
 
 // ToolCallParams extracts tool name and arguments from a tools/call request.
+//
+// Arguments stays the raw JSON the client sent. It is never decoded into Go
+// values here: a decode into float64 fails on a number such as 1e999, and the
+// Go error text carries the number back to the caller before any argument rule
+// has run. The rule checker (pkg/argrules) is the one reader of argument
+// values, and it reads exact text.
 type ToolCallParams struct {
-	Name      string                 `json:"name"`
-	Arguments map[string]interface{} `json:"arguments,omitempty"`
+	Name      string          `json:"name"`
+	Arguments json.RawMessage `json:"arguments,omitempty"`
 }
 
-// ParseToolCall extracts ToolCallParams from a request's params field.
+// Fixed messages for a tools/call whose params cannot be read. None of them
+// carries a byte of the input: the text goes back to the agent, and the input
+// may hold a value the token's rules were written to keep private.
+var (
+	errToolCallEmptyParams = errors.New("empty params")
+	errToolCallParams      = errors.New("invalid tool call params")
+	errToolCallName        = errors.New("tool name is required")
+	errToolCallArguments   = errors.New("invalid tool call params: arguments must be an object")
+)
+
+// ParseToolCall extracts ToolCallParams from a request's params field. It
+// reads the name and keeps the arguments as raw JSON. Every error is one of a
+// few fixed messages with no input bytes.
 func ParseToolCall(params json.RawMessage) (*ToolCallParams, error) {
 	if len(params) == 0 {
-		return nil, fmt.Errorf("empty params")
+		return nil, errToolCallEmptyParams
+	}
+	var raw struct {
+		Name      json.RawMessage `json:"name"`
+		Arguments json.RawMessage `json:"arguments"`
+	}
+	if err := json.Unmarshal(params, &raw); err != nil {
+		// The Go error text can quote the offending value. Say nothing of it.
+		return nil, errToolCallParams
 	}
 	var tc ToolCallParams
-	if err := json.Unmarshal(params, &tc); err != nil {
-		return nil, fmt.Errorf("invalid tool call params: %w", err)
+	if len(raw.Name) > 0 {
+		if err := json.Unmarshal(raw.Name, &tc.Name); err != nil {
+			// A name that is a number, array or object. Do not echo it.
+			return nil, errToolCallParams
+		}
 	}
 	if tc.Name == "" {
-		return nil, fmt.Errorf("tool name is required")
+		return nil, errToolCallName
+	}
+	if args := bytes.TrimSpace(raw.Arguments); len(args) > 0 && !bytes.Equal(args, []byte("null")) {
+		if args[0] != '{' {
+			return nil, errToolCallArguments
+		}
+		tc.Arguments = append(json.RawMessage(nil), args...)
 	}
 	return &tc, nil
+}
+
+// toolCallParseMessage is the only text about a bad tools/call that goes back
+// to the agent. It passes one of the fixed ParseToolCall messages through and
+// turns anything else into a generic one, so a future error that quotes input
+// cannot reach the client.
+func toolCallParseMessage(err error) string {
+	switch {
+	case errors.Is(err, errToolCallEmptyParams),
+		errors.Is(err, errToolCallName),
+		errors.Is(err, errToolCallArguments),
+		errors.Is(err, errToolCallParams):
+		return err.Error()
+	}
+	return errToolCallParams.Error()
 }
 
 // NewErrorResponse creates a JSON-RPC error response.
