@@ -294,3 +294,29 @@ func CollectArgumentRules(caveats []string) ([]argrules.Rule, error) {
 func ScopeValueAllowsTool(scope, toolName string) bool {
 	return matchScope(scope, toolName)
 }
+
+// ArgumentRulesSHA256 identifies the argument rule documents the token
+// carries, for a receipt: see argrules.DocumentsSHA256. It reads the rule
+// caveats in token order. A hand-built TokenInfo with no caveats but with
+// ArgumentRules hashes those rules as one document. It returns "" when the
+// token carries no rules or they cannot be read.
+func (t *TokenInfo) ArgumentRulesSHA256() string {
+	if t == nil {
+		return ""
+	}
+	if t.Raw != nil {
+		sum, err := argrules.DocumentsSHA256(t.Raw.Caveats)
+		if err != nil {
+			return ""
+		}
+		return sum
+	}
+	if len(t.ArgumentRules) == 0 {
+		return ""
+	}
+	doc, err := argrules.Marshal(t.ArgumentRules)
+	if err != nil {
+		return ""
+	}
+	return argrules.HashDocuments([][]byte{doc})
+}

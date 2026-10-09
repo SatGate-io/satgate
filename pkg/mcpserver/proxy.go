@@ -985,7 +985,7 @@ func (p *Proxy) recordMCPDecision(ctx context.Context, req *Request, tokenInfo *
 // BudgetNotEvaluated, so the receipt claims no limit or balance.
 func (p *Proxy) scopeDeniedResponse(ctx context.Context, req *Request, tokenInfo *TokenInfo, toolName string) *Response {
 	message := fmt.Sprintf("tool %q not in scope %q", toolName, tokenInfo.Scope)
-	return p.policyDeniedResponse(ctx, req, tokenInfo, toolName, message, nil)
+	return p.policyDeniedResponse(ctx, req, tokenInfo, toolName, message, nil, nil)
 }
 
 // argumentDeniedResponse refuses a call whose arguments are outside the
@@ -1005,13 +1005,29 @@ func (p *Proxy) argumentDeniedResponse(ctx context.Context, req *Request, tokenI
 	if denied.Field != "" {
 		data["field"] = denied.Field
 	}
-	return p.policyDeniedResponse(ctx, req, tokenInfo, toolName, message, data)
+	// The signed receipt says this was an argument-rule refusal and which
+	// field blocked it, so it cannot be mistaken for a scope refusal. The
+	// rule documents are identified by hash; no argument value is recorded.
+	detail := &argumentDenialDetail{
+		code:      argrules.DenialCode,
+		field:     denied.Field,
+		rulesHash: tokenInfo.ArgumentRulesSHA256(),
+	}
+	return p.policyDeniedResponse(ctx, req, tokenInfo, toolName, message, data, detail)
+}
+
+// argumentDenialDetail is what an argument-rule refusal adds to the signed
+// decision. A scope refusal passes nil, which leaves the decision as it was.
+type argumentDenialDetail struct {
+	code      string
+	field     string
+	rulesHash string
 }
 
 // policyDeniedResponse is the shared refusal. extra is merged into the error
 // data next to any evidence handles; nil extra and no recorder gives a reply
-// with no data.
-func (p *Proxy) policyDeniedResponse(ctx context.Context, req *Request, tokenInfo *TokenInfo, toolName, message string, extra map[string]interface{}) *Response {
+// with no data. detail is non-nil only for an argument-rule refusal.
+func (p *Proxy) policyDeniedResponse(ctx context.Context, req *Request, tokenInfo *TokenInfo, toolName, message string, extra map[string]interface{}, detail *argumentDenialDetail) *Response {
 	if p.evidence == nil {
 		if len(extra) == 0 {
 			return NewErrorResponse(req.ID, CodePolicyDenied, message)
@@ -1035,6 +1051,7 @@ func (p *Proxy) policyDeniedResponse(ctx context.Context, req *Request, tokenInf
 		proxy:     p,
 		req:       req,
 		tokenInfo: tokenInfo,
+		detail:    detail,
 	}, "policy_denied", tokenInfo.TokenID, toolName, time.Now().UTC())
 	if err != nil {
 		return proofUnavailable(err, "record")
@@ -1057,6 +1074,7 @@ type mcpScopeDenialRecorder struct {
 	proxy     *Proxy
 	req       *Request
 	tokenInfo *TokenInfo
+	detail    *argumentDenialDetail
 }
 
 func (m mcpScopeDenialRecorder) RecordSignedDenial(ctx context.Context, in denial.SignedDenial) (any, error) {
@@ -1066,11 +1084,17 @@ func (m mcpScopeDenialRecorder) RecordSignedDenial(ctx context.Context, in denia
 			toolName = tc.Name
 		}
 	}
-	evidence, err := m.proxy.recordMCPDecision(ctx, m.req, m.tokenInfo, toolName, MCPDecision{
+	decision := MCPDecision{
 		Decision:           "denied",
 		DecisionReason:     in.ReasonCode,
 		BudgetNotEvaluated: true,
-	})
+	}
+	if m.detail != nil {
+		decision.DenialCode = m.detail.code
+		decision.ArgumentField = m.detail.field
+		decision.ArgumentRulesSHA256 = m.detail.rulesHash
+	}
+	evidence, err := m.proxy.recordMCPDecision(ctx, m.req, m.tokenInfo, toolName, decision)
 	if err != nil {
 		return nil, err
 	}

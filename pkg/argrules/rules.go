@@ -50,6 +50,7 @@ package argrules
 import (
 	"bytes"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
@@ -708,6 +709,53 @@ func Collect(caveats []string, allows func(scope, tool string) bool) ([]Rule, er
 		}
 	}
 	return all, nil
+}
+
+// DocumentsSHA256 identifies the rule documents a token carries, so a receipt
+// can name the limit without holding the token. It reads every rule caveat in
+// token order, parses it, and takes its canonical document (the bytes Marshal
+// returns, which is what a minting service acknowledges). It returns "" when
+// the caveats hold no rule. See HashDocuments for the digest.
+func DocumentsSHA256(caveats []string) (string, error) {
+	var docs [][]byte
+	for _, caveat := range caveats {
+		if !strings.HasPrefix(caveat, "scope = ") {
+			continue
+		}
+		value := strings.TrimPrefix(caveat, "scope = ")
+		if !IsRuleScope(value) {
+			continue
+		}
+		rules, err := ParseScopeValue(value)
+		if err != nil {
+			return "", err
+		}
+		doc, err := Marshal(rules)
+		if err != nil {
+			return "", err
+		}
+		docs = append(docs, doc)
+	}
+	if len(docs) == 0 {
+		return "", nil
+	}
+	return HashDocuments(docs), nil
+}
+
+// HashDocuments is the lower-case hex SHA-256 of the canonical documents as one
+// compact JSON array in the order given: "[" doc1 "," doc2 "]", each document
+// byte for byte as Marshal produced it.
+func HashDocuments(docs [][]byte) string {
+	h := sha256.New()
+	h.Write([]byte("["))
+	for i, d := range docs {
+		if i > 0 {
+			h.Write([]byte(","))
+		}
+		h.Write(d)
+	}
+	h.Write([]byte("]"))
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 // Denial says why a call was refused by argument rules. It never holds an
