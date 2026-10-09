@@ -135,8 +135,12 @@ func skipJSONValue(dec *json.Decoder) error {
 }
 
 // check passes when at least one shape matches. On failure it names the
-// field of the shape that came closest (the most conditions held), so the
-// message points at something the holder can change.
+// first failing field (in the shape's own field-name order) of the shape that
+// came closest, meaning the shape with the most conditions held. Every
+// condition of every shape is evaluated, so a condition that fails early does
+// not hide the ones after it. On a tie the earliest shape in rule order wins.
+// The pass/deny verdict depends only on whether some shape has no failing
+// condition; the count only picks which field is reported.
 func (r Rule) check(args map[string]json.RawMessage) *Denial {
 	var best *Denial
 	bestHeld := -1
@@ -148,8 +152,9 @@ func (r Rule) check(args map[string]json.RawMessage) *Denial {
 				held++
 				continue
 			}
-			failed = cond.Field
-			break
+			if failed == "" {
+				failed = cond.Field
+			}
 		}
 		if failed == "" {
 			return nil

@@ -35,6 +35,21 @@ type MCPDecision struct {
 	// spend_mode not_evaluated and must not project a limit, remaining, or
 	// attempted balance, because none was read.
 	BudgetNotEvaluated bool `json:"budget_not_evaluated,omitempty"`
+
+	// DenialCode, ArgumentField and ArgumentRulesSHA256 are set only when the
+	// call was refused by the token's argument rules (never for a scope
+	// refusal or any other decision). Recorders sign them into the receipt so
+	// a reader can tell an argument-limit refusal from a scope refusal.
+	//
+	// DenialCode is the stable code argrules.DenialCode (TOOL_ARGUMENT_DENIED).
+	// ArgumentField is the field name from the rule that blocked the call; it
+	// is empty when no single field applies (arguments unreadable, rules
+	// invalid). ArgumentRulesSHA256 is the lower-case hex SHA-256 identifying
+	// the rule documents the token carries (see argrules.DocumentsSHA256).
+	// None of them ever holds an argument value.
+	DenialCode          string `json:"denial_code,omitempty"`
+	ArgumentField       string `json:"argument_field,omitempty"`
+	ArgumentRulesSHA256 string `json:"argument_rules_sha256,omitempty"`
 }
 
 // MCPEvidence is the verifier-facing handle returned after recording an MCP
