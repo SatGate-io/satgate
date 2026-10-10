@@ -298,3 +298,17 @@ func TestMemoryStoreDown(t *testing.T) {
 		t.Fatal("down store answered")
 	}
 }
+
+func TestCoversIgnoresLetterCase(t *testing.T) {
+	l := SpendLimit{Tools: []string{"place_crypto_order"}}
+	for _, name := range []string{"place_crypto_order", "Place_Crypto_Order", "PLACE_CRYPTO_ORDER", "place_Crypto_order"} {
+		if !l.Covers(name) {
+			t.Errorf("%q not covered", name)
+		}
+	}
+	for _, name := range []string{"place_crypto_orders", "place_crypto_order ", "place-crypto-order", ""} {
+		if l.Covers(name) {
+			t.Errorf("%q covered", name)
+		}
+	}
+}

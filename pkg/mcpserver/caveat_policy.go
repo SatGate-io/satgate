@@ -327,21 +327,26 @@ func (t *TokenInfo) ArgumentRulesSHA256() string {
 	return argrules.HashDocuments([][]byte{doc})
 }
 
-// SpendLimitsFor returns the spending limits that cover toolName. It reads the
-// caveats again when the token has them, so a TokenInfo whose field was not
-// filled cannot skip a limit; a token whose controls do not parse returns an
-// error, and the call is refused.
-func (t *TokenInfo) SpendLimitsFor(toolName string) ([]toolcontrols.SpendLimit, error) {
+// AllSpendLimits returns every spending limit the token carries, whatever
+// tools it covers. It reads the caveats again when the token has them, so a
+// TokenInfo whose field was not filled cannot skip a limit; a token whose
+// controls do not parse returns an error, and the call is refused.
+func (t *TokenInfo) AllSpendLimits() ([]toolcontrols.SpendLimit, error) {
 	if t == nil {
 		return nil, nil
 	}
-	limits := t.SpendLimits
 	if t.Raw != nil {
-		var err error
-		limits, err = toolcontrols.Collect(t.Raw.Caveats)
-		if err != nil {
-			return nil, err
-		}
+		return toolcontrols.Collect(t.Raw.Caveats)
+	}
+	return t.SpendLimits, nil
+}
+
+// SpendLimitsFor returns the spending limits that cover toolName (compared
+// without regard to letter case: see toolcontrols.SpendLimit.Covers).
+func (t *TokenInfo) SpendLimitsFor(toolName string) ([]toolcontrols.SpendLimit, error) {
+	limits, err := t.AllSpendLimits()
+	if err != nil {
+		return nil, err
 	}
 	var out []toolcontrols.SpendLimit
 	for _, l := range limits {
@@ -353,9 +358,12 @@ func (t *TokenInfo) SpendLimitsFor(toolName string) ([]toolcontrols.SpendLimit, 
 }
 
 // NeedsCallGate reports whether the token carries a control a CallGate must
-// enforce for toolName. A token whose controls cannot be read needs one for
-// every tool: the call is refused rather than sent unchecked.
+// look at for this call. A token with any spending limit needs one for every
+// tool, not only the covered ones: the gate also refuses a call whose tool
+// name or shape cannot be matched exactly to the limits (see SpendGate.Admit).
+// A token whose controls cannot be read needs one for every tool: the call is
+// refused rather than sent unchecked.
 func (t *TokenInfo) NeedsCallGate(toolName string) bool {
-	limits, err := t.SpendLimitsFor(toolName)
+	limits, err := t.AllSpendLimits()
 	return err != nil || len(limits) > 0
 }

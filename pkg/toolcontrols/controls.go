@@ -114,10 +114,16 @@ type Doc struct {
 	SpendLimits []SpendLimit
 }
 
-// Covers reports whether the limit counts calls to tool.
+// Covers reports whether the limit counts calls to tool. Names match without
+// regard to letter case: a scope that allows "Place_Crypto_Order" must not be
+// a way round a limit written for "place_crypto_order", because an upstream
+// may read the two as one tool. strings.EqualFold also folds the few
+// non-ASCII letters that fold to an ASCII one (the Kelvin sign, the long s),
+// which only widens what is counted. A tool name with anything outside the
+// plain set (see SpendGate.Admit) is refused before this is asked.
 func (l SpendLimit) Covers(tool string) bool {
 	for _, t := range l.Tools {
-		if t == tool {
+		if strings.EqualFold(t, tool) {
 			return true
 		}
 	}

@@ -57,9 +57,29 @@ type held struct {
 
 // Admit implements CallGate.
 func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, error) {
-	limits, err := call.Token.SpendLimitsFor(call.Tool)
+	all, err := call.Token.AllSpendLimits()
 	if err != nil {
 		return nil, fmt.Errorf("token controls: %w", err)
+	}
+	if len(all) == 0 {
+		return nil, nil
+	}
+	// The token carries a limit, so the name this gate matches must be the
+	// name the upstream reads. A name outside the plain set (spaces, Unicode
+	// look-alikes, control characters) or a call whose top level reads two
+	// ways (a repeated key, "Name" next to "name") could be one tool to the
+	// upstream and another here, and it is refused for every tool on the
+	// token, not only the covered ones. A case-variant of a plain name is
+	// handled by SpendLimit.Covers, which ignores case.
+	if !argrules.ValidToolName(call.Tool) || argrules.CheckCallShape(call.Params, call.Tool) != argrules.NumericFieldOK {
+		return &GateAdmission{Refusal: spendRefusal(call.Tool, all[0],
+			"this token has a spending limit, and this call's tool name or layout cannot be matched exactly to it, so the call was not sent")}, nil
+	}
+	var limits []toolcontrols.SpendLimit
+	for _, l := range all {
+		if l.Covers(call.Tool) {
+			limits = append(limits, l)
+		}
 	}
 	if len(limits) == 0 {
 		return nil, nil

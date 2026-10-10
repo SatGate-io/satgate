@@ -58,6 +58,36 @@ const (
 	NumericFieldNotNumber  = "the field is not a plain decimal number"
 )
 
+// CheckCallShape applies to a tools/call the strict reading of the top level
+// that ReadNumericField and argument rules share: params must be valid UTF-8,
+// an object with no repeated key at any depth, no top-level key that differs
+// from "name" or "arguments" only by letter case, and a name equal to
+// toolName. It returns NumericFieldOK or NumericFieldUnreadable. A control
+// that needs "the name checked is the name the upstream reads" calls it for
+// every call on a token that carries the control, not only for covered tools.
+func CheckCallShape(params json.RawMessage, toolName string) string {
+	if !utf8.Valid(params) {
+		return NumericFieldUnreadable
+	}
+	top, err := objectOf(params)
+	if err != nil || hasDuplicateTopLevelKey(params) {
+		return NumericFieldUnreadable
+	}
+	for k := range top {
+		if k != "name" && k != "arguments" && (strings.EqualFold(k, "name") || strings.EqualFold(k, "arguments")) {
+			return NumericFieldUnreadable
+		}
+	}
+	var name string
+	if raw, ok := top["name"]; !ok || json.Unmarshal(raw, &name) != nil || name != toolName {
+		return NumericFieldUnreadable
+	}
+	if err := checkJSONDuplicateKeys(params, maxCallJSONDepth); err != nil {
+		return NumericFieldUnreadable
+	}
+	return NumericFieldOK
+}
+
 // ReadNumericField reads the argument `field` of a tools/call as an exact
 // decimal, with the same strictness argument rules apply: params must be valid
 // UTF-8, an object with no repeated key at any depth, no top-level key that
@@ -67,25 +97,10 @@ const (
 // decimal. The returned reason says why it could not be read; it never holds
 // an argument value.
 func ReadNumericField(params json.RawMessage, toolName, field string) (*Decimal, string) {
-	if !utf8.Valid(params) {
-		return nil, NumericFieldUnreadable
+	if why := CheckCallShape(params, toolName); why != NumericFieldOK {
+		return nil, why
 	}
-	top, err := objectOf(params)
-	if err != nil || hasDuplicateTopLevelKey(params) {
-		return nil, NumericFieldUnreadable
-	}
-	for k := range top {
-		if k != "name" && k != "arguments" && (strings.EqualFold(k, "name") || strings.EqualFold(k, "arguments")) {
-			return nil, NumericFieldUnreadable
-		}
-	}
-	var name string
-	if raw, ok := top["name"]; !ok || json.Unmarshal(raw, &name) != nil || name != toolName {
-		return nil, NumericFieldUnreadable
-	}
-	if err := checkJSONDuplicateKeys(params, maxCallJSONDepth); err != nil {
-		return nil, NumericFieldUnreadable
-	}
+	top, _ := objectOf(params)
 	raw, ok := top["arguments"]
 	if !ok || bytes.Equal(bytes.TrimSpace(raw), []byte("null")) {
 		return nil, NumericFieldMissing

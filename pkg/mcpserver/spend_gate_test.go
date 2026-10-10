@@ -84,6 +84,12 @@ type spendHarness struct {
 
 func newSpendHarness(t *testing.T, doc string) *spendHarness {
 	t.Helper()
+	return newSpendHarnessScope(t, doc, "place_crypto_order,place_equity_order")
+}
+
+// newSpendHarnessScope is newSpendHarness for a token with the given scope.
+func newSpendHarnessScope(t *testing.T, doc, scope string) *spendHarness {
+	t.Helper()
 	proxy, _, _ := newArgProxy(t)
 	rr := &scriptedRouter{}
 	proxy.SetUpstreamRouter(rr)
@@ -91,7 +97,7 @@ func newSpendHarness(t *testing.T, doc string) *spendHarness {
 	proxy.SetEvidenceRecorder(rec)
 	store := toolcontrols.NewMemoryStore(nil)
 	proxy.SetCallGate(NewSpendGate(store))
-	svc, tok := mintBudgetToken(t, argTestRoot, "place_crypto_order,place_equity_order", "tenant-1", "budget-spend", "50")
+	svc, tok := mintBudgetToken(t, argTestRoot, scope, "tenant-1", "budget-spend", "50")
 	tok = appendCaveat(t, svc, tok, controlWord(t, doc))
 	return &spendHarness{proxy: proxy, rr: rr, store: store, rec: rec, token: tok}
 }
@@ -348,6 +354,9 @@ func TestSpendWindowRollover(t *testing.T) {
 	h := newSpendHarness(t, spendDoc200Day)
 	base := time.Date(2026, 10, 9, 12, 0, 0, 0, time.UTC)
 	clock := base
+	// The store expires counters by its own clock; give it the test's, so the
+	// test does not depend on today's date.
+	h.store = toolcontrols.NewMemoryStore(func() time.Time { return clock })
 	h.proxy.SetCallGate(NewSpendGate(h.store))
 	h.proxy.gate.(*SpendGate).now = func() time.Time { return clock }
 	if r := h.call(t, 1, "place_crypto_order", order("200")); r.Error != nil {
@@ -374,6 +383,7 @@ func TestSpendWeekWindowAndTwoLimits(t *testing.T) {
 	  {"tools":["place_crypto_order"],"field":"dollar_amount","max":"150","window":"week"}]}`
 	h := newSpendHarness(t, doc)
 	clock := time.Date(2026, 10, 5, 15, 0, 0, 0, time.UTC) // Monday
+	h.store = toolcontrols.NewMemoryStore(func() time.Time { return clock })
 	h.proxy.SetCallGate(&SpendGate{store: h.store, now: func() time.Time { return clock }})
 	if r := h.call(t, 1, "place_crypto_order", order("100")); r.Error != nil {
 		t.Fatal(r.Error)
@@ -526,5 +536,97 @@ func TestSpendRoundsFractionsUp(t *testing.T) {
 	}
 	if h.counter(t) != 12345679 {
 		t.Fatalf("counter = %d", h.counter(t))
+	}
+}
+
+// Round 2, Grok: a scope that allows a case variant of a limited tool (mcp:*
+// allows everything) must not be a way round the limit.
+func TestSpendCaseVariantToolNameIsCovered(t *testing.T) {
+	h := newSpendHarnessScope(t, spendDoc200Day, "mcp:*")
+
+	// Grok's exact scenario: limit 200/day, Place_Crypto_Order for 500.
+	r := h.call(t, 1, "Place_Crypto_Order", order("500"))
+	if got := errData(t, r)["error"]; got != toolcontrols.DenialCodeSpendLimit {
+		t.Fatalf("500 on a case variant: error = %v, want %s", got, toolcontrols.DenialCodeSpendLimit)
+	}
+	if h.rr.forwarded() != 0 || h.counter(t) != 0 {
+		t.Fatalf("refused call forwarded=%d counter=%d", h.rr.forwarded(), h.counter(t))
+	}
+
+	// A mixed-case call inside the limit is forwarded, and it reserves.
+	if r := h.call(t, 2, "PLACE_crypto_ORDER", order("150")); r.Error != nil {
+		t.Fatalf("150 on a case variant refused: %v", r.Error)
+	}
+	if h.rr.forwarded() != 1 || h.counter(t) != 150*units {
+		t.Fatalf("after 150: forwarded=%d counter=%d", h.rr.forwarded(), h.counter(t))
+	}
+	// The canonical spelling shares the same counter.
+	if r := h.call(t, 3, "place_crypto_order", order("100")); r.Error == nil {
+		t.Fatal("100 more under a 200 limit was forwarded")
+	}
+	if h.rr.forwarded() != 1 {
+		t.Fatalf("forwarded=%d", h.rr.forwarded())
+	}
+}
+
+// Names the upstream might read as a covered tool but that are not plain:
+// refused, never forwarded, on a token that carries a limit.
+func TestSpendUnmatchableToolNamesAreRefused(t *testing.T) {
+	names := map[string]string{
+		"trailing space":   "place_crypto_order ",
+		"leading space":    " place_crypto_order",
+		"newline":          "place_crypto_order\n",
+		"kelvin sign":      "place_crypto_order\u212a",
+		"dotless i":        "place_crypto_order\u0131",
+		"fullwidth":        "\uff50lace_crypto_order",
+		"zero width":       "place_crypto\u200b_order",
+		"combining":        "place_crypto_orde\u0072\u0301",
+		"unrelated spaced": "get quote",
+	}
+	for label, name := range names {
+		t.Run(label, func(t *testing.T) {
+			h := newSpendHarnessScope(t, spendDoc200Day, "mcp:*")
+			params := `{"name":"` + name + `","arguments":` + order("500") + `,"_meta":{"token":"` + h.token + `"}}`
+			req := &Request{JSONRPC: "2.0", ID: json.RawMessage("1"), Method: MethodToolsCall, Params: json.RawMessage(params)}
+			resp, err := h.proxy.handleRequest(context.Background(), req)
+			if err != nil || resp == nil || resp.Error == nil {
+				t.Fatalf("not refused: %+v %v", resp, err)
+			}
+			if h.rr.forwarded() != 0 {
+				t.Fatalf("forwarded %d", h.rr.forwarded())
+			}
+		})
+	}
+}
+
+// A top level that reads two ways is refused on a token with a limit, even for
+// a tool the limit does not cover.
+func TestSpendAmbiguousTopLevelIsRefused(t *testing.T) {
+	h := newSpendHarnessScope(t, spendDoc200Day, "mcp:*")
+	for label, params := range map[string]string{
+		"folded name key": `{"name":"get_quote","Name":"place_crypto_order","arguments":` + order("500") + `}`,
+		"repeated name":   `{"name":"get_quote","name":"place_crypto_order","arguments":` + order("500") + `}`,
+	} {
+		req := &Request{JSONRPC: "2.0", ID: json.RawMessage("7"), Method: MethodToolsCall, Params: json.RawMessage(params)}
+		// handleRequest authenticates from _meta; add the token the way argCall does.
+		req.Params = json.RawMessage(strings.TrimSuffix(params, "}") + `,"_meta":{"token":"` + h.token + `"}}`)
+		resp, err := h.proxy.handleRequest(context.Background(), req)
+		if err != nil || resp == nil || resp.Error == nil {
+			t.Fatalf("%s: not refused: %+v %v", label, resp, err)
+		}
+	}
+	if h.rr.forwarded() != 0 {
+		t.Fatalf("forwarded %d", h.rr.forwarded())
+	}
+}
+
+// An ordinary uncovered tool on a token with a limit still goes through.
+func TestSpendUncoveredPlainToolStillForwarded(t *testing.T) {
+	h := newSpendHarnessScope(t, spendDoc200Day, "mcp:*")
+	if r := h.call(t, 1, "get_quote", `{"symbol":"BTC-USD"}`); r.Error != nil {
+		t.Fatalf("uncovered tool refused: %v", r.Error)
+	}
+	if h.rr.forwarded() != 1 || h.counter(t) != 0 {
+		t.Fatalf("forwarded=%d counter=%d", h.rr.forwarded(), h.counter(t))
 	}
 }
