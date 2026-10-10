@@ -666,6 +666,9 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			return refused, nil
 		}
 		if adm != nil {
+			// The record tells settle whether a failure came before or after
+			// the request left (see dispatch_record.go).
+			ctx, _ = withDispatchRecord(ctx)
 			defer func() { adm.settle(ctx, resp, err) }()
 			ctx = withGateDetail(ctx, adm.Detail)
 		}
@@ -884,6 +887,10 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	}
 
 	resp, err = p.router.ForwardToolCallForTenant(ctx, tenantID, tc.Name, req.Params, timeout)
+	// What the router returned, as the gate must read it: the reply below is
+	// rewritten into a JSON-RPC error on a transport failure, which would
+	// otherwise look like an answer from the upstream.
+	dispatchFrom(ctx).recordForward(resp, err)
 	if err != nil {
 		return NewErrorResponse(req.ID, CodeUpstreamError, fmt.Sprintf("upstream error: %v", err)), nil
 	}

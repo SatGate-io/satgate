@@ -29,10 +29,26 @@ const counterGrace = time.Hour
 //
 // For each limit that covers the call it reads the limit's field as an exact
 // decimal and reserves it in the store before the call is forwarded. If the
-// total would pass the owner's maximum, the call is refused. When the call
-// ends, the reservation is kept if the upstream accepted the call and given
-// back if it did not (a transport failure, a JSON-RPC error, an isError
-// result), so only orders that went through count.
+// total would pass the owner's maximum, the call is refused.
+//
+// When the call ends, the reservation is given back only when SatGate knows
+// the call did not run upstream:
+//
+//   - it was never sent (a dial or connect failure before any byte of the
+//     request was written, a request that could not be built, a refusal by
+//     a later gate, a session closed before dispatch), or
+//   - the upstream answered with a JSON-RPC error ("I did not do this"), or
+//   - the upstream answered with a result whose isError is true (the
+//     documented residual: if an upstream reports isError after a partial
+//     fill, the owner gets that much extra headroom).
+//
+// It is kept for everything else: the amount stays counted when the upstream
+// accepted the call, and also when the call was sent and its fate is unknown
+// (a timeout after the send, a connection reset or closed after the send, an
+// unreadable or partial reply, a context ended after dispatch, an HTTP error
+// status with no JSON-RPC body). An order whose reply was lost may have been
+// placed, and a limit that refunded it would let the agent spend past the
+// owner's maximum. Those are logged as "outcome unknown; reservation kept".
 type SpendGate struct {
 	store toolcontrols.SpendStore
 
@@ -169,6 +185,14 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		Settle: func(ctx context.Context, o GateOutcome) {
 			if o.Succeeded {
 				return // the amount stays counted
+			}
+			if o.Unknown {
+				// The call was sent and SatGate cannot tell whether it ran.
+				// A lost reply is not a refusal: the order may have been
+				// placed. Money that may have been spent stays counted.
+				log.Warn().Str("tool", call.Tool).Int("limits", len(taken)).
+					Msg("spend limit: outcome unknown; reservation kept")
+				return
 			}
 			giveBack()
 		},

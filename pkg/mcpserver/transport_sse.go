@@ -370,7 +370,7 @@ func (t *SSETransport) WriteMessage(ctx context.Context, msg json.RawMessage) er
 		req.Header.Set(k, v)
 	}
 
-	resp, err := t.do(req)
+	resp, err := t.do(traceDispatch(ctx, req))
 	if err != nil {
 		if t.redact {
 			// The POST endpoint (path and query) is chosen by the upstream.

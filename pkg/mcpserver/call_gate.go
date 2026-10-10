@@ -87,11 +87,24 @@ type GateReceiptDetail struct {
 func (d GateReceiptDetail) IsZero() bool { return d == GateReceiptDetail{} }
 
 // GateOutcome says how an admitted call ended.
+//
+// A gate that took something to admit the call (an amount reserved against a
+// limit) gives it back only when it knows the call did not run upstream: a
+// zero GateOutcome (a refusal, a call stopped before it was sent), an upstream
+// JSON-RPC error, an isError result, or a call that was never sent. When the
+// call was sent and its fate is not known, Unknown is true and the gate must
+// keep what it took.
 type GateOutcome struct {
 	// Succeeded is true when the call reached the upstream and the upstream
 	// accepted it: no transport failure, no JSON-RPC error, no isError result.
 	// It is false for a refusal and for every failure after the gate.
 	Succeeded bool
+	// Unknown is true when the call was sent to the upstream and nothing says
+	// whether it ran: a timeout after the send, a connection reset or closed
+	// after the send, a response that could not be read, an HTTP error status
+	// with no JSON-RPC error, a context ended after the send. Succeeded is
+	// false then too. It is false for every outcome SatGate knows.
+	Unknown bool
 }
 
 // SetCallGate installs g. Call it before the proxy serves requests. With no
@@ -161,13 +174,30 @@ func (p *Proxy) admitCall(ctx context.Context, req *Request, tokenInfo *TokenInf
 	return adm, nil
 }
 
-// settle reports how the call ended. A reply with a JSON-RPC error, an
-// isError result, or no reply at all did not succeed.
+// settle reports how the call ended. A reply with a JSON-RPC error or an
+// isError result did not succeed and did not run. A call that was never sent
+// did not run either. A call that was sent and then failed some other way
+// (timeout, closed connection, unreadable reply) is an unknown outcome: the
+// gate is told so and keeps what it took.
 func (a *GateAdmission) settle(ctx context.Context, resp *Response, err error) {
 	if a == nil || a.Settle == nil {
 		return
 	}
-	a.Settle(ctx, GateOutcome{Succeeded: err == nil && responseSucceeded(resp)})
+	rec := dispatchFrom(ctx)
+	if rec == nil {
+		// No record of the call's path (a caller that did not create one):
+		// the old, coarse reading. Nothing in the proxy takes this branch.
+		a.Settle(ctx, GateOutcome{Succeeded: err == nil && responseSucceeded(resp)})
+		return
+	}
+	switch rec.classify() {
+	case endRan:
+		a.Settle(ctx, GateOutcome{Succeeded: true})
+	case endUnknown:
+		a.Settle(ctx, GateOutcome{Unknown: true})
+	default:
+		a.Settle(ctx, GateOutcome{})
+	}
 }
 
 func responseSucceeded(resp *Response) bool {

@@ -186,7 +186,7 @@ func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.Raw
 	}
 	t.sessionMu.RUnlock()
 
-	resp, err := t.do(req)
+	resp, err := t.do(traceDispatch(ctx, req))
 	if err != nil {
 		return wrapUpstreamErrorRedacted("streamable HTTP POST", t.url, err, t.redact)
 	}

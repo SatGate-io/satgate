@@ -27,7 +27,14 @@ type scriptedRouter struct {
 
 func (r *scriptedRouter) AllToolsForTenant(context.Context, string) []json.RawMessage { return nil }
 
-func (r *scriptedRouter) ForwardToolCallForTenant(_ context.Context, _ string, _ string, params json.RawMessage, _ time.Duration) (*Response, error) {
+// Errors a scripted reply can return to say how far the call got, the way the
+// real transports do through the call's dispatch record.
+var (
+	errScriptNotSent = errors.New("dial tcp: connection refused")
+	errScriptSent    = errors.New("read: connection reset by peer")
+)
+
+func (r *scriptedRouter) ForwardToolCallForTenant(ctx context.Context, _ string, _ string, params json.RawMessage, _ time.Duration) (*Response, error) {
 	r.mu.Lock()
 	i := r.n
 	r.n++
@@ -40,7 +47,14 @@ func (r *scriptedRouter) ForwardToolCallForTenant(_ context.Context, _ string, _
 	if f == nil {
 		return okReply()
 	}
-	return f()
+	resp, err := f()
+	switch {
+	case errors.Is(err, errScriptNotSent):
+		NoteDispatchAttempt(ctx)
+	case errors.Is(err, errScriptSent):
+		NoteDispatched(ctx)
+	}
+	return resp, err
 }
 
 func (r *scriptedRouter) forwarded() int {
@@ -59,6 +73,10 @@ func rpcErrorReply() (*Response, error) {
 	return &Response{JSONRPC: "2.0", Error: &RPCError{Code: -32000, Message: "upstream said no"}}, nil
 }
 func forwardFails() (*Response, error) { return nil, errors.New("connection reset") }
+
+// notSent fails before any byte of the request left; lostAfterSend fails after.
+func notSent() (*Response, error)       { return nil, errScriptNotSent }
+func lostAfterSend() (*Response, error) { return nil, errScriptSent }
 
 func controlWord(t *testing.T, doc string) string {
 	t.Helper()
@@ -201,11 +219,12 @@ func TestSpendRefusalDoesNotEchoTheAmount(t *testing.T) {
 	}
 }
 
+// Release only when SatGate knows the call did not run (round 2).
 func TestSpendReleasedWhenUpstreamFails(t *testing.T) {
 	cases := map[string]func() (*Response, error){
-		"json-rpc error": rpcErrorReply,
-		"isError result": isErrorReply,
-		"forward fails":  forwardFails,
+		"json-rpc error":          rpcErrorReply,
+		"isError result":          isErrorReply,
+		"failure before the send": notSent,
 	}
 	for name, reply := range cases {
 		t.Run(name, func(t *testing.T) {
@@ -221,6 +240,31 @@ func TestSpendReleasedWhenUpstreamFails(t *testing.T) {
 			}
 			if h.counter(t) != 200*units {
 				t.Fatalf("counter = %d", h.counter(t))
+			}
+		})
+	}
+}
+
+// The other half of the rule: a call that was sent and whose fate is unknown
+// keeps its reservation.
+func TestSpendKeptWhenOutcomeIsUnknown(t *testing.T) {
+	cases := map[string]func() (*Response, error){
+		"lost after send":          lostAfterSend,
+		"no record of the attempt": forwardFails,
+	}
+	for name, reply := range cases {
+		t.Run(name, func(t *testing.T) {
+			h := newSpendHarness(t, spendDoc200Day)
+			h.rr.replies = []func() (*Response, error){reply}
+			h.call(t, 1, "place_crypto_order", order("200"))
+			if h.counter(t) != 200*units {
+				t.Fatalf("counter after an order of unknown fate = %d, want it kept", h.counter(t))
+			}
+			if r := h.call(t, 2, "place_crypto_order", order("200")); r.Error == nil {
+				t.Fatal("a second order was forwarded after the first one's fate was unknown")
+			}
+			if h.rr.forwarded() != 1 {
+				t.Fatalf("forwarded %d", h.rr.forwarded())
 			}
 		})
 	}
