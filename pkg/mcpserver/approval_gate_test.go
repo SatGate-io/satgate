@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 	"sync"
 	"testing"
@@ -348,17 +349,64 @@ func TestApprovalRepliesAndReceiptsCarryNoArgumentValues(t *testing.T) {
 	_ = a.approvals.Deny("tenant-1", id, "owner@example.com", a.clock)
 	a.call(t, 3, "place_crypto_order", args)
 
-	raw, _ := json.Marshal(r)
-	var all strings.Builder
-	all.Write(raw)
-	for _, d := range a.rec.decisions {
-		b, _ := json.Marshal(d)
-		all.Write(b)
-	}
-	for _, bad := range []string{"777", "ZZQ"} {
-		if strings.Contains(all.String(), bad) {
-			t.Fatalf("a reply or receipt input carries %q: %s", bad, all.String())
+	// Structured, not a substring search of the whole reply: the reply holds a
+	// random approval id and times whose digits can spell any short number
+	// ("777"). Those fields are checked for their shape; every other string in
+	// the reply, the error message and the receipt input is checked for the
+	// call's values.
+	wantID := errData(t, r)["approval_id"].(string)
+	var docs []any
+	for _, v := range []any{r, a.rec.decisions} {
+		raw, _ := json.Marshal(v)
+		var doc any
+		if err := json.Unmarshal(raw, &doc); err != nil {
+			t.Fatal(err)
 		}
+		docs = append(docs, doc)
+	}
+	shaped := map[string]func(string) bool{
+		"approval_id":  toolcontrols.ValidApprovalID,
+		"receipt_id":   func(s string) bool { return s != "" },
+		"evidence_url": func(s string) bool { return strings.HasPrefix(s, "/") || strings.HasPrefix(s, "http") },
+		"expires_at":   func(s string) bool { _, err := time.Parse(time.RFC3339, s); return err == nil },
+		"id":           func(s string) bool { return s != "" },
+	}
+	var walk func(path string, v any)
+	walk = func(path string, v any) {
+		switch x := v.(type) {
+		case map[string]any:
+			for k, e := range x {
+				if str, ok := e.(string); ok {
+					if check, isID := shaped[k]; isID {
+						if !check(str) {
+							t.Fatalf("%s.%s has the wrong shape: %q", path, k, str)
+						}
+						continue
+					}
+				}
+				walk(path+"."+k, e)
+			}
+		case []any:
+			for i, e := range x {
+				walk(fmt.Sprintf("%s[%d]", path, i), e)
+			}
+		case string:
+			for _, bad := range []string{"777", "ZZQ"} {
+				if strings.Contains(x, bad) {
+					t.Fatalf("%s carries a call value (%q)", path, bad)
+				}
+			}
+		case float64:
+			if x == 777.31 || x == 777 {
+				t.Fatalf("%s carries a call value (%v)", path, x)
+			}
+		}
+	}
+	for i, d := range docs {
+		walk(fmt.Sprintf("doc%d", i), d)
+	}
+	if got := errData(t, r)["approval_id"]; got != wantID {
+		t.Fatalf("approval id changed: %v", got)
 	}
 	// The owner's notice is the one place the values are allowed.
 	n := a.notifier.notices[0]
