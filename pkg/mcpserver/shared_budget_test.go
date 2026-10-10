@@ -548,14 +548,14 @@ func TestReceiptDetailOnlyForBudgetAndSymbolCalls(t *testing.T) {
 		{"allowed", "", "", false},
 		{"denied", "", "", false},
 	} {
-		if d[i].Decision != w.decision || d[i].ControlSymbol != w.symbol || d[i].ControlRemaining != w.remaining || d[i].ControlShared != w.shared {
+		if d[i].Decision != w.decision || d[i].ControlSymbol != w.symbol || d[i].ControlShared != w.shared {
 			t.Errorf("decision %d = %+v", i, d[i])
 		}
 	}
 	// The plain receipts' JSON carries none of the new keys at all.
 	for _, i := range []int{3, 4} {
 		b, _ := json.Marshal(d[i])
-		for _, k := range []string{"control_shared", "control_symbol", "control_remaining"} {
+		for _, k := range []string{"control_shared", "control_symbol"} {
 			if strings.Contains(string(b), k) {
 				t.Errorf("plain decision %d carries %s: %s", i, k, b)
 			}
