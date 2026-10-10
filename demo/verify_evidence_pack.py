@@ -197,28 +197,47 @@ def parse_rfc3339(value: Any, reasons: list[str], reason_codes: list[str], field
         add_reason(reasons, reason_codes, f"missing_{field}", f"receipt.{field} missing")
         return None
     try:
-        normalized = value[:-1] + "+00:00" if value.endswith("Z") else value
-        # Go's time.RFC3339Nano emits variable fractional precision, while this
-        # Python runtime accepts exactly three or six fractional digits. Normalize
-        # to six digits by truncating nanoseconds or padding shorter fractions;
-        # the original string still participates in hash/signature verification.
-        if "." in normalized:
-            prefix, suffix = normalized.split(".", 1)
-            frac = suffix
-            tz = ""
-            for marker in ("+", "-"):
-                if marker in suffix:
-                    frac, tz = suffix.split(marker, 1)
-                    tz = marker + tz
-                    break
-            if not frac or not frac.isdigit():
-                raise ValueError("fractional seconds must contain digits")
-            normalized = prefix + "." + frac[:6].ljust(6, "0") + tz
-        parsed = datetime.fromisoformat(normalized)
-        if parsed.tzinfo is None:
-            raise ValueError("timestamp must include timezone")
+        # Strict RFC 3339 section 5.6 grammar, checked BEFORE any normalisation
+        # or datetime.fromisoformat (which also accepts non-RFC3339 shapes such
+        # as a missing seconds field, a space separator, and offsets with
+        # seconds). ASCII digits only; re.fullmatch so a trailing newline fails.
+        #   date-time = YYYY-MM-DD ("T"/"t") hh:mm:ss [.digits] ("Z"/"z" | +-hh:mm)
+        m = re.fullmatch(
+            r"([0-9]{4})-([0-9]{2})-([0-9]{2})[Tt]([0-9]{2}):([0-9]{2}):([0-9]{2})"
+            r"(?:\.([0-9]+))?(?:[Zz]|([+-])([0-9]{2}):([0-9]{2}))",
+            value,
+        )
+        if m is None:
+            raise ValueError("not an RFC 3339 date-time")
+        year, month, day, hour, minute, second = (int(m.group(i)) for i in range(1, 7))
+        offset_hour = int(m.group(9)) if m.group(8) else 0
+        offset_minute = int(m.group(10)) if m.group(8) else 0
+        leap = year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+        days_in_month = (31, 29 if leap else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+        if not (
+            1 <= month <= 12
+            and 1 <= day <= days_in_month[month - 1]
+            and hour <= 23
+            and minute <= 59
+            and second <= 60
+            and offset_hour <= 23
+            and offset_minute <= 59
+        ):
+            raise ValueError("RFC 3339 field out of range")
+        # second == 60 (leap second) passes the range check above but is then
+        # rejected by datetime, which has no leap seconds. This fails closed and
+        # matches Go's time.Parse, so gateway receipts never carry it.
+        # Normalise for datetime only: Z/z -> +00:00, fraction truncated to 6
+        # digits or right-padded with zeros (Python < 3.11 fromisoformat takes
+        # exactly 3 or 6). The original string still participates in receipt
+        # hash/signature verification unchanged.
+        fraction = (m.group(7) or "")[:6].ljust(6, "0")
+        offset = f"{m.group(8)}{m.group(9)}:{m.group(10)}" if m.group(8) else "+00:00"
+        parsed = datetime.fromisoformat(
+            f"{m.group(1)}-{m.group(2)}-{m.group(3)}T{m.group(4)}:{m.group(5)}:{m.group(6)}.{fraction}{offset}"
+        )
         return parsed.astimezone(timezone.utc)
-    except ValueError:
+    except (ValueError, OverflowError):
         add_reason(reasons, reason_codes, f"malformed_{field}", f"receipt.{field} is not RFC3339")
         return None
 

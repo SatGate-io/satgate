@@ -3,6 +3,8 @@
 Synthetic keys/artifacts only. Every mirror is a deep copy of its signed source.
 Run: python -B -m unittest discover -s tools -p 'test_*.py' -v
 """
+from __future__ import annotations
+
 import copy
 import hashlib
 import importlib.util
