@@ -197,11 +197,14 @@ def parse_rfc3339(value: Any, reasons: list[str], reason_codes: list[str], field
         add_reason(reasons, reason_codes, f"missing_{field}", f"receipt.{field} missing")
         return None
     try:
-        normalized = value[:-1] + "+00:00" if value.endswith("Z") else value
-        # Go's time.RFC3339Nano emits variable fractional precision, while this
-        # Python runtime accepts exactly three or six fractional digits. Normalize
-        # to six digits by truncating nanoseconds or padding shorter fractions;
-        # the original string still participates in hash/signature verification.
+        normalized = value[:-1] + "+00:00" if value[-1] in ("Z", "z") else value
+        # Go's time.RFC3339Nano trims trailing zeros, so the fraction has 1-9
+        # digits. Python < 3.11 datetime.fromisoformat accepts exactly three or
+        # six fractional digits (3.11+ accepts any length). Normalize the
+        # fraction to exactly six digits by truncating nanoseconds or
+        # right-padding shorter fractions with zeros. This is for validation
+        # only; the original string still participates in receipt
+        # hash/signature verification unchanged.
         if "." in normalized:
             prefix, suffix = normalized.split(".", 1)
             frac = suffix
@@ -211,7 +214,7 @@ def parse_rfc3339(value: Any, reasons: list[str], reason_codes: list[str], field
                     frac, tz = suffix.split(marker, 1)
                     tz = marker + tz
                     break
-            if not frac or not frac.isdigit():
+            if not frac or not (frac.isascii() and frac.isdigit()):
                 raise ValueError("fractional seconds must contain digits")
             normalized = prefix + "." + frac[:6].ljust(6, "0") + tz
         parsed = datetime.fromisoformat(normalized)
