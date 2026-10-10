@@ -70,6 +70,9 @@ func (g gateDenialRecorder) RecordSignedDenial(ctx context.Context, in denial.Si
 		ControlWindow:      g.detail.Window,
 		ControlLimit:       g.detail.Limit,
 		ApprovalID:         g.detail.ApprovalID,
+		ControlShared:      g.detail.Shared,
+		ControlSymbol:      g.detail.Symbol,
+		ControlRemaining:   g.detail.Remaining,
 	}
 	evidence, err := g.proxy.recordMCPDecision(ctx, g.req, g.tokenInfo, in.Target, decision)
 	if err != nil {

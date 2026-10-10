@@ -60,6 +60,15 @@ type MCPDecision struct {
 	ControlLimit       string `json:"control_limit,omitempty"`
 	ControlWindowTotal string `json:"control_window_total,omitempty"`
 	ApprovalID         string `json:"approval_id,omitempty"`
+
+	// ControlShared, ControlSymbol and ControlRemaining are set only when a
+	// limit with a shared budget or a symbol cap counted or refused the call:
+	// that the total is shared, the canonical symbol, and (refusals) the room
+	// left. Like the fields above they are text the gate chose; none is a
+	// budget id or name, and none is an argument value.
+	ControlShared    bool   `json:"control_shared,omitempty"`
+	ControlSymbol    string `json:"control_symbol,omitempty"`
+	ControlRemaining string `json:"control_remaining,omitempty"`
 }
 
 // MCPEvidence is the verifier-facing handle returned after recording an MCP

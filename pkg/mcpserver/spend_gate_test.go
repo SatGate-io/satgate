@@ -154,7 +154,7 @@ func (h *spendHarness) counter(t *testing.T) int64 {
 	t.Helper()
 	var total int64
 	for _, k := range h.store.Keys() {
-		total += h.store.Total(k)
+		total += h.store.TotalOf(k)
 	}
 	return total
 }

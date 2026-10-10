@@ -75,6 +75,7 @@ func NewSpendGate(store toolcontrols.SpendStore) *SpendGate { return &SpendGate{
 type held struct {
 	res   toolcontrols.Reservation
 	limit toolcontrols.SpendLimit
+	total int64 // the counter after this reservation
 }
 
 // Admit implements CallGate.
@@ -117,6 +118,17 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		now = time.Now().UTC()
 	}
 
+	// A limit that names a shared budget counts only when a budget_bind seal
+	// covers the caveat that carries it. Anyone holding a token can append
+	// caveats offline, so an unsealed reference is refused before any counter
+	// is read or changed: it can neither spend from a budget nor read one.
+	for _, l := range limits {
+		if l.Budget != "" && (!l.Sealed || call.Token == nil || call.Token.TenantID == "") {
+			return &GateAdmission{Refusal: spendRefusalFor(l, "",
+				fmt.Sprintf("%s: this token refers to a shared budget that could not be confirmed, so the call was not sent", call.Tool), nil)}, nil
+		}
+	}
+
 	callID := g.callID(ctx, call)
 	var taken []held
 	giveBack := func() {
@@ -124,36 +136,61 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 			g.release(ctx, taken[i].res)
 		}
 	}
-	var first held
-	var firstTotal int64
+	var symbol string
 
 	for _, l := range limits {
-		deny := func(msg string) *GateAdmission {
+		sym := ""
+		deny := func(msg string, remaining *int64) *GateAdmission {
 			giveBack()
-			return &GateAdmission{Refusal: spendRefusal(call.Tool, l, msg)}
+			return &GateAdmission{Refusal: spendRefusalFor(l, sym, msg, remaining)}
 		}
 		if l.ID == "" {
 			// A limit with no identity has no counter. Never skip it.
 			giveBack()
 			return nil, fmt.Errorf("a spending limit has no counter id")
 		}
+		if len(l.Symbols) > 0 {
+			raw, why := argrules.ReadStringField(call.Params, call.Tool, toolcontrols.SymbolField)
+			verdict, canon := l.CheckSymbol(call.Tool, raw, why == argrules.NumericFieldOK)
+			switch verdict {
+			case toolcontrols.SymbolOther:
+				continue // another symbol: this limit does not touch the call
+			case toolcontrols.SymbolUnreadable:
+				return deny(fmt.Sprintf("%s: this token caps spending by symbol, and the call has no %s the cap can read, so the limit cannot be checked; send the symbol as plain text such as BTC or BTC-USD",
+					call.Tool, toolcontrols.SymbolField), nil), nil
+			case toolcontrols.SymbolAmbiguous:
+				// canon is the stem from the cap's own list, not the agent's text.
+				return deny(fmt.Sprintf("%s: this token caps %s, and a symbol ending in USD with no hyphen could mean that coin or another; send the symbol as %q",
+					call.Tool, canon, canon), nil), nil
+			}
+			sym = canon
+		}
+		key := counterKey(call.Token.TenantID, counterName(l), windowIDOf(l, now))
 		amount, why := argrules.ReadNumericField(call.Params, call.Tool, l.Field)
 		if why != argrules.NumericFieldOK {
-			return deny(fmt.Sprintf("%s: this token has a limit of %s on %s, and %s, so the limit cannot be checked",
-				call.Tool, limitPhrase(l), l.Field, fieldReason(why))), nil
+			return deny(fmt.Sprintf("%s: this token has a limit of %s on %s, and %s, so the limit cannot be checked%s",
+				call.Tool, limitPhrase(l), l.Field, fieldReason(why), sendFieldHint(l, why)), g.remainingAt(ctx, l, key)), nil
 		}
 		units, ok := amountUnits(amount)
 		if !ok {
-			return deny(fmt.Sprintf("%s: this token's limit is %s on %s; this order would go over it",
-				call.Tool, limitPhrase(l), l.Field)), nil
+			rem := g.remainingAt(ctx, l, key)
+			return deny(overMessage(call.Tool, l, sym, rem), rem), nil
 		}
-		windowID, _, end := l.WindowBounds(now)
+		_, _, end := l.WindowBounds(now)
 		res := toolcontrols.Reservation{
-			Key:       counterKey(call.Token.TenantID, l.ID, windowID),
+			Key:       key,
 			CallID:    callID,
 			Units:     units,
 			Max:       l.MaxUnits(),
 			ExpiresAt: end.Add(counterGrace),
+		}
+		// Two limits of one call can name one counter (the same budget twice).
+		// It is counted once; limits that disagree on the maximum are refused.
+		if prev := heldAt(taken, key); prev != nil {
+			if prev.res.Max != res.Max {
+				return deny(fmt.Sprintf("%s: this token lists the same shared budget with two different limits, so the call was not sent", call.Tool), nil), nil
+			}
+			continue
 		}
 		out, err := g.store.Reserve(ctx, res)
 		if err != nil {
@@ -162,8 +199,8 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		}
 		switch out.Status {
 		case toolcontrols.OverLimit:
-			return deny(fmt.Sprintf("%s: this token's limit is %s on %s; this order would go over it",
-				call.Tool, limitPhrase(l), l.Field)), nil
+			left := leftUnits(l.MaxUnits(), out.Total)
+			return deny(overMessage(call.Tool, l, sym, &left), &left), nil
 		case toolcontrols.Duplicate:
 			// The earlier call with this id holds a reservation. Do not
 			// release it from here, and do not forward a second copy.
@@ -173,18 +210,27 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 				Message: fmt.Sprintf("%s: this request id was already used for the same call; send it with a new id to try again", call.Tool),
 			}}, nil
 		}
-		h := held{res: res, limit: l}
-		if len(taken) == 0 {
-			first, firstTotal = h, out.Total
+		taken = append(taken, held{res: res, limit: l, total: out.Total})
+		if sym != "" {
+			symbol = sym
 		}
-		taken = append(taken, h)
+	}
+	if len(taken) == 0 {
+		return nil, nil // every limit was for another symbol
 	}
 
+	first := taken[0]
 	detail := GateReceiptDetail{
 		ArgumentField: first.limit.Field,
 		Window:        string(first.limit.Window),
 		Limit:         first.limit.Max,
-		WindowTotal:   formatUnits(firstTotal),
+		WindowTotal:   formatUnits(first.total),
+		Symbol:        symbol,
+	}
+	for _, h := range taken {
+		if h.limit.Budget != "" {
+			detail.Shared = true
+		}
 	}
 	return &GateAdmission{
 		Detail: detail,
@@ -203,6 +249,105 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 			giveBack()
 		},
 	}, nil
+}
+
+func heldAt(taken []held, key string) *held {
+	for i := range taken {
+		if taken[i].res.Key == key {
+			return &taken[i]
+		}
+	}
+	return nil
+}
+
+// counterName names the counter a limit spends from, apart from tenant and
+// window. A limit with no budget is named by its caveat word, so a token and
+// the children that inherit its words share it. A limit with a budget is named
+// by the budget, so every token minted into the budget shares it, whatever its
+// words. A symbol cap inside a budget has a counter of its own per kind and
+// symbol list, apart from the budget's total.
+func counterName(l toolcontrols.SpendLimit) string {
+	if l.Budget == "" {
+		return l.ID
+	}
+	name := "b:" + l.Budget
+	if len(l.Symbols) > 0 {
+		name += ":s:" + l.SymbolKind() + ":" + strings.Join(l.Symbols, ",")
+	}
+	return name
+}
+
+func windowIDOf(l toolcontrols.SpendLimit, now time.Time) string {
+	id, _, _ := l.WindowBounds(now)
+	return id
+}
+
+// remainingAt reads what is left under a budget or symbol cap, for the
+// refusal's data. It returns nil for any other limit (their refusals carry no
+// remaining), and when the counter cannot be read (the refusal stands without it).
+func (g *SpendGate) remainingAt(ctx context.Context, l toolcontrols.SpendLimit, key string) *int64 {
+	if l.Budget == "" && len(l.Symbols) == 0 {
+		return nil
+	}
+	total, err := g.store.Total(ctx, key)
+	if err != nil {
+		return nil
+	}
+	left := leftUnits(l.MaxUnits(), total)
+	return &left
+}
+
+// leftUnits is max minus total, never below zero.
+func leftUnits(max, total int64) int64 {
+	if total >= max {
+		return 0
+	}
+	return max - total
+}
+
+// logCounter names a counter in a log line without writing its key, which
+// holds a budget id.
+func logCounter(key string) string {
+	sum := sha256.Sum256([]byte(key))
+	return hex.EncodeToString(sum[:])[:12]
+}
+
+// sendFieldHint tells an agent that sent a quantity what to send instead.
+func sendFieldHint(l toolcontrols.SpendLimit, why string) string {
+	if why != argrules.NumericFieldMissing || !strings.HasPrefix(toolcontrols.FormatAmount(l.Field, "1"), "$") {
+		return ""
+	}
+	return fmt.Sprintf("; send %s instead of quantity", l.Field)
+}
+
+// overMessage is the text for a call that would pass a limit. For a budget or a
+// symbol cap it ends with what is left, in words and numbers only: never the
+// budget's id or its owner's name.
+func overMessage(tool string, l toolcontrols.SpendLimit, symbol string, left *int64) string {
+	var who string
+	switch {
+	case l.Budget != "" && symbol != "":
+		who = fmt.Sprintf("the limit for %s in the budget shared by your agents is %s", symbol, limitPhrase(l))
+	case l.Budget != "":
+		who = fmt.Sprintf("the limit shared by your agents is %s", limitPhrase(l))
+	case symbol != "":
+		who = fmt.Sprintf("this token's limit for %s is %s", symbol, limitPhrase(l))
+	default:
+		who = fmt.Sprintf("this token's limit is %s", limitPhrase(l))
+	}
+	msg := fmt.Sprintf("%s: %s on %s; this order would go over it", tool, who, l.Field)
+	if left != nil && (l.Budget != "" || symbol != "") {
+		msg += "; " + toolcontrols.FormatAmount(l.Field, formatUnits(*left)) + " is left " + l.Window.Today()
+		switch {
+		case symbol != "" && l.Budget != "":
+			msg += " for " + symbol + " in the budget shared by your agents"
+		case symbol != "":
+			msg += " for " + symbol
+		default:
+			msg += " in the budget shared by your agents"
+		}
+	}
+	return msg
 }
 
 func (g *SpendGate) callID(ctx context.Context, call GateCall) string {
@@ -234,12 +379,19 @@ func (g *SpendGate) release(ctx context.Context, r toolcontrols.Reservation) {
 	if err := g.store.Release(rctx, r); err != nil {
 		// The counter stays higher than the real spend until the window ends:
 		// the safe direction. Say so loudly.
-		log.Error().Err(err).Str("counter", r.Key).Msg("could not release a spend reservation; the window total stays counted")
+		log.Error().Err(err).Str("counter", logCounter(r.Key)).Msg("could not release a spend reservation; the window total stays counted")
 	}
 }
 
 func spendRefusal(tool string, l toolcontrols.SpendLimit, message string) *GateRefusal {
-	return &GateRefusal{
+	return spendRefusalFor(l, "", message, nil)
+}
+
+// spendRefusalFor is the refusal for limit l. For a limit with a shared budget
+// or a symbol cap the data and the receipt say so, with the canonical symbol
+// and what is left when it was read. Never an id or a name.
+func spendRefusalFor(l toolcontrols.SpendLimit, symbol, message string, remaining *int64) *GateRefusal {
+	r := &GateRefusal{
 		Code:    toolcontrols.DenialCodeSpendLimit,
 		Message: message,
 		Data: map[string]interface{}{
@@ -254,6 +406,19 @@ func spendRefusal(tool string, l toolcontrols.SpendLimit, message string) *GateR
 			Limit:         l.Max,
 		},
 	}
+	if l.Budget != "" {
+		r.Data["shared"] = true
+		r.Detail.Shared = true
+	}
+	if symbol != "" {
+		r.Data["symbol"] = symbol
+		r.Detail.Symbol = symbol
+	}
+	if remaining != nil {
+		r.Data["remaining"] = formatUnits(*remaining)
+		r.Detail.Remaining = formatUnits(*remaining)
+	}
+	return r
 }
 
 func limitPhrase(l toolcontrols.SpendLimit) string {

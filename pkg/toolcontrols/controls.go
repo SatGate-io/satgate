@@ -34,6 +34,20 @@
 //	{"v":1,"spend_limits":[{"tools":["place_crypto_order"],"field":"dollar_amount",
 //	  "max":"200","window":"day","tz":"America/New_York"}]}
 //
+// A limit may also share its total across tokens, and may count only some
+// symbols (see symbols.go):
+//
+//	{"v":1,"spend_limits":[
+//	  {"tools":["place_crypto_order"],"field":"dollar_amount","max":"200","window":"day","tz":"America/New_York","budget":"<24 chars [a-z0-9]>"},
+//	  {"tools":["place_crypto_order"],"field":"dollar_amount","max":"50","window":"day","tz":"America/New_York","budget":"<same id>","symbols":["BTC"]}]}
+//
+// "budget" names a shared budget written by the minting service. The counter
+// is then named by the tenant and the budget instead of the caveat word, so
+// every token minted into the budget spends from one total. It counts only
+// when a budget_bind seal covers the caveat (see CollectSealed). "symbols"
+// restricts the limit to calls whose canonical symbol is listed. A release that
+// predates these keys refuses the document (unknown key): it fails closed.
+//
 // An "ask me" constraint holds calls above a threshold for the owner's
 // approval (see approval.go):
 //
@@ -67,6 +81,7 @@ const (
 	MaxSpendLimits          = 8 // spending limits over all caveats
 	MaxApprovalRules        = 8 // "ask me" rules over all caveats
 	MaxToolsPerLimit        = 8
+	BudgetIDLen             = 24 // characters of [a-z0-9] in a shared budget id
 	MaxScale                = 8  // fractional digits kept for amounts
 	MaxWholeDigits          = 10 // digits before the point in a limit
 	DefaultTimeZone         = "America/New_York"
@@ -111,10 +126,26 @@ type SpendLimit struct {
 	// TZ is an IANA zone name. Windows start at midnight in this zone.
 	TZ string
 
+	// Budget, when set, names a shared budget (24 characters of [a-z0-9],
+	// written by the minting service). The counter is then named by the budget
+	// and the tenant instead of by the caveat word, so every token that names
+	// the same budget spends from one total. The reference counts only when a
+	// budget_bind seal covers the caveat that carries it (see Sealed).
+	Budget string
+	// Symbols, when set, restricts the limit to calls whose canonical symbol
+	// is on the list (1 to MaxSymbolsPerLimit entries, each already in
+	// canonical form, sorted). See symbols.go.
+	Symbols []string
+
 	// ID names the limit's counter: the hex SHA-256 prefix of the caveat word
 	// it was read from. It is set by Collect and ParseScopeValue; a limit
 	// built by hand has no ID and cannot be enforced.
 	ID string
+	// Sealed is set by CollectSealed when the caveat the limit was read from
+	// is covered by a valid budget_bind seal. It is never read from the
+	// document. A limit with a Budget that is not Sealed refuses every call it
+	// covers and never touches a counter.
+	Sealed bool
 
 	max   *big.Rat
 	units int64
@@ -265,6 +296,17 @@ func parseSpendLimit(raw json.RawMessage) (SpendLimit, error) {
 			if err := json.Unmarshal(v, &l.TZ); err != nil {
 				return SpendLimit{}, ctlErr("tz must be a string")
 			}
+		case "budget":
+			if err := json.Unmarshal(v, &l.Budget); err != nil {
+				return SpendLimit{}, ctlErr("budget must be a string")
+			}
+			if !ValidBudgetID(l.Budget) {
+				return SpendLimit{}, ctlErr("budget is not a budget id")
+			}
+		case "symbols":
+			if err := json.Unmarshal(v, &l.Symbols); err != nil || l.Symbols == nil {
+				return SpendLimit{}, ctlErr("symbols must be a list of symbols")
+			}
 		default:
 			return SpendLimit{}, ctlErr("unknown spending limit key %q", clip(k))
 		}
@@ -327,6 +369,54 @@ func (l *SpendLimit) validate() error {
 		return ctlErr("max is out of range")
 	}
 	l.max, l.units = rat, units
+	return l.validateSymbols()
+}
+
+// ValidBudgetID reports whether id has the shape of a budget id: 24
+// characters of [a-z0-9].
+func ValidBudgetID(id string) bool {
+	if len(id) != BudgetIDLen {
+		return false
+	}
+	for i := 0; i < len(id); i++ {
+		c := id[i]
+		if !(c >= 'a' && c <= 'z' || c >= '0' && c <= '9') {
+			return false
+		}
+	}
+	return true
+}
+
+// validateSymbols checks the symbol list against the tools the limit covers.
+func (l *SpendLimit) validateSymbols() error {
+	if l.Symbols == nil {
+		return nil
+	}
+	if len(l.Symbols) == 0 || len(l.Symbols) > MaxSymbolsPerLimit {
+		return ctlErr("symbols lists 1 to %d symbols", MaxSymbolsPerLimit)
+	}
+	for _, t := range l.Tools {
+		if !SymbolCapTool(t) {
+			return ctlErr("a symbol cap cannot name tool %q: symbols are only understood for %s and %s", clip(t), toolCryptoOrder, toolEquityOrder)
+		}
+	}
+	if l.Field == SymbolField {
+		return ctlErr("a symbol cap cannot sum the symbol")
+	}
+	seen := map[string]bool{}
+	for _, sym := range l.Symbols {
+		for _, t := range l.Tools {
+			canon, ok := CanonicalSymbol(t, sym)
+			if !ok || canon != sym {
+				return ctlErr("symbol %q is not in canonical form for %s", clip(sym), t)
+			}
+		}
+		if seen[sym] {
+			return ctlErr("a symbol is listed twice")
+		}
+		seen[sym] = true
+	}
+	sort.Strings(l.Symbols)
 	return nil
 }
 
@@ -385,6 +475,9 @@ func Marshal(d *Doc) ([]byte, error) {
 	for i, l := range d.SpendLimits {
 		cp := l
 		cp.Tools = append([]string(nil), l.Tools...)
+		if l.Symbols != nil {
+			cp.Symbols = append([]string(nil), l.Symbols...)
+		}
 		if err := cp.validate(); err != nil {
 			return nil, err
 		}
@@ -396,7 +489,18 @@ func Marshal(d *Doc) ([]byte, error) {
 		max, _ := json.Marshal(cp.Max)
 		win, _ := json.Marshal(string(cp.Window))
 		tz, _ := json.Marshal(cp.TZ)
-		fmt.Fprintf(&b, `{"tools":%s,"field":%s,"max":%s,"window":%s,"tz":%s}`, tools, field, max, win, tz)
+		fmt.Fprintf(&b, `{"tools":%s,"field":%s,"max":%s,"window":%s,"tz":%s`, tools, field, max, win, tz)
+		// New keys are written only when set, so a document without them is
+		// byte for byte what it was before they existed.
+		if cp.Budget != "" {
+			bj, _ := json.Marshal(cp.Budget)
+			fmt.Fprintf(&b, `,"budget":%s`, bj)
+		}
+		if cp.Symbols != nil {
+			sj, _ := json.Marshal(cp.Symbols)
+			fmt.Fprintf(&b, `,"symbols":%s`, sj)
+		}
+		b.WriteByte('}')
 	}
 	if len(d.SpendLimits) > 0 {
 		b.WriteString(`]`)
@@ -512,10 +616,23 @@ func ParseScopeValue(value string) (*Doc, error) {
 // would let a child that narrowed its tool list lose a limit on a tool it
 // still has. A mint checks tool names against the scope (see the gateway's
 // MCPSpendLimitCaveats); a verifier does not.
+//
+// No limit Collect returns is Sealed: a caller that enforces limits uses
+// CollectSealed.
 func Collect(caveats []string) ([]SpendLimit, error) {
+	return CollectSealed(caveats, 0)
+}
+
+// CollectSealed is Collect for a token whose first sealed caveats are covered
+// by a valid budget_bind seal (macaroon.Service.BudgetSealedPrefix): a limit
+// read from one of them is Sealed. A limit that names a shared budget counts
+// against that budget only when it is Sealed. A holder can append caveats to a
+// token offline but cannot write the seal, so a budget reference they add
+// is never Sealed.
+func CollectSealed(caveats []string, sealedPrefix int) ([]SpendLimit, error) {
 	var all []SpendLimit
 	n := 0
-	for _, caveat := range caveats {
+	for idx, caveat := range caveats {
 		value, ok := strings.CutPrefix(caveat, "scope = ")
 		if !ok || !argrules.IsControlScope(value) {
 			continue
@@ -527,6 +644,9 @@ func Collect(caveats []string) ([]SpendLimit, error) {
 		d, err := ParseScopeValue(value)
 		if err != nil {
 			return nil, err
+		}
+		for i := range d.SpendLimits {
+			d.SpendLimits[i].Sealed = idx < sealedPrefix
 		}
 		all = append(all, d.SpendLimits...)
 		if len(all) > MaxSpendLimits {
@@ -565,6 +685,14 @@ func (w Window) phrase() string {
 	return "a day"
 }
 
+// Today is "today" or "this week".
+func (w Window) Today() string {
+	if w == WindowWeek {
+		return "this week"
+	}
+	return "today"
+}
+
 // Phrase is "a day" or "a week".
 func (w Window) Phrase() string { return w.phrase() }
 
@@ -574,6 +702,14 @@ func Describe(limits []SpendLimit) []string {
 	for _, l := range limits {
 		line := fmt.Sprintf("%s: at most %s %s in total on %s",
 			strings.Join(l.Tools, " and "), FormatAmount(l.Field, l.Max), l.Window.phrase(), l.Field)
+		if len(l.Symbols) > 0 {
+			line += ", for " + strings.Join(l.Symbols, " and ") + " only"
+		}
+		if l.Budget != "" {
+			// The budget's id and its owner's name are never written here:
+			// agents read these lines.
+			line += ", shared with your other agents"
+		}
 		if l.TZ != DefaultTimeZone {
 			line += " (days start at midnight " + l.TZ + " time)"
 		}

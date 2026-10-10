@@ -56,6 +56,7 @@ const (
 	NumericFieldUnreadable = "the call could not be read"
 	NumericFieldMissing    = "the field is missing"
 	NumericFieldNotNumber  = "the field is not a plain decimal number"
+	NumericFieldNotText    = "the field is not text"
 )
 
 // CheckCallShape applies to a tools/call the strict reading of the top level
@@ -123,4 +124,39 @@ func ReadNumericField(params json.RawMessage, toolName, field string) (*Decimal,
 		return nil, NumericFieldNotNumber
 	}
 	return d, NumericFieldOK
+}
+
+// ReadStringField reads the argument `field` of a tools/call as a JSON string,
+// with the same strictness ReadNumericField applies to the call and to the
+// argument keys (no repeated key, no key that differs from field only by
+// letter case, a name equal to toolName). A value that is not a JSON string returns
+// NumericFieldNotText. The text is
+// returned exactly as sent; the caller canonicalizes it.
+func ReadStringField(params json.RawMessage, toolName, field string) (string, string) {
+	if why := CheckCallShape(params, toolName); why != NumericFieldOK {
+		return "", why
+	}
+	top, _ := objectOf(params)
+	raw, ok := top["arguments"]
+	if !ok || bytes.Equal(bytes.TrimSpace(raw), []byte("null")) {
+		return "", NumericFieldMissing
+	}
+	args, err := objectOf(bytes.TrimSpace(raw))
+	if err != nil {
+		return "", NumericFieldUnreadable
+	}
+	for k := range args {
+		if k != field && strings.EqualFold(k, field) {
+			return "", NumericFieldUnreadable
+		}
+	}
+	value, present := args[field]
+	if !present {
+		return "", NumericFieldMissing
+	}
+	s, ok := jsonString(bytes.TrimSpace(value))
+	if !ok {
+		return "", NumericFieldNotText
+	}
+	return s, NumericFieldOK
 }
