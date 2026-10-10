@@ -1005,6 +1005,13 @@ func (p *Proxy) argumentDeniedResponse(ctx context.Context, req *Request, tokenI
 	if denied.Field != "" {
 		data["field"] = denied.Field
 	}
+	// What the closest shape allows, in words built from the rule. It goes to
+	// the caller only (message and data); the signed receipt below is built
+	// from detail and never sees it.
+	if denied.Allowed != "" {
+		message += ": " + denied.Allowed
+		data["allowed"] = denied.Allowed
+	}
 	// The signed receipt says this was an argument-rule refusal and which
 	// field blocked it, so it cannot be mistaken for a scope refusal. The
 	// rule documents are identified by hash; no argument value is recorded.

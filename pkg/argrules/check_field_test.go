@@ -106,6 +106,31 @@ func oracleField(r Rule, args map[string]json.RawMessage) (string, bool) {
 	return field, false
 }
 
+// oracleAllowed recomputes the expected allowed text the same way: the text of
+// the first failing condition of the closest shape, from the rule alone.
+func oracleAllowed(r Rule, args map[string]json.RawMessage) string {
+	bestHeld, text := -1, ""
+	for _, shape := range r.Shapes {
+		var first *Condition
+		failing := 0
+		for i := range shape.Fields {
+			if !shape.Fields[i].holds(args) {
+				failing++
+				if first == nil {
+					first = &shape.Fields[i]
+				}
+			}
+		}
+		if failing == 0 {
+			return ""
+		}
+		if held := len(shape.Fields) - failing; held > bestHeld {
+			bestHeld, text = held, first.AgentText()
+		}
+	}
+	return text
+}
+
 func argsOf(t *testing.T, raw string) map[string]json.RawMessage {
 	t.Helper()
 	var m map[string]json.RawMessage
@@ -302,6 +327,12 @@ func TestVerdictUnchangedOverManyArgumentSets(t *testing.T) {
 			}
 			if got.Reason != ReasonNoShape {
 				t.Fatalf("%s %s: reason %q", tool, raw, got.Reason)
+			}
+			if wantAllowed := oracleAllowed(rule, args); got.Allowed == "" || got.Allowed != wantAllowed {
+				t.Fatalf("%s %s: allowed %q, want %q", tool, raw, got.Allowed, wantAllowed)
+			}
+			if !strings.HasPrefix(got.Allowed, got.Field+" must ") {
+				t.Fatalf("%s %s: allowed %q does not start with the named field %q", tool, raw, got.Allowed, got.Field)
 			}
 		})
 	}
