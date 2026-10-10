@@ -34,6 +34,11 @@
 //	{"v":1,"spend_limits":[{"tools":["place_crypto_order"],"field":"dollar_amount",
 //	  "max":"200","window":"day","tz":"America/New_York"}]}
 //
+// An "ask me" constraint holds calls above a threshold for the owner's
+// approval (see approval.go):
+//
+//	{"v":1,"approvals":[{"tools":["place_crypto_order"],"field":"dollar_amount","above":"50"}]}
+//
 // Unknown keys, repeated keys, a missing key other than tz, and anything over
 // the size limits are errors at mint and at verify.
 package toolcontrols
@@ -60,6 +65,7 @@ const (
 	MaxDocBytes             = 8 * 1024
 	MaxControlCaveats       = 4 // control caveats on one token
 	MaxSpendLimits          = 8 // spending limits over all caveats
+	MaxApprovalRules        = 8 // "ask me" rules over all caveats
 	MaxToolsPerLimit        = 8
 	MaxScale                = 8  // fractional digits kept for amounts
 	MaxWholeDigits          = 10 // digits before the point in a limit
@@ -118,6 +124,7 @@ type SpendLimit struct {
 // Doc is the decoded controls document.
 type Doc struct {
 	SpendLimits []SpendLimit
+	Approvals   []ApprovalRule
 }
 
 // Covers reports whether the limit counts calls to tool. Names match without
@@ -157,7 +164,7 @@ func ParseJSON(doc []byte) (*Doc, error) {
 	if err := json.Unmarshal(doc, &top); err != nil || top == nil {
 		return nil, ctlErr("document must be an object")
 	}
-	var limitsRaw json.RawMessage
+	var limitsRaw, approvalsRaw json.RawMessage
 	sawV := false
 	for k, v := range top {
 		switch k {
@@ -168,6 +175,8 @@ func ParseJSON(doc []byte) (*Doc, error) {
 			sawV = true
 		case "spend_limits":
 			limitsRaw = v
+		case "approvals":
+			approvalsRaw = v
 		default:
 			return nil, ctlErr("unknown document key %q", clip(k))
 		}
@@ -195,7 +204,26 @@ func ParseJSON(doc []byte) (*Doc, error) {
 			out.SpendLimits = append(out.SpendLimits, l)
 		}
 	}
-	if len(out.SpendLimits) == 0 {
+	if approvalsRaw != nil {
+		var list []json.RawMessage
+		if err := json.Unmarshal(approvalsRaw, &list); err != nil {
+			return nil, ctlErr("approvals must be a list")
+		}
+		if len(list) == 0 {
+			return nil, ctlErr("approvals is empty")
+		}
+		if len(list) > MaxApprovalRules {
+			return nil, ctlErr("more than %d approval rules", MaxApprovalRules)
+		}
+		for _, raw := range list {
+			a, err := parseApprovalRule(raw)
+			if err != nil {
+				return nil, err
+			}
+			out.Approvals = append(out.Approvals, a)
+		}
+	}
+	if len(out.SpendLimits) == 0 && len(out.Approvals) == 0 {
 		return nil, ctlErr("document has no controls")
 	}
 	return out, nil
@@ -346,11 +374,14 @@ func clip(s string) string {
 // Marshal is the canonical document: limits in order, tools sorted, tz always
 // written, keys in a fixed order. It is what a minting service acknowledges.
 func Marshal(d *Doc) ([]byte, error) {
-	if d == nil || len(d.SpendLimits) == 0 {
+	if d == nil || (len(d.SpendLimits) == 0 && len(d.Approvals) == 0) {
 		return nil, ctlErr("no controls")
 	}
 	var b strings.Builder
-	b.WriteString(`{"v":1,"spend_limits":[`)
+	b.WriteString(`{"v":1`)
+	if len(d.SpendLimits) > 0 {
+		b.WriteString(`,"spend_limits":[`)
+	}
 	for i, l := range d.SpendLimits {
 		cp := l
 		cp.Tools = append([]string(nil), l.Tools...)
@@ -367,7 +398,28 @@ func Marshal(d *Doc) ([]byte, error) {
 		tz, _ := json.Marshal(cp.TZ)
 		fmt.Fprintf(&b, `{"tools":%s,"field":%s,"max":%s,"window":%s,"tz":%s}`, tools, field, max, win, tz)
 	}
-	b.WriteString(`]}`)
+	if len(d.SpendLimits) > 0 {
+		b.WriteString(`]`)
+	}
+	if len(d.Approvals) > 0 {
+		b.WriteString(`,"approvals":[`)
+		for i, a := range d.Approvals {
+			cp := a
+			cp.Tools = append([]string(nil), a.Tools...)
+			if err := cp.validate(); err != nil {
+				return nil, err
+			}
+			if i > 0 {
+				b.WriteByte(',')
+			}
+			tools, _ := json.Marshal(cp.Tools)
+			field, _ := json.Marshal(cp.Field)
+			above, _ := json.Marshal(cp.Above)
+			fmt.Fprintf(&b, `{"tools":%s,"field":%s,"above":%s}`, tools, field, above)
+		}
+		b.WriteString(`]`)
+	}
+	b.WriteString(`}`)
 	out := []byte(b.String())
 	if len(out) > MaxDocBytes {
 		return nil, ctlErr("document is larger than %d bytes", MaxDocBytes)
@@ -447,6 +499,9 @@ func ParseScopeValue(value string) (*Doc, error) {
 	}
 	for i := range d.SpendLimits {
 		d.SpendLimits[i].ID = limitID(value, i)
+	}
+	for i := range d.Approvals {
+		d.Approvals[i].ID = limitID(value, 1000+i)
 	}
 	return d, nil
 }
