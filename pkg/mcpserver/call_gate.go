@@ -96,8 +96,8 @@ func (d GateReceiptDetail) IsZero() bool { return d == GateReceiptDetail{} }
 // keep what it took.
 type GateOutcome struct {
 	// Succeeded is true when the call reached the upstream and the upstream
-	// accepted it: no transport failure, no JSON-RPC error, no isError result.
-	// It is false for a refusal and for every failure after the gate.
+	// accepted it: no JSON-RPC error, no isError result, no failure on the
+	// way. It is false for a refusal and for every failure after the gate.
 	Succeeded bool
 	// Unknown is true when the call was sent to the upstream and nothing says
 	// whether it ran: a timeout after the send, a connection reset or closed

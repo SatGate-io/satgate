@@ -5,7 +5,10 @@
 // calendar day or an ISO week in a named time zone, summing one numeric
 // argument (for example dollar_amount) of the calls to the listed tools that
 // went through. The gateway reserves the amount before it forwards the call
-// and gives it back if the upstream does not do the work.
+// and gives it back only when it knows the call did not run: it was never
+// sent, or the upstream answered with a JSON-RPC error or an isError result.
+// A call that was sent and whose outcome is unknown (a timeout, a connection
+// closed after the send, an unreadable reply) keeps its reservation.
 //
 // # Wire format
 //
