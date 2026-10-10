@@ -698,6 +698,7 @@ func (m *UpstreamManager) AllTools() []json.RawMessage {
 
 // ForwardToolCall sends a tools/call to the appropriate upstream.
 func (m *UpstreamManager) ForwardToolCall(ctx context.Context, toolName string, params json.RawMessage, timeout time.Duration) (*Response, error) {
+	NoteDispatchAttempt(ctx)
 	client, err := m.ResolveUpstream(toolName)
 	if err != nil {
 		return nil, err

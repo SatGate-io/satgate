@@ -3,6 +3,7 @@ package mcpserver
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/satgate-io/satgate/pkg/toolcontrols"
 	"strconv"
 	"strings"
 
@@ -60,6 +61,10 @@ func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) 
 	if err != nil {
 		return nil, err
 	}
+	limits, err := toolcontrols.Collect(mac.Caveats)
+	if err != nil {
+		return nil, err
+	}
 	budgetID, err := svc.ResolveIssuedBudgetID(mac)
 	if err != nil {
 		return nil, err
@@ -72,6 +77,7 @@ func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) 
 		Scope:         displayScope(mac),
 		TenantID:      tenantID,
 		ArgumentRules: rules,
+		SpendLimits:   limits,
 		Raw:           mac,
 		RawToken:      token,
 	}
@@ -319,4 +325,45 @@ func (t *TokenInfo) ArgumentRulesSHA256() string {
 		return ""
 	}
 	return argrules.HashDocuments([][]byte{doc})
+}
+
+// AllSpendLimits returns every spending limit the token carries, whatever
+// tools it covers. It reads the caveats again when the token has them, so a
+// TokenInfo whose field was not filled cannot skip a limit; a token whose
+// controls do not parse returns an error, and the call is refused.
+func (t *TokenInfo) AllSpendLimits() ([]toolcontrols.SpendLimit, error) {
+	if t == nil {
+		return nil, nil
+	}
+	if t.Raw != nil {
+		return toolcontrols.Collect(t.Raw.Caveats)
+	}
+	return t.SpendLimits, nil
+}
+
+// SpendLimitsFor returns the spending limits that cover toolName (compared
+// without regard to letter case: see toolcontrols.SpendLimit.Covers).
+func (t *TokenInfo) SpendLimitsFor(toolName string) ([]toolcontrols.SpendLimit, error) {
+	limits, err := t.AllSpendLimits()
+	if err != nil {
+		return nil, err
+	}
+	var out []toolcontrols.SpendLimit
+	for _, l := range limits {
+		if l.Covers(toolName) {
+			out = append(out, l)
+		}
+	}
+	return out, nil
+}
+
+// NeedsCallGate reports whether the token carries a control a CallGate must
+// look at for this call. A token with any spending limit needs one for every
+// tool, not only the covered ones: the gate also refuses a call whose tool
+// name or shape cannot be matched exactly to the limits (see SpendGate.Admit).
+// A token whose controls cannot be read needs one for every tool: the call is
+// refused rather than sent unchecked.
+func (t *TokenInfo) NeedsCallGate(toolName string) bool {
+	limits, err := t.AllSpendLimits()
+	return err != nil || len(limits) > 0
 }

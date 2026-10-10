@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/subtle"
 	"fmt"
+	"github.com/satgate-io/satgate/pkg/toolcontrols"
 	"strings"
 
 	"github.com/satgate-io/satgate/pkg/argrules"
@@ -44,6 +45,11 @@ type TokenInfo struct {
 	// rule caveat in order. A tool with no rule here is limited only by scope.
 	// Nil for a token with none.
 	ArgumentRules []argrules.Rule
+
+	// SpendLimits are the spending limits the token carries (see
+	// pkg/toolcontrols), from every control caveat in order. Nil for a token
+	// with none. A CallGate enforces them.
+	SpendLimits []toolcontrols.SpendLimit
 
 	// Raw macaroon (for delegation).
 	Raw *macaroon.Macaroon

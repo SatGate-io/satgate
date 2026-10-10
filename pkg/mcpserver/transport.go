@@ -81,15 +81,19 @@ func (t *StdioTransport) ReadMessage(ctx context.Context) (json.RawMessage, erro
 	}
 }
 
-func (t *StdioTransport) WriteMessage(_ context.Context, msg json.RawMessage) error {
+func (t *StdioTransport) WriteMessage(ctx context.Context, msg json.RawMessage) error {
 	t.writeMu.Lock()
 	defer t.writeMu.Unlock()
 
-	// Write message followed by newline (NDJSON)
-	if _, err := t.writer.Write(msg); err != nil {
+	// Write message followed by newline (NDJSON). A write may have delivered
+	// part of the message even when it fails, so it counts as sent unless the
+	// pipe was already closed (see dispatch_record.go).
+	n, err := t.writer.Write(msg)
+	noteWrite(ctx, n, err)
+	if err != nil {
 		return err
 	}
-	_, err := t.writer.Write([]byte("\n"))
+	_, err = t.writer.Write([]byte("\n"))
 	return err
 }
 

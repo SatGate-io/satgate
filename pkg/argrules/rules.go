@@ -694,6 +694,9 @@ func Collect(caveats []string, allows func(scope, tool string) bool) ([]Rule, er
 			scopes = append(scopes, value)
 			continue
 		}
+		if IsControlScope(value) {
+			continue // tool controls: read by pkg/toolcontrols
+		}
 		ruleCaveats++
 		if ruleCaveats > MaxRuleCaveats {
 			return nil, ruleErr("more than %d rule caveats", MaxRuleCaveats)
@@ -729,7 +732,7 @@ func DocumentsSHA256(caveats []string) (string, error) {
 			continue
 		}
 		value := strings.TrimPrefix(caveat, "scope = ")
-		if !IsRuleScope(value) {
+		if !IsRuleScope(value) || IsControlScope(value) {
 			continue
 		}
 		rules, err := ParseScopeValue(value)

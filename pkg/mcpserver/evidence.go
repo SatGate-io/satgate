@@ -50,6 +50,16 @@ type MCPDecision struct {
 	DenialCode          string `json:"denial_code,omitempty"`
 	ArgumentField       string `json:"argument_field,omitempty"`
 	ArgumentRulesSHA256 string `json:"argument_rules_sha256,omitempty"`
+
+	// ControlWindow, ControlLimit, ControlWindowTotal and ApprovalID are set
+	// by a CallGate (see call_gate.go): the window name ("day"/"week"), the
+	// owner's maximum, the window total after an allowed call, and the
+	// approval the call concerns. Recorders sign them into the receipt. They
+	// are text the gate chose; none is an argument value the agent sent.
+	ControlWindow      string `json:"control_window,omitempty"`
+	ControlLimit       string `json:"control_limit,omitempty"`
+	ControlWindowTotal string `json:"control_window_total,omitempty"`
+	ApprovalID         string `json:"approval_id,omitempty"`
 }
 
 // MCPEvidence is the verifier-facing handle returned after recording an MCP

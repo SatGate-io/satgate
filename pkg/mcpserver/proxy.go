@@ -65,6 +65,7 @@ type Proxy struct {
 	limiter           RequestLimiter    // optional, per-token request rate limit
 	toolsListEnricher ToolsListEnricher // optional, enriches tools/list with cost metadata
 	taskTracker       *TaskTracker      // MCP task-level cost aggregation (SEP-1686)
+	gate              CallGate          // optional, stateful checks per tools/call (see call_gate.go)
 	tokenID           string            // default session token (from config or first auth)
 	rootToken         string            // auto-minted root token (for delegation demos)
 }
@@ -628,7 +629,7 @@ func dropReservedTools(tools []json.RawMessage) []json.RawMessage {
 }
 
 // handleToolsCall is the hot path — intercepts tool calls for budget enforcement.
-func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *TokenInfo) (*Response, error) {
+func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *TokenInfo) (resp *Response, err error) {
 	// Parse tool call
 	tc, err := ParseToolCall(req.Params)
 	if err != nil {
@@ -654,6 +655,23 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	// through this function.
 	if denied := tokenInfo.CheckToolArguments(tc.Name, req.Params); denied != nil {
 		return p.argumentDeniedResponse(ctx, req, tokenInfo, tc.Name, denied), nil
+	}
+
+	// Stateful controls (spending limits, owner approval): see call_gate.go.
+	// After scope and argument rules, before cost, budget and the upstream.
+	// Whatever happens next, the gate is told how the call ended.
+	if p.gate != nil || tokenInfo.NeedsCallGate(tc.Name) {
+		adm, refused := p.admitCall(ctx, req, tokenInfo, tc.Name)
+		if refused != nil {
+			return refused, nil
+		}
+		if adm != nil {
+			// The record tells settle whether a failure came before or after
+			// the request left (see dispatch_record.go).
+			ctx, _ = withDispatchRecord(ctx)
+			defer func() { adm.settle(ctx, resp, err) }()
+			ctx = withGateDetail(ctx, adm.Detail)
+		}
 	}
 
 	// Resolve cost (per-tenant if available, else global)
@@ -868,7 +886,11 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		timeout = ucfg.Timeout
 	}
 
-	resp, err := p.router.ForwardToolCallForTenant(ctx, tenantID, tc.Name, req.Params, timeout)
+	resp, err = p.router.ForwardToolCallForTenant(ctx, tenantID, tc.Name, req.Params, timeout)
+	// What the router returned, as the gate must read it: the reply below is
+	// rewritten into a JSON-RPC error on a transport failure, which would
+	// otherwise look like an answer from the upstream.
+	dispatchFrom(ctx).recordForward(resp, err)
 	if err != nil {
 		return NewErrorResponse(req.ID, CodeUpstreamError, fmt.Sprintf("upstream error: %v", err)), nil
 	}
@@ -953,6 +975,12 @@ func (p *Proxy) recordMCPDecision(ctx context.Context, req *Request, tokenInfo *
 	decision.Scope = tokenInfo.Scope
 	decision.MCPMethod = MethodToolsCall
 	decision.ToolName = toolName
+	if d, ok := gateDetailFrom(ctx); ok && decision.Decision == "allowed" {
+		// What a call gate recorded about an admitted call (a window total,
+		// an approval id). Refusals carry their own detail.
+		decision.ControlWindow, decision.ControlLimit = d.Window, d.Limit
+		decision.ControlWindowTotal, decision.ApprovalID = d.WindowTotal, d.ApprovalID
+	}
 	decision.RouteOrTool = "mcp:tools/call:" + toolName
 	decision.JSONRPCID = string(req.ID)
 	if decision.PolicyMode == "" {
