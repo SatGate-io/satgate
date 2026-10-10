@@ -32,6 +32,21 @@ def allowed_with_total(r):
     return r
 
 
+def shared_refusal(r):
+    # A refusal by a shared-budget limit with a symbol cap: spend_shared,
+    # spend_symbol (canonical) and spend_remaining are signed next to the rest.
+    r.update(denial_code="TOOL_SPEND_LIMIT_DENIED", argument_field="dollar_amount",
+             spend_window="day", spend_limit="50", spend_shared=True,
+             spend_symbol="BTC", spend_remaining="10")
+    return r
+
+
+def shared_allowed(r):
+    r.update(spend_window="day", spend_limit="200", spend_window_total="150",
+             spend_shared=True, spend_symbol="BTC")
+    return r
+
+
 def approval_hold(r):
     r.update(denial_code="APPROVAL_REQUIRED", approval_id="apr_0123456789abcdef")
     return r
@@ -56,6 +71,23 @@ class OrderControlReceipts(unittest.TestCase):
 
     def test_allowed_receipt_with_window_total_verifies(self):
         self.check(allowed_with_total(self.f.receipt("allowed", "budget_authorized")), "allowed")
+
+    def test_shared_budget_symbol_cap_refusal_verifies(self):
+        self.check(shared_refusal(self.f.receipt("denied", "policy_denied")), "denied")
+
+    def test_shared_budget_allowed_receipt_verifies(self):
+        self.check(shared_allowed(self.f.receipt("allowed", "budget_authorized")), "allowed")
+
+    def test_tampering_with_the_shared_fields_is_caught(self):
+        pack = self.f.pack(shared_refusal(self.f.receipt("denied", "policy_denied")))
+        for key, value in (("spend_remaining", "9999"), ("spend_symbol", "ETH"), ("spend_shared", False)):
+            tampered = copy.deepcopy(pack)
+            tampered["receipts"][0][key] = value
+            for surface, verifier in paid.VERIFIERS.items():
+                with self.subTest(surface=surface, key=key):
+                    result = verifier.verify_pack(tampered, jwks=self.f.jwks, require_trusted_issuer=True,
+                                                  now=NOW, allow_mock=True)
+                    self.assertFalse(result["valid"], result)
 
     def test_approval_hold_verifies(self):
         self.check(approval_hold(self.f.receipt("denied", "policy_denied")), "denied")

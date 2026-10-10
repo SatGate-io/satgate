@@ -199,6 +199,9 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		}
 		switch out.Status {
 		case toolcontrols.OverLimit:
+			if l.Budget == "" && len(l.Symbols) == 0 {
+				return deny(overMessage(call.Tool, l, sym, nil), nil), nil
+			}
 			left := leftUnits(l.MaxUnits(), out.Total)
 			return deny(overMessage(call.Tool, l, sym, &left), &left), nil
 		case toolcontrols.Duplicate:

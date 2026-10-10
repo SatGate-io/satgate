@@ -400,6 +400,11 @@ func (l *SpendLimit) validateSymbols() error {
 			return ctlErr("a symbol cap cannot name tool %q: symbols are only understood for %s and %s", clip(t), toolCryptoOrder, toolEquityOrder)
 		}
 	}
+	for _, t := range l.Tools[1:] {
+		if symbolKind(t) != symbolKind(l.Tools[0]) {
+			return ctlErr("a symbol cap covers crypto tools or equity tools, not both")
+		}
+	}
 	if l.Field == SymbolField {
 		return ctlErr("a symbol cap cannot sum the symbol")
 	}
