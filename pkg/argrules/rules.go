@@ -759,10 +759,15 @@ func HashDocuments(docs [][]byte) string {
 }
 
 // Denial says why a call was refused by argument rules. It never holds an
-// argument value: Field is a field name taken from the rule.
+// argument value: Field is a field name taken from the rule, and Allowed is
+// built from that same rule condition (see Condition.AllowedText).
 type Denial struct {
 	Field  string
 	Reason string // one of the Reason constants
+	// Allowed says what the closest shape requires of Field, in plain words.
+	// It is set only for a ReasonNoShape denial that names a field. It is for
+	// the refused caller and is not part of any signed receipt.
+	Allowed string
 }
 
 func (d *Denial) Error() string {

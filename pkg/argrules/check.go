@@ -147,6 +147,7 @@ func (r Rule) check(args map[string]json.RawMessage) *Denial {
 	for _, shape := range r.Shapes {
 		held := 0
 		var failed string
+		var allowed string
 		for _, cond := range shape.Fields {
 			if cond.holds(args) {
 				held++
@@ -154,6 +155,7 @@ func (r Rule) check(args map[string]json.RawMessage) *Denial {
 			}
 			if failed == "" {
 				failed = cond.Field
+				allowed = cond.AllowedText() // from the rule, never the call
 			}
 		}
 		if failed == "" {
@@ -161,7 +163,7 @@ func (r Rule) check(args map[string]json.RawMessage) *Denial {
 		}
 		if held > bestHeld {
 			bestHeld = held
-			best = &Denial{Field: failed, Reason: ReasonNoShape}
+			best = &Denial{Field: failed, Reason: ReasonNoShape, Allowed: allowed}
 		}
 	}
 	if best == nil {
