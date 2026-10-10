@@ -365,6 +365,7 @@ func (t *SSETransport) WriteMessage(ctx context.Context, msg json.RawMessage) er
 		}
 		return fmt.Errorf("SSE POST create: %w", err)
 	}
+	req = markNoReplay(req, msg)
 	req.Header.Set("Content-Type", "application/json")
 	for k, v := range t.headers {
 		req.Header.Set(k, v)

@@ -1,6 +1,8 @@
 package mcpserver
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -67,13 +69,53 @@ func wrapUpstreamErrorRedacted(prefix, rawURL string, err error, redact bool) er
 	return fmt.Errorf("%s %s: %w", prefix, origin, err)
 }
 
+// A tools/call request can carry out an order. Once its bytes may have left,
+// a redirect answer says nothing about whether the first hop ran it, and
+// sending the body again could run it twice (or run it once and hide that
+// behind a later reply). So a request marked by markNoReplay is never sent a
+// second time by this package: a redirect is returned as an error after the
+// send (the dispatch record already says "sent", so a gate keeps whatever it
+// took), net/http gets no GetBody to replay the body with (an HTTP/2 stream
+// refused by the server is retried only when GetBody is set), and the body is
+// not rewound by redirectRequest.
+type noReplayKey struct{}
+
+// markNoReplay returns req marked as not to be replayed when msg, the JSON-RPC
+// message it carries, is a tools/call, or is not a single JSON-RPC object that
+// can be read (a batch may contain a tools/call; a body that cannot be read
+// cannot be shown safe). Other methods (initialize, tools/list, ping,
+// notifications) keep the redirect rule below unchanged.
+func markNoReplay(req *http.Request, msg []byte) *http.Request {
+	if !mayHaveSideEffects(msg) {
+		return req
+	}
+	req.GetBody = nil
+	return req.WithContext(context.WithValue(req.Context(), noReplayKey{}, true))
+}
+
+func mayHaveSideEffects(msg []byte) bool {
+	var m struct {
+		Method string `json:"method"`
+	}
+	if err := json.Unmarshal(msg, &m); err != nil {
+		return true
+	}
+	return m.Method == MethodToolsCall
+}
+
+func noReplay(req *http.Request) bool {
+	v, _ := req.Context().Value(noReplayKey{}).(bool)
+	return v
+}
+
 // doUpstream performs req and applies the upstream redirect rule.
 //
 // A stored header is a tenant-configured header (including Authorization) or
 // Mcp-Session-Id. When any stored header is present, no redirect is followed.
 // Otherwise only same-origin redirects are followed, at most 3. A refused
 // redirect returns an error naming the status code and the target origin
-// (scheme, host, and port only).
+// (scheme, host, and port only). A request marked by markNoReplay is not
+// redirected at all.
 func doUpstream(client *http.Client, req *http.Request, hasStoredHeaders bool) (*http.Response, error) {
 	return doUpstreamRedacted(client, req, hasStoredHeaders, false)
 }
@@ -105,6 +147,12 @@ func doUpstreamRedacted(client *http.Client, req *http.Request, hasStoredHeaders
 		status := resp.StatusCode
 		loc, ok := redirectLocation(resp)
 		discardBody(resp.Body)
+		if noReplay(req) {
+			// The request may already have run. Do not follow, do not send
+			// the body again, and do not take the redirect's answer (or the
+			// next hop's) as the call's outcome.
+			return nil, refusalf("upstream redirect status %d refused: the call was already sent and is not sent again", status)
+		}
 		if !ok {
 			return nil, refusalf("upstream redirect status %d has an invalid location", status)
 		}

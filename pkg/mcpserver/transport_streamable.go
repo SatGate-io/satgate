@@ -175,6 +175,7 @@ func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.Raw
 		}
 		return fmt.Errorf("streamable HTTP POST create: %w", err)
 	}
+	req = markNoReplay(req, msg)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json, text/event-stream")
 	for k, v := range t.headers {
