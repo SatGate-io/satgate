@@ -227,7 +227,7 @@ const LandingPage = () => {
       <section id="see-it-live" className="py-16 px-6 border-b border-gray-800 scroll-mt-20">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-3">See SatGate in Action</h2>
-          <p className="text-gray-400 mb-10 max-w-2xl mx-auto">Three recordings from production, with narration.</p>
+          <p className="text-gray-400 mb-10 max-w-2xl mx-auto">Four recordings from production, with narration.</p>
           <h3 className="text-xl font-bold mb-2">Your agents&apos; API calls: a budget they can&apos;t overspend</h3>
           <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Connect an API, set a route to Control, and mint a token with a 100-credit budget. Without the token the route returns 401; with it, 200. A demo agent spends the budget at 10 credits a call until SatGate blocks its next call. Then the open-source verifier checks the signed receipt for that refusal.</p>
           <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
@@ -261,6 +261,23 @@ const LandingPage = () => {
             </video>
           </div>
           <p className="text-xs text-gray-500 mt-3">The agent in the recording is a scripted MCP client using the public <code className="text-gray-400">satgate-mcp-bridge</code> npm package.</p>
+
+          <h3 className="text-xl font-bold mt-16 mb-2">Your agents on a real brokerage account: each with its own limits</h3>
+          <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Two agents trade one real brokerage account through SatGate, each with its own token. The trading agent can spend $200 a day, needs the owner&apos;s OK for any order over $4, and can only use its own account. It&apos;s refused on the owner&apos;s main account, buys $1 of Bitcoin, and is refused a $250 order the account could pay for. A $5 order waits until the owner approves it from the link in the email, then fills. The owner revokes the trading agent&apos;s token. Its next connection is refused, and the savings agent keeps trading. The refusals, the hold and each order get a signed receipt, and the open-source verifier checks them.</p>
+          <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
+            <video
+              controls
+              preload="none"
+              poster="/satgate-demo-trading-poster.jpg"
+              className="w-full"
+              playsInline
+              aria-label="Narrated demo: two agents with their own tokens trade one real brokerage account; one is refused on the owner's main account and over its $200 daily limit, a $5 order waits for the owner's approval, the owner revokes one agent while the other keeps trading, and the signed receipts pass the open-source verifier"
+            >
+              <source src="/satgate-demo-trading.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <p className="text-xs text-gray-500 mt-3">The agents in the recording are scripted MCP clients. The orders are real: three Bitcoin buys, $7 in total. Account numbers are masked.</p>
 
           <h3 className="text-xl font-bold mt-16 mb-2">External agents: pay before they get in</h3>
           <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Set a route to Admit and choose how external agents pay: USDC on Base, sats over Lightning, or both, each with its own price. An agent with no wallet gets 402 Payment Required and never reaches your API. In the recording, a second agent sends one cent in USDC, the payment settles on Base, and the call goes through. Sending the same payment again is refused. With USDC, each payment buys one request. On Lightning you choose how many requests one payment buys, and on sat-priced routes the price can rise under load, up to a ceiling you set; unpaid 402s don&apos;t raise it. Paying never gets an agent past your access rules, and payment decisions, refusals included, get a signed receipt.</p>
