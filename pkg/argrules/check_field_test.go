@@ -125,7 +125,7 @@ func oracleAllowed(r Rule, args map[string]json.RawMessage) string {
 			return ""
 		}
 		if held := len(shape.Fields) - failing; held > bestHeld {
-			bestHeld, text = held, first.AllowedText()
+			bestHeld, text = held, first.AgentText()
 		}
 	}
 	return text

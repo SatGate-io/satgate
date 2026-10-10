@@ -626,13 +626,19 @@ func ParseScopeValue(value string) ([]Rule, error) {
 
 // Describe is the plain-words form shown to a token owner.
 func Describe(rules []Rule) []string {
+	return describeRules(rules, describeCondition)
+}
+
+// describeRules builds one line per rule with the given clause writer. Describe
+// (owner, full values) and AgentLines (agent, safe values) share it.
+func describeRules(rules []Rule, clause func(Condition) string) []string {
 	var out []string
 	for _, r := range rules {
 		var alts []string
 		for _, s := range r.Shapes {
 			var parts []string
 			for _, f := range s.Fields {
-				parts = append(parts, describeCondition(f))
+				parts = append(parts, clause(f))
 			}
 			alts = append(alts, strings.Join(parts, " and "))
 		}
@@ -760,7 +766,7 @@ func HashDocuments(docs [][]byte) string {
 
 // Denial says why a call was refused by argument rules. It never holds an
 // argument value: Field is a field name taken from the rule, and Allowed is
-// built from that same rule condition (see Condition.AllowedText).
+// built from that same rule condition (see Condition.AgentText).
 type Denial struct {
 	Field  string
 	Reason string // one of the Reason constants

@@ -48,28 +48,29 @@ func TestArgumentRefusalSaysWhatIsAllowed(t *testing.T) {
 	}
 }
 
-// The url condition names the host and path prefixes the rule allows, never
-// the address the call sent.
+// The url condition names the host the rule allows and says only that a path
+// is limited. It never shows the rule's paths and never the address the call
+// sent.
 func TestArgumentRefusalDescribesURLRule(t *testing.T) {
 	const doc = `{"v":1,"rules":[{"tool":"fetch","shapes":[{"url":{"url":{"hosts":["api.example.com"],"path_prefixes":["/v1","/v2"]}}}]}]}`
 	proxy, _, _ := newArgProxy(t)
 	_, tok := argToken(t, "fetch", doc)
 	o := runCall(t, proxy, argCall(1, tok, "fetch", `{"url":"https://evil.example/MARKER-URL-PATH"}`))
 	assertArgDenied(t, o, "fetch", "url")
-	want := "url must be an https address on api.example.com with a path starting /v1 or /v2"
+	want := "url must be an https address on api.example.com with a path this token allows"
 	var data map[string]any
 	_ = json.Unmarshal(o.resp.Error.Data, &data)
 	if data["allowed"] != want || !strings.HasSuffix(o.resp.Error.Message, ": "+want) {
 		t.Fatalf("allowed = %v, message = %q", data["allowed"], o.resp.Error.Message)
 	}
 	raw, _ := json.Marshal(o.resp)
-	if strings.Contains(string(raw), "evil.example") || strings.Contains(string(raw), "MARKER-URL-PATH") {
+	if strings.Contains(string(raw), "evil.example") || strings.Contains(string(raw), "MARKER-URL-PATH") || strings.Contains(string(raw), "/v1") || strings.Contains(string(raw), "/v2") {
 		t.Fatalf("reply leaks the call's address: %s", raw)
 	}
 }
 
 // Refusals that are not a shape mismatch keep their old reply exactly.
-func TestNonShapeRefusalsHaveNoAllowedText(t *testing.T) {
+func TestNonShapeRefusalsHaveNoAgentText(t *testing.T) {
 	proxy, _, _ := newArgProxy(t)
 	_, tok := argToken(t, sleeveScope, sleeveOrderLimitsDoc)
 	// Duplicate key: arguments could not be checked.
@@ -95,7 +96,7 @@ func TestNonShapeRefusalsHaveNoAllowedText(t *testing.T) {
 // The text is for the caller only. What goes to the evidence recorder is the
 // same decision as before this change: no field of it holds allowed text, and
 // the decision is identical whether the rule text is long or short.
-func TestAllowedTextIsNotInTheRecordedDecision(t *testing.T) {
+func TestAgentTextIsNotInTheRecordedDecision(t *testing.T) {
 	proxy, rec := recordArgProxy(t)
 	_, tok := argToken(t, sleeveScope, sleeveOrderLimitsDoc)
 	o := runCall(t, proxy, argCall(1, tok, "place_crypto_order", `{"side":"buy","dollar_amount":"250"}`))
@@ -113,5 +114,47 @@ func TestAllowedTextIsNotInTheRecordedDecision(t *testing.T) {
 	if d.Decision != "denied" || d.DecisionReason != "policy_denied" || !d.BudgetNotEvaluated ||
 		d.DenialCode != "TOOL_ARGUMENT_DENIED" || d.ArgumentField != "dollar_amount" || d.ArgumentRulesSHA256 == "" {
 		t.Fatalf("decision changed: %+v", d)
+	}
+}
+
+// Astra's scenario at the HTTP boundary: the rule's path prefix is a webhook
+// credential. The refusal names the host and never the path, in the message,
+// in error.data, or anywhere else in the reply. A one_of that holds a
+// credential-shaped value is reported by count only.
+func TestIndependentCredentialURLRuleDisclosure(t *testing.T) {
+	const (
+		pathMarker = "REVIEW-FAKE-WEBHOOK-CREDENTIAL-729a"
+		oneOfKey   = "sk-live-REVIEW-FAKE-KEY-5521"
+		doc        = `{"v":1,"rules":[` +
+			`{"tool":"fetch","shapes":[{"url":{"url":{"hosts":["hooks.example.com"],"path_prefixes":["/services/` + pathMarker + `"]}}}]},` +
+			`{"tool":"pay","shapes":[{"account":{"one_of":["` + oneOfKey + `","acct-1"]}}]}]}`
+	)
+	proxy, rr, _ := newArgProxy(t)
+	_, tok := argToken(t, "fetch,pay", doc)
+	cases := []struct {
+		name, tool, args, field, allowed string
+	}{
+		{"url", "fetch", `{"url":"https://hooks.example.com/not-permitted"}`, "url", "url must be an https address on hooks.example.com with a path this token allows"},
+		{"one_of", "pay", `{"account":"other"}`, "account", "account must be one of the 2 values this token allows"},
+	}
+	for i, tc := range cases {
+		o := runCall(t, proxy, argCall(i+1, tok, tc.tool, tc.args))
+		assertArgDenied(t, o, tc.tool, tc.field)
+		var data map[string]any
+		if err := json.Unmarshal(o.resp.Error.Data, &data); err != nil {
+			t.Fatalf("%s: %v", tc.name, err)
+		}
+		if data["allowed"] != tc.allowed || !strings.HasSuffix(o.resp.Error.Message, ": "+tc.allowed) {
+			t.Fatalf("%s: allowed = %v, message = %q", tc.name, data["allowed"], o.resp.Error.Message)
+		}
+		raw, _ := json.Marshal(o.resp)
+		for _, leak := range []string{pathMarker, "/services", oneOfKey, "sk-live", "REVIEW-FAKE"} {
+			if strings.Contains(string(raw), leak) || strings.Contains(o.resp.Error.Message, leak) || strings.Contains(string(o.resp.Error.Data), leak) {
+				t.Fatalf("%s: reply discloses rule value %q: %s", tc.name, leak, raw)
+			}
+		}
+	}
+	if rr.calls() != 0 {
+		t.Fatalf("refused calls reached the upstream %d times", rr.calls())
 	}
 }

@@ -155,7 +155,7 @@ func (r Rule) check(args map[string]json.RawMessage) *Denial {
 			}
 			if failed == "" {
 				failed = cond.Field
-				allowed = cond.AllowedText() // from the rule, never the call
+				allowed = cond.AgentText() // from the rule, never the call
 			}
 		}
 		if failed == "" {
