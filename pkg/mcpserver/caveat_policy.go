@@ -61,7 +61,7 @@ func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) 
 	if err != nil {
 		return nil, err
 	}
-	limits, err := toolcontrols.Collect(mac.Caveats, matchScope)
+	limits, err := toolcontrols.Collect(mac.Caveats)
 	if err != nil {
 		return nil, err
 	}
@@ -338,7 +338,7 @@ func (t *TokenInfo) SpendLimitsFor(toolName string) ([]toolcontrols.SpendLimit, 
 	limits := t.SpendLimits
 	if t.Raw != nil {
 		var err error
-		limits, err = toolcontrols.Collect(t.Raw.Caveats, matchScope)
+		limits, err = toolcontrols.Collect(t.Raw.Caveats)
 		if err != nil {
 			return nil, err
 		}

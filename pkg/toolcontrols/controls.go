@@ -440,22 +440,17 @@ func ParseScopeValue(value string) (*Doc, error) {
 }
 
 // Collect reads every control caveat on a token, in order, and returns its
-// spending limits. allows reports whether one scope caveat value allows a
-// tool (the MCP matchScope): a limit naming a tool that the scope caveats
-// before it do not allow is refused, like a rule for such a tool.
-func Collect(caveats []string, allows func(scope, tool string) bool) ([]SpendLimit, error) {
+// spending limits. A limit that names a tool the token's scope does not allow
+// is kept: it is inert, because the tool cannot be called, and dropping it
+// would let a child that narrowed its tool list lose a limit on a tool it
+// still has. A mint checks tool names against the scope (see the gateway's
+// MCPSpendLimitCaveats); a verifier does not.
+func Collect(caveats []string) ([]SpendLimit, error) {
 	var all []SpendLimit
-	var scopes []string
 	n := 0
 	for _, caveat := range caveats {
 		value, ok := strings.CutPrefix(caveat, "scope = ")
-		if !ok {
-			continue
-		}
-		if !argrules.IsControlScope(value) {
-			if !argrules.IsRuleScope(value) {
-				scopes = append(scopes, value)
-			}
+		if !ok || !argrules.IsControlScope(value) {
 			continue
 		}
 		n++
@@ -465,15 +460,6 @@ func Collect(caveats []string, allows func(scope, tool string) bool) ([]SpendLim
 		d, err := ParseScopeValue(value)
 		if err != nil {
 			return nil, err
-		}
-		for _, l := range d.SpendLimits {
-			for _, t := range l.Tools {
-				for _, s := range scopes {
-					if allows != nil && !allows(s, t) {
-						return nil, ctlErr("a limit names tool %q, which the token scope does not allow", t)
-					}
-				}
-			}
 		}
 		all = append(all, d.SpendLimits...)
 		if len(all) > MaxSpendLimits {

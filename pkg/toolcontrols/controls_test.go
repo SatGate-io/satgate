@@ -148,22 +148,23 @@ func TestArgrulesIgnoresControlWords(t *testing.T) {
 
 func TestCollect(t *testing.T) {
 	c := mustCaveat(t, goodDoc)
-	limits, err := Collect([]string{"tenant_id = t", "scope = t:mcp:*", c}, allowAll)
+	limits, err := Collect([]string{"tenant_id = t", "scope = t:mcp:*", c})
 	if err != nil || len(limits) != 1 || limits[0].ID == "" {
 		t.Fatalf("limits = %v err = %v", limits, err)
 	}
-	if _, err := Collect([]string{"scope = t:mcp:*", c}, func(string, string) bool { return false }); err == nil {
-		t.Fatal("limit on a tool the scope does not allow was accepted")
+	// A limit on a tool the scope does not allow is inert, not an error.
+	if l, err := Collect([]string{"scope = t:other", c}); err != nil || len(l) != 1 {
+		t.Fatalf("narrowed child lost its limit: %v %v", l, err)
 	}
 	// A control word that does not parse is an error, never skipped.
-	if _, err := Collect([]string{"scope = argrules:ctl:v1:nope"}, allowAll); err == nil {
+	if _, err := Collect([]string{"scope = argrules:ctl:v1:nope"}); err == nil {
 		t.Fatal("garbled control word was skipped")
 	}
 	var many []string
 	for i := 0; i <= MaxControlCaveats; i++ {
 		many = append(many, mustCaveat(t, goodDoc))
 	}
-	if _, err := Collect(many, allowAll); err == nil {
+	if _, err := Collect(many); err == nil {
 		t.Fatal("too many control caveats accepted")
 	}
 	if !HasControls([]string{"scope = argrules:ctl:v1:nope"}) || HasControls([]string{"scope = a"}) {
