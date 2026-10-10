@@ -22,9 +22,14 @@ func SpendCounterKey(tenant string, l toolcontrols.SpendLimit, now time.Time) st
 	return counterKey(tenant, counterName(l), windowIDOf(l, now))
 }
 
+// SpendTotalReader is the read half of toolcontrols.SpendStore.
+type SpendTotalReader interface {
+	Total(ctx context.Context, key string) (int64, error)
+}
+
 // ReadSpendUsage reads what a limit has used in the current window and what is
 // left (max minus used, never negative).
-func ReadSpendUsage(ctx context.Context, store toolcontrols.SpendStore, tenant string, l toolcontrols.SpendLimit, now time.Time) (SpendUsage, error) {
+func ReadSpendUsage(ctx context.Context, store SpendTotalReader, tenant string, l toolcontrols.SpendLimit, now time.Time) (SpendUsage, error) {
 	total, err := store.Total(ctx, SpendCounterKey(tenant, l, now))
 	if err != nil {
 		return SpendUsage{}, err
