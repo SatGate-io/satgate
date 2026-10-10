@@ -6,9 +6,12 @@
 // argument (for example dollar_amount) of the calls to the listed tools that
 // went through. The gateway reserves the amount before it forwards the call
 // and gives it back only when it knows the call did not run: it was never
-// sent, or the upstream answered with a JSON-RPC error or an isError result.
-// A call that was sent and whose outcome is unknown (a timeout, a connection
-// closed after the send, an unreadable reply) keeps its reservation.
+// sent, or the upstream answered with a JSON-RPC protocol error that means the
+// request was not processed (-32700, -32600, -32601, -32602). A call that was
+// sent and whose outcome is unknown keeps its reservation: a timeout, a
+// connection closed after the send, an unreadable reply, any other JSON-RPC
+// error, or a result with isError=true. An order the broker rejects therefore
+// still counts toward the total.
 //
 // # Wire format
 //

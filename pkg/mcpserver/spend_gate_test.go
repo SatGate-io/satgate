@@ -69,8 +69,13 @@ func okReply() (*Response, error) {
 func isErrorReply() (*Response, error) {
 	return &Response{JSONRPC: "2.0", Result: json.RawMessage(`{"content":[{"type":"text","text":"rejected"}],"isError":true}`)}, nil
 }
-func rpcErrorReply() (*Response, error) {
-	return &Response{JSONRPC: "2.0", Error: &RPCError{Code: -32000, Message: "upstream said no"}}, nil
+func rpcErrorReply() (*Response, error) { return rpcErrorCode(-32000)() }
+
+// rpcErrorCode answers with a JSON-RPC error of the given code.
+func rpcErrorCode(code int) func() (*Response, error) {
+	return func() (*Response, error) {
+		return &Response{JSONRPC: "2.0", Error: &RPCError{Code: code, Message: "upstream said no"}}, nil
+	}
 }
 func forwardFails() (*Response, error) { return nil, errors.New("connection reset") }
 
@@ -219,11 +224,16 @@ func TestSpendRefusalDoesNotEchoTheAmount(t *testing.T) {
 	}
 }
 
-// Release only when SatGate knows the call did not run (round 2).
+// Release only when SatGate knows the call did not run (round 3): it was never
+// sent, or the upstream answered with a JSON-RPC protocol error that means the
+// request was not processed. Round 2 also released on any JSON-RPC error and
+// on isError=true; those two moved to TestSpendKeptWhenOutcomeIsUnknown.
 func TestSpendReleasedWhenUpstreamFails(t *testing.T) {
 	cases := map[string]func() (*Response, error){
-		"json-rpc error":          rpcErrorReply,
-		"isError result":          isErrorReply,
+		"-32700 parse error":      rpcErrorCode(-32700),
+		"-32600 invalid request":  rpcErrorCode(-32600),
+		"-32601 method not found": rpcErrorCode(-32601),
+		"-32602 invalid params":   rpcErrorCode(-32602),
 		"failure before the send": notSent,
 	}
 	for name, reply := range cases {
@@ -246,11 +256,20 @@ func TestSpendReleasedWhenUpstreamFails(t *testing.T) {
 }
 
 // The other half of the rule: a call that was sent and whose fate is unknown
-// keeps its reservation.
+// keeps its reservation. Round 3 added every JSON-RPC error that does not mean
+// "not processed" and isError=true (round 2 released on those).
 func TestSpendKeptWhenOutcomeIsUnknown(t *testing.T) {
 	cases := map[string]func() (*Response, error){
-		"lost after send":          lostAfterSend,
-		"no record of the attempt": forwardFails,
+		"lost after send":              lostAfterSend,
+		"no record of the attempt":     forwardFails,
+		"-32603 internal error":        rpcErrorCode(-32603),
+		"-32000 server error":          rpcErrorCode(-32000),
+		"-32099 server error":          rpcErrorCode(-32099),
+		"-32002 upstream error":        rpcErrorCode(-32002),
+		"-32604 reserved, not defined": rpcErrorCode(-32604),
+		"code 1":                       rpcErrorCode(1),
+		"code 0":                       rpcErrorCode(0),
+		"isError result":               isErrorReply,
 	}
 	for name, reply := range cases {
 		t.Run(name, func(t *testing.T) {
@@ -367,9 +386,10 @@ func TestSpendDuplicateRequestIDReservesOnce(t *testing.T) {
 	if h.counter(t) != 160*units {
 		t.Fatalf("counter = %d", h.counter(t))
 	}
-	// A replay of a call that failed upstream is not a duplicate: it was released.
+	// A replay of a call the upstream refused as not processed is not a
+	// duplicate: it was released.
 	h2 := newSpendHarness(t, spendDoc200Day)
-	h2.rr.replies = []func() (*Response, error){isErrorReply}
+	h2.rr.replies = []func() (*Response, error){rpcErrorCode(-32602)}
 	h2.call(t, 1, "place_crypto_order", order("100"))
 	if r := h2.call(t, 1, "place_crypto_order", order("100")); r.Error != nil {
 		t.Fatalf("retry of a failed call refused: %v", r.Error)

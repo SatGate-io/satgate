@@ -73,7 +73,7 @@ func (u *orderUpstream) handle(w http.ResponseWriter, r *http.Request) {
 	case MethodToolsCall:
 		u.calls.Add(1)
 		mode := u.mode.Load().(string)
-		if mode != "reject" && mode != "rpcerror" {
+		if mode != "rpcerror" {
 			// The order is carried out before the answer is decided.
 			var amt json.Number
 			_ = json.NewDecoder(bytes.NewReader(req.Params.Arguments.Amount)).Decode(&amt)
@@ -120,10 +120,16 @@ func (u *orderUpstream) handle(w http.ResponseWriter, r *http.Request) {
 			if err == nil {
 				conn.Close()
 			}
-		case "rpcerror":
+		case "rpcerror": // -32602 invalid params: the request was not processed
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"jsonrpc":"2.0","id":` + string(req.ID) + `,"error":{"code":-32602,"message":"no"}}`))
+		case "internal": // executed, then -32603 Internal error (Astra's round-2 scenario)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"jsonrpc":"2.0","id":` + string(req.ID) + `,"error":{"code":-32603,"message":"Internal error"}}`))
+		case "servererr": // executed, then an implementation-defined server error
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"jsonrpc":"2.0","id":` + string(req.ID) + `,"error":{"code":-32000,"message":"no"}}`))
-		case "reject":
+		case "reject": // executed (maybe in part), then a tool-level isError
 			reply(`{"content":[{"type":"text","text":"no"}],"isError":true}`)
 		default:
 			reply(`{"content":[{"type":"text","text":"ok"}],"isError":false}`)
@@ -175,10 +181,12 @@ func TestReviewExecutedOrderLostResponse(t *testing.T) {
 	}
 }
 
-// Every way of ending after the send, other than an answer from the upstream
-// that says it did not run, keeps the reservation.
+// Every way of ending after the send, other than a JSON-RPC protocol error that
+// says the request was not processed, keeps the reservation. Round 3 added
+// internal (-32603), servererr (-32000) and reject (isError=true); round 2
+// released on those.
 func TestSpendKeptAfterSendWhateverTheFailure(t *testing.T) {
-	for _, mode := range []string{"lost", "silent", "http500", "partial"} {
+	for _, mode := range []string{"lost", "silent", "http500", "partial", "internal", "servererr", "reject"} {
 		t.Run(mode, func(t *testing.T) {
 			up := newOrderUpstream(t)
 			up.mode.Store(mode)
@@ -217,9 +225,11 @@ func TestSpendKeptWhenContextEndsAfterDispatch(t *testing.T) {
 	}
 }
 
-// The upstream answered "I did not do this": released.
+// The upstream answered with a protocol error that means "not processed"
+// (-32602): released, and the allowance is whole again. Round 2 also listed
+// the isError reply here; it is now in TestSpendKeptAfterSendWhateverTheFailure.
 func TestSpendReleasedWhenUpstreamSaysItDidNotRun(t *testing.T) {
-	for _, mode := range []string{"rpcerror", "reject"} {
+	for _, mode := range []string{"rpcerror"} {
 		t.Run(mode, func(t *testing.T) {
 			up := newOrderUpstream(t)
 			up.mode.Store(mode)
@@ -227,6 +237,10 @@ func TestSpendReleasedWhenUpstreamSaysItDidNotRun(t *testing.T) {
 			h.call(t, 1, "place_crypto_order", order("200"))
 			if h.counter(t) != 0 {
 				t.Fatalf("%s: counter = %d, want released", mode, h.counter(t)/units)
+			}
+			h.call(t, 2, "place_crypto_order", order("200"))
+			if up.calls.Load() != 2 {
+				t.Fatalf("%s: the second order was not forwarded (calls = %d): the allowance was not whole after a release", mode, up.calls.Load())
 			}
 		})
 	}
@@ -253,7 +267,7 @@ func TestSpendReleasedWhenDialFailsBeforeSend(t *testing.T) {
 func TestDispatchRecordClassification(t *testing.T) {
 	ok := &Response{Result: json.RawMessage(`{"isError":false}`)}
 	isErr := &Response{Result: json.RawMessage(`{"isError":true}`)}
-	rpcErr := &Response{Error: &RPCError{Code: -1, Message: "x"}}
+	rpcErr := func(code int) *Response { return &Response{Error: &RPCError{Code: code, Message: "x"}} }
 	cases := []struct {
 		name      string
 		forwarded bool
@@ -265,8 +279,16 @@ func TestDispatchRecordClassification(t *testing.T) {
 	}{
 		{"never handed to the router", false, false, false, nil, nil, endNotRun},
 		{"answered ok", true, true, true, ok, nil, endRan},
-		{"answered isError", true, true, true, isErr, nil, endNotRun},
-		{"answered JSON-RPC error", true, true, true, rpcErr, nil, endNotRun},
+		{"answered isError", true, true, true, isErr, nil, endUnknown},
+		{"answered -32700", true, true, true, rpcErr(-32700), nil, endNotRun},
+		{"answered -32600", true, true, true, rpcErr(-32600), nil, endNotRun},
+		{"answered -32601", true, true, true, rpcErr(-32601), nil, endNotRun},
+		{"answered -32602", true, true, true, rpcErr(-32602), nil, endNotRun},
+		{"answered -32603", true, true, true, rpcErr(-32603), nil, endUnknown},
+		{"answered -32000", true, true, true, rpcErr(-32000), nil, endUnknown},
+		{"answered -32099", true, true, true, rpcErr(-32099), nil, endUnknown},
+		{"answered -32100", true, true, true, rpcErr(-32100), nil, endUnknown},
+		{"answered code 0", true, true, true, rpcErr(0), nil, endUnknown},
 		{"failed, attempted, not sent", true, true, false, nil, errors.New("dial"), endNotRun},
 		{"failed after send", true, true, true, nil, errors.New("eof"), endUnknown},
 		{"failed, router never said", true, false, false, nil, errors.New("?"), endUnknown},

@@ -130,12 +130,16 @@ const (
 	// endRan: the upstream accepted the call. Keep what was taken.
 	endRan callEnd = iota
 	// endNotRun: SatGate knows the call did not run: it was never sent, or
-	// the upstream answered with a JSON-RPC error, or with isError=true (the
-	// documented residual: an isError after a partial fill is not undone).
+	// the upstream answered with a JSON-RPC protocol error that by the
+	// JSON-RPC 2.0 specification means the request was not processed
+	// (-32700, -32600, -32601, -32602; see rpcErrorMeansNotRun).
 	endNotRun
-	// endUnknown: the call was sent and nothing says it did not run (a
+	// endUnknown: the call was sent and nothing says it did not run: a
 	// timeout, a connection closed after the send, a response that could not
-	// be read, an HTTP error status). Keep what was taken.
+	// be read, an HTTP error status, a redirect, any other JSON-RPC error
+	// (-32603 Internal error and -32000..-32099 server errors can follow an
+	// execution), or a result with isError=true (a tool-level error can
+	// follow a partial or full execution). Keep what was taken.
 	endUnknown
 )
 
@@ -154,8 +158,28 @@ func (r *dispatchRecord) classify() callEnd {
 	if r.resp == nil {
 		return endUnknown
 	}
-	if r.resp.Error != nil || !responseSucceeded(r.resp) {
-		return endNotRun
+	if r.resp.Error != nil {
+		if rpcErrorMeansNotRun(r.resp.Error.Code) {
+			return endNotRun
+		}
+		return endUnknown
+	}
+	if !responseSucceeded(r.resp) {
+		// isError=true: ambiguous, a tool can fail after it has acted.
+		return endUnknown
 	}
 	return endRan
+}
+
+// rpcErrorMeansNotRun is true for the JSON-RPC 2.0 error codes that say the
+// request was not processed: parse error, invalid request, method not found,
+// invalid params. Every other code (-32603 Internal error, the -32000..-32099
+// range the spec leaves to the server, anything else) can be sent by a server
+// after it carried the call out, so it proves nothing.
+func rpcErrorMeansNotRun(code int) bool {
+	switch code {
+	case CodeParseError, CodeInvalidRequest, CodeMethodNotFound, CodeInvalidParams:
+		return true
+	}
+	return false
 }

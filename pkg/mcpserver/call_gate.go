@@ -90,10 +90,13 @@ func (d GateReceiptDetail) IsZero() bool { return d == GateReceiptDetail{} }
 //
 // A gate that took something to admit the call (an amount reserved against a
 // limit) gives it back only when it knows the call did not run upstream: a
-// zero GateOutcome (a refusal, a call stopped before it was sent), an upstream
-// JSON-RPC error, an isError result, or a call that was never sent. When the
-// call was sent and its fate is not known, Unknown is true and the gate must
-// keep what it took.
+// zero GateOutcome (a refusal, a call stopped before it was sent, a call that
+// was never sent, or an upstream JSON-RPC error that by the JSON-RPC 2.0
+// specification means the request was not processed: -32700, -32600, -32601,
+// -32602). When the call was sent and its fate is not known, Unknown is true
+// and the gate must keep what it took. That is every other JSON-RPC error
+// (-32603, -32000..-32099, any other code), a result with isError=true, and
+// every failure after the send.
 type GateOutcome struct {
 	// Succeeded is true when the call reached the upstream and the upstream
 	// accepted it: no JSON-RPC error, no isError result, no failure on the
@@ -102,8 +105,10 @@ type GateOutcome struct {
 	// Unknown is true when the call was sent to the upstream and nothing says
 	// whether it ran: a timeout after the send, a connection reset or closed
 	// after the send, a response that could not be read, an HTTP error status
-	// with no JSON-RPC error, a context ended after the send. Succeeded is
-	// false then too. It is false for every outcome SatGate knows.
+	// with no JSON-RPC error, a context ended after the send, a redirect, a
+	// JSON-RPC error other than -32700/-32600/-32601/-32602, a result with
+	// isError=true. Succeeded is false then too. It is false for every
+	// outcome SatGate knows.
 	Unknown bool
 }
 
@@ -174,20 +179,31 @@ func (p *Proxy) admitCall(ctx context.Context, req *Request, tokenInfo *TokenInf
 	return adm, nil
 }
 
-// settle reports how the call ended. A reply with a JSON-RPC error or an
-// isError result did not succeed and did not run. A call that was never sent
-// did not run either. A call that was sent and then failed some other way
-// (timeout, closed connection, unreadable reply) is an unknown outcome: the
-// gate is told so and keeps what it took.
+// settle reports how the call ended. Only two endings are known not to have
+// run: a call that was never sent, and a reply with a JSON-RPC error that by
+// the JSON-RPC 2.0 specification means the request was not processed
+// (-32700, -32600, -32601, -32602). Anything else that did not succeed is an
+// unknown outcome (another JSON-RPC error, isError=true, a timeout, a closed
+// connection, an unreadable reply, a redirect): the gate is told so and keeps
+// what it took.
 func (a *GateAdmission) settle(ctx context.Context, resp *Response, err error) {
 	if a == nil || a.Settle == nil {
 		return
 	}
 	rec := dispatchFrom(ctx)
 	if rec == nil {
-		// No record of the call's path (a caller that did not create one):
-		// the old, coarse reading. Nothing in the proxy takes this branch.
-		a.Settle(ctx, GateOutcome{Succeeded: err == nil && responseSucceeded(resp)})
+		// No record of the call's path (a caller that did not create one).
+		// Nothing in the proxy takes this branch. Without a record nothing
+		// shows the call was never sent, so only a protocol error that says
+		// "not processed" gives the reservation back.
+		switch {
+		case err == nil && resp != nil && resp.Error != nil && rpcErrorMeansNotRun(resp.Error.Code):
+			a.Settle(ctx, GateOutcome{})
+		case err == nil && responseSucceeded(resp):
+			a.Settle(ctx, GateOutcome{Succeeded: true})
+		default:
+			a.Settle(ctx, GateOutcome{Unknown: true})
+		}
 		return
 	}
 	switch rec.classify() {

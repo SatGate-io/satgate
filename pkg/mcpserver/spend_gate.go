@@ -37,18 +37,24 @@ const counterGrace = time.Hour
 //   - it was never sent (a dial or connect failure before any byte of the
 //     request was written, a request that could not be built, a refusal by
 //     a later gate, a session closed before dispatch), or
-//   - the upstream answered with a JSON-RPC error ("I did not do this"), or
-//   - the upstream answered with a result whose isError is true (the
-//     documented residual: if an upstream reports isError after a partial
-//     fill, the owner gets that much extra headroom).
+//   - the upstream answered with a JSON-RPC protocol error that by the
+//     JSON-RPC 2.0 specification means the request was not processed:
+//     -32700 (parse error), -32600 (invalid request), -32601 (method not
+//     found), -32602 (invalid params).
 //
 // It is kept for everything else: the amount stays counted when the upstream
-// accepted the call, and also when the call was sent and its fate is unknown
-// (a timeout after the send, a connection reset or closed after the send, an
-// unreadable or partial reply, a context ended after dispatch, an HTTP error
-// status with no JSON-RPC body). An order whose reply was lost may have been
-// placed, and a limit that refunded it would let the agent spend past the
-// owner's maximum. Those are logged as "outcome unknown; reservation kept".
+// accepted the call, and also when the call was sent and SatGate cannot tell
+// whether it ran: any other JSON-RPC error (-32603 Internal error,
+// -32000..-32099, any other code), a result with isError=true (a tool can
+// fail after a partial or full execution), a timeout after the send, a
+// connection reset or closed after the send, an unreadable or partial reply,
+// a context ended after dispatch, an HTTP error status with no JSON-RPC body,
+// a redirect of the call. An order that may have been placed must stay
+// counted, or the agent could spend past the owner's maximum. Those are
+// logged as "outcome unknown; reservation kept".
+//
+// Known effect, accepted: an order the broker itself rejects (insufficient
+// funds, market closed) still counts toward the day's total.
 type SpendGate struct {
 	store toolcontrols.SpendStore
 
