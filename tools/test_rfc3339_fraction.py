@@ -1,4 +1,10 @@
-"""parse_rfc3339 accepts every RFC3339 fractional-second length.
+"""parse_rfc3339 accepts every RFC 3339 date-time shape and nothing else.
+
+Round 2: the string is checked against the RFC 3339 section 5.6 grammar (strict
+regex, ASCII digits, then range checks) BEFORE any normalisation or
+datetime.fromisoformat. fromisoformat tolerates non-RFC3339 shapes (missing
+seconds, space separator, offsets with seconds, +00:60); those are now rejected.
+Round 1 wrongly widened that hole by accepting lowercase "z" (Astra, NO-GO).
 
 Go's time.RFC3339Nano trims trailing zeros, so receipts carry 1-9 fractional
 digits. Python < 3.11 datetime.fromisoformat accepts only 3 or 6 digits, which
@@ -85,6 +91,77 @@ ACCEPT = [
     ("2026-07-15T23:59:59.9999999-12:00", utc(2026, 7, 15, 23, 59, 59, 999999, -720)),
 ]
 
+# Astra's matrix: shapes datetime.fromisoformat tolerates (or round 1 let in) that
+# are NOT RFC 3339 section 5.6. Each is rejected as malformed_<field> on every
+# Python. Comment = behaviour before this round on (3.9 / 3.11):
+#   main = origin/main before PR #226, r1 = PR head before round 2, new = now.
+NON_RFC3339_SHAPES = [
+    "2026-07-15T12:56z",        # main: reject, r1: ACCEPT (Astra's finding), new: reject
+    "2026-07-15T12:56Z",        # main/r1: accept (no seconds), new: reject
+    "2026-07-15T12:56+00:00",   # main/r1: accept (no seconds), new: reject
+    "2026-07-15 12:56:55Z",     # main/r1: accept (space separator), new: reject
+    "2026-07-15 12:56:55+00:00",  # main/r1: accept, new: reject
+    "2026-07-15 12:56:55z",
+    "2026-07-15T12:56:55+00:00:30",  # main/r1: accept (seconds in offset), new: reject
+    "2026-07-15T12:56:55+00:00:00",
+    "2026-07-15T12:56:55+00",   # main/r1: reject on 3.9, accept on 3.11; new: reject on both
+    "2026-07-15T12:56:55+0000",  # same: 3.9 reject, 3.11 accept; new: reject on both
+    "20260715T125655Z",         # 3.11 accepts basic format; new: reject
+    "2026-07-15T12:56:55,5Z",   # 3.11 accepts comma fraction; new: reject
+    "2026-07-15T12:56:55.Z",    # main: accept (empty fraction), r1/new: reject
+    "2026-07-15T12:56:55.+00:00",
+    "2026-07-15T\u0661\u0662:56:55Z",   # non-ASCII digits
+    "\uff12026-07-15T12:56:55Z",         # fullwidth digit
+    "2026-07-15T12:56:55Z ",    # trailing whitespace
+    " 2026-07-15T12:56:55Z",    # leading whitespace
+    "2026-07-15T12:56:55Z\n",   # trailing newline ($ would allow it; fullmatch does not)
+    "2026-07-15T12:56:55\tZ",
+]
+
+# Grammar matches but a field is out of range.
+RANGE_ERRORS = [
+    "2026-00-10T12:00:00Z",   # month 00
+    "2026-13-01T12:00:00Z",   # month 13
+    "2026-07-00T12:00:00Z",   # day 00
+    "2026-07-32T12:00:00Z",
+    "2026-04-31T12:00:00Z",   # 30-day month
+    "2026-02-29T12:00:00Z",   # not a leap year
+    "2100-02-29T12:00:00Z",   # century, not a leap year
+    "2026-07-15T24:00:00Z",   # hour 24
+    "2026-07-15T12:60:00Z",   # minute 60
+    "2026-07-15T12:56:61Z",   # second 61
+    "2026-07-15T12:56:99Z",
+    # second 60 passes the section 5.6 range check (leap second) but datetime has
+    # no leap seconds, so it is rejected (fail closed). Go's time.Parse rejects
+    # it too, so gateway receipts never carry it.
+    "2016-12-31T23:59:60Z",
+    "2026-07-15T12:56:55+24:00",   # offset hour 24
+    "2026-07-15T12:56:55-24:00",
+    "2026-07-15T12:56:55+00:60",   # offset minute 60 (main/r1: accepted, read as +01:00)
+    "2026-07-15T12:56:55-05:99",
+    "0000-01-01T00:00:00Z",        # year 0
+    # datetime overflow after offset conversion: main/r1 raised OverflowError
+    # (uncaught crash); now a clean malformed_<field>.
+    "9999-12-31T23:59:59-01:00",
+    "0001-01-01T00:00:00+01:00",
+]
+
+# Valid RFC 3339 that must stay accepted (also in ACCEPT above).
+ACCEPT += [
+    ("2026-07-15t12:56:55z", utc(2026, 7, 15, 12, 56, 55)),             # lowercase t and z
+    ("2026-07-15t12:56:55+00:00", utc(2026, 7, 15, 12, 56, 55)),
+    ("2026-07-15T12:56:55-00:00", utc(2026, 7, 15, 12, 56, 55)),        # RFC 3339 "unknown local offset"
+    ("2026-07-15T12:56:55.5-00:00", utc(2026, 7, 15, 12, 56, 55, 500000)),
+    ("2026-07-15T12:56:55+23:59", utc(2026, 7, 15, 12, 56, 55, 0, 1439)),
+    ("2026-07-15T12:56:55-23:59", utc(2026, 7, 15, 12, 56, 55, 0, -1439)),
+    ("2024-02-29T12:00:00Z", utc(2024, 2, 29, 12, 0, 0)),               # leap day
+    ("2000-02-29T12:00:00Z", utc(2000, 2, 29, 12, 0, 0)),               # 400-year leap
+    ("2026-12-31T23:59:59Z", utc(2026, 12, 31, 23, 59, 59)),
+    ("0001-01-01T00:00:00Z", utc(1, 1, 1, 0, 0, 0)),
+    ("9999-12-31T23:59:59.999999999Z", utc(9999, 12, 31, 23, 59, 59, 999999)),
+    ("2026-01-01T00:00:00.000000001Z", utc(2026, 1, 1, 0, 0, 0)),       # nanosecond truncates to 0us
+]
+
 REJECT = [
     "2026-07-15T12:56:55",            # no timezone
     "2026-07-15T12:56:55.5",          # fraction, no timezone
@@ -106,7 +183,7 @@ REJECT = [
     "2026-07-15T12:56:55.5+25:00",    # impossible offset
     "2026-13-15T12:56:55.5Z",         # impossible date
     "2026-07-15T12:56:55.5Zjunk",
-]
+] + NON_RFC3339_SHAPES + RANGE_ERRORS
 
 
 def parse(module, value):
@@ -192,6 +269,55 @@ class CopiesStayInSync(unittest.TestCase):
             return text[start:text.index("def issuer_jwks_url(")]
 
         self.assertEqual(body(COPIES["tools"]), body(COPIES["demo"]))
+
+
+class SignedReceiptRejectsNonRfc3339(unittest.TestCase):
+    """Astra's scenario: a validly signed receipt whose issued_at is not RFC 3339.
+
+    Round 1 verified `...T12:56z` as valid (lowercase z + fromisoformat's
+    tolerance for a missing seconds field). The signature is fine; the
+    timestamp grammar is what must fail.
+    """
+
+    SHAPES = (
+        "2026-01-01T00:00z",           # Astra's case
+        "2026-01-01T00:00Z",
+        "2026-01-01 00:00:00Z",
+        "2026-01-01T00:00:00+00:00:30",
+        "2026-01-01T00:00:00+00:60",
+    )
+
+    def check(self, tools):
+        for stamp in self.SHAPES:
+            with self.subTest(issued_at=stamp):
+                f = paid.Fixture()
+                receipt = f.receipt("denied", "capability_invalid")
+                receipt["issued_at"] = stamp
+                signed = f.sign(receipt)
+                self.assertEqual(signed["issued_at"], stamp)
+                result = tools.verify_pack(f.pack(receipt), jwks=f.jwks, now=paid.NOW, allow_mock=True)
+                self.assertFalse(result["valid"], result)
+                self.assertIn("malformed_issued_at", result["reason_codes"])
+                # The signature itself is genuine: only the grammar check fails.
+                self.assertTrue(result["checks"]["receipt_0_signature_valid"], result["checks"])
+
+    def test_tools_copy(self):
+        self.check(load(COPIES["tools"], "verify_tools_astra"))
+
+    def test_demo_copy(self):
+        self.check(load(COPIES["demo"], "verify_demo_astra"))
+
+    def test_valid_rfc3339_with_seconds_still_verifies(self):
+        tools = load(COPIES["tools"], "verify_tools_astra_ok")
+        for stamp in ("2026-01-01T00:00:00z", "2026-01-01t00:00:00Z", "2026-01-01T00:00:00-00:00",
+                      "2026-01-01T00:00:00.123456789+00:00"):
+            with self.subTest(issued_at=stamp):
+                f = paid.Fixture()
+                receipt = f.receipt("denied", "capability_invalid")
+                receipt["issued_at"] = stamp
+                receipt["timestamp"] = stamp
+                result = tools.verify_pack(f.pack(receipt), jwks=f.jwks, now=paid.NOW, allow_mock=True)
+                self.assertTrue(result["valid"], result)
 
 
 class SignedReceiptKeepsOriginalString(unittest.TestCase):
