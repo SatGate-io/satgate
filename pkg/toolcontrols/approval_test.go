@@ -156,9 +156,11 @@ func TestCallHash(t *testing.T) {
 	if h("tok", "p", `{"name":"p","arguments":{"l":[1,2]}}`) == h("tok", "p", `{"name":"p","arguments":{"l":[2,1]}}`) {
 		t.Error("array order ignored")
 	}
-	// No arguments and empty arguments are the same call.
-	if h("tok", "p", `{"name":"p"}`) != h("tok", "p", `{"name":"p","arguments":{}}`) {
-		t.Error("absent and empty arguments differ")
+	// Absent, null and empty arguments are three different byte strings. They
+	// are three calls: the hash does not decide that a consumer reads them alike.
+	abs, null, empty := h("tok", "p", `{"name":"p"}`), h("tok", "p", `{"name":"p","arguments":null}`), h("tok", "p", `{"name":"p","arguments":{}}`)
+	if abs == null || abs == empty || null == empty {
+		t.Error("absent, null and empty arguments share a hash")
 	}
 }
 
@@ -170,7 +172,7 @@ func TestCallHashRefusesUnreadableCalls(t *testing.T) {
 		"args array":  `{"name":"p","arguments":[1]}`,
 		"not json":    `nope`,
 		"bad utf8":    "{\"name\":\"p\",\"arguments\":{\"a\":\"\xff\"}}",
-		"too deep":    `{"name":"p","arguments":` + strings.Repeat(`{"a":`, 40) + `1` + strings.Repeat(`}`, 40) + `}`,
+		"too deep":    `{"name":"p","arguments":` + strings.Repeat(`{"a":`, 80) + `1` + strings.Repeat(`}`, 80) + `}`,
 	} {
 		if _, err := CallHash("tok", "p", json.RawMessage(p)); err == nil {
 			t.Errorf("%s: hashed", name)
@@ -357,5 +359,18 @@ func TestApprovalIDShape(t *testing.T) {
 		if ValidApprovalID(bad) {
 			t.Errorf("%q accepted", bad)
 		}
+	}
+}
+
+func TestOwnerSummaryHasNoNULForTheDatabase(t *testing.T) {
+	s := OwnerSummary(json.RawMessage(`{"name":"p","arguments":{"memo":"a\u0000b","k\u0000":1}}`), "f")
+	for _, it := range s {
+		if strings.ContainsRune(it.Name, 0) || strings.ContainsRune(it.Value, 0) {
+			t.Fatalf("NUL in summary: %+v", it)
+		}
+	}
+	b, _ := json.Marshal(s)
+	if strings.Contains(string(b), `\u0000`) {
+		t.Fatalf("summary JSON holds \\u0000: %s", b)
 	}
 }

@@ -403,7 +403,10 @@ func TestApprovalFailsClosed(t *testing.T) {
 		t.Fatal("unreadable amount forwarded")
 	}
 
-	// A notifier that fails does not stop the hold; the next repeat tries again.
+	// A notifier that fails does not stop the hold. The failed email is not
+	// retried by every repeat of the call (that would be an unbounded mail
+	// loop); the approval joins the tenant's backlog and is counted in the
+	// next "N more orders are waiting" summary.
 	c := newApprovalHarness(t, askAbove50)
 	c.notifier.err = errors.New("mail down")
 	r = c.call(t, 1, "place_crypto_order", order("75"))
@@ -413,8 +416,11 @@ func TestApprovalFailsClosed(t *testing.T) {
 	c.notifier.err = nil
 	c.call(t, 2, "place_crypto_order", order("75"))
 	c.call(t, 3, "place_crypto_order", order("75"))
-	if c.notifier.count() != 2 {
-		t.Fatalf("notices = %d, want one failed try and one that worked", c.notifier.count())
+	if c.notifier.count() != 1 {
+		t.Fatalf("notices = %d, want the one failed try and no retry per repeat", c.notifier.count())
+	}
+	if n, ok := c.approvals.TakeSummary("tenant-1", c.clock.Add(3*time.Minute)); !ok || n != 1 {
+		t.Fatalf("summary = %d %v, want the failed approval counted once", n, ok)
 	}
 }
 
@@ -430,8 +436,16 @@ func TestApprovalQueueIsBounded(t *testing.T) {
 	if d := errData(t, r); d["error"] != "APPROVAL_QUEUE_FULL" {
 		t.Fatalf("data = %v", d)
 	}
-	if a.notifier.count() != toolcontrols.MaxPendingApprovals {
+	// The tenant's mail cap (10 an hour) is below the token's queue (20): the
+	// other ten are held and listed, and wait for a summary.
+	if a.notifier.count() != toolcontrols.MaxApprovalEmailsPerHour {
 		t.Fatalf("notices = %d", a.notifier.count())
+	}
+	if len(a.approvals.Rows()) != toolcontrols.MaxPendingApprovals {
+		t.Fatalf("rows = %d", len(a.approvals.Rows()))
+	}
+	if a.rr.forwarded() != 0 {
+		t.Fatal("a refused call was forwarded")
 	}
 }
 
@@ -552,5 +566,212 @@ func TestApprovedCallFollowsTheSpendReleaseRule(t *testing.T) {
 				t.Fatalf("counter = %d, want %d", a.counter(t), want)
 			}
 		})
+	}
+}
+
+// orderSymbol is an order whose symbol is written exactly as given (JSON
+// escapes included), so a test can send a lone surrogate.
+func orderSymbol(amount, symbolJSON string) string {
+	return `{"side":"buy","type":"market","symbol":"` + symbolJSON + `","dollar_amount":"` + amount + `"}`
+}
+
+// Astra's round-2 blocker: the owner approves a call with symbol "\ufffd";
+// the agent retries with "\ud800". encoding/json read both as U+FFFD, so the
+// changed call used the approval and was forwarded with its own raw bytes. A
+// call that cannot be read without loss is now refused outright.
+func TestApprovalLosslessMatchingRefusesChangedSurrogate(t *testing.T) {
+	for name, tc := range map[string]struct{ approved, retried string }{
+		"fffd then lone high":  {`\ufffd`, `\ud800`},
+		"lone high then other": {`\ud800`, `\ud801`},
+		"fffd then lone low":   {`\ufffd`, `\udc00`},
+	} {
+		t.Run(name, func(t *testing.T) {
+			a := newApprovalHarness(t, askAbove50)
+			// The approved call is only held if it can be read; a lone half is
+			// refused at the first send, so approve the readable one when there is one.
+			first := a.call(t, 1, "place_crypto_order", orderSymbol("75", tc.approved))
+			d := errData(t, first)
+			if strings.Contains(tc.approved, `\ud8`) {
+				if d["error"] != "APPROVAL_CHECK_FAILED" {
+					t.Fatalf("a lone surrogate was held: %v", d)
+				}
+				if len(a.approvals.Rows()) != 0 {
+					t.Fatal("a call that cannot be read left a row")
+				}
+			} else {
+				if err := a.approvals.Approve("tenant-1", d["approval_id"].(string), "owner@example.com", a.clock); err != nil {
+					t.Fatal(err)
+				}
+			}
+			rowsBefore, mailBefore := len(a.approvals.Rows()), a.notifier.count()
+
+			r := a.call(t, 2, "place_crypto_order", orderSymbol("75", tc.retried))
+			d = errData(t, r)
+			if d["error"] != "APPROVAL_CHECK_FAILED" || d["receipt_id"] == "" || d["evidence_url"] == "" {
+				t.Fatalf("changed call not refused with a receipt: %v", d)
+			}
+			if a.rr.forwarded() != 0 {
+				t.Fatalf("upstream = %d, want 0: the changed call was forwarded", a.rr.forwarded())
+			}
+			if len(a.approvals.Rows()) != rowsBefore || a.notifier.count() != mailBefore {
+				t.Fatalf("a refused call was held or emailed: rows %d->%d mail %d->%d",
+					rowsBefore, len(a.approvals.Rows()), mailBefore, a.notifier.count())
+			}
+			if dec := a.lastDecision(t); dec.Decision != "denied" || dec.DenialCode != "APPROVAL_CHECK_FAILED" || dec.ApprovalID != "" {
+				t.Fatalf("receipt input = %+v", dec)
+			}
+			// The reply and the receipt name no value from the call.
+			if strings.Contains(r.Error.Message, "ud800") || strings.Contains(string(r.Error.Data), "ud800") {
+				t.Fatal("the refusal repeats the call's value")
+			}
+		})
+	}
+}
+
+// Every way a call can be unreadable without loss is refused on a token with
+// an approval rule, even below the threshold and even for a tool the rule does
+// not cover: nothing held, no email, nothing forwarded.
+func TestApprovalRefusesCallsThatCannotBeReadWithoutLoss(t *testing.T) {
+	for name, args := range map[string]string{
+		"lone high surrogate":        orderSymbol("75", `\ud800`),
+		"lone low surrogate":         orderSymbol("75", `\udc00`),
+		"reversed pair":              orderSymbol("75", `\udc00\ud800`),
+		"surrogate in a key":         `{"sym\ud800bol":"x","dollar_amount":"75"}`,
+		"surrogate deep":             `{"dollar_amount":"75","legs":[{"a":{"b":["\ud800"]}}]}`,
+		"duplicate key at depth":     `{"dollar_amount":"75","legs":[{"a":1,"a":2}]}`,
+		"duplicate nested object":    `{"dollar_amount":"75","o":{"k":1,"k":1}}`,
+		"number too long":            `{"dollar_amount":"75","n":` + strings.Repeat("9", 80) + `}`,
+		"number not finite":          `{"dollar_amount":"75","n":1e999}`,
+		"number past 40 digits":      `{"dollar_amount":"75","n":` + strings.Repeat("1", 41) + `}`,
+		"below threshold, surrogate": orderSymbol("10", `\ud800`),
+	} {
+		t.Run(name, func(t *testing.T) {
+			a := newApprovalHarness(t, askAbove50)
+			r := a.call(t, 1, "place_crypto_order", args)
+			if d := errData(t, r); d["error"] != "APPROVAL_CHECK_FAILED" || d["receipt_id"] == "" {
+				t.Fatalf("data = %v", d)
+			}
+			if a.rr.forwarded() != 0 || len(a.approvals.Rows()) != 0 || a.notifier.count() != 0 {
+				t.Fatalf("forwarded=%d rows=%d mail=%d", a.rr.forwarded(), len(a.approvals.Rows()), a.notifier.count())
+			}
+			if dec := a.lastDecision(t); dec.Decision != "denied" || dec.DenialCode != "APPROVAL_CHECK_FAILED" {
+				t.Fatalf("receipt input = %+v", dec)
+			}
+		})
+	}
+	// Invalid UTF-8 anywhere in the body.
+	a := newApprovalHarness(t, askAbove50)
+	params := "{\"name\":\"place_crypto_order\",\"arguments\":{\"dollar_amount\":\"75\",\"symbol\":\"B\xffC\"},\"_meta\":{\"token\":\"" + a.token + "\"}}"
+	req := &Request{JSONRPC: "2.0", ID: json.RawMessage("1"), Method: MethodToolsCall, Params: json.RawMessage(params)}
+	resp, err := a.proxy.handleRequest(context.Background(), req)
+	if err != nil || resp == nil || resp.Error == nil {
+		t.Fatalf("invalid UTF-8 not refused: %+v %v", resp, err)
+	}
+	if a.rr.forwarded() != 0 || len(a.approvals.Rows()) != 0 || a.notifier.count() != 0 {
+		t.Fatal("invalid UTF-8 call was forwarded, held or emailed")
+	}
+}
+
+// A valid surrogate pair is an ordinary character and stays allowed: it is
+// held, approved and forwarded once like any other call.
+func TestApprovalAllowsAValidSurrogatePair(t *testing.T) {
+	a := newApprovalHarness(t, askAbove50)
+	r := a.call(t, 1, "place_crypto_order", orderSymbol("75", `\ud83d\ude00`))
+	id := errData(t, r)["approval_id"].(string)
+	if err := a.approvals.Approve("tenant-1", id, "owner@example.com", a.clock); err != nil {
+		t.Fatal(err)
+	}
+	if r := a.call(t, 2, "place_crypto_order", orderSymbol("75", `\ud83d\ude00`)); r.Error != nil {
+		t.Fatalf("approved call with a valid pair refused: %v", r.Error)
+	}
+	if a.rr.forwarded() != 1 {
+		t.Fatalf("forwarded = %d", a.rr.forwarded())
+	}
+}
+
+// tokenFor mints another token of the same tenant with its own id (a delegated
+// child or a rotated token is a new token to the store) and the same rule.
+func (a *approvalHarness) tokenFor(t *testing.T, budget string) string {
+	t.Helper()
+	svc, tok := mintBudgetToken(t, argTestRoot, "place_crypto_order,place_equity_order", "tenant-1", budget, "50")
+	return appendCaveat(t, svc, tok, controlWord(t, askAbove50))
+}
+
+func (a *approvalHarness) callAs(t *testing.T, token string, id int, args string) *Response {
+	t.Helper()
+	resp, err := a.proxy.handleRequest(context.Background(), argCall(id, token, "place_crypto_order", args))
+	if err != nil || resp == nil {
+		t.Fatalf("handleRequest: %v %v", resp, err)
+	}
+	return resp
+}
+
+// Email volume: 30 tokens of one tenant each hold a call. The owner gets 10
+// emails in the hour, every call is still held and listed, and one summary
+// (a count, no amounts or symbols) follows when the hour allows.
+func TestApprovalEmailsAreCappedPerTenantWithOneSummary(t *testing.T) {
+	a := newApprovalHarness(t, askAbove50)
+	for i := 0; i < 30; i++ {
+		r := a.callAs(t, a.tokenFor(t, "budget-"+leftPad(i)), i+1, order("75"))
+		if errData(t, r)["error"] != "APPROVAL_REQUIRED" {
+			t.Fatalf("token %d: %v", i, r.Error)
+		}
+	}
+	if got := len(a.approvals.Rows()); got != 30 {
+		t.Fatalf("held = %d, want all 30 listed", got)
+	}
+	if got := a.notifier.count(); got != toolcontrols.MaxApprovalEmailsPerHour {
+		t.Fatalf("emails = %d, want %d", got, toolcontrols.MaxApprovalEmailsPerHour)
+	}
+	if a.rr.forwarded() != 0 {
+		t.Fatal("a held call was forwarded")
+	}
+	// A burst is not announced the moment it starts.
+	if n, ok := a.approvals.TakeSummary("tenant-1", a.clock.Add(time.Minute)); ok {
+		t.Fatalf("summary before the delay: %d", n)
+	}
+	// Then one summary counts the 20 held without an email, and only one.
+	n, ok := a.approvals.TakeSummary("tenant-1", a.clock.Add(3*time.Minute))
+	if !ok || n != 20 {
+		t.Fatalf("summary = %d %v, want 20", n, ok)
+	}
+	if _, ok := a.approvals.TakeSummary("tenant-1", a.clock.Add(4*time.Minute)); ok {
+		t.Fatal("a second summary for the same backlog")
+	}
+}
+
+// At most 50 approvals wait across all of a tenant's tokens. The 51st is
+// refused APPROVAL_QUEUE_FULL with a signed receipt: nothing held, no email.
+func TestApprovalTenantQueueRefusesThe51st(t *testing.T) {
+	a := newApprovalHarness(t, askAbove50)
+	tokens := []string{a.tokenFor(t, "budget-a"), a.tokenFor(t, "budget-b"), a.tokenFor(t, "budget-c")}
+	n := 0
+	for n < toolcontrols.MaxPendingApprovalsPerTenant {
+		tok := tokens[n/toolcontrols.MaxPendingApprovals] // 20 + 20 + 10: no token hits its own bound first
+		r := a.callAs(t, tok, n+1, order("60."+leftPad(n)))
+		if errData(t, r)["error"] != "APPROVAL_REQUIRED" {
+			t.Fatalf("call %d: %v", n+1, r.Error)
+		}
+		n++
+	}
+	rows, mail := len(a.approvals.Rows()), a.notifier.count()
+	if rows != 50 {
+		t.Fatalf("rows = %d", rows)
+	}
+	r := a.callAs(t, tokens[2], 100, order("99.99"))
+	d := errData(t, r)
+	if d["error"] != "APPROVAL_QUEUE_FULL" || d["receipt_id"] == "" || d["evidence_url"] == "" {
+		t.Fatalf("51st: %v", d)
+	}
+	if dec := a.lastDecision(t); dec.Decision != "denied" || dec.DenialCode != "APPROVAL_QUEUE_FULL" {
+		t.Fatalf("receipt input = %+v", dec)
+	}
+	if len(a.approvals.Rows()) != rows || a.notifier.count() != mail || a.rr.forwarded() != 0 {
+		t.Fatalf("51st was held, emailed or forwarded: rows %d->%d mail %d->%d forwarded %d",
+			rows, len(a.approvals.Rows()), mail, a.notifier.count(), a.rr.forwarded())
+	}
+	// A call that is already waiting is still answered, not refused.
+	if r := a.callAs(t, tokens[0], 101, order("60."+leftPad(0))); errData(t, r)["error"] != "APPROVAL_REQUIRED" {
+		t.Fatalf("a waiting call was refused: %v", r.Error)
 	}
 }

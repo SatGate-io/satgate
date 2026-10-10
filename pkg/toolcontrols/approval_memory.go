@@ -33,8 +33,16 @@ type MemoryApprovalStore struct {
 	mu   sync.Mutex
 	rows []*MemoryApproval
 	seq  int
+	// mail is the tenants' email log: one entry per approval email slot used
+	// (kind "approval") and per summary sent (kind "summary").
+	mail []memoryMail
 	// Err, when set, is returned by every call (a store that is down).
 	Err error
+}
+
+type memoryMail struct {
+	tenant, kind string
+	at           time.Time
 }
 
 // MemoryApproval is one row of the memory store.
@@ -44,7 +52,11 @@ type MemoryApproval struct {
 	State                                               string
 	CreatedAt, ExpiresAt                                time.Time
 	NotifiedAt                                          time.Time
-	DecidedBy                                           string
+	// NoticeAt is when an email slot was reserved for the approval's own
+	// email; SummarizedAt is when it was counted in a summary email. A waiting
+	// approval with neither is part of the tenant's unannounced backlog.
+	NoticeAt, SummarizedAt time.Time
+	DecidedBy              string
 }
 
 // NewMemoryApprovalStore returns an empty store.
@@ -73,7 +85,7 @@ func (m *MemoryApprovalStore) Decide(_ context.Context, req ApprovalRequest) (Ap
 			newest.State = StateUsed
 			return ApprovalDecision{Outcome: ApprovalConsumed, ApprovalID: newest.ID, ExpiresAt: newest.ExpiresAt}, nil
 		case newest.State == StatePending && live:
-			return ApprovalDecision{Outcome: ApprovalHeld, ApprovalID: newest.ID, ExpiresAt: newest.ExpiresAt, NeedsNotice: newest.NotifiedAt.IsZero()}, nil
+			return ApprovalDecision{Outcome: ApprovalHeld, ApprovalID: newest.ID, ExpiresAt: newest.ExpiresAt}, nil
 		case newest.State == StateDenied && live:
 			return ApprovalDecision{Outcome: ApprovalDenied, ApprovalID: newest.ID, ExpiresAt: newest.ExpiresAt}, nil
 		case newest.State == StatePending || newest.State == StateApproved:
@@ -82,13 +94,17 @@ func (m *MemoryApprovalStore) Decide(_ context.Context, req ApprovalRequest) (Ap
 		}
 		// A denied approval that ran out: ask again below.
 	}
-	waiting := 0
+	waiting, waitingTenant := 0, 0
 	for _, r := range m.rows {
-		if r.TenantID == req.TenantID && r.TokenID == req.TokenID && r.State == StatePending && req.Now.Before(r.ExpiresAt) {
+		if r.TenantID != req.TenantID || r.State != StatePending || !req.Now.Before(r.ExpiresAt) {
+			continue
+		}
+		waitingTenant++
+		if r.TokenID == req.TokenID {
 			waiting++
 		}
 	}
-	if waiting >= MaxPendingApprovals {
+	if waiting >= MaxPendingApprovals || waitingTenant >= MaxPendingApprovalsPerTenant {
 		return ApprovalDecision{Outcome: ApprovalQueueFull}, nil
 	}
 	id, err := NewApprovalID()
@@ -105,7 +121,27 @@ func (m *MemoryApprovalStore) Decide(_ context.Context, req ApprovalRequest) (Ap
 		State: StatePending, CreatedAt: req.Now, ExpiresAt: req.Now.Add(ttl),
 	}
 	m.rows = append(m.rows, row)
-	return ApprovalDecision{Outcome: ApprovalHeld, ApprovalID: id, ExpiresAt: row.ExpiresAt, NeedsNotice: true}, nil
+	// The owner is emailed about this approval only if the tenant has an
+	// approval-email slot left in the rolling hour.
+	notice := false
+	if m.slotsUsed(req.TenantID, "approval", req.Now) < MaxApprovalEmailsPerHour {
+		m.mail = append(m.mail, memoryMail{req.TenantID, "approval", req.Now})
+		row.NoticeAt = req.Now
+		notice = true
+	}
+	return ApprovalDecision{Outcome: ApprovalHeld, ApprovalID: id, ExpiresAt: row.ExpiresAt, NeedsNotice: notice}, nil
+}
+
+// slotsUsed counts the tenant's emails of one kind in the rolling hour ending
+// at now.
+func (m *MemoryApprovalStore) slotsUsed(tenant, kind string, now time.Time) int {
+	n := 0
+	for _, e := range m.mail {
+		if e.tenant == tenant && e.kind == kind && e.at.After(now.Add(-ApprovalMailWindow)) && !e.at.After(now) {
+			n++
+		}
+	}
+	return n
 }
 
 // MarkNotified implements ApprovalStore.
@@ -119,6 +155,53 @@ func (m *MemoryApprovalStore) MarkNotified(_ context.Context, tenantID, approval
 		r.NotifiedAt = at
 	}
 	return nil
+}
+
+// NoticeFailed implements ApprovalStore: the approval's own email was not
+// sent, so it joins the unannounced backlog and is counted in the next summary.
+// The email slot stays used.
+func (m *MemoryApprovalStore) NoticeFailed(_ context.Context, tenantID, approvalID string) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if m.Err != nil {
+		return m.Err
+	}
+	if r := m.find(tenantID, approvalID); r != nil && r.NotifiedAt.IsZero() {
+		r.NoticeAt = time.Time{}
+	}
+	return nil
+}
+
+// TakeSummary says how many of the tenant's approvals are waiting without an
+// email of their own, and marks them counted, when a summary is due: the
+// oldest of them has waited at least SummaryDelay (so a burst is one summary,
+// not one per call) and the tenant has not been sent a summary in the last
+// ApprovalMailWindow. The caller then sends one email that says how many
+// orders wait (no amounts, no symbols). ok is false when nothing is due.
+func (m *MemoryApprovalStore) TakeSummary(tenantID string, now time.Time) (n int, ok bool) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if m.slotsUsed(tenantID, "summary", now) >= MaxApprovalSummariesPerHour {
+		return 0, false
+	}
+	var rows []*MemoryApproval
+	oldest := now
+	for _, r := range m.rows {
+		if r.TenantID == tenantID && r.State == StatePending && now.Before(r.ExpiresAt) && r.NoticeAt.IsZero() && r.SummarizedAt.IsZero() {
+			rows = append(rows, r)
+			if r.CreatedAt.Before(oldest) {
+				oldest = r.CreatedAt
+			}
+		}
+	}
+	if len(rows) == 0 || now.Sub(oldest) < SummaryDelay {
+		return 0, false
+	}
+	for _, r := range rows {
+		r.SummarizedAt = now
+	}
+	m.mail = append(m.mail, memoryMail{tenantID, "summary", now})
+	return len(rows), true
 }
 
 func (m *MemoryApprovalStore) find(tenantID, id string) *MemoryApproval {

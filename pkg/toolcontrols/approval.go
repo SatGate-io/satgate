@@ -47,6 +47,26 @@ const ApprovalTTL = 15 * time.Minute
 // an agent cannot fill the owner's inbox by changing one argument at a time.
 const MaxPendingApprovals = 20
 
+// MaxPendingApprovalsPerTenant bounds the calls a whole tenant can have waiting
+// at once across all its tokens. A delegated child is a new token, so the
+// per-token bound alone multiplies with the number of tokens.
+const MaxPendingApprovalsPerTenant = 50
+
+// Email volume. A tenant is sent at most MaxApprovalEmailsPerHour approval
+// emails in any rolling ApprovalMailWindow, however many tokens it has. A call
+// over the cap is still held and still on the owner's approvals page; only its
+// email is held back. The held-back calls (and the ones whose email failed) are
+// announced by one summary, "N more orders are waiting for your approval", with
+// no amounts or symbols: at most MaxApprovalSummariesPerHour per window, sent
+// once the oldest of them has waited SummaryDelay, so a burst is one summary.
+// The summary is not an approval email and does not use one of the ten.
+const (
+	MaxApprovalEmailsPerHour    = 10
+	MaxApprovalSummariesPerHour = 1
+	ApprovalMailWindow          = time.Hour
+	SummaryDelay                = 2 * time.Minute
+)
+
 // ApprovalRule holds calls above a threshold for the owner.
 type ApprovalRule struct {
 	// Tools are the tools the rule covers, sorted.
@@ -190,17 +210,31 @@ func DescribeApprovals(rules []ApprovalRule) []string {
 // ---- The call a held approval is bound to ------------------------------------
 
 // ErrCallUnreadable means the call cannot be turned into one canonical form
-// (repeated keys, invalid UTF-8, nesting too deep, not an object).
+// without loss (see strictjson.go): repeated keys at any depth, invalid UTF-8,
+// an unpaired UTF-16 surrogate escape, a number the canonical form cannot keep
+// exactly, nesting too deep, or not an object. The error text names the kind of
+// problem and never holds a value from the call.
 var ErrCallUnreadable = errors.New("the call could not be read")
 
-const maxCallNesting = 16
+// maxCallNesting is the same bound argument rules use (argrules maxCallJSONDepth).
+const maxCallNesting = 64
 
 // CallHash binds an approval to one call: it is the SHA-256 of the token id,
-// the tool and the canonical form of the call's arguments. The canonical form
-// sorts object keys, drops insignificant whitespace and keeps every number as
-// written, so the same call sent again hashes the same however the client
-// formats it, and any changed value hashes differently. The JSON-RPC id and
-// _meta are not part of the call.
+// the tool and the canonical form of the call. What is hashed must identify
+// exactly what is forwarded, so the call is read by the strict, lossless
+// reader in strictjson.go, which refuses what it cannot read without loss
+// instead of normalising it. Two calls hash equal only if the strict reader
+// reads them as equal values.
+//
+// The canonical form sorts object keys and drops insignificant whitespace and
+// escape spelling; it keeps every number as written ("75", "75.0" and "7.5e1"
+// are three calls) and keeps "arguments" absent, null and {} apart. Every
+// top-level member is part of the call (arguments, and anything else an
+// upstream might read), including _meta, which is forwarded as sent. Two
+// members of _meta are left out on purpose: token (the credential; the call
+// is already bound to the token id) and progressToken (a per-request
+// correlation value a client changes on every send; it names progress
+// notifications, not what is ordered). The JSON-RPC id is not in params.
 //
 // The hash is one-way. It is safe to keep next to an approval; it is not a
 // way to read the call back.
@@ -208,42 +242,55 @@ func CallHash(tokenID, tool string, params json.RawMessage) (string, error) {
 	if tokenID == "" || tool == "" {
 		return "", ErrCallUnreadable
 	}
-	if !utf8.Valid(params) {
+	v, err := readStrict(params)
+	if err != nil {
+		return "", err
+	}
+	top, ok := v.(objectEntries)
+	if !ok {
 		return "", ErrCallUnreadable
 	}
-	if err := argrules.CheckDuplicateKeys(params, maxCallNesting); err != nil {
+	// A key that differs from name, arguments or _meta only by letter case may
+	// be read as that member by an upstream whose decoder folds case.
+	for k := range top {
+		if k != "name" && k != "arguments" && k != "_meta" &&
+			(strings.EqualFold(k, "name") || strings.EqualFold(k, "arguments") || strings.EqualFold(k, "_meta")) {
+			return "", unreadable("a member name differs from a reserved one only by letter case")
+		}
+	}
+	if name, ok := top["name"].(string); !ok || name != tool {
 		return "", ErrCallUnreadable
 	}
-	var top struct {
-		Name      string          `json:"name"`
-		Arguments json.RawMessage `json:"arguments"`
+	call := objectEntries{}
+	for k, val := range top {
+		call[k] = val
 	}
-	if err := json.Unmarshal(params, &top); err != nil || top.Name != tool {
-		return "", ErrCallUnreadable
+	delete(call, "name") // equal to tool, which is hashed below
+	if meta, ok := call["_meta"].(objectEntries); ok && len(meta) > 0 {
+		kept := objectEntries{}
+		for k, val := range meta {
+			if k != "token" && k != "progressToken" {
+				kept[k] = val
+			}
+		}
+		if len(kept) == 0 {
+			delete(call, "_meta")
+		} else {
+			call["_meta"] = kept
+		}
 	}
-	args := bytes.TrimSpace(top.Arguments)
-	if len(args) == 0 || bytes.Equal(args, []byte("null")) {
-		args = []byte("{}")
-	}
-	if args[0] != '{' {
-		return "", ErrCallUnreadable
+	if args, present := call["arguments"]; present && args != nil {
+		if _, isObj := args.(objectEntries); !isObj {
+			return "", ErrCallUnreadable
+		}
 	}
 	var buf bytes.Buffer
-	dec := json.NewDecoder(bytes.NewReader(args))
-	dec.UseNumber()
-	var v interface{}
-	if err := dec.Decode(&v); err != nil {
-		return "", ErrCallUnreadable
-	}
-	if err := writeCanonical(&buf, v); err != nil {
+	if err := writeCanonical(&buf, map[string]interface{}(call)); err != nil {
 		return "", ErrCallUnreadable
 	}
 	h := sha256.New()
-	h.Write([]byte("satgate-approval-call-v1\n"))
-	h.Write([]byte(tokenID))
-	h.Write([]byte{'\n'})
-	h.Write([]byte(tool))
-	h.Write([]byte{'\n'})
+	// Length-prefixed, so no token id and tool can be re-split into another pair.
+	fmt.Fprintf(h, "satgate-approval-call-v2\n%d:%s\n%d:%s\n", len(tokenID), tokenID, len(tool), tool)
 	h.Write(buf.Bytes())
 	return hex.EncodeToString(h.Sum(nil)), nil
 }
@@ -258,8 +305,8 @@ func writeCanonical(buf *bytes.Buffer, v interface{}) error {
 		} else {
 			buf.WriteString("false")
 		}
-	case json.Number:
-		buf.WriteString(x.String())
+	case numText:
+		buf.WriteString(string(x))
 	case string:
 		enc := json.NewEncoder(buf)
 		enc.SetEscapeHTML(false)
@@ -278,6 +325,8 @@ func writeCanonical(buf *bytes.Buffer, v interface{}) error {
 			}
 		}
 		buf.WriteByte(']')
+	case objectEntries:
+		return writeCanonical(buf, map[string]interface{}(x))
 	case map[string]interface{}:
 		keys := make([]string, 0, len(x))
 		for k := range x {
@@ -365,7 +414,11 @@ func displayValue(raw json.RawMessage) string {
 	return cutText(compact.String(), maxSummaryValue)
 }
 
+// cutText shortens s for display. A NUL character cannot be stored in a
+// Postgres text or jsonb value, so it is shown as U+2400 (the symbol for NUL);
+// this is the owner's display only, the hash binds the real bytes.
 func cutText(s string, max int) string {
+	s = strings.ReplaceAll(s, "\x00", "\u2400")
 	if utf8.RuneCountInString(s) <= max {
 		return s
 	}
@@ -390,7 +443,8 @@ const (
 	// ApprovalExpired: the waiting or approved approval ran out unused. It is
 	// reported once; the next identical call starts a new one.
 	ApprovalExpired
-	// ApprovalQueueFull: the token already has MaxPendingApprovals waiting.
+	// ApprovalQueueFull: the token already has MaxPendingApprovals waiting, or
+	// the tenant has MaxPendingApprovalsPerTenant waiting across its tokens.
 	ApprovalQueueFull
 )
 
@@ -415,8 +469,11 @@ type ApprovalDecision struct {
 	Outcome    ApprovalOutcome
 	ApprovalID string
 	ExpiresAt  time.Time
-	// NeedsNotice is true when the owner has not been told about a waiting
-	// approval yet (the first call, or an earlier notice failed).
+	// NeedsNotice is true when the store has reserved one of the tenant's
+	// MaxApprovalEmailsPerHour email slots for this approval: the caller must
+	// send the email now. It is false for an approval whose owner was already
+	// told, whose email is in flight, or whose email is over the cap (the
+	// approval is then held and listed, and counted in a later summary).
 	NeedsNotice bool
 }
 
@@ -432,12 +489,23 @@ type ApprovalDecision struct {
 //	denied, not expired         -> ApprovalDenied
 //	waiting or approved, expired-> mark expired, ApprovalExpired (reported once)
 //	anything else               -> if the token has MaxPendingApprovals
-//	                               waiting, ApprovalQueueFull; otherwise make a
-//	                               new waiting approval, ApprovalHeld
+//	                               waiting, or the tenant has
+//	                               MaxPendingApprovalsPerTenant waiting across
+//	                               its tokens, ApprovalQueueFull; otherwise make
+//	                               a new waiting approval, ApprovalHeld
+//
+// Decide also decides whether the owner is emailed: NeedsNotice is true only
+// when it reserved one of the tenant's MaxApprovalEmailsPerHour slots in the
+// last ApprovalMailWindow, atomically with the decision.
 type ApprovalStore interface {
 	Decide(ctx context.Context, req ApprovalRequest) (ApprovalDecision, error)
-	// MarkNotified records that the owner was told about the approval, so a
-	// repeat of the held call does not tell them again.
+	// NoticeFailed is called when the email Decide asked for could not be sent.
+	// The slot it used stays used (a failing mail service does not widen the
+	// cap), but the approval may be given a new slot by a repeat of the call.
+	NoticeFailed(ctx context.Context, tenantID, approvalID string) error
+	// MarkNotified records that the owner was told about the approval. The
+	// owner is told once, when the approval is made (Decide's NeedsNotice), or
+	// in a summary; a repeat of the held call never tells them again.
 	MarkNotified(ctx context.Context, tenantID, approvalID string, at time.Time) error
 }
 

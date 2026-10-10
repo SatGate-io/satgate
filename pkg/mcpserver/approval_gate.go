@@ -83,6 +83,15 @@ func (g *ApprovalGate) Admit(ctx context.Context, call GateCall) (*GateAdmission
 		return &GateAdmission{Refusal: approvalRefusal(toolcontrols.DenialCodeApprovalUnreadable, all[0].Field, "",
 			"this token asks the owner before some calls, and this call's tool name or layout cannot be matched exactly to that, so the call was not sent")}, nil
 	}
+	// What is hashed must identify exactly what is forwarded. A call whose
+	// arguments cannot be read without loss (a lone UTF-16 surrogate escape,
+	// invalid UTF-8, a repeated key at any depth, a number the canonical form
+	// cannot keep exactly) is refused for every tool on the token, whether or
+	// not it would be held: it is never forwarded, never held, never emailed.
+	if err := toolcontrols.CheckCallLossless(call.Params); err != nil {
+		return &GateAdmission{Refusal: approvalRefusal(toolcontrols.DenialCodeApprovalUnreadable, all[0].Field, "",
+			"this token asks the owner before some calls, and this call's arguments cannot be matched exactly to an approval (they cannot be read without loss), so the call was not sent")}, nil
+	}
 	var rules []toolcontrols.ApprovalRule
 	for _, r := range all {
 		if r.Covers(call.Tool) {
@@ -157,7 +166,7 @@ func (g *ApprovalGate) Admit(ctx context.Context, call GateCall) (*GateAdmission
 			g.tell(ctx, call, dec, held)
 		}
 		r := approvalRefusal(toolcontrols.DenialCodeApprovalRequired, held.Field, dec.ApprovalID,
-			fmt.Sprintf("%s: calls with %s above %s need the owner's approval; the owner has been asked",
+			fmt.Sprintf("%s: calls with %s above %s need the owner's approval; the call is waiting for the owner",
 				call.Tool, held.Field, toolcontrols.FormatAmount(held.Field, held.Above)))
 		r.Data["approval_id"] = dec.ApprovalID
 		r.Data["expires_at"] = dec.ExpiresAt.UTC().Format(time.RFC3339)
@@ -179,8 +188,8 @@ func (g *ApprovalGate) Admit(ctx context.Context, call GateCall) (*GateAdmission
 
 	case toolcontrols.ApprovalQueueFull:
 		return &GateAdmission{Refusal: approvalRefusal(toolcontrols.DenialCodeApprovalTooManyOpen, held.Field, "",
-			fmt.Sprintf("%s: this token already has %d calls waiting for the owner; wait for them before sending more",
-				call.Tool, toolcontrols.MaxPendingApprovals))}, nil
+			fmt.Sprintf("%s: too many calls are waiting for the owner (at most %d per token and %d per account); wait for them before sending more",
+				call.Tool, toolcontrols.MaxPendingApprovals, toolcontrols.MaxPendingApprovalsPerTenant))}, nil
 	}
 	return nil, fmt.Errorf("approval store returned an unknown outcome")
 }
@@ -197,6 +206,7 @@ func (g *ApprovalGate) ttl() time.Duration {
 func (g *ApprovalGate) tell(ctx context.Context, call GateCall, dec toolcontrols.ApprovalDecision, r *toolcontrols.ApprovalRule) {
 	if g.Notifier == nil {
 		log.Error().Str("approval_id", dec.ApprovalID).Msg("a call is waiting for approval but no notifier is configured; the owner can still see it on the approvals page")
+		_ = g.Store.NoticeFailed(ctx, call.Token.TenantID, dec.ApprovalID)
 		return
 	}
 	notice := ApprovalNotice{
@@ -214,6 +224,9 @@ func (g *ApprovalGate) tell(ctx context.Context, call GateCall, dec toolcontrols
 		defer cancel()
 		if err := g.Notifier.Notify(nctx, notice); err != nil {
 			log.Error().Err(err).Str("approval_id", notice.ApprovalID).Msg("could not tell the owner about a held call; it is still on the approvals page")
+			if ferr := g.Store.NoticeFailed(nctx, notice.TenantID, notice.ApprovalID); ferr != nil {
+				log.Error().Err(ferr).Str("approval_id", notice.ApprovalID).Msg("could not record the failed notice")
+			}
 			return
 		}
 		if err := g.Store.MarkNotified(nctx, notice.TenantID, notice.ApprovalID, time.Now().UTC()); err != nil {
