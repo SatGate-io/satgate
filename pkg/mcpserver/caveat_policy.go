@@ -65,6 +65,10 @@ func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) 
 	if err != nil {
 		return nil, err
 	}
+	approvals, err := toolcontrols.CollectApprovals(mac.Caveats)
+	if err != nil {
+		return nil, err
+	}
 	budgetID, err := svc.ResolveIssuedBudgetID(mac)
 	if err != nil {
 		return nil, err
@@ -78,6 +82,7 @@ func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) 
 		TenantID:      tenantID,
 		ArgumentRules: rules,
 		SpendLimits:   limits,
+		ApprovalRules: approvals,
 		Raw:           mac,
 		RawToken:      token,
 	}
@@ -358,12 +363,45 @@ func (t *TokenInfo) SpendLimitsFor(toolName string) ([]toolcontrols.SpendLimit, 
 }
 
 // NeedsCallGate reports whether the token carries a control a CallGate must
-// look at for this call. A token with any spending limit needs one for every
-// tool, not only the covered ones: the gate also refuses a call whose tool
+// look at for this call. A token with any spending limit or "ask me" rule
+// needs one for every tool, not only the covered ones: the gate also refuses a call whose tool
 // name or shape cannot be matched exactly to the limits (see SpendGate.Admit).
 // A token whose controls cannot be read needs one for every tool: the call is
 // refused rather than sent unchecked.
 func (t *TokenInfo) NeedsCallGate(toolName string) bool {
 	limits, err := t.AllSpendLimits()
-	return err != nil || len(limits) > 0
+	if err != nil || len(limits) > 0 {
+		return true
+	}
+	rules, err := t.AllApprovalRules()
+	return err != nil || len(rules) > 0
+}
+
+// AllApprovalRules returns every "ask me" rule the token carries, whatever
+// tools it covers. Like AllSpendLimits it reads the caveats again when the
+// token has them, so a TokenInfo whose field was not filled cannot skip a rule.
+func (t *TokenInfo) AllApprovalRules() ([]toolcontrols.ApprovalRule, error) {
+	if t == nil {
+		return nil, nil
+	}
+	if t.Raw != nil {
+		return toolcontrols.CollectApprovals(t.Raw.Caveats)
+	}
+	return t.ApprovalRules, nil
+}
+
+// ApprovalRulesFor returns the "ask me" rules that cover toolName (compared
+// without regard to letter case: see toolcontrols.ApprovalRule.Covers).
+func (t *TokenInfo) ApprovalRulesFor(toolName string) ([]toolcontrols.ApprovalRule, error) {
+	rules, err := t.AllApprovalRules()
+	if err != nil {
+		return nil, err
+	}
+	var out []toolcontrols.ApprovalRule
+	for _, r := range rules {
+		if r.Covers(toolName) {
+			out = append(out, r)
+		}
+	}
+	return out, nil
 }

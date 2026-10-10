@@ -51,6 +51,11 @@ type TokenInfo struct {
 	// with none. A CallGate enforces them.
 	SpendLimits []toolcontrols.SpendLimit
 
+	// ApprovalRules are the "ask me" rules the token carries (see
+	// toolcontrols.ApprovalRule). Nil for a token with none. A CallGate
+	// enforces them.
+	ApprovalRules []toolcontrols.ApprovalRule
+
 	// Raw macaroon (for delegation).
 	Raw *macaroon.Macaroon
 
