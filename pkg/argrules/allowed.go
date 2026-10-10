@@ -22,8 +22,11 @@ const maxAllowedListItems = 16
 //
 //   - max, min, between, absent: shown (numbers are not secrets).
 //   - url: hosts and ports shown; path prefixes and suffixes never shown.
-//   - one_of: values shown only when every value is plain (see plainOneOf);
-//     otherwise only the count is shown.
+//   - one_of: values are shown only when BOTH the field name is on the fixed
+//     allowlist agentVisibleFields (and has no sensitive word in it) AND every
+//     value is plain (see plainOneOf). Otherwise only the count is shown. The
+//     value's shape never decides on its own: a 24-character API key looks
+//     like a plain symbol, so shape and length cannot tell them apart.
 //   - anything else: "<field> is limited by this token".
 const (
 	maxPlainValueLen = 24
@@ -36,6 +39,52 @@ var plainValueRE = regexp.MustCompile(`^[A-Za-z0-9._:-]+$`)
 var credentialPrefixes = []string{
 	"sk-", "sk_", "pk_", "rk_", "ghp_", "gho_", "github_pat_", "xox", "eyJ",
 	"AKIA", "ASIA", "AIza", "glpat-", "shpat_", "whsec_",
+}
+
+// agentVisibleFields is the fixed allowlist of field names whose one_of values
+// an agent may be shown (matched case-insensitively, whole name). Each is a
+// known, non-secret trading or request parameter: a value the agent must send
+// to make a valid call, and one the owner chose in order to restrict the
+// agent. Telling the agent "side must be one of: buy" is what lets it fix the
+// call. A field that is not here is count-only, however harmless its values
+// look. Add a name only if its values can never be a credential.
+//
+//	side, type, order_type, time_in_force, position_effect, market_hours,
+//	direction                 order parameters (enumerations)
+//	symbol, symbols, chain_symbol, underlying_type, asset_class, currency
+//	                          what is being traded (tickers, instrument kinds)
+//	account_number, rhs_account_number
+//	                          which account the call acts on; the agent must
+//	                          send it and already holds it
+//	interval, bounds, span    market-data query parameters (enumerations)
+//	method, http_method       the HTTP verb
+var agentVisibleFields = map[string]bool{
+	"side": true, "type": true, "order_type": true, "symbol": true,
+	"symbols": true, "chain_symbol": true, "account_number": true,
+	"rhs_account_number": true, "time_in_force": true, "market_hours": true,
+	"direction": true, "position_effect": true, "currency": true,
+	"asset_class": true, "underlying_type": true, "interval": true,
+	"bounds": true, "span": true, "method": true, "http_method": true,
+}
+
+// sensitiveFieldWords: a field name containing any of these (case-insensitive)
+// is always count-only, even if someone adds it to agentVisibleFields.
+var sensitiveFieldWords = []string{
+	"key", "token", "secret", "password", "passwd", "auth", "credential",
+	"signature", "cookie", "session",
+}
+
+// oneOfVisible reports whether a one_of condition's values may be shown to an
+// agent: the field is allowlisted, its name is not sensitive, and every value
+// is plain.
+func oneOfVisible(c Condition) bool {
+	name := strings.ToLower(c.Field)
+	for _, w := range sensitiveFieldWords {
+		if strings.Contains(name, w) {
+			return false
+		}
+	}
+	return agentVisibleFields[name] && plainOneOf(c.OneOf)
 }
 
 func plainValue(v string) bool {
@@ -72,7 +121,7 @@ func (c Condition) AgentText() string {
 		return c.Field + " must not be set"
 	case c.OneOf != nil:
 		var s string
-		if plainOneOf(c.OneOf) {
+		if oneOfVisible(c) {
 			s = c.Field + " must be one of: " + listValues(c.OneOf, ", ")
 		} else {
 			s = c.Field + " must be one of the " + strconv.Itoa(len(c.OneOf)) + " values this token allows"
@@ -104,7 +153,7 @@ func (c Condition) agentLine() string {
 		if c.ASCIICaseInsensitive {
 			suffix = " (any letter case)"
 		}
-		if plainOneOf(c.OneOf) {
+		if oneOfVisible(c) {
 			return c.Field + " is " + listValues(c.OneOf, " or ") + suffix
 		}
 		return c.Field + " is one of the " + strconv.Itoa(len(c.OneOf)) + " values this token allows" + suffix

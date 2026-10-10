@@ -158,3 +158,50 @@ func TestIndependentCredentialURLRuleDisclosure(t *testing.T) {
 		t.Fatalf("refused calls reached the upstream %d times", rr.calls())
 	}
 }
+
+// Round 3 regression (Astra round 2): a 24-character alphanumeric API key with
+// no recognised prefix looks like a plain value. Value shape does not decide
+// disclosure; the field name does. The key is absent from the whole refusal
+// and the count line is present. Allowlisted fields (side, symbol) still show
+// their values, and a non-allowlisted field with a plain value is count-only.
+func TestOpaqueKeyOneOfIsCountOnlyAtTheHTTPBoundary(t *testing.T) {
+	const (
+		apiKey = "a7B9c2D4e6F8g1H3j5K7m9N2"
+		doc    = `{"v":1,"rules":[` +
+			`{"tool":"call_api","shapes":[{"api_key":{"one_of":["` + apiKey + `"]}}]},` +
+			`{"tool":"region_api","shapes":[{"region":{"one_of":["us-east-1"]}}]},` +
+			`{"tool":"trade","shapes":[{"side":{"one_of":["buy"]},"symbol":{"one_of":["BTC-USD"]},"account_number":{"one_of":["123456789"]}}]}]}`
+	)
+	proxy, rr, _ := newArgProxy(t)
+	_, tok := argToken(t, "call_api,region_api,trade", doc)
+	cases := []struct {
+		name, tool, args, field, allowed string
+		absent                           []string
+	}{
+		{"opaque key", "call_api", `{"api_key":"wrong"}`, "api_key", "api_key must be one of the 1 values this token allows", []string{apiKey}},
+		{"plain value, field not allowlisted", "region_api", `{"region":"eu-west-1"}`, "region", "region must be one of the 1 values this token allows", []string{"us-east-1"}},
+		{"allowlisted side", "trade", `{"side":"sell","symbol":"BTC-USD","account_number":"123456789"}`, "side", "side must be one of: buy", nil},
+		{"allowlisted symbol", "trade", `{"side":"buy","symbol":"ETH-USD","account_number":"123456789"}`, "symbol", "symbol must be one of: BTC-USD", nil},
+		{"allowlisted account_number", "trade", `{"side":"buy","symbol":"BTC-USD","account_number":"000"}`, "account_number", "account_number must be one of: 123456789", nil},
+	}
+	for i, tc := range cases {
+		o := runCall(t, proxy, argCall(i+1, tok, tc.tool, tc.args))
+		assertArgDenied(t, o, tc.tool, tc.field)
+		var data map[string]any
+		if err := json.Unmarshal(o.resp.Error.Data, &data); err != nil {
+			t.Fatalf("%s: %v", tc.name, err)
+		}
+		if data["allowed"] != tc.allowed || !strings.HasSuffix(o.resp.Error.Message, ": "+tc.allowed) {
+			t.Fatalf("%s: allowed = %v, message = %q", tc.name, data["allowed"], o.resp.Error.Message)
+		}
+		raw, _ := json.Marshal(o.resp)
+		for _, leak := range tc.absent {
+			if strings.Contains(string(raw), leak) {
+				t.Fatalf("%s: reply discloses %q: %s", tc.name, leak, raw)
+			}
+		}
+	}
+	if rr.calls() != 0 {
+		t.Fatalf("refused calls reached the upstream %d times", rr.calls())
+	}
+}
