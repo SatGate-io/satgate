@@ -439,6 +439,18 @@ func assignSlugs(services []serviceSnap) []string {
 	return slugs
 }
 
+// ServiceSlugs returns the slug each service gets, given the display names of
+// the distinct services in claim order. The owner's panel uses it to spot
+// names that start with another service's slug; it is the function the
+// manager itself uses.
+func ServiceSlugs(labels []string) []string {
+	snaps := make([]serviceSnap, len(labels))
+	for i, l := range labels {
+		snaps[i] = serviceSnap{label: l}
+	}
+	return assignSlugs(snaps)
+}
+
 type nameCandidates struct {
 	plain      string   // the tool's own name, or its sanitized form; "" if not allowed
 	lookalike  bool     // plain was dropped because it starts with another service's slug
