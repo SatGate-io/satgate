@@ -106,6 +106,12 @@ type UpstreamConfig struct {
 	// TLSSkipVerify disables TLS certificate verification.
 	// WARNING: Only use for development with self-signed certificates.
 	TLSSkipVerify bool `yaml:"tlsSkipVerify,omitempty"`
+
+	// Credentials, when set, supplies the credential headers of every HTTP
+	// request to this upstream at the moment it is sent, and Headers is then
+	// not sent. Code sets it; YAML never does. nil keeps today's behaviour.
+	// See CredentialSource. Ignored by stdio.
+	Credentials CredentialSource `yaml:"-" json:"-"`
 }
 
 // RoutingRule maps tool name patterns to an upstream.
