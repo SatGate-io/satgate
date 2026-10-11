@@ -237,13 +237,13 @@ func TestMemoryStoreReserveReleaseDuplicate(t *testing.T) {
 		t.Fatalf("over = %+v", r)
 	}
 	r, _ = s.Reserve(ctx, res("k", "a", 150, 200))
-	if r.Status != Duplicate || s.Total("k") != 150 {
-		t.Fatalf("dup = %+v total %d", r, s.Total("k"))
+	if r.Status != Duplicate || s.TotalOf("k") != 150 {
+		t.Fatalf("dup = %+v total %d", r, s.TotalOf("k"))
 	}
 	_ = s.Release(ctx, res("k", "a", 150, 200))
 	_ = s.Release(ctx, res("k", "a", 150, 200)) // twice is harmless
-	if s.Total("k") != 0 {
-		t.Fatalf("total after release = %d", s.Total("k"))
+	if s.TotalOf("k") != 0 {
+		t.Fatalf("total after release = %d", s.TotalOf("k"))
 	}
 	r, _ = s.Reserve(ctx, res("k", "b", 200, 200))
 	if r.Status != Reserved {
@@ -268,8 +268,8 @@ func TestMemoryStoreConcurrencyNeverExceedsMax(t *testing.T) {
 		}(i)
 	}
 	wg.Wait()
-	if ok > max || s.Total("k") != ok || ok != (max/each)*each {
-		t.Fatalf("reserved %d, counter %d, max %d", ok, s.Total("k"), max)
+	if ok > max || s.TotalOf("k") != ok || ok != (max/each)*each {
+		t.Fatalf("reserved %d, counter %d, max %d", ok, s.TotalOf("k"), max)
 	}
 }
 

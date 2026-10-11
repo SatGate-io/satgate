@@ -119,7 +119,7 @@ func newSpendHarnessScope(t *testing.T, doc, scope string) *spendHarness {
 	rec := &lockedRecorder{}
 	proxy.SetEvidenceRecorder(rec)
 	store := toolcontrols.NewMemoryStore(nil)
-	proxy.SetCallGate(NewSpendGate(store))
+	proxy.SetCallGate(newTestSpendGate(store))
 	svc, tok := mintBudgetToken(t, argTestRoot, scope, "tenant-1", "budget-spend", "50")
 	tok = appendCaveat(t, svc, tok, controlWord(t, doc))
 	return &spendHarness{proxy: proxy, rr: rr, store: store, rec: rec, token: tok}
@@ -154,7 +154,7 @@ func (h *spendHarness) counter(t *testing.T) int64 {
 	t.Helper()
 	var total int64
 	for _, k := range h.store.Keys() {
-		total += h.store.Total(k)
+		total += h.store.TotalOf(k)
 	}
 	return total
 }
@@ -421,7 +421,7 @@ func TestSpendWindowRollover(t *testing.T) {
 	// The store expires counters by its own clock; give it the test's, so the
 	// test does not depend on today's date.
 	h.store = toolcontrols.NewMemoryStore(func() time.Time { return clock })
-	h.proxy.SetCallGate(NewSpendGate(h.store))
+	h.proxy.SetCallGate(newTestSpendGate(h.store))
 	h.proxy.gate.(*SpendGate).now = func() time.Time { return clock }
 	if r := h.call(t, 1, "place_crypto_order", order("200")); r.Error != nil {
 		t.Fatal(r.Error)
@@ -496,7 +496,7 @@ func TestSpendTokensDoNotShareACounter(t *testing.T) {
 	a := newSpendHarness(t, spendDoc200Day)
 	b := newSpendHarness(t, spendDoc200Day)
 	b.store = a.store
-	b.proxy.SetCallGate(NewSpendGate(a.store))
+	b.proxy.SetCallGate(newTestSpendGate(a.store))
 	a.call(t, 1, "place_crypto_order", order("200"))
 	if r := b.call(t, 1, "place_crypto_order", order("200")); r.Error != nil {
 		t.Fatalf("a second token shares the first one's counter: %v", r.Error)
