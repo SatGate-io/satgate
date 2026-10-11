@@ -913,3 +913,65 @@ func TestR2Logs_TheStreamableTransportDebugLineHoldsNoURL(t *testing.T) {
 		}
 	}
 }
+
+// ---------------------------------------------------------------------------
+// The manager's own name checks, alone (round 1 left two variants alive
+// because the store enforced the same rules: removed-name reuse and case
+// uniqueness). This store enforces nothing, so only the manager can hold them.
+
+type permissiveStore struct {
+	mu     sync.Mutex
+	preset []ToolNameAssignment
+	byTool map[string]ToolNameAssignment
+}
+
+func newPermissiveStore(preset ...ToolNameAssignment) *permissiveStore {
+	return &permissiveStore{preset: preset, byTool: map[string]ToolNameAssignment{}}
+}
+
+func (p *permissiveStore) Load(context.Context) ([]ToolNameAssignment, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	out := append([]ToolNameAssignment(nil), p.preset...)
+	for _, a := range p.byTool {
+		out = append(out, a)
+	}
+	return out, nil
+}
+
+func (p *permissiveStore) Claim(_ context.Context, a ToolNameAssignment) (ToolNameAssignment, bool, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if have, ok := p.byTool[toolBindingKey(a.Address, a.Original)]; ok {
+		return have, true, nil
+	}
+	p.byTool[toolBindingKey(a.Address, a.Original)] = a // no name check at all
+	return a, true, nil
+}
+
+func TestToolNames_ManagerAloneNeverGivesARemovedServicesNameToAnother(t *testing.T) {
+	svc := newFakeService(t, "NEW", fakeTool{Name: "place_crypto_order", Description: "d"})
+	store := newPermissiveStore(ToolNameAssignment{Name: "place_crypto_order", Address: "address-of-a-removed-service", Original: "place_crypto_order", Service: "Gone"})
+	m := startNames(t, func(m *UpstreamManager) { m.SetToolNameStore(store) }, nil, map[string]*fakeService{"new": svc}, map[string]string{"new": "Newcomer"})
+	got := listTools(t, m)
+	if got["place_crypto_order"].Name != "" {
+		t.Fatalf("a removed service's name was given to a different service: %v", names(got))
+	}
+	if got["newcomer_place_crypto_order"].Name == "" {
+		t.Fatalf("the newcomer has no prefixed name: %v", names(got))
+	}
+}
+
+func TestToolNames_ManagerAloneNeverListsTwoNamesThatDifferOnlyInCase(t *testing.T) {
+	a := newFakeService(t, "A", fakeTool{Name: "Place_Order", Description: "d"})
+	b := newFakeService(t, "B", fakeTool{Name: "place_order", Description: "d"})
+	m := startNames(t, func(m *UpstreamManager) {
+		m.SetToolNameStore(newPermissiveStore())
+		m.SetServiceOrder([]string{"aa", "bb"})
+	}, nil,
+		map[string]*fakeService{"aa": a, "bb": b}, map[string]string{"aa": "Aaa", "bb": "Bbb"})
+	got := listTools(t, m) // fails if two listed names are equal without case
+	if len(got) != 2 || got["Place_Order"].Name == "" || got["bbb_place_order"].Name == "" {
+		t.Fatalf("listed %v", names(got))
+	}
+}
