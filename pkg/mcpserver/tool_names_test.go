@@ -481,9 +481,16 @@ func TestToolNames_RoutingRuleDecidesWhoKeepsThePlainName(t *testing.T) {
 
 func TestToolNames_WithoutOrderOrRulesTheSortedServiceNameWins(t *testing.T) {
 	rh, alp := twoBrokers(t)
-	m := startNames(t, nil, nil, map[string]*fakeService{"robinhood": rh, "alpaca": alp}, brokerNames)
-	if r, _ := callName(t, m, "place_crypto_order"); r != "ALP:place_crypto_order" {
-		t.Fatalf("plain name reaches %q, want the service that sorts first", r)
+	// Many fresh managers: a plain name chosen by map order would go to
+	// Robinhood about half the time.
+	for i := 0; i < 40; i++ {
+		m := startNames(t, nil, nil, map[string]*fakeService{"robinhood": rh, "alpaca": alp}, brokerNames)
+		if r, _ := callName(t, m, "place_crypto_order"); r != "ALP:place_crypto_order" {
+			t.Fatalf("manager %d: plain name reaches %q, want the service that sorts first", i, r)
+		}
+		if r, _ := callName(t, m, "robinhood_place_crypto_order"); r != "RH:place_crypto_order" {
+			t.Fatalf("manager %d: robinhood_place_crypto_order reaches %q", i, r)
+		}
 	}
 }
 
@@ -611,8 +618,15 @@ func TestToolNames_TwentyFreshManagersAgreeOnEveryName(t *testing.T) {
 	for i := 0; i < 20; i++ {
 		m := startNames(t, nil, nil, map[string]*fakeService{"robinhood": rh, "alpaca": alp, "coinbase": cb}, brokerNames)
 		got := map[string]string{}
-		for _, in := range m.ToolNames() {
-			got[in.Service+"/"+in.Original] = in.Name
+		for name := range listTools(t, m) {
+			r, err := callName(t, m, name)
+			if err != nil {
+				t.Fatalf("manager %d: %s: %v", i, name, err)
+			}
+			got[name] = r // the name, and which fake answers it
+		}
+		if len(got) < 10 {
+			t.Fatalf("manager %d lists only %d tools", i, len(got))
 		}
 		if first == nil {
 			first = got
