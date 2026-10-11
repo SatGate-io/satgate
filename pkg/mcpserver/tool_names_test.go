@@ -246,12 +246,13 @@ func TestToolNames_BothOrderToolsListedOnceUnderDifferentNames(t *testing.T) {
 	if d := got["alpaca_place_crypto_order"].Description; !strings.HasPrefix(d, "Alpaca: ") {
 		t.Errorf("prefixed copy description = %q", d)
 	}
-	// A tool that does not clash keeps its description untouched.
-	if d := got["place_stock_order"].Description; d != "Place a stock order." {
-		t.Errorf("unclashed description changed: %q", d)
+	// Round 2 (fix 7): with two or more services every description starts with
+	// the service's name, clash or not.
+	if d := got["place_stock_order"].Description; d != "Alpaca: Place a stock order." {
+		t.Errorf("place_stock_order description = %q", d)
 	}
-	if d := got["get_positions"].Description; d != "List open positions." {
-		t.Errorf("unclashed description changed: %q", d)
+	if d := got["get_positions"].Description; d != "Robinhood: List open positions." {
+		t.Errorf("get_positions description = %q", d)
 	}
 }
 

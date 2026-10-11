@@ -95,7 +95,7 @@ func (t *StreamableHTTPTransport) Connect(ctx context.Context) error {
 		return fmt.Errorf("streamable HTTP: invalid URL %q: %w", t.url, err)
 	}
 
-	log.Debug().Str("url", t.url).Msg("streamable HTTP transport: ready")
+	log.Debug().Str("address", addressDigest8(t.url)).Msg("streamable HTTP transport: ready")
 	return nil
 }
 

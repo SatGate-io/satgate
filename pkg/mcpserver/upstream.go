@@ -39,11 +39,29 @@ type UpstreamManager struct {
 	// Tool names (see tool_names.go). viewMu guards nameStore and order and
 	// serializes builds of the view; namesVer moves whenever the set of
 	// services or their tools may have changed.
-	viewMu    sync.Mutex
-	nameStore ToolNameStore
-	order     []string
-	namesVer  atomic.Uint64
-	viewPtr   atomic.Pointer[toolView]
+	viewMu     sync.Mutex
+	nameStore  ToolNameStore
+	order      []string
+	claimOrder func(ctx context.Context) (ClaimOrder, error)
+	lastOrder  []string
+	namesVer   atomic.Uint64
+	viewPtr    atomic.Pointer[toolView]
+
+	// answered holds the claim keys of services that gave a complete tool
+	// list at least once in this process (viewMu).
+	answered map[string]bool
+	// refusedLogged is the last count of credential-bearing tools logged per
+	// service, so a steady count is logged once (viewMu).
+	refusedLogged map[string]int
+	// runCtx is the context Start was given; retries use it.
+	runCtx     context.Context
+	retryEvery time.Duration // 0: defaultRetryEvery
+	// seenLocal holds the claim keys already recorded as seen (viewMu).
+	seenLocal map[string]bool
+	// retrying and lastRetry keep the retry of absent or incomplete services
+	// to one at a time, at most every retryEvery.
+	retrying  atomic.Bool
+	lastRetry atomic.Int64
 }
 
 // track registers a freshly dialed replacement client. It reports false when
@@ -89,6 +107,14 @@ type UpstreamClient struct {
 	tools     []json.RawMessage
 	toolNames []string
 	ready     bool
+
+	// complete says tools is a complete list (every page was read). A client
+	// whose discovery was cut short keeps the last complete list of the
+	// service (inherit), or none.
+	toolsMu  sync.Mutex
+	complete bool
+	// claimKey is ServiceKey of the config the client was made from.
+	claimKey string
 
 	// closed is set before the manager closes the transport on purpose, so
 	// readLoop treats the read error that follows as the end of the client
@@ -156,6 +182,9 @@ func (m *UpstreamManager) Start(ctx context.Context) error {
 	if m.closed.Load() {
 		return fmt.Errorf("upstream manager is closed")
 	}
+	m.viewMu.Lock()
+	m.runCtx = ctx
+	m.viewMu.Unlock()
 	if len(m.config) <= 1 {
 		// Single upstream — sequential (no goroutine overhead)
 		for name, cfg := range m.config {
@@ -277,16 +306,22 @@ func (m *UpstreamManager) logConnected(name string, client *UpstreamClient) {
 }
 
 func (m *UpstreamManager) connect(ctx context.Context, name string, cfg UpstreamConfig) (*UpstreamClient, error) {
+	var c *UpstreamClient
+	var err error
 	switch cfg.Transport {
 	case "stdio":
-		return m.connectStdio(name, cfg)
+		c, err = m.connectStdio(name, cfg)
 	case "sse":
-		return m.connectSSE(ctx, name, cfg)
+		c, err = m.connectSSE(ctx, name, cfg)
 	case "http", "streamable":
-		return m.connectStreamable(ctx, name, cfg)
+		c, err = m.connectStreamable(ctx, name, cfg)
 	default:
 		return nil, fmt.Errorf("unknown transport %q", cfg.Transport)
 	}
+	if c != nil {
+		c.claimKey = ServiceKey(cfg)
+	}
+	return c, err
 }
 
 func (m *UpstreamManager) connectSSE(ctx context.Context, name string, cfg UpstreamConfig) (*UpstreamClient, error) {
@@ -533,6 +568,7 @@ func (m *UpstreamManager) reconnect(ctx context.Context, client *UpstreamClient,
 			newClient.shutdown()
 			return false
 		}
+		newClient.inherit(client)
 		m.clients[client.name] = newClient
 		m.mu.Unlock()
 		m.namesVer.Add(1)
@@ -633,42 +669,127 @@ func (m *UpstreamManager) initializeUpstream(ctx context.Context, client *Upstre
 	return nil
 }
 
+// maxToolListPages bounds how many pages of tools/list one discovery reads.
+const maxToolListPages = 50
+
+// discoverTools reads every page of the upstream's tools/list. A failure on
+// the first page is an error. After that the list may stop short (the page cap,
+// a cursor the upstream repeated, an error on a later page): the client then
+// has no new complete list and keeps the last complete list of its service, if
+// it inherits one (see inherit). Tool names are chosen only from complete
+// lists (tool_names.go).
 func (m *UpstreamManager) discoverTools(ctx context.Context, client *UpstreamClient) error {
-	resp, err := m.sendRequest(ctx, client, MethodToolsList, nil, 30*time.Second)
-	if err != nil {
-		return err
-	}
-	if resp.Error != nil {
-		if m.redacting() {
-			return fmt.Errorf("tools/list error: server returned a JSON-RPC error (code %d)", resp.Error.Code)
+	var all []json.RawMessage
+	cursor := ""
+	seenCursor := map[string]bool{}
+	complete := false
+	for page := 1; page <= maxToolListPages; page++ {
+		var params json.RawMessage
+		if cursor != "" {
+			params, _ = json.Marshal(map[string]string{"cursor": cursor})
 		}
-		return fmt.Errorf("tools/list error: %s", resp.Error.Message)
-	}
-
-	// Parse tools list result
-	var result struct {
-		Tools []json.RawMessage `json:"tools"`
-	}
-	if err := json.Unmarshal(resp.Result, &result); err != nil {
-		if m.redacting() {
-			return fmt.Errorf("parse tools/list result: reply could not be parsed")
+		resp, err := m.sendRequest(ctx, client, MethodToolsList, params, 30*time.Second)
+		if err == nil && resp.Error != nil {
+			if m.redacting() {
+				err = fmt.Errorf("tools/list error: server returned a JSON-RPC error (code %d)", resp.Error.Code)
+			} else {
+				err = fmt.Errorf("tools/list error: %s", resp.Error.Message)
+			}
 		}
-		return fmt.Errorf("parse tools/list result: %w", err)
+		var result struct {
+			Tools      []json.RawMessage `json:"tools"`
+			NextCursor string            `json:"nextCursor"`
+		}
+		if err == nil {
+			if jerr := json.Unmarshal(resp.Result, &result); jerr != nil {
+				if m.redacting() {
+					err = fmt.Errorf("parse tools/list result: reply could not be parsed")
+				} else {
+					err = fmt.Errorf("parse tools/list result: %w", jerr)
+				}
+			}
+		}
+		if err != nil {
+			if page == 1 {
+				return err
+			}
+			log.Warn().Str("upstream", client.name).Int("page", page).
+				Msg("tool names: a later page of tools/list failed; the last complete list is kept")
+			break
+		}
+		all = append(all, result.Tools...)
+		if result.NextCursor == "" {
+			complete = true
+			break
+		}
+		if seenCursor[result.NextCursor] {
+			log.Warn().Str("upstream", client.name).Int("page", page).
+				Msg("tool names: tools/list repeated a cursor; the last complete list is kept")
+			break
+		}
+		seenCursor[result.NextCursor] = true
+		cursor = result.NextCursor
+		if page == maxToolListPages {
+			log.Warn().Str("upstream", client.name).Int("pages", page).
+				Msg("tool names: tools/list has more pages than the limit; the last complete list is kept")
+		}
 	}
-
-	client.tools = result.Tools
-	client.toolNames = make([]string, 0, len(result.Tools))
-
-	for _, t := range result.Tools {
+	if !complete {
+		return nil
+	}
+	names := make([]string, 0, len(all))
+	for _, t := range all {
 		var tool struct {
 			Name string `json:"name"`
 		}
 		if err := json.Unmarshal(t, &tool); err == nil && tool.Name != "" {
-			client.toolNames = append(client.toolNames, tool.Name)
+			names = append(names, tool.Name)
 		}
 	}
-
+	client.toolsMu.Lock()
+	client.tools = all
+	client.toolNames = names
+	client.complete = true
+	client.toolsMu.Unlock()
 	return nil
+}
+
+// listState returns the client's complete list, if it has one.
+func (c *UpstreamClient) listState() ([]json.RawMessage, bool) {
+	c.toolsMu.Lock()
+	defer c.toolsMu.Unlock()
+	if !c.complete {
+		return nil, false
+	}
+	return append([]json.RawMessage(nil), c.tools...), true
+}
+
+// inherit gives a client whose own discovery was not complete the last
+// complete list of the client it replaces, when both are the same service.
+func (c *UpstreamClient) inherit(old *UpstreamClient) {
+	if c == nil || old == nil || old == c || old.claimKey != c.claimKey {
+		return
+	}
+	tools, ok := old.listState()
+	if !ok {
+		return
+	}
+	c.toolsMu.Lock()
+	defer c.toolsMu.Unlock()
+	if c.complete {
+		return
+	}
+	c.tools = tools
+	c.toolNames = c.toolNames[:0]
+	for _, t := range tools {
+		var tool struct {
+			Name string `json:"name"`
+		}
+		if json.Unmarshal(t, &tool) == nil && tool.Name != "" {
+			c.toolNames = append(c.toolNames, tool.Name)
+		}
+	}
+	c.complete = true
 }
 
 // ResolveUpstream returns the upstream client for a tool name an agent sees.
@@ -683,8 +804,14 @@ func (m *UpstreamManager) ResolveUpstream(toolName string) (*UpstreamClient, err
 }
 
 func (m *UpstreamManager) resolveTool(toolName string) (*toolEntry, error) {
-	if e := m.toolView().byName[toolName]; e != nil {
+	v := m.toolView()
+	if e := v.byName[toolName]; e != nil {
 		return e, nil
+	}
+	if v.unavailable {
+		// Some service's tools are not all in yet. The name may be one of
+		// them. Say so; never send it anywhere.
+		return nil, fmt.Errorf("%s", ToolsNotAvailableYetMessage)
 	}
 	return nil, fmt.Errorf("no upstream found for tool %q", toolName)
 }
@@ -729,6 +856,13 @@ func (m *UpstreamManager) ForwardRequest(ctx context.Context, method string, par
 // AddUpstream connects a new upstream at runtime (live reload).
 // If an upstream with the same name already exists, it is replaced.
 func (m *UpstreamManager) AddUpstream(ctx context.Context, name string, cfg UpstreamConfig) error {
+	return m.addUpstream(ctx, name, cfg, false)
+}
+
+// addUpstream is AddUpstream. With onlyIfConfigured it is a retry of a
+// configured service: it does nothing if the service was removed, changed, or
+// connected by someone else while it connected.
+func (m *UpstreamManager) addUpstream(ctx context.Context, name string, cfg UpstreamConfig, onlyIfConfigured bool) error {
 	if m.closed.Load() {
 		return fmt.Errorf("upstream manager is closed")
 	}
@@ -760,7 +894,16 @@ func (m *UpstreamManager) AddUpstream(ctx context.Context, name string, cfg Upst
 		client.shutdown()
 		return fmt.Errorf("upstream manager is closed")
 	}
+	if onlyIfConfigured {
+		cur, ok := m.config[name]
+		if !ok || cur.URL != cfg.URL || cur.NameKey != cfg.NameKey || m.clients[name] != nil {
+			m.mu.Unlock()
+			client.shutdown()
+			return fmt.Errorf("upstream %q changed while it connected", name)
+		}
+	}
 	if old, exists := m.clients[name]; exists {
+		client.inherit(old)
 		old.shutdown()
 	}
 	m.clients[name] = client

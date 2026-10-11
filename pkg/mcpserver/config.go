@@ -111,6 +111,17 @@ type UpstreamConfig struct {
 	// descriptions and prefixes ("Robinhood: ..."). Empty means the upstream's
 	// key in the configuration.
 	DisplayName string `yaml:"displayName,omitempty"`
+
+	// NameKey, when set, is the key the service's tool names are stored under
+	// instead of the digest of its address. A host that keeps several
+	// services at one address (two logins to one broker) gives each its own.
+	// It is a digest or an opaque id, never a URL or a secret.
+	NameKey string `yaml:"-"`
+
+	// ExtraSecrets are credential values of this service the host knows and
+	// the configuration does not carry (an OAuth refresh token). A tool whose
+	// name or description holds one is not listed.
+	ExtraSecrets []string `yaml:"-"`
 }
 
 // RoutingRule maps tool name patterns to an upstream.
