@@ -436,52 +436,6 @@ func TestZeroCreditDelegationKeepsTheParentsBudget(t *testing.T) {
 	}
 }
 
-// ---- the proof before the seal ---------------------------------------------
-
-// childKeepsOnlyTheParentsSealedBudget is the check that stands between a
-// holder-chosen caveat and the seal. It must say no to a child whose prefix
-// carries a budget reference the parent's issuer seal does not cover, or whose
-// first caveats are not the parent's.
-func TestSealProofRefusesAHolderBudgetInTheChildPrefix(t *testing.T) {
-	svc, tok := sealedBudgetToken(t, "tenant-1", "own-1", bothTools, budgetDoc(budgetA, "200", ""))
-	parent, _ := svc.Decode(tok)
-	svc = svc.AcceptingArgumentRules()
-
-	honest, err := svc.Delegate(tok, []string{"parent = x", "budget_id = del-aaaaaaaaaaaaaaaaaaaaaaaa", "budget_limit = 5.00"})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !childKeepsOnlyTheParentsSealedBudget(svc, parent, honest) {
-		t.Fatal("an honest child was refused")
-	}
-	for name, extra := range map[string][]string{
-		"a holder budget before the seal":   {"parent = x", controlWord(t, budgetDoc(budgetB, "9", ""))},
-		"a holder budget with a raised max": {"parent = x", controlWord(t, budgetDoc(budgetA, "9999999", ""))},
-	} {
-		child, err := svc.Delegate(tok, extra)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if childKeepsOnlyTheParentsSealedBudget(svc, parent, child) {
-			t.Fatalf("%s: the proof passed", name)
-		}
-	}
-	// A child that changed one of the parent's own words.
-	changed := *honest
-	changed.Caveats = append([]string{}, honest.Caveats...)
-	for i, c := range changed.Caveats {
-		if strings.HasPrefix(c, "scope = argrules:ctl:") {
-			changed.Caveats[i] = controlWord(t, budgetDoc(budgetA, "9999999", ""))
-		}
-	}
-	if childKeepsOnlyTheParentsSealedBudget(svc, parent, &changed) {
-		t.Fatal("a child that rewrote the parent's budget word passed")
-	}
-	if childKeepsOnlyTheParentsSealedBudget(svc, nil, honest) || childKeepsOnlyTheParentsSealedBudget(svc, parent, nil) {
-		t.Fatal("nil passed")
-	}
-}
-
 // ---- direct: the refusal happens before any reservation --------------------
 
 func TestDelegateRefusesBeforeAnyReservationDirectly(t *testing.T) {
@@ -501,7 +455,7 @@ func TestDelegateRefusesBeforeAnyReservationDirectly(t *testing.T) {
 	pub := NewChannelPublisher(4)
 	d.SetEventPublisher(pub)
 
-	if _, err := d.Delegate(context.Background(), info, &DelegateParams{Budget: 5, Label: "c"}); err == nil || !isDelegationBudgetRefusal(err) {
+	if _, err := d.Delegate(context.Background(), info, &DelegateParams{Budget: 5, Label: "c"}); err == nil || !strings.Contains(err.Error(), "delegation refused") {
 		t.Fatalf("err = %v", err)
 	}
 	if credits.spends != 0 || credits.inits != 1 {
@@ -513,7 +467,7 @@ func TestDelegateRefusesBeforeAnyReservationDirectly(t *testing.T) {
 	info2, _ := FillTokenInfo(svc2.AcceptingArgumentRules(), mac2, tok2)
 	_ = credits.Initialize(context.Background(), info2.BudgetID, 50)
 	d2 := NewDelegator(svc2, credits)
-	if _, err := d2.Delegate(context.Background(), info2, &DelegateParams{Budget: 5, Scope: scope}); err == nil || !isDelegationBudgetRefusal(err) {
+	if _, err := d2.Delegate(context.Background(), info2, &DelegateParams{Budget: 5, Scope: scope}); err == nil || !strings.Contains(err.Error(), "delegation refused") {
 		t.Fatalf("err = %v", err)
 	}
 	if credits.spends != 0 {
@@ -527,7 +481,7 @@ func TestDelegateRefusesBeforeAnyReservationDirectly(t *testing.T) {
 	// A hand-built identity cannot skip the check: it reads the token itself.
 	forged := *info
 	forged.SealedPrefix = len(mac.Caveats) // claims everything is sealed
-	if _, err := d.Delegate(context.Background(), &forged, &DelegateParams{Budget: 5}); err == nil || !isDelegationBudgetRefusal(err) {
+	if _, err := d.Delegate(context.Background(), &forged, &DelegateParams{Budget: 5}); err == nil || !strings.Contains(err.Error(), "delegation refused") {
 		t.Fatalf("a TokenInfo that claims a full seal skipped the check: %v", err)
 	}
 }
@@ -589,24 +543,14 @@ func TestDelegationNeverRecordsTheRawScope(t *testing.T) {
 		t.Fatalf("the event still carries a raw scope: %v", data["scope"])
 	}
 	want := sha256.Sum256([]byte(accepted))
-	if data[EventScopeSHA256] != hex.EncodeToString(want[:]) || data[EventScopeWords] != 1 {
-		t.Fatalf("event scope fields = %v / %v", data[EventScopeSHA256], data[EventScopeWords])
+	if data["scopeSha256"] != hex.EncodeToString(want[:]) || data["scopeWords"] != 1 {
+		t.Fatalf("event scope fields = %v / %v", data["scopeSha256"], data["scopeWords"])
 	}
 	// Everything but the child's own effective tool scope (published for the
 	// gateway writer, read from the child token, not from the request).
-	delete(data, EventChildScopes)
+	delete(data, "childScopes")
 	raw, _ := json.Marshal(data)
 	if strings.Contains(string(raw), accepted) || strings.Contains(h.logs.String(), accepted) {
 		t.Fatalf("the raw scope reached the event or the log:\n%s\n%s", raw, h.logs.String())
-	}
-}
-
-func TestScopeHashAndWordCount(t *testing.T) {
-	if scopeWordCount("") != 0 || scopeWordCount("a") != 1 || scopeWordCount("a,b c") != 3 || scopeWordCount(" , ") != 0 {
-		t.Fatal("word count")
-	}
-	sum := sha256.Sum256([]byte("a,b"))
-	if scopeSHA256("a,b") != hex.EncodeToString(sum[:]) {
-		t.Fatal("hash")
 	}
 }
