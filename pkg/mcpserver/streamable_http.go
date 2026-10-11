@@ -225,6 +225,12 @@ func (s *SSEServer) handleStreamable(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// A token issued for another MCP resource is refused before any method
+	// runs (see resource_binding.go).
+	if s.refuseWrongResource(w, extractAuthToken(r)) {
+		return
+	}
+
 	switch r.Method {
 	case http.MethodGet:
 		// No server-initiated stream. 405 is the spec's explicit alternative.

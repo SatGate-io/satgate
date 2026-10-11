@@ -228,6 +228,12 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 	// Capture auth token from header before writing response.
 	authToken := extractAuthToken(r)
 
+	// A token issued for another MCP resource gets no stream.
+	if s.refuseWrongResource(w, authToken) {
+		cancel()
+		return
+	}
+
 	// Hosted-app sign-in: a tokenless or unverifiable SSE connect gets the
 	// OAuth challenge instead of a stream. Off (default) changes nothing.
 	if s.oauthChallengeEnabled() && s.requiresVerifiedStreamToken() {
@@ -392,6 +398,11 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 
 	// Also check Authorization header for token (SSE auth)
 	authToken := extractAuthToken(r)
+
+	// A token issued for another MCP resource gets no method answered.
+	if s.refuseWrongResource(w, authToken) {
+		return
+	}
 
 	// Late identity resolution: some clients (e.g., Cursor) don't send the
 	// Authorization header on the initial SSE GET — only on POST /message.

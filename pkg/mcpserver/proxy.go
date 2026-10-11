@@ -58,6 +58,7 @@ type Proxy struct {
 	costs             CostResolver
 	tenantCosts       TenantCostResolver // optional, per-tenant cost resolution
 	auth              Authenticator
+	resource          string // MCP resource URL this proxy serves (see resource_binding.go)
 	delegator         *Delegator
 	events            EventPublisher
 	evidence          EvidenceRecorder
@@ -129,7 +130,7 @@ func New(cfg *Config) (*Proxy, error) {
 		router:      &defaultRouter{mgr: upstream},
 		budget:      budget,
 		costs:       costs,
-		auth:        auth,
+		auth:        BindResource(auth, ""),
 		events:      &NoOpPublisher{},
 		taskTracker: NewTaskTracker(),
 	}
@@ -242,7 +243,7 @@ func (p *Proxy) RootToken() string {
 
 // SetAuthenticator replaces the authenticator.
 func (p *Proxy) SetAuthenticator(a Authenticator) {
-	p.auth = a
+	p.auth = BindResource(a, p.resource)
 }
 
 // SetEventPublisher replaces the event publisher (e.g., with enterprise Redis pub/sub).
