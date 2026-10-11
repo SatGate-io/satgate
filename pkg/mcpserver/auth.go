@@ -56,6 +56,13 @@ type TokenInfo struct {
 	// enforces them.
 	ApprovalRules []toolcontrols.ApprovalRule
 
+	// SealedPrefix is how many leading caveats a valid budget_bind seal
+	// covers (see macaroon.Service.BudgetSealedPrefix). A spending limit that
+	// names a shared budget counts only when the caveat that carries it is one
+	// of them. 0 for a token with no seal and for a hand-built TokenInfo, which
+	// therefore cannot spend from a shared budget.
+	SealedPrefix int
+
 	// Raw macaroon (for delegation).
 	Raw *macaroon.Macaroon
 

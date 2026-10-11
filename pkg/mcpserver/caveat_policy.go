@@ -61,7 +61,8 @@ func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) 
 	if err != nil {
 		return nil, err
 	}
-	limits, err := toolcontrols.Collect(mac.Caveats)
+	sealed := svc.BudgetSealedPrefix(mac)
+	limits, err := toolcontrols.CollectSealed(mac.Caveats, sealed)
 	if err != nil {
 		return nil, err
 	}
@@ -83,6 +84,7 @@ func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) 
 		ArgumentRules: rules,
 		SpendLimits:   limits,
 		ApprovalRules: approvals,
+		SealedPrefix:  sealed,
 		Raw:           mac,
 		RawToken:      token,
 	}
@@ -341,7 +343,7 @@ func (t *TokenInfo) AllSpendLimits() ([]toolcontrols.SpendLimit, error) {
 		return nil, nil
 	}
 	if t.Raw != nil {
-		return toolcontrols.Collect(t.Raw.Caveats)
+		return toolcontrols.CollectSealed(t.Raw.Caveats, t.SealedPrefix)
 	}
 	return t.SpendLimits, nil
 }
