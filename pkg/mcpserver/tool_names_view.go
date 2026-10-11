@@ -99,6 +99,21 @@ func (m *UpstreamManager) IsRenamedTool(name string) bool {
 	return e != nil && e.exposed != e.original
 }
 
+// ToolOrigin says which service and which of its own tools a name agents see
+// stands for, read from the same view that lists and routes the names. A name
+// that is not listed while some service's tools are still missing (or the
+// stored names could not be read) cannot be answered: Err is set.
+func (m *UpstreamManager) ToolOrigin(name string) ToolOrigin {
+	v := m.toolView()
+	if e := v.byName[name]; e != nil {
+		return ToolOrigin{Listed: true, Renamed: e.exposed != e.original, Service: e.service, Original: e.original}
+	}
+	if v.unavailable || v.incomplete {
+		return ToolOrigin{Err: ErrToolTableUnavailable}
+	}
+	return ToolOrigin{}
+}
+
 // ---------------------------------------------------------------------------
 
 // serviceSnap is one configured service, as read for a view.

@@ -41,6 +41,10 @@ type GateCall struct {
 	// recognisably the same call. Gates that need a narrower identity (for
 	// example one per client session) mix their own in.
 	RequestID string
+	// Origin is what the router's tool-name table says Tool stands for (see
+	// ToolOrigin). A gate that matches a shared budget reads the original name
+	// from it when Tool is a renamed tool.
+	Origin ToolOrigin
 	// Now is the decision time. Gates read this, not the clock.
 	Now time.Time
 }
@@ -155,6 +159,7 @@ func (p *Proxy) admitCall(ctx context.Context, req *Request, tokenInfo *TokenInf
 		Tool:      toolName,
 		Params:    req.Params,
 		RequestID: gateRequestID(tokenInfo, toolName, req),
+		Origin:    p.toolOrigin(ctx, tokenInfo.TenantID, toolName),
 		Now:       time.Now().UTC(),
 	})
 	if err != nil {

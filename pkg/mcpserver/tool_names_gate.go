@@ -143,6 +143,52 @@ type RenamedToolRouter interface {
 	IsRenamedToolForTenant(ctx context.Context, tenantID, tool string) bool
 }
 
+// ToolOrigin is what the gateway's own tool-name table says about a name an
+// agent sent. It is read from the table that made the name (the manager's
+// view), never from the shape of the string: a service may list a tool whose
+// own name looks exactly like a renamed one.
+type ToolOrigin struct {
+	// Listed: the name is a tool the tenant's agents are shown.
+	Listed bool
+	// Renamed: the listed name is not the tool's own name.
+	Renamed bool
+	// Service is the manager key of the service the name goes to (Listed).
+	Service string
+	// Original is the tool's own name at that service (Listed).
+	Original string
+	// Err is set when the table could not answer (the tenant is not loaded,
+	// the stored names could not be read, a service's tools are not all in
+	// yet so the name may be one of them). A caller that needs the answer
+	// must refuse; it must not fall back to the name as sent.
+	Err error
+}
+
+// ErrToolTableUnavailable is ToolOrigin.Err when the table cannot say what a
+// name stands for.
+var ErrToolTableUnavailable = errors.New("tool names unavailable")
+
+// ToolOriginRouter is implemented by an UpstreamRouter that can say which
+// service and which original tool a listed name stands for.
+type ToolOriginRouter interface {
+	ToolOriginForTenant(ctx context.Context, tenantID, tool string) ToolOrigin
+}
+
+// toolOrigin asks the router that made the names. A router that has renamed
+// tools but cannot say what they stand for answers with an error, not with
+// the name as sent.
+func (p *Proxy) toolOrigin(ctx context.Context, tenantID, tool string) ToolOrigin {
+	if r, ok := p.router.(ToolOriginRouter); ok {
+		return r.ToolOriginForTenant(ctx, tenantID, tool)
+	}
+	if _, ok := p.router.(*defaultRouter); ok && p.upstream != nil {
+		return p.upstream.ToolOrigin(tool)
+	}
+	if p.isRenamedTool(ctx, tenantID, tool) {
+		return ToolOrigin{Err: ErrToolTableUnavailable}
+	}
+	return ToolOrigin{}
+}
+
 func (p *Proxy) isRenamedTool(ctx context.Context, tenantID, tool string) bool {
 	if r, ok := p.router.(RenamedToolRouter); ok {
 		return r.IsRenamedToolForTenant(ctx, tenantID, tool)
