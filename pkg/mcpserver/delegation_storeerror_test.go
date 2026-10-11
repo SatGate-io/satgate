@@ -179,3 +179,49 @@ func TestHandleDelegateNeverSendsAnErrorValuesText(t *testing.T) {
 	}
 	_ = d
 }
+
+// Delegate itself returns only text this package wrote: for every store answer
+// the error's text is a fixed sentence or built from the store's code and
+// numbers, never the store's own error text, and the error does not wrap it.
+func TestDelegateErrorsCarryNoStoreText(t *testing.T) {
+	ctx := context.Background()
+	refusalWrapped := fmt.Errorf("%s: %w", storeCause, ErrInsufficientBudget)
+	for _, tc := range []struct {
+		name      string
+		carve     func(*BudgetResult, error) (*BudgetResult, error)
+		childInit func(context.Context, string, int64) error
+		want      string
+	}{
+		{"denied, empty code, error", func(*BudgetResult, error) (*BudgetResult, error) {
+			return &BudgetResult{Allowed: false}, errors.New(storeCause)
+		}, nil, wantServerSide},
+		{"denied, known code, error", func(*BudgetResult, error) (*BudgetResult, error) {
+			return &BudgetResult{Allowed: false, ErrorCode: "insufficient_budget"}, errors.New(storeCause)
+		}, nil, wantServerSide},
+		{"nil result, error", func(*BudgetResult, error) (*BudgetResult, error) { return nil, errors.New(storeCause) }, nil, wantServerSide},
+		{"allowed, error", func(*BudgetResult, error) (*BudgetResult, error) {
+			return &BudgetResult{Allowed: true}, errors.New(storeCause)
+		}, nil, wantServerSide},
+		{"ErrInsufficientBudget, nil result", func(*BudgetResult, error) (*BudgetResult, error) { return nil, refusalWrapped }, nil, "insufficient parent budget"},
+		{"ErrInsufficientBudget, refusal result", func(*BudgetResult, error) (*BudgetResult, error) {
+			return &BudgetResult{Allowed: false, ErrorCode: "insufficient_budget"}, refusalWrapped
+		}, nil, "insufficient parent budget: insufficient_budget"},
+		{"child budget creation: error", nil, func(context.Context, string, int64) error { return errors.New(storeCause) }, wantServerSide},
+		{"child budget creation: ErrInsufficientBudget", nil, func(context.Context, string, int64) error { return refusalWrapped }, "insufficient parent budget"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			svc := gbService(t)
+			parent := gbParent(t, svc)
+			b := newGBBudget()
+			_ = b.InMemoryBudgetEnforcer.Initialize(ctx, parent.BudgetID, 100)
+			b.spendResult, b.initChild = tc.carve, tc.childInit
+			_, err := NewDelegator(svc, b).Delegate(ctx, parent, &DelegateParams{Budget: 40})
+			if err == nil || err.Error() != tc.want {
+				t.Fatalf("error %v, want text %q", err, tc.want)
+			}
+			if errors.Unwrap(err) != nil || errors.Is(err, errors.New(storeCause)) {
+				t.Fatalf("the returned error wraps another: %v", errors.Unwrap(err))
+			}
+		})
+	}
+}
