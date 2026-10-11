@@ -53,6 +53,8 @@ type UpstreamManager struct {
 	// refusedLogged is the last count of credential-bearing tools logged per
 	// service, so a steady count is logged once (viewMu).
 	refusedLogged map[string]int
+	// waitLogged holds the wait pairs already logged (viewMu).
+	waitLogged map[ToolWait]bool
 	// runCtx is the context Start was given; retries use it.
 	runCtx     context.Context
 	retryEvery time.Duration // 0: defaultRetryEvery
@@ -172,8 +174,8 @@ func (c *UpstreamClient) stopped(ctx context.Context) bool {
 func NewUpstreamManager(config map[string]UpstreamConfig, routing []RoutingRule, defaultUpstream string, allowPrivateUpstreams ...bool) *UpstreamManager {
 	allowPrivate := len(allowPrivateUpstreams) > 0 && allowPrivateUpstreams[0]
 	return &UpstreamManager{
-		config:                config,
-		routing:               routing,
+		config:                copyUpstreamConfigs(config),
+		routing:               copyRoutingRules(routing),
 		defaultUp:             defaultUpstream,
 		allowPrivateUpstreams: allowPrivate,
 		clients:               make(map[string]*UpstreamClient),
@@ -191,9 +193,12 @@ func (m *UpstreamManager) Start(ctx context.Context) error {
 	// The first retry of a service that did not answer comes one interval
 	// after Start, not at once.
 	m.lastRetry.Store(time.Now().UnixNano())
-	if len(m.config) <= 1 {
+	// The manager writes its config (AddUpstream, RemoveUpstream), so every
+	// read of it holds m.mu. Start works from a copy taken under the lock.
+	startCfg := m.configSnapshot()
+	if len(startCfg) <= 1 {
 		// Single upstream — sequential (no goroutine overhead)
-		for name, cfg := range m.config {
+		for name, cfg := range startCfg {
 			if err := m.startOne(ctx, name, cfg); err != nil {
 				return err
 			}
@@ -208,9 +213,9 @@ func (m *UpstreamManager) Start(ctx context.Context) error {
 		client *UpstreamClient
 		err    error
 	}
-	results := make(chan result, len(m.config))
+	results := make(chan result, len(startCfg))
 
-	for name, cfg := range m.config {
+	for name, cfg := range startCfg {
 		go func(n string, c UpstreamConfig) {
 			client, err := m.connect(ctx, n, c)
 			if err != nil {
@@ -233,7 +238,7 @@ func (m *UpstreamManager) Start(ctx context.Context) error {
 	}
 
 	var firstErr error
-	for i := 0; i < len(m.config); i++ {
+	for i := 0; i < len(startCfg); i++ {
 		r := <-results
 		if r.err != nil {
 			if firstErr == nil {
@@ -255,7 +260,10 @@ func (m *UpstreamManager) Start(ctx context.Context) error {
 	}
 
 	// Fail only if ALL upstreams failed; partial success is OK
-	if len(m.clients) == 0 && firstErr != nil {
+	m.mu.Lock()
+	connected := len(m.clients)
+	m.mu.Unlock()
+	if connected == 0 && firstErr != nil {
 		return firstErr
 	}
 	// Settle every tool name now, from the full set of services, so that a
@@ -300,35 +308,51 @@ func (m *UpstreamManager) startOne(ctx context.Context, name string, cfg Upstrea
 	return nil
 }
 
-// loggableToolNames is the client's tool names without the ones that hold a
-// credential of their own service: such a tool is never named, stored, listed
-// or logged.
-func (m *UpstreamManager) loggableToolNames(name string, client *UpstreamClient) []string {
+// serviceLabel is the service's display name, else its key.
+func (m *UpstreamManager) serviceLabel(name string) string {
+	m.mu.Lock()
+	cfg := m.config[name]
+	m.mu.Unlock()
+	if l := strings.TrimSpace(cfg.DisplayName); l != "" {
+		return l
+	}
+	return name
+}
+
+// connectionCounts is how many of the client's tools are listed and how many
+// are left out because their name or description holds one of the service's
+// credentials. It counts; it names nothing.
+func (m *UpstreamManager) connectionCounts(name string, client *UpstreamClient) (listed, refused int) {
 	m.mu.Lock()
 	cfg := m.config[name]
 	m.mu.Unlock()
 	secrets := credentialValues(cfg)
-	if len(secrets) == 0 {
-		return client.toolNames
-	}
-	out := make([]string, 0, len(client.toolNames))
-	for _, n := range client.toolNames {
-		if !holdsSecret(secrets, n) {
-			out = append(out, n)
+	tools, _ := client.listState()
+	seen := map[string]bool{}
+	for _, raw := range tools {
+		var t struct {
+			Name        string `json:"name"`
+			Description string `json:"description"`
 		}
+		if json.Unmarshal(raw, &t) != nil || t.Name == "" || seen[t.Name] || IsReservedAgentToolName(t.Name) {
+			continue
+		}
+		seen[t.Name] = true
+		if holdsSecret(secrets, t.Name, t.Description) {
+			refused++
+			continue
+		}
+		listed++
 	}
-	return out
+	return listed, refused
 }
 
-// logConnected logs a successful connect. Tool names come from the upstream,
-// so they are left out when text is redacted.
+// logConnected logs a successful connect: the service's display name and two
+// counts. Never a tool name or a description: they come from the upstream, and
+// a refused one may hold a credential.
 func (m *UpstreamManager) logConnected(name string, client *UpstreamClient) {
-	if m.redacting() {
-		log.Info().Str("upstream", name).Int("tools", len(client.toolNames)).Msg("upstream connected")
-		return
-	}
-	log.Info().Str("upstream", name).Int("tools", len(client.toolNames)).
-		Strs("tools", m.loggableToolNames(name, client)).Msg("upstream connected")
+	listed, refused := m.connectionCounts(name, client)
+	log.Info().Str("service", m.serviceLabel(name)).Int("listed", listed).Int("refused", refused).Msg("upstream connected")
 }
 
 func (m *UpstreamManager) connect(ctx context.Context, name string, cfg UpstreamConfig) (*UpstreamClient, error) {
@@ -453,7 +477,9 @@ func (m *UpstreamManager) readLoop(ctx context.Context, client *UpstreamClient) 
 
 			// Attempt respawn for stdio upstreams
 			published := false
+			m.mu.Lock()
 			cfg, hasCfg := m.config[client.name]
+			m.mu.Unlock()
 			if hasCfg && cfg.Transport == "stdio" {
 				published = m.reconnect(ctx, client, "respawning upstream", "upstream respawned successfully", "respawn",
 					func() (*UpstreamClient, error) { return m.connectStdio(client.name, cfg) })
@@ -600,7 +626,8 @@ func (m *UpstreamManager) reconnect(ctx context.Context, client *UpstreamClient,
 		m.namesVer.Add(1)
 		client.shutdown() // the dead transport
 
-		log.Info().Str("upstream", client.name).Int("tools", len(newClient.toolNames)).
+		listed, refused := m.connectionCounts(client.name, newClient)
+		log.Info().Str("service", m.serviceLabel(client.name)).Int("listed", listed).Int("refused", refused).
 			Msg(okMsg)
 		return true
 	}
@@ -872,7 +899,9 @@ func (m *UpstreamManager) ForwardToolCall(ctx context.Context, toolName string, 
 
 // ForwardRequest sends an arbitrary request to the default upstream.
 func (m *UpstreamManager) ForwardRequest(ctx context.Context, method string, params json.RawMessage, timeout time.Duration) (*Response, error) {
+	m.mu.Lock()
 	client, ok := m.clients[m.defaultUp]
+	m.mu.Unlock()
 	if !ok {
 		return nil, fmt.Errorf("no default upstream configured")
 	}
@@ -933,7 +962,7 @@ func (m *UpstreamManager) addUpstream(ctx context.Context, name string, cfg Upst
 		old.shutdown()
 	}
 	m.clients[name] = client
-	m.config[name] = cfg
+	m.config[name] = copyUpstreamConfig(cfg)
 	m.mu.Unlock()
 	m.namesVer.Add(1)
 
@@ -941,15 +970,10 @@ func (m *UpstreamManager) addUpstream(ctx context.Context, name string, cfg Upst
 	return nil
 }
 
-// logAdded logs a live-added upstream; tool names are upstream text and are
-// left out when text is redacted.
+// logAdded logs a live-added upstream: display name and counts only.
 func (m *UpstreamManager) logAdded(name string, client *UpstreamClient) {
-	if m.redacting() {
-		log.Info().Str("upstream", name).Int("tools", len(client.toolNames)).Msg("upstream added (live)")
-		return
-	}
-	log.Info().Str("upstream", name).Int("tools", len(client.toolNames)).
-		Strs("tools", m.loggableToolNames(name, client)).Msg("upstream added (live)")
+	listed, refused := m.connectionCounts(name, client)
+	log.Info().Str("service", m.serviceLabel(name)).Int("listed", listed).Int("refused", refused).Msg("upstream added (live)")
 }
 
 // RemoveUpstream disconnects and removes an upstream at runtime.
@@ -1043,4 +1067,11 @@ func matchToolPattern(pattern, toolName string) bool {
 		return strings.HasPrefix(toolName, prefix)
 	}
 	return pattern == toolName
+}
+
+// configSnapshot is a copy of the manager's config taken under the lock.
+func (m *UpstreamManager) configSnapshot() map[string]UpstreamConfig {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return copyUpstreamConfigs(m.config)
 }

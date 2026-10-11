@@ -63,12 +63,16 @@ import (
 // Who may take a plain name before an earlier service has answered:
 //
 //   - Static configuration (no durable store): while a service that comes
-//     earlier in that order has not answered in this process, a later
-//     service's tools are listed only under their prefixed names. Within the
-//     process a name never changes. After a restart with every service up the
-//     same configuration gives the same names; a degraded start can give a
-//     later service prefixed names that become plain after a healthy restart,
-//     and that never moves a name to a different service.
+//     earlier in that order (routing rules first, then sorted keys) has no
+//     complete tool list in this process, the tools of later services are not
+//     listed, and a call to one gets ToolsNotAvailableYetMessage. No
+//     temporary name is ever offered. The same configuration and the same
+//     tool lists therefore give the same names whatever was up at start. The
+//     cost: one earlier service that is down hides later services' tools
+//     until it answers (turn it off, or change the order). Known limit:
+//     without a database, if a tool list changes between restarts so that an
+//     earlier service now offers a tool a later one already had, the earlier
+//     service takes the plain name at the next start.
 //   - Durable store with a claim order (SetClaimOrderSource): a service claims
 //     a new name only after every earlier service has been seen (it is in this
 //     view, or an earlier complete discovery was recorded). Until then its
@@ -91,7 +95,10 @@ const (
 	// ToolRenamedInvalid: the tool's own name is not accepted by agent apps.
 	ToolRenamedInvalid = "invalid_name"
 	// ToolRenamedPending: an earlier service had not answered when the name
-	// was chosen, so the plain name was left for it.
+	// was chosen, so the plain name was left for it. No new name gets this
+	// reason any more (round 3: a name that a later start could take back is
+	// never listed); it stays so that names stored by an earlier version are
+	// still understood.
 	ToolRenamedPending = "pending"
 	// ToolRenamedLookalike: the plain name started with another service's
 	// slug, so it could pass as that service's tool.
@@ -234,10 +241,16 @@ type ClaimService struct {
 	Label string
 	// ClaimKey is the key its names are stored under (ServiceKey).
 	ClaimKey string
-	// Free marks a service that cannot be reached until its owner acts (it
-	// has never been signed in, or its saved key is refused). It never makes
-	// a later service wait. Every machine must read this the same way.
+	// Free marks a service that the database shows its owner never finished
+	// setting up (it is set to sign in and has no sign-in on file). It never
+	// makes a later service wait. Nothing else sets it: not a stored
+	// needs_signin, not a health status, not one machine's refusal at load,
+	// not a read error. Every machine reads it from the database the same way.
 	Free bool
+	// Secrets are the service's current credential values the host read in
+	// this cycle (stored sign-in tokens), added to the ones in its config for
+	// the check on names and descriptions.
+	Secrets []string
 }
 
 // ClaimOrder lists a tenant's enabled services in the order they were

@@ -109,6 +109,7 @@ type serviceSnap struct {
 	client   *UpstreamClient // nil: configured, not connected
 	tools    []json.RawMessage
 	complete bool
+	withheld bool // the host could not read the service's credentials
 	secrets  []string
 }
 
@@ -183,6 +184,11 @@ func (m *UpstreamManager) snapshotServices() []serviceSnap {
 		if c := m.clients[k]; c != nil {
 			s.client = c
 			s.tools, s.complete = c.listState()
+		}
+		if cfg.WithholdTools {
+			// The host could not read this service's complete credential
+			// set, so nothing it lists can be checked: none of it is shown.
+			s.tools, s.complete, s.withheld = nil, false, true
 		}
 		out = append(out, s)
 	}
@@ -555,6 +561,21 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 		}
 	}
 	m.orderServices(snap, co)
+	if co != nil {
+		extra := map[string][]string{}
+		for _, cs := range co.Services {
+			if len(cs.Secrets) > 0 {
+				extra[cs.ClaimKey] = append(extra[cs.ClaimKey], cs.Secrets...)
+			}
+		}
+		for i := range snap {
+			for _, sec := range extra[snap[i].claimKey] {
+				if len(strings.TrimSpace(sec)) >= minSecretLen {
+					snap[i].secrets = append(snap[i].secrets, strings.TrimSpace(sec))
+				}
+			}
+		}
+	}
 	if !claimsOK {
 		v.fastRetry = true
 	}
@@ -663,6 +684,7 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 		if !waitSeen[w] {
 			waitSeen[w] = true
 			v.waiting = append(v.waiting, w)
+			m.noteWaiting(w, durable)
 		}
 	}
 	// durableBlocker: in a durable order, the first earlier service (that can
@@ -760,7 +782,6 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 		}
 		return a.toolIdx < b.toolIdx
 	})
-	plainBlocked := map[*toolEntry]bool{}
 	for _, e := range fresh {
 		var blocked bool
 		var who string
@@ -772,19 +793,16 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 		if !blocked {
 			continue
 		}
-		if durable {
-			// Not listed until the earlier service has answered.
-			e.blocked = true
-			wait(e, who)
-			v.unavailable = true
-			v.incomplete = true
-			if who == "" {
-				v.fastRetry = true // the order could not be read: try again soon
-			}
-			continue
-		}
-		plainBlocked[e] = true
+		// Not listed until the earlier service has answered. No temporary
+		// name is offered: a name that a later start could take back is
+		// never listed.
+		e.blocked = true
 		wait(e, who)
+		v.unavailable = true
+		v.incomplete = true
+		if who == "" {
+			v.fastRetry = true // the order could not be read: try again soon
+		}
 	}
 
 	otherSlugs := func(i int) []string {
@@ -805,7 +823,7 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 		c := candidateNames(slugs[e.svcIdx], e.original, otherSlugs(e.svcIdx))
 		var cands []string
 		if plainPass {
-			if c.plain == "" || plainBlocked[e] {
+			if c.plain == "" {
 				return
 			}
 			cands = []string{c.plain}
@@ -823,8 +841,6 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 				a.Reason = ToolRenamedInvalid
 			case cand != e.original && c.lookalike:
 				a.Reason = ToolRenamedLookalike
-			case cand != e.original && plainBlocked[e]:
-				a.Reason = ToolRenamedPending
 			case cand != e.original:
 				a.Reason = ToolRenamedClash
 				if holder, ok := byLower[strings.ToLower(e.original)]; ok {
@@ -927,6 +943,24 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 		v.tools = append(v.tools, e.raw)
 	}
 	return v
+}
+
+// noteWaiting logs once per pair that one service's tools are not listed until
+// an earlier one answers, and what the owner can do about it. Display names
+// only.
+func (m *UpstreamManager) noteWaiting(w ToolWait, durable bool) {
+	if durable {
+		return // the host (the owner's panel) says it
+	}
+	if m.waitLogged == nil {
+		m.waitLogged = map[ToolWait]bool{}
+	}
+	if m.waitLogged[w] {
+		return
+	}
+	m.waitLogged[w] = true
+	log.Warn().Str("service", w.Service).Str("waiting_for", w.WaitingFor).
+		Msg("tool names: this service's tools are not listed until an earlier service answers; to stop waiting, turn the earlier service off or change the order")
 }
 
 // noteRefused logs, once per change of count, that tools were left out because

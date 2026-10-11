@@ -133,7 +133,8 @@ func (t *SSETransport) sseLoop() {
 			log.Warn().Str("url", displayOriginOf(t.baseURL)).Dur("backoff", backoff).
 				Msg("SSE stream disconnected, reconnecting")
 		} else {
-			log.Warn().Err(err).Str("url", t.baseURL).Dur("backoff", backoff).
+			// The address digest, never the URL: a URL can carry a key.
+			log.Warn().Err(err).Str("address", addressDigest8(t.baseURL)).Dur("backoff", backoff).
 				Msg("SSE stream disconnected, reconnecting")
 		}
 

@@ -311,6 +311,8 @@ func TestR2Pages_AServiceWithNoCompleteListGetsNoNamesAndOthersAreUnharmed(t *te
 // Fix 2, public: degraded start names.
 
 func TestR2Static_AnEarlierServiceThatIsDownNeverLosesItsPlainNames(t *testing.T) {
+	// Round 3 (fix 3): while the earlier service has not answered, the later
+	// service's tools are NOT listed at all (no temporary prefixed names).
 	rh, rhp := newPagedService(t, "RH", robinhoodTools())
 	alp := newFakeService(t, "ALP", alpacaTools()...)
 	rhp.set("down")
@@ -322,55 +324,46 @@ func TestR2Static_AnEarlierServiceThatIsDownNeverLosesItsPlainNames(t *testing.T
 	}, nil,
 		map[string]UpstreamConfig{"robinhood": rh.cfg("Robinhood"), "alpaca": alp.cfg("Alpaca")})
 	got := listTools(t, m)
-	// Alpaca's tools are all listed, prefixed, never plain: one service being
-	// down does not hide the other.
-	for _, want := range []string{"alpaca_place_crypto_order", "alpaca_get_account", "alpaca_place_stock_order", "alpaca_cancel_order_by_id", "alpaca_get_all_positions"} {
-		if got[want].Name == "" {
-			t.Errorf("missing %q: %v", want, names(got))
-		}
-	}
-	for _, plain := range []string{"place_crypto_order", "get_account", "place_stock_order"} {
-		if got[plain].Name != "" {
-			t.Errorf("the later service took the plain name %q while the earlier one is down", plain)
-		}
+	if len(got) != 0 {
+		t.Fatalf("a later service's tools were listed while the earlier one is down: %v", names(got))
 	}
 	if w := m.Waiting(); len(w) != 1 || w[0] != (ToolWait{Service: "Alpaca", WaitingFor: "Robinhood"}) {
 		t.Fatalf("waiting = %+v", w)
 	}
-	if r, err := callName(t, m, "alpaca_place_crypto_order"); err != nil || r != "ALP:place_crypto_order" {
-		t.Fatalf("alpaca's prefixed name: %q %v", r, err)
+	for _, n := range []string{"alpaca_place_crypto_order", "place_crypto_order", "place_stock_order", "alpaca_place_stock_order"} {
+		_, err := callName(t, m, n)
+		if err == nil || !strings.Contains(err.Error(), ToolsNotAvailableYetMessage) {
+			t.Fatalf("%s: err = %v, want %q", n, err, ToolsNotAvailableYetMessage)
+		}
 	}
-	if _, err := callName(t, m, "place_crypto_order"); err == nil {
-		t.Fatal("the plain name routed while its owner is down")
-	}
-	// Robinhood answers: it takes its plain names; Alpaca's names do not move.
+	// Robinhood answers: it takes its plain names, Alpaca gets its own.
 	rhp.set("")
 	eventually(t, "robinhood to take its plain names", func() bool { return listTools(t, m)["place_crypto_order"].Name != "" })
 	if r, err := callName(t, m, "place_crypto_order"); r != "RH:place_crypto_order" {
 		t.Fatalf("plain name reaches %q (%v)", r, err)
 	}
 	after := listTools(t, m)
-	for name := range got {
-		if _, ok := after[name]; !ok {
-			t.Errorf("name %q was lost when robinhood answered", name)
-		}
-	}
 	if r, _ := callName(t, m, "alpaca_place_crypto_order"); r != "ALP:place_crypto_order" {
-		t.Fatalf("alpaca_place_crypto_order moved to %q", r)
+		t.Fatalf("alpaca_place_crypto_order reaches %q", r)
+	}
+	if r, _ := callName(t, m, "place_stock_order"); r != "ALP:place_stock_order" {
+		t.Fatalf("place_stock_order reaches %q", r)
 	}
 	if len(m.Waiting()) != 0 {
 		t.Fatalf("still waiting: %+v", m.Waiting())
 	}
-	// A fresh manager with every service up gives the documented healthy names.
+	// A fresh manager with every service up gives exactly the same names: a
+	// degraded start followed by a healthy start lists every tool under the
+	// same name.
 	fresh, _ := startCfg(t, func(m *UpstreamManager) { m.SetServiceOrder([]string{"robinhood", "alpaca"}) }, nil,
 		map[string]UpstreamConfig{"robinhood": rh.cfg("Robinhood"), "alpaca": alp.cfg("Alpaca")})
 	healthy := listTools(t, fresh)
-	if healthy["place_stock_order"].Name == "" || healthy["place_crypto_order"].Name == "" {
-		t.Fatalf("healthy names: %v", names(healthy))
+	if len(healthy) != len(after) {
+		t.Fatalf("healthy %v vs degraded-then-healthy %v", names(healthy), names(after))
 	}
-	// Names the degraded process and the healthy one share name the same service.
 	for name := range healthy {
 		if _, ok := after[name]; !ok {
+			t.Errorf("name %q is listed by the healthy start only", name)
 			continue
 		}
 		a, _ := callName(t, m, name)

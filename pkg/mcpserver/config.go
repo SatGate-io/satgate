@@ -122,6 +122,13 @@ type UpstreamConfig struct {
 	// the configuration does not carry (an OAuth refresh token). A tool whose
 	// name or description holds one is not listed.
 	ExtraSecrets []string `yaml:"-"`
+
+	// WithholdTools says the host could not read this service's complete
+	// credential set (stored sign-in tokens, header values, URL query values),
+	// so a tool name or description cannot be checked against it. The service
+	// is connected, but none of its tools is listed or named until the host
+	// sets this off again.
+	WithholdTools bool `yaml:"-"`
 }
 
 // RoutingRule maps tool name patterns to an upstream.
@@ -290,4 +297,53 @@ func (c *Config) validate() error {
 	}
 
 	return nil
+}
+
+// copyUpstreamConfig returns cfg with its own copy of every map and slice, so
+// the copy shares no memory with the caller's value.
+func copyUpstreamConfig(cfg UpstreamConfig) UpstreamConfig {
+	out := cfg
+	out.Command = append([]string(nil), cfg.Command...)
+	if cfg.Command == nil {
+		out.Command = nil
+	}
+	out.ExtraSecrets = append([]string(nil), cfg.ExtraSecrets...)
+	if cfg.ExtraSecrets == nil {
+		out.ExtraSecrets = nil
+	}
+	out.Env = copyStringMap(cfg.Env)
+	out.Headers = copyStringMap(cfg.Headers)
+	return out
+}
+
+func copyStringMap(m map[string]string) map[string]string {
+	if m == nil {
+		return nil
+	}
+	out := make(map[string]string, len(m))
+	for k, v := range m {
+		out[k] = v
+	}
+	return out
+}
+
+// copyUpstreamConfigs copies a whole config map, deeply.
+func copyUpstreamConfigs(in map[string]UpstreamConfig) map[string]UpstreamConfig {
+	out := make(map[string]UpstreamConfig, len(in))
+	for k, v := range in {
+		out[k] = copyUpstreamConfig(v)
+	}
+	return out
+}
+
+// copyRoutingRules copies routing rules, deeply.
+func copyRoutingRules(in []RoutingRule) []RoutingRule {
+	if in == nil {
+		return nil
+	}
+	out := make([]RoutingRule, len(in))
+	for i, r := range in {
+		out[i] = RoutingRule{Tools: append([]string(nil), r.Tools...), Upstream: r.Upstream}
+	}
+	return out
 }
