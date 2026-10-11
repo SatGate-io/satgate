@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -30,6 +31,11 @@ const (
 	// MethodSatGateBudget returns the current budget for the authenticated token.
 	MethodSatGateBudget = "satgate/budget"
 )
+
+// ErrParentCannotDelegate is returned when the parent token cannot be extended
+// into a child token by this server. Its text is what a client sees, so it
+// names no key, signature or caveat.
+var ErrParentCannotDelegate = errors.New("This token can't create child tokens here. Ask the owner to create a token for this agent on the Tokens page.")
 
 // DelegateParams is the input for satgate/delegate.
 type DelegateParams struct {
@@ -157,9 +163,12 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 
 	childMac, err := d.macaroonSvc.Delegate(parent.RawToken, caveats)
 	if err != nil {
-		// Refund parent budget on delegation failure
-		_ = d.budget.Initialize(ctx, parent.BudgetID, parentResult.Remaining+params.Budget)
-		return nil, fmt.Errorf("macaroon delegation failed: %w", err)
+		// Refund only what was carved. With a zero budget nothing was spent.
+		if parentResult != nil {
+			_ = d.budget.Initialize(ctx, parent.BudgetID, parentResult.Remaining+params.Budget)
+		}
+		log.Debug().Err(err).Str("parent", parent.TokenID).Msg("delegation refused: parent token cannot be extended")
+		return nil, ErrParentCannotDelegate
 	}
 	// Seal the child budget_id with the shared writer. A budget_id is
 	// accepted only when this seal covers it.
@@ -169,7 +178,8 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			if parentResult != nil {
 				_ = d.budget.Initialize(ctx, parent.BudgetID, parentResult.Remaining+params.Budget)
 			}
-			return nil, fmt.Errorf("macaroon delegation failed: %w", sealErr)
+			log.Debug().Err(sealErr).Str("parent", parent.TokenID).Msg("delegation refused: child token could not be sealed")
+			return nil, ErrParentCannotDelegate
 		}
 		childMac = sealed
 	}

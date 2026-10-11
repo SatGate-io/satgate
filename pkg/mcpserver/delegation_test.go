@@ -2,6 +2,7 @@ package mcpserver
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -210,5 +211,177 @@ func TestDelegator_MultipleDelegations(t *testing.T) {
 	pr, _ := budget.Remaining(ctx, parentTokenID)
 	if pr != 400 {
 		t.Errorf("parent: expected 400, got %d", pr)
+	}
+}
+
+// recordingBudget counts what the delegator asks of the budget store, so a
+// failed delegation can be checked for exactly the spend and refund it made.
+type recordingBudget struct {
+	*InMemoryBudgetEnforcer
+	spends      []int64
+	initialized []int64
+}
+
+func (r *recordingBudget) Spend(ctx context.Context, id, tool string, cost int64, req string) (*BudgetResult, error) {
+	r.spends = append(r.spends, cost)
+	return r.InMemoryBudgetEnforcer.Spend(ctx, id, tool, cost, req)
+}
+
+func (r *recordingBudget) Initialize(ctx context.Context, id string, credits int64) error {
+	r.initialized = append(r.initialized, credits)
+	return r.InMemoryBudgetEnforcer.Initialize(ctx, id, credits)
+}
+
+// unextendableParent is a parent token this delegator's service cannot
+// extend: it was signed under another key (as a token the authenticator
+// accepts under a different key would be).
+func unextendableParent(t *testing.T) (*macaroon.Service, *TokenInfo) {
+	t.Helper()
+	other, err := macaroon.NewService("some-other-root-key")
+	if err != nil {
+		t.Fatal(err)
+	}
+	mac, err := other.Mint("api:*", time.Now().Add(time.Hour))
+	if err != nil {
+		t.Fatal(err)
+	}
+	svc, err := macaroon.NewService("test-root-key")
+	if err != nil {
+		t.Fatal(err)
+	}
+	id := hashToken(mac.Identifier)
+	return svc, &TokenInfo{TokenID: id, BudgetID: id, RawToken: other.Encode(mac)}
+}
+
+const wantCannotDelegate = "This token can't create child tokens here. Ask the owner to create a token for this agent on the Tokens page."
+
+func TestDelegateRefusesParentItCannotExtend(t *testing.T) {
+	ctx := context.Background()
+	for _, tc := range []struct {
+		name        string
+		budget      int64
+		wantSpends  int
+		wantRefunds []int64 // credits passed to the parent's Initialize after the failure
+	}{
+		{"zero budget: nothing carved, nothing refunded", 0, 0, nil},
+		{"positive budget: one refund equal to the carve", 40, 1, []int64{100}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			svc, parent := unextendableParent(t)
+			rb := &recordingBudget{InMemoryBudgetEnforcer: NewInMemoryBudgetEnforcer()}
+			_ = rb.InMemoryBudgetEnforcer.Initialize(ctx, parent.BudgetID, 100)
+			d := NewDelegator(svc, rb)
+
+			res, err := d.Delegate(ctx, parent, &DelegateParams{Budget: tc.budget, Label: "x"})
+			if err == nil || res != nil {
+				t.Fatalf("want a refusal, got result %v err %v", res, err)
+			}
+			if err.Error() != wantCannotDelegate {
+				t.Fatalf("message = %q", err.Error())
+			}
+			if len(rb.spends) != tc.wantSpends {
+				t.Fatalf("spends = %v, want %d", rb.spends, tc.wantSpends)
+			}
+			if len(rb.initialized) != len(tc.wantRefunds) {
+				t.Fatalf("Initialize calls = %v, want %v", rb.initialized, tc.wantRefunds)
+			}
+			for i, w := range tc.wantRefunds {
+				// refund = parent remaining after the carve (60) + the carve (40)
+				if rb.initialized[i] != w {
+					t.Fatalf("refund %d = %d, want %d", i, rb.initialized[i], w)
+				}
+			}
+		})
+	}
+}
+
+// Through HandleDelegate the same refusal is a JSON-RPC error with the
+// existing code and data.
+func TestHandleDelegateRefusalIsJSONRPCError(t *testing.T) {
+	svc, parent := unextendableParent(t)
+	d := NewDelegator(svc, NewInMemoryBudgetEnforcer())
+	for _, budget := range []int64{0, 5} {
+		raw, _ := json.Marshal(DelegateParams{Budget: budget})
+		resp, err := d.HandleDelegate(context.Background(), &Request{JSONRPC: "2.0", ID: json.RawMessage(`1`), Method: MethodSatGateDelegate, Params: raw}, parent)
+		if err != nil || resp == nil || resp.Error == nil {
+			t.Fatalf("budget %d: want a JSON-RPC error, got %+v %v", budget, resp, err)
+		}
+		if resp.Error.Code != CodeBudgetExhausted || resp.Error.Message != wantCannotDelegate {
+			t.Fatalf("budget %d: code %d message %q", budget, resp.Error.Code, resp.Error.Message)
+		}
+		data, _ := json.Marshal(resp.Error.Data)
+		if string(data) != `{"error":"delegation_failed"}` {
+			t.Fatalf("budget %d: data %s", budget, data)
+		}
+	}
+}
+
+// The other delegation errors keep their messages.
+func TestDelegateOtherErrorsKeepTheirMessages(t *testing.T) {
+	ctx := context.Background()
+	svc, err := macaroon.NewService("test-root-key")
+	if err != nil {
+		t.Fatal(err)
+	}
+	mac, _ := svc.Mint("api:*", time.Now().Add(time.Hour))
+	d := NewDelegator(svc, NewInMemoryBudgetEnforcer())
+	base := TokenInfo{TokenID: "p", BudgetID: "p", RawToken: svc.Encode(mac)}
+
+	depth := base
+	depth.DelegationDepth, depth.Depth = 1, 1
+	capped := base
+	capped.DelegationBudget = 10
+	for _, tc := range []struct {
+		name   string
+		parent TokenInfo
+		params DelegateParams
+		want   string
+	}{
+		{"depth", depth, DelegateParams{Budget: 1}, "delegation depth limit reached (1)"},
+		{"cap", capped, DelegateParams{Budget: 11}, "delegation budget exceeds cap: requested 11, max 10 per delegation"},
+	} {
+		p := tc.parent
+		_, err := d.Delegate(ctx, &p, &tc.params)
+		if err == nil || err.Error() != tc.want {
+			t.Fatalf("%s: %v, want %q", tc.name, err, tc.want)
+		}
+	}
+	// insufficient parent budget is covered by TestDelegator_InsufficientBudget
+}
+
+// A delegator whose seal step fails (the service has no root key to seal
+// with) refuses the same way: one refund equal to the carve.
+func TestDelegateSealFailureRefusesAndRefundsTheCarve(t *testing.T) {
+	ctx := context.Background()
+	for _, tc := range []struct {
+		budget      int64
+		wantSpends  int
+		wantRefunds []int64
+	}{{0, 0, nil}, {40, 1, []int64{100}}} {
+		svc := &macaroon.Service{} // no root key: Delegate works, sealing cannot
+		mac, err := svc.Mint("api:*", time.Now().Add(time.Hour))
+		if err != nil {
+			t.Fatal(err)
+		}
+		id := hashToken(mac.Identifier)
+		parent := &TokenInfo{TokenID: id, BudgetID: id, RawToken: svc.Encode(mac)}
+		rb := &recordingBudget{InMemoryBudgetEnforcer: NewInMemoryBudgetEnforcer()}
+		_ = rb.InMemoryBudgetEnforcer.Initialize(ctx, id, 100)
+		d := NewDelegator(svc, rb)
+
+		res, err := d.Delegate(ctx, parent, &DelegateParams{Budget: tc.budget, Label: "x"})
+		if tc.budget == 0 {
+			// Nothing to seal when no budget is carved: the child is made.
+			if err != nil || res == nil {
+				t.Fatalf("budget 0: %v", err)
+			}
+			continue
+		}
+		if err == nil || res != nil || err.Error() != wantCannotDelegate {
+			t.Fatalf("budget %d: res %v err %v", tc.budget, res, err)
+		}
+		if len(rb.spends) != tc.wantSpends || len(rb.initialized) != len(tc.wantRefunds) || rb.initialized[0] != tc.wantRefunds[0] {
+			t.Fatalf("budget %d: spends %v refunds %v", tc.budget, rb.spends, rb.initialized)
+		}
 	}
 }
