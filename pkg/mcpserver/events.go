@@ -15,6 +15,13 @@ const (
 	EventChildScopes            = "childScopes"
 )
 
+// A delegation event never carries the scope text the holder sent. It carries
+// a SHA-256 of it and how many words it had.
+const (
+	EventScopeSHA256 = "scopeSha256"
+	EventScopeWords  = "scopeWords"
+)
+
 // EventType identifies the kind of MCP proxy event.
 type EventType string
 

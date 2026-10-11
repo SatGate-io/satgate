@@ -32,6 +32,22 @@ def allowed_with_total(r):
     return r
 
 
+def shared_refusal(r):
+    # A refusal by a shared-budget limit with a symbol cap: spend_shared and
+    # spend_symbol (canonical) are signed next to the rest. There is no
+    # remaining field: a refusal makes no balance claim.
+    r.update(denial_code="TOOL_SPEND_LIMIT_DENIED", argument_field="dollar_amount",
+             spend_window="day", spend_limit="50", spend_shared=True,
+             spend_symbol="BTC")
+    return r
+
+
+def shared_allowed(r):
+    r.update(spend_window="day", spend_limit="200", spend_window_total="150",
+             spend_shared=True, spend_symbol="BTC")
+    return r
+
+
 def approval_hold(r):
     r.update(denial_code="APPROVAL_REQUIRED", approval_id="apr_0123456789abcdef")
     return r
@@ -56,6 +72,47 @@ class OrderControlReceipts(unittest.TestCase):
 
     def test_allowed_receipt_with_window_total_verifies(self):
         self.check(allowed_with_total(self.f.receipt("allowed", "budget_authorized")), "allowed")
+
+    def test_shared_budget_symbol_cap_refusal_verifies(self):
+        self.check(shared_refusal(self.f.receipt("denied", "policy_denied")), "denied")
+
+    def test_shared_budget_allowed_receipt_verifies(self):
+        self.check(shared_allowed(self.f.receipt("allowed", "budget_authorized")), "allowed")
+
+    def test_tampering_with_the_shared_fields_is_caught(self):
+        pack = self.f.pack(shared_refusal(self.f.receipt("denied", "policy_denied")))
+        for key, value in (("spend_symbol", "ETH"), ("spend_shared", False)):
+            tampered = copy.deepcopy(pack)
+            tampered["receipts"][0][key] = value
+            for surface, verifier in paid.VERIFIERS.items():
+                with self.subTest(surface=surface, key=key):
+                    result = verifier.verify_pack(tampered, jwks=self.f.jwks, require_trusted_issuer=True,
+                                                  now=NOW, allow_mock=True)
+                    self.assertFalse(result["valid"], result)
+
+    def test_shared_refusal_as_the_gateway_signs_it_verifies(self):
+        # The gateway's spend-limit refusal is a verified policy denial with no
+        # budget evaluation. Build it that way and add the shared fields.
+        r = shared_refusal(paid.verified_not_evaluated(self.f))
+        pack = paid.verified_not_evaluated_pack(self.f, r)
+        for surface, verifier in paid.VERIFIERS.items():
+            with self.subTest(surface=surface):
+                result = verifier.verify_pack(copy.deepcopy(pack), jwks=self.f.jwks, require_trusted_issuer=True,
+                                              now=NOW, allow_mock=True)
+                self.assertTrue(result["valid"], result)
+                self.assertTrue(result["trusted_issuer_valid"], result)
+
+    def test_a_remaining_key_on_a_refusal_is_refused_by_the_demo_copy(self):
+        # Why the receipt has no remaining field: the demo verifier refuses a
+        # verified refusal that makes a balance claim. (The tools copy does not
+        # look at this key; the copies differ, which is a finding in the PR
+        # notes, and neither verifier is edited here.)
+        r = shared_refusal(paid.verified_not_evaluated(self.f))
+        r["spend_remaining"] = "10"
+        pack = paid.verified_not_evaluated_pack(self.f, r)
+        result = paid.VERIFIERS["demo"].verify_pack(copy.deepcopy(pack), jwks=self.f.jwks,
+                                                    require_trusted_issuer=True, now=NOW, allow_mock=True)
+        self.assertFalse(result["valid"], result)
 
     def test_approval_hold_verifies(self):
         self.check(approval_hold(self.f.receipt("denied", "policy_denied")), "denied")

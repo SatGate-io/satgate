@@ -14,6 +14,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/satgate-io/satgate/pkg/argrules"
 	"github.com/satgate-io/satgate/pkg/macaroon"
+	"github.com/satgate-io/satgate/pkg/toolcontrols"
 )
 
 type ctxKey string
@@ -131,6 +132,17 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		return nil, &clientError{msg: "delegation requires macaroon auth (mode=header)"}
 	}
 
+	// A budget the issuer sealed at mint is the only budget a token can carry.
+	// Delegation never adds one, never seals one the holder chose, and never
+	// drops or swaps the parent's. This runs before any reservation or other
+	// work, and it only reads.
+	if err := refuseHolderBudget(d.macaroonSvc, parent.RawToken, params.Scope); err != nil {
+		if r := delegationBudgetRefusal(err); r != nil {
+			return nil, r
+		}
+		return nil, d.refuseMint(parent, err, "parent token cannot be read")
+	}
+
 	// Enforce delegation depth limit
 	if parent.DelegationDepth > 0 && parent.Depth >= parent.DelegationDepth {
 		return nil, &clientError{msg: fmt.Sprintf("delegation depth limit reached (%d)", parent.DelegationDepth)}
@@ -141,16 +153,20 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		return nil, &clientError{msg: fmt.Sprintf("delegation budget exceeds cap: requested %d, max %d per delegation", params.Budget, parent.DelegationBudget)}
 	}
 
-	// Create child macaroon with additional caveats
-	caveats := []string{
+	// Create child macaroon with additional caveats. The caveats this server
+	// writes (the parent link, the child's own credit budget) come first; what
+	// the holder sent in this call (label, scope) comes last. When the child
+	// gets a credit budget it is sealed between the two, so the seal never
+	// covers a word of this request.
+	serverCaveats := []string{
 		fmt.Sprintf("parent = %s", parent.TokenID),
 	}
-
+	var holderCaveats []string
 	if params.Label != "" {
-		caveats = append(caveats, fmt.Sprintf("label = %s", params.Label))
+		holderCaveats = append(holderCaveats, fmt.Sprintf("label = %s", params.Label))
 	}
 	if params.Scope != "" {
-		caveats = append(caveats, fmt.Sprintf("scope = %s", params.Scope))
+		holderCaveats = append(holderCaveats, fmt.Sprintf("scope = %s", params.Scope))
 	}
 	// Generate child budget_id deterministically before minting
 	var childBudgetID string
@@ -162,24 +178,55 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		h.Write([]byte(params.Label))
 		h.Write(nonceBuf)
 		childBudgetID = fmt.Sprintf("del-%s", hex.EncodeToString(h.Sum(nil))[:24])
-		caveats = append(caveats, fmt.Sprintf("budget_id = %s", childBudgetID))
-		caveats = append(caveats, fmt.Sprintf("budget_limit = %.2f", float64(params.Budget)))
+		serverCaveats = append(serverCaveats, fmt.Sprintf("budget_id = %s", childBudgetID))
+		serverCaveats = append(serverCaveats, fmt.Sprintf("budget_limit = %.2f", float64(params.Budget)))
 	}
 
 	// Nothing has been taken from the parent yet, so a failure up to the carve
 	// has nothing to give back.
-	childMac, err := d.macaroonSvc.Delegate(parent.RawToken, caveats)
+	first := serverCaveats
+	if childBudgetID == "" {
+		first = append(append([]string{}, serverCaveats...), holderCaveats...)
+	}
+	childMac, err := d.macaroonSvc.Delegate(parent.RawToken, first)
 	if err != nil {
 		return nil, d.refuseMint(parent, err, "parent token cannot be extended")
 	}
+	parentMac, perr := d.macaroonSvc.Decode(parent.RawToken)
+	if perr != nil {
+		return nil, d.refuseMint(parent, perr, "parent token cannot be read")
+	}
 	// Seal the child budget_id with the shared writer. A budget_id is
 	// accepted only when this seal covers it.
+	//
+	// A seal covers every caveat before it. Before sealing, prove that the
+	// prefix it will cover names no shared budget except the ones already
+	// inside the parent's issuer seal, word for word and at the same place.
+	// Anything else is refused. The checks at the top of Delegate make a
+	// failure here unreachable; this is the proof that the seal adds no budget
+	// the holder chose. No budget has been carved yet, so nothing is given back.
 	if childBudgetID != "" {
+		if !childKeepsOnlyTheParentsSealedBudget(d.macaroonSvc, parentMac, childMac) {
+			log.Error().Str("parent", parent.TokenID).Msg("delegation refused: the child's shared budget could not be proven the same as its parent's")
+			return nil, errDelegationCannotProveSeal
+		}
 		sealed, sealErr := d.macaroonSvc.AppendBudgetBind(d.macaroonSvc.Encode(childMac))
 		if sealErr != nil {
 			return nil, d.refuseMint(parent, sealErr, "child token could not be sealed")
 		}
 		childMac = sealed
+		if len(holderCaveats) > 0 {
+			childMac, err = d.macaroonSvc.DelegateWithoutVerify(d.macaroonSvc.Encode(childMac), holderCaveats)
+			if err != nil {
+				return nil, d.refuseMint(parent, err, "child token could not take the holder's caveats")
+			}
+		}
+	}
+	// The finished child: its budget references are the parent's sealed ones,
+	// unchanged, and nothing else.
+	if !childKeepsOnlyTheParentsSealedBudget(d.macaroonSvc, parentMac, childMac) {
+		log.Error().Str("parent", parent.TokenID).Msg("delegation refused: the finished child's shared budget could not be proven the same as its parent's")
+		return nil, errDelegationCannotProveSeal
 	}
 
 	// Budget transfer: skip for observe-only (0-budget) tokens. Such a request
@@ -247,12 +294,16 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		BudgetID:  parent.BudgetID,
 		TenantID:  parent.TenantID,
 		Data: map[string]interface{}{
-			"childTokenId":              childTokenID,
-			"childBudgetId":             childBudgetID,
-			"childBudget":               params.Budget,
-			"parentRemaining":           parentRemaining,
-			"label":                     params.Label,
-			"scope":                     params.Scope,
+			"childTokenId":    childTokenID,
+			"childBudgetId":   childBudgetID,
+			"childBudget":     params.Budget,
+			"parentRemaining": parentRemaining,
+			"label":           params.Label,
+			// Never the scope text the holder sent: a hash and a word count.
+			// What the child may do is published as EventChildScopes (tool
+			// names only; no rule or control word) and the rule document.
+			EventScopeSHA256:            scopeSHA256(params.Scope),
+			EventScopeWords:             scopeWordCount(params.Scope),
 			EventInheritedRulesKnown:    rulesKnown,
 			EventInheritedArgumentRules: inheritedRules,
 			EventChildScopes:            childScopes,
@@ -373,6 +424,22 @@ func (d *Delegator) HandleDelegate(ctx context.Context, req *Request, tokenInfo 
 
 	result, err := d.Delegate(ctx, tokenInfo, &params)
 	if err != nil {
+		if refusal := delegationBudgetRefusal(err); refusal != nil {
+			// A policy refusal, not an empty budget. Nothing was reserved or
+			// changed. The log and the reply carry a hash and a word count of
+			// the scope, never the text the holder sent. The reply's text is the
+			// refusal's own fixed sentence.
+			log.Warn().
+				Str("tokenId", tokenInfo.TokenID).
+				Str("method", req.Method).
+				Str("scopeSha256", scopeSHA256(params.Scope)).
+				Int("scopeWords", scopeWordCount(params.Scope)).
+				Str("reason", refusal.Error()).
+				Msg("delegation refused")
+			return NewErrorResponseWithData(req.ID, CodePolicyDenied, refusal.Error(), map[string]interface{}{
+				"error": "delegation_failed",
+			}), nil
+		}
 		return NewErrorResponseWithData(req.ID, CodeBudgetExhausted, delegationClientMessage(err), map[string]interface{}{
 			"error": "delegation_failed",
 		}), nil
@@ -456,4 +523,132 @@ func childAuthorityForEvent(svc *macaroon.Service, child *macaroon.Macaroon, tok
 		scopes = append(scopes, v)
 	}
 	return rules, known, scopes
+}
+
+// The three refusals of a delegation that touches a shared budget. Each text is
+// fixed: it never repeats what the holder sent. They share the "delegation_failed"
+// reason code the other delegation failures use.
+var (
+	errDelegationAddsBudget = errors.New("delegation refused: a delegated token cannot add a shared budget; it keeps the budget its parent was issued with")
+	errDelegationUnsealed   = errors.New("delegation refused: this token refers to a shared budget that was not issued with it, so it cannot be delegated")
+	errDelegationScopeBad   = errors.New("delegation refused: the scope carries a control word that cannot be read")
+	// Not reachable through the checks above; a different text so a test can
+	// tell which layer refused.
+	errDelegationCannotProveSeal = errors.New("delegation refused: the child's shared budget could not be proven the same as its parent's")
+)
+
+// delegationBudgetRefusal returns the fixed refusal err is, or nil. The caller
+// sends the returned sentinel's text, never err's.
+func delegationBudgetRefusal(err error) error {
+	for _, e := range []error{errDelegationAddsBudget, errDelegationUnsealed, errDelegationScopeBad, errDelegationCannotProveSeal} {
+		if errors.Is(err, e) {
+			return e
+		}
+	}
+	return nil
+}
+
+// refuseHolderBudget is the gate every delegation passes first. It refuses
+//
+//  1. a budget-bearing control word in the scope the holder sent, and
+//  2. a parent that names a shared budget in a caveat the issuer's seal does
+//     not cover (the holder appended it offline).
+//
+// It reads the parent token itself, not a TokenInfo, so a hand-built identity
+// cannot skip it. A parent whose budget is sealed passes; the child inherits it
+// because caveats are cumulative.
+//
+// The errors it returns are the fixed refusals above, or the decode error, which
+// the caller treats as an unexpected failure and does not send to the client.
+func refuseHolderBudget(svc *macaroon.Service, parentToken, scope string) error {
+	if err := scopeAddsBudget(scope); err != nil {
+		return err
+	}
+	mac, err := svc.Decode(parentToken)
+	if err != nil {
+		return err
+	}
+	if ok, err := budgetRefsAllSealed(mac.Caveats, svc.BudgetSealedPrefix(mac)); err != nil || !ok {
+		return errDelegationUnsealed
+	}
+	return nil
+}
+
+// scopeAddsBudget reports a control word in the delegation scope that names a
+// shared budget, or that cannot be read. Plain tool scopes pass. Words are
+// split the way a scope list is read (commas and spaces).
+func scopeAddsBudget(scope string) error {
+	for _, part := range strings.Split(scope, ",") {
+		for _, word := range strings.Fields(part) {
+			if !strings.HasPrefix(word, argrules.ControlScopePrefix) {
+				if len(word) >= len(argrules.ControlScopePrefix) && strings.EqualFold(word[:len(argrules.ControlScopePrefix)], argrules.ControlScopePrefix) {
+					// A control word in another letter case is read by no
+					// verifier as a control. It is refused rather than judged.
+					return errDelegationScopeBad
+				}
+				continue
+			}
+			doc, err := toolcontrols.ParseScopeValue(word)
+			if err != nil {
+				return errDelegationScopeBad
+			}
+			for _, l := range doc.SpendLimits {
+				if l.Budget != "" {
+					return errDelegationAddsBudget
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// budgetRefsAllSealed reports whether every spending limit in caveats that
+// names a shared budget sits inside the first sealedPrefix caveats, the ones a
+// budget_bind seal covers.
+func budgetRefsAllSealed(caveats []string, sealedPrefix int) (bool, error) {
+	limits, err := toolcontrols.CollectSealed(caveats, sealedPrefix)
+	if err != nil {
+		return false, err
+	}
+	for _, l := range limits {
+		if l.Budget != "" && !l.Sealed {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+// childKeepsOnlyTheParentsSealedBudget is the proof made before the child is
+// sealed: the first n caveats of the child, where n is what the parent's own
+// seal covers, are the parent's caveats word for word (so its budget is
+// carried unchanged), and no caveat after them names a budget. The seal that
+// follows then adds no budget a holder chose.
+func childKeepsOnlyTheParentsSealedBudget(svc *macaroon.Service, parent, child *macaroon.Macaroon) bool {
+	if parent == nil || child == nil {
+		return false
+	}
+	n := svc.BudgetSealedPrefix(parent)
+	if len(parent.Caveats) < n || len(child.Caveats) < len(parent.Caveats) {
+		return false
+	}
+	for i := 0; i < len(parent.Caveats); i++ {
+		if child.Caveats[i] != parent.Caveats[i] {
+			return false
+		}
+	}
+	ok, err := budgetRefsAllSealed(child.Caveats, n)
+	return err == nil && ok
+}
+
+func scopeSHA256(scope string) string {
+	sum := sha256.Sum256([]byte(scope))
+	return hex.EncodeToString(sum[:])
+}
+
+func scopeWordCount(scope string) int {
+	n := 0
+	for _, part := range strings.Split(scope, ",") {
+		n += len(strings.Fields(part))
+	}
+	return n
 }

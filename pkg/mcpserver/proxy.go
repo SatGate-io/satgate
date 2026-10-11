@@ -981,6 +981,7 @@ func (p *Proxy) recordMCPDecision(ctx context.Context, req *Request, tokenInfo *
 		// an approval id). Refusals carry their own detail.
 		decision.ControlWindow, decision.ControlLimit = d.Window, d.Limit
 		decision.ControlWindowTotal, decision.ApprovalID = d.WindowTotal, d.ApprovalID
+		decision.ControlShared, decision.ControlSymbol = d.Shared, d.Symbol
 	}
 	decision.RouteOrTool = "mcp:tools/call:" + toolName
 	decision.JSONRPCID = string(req.ID)

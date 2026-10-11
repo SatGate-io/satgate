@@ -44,8 +44,8 @@ type ReserveResult struct {
 	Total int64
 }
 
-// SpendStore is the durable counter behind spending limits. Both methods must
-// be atomic and safe for any number of concurrent callers across processes.
+// SpendStore is the durable counter behind spending limits. Reserve and
+// Release must be atomic and safe for any number of concurrent callers across processes.
 // A store that cannot answer returns an error; the gateway then refuses the
 // call (fail closed).
 type SpendStore interface {
@@ -56,6 +56,9 @@ type SpendStore interface {
 	// counter by what it held. It does nothing when there is none, so it is
 	// safe to call twice.
 	Release(ctx context.Context, r Reservation) error
+	// Total reads the counter at key, in 10^-8 units, without changing it. A
+	// key with no counter (never used, or past its window) reads 0.
+	Total(ctx context.Context, key string) (int64, error)
 }
 
 // ErrStoreUnavailable is what a store wraps when it cannot reach its backend.
@@ -137,14 +140,24 @@ func (m *MemoryStore) Release(_ context.Context, r Reservation) error {
 	return nil
 }
 
-// Total reports the current counter at key (tests).
-func (m *MemoryStore) Total(key string) int64 {
+// Total implements SpendStore.
+func (m *MemoryStore) Total(_ context.Context, key string) (int64, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	if c := m.counters[key]; c != nil {
-		return c.total
+	if m.Err != nil {
+		return 0, m.Err
 	}
-	return 0
+	m.sweepLocked()
+	if c := m.counters[key]; c != nil {
+		return c.total, nil
+	}
+	return 0, nil
+}
+
+// TotalOf is Total for tests: the counter at key, 0 when there is none.
+func (m *MemoryStore) TotalOf(key string) int64 {
+	n, _ := m.Total(context.Background(), key)
+	return n
 }
 
 // Keys lists the live counters (tests).

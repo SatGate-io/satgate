@@ -57,7 +57,7 @@ func newApprovalHarness(t *testing.T, doc string) *approvalHarness {
 	a.gate = NewApprovalGate(a.approvals, a.notifier)
 	a.gate.Synchronous = true
 	a.gate.now = func() time.Time { return a.clock }
-	h.proxy.SetCallGate(ChainGates(NewSpendGate(h.store), a.gate))
+	h.proxy.SetCallGate(ChainGates(newTestSpendGate(h.store), a.gate))
 	return a
 }
 
@@ -522,7 +522,7 @@ func TestApprovalCaseVariantToolNameIsHeld(t *testing.T) {
 	approvals := toolcontrols.NewMemoryApprovalStore()
 	gate := NewApprovalGate(approvals, &fakeNotifier{})
 	gate.Synchronous = true
-	h.proxy.SetCallGate(ChainGates(NewSpendGate(h.store), gate))
+	h.proxy.SetCallGate(ChainGates(newTestSpendGate(h.store), gate))
 
 	r := h.call(t, 1, "Place_Crypto_Order", order("500"))
 	if got := errData(t, r)["error"]; got != toolcontrols.DenialCodeApprovalRequired {
@@ -563,7 +563,7 @@ func TestApprovalUnmatchableToolNamesAreRefused(t *testing.T) {
 	} {
 		t.Run(label, func(t *testing.T) {
 			a := newApprovalHarness(t, askAbove50)
-			a.proxy.SetCallGate(ChainGates(NewSpendGate(a.store), a.gate))
+			a.proxy.SetCallGate(ChainGates(newTestSpendGate(a.store), a.gate))
 			params := `{"name":"` + name + `","arguments":` + order("500") + `,"_meta":{"token":"` + a.token + `"}}`
 			req := &Request{JSONRPC: "2.0", ID: json.RawMessage("1"), Method: MethodToolsCall, Params: json.RawMessage(params)}
 			resp, err := a.proxy.handleRequest(context.Background(), req)

@@ -81,6 +81,14 @@ type GateReceiptDetail struct {
 	Limit         string // the owner's maximum, as written
 	WindowTotal   string // total in the window after this call (allowed only)
 	ApprovalID    string // the approval concerned
+
+	// Shared, Symbol and Remaining are set only for a call that a limit with
+	// a shared budget or a symbol cap counted or refused. Symbol is the
+	// canonical symbol, Remaining the room left in the window after the
+	// refusal (refusals only). None is an id or a name of the budget.
+	Shared    bool
+	Symbol    string
+	Remaining string
 }
 
 // IsZero reports whether the detail adds nothing.
@@ -315,6 +323,9 @@ func mergeGateDetail(a, b GateReceiptDetail) GateReceiptDetail {
 		Limit:         pick(a.Limit, b.Limit),
 		WindowTotal:   pick(a.WindowTotal, b.WindowTotal),
 		ApprovalID:    pick(a.ApprovalID, b.ApprovalID),
+		Shared:        a.Shared || b.Shared,
+		Symbol:        pick(a.Symbol, b.Symbol),
+		Remaining:     pick(a.Remaining, b.Remaining),
 	}
 }
 
