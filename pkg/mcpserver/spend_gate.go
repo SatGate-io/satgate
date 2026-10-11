@@ -149,6 +149,7 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 			giveBack()
 			return nil, fmt.Errorf("a spending limit has no counter id")
 		}
+		key := counterKey(call.Token.TenantID, counterName(l), windowIDOf(l, now))
 		if len(l.Symbols) > 0 {
 			raw, why := argrules.ReadStringField(call.Params, call.Tool, toolcontrols.SymbolField)
 			verdict, canon := l.CheckSymbol(call.Tool, raw, why == argrules.NumericFieldOK)
@@ -159,13 +160,19 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 				return deny(fmt.Sprintf("%s: this token caps spending by symbol, and the call has no %s the cap can read, so the limit cannot be checked; send the symbol as plain text such as BTC or BTC-USD",
 					call.Tool, toolcontrols.SymbolField), nil), nil
 			case toolcontrols.SymbolAmbiguous:
-				// canon is the stem from the cap's own list, not the agent's text.
-				return deny(fmt.Sprintf("%s: this token caps %s, and a symbol ending in USD with no hyphen could mean that coin or another; send the symbol as %q",
-					call.Tool, canon, canon), nil), nil
+				// canon is the stem from the cap's own list, not the agent's
+				// text. The form maps to exactly this one capped symbol, so
+				// the refusal names it and says what is left under that cap,
+				// in the words the other cap refusals use. The reference was
+				// confirmed sealed above, so reading its counter (read only)
+				// is allowed; an unsealed one never gets this far.
+				sym = canon
+				left := g.remainingAt(ctx, l, key)
+				return deny(fmt.Sprintf("%s: this token caps %s, and a symbol ending in USD with no hyphen could mean that coin or another; send the symbol as %q%s",
+					call.Tool, canon, canon, leftPhrase(l, sym, left)), left), nil
 			}
 			sym = canon
 		}
-		key := counterKey(call.Token.TenantID, counterName(l), windowIDOf(l, now))
 		amount, why := argrules.ReadNumericField(call.Params, call.Tool, l.Field)
 		if why != argrules.NumericFieldOK {
 			return deny(fmt.Sprintf("%s: this token has a limit of %s on %s, and %s, so the limit cannot be checked%s",
@@ -338,17 +345,24 @@ func overMessage(tool string, l toolcontrols.SpendLimit, symbol string, left *in
 	default:
 		who = fmt.Sprintf("this token's limit is %s", limitPhrase(l))
 	}
-	msg := fmt.Sprintf("%s: %s on %s; this order would go over it", tool, who, l.Field)
-	if left != nil && (l.Budget != "" || symbol != "") {
-		msg += "; " + toolcontrols.FormatAmount(l.Field, formatUnits(*left)) + " is left " + l.Window.Today()
-		switch {
-		case symbol != "" && l.Budget != "":
-			msg += " for " + symbol + " in the budget shared by your agents"
-		case symbol != "":
-			msg += " for " + symbol
-		default:
-			msg += " in the budget shared by your agents"
-		}
+	return fmt.Sprintf("%s: %s on %s; this order would go over it", tool, who, l.Field) + leftPhrase(l, symbol, left)
+}
+
+// leftPhrase is the closing words of a budget or symbol-cap refusal: how much
+// is left, for whom. It is empty for any other limit and when the counter
+// could not be read.
+func leftPhrase(l toolcontrols.SpendLimit, symbol string, left *int64) string {
+	if left == nil || (l.Budget == "" && symbol == "") {
+		return ""
+	}
+	msg := "; " + toolcontrols.FormatAmount(l.Field, formatUnits(*left)) + " is left " + l.Window.Today()
+	switch {
+	case symbol != "" && l.Budget != "":
+		msg += " for " + symbol + " in the budget shared by your agents"
+	case symbol != "":
+		msg += " for " + symbol
+	default:
+		msg += " in the budget shared by your agents"
 	}
 	return msg
 }
