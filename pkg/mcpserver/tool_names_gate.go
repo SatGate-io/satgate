@@ -169,3 +169,9 @@ func (p *Proxy) renamedToolRefusal(ctx context.Context, req *Request, tokenInfo 
 		Detail:  GateReceiptDetail{DenialCode: DenialCodeToolNotCovered},
 	})
 }
+
+// SetHealthDetail sets a function whose non-empty answer is added to the
+// gateway's /health reply as "detail" (for example "tool names unavailable").
+// It never changes the status: a gateway whose tool names cannot be read is
+// still up. Without one, /health is unchanged.
+func (p *Proxy) SetHealthDetail(fn func() string) { p.healthDetail = fn }
