@@ -50,6 +50,16 @@ type StreamableHTTPTransport struct {
 
 	// redact keeps upstream-supplied text out of errors and logs.
 	redact bool
+
+	// cred supplies the credential headers per request when a source is set.
+	cred *credentialGate
+}
+
+// SetCredentialSource makes every request this transport sends ask src for its
+// credential headers, immediately before sending. Call it before Connect. With
+// no source (the default) the configured headers are sent, as always.
+func (t *StreamableHTTPTransport) SetCredentialSource(src CredentialSource) {
+	t.cred = newCredentialGate(src)
 }
 
 // SetRedactUpstreamText makes the transport leave upstream-supplied text (a
@@ -119,8 +129,10 @@ func (t *StreamableHTTPTransport) maybeStartNotificationListener() {
 			return
 		}
 		req.Header.Set("Accept", "text/event-stream")
-		for k, v := range t.headers {
-			req.Header.Set(k, v)
+		req, err = t.cred.apply(t.notifCtx, SendBackgroundReconnect, req, t.headers)
+		if err != nil {
+			log.Debug().Msg("streamable HTTP: notification stream not started: no usable credential")
+			return
 		}
 		t.sessionMu.RLock()
 		if t.sessionID != "" {
@@ -168,6 +180,10 @@ func (t *StreamableHTTPTransport) ReadMessage(ctx context.Context) (json.RawMess
 // WriteMessage sends a JSON-RPC message via HTTP POST and processes the response.
 // The response may be a single JSON object or an SSE stream of multiple messages.
 func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.RawMessage) error {
+	return t.cred.scrub(t.writeMessage(ctx, msg))
+}
+
+func (t *StreamableHTTPTransport) writeMessage(ctx context.Context, msg json.RawMessage) error {
 	req, err := http.NewRequestWithContext(ctx, "POST", t.url, bytes.NewReader(msg))
 	if err != nil {
 		if t.redact {
@@ -178,8 +194,9 @@ func (t *StreamableHTTPTransport) WriteMessage(ctx context.Context, msg json.Raw
 	req = markNoReplay(req, msg)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json, text/event-stream")
-	for k, v := range t.headers {
-		req.Header.Set(k, v)
+	req, err = t.cred.apply(ctx, sendReasonOf(ctx), req, t.headers)
+	if err != nil {
+		return err
 	}
 	t.sessionMu.RLock()
 	if t.sessionID != "" {
@@ -383,9 +400,10 @@ func (t *StreamableHTTPTransport) Close() error {
 		req, err := http.NewRequestWithContext(ctx, "DELETE", t.url, nil)
 		if err == nil {
 			req.Header.Set("Mcp-Session-Id", sid)
-			for k, v := range t.headers {
-				req.Header.Set(k, v)
-			}
+			// No usable credential: the session is dropped locally, nothing is sent.
+			req, err = t.cred.apply(ctx, SendCleanup, req, t.headers)
+		}
+		if err == nil {
 			resp, err := t.do(req)
 			if err != nil {
 				if t.redact {
@@ -406,11 +424,12 @@ func (t *StreamableHTTPTransport) Close() error {
 }
 
 func (t *StreamableHTTPTransport) do(req *http.Request) (*http.Response, error) {
-	return doUpstreamRedacted(t.httpClient, req, t.hasStoredHeaders(), t.redact)
+	resp, err := doUpstreamRedacted(t.httpClient, req, t.hasStoredHeaders(), t.redact)
+	return t.cred.observe(req, resp, err)
 }
 
 func (t *StreamableHTTPTransport) hasStoredHeaders() bool {
-	if len(t.headers) > 0 {
+	if len(t.headers) > 0 || t.cred.active() {
 		return true
 	}
 	t.sessionMu.RLock()

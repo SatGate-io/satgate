@@ -281,6 +281,9 @@ func (m *UpstreamManager) connectSSE(ctx context.Context, name string, cfg Upstr
 
 	transport := NewSSETransport(cfg.URL, cfg.Headers, cfg.TLSSkipVerify, m.allowPrivateUpstreams)
 	transport.SetRedactUpstreamText(m.redacting())
+	if cfg.Credentials != nil {
+		transport.SetCredentialSource(cfg.Credentials)
+	}
 
 	connectCtx := ctx
 	if cfg.Timeout > 0 {
@@ -307,6 +310,9 @@ func (m *UpstreamManager) connectStreamable(ctx context.Context, name string, cf
 
 	transport := NewStreamableHTTPTransport(cfg.URL, cfg.Headers, cfg.TLSSkipVerify, m.allowPrivateUpstreams)
 	transport.SetRedactUpstreamText(m.redacting())
+	if cfg.Credentials != nil {
+		transport.SetCredentialSource(cfg.Credentials)
+	}
 
 	connectCtx := ctx
 	if cfg.Timeout > 0 {
@@ -384,7 +390,9 @@ func (m *UpstreamManager) readLoop(ctx context.Context, client *UpstreamClient) 
 			} else if hasCfg && (cfg.Transport == "sse" || cfg.Transport == "http" || cfg.Transport == "streamable") {
 				// Reconnect SSE/streamable upstreams with backoff
 				published = m.reconnect(ctx, client, "reconnecting upstream", "upstream reconnected successfully", "reconnect",
-					func() (*UpstreamClient, error) { return m.connect(ctx, client.name, cfg) })
+					func() (*UpstreamClient, error) {
+						return m.connect(withSendReason(ctx, SendBackgroundReconnect), client.name, cfg)
+					})
 			} else {
 				return
 			}
@@ -472,7 +480,7 @@ func (m *UpstreamManager) reconnect(ctx context.Context, client *UpstreamClient,
 
 		// The handshake ends as soon as either client is shut down (Close,
 		// RemoveUpstream), not when its HTTP round trip happens to finish.
-		hctx, endHandshake := context.WithCancel(ctx)
+		hctx, endHandshake := context.WithCancel(withSendReason(ctx, SendBackgroundReconnect))
 		stopWatch := make(chan struct{})
 		go func() {
 			select {

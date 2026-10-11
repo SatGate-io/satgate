@@ -57,6 +57,19 @@ type SSETransport struct {
 
 	// redact keeps upstream-supplied text out of errors and logs.
 	redact bool
+
+	// cred supplies the credential headers per request when a source is set.
+	// firstWhy is why the first stream GET is sent (set by Connect from its
+	// context); every later stream GET is a background reconnect.
+	cred     *credentialGate
+	firstWhy SendReason
+}
+
+// SetCredentialSource makes every request this transport sends ask src for its
+// credential headers, immediately before sending. Call it before Connect. With
+// no source (the default) the configured headers are sent, as always.
+func (t *SSETransport) SetCredentialSource(src CredentialSource) {
+	t.cred = newCredentialGate(src)
 }
 
 // SetRedactUpstreamText makes the transport leave upstream-supplied text (a
@@ -87,6 +100,7 @@ func NewSSETransport(baseURL string, headers map[string]string, tlsSkipVerify bo
 
 // Connect establishes the SSE stream and waits for the endpoint event.
 func (t *SSETransport) Connect(ctx context.Context) error {
+	t.firstWhy = sendReasonOf(ctx)
 	t.wg.Add(1)
 	go t.sseLoop()
 
@@ -119,12 +133,14 @@ func (t *SSETransport) sseLoop() {
 	backoff := time.Second
 	maxBackoff := 30 * time.Second
 
+	why := t.firstWhy
 	for {
 		if t.ctx.Err() != nil {
 			return
 		}
 
-		err := t.runSSEStream()
+		err := t.runSSEStream(why)
+		why = SendBackgroundReconnect
 		if t.ctx.Err() != nil {
 			return // clean shutdown
 		}
@@ -133,7 +149,7 @@ func (t *SSETransport) sseLoop() {
 			log.Warn().Str("url", displayOriginOf(t.baseURL)).Dur("backoff", backoff).
 				Msg("SSE stream disconnected, reconnecting")
 		} else {
-			log.Warn().Err(err).Str("url", t.baseURL).Dur("backoff", backoff).
+			log.Warn().Err(t.cred.scrub(err)).Str("url", t.baseURL).Dur("backoff", backoff).
 				Msg("SSE stream disconnected, reconnecting")
 		}
 
@@ -150,7 +166,7 @@ func (t *SSETransport) sseLoop() {
 }
 
 // runSSEStream connects to the SSE endpoint and reads events until error or close.
-func (t *SSETransport) runSSEStream() error {
+func (t *SSETransport) runSSEStream(why SendReason) error {
 	if t.onStreamEnd != nil {
 		defer t.onStreamEnd()
 	}
@@ -160,8 +176,10 @@ func (t *SSETransport) runSSEStream() error {
 	}
 	req.Header.Set("Accept", "text/event-stream")
 	req.Header.Set("Cache-Control", "no-cache")
-	for k, v := range t.headers {
-		req.Header.Set(k, v)
+	req, err = t.cred.apply(t.ctx, why, req, t.headers)
+	if err != nil {
+		t.sendError(err)
+		return err
 	}
 
 	resp, err := t.do(req)
@@ -307,7 +325,8 @@ func (t *SSETransport) handleSSEEvent(upstreamURL, streamURL *url.URL, eventType
 }
 
 func (t *SSETransport) do(req *http.Request) (*http.Response, error) {
-	return doUpstreamRedacted(t.httpClient, req, len(t.headers) > 0, t.redact)
+	resp, err := doUpstreamRedacted(t.httpClient, req, len(t.headers) > 0 || t.cred.active(), t.redact)
+	return t.cred.observe(req, resp, err)
 }
 
 // failConnect records a refused endpoint as the terminal error, reports it to
@@ -330,6 +349,7 @@ func (t *SSETransport) terminalError() error {
 }
 
 func (t *SSETransport) sendError(err error) {
+	err = t.cred.scrub(err)
 	select {
 	case t.errors <- err:
 	default:
@@ -350,6 +370,10 @@ func (t *SSETransport) ReadMessage(ctx context.Context) (json.RawMessage, error)
 
 // WriteMessage sends a JSON-RPC message via HTTP POST to the message endpoint.
 func (t *SSETransport) WriteMessage(ctx context.Context, msg json.RawMessage) error {
+	return t.cred.scrub(t.writeMessage(ctx, msg))
+}
+
+func (t *SSETransport) writeMessage(ctx context.Context, msg json.RawMessage) error {
 	t.mu.Lock()
 	endpoint := t.messageEndpoint
 	t.mu.Unlock()
@@ -367,8 +391,9 @@ func (t *SSETransport) WriteMessage(ctx context.Context, msg json.RawMessage) er
 	}
 	req = markNoReplay(req, msg)
 	req.Header.Set("Content-Type", "application/json")
-	for k, v := range t.headers {
-		req.Header.Set(k, v)
+	req, err = t.cred.apply(ctx, sendReasonOf(ctx), req, t.headers)
+	if err != nil {
+		return err
 	}
 
 	resp, err := t.do(traceDispatch(ctx, req))

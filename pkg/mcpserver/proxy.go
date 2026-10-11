@@ -578,7 +578,10 @@ func (p *Proxy) handlePing(req *Request) *Response {
 // In multi-tenant mode with an UpstreamRouter, returns tenant-specific tools.
 func (p *Proxy) handleToolsListWithCtx(ctx context.Context, req *Request) (*Response, error) {
 	tenantID := TenantFromContext(ctx)
-	tools := p.router.AllToolsForTenant(ctx, tenantID)
+	tools, failed := routerTools(ctx, p.router, req.ID, tenantID)
+	if failed != nil {
+		return failed, nil
+	}
 
 	// Allow enterprise layer to enrich tools with cost/budget metadata
 	if p.toolsListEnricher != nil {
@@ -892,7 +895,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	// otherwise look like an answer from the upstream.
 	dispatchFrom(ctx).recordForward(resp, err)
 	if err != nil {
-		return NewErrorResponse(req.ID, CodeUpstreamError, fmt.Sprintf("upstream error: %v", err)), nil
+		return NewErrorResponse(req.ID, CodeUpstreamError, upstreamErrorMessage(p.router, err)), nil
 	}
 
 	// Track every tool call as a task
