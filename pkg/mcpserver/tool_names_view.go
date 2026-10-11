@@ -25,6 +25,10 @@ type ToolNameInfo struct {
 	Renamed  bool
 	Reason   string // "", ToolRenamedClash, ToolRenamedInvalid, ToolRenamedPending or ToolRenamedLookalike
 	Peer     string // the service that holds the plain name, for a clash
+	// LooksLike is the display name of another connected service whose slug
+	// this name starts with ("robinhood_..."), for names stored before that
+	// was a clash. Empty for every name chosen now.
+	LooksLike string
 }
 
 // ToolWait says one service's new tools are waiting for an earlier one.
@@ -70,7 +74,7 @@ func (m *UpstreamManager) ToolNames() []ToolNameInfo {
 	out := make([]ToolNameInfo, 0, len(v.entries))
 	for _, e := range v.entries {
 		out = append(out, ToolNameInfo{Service: e.label, Key: e.service, Original: e.original,
-			Name: e.exposed, Renamed: e.exposed != e.original, Reason: e.reason, Peer: e.peer})
+			Name: e.exposed, Renamed: e.exposed != e.original, Reason: e.reason, Peer: e.peer, LooksLike: e.looksLike})
 	}
 	return out
 }
@@ -121,6 +125,9 @@ type toolEntry struct {
 	toolIdx  int
 	svcIdx   int
 	blocked  bool
+	// looksLike: the display name of another connected service whose slug the
+	// listed name starts with.
+	looksLike string
 }
 
 type toolView struct {
@@ -238,6 +245,9 @@ func (m *UpstreamManager) toolView() *toolView {
 	nv.retryAfter = viewRetryAfter
 	if !nv.fastRetry && (nv.missing || len(nv.waiting) > 0) {
 		nv.retryAfter = viewWaitingRetry
+		if m.waitRetry > 0 {
+			nv.retryAfter = m.waitRetry
+		}
 	}
 	m.viewPtr.Store(nv)
 	if nv.missing {
@@ -261,11 +271,18 @@ func (m *UpstreamManager) kickRetry() {
 	if last := m.lastRetry.Load(); last != 0 && time.Since(time.Unix(0, last)) < every {
 		return
 	}
-	if !m.retrying.CompareAndSwap(false, true) {
+	// A retry started after Close would outlive the manager: refuse it, and
+	// let Close wait for the one that is running.
+	m.retryMu.Lock()
+	if m.closed.Load() || !m.retrying.CompareAndSwap(false, true) {
+		m.retryMu.Unlock()
 		return
 	}
+	m.retryWG.Add(1)
+	m.retryMu.Unlock()
 	m.lastRetry.Store(time.Now().UnixNano())
 	go func() {
+		defer m.retryWG.Done()
 		defer m.retrying.Store(false)
 		type job struct {
 			key    string
@@ -290,12 +307,16 @@ func (m *UpstreamManager) kickRetry() {
 			if m.closed.Load() || ctx.Err() != nil {
 				return
 			}
-			rctx, cancel := context.WithTimeout(ctx, 45*time.Second)
 			if j.client == nil {
-				if err := m.addUpstream(rctx, j.key, j.cfg, true); err == nil {
+				// The new client's read loop lives as long as ctx: do not
+				// give it a context that ends with this attempt.
+				if err := m.addUpstream(ctx, j.key, j.cfg, true); err == nil {
 					log.Info().Str("upstream", j.key).Msg("upstream answered after an earlier failure")
 				}
-			} else if err := m.discoverTools(rctx, j.client); err == nil {
+				continue
+			}
+			rctx, cancel := context.WithTimeout(ctx, 45*time.Second)
+			if err := m.discoverTools(rctx, j.client); err == nil {
 				if _, ok := j.client.listState(); ok {
 					m.namesVer.Add(1)
 				}
@@ -654,6 +675,9 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 			}
 			l := labelOf[s.ClaimKey]
 			if l == "" {
+				l = s.Label
+			}
+			if l == "" {
 				l = s.Key
 			}
 			return true, l
@@ -877,6 +901,12 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 		// View admission: a stored name that is reserved is never listed.
 		if e.exposed == "" || IsReservedAgentToolName(e.exposed) {
 			continue
+		}
+		for j, sl := range slugs {
+			if j != e.svcIdx && strings.HasPrefix(strings.ToLower(e.exposed), sl+"_") {
+				e.looksLike = services[j].label
+				break
+			}
 		}
 		prefix := multi || clashCount[strings.ToLower(e.original)] > 1 || e.reason == ToolRenamedClash
 		e.raw = renderTool(e.raw, e.exposed, e.exposed != e.original, prefix, e.label)

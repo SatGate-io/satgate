@@ -229,6 +229,9 @@ type ToolSeenStore interface {
 type ClaimService struct {
 	// Key is the service's key in the manager.
 	Key string
+	// Label is its display name, for the wait message when the manager does
+	// not hold the service.
+	Label string
 	// ClaimKey is the key its names are stored under (ServiceKey).
 	ClaimKey string
 	// Free marks a service that cannot be reached until its owner acts (it

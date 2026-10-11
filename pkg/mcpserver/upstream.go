@@ -56,12 +56,15 @@ type UpstreamManager struct {
 	// runCtx is the context Start was given; retries use it.
 	runCtx     context.Context
 	retryEvery time.Duration // 0: defaultRetryEvery
+	waitRetry  time.Duration // 0: viewWaitingRetry
 	// seenLocal holds the claim keys already recorded as seen (viewMu).
 	seenLocal map[string]bool
 	// retrying and lastRetry keep the retry of absent or incomplete services
 	// to one at a time, at most every retryEvery.
 	retrying  atomic.Bool
 	lastRetry atomic.Int64
+	retryMu   sync.Mutex
+	retryWG   sync.WaitGroup
 }
 
 // track registers a freshly dialed replacement client. It reports false when
@@ -185,6 +188,9 @@ func (m *UpstreamManager) Start(ctx context.Context) error {
 	m.viewMu.Lock()
 	m.runCtx = ctx
 	m.viewMu.Unlock()
+	// The first retry of a service that did not answer comes one interval
+	// after Start, not at once.
+	m.lastRetry.Store(time.Now().UnixNano())
 	if len(m.config) <= 1 {
 		// Single upstream — sequential (no goroutine overhead)
 		for name, cfg := range m.config {
@@ -294,6 +300,26 @@ func (m *UpstreamManager) startOne(ctx context.Context, name string, cfg Upstrea
 	return nil
 }
 
+// loggableToolNames is the client's tool names without the ones that hold a
+// credential of their own service: such a tool is never named, stored, listed
+// or logged.
+func (m *UpstreamManager) loggableToolNames(name string, client *UpstreamClient) []string {
+	m.mu.Lock()
+	cfg := m.config[name]
+	m.mu.Unlock()
+	secrets := credentialValues(cfg)
+	if len(secrets) == 0 {
+		return client.toolNames
+	}
+	out := make([]string, 0, len(client.toolNames))
+	for _, n := range client.toolNames {
+		if !holdsSecret(secrets, n) {
+			out = append(out, n)
+		}
+	}
+	return out
+}
+
 // logConnected logs a successful connect. Tool names come from the upstream,
 // so they are left out when text is redacted.
 func (m *UpstreamManager) logConnected(name string, client *UpstreamClient) {
@@ -302,7 +328,7 @@ func (m *UpstreamManager) logConnected(name string, client *UpstreamClient) {
 		return
 	}
 	log.Info().Str("upstream", name).Int("tools", len(client.toolNames)).
-		Strs("tools", client.toolNames).Msg("upstream connected")
+		Strs("tools", m.loggableToolNames(name, client)).Msg("upstream connected")
 }
 
 func (m *UpstreamManager) connect(ctx context.Context, name string, cfg UpstreamConfig) (*UpstreamClient, error) {
@@ -923,7 +949,7 @@ func (m *UpstreamManager) logAdded(name string, client *UpstreamClient) {
 		return
 	}
 	log.Info().Str("upstream", name).Int("tools", len(client.toolNames)).
-		Strs("tools", client.toolNames).Msg("upstream added (live)")
+		Strs("tools", m.loggableToolNames(name, client)).Msg("upstream added (live)")
 }
 
 // RemoveUpstream disconnects and removes an upstream at runtime.
@@ -931,7 +957,15 @@ func (m *UpstreamManager) RemoveUpstream(name string) error {
 	m.mu.Lock()
 	client, exists := m.clients[name]
 	if !exists {
+		// A service that is configured but never connected (it did not
+		// answer) is removed too.
+		_, configured := m.config[name]
+		delete(m.config, name)
 		m.mu.Unlock()
+		if configured {
+			m.namesVer.Add(1)
+			return nil
+		}
 		return fmt.Errorf("upstream %q not found", name)
 	}
 	delete(m.clients, name)
@@ -963,11 +997,28 @@ func (m *UpstreamManager) UpstreamNames() []string {
 // and a connection a loop was in the middle of making is closed.
 func (m *UpstreamManager) Close() error {
 	m.closed.Store(true)
+	err := m.closeClients()
+	// The retry of services that did not answer ends with the manager. It is
+	// waited for outside m.mu, which it takes.
+	m.retryMu.Lock()
+	m.retryMu.Unlock()
+	m.retryWG.Wait()
+	// A retry may have connected a client between the two steps.
+	if err2 := m.closeClients(); err == nil {
+		err = err2
+	}
+	return err
+}
+
+func (m *UpstreamManager) closeClients() error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
 	var firstErr error
 	for name, client := range m.clients {
+		if client.closed.Load() {
+			continue // closed by the first pass
+		}
 		if err := client.shutdown(); err != nil {
 			log.Error().Err(err).Str("upstream", name).Msg("close upstream")
 			if firstErr == nil {
