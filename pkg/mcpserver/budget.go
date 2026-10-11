@@ -2,6 +2,7 @@ package mcpserver
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -34,6 +35,13 @@ type BudgetEnforcer interface {
 	// Initialize sets the starting budget for a token.
 	Initialize(ctx context.Context, tokenID string, credits int64) error
 }
+
+// ErrInsufficientBudget is wrapped by a store that finds out, when it creates
+// the child's budget, that the parent could not afford the carve. A store whose
+// Spend only reserves (the enterprise Redis store moves money when the child
+// budget is created) reports a real refusal this way, so the delegator can tell
+// "the budget said no" from "the store broke".
+var ErrInsufficientBudget = errors.New("insufficient budget")
 
 // BudgetRefunder is implemented by budget stores that can give back what one
 // request's Spend debited. It is a separate interface so a store that cannot

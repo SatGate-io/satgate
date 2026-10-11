@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http/httptest"
 	"strings"
 	"sync"
@@ -471,6 +472,25 @@ func TestInsufficientParentBudgetKeepsItsText(t *testing.T) {
 	}
 	if b.refundCalls != 0 || gbRemaining(t, b, parent.BudgetID) != 10 {
 		t.Fatalf("a refused carve gave back %d times, parent %d", b.refundCalls, gbRemaining(t, b, parent.BudgetID))
+	}
+}
+
+// A store that only finds out at child-budget creation that the parent cannot
+// afford the carve reports it with ErrInsufficientBudget; the client sees the
+// budget text, not "a problem on our side". The carve is still given back.
+func TestChildBudgetCreationRefusalIsABudgetRefusal(t *testing.T) {
+	ctx := context.Background()
+	svc := gbService(t)
+	parent := gbParent(t, svc)
+	b := newGBBudget()
+	_ = b.InMemoryBudgetEnforcer.Initialize(ctx, parent.BudgetID, 100)
+	b.initChild = func(context.Context, string, int64) error { return fmt.Errorf("budget transfer: %w", ErrInsufficientBudget) }
+	_, err := NewDelegator(svc, b).Delegate(ctx, parent, &DelegateParams{Budget: 40})
+	if err == nil || !strings.HasPrefix(err.Error(), "insufficient parent budget: budget transfer: insufficient budget") {
+		t.Fatalf("err %v", err)
+	}
+	if b.refundCalls != 1 || gbRemaining(t, b, parent.BudgetID) != 100 {
+		t.Fatalf("give-backs %d parent %d", b.refundCalls, gbRemaining(t, b, parent.BudgetID))
 	}
 }
 

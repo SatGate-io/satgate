@@ -201,6 +201,10 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		initCtx := context.WithValue(ctx, CtxDelegationID, delegationID)
 		if err := d.budget.Initialize(initCtx, childBudgetID, params.Budget); err != nil {
 			d.giveBack(ctx, parent, delegationID, params.Budget)
+			if errors.Is(err, ErrInsufficientBudget) {
+				// The budget said no when the money was to move: a real refusal.
+				return nil, fmt.Errorf("insufficient parent budget: %w", err)
+			}
 			log.Error().Err(err).Str("parent", parent.TokenID).Str("childBudgetId", childBudgetID).Msg("delegation refused: child budget could not be created")
 			return nil, ErrChildTokenFailed
 		}
