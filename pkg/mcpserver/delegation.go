@@ -32,10 +32,17 @@ const (
 	MethodSatGateBudget = "satgate/budget"
 )
 
-// ErrParentCannotDelegate is returned when the parent token cannot be extended
-// into a child token by this server. Its text is what a client sees, so it
-// names no key, signature or caveat.
+// ErrParentCannotDelegate is returned when the parent token's signature does
+// not verify under this server's ordinary key (a hosted sign-in token), so this
+// server cannot extend it into a child token. Its text is what a client sees,
+// so it names no key, signature or caveat.
 var ErrParentCannotDelegate = errors.New("This token can't create child tokens here. Ask the owner to create a token for this agent on the Tokens page.")
+
+// ErrChildTokenFailed is returned when the child token could not be created for
+// a reason the owner cannot fix: decoding, a caveat check, sealing, a missing
+// root key, creating the child's budget, or a budget store that gave no usable
+// answer. The cause goes only to the server log.
+var ErrChildTokenFailed = errors.New("This child token couldn't be created because of a problem on our side. Try again in a few minutes.")
 
 // DelegateParams is the input for satgate/delegate.
 type DelegateParams struct {
@@ -94,7 +101,16 @@ func (d *Delegator) SetEventPublisher(ep EventPublisher) {
 	d.events = ep
 }
 
+// refundTimeout bounds a give-back. It runs on a context detached from the
+// request, so a cancelled or timed-out request still gets its carve back.
+const refundTimeout = 5 * time.Second
+
 // Delegate creates a child token with a carved budget from the parent.
+//
+// Order: the child token is minted and sealed first and held only in a local
+// variable. Then the budget is carved. The only step after the carve that can
+// fail is creating the child's budget, and a failure there gives the carve back.
+// A token minted for a request that fails is never returned, logged or published.
 func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *DelegateParams) (*DelegateResult, error) {
 	if params.Budget < 0 {
 		return nil, fmt.Errorf("budget must be non-negative")
@@ -112,28 +128,6 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 	// Enforce per-delegation budget cap
 	if parent.DelegationBudget > 0 && params.Budget > parent.DelegationBudget {
 		return nil, fmt.Errorf("delegation budget exceeds cap: requested %d, max %d per delegation", params.Budget, parent.DelegationBudget)
-	}
-
-	// Auto-initialize parent budget from macaroon caveat if not yet initialized
-	if parent.BudgetLimit > 0 && parent.BudgetID != "" {
-		_ = d.budget.Initialize(ctx, parent.BudgetID, parent.BudgetLimit)
-	}
-
-	// Budget transfer: skip for observe-only (0-budget) tokens
-	var parentResult *BudgetResult
-	var delegationID string
-	if params.Budget > 0 {
-		// Carve budget from parent: atomically check & decrement parent, set child.
-		// Each delegation gets a unique idempotency key (nonce) so repeated calls
-		// are treated as new spends, not retries of the same operation.
-		nonce := make([]byte, 8)
-		_, _ = rand.Read(nonce)
-		delegationID = fmt.Sprintf("delegate-%s-%s-%d-%s", parent.BudgetID, params.Label, params.Budget, hex.EncodeToString(nonce))
-		var err error
-		parentResult, err = d.budget.Spend(ctx, parent.BudgetID, "_delegation", params.Budget, delegationID)
-		if err != nil {
-			return nil, fmt.Errorf("insufficient parent budget: %w", err)
-		}
 	}
 
 	// Create child macaroon with additional caveats
@@ -161,41 +155,60 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		caveats = append(caveats, fmt.Sprintf("budget_limit = %.2f", float64(params.Budget)))
 	}
 
+	// Nothing has been taken from the parent yet, so a failure up to the carve
+	// has nothing to give back.
 	childMac, err := d.macaroonSvc.Delegate(parent.RawToken, caveats)
 	if err != nil {
-		// Refund only what was carved. With a zero budget nothing was spent.
-		if parentResult != nil {
-			_ = d.budget.Initialize(ctx, parent.BudgetID, parentResult.Remaining+params.Budget)
-		}
-		log.Debug().Err(err).Str("parent", parent.TokenID).Msg("delegation refused: parent token cannot be extended")
-		return nil, ErrParentCannotDelegate
+		return nil, d.refuseMint(parent, err, "parent token cannot be extended")
 	}
 	// Seal the child budget_id with the shared writer. A budget_id is
 	// accepted only when this seal covers it.
 	if childBudgetID != "" {
 		sealed, sealErr := d.macaroonSvc.AppendBudgetBind(d.macaroonSvc.Encode(childMac))
 		if sealErr != nil {
-			if parentResult != nil {
-				_ = d.budget.Initialize(ctx, parent.BudgetID, parentResult.Remaining+params.Budget)
-			}
-			log.Debug().Err(sealErr).Str("parent", parent.TokenID).Msg("delegation refused: child token could not be sealed")
-			return nil, ErrParentCannotDelegate
+			return nil, d.refuseMint(parent, sealErr, "child token could not be sealed")
 		}
 		childMac = sealed
 	}
 
-	childToken := d.macaroonSvc.Encode(childMac)
-	childTokenID := hashToken(childMac.Identifier + childMac.Signature)
-	inheritedRules, rulesKnown, childScopes := childAuthorityForEvent(d.macaroonSvc, childMac, childToken)
+	// Budget transfer: skip for observe-only (0-budget) tokens. Such a request
+	// calls neither Spend nor Initialize on the parent.
+	var parentResult *BudgetResult
+	var delegationID string
+	if params.Budget > 0 {
+		// Auto-initialize parent budget from macaroon caveat if not yet initialized
+		if parent.BudgetLimit > 0 && parent.BudgetID != "" {
+			_ = d.budget.Initialize(ctx, parent.BudgetID, parent.BudgetLimit)
+		}
+
+		// Carve budget from parent: atomically check & decrement parent, set child.
+		// Each delegation gets a unique idempotency key (nonce) so repeated calls
+		// are treated as new spends, not retries of the same operation.
+		nonce := make([]byte, 8)
+		_, _ = rand.Read(nonce)
+		delegationID = fmt.Sprintf("delegate-%s-%s-%d-%s", parent.BudgetID, params.Label, params.Budget, hex.EncodeToString(nonce))
+		res, spendErr := d.budget.Spend(ctx, parent.BudgetID, "_delegation", params.Budget, delegationID)
+		if err := d.carveOutcome(parent, res, spendErr); err != nil {
+			// Nothing was carved (see carveOutcome), so nothing is given back.
+			return nil, err
+		}
+		parentResult = res
+	}
 
 	// Initialize child budget (skip for observe-only 0-budget tokens)
 	if params.Budget > 0 && childBudgetID != "" {
 		// Pass delegation ID via context for atomic TransferBudget in enterprise
 		initCtx := context.WithValue(ctx, CtxDelegationID, delegationID)
 		if err := d.budget.Initialize(initCtx, childBudgetID, params.Budget); err != nil {
-			return nil, fmt.Errorf("initialize child budget: %w", err)
+			d.giveBack(ctx, parent, delegationID, params.Budget)
+			log.Error().Err(err).Str("parent", parent.TokenID).Str("childBudgetId", childBudgetID).Msg("delegation refused: child budget could not be created")
+			return nil, ErrChildTokenFailed
 		}
 	}
+
+	childToken := d.macaroonSvc.Encode(childMac)
+	childTokenID := hashToken(childMac.Identifier + childMac.Signature)
+	inheritedRules, rulesKnown, childScopes := childAuthorityForEvent(d.macaroonSvc, childMac, childToken)
 
 	parentRemaining := int64(0)
 	if parentResult != nil {
@@ -236,6 +249,83 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		ParentRemaining: parentRemaining,
 		BudgetID:        childBudgetID,
 	}, nil
+}
+
+// refuseMint turns a failure to mint or seal the child into the refusal the
+// client sees. Only a parent whose signature does not verify under this
+// server's ordinary key gets ErrParentCannotDelegate (the owner can fix that on
+// the Tokens page). Anything else is on the server's side. The raw error goes
+// only to the server log, never to the client, and never includes token text.
+func (d *Delegator) refuseMint(parent *TokenInfo, err error, what string) error {
+	if errors.Is(err, macaroon.ErrInvalidSignature) {
+		log.Debug().Err(err).Str("parent", parent.TokenID).Msgf("delegation refused: %s", what)
+		return ErrParentCannotDelegate
+	}
+	log.Error().Err(err).Str("parent", parent.TokenID).Msgf("delegation refused: %s", what)
+	return ErrChildTokenFailed
+}
+
+// refusalCodes are the ErrorCodes of a Spend result that mean "the budget said
+// no", as opposed to "the budget could not answer".
+var refusalCodes = map[string]bool{
+	"":                       true, // Allowed false with no code is still a no
+	"budget_exhausted":       true,
+	"insufficient_budget":    true,
+	"budget_not_initialized": true,
+	"token_not_found":        true,
+}
+
+// carveOutcome decides what a Spend answer for the carve means. The carve is
+// approved only by a non-nil result with Allowed true and no error; it returns
+// nil then. Every other answer took nothing from the parent, so there is
+// nothing to give back, and the client sees one of two refusals:
+//
+//   - the budget said no (Allowed false with a refusal code): the existing
+//     "insufficient parent budget" text;
+//   - the budget could not answer (nil result, a store error, an answer that
+//     contradicts itself): ErrChildTokenFailed. The raw cause is logged only.
+func (d *Delegator) carveOutcome(parent *TokenInfo, res *BudgetResult, err error) error {
+	switch {
+	case res != nil && res.Allowed && err == nil:
+		return nil
+	case res != nil && !res.Allowed && refusalCodes[res.ErrorCode]:
+		if err != nil {
+			return fmt.Errorf("insufficient parent budget: %w", err)
+		}
+		return fmt.Errorf("insufficient parent budget: %s", refusalReason(res))
+	}
+	if err == nil {
+		err = errors.New("the budget store gave no usable answer")
+	}
+	log.Error().Err(err).Str("parent", parent.TokenID).Str("budgetId", parent.BudgetID).Msg("delegation refused: the carve was not approved by the budget store")
+	return ErrChildTokenFailed
+}
+
+func refusalReason(res *BudgetResult) string {
+	if res.ErrorCode != "" {
+		return res.ErrorCode
+	}
+	return "not allowed"
+}
+
+// giveBack returns one request's carve to the parent through the store's
+// Refund. It runs on a context detached from the request's cancellation. If the
+// store cannot give back, or the give-back fails, that is logged at error level
+// with the budget ID, request ID and amount; the caller still returns its refusal.
+func (d *Delegator) giveBack(ctx context.Context, parent *TokenInfo, requestID string, amount int64) {
+	if amount <= 0 {
+		return
+	}
+	refunder, ok := d.budget.(BudgetRefunder)
+	if !ok {
+		log.Error().Str("budgetId", parent.BudgetID).Str("requestId", requestID).Int64("amount", amount).Msg("delegation give-back failed: the budget store cannot give back a carve")
+		return
+	}
+	rctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), refundTimeout)
+	defer cancel()
+	if err := refunder.Refund(rctx, parent.BudgetID, requestID, amount); err != nil {
+		log.Error().Err(err).Str("budgetId", parent.BudgetID).Str("requestId", requestID).Int64("amount", amount).Msg("delegation give-back failed")
+	}
 }
 
 // HandleDelegate processes a satgate/delegate JSON-RPC request.

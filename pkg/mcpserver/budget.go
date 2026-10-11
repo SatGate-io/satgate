@@ -35,6 +35,24 @@ type BudgetEnforcer interface {
 	Initialize(ctx context.Context, tokenID string, credits int64) error
 }
 
+// BudgetRefunder is implemented by budget stores that can give back what one
+// request's Spend debited. It is a separate interface so a store that cannot
+// give back still satisfies BudgetEnforcer.
+//
+// Contract:
+//   - It adds back what the store recorded that request ID debiting from that
+//     budget, as an increment. It never writes an absolute balance, so a spend
+//     made after the request's debit stays spent.
+//   - At most once per request ID: a second call changes nothing.
+//   - Only a debit the store recorded counts. A budget with no record
+//     (unlimited), a refused spend, an unknown request ID, or a deferred
+//     reservation that moved no money is never credited, and is not an error.
+//   - amount is the most the caller expects back; the store never credits more
+//     than it recorded.
+type BudgetRefunder interface {
+	Refund(ctx context.Context, budgetID, requestID string, amount int64) error
+}
+
 // CostResolver determines the credit cost for a tool call.
 type CostResolver interface {
 	// Resolve returns the credit cost for the given tool name.
@@ -56,6 +74,15 @@ type InMemoryBudgetEnforcer struct {
 	mu      sync.Mutex
 	budgets map[string]int64 // tokenID -> remaining credits
 	spent   []SpendRecord    // append-only receipt-ready spend records
+	// debits is what each admitted Spend took, by budget and request ID, until
+	// Refund gives it back. A spend that took nothing records nothing.
+	debits map[string]int64
+}
+
+var _ BudgetRefunder = (*InMemoryBudgetEnforcer)(nil)
+
+func debitKey(budgetID, requestID string) string {
+	return budgetID + "\x00" + requestID
 }
 
 // SpendRecord is an in-memory, receipt-ready spend record.
@@ -72,6 +99,7 @@ type SpendRecord struct {
 func NewInMemoryBudgetEnforcer() *InMemoryBudgetEnforcer {
 	return &InMemoryBudgetEnforcer{
 		budgets: make(map[string]int64),
+		debits:  make(map[string]int64),
 	}
 }
 
@@ -134,6 +162,12 @@ func (e *InMemoryBudgetEnforcer) Spend(_ context.Context, tokenID string, toolNa
 
 	remaining -= cost
 	e.budgets[tokenID] = remaining
+	if cost > 0 {
+		if e.debits == nil {
+			e.debits = make(map[string]int64)
+		}
+		e.debits[debitKey(tokenID, requestID)] += cost
+	}
 
 	e.spent = append(e.spent, SpendRecord{
 		TokenID:   tokenID,
@@ -144,6 +178,31 @@ func (e *InMemoryBudgetEnforcer) Spend(_ context.Context, tokenID string, toolNa
 	})
 
 	return &BudgetResult{Allowed: true, Remaining: remaining, TokenID: tokenID, Cost: cost}, nil
+}
+
+// Refund gives back what Spend recorded for this request ID on this budget, as
+// an increment under the store's lock, and forgets the record so a second call
+// changes nothing.
+func (e *InMemoryBudgetEnforcer) Refund(_ context.Context, budgetID, requestID string, amount int64) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	if amount <= 0 {
+		return nil
+	}
+	key := debitKey(budgetID, requestID)
+	recorded, ok := e.debits[key]
+	if !ok {
+		return nil
+	}
+	delete(e.debits, key)
+	if _, exists := e.budgets[budgetID]; !exists {
+		return nil
+	}
+	if amount < recorded {
+		recorded = amount
+	}
+	e.budgets[budgetID] += recorded
+	return nil
 }
 
 // SpendWithTask is like Spend but also records the MCP task ID for correlation.

@@ -3,6 +3,7 @@ package mcpserver
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"testing"
 	"time"
 
@@ -214,12 +215,11 @@ func TestDelegator_MultipleDelegations(t *testing.T) {
 	}
 }
 
-// recordingBudget counts what the delegator asks of the budget store, so a
-// failed delegation can be checked for exactly the spend and refund it made.
+// recordingBudget counts what the delegator asks of the budget store.
 type recordingBudget struct {
 	*InMemoryBudgetEnforcer
 	spends      []int64
-	initialized []int64
+	initialized []string
 }
 
 func (r *recordingBudget) Spend(ctx context.Context, id, tool string, cost int64, req string) (*BudgetResult, error) {
@@ -228,7 +228,7 @@ func (r *recordingBudget) Spend(ctx context.Context, id, tool string, cost int64
 }
 
 func (r *recordingBudget) Initialize(ctx context.Context, id string, credits int64) error {
-	r.initialized = append(r.initialized, credits)
+	r.initialized = append(r.initialized, id)
 	return r.InMemoryBudgetEnforcer.Initialize(ctx, id, credits)
 }
 
@@ -253,45 +253,33 @@ func unextendableParent(t *testing.T) (*macaroon.Service, *TokenInfo) {
 	return svc, &TokenInfo{TokenID: id, BudgetID: id, RawToken: other.Encode(mac)}
 }
 
-const wantCannotDelegate = "This token can't create child tokens here. Ask the owner to create a token for this agent on the Tokens page."
+const (
+	wantCannotDelegate = "This token can't create child tokens here. Ask the owner to create a token for this agent on the Tokens page."
+	wantServerSide     = "This child token couldn't be created because of a problem on our side. Try again in a few minutes."
+)
 
+// A parent signed under another key gets the Tokens-page sentence, nothing is
+// carved, and the parent's budget is not touched at all.
 func TestDelegateRefusesParentItCannotExtend(t *testing.T) {
 	ctx := context.Background()
-	for _, tc := range []struct {
-		name        string
-		budget      int64
-		wantSpends  int
-		wantRefunds []int64 // credits passed to the parent's Initialize after the failure
-	}{
-		{"zero budget: nothing carved, nothing refunded", 0, 0, nil},
-		{"positive budget: one refund equal to the carve", 40, 1, []int64{100}},
-	} {
-		t.Run(tc.name, func(t *testing.T) {
-			svc, parent := unextendableParent(t)
-			rb := &recordingBudget{InMemoryBudgetEnforcer: NewInMemoryBudgetEnforcer()}
-			_ = rb.InMemoryBudgetEnforcer.Initialize(ctx, parent.BudgetID, 100)
-			d := NewDelegator(svc, rb)
-
-			res, err := d.Delegate(ctx, parent, &DelegateParams{Budget: tc.budget, Label: "x"})
-			if err == nil || res != nil {
-				t.Fatalf("want a refusal, got result %v err %v", res, err)
-			}
-			if err.Error() != wantCannotDelegate {
-				t.Fatalf("message = %q", err.Error())
-			}
-			if len(rb.spends) != tc.wantSpends {
-				t.Fatalf("spends = %v, want %d", rb.spends, tc.wantSpends)
-			}
-			if len(rb.initialized) != len(tc.wantRefunds) {
-				t.Fatalf("Initialize calls = %v, want %v", rb.initialized, tc.wantRefunds)
-			}
-			for i, w := range tc.wantRefunds {
-				// refund = parent remaining after the carve (60) + the carve (40)
-				if rb.initialized[i] != w {
-					t.Fatalf("refund %d = %d, want %d", i, rb.initialized[i], w)
-				}
-			}
-		})
+	for _, budget := range []int64{0, 40} {
+		svc, parent := unextendableParent(t)
+		rb := &recordingBudget{InMemoryBudgetEnforcer: NewInMemoryBudgetEnforcer()}
+		_ = rb.InMemoryBudgetEnforcer.Initialize(ctx, parent.BudgetID, 100)
+		parent.BudgetLimit = 100
+		res, err := NewDelegator(svc, rb).Delegate(ctx, parent, &DelegateParams{Budget: budget, Label: "x"})
+		if err == nil || res != nil {
+			t.Fatalf("budget %d: want a refusal, got result %v err %v", budget, res, err)
+		}
+		if !errors.Is(err, ErrParentCannotDelegate) || err.Error() != wantCannotDelegate {
+			t.Fatalf("budget %d: message = %q", budget, err.Error())
+		}
+		if len(rb.spends) != 0 || len(rb.initialized) != 0 {
+			t.Fatalf("budget %d: the parent's budget was touched: spends %v initializes %v", budget, rb.spends, rb.initialized)
+		}
+		if n, _ := rb.Remaining(ctx, parent.BudgetID); n != 100 {
+			t.Fatalf("budget %d: parent = %d, want 100", budget, n)
+		}
 	}
 }
 
@@ -347,41 +335,4 @@ func TestDelegateOtherErrorsKeepTheirMessages(t *testing.T) {
 		}
 	}
 	// insufficient parent budget is covered by TestDelegator_InsufficientBudget
-}
-
-// A delegator whose seal step fails (the service has no root key to seal
-// with) refuses the same way: one refund equal to the carve.
-func TestDelegateSealFailureRefusesAndRefundsTheCarve(t *testing.T) {
-	ctx := context.Background()
-	for _, tc := range []struct {
-		budget      int64
-		wantSpends  int
-		wantRefunds []int64
-	}{{0, 0, nil}, {40, 1, []int64{100}}} {
-		svc := &macaroon.Service{} // no root key: Delegate works, sealing cannot
-		mac, err := svc.Mint("api:*", time.Now().Add(time.Hour))
-		if err != nil {
-			t.Fatal(err)
-		}
-		id := hashToken(mac.Identifier)
-		parent := &TokenInfo{TokenID: id, BudgetID: id, RawToken: svc.Encode(mac)}
-		rb := &recordingBudget{InMemoryBudgetEnforcer: NewInMemoryBudgetEnforcer()}
-		_ = rb.InMemoryBudgetEnforcer.Initialize(ctx, id, 100)
-		d := NewDelegator(svc, rb)
-
-		res, err := d.Delegate(ctx, parent, &DelegateParams{Budget: tc.budget, Label: "x"})
-		if tc.budget == 0 {
-			// Nothing to seal when no budget is carved: the child is made.
-			if err != nil || res == nil {
-				t.Fatalf("budget 0: %v", err)
-			}
-			continue
-		}
-		if err == nil || res != nil || err.Error() != wantCannotDelegate {
-			t.Fatalf("budget %d: res %v err %v", tc.budget, res, err)
-		}
-		if len(rb.spends) != tc.wantSpends || len(rb.initialized) != len(tc.wantRefunds) || rb.initialized[0] != tc.wantRefunds[0] {
-			t.Fatalf("budget %d: spends %v refunds %v", tc.budget, rb.spends, rb.initialized)
-		}
-	}
 }
