@@ -648,6 +648,12 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		return p.scopeDeniedResponse(ctx, req, tokenInfo, tc.Name), nil
 	}
 
+	// A tool listed under a name other than its own is not covered by a token's
+	// money rules unless they name it: see tool_names_gate.go.
+	if refused := p.renamedToolRefusal(ctx, req, tokenInfo, tc.Name); refused != nil {
+		return refused, nil
+	}
+
 	// Argument rules: the token may allow the tool but limit what it can do.
 	// This runs on the exact params that are forwarded below, before cost,
 	// budget, events or any upstream call, so a refusal charges nothing and

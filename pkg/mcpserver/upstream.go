@@ -35,6 +35,15 @@ type UpstreamManager struct {
 	// inflight holds clients that a read loop has dialed to replace a dead
 	// transport and not yet published, so Close can end them.
 	inflight map[*UpstreamClient]struct{}
+
+	// Tool names (see tool_names.go). viewMu guards nameStore and order and
+	// serializes builds of the view; namesVer moves whenever the set of
+	// services or their tools may have changed.
+	viewMu    sync.Mutex
+	nameStore ToolNameStore
+	order     []string
+	namesVer  atomic.Uint64
+	viewPtr   atomic.Pointer[toolView]
 }
 
 // track registers a freshly dialed replacement client. It reports false when
@@ -154,6 +163,7 @@ func (m *UpstreamManager) Start(ctx context.Context) error {
 				return err
 			}
 		}
+		m.toolView()
 		return nil
 	}
 
@@ -205,6 +215,7 @@ func (m *UpstreamManager) Start(ctx context.Context) error {
 		}
 		m.clients[r.name] = r.client
 		m.mu.Unlock()
+		m.namesVer.Add(1)
 		m.logConnected(r.name, r.client)
 	}
 
@@ -212,6 +223,9 @@ func (m *UpstreamManager) Start(ctx context.Context) error {
 	if len(m.clients) == 0 && firstErr != nil {
 		return firstErr
 	}
+	// Settle every tool name now, from the full set of services, so that a
+	// name is never decided by which service happened to answer first.
+	m.toolView()
 	return nil
 }
 
@@ -246,6 +260,7 @@ func (m *UpstreamManager) startOne(ctx context.Context, name string, cfg Upstrea
 		return fail(fmt.Errorf("upstream %q tools/list: %w", name, err))
 	}
 
+	m.namesVer.Add(1)
 	m.logConnected(name, client)
 	return nil
 }
@@ -520,6 +535,7 @@ func (m *UpstreamManager) reconnect(ctx context.Context, client *UpstreamClient,
 		}
 		m.clients[client.name] = newClient
 		m.mu.Unlock()
+		m.namesVer.Add(1)
 		client.shutdown() // the dead transport
 
 		log.Info().Str("upstream", client.name).Int("tools", len(newClient.toolNames)).
@@ -655,55 +671,50 @@ func (m *UpstreamManager) discoverTools(ctx context.Context, client *UpstreamCli
 	return nil
 }
 
-// ResolveUpstream returns the upstream client for a given tool name.
+// ResolveUpstream returns the upstream client for a tool name an agent sees.
+// It reads the same view AllTools lists (see tool_names.go): a name that is not
+// listed, whatever its case, spacing or any routing pattern, reaches nothing.
 func (m *UpstreamManager) ResolveUpstream(toolName string) (*UpstreamClient, error) {
-	// Check routing rules first
-	for _, rule := range m.routing {
-		for _, pattern := range rule.Tools {
-			if matchToolPattern(pattern, toolName) {
-				if client, ok := m.clients[rule.Upstream]; ok {
-					return client, nil
-				}
-			}
-		}
-	}
-
-	// Auto-resolve: find the upstream that discovered this tool
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	for _, client := range m.clients {
-		for _, tn := range client.toolNames {
-			if tn == toolName {
-				return client, nil
-			}
-		}
-	}
-
-	// Default upstream
-	if client, ok := m.clients[m.defaultUp]; ok {
-		return client, nil
-	}
-
-	return nil, fmt.Errorf("no upstream found for tool %q", toolName)
-}
-
-// AllTools returns the aggregated tools list from all upstreams.
-func (m *UpstreamManager) AllTools() []json.RawMessage {
-	var all []json.RawMessage
-	for _, client := range m.clients {
-		all = append(all, client.tools...)
-	}
-	return all
-}
-
-// ForwardToolCall sends a tools/call to the appropriate upstream.
-func (m *UpstreamManager) ForwardToolCall(ctx context.Context, toolName string, params json.RawMessage, timeout time.Duration) (*Response, error) {
-	NoteDispatchAttempt(ctx)
-	client, err := m.ResolveUpstream(toolName)
+	e, err := m.resolveTool(toolName)
 	if err != nil {
 		return nil, err
 	}
-	return m.sendRequest(ctx, client, MethodToolsCall, params, timeout)
+	return e.client, nil
+}
+
+func (m *UpstreamManager) resolveTool(toolName string) (*toolEntry, error) {
+	if e := m.toolView().byName[toolName]; e != nil {
+		return e, nil
+	}
+	return nil, fmt.Errorf("no upstream found for tool %q", toolName)
+}
+
+// AllTools returns the tools agents see: one entry per name, each name unique
+// (without regard to case) and accepted by agent apps. See tool_names.go.
+func (m *UpstreamManager) AllTools() []json.RawMessage {
+	return append([]json.RawMessage(nil), m.toolView().tools...)
+}
+
+// ForwardToolCall sends a tools/call to the service that owns the listed name,
+// under the tool's own name at that service.
+func (m *UpstreamManager) ForwardToolCall(ctx context.Context, toolName string, params json.RawMessage, timeout time.Duration) (*Response, error) {
+	NoteDispatchAttempt(ctx)
+	e, err := m.resolveTool(toolName)
+	if err != nil {
+		return nil, err
+	}
+	if e.exposed != e.original {
+		// Backstop for rule 7 (see tool_names_gate.go): a token with money
+		// rules never reaches a renamed tool its rules do not name, even if
+		// the caller installed no gate.
+		if err := RenamedToolRefusal(TokenInfoFromContext(ctx), e.exposed); err != nil {
+			return nil, err
+		}
+		if params, err = renameCallParams(params, e.original); err != nil {
+			return nil, err
+		}
+	}
+	return m.sendRequest(ctx, e.client, MethodToolsCall, params, timeout)
 }
 
 // ForwardRequest sends an arbitrary request to the default upstream.
@@ -755,6 +766,7 @@ func (m *UpstreamManager) AddUpstream(ctx context.Context, name string, cfg Upst
 	m.clients[name] = client
 	m.config[name] = cfg
 	m.mu.Unlock()
+	m.namesVer.Add(1)
 
 	m.logAdded(name, client)
 	return nil
@@ -782,6 +794,7 @@ func (m *UpstreamManager) RemoveUpstream(name string) error {
 	delete(m.clients, name)
 	delete(m.config, name)
 	m.mu.Unlock()
+	m.namesVer.Add(1)
 
 	if err := client.shutdown(); err != nil {
 		log.Warn().Err(err).Str("upstream", name).Msg("error closing removed upstream")

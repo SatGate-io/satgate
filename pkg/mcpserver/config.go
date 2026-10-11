@@ -106,6 +106,11 @@ type UpstreamConfig struct {
 	// TLSSkipVerify disables TLS certificate verification.
 	// WARNING: Only use for development with self-signed certificates.
 	TLSSkipVerify bool `yaml:"tlsSkipVerify,omitempty"`
+
+	// DisplayName is how the service is named to people and in tool
+	// descriptions and prefixes ("Robinhood: ..."). Empty means the upstream's
+	// key in the configuration.
+	DisplayName string `yaml:"displayName,omitempty"`
 }
 
 // RoutingRule maps tool name patterns to an upstream.
