@@ -68,7 +68,7 @@ func newDelegHarness(t *testing.T) *delegHarness {
 	proxy.SetUpstreamRouter(&defaultRouter{mgr: mgr})
 	proxy.SetEvidenceRecorder(&lockedRecorder{})
 	h.store = toolcontrols.NewMemoryStore(nil)
-	proxy.SetCallGate(NewSpendGate(h.store))
+	proxy.SetCallGate(newTestSpendGate(h.store))
 	h.srv = httptest.NewServer(NewSSEServer(proxy, ":0").Handler())
 	t.Cleanup(h.srv.Close)
 	return h

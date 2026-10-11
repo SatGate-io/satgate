@@ -154,7 +154,7 @@ func TestBTCUSDOnAnUnsealedReferenceNeverReadsACounter(t *testing.T) {
 	proxy.SetEvidenceRecorder(&lockedRecorder{})
 	mem := toolcontrols.NewMemoryStore(nil)
 	cs := &countingStore{SpendStore: mem}
-	proxy.SetCallGate(NewSpendGate(cs))
+	proxy.SetCallGate(newTestSpendGate(cs))
 	h := &budgetHarness{proxy: proxy, rr: rr, store: mem, rec: &lockedRecorder{}}
 
 	svc, sealed := sealedBudgetToken(t, "tenant-1", "own-1", bothTools, budgetDoc(budgetA, "200", "50"))
@@ -194,7 +194,7 @@ func TestBTCUSDRefusalStandsWhenTheCounterCannotBeRead(t *testing.T) {
 	h.call(t, tok, 1, "place_crypto_order", orderSym("BTC", "40"))
 	h.store.Err = nil
 	failing := &readFailsStore{SpendStore: h.store}
-	h.proxy.SetCallGate(NewSpendGate(failing))
+	h.proxy.SetCallGate(newTestSpendGate(failing))
 	r := h.call(t, tok, 2, "place_crypto_order", orderSym("BTCUSD", "5"))
 	d := errData(t, r)
 	if d["error"] != toolcontrols.DenialCodeSpendLimit || d["symbol"] != "BTC" {

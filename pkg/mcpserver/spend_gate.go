@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"math/big"
 	"strings"
@@ -63,9 +64,38 @@ type SpendGate struct {
 	// but a different scope are different calls.
 	CallScope func(ctx context.Context) string
 
+	// SharedBudgetValidator confirms, for every sealed shared-budget reference
+	// on a call, that the owner's saved budget still stands and says what the
+	// token's word says. It runs before any counter is read or changed. With no
+	// validator configured a call that covers a shared-budget reference is
+	// refused (see SharedBudgetValidator).
+	SharedBudgetValidator SharedBudgetValidator
+
 	// now is the clock; nil means time.Now. Tests set it.
 	now func() time.Time
 }
+
+// ErrSharedBudgetUnavailable is what a SharedBudgetValidator returns when the
+// budget a sealed reference names is not one the token's tenant has right now:
+// no such budget, archived, or limits that differ from the saved ones.
+var ErrSharedBudgetUnavailable = errors.New("shared budget unavailable")
+
+// SharedBudgetValidator checks one sealed shared-budget limit of a token of
+// tenantID against the owner's saved record. nil means the budget is live and
+// the limit equals it. ErrSharedBudgetUnavailable (wrapped or not) means the
+// reference is not honoured. Any other error means the record could not be
+// read; the call is refused and not retried here. The gate calls it before it
+// reads or changes any counter, so a refused reference counts nothing.
+type SharedBudgetValidator func(ctx context.Context, tenantID string, l toolcontrols.SpendLimit) error
+
+const (
+	// MsgSharedBudgetUnavailable refuses a call whose sealed budget reference
+	// does not match a live budget of the token's tenant.
+	MsgSharedBudgetUnavailable = "This agent's shared budget isn't available. Ask the owner to check the Budgets page."
+	// MsgSharedBudgetCheckFailed refuses a call when the saved budget could
+	// not be read.
+	MsgSharedBudgetCheckFailed = "SatGate couldn't check this agent's shared budget. Try again in a minute."
+)
 
 // NewSpendGate returns a gate over store. A nil store refuses every covered
 // call (fail closed).
@@ -126,6 +156,27 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		if l.Budget != "" && (!l.Sealed || call.Token == nil || call.Token.TenantID == "") {
 			return &GateAdmission{Refusal: spendRefusalFor(l, "",
 				fmt.Sprintf("%s: this token refers to a shared budget that could not be confirmed, so the call was not sent", call.Tool), nil)}, nil
+		}
+	}
+
+	// A sealed reference proves the issuer wrote the word, not that the owner
+	// still has that budget with those limits. Ask the owner's saved record
+	// before anything is counted. Nothing configured means nothing is honoured.
+	for _, l := range limits {
+		if l.Budget == "" {
+			continue
+		}
+		if g.SharedBudgetValidator == nil {
+			return &GateAdmission{Refusal: spendRefusalFor(l, "", MsgSharedBudgetUnavailable, nil)}, nil
+		}
+		err := g.SharedBudgetValidator(ctx, call.Token.TenantID, l)
+		switch {
+		case err == nil:
+		case errors.Is(err, ErrSharedBudgetUnavailable):
+			return &GateAdmission{Refusal: spendRefusalFor(l, "", MsgSharedBudgetUnavailable, nil)}, nil
+		default:
+			log.Error().Err(err).Msg("spend limit: could not check a shared budget; call refused")
+			return &GateAdmission{Refusal: spendRefusalFor(l, "", MsgSharedBudgetCheckFailed, nil)}, nil
 		}
 	}
 

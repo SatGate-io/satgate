@@ -79,7 +79,7 @@ func newBudgetHarness(t *testing.T) *budgetHarness {
 	rec := &lockedRecorder{}
 	proxy.SetEvidenceRecorder(rec)
 	store := toolcontrols.NewMemoryStore(nil)
-	proxy.SetCallGate(NewSpendGate(store))
+	proxy.SetCallGate(newTestSpendGate(store))
 	return &budgetHarness{proxy: proxy, rr: rr, store: store, rec: rec}
 }
 
@@ -453,7 +453,7 @@ func TestBudgetReferenceWithNoSealIsRefused(t *testing.T) {
 	d, _ := toolcontrols.ParseJSON([]byte(budgetDoc(budgetA, "200", "")))
 	lim := d.SpendLimits
 	lim[0].ID = "x"
-	g := NewSpendGate(h.store)
+	g := newTestSpendGate(h.store)
 	adm, err := g.Admit(context.Background(), GateCall{
 		Token:  &TokenInfo{TenantID: "tenant-1", SpendLimits: lim},
 		Tool:   "place_crypto_order",
@@ -596,7 +596,7 @@ func raceTwoAgentsOneBudget(t *testing.T, store toolcontrols.SpendStore, total f
 		}
 		infos = append(infos, info)
 	}
-	g := NewSpendGate(store)
+	g := newTestSpendGate(store)
 	var admitted, refused int64
 	var wg sync.WaitGroup
 	const workers, each = 16, 10
@@ -657,7 +657,7 @@ func TestApprovedCallRefusedWhenOtherAgentsUsedTheRoom(t *testing.T) {
 	gate.Synchronous = true
 	clock := time.Now().UTC()
 	gate.now = func() time.Time { return clock }
-	h.proxy.SetCallGate(ChainGates(NewSpendGate(h.store), gate))
+	h.proxy.SetCallGate(ChainGates(newTestSpendGate(h.store), gate))
 
 	_, asker := sealedBudgetToken(t, "tenant-1", "own-1", bothTools, doc)
 	_, other := sealedBudgetToken(t, "tenant-1", "own-2", bothTools, doc)
