@@ -85,13 +85,17 @@ var ErrSharedBudgetUnavailable = errors.New("shared budget unavailable")
 // token that names budgetID (SharedBudgetGroups), collected before any tool
 // filtering, so the validator sees what is missing as well as what is there.
 // allows reports whether the token's own scope allows a tool, so a validator
-// can tell a key that was narrowed from one whose limits were cut. nil means
+// can tell a key that was narrowed from one whose limits were cut. tool is the
+// tool of the call being admitted, or "" when the caller is not admitting a
+// call (a read): a validator may let a call to a tool the budget has nothing
+// to do with (a price quote, the budget check itself) through when the group
+// fails, and must refuse a call to a tool the budget governs. nil means
 // the budget is live and the group is exactly what the owner's budget writes.
 // ErrSharedBudgetUnavailable (wrapped or not) means the reference is not
 // honoured. Any other error means the record could not be read; the call is
 // refused and not retried here. The gate calls it before it reads or changes
 // any counter, so a refused reference counts nothing.
-type SharedBudgetValidator func(ctx context.Context, tenantID, budgetID string, group []toolcontrols.SpendLimit, allows func(tool string) bool) error
+type SharedBudgetValidator func(ctx context.Context, tenantID, budgetID string, group []toolcontrols.SpendLimit, allows func(tool string) bool, tool string) error
 
 // SharedBudgetGroup is the sealed limits of one token that name one budget.
 type SharedBudgetGroup struct {
@@ -179,7 +183,7 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		if g == nil || g.SharedBudgetValidator == nil {
 			return &GateAdmission{Refusal: spendRefusalFor(grp.Limits[0], "", MsgSharedBudgetUnavailable, nil)}, nil
 		}
-		err := g.SharedBudgetValidator(ctx, call.Token.TenantID, grp.ID, grp.Limits, call.Token.AllowsTool)
+		err := g.SharedBudgetValidator(ctx, call.Token.TenantID, grp.ID, grp.Limits, call.Token.AllowsTool, call.Tool)
 		switch {
 		case err == nil:
 		case errors.Is(err, ErrSharedBudgetUnavailable):

@@ -17,7 +17,9 @@ import (
 // gate with NewSpendGate and set their own.
 func newTestSpendGate(store toolcontrols.SpendStore) *SpendGate {
 	g := NewSpendGate(store)
-	g.SharedBudgetValidator = func(context.Context, string, string, []toolcontrols.SpendLimit, func(string) bool) error { return nil }
+	g.SharedBudgetValidator = func(context.Context, string, string, []toolcontrols.SpendLimit, func(string) bool, string) error {
+		return nil
+	}
 	return g
 }
 
@@ -32,19 +34,19 @@ func TestSharedBudgetValidatorRunsBeforeAnyCounter(t *testing.T) {
 	}
 	var calls atomic.Int64
 	cases := []outcome{
-		{"a validator that accepts", func(context.Context, string, string, []toolcontrols.SpendLimit, func(string) bool) error {
+		{"a validator that accepts", func(context.Context, string, string, []toolcontrols.SpendLimit, func(string) bool, string) error {
 			calls.Add(1)
 			return nil
 		}, ""},
-		{"a validator that says unavailable", func(context.Context, string, string, []toolcontrols.SpendLimit, func(string) bool) error {
+		{"a validator that says unavailable", func(context.Context, string, string, []toolcontrols.SpendLimit, func(string) bool, string) error {
 			calls.Add(1)
 			return ErrSharedBudgetUnavailable
 		}, MsgSharedBudgetUnavailable},
-		{"a wrapped unavailable", func(context.Context, string, string, []toolcontrols.SpendLimit, func(string) bool) error {
+		{"a wrapped unavailable", func(context.Context, string, string, []toolcontrols.SpendLimit, func(string) bool, string) error {
 			calls.Add(1)
 			return fmt.Errorf("lookup: %w", ErrSharedBudgetUnavailable)
 		}, MsgSharedBudgetUnavailable},
-		{"a validator that fails", func(context.Context, string, string, []toolcontrols.SpendLimit, func(string) bool) error {
+		{"a validator that fails", func(context.Context, string, string, []toolcontrols.SpendLimit, func(string) bool, string) error {
 			calls.Add(1)
 			return errors.New("database down")
 		}, MsgSharedBudgetCheckFailed},
@@ -90,10 +92,10 @@ func TestSharedBudgetValidatorRunsBeforeAnyCounter(t *testing.T) {
 // do not cover the call too, and the token's own tool check.
 func TestSharedBudgetValidatorSeesTheWholeGroup(t *testing.T) {
 	type ask struct {
-		tenant, id string
-		n          int
-		crypto     bool
-		equity     bool
+		tenant, id, tool string
+		n                int
+		crypto           bool
+		equity           bool
 	}
 	run := func(t *testing.T, tool, args string, docs ...string) []ask {
 		proxy, _, _ := newArgProxy(t)
@@ -101,8 +103,8 @@ func TestSharedBudgetValidatorSeesTheWholeGroup(t *testing.T) {
 		proxy.SetEvidenceRecorder(&lockedRecorder{})
 		g := NewSpendGate(toolcontrols.NewMemoryStore(nil))
 		var asks []ask
-		g.SharedBudgetValidator = func(_ context.Context, tenant, id string, group []toolcontrols.SpendLimit, allows func(string) bool) error {
-			asks = append(asks, ask{tenant, id, len(group), allows("place_crypto_order"), allows("place_equity_order")})
+		g.SharedBudgetValidator = func(_ context.Context, tenant, id string, group []toolcontrols.SpendLimit, allows func(string) bool, tool string) error {
+			asks = append(asks, ask{tenant, id, tool, len(group), allows("place_crypto_order"), allows("place_equity_order")})
 			return nil
 		}
 		proxy.SetCallGate(g)
@@ -115,13 +117,13 @@ func TestSharedBudgetValidatorSeesTheWholeGroup(t *testing.T) {
 	}
 	t.Run("a covered order: one ask with the total and the cap", func(t *testing.T) {
 		asks := run(t, "place_crypto_order", orderSym("BTC", "10"), budgetDoc(budgetA, "200", "50"))
-		if len(asks) != 1 || asks[0] != (ask{"tenant-7", budgetA, 2, true, true}) {
+		if len(asks) != 1 || asks[0] != (ask{"tenant-7", budgetA, "place_crypto_order", 2, true, true}) {
 			t.Fatalf("asks = %+v", asks)
 		}
 	})
 	t.Run("a call the budget does not cover still asks, with the group", func(t *testing.T) {
 		asks := run(t, "place_equity_order", orderSym("AAPL", "10"), budgetDoc(budgetA, "200", "50"))
-		if len(asks) != 1 || asks[0].n != 2 {
+		if len(asks) != 1 || asks[0].n != 2 || asks[0].tool != "place_equity_order" {
 			t.Fatalf("asks = %+v", asks)
 		}
 	})
