@@ -488,7 +488,7 @@ func TestChildBudgetCreationRefusalIsABudgetRefusal(t *testing.T) {
 		return fmt.Errorf("budget transfer: %w", ErrInsufficientBudget)
 	}
 	_, err := NewDelegator(svc, b).Delegate(ctx, parent, &DelegateParams{Budget: 40})
-	if err == nil || !strings.HasPrefix(err.Error(), "insufficient parent budget: budget transfer: insufficient budget") {
+	if err == nil || err.Error() != "insufficient parent budget" {
 		t.Fatalf("err %v", err)
 	}
 	if b.refundCalls != 1 || gbRemaining(t, b, parent.BudgetID) != 100 {

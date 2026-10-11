@@ -44,6 +44,17 @@ var ErrParentCannotDelegate = errors.New("This token can't create child tokens h
 // answer. The cause goes only to the server log.
 var ErrChildTokenFailed = errors.New("This child token couldn't be created because of a problem on our side. Try again in a few minutes.")
 
+// clientError is a refusal whose text is built by this package from fixed
+// words and numbers. Its text is what the client sees. No error returned by a
+// budget store, a macaroon call or any other dependency is ever put in one.
+type clientError struct{ msg string }
+
+func (e *clientError) Error() string { return e.msg }
+
+// errInsufficientParentBudget is the one fixed sentence for a budget refusal
+// the store reported as an ErrInsufficientBudget error.
+var errInsufficientParentBudget = &clientError{msg: "insufficient parent budget"}
+
 // DelegateParams is the input for satgate/delegate.
 type DelegateParams struct {
 	// Budget is the number of credits to allocate to the child token.
@@ -113,21 +124,21 @@ const refundTimeout = 5 * time.Second
 // A token minted for a request that fails is never returned, logged or published.
 func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *DelegateParams) (*DelegateResult, error) {
 	if params.Budget < 0 {
-		return nil, fmt.Errorf("budget must be non-negative")
+		return nil, &clientError{msg: "budget must be non-negative"}
 	}
 
 	if parent.RawToken == "" {
-		return nil, fmt.Errorf("delegation requires macaroon auth (mode=header)")
+		return nil, &clientError{msg: "delegation requires macaroon auth (mode=header)"}
 	}
 
 	// Enforce delegation depth limit
 	if parent.DelegationDepth > 0 && parent.Depth >= parent.DelegationDepth {
-		return nil, fmt.Errorf("delegation depth limit reached (%d)", parent.DelegationDepth)
+		return nil, &clientError{msg: fmt.Sprintf("delegation depth limit reached (%d)", parent.DelegationDepth)}
 	}
 
 	// Enforce per-delegation budget cap
 	if parent.DelegationBudget > 0 && params.Budget > parent.DelegationBudget {
-		return nil, fmt.Errorf("delegation budget exceeds cap: requested %d, max %d per delegation", params.Budget, parent.DelegationBudget)
+		return nil, &clientError{msg: fmt.Sprintf("delegation budget exceeds cap: requested %d, max %d per delegation", params.Budget, parent.DelegationBudget)}
 	}
 
 	// Create child macaroon with additional caveats
@@ -203,9 +214,11 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			d.giveBack(ctx, parent, delegationID, params.Budget)
 			if errors.Is(err, ErrInsufficientBudget) {
 				// The budget said no when the money was to move: a real refusal.
-				return nil, fmt.Errorf("insufficient parent budget: %w", err)
+				// The client gets the fixed sentence, never the error's text.
+				log.Warn().Err(err).Str("parent", parent.TokenID).Str("budgetId", parent.BudgetID).Str("childBudgetId", childBudgetID).Msg("delegation refused: the parent budget could not afford the carve")
+				return nil, errInsufficientParentBudget
 			}
-			log.Error().Err(err).Str("parent", parent.TokenID).Str("childBudgetId", childBudgetID).Msg("delegation refused: child budget could not be created")
+			log.Error().Err(err).Str("parent", parent.TokenID).Str("budgetId", parent.BudgetID).Str("childBudgetId", childBudgetID).Msg("delegation refused: child budget could not be created")
 			return nil, ErrChildTokenFailed
 		}
 	}
@@ -284,19 +297,28 @@ var refusalCodes = map[string]bool{
 // nil then. Every other answer took nothing from the parent, so there is
 // nothing to give back, and the client sees one of two refusals:
 //
-//   - the budget said no (Allowed false with a refusal code): the existing
-//     "insufficient parent budget" text;
-//   - the budget could not answer (nil result, a store error, an answer that
-//     contradicts itself): ErrChildTokenFailed. The raw cause is logged only.
+//   - the budget said no, in a form this package can trust: no error and a
+//     non-nil result with Allowed false and a code in refusalCodes (the message
+//     is built from the code and the result's numbers), or an error that
+//     matches ErrInsufficientBudget (the message is built the same way when the
+//     result also refuses, else it is the fixed sentence). The error's own text
+//     is never used;
+//   - anything else (nil result, a store error, an answer that contradicts
+//     itself, a refusal-shaped result that comes with an unrecognised error):
+//     ErrChildTokenFailed. The error is logged only.
 func (d *Delegator) carveOutcome(parent *TokenInfo, res *BudgetResult, err error) error {
+	refusal := res != nil && !res.Allowed && refusalCodes[res.ErrorCode]
 	switch {
 	case res != nil && res.Allowed && err == nil:
 		return nil
-	case res != nil && !res.Allowed && refusalCodes[res.ErrorCode]:
-		if err != nil {
-			return fmt.Errorf("insufficient parent budget: %w", err)
+	case err == nil && refusal:
+		return refusalError(res, false)
+	case err != nil && errors.Is(err, ErrInsufficientBudget):
+		log.Warn().Err(err).Str("parent", parent.TokenID).Str("budgetId", parent.BudgetID).Msg("delegation refused: the parent budget could not afford the carve")
+		if refusal {
+			return refusalError(res, true)
 		}
-		return fmt.Errorf("insufficient parent budget: %s", refusalReason(res))
+		return errInsufficientParentBudget
 	}
 	if err == nil {
 		err = errors.New("the budget store gave no usable answer")
@@ -305,11 +327,17 @@ func (d *Delegator) carveOutcome(parent *TokenInfo, res *BudgetResult, err error
 	return ErrChildTokenFailed
 }
 
-func refusalReason(res *BudgetResult) string {
-	if res.ErrorCode != "" {
-		return res.ErrorCode
+// refusalError is the budget refusal built from a result's code. numbers adds
+// the result's remaining and required amounts to a budget_exhausted refusal; the
+// store's own error text is never used.
+func refusalError(res *BudgetResult, numbers bool) error {
+	switch {
+	case numbers && res.ErrorCode == "budget_exhausted":
+		return &clientError{msg: fmt.Sprintf("insufficient parent budget: budget exhausted: %d remaining, %d required", res.Remaining, res.Cost)}
+	case res.ErrorCode == "":
+		return &clientError{msg: "insufficient parent budget: not allowed"}
 	}
-	return "not allowed"
+	return &clientError{msg: "insufficient parent budget: " + res.ErrorCode}
 }
 
 // giveBack returns one request's carve to the parent through the store's
@@ -345,7 +373,7 @@ func (d *Delegator) HandleDelegate(ctx context.Context, req *Request, tokenInfo 
 
 	result, err := d.Delegate(ctx, tokenInfo, &params)
 	if err != nil {
-		return NewErrorResponseWithData(req.ID, CodeBudgetExhausted, err.Error(), map[string]interface{}{
+		return NewErrorResponseWithData(req.ID, CodeBudgetExhausted, delegationClientMessage(err), map[string]interface{}{
 			"error": "delegation_failed",
 		}), nil
 	}
@@ -356,6 +384,25 @@ func (d *Delegator) HandleDelegate(ctx context.Context, req *Request, tokenInfo 
 		ID:      req.ID,
 		Result:  resultJSON,
 	}, nil
+}
+
+// delegationClientMessage is the text the client sees for a failed delegation.
+// It is chosen by kind, never taken from an arbitrary error: a refusal this
+// package built carries its own text; the two fixed sentences are returned as
+// constants; anything else, including an error that wraps one of the fixed
+// sentences around a cause, gets the server-side sentence.
+func delegationClientMessage(err error) string {
+	var ce *clientError
+	switch {
+	case errors.As(err, &ce):
+		return ce.msg
+	case errors.Is(err, ErrParentCannotDelegate):
+		return ErrParentCannotDelegate.Error()
+	case errors.Is(err, ErrChildTokenFailed):
+		return ErrChildTokenFailed.Error()
+	}
+	log.Error().Err(err).Msg("delegation refused: unclassified error")
+	return ErrChildTokenFailed.Error()
 }
 
 // HandleBudget returns the current budget for the authenticated token.

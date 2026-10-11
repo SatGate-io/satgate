@@ -43,6 +43,14 @@ type BudgetEnforcer interface {
 // "the budget said no" from "the store broke".
 var ErrInsufficientBudget = errors.New("insufficient budget")
 
+// budgetRefusal is the error InMemoryBudgetEnforcer.Spend returns with a
+// refused result. It matches ErrInsufficientBudget, so a caller can tell it
+// from a store failure by type.
+type budgetRefusal struct{ msg string }
+
+func (e *budgetRefusal) Error() string        { return e.msg }
+func (e *budgetRefusal) Is(target error) bool { return target == ErrInsufficientBudget }
+
 // BudgetRefunder is implemented by budget stores that can give back what one
 // request's Spend debited. It is a separate interface so a store that cannot
 // give back still satisfies BudgetEnforcer.
@@ -165,7 +173,7 @@ func (e *InMemoryBudgetEnforcer) Spend(_ context.Context, tokenID string, toolNa
 			TokenID:   tokenID,
 			Cost:      cost,
 			ErrorCode: "budget_exhausted",
-		}, fmt.Errorf("budget exhausted: %d remaining, %d required", remaining, cost)
+		}, &budgetRefusal{msg: fmt.Sprintf("budget exhausted: %d remaining, %d required", remaining, cost)}
 	}
 
 	remaining -= cost
