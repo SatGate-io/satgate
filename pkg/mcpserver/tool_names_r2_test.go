@@ -156,9 +156,21 @@ func (p *pager) serve(w http.ResponseWriter, r *http.Request) {
 }
 
 // startCfg is startNames over explicit configs.
+// logCaptured remembers which tests already captured the log. A second manager
+// built in the same test must not swap the global logger again while the first
+// manager's background retry is still logging through it.
+var logCaptured sync.Map // test name -> *syncBuffer
+
 func startCfg(t *testing.T, opts func(*UpstreamManager), routing []RoutingRule, cfgs map[string]UpstreamConfig) (*UpstreamManager, *syncBuffer) {
 	t.Helper()
-	buf := captureLogs(t)
+	var buf *syncBuffer
+	if v, ok := logCaptured.Load(t.Name()); ok {
+		buf = v.(*syncBuffer)
+	} else {
+		buf = captureLogs(t)
+		logCaptured.Store(t.Name(), buf)
+		t.Cleanup(func() { logCaptured.Delete(t.Name()) })
+	}
 	m := NewUpstreamManager(cfgs, routing, "", true)
 	if opts != nil {
 		opts(m)
