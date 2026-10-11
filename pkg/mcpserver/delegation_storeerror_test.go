@@ -225,3 +225,25 @@ func TestDelegateErrorsCarryNoStoreText(t *testing.T) {
 		})
 	}
 }
+
+// A parent token that cannot be read is an unexpected failure: the app gets the
+// server-side sentence, the decode error goes to the log, nothing is carved.
+func TestUnreadableParentGetsTheServerSentence(t *testing.T) {
+	logs := gbLogs(t)
+	ctx := context.Background()
+	svc := gbService(t)
+	parent := gbParent(t, svc)
+	parent.RawToken = "not-a-token-" + storeCause
+	b := newGBBudget()
+	_ = b.InMemoryBudgetEnforcer.Initialize(ctx, parent.BudgetID, 100)
+	_, err := NewDelegator(svc, b).Delegate(ctx, parent, &DelegateParams{Budget: 40})
+	if err == nil || err.Error() != wantServerSide {
+		t.Fatalf("error %v", err)
+	}
+	if b.parentSpends != 0 || b.refundCalls != 0 || gbRemaining(t, b, parent.BudgetID) != 100 {
+		t.Fatalf("spends %d give-backs %d", b.parentSpends, b.refundCalls)
+	}
+	if !strings.Contains(logs.String(), `"level":"error"`) {
+		t.Fatalf("not logged: %s", logs.String())
+	}
+}
