@@ -17,7 +17,7 @@ import (
 // gate with NewSpendGate and set their own.
 func newTestSpendGate(store toolcontrols.SpendStore) *SpendGate {
 	g := NewSpendGate(store)
-	g.SharedBudgetValidator = func(context.Context, string, toolcontrols.SpendLimit) error { return nil }
+	g.SharedBudgetValidator = func(context.Context, string, string, []toolcontrols.SpendLimit, func(string) bool) error { return nil }
 	return g
 }
 
@@ -32,16 +32,19 @@ func TestSharedBudgetValidatorRunsBeforeAnyCounter(t *testing.T) {
 	}
 	var calls atomic.Int64
 	cases := []outcome{
-		{"a validator that accepts", func(context.Context, string, toolcontrols.SpendLimit) error { calls.Add(1); return nil }, ""},
-		{"a validator that says unavailable", func(context.Context, string, toolcontrols.SpendLimit) error {
+		{"a validator that accepts", func(context.Context, string, string, []toolcontrols.SpendLimit, func(string) bool) error {
+			calls.Add(1)
+			return nil
+		}, ""},
+		{"a validator that says unavailable", func(context.Context, string, string, []toolcontrols.SpendLimit, func(string) bool) error {
 			calls.Add(1)
 			return ErrSharedBudgetUnavailable
 		}, MsgSharedBudgetUnavailable},
-		{"a wrapped unavailable", func(context.Context, string, toolcontrols.SpendLimit) error {
+		{"a wrapped unavailable", func(context.Context, string, string, []toolcontrols.SpendLimit, func(string) bool) error {
 			calls.Add(1)
 			return fmt.Errorf("lookup: %w", ErrSharedBudgetUnavailable)
 		}, MsgSharedBudgetUnavailable},
-		{"a validator that fails", func(context.Context, string, toolcontrols.SpendLimit) error {
+		{"a validator that fails", func(context.Context, string, string, []toolcontrols.SpendLimit, func(string) bool) error {
 			calls.Add(1)
 			return errors.New("database down")
 		}, MsgSharedBudgetCheckFailed},
@@ -82,30 +85,55 @@ func TestSharedBudgetValidatorRunsBeforeAnyCounter(t *testing.T) {
 	}
 }
 
-// The validator sees the token's tenant and the sealed limit, once per
-// reference, and is not asked about a limit with no budget.
-func TestSharedBudgetValidatorSeesTenantAndLimit(t *testing.T) {
-	proxy, _, _ := newArgProxy(t)
-	proxy.SetUpstreamRouter(&scriptedRouter{})
-	proxy.SetEvidenceRecorder(&lockedRecorder{})
-	g := NewSpendGate(toolcontrols.NewMemoryStore(nil))
-	var seen []toolcontrols.SpendLimit
-	var tenants []string
-	g.SharedBudgetValidator = func(_ context.Context, tenant string, l toolcontrols.SpendLimit) error {
-		seen, tenants = append(seen, l), append(tenants, tenant)
-		return nil
+// The validator is asked once per budget the token names, with the tenant, the
+// budget id and the whole group of sealed limits for that id: the limits that
+// do not cover the call too, and the token's own tool check.
+func TestSharedBudgetValidatorSeesTheWholeGroup(t *testing.T) {
+	type ask struct {
+		tenant, id string
+		n          int
+		crypto     bool
+		equity     bool
 	}
-	proxy.SetCallGate(g)
-	_, tok := sealedBudgetToken(t, "tenant-7", "own-1", bothTools, budgetDoc(budgetA, "200", "50"))
-	if resp, err := proxy.handleRequest(context.Background(), argCall(1, tok, "place_crypto_order", orderSym("BTC", "10"))); err != nil || resp.Error != nil {
-		t.Fatalf("order: %v %v", resp, err)
-	}
-	if len(seen) != 2 {
-		t.Fatalf("validator saw %d limits, want the total and the BTC cap: %+v", len(seen), seen)
-	}
-	for i, l := range seen {
-		if tenants[i] != "tenant-7" || l.Budget != budgetA {
-			t.Fatalf("saw tenant %q budget %q", tenants[i], l.Budget)
+	run := func(t *testing.T, tool, args string, docs ...string) []ask {
+		proxy, _, _ := newArgProxy(t)
+		proxy.SetUpstreamRouter(&scriptedRouter{})
+		proxy.SetEvidenceRecorder(&lockedRecorder{})
+		g := NewSpendGate(toolcontrols.NewMemoryStore(nil))
+		var asks []ask
+		g.SharedBudgetValidator = func(_ context.Context, tenant, id string, group []toolcontrols.SpendLimit, allows func(string) bool) error {
+			asks = append(asks, ask{tenant, id, len(group), allows("place_crypto_order"), allows("place_equity_order")})
+			return nil
 		}
+		proxy.SetCallGate(g)
+		scope := bothTools
+		_, tok := sealedBudgetToken(t, "tenant-7", "own-1", scope, docs...)
+		if resp, err := proxy.handleRequest(context.Background(), argCall(1, tok, tool, args)); err != nil || resp.Error != nil {
+			t.Fatalf("call: %v %v", resp, err)
+		}
+		return asks
 	}
+	t.Run("a covered order: one ask with the total and the cap", func(t *testing.T) {
+		asks := run(t, "place_crypto_order", orderSym("BTC", "10"), budgetDoc(budgetA, "200", "50"))
+		if len(asks) != 1 || asks[0] != (ask{"tenant-7", budgetA, 2, true, true}) {
+			t.Fatalf("asks = %+v", asks)
+		}
+	})
+	t.Run("a call the budget does not cover still asks, with the group", func(t *testing.T) {
+		asks := run(t, "place_equity_order", orderSym("AAPL", "10"), budgetDoc(budgetA, "200", "50"))
+		if len(asks) != 1 || asks[0].n != 2 {
+			t.Fatalf("asks = %+v", asks)
+		}
+	})
+	t.Run("two budgets: one ask each, each with its own limits", func(t *testing.T) {
+		asks := run(t, "place_crypto_order", orderSym("BTC", "10"), budgetDoc(budgetA, "200", "50"), budgetDoc(budgetB, "300", ""))
+		if len(asks) != 2 || asks[0].id != budgetA || asks[0].n != 2 || asks[1].id != budgetB || asks[1].n != 1 {
+			t.Fatalf("asks = %+v", asks)
+		}
+	})
+	t.Run("a token with no budget asks nothing", func(t *testing.T) {
+		if asks := run(t, "place_crypto_order", orderSym("BTC", "10")); len(asks) != 0 {
+			t.Fatalf("asks = %+v", asks)
+		}
+	})
 }

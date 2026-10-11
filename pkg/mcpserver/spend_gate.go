@@ -80,13 +80,46 @@ type SpendGate struct {
 // no such budget, archived, or limits that differ from the saved ones.
 var ErrSharedBudgetUnavailable = errors.New("shared budget unavailable")
 
-// SharedBudgetValidator checks one sealed shared-budget limit of a token of
-// tenantID against the owner's saved record. nil means the budget is live and
-// the limit equals it. ErrSharedBudgetUnavailable (wrapped or not) means the
-// reference is not honoured. Any other error means the record could not be
-// read; the call is refused and not retried here. The gate calls it before it
-// reads or changes any counter, so a refused reference counts nothing.
-type SharedBudgetValidator func(ctx context.Context, tenantID string, l toolcontrols.SpendLimit) error
+// SharedBudgetValidator checks everything a token carries for one shared
+// budget against the owner's saved record. group is every sealed limit of the
+// token that names budgetID (SharedBudgetGroups), collected before any tool
+// filtering, so the validator sees what is missing as well as what is there.
+// allows reports whether the token's own scope allows a tool, so a validator
+// can tell a key that was narrowed from one whose limits were cut. nil means
+// the budget is live and the group is exactly what the owner's budget writes.
+// ErrSharedBudgetUnavailable (wrapped or not) means the reference is not
+// honoured. Any other error means the record could not be read; the call is
+// refused and not retried here. The gate calls it before it reads or changes
+// any counter, so a refused reference counts nothing.
+type SharedBudgetValidator func(ctx context.Context, tenantID, budgetID string, group []toolcontrols.SpendLimit, allows func(tool string) bool) error
+
+// SharedBudgetGroup is the sealed limits of one token that name one budget.
+type SharedBudgetGroup struct {
+	ID     string
+	Limits []toolcontrols.SpendLimit
+}
+
+// SharedBudgetGroups collects, from every limit a token carries (not only the
+// ones that cover one call), the sealed limits per budget id, in the order the
+// ids first appear. A limit that names a budget without a seal is not part of
+// any group: it has no authority, and the gate refuses the calls it covers.
+func SharedBudgetGroups(all []toolcontrols.SpendLimit) []SharedBudgetGroup {
+	var out []SharedBudgetGroup
+	at := map[string]int{}
+	for _, l := range all {
+		if l.Budget == "" || !l.Sealed {
+			continue
+		}
+		i, ok := at[l.Budget]
+		if !ok {
+			i = len(out)
+			at[l.Budget] = i
+			out = append(out, SharedBudgetGroup{ID: l.Budget})
+		}
+		out[i].Limits = append(out[i].Limits, l)
+	}
+	return out
+}
 
 const (
 	// MsgSharedBudgetUnavailable refuses a call whose sealed budget reference
@@ -134,6 +167,28 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 			limits = append(limits, l)
 		}
 	}
+	// A sealed reference proves the issuer wrote the word, not that the owner
+	// still has that budget, or that the token carries all of it. For every
+	// budget the token names, the owner's saved record is checked against the
+	// whole group the token carries, taken from all of its limits and not from
+	// the ones that cover this call: a token missing the total, or a cap, or
+	// with the total's tools cut, must not be saved by the limits that remain.
+	// Nothing is counted before this passes. No validator means nothing is
+	// honoured.
+	for _, grp := range SharedBudgetGroups(all) {
+		if g == nil || g.SharedBudgetValidator == nil {
+			return &GateAdmission{Refusal: spendRefusalFor(grp.Limits[0], "", MsgSharedBudgetUnavailable, nil)}, nil
+		}
+		err := g.SharedBudgetValidator(ctx, call.Token.TenantID, grp.ID, grp.Limits, call.Token.AllowsTool)
+		switch {
+		case err == nil:
+		case errors.Is(err, ErrSharedBudgetUnavailable):
+			return &GateAdmission{Refusal: spendRefusalFor(grp.Limits[0], "", MsgSharedBudgetUnavailable, nil)}, nil
+		default:
+			log.Error().Err(err).Msg("spend limit: could not check a shared budget; call refused")
+			return &GateAdmission{Refusal: spendRefusalFor(grp.Limits[0], "", MsgSharedBudgetCheckFailed, nil)}, nil
+		}
+	}
 	if len(limits) == 0 {
 		return nil, nil
 	}
@@ -156,27 +211,6 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		if l.Budget != "" && (!l.Sealed || call.Token == nil || call.Token.TenantID == "") {
 			return &GateAdmission{Refusal: spendRefusalFor(l, "",
 				fmt.Sprintf("%s: this token refers to a shared budget that could not be confirmed, so the call was not sent", call.Tool), nil)}, nil
-		}
-	}
-
-	// A sealed reference proves the issuer wrote the word, not that the owner
-	// still has that budget with those limits. Ask the owner's saved record
-	// before anything is counted. Nothing configured means nothing is honoured.
-	for _, l := range limits {
-		if l.Budget == "" {
-			continue
-		}
-		if g.SharedBudgetValidator == nil {
-			return &GateAdmission{Refusal: spendRefusalFor(l, "", MsgSharedBudgetUnavailable, nil)}, nil
-		}
-		err := g.SharedBudgetValidator(ctx, call.Token.TenantID, l)
-		switch {
-		case err == nil:
-		case errors.Is(err, ErrSharedBudgetUnavailable):
-			return &GateAdmission{Refusal: spendRefusalFor(l, "", MsgSharedBudgetUnavailable, nil)}, nil
-		default:
-			log.Error().Err(err).Msg("spend limit: could not check a shared budget; call refused")
-			return &GateAdmission{Refusal: spendRefusalFor(l, "", MsgSharedBudgetCheckFailed, nil)}, nil
 		}
 	}
 
