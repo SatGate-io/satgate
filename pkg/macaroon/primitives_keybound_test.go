@@ -71,9 +71,8 @@ func TestAttenuationKeepsTheChainsKey(t *testing.T) {
 // given a sign-in token's caveats therefore produces an ordinary-key token. The
 // primitives do not check where the caveats came from, so the caller must be
 // trusted and must hold the key; no request path reaches them with a presented
-// token. Callers in this module: Gateway.issueL402Challenge in pkg/proxy
-// (proxy_oss.go) calls both, on a token it has just minted, and
-// MintWrapper.Encode in this package re-signs a token the same service minted.
+// token. The only caller in this module outside tests is pkg/proxy/proxy_oss.go
+// (issueL402Challenge, lines 518 and 520), which re-signs a token it has just minted.
 func TestRootKeyWritersReissueUnderTheirOwnKey(t *testing.T) {
 	signIn, err := NewService("hosted-sign-in-derived-key")
 	if err != nil {
