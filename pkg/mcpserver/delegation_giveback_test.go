@@ -484,7 +484,9 @@ func TestChildBudgetCreationRefusalIsABudgetRefusal(t *testing.T) {
 	parent := gbParent(t, svc)
 	b := newGBBudget()
 	_ = b.InMemoryBudgetEnforcer.Initialize(ctx, parent.BudgetID, 100)
-	b.initChild = func(context.Context, string, int64) error { return fmt.Errorf("budget transfer: %w", ErrInsufficientBudget) }
+	b.initChild = func(context.Context, string, int64) error {
+		return fmt.Errorf("budget transfer: %w", ErrInsufficientBudget)
+	}
 	_, err := NewDelegator(svc, b).Delegate(ctx, parent, &DelegateParams{Budget: 40})
 	if err == nil || !strings.HasPrefix(err.Error(), "insufficient parent budget: budget transfer: insufficient budget") {
 		t.Fatalf("err %v", err)
