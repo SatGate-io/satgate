@@ -64,12 +64,13 @@ type Proxy struct {
 	revocation        RevocationChecker // optional, checks if token is revoked
 	limiter           RequestLimiter    // optional, per-token request rate limit
 	toolsListEnricher ToolsListEnricher // optional, enriches tools/list with cost metadata
+	taskTracker       *TaskTracker      // MCP task-level cost aggregation (SEP-1686)
+	gate              CallGate          // optional, stateful checks per tools/call (see call_gate.go)
+	tokenID           string            // default session token (from config or first auth)
+	rootToken         string            // auto-minted root token (for delegation demos)
+
 	// healthDetail adds a note to /health (SetHealthDetail).
 	healthDetail func() string
-	taskTracker  *TaskTracker // MCP task-level cost aggregation (SEP-1686)
-	gate         CallGate     // optional, stateful checks per tools/call (see call_gate.go)
-	tokenID      string       // default session token (from config or first auth)
-	rootToken    string       // auto-minted root token (for delegation demos)
 }
 
 // ResponseGuard wraps the handling of every request the proxy answers: the
