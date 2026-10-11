@@ -963,15 +963,22 @@ func TestToolNames_ManagerAloneNeverGivesARemovedServicesNameToAnother(t *testin
 }
 
 func TestToolNames_ManagerAloneNeverListsTwoNamesThatDifferOnlyInCase(t *testing.T) {
-	a := newFakeService(t, "A", fakeTool{Name: "Place_Order", Description: "d"})
-	b := newFakeService(t, "B", fakeTool{Name: "place_order", Description: "d"})
-	m := startNames(t, func(m *UpstreamManager) {
-		m.SetToolNameStore(newPermissiveStore())
-		m.SetServiceOrder([]string{"aa", "bb"})
-	}, nil,
-		map[string]*fakeService{"aa": a, "bb": b}, map[string]string{"aa": "Aaa", "bb": "Bbb"})
-	got := listTools(t, m) // fails if two listed names are equal without case
-	if len(got) != 2 || got["Place_Order"].Name == "" || got["bbb_place_order"].Name == "" {
-		t.Fatalf("listed %v", names(got))
+	// Both spellings, in several orders: whichever service is second, its
+	// spelling is not a name of its own.
+	for _, c := range []struct{ first, second, wantSecond string }{
+		{"Place_Order", "place_order", "bbb_place_order"},
+		{"place_order", "Place_Order", "bbb_Place_Order"},
+		{"place_order", "PLACE_ORDER", "bbb_PLACE_ORDER"},
+	} {
+		a := newFakeService(t, "A", fakeTool{Name: c.first, Description: "d"})
+		b := newFakeService(t, "B", fakeTool{Name: c.second, Description: "d"})
+		m := startNames(t, func(m *UpstreamManager) {
+			m.SetToolNameStore(newPermissiveStore())
+			m.SetServiceOrder([]string{"aa", "bb"})
+		}, nil, map[string]*fakeService{"aa": a, "bb": b}, map[string]string{"aa": "Aaa", "bb": "Bbb"})
+		got := listTools(t, m) // fails if two listed names are equal without case
+		if len(got) != 2 || got[c.first].Name == "" || got[c.wantSecond].Name == "" {
+			t.Fatalf("%s then %s: listed %v", c.first, c.second, names(got))
+		}
 	}
 }
