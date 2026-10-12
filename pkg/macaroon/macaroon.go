@@ -6,12 +6,17 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
 
 	macaroonv2 "gopkg.in/macaroon.v2"
 )
+
+// ErrInvalidSignature is wrapped by Verify when a token's signature chain does
+// not verify under this service's root key. Test for it with errors.Is.
+var ErrInvalidSignature = errors.New("invalid signature")
 
 // Macaroon represents a capability token using chained HMAC signatures.
 //
@@ -147,7 +152,7 @@ func (s *Service) Verify(token string) (*Macaroon, error) {
 	// Reconstruct the chained signature from root key
 	expectedSig := s.chainedSignature(mac)
 	if !hmac.Equal([]byte(mac.Signature), []byte(expectedSig)) {
-		return nil, fmt.Errorf("invalid signature: token was signed with a different root key. Check that the gateway and the token issuer use the same capability root key")
+		return nil, fmt.Errorf("%w: token was signed with a different root key. Check that the gateway and the token issuer use the same capability root key", ErrInvalidSignature)
 	}
 
 	// Check caveats
