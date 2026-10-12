@@ -110,7 +110,9 @@ func TestSharedBudgetValidatorSeesTheWholeGroup(t *testing.T) {
 		proxy.SetCallGate(g)
 		scope := bothTools
 		_, tok := sealedBudgetToken(t, "tenant-7", "own-1", scope, docs...)
-		if resp, err := proxy.handleRequest(context.Background(), argCall(1, tok, tool, args)); err != nil || resp.Error != nil {
+		// An order no limit of the token covers is refused after the ask (it
+		// still asks with the group); anything else must be allowed.
+		if resp, err := proxy.handleRequest(context.Background(), argCall(1, tok, tool, args)); err != nil || resp.Error != nil && resp.Error.Message != MsgSharedBudgetNotCovered {
 			t.Fatalf("call: %v %v", resp, err)
 		}
 		return asks

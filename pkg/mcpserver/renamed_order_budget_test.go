@@ -3,6 +3,7 @@ package mcpserver
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 )
 
@@ -100,5 +101,70 @@ func TestToolNamedLikeARenamedOneIsNotAnOrderTool(t *testing.T) {
 	}
 	if h.sum() != 0 || rr.n != 1 {
 		t.Fatalf("a tool that merely looks like a renamed order tool was debited: %v, upstream calls %d", h.totals(), rr.n)
+	}
+}
+
+// Round 6: an order the token's shared budget does not cover is refused when
+// it is placed, on the order the call resolves to, whatever existed when the
+// key was made.
+
+// A crypto-only budget; the key's tools name a renamed equity tool that did not
+// exist yet. The table now lists it and it resolves to place_equity_order.
+func TestOrderTheSharedBudgetDoesNotCoverIsRefusedAtPlacement(t *testing.T) {
+	const futureEquity = "fourth_place_equity_order"
+	origins := map[string]ToolOrigin{
+		"place_crypto_order": {Listed: true, Service: "robinhood", Original: "place_crypto_order"},
+		"place_equity_order": {Listed: true, Service: "robinhood", Original: "place_equity_order"},
+		futureEquity:         {Listed: true, Renamed: true, Service: "fourth", Original: "place_equity_order"},
+	}
+	for _, tool := range []string{futureEquity, "place_equity_order"} {
+		t.Run(tool, func(t *testing.T) {
+			h, rr := newOriginHarness(t, origins)
+			_, tok := sealedBudgetToken(t, "tenant-1", "own-1", "place_crypto_order,place_equity_order,"+futureEquity, budgetDoc(budgetA, "4", "2"))
+			r := h.call(t, tok, 1, tool, orderSym("AAPL", "1"))
+			if r.Error == nil || r.Error.Message != MsgSharedBudgetNotCovered {
+				t.Fatalf("%s: %+v", tool, r.Error)
+			}
+			if rr.n != 0 || len(h.totals()) != 0 {
+				t.Fatalf("upstream calls %d, counters %v: the refusal must come first", rr.n, h.totals())
+			}
+		})
+	}
+	// The budget's own order still works, and a tool the budget cannot govern
+	// (a price quote) is not touched by the rule.
+	h, rr := newOriginHarness(t, origins)
+	_, tok := sealedBudgetToken(t, "tenant-1", "own-1", "place_crypto_order,place_equity_order,get_quote", budgetDoc(budgetA, "4", "2"))
+	if r := h.call(t, tok, 1, "place_crypto_order", orderSym("BTC", "1")); r.Error != nil {
+		t.Fatalf("covered order refused: %v", r.Error)
+	}
+	if r := h.call(t, tok, 2, "get_quote", `{"symbol":"BTC"}`); r.Error != nil {
+		t.Fatalf("a tool no budget governs was refused: %v", r.Error)
+	}
+	if rr.n != 2 || h.sum() != 2*units {
+		t.Fatalf("upstream %d, counters %v", rr.n, h.totals())
+	}
+}
+
+// A limit the owner wrote on the token for the name as sent still governs the
+// call, so the token's shared budget is not the only thing that can cover it.
+func TestOwnLimitOnTheNameAsSentCoversARenamedOrder(t *testing.T) {
+	origins := map[string]ToolOrigin{
+		"place_crypto_order": {Listed: true, Service: "robinhood", Original: "place_crypto_order"},
+		renamedOrder:         {Listed: true, Renamed: true, Service: "robinhood-2", Original: "place_crypto_order"},
+	}
+	h, rr := newOriginHarness(t, origins)
+	own := `{"v":1,"spend_limits":[{"tools":["` + renamedOrder + `"],"field":"dollar_amount","max":"3","window":"day","tz":"America/New_York"}]}`
+	// The token's shared budget is for equity orders: only the owner's own limit
+	// covers the renamed crypto order.
+	equityOnly := strings.ReplaceAll(budgetDoc(budgetB, "4", ""), "place_crypto_order", "place_equity_order")
+	_, tok := sealedBudgetToken(t, "tenant-1", "own-1", "place_crypto_order,place_equity_order,"+renamedOrder, equityOnly, own)
+	if r := h.call(t, tok, 1, renamedOrder, orderSym("BTC", "2")); r.Error != nil {
+		t.Fatalf("an order the token's own limit covers was refused: %v", r.Error)
+	}
+	if r := h.call(t, tok, 2, renamedOrder, orderSym("BTC", "2")); r.Error == nil {
+		t.Fatal("the token's own $3 limit did not govern the second order")
+	}
+	if rr.n != 1 {
+		t.Fatalf("upstream calls %d, want 1", rr.n)
 	}
 }

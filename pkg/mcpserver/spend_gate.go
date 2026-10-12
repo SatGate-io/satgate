@@ -71,6 +71,11 @@ type SpendGate struct {
 	// refused (see SharedBudgetValidator).
 	SharedBudgetValidator SharedBudgetValidator
 
+	// BudgetGoverns reports whether a shared budget can govern an order tool
+	// by its own name (the enterprise wires mcpbudget.CanGovern). nil means
+	// the two order tools the gate knows (toolcontrols.SymbolCapTool).
+	BudgetGoverns func(tool string) bool
+
 	// now is the clock; nil means time.Now. Tests set it.
 	now func() time.Time
 }
@@ -132,11 +137,23 @@ const (
 	// MsgSharedBudgetCheckFailed refuses a call when the saved budget could
 	// not be read.
 	MsgSharedBudgetCheckFailed = "SatGate couldn't check this agent's shared budget. Try again in a minute."
+	// MsgSharedBudgetNotCovered refuses an order tool, by the name it resolves
+	// to, that none of the token's limits covers while the token carries a
+	// shared budget.
+	MsgSharedBudgetNotCovered = "This token's shared budget doesn't cover this order, so it was not sent. Ask the owner for a token whose budget covers it."
 )
 
 // NewSpendGate returns a gate over store. A nil store refuses every covered
 // call (fail closed).
 func NewSpendGate(store toolcontrols.SpendStore) *SpendGate { return &SpendGate{store: store} }
+
+// budgetGoverns reports whether a shared budget can govern tool by its own name.
+func (g *SpendGate) budgetGoverns(tool string) bool {
+	if g != nil && g.BudgetGoverns != nil {
+		return g.BudgetGoverns(tool)
+	}
+	return toolcontrols.SymbolCapTool(tool)
+}
 
 // held is one reservation the gate took for the call.
 type held struct {
@@ -230,6 +247,15 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		}
 	}
 	if len(limits) == 0 {
+		// A token that carries a shared budget places no order that none of
+		// its limits covers. This is decided here, on the tool the call
+		// resolves to (own) and the limits the token carries now; nothing the
+		// key was made from is consulted, so an order tool that appeared
+		// after the key was made is held to the same rule. It runs before any
+		// counter is read or changed and before the call is forwarded.
+		if groups := SharedBudgetGroups(all); len(groups) > 0 && g.budgetGoverns(own) {
+			return &GateAdmission{Refusal: spendRefusalFor(groups[0].Limits[0], "", MsgSharedBudgetNotCovered, nil)}, nil
+		}
 		return nil, nil
 	}
 	if g == nil || g.store == nil {
