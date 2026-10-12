@@ -69,7 +69,7 @@ export default function AiAgentCostControlPage() {
     name: 'AI Agent Cost Control | Before the Request Goes Through',
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-cost-control',
-    dateModified: '2026-05-05',
+    dateModified: '2026-10-12',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent cost control' },
@@ -89,7 +89,7 @@ export default function AiAgentCostControlPage() {
     description: metadata.description,
     url: 'https://satgate.io/ai-agent-cost-control',
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
-    dateModified: '2026-05-05',
+    dateModified: '2026-10-12',
     about: webPageJsonLd.about,
     offers: { '@type': 'Offer', url: 'https://satgate.io/pricing' },
     featureList: [
