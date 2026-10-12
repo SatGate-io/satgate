@@ -553,7 +553,7 @@ func (s *SSEServer) writePreConnectDenial(w http.ResponseWriter, r *http.Request
 
 func (s *SSEServer) handleHealth(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	body := map[string]interface{}{
 		"status":  "ok",
 		"server":  s.proxy.config.Server.Name,
 		"version": s.proxy.config.Server.Version,
@@ -562,7 +562,13 @@ func (s *SSEServer) handleHealth(w http.ResponseWriter, _ *http.Request) {
 			defer s.mu.Unlock()
 			return len(s.sessions)
 		}(),
-	})
+	}
+	if s.proxy.healthDetail != nil {
+		if d := s.proxy.healthDetail(); d != "" {
+			body["detail"] = d
+		}
+	}
+	json.NewEncoder(w).Encode(body)
 }
 
 // extractAuthToken pulls Bearer token from Authorization header.

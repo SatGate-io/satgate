@@ -71,6 +71,11 @@ type SpendGate struct {
 	// refused (see SharedBudgetValidator).
 	SharedBudgetValidator SharedBudgetValidator
 
+	// BudgetGoverns reports whether a shared budget can govern an order tool
+	// by its own name (the enterprise wires mcpbudget.CanGovern). nil means
+	// the two order tools the gate knows (toolcontrols.SymbolCapTool).
+	BudgetGoverns func(tool string) bool
+
 	// now is the clock; nil means time.Now. Tests set it.
 	now func() time.Time
 }
@@ -132,11 +137,23 @@ const (
 	// MsgSharedBudgetCheckFailed refuses a call when the saved budget could
 	// not be read.
 	MsgSharedBudgetCheckFailed = "SatGate couldn't check this agent's shared budget. Try again in a minute."
+	// MsgSharedBudgetNotCovered refuses an order tool, by the name it resolves
+	// to, that none of the token's limits covers while the token carries a
+	// shared budget.
+	MsgSharedBudgetNotCovered = "This token's shared budget doesn't cover this order, so it was not sent. Ask the owner for a token whose budget covers it."
 )
 
 // NewSpendGate returns a gate over store. A nil store refuses every covered
 // call (fail closed).
 func NewSpendGate(store toolcontrols.SpendStore) *SpendGate { return &SpendGate{store: store} }
+
+// budgetGoverns reports whether a shared budget can govern tool by its own name.
+func (g *SpendGate) budgetGoverns(tool string) bool {
+	if g != nil && g.BudgetGoverns != nil {
+		return g.BudgetGoverns(tool)
+	}
+	return toolcontrols.SymbolCapTool(tool)
+}
 
 // held is one reservation the gate took for the call.
 type held struct {
@@ -165,9 +182,37 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		return &GateAdmission{Refusal: spendRefusal(call.Tool, all[0],
 			"this token has a spending limit, and this call's tool name or layout cannot be matched exactly to it, so the call was not sent")}, nil
 	}
+	// A tool listed under a name other than its own (a second broker's
+	// place_crypto_order is robinhood-2_place_crypto_order) is the same order
+	// tool to a shared budget: the budget, its coin caps and its counters
+	// are written for the tool's own name. The gateway's own tool-name table
+	// says which tool a name stands for (call.Origin); the name is never cut
+	// apart to find out. When the table cannot say, an agent with a shared
+	// budget places nothing: the name as sent could be any order tool.
+	own := call.Tool
+	if call.Origin.Listed && call.Origin.Renamed && call.Origin.Original != "" {
+		own = call.Origin.Original
+	}
+	if call.Origin.Err != nil && !IsGatewayToolName(call.Tool) {
+		if groups := SharedBudgetGroups(all); len(groups) > 0 {
+			return &GateAdmission{Refusal: spendRefusalFor(groups[0].Limits[0], "", MsgSharedBudgetCheckFailed, nil)}, nil
+		}
+	}
+	// ownName is the name a limit is matched, and its symbol read, under: the
+	// tool's own name when the limit covers that, else the name as sent (a
+	// limit the owner wrote for the renamed name itself).
+	ownName := func(l toolcontrols.SpendLimit) string {
+		if own != call.Tool && l.Budget != "" && l.Covers(own) {
+			return own
+		}
+		return call.Tool
+	}
 	var limits []toolcontrols.SpendLimit
 	for _, l := range all {
-		if l.Covers(call.Tool) {
+		// Only a shared budget's limits are matched through the original
+		// name. A limit the owner wrote on the token itself covers the names
+		// it lists (rule 7 in tool_names_gate.go is unchanged).
+		if l.Covers(call.Tool) || l.Budget != "" && l.Covers(own) {
 			limits = append(limits, l)
 		}
 	}
@@ -183,7 +228,15 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		if g == nil || g.SharedBudgetValidator == nil {
 			return &GateAdmission{Refusal: spendRefusalFor(grp.Limits[0], "", MsgSharedBudgetUnavailable, nil)}, nil
 		}
-		err := g.SharedBudgetValidator(ctx, call.Token.TenantID, grp.ID, grp.Limits, call.Token.AllowsTool, call.Tool)
+		allows := call.Token.AllowsTool
+		if own != call.Tool {
+			// The key reaches the tool's own name through the renamed one:
+			// the validator must find every limit the budget writes for it.
+			allows = func(tool string) bool {
+				return call.Token.AllowsTool(tool) || strings.EqualFold(tool, own) && call.Token.AllowsTool(call.Tool)
+			}
+		}
+		err := g.SharedBudgetValidator(ctx, call.Token.TenantID, grp.ID, grp.Limits, allows, own)
 		switch {
 		case err == nil:
 		case errors.Is(err, ErrSharedBudgetUnavailable):
@@ -194,6 +247,15 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		}
 	}
 	if len(limits) == 0 {
+		// A token that carries a shared budget places no order that none of
+		// its limits covers. This is decided here, on the tool the call
+		// resolves to (own) and the limits the token carries now; nothing the
+		// key was made from is consulted, so an order tool that appeared
+		// after the key was made is held to the same rule. It runs before any
+		// counter is read or changed and before the call is forwarded.
+		if groups := SharedBudgetGroups(all); len(groups) > 0 && g.budgetGoverns(own) {
+			return &GateAdmission{Refusal: spendRefusalFor(groups[0].Limits[0], "", MsgSharedBudgetNotCovered, nil)}, nil
+		}
 		return nil, nil
 	}
 	if g == nil || g.store == nil {
@@ -241,7 +303,7 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		key := counterKey(call.Token.TenantID, counterName(l), windowIDOf(l, now))
 		if len(l.Symbols) > 0 {
 			raw, why := argrules.ReadStringField(call.Params, call.Tool, toolcontrols.SymbolField)
-			verdict, canon := l.CheckSymbol(call.Tool, raw, why == argrules.NumericFieldOK)
+			verdict, canon := l.CheckSymbol(ownName(l), raw, why == argrules.NumericFieldOK)
 			switch verdict {
 			case toolcontrols.SymbolOther:
 				continue // another symbol: this limit does not touch the call

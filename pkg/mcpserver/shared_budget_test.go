@@ -422,9 +422,15 @@ func TestUnsealedBudgetReferenceIsRefusedAndNeverCounts(t *testing.T) {
 	if h.sum() != 5*units {
 		t.Fatalf("totals = %v", h.totals())
 	}
-	// A call for a tool the appended limit does not cover is not refused by it.
-	if r := h.call(t, evil, 4, "place_equity_order", order("5")); r.Error != nil {
-		t.Fatalf("the appended reference refused a tool it does not cover: %v", r.Error)
+	// A call for a tool the appended limit does not cover is not refused by
+	// it: the budget the token is properly in does not cover an equity order
+	// either, so the token's shared budget refuses it with its own text, and
+	// nothing is counted or forwarded.
+	if r := h.call(t, evil, 4, "place_equity_order", order("5")); r.Error == nil || r.Error.Message != MsgSharedBudgetNotCovered {
+		t.Fatalf("an order no limit of the token covers: %+v", r.Error)
+	}
+	if h.sum() != 5*units {
+		t.Fatalf("totals = %v", h.totals())
 	}
 }
 

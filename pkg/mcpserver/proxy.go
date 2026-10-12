@@ -69,6 +69,9 @@ type Proxy struct {
 	gate              CallGate          // optional, stateful checks per tools/call (see call_gate.go)
 	tokenID           string            // default session token (from config or first auth)
 	rootToken         string            // auto-minted root token (for delegation demos)
+
+	// healthDetail adds a note to /health (SetHealthDetail).
+	healthDetail func() string
 }
 
 // ResponseGuard wraps the handling of every request the proxy answers: the
@@ -647,6 +650,12 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	// matchScope strips a tenant UUID prefix and ORs words inside one caveat.
 	if !tokenInfo.AllowsTool(tc.Name) {
 		return p.scopeDeniedResponse(ctx, req, tokenInfo, tc.Name), nil
+	}
+
+	// A tool listed under a name other than its own is not covered by a token's
+	// money rules unless they name it: see tool_names_gate.go.
+	if refused := p.renamedToolRefusal(ctx, req, tokenInfo, tc.Name); refused != nil {
+		return refused, nil
 	}
 
 	// Argument rules: the token may allow the tool but limit what it can do.
