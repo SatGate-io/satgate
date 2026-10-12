@@ -351,9 +351,8 @@ var refusalCodes = map[string]bool{
 //   - the budget said no, in a form this package can trust: no error and a
 //     non-nil result with Allowed false and a code in refusalCodes (the message
 //     is built from the code and the result's numbers), or an error that
-//     matches ErrInsufficientBudget (the message is built the same way when the
-//     result also refuses, else it is the fixed sentence). The error's own text
-//     is never used;
+//     matches ErrInsufficientBudget (always the one fixed sentence, whatever
+//     the result holds). The error's own text is never used;
 //   - anything else (nil result, a store error, an answer that contradicts
 //     itself, a refusal-shaped result that comes with an unrecognised error):
 //     ErrChildTokenFailed. The error is logged only.
@@ -365,10 +364,9 @@ func (d *Delegator) carveOutcome(parent *TokenInfo, res *BudgetResult, err error
 	case err == nil && refusal:
 		return refusalError(res, false)
 	case err != nil && errors.Is(err, ErrInsufficientBudget):
+		// A typed refusal always gets the one fixed sentence, whatever the
+		// result also holds. The result's code and numbers are not used.
 		log.Warn().Err(err).Str("parent", parent.TokenID).Str("budgetId", parent.BudgetID).Msg("delegation refused: the parent budget could not afford the carve")
-		if refusal {
-			return refusalError(res, true)
-		}
 		return errInsufficientParentBudget
 	}
 	if err == nil {

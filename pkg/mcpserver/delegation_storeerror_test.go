@@ -114,8 +114,10 @@ func TestBudgetStoreErrorNeverReachesTheApp(t *testing.T) {
 	}
 }
 
-// The real refusal keeps its text, over /mcp: built from the store's code and
-// numbers, not from the store's error text.
+// A refusal that comes with no error keeps its text, over /mcp: built from the
+// store's code, not from the store's error text. (An error that matches
+// ErrInsufficientBudget gets the one fixed sentence instead; see
+// TestTypedBudgetRefusalAlwaysGetsTheFixedSentence.)
 func TestRealBudgetRefusalKeepsItsTextOverMCP(t *testing.T) {
 	for _, tc := range []struct {
 		name  string
@@ -127,9 +129,6 @@ func TestRealBudgetRefusalKeepsItsTextOverMCP(t *testing.T) {
 		}, "insufficient parent budget: budget_exhausted"},
 		{"no code, no error", func(*BudgetResult, error) (*BudgetResult, error) { return &BudgetResult{Allowed: false}, nil },
 			"insufficient parent budget: not allowed"},
-		{"refusal result with ErrInsufficientBudget", func(*BudgetResult, error) (*BudgetResult, error) {
-			return &BudgetResult{Allowed: false, ErrorCode: "budget_exhausted", Remaining: 10, Cost: 40}, fmt.Errorf("%s: %w", storeCause, ErrInsufficientBudget)
-		}, "insufficient parent budget: budget exhausted: 10 remaining, 40 required"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			s, p := newHeaderModeStreamable(t)
@@ -205,6 +204,9 @@ func TestDelegateErrorsCarryNoStoreText(t *testing.T) {
 		{"ErrInsufficientBudget, nil result", func(*BudgetResult, error) (*BudgetResult, error) { return nil, refusalWrapped }, nil, "insufficient parent budget"},
 		{"ErrInsufficientBudget, refusal result", func(*BudgetResult, error) (*BudgetResult, error) {
 			return &BudgetResult{Allowed: false, ErrorCode: "insufficient_budget"}, refusalWrapped
+		}, nil, "insufficient parent budget"},
+		{"no error, refusal result with a code", func(*BudgetResult, error) (*BudgetResult, error) {
+			return &BudgetResult{Allowed: false, ErrorCode: "insufficient_budget"}, nil
 		}, nil, "insufficient parent budget: insufficient_budget"},
 		{"child budget creation: error", nil, func(context.Context, string, int64) error { return errors.New(storeCause) }, wantServerSide},
 		{"child budget creation: ErrInsufficientBudget", nil, func(context.Context, string, int64) error { return refusalWrapped }, "insufficient parent budget"},
@@ -245,5 +247,96 @@ func TestUnreadableParentGetsTheServerSentence(t *testing.T) {
 	}
 	if !strings.Contains(logs.String(), `"level":"error"`) {
 		t.Fatalf("not logged: %s", logs.String())
+	}
+}
+
+// Whenever the budget store's error matches ErrInsufficientBudget, the app gets
+// the one fixed sentence "insufficient parent budget": whatever else the result
+// holds (any recognised refusal code, numbers, Allowed true), and however the
+// error is wrapped. Through the real /mcp path: HTTP 200, the same JSON-RPC
+// code, data "delegation_failed", no digits and no code text, no child token,
+// the parent's balance whole, and the cause in the server log at warn level.
+func TestTypedBudgetRefusalAlwaysGetsTheFixedSentence(t *testing.T) {
+	typed := fmt.Errorf("%s: %w", storeCause, ErrInsufficientBudget)
+	type answer struct {
+		name      string
+		carve     func(*BudgetResult, error) (*BudgetResult, error)
+		childInit func(context.Context, string, int64) error
+		giveBacks int
+	}
+	var cases []answer
+	add := func(name string, res *BudgetResult, err error) {
+		cases = append(cases, answer{name: name, carve: func(*BudgetResult, error) (*BudgetResult, error) { return res, err }})
+	}
+	add("typed error alone", nil, typed)
+	add("typed error, result allowed", &BudgetResult{Allowed: true, Remaining: 60}, typed)
+	add("typed error, denied with no code", &BudgetResult{Allowed: false, Remaining: 17, Cost: 40}, typed)
+	for _, code := range []string{"budget_exhausted", "insufficient_budget", "budget_not_initialized", "token_not_found"} {
+		add("typed error with code "+code, &BudgetResult{Allowed: false, ErrorCode: code, Remaining: 17, Cost: 40}, typed)
+	}
+	add("typed error with an unrecognised code", &BudgetResult{Allowed: false, ErrorCode: "weird_code", Remaining: 17, Cost: 40}, typed)
+	add("typed error wrapped once", &BudgetResult{Allowed: false, ErrorCode: "budget_exhausted", Remaining: 17, Cost: 40}, fmt.Errorf("spend: %w", typed))
+	add("typed error wrapped twice, nil result", nil, fmt.Errorf("carve: %w", fmt.Errorf("spend: %w", typed)))
+	add("typed error joined with another", &BudgetResult{Allowed: false, ErrorCode: "budget_exhausted", Remaining: 17, Cost: 40}, errors.Join(errors.New("other"), typed))
+	add("the in-memory store's own refusal", &BudgetResult{Allowed: false, ErrorCode: "budget_exhausted", Remaining: 17, Cost: 40}, &budgetRefusal{msg: "budget exhausted: 17 remaining, 40 required: " + storeCause})
+	cases = append(cases,
+		answer{name: "child budget creation: typed error", childInit: func(context.Context, string, int64) error { return typed }, giveBacks: 1},
+		answer{name: "child budget creation: typed error wrapped", childInit: func(context.Context, string, int64) error {
+			return fmt.Errorf("transfer: %w", fmt.Errorf("initialize: %w", typed))
+		}, giveBacks: 1},
+	)
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			logs := gbLogs(t)
+			s, p := newHeaderModeStreamable(t)
+			svc := gbService(t)
+			parent := gbParent(t, svc)
+			p.SetAuthenticator(gbAuth{parent})
+			b := newGBBudget()
+			_ = b.InMemoryBudgetEnforcer.Initialize(context.Background(), parent.BudgetID, 100)
+			b.spendResult, b.initChild = tc.carve, tc.childInit
+			p.delegator = NewDelegator(svc, b)
+			p.SetBudgetEnforcer(b)
+			srv := httptest.NewServer(s.Handler())
+			defer srv.Close()
+			sid := mustInitSession(t, srv.URL, "good-token")
+			status, _, body := streamablePost(t, srv.URL+"/mcp", sid, "good-token", map[string]any{"jsonrpc": "2.0", "id": 2, "method": "satgate/delegate", "params": map[string]any{"budget": 40}})
+			if status != 200 {
+				t.Fatalf("HTTP %d: %s", status, body)
+			}
+			const want = `{"jsonrpc":"2.0","id":2,"error":{"code":-32000,"message":"insufficient parent budget","data":{"error":"delegation_failed"}}}`
+			if strings.TrimSpace(body) != want && !strings.Contains(body, want) {
+				t.Fatalf("response is not exactly the fixed refusal: %s", body)
+			}
+			for _, bad := range []string{"17", "40", "remaining", "required", "exhausted", "not allowed", "insufficient_budget", "not_initialized", "token_not_found", "weird_code", `"token":`, `"result"`} {
+				if strings.Contains(body, bad) {
+					t.Fatalf("response contains %q: %s", bad, body)
+				}
+			}
+			for _, piece := range secretPieces {
+				if strings.Contains(body, piece) {
+					t.Fatalf("response contains %q: %s", piece, body)
+				}
+			}
+			if b.refundCalls != tc.giveBacks {
+				t.Fatalf("give-backs %d, want %d", b.refundCalls, tc.giveBacks)
+			}
+			if got := gbRemaining(t, b, parent.BudgetID); got != 100 {
+				t.Fatalf("parent balance %d, want 100", got)
+			}
+			out := logs.String()
+			if !strings.Contains(out, `"level":"warn"`) || !strings.Contains(out, `"parent":"parent-token"`) || !strings.Contains(out, `"budgetId":"parent"`) {
+				t.Fatalf("no warning with the parent token ID and budget ID: %s", out)
+			}
+			if !strings.Contains(out, "PRIVATE_STORE_CAUSE") && tc.name != "the in-memory store's own refusal" {
+				t.Fatalf("the cause was not logged: %s", out)
+			}
+			if tc.name == "the in-memory store's own refusal" && !strings.Contains(out, "17 remaining, 40 required") {
+				t.Fatalf("the cause was not logged: %s", out)
+			}
+			if strings.Contains(out, "eyJ") {
+				t.Fatalf("log contains token text: %s", out)
+			}
+		})
 	}
 }

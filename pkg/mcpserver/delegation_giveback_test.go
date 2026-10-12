@@ -459,7 +459,9 @@ func TestOnlyAnApprovedAnswerCarves(t *testing.T) {
 	}
 }
 
-// A real budget refusal keeps its text and takes nothing.
+// The in-memory store reports a refusal as a result plus a typed error. The
+// client gets the one fixed sentence, without the store's numbers, and the
+// store takes nothing.
 func TestInsufficientParentBudgetKeepsItsText(t *testing.T) {
 	ctx := context.Background()
 	svc := gbService(t)
@@ -467,7 +469,7 @@ func TestInsufficientParentBudgetKeepsItsText(t *testing.T) {
 	b := newGBBudget()
 	_ = b.InMemoryBudgetEnforcer.Initialize(ctx, parent.BudgetID, 10)
 	_, err := NewDelegator(svc, b).Delegate(ctx, parent, &DelegateParams{Budget: 40})
-	if err == nil || !strings.HasPrefix(err.Error(), "insufficient parent budget: budget exhausted: 10 remaining, 40 required") {
+	if err == nil || err.Error() != "insufficient parent budget" {
 		t.Fatalf("err %v", err)
 	}
 	if b.refundCalls != 0 || gbRemaining(t, b, parent.BudgetID) != 10 {
