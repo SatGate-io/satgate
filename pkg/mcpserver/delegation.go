@@ -168,6 +168,18 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 	if params.Scope != "" {
 		holderCaveats = append(holderCaveats, fmt.Sprintf("scope = %s", params.Scope))
 	}
+	// A zero-credit child has no budget id of its own, so nothing the child
+	// carries names it once a holder appends a caveat: the copy has a new
+	// signature and a new token id. It gets a caveat that names this helper,
+	// before the holder's caveats, so a revoke of the helper reaches every copy.
+	// Own-credit children are named by their budget id and are not changed.
+	var childRevocationID string
+	if params.Budget == 0 {
+		childRevocationID = d.helperRevocationID(parent, params)
+		if childRevocationID != "" {
+			serverCaveats = append(serverCaveats, "token_id = "+childRevocationID)
+		}
+	}
 	// Generate child budget_id deterministically before minting
 	var childBudgetID string
 	if params.Budget > 0 {
@@ -294,11 +306,15 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		BudgetID:  parent.BudgetID,
 		TenantID:  parent.TenantID,
 		Data: map[string]interface{}{
-			"childTokenId":    childTokenID,
-			"childBudgetId":   childBudgetID,
-			"childBudget":     params.Budget,
-			"parentRemaining": parentRemaining,
-			"label":           params.Label,
+			"childTokenId":  childTokenID,
+			"childBudgetId": childBudgetID,
+			// The id this helper's key carries as a second token_id caveat
+			// (empty for a child with its own budget, and for a parent that
+			// has no token_id of its own). An id, not a secret.
+			EventChildRevocationID: childRevocationID,
+			"childBudget":          params.Budget,
+			"parentRemaining":      parentRemaining,
+			"label":                params.Label,
 			// Never the scope text the holder sent: a hash and a word count.
 			// What the child may do is published as EventChildScopes (tool
 			// names only; no rule or control word) and the rule document.
@@ -649,4 +665,46 @@ func scopeWordCount(scope string) int {
 		n += len(strings.Fields(part))
 	}
 	return n
+}
+
+// HelperRevocationIDPrefix starts the id a zero-credit helper carries. No other
+// id this system writes starts with it (row ids are 12 hex characters or start
+// with "del-"), so a revoke of one helper can never name anything else.
+const HelperRevocationIDPrefix = "hlp-"
+
+// EventChildRevocationID is the child_delegated event field that carries the
+// helper's revocation id.
+const EventChildRevocationID = "childRevocationId"
+
+// helperRevocationID derives the id a zero-credit helper carries from the
+// parent's token id, the label and the scope the holder sent. Nothing random
+// goes in: delegating again with the same parent, label and scope gives the same
+// key and the same id, so the same database row (no new row per session), and a
+// helper revoked once is still refused when it is delegated again.
+//
+// The parent must carry a token_id caveat of its own. The id is a second
+// token_id caveat, and a reader that takes the first one (receipts, billing)
+// must keep getting the parent's. A parent without one gets no id.
+func (d *Delegator) helperRevocationID(parent *TokenInfo, params *DelegateParams) string {
+	if parent == nil || parent.RawToken == "" {
+		return ""
+	}
+	mac := parent.Raw
+	if mac == nil {
+		var err error
+		if mac, err = d.macaroonSvc.Decode(parent.RawToken); err != nil {
+			return ""
+		}
+	}
+	if mac.GetCaveat("token_id") == "" {
+		return ""
+	}
+	h := sha256.New()
+	h.Write([]byte("satgate-zero-credit-helper-v1\x00"))
+	h.Write([]byte(parent.TokenID))
+	h.Write([]byte{0})
+	h.Write([]byte(params.Label))
+	h.Write([]byte{0})
+	h.Write([]byte(params.Scope))
+	return HelperRevocationIDPrefix + hex.EncodeToString(h.Sum(nil))[:24]
 }
