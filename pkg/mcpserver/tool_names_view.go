@@ -345,6 +345,16 @@ const (
 
 	// viewBuildLimit bounds one build for a call (not a list), as before.
 	viewBuildLimit = 10 * time.Second
+
+	// viewPublishMargin: the builds of a list end this long before its
+	// deadline, and no build starts with less than this left. Lists queued
+	// behind the build give up at the deadline itself, so the build has
+	// published its result (a held view with the kept tools, say) by the
+	// time they stop waiting and they share it; without the margin they
+	// would give up in the same instant and answer with no tools. Measured
+	// at round 4: without it, nine of ten lists behind a stalled sign-in
+	// read listed 0 tools where round 3 listed the 6 kept ones.
+	viewPublishMargin = 150 * time.Millisecond
 )
 
 // listBudget is ListBudget; tests in this package shorten it.
@@ -443,16 +453,17 @@ func (m *UpstreamManager) viewFor(ctx context.Context, list bool) *toolView {
 			return v
 		}
 	}
-	if list && !time.Now().Before(dl) {
+	// The builds of a list end viewPublishMargin before its deadline.
+	end := dl.Add(-viewPublishMargin)
+	if list && !time.Now().Before(end) {
 		// No build starts once the budget is used up.
 		return heldView()
 	}
 	if m.nameStore == nil {
 		m.nameStore = NewMemoryToolNameStore()
 	}
-	// Every build of this list ends with its budget (dl); a call's builds
+	// Every build of this list ends with its budget (end); a call's builds
 	// end after viewBuildLimit.
-	end := dl
 	if !list {
 		end = time.Now().Add(viewBuildLimit)
 	}
@@ -471,7 +482,7 @@ func (m *UpstreamManager) viewFor(ctx context.Context, list bool) *toolView {
 			break
 		}
 		left := viewBuildBudget - time.Since(started)
-		if attempt >= viewBuildAttempts || left <= 0 || (list && !time.Now().Before(dl)) {
+		if attempt >= viewBuildAttempts || left <= 0 || (list && !time.Now().Before(end)) {
 			nv = heldView()
 			break
 		}

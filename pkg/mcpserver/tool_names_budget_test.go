@@ -294,6 +294,52 @@ func TestBudget_ThreeBuildsAreACapNotThreeAllowances(t *testing.T) {
 	})
 }
 
+// Round 3 listed the kept tools for every list behind a stalled sign-in read;
+// so must a list that queues behind the build: the build publishes its held
+// view (the 9 kept tools) before the queued lists give up (viewPublishMargin).
+func TestBudget_ListsBehindAStalledReadShareTheKeptToolsTheBuildPublishes(t *testing.T) {
+	defer setListBudgetForTest(500 * time.Millisecond)()
+	m, h, _, _, _ := r3Setup(t, nil)
+	var reads atomic.Int32
+	m.SetClaimOrderSource(func(ctx context.Context) (ClaimOrder, error) {
+		reads.Add(1)
+		<-ctx.Done() // the sign-in read stalls until its deadline
+		co, _ := h.get(ctx)
+		co.AllUnreadable = true
+		return co, ctx.Err()
+	})
+	reads.Store(0)
+	m.Recheck()
+	const lists = 10
+	var wg sync.WaitGroup
+	start := make(chan struct{})
+	counts := make([]int, lists)
+	els := make([]time.Duration, lists)
+	for i := 0; i < lists; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			<-start
+			began := time.Now()
+			counts[i] = len(m.AllTools())
+			els[i] = time.Since(began)
+		}(i)
+	}
+	close(start)
+	wg.Wait()
+	for i := range counts {
+		if counts[i] != 9 {
+			t.Fatalf("list %d listed %d of the 9 kept tools (counts %v)", i, counts[i], counts)
+		}
+		if els[i] > 900*time.Millisecond {
+			t.Fatalf("list %d took %s on a 500ms budget", i, els[i])
+		}
+	}
+	if got := reads.Load(); got != 1 {
+		t.Fatalf("%d reads for %d lists; the queued lists must share the one build", got, lists)
+	}
+}
+
 // Item 4: a stalled name store is bounded by the list's budget too (the
 // build's context is the budget's).
 func TestBudget_AStalledNameStoreIsBoundedByTheListBudget(t *testing.T) {
