@@ -438,3 +438,59 @@ func TestChecked_TheRecordOwnsItsExpiry(t *testing.T) {
 		t.Fatal("a record with no complete read keeps values")
 	}
 }
+
+// Round 5: a list whose context ends while it waits for the view lock answers
+// then (held, no tools) and leaves nothing waiting: not a goroutine, and not a
+// queued waiter that would hold the lock when its owner lets go. The owner is
+// a call (ToolOrigin takes the lock the way a call does; here the test holds
+// it by hand for longer than the list budget).
+func TestBudget_ACancelledListLeavesNothingQueuedForTheViewLock(t *testing.T) {
+	m, _, _, _, _ := r3Setup(t, nil)
+	m.viewMu.Lock() // a call that is building
+	m.Recheck()     // the cached view is out of date: every list needs the lock
+	time.Sleep(50 * time.Millisecond)
+	before := settledGoroutines()
+
+	const n = 100
+	var wg sync.WaitGroup
+	var tools atomic.Int32
+	var slowest atomic.Int64
+	for i := 0; i < n; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+			defer cancel()
+			start := time.Now()
+			tools.Add(int32(len(m.AllToolsContext(ctx))))
+			if d := int64(time.Since(start)); d > slowest.Load() {
+				slowest.Store(d)
+			}
+		}()
+	}
+	done := make(chan struct{})
+	go func() { wg.Wait(); close(done) }()
+	select {
+	case <-done:
+	case <-time.After(2 * time.Second): // far less than ListBudget (2.75 s): ctx must end the wait
+		t.Fatal("lists with a 50ms context were still waiting for the view lock after 2 s: ctx does not end the wait")
+	}
+	if got := tools.Load(); got != 0 {
+		t.Fatalf("lists that gave up listed %d tools in all; with no usable view they answer with none", got)
+	}
+	if d := time.Duration(slowest.Load()); d > 400*time.Millisecond {
+		t.Fatalf("the slowest cancelled list took %s, want about 50ms", d)
+	}
+	time.Sleep(200 * time.Millisecond)
+	if after := settledGoroutines(); after > before+3 {
+		t.Fatalf("goroutines with the view lock still held: %d before the %d lists, %d after them", before, n, after)
+	}
+	m.viewMu.Unlock()
+	if !m.viewMu.TryLock() {
+		t.Fatal("the owner let go and the view lock is not free: a cancelled list is still queued for it")
+	}
+	m.viewMu.Unlock()
+	if got := len(m.AllTools()); got != 9 {
+		t.Fatalf("a list after the owner let go: %d of 9 tools", got)
+	}
+}

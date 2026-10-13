@@ -56,7 +56,13 @@ func TestViewLock_AnAbandonedWaitLeavesNothingBehind(t *testing.T) {
 	for _, c := range cancels {
 		c()
 	}
-	wg.Wait()
+	waited := make(chan struct{})
+	go func() { wg.Wait(); close(waited) }()
+	select {
+	case <-waited:
+	case <-time.After(3 * time.Second): // a wait that ignores its deadline or ctx: fail, do not hang
+		t.Fatal("200 waits did not end 3 s after their deadlines and cancels: a wait ignores its deadline or its ctx")
+	}
 
 	// The owner still holds the lock: nothing of the 200 may be left.
 	if after := settledGoroutines(); after > before+2 {
