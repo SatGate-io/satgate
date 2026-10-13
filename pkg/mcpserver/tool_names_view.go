@@ -352,15 +352,23 @@ func (m *UpstreamManager) viewFor(list bool) *toolView {
 	// inside viewBuildBudget), then held.
 	started := time.Now()
 	var nv *toolView
+	bctx := ctx
 	for attempt := 1; ; attempt++ {
-		nv = m.buildToolView(ctx, m.snapshotServices())
+		nv = m.buildToolView(bctx, m.snapshotServices())
 		if nv.valid(m.now()) {
 			break
 		}
-		if attempt >= viewBuildAttempts || time.Since(started) >= viewBuildBudget {
+		left := viewBuildBudget - time.Since(started)
+		if attempt >= viewBuildAttempts || left <= 0 {
 			nv = heldView()
 			break
 		}
+		// The build again gets what is left of the budget, so a list that
+		// had to build twice still answers in about viewBuildBudget plus
+		// the first build.
+		var stop context.CancelFunc
+		bctx, stop = context.WithTimeout(ctx, left)
+		defer stop()
 	}
 	nv.ver = ver
 	nv.at = time.Now()
