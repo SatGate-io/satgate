@@ -279,14 +279,23 @@ func (m *UpstreamManager) orderServices(snap []serviceSnap, co *ClaimOrder) {
 
 // toolView returns the current view, building it when services changed since
 // the last one, when its retry time has passed, or when the tools it keeps
-// have reached the time limit (KeptToolsMaxAge).
-func (m *UpstreamManager) toolView() *toolView { return m.viewFor(false) }
+// have reached the time limit (KeptToolsMaxAge). It is for calls and for the
+// accessors: it waits for the view lock and for a build as long as that takes
+// (a build is bounded by 10 s), exactly as before the list budget.
+func (m *UpstreamManager) toolView() *toolView { return m.viewFor(nil, false) }
 
-// listView is toolView for a list of tools. A view built without a complete
-// read of the account's sign-ins is built again by every list, one build at a
-// time: a list that arrives while a build runs uses that build's result.
-// The first list after the store recovers therefore shows the held tools.
-func (m *UpstreamManager) listView() *toolView { return m.viewFor(true) }
+// listView is toolView for a list of tools, under one time budget: ListBudget
+// from now, or the deadline of ctx if that is sooner. The budget
+// covers the wait for the view lock and every build, including each build's
+// read of the sign-ins and of the stored names. When it is used up the list
+// answers at once with what is safe: a complete view that is still valid, or
+// the held view (no tools).
+//
+// A view built without a complete read of the account's sign-ins is built
+// again by every list, one build at a time: a list that arrives while a
+// build runs uses that build's result. The first list after the store
+// recovers therefore shows the held tools.
+func (m *UpstreamManager) listView(ctx context.Context) *toolView { return m.viewFor(ctx, true) }
 
 // valid says whether a built view may still be served at now: it is within
 // KeptToolsMaxAge of the complete read it stands on, the record it was
@@ -313,22 +322,115 @@ func heldView() *toolView {
 const (
 	// A view whose read was made stale by a sign-in write while it was being
 	// built is built again from the new values, at most viewBuildAttempts
-	// times and not after viewBuildBudget; then nothing is listed until the
+	// times (a cap, not three allowances: every build ends with the list's
+	// budget) and not after viewBuildBudget; then nothing is listed until the
 	// next list builds again.
 	viewBuildAttempts = 3
 	viewBuildBudget   = 2 * time.Second
+
+	// ListBudget is the time one list has, from the moment it reaches
+	// AllToolsContext (or the earlier deadline of the caller's context). The
+	// enterprise router starts the same clock when the list reaches
+	// AllToolsForTenant and passes what is left.
+	//
+	// Why 2.5 s: the 2 s read deadline of the sign-in read and the 250 ms a
+	// list gives a config load to wind down already come to 2.25 s, the
+	// longest single wait measured at round 3 (2.25 s inside the limit, 2.76 s
+	// past it). The budget ends there, 0.5 s under the 3 s bar. The 0.5 s is
+	// for what the budget cannot bound: the scheduler waking the goroutines
+	// that notice the deadline (measured in tens of milliseconds under -race
+	// with the machine loaded), the answer being marshalled, and a slower CI
+	// runner. A budget of 2.8 s or more would leave under 200 ms for that.
+	ListBudget = 2500 * time.Millisecond
+
+	// viewBuildLimit bounds one build for a call (not a list), as before.
+	viewBuildLimit = 10 * time.Second
 )
 
-func (m *UpstreamManager) viewFor(list bool) *toolView {
+// listBudget is ListBudget; tests in this package shorten it.
+var listBudget = ListBudget
+
+// lockViewWithin takes viewMu, giving up at dl or when ctx ends. sync.Mutex
+// has no timed lock: the wait is made by a helper goroutine, in the mutex's
+// own queue, and a list that gives up leaves the helper to release the lock
+// the moment it gets it (a build holds it for at most its own budget, so the
+// helper does not outlive that). The wait of a list is never longer than its
+// budget, whoever holds the lock.
+func (m *UpstreamManager) lockViewWithin(ctx context.Context, dl time.Time) bool {
+	if m.viewMu.TryLock() {
+		return true
+	}
+	got := make(chan struct{})
+	go func() {
+		m.viewMu.Lock()
+		close(got)
+	}()
+	t := time.NewTimer(time.Until(dl))
+	defer t.Stop()
+	select {
+	case <-got:
+		return true
+	case <-t.C:
+	case <-ctx.Done():
+	}
+	select {
+	case <-got: // got it at the last moment
+		return true
+	default:
+	}
+	go func() {
+		<-got
+		m.viewMu.Unlock()
+	}()
+	return false
+}
+
+// outOfBudget is the answer of a list that has no time left: the cached view
+// if it is complete, valid and current, otherwise the held view. It never
+// takes the view lock and never builds.
+func (m *UpstreamManager) outOfBudget() *toolView {
+	if v := m.viewPtr.Load(); v != nil && v.ver == m.namesVer.Load() && !v.incomplete && v.valid(m.now()) {
+		return v
+	}
+	return heldView()
+}
+
+func (m *UpstreamManager) viewFor(ctx context.Context, list bool) *toolView {
 	arrived := time.Now()
 	if v := m.viewPtr.Load(); v != nil && v.ver == m.namesVer.Load() && !v.incomplete && v.valid(m.now()) {
 		return v
 	}
-	m.viewMu.Lock()
+	// A list has one budget from here: the wait for the lock, then every
+	// build. A call (list == false) waits and builds as before.
+	var dl time.Time
+	if list {
+		if ctx == nil {
+			ctx = context.Background()
+		}
+		// The caller's deadline if it is sooner than ListBudget from now.
+		dl = arrived.Add(listBudget)
+		if cd, ok := ctx.Deadline(); ok && cd.Before(dl) {
+			dl = cd
+		}
+		if !m.lockViewWithin(ctx, dl) {
+			return m.outOfBudget()
+		}
+	} else {
+		m.viewMu.Lock()
+	}
 	defer m.viewMu.Unlock()
 	ver := m.namesVer.Load()
-	if v := m.viewPtr.Load(); v != nil && v.ver == ver && v.valid(m.now()) {
+	if v := m.viewPtr.Load(); v != nil && v.valid(m.now()) {
 		switch {
+		case v.ver != ver:
+			// Out of date. The one thing a queued list shares anyway is the
+			// held result of a build that finished after it arrived and
+			// lists nothing: the sign-in writes that made the build give up
+			// moved the version, and another build would meet the same
+			// writes. A view with tools and an old version is never shared.
+			if list && v.held && len(v.tools) == 0 && v.at.After(arrived) {
+				return v
+			}
 		case !v.incomplete:
 			return v
 		case list && v.held && v.at.After(arrived):
@@ -341,15 +443,25 @@ func (m *UpstreamManager) viewFor(list bool) *toolView {
 			return v
 		}
 	}
+	if list && !time.Now().Before(dl) {
+		// No build starts once the budget is used up.
+		return heldView()
+	}
 	if m.nameStore == nil {
 		m.nameStore = NewMemoryToolNameStore()
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	// Every build of this list ends with its budget (dl); a call's builds
+	// end after viewBuildLimit.
+	end := dl
+	if !list {
+		end = time.Now().Add(viewBuildLimit)
+	}
+	ctx, cancel := context.WithDeadline(context.Background(), end)
 	defer cancel()
 	// A view is published only if the record is still in the generation its
 	// read came back in. If a sign-in write moved it during the build, the
 	// view is built again from the new values (a bounded number of times,
-	// inside viewBuildBudget), then held.
+	// inside viewBuildBudget and the list's budget), then held.
 	started := time.Now()
 	var nv *toolView
 	bctx := ctx
@@ -359,13 +471,13 @@ func (m *UpstreamManager) viewFor(list bool) *toolView {
 			break
 		}
 		left := viewBuildBudget - time.Since(started)
-		if attempt >= viewBuildAttempts || left <= 0 {
+		if attempt >= viewBuildAttempts || left <= 0 || (list && !time.Now().Before(dl)) {
 			nv = heldView()
 			break
 		}
-		// The build again gets what is left of the budget, so a list that
-		// had to build twice still answers in about viewBuildBudget plus
-		// the first build.
+		// The build again gets what is left of viewBuildBudget (and never
+		// more than what is left of the list's budget: bctx is a child of
+		// the context that ends with it).
 		var stop context.CancelFunc
 		bctx, stop = context.WithTimeout(ctx, left)
 		defer stop()

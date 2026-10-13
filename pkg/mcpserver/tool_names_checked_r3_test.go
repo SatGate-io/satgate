@@ -15,10 +15,23 @@ import (
 // failNames is a name store whose Load can be made to fail.
 type failNames struct {
 	ToolNameStore
-	fail atomic.Bool
+	fail  atomic.Bool
+	stall atomic.Bool  // Load waits for its context to end (round 4)
+	delay atomic.Int64 // Load answers after this many nanoseconds (round 4)
 }
 
 func (s *failNames) Load(ctx context.Context) ([]ToolNameAssignment, error) {
+	if s.stall.Load() {
+		<-ctx.Done()
+		return nil, ctx.Err()
+	}
+	if d := s.delay.Load(); d > 0 {
+		select {
+		case <-time.After(time.Duration(d)):
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		}
+	}
 	if s.fail.Load() {
 		return nil, errString("synthetic names store unavailable")
 	}

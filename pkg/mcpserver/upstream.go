@@ -876,8 +876,21 @@ func (m *UpstreamManager) resolveTool(toolName string) (*toolEntry, error) {
 
 // AllTools returns the tools agents see: one entry per name, each name unique
 // (without regard to case) and accepted by agent apps. See tool_names.go.
+//
+// The list has one time budget, ListBudget; AllToolsContext takes the
+// caller's own (see tool_names_view.go).
 func (m *UpstreamManager) AllTools() []json.RawMessage {
-	return append([]json.RawMessage(nil), m.listView().tools...)
+	return m.AllToolsContext(context.Background())
+}
+
+// AllToolsContext is AllTools under ListBudget, or the deadline of ctx if that
+// is sooner. The budget covers the wait for the view lock and
+// every build of the view. When it is used up the list is what is safe: the
+// current view if it is complete and valid, otherwise no tools. ctx ending
+// before the deadline also ends the wait for the view lock; it does not
+// cancel a build that other lists share.
+func (m *UpstreamManager) AllToolsContext(ctx context.Context) []json.RawMessage {
+	return append([]json.RawMessage(nil), m.listView(ctx).tools...)
 }
 
 // ForwardToolCall sends a tools/call to the service that owns the listed name,
