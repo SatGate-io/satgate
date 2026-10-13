@@ -160,6 +160,7 @@ type toolView struct {
 	// name may be one of them.
 	unavailable bool
 	missing     bool // a service has no complete list: retry its discovery
+	held        bool // some tool waits for a complete credential read: build again after viewWaitingRetry
 	entries     []*toolEntry
 	byName      map[string]*toolEntry // exposed, exact
 	tools       []json.RawMessage
@@ -268,7 +269,7 @@ func (m *UpstreamManager) toolView() *toolView {
 	nv.ver = ver
 	nv.at = time.Now()
 	nv.retryAfter = viewRetryAfter
-	if !nv.fastRetry && (nv.missing || len(nv.waiting) > 0) {
+	if !nv.fastRetry && (nv.missing || nv.held || len(nv.waiting) > 0) {
 		nv.retryAfter = viewWaitingRetry
 		if m.waitRetry > 0 {
 			nv.retryAfter = m.waitRetry
@@ -669,7 +670,7 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 			// service's new tool waits only if it wants a plain name that a
 			// held tool could take.
 			heldNames[s.claimKey] = screens[i].heldNames
-			v.fastRetry = true // look again soon: the host's read may have recovered
+			v.held = true
 			v.unavailable = true
 			v.incomplete = true
 		default:
