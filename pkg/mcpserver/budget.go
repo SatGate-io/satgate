@@ -82,6 +82,32 @@ type TenantCostResolver interface {
 	ResolveForTenant(tenantID string, toolName string) int64
 }
 
+// CheckedTenantCostResolver is an optional addition to TenantCostResolver for a
+// resolver that can fail to know a price (it reads it from a store that can be
+// down). The proxy uses it, when the tenant resolver has it, instead of
+// ResolveForTenant.
+//
+// ResolveForTenantChecked returns the price and a nil error when the price is
+// known: read now, cached, or the last good one the resolver holds. It returns
+// a non-nil error when it could not read the price and holds no usable one. The
+// price returned with an error is the one ResolveForTenant would have given (a
+// guess); the proxy never charges it in a mode that charges or blocks. It uses
+// it only in observe mode, which never blocks (see handleToolsCall).
+//
+// A tool that is free whatever the profile says is (0, nil) with no read.
+// ctx is the request's context.
+type CheckedTenantCostResolver interface {
+	ResolveForTenantChecked(ctx context.Context, tenantID string, toolName string) (int64, error)
+}
+
+// ToolPriceUnavailableMessage is the JSON-RPC error message for a tools/call
+// refused because its price could not be read (see CheckedTenantCostResolver).
+// It is fixed text: it carries no store error, key or tenant. The error data
+// has "error":"tool_price_unavailable" and "retryable":true. It differs from
+// "Budget service unavailable" on purpose: a gateway in front of the proxy may
+// treat that one specially.
+const ToolPriceUnavailableMessage = "Tool price temporarily unavailable; the call was not sent and nothing was charged. Retry."
+
 // --- In-memory budget enforcer (OSS) ---
 
 // InMemoryBudgetEnforcer provides single-instance budget enforcement.

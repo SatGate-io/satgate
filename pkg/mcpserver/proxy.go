@@ -632,6 +632,21 @@ func dropReservedTools(tools []json.RawMessage) []json.RawMessage {
 	return kept
 }
 
+// priceUnknownRefuses reports whether a call whose price could not be read is
+// refused: in a mode that debits and blocks (control, hard, soft, fiat402)
+// when the token has a budget, because that debit would be at a guessed
+// price. Observe-class modes (observe, shadow, chargeback) never block, so
+// they go on with the resolver's default price, as before. A token with no
+// budget is not debited by this function in any mode, so its price decides
+// nothing here.
+func (p *Proxy) priceUnknownRefuses(budgetID string) bool {
+	switch p.config.Enforcement.Mode {
+	case "control", "hard", "soft", "fiat402":
+		return budgetID != ""
+	}
+	return false
+}
+
 // handleToolsCall is the hot path — intercepts tool calls for budget enforcement.
 func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *TokenInfo) (resp *Response, err error) {
 	// Parse tool call
@@ -667,6 +682,36 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		return p.argumentDeniedResponse(ctx, req, tokenInfo, tc.Name, denied), nil
 	}
 
+	// The price, for a tenant resolver that can say it does not know it (see
+	// CheckedTenantCostResolver). It is asked before the call gate, so a call
+	// refused for want of a price takes no spending-limit slot, asks no owner
+	// for approval and has nothing to settle. A resolver without the method
+	// is asked below, as it always was.
+	var (
+		cost         int64
+		costResolved bool
+	)
+	if checked, ok := p.tenantCosts.(CheckedTenantCostResolver); ok && tokenInfo.TenantID != "" {
+		price, priceErr := checked.ResolveForTenantChecked(ctx, tokenInfo.TenantID, tc.Name)
+		cost, costResolved = price, true
+		if priceErr != nil {
+			if p.priceUnknownRefuses(tokenInfo.BudgetID) {
+				log.Error().Err(priceErr).Str("tool", tc.Name).Str("budgetId", tokenInfo.BudgetID).
+					Str("mode", p.config.Enforcement.Mode).
+					Msg("tool price unavailable; refusing the call before any charge")
+				return NewErrorResponseWithData(req.ID, CodeInternalError, ToolPriceUnavailableMessage, map[string]interface{}{
+					"error":     "tool_price_unavailable",
+					"tool":      tc.Name,
+					"retryable": true,
+				}), nil
+			}
+			log.Warn().Err(priceErr).Str("tool", tc.Name).Str("budgetId", tokenInfo.BudgetID).
+				Str("mode", p.config.Enforcement.Mode).
+				Int64("cost", price).
+				Msg("tool price unavailable; observe mode never blocks, using the default price")
+		}
+	}
+
 	// Stateful controls (spending limits, owner approval): see call_gate.go.
 	// After scope and argument rules, before cost, budget and the upstream.
 	// Whatever happens next, the gate is told how the call ended.
@@ -685,8 +730,9 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	}
 
 	// Resolve cost (per-tenant if available, else global)
-	var cost int64
-	if p.tenantCosts != nil && tokenInfo.TenantID != "" {
+	if costResolved {
+		// Resolved above, before the call gate.
+	} else if p.tenantCosts != nil && tokenInfo.TenantID != "" {
 		cost = p.tenantCosts.ResolveForTenant(tokenInfo.TenantID, tc.Name)
 	} else {
 		cost = p.costs.Resolve(tc.Name)
