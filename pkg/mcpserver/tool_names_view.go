@@ -707,6 +707,14 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 	if !claimsOK {
 		v.fastRetry = true
 	}
+	if !readComplete {
+		// Not every sign-in was read: whatever is listed is listed on the
+		// strength of an earlier read. Every list reads again until one is
+		// complete (viewFor), which also moves the time of the last complete
+		// read forward as soon as the store is back.
+		v.held = true
+		v.incomplete = true
+	}
 
 	// Services in order; a second service with the same claim key is the same
 	// service connected twice and offers nothing.

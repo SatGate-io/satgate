@@ -118,13 +118,14 @@ func TestChecked_AChangedDescriptionWaitsAndTheOldBytesAreNotKept(t *testing.T) 
 	eventually(t, "changed tool after recovery", func() bool { return strings.Contains(listTools(t, m)["get_account"].Description, "more") })
 }
 
-// Changed in round 2 (tool-names-keep-checked, 1012b): round 1 expected that
+// Changed in round 2 (tool-names-keep-checked, 1012b). The name is round 1's and
+// is kept; what it asserts is not. Round 1 expected that
 // one unreadable sign-in affected only its own service. The rule rounds 4 and
 // 5 confirmed is the other one: a sign-in that cannot be read means new tools
 // cannot be checked against it, in any service. A cold start with Robinhood's
 // sign-in unreadable therefore lists nothing, and the first list after the
 // read recovers shows everything.
-func TestChecked_OneUnreadableSignInHoldsNewToolsOfEveryService(t *testing.T) {
+func TestChecked_OneUnreadableSignInAffectsOnlyItsService(t *testing.T) {
 	rh, alp := twoBrokers(t)
 	h := &hostRead{}
 	h.set([]string{"robinhood"}, claimSvc("robinhood", "Robinhood", rh, false), claimSvc("alpaca", "Alpaca", alp, false))
