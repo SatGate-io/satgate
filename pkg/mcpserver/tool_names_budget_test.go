@@ -86,16 +86,19 @@ func TestBudget_AQueuedListDoesNotWaitForTheViewLockPastItsBudget(t *testing.T) 
 	t.Run("the lock is not lost: a later list builds as usual", func(t *testing.T) {
 		m, _, _, _, _ := r3Setup(t, nil)
 		m.viewMu.Lock()
+		unlock := time.AfterFunc(1200*time.Millisecond, m.viewMu.Unlock)
+		defer unlock.Stop()
 		m.Recheck()
-		done := make(chan int, 1)
-		go func() { done <- len(m.AllTools()) }()
-		if n := <-done; n != 0 {
-			t.Fatalf("while held: %d tools", n)
+		start := time.Now()
+		n := len(m.AllTools())
+		el := time.Since(start)
+		if n != 0 || el > 900*time.Millisecond {
+			t.Fatalf("while the lock was held: %d tools after %s, want none after about the 300ms budget", n, el)
 		}
-		m.viewMu.Unlock()
+		time.Sleep(1200*time.Millisecond - time.Since(start)) // the owner lets go
 		// The helper that waited for the lock for the list that gave up has
 		// taken it and let it go; a new list builds.
-		deadline := time.Now().Add(time.Second)
+		deadline := time.Now().Add(2 * time.Second)
 		for {
 			if n := len(m.AllTools()); n == 9 {
 				break
