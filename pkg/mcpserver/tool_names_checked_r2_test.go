@@ -148,6 +148,31 @@ func TestChecked_TheFirstListAfterRecoveryShowsWhatWasHeld(t *testing.T) {
 	})
 }
 
+// A view built without a complete read is not cached as good even when nothing
+// is held: all its tools are kept. The first list after the read recovers
+// checks the kept tools against the complete read; a kept tool that holds a
+// value that read shows is gone from that list, with no other trigger.
+func TestChecked_AViewBuiltWithoutACompleteReadIsBuiltAgainByTheFirstListAfterRecovery(t *testing.T) {
+	m, h, _, _ := keptSetup(t)
+	if n := len(m.AllTools()); n != 9 {
+		t.Fatalf("setup: %d", n)
+	}
+	h.down()
+	m.Recheck()
+	if n := len(m.AllTools()); n != 9 {
+		t.Fatalf("while the read fails all 9 are kept: %d", n)
+	}
+	// The store is back, and its complete read now holds a value that sits in
+	// the unchanged description of Alpaca's get_account.
+	h.set(nil)
+	h.withSecrets("robinhood", "Get the trading account.")
+	for name, tl := range listTools(t, m) {
+		if strings.Contains(tl.Description, "trading account") {
+			t.Fatalf("the first list after recovery still lists %q, which holds a sign-in value", name)
+		}
+	}
+}
+
 // B3: the time limit, on an injected clock; a failed read does not extend it.
 func TestChecked_KeptToolsHaveATimeLimitAFailedReadDoesNotExtend(t *testing.T) {
 	rh, alp := twoBrokers(t)
