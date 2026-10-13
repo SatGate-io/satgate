@@ -333,15 +333,20 @@ const (
 	// enterprise router starts the same clock when the list reaches
 	// AllToolsForTenant and passes what is left.
 	//
-	// Why 2.5 s: the 2 s read deadline of the sign-in read and the 250 ms a
-	// list gives a config load to wind down already come to 2.25 s, the
-	// longest single wait measured at round 3 (2.25 s inside the limit, 2.76 s
-	// past it). The budget ends there, 0.5 s under the 3 s bar. The 0.5 s is
-	// for what the budget cannot bound: the scheduler waking the goroutines
-	// that notice the deadline (measured in tens of milliseconds under -race
-	// with the machine loaded), the answer being marshalled, and a slower CI
-	// runner. A budget of 2.8 s or more would leave under 200 ms for that.
-	ListBudget = 2500 * time.Millisecond
+	// Why 2.75 s: the rules reviewed at round 3 wait up to 2 s for the
+	// config load's sign-in read (signInReadDeadline) and give a load that
+	// is winding down 250 ms more (loadGrace). The view's own read and a
+	// stale rebuild come after that, so a budget of 2.25 s would leave them
+	// nothing. The builds end viewPublishMargin (100 ms) before the budget,
+	// so a list answers at about 2.65 s, and 2.75 s leaves two equal gaps of
+	// 0.25 s: below the 3 s bar, for what a deadline cannot bound (the
+	// scheduler waking the goroutines that notice it, marshalling the
+	// answer, a slow CI runner under -race; observed on Dean with other
+	// lanes running, -race, ten lists at once: 1 to 5 ms past the deadline),
+	// and above the first build of Astra's stacked case (a 400 ms read that
+	// starts when the 2 s config read ends), so that case finishes its first
+	// read, sees the commit, and answers held instead of being cut.
+	ListBudget = 2750 * time.Millisecond
 
 	// viewBuildLimit bounds one build for a call (not a list), as before.
 	viewBuildLimit = 10 * time.Second
@@ -354,7 +359,7 @@ const (
 	// would give up in the same instant and answer with no tools. Measured
 	// at round 4: without it, nine of ten lists behind a stalled sign-in
 	// read listed 0 tools where round 3 listed the 6 kept ones.
-	viewPublishMargin = 150 * time.Millisecond
+	viewPublishMargin = 100 * time.Millisecond
 )
 
 // listBudget is ListBudget; tests in this package shorten it.
