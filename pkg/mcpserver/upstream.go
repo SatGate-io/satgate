@@ -42,7 +42,7 @@ type UpstreamManager struct {
 	// Tool names (see tool_names.go). viewMu guards nameStore and order and
 	// serializes builds of the view; namesVer moves whenever the set of
 	// services or their tools may have changed.
-	viewMu     sync.Mutex
+	viewMu     viewLock
 	nameStore  ToolNameStore
 	checked    *ToolCheckRecord                 // passed-check record (viewMu); see tool_names_checked.go
 	clock      atomic.Pointer[func() time.Time] // nil: time.Now; see SetClock

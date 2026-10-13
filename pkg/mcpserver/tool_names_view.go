@@ -365,39 +365,12 @@ const (
 // listBudget is ListBudget; tests in this package shorten it.
 var listBudget = ListBudget
 
-// lockViewWithin takes viewMu, giving up at dl or when ctx ends. sync.Mutex
-// has no timed lock: the wait is made by a helper goroutine, in the mutex's
-// own queue, and a list that gives up leaves the helper to release the lock
-// the moment it gets it (a build holds it for at most its own budget, so the
-// helper does not outlive that). The wait of a list is never longer than its
-// budget, whoever holds the lock.
+// lockViewWithin takes the view lock, giving up at dl or when ctx ends. The
+// wait is a select on the lock's one-slot channel, the deadline and ctx (see
+// viewLock), so a list that gives up leaves nothing behind. The wait of a
+// list is never longer than its budget, whoever holds the lock.
 func (m *UpstreamManager) lockViewWithin(ctx context.Context, dl time.Time) bool {
-	if m.viewMu.TryLock() {
-		return true
-	}
-	got := make(chan struct{})
-	go func() {
-		m.viewMu.Lock()
-		close(got)
-	}()
-	t := time.NewTimer(time.Until(dl))
-	defer t.Stop()
-	select {
-	case <-got:
-		return true
-	case <-t.C:
-	case <-ctx.Done():
-	}
-	select {
-	case <-got: // got it at the last moment
-		return true
-	default:
-	}
-	go func() {
-		<-got
-		m.viewMu.Unlock()
-	}()
-	return false
+	return m.viewMu.LockWithin(ctx, dl)
 }
 
 // outOfBudget is the answer of a list that has no time left: the cached view
