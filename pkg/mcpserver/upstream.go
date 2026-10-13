@@ -44,7 +44,8 @@ type UpstreamManager struct {
 	// services or their tools may have changed.
 	viewMu     sync.Mutex
 	nameStore  ToolNameStore
-	checked    *ToolCheckRecord // passed-check record (viewMu); see tool_names_checked.go
+	checked    *ToolCheckRecord                 // passed-check record (viewMu); see tool_names_checked.go
+	clock      atomic.Pointer[func() time.Time] // nil: time.Now; see SetClock
 	order      []string
 	claimOrder func(ctx context.Context) (ClaimOrder, error)
 	lastOrder  []string
@@ -876,7 +877,7 @@ func (m *UpstreamManager) resolveTool(toolName string) (*toolEntry, error) {
 // AllTools returns the tools agents see: one entry per name, each name unique
 // (without regard to case) and accepted by agent apps. See tool_names.go.
 func (m *UpstreamManager) AllTools() []json.RawMessage {
-	return append([]json.RawMessage(nil), m.toolView().tools...)
+	return append([]json.RawMessage(nil), m.listView().tools...)
 }
 
 // ForwardToolCall sends a tools/call to the service that owns the listed name,

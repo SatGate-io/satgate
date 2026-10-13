@@ -130,6 +130,10 @@ type serviceSnap struct {
 	// stay; the rest are held back (tool_names_checked.go).
 	unreadable bool
 	secrets    []string
+	// signIns are the OAuth sign-in values (access and refresh) the host
+	// passed with the service's config (ExtraSecrets). They are screened
+	// against every service's tools, not only this one's.
+	signIns []string
 }
 
 type toolEntry struct {
@@ -160,12 +164,19 @@ type toolView struct {
 	// name may be one of them.
 	unavailable bool
 	missing     bool // a service has no complete list: retry its discovery
-	held        bool // some tool waits for a complete credential read: build again after viewWaitingRetry
-	entries     []*toolEntry
-	byName      map[string]*toolEntry // exposed, exact
-	tools       []json.RawMessage
-	dups        [][]string
-	waiting     []ToolWait
+	// held: some tool waits for a complete read of the account's sign-ins
+	// (the host could not read all of them in full, or the time limit on kept
+	// tools has passed). Every list builds the view again, one build at a
+	// time, until a complete read works.
+	held bool
+	// keptUntil: when kept tools are listed from this view, the time (on the
+	// manager's clock) they stop being listed. Zero: none are.
+	keptUntil time.Time
+	entries   []*toolEntry
+	byName    map[string]*toolEntry // exposed, exact
+	tools     []json.RawMessage
+	dups      [][]string
+	waiting   []ToolWait
 }
 
 const (
@@ -201,6 +212,11 @@ func (m *UpstreamManager) snapshotServices() []serviceSnap {
 			claim = hex.EncodeToString(sum[:])
 		}
 		s := serviceSnap{key: k, label: label, claimKey: claim, secrets: credentialValues(cfg), unreadable: m.unreadable[k]}
+		for _, v := range cfg.ExtraSecrets {
+			if v = strings.TrimSpace(v); len(v) >= minSecretLen {
+				s.signIns = append(s.signIns, v)
+			}
+		}
 		if c := m.clients[k]; c != nil {
 			s.client = c
 			s.tools, s.complete = c.listState()
@@ -248,16 +264,42 @@ func (m *UpstreamManager) orderServices(snap []serviceSnap, co *ClaimOrder) {
 }
 
 // toolView returns the current view, building it when services changed since
-// the last one.
-func (m *UpstreamManager) toolView() *toolView {
-	if v := m.viewPtr.Load(); v != nil && v.ver == m.namesVer.Load() && !v.incomplete {
+// the last one, when its retry time has passed, or when the tools it keeps
+// have reached the time limit (KeptToolsMaxAge).
+func (m *UpstreamManager) toolView() *toolView { return m.viewFor(false) }
+
+// listView is toolView for a list of tools. A view built without a complete
+// read of the account's sign-ins is built again by every list, one build at a
+// time: a list that arrives while a build runs uses that build's result.
+// The first list after the store recovers therefore shows the held tools.
+func (m *UpstreamManager) listView() *toolView { return m.viewFor(true) }
+
+// usable says whether a built view may still be served at now.
+func (v *toolView) keptValid(now time.Time) bool {
+	return v.keptUntil.IsZero() || now.Before(v.keptUntil)
+}
+
+func (m *UpstreamManager) viewFor(list bool) *toolView {
+	arrived := time.Now()
+	if v := m.viewPtr.Load(); v != nil && v.ver == m.namesVer.Load() && !v.incomplete && v.keptValid(m.now()) {
 		return v
 	}
 	m.viewMu.Lock()
 	defer m.viewMu.Unlock()
 	ver := m.namesVer.Load()
-	if v := m.viewPtr.Load(); v != nil && v.ver == ver && (!v.incomplete || time.Since(v.at) < v.retryAfter) {
-		return v
+	if v := m.viewPtr.Load(); v != nil && v.ver == ver && v.keptValid(m.now()) {
+		switch {
+		case !v.incomplete:
+			return v
+		case list && v.held && v.at.After(arrived):
+			// A build that finished after this list arrived: lists queued
+			// behind it share its result instead of each paying for a read.
+			return v
+		case list && v.held:
+			// Another build is due: this list starts it.
+		case time.Since(v.at) < v.retryAfter:
+			return v
+		}
 	}
 	snap := m.snapshotServices()
 	if m.nameStore == nil {
@@ -562,27 +604,39 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 	claimsOK := true
 	seenSet := map[string]bool{}
 	seenStore, hasSeen := store.(ToolSeenStore)
+	if m.checked == nil {
+		m.checked = NewToolCheckRecord()
+	}
+	// Is the read of the account's sign-ins complete? One sign-in that cannot
+	// be read makes it incomplete for every service: a new or changed tool is
+	// checked against all of the account's sign-ins or not at all.
+	epoch := m.checked.Epoch()
+	readAt := m.now()
+	readComplete := true
+	var addAcctEarly []string
 	if durable {
 		c, err := m.claimOrder(ctx)
-		bad := map[string]bool{}
-		for _, k := range c.Unreadable {
-			bad[k] = true
+		if !c.ReadAt.IsZero() {
+			epoch, readAt = c.ReadEpoch, c.ReadAt
+		} else {
+			readAt = m.now()
 		}
-		for i := range snap {
-			if bad[snap[i].key] || c.AllUnreadable {
-				snap[i].unreadable = true
-			}
+		// What the host says about the sign-ins decides whether the read is
+		// complete, with or without an error: an order that cannot be read
+		// (err) is not by itself a sign-in that cannot (the host says
+		// AllUnreadable when it knows no sign-in). The values the host did
+		// read count either way.
+		if c.AllUnreadable || len(c.Unreadable) > 0 {
+			readComplete = false
+		}
+		for _, cs := range c.Services {
+			addAcctEarly = append(addAcctEarly, cs.Secrets...)
 		}
 		if err != nil {
 			claimsOK = false
 			log.Warn().Msg("tool names: the connection order could not be read; no new names are chosen until it can")
 		} else {
 			co = &c
-			// The host read the sign-ins in this build: its answer is the
-			// current one, for every service.
-			for i := range snap {
-				snap[i].unreadable = bad[snap[i].key] || c.AllUnreadable
-			}
 			if hasSeen {
 				s, err := seenStore.LoadSeen(ctx)
 				if err != nil {
@@ -593,8 +647,28 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 				}
 			}
 		}
+	} else {
+		m.mu.Lock()
+		readComplete = len(m.unreadable) == 0
+		m.mu.Unlock()
+	}
+	for i := range snap {
+		snap[i].unreadable = !readComplete
 	}
 	m.orderServices(snap, co)
+	// Every sign-in value the account has: the values the host read in this
+	// build, and the values its services' configs carry (for a service that
+	// could not be read, the values of the last complete read). The check of a
+	// tool covers all of them, whichever service the tool belongs to.
+	var acct []string
+	addAcct := func(vs ...string) {
+		for _, v := range vs {
+			if v = strings.TrimSpace(v); len(v) >= minSecretLen {
+				acct = append(acct, v)
+			}
+		}
+	}
+	addAcct(addAcctEarly...)
 	if co != nil {
 		extra := map[string][]string{}
 		for _, cs := range co.Services {
@@ -608,6 +682,26 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 					snap[i].secrets = append(snap[i].secrets, strings.TrimSpace(sec))
 				}
 			}
+		}
+	}
+	for i := range snap {
+		addAcct(snap[i].signIns...)
+	}
+	keptOK := false
+	if readComplete {
+		if claimsOK {
+			m.checked.NoteCompleteRead(epoch, readAt, acct)
+		}
+	} else {
+		// The read failed: the values of the last complete read stand in for
+		// it, for at most KeptToolsMaxAge after that read. A failed read does
+		// not move that time.
+		var vals []string
+		var until time.Time
+		vals, until, keptOK = m.checked.kept(m.now())
+		addAcct(vals...)
+		if keptOK {
+			v.keptUntil = until
 		}
 	}
 	if !claimsOK {
@@ -639,9 +733,6 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 	slugs := assignSlugs(services)
 	multi := len(services) >= 2
 
-	if m.checked == nil {
-		m.checked = NewToolCheckRecord()
-	}
 	inView := map[string]bool{} // claim key of services with a complete list now
 	labelOf := map[string]string{}
 	heldNames := map[string]map[string]bool{} // claim key -> names its held tools could take
@@ -652,7 +743,7 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 	for i, s := range services {
 		labelOf[s.claimKey] = s.label
 		if s.complete {
-			screens[i] = m.screenTools(s, claimsOK)
+			screens[i] = m.screenTools(s, acct, readComplete, keptOK, claimsOK, epoch)
 		}
 		switch {
 		case s.complete && screens[i].held == 0:
@@ -1020,16 +1111,18 @@ type screenedTool struct {
 }
 
 // screenTools applies the credential check to one service's complete list. A
-// tool that holds one of the service's credentials is never listed. When the
-// host could not read the service's credential set in full, a tool is listed
-// only if it passed before with the same name and description and also holds
-// none of the credential values the manager has now; the rest are held. When
-// the credential set is complete (and record says the build's other reads
-// succeeded), every tool that passes is recorded.
-func (m *UpstreamManager) screenTools(s serviceSnap, record bool) toolScreen {
+// tool that holds one of the service's credentials, or any sign-in value of
+// the account (acct), is never listed, whichever service issued the value.
+// When the host could not read every sign-in of the account in full
+// (readComplete false), a tool is listed only if keptOK says the time limit
+// has not passed and it passed before with the same name and description;
+// the rest are held. When the read is complete (and record says the build's
+// other reads succeeded), every tool that passes is recorded under epoch.
+func (m *UpstreamManager) screenTools(s serviceSnap, acct []string, readComplete, keptOK, record bool, epoch uint64) toolScreen {
 	var out toolScreen
 	seen := map[string]bool{}
 	var passed []toolDigest
+	secrets := append(append([]string(nil), s.secrets...), acct...)
 	for ti, raw := range s.tools {
 		var probe struct {
 			Name        json.RawMessage `json:"name"`
@@ -1048,13 +1141,13 @@ func (m *UpstreamManager) screenTools(s serviceSnap, record bool) toolScreen {
 		seen[name] = true
 		var desc string
 		_ = json.Unmarshal(probe.Description, &desc)
-		if holdsSecret(s.secrets, name, desc) {
+		if holdsSecret(secrets, name, desc) {
 			out.refused++
 			continue
 		}
 		d := digestOfTool(name, desc)
-		if s.unreadable {
-			if !m.checked.has(s.claimKey, d) {
+		if !readComplete {
+			if !keptOK || !m.checked.has(s.claimKey, d) {
 				out.held++
 				if out.heldNames == nil {
 					out.heldNames = map[string]bool{}
@@ -1068,11 +1161,9 @@ func (m *UpstreamManager) screenTools(s serviceSnap, record bool) toolScreen {
 		}
 		out.items = append(out.items, screenedTool{raw: raw, idx: ti, name: name})
 	}
-	// Record only what passed against a credential set that was read in full
-	// in this build: the host's answer for the service says so, and so does a
-	// claim order that was read (its sign-in values are part of the check).
-	if !s.unreadable && record {
-		m.checked.replace(s.claimKey, passed)
+	// Record only what passed against a read of the whole account's sign-ins.
+	if readComplete && record {
+		m.checked.replace(epoch, s.claimKey, passed)
 	}
 	return out
 }

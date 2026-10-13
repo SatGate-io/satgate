@@ -118,36 +118,25 @@ func TestChecked_AChangedDescriptionWaitsAndTheOldBytesAreNotKept(t *testing.T) 
 	eventually(t, "changed tool after recovery", func() bool { return strings.Contains(listTools(t, m)["get_account"].Description, "more") })
 }
 
-func TestChecked_OneUnreadableSignInAffectsOnlyItsService(t *testing.T) {
+// Changed in round 2 (tool-names-keep-checked, 1012b): round 1 expected that
+// one unreadable sign-in affected only its own service. The rule rounds 4 and
+// 5 confirmed is the other one: a sign-in that cannot be read means new tools
+// cannot be checked against it, in any service. A cold start with Robinhood's
+// sign-in unreadable therefore lists nothing, and the first list after the
+// read recovers shows everything.
+func TestChecked_OneUnreadableSignInHoldsNewToolsOfEveryService(t *testing.T) {
 	rh, alp := twoBrokers(t)
 	h := &hostRead{}
 	h.set([]string{"robinhood"}, claimSvc("robinhood", "Robinhood", rh, false), claimSvc("alpaca", "Alpaca", alp, false))
 	cfgs := map[string]UpstreamConfig{"robinhood": rh.cfg("Robinhood"), "alpaca": alp.cfg("Alpaca")}
-	// Cold start: nothing has passed on this machine, and Robinhood's read fails.
 	m, _ := startCfg(t, func(m *UpstreamManager) { m.SetToolNameStore(newSeenStore()); m.SetClaimOrderSource(h.get); fast(m) }, nil, cfgs)
-	got := listTools(t, m)
-	for name, tl := range got {
-		if strings.HasPrefix(tl.Description, "Robinhood") {
-			t.Fatalf("a Robinhood tool %q was listed on a cold start with its sign-in unreadable", name)
-		}
+	if got := listTools(t, m); len(got) != 0 {
+		t.Fatalf("a cold start with one unreadable sign-in listed %v", names(got))
 	}
-	// Alpaca's tools that want a plain name Robinhood's held tools could take
-	// (get_account, place_crypto_order) wait for Robinhood, as they always
-	// wait for an earlier service; the three that are Alpaca's own are
-	// checked and listed as normal.
-	want := []string{"get_all_positions", "place_stock_order", "cancel_order_by_id"}
-	if len(got) != len(want) {
-		t.Fatalf("Alpaca's own tools should be checked and listed: %v", names(got))
+	h.set(nil) // no namesVer bump, no waiting: the next list is the first after recovery
+	if got := listTools(t, m); len(got) != 9 {
+		t.Fatalf("the first list after recovery has %d of 9: %v", len(got), names(got))
 	}
-	for _, w := range want {
-		if got[w].Name == "" {
-			t.Fatalf("%s missing: %v", w, names(got))
-		}
-	}
-	// The next list after recovery shows them (retry; the failure was not kept).
-	h.set(nil)
-	m.namesVer.Add(1)
-	eventually(t, "Robinhood's tools after recovery", func() bool { return len(listTools(t, m)) == 9 })
 }
 
 func TestChecked_ColdStartWithAFailingReadHoldsTheServiceAndRetries(t *testing.T) {
