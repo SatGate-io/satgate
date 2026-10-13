@@ -125,7 +125,15 @@ type serviceSnap struct {
 	tools    []json.RawMessage
 	complete bool
 	withheld bool // the host could not read the service's credentials
-	secrets  []string
+	// unreadable: the host could not read the service's complete credential
+	// set just now. Tools that passed the check before, with the same bytes,
+	// stay; the rest are held back (tool_names_checked.go).
+	unreadable bool
+	secrets    []string
+	// signIns are the OAuth sign-in values (access and refresh) the host
+	// passed with the service's config (ExtraSecrets). They are screened
+	// against every service's tools, not only this one's.
+	signIns []string
 }
 
 type toolEntry struct {
@@ -156,11 +164,33 @@ type toolView struct {
 	// name may be one of them.
 	unavailable bool
 	missing     bool // a service has no complete list: retry its discovery
-	entries     []*toolEntry
-	byName      map[string]*toolEntry // exposed, exact
-	tools       []json.RawMessage
-	dups        [][]string
-	waiting     []ToolWait
+	// held: some tool waits for a complete read of the account's sign-ins
+	// (the host could not read all of them in full, or the time limit on kept
+	// tools has passed). Every list builds the view again, one build at a
+	// time, until a complete read works.
+	held bool
+	// keptUntil: the time (on the manager's clock) this view stops being
+	// served: KeptToolsMaxAge after the complete read it stands on (a view
+	// built from a complete read), or after the last complete read whose
+	// values screened its kept tools (a view built while the read fails).
+	// Zero: it stands on no read (a hold, or a view of nothing). A view past
+	// it is never returned: it is built again, and with no complete read to
+	// stand on that build holds every tool.
+	keptUntil time.Time
+	// rec, recEpoch: the record this view's check used and its generation
+	// when the host's read came back. A view is served only while the record
+	// is still in that generation (Forget, ForgetSignIns, InvalidateTenant
+	// and a sign-in written on this machine all move it).
+	rec      *ToolCheckRecord
+	recEpoch uint64
+	// stale: the generation moved while the view was being built, so it was
+	// screened with values the host has since replaced. Never published.
+	stale   bool
+	entries []*toolEntry
+	byName  map[string]*toolEntry // exposed, exact
+	tools   []json.RawMessage
+	dups    [][]string
+	waiting []ToolWait
 }
 
 const (
@@ -195,7 +225,12 @@ func (m *UpstreamManager) snapshotServices() []serviceSnap {
 			sum := sha256.Sum256([]byte("key:" + k))
 			claim = hex.EncodeToString(sum[:])
 		}
-		s := serviceSnap{key: k, label: label, claimKey: claim, secrets: credentialValues(cfg)}
+		s := serviceSnap{key: k, label: label, claimKey: claim, secrets: credentialValues(cfg), unreadable: m.unreadable[k]}
+		for _, v := range cfg.ExtraSecrets {
+			if v = strings.TrimSpace(v); len(v) >= minSecretLen {
+				s.signIns = append(s.signIns, v)
+			}
+		}
 		if c := m.clients[k]; c != nil {
 			s.client = c
 			s.tools, s.complete = c.listState()
@@ -243,28 +278,203 @@ func (m *UpstreamManager) orderServices(snap []serviceSnap, co *ClaimOrder) {
 }
 
 // toolView returns the current view, building it when services changed since
-// the last one.
-func (m *UpstreamManager) toolView() *toolView {
-	if v := m.viewPtr.Load(); v != nil && v.ver == m.namesVer.Load() && !v.incomplete {
+// the last one, when its retry time has passed, or when the tools it keeps
+// have reached the time limit (KeptToolsMaxAge). It is for calls and for the
+// accessors: it waits for the view lock and for a build as long as that takes
+// (a build is bounded by 10 s), exactly as before the list budget.
+func (m *UpstreamManager) toolView() *toolView { return m.viewFor(nil, false) }
+
+// listView is toolView for a list of tools, under one time budget: ListBudget
+// from now, or the deadline of ctx if that is sooner. The budget
+// covers the wait for the view lock and every build, including each build's
+// read of the sign-ins and of the stored names. When it is used up the list
+// answers at once with what is safe: a complete view that is still valid, or
+// the held view (no tools).
+//
+// A view built without a complete read of the account's sign-ins is built
+// again by every list, one build at a time: a list that arrives while a
+// build runs uses that build's result. The first list after the store
+// recovers therefore shows the held tools.
+func (m *UpstreamManager) listView(ctx context.Context) *toolView { return m.viewFor(ctx, true) }
+
+// valid says whether a built view may still be served at now: it is within
+// KeptToolsMaxAge of the complete read it stands on, the record it was
+// checked against has not been forgotten since, and it was not built from a
+// read that a sign-in write had already made stale. Every path that serves a
+// view (the cached view, a shared build, the name-store fallback) asks it.
+func (v *toolView) valid(now time.Time) bool {
+	if v.stale {
+		return false
+	}
+	if !v.keptUntil.IsZero() && !now.Before(v.keptUntil) {
+		return false
+	}
+	return v.rec == nil || v.rec.Current(v.recEpoch)
+}
+
+// heldView is what is served when no view could be built from a read that is
+// still current: no tool is listed or routed, and every list tries again.
+func heldView() *toolView {
+	return &toolView{byName: map[string]*toolEntry{}, tools: []json.RawMessage{},
+		held: true, incomplete: true, unavailable: true, fastRetry: true}
+}
+
+const (
+	// A view whose read was made stale by a sign-in write while it was being
+	// built is built again from the new values, at most viewBuildAttempts
+	// times (a cap, not three allowances: every build ends with the list's
+	// budget) and not after viewBuildBudget; then nothing is listed until the
+	// next list builds again.
+	viewBuildAttempts = 3
+	viewBuildBudget   = 2 * time.Second
+
+	// ListBudget is the time one list has, from the moment it reaches
+	// AllToolsContext (or the earlier deadline of the caller's context). The
+	// enterprise router starts the same clock when the list reaches
+	// AllToolsForTenant and passes what is left.
+	//
+	// Why 2.75 s: the rules reviewed at round 3 wait up to 2 s for the
+	// config load's sign-in read (signInReadDeadline) and give a load that
+	// is winding down 250 ms more (loadGrace). The view's own read and a
+	// stale rebuild come after that, so a budget of 2.25 s would leave them
+	// nothing. The builds end viewPublishMargin (100 ms) before the budget,
+	// so a list answers at about 2.65 s, and 2.75 s leaves two equal gaps of
+	// 0.25 s: below the 3 s bar, for what a deadline cannot bound (the
+	// scheduler waking the goroutines that notice it, marshalling the
+	// answer, a slow CI runner under -race; observed on Dean with other
+	// lanes running, -race, ten lists at once: 1 to 5 ms past the deadline),
+	// and above the first build of Astra's stacked case (a 400 ms read that
+	// starts when the 2 s config read ends), so that case finishes its first
+	// read, sees the commit, and answers held instead of being cut.
+	ListBudget = 2750 * time.Millisecond
+
+	// viewBuildLimit bounds one build for a call (not a list), as before.
+	viewBuildLimit = 10 * time.Second
+
+	// viewPublishMargin: the builds of a list end this long before its
+	// deadline, and no build starts with less than this left. Lists queued
+	// behind the build give up at the deadline itself, so the build has
+	// published its result (a held view with the kept tools, say) by the
+	// time they stop waiting and they share it; without the margin they
+	// would give up in the same instant and answer with no tools. Measured
+	// at round 4: without it, nine of ten lists behind a stalled sign-in
+	// read listed 0 tools where round 3 listed the 6 kept ones.
+	viewPublishMargin = 100 * time.Millisecond
+)
+
+// listBudget is ListBudget; tests in this package shorten it.
+var listBudget = ListBudget
+
+// lockViewWithin takes the view lock, giving up at dl or when ctx ends. The
+// wait is a select on the lock's one-slot channel, the deadline and ctx (see
+// viewLock), so a list that gives up leaves nothing behind. The wait of a
+// list is never longer than its budget, whoever holds the lock.
+func (m *UpstreamManager) lockViewWithin(ctx context.Context, dl time.Time) bool {
+	return m.viewMu.LockWithin(ctx, dl)
+}
+
+// outOfBudget is the answer of a list that has no time left: the cached view
+// if it is complete, valid and current, otherwise the held view. It never
+// takes the view lock and never builds.
+func (m *UpstreamManager) outOfBudget() *toolView {
+	if v := m.viewPtr.Load(); v != nil && v.ver == m.namesVer.Load() && !v.incomplete && v.valid(m.now()) {
 		return v
 	}
-	m.viewMu.Lock()
+	return heldView()
+}
+
+func (m *UpstreamManager) viewFor(ctx context.Context, list bool) *toolView {
+	arrived := time.Now()
+	if v := m.viewPtr.Load(); v != nil && v.ver == m.namesVer.Load() && !v.incomplete && v.valid(m.now()) {
+		return v
+	}
+	// A list has one budget from here: the wait for the lock, then every
+	// build. A call (list == false) waits and builds as before.
+	var dl time.Time
+	if list {
+		if ctx == nil {
+			ctx = context.Background()
+		}
+		// The caller's deadline if it is sooner than ListBudget from now.
+		dl = arrived.Add(listBudget)
+		if cd, ok := ctx.Deadline(); ok && cd.Before(dl) {
+			dl = cd
+		}
+		if !m.lockViewWithin(ctx, dl) {
+			return m.outOfBudget()
+		}
+	} else {
+		m.viewMu.Lock()
+	}
 	defer m.viewMu.Unlock()
 	ver := m.namesVer.Load()
-	if v := m.viewPtr.Load(); v != nil && v.ver == ver && (!v.incomplete || time.Since(v.at) < v.retryAfter) {
-		return v
+	if v := m.viewPtr.Load(); v != nil && v.valid(m.now()) {
+		switch {
+		case v.ver != ver:
+			// Out of date. The one thing a queued list shares anyway is the
+			// held result of a build that finished after it arrived and
+			// lists nothing: the sign-in writes that made the build give up
+			// moved the version, and another build would meet the same
+			// writes. A view with tools and an old version is never shared.
+			if list && v.held && len(v.tools) == 0 && v.at.After(arrived) {
+				return v
+			}
+		case !v.incomplete:
+			return v
+		case list && v.held && v.at.After(arrived):
+			// A build that finished after this list arrived: lists queued
+			// behind it share its result instead of each paying for a read.
+			return v
+		case list && v.held:
+			// Another build is due: this list starts it.
+		case time.Since(v.at) < v.retryAfter:
+			return v
+		}
 	}
-	snap := m.snapshotServices()
+	// The builds of a list end viewPublishMargin before its deadline.
+	end := dl.Add(-viewPublishMargin)
+	if list && !time.Now().Before(end) {
+		// No build starts once the budget is used up.
+		return heldView()
+	}
 	if m.nameStore == nil {
 		m.nameStore = NewMemoryToolNameStore()
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	// Every build of this list ends with its budget (end); a call's builds
+	// end after viewBuildLimit.
+	if !list {
+		end = time.Now().Add(viewBuildLimit)
+	}
+	ctx, cancel := context.WithDeadline(context.Background(), end)
 	defer cancel()
-	nv := m.buildToolView(ctx, snap)
+	// A view is published only if the record is still in the generation its
+	// read came back in. If a sign-in write moved it during the build, the
+	// view is built again from the new values (a bounded number of times,
+	// inside viewBuildBudget and the list's budget), then held.
+	started := time.Now()
+	var nv *toolView
+	bctx := ctx
+	for attempt := 1; ; attempt++ {
+		nv = m.buildToolView(bctx, m.snapshotServices())
+		if nv.valid(m.now()) {
+			break
+		}
+		left := viewBuildBudget - time.Since(started)
+		if attempt >= viewBuildAttempts || left <= 0 || (list && !time.Now().Before(end)) {
+			nv = heldView()
+			break
+		}
+		// The build again gets what is left of viewBuildBudget (and never
+		// more than what is left of the list's budget: bctx is a child of
+		// the context that ends with it).
+		var stop context.CancelFunc
+		bctx, stop = context.WithTimeout(ctx, left)
+		defer stop()
+	}
 	nv.ver = ver
 	nv.at = time.Now()
 	nv.retryAfter = viewRetryAfter
-	if !nv.fastRetry && (nv.missing || len(nv.waiting) > 0) {
+	if !nv.fastRetry && (nv.missing || nv.held || len(nv.waiting) > 0) {
 		nv.retryAfter = viewWaitingRetry
 		if m.waitRetry > 0 {
 			nv.retryAfter = m.waitRetry
@@ -533,12 +743,20 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 		// Names never change, so the last view is still right about every name
 		// it has; keep serving it and try again soon.
 		log.Warn().Msg("tool names: stored names could not be read; the last list is kept until they can")
-		if prev := m.viewPtr.Load(); prev != nil {
+		// The last view is reused only while it is still valid: within
+		// KeptToolsMaxAge of the complete read it stands on and in the
+		// record's current generation (Forget and InvalidateTenant end it).
+		// Otherwise nothing is listed until the names can be read.
+		if prev := m.viewPtr.Load(); prev != nil && prev.valid(m.now()) && (prev.rec == nil || prev.rec == m.checked) {
 			keep := *prev
 			keep.incomplete = true
 			keep.fastRetry = true
 			return &keep
 		}
+		// Nothing can be listed, and every list tries the store again (held),
+		// so the first list after it recovers shows the tools.
+		v.held = true
+		v.unavailable = true
 		v.incomplete = true
 		v.fastRetry = true
 		return v
@@ -557,8 +775,34 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 	claimsOK := true
 	seenSet := map[string]bool{}
 	seenStore, hasSeen := store.(ToolSeenStore)
+	if m.checked == nil {
+		m.checked = NewToolCheckRecord()
+	}
+	// Is the read of the account's sign-ins complete? One sign-in that cannot
+	// be read makes it incomplete for every service: a new or changed tool is
+	// checked against all of the account's sign-ins or not at all.
+	epoch := m.checked.Epoch()
+	readAt := m.now()
+	readComplete := true
+	var addAcctEarly []string
 	if durable {
 		c, err := m.claimOrder(ctx)
+		if !c.ReadAt.IsZero() {
+			epoch, readAt = c.ReadEpoch, c.ReadAt
+		} else {
+			readAt = m.now()
+		}
+		// What the host says about the sign-ins decides whether the read is
+		// complete, with or without an error: an order that cannot be read
+		// (err) is not by itself a sign-in that cannot (the host says
+		// AllUnreadable when it knows no sign-in). The values the host did
+		// read count either way.
+		if c.AllUnreadable || len(c.Unreadable) > 0 {
+			readComplete = false
+		}
+		for _, cs := range c.Services {
+			addAcctEarly = append(addAcctEarly, cs.Secrets...)
+		}
 		if err != nil {
 			claimsOK = false
 			log.Warn().Msg("tool names: the connection order could not be read; no new names are chosen until it can")
@@ -574,8 +818,33 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 				}
 			}
 		}
+	} else {
+		m.mu.Lock()
+		readComplete = len(m.unreadable) == 0
+		m.mu.Unlock()
 	}
+	for i := range snap {
+		snap[i].unreadable = !readComplete
+	}
+	// The generation this view is bound to: the record's, now that the host's
+	// read is back. A sign-in write after this point moves it and ends the
+	// view (valid). One before it is caught by NoteCompleteRead below, which
+	// compares the generation the read began in (epoch).
+	v.rec, v.recEpoch = m.checked, m.checked.Epoch()
 	m.orderServices(snap, co)
+	// Every sign-in value the account has: the values the host read in this
+	// build, and the values its services' configs carry (for a service that
+	// could not be read, the values of the last complete read). The check of a
+	// tool covers all of them, whichever service the tool belongs to.
+	var acct []string
+	addAcct := func(vs ...string) {
+		for _, v := range vs {
+			if v = strings.TrimSpace(v); len(v) >= minSecretLen {
+				acct = append(acct, v)
+			}
+		}
+	}
+	addAcct(addAcctEarly...)
 	if co != nil {
 		extra := map[string][]string{}
 		for _, cs := range co.Services {
@@ -591,8 +860,52 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 			}
 		}
 	}
+	for i := range snap {
+		addAcct(snap[i].signIns...)
+	}
+	keptOK := false
+	if readComplete {
+		// Was the record forgotten after this read began (a sign-in was
+		// written, or InvalidateTenant ran)? Then the values just read may be
+		// older than the stored ones: nothing is named, stored or listed from
+		// them, and the caller builds again (viewFor). NoteCompleteRead says
+		// it for a read that is recorded; a build whose order could not be
+		// read records nothing and asks the record directly.
+		var fresh bool
+		if claimsOK {
+			fresh = m.checked.NoteCompleteRead(epoch, readAt, acct)
+		} else {
+			fresh = m.checked.Current(epoch)
+		}
+		if !fresh {
+			v.stale = true
+			return v
+		}
+		// The view stands on this complete read, and no longer than
+		// KeptToolsMaxAge after it.
+		v.keptUntil = readAt.Add(KeptToolsMaxAge)
+	} else {
+		// The read failed: the values of the last complete read stand in for
+		// it, for at most KeptToolsMaxAge after that read. A failed read does
+		// not move that time.
+		var vals []string
+		var until time.Time
+		vals, until, keptOK = m.checked.kept(m.now())
+		addAcct(vals...)
+		if keptOK {
+			v.keptUntil = until
+		}
+	}
 	if !claimsOK {
 		v.fastRetry = true
+	}
+	if !readComplete {
+		// Not every sign-in was read: whatever is listed is listed on the
+		// strength of an earlier read. Every list reads again until one is
+		// complete (viewFor), which also moves the time of the last complete
+		// read forward as soon as the store is back.
+		v.held = true
+		v.incomplete = true
 	}
 
 	// Services in order; a second service with the same claim key is the same
@@ -622,15 +935,36 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 
 	inView := map[string]bool{} // claim key of services with a complete list now
 	labelOf := map[string]string{}
-	for _, s := range services {
+	heldNames := map[string]map[string]bool{} // claim key -> names its held tools could take
+	// What each service offers, screened once: the tools that hold none of its
+	// credentials and, for a service whose credentials could not be read in
+	// full, only those that passed the check before with the same bytes.
+	screens := make([]toolScreen, len(services))
+	for i, s := range services {
 		labelOf[s.claimKey] = s.label
 		if s.complete {
+			screens[i] = m.screenTools(s, acct, readComplete, keptOK, claimsOK, epoch)
+		}
+		switch {
+		case s.complete && screens[i].held == 0:
 			inView[s.claimKey] = true
 			if m.answered == nil {
 				m.answered = map[string]bool{}
 			}
 			m.answered[s.claimKey] = true
-		} else {
+		case s.complete:
+			// Tools of this service are held back until the host can read its
+			// credentials in full. The host says when that changes
+			// (SetCredentialsUnreadable), which builds the view again; an
+			// unlisted name may be one of the held tools. The service is not
+			// recorded as answered (not all its tools are named), and a later
+			// service's new tool waits only if it wants a plain name that a
+			// held tool could take.
+			heldNames[s.claimKey] = screens[i].heldNames
+			v.held = true
+			v.unavailable = true
+			v.incomplete = true
+		default:
 			v.missing = true
 			v.unavailable = true
 			v.incomplete = true
@@ -644,35 +978,12 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 		if !s.complete {
 			continue
 		}
-		seen := map[string]bool{}
-		refused := 0
-		for ti, raw := range s.tools {
-			var probe struct {
-				Name        json.RawMessage `json:"name"`
-				Description json.RawMessage `json:"description"`
-			}
-			if json.Unmarshal(raw, &probe) != nil {
-				continue
-			}
-			var name string
-			if json.Unmarshal(probe.Name, &name) != nil || name == "" {
-				continue
-			}
-			if IsReservedAgentToolName(name) || seen[name] {
-				continue
-			}
-			seen[name] = true
-			var desc string
-			_ = json.Unmarshal(probe.Description, &desc)
-			if holdsSecret(s.secrets, name, desc) {
-				refused++
-				continue
-			}
-			offers[i][strings.ToLower(name)] = true
-			all = append(all, &toolEntry{service: s.key, label: s.label, claimKey: s.claimKey, original: name,
-				client: s.client, raw: raw, toolIdx: ti, svcIdx: i})
+		for _, it := range screens[i].items {
+			offers[i][strings.ToLower(it.name)] = true
+			all = append(all, &toolEntry{service: s.key, label: s.label, claimKey: s.claimKey, original: it.name,
+				client: s.client, raw: it.raw, toolIdx: it.idx, svcIdx: i})
 		}
-		m.noteRefused(s.claimKey, s.label, refused)
+		m.noteRefused(s.claimKey, s.label, screens[i].refused)
 	}
 
 	taken := map[string]bool{} // lower(name) held by anything
@@ -719,7 +1030,17 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 			return true, "" // not in the order: it appears next cycle
 		}
 		for _, s := range co.Services[:pos] {
-			if s.Free || inView[s.ClaimKey] || seenSet[s.ClaimKey] {
+			if s.Free {
+				continue
+			}
+			if hn, held := heldNames[s.ClaimKey]; held {
+				// Held tools are new or changed ones: even for a service seen
+				// before, a later service does not take a plain name they
+				// could take. It does not wait for anything else.
+				if !wantsHeldName(hn, e.original) {
+					continue
+				}
+			} else if inView[s.ClaimKey] || seenSet[s.ClaimKey] {
 				continue
 			}
 			l := labelOf[s.ClaimKey]
@@ -756,11 +1077,24 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 			}
 		}
 		for _, s := range services[:e.svcIdx] {
+			if hn, held := heldNames[s.claimKey]; held {
+				if wantsHeldName(hn, e.original) {
+					return true, s.label
+				}
+				continue
+			}
 			if unanswered(s) {
 				return true, s.label
 			}
 		}
 		return false, ""
+	}
+
+	// A sign-in written since the screen began: do not name or store anything
+	// from it (the caller builds again).
+	if !m.checked.Current(v.recEpoch) {
+		v.stale = true
+		return v
 	}
 
 	// Phase B: new tools, the ones a routing rule favours first, then by
@@ -958,6 +1292,87 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 		v.tools = append(v.tools, e.raw)
 	}
 	return v
+}
+
+// wantsHeldName reports whether a tool named original could take a plain name
+// that one of an earlier service's held tools could take.
+func wantsHeldName(held map[string]bool, original string) bool {
+	return held[strings.ToLower(original)] || held[strings.ToLower(sanitizeToolName(original))]
+}
+
+// toolScreen is the result of screening one service's tools.
+type toolScreen struct {
+	items   []screenedTool
+	refused int // hold one of the service's credentials
+	held    int // not checkable now: the credential set was not read in full and the tool is new or changed
+	// heldNames are the lower-case plain names the held tools could take (their
+	// own name and its sanitized form). A later service's new tool that wants
+	// one of these waits: the plain name belongs to the earlier service.
+	heldNames map[string]bool
+}
+
+type screenedTool struct {
+	raw  json.RawMessage
+	idx  int
+	name string
+}
+
+// screenTools applies the credential check to one service's complete list. A
+// tool that holds one of the service's credentials, or any sign-in value of
+// the account (acct), is never listed, whichever service issued the value.
+// When the host could not read every sign-in of the account in full
+// (readComplete false), a tool is listed only if keptOK says the time limit
+// has not passed and it passed before with the same name and description;
+// the rest are held. When the read is complete (and record says the build's
+// other reads succeeded), every tool that passes is recorded under epoch.
+func (m *UpstreamManager) screenTools(s serviceSnap, acct []string, readComplete, keptOK, record bool, epoch uint64) toolScreen {
+	var out toolScreen
+	seen := map[string]bool{}
+	var passed []toolDigest
+	secrets := append(append([]string(nil), s.secrets...), acct...)
+	for ti, raw := range s.tools {
+		var probe struct {
+			Name        json.RawMessage `json:"name"`
+			Description json.RawMessage `json:"description"`
+		}
+		if json.Unmarshal(raw, &probe) != nil {
+			continue
+		}
+		var name string
+		if json.Unmarshal(probe.Name, &name) != nil || name == "" {
+			continue
+		}
+		if IsReservedAgentToolName(name) || seen[name] {
+			continue
+		}
+		seen[name] = true
+		var desc string
+		_ = json.Unmarshal(probe.Description, &desc)
+		if holdsSecret(secrets, name, desc) {
+			out.refused++
+			continue
+		}
+		d := digestOfTool(name, desc)
+		if !readComplete {
+			if !keptOK || !m.checked.has(s.claimKey, d) {
+				out.held++
+				if out.heldNames == nil {
+					out.heldNames = map[string]bool{}
+				}
+				out.heldNames[strings.ToLower(name)] = true
+				out.heldNames[strings.ToLower(sanitizeToolName(name))] = true
+				continue
+			}
+		} else {
+			passed = append(passed, d)
+		}
+		out.items = append(out.items, screenedTool{raw: raw, idx: ti, name: name})
+	}
+	// Record only what passed against a read of the whole account's sign-ins.
+	if readComplete && record {
+		m.checked.replace(epoch, s.claimKey, passed)
+	}
+	return out
 }
 
 // noteWaiting logs once per pair that one service's tools are not listed until
