@@ -125,7 +125,11 @@ type serviceSnap struct {
 	tools    []json.RawMessage
 	complete bool
 	withheld bool // the host could not read the service's credentials
-	secrets  []string
+	// unreadable: the host could not read the service's complete credential
+	// set just now. Tools that passed the check before, with the same bytes,
+	// stay; the rest are held back (tool_names_checked.go).
+	unreadable bool
+	secrets    []string
 }
 
 type toolEntry struct {
@@ -195,7 +199,7 @@ func (m *UpstreamManager) snapshotServices() []serviceSnap {
 			sum := sha256.Sum256([]byte("key:" + k))
 			claim = hex.EncodeToString(sum[:])
 		}
-		s := serviceSnap{key: k, label: label, claimKey: claim, secrets: credentialValues(cfg)}
+		s := serviceSnap{key: k, label: label, claimKey: claim, secrets: credentialValues(cfg), unreadable: m.unreadable[k]}
 		if c := m.clients[k]; c != nil {
 			s.client = c
 			s.tools, s.complete = c.listState()
@@ -559,11 +563,25 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 	seenStore, hasSeen := store.(ToolSeenStore)
 	if durable {
 		c, err := m.claimOrder(ctx)
+		bad := map[string]bool{}
+		for _, k := range c.Unreadable {
+			bad[k] = true
+		}
+		for i := range snap {
+			if bad[snap[i].key] || c.AllUnreadable {
+				snap[i].unreadable = true
+			}
+		}
 		if err != nil {
 			claimsOK = false
 			log.Warn().Msg("tool names: the connection order could not be read; no new names are chosen until it can")
 		} else {
 			co = &c
+			// The host read the sign-ins in this build: its answer is the
+			// current one, for every service.
+			for i := range snap {
+				snap[i].unreadable = bad[snap[i].key] || c.AllUnreadable
+			}
 			if hasSeen {
 				s, err := seenStore.LoadSeen(ctx)
 				if err != nil {
@@ -620,17 +638,41 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 	slugs := assignSlugs(services)
 	multi := len(services) >= 2
 
+	if m.checked == nil {
+		m.checked = NewToolCheckRecord()
+	}
 	inView := map[string]bool{} // claim key of services with a complete list now
 	labelOf := map[string]string{}
-	for _, s := range services {
+	heldNames := map[string]map[string]bool{} // claim key -> names its held tools could take
+	// What each service offers, screened once: the tools that hold none of its
+	// credentials and, for a service whose credentials could not be read in
+	// full, only those that passed the check before with the same bytes.
+	screens := make([]toolScreen, len(services))
+	for i, s := range services {
 		labelOf[s.claimKey] = s.label
 		if s.complete {
+			screens[i] = m.screenTools(s, claimsOK)
+		}
+		switch {
+		case s.complete && screens[i].held == 0:
 			inView[s.claimKey] = true
 			if m.answered == nil {
 				m.answered = map[string]bool{}
 			}
 			m.answered[s.claimKey] = true
-		} else {
+		case s.complete:
+			// Tools of this service are held back until the host can read its
+			// credentials in full. The host says when that changes
+			// (SetCredentialsUnreadable), which builds the view again; an
+			// unlisted name may be one of the held tools. The service is not
+			// recorded as answered (not all its tools are named), and a later
+			// service's new tool waits only if it wants a plain name that a
+			// held tool could take.
+			heldNames[s.claimKey] = screens[i].heldNames
+			v.fastRetry = true // look again soon: the host's read may have recovered
+			v.unavailable = true
+			v.incomplete = true
+		default:
 			v.missing = true
 			v.unavailable = true
 			v.incomplete = true
@@ -644,35 +686,12 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 		if !s.complete {
 			continue
 		}
-		seen := map[string]bool{}
-		refused := 0
-		for ti, raw := range s.tools {
-			var probe struct {
-				Name        json.RawMessage `json:"name"`
-				Description json.RawMessage `json:"description"`
-			}
-			if json.Unmarshal(raw, &probe) != nil {
-				continue
-			}
-			var name string
-			if json.Unmarshal(probe.Name, &name) != nil || name == "" {
-				continue
-			}
-			if IsReservedAgentToolName(name) || seen[name] {
-				continue
-			}
-			seen[name] = true
-			var desc string
-			_ = json.Unmarshal(probe.Description, &desc)
-			if holdsSecret(s.secrets, name, desc) {
-				refused++
-				continue
-			}
-			offers[i][strings.ToLower(name)] = true
-			all = append(all, &toolEntry{service: s.key, label: s.label, claimKey: s.claimKey, original: name,
-				client: s.client, raw: raw, toolIdx: ti, svcIdx: i})
+		for _, it := range screens[i].items {
+			offers[i][strings.ToLower(it.name)] = true
+			all = append(all, &toolEntry{service: s.key, label: s.label, claimKey: s.claimKey, original: it.name,
+				client: s.client, raw: it.raw, toolIdx: it.idx, svcIdx: i})
 		}
-		m.noteRefused(s.claimKey, s.label, refused)
+		m.noteRefused(s.claimKey, s.label, screens[i].refused)
 	}
 
 	taken := map[string]bool{} // lower(name) held by anything
@@ -719,7 +738,17 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 			return true, "" // not in the order: it appears next cycle
 		}
 		for _, s := range co.Services[:pos] {
-			if s.Free || inView[s.ClaimKey] || seenSet[s.ClaimKey] {
+			if s.Free {
+				continue
+			}
+			if hn, held := heldNames[s.ClaimKey]; held {
+				// Held tools are new or changed ones: even for a service seen
+				// before, a later service does not take a plain name they
+				// could take. It does not wait for anything else.
+				if !wantsHeldName(hn, e.original) {
+					continue
+				}
+			} else if inView[s.ClaimKey] || seenSet[s.ClaimKey] {
 				continue
 			}
 			l := labelOf[s.ClaimKey]
@@ -756,6 +785,12 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 			}
 		}
 		for _, s := range services[:e.svcIdx] {
+			if hn, held := heldNames[s.claimKey]; held {
+				if wantsHeldName(hn, e.original) {
+					return true, s.label
+				}
+				continue
+			}
 			if unanswered(s) {
 				return true, s.label
 			}
@@ -958,6 +993,87 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 		v.tools = append(v.tools, e.raw)
 	}
 	return v
+}
+
+// wantsHeldName reports whether a tool named original could take a plain name
+// that one of an earlier service's held tools could take.
+func wantsHeldName(held map[string]bool, original string) bool {
+	return held[strings.ToLower(original)] || held[strings.ToLower(sanitizeToolName(original))]
+}
+
+// toolScreen is the result of screening one service's tools.
+type toolScreen struct {
+	items   []screenedTool
+	refused int // hold one of the service's credentials
+	held    int // not checkable now: the credential set was not read in full and the tool is new or changed
+	// heldNames are the lower-case plain names the held tools could take (their
+	// own name and its sanitized form). A later service's new tool that wants
+	// one of these waits: the plain name belongs to the earlier service.
+	heldNames map[string]bool
+}
+
+type screenedTool struct {
+	raw  json.RawMessage
+	idx  int
+	name string
+}
+
+// screenTools applies the credential check to one service's complete list. A
+// tool that holds one of the service's credentials is never listed. When the
+// host could not read the service's credential set in full, a tool is listed
+// only if it passed before with the same name and description and also holds
+// none of the credential values the manager has now; the rest are held. When
+// the credential set is complete (and record says the build's other reads
+// succeeded), every tool that passes is recorded.
+func (m *UpstreamManager) screenTools(s serviceSnap, record bool) toolScreen {
+	var out toolScreen
+	seen := map[string]bool{}
+	var passed []toolDigest
+	for ti, raw := range s.tools {
+		var probe struct {
+			Name        json.RawMessage `json:"name"`
+			Description json.RawMessage `json:"description"`
+		}
+		if json.Unmarshal(raw, &probe) != nil {
+			continue
+		}
+		var name string
+		if json.Unmarshal(probe.Name, &name) != nil || name == "" {
+			continue
+		}
+		if IsReservedAgentToolName(name) || seen[name] {
+			continue
+		}
+		seen[name] = true
+		var desc string
+		_ = json.Unmarshal(probe.Description, &desc)
+		if holdsSecret(s.secrets, name, desc) {
+			out.refused++
+			continue
+		}
+		d := digestOfTool(name, desc)
+		if s.unreadable {
+			if !m.checked.has(s.claimKey, d) {
+				out.held++
+				if out.heldNames == nil {
+					out.heldNames = map[string]bool{}
+				}
+				out.heldNames[strings.ToLower(name)] = true
+				out.heldNames[strings.ToLower(sanitizeToolName(name))] = true
+				continue
+			}
+		} else {
+			passed = append(passed, d)
+		}
+		out.items = append(out.items, screenedTool{raw: raw, idx: ti, name: name})
+	}
+	// Record only what passed against a credential set that was read in full
+	// in this build: the host's answer for the service says so, and so does a
+	// claim order that was read (its sign-in values are part of the check).
+	if !s.unreadable && record {
+		m.checked.replace(s.claimKey, passed)
+	}
+	return out
 }
 
 // noteWaiting logs once per pair that one service's tools are not listed until

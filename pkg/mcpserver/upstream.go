@@ -24,6 +24,9 @@ type UpstreamManager struct {
 	mu        sync.Mutex
 	clients   map[string]*UpstreamClient
 	idCounter atomic.Int64
+	// unreadable holds the keys of services whose complete credential set the
+	// host could not read just now (m.mu). See SetCredentialsUnreadable.
+	unreadable map[string]bool
 
 	// redact keeps upstream-supplied text out of errors and logs. See
 	// SetRedactUpstreamText.
@@ -41,6 +44,7 @@ type UpstreamManager struct {
 	// services or their tools may have changed.
 	viewMu     sync.Mutex
 	nameStore  ToolNameStore
+	checked    *ToolCheckRecord // passed-check record (viewMu); see tool_names_checked.go
 	order      []string
 	claimOrder func(ctx context.Context) (ClaimOrder, error)
 	lastOrder  []string

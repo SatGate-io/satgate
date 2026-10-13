@@ -257,6 +257,16 @@ type ClaimService struct {
 // connected.
 type ClaimOrder struct {
 	Services []ClaimService
+	// Unreadable lists the keys (in the manager) of the services whose stored
+	// sign-ins the host could not read in full in this read, and AllUnreadable
+	// says that none could be read. They are honoured even when the read
+	// returns an error. When the read succeeds they are the host's answer for
+	// this build and replace what it said earlier with
+	// SetCredentialsUnreadable; on an error they add to it. For such a service
+	// only tools that passed the credential check before, with the same name
+	// and description, are listed; the rest wait (tool_names_checked.go).
+	Unreadable    []string
+	AllUnreadable bool
 }
 
 // ServiceKey is the key a service's names are stored under: the claim key the
