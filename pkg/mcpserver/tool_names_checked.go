@@ -3,6 +3,7 @@ package mcpserver
 import (
 	"crypto/sha256"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -56,9 +57,9 @@ func digestOfTool(name, description string) toolDigest {
 type ToolCheckRecord struct {
 	mu     sync.Mutex
 	passed map[string]map[toolDigest]struct{} // service claim key -> digests
-	epoch  uint64
-	values []string  // sign-in values of the last complete read
-	readAt time.Time // when that read finished; zero: none
+	epoch  atomic.Uint64                      // moved under mu; read without it
+	values []string                           // sign-in values of the last complete read
+	readAt time.Time                          // when that read finished; zero: none
 }
 
 // NewToolCheckRecord returns an empty record.
@@ -67,11 +68,12 @@ func NewToolCheckRecord() *ToolCheckRecord {
 }
 
 // Epoch says which generation of the record a reader or builder started in.
-func (r *ToolCheckRecord) Epoch() uint64 {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	return r.epoch
-}
+func (r *ToolCheckRecord) Epoch() uint64 { return r.epoch.Load() }
+
+// Current says whether the record is still in generation epoch: nothing has
+// forgotten it (Forget, ForgetSignIns) since. A view built in generation
+// epoch is served only while this is true (toolView.valid).
+func (r *ToolCheckRecord) Current(epoch uint64) bool { return r.epoch.Load() == epoch }
 
 // Forget empties the record: passed tools, kept sign-in values and the time
 // of the last complete read. The host calls it when the account's sign-ins
@@ -79,7 +81,7 @@ func (r *ToolCheckRecord) Epoch() uint64 {
 // complete read, as on a cold start.
 func (r *ToolCheckRecord) Forget() {
 	r.mu.Lock()
-	r.epoch++
+	r.epoch.Add(1)
 	r.passed = map[string]map[toolDigest]struct{}{}
 	r.values, r.readAt = nil, time.Time{}
 	r.mu.Unlock()
@@ -89,9 +91,12 @@ func (r *ToolCheckRecord) Forget() {
 // read, and keeps which tools passed. The host calls it when a sign-in was
 // written on this machine (a refreshed token): the values kept are then out of
 // date, so tools kept only by the time limit wait for the next complete read.
-// Tools are not held while reads work: the next list reads again.
+// Tools are not held while reads work: the next list reads again. It moves
+// the epoch like Forget does, so a view or a read that began earlier is not
+// served or recorded.
 func (r *ToolCheckRecord) ForgetSignIns() {
 	r.mu.Lock()
+	r.epoch.Add(1)
 	r.values, r.readAt = nil, time.Time{}
 	r.mu.Unlock()
 }
@@ -106,7 +111,7 @@ func (r *ToolCheckRecord) ForgetSignIns() {
 func (r *ToolCheckRecord) NoteCompleteRead(epoch uint64, at time.Time, values []string) bool {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	if epoch != r.epoch {
+	if epoch != r.epoch.Load() {
 		return false
 	}
 	if at.Before(r.readAt) {
@@ -150,7 +155,7 @@ func (r *ToolCheckRecord) replace(epoch uint64, claimKey string, ds []toolDigest
 		set[d] = struct{}{}
 	}
 	r.mu.Lock()
-	if epoch == r.epoch {
+	if epoch == r.epoch.Load() {
 		r.passed[claimKey] = set
 	}
 	r.mu.Unlock()

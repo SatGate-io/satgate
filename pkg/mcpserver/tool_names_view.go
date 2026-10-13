@@ -169,14 +169,28 @@ type toolView struct {
 	// tools has passed). Every list builds the view again, one build at a
 	// time, until a complete read works.
 	held bool
-	// keptUntil: when kept tools are listed from this view, the time (on the
-	// manager's clock) they stop being listed. Zero: none are.
+	// keptUntil: the time (on the manager's clock) this view stops being
+	// served: KeptToolsMaxAge after the complete read it stands on (a view
+	// built from a complete read), or after the last complete read whose
+	// values screened its kept tools (a view built while the read fails).
+	// Zero: it stands on no read (a hold, or a view of nothing). A view past
+	// it is never returned: it is built again, and with no complete read to
+	// stand on that build holds every tool.
 	keptUntil time.Time
-	entries   []*toolEntry
-	byName    map[string]*toolEntry // exposed, exact
-	tools     []json.RawMessage
-	dups      [][]string
-	waiting   []ToolWait
+	// rec, recEpoch: the record this view's check used and its generation
+	// when the host's read came back. A view is served only while the record
+	// is still in that generation (Forget, ForgetSignIns, InvalidateTenant
+	// and a sign-in written on this machine all move it).
+	rec      *ToolCheckRecord
+	recEpoch uint64
+	// stale: the generation moved while the view was being built, so it was
+	// screened with values the host has since replaced. Never published.
+	stale   bool
+	entries []*toolEntry
+	byName  map[string]*toolEntry // exposed, exact
+	tools   []json.RawMessage
+	dups    [][]string
+	waiting []ToolWait
 }
 
 const (
@@ -274,20 +288,46 @@ func (m *UpstreamManager) toolView() *toolView { return m.viewFor(false) }
 // The first list after the store recovers therefore shows the held tools.
 func (m *UpstreamManager) listView() *toolView { return m.viewFor(true) }
 
-// usable says whether a built view may still be served at now.
-func (v *toolView) keptValid(now time.Time) bool {
-	return v.keptUntil.IsZero() || now.Before(v.keptUntil)
+// valid says whether a built view may still be served at now: it is within
+// KeptToolsMaxAge of the complete read it stands on, the record it was
+// checked against has not been forgotten since, and it was not built from a
+// read that a sign-in write had already made stale. Every path that serves a
+// view (the cached view, a shared build, the name-store fallback) asks it.
+func (v *toolView) valid(now time.Time) bool {
+	if v.stale {
+		return false
+	}
+	if !v.keptUntil.IsZero() && !now.Before(v.keptUntil) {
+		return false
+	}
+	return v.rec == nil || v.rec.Current(v.recEpoch)
 }
+
+// heldView is what is served when no view could be built from a read that is
+// still current: no tool is listed or routed, and every list tries again.
+func heldView() *toolView {
+	return &toolView{byName: map[string]*toolEntry{}, tools: []json.RawMessage{},
+		held: true, incomplete: true, unavailable: true, fastRetry: true}
+}
+
+const (
+	// A view whose read was made stale by a sign-in write while it was being
+	// built is built again from the new values, at most viewBuildAttempts
+	// times and not after viewBuildBudget; then nothing is listed until the
+	// next list builds again.
+	viewBuildAttempts = 3
+	viewBuildBudget   = 2 * time.Second
+)
 
 func (m *UpstreamManager) viewFor(list bool) *toolView {
 	arrived := time.Now()
-	if v := m.viewPtr.Load(); v != nil && v.ver == m.namesVer.Load() && !v.incomplete && v.keptValid(m.now()) {
+	if v := m.viewPtr.Load(); v != nil && v.ver == m.namesVer.Load() && !v.incomplete && v.valid(m.now()) {
 		return v
 	}
 	m.viewMu.Lock()
 	defer m.viewMu.Unlock()
 	ver := m.namesVer.Load()
-	if v := m.viewPtr.Load(); v != nil && v.ver == ver && v.keptValid(m.now()) {
+	if v := m.viewPtr.Load(); v != nil && v.ver == ver && v.valid(m.now()) {
 		switch {
 		case !v.incomplete:
 			return v
@@ -301,13 +341,27 @@ func (m *UpstreamManager) viewFor(list bool) *toolView {
 			return v
 		}
 	}
-	snap := m.snapshotServices()
 	if m.nameStore == nil {
 		m.nameStore = NewMemoryToolNameStore()
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	nv := m.buildToolView(ctx, snap)
+	// A view is published only if the record is still in the generation its
+	// read came back in. If a sign-in write moved it during the build, the
+	// view is built again from the new values (a bounded number of times,
+	// inside viewBuildBudget), then held.
+	started := time.Now()
+	var nv *toolView
+	for attempt := 1; ; attempt++ {
+		nv = m.buildToolView(ctx, m.snapshotServices())
+		if nv.valid(m.now()) {
+			break
+		}
+		if attempt >= viewBuildAttempts || time.Since(started) >= viewBuildBudget {
+			nv = heldView()
+			break
+		}
+	}
 	nv.ver = ver
 	nv.at = time.Now()
 	nv.retryAfter = viewRetryAfter
@@ -580,12 +634,20 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 		// Names never change, so the last view is still right about every name
 		// it has; keep serving it and try again soon.
 		log.Warn().Msg("tool names: stored names could not be read; the last list is kept until they can")
-		if prev := m.viewPtr.Load(); prev != nil {
+		// The last view is reused only while it is still valid: within
+		// KeptToolsMaxAge of the complete read it stands on and in the
+		// record's current generation (Forget and InvalidateTenant end it).
+		// Otherwise nothing is listed until the names can be read.
+		if prev := m.viewPtr.Load(); prev != nil && prev.valid(m.now()) && (prev.rec == nil || prev.rec == m.checked) {
 			keep := *prev
 			keep.incomplete = true
 			keep.fastRetry = true
 			return &keep
 		}
+		// Nothing can be listed, and every list tries the store again (held),
+		// so the first list after it recovers shows the tools.
+		v.held = true
+		v.unavailable = true
 		v.incomplete = true
 		v.fastRetry = true
 		return v
@@ -655,6 +717,11 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 	for i := range snap {
 		snap[i].unreadable = !readComplete
 	}
+	// The generation this view is bound to: the record's, now that the host's
+	// read is back. A sign-in write after this point moves it and ends the
+	// view (valid). One before it is caught by NoteCompleteRead below, which
+	// compares the generation the read began in (epoch).
+	v.rec, v.recEpoch = m.checked, m.checked.Epoch()
 	m.orderServices(snap, co)
 	// Every sign-in value the account has: the values the host read in this
 	// build, and the values its services' configs carry (for a service that
@@ -689,9 +756,25 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 	}
 	keptOK := false
 	if readComplete {
+		// Was the record forgotten after this read began (a sign-in was
+		// written, or InvalidateTenant ran)? Then the values just read may be
+		// older than the stored ones: nothing is named, stored or listed from
+		// them, and the caller builds again (viewFor). NoteCompleteRead says
+		// it for a read that is recorded; a build whose order could not be
+		// read records nothing and asks the record directly.
+		var fresh bool
 		if claimsOK {
-			m.checked.NoteCompleteRead(epoch, readAt, acct)
+			fresh = m.checked.NoteCompleteRead(epoch, readAt, acct)
+		} else {
+			fresh = m.checked.Current(epoch)
 		}
+		if !fresh {
+			v.stale = true
+			return v
+		}
+		// The view stands on this complete read, and no longer than
+		// KeptToolsMaxAge after it.
+		v.keptUntil = readAt.Add(KeptToolsMaxAge)
 	} else {
 		// The read failed: the values of the last complete read stand in for
 		// it, for at most KeptToolsMaxAge after that read. A failed read does
@@ -896,6 +979,13 @@ func (m *UpstreamManager) buildToolView(ctx context.Context, snap []serviceSnap)
 			}
 		}
 		return false, ""
+	}
+
+	// A sign-in written since the screen began: do not name or store anything
+	// from it (the caller builds again).
+	if !m.checked.Current(v.recEpoch) {
+		v.stale = true
+		return v
 	}
 
 	// Phase B: new tools, the ones a routing rule favours first, then by
