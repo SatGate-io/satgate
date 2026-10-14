@@ -375,7 +375,7 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			perr := cp.PersistChild(pctx, delegationEvent)
 			cancel()
 			if perr != nil {
-				log.Error().Str("parent", parent.TokenID).Msg("delegation refused: the helper's revocation id could not be recorded")
+				log.Error().Msg("delegation refused: the helper's revocation id could not be recorded")
 				return nil, ErrChildTokenFailed
 			}
 		}
