@@ -329,3 +329,26 @@ func TestHelperRevocationIDIsOffInANewDelegator(t *testing.T) {
 		t.Fatal("helper ids are on by default")
 	}
 }
+
+// The proxy forwards the option to the delegator it built.
+func TestProxySetHelperRevocationIDReachesTheDelegator(t *testing.T) {
+	p := &Proxy{delegator: NewDelegator(mustSvc(t), NewInMemoryBudgetEnforcer())}
+	p.SetHelperRevocationID(true)
+	if !p.delegator.helperIDs {
+		t.Fatal("option not forwarded")
+	}
+	p.SetHelperRevocationID(false)
+	if p.delegator.helperIDs {
+		t.Fatal("option not turned off")
+	}
+	(&Proxy{}).SetHelperRevocationID(true) // no delegator: no panic
+}
+
+func mustSvc(t *testing.T) *macaroon.Service {
+	t.Helper()
+	svc, err := macaroon.NewService("test-root-key")
+	if err != nil {
+		t.Fatal(err)
+	}
+	return svc
+}
