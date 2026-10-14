@@ -95,6 +95,24 @@ type Delegator struct {
 	macaroonSvc *macaroon.Service
 	budget      BudgetEnforcer
 	events      EventPublisher
+	// helperIDs turns on the hlp- token_id caveat for zero-credit children.
+	// Off by default: with it off a zero-credit child is minted exactly as it
+	// was before the caveat existed, so every gateway machine, old or new,
+	// accepts and stops it the same way. See EnableHelperRevocationID.
+	helperIDs bool
+}
+
+// EnableHelperRevocationID turns the hlp- token_id caveat for zero-credit
+// children on or off. It is off in a new Delegator. Turn it on only when every
+// machine that enforces a revoke reads every token_id caveat of a key (an
+// older enforcer reads the first one only, and would keep spending a helper
+// that carries this caveat after its revoke). Call it before the Delegator
+// serves requests; it is not safe to change while Delegate runs.
+//
+// With it on, a zero-credit child is refused unless the parent's first
+// token_id caveat (the one the issuer wrote) is present and not empty.
+func (d *Delegator) EnableHelperRevocationID(on bool) {
+	d.helperIDs = on
 }
 
 // NewDelegator creates a new delegator. Requires macaroon auth mode.
@@ -174,11 +192,16 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 	// before the holder's caveats, so a revoke of the helper reaches every copy.
 	// Own-credit children are named by their budget id and are not changed.
 	var childRevocationID string
-	if params.Budget == 0 {
-		childRevocationID = d.helperRevocationID(parent, params)
-		if childRevocationID != "" {
-			serverCaveats = append(serverCaveats, "token_id = "+childRevocationID)
+	if params.Budget == 0 && d.helperIDs {
+		var idErr error
+		childRevocationID, idErr = d.helperRevocationID(parent, params)
+		if idErr != nil {
+			// The parent has no identity the issuer wrote, so no stable id can
+			// be derived for its helper. Nothing has been taken from the
+			// parent; refuse rather than mint a helper no revoke can name.
+			return nil, errDelegationNoParentIdentity
 		}
+		serverCaveats = append(serverCaveats, "token_id = "+childRevocationID)
 	}
 	// Generate child budget_id deterministically before minting
 	var childBudgetID string
@@ -676,28 +699,52 @@ const HelperRevocationIDPrefix = "hlp-"
 // helper's revocation id.
 const EventChildRevocationID = "childRevocationId"
 
+// errDelegationNoParentIdentity is the fixed refusal for a zero-credit
+// delegation (with helper ids on) from a parent whose first token_id caveat is
+// missing or empty. It never repeats a caveat.
+var errDelegationNoParentIdentity = &clientError{msg: "delegation refused: this token has no identity of its own, so a helper made from it could not be revoked on its own"}
+
+// firstCaveatValue returns the value of the first caveat named key, and whether
+// there is one. The first is the one the issuer wrote: caveats only append, so
+// a holder can add later ones but cannot put one in front. GetCaveat returns
+// the last, which a holder can choose; nothing that names a key for a revoke
+// may use it.
+func firstCaveatValue(mac *macaroon.Macaroon, key string) (string, bool) {
+	if mac == nil {
+		return "", false
+	}
+	prefix := key + " = "
+	for _, caveat := range mac.Caveats {
+		if strings.HasPrefix(caveat, prefix) {
+			return strings.TrimPrefix(caveat, prefix), true
+		}
+	}
+	return "", false
+}
+
 // helperRevocationID derives the id a zero-credit helper carries from the
 // parent's token id, the label and the scope the holder sent. Nothing random
 // goes in: delegating again with the same parent, label and scope gives the same
 // key and the same id, so the same database row (no new row per session), and a
 // helper revoked once is still refused when it is delegated again.
 //
-// The parent must carry a token_id caveat of its own. The id is a second
-// token_id caveat, and a reader that takes the first one (receipts, billing)
-// must keep getting the parent's. A parent without one gets no id.
-func (d *Delegator) helperRevocationID(parent *TokenInfo, params *DelegateParams) string {
+// The parent's identity is its first token_id caveat, read from the parent
+// token itself (the one Delegate extends), never from a TokenInfo a caller built
+// and never by a last-value lookup a holder could shadow with a later, empty
+// token_id caveat. If that first caveat is missing or empty the error is
+// returned and the caller refuses to delegate. The id is a second token_id
+// caveat, and a reader that takes the first one (receipts, billing) keeps
+// getting the parent's.
+func (d *Delegator) helperRevocationID(parent *TokenInfo, params *DelegateParams) (string, error) {
 	if parent == nil || parent.RawToken == "" {
-		return ""
+		return "", errDelegationNoParentIdentity
 	}
-	mac := parent.Raw
-	if mac == nil {
-		var err error
-		if mac, err = d.macaroonSvc.Decode(parent.RawToken); err != nil {
-			return ""
-		}
+	mac, err := d.macaroonSvc.Decode(parent.RawToken)
+	if err != nil {
+		return "", errDelegationNoParentIdentity
 	}
-	if mac.GetCaveat("token_id") == "" {
-		return ""
+	if id, ok := firstCaveatValue(mac, "token_id"); !ok || id == "" {
+		return "", errDelegationNoParentIdentity
 	}
 	h := sha256.New()
 	h.Write([]byte("satgate-zero-credit-helper-v1\x00"))
@@ -706,5 +753,5 @@ func (d *Delegator) helperRevocationID(parent *TokenInfo, params *DelegateParams
 	h.Write([]byte(params.Label))
 	h.Write([]byte{0})
 	h.Write([]byte(params.Scope))
-	return HelperRevocationIDPrefix + hex.EncodeToString(h.Sum(nil))[:24]
+	return HelperRevocationIDPrefix + hex.EncodeToString(h.Sum(nil))[:24], nil
 }

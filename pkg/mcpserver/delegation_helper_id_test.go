@@ -51,6 +51,7 @@ func helperIDRig(t *testing.T) (*macaroon.Service, *Delegator, *captureEvents, *
 		t.Fatal(err)
 	}
 	d := NewDelegator(svc, budget)
+	d.EnableHelperRevocationID(true)
 	ev := &captureEvents{}
 	d.SetEventPublisher(ev)
 	tok := svc.Encode(mac)
@@ -189,9 +190,10 @@ func TestOwnCreditChildGetsNoHelperID(t *testing.T) {
 	}
 }
 
-// A parent with no token_id caveat of its own gets no helper id: ours would be
-// the first token_id, and receipts and billing read the first.
-func TestHelperOfParentWithoutTokenIDGetsNoHelperID(t *testing.T) {
+// With helper ids on, a parent with no token_id caveat of its own cannot have a
+// zero-credit helper: no stable id can be derived, so the delegation is refused
+// with the fixed sentence and no key. With the option off it mints as before.
+func TestHelperOfParentWithoutTokenIDIsRefusedWhenOnAndMintsWhenOff(t *testing.T) {
 	ctx := context.Background()
 	svc, err := macaroon.NewService("test-root-key")
 	if err != nil {
@@ -201,9 +203,25 @@ func TestHelperOfParentWithoutTokenIDGetsNoHelperID(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	d := NewDelegator(svc, NewInMemoryBudgetEnforcer())
 	parent := &TokenInfo{TokenID: hashToken(mac.Identifier + mac.Signature), RawToken: svc.Encode(mac)}
-	res, err := d.Delegate(ctx, parent, &DelegateParams{Budget: 0, Label: "w"})
+
+	on := NewDelegator(svc, NewInMemoryBudgetEnforcer())
+	on.EnableHelperRevocationID(true)
+	ev := &captureEvents{}
+	on.SetEventPublisher(ev)
+	res, err := on.Delegate(ctx, parent, &DelegateParams{Budget: 0, Label: "w"})
+	if err == nil || res != nil {
+		t.Fatalf("a parent with no token_id gave a helper: res=%v err=%v", res, err)
+	}
+	if got := delegationClientMessage(err); got != errDelegationNoParentIdentity.msg {
+		t.Fatalf("client text = %q, want the fixed sentence", got)
+	}
+	if len(ev.events) != 0 {
+		t.Fatalf("a refused delegation published %d events", len(ev.events))
+	}
+
+	off := NewDelegator(svc, NewInMemoryBudgetEnforcer())
+	res, err = off.Delegate(ctx, parent, &DelegateParams{Budget: 0, Label: "w"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -234,5 +252,80 @@ func TestMCPVerifierAcceptsANewZeroCreditHelper(t *testing.T) {
 	}
 	if v := os_getenv("SATGATE_EMIT_HELPER_FIXTURE"); v != "" {
 		emitHelperFixture(t, v, res.Token)
+	}
+}
+
+// Reviewer probe by Astra (astra-cto-review, round 2, public_shadow_test.go),
+// kept as a permanent test and changed from "the child has an hlp- id" to the
+// design's answer: a holder who appends an empty token_id to a valid parent
+// gets a refusal, not a key. The old lookup took the last token_id caveat,
+// saw the empty one, and minted a zero-credit child with no stable id.
+func TestReviewHolderEmptyTokenIDCannotDisableHelperIdentity(t *testing.T) {
+	svc, d, ev, parent := helperIDRig(t)
+	changed, e := svc.DelegateWithoutVerify(parent.RawToken, []string{"token_id = "})
+	if e != nil {
+		t.Fatal(e)
+	}
+	p, e := (&MacaroonAuthenticator{Service: svc}).Verify(context.Background(), svc.Encode(changed))
+	if e != nil {
+		t.Fatal(e)
+	}
+	child, e := d.Delegate(context.Background(), p, &DelegateParams{Label: "holder-empty-token-id"})
+	if e == nil || child != nil {
+		if child != nil {
+			if m, verr := svc.Verify(child.Token); verr == nil {
+				for _, c := range m.Caveats {
+					if strings.HasPrefix(c, "token_id = hlp-") {
+						return // a helper with its id would also close the hole
+					}
+				}
+			}
+		}
+		t.Fatal("a holder's empty token_id shadow got a zero-credit helper with no stable revocation id")
+	}
+	if got := delegationClientMessage(e); got != errDelegationNoParentIdentity.msg {
+		t.Fatalf("client text = %q, want the fixed sentence", got)
+	}
+	if len(ev.events) != 0 {
+		t.Fatalf("a refused delegation published %d events", len(ev.events))
+	}
+}
+
+// A later token_id caveat that names something else does not change the id
+// either: the helper carries the same id as the unshadowed parent's, because
+// the identity is read from the first token_id and the parent's own key hash.
+func TestHolderTokenIDAfterTheIssuersDoesNotChangeTheHelperID(t *testing.T) {
+	ctx := context.Background()
+	svc, d, _, parent := helperIDRig(t)
+	changed, err := svc.DelegateWithoutVerify(parent.RawToken, []string{"token_id = something-else"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	p, err := (&MacaroonAuthenticator{Service: svc}).Verify(ctx, svc.Encode(changed))
+	if err != nil {
+		t.Fatal(err)
+	}
+	shadowed, err := d.Delegate(ctx, p, &DelegateParams{Label: "w", Scope: "api:read"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	m, err := svc.Verify(shadowed.Token)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ids := tokenIDCaveats(m)
+	if len(ids) != 3 || ids[0] != "parent-row" || !strings.HasPrefix(ids[2], HelperRevocationIDPrefix) {
+		t.Fatalf("token_id caveats = %v, want parent's first, holder's, then an hlp- id", ids)
+	}
+}
+
+// A new Delegator has the option off.
+func TestHelperRevocationIDIsOffInANewDelegator(t *testing.T) {
+	svc, err := macaroon.NewService("test-root-key")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if NewDelegator(svc, NewInMemoryBudgetEnforcer()).helperIDs {
+		t.Fatal("helper ids are on by default")
 	}
 }
