@@ -461,18 +461,14 @@ func TestHelperWhoseIDIsRecordedGetsItsKey(t *testing.T) {
 	}
 }
 
-// A child that has no id of its own (own credit, or the option off) is not held
-// up by the persister: it is not asked.
-func TestOnlyAHelperWithAnIDIsPersistedBeforeItsKeyIsReturned(t *testing.T) {
+// An own-credit child is named by its budget id and is not held up by the
+// persister: it is not asked.
+func TestOwnCreditChildIsNotHeldUpByThePersister(t *testing.T) {
 	ctx := context.Background()
 	_, d, _, parent := helperIDRig(t)
 	pe := &persistingEvents{err: errors.New("down")}
 	d.SetEventPublisher(pe)
 	if _, err := d.Delegate(ctx, parent, &DelegateParams{Label: "funded", Budget: 10}); err != nil {
 		t.Fatalf("own-credit child refused: %v", err)
-	}
-	d.EnableHelperRevocationID(false)
-	if _, err := d.Delegate(ctx, parent, &DelegateParams{Label: "legacy-shape"}); err != nil {
-		t.Fatalf("option-off helper refused: %v", err)
 	}
 }

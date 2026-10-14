@@ -355,19 +355,30 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		},
 	}
 
-	// A zero-credit helper that carries its own revocation id is recorded by
-	// the event consumer before its key leaves this function. The id is what a
-	// revoke of the helper names; a key whose id was not recorded could never be
-	// revoked on its own (every copy of it would survive). If the publisher can
-	// record it (ChildPersister) and does not, no key is returned. The cause
-	// goes to the consumer's own log, not here, because it can embed an id.
-	if childRevocationID != "" {
+	// A zero-credit helper is recorded by the event consumer before its key
+	// leaves this function, whether or not it carries an hlp- id. What a revoke
+	// of the helper names is its hlp- id (setting on) or its own macaroon
+	// signature (setting off); a key whose name was not recorded could never be
+	// revoked on its own, so if the publisher can record it (ChildPersister) and
+	// does not, no key is returned. The cause goes to the consumer's own log,
+	// not here, because it can embed an id.
+	//
+	// The signature goes only to PersistChild, on a copy of the event that is
+	// never published: no other subscriber of the delegation event sees it, and
+	// nothing here logs it.
+	if params.Budget == 0 {
 		if cp, ok := d.events.(ChildPersister); ok {
+			persistEvent := delegationEvent
+			persistEvent.Data = make(map[string]interface{}, len(delegationEvent.Data)+1)
+			for k, v := range delegationEvent.Data {
+				persistEvent.Data[k] = v
+			}
+			persistEvent.Data[EventChildSignature] = childMac.Signature
 			pctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), persistChildTimeout)
-			perr := cp.PersistChild(pctx, delegationEvent)
+			perr := cp.PersistChild(pctx, persistEvent)
 			cancel()
 			if perr != nil {
-				log.Error().Msg("delegation refused: the helper's revocation id could not be recorded")
+				log.Error().Msg("delegation refused: the helper could not be recorded where a revoke finds it")
 				return nil, ErrChildTokenFailed
 			}
 		}
@@ -728,6 +739,13 @@ func scopeWordCount(scope string) int {
 // id this system writes starts with it (row ids are 12 hex characters or start
 // with "del-"), so a revoke of one helper can never name anything else.
 const HelperRevocationIDPrefix = "hlp-"
+
+// EventChildSignature is the field of the event handed to ChildPersister (and
+// only that one) that carries a zero-credit helper's own macaroon signature,
+// a 64-character hex string. It is the one id the gateway's HTTP check reads
+// that names this helper alone. It is a secret: it is never in the published
+// event, never in a caveat, and never in a log.
+const EventChildSignature = "childSignature"
 
 // EventChildRevocationID is the child_delegated event field that carries the
 // helper's revocation id.
