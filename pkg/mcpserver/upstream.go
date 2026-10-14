@@ -24,6 +24,9 @@ type UpstreamManager struct {
 	mu        sync.Mutex
 	clients   map[string]*UpstreamClient
 	idCounter atomic.Int64
+	// unreadable holds the keys of services whose complete credential set the
+	// host could not read just now (m.mu). See SetCredentialsUnreadable.
+	unreadable map[string]bool
 
 	// redact keeps upstream-supplied text out of errors and logs. See
 	// SetRedactUpstreamText.
@@ -39,8 +42,10 @@ type UpstreamManager struct {
 	// Tool names (see tool_names.go). viewMu guards nameStore and order and
 	// serializes builds of the view; namesVer moves whenever the set of
 	// services or their tools may have changed.
-	viewMu     sync.Mutex
+	viewMu     viewLock
 	nameStore  ToolNameStore
+	checked    *ToolCheckRecord                 // passed-check record (viewMu); see tool_names_checked.go
+	clock      atomic.Pointer[func() time.Time] // nil: time.Now; see SetClock
 	order      []string
 	claimOrder func(ctx context.Context) (ClaimOrder, error)
 	lastOrder  []string
@@ -871,8 +876,21 @@ func (m *UpstreamManager) resolveTool(toolName string) (*toolEntry, error) {
 
 // AllTools returns the tools agents see: one entry per name, each name unique
 // (without regard to case) and accepted by agent apps. See tool_names.go.
+//
+// The list has one time budget, ListBudget; AllToolsContext takes the
+// caller's own (see tool_names_view.go).
 func (m *UpstreamManager) AllTools() []json.RawMessage {
-	return append([]json.RawMessage(nil), m.toolView().tools...)
+	return m.AllToolsContext(context.Background())
+}
+
+// AllToolsContext is AllTools under ListBudget, or the deadline of ctx if that
+// is sooner. The budget covers the wait for the view lock and
+// every build of the view. When it is used up the list is what is safe: the
+// current view if it is complete and valid, otherwise no tools. ctx ending
+// before the deadline also ends the wait for the view lock; it does not
+// cancel a build that other lists share.
+func (m *UpstreamManager) AllToolsContext(ctx context.Context) []json.RawMessage {
+	return append([]json.RawMessage(nil), m.listView(ctx).tools...)
 }
 
 // ForwardToolCall sends a tools/call to the service that owns the listed name,
