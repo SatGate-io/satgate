@@ -2,6 +2,7 @@ package mcpserver
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"sync"
 	"testing"
@@ -351,4 +352,77 @@ func mustSvc(t *testing.T) *macaroon.Service {
 		t.Fatal(err)
 	}
 	return svc
+}
+
+// persistingEvents records a delegated child the way the enterprise event
+// consumer does, and can be told to fail.
+type persistingEvents struct {
+	captureEvents
+	err       error
+	persisted []Event
+}
+
+func (p *persistingEvents) PersistChild(_ context.Context, e Event) error {
+	if p.err != nil {
+		return p.err
+	}
+	p.persisted = append(p.persisted, e)
+	return nil
+}
+
+// A helper whose revocation id the event consumer could not record gets no key:
+// a key that no revoke can name on its own must not reach the holder. Nothing is
+// published for the refused delegation. The client text is the fixed sentence.
+func TestHelperWhoseIDCannotBeRecordedGetsNoKey(t *testing.T) {
+	ctx := context.Background()
+	_, d, _, parent := helperIDRig(t)
+	pe := &persistingEvents{err: errors.New("pq: could not store hlp-secretidthatmustnotappear")}
+	d.SetEventPublisher(pe)
+	res, err := d.Delegate(ctx, parent, &DelegateParams{Label: "w", Scope: "api:read"})
+	if err == nil || res != nil {
+		t.Fatalf("res=%v err=%v, want no key", res, err)
+	}
+	if got := delegationClientMessage(err); got != ErrChildTokenFailed.Error() {
+		t.Fatalf("client text = %q", got)
+	}
+	if strings.Contains(err.Error(), "secretidthatmustnotappear") {
+		t.Fatal("the store error reached the caller")
+	}
+	if len(pe.events) != 0 {
+		t.Fatalf("a refused delegation published %d events", len(pe.events))
+	}
+}
+
+// When the id is recorded, the key is returned and the event is published after.
+func TestHelperWhoseIDIsRecordedGetsItsKey(t *testing.T) {
+	ctx := context.Background()
+	_, d, _, parent := helperIDRig(t)
+	pe := &persistingEvents{}
+	d.SetEventPublisher(pe)
+	res, err := d.Delegate(ctx, parent, &DelegateParams{Label: "w", Scope: "api:read"})
+	if err != nil || res == nil {
+		t.Fatalf("res=%v err=%v", res, err)
+	}
+	if len(pe.persisted) != 1 || len(pe.events) != 1 {
+		t.Fatalf("persisted %d, published %d, want 1 and 1", len(pe.persisted), len(pe.events))
+	}
+	if id, _ := pe.persisted[0].Data[EventChildRevocationID].(string); !strings.HasPrefix(id, HelperRevocationIDPrefix) {
+		t.Fatalf("persisted event carries %q", id)
+	}
+}
+
+// A child that has no id of its own (own credit, or the option off) is not held
+// up by the persister: it is not asked.
+func TestOnlyAHelperWithAnIDIsPersistedBeforeItsKeyIsReturned(t *testing.T) {
+	ctx := context.Background()
+	_, d, _, parent := helperIDRig(t)
+	pe := &persistingEvents{err: errors.New("down")}
+	d.SetEventPublisher(pe)
+	if _, err := d.Delegate(ctx, parent, &DelegateParams{Label: "funded", Budget: 10}); err != nil {
+		t.Fatalf("own-credit child refused: %v", err)
+	}
+	d.EnableHelperRevocationID(false)
+	if _, err := d.Delegate(ctx, parent, &DelegateParams{Label: "legacy-shape"}); err != nil {
+		t.Fatalf("option-off helper refused: %v", err)
+	}
 }

@@ -131,6 +131,20 @@ func (d *Delegator) SetEventPublisher(ep EventPublisher) {
 	d.events = ep
 }
 
+// ChildPersister is implemented by an EventPublisher that records a delegated
+// child where a revoke can find it. Delegate calls PersistChild, for a
+// zero-credit helper that carries its own revocation id, before it returns the
+// key; a non-nil error means the id was not durably recorded and no key is
+// returned. PersistChild must be safe to call again for the same event (the
+// same parent, label and scope give the same key), and must not put the error's
+// text in the reply.
+type ChildPersister interface {
+	PersistChild(ctx context.Context, event Event) error
+}
+
+// persistChildTimeout bounds PersistChild.
+const persistChildTimeout = 10 * time.Second
+
 // refundTimeout bounds a give-back. It runs on a context detached from the
 // request, so a cancelled or timed-out request still gets its carve back.
 const refundTimeout = 5 * time.Second
@@ -322,7 +336,7 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		Str("label", params.Label).
 		Msg("token delegated")
 
-	d.events.Publish(Event{
+	delegationEvent := Event{
 		Type:      EventDelegation,
 		Timestamp: time.Now(),
 		TokenID:   parent.TokenID,
@@ -347,7 +361,26 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			EventInheritedArgumentRules: inheritedRules,
 			EventChildScopes:            childScopes,
 		},
-	})
+	}
+
+	// A zero-credit helper that carries its own revocation id is recorded by
+	// the event consumer before its key leaves this function. The id is what a
+	// revoke of the helper names; a key whose id was not recorded could never be
+	// revoked on its own (every copy of it would survive). If the publisher can
+	// record it (ChildPersister) and does not, no key is returned. The cause
+	// goes to the consumer's own log, not here, because it can embed an id.
+	if childRevocationID != "" {
+		if cp, ok := d.events.(ChildPersister); ok {
+			pctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), persistChildTimeout)
+			perr := cp.PersistChild(pctx, delegationEvent)
+			cancel()
+			if perr != nil {
+				log.Error().Str("parent", parent.TokenID).Msg("delegation refused: the helper's revocation id could not be recorded")
+				return nil, ErrChildTokenFailed
+			}
+		}
+	}
+	d.events.Publish(delegationEvent)
 
 	return &DelegateResult{
 		Token:           childToken,
