@@ -1,12 +1,16 @@
 package mcpserver
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"strings"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 
 	"github.com/satgate-io/satgate/pkg/macaroon"
 )
@@ -414,6 +418,10 @@ func TestHelperWhoseIDCannotBeRecordedGetsNoKey(t *testing.T) {
 	_, d, _, parent := helperIDRig(t)
 	pe := &persistingEvents{err: errors.New("pq: could not store hlp-secretidthatmustnotappear")}
 	d.SetEventPublisher(pe)
+	var logs bytes.Buffer
+	oldLogger := log.Logger
+	log.Logger = zerolog.New(&logs)
+	defer func() { log.Logger = oldLogger }()
 	res, err := d.Delegate(ctx, parent, &DelegateParams{Label: "w", Scope: "api:read"})
 	if err == nil || res != nil {
 		t.Fatalf("res=%v err=%v, want no key", res, err)
@@ -423,6 +431,12 @@ func TestHelperWhoseIDCannotBeRecordedGetsNoKey(t *testing.T) {
 	}
 	if strings.Contains(err.Error(), "secretidthatmustnotappear") {
 		t.Fatal("the store error reached the caller")
+	}
+	if !strings.Contains(logs.String(), "could not be recorded") {
+		t.Fatal("the refusal was not logged, so the operator cannot see why a key was withheld")
+	}
+	if strings.Contains(logs.String(), parent.TokenID) {
+		t.Fatalf("the parent's token id was logged raw: %s", logs.String())
 	}
 	if len(pe.events) != 0 {
 		t.Fatalf("a refused delegation published %d events", len(pe.events))

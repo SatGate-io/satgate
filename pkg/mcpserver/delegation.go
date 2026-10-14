@@ -328,14 +328,6 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		parentRemaining = parentResult.Remaining
 	}
 
-	log.Info().
-		Str("parent", parent.TokenID).
-		Str("child", childTokenID).
-		Int64("budget", params.Budget).
-		Int64("parentRemaining", parentRemaining).
-		Str("label", params.Label).
-		Msg("token delegated")
-
 	delegationEvent := Event{
 		Type:      EventDelegation,
 		Timestamp: time.Now(),
@@ -380,6 +372,15 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			}
 		}
 	}
+	// Written once the key is going out: a delegation that is refused above
+	// (a helper whose id could not be recorded) is not logged as delegated.
+	log.Info().
+		Str("parent", parent.TokenID).
+		Str("child", childTokenID).
+		Int64("budget", params.Budget).
+		Int64("parentRemaining", parentRemaining).
+		Str("label", params.Label).
+		Msg("token delegated")
 	d.events.Publish(delegationEvent)
 
 	return &DelegateResult{
