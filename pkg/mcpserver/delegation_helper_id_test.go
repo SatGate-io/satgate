@@ -256,11 +256,15 @@ func TestMCPVerifierAcceptsANewZeroCreditHelper(t *testing.T) {
 	}
 }
 
-// Reviewer probe by Astra (astra-cto-review, round 2, public_shadow_test.go),
-// kept as a permanent test and changed from "the child has an hlp- id" to the
-// design's answer: a holder who appends an empty token_id to a valid parent
-// gets a refusal, not a key. The old lookup took the last token_id caveat,
-// saw the empty one, and minted a zero-credit child with no stable id.
+// Credit: Astra's round 2 probe of the same name (public_shadow_test.go).
+//
+// The parent's identity is its FIRST token_id caveat, the one the issuer wrote;
+// a holder can only add later ones. A holder who appends an empty "token_id = "
+// to a valid parent therefore changes nothing: the helper still carries its
+// hlp- id, exactly as the unshadowed parent's helper does. (The round 2 code
+// read the LAST token_id, saw the empty one, and minted a zero-credit child with
+// no stable id.) A parent whose FIRST token_id is missing or empty is the case
+// that is refused: see TestHelperOfParentWithoutTokenIDIsRefusedWhenOnAndMintsWhenOff.
 func TestReviewHolderEmptyTokenIDCannotDisableHelperIdentity(t *testing.T) {
 	svc, d, ev, parent := helperIDRig(t)
 	changed, e := svc.DelegateWithoutVerify(parent.RawToken, []string{"token_id = "})
@@ -272,19 +276,51 @@ func TestReviewHolderEmptyTokenIDCannotDisableHelperIdentity(t *testing.T) {
 		t.Fatal(e)
 	}
 	child, e := d.Delegate(context.Background(), p, &DelegateParams{Label: "holder-empty-token-id"})
-	if e == nil || child != nil {
-		if child != nil {
-			if m, verr := svc.Verify(child.Token); verr == nil {
-				for _, c := range m.Caveats {
-					if strings.HasPrefix(c, "token_id = hlp-") {
-						return // a helper with its id would also close the hole
-					}
-				}
-			}
-		}
-		t.Fatal("a holder's empty token_id shadow got a zero-credit helper with no stable revocation id")
+	if e != nil || child == nil {
+		t.Fatalf("a holder's empty token_id after the issuer's refused a valid parent: %v", e)
 	}
-	if got := delegationClientMessage(e); got != errDelegationNoParentIdentity.msg {
+	m, e := svc.Verify(child.Token)
+	if e != nil {
+		t.Fatal(e)
+	}
+	found := false
+	for _, c := range m.Caveats {
+		if strings.HasPrefix(c, "token_id = hlp-") {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("a holder's empty token_id shadow disabled the helper's stable revocation id")
+	}
+	if len(ev.events) != 1 {
+		t.Fatalf("published %d events, want 1", len(ev.events))
+	}
+	if id, _ := ev.events[0].Data[EventChildRevocationID].(string); !strings.HasPrefix(id, HelperRevocationIDPrefix) {
+		t.Fatalf("the published event carries no hlp- id: %q", id)
+	}
+}
+
+// A parent whose FIRST token_id is empty (a key the issuer did not make) is
+// refused with the fixed sentence, and nothing is published.
+func TestHelperOfParentWhoseFirstTokenIDIsEmptyIsRefused(t *testing.T) {
+	svc, d, ev, _ := helperIDRig(t)
+	root, err := svc.Mint("api:*", time.Now().Add(time.Hour))
+	if err != nil {
+		t.Fatal(err)
+	}
+	emptyFirst, err := svc.Delegate(svc.Encode(root), []string{"token_id = ", "token_id = holder-chosen"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	p, err := (&MacaroonAuthenticator{Service: svc}).Verify(context.Background(), svc.Encode(emptyFirst))
+	if err != nil {
+		t.Fatal(err)
+	}
+	child, err := d.Delegate(context.Background(), p, &DelegateParams{Label: "empty-first"})
+	if err == nil || child != nil {
+		t.Fatalf("a parent whose first token_id is empty got a key (err=%v)", err)
+	}
+	if got := delegationClientMessage(err); got != errDelegationNoParentIdentity.msg {
 		t.Fatalf("client text = %q, want the fixed sentence", got)
 	}
 	if len(ev.events) != 0 {
