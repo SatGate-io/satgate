@@ -170,7 +170,7 @@ const LandingPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              Keep your AI agents within budget on the paid services they use. Make outside agents pay before they use yours. Get a signed receipt for every decision.
+              Keep your AI agents within budget on the paid services they use. Make external agents pay before they use yours. Get a signed receipt for every decision.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
               Each time an agent uses a service, SatGate checks it first. (Developers call these services APIs.) Your own agents stop when their budget runs out. External agents pay on the routes you choose, so hammering your API gets expensive, and paying never gets them past your access rules.
