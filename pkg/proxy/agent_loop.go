@@ -255,7 +255,7 @@ func (g *Gateway) simulateAgentPolicy(w http.ResponseWriter, r *http.Request) {
 	if tool != "" {
 		routeOrTool = tool
 	}
-	pack := g.evidencePack(policy, protocolDecision, reason, routeOrTool, contacted, status)
+	pack := g.evidencePack(policy, protocolDecision, reason, routeOrTool, contacted, status, false)
 	if policy.Kind == "charge" {
 		if policy.PriceSats <= 0 {
 			pack["promote_block"] = "price_unknown"
@@ -415,12 +415,19 @@ func protocolDecision(kind, raw string) (string, string) {
 	}
 }
 
-func (g *Gateway) evidencePack(policy *agentPolicy, decision, reason, routeOrTool string, contacted bool, status int) map[string]any {
+func (g *Gateway) evidencePack(policy *agentPolicy, decision, reason, routeOrTool string, contacted bool, status int, settlement bool) map[string]any {
 	now := time.Now().UTC().Format(time.RFC3339)
 	packID := "ep_" + randHex(8)
 	receiptID := "rcpt_" + randHex(8)
 	sum := sha256.Sum256([]byte(policy.ID))
 	pub := base64.RawURLEncoding.EncodeToString(g.loop().publicKey)
+	priceStatus := "UNKNOWN"
+	if policy.PriceSats > 0 {
+		priceStatus = "QUOTED"
+	}
+	if settlement && (policy.PriceSats <= 0 || !g.realPaymentRail()) {
+		settlement = false
+	}
 	receipt := map[string]any{
 		"schema_version":        "satgate.receipt.v1",
 		"schema_url":            "https://satgate.io/.well-known/satgate-receipt.schema.json",
@@ -440,11 +447,14 @@ func (g *Gateway) evidencePack(policy *agentPolicy, decision, reason, routeOrToo
 		"route_or_tool":         routeOrTool,
 		"upstream_contacted":    contacted,
 		"upstream_status":       status,
-		"provider_price_status": "UNKNOWN",
-		"settlement":            false,
+		"provider_price_status": priceStatus,
+		"settlement":            settlement,
 		"metadata": map[string]any{
 			"public_key_ed25519_b64": pub,
 		},
+	}
+	if policy.PriceSats > 0 {
+		receipt["price_sats"] = int(policy.PriceSats)
 	}
 	payload := jcs(receipt)
 	hash := sha256.Sum256(payload)
@@ -452,7 +462,7 @@ func (g *Gateway) evidencePack(policy *agentPolicy, decision, reason, routeOrToo
 	sig := ed25519.Sign(g.loop().privateKey, payload)
 	receipt["receipt_hash"] = receiptHash
 	receipt["signature"] = "ed25519:" + base64.RawURLEncoding.EncodeToString(sig)
-	return map[string]any{
+	pack := map[string]any{
 		"schema_version":        "satgate.evidence_pack.v1",
 		"evidence_pack_id":      packID,
 		"receipt_id":            receiptID,
@@ -464,12 +474,37 @@ func (g *Gateway) evidencePack(policy *agentPolicy, decision, reason, routeOrToo
 		"receipt_hash":          receiptHash,
 		"budget_state":          map[string]any{},
 		"environment":           "runtime",
-		"settlement":            false,
-		"provider_price_status": "UNKNOWN",
+		"settlement":            settlement,
+		"provider_price_status": priceStatus,
 		"upstream_contacted":    contacted,
 		"upstream_status":       status,
 		"receipts":              []any{receipt},
 	}
+	if policy.PriceSats > 0 {
+		pack["price_sats"] = int(policy.PriceSats)
+	}
+	return pack
+}
+
+func (g *Gateway) paidInvoice(r *http.Request, policy *agentPolicy) bool {
+	if r == nil || policy == nil || policy.PriceSats <= 0 || g.lightning == nil || g.macaroonSvc == nil || !g.realPaymentRail() {
+		return false
+	}
+	token := extractL402Token(r)
+	parts := strings.SplitN(token, ":", 2)
+	if len(parts) != 2 {
+		return false
+	}
+	mac, err := g.macaroonSvc.Verify(parts[0])
+	if err != nil {
+		return false
+	}
+	hash := mac.GetCaveat("payment_hash")
+	if len(hash) != 64 {
+		return false
+	}
+	paid, err := g.lightning.CheckPayment(hash)
+	return err == nil && paid
 }
 
 func (g *Gateway) withLivePack(w http.ResponseWriter, r *http.Request, route *config.Route) http.ResponseWriter {
@@ -512,7 +547,10 @@ func (g *Gateway) recordLivePack(route *config.Route, r *http.Request, code int,
 	decision, reason := "allowed", "policy_allowed"
 	contacted := true
 	status := code
-	if policy.Kind == "deny" || policy.Kind == "charge" || code == http.StatusUnauthorized || code == http.StatusForbidden || code == http.StatusPaymentRequired {
+	settlement := false
+	if policy.Kind == "charge" && code != http.StatusPaymentRequired && code != http.StatusUnauthorized && code != http.StatusForbidden {
+		settlement = g.paidInvoice(r, policy)
+	} else if policy.Kind == "deny" || policy.Kind == "charge" || code == http.StatusUnauthorized || code == http.StatusForbidden || code == http.StatusPaymentRequired {
 		decision = "denied"
 		reason = "policy_denied"
 		if policy.Kind == "capability" || policy.Kind == "identity" {
@@ -528,7 +566,7 @@ func (g *Gateway) recordLivePack(route *config.Route, r *http.Request, code int,
 	if tool != "" {
 		routeOrTool = tool
 	}
-	pack := g.evidencePack(policy, decision, reason, routeOrTool, contacted, status)
+	pack := g.evidencePack(policy, decision, reason, routeOrTool, contacted, status, settlement)
 	if fp, _ := r.Context().Value(identityFingerprintKey).(string); fp != "" {
 		pack["identity_fingerprint"] = fp
 	}
