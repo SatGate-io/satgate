@@ -4,15 +4,16 @@ import Image from 'next/image';
 import { ArrowRight, DollarSign, Lock, MailCheck } from 'lucide-react';
 
 const title = 'Let your AI agent trade your Robinhood agent account, inside limits you set';
+const metaTitle = 'Limits for your AI agent\'s Robinhood account | SatGate';
 const description =
   'Set dollar limits per order, per day and per week. Lock your AI agent to your Robinhood Agentic account. Approve orders by email, and stop your agent with one button.';
 
 export const metadata: Metadata = {
-  title,
+  title: { absolute: metaTitle },
   description,
   alternates: { canonical: 'https://satgate.io/trading' },
   openGraph: {
-    title,
+    title: metaTitle,
     description,
     url: 'https://satgate.io/trading',
     type: 'website',
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title,
+    title: metaTitle,
     description,
   },
 };
@@ -40,7 +41,6 @@ const canAndCant = [
   'On its own, SatGate only asks Robinhood for its list of tools, plus one read of your account list during setup, when you click, to find your Agentic account. It never reads your balances or places orders by itself.',
   'Robinhood lets a connected agent read all your Robinhood accounts. SatGate locks yours to the Agentic account.',
   'Every call gets a signed receipt with the tool name and the decision. We don\'t keep Robinhood\'s replies, so we don\'t keep your balances or positions.',
-  'If someone broke into SatGate, they could place trades in your Agentic account but could not withdraw money. Keep in that account only what you\'re willing to have your agent trade.',
   'You can stop your agent in SatGate at any time, or disconnect SatGate in the Robinhood app. SatGate\'s bill is a separate subscription and never comes out of your brokerage account.',
 ];
 
@@ -48,7 +48,7 @@ export default function TradingPage() {
   const webPageJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: title,
+    name: metaTitle,
     url: 'https://satgate.io/trading',
     description,
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -89,6 +89,14 @@ export default function TradingPage() {
               </li>
             ))}
           </ul>
+          <div className="mt-8">
+            <a
+              href={signupUrl}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 px-8 py-3 font-bold text-white shadow-lg shadow-purple-500/20 transition hover:from-purple-500 hover:to-cyan-500"
+            >
+              Set up my agent&apos;s limits <ArrowRight size={16} />
+            </a>
+          </div>
         </div>
       </section>
 
@@ -112,6 +120,7 @@ export default function TradingPage() {
           <p className="mt-4 text-sm text-gray-500">
             SatGate sets limits and keeps receipts. It does not pick trades or give investment advice.
           </p>
+          <p className="mt-2 text-sm text-gray-500">SatGate is not affiliated with or endorsed by Robinhood.</p>
         </div>
       </section>
     </main>
