@@ -257,6 +257,16 @@ func (p *Proxy) SetEventPublisher(ep EventPublisher) {
 	}
 }
 
+// SetHelperRevocationID turns the hlp- token_id caveat for zero-credit children
+// on or off (off by default). See Delegator.EnableHelperRevocationID: turn it on
+// only when every machine that enforces a revoke reads every token_id caveat.
+// Call it before the proxy serves requests.
+func (p *Proxy) SetHelperRevocationID(on bool) {
+	if p.delegator != nil {
+		p.delegator.EnableHelperRevocationID(on)
+	}
+}
+
 // SetEvidenceRecorder wires signed evidence recording for governed MCP decisions.
 func (p *Proxy) SetEvidenceRecorder(rec EvidenceRecorder) {
 	p.evidence = rec

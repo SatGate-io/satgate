@@ -95,6 +95,24 @@ type Delegator struct {
 	macaroonSvc *macaroon.Service
 	budget      BudgetEnforcer
 	events      EventPublisher
+	// helperIDs turns on the hlp- token_id caveat for zero-credit children.
+	// Off by default: with it off a zero-credit child is minted exactly as it
+	// was before the caveat existed, so every gateway machine, old or new,
+	// accepts and stops it the same way. See EnableHelperRevocationID.
+	helperIDs bool
+}
+
+// EnableHelperRevocationID turns the hlp- token_id caveat for zero-credit
+// children on or off. It is off in a new Delegator. Turn it on only when every
+// machine that enforces a revoke reads every token_id caveat of a key (an
+// older enforcer reads the first one only, and would keep spending a helper
+// that carries this caveat after its revoke). Call it before the Delegator
+// serves requests; it is not safe to change while Delegate runs.
+//
+// With it on, a zero-credit child is refused unless the parent's first
+// token_id caveat (the one the issuer wrote) is present and not empty.
+func (d *Delegator) EnableHelperRevocationID(on bool) {
+	d.helperIDs = on
 }
 
 // NewDelegator creates a new delegator. Requires macaroon auth mode.
@@ -112,6 +130,20 @@ func NewDelegator(macaroonSvc *macaroon.Service, budget BudgetEnforcer) *Delegat
 func (d *Delegator) SetEventPublisher(ep EventPublisher) {
 	d.events = ep
 }
+
+// ChildPersister is implemented by an EventPublisher that records a delegated
+// child where a revoke can find it. Delegate calls PersistChild, for a
+// zero-credit helper that carries its own revocation id, before it returns the
+// key; a non-nil error means the id was not durably recorded and no key is
+// returned. PersistChild must be safe to call again for the same event (the
+// same parent, label and scope give the same key), and must not put the error's
+// text in the reply.
+type ChildPersister interface {
+	PersistChild(ctx context.Context, event Event) error
+}
+
+// persistChildTimeout bounds PersistChild.
+const persistChildTimeout = 10 * time.Second
 
 // refundTimeout bounds a give-back. It runs on a context detached from the
 // request, so a cancelled or timed-out request still gets its carve back.
@@ -167,6 +199,23 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 	}
 	if params.Scope != "" {
 		holderCaveats = append(holderCaveats, fmt.Sprintf("scope = %s", params.Scope))
+	}
+	// A zero-credit child has no budget id of its own, so nothing the child
+	// carries names it once a holder appends a caveat: the copy has a new
+	// signature and a new token id. It gets a caveat that names this helper,
+	// before the holder's caveats, so a revoke of the helper reaches every copy.
+	// Own-credit children are named by their budget id and are not changed.
+	var childRevocationID string
+	if params.Budget == 0 && d.helperIDs {
+		var idErr error
+		childRevocationID, idErr = d.helperRevocationID(parent, params)
+		if idErr != nil {
+			// The parent has no identity the issuer wrote, so no stable id can
+			// be derived for its helper. Nothing has been taken from the
+			// parent; refuse rather than mint a helper no revoke can name.
+			return nil, errDelegationNoParentIdentity
+		}
+		serverCaveats = append(serverCaveats, "token_id = "+childRevocationID)
 	}
 	// Generate child budget_id deterministically before minting
 	var childBudgetID string
@@ -279,26 +328,22 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		parentRemaining = parentResult.Remaining
 	}
 
-	log.Info().
-		Str("parent", parent.TokenID).
-		Str("child", childTokenID).
-		Int64("budget", params.Budget).
-		Int64("parentRemaining", parentRemaining).
-		Str("label", params.Label).
-		Msg("token delegated")
-
-	d.events.Publish(Event{
+	delegationEvent := Event{
 		Type:      EventDelegation,
 		Timestamp: time.Now(),
 		TokenID:   parent.TokenID,
 		BudgetID:  parent.BudgetID,
 		TenantID:  parent.TenantID,
 		Data: map[string]interface{}{
-			"childTokenId":    childTokenID,
-			"childBudgetId":   childBudgetID,
-			"childBudget":     params.Budget,
-			"parentRemaining": parentRemaining,
-			"label":           params.Label,
+			"childTokenId":  childTokenID,
+			"childBudgetId": childBudgetID,
+			// The id this helper's key carries as a second token_id caveat
+			// (empty for a child with its own budget, and for a parent that
+			// has no token_id of its own). An id, not a secret.
+			EventChildRevocationID: childRevocationID,
+			"childBudget":          params.Budget,
+			"parentRemaining":      parentRemaining,
+			"label":                params.Label,
 			// Never the scope text the holder sent: a hash and a word count.
 			// What the child may do is published as EventChildScopes (tool
 			// names only; no rule or control word) and the rule document.
@@ -308,7 +353,46 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			EventInheritedArgumentRules: inheritedRules,
 			EventChildScopes:            childScopes,
 		},
-	})
+	}
+
+	// A zero-credit helper is recorded by the event consumer before its key
+	// leaves this function, whether or not it carries an hlp- id. What a revoke
+	// of the helper names is its hlp- id (setting on) or its own macaroon
+	// signature (setting off); a key whose name was not recorded could never be
+	// revoked on its own, so if the publisher can record it (ChildPersister) and
+	// does not, no key is returned. The cause goes to the consumer's own log,
+	// not here, because it can embed an id.
+	//
+	// The signature goes only to PersistChild, on a copy of the event that is
+	// never published: no other subscriber of the delegation event sees it, and
+	// nothing here logs it.
+	if params.Budget == 0 {
+		if cp, ok := d.events.(ChildPersister); ok {
+			persistEvent := delegationEvent
+			persistEvent.Data = make(map[string]interface{}, len(delegationEvent.Data)+1)
+			for k, v := range delegationEvent.Data {
+				persistEvent.Data[k] = v
+			}
+			persistEvent.Data[EventChildSignature] = childMac.Signature
+			pctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), persistChildTimeout)
+			perr := cp.PersistChild(pctx, persistEvent)
+			cancel()
+			if perr != nil {
+				log.Error().Msg("delegation refused: the helper could not be recorded where a revoke finds it")
+				return nil, ErrChildTokenFailed
+			}
+		}
+	}
+	// Written once the key is going out: a delegation that is refused above
+	// (a helper whose id could not be recorded) is not logged as delegated.
+	log.Info().
+		Str("parent", parent.TokenID).
+		Str("child", childTokenID).
+		Int64("budget", params.Budget).
+		Int64("parentRemaining", parentRemaining).
+		Str("label", params.Label).
+		Msg("token delegated")
+	d.events.Publish(delegationEvent)
 
 	return &DelegateResult{
 		Token:           childToken,
@@ -649,4 +733,77 @@ func scopeWordCount(scope string) int {
 		n += len(strings.Fields(part))
 	}
 	return n
+}
+
+// HelperRevocationIDPrefix starts the id a zero-credit helper carries. No other
+// id this system writes starts with it (row ids are 12 hex characters or start
+// with "del-"), so a revoke of one helper can never name anything else.
+const HelperRevocationIDPrefix = "hlp-"
+
+// EventChildSignature is the field of the event handed to ChildPersister (and
+// only that one) that carries a zero-credit helper's own macaroon signature,
+// a 64-character hex string. It is the one id the gateway's HTTP check reads
+// that names this helper alone. It is a secret: it is never in the published
+// event, never in a caveat, and never in a log.
+const EventChildSignature = "childSignature"
+
+// EventChildRevocationID is the child_delegated event field that carries the
+// helper's revocation id.
+const EventChildRevocationID = "childRevocationId"
+
+// errDelegationNoParentIdentity is the fixed refusal for a zero-credit
+// delegation (with helper ids on) from a parent whose first token_id caveat is
+// missing or empty. It never repeats a caveat.
+var errDelegationNoParentIdentity = &clientError{msg: "delegation refused: this token has no identity of its own, so a helper made from it could not be revoked on its own"}
+
+// firstCaveatValue returns the value of the first caveat named key, and whether
+// there is one. The first is the one the issuer wrote: caveats only append, so
+// a holder can add later ones but cannot put one in front. GetCaveat returns
+// the last, which a holder can choose; nothing that names a key for a revoke
+// may use it.
+func firstCaveatValue(mac *macaroon.Macaroon, key string) (string, bool) {
+	if mac == nil {
+		return "", false
+	}
+	prefix := key + " = "
+	for _, caveat := range mac.Caveats {
+		if strings.HasPrefix(caveat, prefix) {
+			return strings.TrimPrefix(caveat, prefix), true
+		}
+	}
+	return "", false
+}
+
+// helperRevocationID derives the id a zero-credit helper carries from the
+// parent's token id, the label and the scope the holder sent. Nothing random
+// goes in: delegating again with the same parent, label and scope gives the same
+// key and the same id, so the same database row (no new row per session), and a
+// helper revoked once is still refused when it is delegated again.
+//
+// The parent's identity is its first token_id caveat, read from the parent
+// token itself (the one Delegate extends), never from a TokenInfo a caller built
+// and never by a last-value lookup a holder could shadow with a later, empty
+// token_id caveat. If that first caveat is missing or empty the error is
+// returned and the caller refuses to delegate. The id is a second token_id
+// caveat, and a reader that takes the first one (receipts, billing) keeps
+// getting the parent's.
+func (d *Delegator) helperRevocationID(parent *TokenInfo, params *DelegateParams) (string, error) {
+	if parent == nil || parent.RawToken == "" {
+		return "", errDelegationNoParentIdentity
+	}
+	mac, err := d.macaroonSvc.Decode(parent.RawToken)
+	if err != nil {
+		return "", errDelegationNoParentIdentity
+	}
+	if id, ok := firstCaveatValue(mac, "token_id"); !ok || id == "" {
+		return "", errDelegationNoParentIdentity
+	}
+	h := sha256.New()
+	h.Write([]byte("satgate-zero-credit-helper-v1\x00"))
+	h.Write([]byte(parent.TokenID))
+	h.Write([]byte{0})
+	h.Write([]byte(params.Label))
+	h.Write([]byte{0})
+	h.Write([]byte(params.Scope))
+	return HelperRevocationIDPrefix + hex.EncodeToString(h.Sum(nil))[:24], nil
 }
