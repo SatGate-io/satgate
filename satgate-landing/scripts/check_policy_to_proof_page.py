@@ -187,20 +187,20 @@ govern_forbidden_phrases = [
 ]
 
 acp_required_phrases = [
-    "Govern enterprise AI agents before they touch expensive models",
-    "Internal first, rail-aware when needed",
-    "One control plane for internal agents and governed paid calls.",
-    "Evidence preserved across rails",
-    "Finance parent agent",
-    "Invoice-reconciler worker",
-    "Customer-data export blocked by policy",
+    "Treat every model like a capable insider that can make mistakes or be tricked.",
+    "Start in Observe to see what your agents do, then turn on Control when you're ready.",
+    "One place to connect agents to your APIs and MCP tools, with limits per agent instead of shared keys.",
+    "Evidence the model didn't write.",
+    "Research agent: 5,000 credits, 3 tools, ends Friday",
+    "Helper: 1,000 credits carved from those 5,000, and 1 of those tools",
+    "The helper calls a tool it wasn't given: refused, with a signed receipt",
     "Platform team",
     "Security team",
-    "FinOps team",
-    "A one-page proof card. The full lifecycle exports as a signed receipt (Evidence Pack).",
-    "See the full receipt lifecycle",
-    "Why do enterprise AI agents need no standing authority?",
-    "Govern enterprise agents end to end.",
+    "Finance teams",
+    "A SatGate Cloud receipt can be checked with the open-source verifier against our published keys.",
+    "Rules and Receipts",
+    "Why shouldn't AI agents hold API keys?",
+    "Give every agent its own limits, and keep the off switch.",
 ]
 
 acp_forbidden_phrases = [

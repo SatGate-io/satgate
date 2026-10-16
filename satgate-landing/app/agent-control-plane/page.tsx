@@ -5,21 +5,19 @@ import {
   ArrowRight,
   Bot,
   CheckCircle2,
-  CircleDollarSign,
-  FileSearch,
-  FileText,
   GitBranch,
-  KeyRound,
   LockKeyhole,
   ShieldCheck,
-  Siren,
   TimerReset,
 } from "lucide-react";
 
+const pageTitle = "SatGate Agent Control Plane | Limits and an off switch for AI agents";
+const pageDescription =
+  "Give each AI agent its own limits, let helpers get only part of them, and stop an agent and every helper it started from one place.";
+
 export const metadata: Metadata = {
-  title: "SatGate Agent Control Plane | Govern Enterprise AI Agents",
-  description:
-    "SatGate is an agent control plane for enterprise AI agents: scoped capabilities, delegation lineage, budget enforcement before the request goes through, receipt exports, and next-request revocation.",
+  title: pageTitle,
+  description: pageDescription,
   keywords: [
     "agent control plane",
     "AI agent control plane",
@@ -36,130 +34,104 @@ export const metadata: Metadata = {
     canonical: "https://satgate.io/agent-control-plane",
   },
   openGraph: {
-    title: "SatGate Agent Control Plane | Govern Enterprise AI Agents",
-    description:
-      "Govern enterprise AI agents with scoped capabilities, delegation lineage, budgets checked before the request goes through, receipt exports, and next-request revocation.",
+    title: pageTitle,
+    description: pageDescription,
     url: "https://satgate.io/agent-control-plane",
     type: "website",
-    images: [
-      {
-        url: "/acp-demo/satgate-acp-thumbnail.jpg",
-        width: 1920,
-        height: 1080,
-        alt: "SatGate Agent Control Plane gateway enforcement timeline",
-      },
-    ],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SatGate Agent Control Plane",
-    description:
-      "Control the agent. Control delegation. Prove the lineage. Meter spend. Stop the next governed request.",
-    images: ["/acp-demo/satgate-acp-thumbnail.jpg"],
+    title: pageTitle,
+    description: pageDescription,
+    images: ["/og.png"],
   },
 };
 
+const demoMailto = "mailto:contact@satgate.io?subject=SatGate%20Agent%20Control%20Plane%20demo";
+
+const heroLead =
+  "Treat every model like a capable insider that can make mistakes or be tricked. SatGate gives each agent its own limits, checks each request against them before it reaches your services, and lets you stop an agent and every helper it started from one place.";
+
+const heroSecondLine = "Your agents do the work. You keep the authority.";
+
+const exampleTitle = "Example: one agent and one helper";
+
+const exampleLines = [
+  "Research agent: 5,000 credits, 3 tools, ends Friday",
+  "Helper: 1,000 credits carved from those 5,000, and 1 of those tools",
+  "The helper calls a tool it wasn't given: refused, with a signed receipt",
+  "You revoke the research agent: the helper's next request is refused too",
+];
+
+const exampleCaption = "An example of limits you set in SatGate. Your numbers and tools will differ.";
+
 const proofPoints = [
   {
-    icon: KeyRound,
-    title: "No permanent keys",
-    body: "Agents get temporary authority for the job, not reusable secrets that linger after the work is done.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Business limits built in",
-    body: "Each agent works inside the scope, budget, customer boundary, and expiration you set.",
+    icon: LockKeyhole,
+    title: "Limits the model can't change.",
+    body: "Budgets, allowed tools and end dates live in SatGate, not in a prompt or a provider's settings. SatGate checks each request against them before it reaches the service. In Control, a request outside those limits is refused. Observe records it and does not block on budget.",
   },
   {
     icon: GitBranch,
-    title: "Delegation you can prove",
-    body: "When an agent hands work to another agent, SatGate shows who delegated what — and where the limits held.",
+    title: "Handoffs that only narrow.",
+    body: "An agent can give a helper part of what it has: the same tools or fewer, and a budget carved out of what it has left. It can never pass on more.",
   },
   {
-    icon: CircleDollarSign,
-    title: "Spend visible and stoppable",
-    body: "Every action is measured before cost gets out of hand, with revocation ready when risk changes.",
+    icon: TimerReset,
+    title: "One off switch for the whole chain.",
+    body: "Revoke an agent and its next request is refused, along with every helper it handed work to. If a revoke can't be confirmed, the dashboard says so instead of showing it as done.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Evidence the model didn't write.",
+    body: "SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a permission, and when an agent spends from a budget in Control. The agent never writes or edits its own record. A SatGate Cloud receipt can be checked with the open-source verifier against our published keys.",
   },
 ];
 
-const enforcementOutcomes = [
-  ["Approved work", "The agent completes authorized tasks through SatGate, with policy and tenant context attached."],
-  ["Budget protected", "Spend caps stop runaway loops before the next expensive call goes through."],
-  ["Access revoked", "A kill switch cuts off a risky agent or delegated worker immediately."],
-  ["Tenant isolated", "Customer boundaries stay intact even when agents call shared tools or APIs."],
-  ["Delegation contained", "A worker can only receive the narrower authority the parent was allowed to hand off."],
-];
+const apiKeyHeading = "Why not just give the agent an API key?";
+const apiKeyBody =
+  "A key in an agent's settings works for anyone who copies it, has no budget, and keeps working until someone rotates it. With SatGate, the key to your service stays in SatGate. The agent gets its own token, with its own limits and an end date, and stopping it doesn't mean changing the key your other agents and apps use.";
 
-const controlPlaneCapabilities = [
-  [
-    "Start with zero standing access",
-    "Agents do not wake up holding broad, reusable keys. They earn temporary authority for the job in front of them.",
-  ],
-  [
-    "Give every agent a bounded mandate",
-    "Each capability carries the business limits that matter: scope, budget, tenant, expiry, delegation, and revocation.",
-  ],
-  [
-    "Control delegated work",
-    "When an agent spins up a worker, SatGate keeps the worker narrower than the parent and proves the handoff later.",
-  ],
-  [
-    "Stop spend before it happens",
-    "Budget checks run before model, API, SaaS, or MCP tool calls turn into real cost.",
-  ],
-  [
-    "Show proof teams can trust",
-    "Security and finance get a clear record of who acted, what was allowed, what was denied, and what it cost.",
-  ],
-  [
-    "Revoke without drama",
-    "Shut down an agent, worker, route, tenant, or budget without rotating every upstream provider secret.",
-  ],
-];
-
-const comparisons = [
-  ["Connection", "Agents can reach models, APIs, and MCP tools."],
-  ["Control", "SatGate decides what authority, budget, and delegation each agent receives."],
-  ["Proof", "Every allowed, denied, charged, or revoked action leaves a receipt that feeds the exported receipt bundle (Evidence Pack)."],
-  ["Revenue", "The same control path governs paid calls across x402, L402, AgentCore Payments, and Pay.sh while preserving proof of agent permissions."],
-];
-
-const personaCards = [
-  ["Platform team", "Gets a control plane for enterprise agents across APIs, MCP tools, models, and payment methods."],
-  ["Security team", "Gets revocation with evidence: the authority chain, denial reason, and first blocked call after revoke."],
-  ["FinOps team", "Gets spend attributed to the agent, token, route, tool, and policy before finance has to reconstruct it."],
+const audiences = [
+  ["Platform teams", "One place to connect agents to your APIs and MCP tools, with limits per agent instead of shared keys."],
+  ["Security teams", "Signed receipts for refusals, the chain of handoffs in the dashboard, and an off switch that reaches every helper."],
+  ["Finance teams", "Budgets checked before the spend in Control, and spending per agent on the Usage page."],
 ];
 
 const faqs = [
   [
     "What is an agent control plane?",
-    "An agent control plane gives teams a live way to govern AI agents: what they can access, how much they can spend, what they can delegate, and when their authority should end. SatGate puts that control in the path of each agent action.",
+    "It's the one place where you decide what each AI agent can reach, how much it can spend, who it can hand work to and when its access ends, and where you stop it. SatGate checks those limits on each request, before the request reaches your services.",
   ],
   [
     "How is an agent control plane different from an API gateway?",
-    "An API gateway protects services. An agent control plane governs the agents using those services: their budget, customer boundary, delegation rights, signed receipt (Evidence Pack), and ability to have governed requests denied after revocation.",
+    "An API gateway protects one service. SatGate follows the agent: one budget across the services it calls, the helpers it hands work to, and an off switch that reaches all of them.",
   ],
   [
-    "Why do enterprise AI agents need no standing authority?",
-    "Standing API keys give an agent reusable power even after the task, budget, tenant, or policy context changes. SatGate keeps enterprise agents untrusted by default; they check in, receive short-lived scoped authority, and lose that authority when policy, budget, expiry, or revocation says stop.",
+    "Why shouldn't AI agents hold API keys?",
+    "A key works for anyone who holds it, has no budget and lasts until someone rotates it. With SatGate, each agent gets its own token with its own limits and end date, and you can stop one agent without changing the keys anything else uses.",
   ],
   [
-    "How does SatGate control agent delegation?",
-    "SatGate lets a parent agent hand off only the authority it is allowed to share. The worker gets narrower limits, the handoff is visible, and attempts to exceed policy are blocked before they become spend or risk.",
+    "How does SatGate control handoffs between agents?",
+    "An agent can give a helper only part of what it has: the same tools or fewer, and a budget carved out of what it has left. Revoking an agent refuses its helpers' next requests too.",
   ],
 ];
 
 const relatedTopics = [
-  ["/policy-to-proof", "Rules and Receipts", "Turn every mint, delegation, paid call, denial, and revocation into receipts and an exportable signed receipt (Evidence Pack)."],
-  ["/mcp", "MCP governance", "Apply budget, revocation, and audit controls to agent tool calls."],
-  ["/agent-api-governance", "Agent API governance", "Replace broad API keys with policy-bound, auditable agent permissions."],
-  ["/agent-capability-tokens", "Agent capability tokens", "Encode route, budget, expiry, delegation, and revocation into agent access."],
-  ["/revocable-agent-credentials", "Revocable agent credentials", "Kill agent access without rotating every upstream provider secret."],
-  ["/economic-firewall", "Economic firewall", "Enforcement before the request goes through, for agent access, spend, and governed paid calls."],
-  ["/ai-agent-cost-control", "AI agent cost control", "Control model, API, MCP, and delegated sub-agent spend before cost is created."],
-  ["/economic-firewall-readiness-grader", "Economic firewall readiness grader", "Score identity, budgets, revocation, audit, routing, MCP, and paid-call governance readiness."],
-  ["/satgate-for-hermes-agent", "SatGate for Hermes Agent", "Govern local Hermes/Open WebUI agent workflows with SatGate checking each request before it goes through."],
+  ["/policy-to-proof", "Rules and Receipts", "How SatGate checks each request against your rules, and when it signs a receipt."],
+  ["/mcp", "MCP governance", "Budgets, allowed tools and an off switch for your agents' tool calls."],
+  ["/agent-api-governance", "Agent API governance", "Give each agent its own limited token instead of a shared API key."],
+  ["/agent-capability-tokens", "Agent capability tokens", "What an agent's token carries: the routes it can use, the budget it spends from and its end date."],
+  ["/revocable-agent-credentials", "Revocable agent credentials", "Stop one agent without changing the keys anything else uses."],
+  ["/economic-firewall", "Economic firewall", "Budgets for your agents, and payment from external agents, on the routes you choose."],
+  ["/ai-agent-cost-control", "AI agent cost control", "Set budgets for your agents and their helpers, and see what each one spends."],
+  ["/economic-firewall-readiness-grader", "Economic firewall readiness grader", "Score how ready your agent setup is, from budgets and revoke to receipts and MCP."],
+  ["/satgate-for-hermes-agent", "SatGate for Hermes Agent", "Put limits on local Hermes agents, with SatGate checking each request before it goes through."],
 ];
+
+const closingHeading = "Give every agent its own limits, and keep the off switch.";
+const closingLine = "Start in Observe to see what your agents do, then turn on Control when you're ready.";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -168,16 +140,15 @@ const jsonLd = {
       "@type": "WebPage",
       name: "SatGate Agent Control Plane",
       url: "https://satgate.io/agent-control-plane",
-      description:
-        "An agent control plane for enterprise AI agents: scoped capabilities, delegation lineage, budget enforcement before the request goes through, receipt exports, and revocation without standing API keys.",
+      description: pageDescription,
       datePublished: "2026-04-27",
-      dateModified: "2026-05-05",
+      dateModified: "2026-10-16",
       isPartOf: { "@type": "WebSite", name: "SatGate", url: "https://satgate.io" },
       about: [
         { "@type": "Thing", name: "AI agent control plane" },
-        { "@type": "Thing", name: "AI agent delegation control" },
-        { "@type": "Thing", name: "agent capability management" },
-        { "@type": "Thing", name: "budget enforcement before the request goes through" },
+        { "@type": "Thing", name: "per-agent limits" },
+        { "@type": "Thing", name: "agent handoffs" },
+        { "@type": "Thing", name: "signed receipts" },
       ],
     },
     {
@@ -185,8 +156,7 @@ const jsonLd = {
       name: "Agent control plane",
       termCode: "agent-control-plane",
       url: "https://satgate.io/agent-control-plane",
-      description:
-        "A governance layer that controls what AI agents can access, spend, delegate, prove, and continue doing at runtime.",
+      description: faqs[0][1],
       inDefinedTermSet: "https://satgate.io/agent-control-plane",
     },
     {
@@ -196,26 +166,17 @@ const jsonLd = {
       operatingSystem: "Any",
       url: "https://satgate.io/agent-control-plane",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-      featureList: [
-        "No standing API keys for enterprise AI agents",
-        "Scoped agent capabilities",
-        "Delegation lineage proof",
-        "Budget enforcement before the request goes through",
-        "MCP tool governance",
-        "Agent signed receipts (Evidence Packs)",
-        "Next-request revocation and kill switch",
-      ],
+      featureList: proofPoints.map(({ title }) => title),
     },
     {
       "@type": "ItemList",
-      name: "Agent control-plane capabilities",
-      description:
-        "Core controls required to govern enterprise AI agents without standing keys, unmanaged delegation, or invisible spend.",
-      itemListElement: controlPlaneCapabilities.map(([name, description], index) => ({
+      name: "Agent control plane limits",
+      description: pageDescription,
+      itemListElement: proofPoints.map(({ title, body }, index) => ({
         "@type": "ListItem",
         position: index + 1,
-        name,
-        description,
+        name: title,
+        description: body,
       })),
     },
     {
@@ -273,51 +234,44 @@ export default function AgentControlPlanePage() {
         <div className="absolute left-1/2 top-0 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-purple-600/20 blur-3xl" />
         <div className="absolute right-0 top-24 h-96 w-96 rounded-full bg-cyan-500/15 blur-3xl" />
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.95fr_1.05fr]">
-          <div>
+          <div className="min-w-0">
             <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-200">
               <Bot size={16} />
-              Governed AI agents
+              Agent control plane
             </div>
             <h1 className="max-w-4xl text-5xl font-black leading-[0.95] tracking-[-0.055em] text-white sm:text-6xl lg:text-7xl">
               SatGate Agent Control Plane
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-slate-300">
-              Govern enterprise AI agents before they touch expensive models, sensitive APIs, paid tools, or customer data. SatGate gives every agent bounded authority, visible spend, controlled delegation, and next-request revocation.
+              {heroLead}
             </p>
             <p className="mt-5 max-w-2xl text-lg font-semibold text-cyan-200">
-              Let agents work — without giving them blank checks, permanent keys, or invisible authority.
+              {heroSecondLine}
             </p>
             <div className="mt-9 flex flex-col gap-4 sm:flex-row">
               <a
-                href="mailto:contact@satgate.io?subject=SatGate%20Agent%20Control%20Plane%20demo"
+                href={demoMailto}
                 className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-cyan-500 px-6 py-4 text-base font-bold text-white shadow-2xl shadow-cyan-500/20 transition hover:scale-[1.01]"
               >
                 Book a demo <ArrowRight size={18} />
               </a>
-              <a
-                href="/acp-demo/satgate-acp-security-proof-card.pdf"
+              <Link
+                href="/blog/zero-trust-in-the-model"
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-6 py-4 text-base font-bold text-slate-100 transition hover:bg-white/10"
               >
-                Download proof card <FileText size={18} />
-              </a>
+                Why zero trust in the model <ArrowRight size={18} />
+              </Link>
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-3 shadow-2xl shadow-black/60">
-            <video
-              className="aspect-video w-full rounded-[1.35rem] bg-black object-cover"
-              controls
-              preload="metadata"
-              poster="/acp-demo/satgate-acp-thumbnail.jpg"
-            >
-              <source src="/acp-demo/satgate-acp-first-touch.mp4" type="video/mp4" />
-            </video>
-            <div className="flex items-center justify-between gap-4 px-3 py-4 text-sm text-slate-300">
-              <span>Agent Control Plane overview</span>
-              <a href="/acp-demo/satgate-acp-walkthrough.mp4" className="text-cyan-200 hover:text-cyan-100">
-                Watch the full walkthrough →
-              </a>
-            </div>
+          <div className="min-w-0 rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/60 sm:p-8">
+            <h2 className="text-xl font-bold text-white">{exampleTitle}</h2>
+            <ol className="mt-6 list-decimal space-y-4 pl-5 text-base leading-7 text-slate-200 marker:font-semibold marker:text-cyan-200">
+              {exampleLines.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ol>
+            <p className="mt-6 text-sm leading-6 text-slate-400">{exampleCaption}</p>
           </div>
         </div>
       </section>
@@ -326,7 +280,7 @@ export default function AgentControlPlanePage() {
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-5 md:grid-cols-4">
             {proofPoints.map(({ icon: Icon, title, body }) => (
-              <div key={title} className="rounded-3xl border border-white/10 bg-white/[0.035] p-6">
+              <div key={title} className="min-w-0 rounded-3xl border border-white/10 bg-white/[0.035] p-6">
                 <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-200">
                   <Icon size={24} />
                 </div>
@@ -339,241 +293,37 @@ export default function AgentControlPlanePage() {
       </section>
 
       <section className="border-y border-white/10 bg-white/[0.025] px-5 py-16 sm:px-8 lg:py-24">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-10 max-w-3xl">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-3 py-1 text-sm font-semibold text-yellow-200">
-              <FileSearch size={15} />
-              Internal first, rail-aware when needed
-            </div>
-            <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
-              One control plane for internal agents and governed paid calls.
-            </h2>
-            <p className="mt-5 text-lg leading-8 text-slate-300">
-              Internal agent calls and governed external paid calls move through the same authority model: same scoped capability, same delegation chain, one signed receipt (Evidence Pack).
-            </p>
-          </div>
-          <div className="grid gap-5 md:grid-cols-2">
-            <div className="rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-6">
-              <div className="mb-3 text-xs font-bold uppercase tracking-[0.22em] text-cyan-200">Govern Authority</div>
-              <h3 className="text-2xl font-black text-white">Policy enforced before execution</h3>
-              <p className="mt-4 leading-7 text-slate-300">
-                No scoped capability means no action. SatGate decides what each enterprise agent can access, how much it can spend, what it can delegate, and whether it can continue before the request reaches an API, model, or MCP tool.
-              </p>
-            </div>
-            <div className="rounded-3xl border border-yellow-400/30 bg-yellow-400/10 p-6">
-              <div className="mb-3 text-xs font-bold uppercase tracking-[0.22em] text-yellow-200">Preserve Proof</div>
-              <h3 className="text-2xl font-black text-white">Evidence preserved across rails</h3>
-              <p className="mt-4 leading-7 text-slate-300">
-                Payment proves value moved. SatGate proves the agent was allowed to move it across internal APIs, MCP tools, x402, L402, AgentCore Payments, Pay.sh, API-key billing, or enterprise ledgers.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="border-y border-white/10 bg-white/[0.025] px-5 py-16 sm:px-8 lg:py-24">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.85fr_1.15fr]">
-          <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-sm font-semibold text-cyan-200">
-              <ShieldCheck size={15} />
-              Built for enterprise autonomy
-            </div>
-            <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
-              Run autonomous agents with authority you can explain.
-            </h2>
-            <p className="mt-5 text-lg leading-8 text-slate-300">
-              AI agents are starting to call APIs, use paid tools, delegate work, and act across customer environments. A production team needs more than connection and logs — it needs a way to decide what each agent is allowed to do before the action happens.
-            </p>
-            <p className="mt-4 text-lg leading-8 text-slate-300">
-              SatGate turns agent permissions into a governed business object: scoped, budgeted, delegated, metered, audited, and revocable. The agent can move fast, but it never gets unlimited power.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {controlPlaneCapabilities.map(([title, body]) => (
-              <div key={title} className="rounded-3xl border border-white/10 bg-[#07111f] p-5">
-                <h3 className="font-bold text-white">{title}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-400">{body}</p>
-              </div>
-            ))}
-          </div>
+        <div className="mx-auto max-w-3xl">
+          <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
+            {apiKeyHeading}
+          </h2>
+          <p className="mt-5 text-lg leading-8 text-slate-300">
+            {apiKeyBody}
+          </p>
         </div>
       </section>
 
       <section className="px-5 py-16 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-9 max-w-3xl">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-purple-400/30 bg-purple-400/10 px-3 py-1 text-sm font-semibold text-purple-200">
-              <Bot size={15} />
-              Why this is different
-            </div>
-            <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
-              From connected agents to governed agents.
-            </h2>
-            <p className="mt-5 text-lg leading-8 text-slate-300">
-              Most agent stacks focus on getting tools connected. SatGate focuses on whether the agent should be allowed to act, spend, delegate, or continue — and proving that decision afterward.
-            </p>
-          </div>
-          <div className="grid gap-4 lg:grid-cols-4">
-            {comparisons.map(([title, body]) => (
-              <div key={title} className="rounded-3xl border border-white/10 bg-white/[0.035] p-5">
-                <h3 className="text-lg font-bold text-white">{title}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-400">{body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="border-y border-white/10 bg-white/[0.025] px-5 py-16 sm:px-8 lg:py-24">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.92fr_1.08fr]">
-          <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-purple-400/30 bg-purple-400/10 px-3 py-1 text-sm font-semibold text-purple-200">
-              <LockKeyhole size={15} />
-              Delegation without runaway authority
-            </div>
-            <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
-              See exactly how agent permissions move.
-            </h2>
-            <p className="mt-5 text-lg leading-8 text-slate-300">
-              When one agent delegates work to another, SatGate keeps the child narrower than the parent. Security teams can see the chain of authority, the budget attached to it, and where policy stopped the handoff.
-            </p>
-          </div>
-          <div className="rounded-3xl border border-white/10 bg-[#061120] p-6">
-            <div className="mb-5 flex items-center gap-3 text-cyan-200">
-              <GitBranch size={20} />
-              <span className="text-sm font-bold uppercase tracking-[0.22em]">Authority chain</span>
-            </div>
-            <div className="space-y-4 font-mono text-sm">
-              <div className="rounded-2xl border border-cyan-400/35 bg-cyan-400/10 p-4">
-                Finance parent agent <span className="text-slate-400">approved scope and budget</span>
-              </div>
-              <div className="ml-8 rounded-2xl border border-purple-400/40 bg-purple-400/10 p-4">
-                ↳ Invoice-reconciler worker <span className="text-slate-400">narrower authority</span>
-              </div>
-              <div className="ml-16 rounded-2xl border border-red-400/40 bg-red-400/10 p-4 text-red-200">
-                ↳ Customer-data export blocked by policy
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="px-5 py-16 sm:px-8 lg:py-24">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-9 max-w-3xl">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-sm font-semibold text-cyan-200">
-              <ShieldCheck size={15} />
-              Built for enterprise control owners
-            </div>
-            <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
-              The control plane speaks to platform, security, and finance.
-            </h2>
-          </div>
+          <h2 className="mb-9 text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
+            Who it&apos;s for
+          </h2>
           <div className="grid gap-5 md:grid-cols-3">
-            {personaCards.map(([title, body]) => (
-              <div key={title} className="rounded-3xl border border-white/10 bg-[#07111f] p-6">
-                <h3 className="text-xl font-bold text-white">{title}</h3>
-                <p className="mt-4 leading-7 text-slate-400">{body}</p>
+            {audiences.map(([title, body]) => (
+              <div key={title} className="min-w-0 rounded-3xl border border-white/10 bg-[#07111f] p-6">
+                <h3 className="text-lg font-semibold leading-8 text-slate-200">{`${title}: ${body}`}</h3>
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="px-5 py-16 sm:px-8 lg:py-24">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-9 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-            <div>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-sm font-semibold text-cyan-200">
-                <Siren size={15} />
-                Clear policy outcomes
-              </div>
-              <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
-                Clear outcomes, not raw logs.
-              </h2>
-            </div>
-            <p className="max-w-2xl text-slate-300">
-              SatGate shows what happened in plain English: approved work, protected budget, revoked access, tenant isolation, and contained delegation.
-            </p>
-          </div>
-          <div className="grid gap-4 md:grid-cols-5">
-            {enforcementOutcomes.map(([title, body]) => (
-              <div key={title} className="rounded-3xl border border-white/10 bg-white/[0.035] p-5">
-                <div className="text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">Outcome</div>
-                <h3 className="mt-4 text-base font-bold text-white">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-400">{body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="border-t border-white/10 px-5 py-16 sm:px-8 lg:py-24">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_0.85fr]">
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-3">
-            <video className="aspect-video w-full rounded-[1.35rem] bg-black object-cover" controls preload="metadata" poster="/acp-demo/satgate-acp-thumbnail.jpg">
-              <source src="/acp-demo/satgate-acp-walkthrough.mp4" type="video/mp4" />
-            </video>
-          </div>
-          <div className="flex flex-col justify-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-sm font-semibold text-cyan-200 w-fit">
-              <TimerReset size={15} />
-              Product walkthrough
-            </div>
-            <h2 className="text-4xl font-black tracking-[-0.04em] text-white">See the control loop end to end.</h2>
-            <p className="mt-5 text-lg leading-8 text-slate-300">
-              The walkthrough shows the control loop end to end: an agent receives bounded authority, delegates safely, hits real policy checks, leaves a signed receipt (Evidence Pack), and can be shut down immediately.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="border-t border-white/10 bg-white/[0.025] px-5 py-16 sm:px-8 lg:py-24">
-        <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
-          <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-purple-400/30 bg-purple-400/10 px-3 py-1 text-sm font-semibold text-purple-200 w-fit">
-              <FileText size={15} />
-              Security proof card
-            </div>
-            <h2 className="text-4xl font-black tracking-[-0.04em] text-white">A one-page proof card. The full lifecycle exports as a signed receipt (Evidence Pack).</h2>
-            <p className="mt-5 text-lg leading-8 text-slate-300">
-              Use the proof card to explain the Agent Control Plane in a security review: no permanent keys, bounded authority, controlled delegation, visible spend, next-request revocation, and an exportable signed receipt (Evidence Pack) for the full rules and receipts lifecycle.
-            </p>
-            <Link href="/policy-to-proof" className="mt-5 inline-flex text-sm font-bold text-cyan-200 hover:text-cyan-100">
-              See the full receipt lifecycle →
-            </Link>
-            <a
-              href="/acp-demo/satgate-acp-security-proof-card.pdf"
-              className="mt-8 inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 text-base font-black text-slate-950 transition hover:bg-cyan-100"
-            >
-              Download proof card <ArrowRight size={18} />
-            </a>
-          </div>
-          <a
-            href="/acp-demo/satgate-acp-security-proof-card.pdf"
-            className="block rounded-[2rem] border border-white/10 bg-white p-2 shadow-2xl shadow-black/40 transition hover:border-cyan-300/50"
-            aria-label="Download SatGate Agent Control Plane proof card"
-          >
-            {/* Use a plain img here; Next's dev image optimizer rejects this local PNG in some environments. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/acp-demo/satgate-acp-security-proof-card.png"
-              alt="SatGate Agent Control Plane proof card preview"
-              className="aspect-video w-full rounded-[1.4rem] object-contain"
-            />
-          </a>
         </div>
       </section>
 
       <section className="border-t border-white/10 px-5 py-16 sm:px-8 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr]">
-          <div>
-            <h2 className="text-4xl font-black tracking-[-0.04em] text-white">Agent control-plane FAQ</h2>
-            <p className="mt-5 text-lg leading-8 text-slate-300">
-              SatGate is for teams that want autonomous agents in production without handing them permanent keys, unmanaged delegation, or uncontrolled spend.
-            </p>
+          <div className="min-w-0">
+            <h2 className="text-4xl font-black tracking-[-0.04em] text-white">Questions</h2>
           </div>
-          <div className="space-y-4">
+          <div className="min-w-0 space-y-4">
             {faqs.map(([question, answer]) => (
               <div key={question} className="rounded-3xl border border-white/10 bg-white/[0.035] p-6">
                 <h3 className="text-lg font-bold text-white">{question}</h3>
@@ -586,10 +336,10 @@ export default function AgentControlPlanePage() {
 
       <section className="border-t border-white/10 bg-white/[0.025] px-5 py-16 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-7xl">
-          <h2 className="text-3xl font-black tracking-[-0.04em] text-white">Related agent-governance topics</h2>
+          <h2 className="text-3xl font-black tracking-[-0.04em] text-white">Related pages</h2>
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {relatedTopics.map(([href, title, body]) => (
-              <Link key={href} href={href} className="rounded-3xl border border-white/10 bg-[#07111f] p-5 transition hover:border-cyan-400/50 hover:bg-cyan-400/10">
+              <Link key={href} href={href} className="min-w-0 rounded-3xl border border-white/10 bg-[#07111f] p-5 transition hover:border-cyan-400/50 hover:bg-cyan-400/10">
                 <h3 className="font-bold text-white">{title}</h3>
                 <p className="mt-3 text-sm leading-6 text-slate-400">{body}</p>
               </Link>
@@ -602,17 +352,25 @@ export default function AgentControlPlanePage() {
         <div className="mx-auto max-w-5xl rounded-[2rem] border border-cyan-400/25 bg-gradient-to-br from-cyan-400/10 to-purple-500/10 p-8 text-center sm:p-12">
           <CheckCircle2 className="mx-auto mb-5 text-cyan-200" size={40} />
           <h2 className="text-3xl font-black tracking-[-0.04em] text-white sm:text-4xl">
-            Govern enterprise agents end to end.
+            {closingHeading}
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-slate-300">
-            No standing API keys. No unmanaged delegation. No invisible spend.
+            {closingLine}
           </p>
-          <a
-            href="mailto:contact@satgate.io?subject=SatGate%20Agent%20Control%20Plane%20demo"
-            className="mt-8 inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 text-base font-black text-slate-950 transition hover:bg-cyan-100"
-          >
-            Book a demo <ArrowRight size={18} />
-          </a>
+          <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <a
+              href={demoMailto}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 text-base font-black text-slate-950 transition hover:bg-cyan-100"
+            >
+              Book a demo <ArrowRight size={18} />
+            </a>
+            <a
+              href="https://cloud.satgate.io/cloud/login"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-6 py-4 text-base font-bold text-slate-100 transition hover:bg-white/10"
+            >
+              Open SatGate Cloud <ArrowRight size={18} />
+            </a>
+          </div>
         </div>
       </section>
     </main>
