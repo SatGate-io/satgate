@@ -19,12 +19,12 @@ export const metadata: Metadata = {
     template: "%s | SatGate",
   },
   description:
-    "Budgets and permissions for your AI agents, paid access for external agents where you choose, and a signed receipt for every decision.",
+    "Budgets and permissions for your AI agents, paid access for external agents where you choose, and signed receipts for spends, payments and refusals.",
   keywords: [
     "rules and receipts",
     "signed receipts",
     "permission before the agent acts",
-    "payment rules that work with any payment method",
+    "payment rules for L402 and x402",
     "MCP governance",
     "AI agent gateway",
     "API cost control",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SatGate: an economic firewall for AI agents",
     description:
-      "Budgets and permissions for your AI agents, paid access for external agents where you choose, and a signed receipt for every decision.",
+      "Budgets and permissions for your AI agents, paid access for external agents where you choose, and signed receipts for spends, payments and refusals.",
     url: "https://satgate.io",
     siteName: "SatGate",
     images: [
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SatGate: an economic firewall for AI agents",
     description:
-      "Budgets and permissions for your AI agents, paid access for external agents where you choose, and a signed receipt for every decision.",
+      "Budgets and permissions for your AI agents, paid access for external agents where you choose, and signed receipts for spends, payments and refusals.",
     images: ["/og.png"],
   },
   robots: {
@@ -93,7 +93,7 @@ const jsonLd = {
       url: "https://satgate.io",
       logo: "https://satgate.io/apple-touch-icon.png",
       description:
-        "SatGate is an economic firewall for AI agents. Before a request reaches your API or MCP tool, it checks the agent's budget and permissions, and payment where you charge for access. Each decision gets a signed receipt.",
+        "SatGate is an economic firewall for AI agents. Before a request reaches your API or MCP tool, it checks the agent's budget and permissions, and payment where you charge for access. Spends, payments and refusals get a signed receipt.",
       sameAs: ["https://github.com/SatGate-io/satgate"],
       contactPoint: {
         "@type": "ContactPoint",
