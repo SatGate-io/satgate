@@ -97,7 +97,7 @@ export default function GovernPage() {
             </div>
             <div className="min-w-0 p-6 rounded-xl bg-black border border-gray-800">
               <h3 className="font-bold text-white mb-2">Evidence the model didn&apos;t write.</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">A budgeted or paid request that SatGate allows, and a refusal over a budget, a payment or a permission, gets a receipt signed by SatGate. A Cloud receipt can be checked with the open-source verifier against our published keys. A request with no budget and no payment does not get one.</p>
+              <p className="text-gray-400 text-sm leading-relaxed">SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a permission, and when an agent spends from a budget in Control. The agent never writes or edits its own record. A SatGate Cloud receipt can be checked with the open-source verifier against our published keys.</p>
             </div>
             <div className="min-w-0 p-6 rounded-xl bg-black border border-gray-800">
               <h3 className="font-bold text-white mb-2">An off switch that works mid-task.</h3>
