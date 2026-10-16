@@ -193,6 +193,15 @@ def add_reason(reasons: list[str], reason_codes: list[str] | None, code: str, me
 
 
 def parse_rfc3339(value: Any, reasons: list[str], reason_codes: list[str], field: str) -> datetime | None:
+    """Parse an RFC 3339 section 5.6 date-time into an aware UTC datetime.
+
+    Supported range: years 0001 to 9999 (Python's datetime range), as ruled on
+    #226 and #485. Year 0000 is malformed, and so is a value whose UTC instant
+    falls outside that range once its offset is applied
+    (0001-01-01T00:00:00+01:00, 9999-12-31T23:59:59-01:00). A value outside
+    the grammar or the range adds malformed_<field>; a missing one adds
+    missing_<field>. Returns None in both cases.
+    """
     if not isinstance(value, str) or not value:
         add_reason(reasons, reason_codes, f"missing_{field}", f"receipt.{field} missing")
         return None
