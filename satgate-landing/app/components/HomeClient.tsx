@@ -170,10 +170,10 @@ const LandingPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              Keep your AI agents within budget on the paid services they use. Make outside agents pay before they use yours. Get a signed receipt for every decision.
+              Keep your AI agents within budget on the paid services they use. Make external agents pay before they use yours. Get a signed receipt for every decision.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
-              Each time an agent uses a service, SatGate checks it first. (Developers call these services APIs.) Your own agents stop when their budget runs out. External agents pay on the routes you choose, so hammering your API gets expensive, and paying never gets them past your access rules.
+              Each time an agent uses a service, SatGate checks it first. (Developers call these services APIs.) Your own agents stop when their budget runs out. External agents pay on the routes you choose, so abusing your API gets expensive, and paying never gets them past your access rules.
             </p>
             <div className="flex flex-wrap gap-4">
               <a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
@@ -460,7 +460,7 @@ const LandingPage = () => {
                 Give external agents limited access, and charge them where you want to.
               </p>
               <p className="text-xs text-yellow-400/80 mb-3 italic">
-                On a paid route, payment comes first, before the request reaches your API, so hammering it gets expensive. Paying never gets an agent past your access rules.
+                On a paid route, payment comes first, before the request reaches your API, so abusing it gets expensive. Paying never gets an agent past your access rules.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ No shared API keys to hand out</li>
