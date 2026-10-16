@@ -68,14 +68,13 @@ export default function GovernPage() {
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-6">
             <Shield size={12} /> Enterprise agent governance
           </div>
-          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-            Enterprise AI agent governance,
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-              from Policy to Proof.
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
+              Zero trust for AI agents
             </span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            SatGate checks each request before it goes through: Observe agent activity, Control scopes, budgets, delegation, and revocation before the agent acts, then Prove every decision with signed receipts (Evidence Packs) across APIs, MCP tools, and payment methods.
+            Treat every model like a capable insider that can make mistakes or be tricked. The model provider supplies the intelligence. You keep the authority.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/policy-to-proof" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center justify-center gap-2">
@@ -87,6 +86,39 @@ export default function GovernPage() {
           </div>
         </div>
       </header>
+
+      <section className="py-16 px-6 border-t border-gray-800 bg-gradient-to-b from-gray-900/20 to-black">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-10">Your limits, your evidence, your off switch.</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="min-w-0 p-6 rounded-xl bg-black border border-gray-800">
+              <h3 className="font-bold text-white mb-2">Limits the model can&apos;t change.</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">Budgets, allowed tools and end dates live in SatGate, not in a prompt or a provider&apos;s settings. Every request is checked before it reaches the service, so a tricked agent gets refused.</p>
+            </div>
+            <div className="min-w-0 p-6 rounded-xl bg-black border border-gray-800">
+              <h3 className="font-bold text-white mb-2">Evidence the model didn&apos;t write.</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">Each allowed request, and each refusal over a budget, payment or permission, gets a receipt signed by SatGate. Anyone can check it against our published keys.</p>
+            </div>
+            <div className="min-w-0 p-6 rounded-xl bg-black border border-gray-800">
+              <h3 className="font-bold text-white mb-2">An off switch that works mid-task.</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">Revoke an agent and its next request is refused, along with any helpers it handed work to. If a revoke can&apos;t be confirmed, the dashboard says so instead of showing it as done.</p>
+            </div>
+            <div className="min-w-0 p-6 rounded-xl bg-black border border-gray-800">
+              <h3 className="font-bold text-white mb-2">No single model in charge.</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">The same limits and receipts apply whichever model or vendor runs your agents.</p>
+            </div>
+            <div className="min-w-0 p-6 rounded-xl bg-black border border-gray-800">
+              <h3 className="font-bold text-white mb-2">Run it yourself.</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">Self-hosted SatGate runs on your own servers and database and takes no rules from SatGate Cloud.</p>
+            </div>
+          </div>
+          <p className="text-center mt-8">
+            <Link href="/blog/zero-trust-in-the-model" className="text-sm text-purple-400 hover:text-purple-300 transition">
+              Why this matters: zero trust in the model →
+            </Link>
+          </p>
+        </div>
+      </section>
 
       {/* One Token, Two Threats */}
       <section className="py-16 px-6 border-t border-gray-800 bg-gradient-to-b from-gray-900/20 to-black">

@@ -32,6 +32,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'zero-trust-in-the-model',
+    title: "Zero trust in the model: Nadella's insider-risk rules and where SatGate fits",
+    description: 'Satya Nadella says to treat AI models as insider risks and keep the controls outside the model. What that asks of agent builders, and what SatGate does today.',
+    date: '2026-10-16',
+    readTime: '4 min read',
+    author: 'SatGate Team',
+    tags: ['Zero Trust', 'AI Agents', 'Security'],
+  },
+  {
     slug: 'always-on-agents-economic-authority',
     title: 'Always-On Agents Need More Than Identity. They Need Economic Authority.',
     description: 'Microsoft Scout shows where enterprise agents are headed: identity and access matter, but external agent actions also need economic authority, payment ownership, and proof.',
