@@ -227,7 +227,7 @@ export default function EconomicFirewallPage() {
       <section className="max-w-6xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-bold text-white mb-6">Where the idea came from</h2>
         <div className="space-y-5 max-w-4xl text-lg leading-relaxed text-gray-300">
-          <p>It started with one rule: an external agent pays before it uses your API. That makes hammering your API expensive. It raises the cost of an attack; it does not make one impossible.</p>
+          <p>It started with one rule: an external agent pays before it uses your API. That makes abusing your API expensive. It raises the cost of an attack; it does not make one impossible.</p>
           <p>The same idea works for your own agents. Each one gets a budget and a list of what it may do, and SatGate checks both before a request runs. Observe shows usage without blocking; Control enforces the limits. Your own agents don&apos;t pay anyone. They spend from the budget you set.</p>
           <p>Make SatGate the only way to reach your API, and keep your API keys behind it, so agents can&apos;t go around it.</p>
           <p><strong className="text-white">Receipts from all three.</strong> SatGate signs a receipt for each decision, on HTTP APIs and MCP tools, and anyone can check it. A receipt shows what SatGate decided. It is not a compliance certificate.</p>
