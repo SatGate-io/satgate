@@ -18,7 +18,7 @@ import {
 export const metadata: Metadata = {
   title: "Build Agents That Work Within a Budget",
   description:
-    "Give each agent a task, a budget and a list of tools it may use. Read the public docs and demo, start a 14-day free trial, and check every decision with a signed receipt.",
+    "Give each agent a task, a budget and a list of tools it may use. Read the public docs and demo, start a 14-day free trial, and check spends and refusals with a signed receipt.",
   keywords: [
     "SatGate build",
     "AI agent capabilities",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Build agents that work within a budget",
     description:
-      "Give agents a task, a budget and a list of allowed tools. Read the public docs, and see which APIs are public and which are in private beta.",
+      "Give agents a task, a budget and a list of allowed tools. Read the public docs, and see which APIs are public and which are not available yet.",
   },
 };
 
@@ -136,7 +136,7 @@ const primitives = [
     icon: ReceiptText,
     title: "Check the receipt",
     label: "satgate.verify",
-    body: "Verify the receipt the call returned. Add it to a signed receipt (Evidence Pack) for audits, incident reviews, billing questions or proof of a revoke.",
+    body: "Verify the receipt the call returned. Keep it for audits, incident reviews or billing questions.",
   },
 ];
 
@@ -153,15 +153,15 @@ const trustMetadataNote = 'What SatGate publishes for machines: which tokens it 
 const buildDocLinks = [
   { title: "Gateway quickstart", href: `${docsBase}/getting-started/quickstart.md`, body: "Run the open-source gateway on your own machine. Paid routes are optional; you can start with budgets only." },
   { title: "Capability schema", href: `${docsBase}/reference/capability-schema.md`, body: "What a token holds: who issued it, who it’s for, allowed tools, budget, expiry, extra limits and how far it can be handed off." },
-  { title: "Receipt schema", href: `${docsBase}/reference/receipt-schema.md`, body: "The signed record SatGate writes when it allows, refuses, hands off, revokes or charges." },
+  { title: "Receipt schema", href: `${docsBase}/reference/receipt-schema.md`, body: "The signed record SatGate writes when it allows, refuses or charges a request." },
   { title: "Trust metadata", href: `${docsBase}/reference/satgate-trust-metadata.md`, body: trustMetadataNote },
   { title: "Open verifier", href: "https://github.com/SatGate-io/evidence-pack-verifier", body: "Check a live receipt against the issuer’s published keys (JWKS). Uses RFC 8785 canonical JSON and Ed25519 signatures." },
-  { title: "MCP integration", href: `${docsBase}/guides/mcp-gateway.md`, body: "Put SatGate in front of MCP tools and get a receipt for each tool call." },
-  { title: "Raw HTTP", href: `${docsBase}/guides/raw-http.md`, body: "Copy-paste curl commands for issue, pay and verify. No SDK needed." },
+  { title: "MCP integration", href: `${docsBase}/guides/mcp-gateway.md`, body: "Put SatGate in front of MCP tools and get a receipt for each priced tool call or refusal." },
+  { title: "Raw HTTP", href: `${docsBase}/guides/raw-http.md`, body: "Curl commands for issue, pay and verify. The API they call is not available yet." },
   { title: "OpenAI tools", href: `${docsBase}/guides/openai-tools.md`, body: "Run OpenAI tool calls through SatGate and verify the receipts." },
   { title: "Anthropic tools", href: `${docsBase}/guides/anthropic-tools.md`, body: "Enforce limits on Anthropic tool use in your own gateway, not inside the model provider." },
   { title: "LangChain", href: `${docsBase}/guides/langchain-integration.md`, body: "Keep LangChain for orchestration and add SatGate where the tools are called." },
-  { title: "CrewAI", href: `${docsBase}/guides/crewai.md`, body: "Give each CrewAI tool its own token and a receipt for every call." },
+  { title: "CrewAI", href: `${docsBase}/guides/crewai.md`, body: "Give each CrewAI tool its own token and a receipt for each priced call or refusal." },
 
   { title: "API overview", href: `${docsBase}/api/overview.md`, body: "The lower-level gateway APIs and how they map to issue, pay and verify." },
   { title: "Python SDK", href: `${docsBase}/sdks/python.md`, body: "Install and set up the Python SDK." },
@@ -180,13 +180,12 @@ const runtimeChips = [
 const allowedReceipt = {
   receipt_id: "rcpt_7J4xQf9",
   decision: "allowed",
-  decision_reason: "capability_scope_and_budget_ok",
-  agent_id: "research-agent",
-  capability_id: "cap_2Xn83k",
+  decision_reason: "budget_authorized",
   policy_version: "policy_2026_05_build_v1",
   route_or_tool: "api.example.com/search",
-  amount_usd: "0.42",
-  rail: "enterprise_ledger",
+  capability_hash: "sha256:demo_redacted",
+  attempted_amount_usd: "0.42",
+  remaining_budget_usd: "4.20",
   evidence_pack_id: "ep_2026_05_12_001",
   signature: "ed25519:demo_redacted",
 };
@@ -195,10 +194,9 @@ const deniedReceipt = {
   receipt_id: "rcpt_9Kp1vM2",
   decision: "denied",
   decision_reason: "budget_exhausted",
-  agent_id: "research-agent",
-  capability_id: "cap_2Xn83k",
   policy_version: "policy_2026_05_build_v1",
   route_or_tool: "api.example.com/search",
+  capability_hash: "sha256:demo_redacted",
   attempted_amount_usd: "4.20",
   remaining_budget_usd: "0.00",
   evidence_pack_id: "ep_2026_05_12_001",
@@ -225,7 +223,7 @@ const jsonLd = {
     },
     {
       "@type": "SoftwareSourceCode",
-      name: "SatGate issue/pay/verify private-beta illustration",
+      name: "SatGate issue/pay/verify illustration (API not available yet)",
       codeSampleType: "code snippet",
       programmingLanguage: "Python",
       text: quickstart,
@@ -292,7 +290,7 @@ export default function BuildPage() {
               <p className="mb-2 text-xs font-mono uppercase tracking-[0.18em] text-cyan-300">SDK access</p>
               <pre className="max-w-full overflow-x-auto rounded-xl bg-black p-4 text-sm leading-6 text-gray-300"><code>{installCommands}</code></pre>
               <p className="mt-3 text-sm leading-6 text-gray-500">
-                The issue, pay and verify API is in private beta. <a href="https://github.com/SatGate-io/satgate/blob/main/docs/index.md" target="_blank" rel="noopener noreferrer" className="text-cyan-300 hover:text-cyan-200">Request access →</a>
+                The issue, pay and verify SDK methods are not backed by a live API yet. <a href="https://github.com/SatGate-io/satgate/blob/main/docs/index.md" target="_blank" rel="noopener noreferrer" className="text-cyan-300 hover:text-cyan-200">Read the docs →</a>
               </p>
             </div>
           </div>
@@ -315,7 +313,7 @@ export default function BuildPage() {
           <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-cyan-300">Start with the task</p>
           <h2 className="text-3xl font-bold text-white sm:text-4xl">Real work, within limits you set.</h2>
           <p className="mt-4 text-lg leading-8 text-gray-400">
-            SatGate protects the APIs and tools the task depends on. Observe shows usage without blocking. Control enforces your agents’ budgets and permissions. Admit charges external agents on paid routes, after checking they’re allowed in. All three sign receipts anyone can check. A receipt is a record, not a compliance guarantee.
+            SatGate protects the APIs and tools the task depends on. Observe shows usage without blocking. Control enforces your agents’ budgets and permissions. Admit charges external agents on paid routes, after checking they’re allowed in. Control and Admit sign receipts anyone can check, and Observe can too. A receipt is a record, not a compliance guarantee.
           </p>
         </div>
         <div className="grid gap-5 md:grid-cols-3">
@@ -331,10 +329,10 @@ export default function BuildPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="mb-10 max-w-3xl">
-          <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-emerald-300">Private-beta API</p>
+          <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-emerald-300">Not available yet</p>
           <h2 className="text-3xl font-bold text-white sm:text-4xl">Issue. Pay. Verify.</h2>
           <p className="mt-4 text-lg leading-8 text-gray-400">
-            The issue, pay and verify API is in private beta. The examples below show how it works; you can’t run them end to end without beta access. The public SDK packages install on their own.
+            The issue, pay and verify SDK methods are not backed by a live API yet. The examples below show the intended calls; you can’t run them end to end. The public SDK packages install on their own.
           </p>
         </div>
         <div className="grid gap-5 md:grid-cols-3">
@@ -391,13 +389,13 @@ export default function BuildPage() {
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="mb-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <div>
-            <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-cyan-300">Private-beta examples</p>
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">Example calls for accounts with beta access.</h2>
+            <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-cyan-300">Examples</p>
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">Example calls. The API they call is not available yet.</h2>
           </div>
         </div>
 
         <div className="mb-6 min-w-0 rounded-2xl border border-gray-800 bg-gray-950">
-          <div className="border-b border-gray-800 px-5 py-3 font-mono text-xs text-gray-500">Python example (private beta)</div>
+          <div className="border-b border-gray-800 px-5 py-3 font-mono text-xs text-gray-500">Python example (API not available yet)</div>
           <pre className="max-w-full overflow-x-auto p-5 text-sm leading-6 text-gray-300"><code>{quickstart}</code></pre>
         </div>
         <div className="grid min-w-0 gap-6 lg:grid-cols-2">
@@ -466,7 +464,7 @@ export default function BuildPage() {
             <div className="grid gap-3 text-sm text-gray-300">
               {[
                 "A set budget for the task and for each sub-agent",
-                "Receipts for every allow, refusal, handoff, revoke and payment",
+                "Receipts for budget spends, payments and refusals",
                 "The result judged on its own, apart from the receipts",
                 "Check that a retried call isn’t charged twice",
                 "Your rules enforced between the agent and your tools",

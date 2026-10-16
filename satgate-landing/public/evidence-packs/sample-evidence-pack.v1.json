@@ -482,9 +482,7 @@
     "internal_rail": "enterprise_ledger",
     "external_rails": [
       "x402",
-      "l402",
-      "api_key_billing",
-      "enterprise_contract"
+      "l402"
     ],
     "events": [
       {
