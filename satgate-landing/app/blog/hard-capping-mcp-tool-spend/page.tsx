@@ -156,7 +156,7 @@ export default function HardCappingMcpToolSpendPage() {
             SatGate MCP Proxy sits between your MCP client and your MCP servers. It intercepts every <code className="text-purple-300">tools/call</code>, tracks cost in real-time, and enforces hard budget caps — not soft alerts, not warnings, actual enforcement.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            When the budget is exhausted, the proxy returns <code className="text-purple-300">HTTP 402 Payment Required</code>. The agent receives a clean &quot;Budget exceeded&quot; message and stops. No infinite loops. No surprise bills.
+            When the budget is exhausted, the proxy refuses the call with a <code className="text-purple-300">budget_exhausted</code> error. The agent receives a clean &quot;Budget exceeded&quot; message and stops. No infinite loops. No surprise bills.
           </p>
           <p className="text-gray-300 leading-relaxed">
             The enforcement mechanism uses <strong className="text-white">L402 macaroons</strong> — cryptographic tokens with embedded budget constraints. Unlike API keys (which grant unlimited access until revoked), a macaroon can encode: &quot;This agent can spend up to $5 on search tools, expiring in 1 hour.&quot; The constraints are baked into the token itself and verified on every call.
@@ -222,7 +222,7 @@ export default function HardCappingMcpToolSpendPage() {
 │  Cursor      │◀────│                  │◀────│  (search, db…) │
 │  Claude      │     │  ✓ Budget check  │     │                │
 │  Desktop     │     │  ✓ Cost tracking │     │                │
-│              │     │  ✓ 402 on limit  │     │                │
+│              │     │  ✓ refuse at cap │     │                │
 └─────────────┘     └──────────────────┘     └────────────────┘`}</code>
           </pre>
 
@@ -234,21 +234,20 @@ export default function HardCappingMcpToolSpendPage() {
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
             <code className="text-green-300">{`{
   "mcpServers": {
-    "search": {
-      "command": "satgate-proxy",
-      "args": [
-        "--upstream", "npx @anthropic/mcp-server-brave-search",
-        "--budget", "500",
-        "--budget-window", "1h",
-        "--cost-per-call", "5"
-      ]
+    "satgate": {
+      "command": "npx",
+      "args": ["-y", "satgate-mcp-bridge"],
+      "env": {
+        "SATGATE_URL": "https://satgate-mcp-saas.fly.dev",
+        "SATGATE_TOKEN": "paste-the-token-from-MCP-Setup"
+      }
     }
   }
 }`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            That&apos;s it. Your agent now has a hard cap of 500 sats per hour on search calls. No code changes. No agent modifications.
+            This is the snippet MCP Setup gives Claude Desktop. The cap is the budget on the token you mint there (a new token starts at 1,000 credits), and each tool call costs 1 credit unless you set per-tool costs. No code changes. No agent modifications.
           </p>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">What Happens on Each Tool Call</h3>
@@ -256,13 +255,18 @@ export default function HardCappingMcpToolSpendPage() {
             <li><strong className="text-white">Intercept</strong> — Proxy receives the <code className="text-purple-300">tools/call</code> JSON-RPC request</li>
             <li><strong className="text-white">Resolve cost</strong> — Looks up the tool name in the cost table (exact match or wildcard)</li>
             <li><strong className="text-white">Check budget</strong> — Compares accumulated spend against the macaroon&apos;s budget caveat</li>
-            <li><strong className="text-white">Forward or reject</strong> — If within budget: forward to upstream, debit cost. If over budget: return 402 with a clear error message</li>
+            <li><strong className="text-white">Forward or reject</strong> — If within budget: forward to upstream, debit cost. If over budget, the call is refused with a budget_exhausted error</li>
           </ol>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-red-300">{`HTTP 402
-{
-  "error": "budget_exhausted"
+            <code className="text-red-300">{`{
+  "jsonrpc": "2.0",
+  "id": 7,
+  "error": {
+    "code": -32000,
+    "message": "Budget exhausted",
+    "data": { "error": "budget_exhausted" }
+  }
 }`}</code>
           </pre>
 
@@ -279,7 +283,7 @@ export default function HardCappingMcpToolSpendPage() {
             <code className="text-cyan-300">{`Mint a token with a budget in the SatGate dashboard: Cloud, then Tokens or MCP setup.
 Send the agent's calls through the gateway with that token.
 There is no satgate token create or satgate token attenuate command.
-There is no daily limit. A spent budget returns HTTP 402 with code budget_exhausted.`}</code>
+There is no daily limit. A spent budget refuses the next call with code budget_exhausted.`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">

@@ -161,11 +161,11 @@ export default function CursorMCPProxySetupGuidePage() {
           </p>
 
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
-            <code>{`# example startup
-satgate gateway start
+            <code>{`# open-source HTTP gateway
+satgate --config ./gateway.yaml
 
-# or, depending on your deployment style
-satgate-gateway --config ./satgate.yaml`}</code>
+# open-source MCP proxy
+satgate-mcp --config ./satgate-mcp.yaml`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">

@@ -149,29 +149,22 @@ export default function McpBudgetEnforcementGuidePage() {
           </p>
 
           <pre className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-sm font-mono text-gray-300 overflow-x-auto my-6">
-{`# MCP Cost Profile
-mcp:
-  costProfile:
-    defaultCostCredits: 1
-    tools:
-      - name: "web_search"
-        costCredits: 2
-      - name: "code_execute"
-        costCredits: 10
-      - name: "file_read"
-        costCredits: 1
-      - name: "database_query"
-        costCredits: 5
-      - name: "send_email"
-        costCredits: 3
-      - name: "*_premium"
-        costCredits: 20  # wildcard matching`}
+{`# satgate-mcp.yaml: per-tool costs
+tools:
+  defaultCost: 1
+  costs:
+    web_search: 2
+    code_execute: 10
+    file_read: 1
+    database_query: 5
+    send_email: 3
+    "premium_*": 20  # prefix wildcard`}
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            Wildcard matching (<code className="bg-gray-800 px-1.5 rounded text-purple-300">*_premium</code>) 
+            Wildcard matching (<code className="bg-gray-800 px-1.5 rounded text-purple-300">premium_*</code>) 
             lets you price tool families without listing every variant. Any tool not matched gets the 
-            <code className="bg-gray-800 px-1.5 rounded text-purple-300">defaultCostCredits</code>.
+            <code className="bg-gray-800 px-1.5 rounded text-purple-300">defaultCost</code>.
           </p>
 
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">Step 2: Mint Tokens with Budgets</h2>
@@ -180,19 +173,13 @@ mcp:
           </p>
 
           <pre className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-sm font-mono text-gray-300 overflow-x-auto my-6">
-{`# Mint a token with 500-credit budget
-satgate mint \\
-  --agent "research-bot" \\
-  --budget 500 \\
-  --scope "/mcp/*" \\
-  --expiry 24h \\
-  --cost-center "engineering"
-
-# Token carries:
-#   budget_total_credits: 500
-#   scope: /mcp/*
-#   cost_center: engineering
-#   expires: 2026-03-06T07:00:00Z`}
+{`# Mint a token with a 500-credit budget in MCP Setup
+# (cloud.satgate.io). There is no CLI flag for this.
+#   agent        research-bot
+#   budget       500 credits
+#   tools        the ones it may call
+#   expires      24h
+#   cost center  engineering`}
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
@@ -259,20 +246,10 @@ satgate mint \\
           </p>
 
           <pre className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-sm font-mono text-gray-300 overflow-x-auto my-6">
-{`# Coordinator has 500 credits
-# Delegate 100 to research-agent
-satgate delegate \\
-  --from <coordinator-token> \\
-  --to "research-agent" \\
-  --budget 100 \\
-  --scope "/mcp/search*"
-
-# Delegate 200 to code-agent
-satgate delegate \\
-  --from <coordinator-token> \\
-  --to "code-agent" \\
-  --budget 200 \\
-  --scope "/mcp/code*"
+{`# Coordinator has 500 credits. In the dashboard
+# (Delegation & Budgets), hand out narrower tokens:
+#   research-agent   100 credits   search tools
+#   code-agent       200 credits   code tools
 
 # Coordinator keeps 200 for itself
 # Total across tree: still ≤ 500`}
@@ -333,40 +310,35 @@ satgate delegate \\
 
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">Quick Start</h2>
           <p className="text-gray-300 leading-relaxed">
-            Get MCP budget enforcement running in 5 minutes:
+            Run the open-source MCP proxy on your own machine:
           </p>
 
           <pre className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-sm font-mono text-gray-300 overflow-x-auto my-6">
-{`# 1. Install
-go install github.com/SatGate-io/satgate@latest
+{`# 1. Install the MCP proxy
+go install github.com/satgate-io/satgate/cmd/satgate-mcp@latest
 
-# 2. Configure (mcp-proxy.yaml)
-listen: :8080
-admin:
-  separateListener: :9090
-routes:
-  - path: /mcp/*
-    upstream: http://your-mcp-server:3000
-    policy:
-      kind: control
-      control:
-        enforceBudget: true
-        budgetMode: request_path
-mcp:
-  costProfile:
-    defaultCostCredits: 1
-    tools:
-      - name: "expensive_tool"
-        costCredits: 10
+# 2. Configure (satgate-mcp.yaml)
+upstreams:
+  tools:
+    transport: stdio
+    command: ["npx", "-y", "your-mcp-server"]
+budget:
+  backend: memory
+  limit: 100          # credits
+tools:
+  defaultCost: 1
+  costs:
+    expensive_tool: 10
+enforcement:
+  mode: hard
 
-# 3. Run
-satgate -config mcp-proxy.yaml
+# 3. Run it from your MCP client config
+#    "command": "satgate-mcp",
+#    "args": ["--config", "/path/to/satgate-mcp.yaml"]
 
-# 4. Mint a token
-curl -X POST http://localhost:9090/admin/mint \\
-  -d '{"agent":"my-bot","budget_total_credits":100}'
-
-# 5. Connect your agent to localhost:8080/mcp`}
+# The binary takes only --config and --version.
+# For per-agent tokens with their own budgets, use
+# MCP Setup on SatGate Cloud.`}
           </pre>
 
           <div className="bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-purple-500/20 rounded-xl p-8 mt-12 text-center">

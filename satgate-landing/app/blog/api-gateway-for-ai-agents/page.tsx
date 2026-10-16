@@ -227,12 +227,11 @@ agents:
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-purple-300">{`# Parent agent mints a delegated token
-satgate mint \\
-  --from parent-token \\
-  --add-caveat "budget <= 500" \\
-  --add-caveat "tools = [web_search, summarize]" \\
-  --add-caveat "expires = 2026-03-12T23:59:59Z"
+            <code className="text-purple-300">{`# Hand the child a narrower token in the dashboard
+# (Delegation & Budgets). There is no CLI for this.
+#   budget   500 credits
+#   tools    web_search, summarize
+#   expires  2026-03-12T23:59:59Z
 
 # Child agent gets a token that:
 # - Can only spend 500 credits (not parent's full 5000)

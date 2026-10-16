@@ -351,12 +351,10 @@ Authorization: Bearer macaroon_v1_agent42_budget500
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`# Mint a budget-capped token for an agent
-satgate mint \\
-  --budget 1000 \\
-  --tools "gpt-4o:15,gpt-4o-mini:1,web_search:5" \\
-  --expires 24h \\
-  --holder "research-agent-prod"
+            <code className="text-green-300">{`# Mint a budget-capped token for an agent in the
+# dashboard (Tokens): 1000 credits, expires in 24h,
+# for research-agent-prod. Route and tool costs are
+# set once for your account. There is no CLI flag for this.
 
 # The agent uses this token for all API calls
 # Gateway enforces the budget automatically
