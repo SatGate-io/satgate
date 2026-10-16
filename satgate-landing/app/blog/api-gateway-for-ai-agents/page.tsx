@@ -319,7 +319,7 @@ agents:
           <ul className="text-gray-300 space-y-3">
             <li><strong className="text-white">Observe:</strong> Deploy in audit mode. See what agents are calling, spending, and delegating. No enforcement yet, just structured visibility.</li>
             <li><strong className="text-white">Control:</strong> Enable policy checked before the request goes through. Set budget, scope, route, tenant, and MCP-tool limits that block bad calls before they execute.</li>
-            <li><strong className="text-white">Prove:</strong> Preserve signed receipts for allow, deny, spend, delegation, and revocation decisions so security, finance, and auditors can verify what happened later.</li>
+            <li><strong className="text-white">Prove:</strong> Preserve signed receipts for spends, payments and refusals so security, finance, and auditors can verify what happened later.</li>
           </ul>
 
           <p className="text-gray-300 leading-relaxed">
@@ -350,7 +350,7 @@ agents:
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            You don't need to replace your gateway. You need to add governance that checks before the request goes through and understands authority, budgets, delegation, and variable costs, then proves each decision. That's the difference between an API gateway that routes traffic and one that governs autonomous agent activity.
+            You don't need to replace your gateway. You need to add governance that checks before the request goes through and understands authority, budgets, delegation, and variable costs, then signs receipts for spends and refusals. That's the difference between an API gateway that routes traffic and one that governs autonomous agent activity.
           </p>
 
           <div className="my-8 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
@@ -389,7 +389,7 @@ agents:
 
           <div className="mt-12 p-6 bg-gray-900/50 border border-gray-800 rounded-lg">
             <p className="text-gray-300 mb-4">
-              SatGate is open source. Try it:
+              The SatGate gateway is open source. Try it:
             </p>
             <pre className="bg-gray-900/70 rounded p-3 text-sm overflow-x-auto">
               <code className="text-green-300">{`go install github.com/satgate-io/satgate/cmd/satgate-mcp@latest`}</code>
@@ -417,7 +417,7 @@ agents:
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">SatGate path: Observe → Control → Prove</h3>
             <p className="mb-4 text-gray-300">
-              Start by observing agent, API, and MCP usage. Move to checks before the request goes through when budgets, scopes, and revocation need to stop bad calls before they run. Preserve signed receipts so every allow, deny, and budget decision can be verified later.
+              Start by observing agent, API, and MCP usage. Move to checks before the request goes through when budgets, scopes, and revocation need to stop bad calls before they run. Preserve signed receipts so budget spends, payments and refusals can be verified later.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">See how rules and receipts work →</Link>

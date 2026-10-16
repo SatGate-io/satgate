@@ -421,7 +421,7 @@ export API_BASE_URL=https://api.satgate.io/v1
 
           <div className="mt-12 p-6 bg-gray-900/50 border border-gray-800 rounded-lg">
             <p className="text-gray-300 mb-4">
-              SatGate provides open-source spending controls for API teams. Add budget enforcement to your APIs in minutes:
+              SatGate's open-source gateway adds spending controls for API teams. Add budget enforcement to your APIs:
             </p>
             <pre className="bg-gray-900/70 rounded p-3 text-sm overflow-x-auto">
               <code className="text-green-300">{`go install github.com/satgate-io/satgate/cmd/satgate-mcp@latest`}</code>

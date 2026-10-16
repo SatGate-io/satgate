@@ -211,7 +211,7 @@ export default function LlmCostMonitoringPage() {
             {[
               ['/build', 'Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.'],
               ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with the snippet from MCP Setup.'],
-              ['/policy-to-proof', 'Rules and Receipts', 'How each decision becomes a signed receipt.'],
+              ['/policy-to-proof', 'Rules and Receipts', 'How spends, payments and refusals become signed receipts.'],
               ['/economic-firewall-readiness-grader', 'Readiness grader', 'Find gaps across identity, budgets, routing, revocation, signed receipts, and payment details.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-purple-500/50 hover:bg-purple-950/20">

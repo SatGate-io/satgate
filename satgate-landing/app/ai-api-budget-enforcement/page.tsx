@@ -129,7 +129,7 @@ export default function Page() {
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Budget before forwarding</h3><p className="leading-relaxed text-gray-400">Check remaining daily, session, per-agent, per-tool, and per-request budget before traffic reaches the upstream provider.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Policy by agent and workflow</h3><p className="leading-relaxed text-gray-400">Separate budgets by tenant, workflow, route, model, MCP server, delegated sub-agent, and task instead of one account-level cap.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Stop loops automatically</h3><p className="leading-relaxed text-gray-400">Deny the next request when a loop, retry storm, fanout chain, or high-cost tool call crosses policy.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Audit every decision</h3><p className="leading-relaxed text-gray-400">Record allow/deny decisions with identity, route, estimated cost, budget remaining, policy, and revocation state.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Audit allow and deny decisions</h3><p className="leading-relaxed text-gray-400">Record allow/deny decisions with identity, route, estimated cost, budget remaining, policy, and revocation state.</p></div>
           </div>
         </div>
       </section>

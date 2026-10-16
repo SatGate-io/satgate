@@ -274,7 +274,7 @@ const agentBToken = attenuate(agentAToken, {
               </div>
               <div>
                 <p className="text-white font-semibold text-lg">Prove</p>
-                <p className="text-gray-400">Preserve signed receipts for allowed, denied, delegated, revoked, and payment-method decisions. Payment methods such as L402 or x402 can move value; the governance layer proves why access was allowed.</p>
+                <p className="text-gray-400">Preserve signed receipts for budget spends, payments and refusals. Payment methods such as L402 or x402 can move value; the governance layer proves why access was allowed.</p>
               </div>
             </div>
           </div>

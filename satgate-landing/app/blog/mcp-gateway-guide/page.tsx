@@ -636,7 +636,7 @@ Orchestrator (10,000 credits)
 
           <div className="mt-12 p-6 bg-gray-900/50 border border-gray-800 rounded-lg">
             <p className="text-gray-300 mb-4">
-              SatGate adds spending controls to your MCP gateway. Open source, deploys in minutes:
+              SatGate adds spending controls to your MCP gateway. The MCP proxy is open source:
             </p>
             <pre className="bg-gray-900/70 rounded p-3 text-sm overflow-x-auto">
               <code className="text-green-300">{`go install github.com/satgate-io/satgate/cmd/satgate-mcp@latest`}</code>

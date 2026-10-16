@@ -169,7 +169,7 @@ export default function SatGateIntegrationPage() {
               <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">1</span><span>Place SatGate in front of APIs, MCP servers, or model/provider routes used by Claude Code.</span></li>
               <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">2</span><span>Issue a short-lived capability token for each coding task or session.</span></li>
               <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">3</span><span>Attach caveats for route, tool, spend, delegation and expiry.</span></li>
-              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">4</span><span>Revoke or narrow the capability immediately when the task is complete or risky.</span></li>
+              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">4</span><span>Revoke or narrow the capability before its next request when the task is complete or risky.</span></li>
         </ol>
       </section>
 

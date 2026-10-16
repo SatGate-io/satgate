@@ -163,7 +163,7 @@ export default function ToolsPage() {
         name: 'How do these tools relate to an economic firewall?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'The calculators estimate the risk. SatGate enforces budgets, permissions and revocation before the request goes through, and signs a receipt for each decision.',
+          text: 'The calculators estimate the risk. SatGate enforces budgets, permissions and revocation before the request goes through, and signs receipts for spends, payments and refusals.',
         },
       },
     ],
@@ -251,7 +251,7 @@ export default function ToolsPage() {
             ],
             [
               'How do these tools relate to an economic firewall?',
-              'The calculators estimate the risk. SatGate enforces budgets, permissions and revocation before the request goes through, and signs a receipt for each decision.',
+              'The calculators estimate the risk. SatGate enforces budgets, permissions and revocation before the request goes through, and signs receipts for spends, payments and refusals.',
             ],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">

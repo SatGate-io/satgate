@@ -589,7 +589,7 @@ export default function SandboxPage() {
             Try SatGate in your browser.
           </h2>
           <p className="mx-auto max-w-3xl text-lg leading-relaxed text-gray-400">
-            Start with the 90-second walkthrough, then try each part on its own: tokens, access limits, budgets and payments. Every step links to its receipt.
+            Start with the 90-second walkthrough, then try each part on its own: tokens, access limits, budgets and payments. Each refusal links to its receipt.
           </p>
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="#golden-path" className="text-purple-300 hover:text-purple-200 text-sm font-semibold underline underline-offset-4 transition">

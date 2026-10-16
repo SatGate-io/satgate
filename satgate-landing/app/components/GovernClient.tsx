@@ -223,7 +223,7 @@ export default function GovernPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-lg">CISO</h3>
-                  <span className="text-xs text-red-400 font-medium">Revocation proof</span>
+                  <span className="text-xs text-red-400 font-medium">Revocation</span>
                 </div>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed mb-3">
