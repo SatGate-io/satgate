@@ -119,15 +119,15 @@ const faqs = [
 ];
 
 const relatedTopics = [
-  ["/policy-to-proof", "Rules and Receipts", "Turn every mint, delegation, paid call, denial, and revocation into receipts and an exportable signed receipt (Evidence Pack)."],
-  ["/mcp", "MCP governance", "Apply budget, revocation, and audit controls to agent tool calls."],
-  ["/agent-api-governance", "Agent API governance", "Replace broad API keys with policy-bound, auditable agent permissions."],
-  ["/agent-capability-tokens", "Agent capability tokens", "Encode route, budget, expiry, delegation, and revocation into agent access."],
-  ["/revocable-agent-credentials", "Revocable agent credentials", "Kill agent access without rotating every upstream provider secret."],
-  ["/economic-firewall", "Economic firewall", "Enforcement before the request goes through, for agent access, spend, and governed paid calls."],
-  ["/ai-agent-cost-control", "AI agent cost control", "Control model, API, MCP, and delegated sub-agent spend before cost is created."],
-  ["/economic-firewall-readiness-grader", "Economic firewall readiness grader", "Score identity, budgets, revocation, audit, routing, MCP, and paid-call governance readiness."],
-  ["/satgate-for-hermes-agent", "SatGate for Hermes Agent", "Govern local Hermes/Open WebUI agent workflows with SatGate checking each request before it goes through."],
+  ["/policy-to-proof", "Rules and Receipts", "How SatGate checks each request against your rules, and when it signs a receipt."],
+  ["/mcp", "MCP governance", "Budgets, allowed tools and an off switch for your agents' tool calls."],
+  ["/agent-api-governance", "Agent API governance", "Give each agent its own limited token instead of a shared API key."],
+  ["/agent-capability-tokens", "Agent capability tokens", "What an agent's token carries: the routes it can use, the budget it spends from and its end date."],
+  ["/revocable-agent-credentials", "Revocable agent credentials", "Stop one agent without changing the keys anything else uses."],
+  ["/economic-firewall", "Economic firewall", "Budgets for your agents, and payment from external agents, on the routes you choose."],
+  ["/ai-agent-cost-control", "AI agent cost control", "Set budgets for your agents and their helpers, and see what each one spends."],
+  ["/economic-firewall-readiness-grader", "Economic firewall readiness grader", "Score how ready your agent setup is, from budgets and revoke to receipts and MCP."],
+  ["/satgate-for-hermes-agent", "SatGate for Hermes Agent", "Put limits on local Hermes and Open WebUI agents, with SatGate checking each request before it goes through."],
 ];
 
 const closingHeading = "Give every agent its own limits, and keep the off switch.";
@@ -336,7 +336,7 @@ export default function AgentControlPlanePage() {
 
       <section className="border-t border-white/10 bg-white/[0.025] px-5 py-16 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-7xl">
-          <h2 className="text-3xl font-black tracking-[-0.04em] text-white">Related agent-governance topics</h2>
+          <h2 className="text-3xl font-black tracking-[-0.04em] text-white">Related pages</h2>
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {relatedTopics.map(([href, title, body]) => (
               <Link key={href} href={href} className="min-w-0 rounded-3xl border border-white/10 bg-[#07111f] p-5 transition hover:border-cyan-400/50 hover:bg-cyan-400/10">
