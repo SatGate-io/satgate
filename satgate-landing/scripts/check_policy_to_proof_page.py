@@ -143,7 +143,7 @@ required_phrases = [
 govern_required_phrases = [
     "Govern what agents can do",
     "Prove every decision",
-    "Observe agent activity, Control scopes, budgets, delegation, and revocation before the agent acts",
+    "SatGate checks each request against them before it reaches the service.",
     "Payment proves value moved; SatGate proves authority was evaluated.",
     "Govern first. Enforce before execution. Prove every decision afterward.",
     "Receipt exports",
