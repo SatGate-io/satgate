@@ -1,6 +1,10 @@
 package mcpserver
 
-import "context"
+import (
+	"context"
+
+	"github.com/rs/zerolog/log"
+)
 
 // EnforcementModeResolver returns the enforcement mode that applies to one
 // tools/call, given the tenant of the token that made it. A host that serves
@@ -10,7 +14,8 @@ import "context"
 // The answer must be "observe" or "control" (the legacy names shadow,
 // chargeback, soft, hard and fiat402 are accepted). Anything else, an empty
 // answer included, is read as "control": a call whose mode cannot be
-// resolved is blocked on exhaustion, never allowed through.
+// resolved is blocked on exhaustion, never allowed through. A resolver that
+// panics is read the same way (see resolveEnforcementMode).
 type EnforcementModeResolver func(ctx context.Context, tenantID string) string
 
 // ctxEnforcementMode carries the mode a tools/call was decided under, so that
@@ -44,11 +49,27 @@ func (p *Proxy) enforcementModeFor(ctx context.Context, tenantID string) string 
 	if mode, ok := EnforcementModeFromContext(ctx); ok {
 		return mode
 	}
-	switch mode := normalizeEnforcementMode(p.modeResolver(ctx, tenantID)); mode {
+	switch mode := p.resolveEnforcementMode(ctx, tenantID); mode {
 	case "observe", "control":
 		return mode
 	}
 	return "control"
+}
+
+// resolveEnforcementMode calls the host's resolver at the resolution boundary.
+// A resolver that panics decides the call as control: the panic is contained
+// here, so it never leaves tools/call, and the one log line says that it
+// happened without the panic value, which could carry a tenant's data or a
+// credential. The call is then refused on exhaustion like any other control
+// call.
+func (p *Proxy) resolveEnforcementMode(ctx context.Context, tenantID string) (mode string) {
+	defer func() {
+		if recover() != nil {
+			log.Error().Msg("enforcement mode resolver panicked; deciding the call as control")
+			mode = "control"
+		}
+	}()
+	return normalizeEnforcementMode(p.modeResolver(ctx, tenantID))
 }
 
 // withResolvedEnforcementMode returns the call's mode and a context that
