@@ -60,7 +60,7 @@ const questions: Question[] = [
     id: 'paidRails',
     category: 'Payment details',
     prompt: 'When value moves across payment methods, can you preserve payment context alongside authority, denial, delegation, and revocation evidence?',
-    fix: 'Govern paid calls across x402, L402, AgentCore Payments, Pay.sh, API-key billing, or enterprise ledgers without making payment the center of the control model.',
+    fix: 'Govern paid calls across x402 and L402 (AgentCore Payments and Pay.sh are planned) without making payment the center of the control model.',
   },
 ];
 
@@ -127,7 +127,7 @@ export default function EconomicFirewallReadinessGraderPage() {
     mainEntity: [
       { '@type': 'Question', name: 'What is economic firewall readiness?', acceptedAnswer: { '@type': 'Answer', text: 'Economic firewall readiness measures whether an organization can observe, control, audit, revoke, route, budget, and preserve payment details for AI agent/API activity before requests execute.' } },
       { '@type': 'Question', name: 'What score means we are ready for autonomous agents?', acceptedAnswer: { '@type': 'Answer', text: 'A score above 85 means most core checks before the request goes through are in place. Lower scores indicate gaps in identity, budget enforcement, MCP governance, revocation, audit, routing, or payment.' } },
-      { '@type': 'Question', name: 'How does SatGate improve readiness?', acceptedAnswer: { '@type': 'Answer', text: 'On each request that goes through SatGate, it can observe agent/API activity, enforce budget and access policy, revoke scoped capabilities, preserve a signed receipt, route economically, and apply payment rules when value moves.' } },
+      { '@type': 'Question', name: 'How does SatGate improve readiness?', acceptedAnswer: { '@type': 'Answer', text: 'On each request that goes through SatGate, it can observe agent and API activity, enforce budget and access policy, revoke scoped capabilities, sign receipts and apply payment rules when value moves.' } },
       { '@type': 'Question', name: 'Which gaps should teams fix first?', acceptedAnswer: { '@type': 'Answer', text: 'Teams should fix request attribution, hard budget enforcement, MCP tool policy, scoped revocable credentials, and signed receipt capture first because those controls stop unauthorized actions before execution.' } },
       { '@type': 'Question', name: 'Is a dashboard enough for economic firewall readiness?', acceptedAnswer: { '@type': 'Answer', text: 'No. Dashboards help explain activity after it happens, but economic firewall readiness requires checks before the request goes through that can allow, deny, route, revoke, delegate, or preserve payment details before agents execute work.' } },
     ],
@@ -269,7 +269,7 @@ export default function EconomicFirewallReadinessGraderPage() {
             {[
               ['What is economic firewall readiness?', 'Economic firewall readiness measures whether an organization can observe, control, audit, revoke, route, budget, and preserve payment details for AI agent/API activity before requests execute.'],
               ['What score means we are ready for autonomous agents?', 'A score above 85 means most core checks before the request goes through are in place. Lower scores indicate gaps in identity, budget enforcement, MCP governance, revocation, audit, routing, or payment.'],
-              ['How does SatGate improve readiness?', 'On each request that goes through SatGate, it can observe agent/API activity, enforce budget and access policy, revoke scoped capabilities, preserve a signed receipt, route economically, and apply payment rules when value moves.'],
+              ['How does SatGate improve readiness?', 'On each request that goes through SatGate, it can observe agent and API activity, enforce budget and access policy, revoke scoped capabilities, sign receipts and apply payment rules when value moves.'],
               ['Which gaps should teams fix first?', 'Teams should fix request attribution, hard budget enforcement, MCP tool policy, scoped revocable credentials, and signed receipt capture first because those controls stop unauthorized actions before execution.'],
               ['Is a dashboard enough for economic firewall readiness?', 'No. Dashboards help explain activity after it happens, but economic firewall readiness requires checks before the request goes through that can allow, deny, route, revoke, delegate, or preserve payment details before agents execute work.'],
             ].map(([question, answer]) => (
@@ -286,7 +286,7 @@ export default function EconomicFirewallReadinessGraderPage() {
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-purple-950/30 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Move weak areas to checks before the request goes through</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            SatGate checks permission before the agent acts: Observe every agent call, Control risky requests before they execute, and keep a signed receipt for allowed, denied, delegated, revoked, or paid decisions.
+            SatGate checks permission before the agent acts: Observe every agent call, Control risky requests before they execute, and keep a signed receipt for spends, payments and refusals.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">

@@ -5,7 +5,7 @@ export const metadata = {
   title: "API Monetization for AI Agents: Pricing, Billing, L402, and Metering",
   description: "How to monetize APIs for AI agents with machine-readable pricing, metering before the request goes through, budget enforcement, and charging external agents.",
   alternates: { canonical: 'https://satgate.io/blog/api-monetization-ai' },
-  keywords: ['API monetization AI', 'API monetization for AI agents', 'monetize API AI', 'AI agent billing', 'machine-to-machine payments', 'API pricing AI agents', 'payment rules that work with any payment method'],
+  keywords: ['API monetization AI', 'API monetization for AI agents', 'monetize API AI', 'AI agent billing', 'machine-to-machine payments', 'API pricing AI agents', 'payment rules for L402 and x402'],
   openGraph: {
     title: 'API Monetization for AI Agents: Pricing, Billing, and L402',
     description: 'Monetize APIs for AI agents with machine-readable pricing, metering before the request goes through, budget enforcement, and charging external agents.',

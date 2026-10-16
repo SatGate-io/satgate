@@ -38,7 +38,7 @@ export default function ApiGatewayForAiAgentsBlogPage() {
       { '@type': 'Thing', name: 'agent-aware budget enforcement' },
       { '@type': 'Thing', name: 'MCP tool cost control' },
       { '@type': 'Thing', name: 'scoped capability tokens for APIs' },
-      { '@type': 'Thing', name: 'payment rules that work with any payment method' },
+      { '@type': 'Thing', name: 'payment rules for L402 and x402' },
       { '@type': 'Thing', name: 'Observe Control Prove' },
       { '@type': 'Thing', name: 'signed receipts' },
     ],

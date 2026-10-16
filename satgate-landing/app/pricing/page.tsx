@@ -58,7 +58,7 @@ const PricingPage = () => {
       { '@type': 'Thing', name: 'AI agent budget enforcement' },
       { '@type': 'Thing', name: 'SatGate Economic Firewall' },
       { '@type': 'Thing', name: 'AI agent spending limits' },
-      { '@type': 'Thing', name: 'payment rules that work with any payment method' },
+      { '@type': 'Thing', name: 'payment rules for L402 and x402' },
     ],
   };
 

@@ -103,7 +103,7 @@ const goldenPathSteps: Array<{
     reason: 'tenant=acme-finance; scope=/v1/invoices/*; budget<=3.00 USD',
     route: 'agent:invoice-reconciler-worker',
     budget: '3.00 USD budget',
-    receipt: 'rcpt_demo_001 / rcpt_demo_002',
+    receipt: 'none: issuing a token is an audit log entry',
     tone: 'issued',
   },
   {
@@ -143,7 +143,7 @@ const goldenPathSteps: Array<{
     reason: 'capability_revoked',
     route: 'mcp:invoices.search',
     budget: 'Nothing spent after the revoke',
-    receipt: 'rcpt_demo_008 / rcpt_demo_009',
+    receipt: 'rcpt_demo_009 (the refused request)',
     tone: 'revoked',
   },
 ];
@@ -182,7 +182,7 @@ function GoldenPathSection() {
         <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
           <div>
             <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-5xl">
-              One agent, allowed, blocked and revoked, with a receipt for every step.
+              One agent, allowed, blocked and revoked. Each block gets a receipt.
             </h2>
             <p className="mt-5 text-lg leading-8 text-gray-300">
               This walkthrough is a simulation with sample data, so it runs the same way every time. The receipts match the sample signed receipt (Evidence Pack) in the viewer. To see SatGate on production, watch the <Link href="/#see-it-live" className="text-cyan-300 underline hover:text-cyan-200">two recordings on the home page</Link>.
@@ -547,7 +547,7 @@ export default function SandboxPage() {
       {
         '@type': 'Question',
         name: 'Is the demo for AI agent cost control or security?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Both. SatGate checks permissions and budget on the same request, so one gateway handles access limits and spending limits, with a receipt for each decision.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'Both. SatGate checks permissions and budget on the same request, so one gateway handles access limits and spending limits, with a receipt for each refusal and each spend.' },
       },
     ],
   };
@@ -781,7 +781,7 @@ export default function SandboxPage() {
             {[
               ['What does the SatGate demo show?', 'Four things: creating a token for an agent, limiting what it can call, capping what it can spend, and charging external agents before they get in.'],
               ['How does SatGate stop unauthorized agent spend?', 'Before SatGate forwards a request, it checks who the agent is, what its token allows, how much budget is left and whether the token was revoked. If any check fails, the request stops at SatGate.'],
-              ['Is the demo for AI agent cost control or security?', 'Both. SatGate checks permissions and budget on the same request, so one gateway handles access limits and spending limits, with a receipt for each decision.'],
+              ['Is the demo for AI agent cost control or security?', 'Both. SatGate checks permissions and budget on the same request, so one gateway handles access limits and spending limits, with a receipt for each refusal and each spend.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
                 <h3 className="mb-2 font-bold text-white">{question}</h3>

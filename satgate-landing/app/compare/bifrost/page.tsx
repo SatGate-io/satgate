@@ -25,7 +25,7 @@ export default function CompareBifrostPage() {
     '@type': 'WebPage',
     name: 'SatGate vs Bifrost',
     url: 'https://satgate.io/compare/bifrost',
-    description: 'Compare SatGate and Bifrost AI gateways for LLM routing, agent spend governance, per-tool budgets, and payment rules that work with any payment method.',
+    description: 'Compare SatGate and Bifrost AI gateways for LLM routing, agent spend governance, per-tool budgets, and payment rules for L402 and x402.',
     datePublished: '2026-04-30',
     dateModified: '2026-05-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -46,7 +46,7 @@ export default function CompareBifrostPage() {
         name: 'What is the main difference between SatGate and Bifrost?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Bifrost focuses on routing LLM traffic across providers. SatGate focuses on spending controls: hard budget enforcement, per-tool cost attribution, scoped agent credentials, and payment rules that work with any payment method.',
+          text: 'Bifrost focuses on routing LLM traffic across providers. SatGate focuses on spending controls: hard budget enforcement, per-tool cost attribution, scoped agent credentials, and payment rules for L402 and x402.',
         },
       },
       {
@@ -127,7 +127,7 @@ export default function CompareBifrostPage() {
                   <td className="py-4 text-center"><X className="inline text-red-400" size={18} /></td>
                 </tr>
                 <tr className="border-b border-gray-800">
-                  <td className="py-4 font-medium text-gray-300">Fiat-denominated budget control</td>
+                  <td className="py-4 font-medium text-gray-300">Credit budgets with a configurable unit</td>
                   <td className="py-4 text-center"><Check className="inline text-green-400" size={18} /></td>
                   <td className="py-4 text-center"><X className="inline text-red-400" size={18} /></td>
                 </tr>
@@ -341,7 +341,7 @@ export default function CompareBifrostPage() {
           <h2 className="text-xl font-bold mb-6">SatGate vs Bifrost questions</h2>
           <div className="space-y-5">
             {[
-              ['What is the main difference between SatGate and Bifrost?', 'Bifrost focuses on routing LLM traffic across providers. SatGate focuses on spending controls: hard budget enforcement, per-tool cost attribution, scoped agent credentials, and payment rules that work with any payment method.'],
+              ['What is the main difference between SatGate and Bifrost?', 'Bifrost focuses on routing LLM traffic across providers. SatGate focuses on spending controls: hard budget enforcement, per-tool cost attribution, scoped agent credentials, and payment rules for L402 and x402.'],
               ['Can SatGate and Bifrost be used together?', 'Yes. SatGate can sit before Bifrost to enforce budget and policy controls, while Bifrost handles downstream LLM routing, failover, and provider optimization.'],
               ['When should teams choose SatGate over an LLM router?', 'Choose SatGate when the priority is preventing runaway agent spend, enforcing per-agent or per-tool budgets, attributing costs to teams, or charging external agents for API access.'],
             ].map(([question, answer]) => (

@@ -300,7 +300,7 @@ export default function WhyProcessWontScaleBlogPage() {
               {' · '}
               <a href="https://satgate.io/pricing" className="text-cyan-400 hover:text-cyan-300">Pricing →</a>
               {' · '}
-              <a href="https://github.com/nicewook/satgate" className="text-cyan-400 hover:text-cyan-300">GitHub →</a>
+              <a href="https://github.com/SatGate-io/satgate" className="text-cyan-400 hover:text-cyan-300">GitHub →</a>
             </p>
           </div>
 

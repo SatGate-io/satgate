@@ -63,7 +63,7 @@ export default function SatGateIntegrationPage() {
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-04',
     about: webPageJsonLd.about,
-    featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'signed receipts before the request goes through', 'payment rules that work with any payment method'],
+    featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'signed receipts before the request goes through', 'payment rules for L402 and x402'],
   };
 
   const faqJsonLd = {
