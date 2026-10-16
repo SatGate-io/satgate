@@ -31,7 +31,7 @@ export const metadata = {
 
 const flows = [
   ['Card checkout', 'Agent receives a temporary card credential and fills a merchant checkout.', 'Good for web purchases, but not request-native API monetization.'],
-  ['x402', 'API returns a 402 payment challenge for stablecoin settlement across supported chains and clients.', 'x402, AgentCore Payments, and Pay.sh still need SatGate permission checks and signed receipts above the payment method.'],
+  ['x402', 'API returns a 402 payment challenge for USDC on Base.', 'x402 payments still pass SatGate permission checks and get signed receipts. AgentCore Payments and Pay.sh are planned.'],
   ['Shared payment token', 'Agent receives a payment token for a supported 402 machine-payment flow.', 'Specific to one payment method; treat it as a subpattern of payment details that still needs governance.'],
   ['payment details', 'API returns a Lightning-backed 402 challenge and verifies proof before access.', 'Payment details can support request-native paid API access; SatGate governs the decision and receipt.'],
   ['Policy-only 402 observation', 'SatGate records and evaluates payment challenges even when another payment method completes payment.', 'Useful for audit, deny/allow rules, and spend governance.'],

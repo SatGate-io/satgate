@@ -17,7 +17,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     eyebrow: 'Managed agent payments vs spending rules you control',
     title: 'SatGate vs AWS AgentCore Payments: Agent Spending Rules Beyond AWS',
     description: 'AWS AgentCore Payments helps agents transact inside AWS. SatGate governs authority, proof from a signed receipt, MCP tools, and payment methods before execution across the multi-provider enterprise environment.',
-    verdict: 'If everything runs inside AWS AgentCore, AWS handles agent payments for you. If your agents also use OpenAI, Anthropic, local agents, MCP tools, internal APIs, your own gateways or more than one payment method, SatGate applies one set of rules across all of them.',
+    verdict: 'If everything runs inside AWS AgentCore, AWS handles agent payments for you. If your agents also use other model providers, MCP tools, internal APIs or your own gateways, SatGate applies one set of rules across them. It takes L402 and x402 payments.',
     competitorGoodAt: [
       'Managed payment enablement for agents built around AWS AgentCore patterns.',
       'Tight fit for teams standardizing agent runtime, identity, tools, and observability inside AWS.',

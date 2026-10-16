@@ -19,7 +19,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'OpenAI API Budget Limits: Stop Runaway Spend Before Calls',
-    description: 'Set per-agent, team, and workflow budgets before GPT calls execute, then prove each allow, deny, or downgrade decision.',
+    description: 'Set per-agent, team, and workflow budgets before GPT calls execute, then prove each spend and refusal.',
   },
 };
 
@@ -70,7 +70,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
         name: 'How do you set per-agent OpenAI budget limits?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Set per-agent OpenAI budget limits by routing calls through a gateway that identifies the agent, estimates or prices the request, checks remaining budget, and blocks or downgrades the call before it reaches OpenAI.',
+          text: 'Set per-agent OpenAI budget limits by routing calls through a gateway that identifies the agent, estimates or prices the request, checks remaining budget, and blocks the call before it reaches OpenAI.',
         },
       },
       {
@@ -86,7 +86,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
         name: 'How do you enforce an OpenAI API budget limit before GPT calls run?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Put a gateway in front of OpenAI, identify the agent or team, estimate the request cost from model and token policy, check remaining budget, and allow, block, or downgrade the request before it reaches the OpenAI API.',
+          text: 'Put a gateway in front of OpenAI, identify the agent or team, estimate the request cost from model and token policy, check remaining budget, and allow or block the request before it reaches the OpenAI API.',
         },
       },
     ],
@@ -118,7 +118,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
           <h1 className="text-4xl font-bold mb-4">How to Add OpenAI API Budget Limits Before Calls Run</h1>
           <div className="mb-6 rounded-2xl border border-green-900/60 bg-green-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-green-300">Direct answer</p>
-            <p className="text-gray-300">OpenAI usage limits are account-level. Controls that run before the request goes through enforce per-agent, per-team, and per-workflow budgets before a GPT call reaches OpenAI, then Prove each allow, deny, or downgrade with a signed receipt.</p>
+            <p className="text-gray-300">OpenAI usage limits are account-level. Controls that run before the request goes through enforce per-agent, per-team, and per-workflow budgets before a GPT call reaches OpenAI, then sign a receipt for each spend and refusal.</p>
           </div>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row">
             <Link href="/build" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Add a budget with SatGate</Link>
@@ -126,7 +126,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
           </div>
           
           <p className="text-xl text-gray-400 mb-6">
-            OpenAI&apos;s dashboard shows cost after it happens. SatGate-style budget authority blocks, downgrades, or routes GPT calls before spend crosses a policy line.
+            OpenAI&apos;s dashboard shows cost after it happens. SatGate blocks GPT calls before spend crosses a policy line.
           </p>
           
           <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -433,14 +433,14 @@ Do not treat that as HTTP 429.`}</code>
             <ol className="list-decimal list-inside space-y-2 text-gray-300 my-4">
               <li>Tag every OpenAI request with agent, team, customer, session, and workflow.</li>
               <li>Price the request using model, token, and tool policy before forwarding it.</li>
-              <li>Block, downgrade, queue, or require approval when the remaining budget is not enough.</li>
+              <li>Block or require approval when the remaining budget is not enough.</li>
             </ol>
           </div>
           
           <div className="bg-gray-900 border border-gray-800 p-6 rounded-lg mt-8">
             <h3 className="text-xl font-semibold mb-4">Ready to Protect Your OpenAI Spending?</h3>
             <p className="mb-4 text-gray-300">
-              SatGate is open source and takes 5 minutes to set up. Never wake up to a surprise OpenAI bill again.
+              The SatGate gateway is open source. Never wake up to a surprise OpenAI bill again.
             </p>
             <div className="flex gap-4">
               <a href="https://github.com/SatGate-io/satgate" className="inline-flex items-center px-4 py-2 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition">
@@ -466,7 +466,7 @@ Do not treat that as HTTP 429.`}</code>
 
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">How do you set per-agent OpenAI budget limits?</h3>
           <p className="text-gray-300 leading-relaxed">
-            Set per-agent OpenAI budget limits by routing calls through a gateway that identifies the agent, estimates or prices the request, checks remaining budget, and blocks or downgrades the call before it reaches OpenAI.
+            Set per-agent OpenAI budget limits by routing calls through a gateway that identifies the agent, estimates or prices the request, checks remaining budget, and blocks the call before it reaches OpenAI.
           </p>
 
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">Can you set OpenAI API budget limits by team or customer?</h3>
@@ -476,12 +476,12 @@ Do not treat that as HTTP 429.`}</code>
 
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">How do you enforce an OpenAI API budget limit before GPT calls run?</h3>
           <p className="text-gray-300 leading-relaxed">
-            Put a gateway in front of OpenAI, identify the agent or team, estimate the request cost from model and token policy, check remaining budget, and allow, block, or downgrade the request before it reaches the OpenAI API.
+            Put a gateway in front of OpenAI, identify the agent or team, estimate the request cost from model and token policy, check remaining budget, and allow or block the request before it reaches the OpenAI API.
           </p>
 
           <div className="my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">Put a budget in front of OpenAI calls</h3>
-            <p className="mb-4 text-gray-300">Give each agent a token with a credit budget, route its OpenAI calls through SatGate, and see every allow and refusal with a signed receipt.</p>
+            <p className="mb-4 text-gray-300">Give each agent a token with a credit budget, route its OpenAI calls through SatGate, and see every budget spend and refusal with a signed receipt.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/build" className="text-cyan-300 hover:text-cyan-200">Build with SatGate →</Link>
               <Link href="/ai-agent-cost-control" className="text-cyan-300 hover:text-cyan-200">AI agent cost control →</Link>

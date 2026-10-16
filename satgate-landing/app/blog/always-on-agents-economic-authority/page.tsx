@@ -321,7 +321,7 @@ export default function AlwaysOnAgentsEconomicAuthorityBlogPage() {
           </ul>
 
           <p className={paragraphClass}>
-            If the answer is yes, the action proceeds with a receipt. If the answer is no, the action is denied with a receipt.
+            If the action spends from a budget or pays, it proceeds with a receipt. If it is refused for budget, payment or permission, it is denied with a receipt.
           </p>
 
           <p className={paragraphClass}>

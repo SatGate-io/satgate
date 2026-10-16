@@ -146,7 +146,7 @@ export default function AgentApiGovernancePage() {
         '@type': 'ListItem',
         position: 2,
         name: 'Budget-aware authority',
-        description: 'Access policy includes spend limits, per-request ceilings, daily caps, tool limits, and remaining budget checks before forwarding traffic.',
+        description: 'Access policy includes spend limits, tool limits and remaining budget checks before forwarding traffic.',
       },
       {
         '@type': 'ListItem',
@@ -262,7 +262,7 @@ export default function AgentApiGovernancePage() {
           <div className="grid md:grid-cols-2 gap-5">
             {[
               ['Agent-scoped identity', 'Every request should identify the tenant, agent, task, workflow, parent agent, delegated sub-agent, token, route, and tool behind the call.'],
-              ['Budget-aware authority', 'Access policy should include spend limits, per-request ceilings, daily caps, tool limits, and remaining budget checks before forwarding traffic.'],
+              ['Budget-aware authority', 'Access policy should include spend limits, tool limits and remaining budget checks before forwarding traffic.'],
               ['Revocation before the next request', 'When an agent loops, leaks a token, or finishes a task, access can be narrowed, expired or revoked before the next request, without rotating global keys.'],
               ['Delegation with narrowing', 'Sub-agents should never inherit full parent authority. Each delegation should shrink scope, budget, lifetime, and allowed tools.'],
             ].map(([title, body]) => (

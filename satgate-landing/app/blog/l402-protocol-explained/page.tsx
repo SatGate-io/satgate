@@ -327,7 +327,7 @@ budget_id = "budget-xyz-789"
 routes:
   - path: /api/v1/translate
     target: http://localhost:8080
-    policy: l402          # Also accepts "charge" or "monetize"
+    policy: { kind: l402 }  # also accepts charge or monetize
     price_sats: 50        # Cost per request in satoshis
     description: "Translation API — per-request pricing"
 

@@ -51,7 +51,7 @@ export default function McpBudgetEnforcementGuidePage() {
         name: 'What is MCP budget enforcement?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'MCP budget enforcement prices each MCP tool call, assigns an agent or workflow budget, checks remaining budget before the tool executes, and blocks or downgrades calls that would exceed the limit.',
+          text: 'MCP budget enforcement prices each MCP tool call, assigns an agent or workflow budget, checks remaining budget before the tool executes, and blocks calls that would exceed the limit.',
         },
       },
       {
@@ -284,7 +284,7 @@ tools:
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">What is MCP budget enforcement?</h3>
                 <p className="text-gray-300 leading-relaxed mb-0">
-                  MCP budget enforcement prices each MCP tool call, assigns an agent or workflow budget, checks remaining budget before the tool executes, and blocks or downgrades calls that would exceed the limit.
+                  MCP budget enforcement prices each MCP tool call, assigns an agent or workflow budget, checks remaining budget before the tool executes, and blocks calls that would exceed the limit.
                 </p>
               </div>
               <div>

@@ -251,7 +251,7 @@ sub_agent_token = attenuate(agent_a_token, [
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            This is the key innovation for AI monetization: the token itself carries the payment contract. No central billing system needs to be queried in real-time. The gateway validates the macaroon, checks the embedded budget caveat against accumulated spend, and either allows or rejects the call. The billing happens at the point of consumption, not 30 days later.
+            This is the key innovation for AI monetization: the token itself carries the payment contract. The gateway validates the macaroon locally and checks spend against the budget in its own store, then either allows or rejects the call. The billing happens at the point of consumption, not 30 days later.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Five API Monetization Models for AI Workloads</h2>
@@ -343,7 +343,7 @@ sub_agent_token = attenuate(agent_a_token, [
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            SatGate implements this pattern as an open-source economic firewall. You define per-endpoint pricing, set budget policies, and mint macaroon tokens with embedded spending limits. The gateway handles the rest — L402 challenge-response, real-time budget tracking, cost attribution, and settlement.
+            SatGate implements this pattern as an economic firewall with an open-source core gateway. You define per-endpoint pricing, set budget policies, and mint macaroon tokens with embedded spending limits. The gateway handles the rest — L402 challenge-response, real-time budget tracking, cost attribution, and settlement.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Revenue Math: Why This Matters Now</h2>

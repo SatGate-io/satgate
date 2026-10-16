@@ -508,7 +508,7 @@ X-SatGate-Budget-Limit: 2500
               <div className="bg-gray-900 border border-cyan-500/30 rounded-xl p-4">
                 <p className="font-bold text-cyan-300 mb-1">🎛 Control ($99/mo)</p>
                 <p className="text-gray-400">
-                  Turn on budget enforcement. Hard caps, per-tool cost attribution, cascade delegation. Agents 
+                  Turn on budget enforcement. Hard caps, per-tool cost attribution, cascade delegation. HTTP agents 
                   that exceed their budget get a 402, not a surprise invoice.
                 </p>
               </div>

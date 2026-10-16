@@ -35,7 +35,7 @@ const stages = [
   { icon: Bell, title: 'Alert', body: 'Notify teams when spend crosses thresholds, but treat alerting as a signal — not the control itself.' },
   { icon: Gauge, title: 'Budget', body: 'Assign per-agent, per-session, per-route, per-tool, and per-tenant ceilings in dollars or credits.' },
   { icon: Route, title: 'Route', body: 'Move low-value calls to cheaper models or tools while reserving premium routes for justified work.' },
-  { icon: LockKeyhole, title: 'Enforce', body: 'Block, downgrade, revoke, or require payment before the upstream call executes.' },
+  { icon: LockKeyhole, title: 'Enforce', body: 'Block, revoke or require payment before the upstream call runs.' },
 ];
 
 export default function LlmCostMonitoringPage() {
@@ -73,7 +73,7 @@ export default function LlmCostMonitoringPage() {
         name: 'What is the difference between LLM cost monitoring and LLM cost control?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Monitoring observes and alerts on spend. Cost control enforces budget policy before requests execute by blocking, routing, revoking, downgrading, or requiring payment before the request goes through.',
+          text: 'Monitoring observes and alerts on spend. Cost control enforces budget policy before requests execute by blocking, revoking or requiring payment before the request goes through.',
         },
       },
       {
@@ -89,7 +89,7 @@ export default function LlmCostMonitoringPage() {
         name: 'How do you turn LLM cost monitoring signals into controls?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Convert monitoring signals into policy objects: per-agent and per-route budgets, MCP tool caps, model-routing rules, scoped capability tokens, revocation triggers, and signed receipt requirements enforced at the gateway before forwarding to upstream services.',
+          text: 'Convert monitoring signals into policy objects: per-agent and per-route budgets, MCP tool caps and scoped tokens, enforced at the gateway before forwarding to upstream services.',
         },
       },
     ],
@@ -120,7 +120,7 @@ export default function LlmCostMonitoringPage() {
             LLM Cost Monitoring Is the Warning Light. Enforcement Is the Brake.
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Monitoring tells you which models, tools, users, and agents create spend. SatGate turns that visibility into budgets on each request that goes through SatGate, routing, revocation, and structured denials before runaway cost becomes a bill.
+            Monitoring tells you which models, tools, users, and agents create spend. SatGate turns that visibility into budgets on each request that goes through SatGate, revocation and structured denials before runaway cost becomes a bill.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -144,7 +144,7 @@ export default function LlmCostMonitoringPage() {
               But autonomous agents change the failure mode. They can call tools while you sleep, retry through failures, fan out to sub-agents, and move spend from model providers into MCP servers and paid APIs.
             </p>
             <p>
-              That means monitoring must feed enforcement. When the system detects cost risk, it should not only alert a human — it should enforce budgets, route cheaper, revoke stale authority, or deny the request before spend is created.
+              That means monitoring must feed enforcement. When the system detects cost risk, it should not only alert a human — it should enforce budgets, revoke stale authority or deny the request before spend is created.
             </p>
           </div>
         </div>
@@ -186,7 +186,7 @@ export default function LlmCostMonitoringPage() {
           </div>
           {[
             ['Token spend visibility', 'Shows spend after requests execute', 'Shows spend and attaches it to enforceable policy'],
-            ['Runaway agent loops', 'Alerts when spend spikes', 'Blocks or downgrades requests before budget is exceeded'],
+            ['Runaway agent loops', 'Alerts when spend spikes', 'Blocks requests before budget is exceeded'],
             ['MCP tool cost', 'May miss non-model tool spend', 'Prices and caps each tool call before the request goes through'],
             ['Shared API keys', 'Shows account-level cost', 'Uses scoped, revocable agent permissions and attribution'],
             ['Finance controls', 'Exports reports', 'Enforces team budgets and chargeback boundaries inline'],
@@ -210,7 +210,7 @@ export default function LlmCostMonitoringPage() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {[
               ['/build', 'Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.'],
-              ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with one npx command.'],
+              ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with the snippet from MCP Setup.'],
               ['/policy-to-proof', 'Rules and Receipts', 'How each decision becomes a signed receipt.'],
               ['/economic-firewall-readiness-grader', 'Readiness grader', 'Find gaps across identity, budgets, routing, revocation, signed receipts, and payment details.'],
             ].map(([href, title, body]) => (
@@ -234,7 +234,7 @@ export default function LlmCostMonitoringPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is the difference between LLM cost monitoring and LLM cost control?</h3>
-              <p className="leading-relaxed text-gray-400">Monitoring observes and alerts on spend. Cost control enforces budget policy before requests execute by blocking, routing, revoking, downgrading, or requiring payment before the request goes through.</p>
+              <p className="leading-relaxed text-gray-400">Monitoring observes and alerts on spend. Cost control enforces budget policy before requests execute by blocking, revoking or requiring payment before the request goes through.</p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Why do AI agents need more than cost monitoring?</h3>
@@ -242,7 +242,7 @@ export default function LlmCostMonitoringPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How do you turn LLM cost monitoring signals into controls?</h3>
-              <p className="leading-relaxed text-gray-400">Convert monitoring signals into policy objects: per-agent and per-route budgets, MCP tool caps, model-routing rules, scoped capability tokens, revocation triggers, and signed receipt requirements enforced at the gateway before forwarding to upstream services.</p>
+              <p className="leading-relaxed text-gray-400">Convert monitoring signals into policy objects: per-agent and per-route budgets, MCP tool caps and scoped tokens, enforced at the gateway before forwarding to upstream services.</p>
             </div>
           </div>
         </div>

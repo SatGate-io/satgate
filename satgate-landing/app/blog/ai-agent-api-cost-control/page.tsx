@@ -57,7 +57,7 @@ export default function AiAgentApiCostControlPage() {
         name: 'How do you control AI agent API costs?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Control AI agent API costs by putting an enforcement layer before the request goes through. The layer should identify the agent, price the API or tool call, check remaining budget, apply route/model policy, and deny or downgrade requests at the gateway before forwarding.',
+          text: 'Control AI agent API costs by putting an enforcement layer before the request goes through. The layer should identify the agent, price the API or tool call, check remaining budget, apply route policy, and deny requests at the gateway before forwarding.',
         },
       },
       {
@@ -174,7 +174,7 @@ export default function AiAgentApiCostControlPage() {
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Economic firewalls: budget enforcement at the gateway layer</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            An <Link href="/govern" className="text-cyan-400 hover:text-cyan-300">AI agent governance layer</Link> is the missing layer between autonomous agents and billable APIs. It sits inline, checks the policy attached to the agent capability, and decides whether the request should be observed, controlled, proved, routed, or blocked.
+            An <Link href="/govern" className="text-cyan-400 hover:text-cyan-300">AI agent governance layer</Link> is the missing layer between autonomous agents and billable APIs. It sits inline, checks the policy attached to the agent capability, and decides whether the request should be observed, controlled or blocked.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -230,7 +230,7 @@ audit:
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">How do you control AI agent API costs?</h3>
                 <p className="text-gray-300 leading-relaxed mb-0">
-                  Put an enforcement layer before the request goes through. It should identify the agent, price the API or tool call, check remaining budget, apply route/model policy, and deny or downgrade requests at the gateway before forwarding.
+                  Put an enforcement layer before the request goes through. It should identify the agent, price the API or tool call, check remaining budget, apply route policy, and deny requests at the gateway before forwarding.
                 </p>
               </div>
               <div>

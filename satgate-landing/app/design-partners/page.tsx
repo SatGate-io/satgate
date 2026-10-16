@@ -215,7 +215,7 @@ export default function DesignPartnersPage() {
                 <h3 className="font-bold text-lg">Free Observe Mode</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Full visibility into your AI agent traffic in a bounded staging lane. See every API call, token, cost, policy decision, and signed receipt across MCP servers, REST APIs, and LLM endpoints.
+                Full visibility into your AI agent traffic in a bounded staging lane. See API calls, tokens, costs, refusals and signed receipts across MCP servers, REST APIs and LLM endpoints.
               </p>
             </div>
 

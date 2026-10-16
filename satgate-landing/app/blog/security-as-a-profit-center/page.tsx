@@ -272,7 +272,7 @@ Example:
                 <span className="text-2xl">📊</span>
                 <h4 className="text-white font-bold m-0">Days 1–14: Observe</h4>
               </div>
-              <p className="text-gray-400 text-sm mb-0">SatGate logs every tool call, cost, agent identity, and loop pattern. No blocking. No enforcement. Just data.</p>
+              <p className="text-gray-400 text-sm mb-0">SatGate logs every tool call, its cost and the token behind it, without blocking. No enforcement. Just data.</p>
             </div>
             <div className="bg-gray-900 border border-gray-800 rounded-lg p-5">
               <div className="flex items-center gap-3 mb-2">

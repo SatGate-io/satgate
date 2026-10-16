@@ -23,7 +23,7 @@ const comparisonRows = [
     feature: 'Governance Scope',
     icon: <Shield size={16} className="text-gray-400" />,
     cloud: 'Blunt — general "least privilege" IAM roles',
-    satgate: 'Granular — per-tool, per-session, per-task constraints',
+    satgate: 'Per-tool and per-token constraints',
   },
   {
     feature: 'Cost Attribution',

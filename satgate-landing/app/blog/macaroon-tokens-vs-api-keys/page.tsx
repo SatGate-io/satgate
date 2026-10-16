@@ -66,7 +66,7 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
         name: 'Can macaroon tokens enforce AI agent spending limits?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes. Budget caveats can bind a macaroon to a spending limit, task, tool, route, or customer account. A gateway can verify those caveats before each request and block or downgrade calls that exceed policy.',
+          text: 'Yes. Budget caveats can bind a macaroon to a spending limit, task, tool, route, or customer account. A gateway can verify those caveats before each request and block calls that exceed policy.',
         },
       },
       {
@@ -272,7 +272,7 @@ agent_c_macaroon = attenuate(agent_b_macaroon, [
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">Can macaroon tokens enforce AI agent spending limits?</h3>
                 <p className="text-gray-300 leading-relaxed mb-0">
-                  Yes. Budget caveats can bind a macaroon to a spending limit, task, tool, route, or customer account. A gateway verifies those caveats before each request and blocks or downgrades calls that exceed policy.
+                  Yes. Budget caveats can bind a macaroon to a spending limit, task, tool, route, or customer account. A gateway verifies those caveats before each request and blocks calls that exceed policy.
                 </p>
               </div>
               <div>

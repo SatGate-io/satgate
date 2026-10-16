@@ -268,9 +268,9 @@ export default function AiSpendGovernanceBlogPage() {
             <li>Attribute spend by user, team, tenant, agent, workflow, model, API, and tool.</li>
             <li>Set budgets by task, team, agent, capability, tenant, or workflow.</li>
             <li>Route work to the right model or tool based on cost, risk, and policy.</li>
-            <li>Block, downgrade, approve, or escalate requests before execution.</li>
+            <li>Block, approve or escalate requests before execution.</li>
             <li>Enforce delegated permissions instead of relying on broad API keys.</li>
-            <li>Create receipts for allowed and denied actions.</li>
+            <li>Create receipts for budget spends, payments and denied actions.</li>
             <li>Export evidence for finance, security, compliance, and leadership review.</li>
           </ul>
 

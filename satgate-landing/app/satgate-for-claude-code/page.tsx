@@ -30,7 +30,7 @@ export const metadata = {
 const controls = [
   { icon: DollarSign, title: 'Budget before the call runs', body: 'Check remaining spend, request ceilings, route cost, and policy before forwarding the call.' },
   { icon: KeyRound, title: 'Scoped capabilities', body: 'Replace broad static keys with expiring, revocable credentials constrained by route, tool, calls, and spend.' },
-  { icon: ShieldCheck, title: 'Revocation and kill switches', body: 'Stop a risky task, tool, or agent session immediately without rotating every shared secret.' },
+  { icon: ShieldCheck, title: 'Revocation and kill switches', body: 'Stop a risky task, tool or agent session on its next request, without rotating every shared secret.' },
   { icon: Workflow, title: 'MCP and API governance', body: 'Apply the same economic policy across MCP servers, internal APIs, model providers, and paid tools.' },
 ];
 
@@ -139,7 +139,7 @@ export default function SatGateIntegrationPage() {
           <ul className="space-y-3 text-gray-300">
               <li className="rounded-lg border border-gray-800 bg-black/60 p-4">Set hard spend ceilings for coding tasks before a runaway loop gets expensive.</li>
               <li className="rounded-lg border border-gray-800 bg-black/60 p-4">Limit which internal APIs, MCP tools, and paid resources a coding agent can reach.</li>
-              <li className="rounded-lg border border-gray-800 bg-black/60 p-4">Audit every allowed and denied request by agent run, tool, route, and budget.</li>
+              <li className="rounded-lg border border-gray-800 bg-black/60 p-4">Audit priced and refused requests by token, tool, route and budget.</li>
           </ul>
         </div>
       </section>
@@ -147,7 +147,7 @@ export default function SatGateIntegrationPage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-bold text-white">SatGate controls for Claude Code</h2>
-          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the governance layer around agentic tool use: Observe first, Control when limits are known, and record every approval, denial, and paid-access decision with signed receipts.</p>
+          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the governance layer around agentic tool use: Observe first, Control when limits are known, and record approval holds, budget and permission denials, and budget spends with signed receipts.</p>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {controls.map(({ icon: Icon, title, body }) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-black p-6 transition hover:border-cyan-900/70">
@@ -168,7 +168,7 @@ export default function SatGateIntegrationPage() {
         <ol className="space-y-5 text-gray-300">
               <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">1</span><span>Place SatGate in front of APIs, MCP servers, or model/provider routes used by Claude Code.</span></li>
               <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">2</span><span>Issue a short-lived capability token for each coding task or session.</span></li>
-              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">3</span><span>Attach caveats for route, model, calls, spend, delegation, and expiry.</span></li>
+              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">3</span><span>Attach caveats for route, tool, spend, delegation and expiry.</span></li>
               <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">4</span><span>Revoke or narrow the capability immediately when the task is complete or risky.</span></li>
         </ol>
       </section>

@@ -72,7 +72,7 @@ const tools = [
   {
     href: '/mcp-proxy-config-generator',
     title: 'MCP connect snippet',
-    description: 'The real Cloud MCP snippet for Cursor and Claude Code. Credits, not a dollar budget.',
+    description: 'The real Cloud MCP snippets for Cursor, Claude Desktop, Claude Code and OpenClaw. Credits, not a dollar budget.',
     icon: Wrench,
   },
   {

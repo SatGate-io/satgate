@@ -86,7 +86,7 @@ export default function LlmCostDashboardPage() {
         name: 'Is an LLM cost dashboard enough to stop runaway spend?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. Dashboards and alerts show spend after or during usage. Autonomous agents need budget checks before the request goes through that can block, downgrade, route, or revoke requests before expensive calls execute.',
+          text: 'No. Dashboards and alerts show spend after or during usage. Autonomous agents need budget checks before the request goes through that can block or revoke requests before expensive calls execute.',
         },
       },
       {
@@ -94,7 +94,7 @@ export default function LlmCostDashboardPage() {
         name: 'How does SatGate turn LLM cost dashboards into enforcement?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate observes agent/API spend, attributes it by agent and route, then enforces budgets, revocation, routing, and MCP tool policy on each request that goes through SatGate, before forwarding to upstream services.',
+          text: 'SatGate observes agent/API spend, attributes it by agent and route, then enforces budgets, revocation and MCP tool policy on each request that goes through SatGate, before forwarding to upstream services.',
         },
       },
       {
@@ -102,7 +102,7 @@ export default function LlmCostDashboardPage() {
         name: 'What should teams do after finding LLM spend risk?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Turn the dashboard finding into enforceable policy: set per-agent budgets, MCP tool caps, model-routing rules, scoped token authority, revocation triggers, and signed receipt (Evidence Pack) fields before the request goes through.',
+          text: 'Turn the dashboard finding into enforceable policy: set per-agent budgets, MCP tool caps, scoped token authority and revocation before the request goes through.',
         },
       },
     ],
@@ -216,12 +216,12 @@ export default function LlmCostDashboardPage() {
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">From dashboard to control</p>
           <h2 className="mb-4 text-3xl font-bold text-white">Convert cost visibility into policy</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
-            A dashboard should not be a dead end. Once it exposes spend risk, generate the policy objects that let SatGate block, route, revoke, or issue a signed receipt (Evidence Pack) on the next request.
+            A dashboard should not be a dead end. Once it exposes spend risk, set the limits that let SatGate block, revoke or sign a receipt on the next request.
           </p>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {[
               ['/build', 'Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.'],
-              ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with one npx command.'],
+              ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with the snippet from MCP Setup.'],
               ['/policy-to-proof', 'Rules and Receipts', 'How each decision becomes a signed receipt.'],
               ['/runaway-agent-cost-calculator', 'Runaway cost calculator', 'Estimate what a looping or retrying agent can spend in an hour.'],
             ].map(([href, title, body]) => (
@@ -245,15 +245,15 @@ export default function LlmCostDashboardPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Is an LLM cost dashboard enough to stop runaway spend?</h3>
-              <p className="leading-relaxed text-gray-400">No. Dashboards and alerts show spend after or during usage. Autonomous agents need budget checks before the request goes through that can block, downgrade, route, or revoke requests before expensive calls execute.</p>
+              <p className="leading-relaxed text-gray-400">No. Dashboards and alerts show spend after or during usage. Autonomous agents need budget checks before the request goes through that can block or revoke requests before expensive calls execute.</p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate turn LLM cost dashboards into enforcement?</h3>
-              <p className="leading-relaxed text-gray-400">SatGate observes agent/API spend, attributes it by agent and route, then enforces budgets, revocation, routing, and MCP tool policy on each request that goes through SatGate, before forwarding to upstream services.</p>
+              <p className="leading-relaxed text-gray-400">SatGate observes agent/API spend, attributes it by agent and route, then enforces budgets, revocation and MCP tool policy on each request that goes through SatGate, before forwarding to upstream services.</p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What should teams do after finding LLM spend risk?</h3>
-              <p className="leading-relaxed text-gray-400">Turn the dashboard finding into enforceable policy: set per-agent budgets, MCP tool caps, model-routing rules, scoped token authority, revocation triggers, and signed receipt (Evidence Pack) fields before the request goes through.</p>
+              <p className="leading-relaxed text-gray-400">Turn the dashboard finding into enforceable policy: set per-agent budgets, MCP tool caps, scoped token authority and revocation before the request goes through.</p>
             </div>
           </div>
         </div>
