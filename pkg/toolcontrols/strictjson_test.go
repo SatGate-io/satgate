@@ -2,8 +2,11 @@ package toolcontrols
 
 import (
 	"encoding/json"
+	"errors"
+	"math"
 	"math/rand"
 	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -108,6 +111,69 @@ func TestCallHashRefusesWhatCannotBeReadWithoutLoss(t *testing.T) {
 	} {
 		if _, err := CallHash("tok", "place", call(`{"n":`+n+`}`)); err != nil {
 			t.Errorf("%s: refused: %v", name, err)
+		}
+	}
+}
+
+// Review comment 6095724731 on #227: the leading-digit bound let 9e308 through,
+// though it is above math.MaxFloat64 and encoding/json refuses it as an
+// overflow. A number above math.MaxFloat64 in magnitude is refused, positive
+// or negative, at any depth, in the same way as 1e999 (ErrCallUnreadable,
+// "number is outside the exact range"); the largest finite binary64 and
+// everything below it stay allowed.
+func TestNumbersAboveMaxFloat64AreRefused(t *testing.T) {
+	const want = "the call could not be read: number is outside the exact range"
+	refused := map[string]string{
+		"9e308":                  `{"n":9e308}`,
+		"-9e308":                 `{"n":-9e308}`,
+		"1e309":                  `{"n":1e309}`,
+		"1.8e308":                `{"n":1.8e308}`,
+		"one past the max":       `{"n":1.7976931348623158e308}`,
+		"-one past the max":      `{"n":-1.7976931348623158e308}`,
+		"upper-case E":           `{"n":9E+308}`,
+		"spelled as an integer":  `{"n":18e307}`,
+		"spelled as a fraction":  `{"n":0.9e309}`,
+		"nested":                 `{"legs":[{"a":{"b":[1,{"c":9e308}]}}]}`,
+		"nested negative":        `{"legs":[[[-9e308]]]}`,
+		"in _meta":               `{}, "_meta":{"x":[9e308]}`,
+		"top level of arguments": `9e308`,
+	}
+	for name, args := range refused {
+		p := json.RawMessage(`{"name":"place","arguments":` + args + `}`)
+		err := CheckCallLossless(p)
+		if err == nil {
+			t.Errorf("%s: CheckCallLossless accepted it", name)
+			continue
+		}
+		if !errors.Is(err, ErrCallUnreadable) || err.Error() != want {
+			t.Errorf("%s: error = %v, want %q", name, err, want)
+		}
+		if h, err := CallHash("tok", "place", p); err == nil {
+			t.Errorf("%s: hashed to %s", name, h)
+		} else if !errors.Is(err, ErrCallUnreadable) || err.Error() != want {
+			t.Errorf("%s: CallHash error = %v, want %q", name, err, want)
+		}
+	}
+	for name, n := range map[string]string{
+		"max":                "1.7976931348623157e308",
+		"-max":               "-1.7976931348623157e308",
+		"max as an integer":  "17976931348623157e292",
+		"max as a fraction":  "0.17976931348623157e309",
+		"1e308":              "1e308",
+		"-1e308":             "-1e308",
+		"1.79e308":           "1.79e308",
+		"zero, big exponent": "0e999",
+	} {
+		p := call(`{"n":` + n + `}`)
+		if err := CheckCallLossless(p); err != nil {
+			t.Errorf("%s: refused: %v", name, err)
+		}
+		if _, err := CallHash("tok", "place", p); err != nil {
+			t.Errorf("%s: CallHash refused: %v", name, err)
+		}
+		// Every number allowed here is finite for a float reader.
+		if f, err := strconv.ParseFloat(n, 64); err != nil || math.IsInf(f, 0) {
+			t.Errorf("%s: ParseFloat = %v, %v", name, f, err)
 		}
 	}
 }
