@@ -379,6 +379,12 @@ const LandingPage = () => {
               <span>✓ Revoke works on the next request</span>
               <span>✓ Signed receipts</span>
             </div>
+            <p className="mt-4 rounded-lg border border-purple-500/40 bg-purple-950/40 px-4 py-3 text-sm leading-relaxed text-purple-100">
+              Your rules sit outside the model. Limits, receipts and the off switch live in SatGate, where no prompt or model provider can change them.
+            </p>
+            <Link href="/govern" className="mt-3 inline-flex items-center text-sm font-medium text-purple-300 hover:text-purple-200 transition">
+              Zero trust for AI agents →
+            </Link>
           </div>
 
           {/* Your Agents */}
