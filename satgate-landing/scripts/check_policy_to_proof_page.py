@@ -192,7 +192,7 @@ acp_required_phrases = [
     "One place to connect agents to your APIs and MCP tools, with limits per agent instead of shared keys.",
     "Evidence the model didn't write.",
     "Research agent: 5,000 credits, 3 tools, ends Friday",
-    "Helper: 1,000 credits carved from those 5,000, 1 of those tools, can't hand off again",
+    "Helper: 1,000 credits carved from those 5,000, and 1 of those tools",
     "The helper calls a tool it wasn't given: refused, with a signed receipt",
     "Platform team",
     "Security team",

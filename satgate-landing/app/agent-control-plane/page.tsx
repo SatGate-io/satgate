@@ -59,7 +59,7 @@ const exampleTitle = "Example: one agent and one helper";
 
 const exampleLines = [
   "Research agent: 5,000 credits, 3 tools, ends Friday",
-  "Helper: 1,000 credits carved from those 5,000, 1 of those tools, can't hand off again",
+  "Helper: 1,000 credits carved from those 5,000, and 1 of those tools",
   "The helper calls a tool it wasn't given: refused, with a signed receipt",
   "You revoke the research agent: the helper's next request is refused too",
 ];
@@ -75,7 +75,7 @@ const proofPoints = [
   {
     icon: GitBranch,
     title: "Handoffs that only narrow.",
-    body: "An agent can give a helper part of what it has: the same tools or fewer, and a budget carved out of what it has left. It can never pass on more. You can also limit how many levels of handoff a token allows, down to none.",
+    body: "An agent can give a helper part of what it has: the same tools or fewer, and a budget carved out of what it has left. It can never pass on more.",
   },
   {
     icon: TimerReset,
@@ -114,7 +114,7 @@ const faqs = [
   ],
   [
     "How does SatGate control handoffs between agents?",
-    "An agent can give a helper only part of what it has: the same tools or fewer, and a budget carved out of what it has left. You can limit how many levels of handoff are allowed. Revoking an agent refuses its helpers' next requests too.",
+    "An agent can give a helper only part of what it has: the same tools or fewer, and a budget carved out of what it has left. Revoking an agent refuses its helpers' next requests too.",
   ],
 ];
 
@@ -127,7 +127,7 @@ const relatedTopics = [
   ["/economic-firewall", "Economic firewall", "Budgets for your agents, and payment from external agents, on the routes you choose."],
   ["/ai-agent-cost-control", "AI agent cost control", "Set budgets for your agents and their helpers, and see what each one spends."],
   ["/economic-firewall-readiness-grader", "Economic firewall readiness grader", "Score how ready your agent setup is, from budgets and revoke to receipts and MCP."],
-  ["/satgate-for-hermes-agent", "SatGate for Hermes Agent", "Put limits on local Hermes and Open WebUI agents, with SatGate checking each request before it goes through."],
+  ["/satgate-for-hermes-agent", "SatGate for Hermes Agent", "Put limits on local Hermes agents, with SatGate checking each request before it goes through."],
 ];
 
 const closingHeading = "Give every agent its own limits, and keep the off switch.";
