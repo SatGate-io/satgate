@@ -109,11 +109,11 @@ export default function ZeroTrustInTheModelBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            SatGate signs a receipt for each allowed request and for each refusal over a budget, a payment or a permission. The receipt says which agent asked, what it asked for and why SatGate allowed or refused it. Anyone can check one with the open-source verifier against SatGate&apos;s published keys. The agent never writes its own record, so the record doesn&apos;t depend on the model&apos;s account of itself.
+            A budgeted or paid request that SatGate allows, and a refusal over a budget, a payment or a permission, gets a receipt signed by SatGate. The receipt names the tool or route, says whether SatGate allowed or refused it and why, and carries a hash of the token so you can match it to the agent. It does not name the agent or include the call&apos;s arguments. A Cloud receipt can be checked with the open-source verifier against SatGate&apos;s published keys. The agent never writes its own record, so the record doesn&apos;t depend on the model&apos;s account of itself.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            There are limits to this. A request that never goes through SatGate leaves no receipt, and refusals for going over a rate limit don&apos;t get one either.
+            There are limits to this. A request with no budget and no payment does not get a receipt. Neither does a request that never goes through SatGate, or a refusal for going over a rate limit.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">An emergency brake</h2>
