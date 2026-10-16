@@ -17,26 +17,28 @@ const cursorSnippet = `{
   }
 }`;
 
-const desktopNote = `Claude Desktop and OpenClaw do not use this npx command.
-Open MCP Setup in the dashboard and copy the tenant /sse URL.
-Send it with this header, replacing YOUR_AGENT_TOKEN with the agent token from MCP Setup:
+// Same shapes as MCP Setup in the dashboard (satgate-enterprise
+// dashboard/app/lib/mcp-client-configs.ts): Cursor and Claude Desktop run the
+// stdio bridge; Claude Code and OpenClaw connect to the streamable HTTP /mcp URL.
+const claudeCodeSnippet = `claude mcp add --transport http satgate https://satgate-mcp-saas.fly.dev/mcp \\
+  --header 'Authorization: Bearer YOUR_AGENT_TOKEN'`;
 
-Authorization: Bearer YOUR_AGENT_TOKEN`;
+const openclawSnippet = `openclaw mcp set satgate '{"url":"https://satgate-mcp-saas.fly.dev/mcp","transport":"streamable-http","headers":{"Authorization":"Bearer YOUR_AGENT_TOKEN"}}'`;
 
 type ClientKey = 'cursor' | 'claudeCode' | 'claudeDesktop' | 'openclaw';
 
-const clients: Record<ClientKey, { label: string; kind: 'npx' | 'sse' }> = {
-  cursor: { label: 'Cursor', kind: 'npx' },
-  claudeCode: { label: 'Claude Code', kind: 'npx' },
-  claudeDesktop: { label: 'Claude Desktop', kind: 'sse' },
-  openclaw: { label: 'OpenClaw', kind: 'sse' },
+const clients: Record<ClientKey, { label: string; file: string; snippet: string }> = {
+  cursor: { label: 'Cursor', file: '~/.cursor/mcp.json', snippet: cursorSnippet },
+  claudeCode: { label: 'Claude Code', file: 'Run in a terminal', snippet: claudeCodeSnippet },
+  claudeDesktop: { label: 'Claude Desktop', file: 'claude_desktop_config.json', snippet: cursorSnippet },
+  openclaw: { label: 'OpenClaw', file: 'Run in a terminal', snippet: openclawSnippet },
 };
 
 export default function McpProxyConfigGeneratorPage() {
   const [client, setClient] = useState<ClientKey>('cursor');
   const [copied, setCopied] = useState(false);
   const output = useMemo(
-    () => (clients[client].kind === 'npx' ? cursorSnippet : desktopNote),
+    () => clients[client].snippet,
     [client],
   );
 
@@ -55,7 +57,7 @@ export default function McpProxyConfigGeneratorPage() {
           </div>
           <h1 className="mb-6 text-4xl font-extrabold tracking-tight md:text-6xl">MCP connect snippet</h1>
           <p className="mb-8 text-xl leading-relaxed text-gray-300">
-            This is the snippet Cloud MCP gives Cursor and Claude Code. It does not set a dollar budget, and it does not add flags SatGate does not read.
+            These are the connect snippets MCP Setup gives Cursor, Claude Desktop, Claude Code and OpenClaw. They do not set a dollar budget, and they do not add flags SatGate does not read.
           </p>
           <a href="https://cloud.satgate.io/cloud/signup" className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
             Start free trial <ArrowRight size={18} />
@@ -80,7 +82,7 @@ export default function McpProxyConfigGeneratorPage() {
         <div className="rounded-xl border border-gray-800 bg-gray-950 p-5">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-sm font-semibold text-white">
-              {clients[client].kind === 'npx' ? 'mcp.json' : 'From MCP Setup'}
+              {clients[client].file}
             </p>
             <button type="button" onClick={copyOutput} className="inline-flex items-center gap-2 text-sm text-cyan-300 hover:text-cyan-200">
               {copied ? <Check size={16} /> : <Copy size={16} />}
@@ -91,7 +93,7 @@ export default function McpProxyConfigGeneratorPage() {
         </div>
 
         <p className="mt-6 text-sm leading-relaxed text-gray-400">
-          A new token starts at 1,000 credits. A tool call costs 1 credit unless you set a per-tool cost. This snippet does not set a dollar budget. Copy the live URL and token from{' '}
+          A new token starts at 1,000 credits. A tool call costs 1 credit unless you set a per-tool cost. Replace the token placeholder with your agent token. Copy the live URL and token from{' '}
           <a href="https://cloud.satgate.io/cloud/mcp/onboarding" className="text-cyan-300 hover:text-cyan-200">MCP Setup</a>.
         </p>
         <p className="mt-4 text-sm text-gray-500">

@@ -1,5 +1,5 @@
 # SatGate: economic firewall for agent workloads
-> Keep your agents within budget. Make external agents pay before they use your API. Get a signed receipt for every decision.
+> Keep your agents within budget. Make external agents pay before they use your API. Get signed receipts for spends, payments and refusals.
 > Three controls: Observe, Control and Admit. All three sign receipts.
 
 ## Purpose
@@ -19,7 +19,7 @@ Enforce your agents' budgets and permissions before each request runs. Observe s
 Let external agents in with limited access, and make them pay first on the routes you choose. Payment never overrides permissions.
 
 ## Proof across all three controls
-SatGate signs a receipt for every decision, on HTTP APIs and MCP tools, for your own agents and for external ones. Receipts are exported together as an Evidence Pack. Anyone can check them against SatGate's published keys (JWKS) with the open-source verifier. A receipt shows what SatGate decided. It is not a compliance certificate, and it does not prove answer quality, that a supplier told the truth, anyone's legal identity or that an outside payment settled.
+SatGate signs a receipt when it refuses a request over a budget, a missing payment or a tool permission, and when an agent spends from a budget. This covers HTTP APIs and MCP tools, your own agents and external ones. Each receipt comes in an Evidence Pack. Anyone can check them against SatGate's published keys (JWKS) with the open-source verifier. A receipt shows what SatGate decided. It is not a compliance certificate, and it does not prove answer quality, that a supplier told the truth, anyone's legal identity or that an outside payment settled.
 
 ## Agent choice and owner enforcement
 Agents may choose SatGate because it helps them get work done. The limits stay owner-enforced either way. Make SatGate the only route to the API: block direct access to the origin, keep upstream API keys behind SatGate and restrict outbound traffic so agents cannot go around it.
@@ -34,7 +34,7 @@ Agents may choose SatGate because it helps them get work done. The limits stay o
 - Pricing: https://satgate.io/pricing
 - Optional 90-day design-partner pilot for larger teams that want help: https://satgate.io/design-partners
 
-The demo above uses simulated traffic and local test keys. It does not cover trusted issuers, sub-agent budgets, MCP or real payments. For a real paid call, see "Try it as an agent" below. Installing a public SDK does not give you hosted API access; that starts with the 14-day free trial. The issue, pay and verify API is in private beta. Testing a new agent with sub-agents needs a setup and permissions agreed with the owner first; there is no public one-click installer for that.
+The demo above uses simulated traffic and local test keys. It does not cover trusted issuers, sub-agent budgets, MCP or real payments. For a real paid call, see "Try it as an agent" below. Installing a public SDK does not give you hosted API access; that starts with the 14-day free trial. The issue, pay and verify SDK methods are not backed by a live API yet. Testing a new agent with sub-agents needs a setup and permissions agreed with the owner first; there is no public one-click installer for that.
 
 The trust metadata lists which payment adapters are supported and which are planned. AgentCore Payments and Pay.sh are planned. The metadata says what is available; try an adapter yourself before saying it works.
 

@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Bot, Gauge, ShieldCheck, Terminal } from 'lucide
 
 export const metadata = {
   title: 'MCP Gateway for AI Agents: Budgets, Permissions, Receipts',
-  description: 'Put SatGate in front of MCP tools: per-tool budgets, scoped permissions, revocation, and a signed receipt for every allowed or refused call.',
+  description: 'Put SatGate in front of MCP tools: per-tool budgets, scoped permissions, revocation, and a signed receipt for each priced call and each budget or permission refusal.',
   alternates: { canonical: 'https://satgate.io/mcp' },
   keywords: [
     'MCP governance',
@@ -17,7 +17,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'MCP Gateway for AI Agents: Budgets, Permissions, Receipts',
-    description: 'Budgets and permissions for MCP tools, and a signed receipt when a call is allowed or refused.',
+    description: 'Budgets and permissions for MCP tools, and a signed receipt for priced calls and refusals.',
     url: 'https://satgate.io/mcp',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -25,7 +25,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'MCP Gateway for AI Agents: Budgets, Permissions, Receipts',
-    description: 'Budgets and permissions for MCP tools, and a signed receipt when a call is allowed or refused.',
+    description: 'Budgets and permissions for MCP tools, and a signed receipt for priced calls and refusals.',
   },
 };
 
@@ -33,13 +33,13 @@ const cards = [
   {
     href: '/mcp-proxy-config-generator',
     title: 'MCP connect snippet',
-    description: 'The npx satgate-mcp-bridge snippet for Cursor and Claude Code. Credits, not a dollar budget.',
+    description: 'The Cloud MCP connect snippets for Cursor, Claude Desktop, Claude Code and OpenClaw. Credits, not a dollar budget.',
     icon: Terminal,
   },
   {
     href: '/blog/mcp-budget-enforcement-guide',
     title: 'MCP budget enforcement guide',
-    description: 'How per-tool costs, session caps and budgets for sub-agents stop a tool call before it runs.',
+    description: 'How per-tool costs and budgets for sub-agents stop a tool call before it runs.',
     icon: Gauge,
   },
   {
@@ -117,7 +117,7 @@ export default function MCPPage() {
         name: 'How does SatGate control MCP spend?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate can proxy MCP traffic and enforce per-tool prices, session caps, workflow budgets, capability caveats, revocation, and audit requirements before tool calls reach the upstream MCP server.',
+          text: 'SatGate can proxy MCP traffic and enforce per-tool prices, token budgets, capability caveats and revocation before tool calls reach the upstream MCP server.',
         },
       },
     ],
@@ -172,7 +172,7 @@ export default function MCPPage() {
               Open MCP Setup
             </a>
           </div>
-          <p className="mt-4 text-sm text-gray-500">Claude Code uses the same npx snippet. Claude Desktop and OpenClaw use the tenant /sse URL with an Authorization Bearer header, copied from MCP Setup.</p>
+          <p className="mt-4 text-sm text-gray-500">Claude Desktop uses the same npx snippet as Cursor. Claude Code uses the claude mcp add command from MCP Setup. OpenClaw uses the tenant /mcp URL with an Authorization Bearer header, copied from MCP Setup.</p>
         </div>
       </section>
 
@@ -186,7 +186,7 @@ export default function MCPPage() {
             MCP for your agents, with a budget
           </h2>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300">
-            SatGate sits in front of MCP tools. You see what each agent calls, you cap it, and you get a signed receipt when a call is allowed or refused.
+            SatGate sits in front of MCP tools. You see what each agent calls, you cap it, and you get a signed receipt when a priced call is allowed or a call is refused for budget or permission.
           </p>
         </div>
       </section>
@@ -212,7 +212,7 @@ export default function MCPPage() {
           <li className="rounded-2xl border border-gray-800 bg-black p-6 text-gray-400"><span className="font-bold text-white">Admit.</span> Charge external agents on the HTTP routes you choose. Each route takes Lightning, USDC on Base, or both. You set how many requests a Lightning payment buys; a USDC payment buys one. See <Link href="/pricing" className="text-purple-300 hover:text-purple-200">pricing</Link>.</li>
         </ul>
         <p className="mt-6 max-w-4xl text-gray-400">
-          Each allowed or refused call gets a signed receipt, so you can prove what an agent was allowed to do. Export those receipts as an Evidence Pack and <Link href="/verify-evidence-pack" className="text-purple-300 hover:text-purple-200">verify them yourself</Link>. For the budget model in detail, read the <Link href="/blog/mcp-budget-enforcement-guide" className="text-purple-300 hover:text-purple-200">MCP budget enforcement guide</Link>, or start from the <Link href="/build" className="text-purple-300 hover:text-purple-200">developer page</Link>.
+          Each priced call and each budget or permission refusal gets a signed receipt, so you can prove what an agent was allowed to do. Export those receipts as an Evidence Pack and <Link href="/verify-evidence-pack" className="text-purple-300 hover:text-purple-200">verify them yourself</Link>. For the budget model in detail, read the <Link href="/blog/mcp-budget-enforcement-guide" className="text-purple-300 hover:text-purple-200">MCP budget enforcement guide</Link>, or start from the <Link href="/build" className="text-purple-300 hover:text-purple-200">developer page</Link>.
         </p>
       </section>
 
@@ -221,7 +221,7 @@ export default function MCPPage() {
           {[
             ['Price every tool', 'Assign cost profiles to MCP tools so agents cannot treat expensive operations like free function calls.'],
             ['Enforce before the call runs', 'Block over-budget or out-of-scope tool calls before they reach the upstream MCP server.'],
-            ['Audit every decision', 'Emit receipt-backed proof for agent, workflow, tool, policy, budget, paid-call, denial, delegation, and revocation decisions.'],
+            ['Audit spends and refusals', 'Emit signed receipts for budget spends and for budget and permission refusals.'],
           ].map(([title, body]) => (
             <div key={title} className="rounded-2xl border border-gray-800 bg-black p-6">
               <h2 className="mb-3 text-2xl font-bold text-white">{title}</h2>
@@ -237,7 +237,7 @@ export default function MCPPage() {
           {[
             ['What is MCP governance?', 'MCP governance is the control layer around Model Context Protocol tool calls: budgets, scoped authority, revocation, signed receipts, and risk actions before agents execute tools.'],
             ['Why do MCP tools need budget enforcement?', 'Autonomous agents can call paid or risky tools repeatedly, delegate work, or loop. MCP budget enforcement stops over-budget tool calls before the request goes through instead of discovering spend after the fact.'],
-            ['How does SatGate control MCP spend?', 'SatGate can proxy MCP traffic and enforce per-tool prices, session caps, workflow budgets, capability caveats, revocation, and audit requirements before tool calls reach the upstream MCP server.'],
+            ['How does SatGate control MCP spend?', 'SatGate can proxy MCP traffic and enforce per-tool prices, token budgets, capability caveats and revocation before tool calls reach the upstream MCP server.'],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-3 text-xl font-bold text-white">{question}</h3>

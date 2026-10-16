@@ -109,7 +109,7 @@ export default function ZeroTrustInTheModelBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a permission. In Control mode, where SatGate enforces your limits, it also signs one when an agent spends from a budget. The receipt names the tool or route and says whether SatGate allowed or refused it and why. It doesn&apos;t name the agent or include the call&apos;s arguments. A SatGate Cloud receipt can be checked with the open-source verifier against SatGate&apos;s published keys. The agent never writes its own record, so the record doesn&apos;t depend on the model&apos;s account of itself.
+            SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission. In Control mode, where SatGate enforces your limits, it also signs one when an agent spends from a budget. The receipt names the tool or route and says whether SatGate allowed or refused it and why. It doesn&apos;t name the agent or include the call&apos;s arguments. A SatGate Cloud receipt can be checked with the open-source verifier against SatGate&apos;s published keys. The agent never writes its own record, so the record doesn&apos;t depend on the model&apos;s account of itself.
           </p>
 
           <p className="text-gray-300 leading-relaxed">

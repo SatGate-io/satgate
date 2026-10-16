@@ -186,7 +186,7 @@ export default function AgentsLandingPage() {
               </div>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400 shrink-0" /> Per-tool cost profiles</li>
-                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400 shrink-0" /> SSE client transport; SSE or Streamable HTTP upstreams</li>
+                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400 shrink-0" /> SSE or streamable HTTP for clients and upstreams</li>
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400 shrink-0" /> Real-time MCP Monitor dashboard</li>
               </ul>
             </div>
@@ -201,7 +201,7 @@ export default function AgentsLandingPage() {
             Start observing. Enforce when ready.
           </h2>
           <p className="text-gray-400 text-center max-w-2xl mx-auto mb-12">
-            Every SatGate deployment starts in Observe mode. See the data. Then enforce.
+            You can start any deployment in Observe mode. See the data. Then enforce.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -229,7 +229,7 @@ export default function AgentsLandingPage() {
               <h3 className="text-xl font-semibold text-white mb-2">Control</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Set per-agent budgets. Get alerts at thresholds.
-                Block requests when budgets are exhausted — agents get HTTP 402. No surprise bills.
+                Block requests when budgets are exhausted. HTTP agents get a 402. No surprise bills.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-cyan-400 shrink-0" /> Per-agent credit budgets</li>
@@ -301,14 +301,14 @@ export default function AgentsLandingPage() {
                 <Ban className="text-red-400" size={16} />
                 <h4 className="text-red-300 font-semibold text-sm">Admin Kill Switch</h4>
               </div>
-              <p className="text-gray-500 text-xs">Revoke any agent&apos;s token. The next governed request gets 401, including cascade to delegated child tokens.</p>
+              <p className="text-gray-500 text-xs">Revoke any agent&apos;s token. Its next request is refused, and so are its delegated child tokens&apos; requests.</p>
             </div>
             <div className="bg-amber-950/20 border border-amber-900/30 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-2">
                 <DollarSign className="text-amber-400" size={16} />
                 <h4 className="text-amber-300 font-semibold text-sm">Economic Firewall</h4>
               </div>
-              <p className="text-gray-500 text-xs">Every token carries a spending cap. When credits hit zero, SatGate returns HTTP 402. No surprise bills. No runaway agents.</p>
+              <p className="text-gray-500 text-xs">Every token carries a spending cap. When credits hit zero, SatGate refuses the next priced request (HTTP 402 on HTTP routes). No surprise bills. No runaway agents.</p>
             </div>
             <div className="bg-cyan-950/20 border border-cyan-900/30 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-2">
