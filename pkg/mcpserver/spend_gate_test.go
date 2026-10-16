@@ -1,15 +1,20 @@
 package mcpserver
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/big"
+	"regexp"
+	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
+	"unicode"
 
 	"github.com/satgate-io/satgate/pkg/macaroon"
 	"github.com/satgate-io/satgate/pkg/toolcontrols"
@@ -205,13 +210,13 @@ func TestSpendRefusalDoesNotEchoTheAmount(t *testing.T) {
 		t.Fatal("not refused")
 	}
 	raw, _ := json.Marshal(r)
-	if strings.Contains(string(raw), "777") {
-		t.Fatalf("refusal echoes the amount: %s", raw)
+	if where := amountEchoes(t, raw, "777.31"); len(where) > 0 {
+		t.Fatalf("refusal echoes the amount at %v: %s", where, raw)
 	}
 	for _, d := range h.rec.decisions {
 		b, _ := json.Marshal(d)
-		if strings.Contains(string(b), "777") {
-			t.Fatalf("receipt input carries the amount: %s", b)
+		if where := amountEchoes(t, b, "777.31"); len(where) > 0 {
+			t.Fatalf("receipt input carries the amount at %v: %s", where, b)
 		}
 	}
 	if len(h.rec.decisions) != 1 {
@@ -221,6 +226,136 @@ func TestSpendRefusalDoesNotEchoTheAmount(t *testing.T) {
 	if d.Decision != "denied" || d.DecisionReason != "policy_denied" || d.DenialCode != "TOOL_SPEND_LIMIT_DENIED" ||
 		d.ArgumentField != "dollar_amount" || d.ControlWindow != "day" || d.ControlLimit != "200" || !d.BudgetNotEvaluated {
 		t.Fatalf("decision = %+v", d)
+	}
+}
+
+// amountEchoes reports where the JSON document doc carries amount as a value.
+// It decodes doc and looks at every object key, string and number on its own,
+// so it never matches inside an unrelated value the way a substring of the
+// serialized bytes does: the old check looked for "777" in the bytes and
+// failed whenever the random 12-hex token id held those digits
+// (token_id 7775a9f2092b in CI run 38937620498). A value echoes the amount
+// when
+//   - it contains the amount's literal text (a literal with a decimal point
+//     cannot occur inside a hex id or any other run of letters and digits), or
+//   - one of its words (a run of letters, digits, '_' and '.') is a plain
+//     decimal number equal to the amount, to its whole part, or to the
+//     amount in counter units, or
+//   - it is a JSON number equal to one of those.
+//
+// A word that mixes letters and digits (a hex id, rcpt_1) is an identifier,
+// not a number, and is not compared.
+func amountEchoes(t *testing.T, doc []byte, amount string) []string {
+	t.Helper()
+	amt, ok := new(big.Rat).SetString(amount)
+	if !ok {
+		t.Fatalf("amount %q is not a decimal", amount)
+	}
+	whole := new(big.Rat).SetInt(new(big.Int).Quo(amt.Num(), amt.Denom()))
+	inUnits := new(big.Rat).Mul(amt, new(big.Rat).SetInt64(units))
+	forms := []*big.Rat{amt, inUnits}
+	if whole.Sign() != 0 { // a whole part of 0 would match every zero count
+		forms = append(forms, whole)
+	}
+	equalsAForm := func(r *big.Rat) bool {
+		for _, f := range forms {
+			if r.Cmp(f) == 0 {
+				return true
+			}
+		}
+		return false
+	}
+
+	dec := json.NewDecoder(bytes.NewReader(doc))
+	dec.UseNumber()
+	var v any
+	if err := dec.Decode(&v); err != nil {
+		t.Fatalf("decode %s: %v", doc, err)
+	}
+	var hits []string
+	checkText := func(path, s string) {
+		if strings.Contains(s, amount) {
+			hits = append(hits, path)
+			return
+		}
+		words := strings.FieldsFunc(s, func(r rune) bool {
+			return !unicode.IsLetter(r) && !unicode.IsDigit(r) && r != '_' && r != '.'
+		})
+		for _, w := range words {
+			w = strings.TrimRight(w, ".")
+			if !plainDecimal.MatchString(w) {
+				continue
+			}
+			if r, ok := new(big.Rat).SetString(w); ok && equalsAForm(r) {
+				hits = append(hits, path)
+				return
+			}
+		}
+	}
+	var walk func(path string, v any)
+	walk = func(path string, v any) {
+		switch x := v.(type) {
+		case map[string]any:
+			for k, e := range x {
+				checkText(path+"{"+k+"}", k)
+				walk(path+"."+k, e)
+			}
+		case []any:
+			for i, e := range x {
+				walk(fmt.Sprintf("%s[%d]", path, i), e)
+			}
+		case string:
+			checkText(path, x)
+		case json.Number:
+			if r, ok := new(big.Rat).SetString(x.String()); ok && equalsAForm(r) {
+				hits = append(hits, path)
+			}
+		}
+	}
+	walk("$", v)
+	sort.Strings(hits)
+	return hits
+}
+
+var plainDecimal = regexp.MustCompile(`^[0-9]+(\.[0-9]+)?$`)
+
+// The receipt input that failed CI run 38937620498: its token id holds the
+// digits 777, and it does not carry the amount 777.31. The check passes it,
+// and catches the amount planted in each form a refusal could echo it.
+func TestAmountEchoesIsExact(t *testing.T) {
+	const ciReceipt = `{"decision":"denied","decision_reason":"policy_denied","policy_mode":"control","tenant_id":"tenant-1","token_id":"7775a9f2092b","budget_id":"budget-spend","budget_subject_id":"budget-spend","scope":"place_crypto_order,place_equity_order","mcp_method":"tools/call","tool_name":"place_crypto_order","route_or_tool":"mcp:tools/call:place_crypto_order","request_id":"","jsonrpc_id":"1","cost_credits":0,"remaining_credits":0,"remaining_before_credits":0,"budget_not_evaluated":true,"denial_code":"TOOL_SPEND_LIMIT_DENIED","argument_field":"dollar_amount","control_window":"day","control_limit":"200"}`
+	if !strings.Contains(ciReceipt, "777") {
+		t.Fatal("the CI receipt no longer holds the digits the old check matched")
+	}
+	if hits := amountEchoes(t, []byte(ciReceipt), "777.31"); len(hits) != 0 {
+		t.Fatalf("CI receipt flagged at %v", hits)
+	}
+	planted := map[string]any{
+		"control_window_total": "777.31",
+		"approval_id":          "amount 777.31",
+		"control_symbol":       "$777",
+		"request_id":           "over by 777.",
+		"remaining_credits":    json.Number("77731000000"),
+		"cost_credits":         json.Number("7.7731e2"),
+		"jsonrpc_id":           "77731000000",
+	}
+	for field, val := range planted {
+		var m map[string]any
+		dec := json.NewDecoder(strings.NewReader(ciReceipt))
+		dec.UseNumber()
+		if err := dec.Decode(&m); err != nil {
+			t.Fatal(err)
+		}
+		m[field] = val
+		b, _ := json.Marshal(m)
+		hits := amountEchoes(t, b, "777.31")
+		if len(hits) != 1 || hits[0] != "$."+field {
+			t.Errorf("%s = %v: hits %v, want [$.%s]", field, val, hits, field)
+		}
+	}
+	// A key can echo too.
+	if hits := amountEchoes(t, []byte(`{"a":{"777.31":true}}`), "777.31"); len(hits) != 1 {
+		t.Errorf("key echo: hits %v", hits)
 	}
 }
 
