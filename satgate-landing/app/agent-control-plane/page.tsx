@@ -58,8 +58,8 @@ const heroSecondLine = "Your agents do the work. You keep the authority.";
 const exampleTitle = "Example: one agent and one helper";
 
 const exampleLines = [
-  "Research agent: $50 budget, 3 tools, ends Friday",
-  "Helper: $10 carved from that $50, 1 of those tools, can't hand off again",
+  "Research agent: 5,000 credits, 3 tools, ends Friday",
+  "Helper: 1,000 credits carved from those 5,000, 1 of those tools, can't hand off again",
   "The helper calls a tool it wasn't given: refused, with a signed receipt",
   "You revoke the research agent: the helper's next request is refused too",
 ];
