@@ -38,7 +38,7 @@ REQUIRED = {
     "app/page.tsx": [
         "Economic Firewall for AI Agents",
         "within budget",
-        "signed receipt for every decision",
+        "signed receipts for spends, payments and refusals",
     ],
     "app/components/HomeClient.tsx": [
         "Keep your AI agents within budget on the paid services they use. Make external agents pay before they use yours.",

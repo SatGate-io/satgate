@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Bot, Gauge, ShieldCheck, Terminal } from 'lucide
 
 export const metadata = {
   title: 'MCP Gateway for AI Agents: Budgets, Permissions, Receipts',
-  description: 'Put SatGate in front of MCP tools: per-tool budgets, scoped permissions, revocation, and a signed receipt for each priced call and each budget or permission refusal.',
+  description: 'Put SatGate in front of MCP tools: per-tool budgets, scoped permissions, revocation, and a signed receipt for priced calls and refusals.',
   alternates: { canonical: 'https://satgate.io/mcp' },
   keywords: [
     'MCP governance',

@@ -100,7 +100,7 @@ export default function RailPartnersPage() {
               <Handshake size={14} /> Partner brief
             </div>
             <h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">
-              Agent permissions for every payment method.
+              Agent permissions for L402 and x402 payments.
             </h1>
             <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
               Payment methods can authorize value movement. SatGate proves the agent was allowed to attempt it: who passed permissions down, which policy applied, what budget was left, and what evidence exists after the decision.

@@ -17,11 +17,11 @@ REPO = ROOT.parent
 
 REQUIRED_PHRASES = {
     "app/page.tsx": [
-        "signs a receipt for each decision",
-        "signed receipt for every decision",
+        "signs receipts for spends, payments and refusals",
+        "signed receipts for spends, payments and refusals",
     ],
     "app/components/HomeClient.tsx": [
-        "Receipts for allowed, denied, paid, delegated, and revoked decisions",
+        "Receipts for allowed and denied decisions, including paid requests",
         "Allowed receipts",
         "Paid receipts",
         "Export Evidence Pack",
@@ -44,7 +44,7 @@ REQUIRED_PHRASES = {
         "Denied-call receipts",
     ],
     "app/policy-to-proof/page.tsx": [
-        "paid call, denial, delegation, and revocation produces signed receipts",
+        "Paid calls, budget spends and refusals produce signed receipts",
         "receipt_id",
         "evidence_pack_id",
         "policy_version",
