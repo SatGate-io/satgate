@@ -355,10 +355,13 @@ func (s *SSEServer) handleStreamablePost(w http.ResponseWriter, r *http.Request)
 		var found bool
 		sess, found = s.lookupStreamSession(sid)
 		if !found {
-			http.Error(w, "session not found", http.StatusNotFound)
-			return
-		}
-		if s.rejectStreamSessionToken(w, r, sess) {
+			// Lost to a restart, another machine or the idle TTL: served
+			// again under the same id only for the token it was issued to
+			// (streamable_resume.go). Otherwise 404 as before.
+			if sess, found = s.resumeStreamSession(w, r, sid); !found {
+				return
+			}
+		} else if s.rejectStreamSessionToken(w, r, sess) {
 			return
 		}
 		if !s.protocolVersionAllowed(r) {
@@ -460,6 +463,11 @@ func (s *SSEServer) sweepExpiredStreamSessionsLocked(now time.Time, force bool) 
 		return nil
 	}
 	s.streamLastSweep = now
+	for id, until := range s.streamEnded {
+		if now.After(until) {
+			delete(s.streamEnded, id)
+		}
+	}
 	var closed []*streamSession
 	for id, sess := range s.streamSessions {
 		if !sess.expiresAt.IsZero() && now.After(sess.expiresAt) {
@@ -471,9 +479,15 @@ func (s *SSEServer) sweepExpiredStreamSessionsLocked(now time.Time, force bool) 
 }
 
 func (s *SSEServer) createStreamSession(ctx context.Context, token, protocol string) (*streamSession, bool) {
+	return s.addStreamSession(ctx, streamSessionIDFor(token), token, protocol, false)
+}
+
+// addStreamSession puts a session for id in the map. For a resumed id that a
+// concurrent request already put back, the session in the map is returned.
+func (s *SSEServer) addStreamSession(ctx context.Context, id, token, protocol string, resumed bool) (*streamSession, bool) {
 	now := time.Now()
 	sess := &streamSession{
-		id:        generateSessionID(),
+		id:        id,
 		tokenSum:  sha256.Sum256([]byte(token)),
 		protocol:  protocol,
 		expiresAt: now.Add(s.streamIdleTTL()),
@@ -496,6 +510,13 @@ func (s *SSEServer) createStreamSession(ctx context.Context, token, protocol str
 	}
 	full := len(s.streamSessions) >= s.streamMaxSessions()
 	closed := s.sweepExpiredStreamSessionsLocked(now, full)
+	if existing, ok := s.streamSessions[sess.id]; ok {
+		s.streamMu.Unlock()
+		for _, c := range closed {
+			s.publishStreamClose(c)
+		}
+		return existing, true
+	}
 	if len(s.streamSessions) >= s.streamMaxSessions() {
 		s.streamMu.Unlock()
 		for _, c := range closed {
@@ -510,17 +531,8 @@ func (s *SSEServer) createStreamSession(ctx context.Context, token, protocol str
 		s.publishStreamClose(c)
 	}
 
-	if s.proxy != nil && s.proxy.events != nil {
-		s.proxy.events.Publish(Event{
-			Type:      EventSessionConnect,
-			Timestamp: now,
-			SessionID: sess.id,
-			TokenID:   sess.identity.tokenID,
-			TenantID:  sess.identity.tenantID,
-			BudgetID:  sess.identity.budgetID,
-		})
-	}
-	log.Info().Str("session", sess.id).Str("protocol", protocol).Msg("streamable HTTP session established")
+	s.publishStreamConnect(sess, resumed)
+	logStreamSession(sess, resumed)
 	return sess, true
 }
 
@@ -557,6 +569,7 @@ func (s *SSEServer) deleteStreamSession(id string) {
 	sess, ok := s.streamSessions[id]
 	if ok {
 		delete(s.streamSessions, id)
+		s.markStreamSessionEndedLocked(id, time.Now())
 	}
 	s.streamMu.Unlock()
 	if ok {

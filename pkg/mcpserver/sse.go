@@ -34,7 +34,10 @@ type SSEServer struct {
 	streamTTL       time.Duration
 	streamMax       int
 	streamLastSweep time.Time
-	allowedOrigins  map[string]struct{}
+	// streamEnded holds ids ended with DELETE (until the idle TTL) so they
+	// are not resumed on this process. See streamable_resume.go.
+	streamEnded    map[string]time.Time
+	allowedOrigins map[string]struct{}
 
 	// oauthMetadataURL, when set, turns every 401 from the header-auth
 	// transport paths into an RFC 9728 / MCP authorization challenge.
