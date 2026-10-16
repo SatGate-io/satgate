@@ -142,6 +142,57 @@ type ChildPersister interface {
 	PersistChild(ctx context.Context, event Event) error
 }
 
+// HandoffLimiter is implemented by an EventPublisher that can read the handoff
+// limit the owner stored for a token (the gateway's delegation tree row).
+// Delegate asks it before it mints or carves anything.
+//
+// HandoffLimit answers with limited=false when no limit is stored for the
+// parent (a token with no row, or a row with no limit): that is unlimited, the
+// same as before this interface existed. With limited=true, limit is the
+// stored number: 0 means this token may not hand off, N means a chain may go at
+// most N levels below its root (parent.Depth is how far down the parent is).
+// An error means the limit could not be read; Delegate then refuses, because a
+// limit it cannot read is not a limit it can promise to keep. The error's text
+// is only logged.
+type HandoffLimiter interface {
+	HandoffLimit(ctx context.Context, parent *TokenInfo) (limit int, limited bool, err error)
+}
+
+// HandoffAllowed is the one rule for a stored handoff limit: no limit means
+// unlimited, 0 (or less) refuses, and N refuses a parent already N levels
+// down. parentDepth is the parent's depth in its chain (0 for a root).
+func HandoffAllowed(limit int, limited bool, parentDepth int) bool {
+	if !limited {
+		return true
+	}
+	if limit <= 0 {
+		return false
+	}
+	return parentDepth+1 <= limit
+}
+
+// checkStoredHandoffLimit applies HandoffAllowed to the limit the event
+// consumer stored for parent. The refusals are clientErrors, so they leave
+// HandleDelegate in the same shape as the depth-limit refusal beside them.
+func (d *Delegator) checkStoredHandoffLimit(ctx context.Context, parent *TokenInfo) error {
+	hl, ok := d.events.(HandoffLimiter)
+	if !ok {
+		return nil
+	}
+	limit, limited, err := hl.HandoffLimit(ctx, parent)
+	if err != nil {
+		log.Error().Err(err).Str("parent", parent.TokenID).Msg("delegation refused: the stored handoff limit could not be read")
+		return ErrChildTokenFailed
+	}
+	if HandoffAllowed(limit, limited, parent.Depth) {
+		return nil
+	}
+	if limit <= 0 {
+		return &clientError{msg: "this token can't hand off to a helper"}
+	}
+	return &clientError{msg: fmt.Sprintf("this token has reached its handoff limit (%d levels)", limit)}
+}
+
 // persistChildTimeout bounds PersistChild.
 const persistChildTimeout = 10 * time.Second
 
@@ -173,6 +224,13 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			return nil, r
 		}
 		return nil, d.refuseMint(parent, err, "parent token cannot be read")
+	}
+
+	// Enforce the handoff limit the owner stored for this token, when the
+	// event consumer can read one (HandoffLimiter). Nothing has been taken
+	// from the parent yet, so a refusal here changes nothing.
+	if err := d.checkStoredHandoffLimit(ctx, parent); err != nil {
+		return nil, err
 	}
 
 	// Enforce delegation depth limit
