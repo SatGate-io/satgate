@@ -13,51 +13,95 @@ import (
 
 // The handoff limit an owner stored for a token must hold on satgate/delegate.
 // limitStore stands in for the gateway's delegation tree: it is the event
-// publisher the Delegator publishes to, it answers HandoffLimit from the rows
-// it holds, and it writes a row for every child (the child inherits its
-// parent's limit, as the gateway's row writer does).
+// publisher the Delegator publishes to, it answers HandoffRecord from the rows
+// it holds, and it writes a row for every child from the decision the event
+// carries (depth + 1, the same limit), before the key is returned
+// (PersistChild) and again when the event is published.
 type limitStore struct {
-	mu     sync.Mutex
-	rows   map[string]*int // row id (budget id) -> stored limit; nil = unlimited
-	order  []string        // child rows written, in order
-	events int
-	err    error // HandoffLimit fails with this when set
+	mu        sync.Mutex
+	rows      map[string]*storedRow // row id (budget id) -> stored row
+	missing   map[string]bool       // ids that should have a row and have none
+	order     []string              // child rows written, in order
+	persisted []string              // child rows written by PersistChild
+	events    int
+	err       error // HandoffRecord fails with this when set
 }
 
-func newLimitStore() *limitStore { return &limitStore{rows: map[string]*int{}} }
+type storedRow struct {
+	limit *int
+	depth int
+}
+
+type missingRow struct{}
+
+func (missingRow) Error() string              { return "no stored row" }
+func (missingRow) HandoffRecordMissing() bool { return true }
+
+func newLimitStore() *limitStore {
+	return &limitStore{rows: map[string]*storedRow{}, missing: map[string]bool{}}
+}
 
 func (s *limitStore) setRow(id string, limit *int) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.rows[id] = limit
+	s.rows[id] = &storedRow{limit: limit}
+}
+
+func (s *limitStore) record(ev Event, persist bool) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if ev.Type != EventDelegation {
+		return nil
+	}
+	child, _ := ev.Data["childBudgetId"].(string)
+	if child == "" {
+		child, _ = ev.Data["childTokenId"].(string)
+	}
+	parent, _ := ev.Data[EventParentRowID].(string)
+	if child == "" || parent == "" {
+		return nil
+	}
+	if persist {
+		s.persisted = append(s.persisted, child)
+	}
+	if _, done := s.rows[child]; done {
+		return nil
+	}
+	row := &storedRow{depth: ev.Data[EventParentDepth].(int) + 1}
+	if l, ok := ev.Data[EventParentLimit].(int); ok {
+		row.limit = &l
+	}
+	s.rows[child] = row
+	s.order = append(s.order, child)
+	return nil
 }
 
 func (s *limitStore) Publish(ev Event) {
 	s.mu.Lock()
-	defer s.mu.Unlock()
 	s.events++
-	if ev.Type != EventDelegation {
-		return
-	}
-	child, _ := ev.Data["childBudgetId"].(string)
-	if child == "" {
-		return
-	}
-	s.rows[child] = s.rows[ev.BudgetID]
-	s.order = append(s.order, child)
+	s.mu.Unlock()
+	_ = s.record(ev, false)
 }
 
-func (s *limitStore) HandoffLimit(_ context.Context, parent *TokenInfo) (int, bool, error) {
+func (s *limitStore) PersistChild(_ context.Context, ev Event) error { return s.record(ev, true) }
+
+func (s *limitStore) HandoffRecord(_ context.Context, parent *TokenInfo) (string, int, int, bool, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.err != nil {
-		return 0, false, s.err
+		return "", 0, 0, false, s.err
 	}
-	l, ok := s.rows[parent.BudgetID]
-	if !ok || l == nil {
-		return 0, false, nil
+	if s.missing[parent.BudgetID] {
+		return "", 0, 0, false, missingRow{}
 	}
-	return *l, true, nil
+	r, ok := s.rows[parent.BudgetID]
+	if !ok {
+		return "", 0, 0, false, nil
+	}
+	if r.limit == nil {
+		return parent.BudgetID, r.depth, 0, false, nil
+	}
+	return parent.BudgetID, r.depth, *r.limit, true, nil
 }
 
 func (s *limitStore) children() []string {
@@ -213,12 +257,72 @@ func TestStoredHandoffLimitNilIsUnlimited(t *testing.T) {
 	}
 }
 
-// A parent with no row at all (a token nobody stored a limit for) is unlimited.
+// A parent with no stored limit at all (the store keeps nothing for it, such
+// as a token that names no tenant) is unlimited, as before.
 func TestStoredHandoffLimitMissingRowIsUnlimited(t *testing.T) {
 	r := newHandoffRig(t)
 	parent := r.root(nil)
 	delete(r.store.rows, parent.BudgetID)
 	r.child(r.handoff(parent, 5))
+}
+
+// Round 2: a parent the store says should have a row, and has none, is
+// refused with the plain words, and nothing is created or carved.
+func TestStoredHandoffLimitRowThatShouldExistAndDoesNotRefuses(t *testing.T) {
+	for _, budget := range []int64{0, 25} {
+		r := newHandoffRig(t)
+		parent := r.root(nil)
+		delete(r.store.rows, parent.BudgetID)
+		r.store.missing[parent.BudgetID] = true
+		r.wantRefused(r.handoff(parent, budget), wantNoHandoff)
+		if len(r.store.children()) != 0 || len(r.budget.spends) != 0 || r.store.events != 0 {
+			t.Fatalf("budget %d: something was created: rows %v spends %v events %d", budget, r.store.children(), r.budget.spends, r.store.events)
+		}
+	}
+}
+
+// Round 2: the child's row is written from the row the decision read (depth
+// + 1, the same limit), before the key is returned, for a child with credits
+// as well as a helper.
+func TestStoredHandoffLimitChildRowIsWrittenFromTheDecisionBeforeTheKey(t *testing.T) {
+	for _, budget := range []int64{0, 40} {
+		r := newHandoffRig(t)
+		parent := r.root(intp(2))
+		resp := r.handoff(parent, budget)
+		child := r.child(resp)
+		var res DelegateResult
+		_ = json.Unmarshal(resp.Result, &res)
+		id := res.BudgetID
+		if id == "" {
+			id = res.TokenID
+		}
+		if len(r.store.persisted) == 0 || r.store.persisted[0] != id {
+			t.Fatalf("budget %d: the child row was not written before the key: %v (child %s)", budget, r.store.persisted, id)
+		}
+		row := r.store.rows[id]
+		if row == nil || row.depth != 1 || row.limit == nil || *row.limit != 2 {
+			t.Fatalf("budget %d: child row %+v, want depth 1 limit 2", budget, row)
+		}
+		_ = child
+	}
+}
+
+// Round 2: a child with credits whose row cannot be written gets no key, and
+// its carve goes back to the parent.
+func TestStoredHandoffLimitChildRowNotWrittenGivesNoKeyAndGivesTheCarveBack(t *testing.T) {
+	r := newHandoffRig(t)
+	parent := r.root(intp(2))
+	r.d.SetEventPublisher(&failingPersister{r.store})
+	r.wantRefused(r.handoff(parent, 40), ErrChildTokenFailed.Error())
+	if n, _ := r.budget.Remaining(context.Background(), parent.BudgetID); n != 1000 {
+		t.Fatalf("parent remaining %d, want 1000 (the carve given back)", n)
+	}
+}
+
+type failingPersister struct{ *limitStore }
+
+func (f *failingPersister) PersistChild(context.Context, Event) error {
+	return errors.New("PRIVATE_DB_CAUSE")
 }
 
 // A limit that cannot be read refuses with the server-side sentence; nothing

@@ -20,8 +20,8 @@ func TestHandoffAllowedRule(t *testing.T) {
 		{"three at depth two", 3, true, 2, true},
 		{"three at depth three", 3, true, 3, false},
 	} {
-		if got := HandoffAllowed(tc.limit, tc.limited, tc.depth); got != tc.want {
-			t.Errorf("%s: HandoffAllowed(%d,%v,%d) = %v, want %v", tc.name, tc.limit, tc.limited, tc.depth, got, tc.want)
+		if got := handoffAllowed(tc.limit, tc.limited, tc.depth); got != tc.want {
+			t.Errorf("%s: handoffAllowed(%d,%v,%d) = %v, want %v", tc.name, tc.limit, tc.limited, tc.depth, got, tc.want)
 		}
 	}
 }
