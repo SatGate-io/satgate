@@ -163,7 +163,8 @@ type ChildPersister interface {
 //     a helper".
 //   - any other error: the limit could not be read. Refused with
 //     ErrChildTokenFailed, because a limit that cannot be read is not one
-//     Delegate can promise to keep. The error's text is only logged.
+//     Delegate can promise to keep. Only the error's class is logged (see
+//     errClass), never its text or the parent's id.
 //
 // The method uses only basic types so a gateway can implement it while it
 // still builds against a version of this package without the interface.
@@ -184,34 +185,66 @@ func handoffAllowed(limit int, limited bool, parentDepth int) bool {
 	return parentDepth+1 <= limit
 }
 
-// carriesZeroDelegationDepth reports whether any delegation_depth caveat in the
-// parent's chain reads as zero. A positive cap is not looked at here: it keeps
-// the reading Delegate gives it below. The value is read the way
-// /v1/mint/delegate reads it (the leading integer), so a token it refuses for a
-// zero this refuses too. A token that cannot be read here is left to the checks
-// that follow, which refuse it.
-func carriesZeroDelegationDepth(svc *macaroon.Service, parent *TokenInfo) bool {
+// delegationDepthPrefix starts every depth caveat. A caveat that does not start
+// with it (for example "delegation_depth=3") is not a depth caveat here, as on
+// /v1/mint/delegate.
+const delegationDepthPrefix = "delegation_depth = "
+
+// readDelegationDepth reads one depth caveat exactly as /v1/mint/delegate does
+// (mint.go reads it with fmt.Sscanf and macaroon.go's validator judges the
+// result): the leading integer after the prefix, after any spaces, with an
+// optional sign. isDepth is false for a caveat that is not a depth caveat. ok
+// is false when the value does not read (empty, spaces only, letters first, a
+// digit that is not 0-9, out of range): that route refuses such a token. The
+// rest of the value is not looked at, so "3abc" reads 3, "2.5" reads 2, "1e3"
+// reads 1 and "0x10" reads 0.
+func readDelegationDepth(caveat string) (depth int, isDepth, ok bool) {
+	if !strings.HasPrefix(caveat, delegationDepthPrefix) {
+		return 0, false, false
+	}
+	if _, err := fmt.Sscanf(caveat, "delegation_depth = %d", &depth); err != nil {
+		return 0, true, false
+	}
+	return depth, true, true
+}
+
+// readDelegationDepthChain judges every depth caveat in a chain. refused is
+// true when /v1/mint/delegate would refuse the token for its depth: any value
+// that does not read, reads below zero, or reads as zero (the issuer's or a
+// holder's). Otherwise cap is the smallest value read (0 when the chain has no
+// depth caveat), which is the cap that route applies.
+func readDelegationDepthChain(caveats []string) (cap int, refused bool) {
+	for _, caveat := range caveats {
+		depth, isDepth, ok := readDelegationDepth(caveat)
+		if !isDepth {
+			continue
+		}
+		if !ok || depth <= 0 {
+			return 0, true
+		}
+		if cap == 0 || depth < cap {
+			cap = depth
+		}
+	}
+	return cap, false
+}
+
+// parentCaveats are the caveats of the parent's chain: the decoded token when
+// the caller kept it, else the raw token decoded here. nil when neither reads;
+// the checks that follow refuse such a token.
+func parentCaveats(svc *macaroon.Service, parent *TokenInfo) []string {
 	mac := parent.Raw
 	if mac == nil && svc != nil && parent.RawToken != "" {
 		decoded, err := svc.Decode(parent.RawToken)
 		if err != nil {
-			return false
+			return nil
 		}
 		mac = decoded
 	}
 	if mac == nil {
-		return false
+		return nil
 	}
-	for _, caveat := range mac.Caveats {
-		if !strings.HasPrefix(caveat, "delegation_depth = ") {
-			continue
-		}
-		var v int
-		if _, err := fmt.Sscanf(caveat, "delegation_depth = %d", &v); err == nil && v == 0 {
-			return true
-		}
-	}
-	return false
+	return mac.Caveats
 }
 
 // storedHandoff is the record a handoff was decided by (see HandoffLimiter).
@@ -239,10 +272,10 @@ func (d *Delegator) checkStoredHandoffLimit(ctx context.Context, parent *TokenIn
 	if err != nil {
 		var missing interface{ HandoffRecordMissing() bool }
 		if errors.As(err, &missing) && missing.HandoffRecordMissing() {
-			log.Warn().Str("parent", parent.TokenID).Msg("delegation refused: the parent has no stored row")
+			log.Warn().Msg("delegation refused: the parent has no stored row")
 			return nil, errNoStoredHandoff
 		}
-		log.Error().Err(err).Str("parent", parent.TokenID).Msg("delegation refused: the stored handoff limit could not be read")
+		log.Error().Err(errClass(err)).Msg("delegation refused: the stored handoff limit could not be read")
 		return nil, ErrChildTokenFailed
 	}
 	if rowID == "" {
@@ -279,12 +312,14 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		return nil, &clientError{msg: "delegation requires macaroon auth (mode=header)"}
 	}
 
-	// A token that carries delegation_depth = 0 anywhere in its chain allows no
-	// further handoffs, whether the issuer wrote it or a holder appended it,
-	// and whether or not a stored limit is wired. This runs before the stored
-	// limit is read, before any mint, and before any carve: it only reads the
-	// caveats the token already carries.
-	if carriesZeroDelegationDepth(d.macaroonSvc, parent) {
+	// A token whose chain carries a depth /v1/mint/delegate would refuse (zero,
+	// below zero, or a value that does not read) allows no handoff, whether the
+	// issuer wrote it or a holder appended it, and whether or not a stored limit
+	// is wired. This runs before the stored limit is read, before any mint, and
+	// before any carve: it only reads the caveats the token already carries. The
+	// smallest value that does read is the cap, read the same way.
+	depthCap, refused := readDelegationDepthChain(parentCaveats(d.macaroonSvc, parent))
+	if refused {
 		log.Warn().Msg("delegation refused: this token allows no further handoffs")
 		return nil, errNoStoredHandoff
 	}
@@ -309,8 +344,11 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 	}
 
 	// Enforce delegation depth limit
-	if parent.DelegationDepth > 0 && parent.Depth >= parent.DelegationDepth {
-		return nil, &clientError{msg: fmt.Sprintf("delegation depth limit reached (%d)", parent.DelegationDepth)}
+	if depthCap == 0 || (parent.DelegationDepth > 0 && parent.DelegationDepth < depthCap) {
+		depthCap = parent.DelegationDepth
+	}
+	if depthCap > 0 && parent.Depth >= depthCap {
+		return nil, &clientError{msg: fmt.Sprintf("delegation depth limit reached (%d)", depthCap)}
 	}
 
 	// Enforce per-delegation budget cap

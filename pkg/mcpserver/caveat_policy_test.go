@@ -335,11 +335,20 @@ func TestDelegate_DepthCapIgnoresLaterWiden(t *testing.T) {
 	// leaves the cap at 2, it refuses the first handoff (see
 	// TestDelegateRefusesZeroDelegationDepthWithAndWithoutStore). It still does
 	// not widen anything.
-	for _, extra := range []string{"delegation_depth = 9", "delegation_depth = nope"} {
+	for _, extra := range []string{"delegation_depth = 9"} {
 		t.Run(extra, func(t *testing.T) {
 			assertDepthStopsAt(t, "2", extra, 2)
 		})
 	}
+	// Round 5: a holder-appended value that does not read is no longer
+	// ignored (the cap stayed 2). /v1/mint/delegate refuses such a token, so
+	// satgate/delegate refuses it on the first handoff too, rather than
+	// handing a child over under a cap of 2.
+	t.Run("delegation_depth = nope", func(t *testing.T) {
+		r := newZeroDepthRig(t, false)
+		parent := r.token([]string{"delegation_depth = 2"}, []string{"delegation_depth = nope"}, nil)
+		r.wantRefusedAndUntouched(parent, r.handoff(parent, 0), wantNoHandoff, "nope under a cap of 2")
+	})
 }
 
 func TestDelegate_AppendedDepthCapNarrowsUnlimited(t *testing.T) {
