@@ -98,10 +98,6 @@ Both routes are Admit. In the dashboard, Admit is the Charge policy.
 - Benchmark CSV Data: https://satgate.io/data/ai-agent-runaway-spend-benchmark.csv
 - MCP connect snippet: https://satgate.io/mcp-proxy-config-generator
 - MCP signed receipt (Evidence Pack) sample: https://satgate.io/policy-templates/mcp-governance/mcp-evidence-pack.sample.v1.json
-- MCP Spend Caps Template: https://satgate.io/policy-templates/mcp-governance/spend-caps.v1.yaml
-- MCP Tool Allowlist Template: https://satgate.io/policy-templates/mcp-governance/tool-allowlist.v1.yaml
-- MCP Tenant Isolation Template: https://satgate.io/policy-templates/mcp-governance/tenant-isolation.v1.yaml
-- MCP Delegation Depth Template: https://satgate.io/policy-templates/mcp-governance/delegation-depth.v1.yaml
 - Economic Firewall Readiness Grader: https://satgate.io/economic-firewall-readiness-grader
 
 ## Category Pages
