@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock, Shield, AlertTriangle, Lock, Eye, Target, Layers, CheckCircle } from 'lucide-react';
 
 export const metadata = {
-  title: 'Can Adversaries Game Your Economic Firewall? - SatGate Blog',
+  title: { absolute: 'Can Adversaries Game Your Economic Firewall? - SatGate Blog' },
   description: 'Can attackers game an economic firewall? See four adversarial cost-control attacks and the cryptographic defenses that stop them.',
   openGraph: {
     title: 'Can Adversaries Game Your Economic Firewall?',

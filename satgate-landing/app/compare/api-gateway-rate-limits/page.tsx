@@ -4,7 +4,7 @@ import { brutalComparisons } from '../_components/comparisons';
 const config = brutalComparisons['api-gateway-rate-limits'];
 
 export const metadata = {
-  title: 'SatGate vs API Gateway Rate Limits: Budgets, Not Just Request Counts',
+  title: { absolute: 'SatGate vs API Gateway Rate Limits: Budgets, Not Just Request Counts' },
   description: 'Compare API gateway rate limits with SatGate per-agent rules: budgets for agents and sub-agents, MCP tool rules, payments, cloud or self-hosted, and signed receipts.',
   alternates: { canonical: 'https://satgate.io/compare/api-gateway-rate-limits' },
   keywords: ['SatGate vs API Gateway rate limits', 'agent API rate limits', 'API gateway budget enforcement', 'MCP rate limits', 'agent spend policy'],

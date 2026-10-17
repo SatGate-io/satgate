@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Verify a SatGate receipt',
+  title: { absolute: 'Verify a SatGate receipt' },
   description: 'Check a SatGate receipt yourself, with no SatGate account: download a real signed receipt (Evidence Pack) and verify its Ed25519 signature against the published keys.',
   alternates: { canonical: 'https://satgate.io/verify-evidence-pack' },
 };

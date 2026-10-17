@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Check, DollarSign, Gauge, KeyRound, Minus, ShieldCheck, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate vs Kong AI Gateway - AI Gateway vs Agent Spending Controls',
+  title: { absolute: 'SatGate vs Kong AI Gateway - AI Gateway vs Agent Spending Controls' },
   description: 'Compare SatGate and Kong AI Gateway. Kong is API/AI gateway infrastructure; SatGate controls agent spend, MCP tools, scoped credentials, and charging external agents.',
   alternates: { canonical: 'https://satgate.io/compare/kong-ai-gateway' },
   keywords: [

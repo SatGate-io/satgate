@@ -4,7 +4,7 @@ import { brutalComparisons } from '../_components/comparisons';
 const config = brutalComparisons['openai-anthropic-budget-controls'];
 
 export const metadata = {
-  title: 'SatGate vs OpenAI and Anthropic Budgets: One Budget Across Providers',
+  title: { absolute: 'SatGate vs OpenAI and Anthropic Budgets: One Budget Across Providers' },
   description: 'Compare OpenAI and Anthropic built-in budget controls with SatGate: one agent budget across providers, MCP tool rules, payments, cloud or self-hosted, and signed receipts.',
   alternates: { canonical: 'https://satgate.io/compare/openai-anthropic-budget-controls' },
   keywords: ['OpenAI budget controls alternative', 'Anthropic budget controls alternative', 'cross-provider AI budgets', 'agent budget enforcement', 'SatGate vs OpenAI budgets'],

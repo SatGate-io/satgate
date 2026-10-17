@@ -32,7 +32,7 @@ REQUIRED_PHRASES = {
         "Ask about a 90-day design-partner pilot",
     ],
     "app/pay/page.tsx": [
-        "paid-call receipts",
+        "Payment decisions, refusals included, get a signed receipt",
         "Receipt Returned",
         "Paid-call receipt queued for export",
         "receipt_id",

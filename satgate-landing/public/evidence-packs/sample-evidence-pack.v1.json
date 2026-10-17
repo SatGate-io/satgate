@@ -51,12 +51,12 @@
     "budget_id": "bud_FIN_AP_042",
     "owner": "finance-automation",
     "cost_center": "FIN-AP-042",
-    "currency": "USD",
-    "unit_precision": 2,
-    "root_limit": "25.00",
-    "delegated_limit": "3.00",
-    "spent": "0.78",
-    "remaining": "0.00",
+    "currency": "credits",
+    "unit_precision": 0,
+    "root_limit": "100",
+    "delegated_limit": "30",
+    "spent": "30",
+    "remaining": "0",
     "reset_window": "2026-05-10T00:00:00Z/2026-05-11T00:00:00Z",
     "exhausted": true,
     "ledger_root": "sha256:demo_budget_ledger_root"
@@ -102,9 +102,9 @@
           "value": "tenant_acme_finance"
         },
         {
-          "type": "budget_usd",
+          "type": "budget_credits",
           "op": "lte",
-          "value": "25.00"
+          "value": "100"
         },
         {
           "type": "delegation_depth",
@@ -119,7 +119,7 @@
       ],
       "delegation_depth_current": 0,
       "delegation_depth_max": 1,
-      "budget_limit": "25.00",
+      "budget_limit": "100",
       "expires_at": "2026-05-10T15:22:31Z",
       "receipt_hash": "sha256:1d2f1b29c390d2bb626607a79d8cde629502d7d9ab17f01e5c30772afd22e3a7"
     },
@@ -168,9 +168,9 @@
       ],
       "caveats_added": [
         {
-          "type": "budget_usd",
+          "type": "budget_credits",
           "op": "lte",
-          "value": "3.00"
+          "value": "30"
         },
         {
           "type": "deny",
@@ -185,8 +185,8 @@
       ],
       "delegation_depth_current": 1,
       "delegation_depth_max": 1,
-      "budget_limit": "3.00",
-      "budget_carved": "3.00",
+      "budget_limit": "30",
+      "budget_carved": "30",
       "expires_at": "2026-05-10T15:22:31Z",
       "attenuation_proof": {
         "scope_after_subset_of_before": true,
@@ -271,15 +271,15 @@
       "prev_receipt_hash": "sha256:d72cdcaa8b4e376c8ed757280c61ee32aafcd0dbd8b19044f762aaae2e97e975",
       "route": "/v1/invoices/search",
       "mcp_tool": "invoices.search",
-      "amount": "0.18",
-      "currency": "USD",
-      "budget_remaining": "2.82",
+      "amount": "10",
+      "currency": "credits",
+      "budget_remaining": "20",
       "payment_context_ref": "payctx_internal_ledger",
       "request_id": "req_demo_search_001",
-      "receipt_hash": "sha256:17a79e54773812cbde6775225fc7017db6404e5ed859e669b32722861d40eafb",
+      "receipt_hash": "sha256:08ccabafb129213fe848f23d87c070c6f3180362c734776b57b9c999928f99bc",
       "evidence_pack_id": "ep_demo_2026_05_10_001",
       "policy_version": "pol_invoice_reconciliation@2026-05-09",
-      "decision_reason": "receipt_3_recorded"
+      "decision_reason": "budget_authorized"
     },
     {
       "receipt_id": "rcpt_demo_004",
@@ -299,17 +299,17 @@
       "result": "allowed",
       "policy_decision_ref": "dec_demo_invoice_policy_v7",
       "budget_ledger_ref": "led_demo_002",
-      "prev_receipt_hash": "sha256:17a79e54773812cbde6775225fc7017db6404e5ed859e669b32722861d40eafb",
+      "prev_receipt_hash": "sha256:08ccabafb129213fe848f23d87c070c6f3180362c734776b57b9c999928f99bc",
       "route": "/v1/invoices/compare",
-      "amount": "0.42",
-      "currency": "USD",
-      "budget_remaining": "2.40",
+      "amount": "10",
+      "currency": "credits",
+      "budget_remaining": "10",
       "payment_context_ref": "payctx_internal_ledger",
       "request_id": "req_demo_compare_001",
-      "receipt_hash": "sha256:75d6c718ed0fd7f4bd76cb45f1a1b8f17da128e9f721296192dfe4d3a3bb2ae1",
+      "receipt_hash": "sha256:a30fcdbffb8b9dddfe40e24b45860e0babcfb334c4747fa24be92d3477fce87d",
       "evidence_pack_id": "ep_demo_2026_05_10_001",
       "policy_version": "pol_invoice_reconciliation@2026-05-09",
-      "decision_reason": "receipt_4_recorded"
+      "decision_reason": "budget_authorized"
     },
     {
       "receipt_id": "rcpt_demo_005",
@@ -329,18 +329,18 @@
       "result": "allowed",
       "policy_decision_ref": "dec_demo_invoice_policy_v7",
       "budget_ledger_ref": "led_demo_003",
-      "prev_receipt_hash": "sha256:75d6c718ed0fd7f4bd76cb45f1a1b8f17da128e9f721296192dfe4d3a3bb2ae1",
+      "prev_receipt_hash": "sha256:a30fcdbffb8b9dddfe40e24b45860e0babcfb334c4747fa24be92d3477fce87d",
       "route": "/v1/invoices/ocr",
       "mcp_tool": "document_ai.ocr",
-      "amount": "0.18",
-      "currency": "USD",
-      "budget_remaining": "2.22",
+      "amount": "10",
+      "currency": "credits",
+      "budget_remaining": "0",
       "payment_context_ref": "payctx_x402_001",
       "request_id": "req_demo_ocr_001",
-      "receipt_hash": "sha256:0b1deba9e550096260980b97e4d73388a2dc2caf1bb09114a7b502b8521cc095",
+      "receipt_hash": "sha256:0222f0eef3ad85551582489028994a41906b73f632d7f059e419612981e0b88e",
       "evidence_pack_id": "ep_demo_2026_05_10_001",
       "policy_version": "pol_invoice_reconciliation@2026-05-09",
-      "decision_reason": "receipt_5_recorded"
+      "decision_reason": "budget_authorized"
     },
     {
       "receipt_id": "rcpt_demo_006",
@@ -357,17 +357,17 @@
       },
       "action": "call_api_route",
       "resource": "/v1/invoices/export",
-      "result": "blocked",
+      "result": "denied",
       "policy_decision_ref": "dec_demo_invoice_policy_v7",
       "budget_ledger_ref": null,
-      "prev_receipt_hash": "sha256:0b1deba9e550096260980b97e4d73388a2dc2caf1bb09114a7b502b8521cc095",
+      "prev_receipt_hash": "sha256:0222f0eef3ad85551582489028994a41906b73f632d7f059e419612981e0b88e",
       "route": "/v1/invoices/export",
-      "reason_code": "scope_violation:no_customer_data_export",
+      "reason_code": "policy_denied",
       "request_id": "req_demo_export_001",
-      "receipt_hash": "sha256:deb366ce5af90083afcf9271d3c3310ed23d7927795f36e132532e888fcc162c",
+      "receipt_hash": "sha256:3458f37944a561170cd5d6e7540b608614c4d8181a07c60c296f572a64c08d93",
       "evidence_pack_id": "ep_demo_2026_05_10_001",
       "policy_version": "pol_invoice_reconciliation@2026-05-09",
-      "decision_reason": "scope_violation:no_customer_data_export"
+      "decision_reason": "policy_denied"
     },
     {
       "receipt_id": "rcpt_demo_007",
@@ -384,15 +384,15 @@
       },
       "action": "call_api_route",
       "resource": "/v1/invoices/reconcile",
-      "result": "blocked",
+      "result": "denied",
       "policy_decision_ref": "dec_demo_invoice_policy_v7",
       "budget_ledger_ref": "led_demo_004",
-      "prev_receipt_hash": "sha256:deb366ce5af90083afcf9271d3c3310ed23d7927795f36e132532e888fcc162c",
+      "prev_receipt_hash": "sha256:3458f37944a561170cd5d6e7540b608614c4d8181a07c60c296f572a64c08d93",
       "route": "/v1/invoices/reconcile",
       "reason_code": "budget_exhausted",
-      "budget_remaining": "0.00",
+      "budget_remaining": "0",
       "request_id": "req_demo_reconcile_001",
-      "receipt_hash": "sha256:c9dcbe1e6bf5da255d24af48b417d1b81e73450e208d31e78a041ed9207405ff",
+      "receipt_hash": "sha256:80563f377284c77b547d1b96f9a1e0f751b306c801b495b2d30436108e6c825d",
       "evidence_pack_id": "ep_demo_2026_05_10_001",
       "policy_version": "pol_invoice_reconciliation@2026-05-09",
       "decision_reason": "budget_exhausted"
@@ -414,10 +414,10 @@
       "result": "revoked",
       "policy_decision_ref": "dec_demo_invoice_policy_v7",
       "budget_ledger_ref": null,
-      "prev_receipt_hash": "sha256:c9dcbe1e6bf5da255d24af48b417d1b81e73450e208d31e78a041ed9207405ff",
+      "prev_receipt_hash": "sha256:80563f377284c77b547d1b96f9a1e0f751b306c801b495b2d30436108e6c825d",
       "reason_code": "incident_review_stop_worker",
       "request_id": "req_demo_revoke_001",
-      "receipt_hash": "sha256:78e8362a8a875b7179d7a8ed3ec7b5ad8733957cb14417e25c926fc85c31135a",
+      "receipt_hash": "sha256:93305807021cffda9d24fcd870d6179f224df5c4a34b0200aad35e0d02c08e34",
       "evidence_pack_id": "ep_demo_2026_05_10_001",
       "policy_version": "pol_invoice_reconciliation@2026-05-09",
       "decision_reason": "incident_review_stop_worker"
@@ -439,10 +439,10 @@
       "result": "evidence_pack_issued",
       "policy_decision_ref": "dec_demo_invoice_policy_v7",
       "budget_ledger_ref": null,
-      "prev_receipt_hash": "sha256:78e8362a8a875b7179d7a8ed3ec7b5ad8733957cb14417e25c926fc85c31135a",
+      "prev_receipt_hash": "sha256:93305807021cffda9d24fcd870d6179f224df5c4a34b0200aad35e0d02c08e34",
       "reason_code": "auditor_request",
       "request_id": "req_demo_export_pack_001",
-      "receipt_hash": "sha256:a2960795ff2e5412577aaca61eb8c204323037e5d0f5baf5ee676fa3748bc79b",
+      "receipt_hash": "sha256:54250faee577d2ae04c87a005be4265099422f9779b87d2d4e1a6e14d9fde748",
       "evidence_pack_id": "ep_demo_2026_05_10_001",
       "policy_version": "pol_invoice_reconciliation@2026-05-09",
       "decision_reason": "auditor_request"
@@ -460,8 +460,8 @@
       {
         "payment_context_id": "payctx_internal_ledger",
         "rail": "enterprise_ledger",
-        "amount": "0.60",
-        "currency": "USD",
+        "amount": "20",
+        "currency": "credits",
         "cost_center": "FIN-AP-042",
         "settlement_status": "posted",
         "policy_decision_ref": "dec_demo_invoice_policy_v7"
@@ -484,9 +484,9 @@
     "hash_algorithm": "sha256",
     "chain_type": "linear_hash_chain",
     "first_receipt_hash": "sha256:1d2f1b29c390d2bb626607a79d8cde629502d7d9ab17f01e5c30772afd22e3a7",
-    "last_receipt_hash": "sha256:a2960795ff2e5412577aaca61eb8c204323037e5d0f5baf5ee676fa3748bc79b",
+    "last_receipt_hash": "sha256:54250faee577d2ae04c87a005be4265099422f9779b87d2d4e1a6e14d9fde748",
     "receipt_count": 9,
-    "chain_root": "sha256:4072f1e7f10ee7016d8614ff08f7c1171d29933fa1304225ed46cf44db39d4f9"
+    "chain_root": "sha256:42ad673a73db1590ec8032f7318a99a342ad13ecc5a21e9aa5a547b27da627b0"
   },
   "redaction": {
     "applied": true,
@@ -499,7 +499,7 @@
     ],
     "method": "masked_with_hash_commitments",
     "original_chain_root": "sha256:demo_original_chain_root_redacted",
-    "redacted_chain_root": "sha256:4072f1e7f10ee7016d8614ff08f7c1171d29933fa1304225ed46cf44db39d4f9",
+    "redacted_chain_root": "sha256:42ad673a73db1590ec8032f7318a99a342ad13ecc5a21e9aa5a547b27da627b0",
     "proof_mode": "redacted_hash_commitments"
   },
   "export": {
@@ -530,7 +530,7 @@
     "verify_url": "https://satgate.io/evidence-pack-demo",
     "cli": "satgate-cli proof export --tenant tenant_acme_finance"
   },
-  "chain_root": "sha256:4072f1e7f10ee7016d8614ff08f7c1171d29933fa1304225ed46cf44db39d4f9",
+  "chain_root": "sha256:42ad673a73db1590ec8032f7318a99a342ad13ecc5a21e9aa5a547b27da627b0",
   "signature": "ed25519:REDACTED_DEMO_SAMPLE_DO_NOT_VERIFY",
   "policy_version": "pol_invoice_reconciliation@2026-05-09"
 }

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, Shield, Lock, Eye, Key, Zap, CheckCircle, Code, GitBranch, Bot, Activity, Server, FileText } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate Security | Capability Tokens for AI Agent Governance',
+  title: { absolute: 'SatGate Security | Capability Tokens for AI Agent Governance' },
   description: 'SatGate security model for AI agent API governance: capability tokens, scoped budgets, delegation limits, revocation, audit, and policy before the request goes through.',
   alternates: { canonical: 'https://satgate.io/security' },
   keywords: [

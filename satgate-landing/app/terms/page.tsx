@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-  title: 'Terms of Service - SatGate',
+  title: { absolute: 'Terms of Service - SatGate' },
   description: 'SatGate terms of service for SaaS and self-host, including economic access control, L402 payments, licensing, and prohibited uses.',
   alternates: { canonical: 'https://satgate.io/terms' },
   openGraph: {

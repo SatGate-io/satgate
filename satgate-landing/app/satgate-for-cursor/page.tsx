@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, Bot, DollarSign, Gauge, KeyRound, ShieldCheck, Terminal, Workflow } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate for Cursor AI Agents',
+  title: { absolute: 'SatGate for Cursor AI Agents' },
   description: 'Control Cursor agent spend, MCP tool access, and API credentials with SatGate budgets before the request goes through, revocation, and signed receipts.',
   alternates: { canonical: 'https://satgate.io/satgate-for-cursor' },
   keywords: [

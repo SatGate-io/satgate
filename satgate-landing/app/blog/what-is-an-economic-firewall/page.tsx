@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock, Shield, DollarSign, ArrowRight, AlertTriangle, Eye, Lock, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'What Is an Economic Firewall? | SatGate',
+  title: { absolute: 'What Is an Economic Firewall? | SatGate' },
   description: 'An economic firewall enforces AI agent budget limits in real time. Learn why rate limits fail and how SatGate governs autonomous API spend.',
   alternates: { canonical: 'https://satgate.io/blog/what-is-an-economic-firewall' },
   keywords: ['economic firewall', 'AI agent security', 'API budget enforcement', 'macaroon delegation', 'agent economy', 'MCP cost control', 'L402', 'API gateway AI'],

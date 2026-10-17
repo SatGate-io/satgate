@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'SatGate vs AWS Bedrock vs Azure AI Foundry: Agent Spending Controls',
+  title: { absolute: 'SatGate vs AWS Bedrock vs Azure AI Foundry: Agent Spending Controls' },
   description:
     'Compare SatGate with AWS Bedrock and Azure AI Foundry for AI agent controls, budget enforcement, visibility across clouds, and L402 payments.',
   keywords: [

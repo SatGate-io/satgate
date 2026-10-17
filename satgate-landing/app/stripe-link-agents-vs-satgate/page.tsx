@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, CheckCircle2, CreditCard, Gauge, KeyRound, ShieldCheck, WalletCards, XCircle } from 'lucide-react';
 
 export const metadata = {
-  title: 'Stripe Link for Agents vs SatGate',
+  title: { absolute: 'Stripe Link for Agents vs SatGate' },
   description: 'Compare Stripe Link for Agents and SatGate: agent wallets and payment credentials vs spending checks before the request goes through, budgets, audit, and L402.',
   alternates: { canonical: 'https://satgate.io/stripe-link-agents-vs-satgate' },
   keywords: [

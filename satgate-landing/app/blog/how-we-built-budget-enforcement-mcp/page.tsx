@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: 'How We Built Budget Enforcement for MCP Tool Calls - SatGate Blog',
+  title: { absolute: 'How We Built Budget Enforcement for MCP Tool Calls - SatGate Blog' },
   description: 'We shipped an open-source MCP proxy that enforces per-tool budgets with cryptographic delegation. Here\'s how we built it and what we learned.',
   alternates: { canonical: 'https://satgate.io/blog/how-we-built-budget-enforcement-mcp' },
   openGraph: {

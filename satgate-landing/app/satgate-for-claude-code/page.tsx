@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, Bot, DollarSign, Gauge, KeyRound, ShieldCheck, Terminal, Workflow } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate for Claude Code',
+  title: { absolute: 'SatGate for Claude Code' },
   description: 'Add budget enforcement, revocable credentials, and MCP governance around Claude Code workflows and autonomous coding-agent API calls.',
   alternates: { canonical: 'https://satgate.io/satgate-for-claude-code' },
   keywords: [

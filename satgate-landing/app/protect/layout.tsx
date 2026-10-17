@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "AI Agent Budget Enforcement Demo | SatGate Control",
+  title: { absolute: "AI Agent Budget Enforcement Demo | SatGate Control" },
   alternates: { canonical: "https://satgate.io/protect" },
   description:
     "See AI agent budget enforcement before the request goes through. Control API and MCP tool spend with per-agent caps, delegation limits, policy decisions, and next-request revocation.",

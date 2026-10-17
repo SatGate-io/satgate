@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "SatGate Design Partners | Economic Firewall for AI Agents",
+  title: { absolute: "SatGate Design Partners | Economic Firewall for AI Agents" },
   alternates: { canonical: "https://satgate.io/design-partners" },
   description:
     "Optional 90-day design-partner pilot for larger teams that want help with rules and receipts for AI agents. A 14-day self-serve trial is also open.",

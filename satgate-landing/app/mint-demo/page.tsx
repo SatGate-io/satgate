@@ -168,7 +168,7 @@ export default function MintDemoPage() {
       {
         '@type': 'Question',
         name: 'How do macaroons help with agent delegation?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Macaroon caveats let delegated agent credentials become more constrained by route, budget, expiry, call count, and delegation policy while preserving cryptographic verification.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'Macaroon caveats let delegated agent credentials become more constrained by route, budget, expiry, and delegation policy while preserving cryptographic verification.' },
       },
       {
         '@type': 'Question',
@@ -220,7 +220,7 @@ export default function MintDemoPage() {
           </h2>
           <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
             Watch SatGate Mint exchange a workload identity token for a capability-bearing macaroon. 
-            No secrets to manage. No tokens to rotate. The identity <em>is</em> the credential.
+            No static API keys to hand out. Each token expires on its own, and the workload gets a new one by exchanging its identity again.
           </p>
         </div>
       </div>
@@ -464,7 +464,7 @@ export default function MintDemoPage() {
             {[
               ['What does the SatGate Mint demo show?', 'The demo shows an AI agent exchanging workload identity for a scoped macaroon capability token with budget, expiry, policy, and verification data.'],
               ['Why mint capability tokens for AI agents?', 'Capability tokens let teams give agents narrow, revocable, budget-aware API authority instead of broad static API keys.'],
-              ['How do macaroons help with agent delegation?', 'Macaroon caveats let delegated agent credentials become more constrained by route, budget, expiry, call count, and delegation policy while preserving cryptographic verification.'],
+              ['How do macaroons help with agent delegation?', 'Macaroon caveats let delegated agent credentials become more constrained by route, budget, expiry, and delegation policy while preserving cryptographic verification.'],
               ['How is SatGate Mint different from issuing static API keys?', 'SatGate Mint exchanges workload identity for scoped, expiring, budget-aware capability tokens instead of handing agents broad static API keys that must be manually rotated.'],
               ['What should a minted agent credential include?', 'A minted agent credential should include workload identity, tenant, agent, task or workflow, route scope, budget caveats, expiry, delegation limits, audit fields, and revocation policy.'],
             ].map(([question, answer]) => (
