@@ -34,6 +34,38 @@ const whatItDoes = [
   { icon: MailCheck, text: 'Get an email to approve orders you want to see first, and stop your agent with one button.' },
 ];
 
+const comparisonTitle = 'What Robinhood gives you, and what SatGate adds';
+const comparisonIntro =
+  'Robinhood gives your agent its own account that you fund, trade approvals you can turn on, and its activity in the Robinhood app. SatGate adds the following on top.';
+
+const comparisonRows = [
+  {
+    topic: 'Which accounts your agent can read',
+    robinhood: 'Your agent can read all your Robinhood accounts, with their numbers, positions and balances.',
+    satgate:
+      'Your agent can see only the Agentic account. SatGate refuses the request that lists all your accounts, and any request that names another account.',
+  },
+  {
+    topic: 'How much your agent can trade',
+    robinhood: 'You choose how much money to put in the agent\'s account, and the agent can trade with what is in it.',
+    satgate:
+      'You set the most it can trade, in dollars, per order, per day and per week, and an order over a limit is refused before it reaches Robinhood.',
+  },
+  {
+    topic: 'Approving orders',
+    robinhood:
+      'Trade approvals are an on or off setting. With it on, you review and place each trade your agent proposes in the Robinhood app.',
+    satgate:
+      'You pick a dollar amount. An order over it waits for your yes by email or in SatGate, and smaller orders go through within your limits.',
+  },
+  {
+    topic: 'Orders that were stopped',
+    robinhood: 'Orders your agent places show up in the Activity section of its account in the Robinhood app.',
+    satgate:
+      'When SatGate refuses an order for being over a limit, outside the Agentic account or not allowed, it signs a receipt for the refusal.',
+  },
+];
+
 const canAndCant = [
   'You sign in on Robinhood\'s own page. SatGate never sees your Robinhood password.',
   'SatGate can\'t move money. Robinhood\'s agent connection has no deposit, withdrawal, transfer or bank-link action, and trades can only happen in the Agentic account you fund.',
@@ -97,6 +129,34 @@ export default function TradingPage() {
               Set up my agent&apos;s limits <ArrowRight size={16} />
             </a>
           </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-4xl px-6 pt-16" aria-labelledby="comparison-title">
+        <div className="rounded-lg border border-gray-800 bg-black/60 p-6 md:p-8">
+          <h2 id="comparison-title" className="mb-3 text-2xl font-bold text-white">{comparisonTitle}</h2>
+          <p className="mb-6 text-gray-300">{comparisonIntro}</p>
+          <div className="hidden gap-8 border-b border-gray-800 pb-3 text-sm font-semibold text-gray-400 md:grid md:grid-cols-2" aria-hidden="true">
+            <span>Robinhood on its own</span>
+            <span>With SatGate</span>
+          </div>
+          <ul>
+            {comparisonRows.map((row) => (
+              <li key={row.topic} className="border-b border-gray-800 py-5 last:border-b-0 last:pb-0">
+                <h3 className="mb-3 text-base font-semibold text-white">{row.topic}</h3>
+                <div className="grid gap-4 md:grid-cols-2 md:gap-8">
+                  <div>
+                    <p className="mb-1 text-sm font-semibold text-gray-400 md:hidden">Robinhood on its own</p>
+                    <p className="text-gray-300">{row.robinhood}</p>
+                  </div>
+                  <div className="border-l-2 border-cyan-300 pl-4">
+                    <p className="mb-1 text-sm font-semibold text-cyan-300 md:hidden">With SatGate</p>
+                    <p className="text-gray-100">{row.satgate}</p>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
