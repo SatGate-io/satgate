@@ -53,6 +53,25 @@
 //
 //	{"v":1,"approvals":[{"tools":["place_crypto_order"],"field":"dollar_amount","above":"50"}]}
 //
+// # Order cost (opt-in)
+//
+// A spending limit or an "ask me" rule that sums or compares one named field
+// cannot value a limit order, which states a quantity and a price instead of
+// dollar_amount. Either may carry "value":"order_max_cost":
+//
+//	{"tools":["place_equity_order"],"field":"dollar_amount","max":"300","window":"day","value":"order_max_cost"}
+//
+// The limit or rule then counts each order at the most it can cost, by
+// argrules.OrderMaxCost: dollar_amount, or quantity times limit_price for a day
+// limit buy of shares. It is the same function the per-order cap (the "order"
+// condition with max_cost, in pkg/argrules) uses, so a call has one value on
+// every path. An order that does not fill still counts until the day or week
+// resets. The key is accepted only with field dollar_amount and only on
+// place_equity_order and place_crypto_order (any letter case); it may share a
+// limit with "budget" and "symbols". A document without the key means what it
+// always meant, and its canonical form is unchanged. A release that predates
+// the key refuses the document (unknown key): it fails closed.
+//
 // Unknown keys, repeated keys, a missing key other than tz, and anything over
 // the size limits are errors at mint and at verify.
 package toolcontrols
@@ -136,6 +155,11 @@ type SpendLimit struct {
 	// is on the list (1 to MaxSymbolsPerLimit entries, each already in
 	// canonical form, sorted). See symbols.go.
 	Symbols []string
+	// Value, when set, is argrules.OrderCostBasis ("order_max_cost"): the limit
+	// counts each call at the most it can cost (argrules.OrderMaxCost) instead
+	// of reading Field. Field must then be dollar_amount and every tool an
+	// order tool. Empty means the limit reads Field, as before.
+	Value string
 
 	// ID names the limit's counter: the hex SHA-256 prefix of the caveat word
 	// it was read from. It is set by Collect and ParseScopeValue; a limit
@@ -266,7 +290,7 @@ func parseSpendLimit(raw json.RawMessage) (SpendLimit, error) {
 		return SpendLimit{}, ctlErr("a spending limit must be an object")
 	}
 	var l SpendLimit
-	var sawTools, sawField, sawMax, sawWindow bool
+	var sawTools, sawField, sawMax, sawWindow, sawValue bool
 	for k, v := range obj {
 		switch k {
 		case "tools":
@@ -307,12 +331,22 @@ func parseSpendLimit(raw json.RawMessage) (SpendLimit, error) {
 			if err := json.Unmarshal(v, &l.Symbols); err != nil || l.Symbols == nil {
 				return SpendLimit{}, ctlErr("symbols must be a list of symbols")
 			}
+		case "value":
+			if err := json.Unmarshal(v, &l.Value); err != nil {
+				return SpendLimit{}, ctlErr("value must be a string")
+			}
+			sawValue = true
 		default:
 			return SpendLimit{}, ctlErr("unknown spending limit key %q", clip(k))
 		}
 	}
 	if !sawTools || !sawField || !sawMax || !sawWindow {
 		return SpendLimit{}, ctlErr("a spending limit needs tools, field, max and window")
+	}
+	if sawValue && l.Value == "" {
+		// An empty value is not "no value": refuse it rather than read it as
+		// the old meaning.
+		return SpendLimit{}, ctlErr("value must be %q", argrules.OrderCostBasis)
 	}
 	if err := l.validate(); err != nil {
 		return SpendLimit{}, err
@@ -369,8 +403,39 @@ func (l *SpendLimit) validate() error {
 		return ctlErr("max is out of range")
 	}
 	l.max, l.units = rat, units
+	if err := validateValueBasis(l.Value, l.Field, l.Tools); err != nil {
+		return err
+	}
 	return l.validateSymbols()
 }
+
+// validateValueBasis checks the "value" key of a spending limit or an "ask me"
+// rule. Empty is the old meaning and always passes. Otherwise it must be
+// argrules.OrderCostBasis, the field must be dollar_amount, and every tool
+// must be an order tool, so no other tool and no other field can be counted
+// this way (options stay off: nothing here values their price, legs or
+// quantity).
+func validateValueBasis(value, field string, tools []string) error {
+	if value == "" {
+		return nil
+	}
+	if value != argrules.OrderCostBasis {
+		return ctlErr("value must be %q", argrules.OrderCostBasis)
+	}
+	if field != OrderCostField {
+		return ctlErr("a limit with value %q must have field %q", argrules.OrderCostBasis, OrderCostField)
+	}
+	for _, t := range tools {
+		if !argrules.IsOrderTool(t) {
+			return ctlErr("value %q can only count %s and %s, not %q", argrules.OrderCostBasis, toolEquityOrder, toolCryptoOrder, clip(t))
+		}
+	}
+	return nil
+}
+
+// OrderCostField is the only field a limit or rule with value order_max_cost
+// may name. It is the field the old reading of the same limit would sum.
+const OrderCostField = "dollar_amount"
 
 // ValidBudgetID reports whether id has the shape of a budget id: 24
 // characters of [a-z0-9].
@@ -505,6 +570,10 @@ func Marshal(d *Doc) ([]byte, error) {
 			sj, _ := json.Marshal(cp.Symbols)
 			fmt.Fprintf(&b, `,"symbols":%s`, sj)
 		}
+		if cp.Value != "" {
+			vj, _ := json.Marshal(cp.Value)
+			fmt.Fprintf(&b, `,"value":%s`, vj)
+		}
 		b.WriteByte('}')
 	}
 	if len(d.SpendLimits) > 0 {
@@ -524,7 +593,12 @@ func Marshal(d *Doc) ([]byte, error) {
 			tools, _ := json.Marshal(cp.Tools)
 			field, _ := json.Marshal(cp.Field)
 			above, _ := json.Marshal(cp.Above)
-			fmt.Fprintf(&b, `{"tools":%s,"field":%s,"above":%s}`, tools, field, above)
+			fmt.Fprintf(&b, `{"tools":%s,"field":%s,"above":%s`, tools, field, above)
+			if cp.Value != "" {
+				vj, _ := json.Marshal(cp.Value)
+				fmt.Fprintf(&b, `,"value":%s`, vj)
+			}
+			b.WriteByte('}')
 		}
 		b.WriteString(`]`)
 	}
@@ -707,6 +781,10 @@ func Describe(limits []SpendLimit) []string {
 	for _, l := range limits {
 		line := fmt.Sprintf("%s: at most %s %s in total on %s",
 			strings.Join(l.Tools, " and "), FormatAmount(l.Field, l.Max), l.Window.phrase(), l.Field)
+		if l.Value != "" {
+			line = fmt.Sprintf("%s: at most %s %s in total, counting each order at the most it can cost (%s)",
+				strings.Join(l.Tools, " and "), FormatAmount(l.Field, l.Max), l.Window.phrase(), argrules.OrderCostCountedAs)
+		}
 		if len(l.Symbols) > 0 {
 			line += ", for " + strings.Join(l.Symbols, " and ") + " only"
 		}
