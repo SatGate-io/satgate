@@ -29,6 +29,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/docs', lastModified: '2026-07-02', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/agent-capability-tokens', lastModified: '2026-05-10', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/capability-lifecycle-demo', lastModified: '2026-05-10', changeFrequency: 'weekly', priority: 0.9 },
+  { path: '/trading', lastModified: '2026-10-15', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/pricing', lastModified: '2026-09-27', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/security', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog', lastModified: '2026-10-16', changeFrequency: 'weekly', priority: 0.8 },

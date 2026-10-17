@@ -189,6 +189,10 @@ const LandingPage = () => {
               <Link href="/evidence-pack-demo" className="text-gray-400 hover:text-white underline underline-offset-2">See a signed receipt (Evidence Pack)</Link>
             </p>
             <p className="mt-2 text-sm text-gray-500">14 days free. No credit card.</p>
+            <p className="mt-4 text-base text-gray-300">
+              Trading on Robinhood? Set limits for your AI agent.{' '}
+              <Link href="/trading" className="font-medium text-cyan-300 hover:text-cyan-200 underline underline-offset-2">See how</Link>
+            </p>
 
             {/* Proof strip */}
             <div className="mt-6 space-y-2 text-xs text-gray-500">
@@ -276,6 +280,11 @@ const LandingPage = () => {
               <source src="/satgate-demo-trading.mp4" type="video/mp4" />
               Your browser does not support the video tag.
             </video>
+          </div>
+          <div className="mt-6">
+            <Link href="/trading" className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 px-8 py-3 font-bold text-white shadow-lg shadow-purple-500/20 transition hover:from-purple-500 hover:to-cyan-500">
+              Set up my agent&apos;s limits <ArrowRight size={16} />
+            </Link>
           </div>
           <p className="text-xs text-gray-500 mt-3">The agents in the recording are scripted MCP clients. The orders are real: three Bitcoin buys, $7 in total. Account numbers are masked.</p>
 
