@@ -181,16 +181,16 @@ satgate-mcp --config ./satgate-mcp.yaml`}</code>
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
             <code>{`upstreams:
   github-read:
-    transport: http
-    url: https://mcp.internal/github-read
+    transport: stdio
+    command: ["./mcp-servers/github-read"]
 
   web-fetch:
-    transport: http
-    url: https://mcp.internal/web-fetch
+    transport: stdio
+    command: ["./mcp-servers/web-fetch"]
 
   ci-actions:
-    transport: http
-    url: https://mcp.internal/ci`}</code>
+    transport: stdio
+    command: ["./mcp-servers/ci-actions"]`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
