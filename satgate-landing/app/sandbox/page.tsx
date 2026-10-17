@@ -140,10 +140,10 @@ const goldenPathSteps: Array<{
     label: '6 · Blocked: token revoked',
     status: 'HTTP 401/403',
     decision: 'blocked',
-    reason: 'capability_revoked',
+    reason: 'token_revoked',
     route: 'mcp:invoices.search',
     budget: 'Nothing spent after the revoke',
-    receipt: 'rcpt_demo_009 (the refused request)',
+    receipt: 'none',
     tone: 'revoked',
   },
 ];
