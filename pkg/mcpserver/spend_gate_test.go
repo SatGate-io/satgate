@@ -319,6 +319,81 @@ func amountEchoes(t *testing.T, doc []byte, amount string) []string {
 
 var plainDecimal = regexp.MustCompile(`^[0-9]+(\.[0-9]+)?$`)
 
+// The refusal does not echo an amount whose digits sit in the token id.
+// TestSpendRefusalDoesNotEchoTheAmount sends 777.31 whatever token id the run
+// mints, so it meets the case CI run 38937620498 failed on (the id holding
+// the amount's digits) only about once in 400 runs. This test meets it on
+// every run, through the real refusal: the amount is made from digits of this
+// run's own token id, so the receipt input always holds the amount's digits
+// inside the id. The check before c76cfac6 (the amount's whole part as a
+// substring of the serialized bytes) fails here every time; amountEchoes,
+// which compares values, must find nothing, and the refusal is still the
+// spend refusal.
+func TestSpendRefusalDoesNotEchoAnAmountWhoseDigitsAreInTheTokenID(t *testing.T) {
+	for attempt := 0; attempt < 50; attempt++ {
+		h := newSpendHarness(t, spendDoc200Day)
+		// An order that reaches the limit exactly: every later amount is refused.
+		if r := h.call(t, 1, "place_crypto_order", order("200")); r.Error != nil {
+			t.Fatalf("order up to the limit refused: %v", r.Error)
+		}
+		if len(h.rec.decisions) != 1 || h.rec.decisions[0].TokenID == "" {
+			t.Fatalf("want one decision with a token id after the first order: %+v", h.rec.decisions)
+		}
+		tokenID := h.rec.decisions[0].TokenID
+		whole := digitsForAmount(tokenID)
+		if whole == "" {
+			continue // this id has no usable run of digits; mint another
+		}
+		amount := whole + ".31"
+		r := h.call(t, 2, "place_crypto_order", order(amount))
+		if r.Error == nil || r.Error.Code != CodePolicyDenied {
+			t.Fatalf("order of %s over the limit was not refused: %+v", amount, r)
+		}
+		if len(h.rec.decisions) != 2 {
+			t.Fatalf("decisions = %d", len(h.rec.decisions))
+		}
+		d := h.rec.decisions[1]
+		if d.TokenID != tokenID || d.Decision != "denied" || d.DenialCode != "TOOL_SPEND_LIMIT_DENIED" {
+			t.Fatalf("decision = %+v", d)
+		}
+		receipt, _ := json.Marshal(d)
+		// The case is there: the receipt input holds the amount's digits, in
+		// the token id.
+		if !strings.Contains(tokenID, whole) || !strings.Contains(string(receipt), whole) {
+			t.Fatalf("the receipt input does not hold %q: %s", whole, receipt)
+		}
+		raw, _ := json.Marshal(r)
+		if where := amountEchoes(t, raw, amount); len(where) > 0 {
+			t.Fatalf("refusal echoes the amount %s at %v: %s", amount, where, raw)
+		}
+		if where := amountEchoes(t, receipt, amount); len(where) > 0 {
+			t.Fatalf("receipt input carries the amount %s at %v: %s", amount, where, receipt)
+		}
+		t.Logf("token id %s, amount %s: the id holds %q; no echo", tokenID, amount, whole)
+		return
+	}
+	t.Fatal("no token id in 50 mints had a usable run of digits")
+}
+
+// digitsForAmount picks, from a token id, a run of decimal digits to be the
+// whole part of an amount: two to six digits (an amount the counter holds),
+// no leading zero, and none of the numbers the refusal and its receipt carry
+// as themselves (the limit 200 and the JSON-RPC ids 1 and 2), so that the id
+// is the only place the digits can come from. It returns "" when the id has
+// none.
+func digitsForAmount(tokenID string) string {
+	for _, run := range regexp.MustCompile(`[0-9]+`).FindAllString(tokenID, -1) {
+		run = strings.TrimLeft(run, "0")
+		if len(run) > 6 {
+			run = run[:6]
+		}
+		if len(run) >= 2 && run != "200" {
+			return run
+		}
+	}
+	return ""
+}
+
 // The receipt input that failed CI run 38937620498: its token id holds the
 // digits 777, and it does not carry the amount 777.31. The check passes it,
 // and catches the amount planted in each form a refusal could echo it.
