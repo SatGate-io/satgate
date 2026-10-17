@@ -156,7 +156,7 @@ export default function EconomicFirewallPage() {
         '@type': 'ListItem',
         position: 3,
         name: 'Charge external agents',
-        description: 'Decide what external agents can reach and which routes they pay for. Keep the receipts for allowed and refused requests.',
+        description: 'Decide what external agents can reach and which routes they pay for. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.',
       },
     ],
   };
@@ -388,7 +388,7 @@ export default function EconomicFirewallPage() {
           {[
             ['1', 'See what your agents do', 'List which agents, sub-agents, routes, models and MCP tools are in use, and what they cost, before you change anything.', '/agent-control-plane'],
             ['2', 'Set limits', 'Turn on Control for the risky routes: budget caps, narrower tokens, expiry and revokes.', '/build'],
-            ['3', 'Charge external agents', 'Decide what external agents can reach and which routes they pay for. Keep the receipts for allowed and refused requests.', '/policy-to-proof'],
+            ['3', 'Charge external agents', 'Decide what external agents can reach and which routes they pay for. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.', '/policy-to-proof'],
           ].map(([step, title, body, href]) => (
             <Link key={step} href={href} className="rounded-2xl border border-gray-800 bg-gray-950 p-6 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
               <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500/15 font-mono text-cyan-200">{step}</div>

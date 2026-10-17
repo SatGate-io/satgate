@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Build agents that work within a budget",
     description:
-      "Give an agent a task and a budget. SatGate checks every tool call, lets you hand smaller budgets to sub-agents, and signs a receipt when it says no.",
+      "Give an agent a task and a budget. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission.",
     url: "https://satgate.io/build",
     type: "website",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -153,7 +153,7 @@ const trustMetadataNote = 'What SatGate publishes for machines: which tokens it 
 const buildDocLinks = [
   { title: "Gateway quickstart", href: `${docsBase}/getting-started/quickstart.md`, body: "Run the open-source gateway on your own machine. Paid routes are optional; you can start with budgets only." },
   { title: "Capability schema", href: `${docsBase}/reference/capability-schema.md`, body: "What a token holds: who issued it, who it’s for, allowed tools, budget, expiry, extra limits and how far it can be handed off." },
-  { title: "Receipt schema", href: `${docsBase}/reference/receipt-schema.md`, body: "The signed record SatGate writes when it allows, refuses or charges a request." },
+  { title: "Receipt schema", href: `${docsBase}/reference/receipt-schema.md`, body: "The signed record SatGate writes. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control." },
   { title: "Trust metadata", href: `${docsBase}/reference/satgate-trust-metadata.md`, body: trustMetadataNote },
   { title: "Open verifier", href: "https://github.com/SatGate-io/evidence-pack-verifier", body: "Check a live receipt against the issuer’s published keys (JWKS). Uses RFC 8785 canonical JSON and Ed25519 signatures." },
   { title: "MCP integration", href: `${docsBase}/guides/mcp-gateway.md`, body: "Put SatGate in front of MCP tools. When a receipt signer is configured, a priced call and a budget or tool-permission refusal get a signed receipt." },

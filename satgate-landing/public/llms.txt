@@ -1,6 +1,6 @@
 # SatGate: economic firewall for agent workloads
 > Keep your agents within budget. Make external agents pay before they use your API. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
-> Three controls: Observe, Control and Admit. All three sign receipts.
+> Three controls: Observe, Control and Admit. Control and Admit sign receipts, and Observe can too.
 
 ## Purpose
 SatGate sits in front of APIs and MCP tools and checks each agent request before it runs. Your own agents spend from a budget you set. External agents pay before the request goes through, on the routes you choose to charge for. Paying never gets an agent past its permissions, an expired or revoked token, or another tenant's data.

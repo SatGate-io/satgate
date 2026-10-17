@@ -284,7 +284,7 @@ const agentBToken = attenuate(agentAToken, {
           </p>
           <ul className="text-gray-300 space-y-2">
             <li><strong>Observe → Control</strong> is the enterprise path: identify the agent, bind budget and scope, and block over-budget work before it executes.</li>
-            <li><strong>Observe → Prove</strong> is the accountability path: preserve receipts for policy decisions, spend, delegation, denials, revocation, and payment details.</li>
+            <li><strong>Observe → Prove</strong> is the accountability path: keep signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.</li>
           </ul>
           <p className="text-gray-300 leading-relaxed">
             Most organizations will start with Observe, then move high-risk routes into Control and export a signed receipt (Evidence Pack) when security, finance, or compliance asks what happened.

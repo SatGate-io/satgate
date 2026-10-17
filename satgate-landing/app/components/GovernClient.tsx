@@ -328,7 +328,7 @@ export default function GovernPage() {
               </p>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li className="text-yellow-400">✓ receipt exports</li>
-                <li className="text-yellow-400">✓ Signed denial receipts</li>
+                <li className="text-yellow-400">✓ Signed receipts for refusals over a budget, a missing payment or a tool permission</li>
                 <li className="text-yellow-400">✓ x402 and L402 payment details</li>
                 <li className="text-yellow-400">✓ receipt authority timeline</li>
               </ul>
@@ -463,7 +463,7 @@ export default function GovernPage() {
                       <CheckCircle size={16} className="text-green-400" /> Receipt exported
                     </h4>
                     <p className="text-gray-500 text-sm">
-                      Receipts show what each request spent or why it was refused.
+                      SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
                     </p>
                   </div>
                 </div>
@@ -860,7 +860,7 @@ export SATGATE_TOKEN=$TOKEN
           <div className="space-y-6">
             {[
               ['What is AI agent governance?', 'AI agent governance is the set of controls that determines which agents can call which APIs, tools, and models; how much they can spend; what authority they can delegate; and when access must be revoked. For autonomous agents, governance needs enforcement before the request goes through, not just logs and dashboards.'],
-              ['What are rules and receipts for AI agents?', 'Rules and receipts for AI agents sit before the request goes through. They apply scopes, budgets, delegation rules, and revocation before an agent reaches an upstream API, model, or MCP tool, then preserve signed receipts (Evidence Packs) so the decision can be verified later.'],
+              ['What are rules and receipts for AI agents?', 'Rules and receipts for AI agents sit before the request goes through. They apply scopes, budgets, delegation rules, and revocation before an agent reaches an upstream API, model, or MCP tool, then keep signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, so they can be verified later.'],
               ['How should enterprises govern MCP tool usage?', 'Enterprises should govern MCP tools with per-tool budgets, scoped capability tokens, task and tenant attribution, signed receipts (Evidence Packs), revocation, and hard policy decisions before the request goes through. Rate limits and dashboards are useful, but they do not replace enforcement before tool calls execute.'],
               ['What is the difference between AI governance and AI agent governance?', 'AI governance usually covers model risk, data policy, compliance, and human review. AI agent governance adds controls on each request that goes through SatGate for autonomous actions: scopes, budgets, delegated permissions, revocation, denial reasons, spend attribution, and proof before APIs or MCP tools execute.'],
               ['Is SatGate tied to x402, L402, AgentCore Payments, or Pay.sh?', 'Lightning (L402) and USDC on Base (x402) are live. On each paid route, the owner picks Lightning, USDC, or both. AgentCore Payments and Pay.sh are planned. Payment never overrides permissions.'],

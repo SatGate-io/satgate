@@ -235,7 +235,7 @@ export default function Http402ForAiAgentsPage() {
         <div className="rounded-3xl border border-yellow-900/60 bg-gradient-to-br from-yellow-950/20 to-cyan-950/30 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">Govern paid agent access before the agent acts</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            HTTP 402 can carry payment context. SatGate turns that context into governed action: authority, policy, budget, proof, and a signed receipt for every paid request.
+            HTTP 402 can carry payment context. SatGate turns that context into governed action: authority, policy, budget and proof. Each payment gets a signed receipt when signing succeeds.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">

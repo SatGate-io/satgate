@@ -66,7 +66,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
         name: 'Is Prove the same as internal budget enforcement?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. Internal budget enforcement controls spend for agents you own. Prove is the evidence layer that preserves receipts for budget, authority, delegation, revocation, and payment-method decisions.',
+          text: 'No. Internal budget enforcement controls spend for agents you own. Prove is the evidence layer. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.',
         },
       },
     ],
@@ -223,14 +223,14 @@ export default function EnterpriseAdoptionPlaybookPage() {
             Prove is the stage where governance stops being a dashboard claim and becomes an artifact. SatGate preserves the policy basis, requesting agent, delegated scope, budget state, route, payment details when present, and final decision as a signed receipt that finance, security, and compliance can inspect later.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            Payment methods such as L402 can still matter, but they are not the center of the framework. They are one context SatGate can govern before value moves. The product job is broader: prove why an autonomous agent was allowed, denied, downgraded, routed, or required to seek approval before execution.
+            Payment methods such as L402 can still matter, but they are not the center of the framework. They are one context SatGate can govern before value moves. The product job is broader: prove why an autonomous agent was allowed, denied or required to seek approval before execution.
           </p>
           <p className="text-gray-300 leading-relaxed">
             This unlocks proof models that traditional API governance rarely captures:
           </p>
           <ul className="text-gray-300 space-y-2">
             <li><strong>Budget receipts:</strong> show which cap, tenant, workflow, or delegated token authorized the spend.</li>
-            <li><strong>Delegation receipts:</strong> preserve parent/child authority, caveats, expiration, and revocation state.</li>
+            <li><strong>Delegation records:</strong> the token&apos;s lineage keeps parent/child authority, caveats and expiration.</li>
             <li><strong>Payment-method receipts:</strong> record when payment context was checked before access without making payment the product center.</li>
           </ul>
           <p className="text-gray-300 leading-relaxed">
@@ -327,7 +327,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
             <li><strong>Let it run for two weeks.</strong> Collect baseline data. Identify your top spenders, noisiest agents, and most expensive tool calls.</li>
             <li><strong>Present the data to stakeholders.</strong> You now have an evidence-based case for budget enforcement — with specific numbers, not hypotheticals.</li>
             <li><strong>Activate Fiat402 (Control) mode.</strong> Set budgets based on your observed baselines plus a reasonable margin. Monitor for the first week and adjust.</li>
-            <li><strong>Activate Prove mode.</strong> Preserve signed receipts for allow, deny, budget, delegation, revocation, and payment-method decisions.</li>
+            <li><strong>Activate Prove mode.</strong> Preserve signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.</li>
           </ol>
 
           <p className="text-gray-300 leading-relaxed mt-6">
@@ -344,7 +344,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
               {[
                 ['What are Observe, Control, and Prove in AI agent governance?', 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Prove preserves signed receipts for allow, deny, budget, delegation, and payment-method decisions.'],
                 ['Why should enterprises start AI agent governance in Observe mode?', 'Observe mode gives teams real baseline data on agent spend, tool usage, retry loops, and cost outliers before hard caps are introduced, making later enforcement safer and easier to justify.'],
-                ['Is Prove the same as internal budget enforcement?', 'No. Internal budget enforcement controls spend for agents you own. Prove is the evidence layer that preserves receipts for budget, authority, delegation, revocation, and payment-method decisions.'],
+                ['Is Prove the same as internal budget enforcement?', 'No. Internal budget enforcement controls spend for agents you own. Prove is the evidence layer. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

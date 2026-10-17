@@ -73,7 +73,7 @@ const sandboxDemos = [
     href: '/pay',
     icon: Zap,
     eyebrow: '4 · Charge external agents',
-    body: 'Make an external agent pay before its request goes through, with a receipt either way.',
+    body: 'Make an external agent pay before its request goes through. Payment refusals get a signed receipt, and so do most paid requests.',
   },
 ];
 const goldenPathSteps: Array<{
@@ -182,7 +182,7 @@ function GoldenPathSection() {
         <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
           <div>
             <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-5xl">
-              One agent, allowed, blocked and revoked. Each block gets a receipt.
+              One agent, allowed, blocked and revoked.
             </h2>
             <p className="mt-5 text-lg leading-8 text-gray-300">
               This walkthrough is a simulation with sample data, so it runs the same way every time. The receipts match the sample signed receipt (Evidence Pack) in the viewer. To see SatGate on production, watch the <Link href="/#see-it-live" className="text-cyan-300 underline hover:text-cyan-200">two recordings on the home page</Link>.
@@ -589,7 +589,7 @@ export default function SandboxPage() {
             Try SatGate in your browser.
           </h2>
           <p className="mx-auto max-w-3xl text-lg leading-relaxed text-gray-400">
-            Start with the 90-second walkthrough, then try each part on its own: tokens, access limits, budgets and payments. Each refusal links to its receipt.
+            Start with the 90-second walkthrough, then try each part on its own: tokens, access limits, budgets and payments.
           </p>
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="#golden-path" className="text-purple-300 hover:text-purple-200 text-sm font-semibold underline underline-offset-4 transition">
