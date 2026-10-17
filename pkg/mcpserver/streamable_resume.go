@@ -81,11 +81,23 @@ func isLowerHex(s string) bool {
 	return true
 }
 
+// ResumesStreamSessions reports whether this handler serves a Streamable
+// HTTP POST whose Mcp-Session-Id it does not hold again under that id (header
+// auth mode, see above). A wrapper in front of the handler (SatGate Cloud's
+// spend-session wrapper) forwards such a request only when this reports
+// true. A handler without this method (a module before session resume)
+// cannot resume, and the wrapper answers 404 itself, as it always did.
+func (s *SSEServer) ResumesStreamSessions() bool {
+	return s != nil && s.requiresVerifiedStreamToken()
+}
+
 // resumeStreamSession serves a request whose session id this process does not
 // hold. It either returns the session to use (resumed, or one a concurrent
 // request resumed first) or writes the refusal and returns false.
 func (s *SSEServer) resumeStreamSession(w http.ResponseWriter, r *http.Request, sid string) (*streamSession, bool) {
-	if !s.requiresVerifiedStreamToken() || s.streamSessionEnded(sid) {
+	// Cheap early refusal; addStreamSession checks again under the lock that
+	// guards the insert, so a DELETE that completes meanwhile still wins.
+	if !s.requiresVerifiedStreamToken() || s.streamResumeRefused(sid) {
 		http.Error(w, "session not found", http.StatusNotFound)
 		return nil, false
 	}
@@ -122,8 +134,12 @@ func (s *SSEServer) resumeStreamSession(w http.ResponseWriter, r *http.Request, 
 		}
 		protocol = v
 	}
-	sess, created := s.addStreamSession(r.Context(), sid, token, protocol, true)
-	if !created {
+	sess, res := s.addStreamSession(r.Context(), sid, token, protocol, true)
+	switch res {
+	case streamSessionEndedHere:
+		http.Error(w, "session not found", http.StatusNotFound)
+		return nil, false
+	case streamSessionCapFull:
 		w.Header().Set("Retry-After", "60")
 		http.Error(w, "too many sessions", http.StatusServiceUnavailable)
 		return nil, false
@@ -136,40 +152,91 @@ func (s *SSEServer) resumeStreamSession(w http.ResponseWriter, r *http.Request, 
 	return sess, true
 }
 
-// markStreamSessionEnded remembers an id ended with DELETE for the idle TTL,
-// so this process does not bring it back. Caller holds streamMu.
+// Ended sessions (DELETE) stay ended on the process that ended them.
+//
+// The tombstone map is bounded by the session cap, and an unexpired
+// tombstone is never dropped to make room. When a DELETE finds the map full
+// of unexpired tombstones, its id is not recorded; instead no session is
+// resumed on this process until that id's own TTL is over
+// (streamEndedFullUntil), so the unrecorded id cannot come back early
+// either. While the map is full of unexpired tombstones, every resume is
+// refused as well. initialize and live sessions are not affected.
+
+// markStreamSessionEndedLocked remembers an id ended with DELETE for the idle
+// TTL, so this process does not bring it back. Caller holds streamMu.
 func (s *SSEServer) markStreamSessionEndedLocked(id string, now time.Time) {
 	if s.streamEnded == nil {
 		s.streamEnded = make(map[string]time.Time)
 	}
-	if len(s.streamEnded) >= s.streamMaxSessions() {
-		for k, until := range s.streamEnded {
-			if now.After(until) {
-				delete(s.streamEnded, k)
-			}
+	until := now.Add(s.streamIdleTTL())
+	if _, ok := s.streamEnded[id]; !ok && s.streamEndedFullLocked(now) {
+		if until.After(s.streamEndedFullUntil) {
+			s.streamEndedFullUntil = until
 		}
-		for k := range s.streamEnded {
-			if len(s.streamEnded) < s.streamMaxSessions() {
-				break
-			}
-			delete(s.streamEnded, k)
-		}
+		log.Warn().Int("tombstones", len(s.streamEnded)).Time("until", until).
+			Msg("streamable HTTP ended-session list full; no session is resumed on this process until it drains")
+		return
 	}
-	s.streamEnded[id] = now.Add(s.streamIdleTTL())
+	s.streamEnded[id] = until
 }
 
-func (s *SSEServer) streamSessionEnded(id string) bool {
-	s.streamMu.Lock()
-	defer s.streamMu.Unlock()
+// streamEndedFullLocked reports whether the tombstone map is at its cap with
+// every entry unexpired (expired entries are dropped first). Caller holds
+// streamMu.
+func (s *SSEServer) streamEndedFullLocked(now time.Time) bool {
+	if len(s.streamEnded) < s.streamMaxSessions() {
+		return false
+	}
+	// Tombstones all get the same TTL, so none can expire before the
+	// earliest expiry recorded at the last scan.
+	if now.Before(s.streamEndedNextExpiry) {
+		return true
+	}
+	s.sweepEndedStreamSessionsLocked(now)
+	return len(s.streamEnded) >= s.streamMaxSessions()
+}
+
+// sweepEndedStreamSessionsLocked drops expired tombstones and records the
+// earliest remaining expiry. Caller holds streamMu.
+func (s *SSEServer) sweepEndedStreamSessionsLocked(now time.Time) {
+	var next time.Time
+	for id, until := range s.streamEnded {
+		if now.After(until) {
+			delete(s.streamEnded, id)
+			continue
+		}
+		if next.IsZero() || until.Before(next) {
+			next = until
+		}
+	}
+	s.streamEndedNextExpiry = next
+}
+
+// streamResumeRefusedLocked reports whether id may not be resumed on this
+// process now: it was ended here with DELETE, or every resume is refused
+// for now (see above). Caller holds streamMu.
+func (s *SSEServer) streamResumeRefusedLocked(id string, now time.Time) bool {
+	if !s.streamEndedFullUntil.IsZero() && !now.After(s.streamEndedFullUntil) {
+		return true
+	}
+	if s.streamEndedFullLocked(now) {
+		return true
+	}
 	until, ok := s.streamEnded[id]
 	if !ok {
 		return false
 	}
-	if time.Now().After(until) {
+	if now.After(until) {
 		delete(s.streamEnded, id)
 		return false
 	}
 	return true
+}
+
+func (s *SSEServer) streamResumeRefused(id string) bool {
+	s.streamMu.Lock()
+	defer s.streamMu.Unlock()
+	return s.streamResumeRefusedLocked(id, time.Now())
 }
 
 func (s *SSEServer) publishStreamConnect(sess *streamSession, resumed bool) {

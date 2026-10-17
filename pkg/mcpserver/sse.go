@@ -36,8 +36,15 @@ type SSEServer struct {
 	streamLastSweep time.Time
 	// streamEnded holds ids ended with DELETE (until the idle TTL) so they
 	// are not resumed on this process. See streamable_resume.go.
-	streamEnded    map[string]time.Time
-	allowedOrigins map[string]struct{}
+	streamEnded map[string]time.Time
+	// streamEndedFullUntil: a DELETE found streamEnded full of unexpired
+	// tombstones and could not record its id; no session is resumed on this
+	// process before this time (that id's own TTL).
+	streamEndedFullUntil time.Time
+	// streamEndedNextExpiry caches the earliest tombstone expiry seen when
+	// streamEnded was found full, so a full map is not rescanned per request.
+	streamEndedNextExpiry time.Time
+	allowedOrigins        map[string]struct{}
 
 	// oauthMetadataURL, when set, turns every 401 from the header-auth
 	// transport paths into an RFC 9728 / MCP authorization challenge.
