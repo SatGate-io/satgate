@@ -248,19 +248,35 @@ func TestSpendReleasedWhenUpstreamSaysItDidNotRun(t *testing.T) {
 
 // A dial failure before any byte is written: released, and a retry once the
 // upstream is back may use the whole allowance.
+//
+// The harness's HTTP client has an idle keep-alive connection to the upstream
+// after it listed the tools. If the upstream is closed and the call is then
+// written on that connection before the client sees it closed, a connection was
+// obtained and the call may have left: the outcome is unknown and the
+// reservation is kept (TestSpendKeptWhenCallIsWrittenOnDeadPooledConnection).
+// Whether that happens is a race. So the test gives the proxy a client with an
+// empty pool, built the way the product builds it, and checks afterwards that
+// the call dialed, that every dial was refused, and that no connection was ever
+// obtained. The call can only be a never-sent call.
 func TestSpendReleasedWhenDialFailsBeforeSend(t *testing.T) {
 	up := newOrderUpstream(t)
 	h := httpSpendHarness(t, up, 2*time.Second)
+	probe := freshUpstreamClient(t, h, nil)
 	up.srv.Close() // connection refused from here on
 	r := h.call(t, 1, "place_crypto_order", order("200"))
 	if r.Error == nil {
 		t.Fatalf("call to a dead upstream succeeded: %s", r.Result)
 	}
 	if h.counter(t) != 0 {
-		t.Fatalf("counter after a dial failure = %d, want released", h.counter(t)/units)
+		t.Errorf("counter after a dial failure = %d, want released", h.counter(t)/units)
 	}
 	if up.executed.Load() != 0 {
-		t.Fatalf("executed %d", up.executed.Load())
+		t.Errorf("executed %d", up.executed.Load())
+	}
+	// The fixture must have forced what the test names: a fresh dial, refused.
+	if probe.dialStarts.Load() < 1 || probe.dialFailed.Load() != probe.dialStarts.Load() || probe.gotConn.Load() != 0 {
+		t.Errorf("not a fresh failed dial: %d dials, %d refused, %d connections obtained (%d pooled)",
+			probe.dialStarts.Load(), probe.dialFailed.Load(), probe.gotConn.Load(), probe.reused.Load())
 	}
 }
 
