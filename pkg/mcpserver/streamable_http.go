@@ -355,10 +355,13 @@ func (s *SSEServer) handleStreamablePost(w http.ResponseWriter, r *http.Request)
 		var found bool
 		sess, found = s.lookupStreamSession(sid)
 		if !found {
-			http.Error(w, "session not found", http.StatusNotFound)
-			return
-		}
-		if s.rejectStreamSessionToken(w, r, sess) {
+			// Lost to a restart, another machine or the idle TTL: served
+			// again under the same id only for the token it was issued to
+			// (streamable_resume.go). Otherwise 404 as before.
+			if sess, found = s.resumeStreamSession(w, r, sid); !found {
+				return
+			}
+		} else if s.rejectStreamSessionToken(w, r, sess) {
 			return
 		}
 		if !s.protocolVersionAllowed(r) {
@@ -460,6 +463,7 @@ func (s *SSEServer) sweepExpiredStreamSessionsLocked(now time.Time, force bool) 
 		return nil
 	}
 	s.streamLastSweep = now
+	s.sweepEndedStreamSessionsLocked(now)
 	var closed []*streamSession
 	for id, sess := range s.streamSessions {
 		if !sess.expiresAt.IsZero() && now.After(sess.expiresAt) {
@@ -471,9 +475,32 @@ func (s *SSEServer) sweepExpiredStreamSessionsLocked(now time.Time, force bool) 
 }
 
 func (s *SSEServer) createStreamSession(ctx context.Context, token, protocol string) (*streamSession, bool) {
+	sess, res := s.addStreamSession(ctx, streamSessionIDFor(token), token, protocol, false)
+	return sess, res == streamSessionAdded
+}
+
+// streamAddResult is the outcome of addStreamSession.
+type streamAddResult int
+
+const (
+	// streamSessionAdded: the session is in the map (for a resumed id, it
+	// may be the one a concurrent request put back first).
+	streamSessionAdded streamAddResult = iota
+	// streamSessionCapFull: the session cap is reached (503).
+	streamSessionCapFull
+	// streamSessionEndedHere: a resumed id this process may not bring back
+	// (ended with DELETE, or every resume is refused for now; 404).
+	streamSessionEndedHere
+)
+
+// addStreamSession puts a session for id in the map. For a resumed id that a
+// concurrent request already put back, the session in the map is returned.
+// For a resumed id, the DELETE tombstone is checked under the same lock as
+// the insert, so a DELETE that completed first always wins.
+func (s *SSEServer) addStreamSession(ctx context.Context, id, token, protocol string, resumed bool) (*streamSession, streamAddResult) {
 	now := time.Now()
 	sess := &streamSession{
-		id:        generateSessionID(),
+		id:        id,
 		tokenSum:  sha256.Sum256([]byte(token)),
 		protocol:  protocol,
 		expiresAt: now.Add(s.streamIdleTTL()),
@@ -496,13 +523,27 @@ func (s *SSEServer) createStreamSession(ctx context.Context, token, protocol str
 	}
 	full := len(s.streamSessions) >= s.streamMaxSessions()
 	closed := s.sweepExpiredStreamSessionsLocked(now, full)
+	if existing, ok := s.streamSessions[sess.id]; ok {
+		s.streamMu.Unlock()
+		for _, c := range closed {
+			s.publishStreamClose(c)
+		}
+		return existing, streamSessionAdded
+	}
+	if resumed && s.streamResumeRefusedLocked(sess.id, now) {
+		s.streamMu.Unlock()
+		for _, c := range closed {
+			s.publishStreamClose(c)
+		}
+		return nil, streamSessionEndedHere
+	}
 	if len(s.streamSessions) >= s.streamMaxSessions() {
 		s.streamMu.Unlock()
 		for _, c := range closed {
 			s.publishStreamClose(c)
 		}
 		log.Warn().Int("sessions", s.streamMaxSessions()).Msg("streamable HTTP session cap reached")
-		return nil, false
+		return nil, streamSessionCapFull
 	}
 	s.streamSessions[sess.id] = sess
 	s.streamMu.Unlock()
@@ -510,18 +551,9 @@ func (s *SSEServer) createStreamSession(ctx context.Context, token, protocol str
 		s.publishStreamClose(c)
 	}
 
-	if s.proxy != nil && s.proxy.events != nil {
-		s.proxy.events.Publish(Event{
-			Type:      EventSessionConnect,
-			Timestamp: now,
-			SessionID: sess.id,
-			TokenID:   sess.identity.tokenID,
-			TenantID:  sess.identity.tenantID,
-			BudgetID:  sess.identity.budgetID,
-		})
-	}
-	log.Info().Str("session", sess.id).Str("protocol", protocol).Msg("streamable HTTP session established")
-	return sess, true
+	s.publishStreamConnect(sess, resumed)
+	logStreamSession(sess, resumed)
+	return sess, streamSessionAdded
 }
 
 func (s *SSEServer) lookupStreamSession(id string) (*streamSession, bool) {
@@ -557,6 +589,7 @@ func (s *SSEServer) deleteStreamSession(id string) {
 	sess, ok := s.streamSessions[id]
 	if ok {
 		delete(s.streamSessions, id)
+		s.markStreamSessionEndedLocked(id, time.Now())
 	}
 	s.streamMu.Unlock()
 	if ok {
