@@ -351,12 +351,10 @@ Authorization: Bearer macaroon_v1_agent42_budget500
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`# Mint a budget-capped token for an agent
-satgate mint \\
-  --budget 1000 \\
-  --tools "gpt-4o:15,gpt-4o-mini:1,web_search:5" \\
-  --expires 24h \\
-  --holder "research-agent-prod"
+            <code className="text-green-300">{`# Mint a budget-capped token for an agent in the
+# dashboard (Tokens): 1000 credits, expires in 24h,
+# for research-agent-prod. Route and tool costs are
+# set once for your account. There is no CLI flag for this.
 
 # The agent uses this token for all API calls
 # Gateway enforces the budget automatically
@@ -430,7 +428,7 @@ satgate mint \\
 
           <div className="mt-12 p-6 bg-gray-900/50 border border-gray-800 rounded-lg">
             <p className="text-gray-300 mb-4">
-              SatGate is open source. Try budget enforcement on your LLM calls today:
+              The SatGate gateway is open source. Try budget enforcement on your LLM calls today:
             </p>
             <pre className="bg-gray-900/70 rounded p-3 text-sm overflow-x-auto">
               <code className="text-green-300">{`go install github.com/satgate-io/satgate/cmd/satgate-mcp@latest`}</code>
@@ -469,7 +467,7 @@ satgate mint \\
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">SatGate path: Observe → Control → Prove</h3>
             <p className="mb-4 text-gray-300">
-              Start by observing agent, API, and MCP usage. Move to checks before the request goes through when budgets, scopes, and revocation need to stop bad calls before they run. Preserve signed receipts so every allow, deny, and budget decision can be verified later.
+              Start by observing agent, API, and MCP usage. Move to checks before the request goes through when budgets, scopes, and revocation need to stop bad calls before they run. Preserve signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, so they can be verified later.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">See how rules and receipts work →</Link>

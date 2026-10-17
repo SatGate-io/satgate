@@ -5,7 +5,7 @@ import { ArrowRight, BadgeCheck, FileText, GitBranch, Handshake, Layers3, Receip
 export const metadata: Metadata = {
   title: "SatGate for Payment Methods | Agent Permissions and Receipts",
   description:
-    "SatGate gives payment methods, API platforms, and agent ecosystems a permissions-and-receipts layer that works with any payment method: policy before action, receipts after action, and signed receipts (Evidence Packs) for dispute-ready proof.",
+    "SatGate gives payment methods, API platforms, and agent ecosystems a permissions-and-receipts layer that works with L402 and x402 payments today: policy before action, receipts after action, and signed receipts (Evidence Packs) for dispute-ready proof.",
   keywords: [
     "agent payment method governance",
     "AI agent permissions and receipts",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SatGate for Payment Methods | Agent Permissions and Receipts",
     description:
-      "An Economic Firewall that works with any payment method, for partners that need authorization, scope, budget, and signed receipt proof around agent-initiated transactions.",
+      "An Economic Firewall that works with L402 and x402 payments, for partners that need authorization, scope, budget, and signed receipt proof around agent-initiated transactions.",
     url: "https://satgate.io/partners/rails",
     type: "website",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -41,8 +41,8 @@ const partnerFit = [
 const flow = [
   ["1", "Permission", "The principal or platform passes down a bounded capability: agent, tenant, route/tool, budget, expiry, policy version, and delegation depth."],
   ["2", "Decision", "SatGate enforces policy before the request goes through to the upstream API, MCP tool, or payment method."],
-  ["3", "Receipt", "Every allowed, denied, delegated, revoked, or paid decision emits a signed receipt with the policy basis and payment details."],
-  ["4", "Signed receipt", "Receipts roll into a verifiable bundle (Evidence Pack), anchored by issuer JWKS and independently checked by the open verifier."],
+  ["3", "Receipt", "Budget spends, and refusals over a budget, a missing payment or a tool permission, emit a signed receipt with the policy and payment details."],
+  ["4", "Signed receipt", "Each receipt is in a verifiable Evidence Pack, checked against the issuer JWKS by the open verifier."],
 ];
 
 const railQuestions = [
@@ -72,7 +72,7 @@ const jsonLd = {
         { "@type": "Thing", name: "agent payment method governance" },
         { "@type": "Thing", name: "Agent Permissions and Receipts" },
         { "@type": "Thing", name: "signed receipt (Evidence Pack) verification" },
-        { "@type": "Thing", name: "Economic Firewall that works with any payment method" },
+        { "@type": "Thing", name: "Economic Firewall that works with L402 and x402 payments" },
       ],
     },
     {
@@ -100,13 +100,13 @@ export default function RailPartnersPage() {
               <Handshake size={14} /> Partner brief
             </div>
             <h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">
-              Agent permissions for every payment method.
+              Agent permissions for L402 and x402 payments.
             </h1>
             <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
               Payment methods can authorize value movement. SatGate proves the agent was allowed to attempt it: who passed permissions down, which policy applied, what budget was left, and what evidence exists after the decision.
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
-              Payment methods keep changing. SatGate’s Agent Permissions and Receipts layer sits above x402, L402, Stripe, AgentCore Payments, Pay.sh, API-key billing, and enterprise ledgers.
+              Payment methods keep changing. SatGate’s permissions and receipts work with x402 and L402 today. AgentCore Payments and Pay.sh are planned.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a href="/briefs/satgate-agent-authority-rails-brief.pdf" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">

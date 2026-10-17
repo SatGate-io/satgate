@@ -30,7 +30,7 @@ export const metadata = {
 const controls = [
   { icon: DollarSign, title: 'Budget before the call runs', body: 'Check remaining spend, request ceilings, route cost, and policy before forwarding the call.' },
   { icon: KeyRound, title: 'Scoped capabilities', body: 'Replace broad static keys with expiring, revocable credentials constrained by route, tool, calls, and spend.' },
-  { icon: ShieldCheck, title: 'Revocation and kill switches', body: 'Stop a risky task, tool, or agent session immediately without rotating every shared secret.' },
+  { icon: ShieldCheck, title: 'Revocation and kill switches', body: 'Stop a risky task, tool or agent session on its next request, without rotating every shared secret.' },
   { icon: Workflow, title: 'MCP and API governance', body: 'Apply the same economic policy across MCP servers, internal APIs, model providers, and paid tools.' },
 ];
 
@@ -65,7 +65,7 @@ export default function SatGateIntegrationPage() {
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-03',
     audience: webPageJsonLd.audience,
-    featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'signed receipts before the request goes through', 'payment rules that work with any payment method'],
+    featureList: ['AI agent spend control', 'MCP budget enforcement', 'Revocable capability tokens', 'signed receipts before the request goes through', 'payment rules for L402 and x402'],
   };
 
   const faqJsonLd = {
@@ -149,7 +149,7 @@ export default function SatGateIntegrationPage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-bold text-white">SatGate controls for Claude Desktop</h2>
-          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the governance layer around agentic tool use: Observe first, Control when limits are known, and keep a signed receipt for every approval, denial, and paid-access decision.</p>
+          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the governance layer around agentic tool use: Observe first, Control when limits are known, and keep a signed receipt for approval holds, budget and permission denials, and budget spends.</p>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {controls.map(({ icon: Icon, title, body }) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-black p-6 transition hover:border-cyan-900/70">

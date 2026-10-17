@@ -65,7 +65,7 @@ export default function WhatIsEconomicFirewallPage() {
         name: 'Why do AI agents need economic firewalls?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'AI agents can call tools, retry, delegate, and spend autonomously at machine speed. Dashboards and alerts show costs after the fact, while an economic firewall blocks or downgrades spend before runaway loops or expensive tool calls hit the bill.',
+          text: 'AI agents can call tools, retry, delegate, and spend autonomously at machine speed. Dashboards and alerts show costs after the fact, while an economic firewall blocks spend before runaway loops or expensive tool calls hit the bill.',
         },
       },
     ],
@@ -274,7 +274,7 @@ const agentBToken = attenuate(agentAToken, {
               </div>
               <div>
                 <p className="text-white font-semibold text-lg">Prove</p>
-                <p className="text-gray-400">Preserve signed receipts for allowed, denied, delegated, revoked, and payment-method decisions. Payment methods such as L402 or x402 can move value; the governance layer proves why access was allowed.</p>
+                <p className="text-gray-400">Preserve signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission. Payment methods such as L402 or x402 can move value; the governance layer proves why access was allowed.</p>
               </div>
             </div>
           </div>
@@ -284,7 +284,7 @@ const agentBToken = attenuate(agentAToken, {
           </p>
           <ul className="text-gray-300 space-y-2">
             <li><strong>Observe → Control</strong> is the enterprise path: identify the agent, bind budget and scope, and block over-budget work before it executes.</li>
-            <li><strong>Observe → Prove</strong> is the accountability path: preserve receipts for policy decisions, spend, delegation, denials, revocation, and payment details.</li>
+            <li><strong>Observe → Prove</strong> is the accountability path: keep signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.</li>
           </ul>
           <p className="text-gray-300 leading-relaxed">
             Most organizations will start with Observe, then move high-risk routes into Control and export a signed receipt (Evidence Pack) when security, finance, or compliance asks what happened.
@@ -320,14 +320,14 @@ const agentBToken = attenuate(agentAToken, {
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">Why do AI agents need economic firewalls?</h3>
                 <p className="text-gray-300 leading-relaxed mb-0">
-                  AI agents can call tools, retry, delegate, and spend autonomously at machine speed. Dashboards and alerts show costs after the fact, while an economic firewall blocks or downgrades spend before runaway loops or expensive tool calls hit the bill.
+                  AI agents can call tools, retry, delegate, and spend autonomously at machine speed. Dashboards and alerts show costs after the fact, while an economic firewall blocks spend before runaway loops or expensive tool calls hit the bill.
                 </p>
               </div>
             </div>
           </div>
 
           <div className="bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-purple-500/20 rounded-xl p-8 mt-12 text-center">
-            <h3 className="text-xl font-bold text-white mb-3">SatGate is an open-source economic firewall</h3>
+            <h3 className="text-xl font-bold text-white mb-3">SatGate&apos;s core gateway is open source</h3>
             <p className="text-gray-400 mb-6">Per-agent budgets, per-tool cost attribution, macaroon delegation. Deploy in minutes.</p>
             <div className="flex flex-wrap gap-4 justify-center">
               <a href="https://github.com/SatGate-io/satgate" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-6 py-3 rounded-lg font-bold hover:opacity-90 transition flex items-center gap-2">

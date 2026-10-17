@@ -6,7 +6,7 @@ const metadata = {
   issuer: {
     name: "SatGate",
     issuer_id: "https://api.satgate.io",
-    product: "Economic firewall for AI agents: budgets for your own agents, payment from external agents on the routes you choose, and a signed receipt for every decision.",
+    product: "Economic firewall for AI agents: budgets for your own agents, payment from external agents on the routes you choose, and signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.",
     contact: "contact@satgate.io",
     key_discovery: {
       method: "jwks_uri",
@@ -85,8 +85,8 @@ const metadata = {
         receipt_authority: "settled_x402_authorization",
       },
       { id: "l402", type: "payment_rail", role: "external_paid_access", status: "supported" },
-      { id: "api_key_billing", type: "billing_adapter", role: "existing_vendor_billing", status: "supported" },
-      { id: "enterprise_ledger", type: "ledger_adapter", role: "internal_chargeback", status: "supported" },
+      { id: "api_key_billing", type: "billing_adapter", role: "existing_vendor_billing", status: "unavailable" },
+      { id: "enterprise_ledger", type: "ledger_adapter", role: "internal_chargeback", status: "unavailable" },
       { id: "agentcore_payments", type: "payment_rail", role: "external_paid_access", status: "planned" },
       { id: "pay_sh", type: "payment_rail", role: "external_paid_access", status: "planned" },
     ],

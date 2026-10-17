@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "AI agent accountability",
     "AI agent receipts",
     "signed receipt (Evidence Pack) verifier",
-    "works with any payment method",
+    "works with L402 and x402 payments",
     "x402 governance",
     "L402 governance",
   ],
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Agent Permissions and Receipts | SatGate",
     description:
-      "Works with any payment method, with pre-flight policy enforcement and signed receipts for autonomous agents.",
+      "Works with L402 and x402 payments, with policy checks before each request and signed receipts for autonomous agents.",
     url: "https://satgate.io/agent-authority-layer",
     type: "website",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -46,7 +46,7 @@ const layers = [
   {
     icon: ReceiptText,
     title: "Evidence — after the call",
-    body: "Every allow, deny, delegation, revocation, and paid event leaves a signed receipt, rolled into an Evidence Pack.",
+    body: "SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. Each receipt comes in an Evidence Pack.",
   },
 ];
 
@@ -102,7 +102,7 @@ const jsonLd = {
       about: [
         { "@type": "Thing", name: "agent permissions" },
         { "@type": "Thing", name: "signed receipt (Evidence Pack)" },
-        { "@type": "Thing", name: "works with any payment method" },
+        { "@type": "Thing", name: "works with L402 and x402 payments" },
         { "@type": "Thing", name: "Ed25519 receipt verification" },
       ],
     },
@@ -114,7 +114,7 @@ const jsonLd = {
         "delegated permissions",
         "Pre-flight policy enforcement",
         "Signed receipts",
-        "Receipt checks that work with any payment method",
+        "Receipt checks for L402 and x402 payments",
       ],
     },
     {
@@ -288,7 +288,7 @@ export default function AgentAuthorityLayerPage() {
         <div className="rounded-3xl border border-cyan-400/20 bg-cyan-400/10 p-8 text-center">
           <h2 className="text-3xl font-bold text-white">Agents should not get standing authority.</h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-gray-300">
-            Give them scoped authority, enforce it before the agent acts, and leave a signed receipt for every decision.
+            Give them scoped authority and enforce it before the agent acts. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">

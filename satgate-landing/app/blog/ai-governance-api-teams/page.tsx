@@ -230,20 +230,15 @@ Authorization: Bearer macaroon_v1_agent42_budget500
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`# Orchestrator mints delegated tokens
-satgate mint --parent orchestrator_token \\
-  --budget 2000 \\
-  --holder "research-agent" \\
-  --tools "search:2,generate:15"
-
-satgate mint --parent orchestrator_token \\
-  --budget 1000 \\
-  --holder "summarizer-agent" \\
-  --tools "generate:15,embed:1"
+            <code className="text-green-300">{`# Mint the delegated tokens in the dashboard
+# (Delegation & Budgets). There is no CLI flag for this.
+#   research-agent     2000 credits   search, generate
+#   summarizer-agent   1000 credits   generate, embed
+# Per-tool costs are set once for your account.
 
 # Each sub-agent operates within its slice
 # Total delegation ≤ parent budget
-# Full receipt chain from leaf to root`}</code>
+# Token lineage traces each leaf back to the root`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
@@ -368,7 +363,7 @@ GET /api/governance/costs?period=2026-03-01..2026-03-19
             <li><strong className="text-white">Per-endpoint cost modeling</strong> so every API call has an economic weight</li>
             <li><strong className="text-white">Real-time budget enforcement</strong> — pre-call checks, not post-hoc billing</li>
             <li><strong className="text-white">HTTP 402 responses</strong> that give agents structured denial with actionable alternatives</li>
-            <li><strong className="text-white">Full signed receipts</strong> from agent leaf to orchestrator root</li>
+            <li><strong className="text-white">Signed receipts</strong> for each agent&apos;s budget spends and for its refusals over a budget, a missing payment or a tool permission</li>
             <li><strong className="text-white">MCP-native support</strong> for teams building with the Model Context Protocol</li>
           </ul>
 
@@ -376,14 +371,15 @@ GET /api/governance/costs?period=2026-03-01..2026-03-19
             <code className="text-green-300">{`# Add spending controls to your existing API
 # No changes to your agents or backend
 
-# 1. Define your cost model
-satgate init --costs "search:2,generate:15,embed:1,image:50"
+# 1. Define your cost model: set each route's cost
+#    in the dashboard (cloud.satgate.io)
 
-# 2. Mint governance tokens for each team
-satgate mint --budget 5000 --holder "team-alpha" --expires 24h
+# 2. Mint a token for each team in Tokens,
+#    with its budget and expiry
 
-# 3. Point agents at the SatGate proxy
-export API_BASE_URL=https://gateway.satgate.io/v1
+# 3. Point agents at SatGate with your tenant header
+export API_BASE_URL=https://api.satgate.io/v1
+# and send X-SatGate-Tenant: your-tenant
 
 # That's it. Budget enforcement is live.`}</code>
           </pre>
@@ -425,7 +421,7 @@ export API_BASE_URL=https://gateway.satgate.io/v1
 
           <div className="mt-12 p-6 bg-gray-900/50 border border-gray-800 rounded-lg">
             <p className="text-gray-300 mb-4">
-              SatGate provides open-source spending controls for API teams. Add budget enforcement to your APIs in minutes:
+              SatGate&apos;s open-source gateway adds spending controls for API teams. Add budget enforcement to your APIs:
             </p>
             <pre className="bg-gray-900/70 rounded p-3 text-sm overflow-x-auto">
               <code className="text-green-300">{`go install github.com/satgate-io/satgate/cmd/satgate-mcp@latest`}</code>

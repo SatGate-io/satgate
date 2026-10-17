@@ -131,14 +131,14 @@ Current adapter catalog:
 - `mcp`: `protocol` / `tool_transport` / `supported`
 - `x402`: `payment_rail` / `external_paid_access` / `supported`
 - `l402`: `payment_rail` / `external_paid_access` / `supported`
-- `api_key_billing`: `billing_adapter` / `existing_vendor_billing` / `supported`
-- `enterprise_ledger`: `ledger_adapter` / `internal_chargeback` / `supported`
+- `api_key_billing`: `billing_adapter` / `existing_vendor_billing` / `unavailable`
+- `enterprise_ledger`: `ledger_adapter` / `internal_chargeback` / `unavailable`
 - `agentcore_payments`: `payment_rail` / `external_paid_access` / `planned`
 - `pay_sh`: `payment_rail` / `external_paid_access` / `planned`
 
 The `x402` entry also says how to pay on that rail: x402 version 2, scheme `exact`, USDC on Base (`eip155:8453`) or Base Sepolia (`eip155:84532`) with the USDC contract for each network, one payment per request (`payment_scope: "one_request"`), and the authority label its receipts carry (`settled_x402_authorization`). A route only offers x402 when its owner turns it on; the 402 response for that route is the source of truth for price and receiving address.
 
-Rails sit below authority and receipt verification. SatGate proof is the receipt/Evidence Pack layer around the rail. Marketing copy may mention planned rails, but the well-known artifact is canonical for whether a rail is currently supported or planned.
+Rails sit below authority and receipt verification. SatGate proof is the receipt/Evidence Pack layer around the rail. Marketing copy may mention planned rails, but the well-known artifact is canonical for whether a rail is currently supported, planned or unavailable. `unavailable` means no adapter ships for that id; treat it like `planned`.
 
 ## Signing key discovery
 
@@ -294,7 +294,9 @@ assert isinstance(data['rails_adapters']['supported'][0], dict)
 adapters = {adapter['id']: adapter for adapter in data['rails_adapters']['supported']}
 assert adapters['agentcore_payments']['status'] == 'planned'
 assert adapters['pay_sh']['status'] == 'planned'
-assert {adapter['status'] for adapter in adapters.values()} <= {'supported','planned'}
+assert adapters['api_key_billing']['status'] == 'unavailable'
+assert adapters['enterprise_ledger']['status'] == 'unavailable'
+assert {adapter['status'] for adapter in adapters.values()} <= {'supported','planned','unavailable'}
 assert data['issuer']['key_discovery']['method'] == 'jwks_uri'
 print('satgate trust metadata ok')
 PY

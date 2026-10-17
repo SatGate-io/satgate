@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "agent permissions evidence",
     "agent control plane evidence",
     "tamper-evident signed receipt",
-    "AI agent revocation proof",
+    "AI agent revocation",
     "AI agent spend ledger",
     "macaroon delegation audit",
   ],
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SatGate Rules and Receipts | Evidence for Enterprise Agent Permissions",
     description:
-      "Every grant, paid call, denial, delegation, and revocation produces signed receipts your CISO, finance team, and auditor can trust.",
+      "Signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, which your CISO, finance team and auditor can check.",
     url: "https://satgate.io/policy-to-proof",
     type: "website",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -49,8 +49,8 @@ export const metadata: Metadata = {
 const evidenceQuestions = [
   {
     question: "Who authorized this?",
-    artifact: "Mint receipt",
-    body: "Identity claim, policy match, issuer, timestamp, and the capability minted for the invoice-reconciler worker.",
+    artifact: "Mint record",
+    body: "The audit log entry for the token issued to the invoice-reconciler worker.",
   },
   {
     question: "Which agent got access?",
@@ -70,12 +70,12 @@ const evidenceQuestions = [
   {
     question: "What was denied?",
     artifact: "Denial receipt",
-    body: "A policy, budget, scope, tenant, or revocation reason code attached to the blocked invoice call.",
+    body: "A budget, missing-payment or tool-permission reason code attached to the blocked invoice call.",
   },
   {
     question: "Can we prove revocation worked?",
-    artifact: "Revocation receipt + post-revoke denial",
-    body: "The revocation receipt and the first post-revoke denial receipt after access ended, tied to the same authority chain.",
+    artifact: "Post-revoke denial",
+    body: "The next request after a revoke is refused.",
   },
 ];
 
@@ -85,14 +85,11 @@ const demoSteps = [
   ["Spend", "The worker calls invoice APIs or MCP tools under budget; the ledger updates by token and path."],
   ["Deny", "Export and over-budget calls return reason-coded receipts before data or spend escapes."],
   ["Revoke", "Security kills the worker capability without rotating every upstream provider key."],
-  ["Export", "The lifecycle becomes one signed receipt (Evidence Pack) a CISO, auditor, or incident reviewer can read."],
+  ["Export", "The workflow's signed receipts are exported as a list a CISO, auditor or incident reviewer can read."],
 ];
 
 const standardsMappings = [
-  ["Mint receipt — US SOC 2", "SOC 2 CC6.1", "Logical access provisioning tied to identity, policy, issuer, and timestamp."],
-  ["Mint receipt — ISO 27001", "ISO 27001 A.9.2.1", "User registration and de-registration evidence for issuing agent permissions."],
   ["Delegation chain", "SOC 2 CC6.3 / NIST AC-3", "Least-privilege narrowing across parent and worker permissions."],
-  ["Revocation receipt", "SOC 2 CC6.2/CC6.3 / NIST AC-2(3)", "Deprovisioning event plus first post-revoke denial trail."],
   ["Spend ledger", "SOC 2 CC1.4 / FinOps attribution", "Governance evidence for who created spend, on which route/tool, under which token."],
 ];
 
@@ -105,7 +102,7 @@ const personas = [
   {
     title: "CISO",
     icon: ShieldAlert,
-    quote: "Revocation isn’t a promise — it’s a signed receipt followed by a denied call.",
+    quote: "Revocation isn’t a promise. The next request after a revoke is refused.",
   },
   {
     title: "FinOps lead",
@@ -124,7 +121,7 @@ const evidencePack = {
   payment_context: {
     default_market: "internal_enterprise_agents",
     internal_rail: "existing_iam_service_account_or_api_key_billing",
-    optional_external_rails: ["x402", "l402", "api_key_billing", "enterprise_ledger"],
+    optional_external_rails: ["x402", "l402"],
     note: "The same authority chain and receipts can cover an internal agent call, or a governed bridge call to an external paid API.",
   },
   authority_chain: [
@@ -132,28 +129,20 @@ const evidencePack = {
       kind: "root_grant",
       subject: "dean-agent:finance-automation",
       issuer_kid: "satgate-mint-2026-05",
-      caveats: ["tenant=acme-finance", "budget_usd<=25", "delegation_depth<=1"],
-      receipt_hash: "sha256:7a2ca1b8d5e0a0d7c9545c7f8e6d03d12761b687a7a1f27c0dd7ed2e643a01b5",
+      caveats: ["tenant_id = acme-finance", "delegation_depth = 1"],
     },
     {
       kind: "delegation",
       subject: "worker-agent:invoice-reconciler",
       parent: "dean-agent:finance-automation",
-      caveats: ["budget_usd<=3", "no_customer_data_export", "route_prefix=/v1/invoices"],
-      receipt_hash: "sha256:95f1c3df9d1f8d7a0e5b60b850f4b6013dd2f0e18496f9e5a8c0319fd51382bf",
     },
   ],
   receipts: [
-    { receipt_id: "rcpt_mint_001", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "mint", ts: "2026-05-09T14:22:31Z", issuer_kid: "satgate-mint-2026-05", decision_reason: "root_capability_issued", result: "issued", caveats: ["tenant=acme-finance", "budget_usd<=25", "delegation_depth<=1"], receipt_hash: "sha256:7a2c..." },
-    { receipt_id: "rcpt_delegation_002", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "delegation", ts: "2026-05-09T14:23:04Z", decision_reason: "scope_budget_and_depth_attenuated", result: "attenuated", receipt_hash: "sha256:95f1..." },
     { receipt_id: "rcpt_spend_search_003", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "spend", ts: "2026-05-09T14:23:18Z", route: "/v1/invoices/search", amount_usd: "0.18", payment_protocol: "internal_api", settlement: { rail: "internal_ledger", cost_center: "FIN-AP-042" }, decision_reason: "allowed_under_policy", result: "allowed", receipt_hash: "sha256:01d8..." },
     { receipt_id: "rcpt_spend_compare_004", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "spend", ts: "2026-05-09T14:24:02Z", route: "/v1/invoices/compare", amount_usd: "0.42", payment_protocol: "internal_api", settlement: { rail: "internal_ledger", cost_center: "FIN-AP-042" }, decision_reason: "allowed_under_policy", result: "allowed", receipt_hash: "sha256:a923..." },
     { receipt_id: "rcpt_paid_ocr_005", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "spend", ts: "2026-05-09T14:24:44Z", route: "/v1/invoices/ocr", mcp_tool: "document_ai.ocr", amount_usd: "0.18", payment_protocol: "x402", settlement: { chain: "base", tx: "REDACTED_DEMO_SAMPLE", ms: 187 }, decision_reason: "allowed_under_policy", result: "allowed", receipt_hash: "sha256:deb5..." },
     { receipt_id: "rcpt_denial_scope_006", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "denial", ts: "2026-05-09T14:25:08Z", decision_reason: "scope_violation:no_customer_data_export", reason_code: "scope_violation:no_customer_data_export", result: "blocked", receipt_hash: "sha256:9b0f..." },
     { receipt_id: "rcpt_denial_budget_007", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "denial", ts: "2026-05-09T14:25:33Z", decision_reason: "budget_exhausted", reason_code: "budget_exhausted", result: "blocked", receipt_hash: "sha256:c3f6..." },
-    { receipt_id: "rcpt_revocation_008", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "revocation", ts: "2026-05-09T14:26:11Z", revoked_by: "security-admin", decision_reason: "capability_revoked_by_security_admin", result: "revoked", receipt_hash: "sha256:37d1..." },
-    { receipt_id: "rcpt_post_revoke_denial_009", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "post_revoke_denial", ts: "2026-05-09T14:26:16Z", decision_reason: "capability_revoked", reason_code: "capability_revoked", result: "blocked", receipt_hash: "sha256:8b95..." },
-    { receipt_id: "rcpt_export_010", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "export", ts: "2026-05-09T14:26:31Z", decision_reason: "evidence_pack_exported", result: "evidence_pack_issued", receipt_hash: "sha256:e1b3..." },
   ],
   chain_root: "sha256:f04ed8430b11c8975cc5ef35919ee078fc4cb166cd8d611ed0d94b7da69df09d",
   signature: "ed25519:REDACTED_DEMO_SAMPLE_DO_NOT_VERIFY",
@@ -268,7 +257,7 @@ export default function PolicyToProofPage() {
               Most enterprise agents do not need a wallet to call internal APIs. They need bounded delegated permissions, budget controls, revocation, and audit evidence around the credentials they already have.
             </p>
             <p className="mt-4 text-base leading-7 text-gray-500">
-              When that same internal workflow crosses into an external paid API, SatGate keeps the proof intact: internal scope and delegation, plus spend attribution above x402 rails, L402, API-key billing, or enterprise ledgers. Payment proves value moved. SatGate proves the agent was allowed to move it.
+              When that same internal workflow crosses into an external paid API, SatGate keeps the proof intact: internal scope and delegation, plus spend attribution for x402 and L402 payments. Payment proves value moved. SatGate proves the agent was allowed to move it.
             </p>
           </div>
         </div>
@@ -296,7 +285,7 @@ export default function PolicyToProofPage() {
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-300">Paid calls</p>
               <h3 className="mt-4 text-xl font-black text-white">Becoming part of the path.</h3>
               <p className="mt-3 text-sm leading-6 text-gray-400">
-                x402, L402, AgentCore Payments, Pay.sh, and related rails make it easier for agents to call paid services. SatGate adds policy, limits, evidence, and review around that spend path.
+                x402, L402, AgentCore Payments, Pay.sh and similar payment methods make it easier for agents to call paid services. SatGate adds policy, limits and receipts around x402 and L402 today. AgentCore Payments and Pay.sh are planned.
               </p>
             </article>
             <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
@@ -308,9 +297,9 @@ export default function PolicyToProofPage() {
             </article>
             <article className="rounded-2xl border border-emerald-300/20 bg-emerald-300/5 p-6">
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-emerald-200">SatGate</p>
-              <h3 className="mt-4 text-xl font-black text-white">Sits above the rails.</h3>
+              <h3 className="mt-4 text-xl font-black text-white">Sits in front of your APIs.</h3>
               <p className="mt-3 text-sm leading-6 text-gray-400">
-                Every authority decision is recorded — payment or not — so review and audit do not depend on which protocol the agent used.
+                SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. This covers HTTP APIs and MCP tools.
               </p>
             </article>
           </div>
@@ -333,7 +322,7 @@ export default function PolicyToProofPage() {
             </div>
             <div className="rounded-3xl border border-emerald-400/20 bg-emerald-400/5 p-7">
               <p className="text-sm font-bold uppercase tracking-[0.22em] text-emerald-200">SatGate</p>
-              <h3 className="mt-4 text-2xl font-black text-white">Signed mint receipt, narrowing chain, spend ledger, denial reason, revocation proof: one export.</h3>
+              <h3 className="mt-4 text-2xl font-black text-white">Signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, exportable as a list.</h3>
               <p className="mt-4 text-base leading-7 text-gray-400">
                 The signed receipt (Evidence Pack) is not a logging afterthought. It is generated by the same authority path that enforces the decision.
               </p>
@@ -352,7 +341,7 @@ export default function PolicyToProofPage() {
               <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Answer the audit questions after the invoice-reconciler acts.</h2>
             </div>
             <p className="max-w-md text-sm leading-6 text-gray-500">
-              The receipt bundles these artifacts into one export instead of sending teams on a forensics project across logs, invoices, and gateway dashboards. Authority-chain entries preserve lineage; matching receipts preserve the allow, deny, pay, delegate, and revoke sequence, so auditors can verify both structure and chronology.
+              Receipts and the audit log answer these questions without a forensics project across logs, invoices and gateway dashboards. Token lineage shows who handed work to whom; matching receipts preserve the allow and deny sequence, including paid requests.
             </p>
           </div>
 
@@ -434,7 +423,7 @@ export default function PolicyToProofPage() {
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-purple-300">Demo path</p>
             <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Mint → Delegate → Spend → Deny → Revoke → Export.</h2>
             <p className="mt-5 text-lg leading-8 text-gray-400">
-              The demo ends on the exported signed receipt (Evidence Pack): one artifact proving authority, spend, denial, and revocation across the invoice-reconciler lifecycle. Even producing the receipt is itself an auditable event.
+              The demo ends on the exported receipts across the invoice-reconciler lifecycle: signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.
             </p>
             <p className="mt-4 text-sm leading-6 text-gray-500">
               Read the six-step lifecycle below, or watch the 90-second cut.
@@ -492,7 +481,7 @@ export default function PolicyToProofPage() {
                   <span className="text-sm font-bold uppercase tracking-[0.2em]">Buyer promise</span>
                 </div>
                 <p className="text-2xl font-black leading-snug text-white">
-                  SatGate lets enterprises delegate authority to AI agents without permanent credentials, unlimited spend, or unobservable authority — and proves every step.
+                  SatGate lets enterprises delegate limited authority to AI agents. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
                 </p>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <a

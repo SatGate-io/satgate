@@ -17,11 +17,11 @@ REPO = ROOT.parent
 
 REQUIRED_PHRASES = {
     "app/page.tsx": [
-        "signs a receipt for each decision",
-        "signed receipt for every decision",
+        "SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.",
+        "signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission",
     ],
     "app/components/HomeClient.tsx": [
-        "Receipts for allowed, denied, paid, delegated, and revoked decisions",
+        "Signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, ready to export",
         "Allowed receipts",
         "Paid receipts",
         "Export Evidence Pack",
@@ -44,7 +44,7 @@ REQUIRED_PHRASES = {
         "Denied-call receipts",
     ],
     "app/policy-to-proof/page.tsx": [
-        "paid call, denial, delegation, and revocation produces signed receipts",
+        "Signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, which your CISO",
         "receipt_id",
         "evidence_pack_id",
         "policy_version",
@@ -161,17 +161,28 @@ def check_evidence_pack_samples() -> list[str]:
     return errors
 
 
+REMOVED_MCP_TEMPLATES = [
+    "spend-caps.v1.yaml",
+    "tool-allowlist.v1.yaml",
+    "tenant-isolation.v1.yaml",
+    "delegation-depth.v1.yaml",
+    "mcp-governance-policy-bundle.v1.json",
+]
+
+
 def check_mcp_templates() -> list[str]:
+    # SatGate does not read the satgate.io/policy/v1 format, so these files must stay deleted.
     errors: list[str] = []
-    for path in (ROOT / "public/policy-templates/mcp-governance").glob("*.yaml"):
-        text = path.read_text()
-        if "required_receipt_fields:" in text and "- evidence_pack_id" not in text:
-            errors.append(f"{path.name}: required_receipt_fields missing evidence_pack_id")
-    bundle = json.loads((ROOT / "public/policy-templates/mcp-governance/mcp-governance-policy-bundle.v1.json").read_text())
-    defaults = bundle.get("global_security_defaults", {})
-    for key in ["require_receipt_id", "require_evidence_pack_id", "require_decision_reason", "require_policy_version_on_decision"]:
-        if defaults.get(key) is not True:
-            errors.append(f"policy bundle global_security_defaults.{key} is not true")
+    folder = ROOT / "public/policy-templates/mcp-governance"
+    for name in REMOVED_MCP_TEMPLATES:
+        if (folder / name).exists():
+            errors.append(f"{name}: removed MCP policy template is back in public/policy-templates/mcp-governance")
+    if list(folder.glob("*.yaml")):
+        errors.append("public/policy-templates/mcp-governance has a .yaml policy template again")
+    llms = (ROOT / "public/llms.txt").read_text()
+    for name in REMOVED_MCP_TEMPLATES:
+        if name in llms:
+            errors.append(f"public/llms.txt still links removed MCP policy template {name}")
     return errors
 
 

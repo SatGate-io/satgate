@@ -290,7 +290,7 @@ export default function DeepMindDelegationPage() {
                   <p className="text-gray-500 text-sm mb-2">Paper: Economic penalties and bonds to incentivize correct behavior (pp. 19–21)</p>
                   <p className="text-gray-300 text-sm">
                     <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Budget enforcement with auto-revocation.
-                    When a token exhausts its budget, it&apos;s immediately invalid — no request reaches the upstream.
+                    When a token&apos;s budget runs out, SatGate refuses its next priced request before it reaches the upstream.
                     On revoke, unspent child credits atomically return to the parent via a Lua-scripted Redis cascade.
                     The economic incentive is structural: agents that overspend lose access.
                   </p>
@@ -466,7 +466,7 @@ export default function DeepMindDelegationPage() {
           {/* CTA */}
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">Try It</h2>
           <p className="text-gray-300 leading-relaxed">
-            SatGate is open source (Apache 2.0). The gateway runs as a sidecar or standalone proxy with sub-ms overhead.
+            The SatGate open-source gateway is Apache 2.0 and runs as a sidecar or standalone proxy.
             If the DeepMind delegation framework describes the architecture you want, SatGate is the implementation.
           </p>
 

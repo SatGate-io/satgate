@@ -58,7 +58,7 @@ const PricingPage = () => {
       { '@type': 'Thing', name: 'AI agent budget enforcement' },
       { '@type': 'Thing', name: 'SatGate Economic Firewall' },
       { '@type': 'Thing', name: 'AI agent spending limits' },
-      { '@type': 'Thing', name: 'payment rules that work with any payment method' },
+      { '@type': 'Thing', name: 'payment rules for L402 and x402' },
     ],
   };
 
@@ -204,7 +204,7 @@ const PricingPage = () => {
               <span className="text-gray-500 text-xs">Let external agents in, and charge them</span>
             </div>
           </div>
-          <p className="mt-4 text-center text-sm text-gray-400">Receipts for all three. Anyone can check a signed receipt with the open-source verifier.</p>
+          <p className="mt-4 text-center text-sm text-gray-400">Control and Admit sign receipts, and Observe can too. Anyone can check a signed receipt with the open-source verifier.</p>
         </div>
       </section>
 
@@ -322,7 +322,7 @@ const PricingPage = () => {
                 <tr className="border-b border-gray-800/50">
                   <td className="py-3 px-4 text-gray-300">Budgets</td>
                   <td className="py-3 px-4">None. You find out when the bill arrives</td>
-                  <td className="py-3 px-4 text-white">Hard caps, checked on every call</td>
+                  <td className="py-3 px-4 text-white">Hard caps, checked on every priced call</td>
                 </tr>
                 <tr className="border-b border-gray-800/50">
                   <td className="py-3 px-4 text-gray-300">Who spent what</td>
@@ -347,7 +347,7 @@ const PricingPage = () => {
                 <tr>
                   <td className="py-3 px-4 text-gray-300">Payments</td>
                   <td className="py-3 px-4">None built in</td>
-                  <td className="py-3 px-4 text-white">Charge external agents on the routes you choose. Each route takes Lightning, USDC on Base (x402), or both. You set how many requests one Lightning payment buys. One USDC payment buys one request. A signed receipt either way.</td>
+                  <td className="py-3 px-4 text-white">Charge external agents on the routes you choose. Each route takes Lightning, USDC on Base (x402), or both. You set how many requests one Lightning payment buys. One USDC payment buys one request. Each payment gets a signed receipt when signing succeeds.</td>
                 </tr>
               </tbody>
             </table>
@@ -372,7 +372,7 @@ const PricingPage = () => {
             <div className="text-center">
               <div className="text-3xl mb-3">💰</div>
               <h3 className="font-bold text-white mb-2">Earn money</h3>
-              <p className="text-gray-400 text-sm">Charge external agents on the routes you choose. Each route takes Lightning, USDC on Base, or both. One USDC payment on Base buys one request. On Lightning routes you choose how many requests one payment buys. A signed receipt either way.</p>
+              <p className="text-gray-400 text-sm">Charge external agents on the routes you choose. Each route takes Lightning, USDC on Base, or both. One USDC payment on Base buys one request. On Lightning routes you choose how many requests one payment buys. Each payment gets a signed receipt when signing succeeds.</p>
             </div>
           </div>
         </div>

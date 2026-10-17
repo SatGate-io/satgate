@@ -286,7 +286,7 @@ export default function RunawayAgentCostCalculatorPage() {
         <div className="rounded-3xl border border-orange-900/60 bg-gradient-to-br from-orange-950/30 to-yellow-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Stop runaway spend before the request goes through</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            SatGate puts permission before the agent acts for agent/API spend: control budgets before paid calls execute, revoke unsafe authority, and preserve signed receipts for every allowed, denied, routed, or paid decision.
+            SatGate puts permission before the agent acts for agent/API spend: control budgets before paid calls execute, revoke unsafe authority, and keep signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">

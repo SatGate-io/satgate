@@ -104,7 +104,7 @@ export default function CapabilityAuthPage() {
               Traditional identity-based auth asks, “who is this?” That works for humans and stable apps, but autonomous agents need narrower authority. They need credentials that say which tool is allowed, what task it is for, how much it can spend, how long it lasts, and whether it can delegate.
             </p>
             <p>
-              SatGate puts that capability check before the request goes through. The result is not just authentication. It is rules and receipts for AI agents: Observe the call, Control the budget and what the agent is allowed to do before the agent acts, and Prove each decision with a signed receipt.
+              SatGate puts that capability check before the request goes through. The result is not just authentication. It is rules and receipts for AI agents: Observe the call, and Control the budget and what the agent is allowed to do before the agent acts. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
             </p>
           </div>
         </div>

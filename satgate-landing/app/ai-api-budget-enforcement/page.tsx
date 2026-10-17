@@ -32,7 +32,7 @@ export const metadata = {
 
 const controls = [
   { icon: Bot, title: 'Agent identity', body: 'Attribute requests to the tenant, agent, task, workflow, route, model, MCP tool, and delegated sub-agent.' },
-  { icon: DollarSign, title: 'Budget checks', body: 'Evaluate remaining spend, per-request ceilings, daily caps, tool caps, and route budgets before forwarding.' },
+  { icon: DollarSign, title: 'Budget checks', body: 'Evaluate remaining spend, tool costs and route budgets before forwarding.' },
   { icon: KeyRound, title: 'Scoped credentials', body: 'Use expiring capabilities instead of broad static keys so authority matches the job.' },
   { icon: Ban, title: 'Revocation', body: 'Block the next request when a credential, workflow, route, budget, or agent should stop.' },
   { icon: ReceiptText, title: 'Audit trails', body: 'Record allow/deny decisions with policy, budget remaining, route, tool, estimated cost, and outcome.' },
@@ -80,7 +80,7 @@ export default function Page() {
       { '@type': 'Question', name: 'Why are dashboards not enough?', acceptedAnswer: { '@type': 'Answer', text: 'Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced at the gateway before forwarding.' } },
       { '@type': 'Question', name: 'How does SatGate help?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before the request goes through.' } },
       { '@type': 'Question', name: 'How is AI API budget enforcement different from provider spend alerts?', acceptedAnswer: { '@type': 'Answer', text: 'Provider spend alerts notify teams after usage crosses a threshold. AI API budget enforcement checks request cost, remaining budget, identity, route, and policy before the API call executes.' } },
-      { '@type': 'Question', name: 'What should happen when an AI agent exceeds its API budget?', acceptedAnswer: { '@type': 'Answer', text: 'The request should be blocked, downgraded, routed to a cheaper provider, sent for approval, or challenged for payment depending on policy, with an audit record explaining the decision.' } },
+      { '@type': 'Question', name: 'What should happen when an AI agent exceeds its API budget?', acceptedAnswer: { '@type': 'Answer', text: 'The request should be blocked, sent for approval or challenged for payment depending on policy, with an audit record explaining the decision.' } },
     ],
   };
 
@@ -129,7 +129,7 @@ export default function Page() {
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Budget before forwarding</h3><p className="leading-relaxed text-gray-400">Check remaining daily, session, per-agent, per-tool, and per-request budget before traffic reaches the upstream provider.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Policy by agent and workflow</h3><p className="leading-relaxed text-gray-400">Separate budgets by tenant, workflow, route, model, MCP server, delegated sub-agent, and task instead of one account-level cap.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Stop loops automatically</h3><p className="leading-relaxed text-gray-400">Deny the next request when a loop, retry storm, fanout chain, or high-cost tool call crosses policy.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Audit every decision</h3><p className="leading-relaxed text-gray-400">Record allow/deny decisions with identity, route, estimated cost, budget remaining, policy, and revocation state.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Audit allow and deny decisions</h3><p className="leading-relaxed text-gray-400">Record allow/deny decisions with identity, route, estimated cost, budget remaining, policy, and revocation state.</p></div>
           </div>
         </div>
       </section>
@@ -182,7 +182,7 @@ export default function Page() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What should happen when an AI agent exceeds its API budget?</h3>
               <p className="text-gray-400 leading-relaxed">
-                The request should be blocked, downgraded, routed to a cheaper provider, sent for approval, or challenged for payment depending on policy, with an audit record explaining the decision.
+                The request should be blocked, sent for approval or challenged for payment depending on policy, with an audit record explaining the decision.
               </p>
             </div>
           </div>

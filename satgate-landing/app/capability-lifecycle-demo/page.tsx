@@ -56,7 +56,7 @@ export default function CapabilityLifecycleDemoPage() {
         name: 'What is a capability lifecycle for AI agents?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'A capability lifecycle shows how agent permissions are issued, delegated to a child, narrowed with caveats, revoked before the next request, and preserved as signed receipt proof.',
+          text: 'A capability lifecycle shows how agent permissions are issued, delegated to a child, narrowed with caveats, and revoked before the next request.',
         },
       },
       {

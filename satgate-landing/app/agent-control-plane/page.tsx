@@ -85,7 +85,7 @@ const proofPoints = [
   {
     icon: ShieldCheck,
     title: "Evidence the model didn't write.",
-    body: "SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a permission, and when an agent spends from a budget in Control. The agent never writes or edits its own record. A SatGate Cloud receipt can be checked with the open-source verifier against our published keys.",
+    body: "SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. The agent never writes or edits its own record. A SatGate Cloud receipt can be checked with the open-source verifier against our published keys.",
   },
 ];
 
@@ -95,7 +95,7 @@ const apiKeyBody =
 
 const audiences = [
   ["Platform teams", "One place to connect agents to your APIs and MCP tools, with limits per agent instead of shared keys."],
-  ["Security teams", "Signed receipts for refusals, the chain of handoffs in the dashboard, and an off switch that reaches every helper."],
+  ["Security teams", "Signed receipts for budget, payment and tool refusals, the chain of handoffs in the dashboard, and an off switch that reaches every helper."],
   ["Finance teams", "Budgets checked before the spend in Control, and spending per agent on the Usage page."],
 ];
 

@@ -1092,9 +1092,9 @@ export default function ProtectDemoPage() {
                   <div className="bg-gradient-to-r from-purple-950/30 to-cyan-950/30 rounded-xl p-4 border border-purple-800/30">
                     <h4 className="font-semibold text-white mb-2">What You'll See:</h4>
                     <ul className="text-gray-400 text-sm space-y-1">
-                      <li>✓ Stateless credential issuance (no database)</li>
+                      <li>✓ Credential issuance with no database lookup at verify time</li>
                       <li>✓ Instant cryptographic validation</li>
-                      <li>✓ Offline token delegation (zero network calls)</li>
+                      <li>✓ Offline narrowing of a token&apos;s caveats</li>
                       <li>✓ Mathematical scope enforcement</li>
                     </ul>
                   </div>
@@ -1357,7 +1357,7 @@ export default function ProtectDemoPage() {
                         </div>
                         <p className="text-gray-400 text-sm">
                           The child token has been compromised! An attacker obtained it from a worker's logs. 
-                          We need to revoke it <strong>immediately</strong>.
+                          We need to revoke it. The next request after a revoke is refused.
                         </p>
                       </div>
 

@@ -3,7 +3,7 @@ import { ArrowRight, Bot, DollarSign, Gauge, ShieldCheck, Workflow, BarChart3 } 
 
 export const metadata = {
   title: 'AI Agent Cost Control | Before the Request Goes Through',
-  description: 'Control AI agent API spend before it happens. SatGate enforces budgets, revocation, routing, and signed receipts before the request goes through.',
+  description: 'Control AI agent API spend before it happens. SatGate enforces budgets and revocation before the request goes through, and signs receipts.',
   alternates: { canonical: 'https://satgate.io/ai-agent-cost-control' },
   keywords: [
     'AI agent cost control',
@@ -17,7 +17,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'AI Agent Cost Control | Before the Request Goes Through',
-    description: 'Enforce per-agent budgets, spend caps, revocation, routing, and signed receipts before autonomous API calls execute.',
+    description: 'Enforce per-agent budgets, spend caps and revocation before autonomous API calls run, with signed receipts.',
     url: 'https://satgate.io/ai-agent-cost-control',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -25,7 +25,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'AI Agent Cost Control | Before the Request Goes Through',
-    description: 'Stop runaway AI agent spend with budget checks before the request goes through, revocation, routing, and signed receipts.',
+    description: 'Stop runaway AI agent spend with budget checks before the request goes through, revocation and signed receipts.',
   },
 };
 
@@ -48,12 +48,12 @@ const controls = [
   {
     icon: ShieldCheck,
     title: 'Revocation and kill switches',
-    body: 'Expire, revoke, or narrow capabilities immediately when an agent misbehaves or a task is complete.',
+    body: 'Expire, revoke or narrow capabilities before the agent\'s next request, when it misbehaves or a task is complete.',
   },
   {
     icon: Workflow,
-    title: 'Provider routing',
-    body: 'Route routine work to lower-cost providers and reserve premium models for tasks that justify the spend.',
+    title: 'Route budgets',
+    body: 'Give premium-model routes their own budget, separate from routine work.',
   },
   {
     icon: BarChart3,
@@ -193,7 +193,7 @@ export default function AiAgentCostControlPage() {
         '@type': 'ListItem',
         position: 4,
         name: 'Signed receipt capture',
-        description: 'Allowed, denied, delegated, routed, paid, and revoked requests leave receipts finance and security can review.',
+        description: 'SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. Finance and security can review the receipts.',
       },
     ],
   };
@@ -261,7 +261,7 @@ export default function AiAgentCostControlPage() {
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-10">
-            SatGate checks permission before the agent acts. Budget enforcement, revocation, routing, and signed receipts run on each request that goes through SatGate, before autonomous agents can spend against OpenAI, Claude, MCP, or paid API budgets.
+            SatGate checks permission before the agent acts. Budget enforcement, revocation and signed receipts run on each request that goes through SatGate, before autonomous agents can spend against OpenAI, Claude, MCP, or paid API budgets.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
@@ -326,7 +326,7 @@ export default function AiAgentCostControlPage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-6 py-20">
-        <h2 className="text-3xl font-bold text-white mb-8">Start with Observe. Graduate to Control. Preserve proof for every decision.</h2>
+        <h2 className="text-3xl font-bold text-white mb-8">Start with Observe. Move to Control. Keep signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.</h2>
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
             <div className="text-purple-300 font-mono text-sm mb-3">01 / OBSERVE</div>
@@ -341,7 +341,7 @@ export default function AiAgentCostControlPage() {
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
             <div className="text-yellow-300 font-mono text-sm mb-3">03 / PROVE</div>
             <h3 className="text-xl font-bold text-white mb-3">Preserve decision evidence</h3>
-            <p className="text-gray-400 leading-relaxed">Record every authority decision (allowed, denied, delegated, revoked, or paid) in the signed receipt (Evidence Pack). Payment proves value moved; SatGate proves the agent was allowed to move it.</p>
+            <p className="text-gray-400 leading-relaxed">SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. Payment proves value moved; SatGate proves the agent was allowed to move it.</p>
           </div>
         </div>
       </section>
@@ -373,14 +373,14 @@ export default function AiAgentCostControlPage() {
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Buying checklist</p>
           <h2 className="mb-4 text-3xl font-bold text-white">What to demand from AI agent cost-control software</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
-            If the product only reports spend after the fact, it is observability — not cost control. AI agent cost-control software should make a deny/allow/reroute decision before every expensive call.
+            If the product only reports spend after the fact, it is observability — not cost control. AI agent cost-control software should allow or deny each expensive call before it runs.
           </p>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {[
               ['Inline enforcement', 'Budget policy runs before model, API, or MCP tool execution — not after a billing export.'],
               ['Agent-level attribution', 'Every request maps to tenant, workflow, agent, delegated sub-agent, token, route, and tool.'],
               ['Revocable authority', 'Credentials can expire, narrow, delegate safely, or be killed without rotating shared API keys.'],
-              ['Signed receipt capture', 'Allowed, denied, delegated, routed, paid, and revoked requests leave receipts finance and security can review.'],
+              ['Signed receipt capture', 'SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. Finance and security can review the receipts.'],
             ].map(([title, body]) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-5">
                 <h3 className="mb-2 font-bold text-white">{title}</h3>
@@ -433,7 +433,7 @@ export default function AiAgentCostControlPage() {
           </div>
           <div className="mt-8 rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6">
             <h3 className="mb-2 text-xl font-bold text-white">Need a readiness score first?</h3>
-            <p className="mb-4 text-gray-400">Use the grader to see whether identity, budget policy, MCP governance, revocation, audit, routing, and payment details are ready for autonomous agents.</p>
+            <p className="mb-4 text-gray-400">Use the grader to see whether identity, budget policy, MCP governance, revocation, audit and payment details are ready for autonomous agents.</p>
             <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center gap-2 font-semibold text-purple-300 hover:text-purple-200">Run the economic firewall readiness grader <ArrowRight size={16} /></Link>
           </div>
         </div>
