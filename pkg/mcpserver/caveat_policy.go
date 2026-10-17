@@ -197,7 +197,9 @@ func displayScope(mac *macaroon.Macaroon) string {
 
 // narrowestPositiveInt is the minimum successfully parsed positive integer.
 // A non-numeric value, zero, or a negative value does not set or clear a cap.
-// Zero means unlimited only when no positive cap was parsed.
+// Zero means unlimited only when no positive cap was parsed. That is the cap
+// reading only: a zero caveat is refused by Delegate before this value is used
+// (carriesZeroDelegationDepth).
 func narrowestPositiveInt(mac *macaroon.Macaroon, key string) int {
 	found := false
 	min := 0

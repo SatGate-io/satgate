@@ -184,6 +184,36 @@ func handoffAllowed(limit int, limited bool, parentDepth int) bool {
 	return parentDepth+1 <= limit
 }
 
+// carriesZeroDelegationDepth reports whether any delegation_depth caveat in the
+// parent's chain reads as zero. A positive cap is not looked at here: it keeps
+// the reading Delegate gives it below. The value is read the way
+// /v1/mint/delegate reads it (the leading integer), so a token it refuses for a
+// zero this refuses too. A token that cannot be read here is left to the checks
+// that follow, which refuse it.
+func carriesZeroDelegationDepth(svc *macaroon.Service, parent *TokenInfo) bool {
+	mac := parent.Raw
+	if mac == nil && svc != nil && parent.RawToken != "" {
+		decoded, err := svc.Decode(parent.RawToken)
+		if err != nil {
+			return false
+		}
+		mac = decoded
+	}
+	if mac == nil {
+		return false
+	}
+	for _, caveat := range mac.Caveats {
+		if !strings.HasPrefix(caveat, "delegation_depth = ") {
+			continue
+		}
+		var v int
+		if _, err := fmt.Sscanf(caveat, "delegation_depth = %d", &v); err == nil && v == 0 {
+			return true
+		}
+	}
+	return false
+}
+
 // storedHandoff is the record a handoff was decided by (see HandoffLimiter).
 type storedHandoff struct {
 	rowID   string
@@ -247,6 +277,16 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 
 	if parent.RawToken == "" {
 		return nil, &clientError{msg: "delegation requires macaroon auth (mode=header)"}
+	}
+
+	// A token that carries delegation_depth = 0 anywhere in its chain allows no
+	// further handoffs, whether the issuer wrote it or a holder appended it,
+	// and whether or not a stored limit is wired. This runs before the stored
+	// limit is read, before any mint, and before any carve: it only reads the
+	// caveats the token already carries.
+	if carriesZeroDelegationDepth(d.macaroonSvc, parent) {
+		log.Warn().Msg("delegation refused: this token allows no further handoffs")
+		return nil, errNoStoredHandoff
 	}
 
 	// A budget the issuer sealed at mint is the only budget a token can carry.

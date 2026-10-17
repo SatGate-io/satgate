@@ -331,7 +331,11 @@ func newSpendProxy(t *testing.T, root string, svc *macaroon.Service) *Proxy {
 }
 
 func TestDelegate_DepthCapIgnoresLaterWiden(t *testing.T) {
-	for _, extra := range []string{"delegation_depth = 9", "delegation_depth = nope", "delegation_depth = 0"} {
+	// A holder-appended zero is not in this list since round 4: it no longer
+	// leaves the cap at 2, it refuses the first handoff (see
+	// TestDelegateRefusesZeroDelegationDepthWithAndWithoutStore). It still does
+	// not widen anything.
+	for _, extra := range []string{"delegation_depth = 9", "delegation_depth = nope"} {
 		t.Run(extra, func(t *testing.T) {
 			assertDepthStopsAt(t, "2", extra, 2)
 		})
