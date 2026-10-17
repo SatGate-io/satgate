@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, DollarSign, Lock, MailCheck } from 'lucide-react';
+import { ArrowRight, DollarSign, Lock, Receipt } from 'lucide-react';
 
-const title = 'Let your AI agent trade your Robinhood agent account, inside limits you set';
-const metaTitle = 'Limits for your AI agent\'s Robinhood account | SatGate';
+const title = 'Financial guardrails for your AI trading agent';
+const lead =
+  'Your limits sit outside the AI, so it can\'t loosen them or talk its way past them. SatGate checks them before an order reaches Robinhood.';
+const metaTitle = 'Financial guardrails for agentic trading on Robinhood | SatGate';
 const description =
   'Set dollar limits per order, per day and per week. Lock your AI agent to your Robinhood Agentic account. Approve orders by email, and stop your agent with one button.';
 
@@ -29,9 +31,9 @@ export const metadata: Metadata = {
 const signupUrl = 'https://cloud.satgate.io/cloud/signup?intent=trading';
 
 const whatItDoes = [
-  { icon: DollarSign, text: 'Set dollar limits per order, per day and per week.' },
-  { icon: Lock, text: 'Lock your agent to your Robinhood Agentic account.' },
-  { icon: MailCheck, text: 'Get an email to approve orders you want to see first, and stop your agent with one button.' },
+  { icon: Lock, text: 'Lock your agent to your Robinhood Agentic account, so it can\'t read your other accounts.' },
+  { icon: DollarSign, text: 'Set dollar limits per order, per day and per week, and have any order over a limit refused.' },
+  { icon: Receipt, text: 'Get a signed receipt when SatGate refuses an order for breaking your rules, and stop your agent with one button.' },
 ];
 
 const comparisonTitle = 'What Robinhood gives you, and what SatGate adds';
@@ -49,7 +51,7 @@ const comparisonRows = [
     topic: 'How much your agent can trade',
     robinhood: 'You choose how much money to put in the agent\'s account, and the agent can trade with what is in it.',
     satgate:
-      'You set the most it can trade, in dollars, per order, per day and per week, and an order over a limit is refused before it reaches Robinhood.',
+      'You set the most it can trade, in dollars, per order, per day and per week, and an order over a limit is refused before it reaches Robinhood. Orders are dollar amounts in stocks or crypto. Options and limit orders are off.',
   },
   {
     topic: 'Approving orders',
@@ -72,7 +74,7 @@ const canAndCant = [
   'SatGate stores the access Robinhood gives it, encrypted, and uses it to pass along the calls your agent is allowed to make.',
   'On its own, SatGate only asks Robinhood for its list of tools, plus one read of your account list during setup, when you click, to find your Agentic account. It never reads your balances or places orders by itself.',
   'Robinhood lets a connected agent read all your Robinhood accounts. SatGate locks yours to the Agentic account.',
-  'Every call gets a signed receipt with the tool name and the decision. We don\'t keep Robinhood\'s replies, so we don\'t keep your balances or positions.',
+  'SatGate signs a receipt when it refuses your agent\'s request for breaking your rules, with the tool name and the reason. We don\'t keep Robinhood\'s replies, so we don\'t keep your balances or positions.',
   'You can stop your agent in SatGate at any time, or disconnect SatGate in the Robinhood app. SatGate\'s bill is a separate subscription and never comes out of your brokerage account.',
 ];
 
@@ -112,7 +114,8 @@ export default function TradingPage() {
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_0%,rgba(34,211,238,0.18),transparent_34%),radial-gradient(circle_at_80%_10%,rgba(168,85,247,0.14),transparent_32%)]" />
         <div className="relative mx-auto max-w-4xl px-6 py-16 md:py-24">
-          <h1 className="mb-8 text-4xl font-extrabold tracking-tight md:text-6xl">{title}.</h1>
+          <h1 className="mb-4 text-4xl font-extrabold tracking-tight md:text-6xl">{title}</h1>
+          <p className="mb-8 text-lg text-gray-300 md:text-xl">{lead}</p>
           <ul className="space-y-4">
             {whatItDoes.map(({ icon: Icon, text }) => (
               <li key={text} className="flex items-start gap-3 text-lg text-gray-300 md:text-xl">
