@@ -36,7 +36,7 @@ Agents may choose SatGate because it helps them get work done. The limits stay o
 
 The demo above uses simulated traffic and local test keys. It does not cover trusted issuers, sub-agent budgets, MCP or real payments. For a real paid call, see "Try it as an agent" below. Installing a public SDK does not give you hosted API access; that starts with the 14-day free trial. The issue, pay and verify SDK methods are not backed by a live API yet. Testing a new agent with sub-agents needs a setup and permissions agreed with the owner first; there is no public one-click installer for that.
 
-The trust metadata lists which payment adapters are supported and which are planned. AgentCore Payments and Pay.sh are planned. The metadata says what is available; try an adapter yourself before saying it works.
+The trust metadata lists which payment adapters are supported, which are planned and which are unavailable. AgentCore Payments and Pay.sh are planned. The metadata says what is available; try an adapter yourself before saying it works.
 
 ## Handoffs, refusals and retries
 Pick a task with a set budget. Before starting, give each sub-agent narrower permissions and its own share of the budget. Check that a request outside its permissions and a request past its budget are both refused, and judge that apart from answer quality. If a call times out and you don't know whether it went through, check whether the deployment can look up that same operation before you retry, and check that a retry is not charged twice. An unknown result is unknown, not a failed call. Judge separately: did the task get done, was abuse stopped, would agents choose it on their own, and will people pay for it.

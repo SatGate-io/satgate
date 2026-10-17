@@ -119,7 +119,7 @@ const schema = {
       properties: {
         supported: {
           type: "array",
-          description: "Known adapter catalog. Consumers should key on id and treat status=planned as not currently supported.",
+          description: "Known adapter catalog. Consumers should key on id and treat status=planned or status=unavailable as not currently supported.",
           uniqueItems: true,
           items: {
             type: "object",
@@ -128,7 +128,7 @@ const schema = {
               id: { type: "string", description: "Stable adapter identifier." },
               type: { type: "string", description: "Adapter category, such as protocol, payment_rail, billing_adapter, or ledger_adapter." },
               role: { type: "string", description: "Adapter role under SatGate authority/proof." },
-              status: { enum: ["supported", "planned"], description: "Current support status for this adapter id." },
+              status: { enum: ["supported", "planned", "unavailable"], description: "Current support status for this adapter id." },
             },
             additionalProperties: true,
           },
