@@ -1284,7 +1284,7 @@ export default function ProtectDemoPage() {
                         </div>
                         <p className="text-gray-400 text-sm">
                           The child token has been compromised! An attacker obtained it from a worker's logs. 
-                          We need to revoke it <strong>immediately</strong>.
+                          We need to revoke it. The next request after a revoke is refused.
                         </p>
                       </div>
 
