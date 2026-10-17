@@ -428,7 +428,7 @@ export default function EconomicFirewallPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               ['/policy-to-proof', 'Rules and Receipts', 'How payments, spends and refusals become signed receipts.'],
-              ['/mcp', 'MCP', 'Budgets and permissions for MCP tools, and a signed receipt for priced calls and refusals.'],
+              ['/mcp', 'MCP', 'Budgets and permissions for MCP tools. When a receipt signer is configured, a priced call and a budget or tool-permission refusal get a signed receipt.'],
               ['/govern', 'Control AI agents', 'Budgets and permissions for your own agents, with receipts you can export.'],
               ['/agent-control-plane', 'Agent control plane', 'Permissions, handoffs, spend, audit and revokes for large fleets of agents.'],
               ['/mcp', 'MCP governance', 'Budgets, revokes and receipts for MCP tool calls.'],

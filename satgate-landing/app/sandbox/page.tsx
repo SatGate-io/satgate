@@ -547,7 +547,7 @@ export default function SandboxPage() {
       {
         '@type': 'Question',
         name: 'Is the demo for AI agent cost control or security?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Both. SatGate checks permissions and budget on the same request, so one gateway handles access limits and spending limits, with a receipt for each refusal and each spend.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'Both. SatGate checks permissions and budget on the same request, so one gateway handles access limits and spending limits, with a receipt for a budget spend, and for a refusal over a budget, a missing payment or a tool permission.' },
       },
     ],
   };
@@ -781,7 +781,7 @@ export default function SandboxPage() {
             {[
               ['What does the SatGate demo show?', 'Four things: creating a token for an agent, limiting what it can call, capping what it can spend, and charging external agents before they get in.'],
               ['How does SatGate stop unauthorized agent spend?', 'Before SatGate forwards a request, it checks who the agent is, what its token allows, how much budget is left and whether the token was revoked. If any check fails, the request stops at SatGate.'],
-              ['Is the demo for AI agent cost control or security?', 'Both. SatGate checks permissions and budget on the same request, so one gateway handles access limits and spending limits, with a receipt for each refusal and each spend.'],
+              ['Is the demo for AI agent cost control or security?', 'Both. SatGate checks permissions and budget on the same request, so one gateway handles access limits and spending limits, with a receipt for a budget spend, and for a refusal over a budget, a missing payment or a tool permission.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
                 <h3 className="mb-2 font-bold text-white">{question}</h3>

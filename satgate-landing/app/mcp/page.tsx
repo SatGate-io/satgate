@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Bot, Gauge, ShieldCheck, Terminal } from 'lucide
 
 export const metadata = {
   title: 'MCP Gateway for AI Agents: Budgets, Permissions, Receipts',
-  description: 'Put SatGate in front of MCP tools: per-tool budgets, scoped permissions, revocation, and a signed receipt for priced calls and refusals.',
+  description: 'Put SatGate in front of MCP tools: per-tool budgets, scoped permissions, revocation, and signed receipts for priced calls and budget or tool refusals.',
   alternates: { canonical: 'https://satgate.io/mcp' },
   keywords: [
     'MCP governance',
@@ -17,7 +17,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'MCP Gateway for AI Agents: Budgets, Permissions, Receipts',
-    description: 'Budgets and permissions for MCP tools, and a signed receipt for priced calls and refusals.',
+    description: 'Budgets and permissions for MCP tools, and signed receipts for priced calls and for budget or tool-permission refusals.',
     url: 'https://satgate.io/mcp',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -25,7 +25,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'MCP Gateway for AI Agents: Budgets, Permissions, Receipts',
-    description: 'Budgets and permissions for MCP tools, and a signed receipt for priced calls and refusals.',
+    description: 'Budgets and permissions for MCP tools, and signed receipts for priced calls and for budget or tool-permission refusals.',
   },
 };
 
@@ -212,7 +212,7 @@ export default function MCPPage() {
           <li className="rounded-2xl border border-gray-800 bg-black p-6 text-gray-400"><span className="font-bold text-white">Admit.</span> Charge external agents on the HTTP routes you choose. Each route takes Lightning, USDC on Base, or both. You set how many requests a Lightning payment buys; a USDC payment buys one. See <Link href="/pricing" className="text-purple-300 hover:text-purple-200">pricing</Link>.</li>
         </ul>
         <p className="mt-6 max-w-4xl text-gray-400">
-          Each priced call and each budget or permission refusal gets a signed receipt, so you can prove what an agent was allowed to do. Export those receipts as an Evidence Pack and <Link href="/verify-evidence-pack" className="text-purple-300 hover:text-purple-200">verify them yourself</Link>. For the budget model in detail, read the <Link href="/blog/mcp-budget-enforcement-guide" className="text-purple-300 hover:text-purple-200">MCP budget enforcement guide</Link>, or start from the <Link href="/build" className="text-purple-300 hover:text-purple-200">developer page</Link>.
+          When a receipt signer is configured, a priced call and a budget or tool-permission refusal get a signed receipt. The open-source MCP proxy does not sign one unless that signer is set. Export those receipts as an Evidence Pack and <Link href="/verify-evidence-pack" className="text-purple-300 hover:text-purple-200">verify them yourself</Link>. For the budget model in detail, read the <Link href="/blog/mcp-budget-enforcement-guide" className="text-purple-300 hover:text-purple-200">MCP budget enforcement guide</Link>, or start from the <Link href="/build" className="text-purple-300 hover:text-purple-200">developer page</Link>.
         </p>
       </section>
 
@@ -221,7 +221,7 @@ export default function MCPPage() {
           {[
             ['Price every tool', 'Assign cost profiles to MCP tools so agents cannot treat expensive operations like free function calls.'],
             ['Enforce before the call runs', 'Block over-budget or out-of-scope tool calls before they reach the upstream MCP server.'],
-            ['Audit spends and refusals', 'Emit signed receipts for budget spends and for budget and permission refusals.'],
+            ['Audit budget and tool refusals', 'When a receipt signer is configured, a priced call and a budget or tool-permission refusal get a signed receipt.'],
           ].map(([title, body]) => (
             <div key={title} className="rounded-2xl border border-gray-800 bg-black p-6">
               <h2 className="mb-3 text-2xl font-bold text-white">{title}</h2>

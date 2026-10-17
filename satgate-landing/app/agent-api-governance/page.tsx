@@ -319,26 +319,7 @@ export default function AgentApiGovernancePage() {
 
           <div className="min-w-0 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h2 className="text-2xl font-bold text-white mb-4">Example capability policy</h2>
-            <pre className="bg-black border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm text-gray-300"><code>{`parent_agent: finance-automation
-worker_agent: invoice-reconciler
-scope:
-  routes: [/invoices/read, /vendors/match, /payments/schedule]
-  denied_routes: [/payments/release]
-authority:
-  tenant: acme-finance
-  workflow: monthly-close
-budget:
-  workflow: 25.00 USD
-  per_request: 0.50 USD
-delegation:
-  allowed: true
-  max_delegation_depth: 1
-  child_budget_max: 5.00 USD
-expiry: 2026-12-31T00:00:00Z
-revocation: before_next_request
-evidence:
-  receipt: required
-  include: [parent_agent, worker_agent, route, policy, decision, outcome]`}</code></pre>
+            <pre className="bg-black border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm text-gray-300"><code>{`delegation_depth = 1`}</code></pre>
           </div>
         </div>
       </section>
