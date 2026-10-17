@@ -194,17 +194,10 @@ export default function AiAgentApiCostControlPage() {
             A practical agent cost-control policy should be readable by engineers, finance, and security. It might look like this conceptually:
           </p>
 
-          <pre className="bg-gray-950 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm text-gray-300"><code>{`agent: research-bot
-route: /v1/responses
-provider: openai
-mode: control
-budget:
-  daily: 25.00 USD
-  per_request: 0.50 USD
-  premium_tool_calls: 10
-on_exhausted: block
-audit:
-  include: [agent, task, model, route, estimated_cost, decision]`}</code></pre>
+          <pre className="bg-gray-950 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm text-gray-300"><code>{`routes:
+  - name: research-bot
+    match: { pathPrefix: /v1/responses }
+    policy: { kind: control }`}</code></pre>
 
           <p className="text-gray-300 leading-relaxed">
             The exact syntax can vary. The important part is the enforcement point. If the policy is only in a spreadsheet, dashboard, or Slack alert, it is advice. If it is checked before the API call, it is control.

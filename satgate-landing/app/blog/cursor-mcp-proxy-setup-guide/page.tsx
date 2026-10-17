@@ -179,22 +179,18 @@ satgate-mcp --config ./satgate-mcp.yaml`}</code>
           </p>
 
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
-            <code>{`mcpServers:
+            <code>{`upstreams:
   github-read:
+    transport: http
     url: https://mcp.internal/github-read
-    policy:
-      price: 1
 
   web-fetch:
+    transport: http
     url: https://mcp.internal/web-fetch
-    policy:
-      price: 2
 
   ci-actions:
-    url: https://mcp.internal/ci
-    policy:
-      price: 10
-      requireApproval: true`}</code>
+    transport: http
+    url: https://mcp.internal/ci`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
@@ -251,18 +247,10 @@ There is no satgate token create command, and no daily limit.`}</code>
           </p>
 
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
-            <code>{`policies:
-  cursor-dev:
-    totalDailyCredits: 25
-    tools:
-      github-read:
-        cost: 1
-        maxCallsPerHour: 100
-      web-fetch:
-        cost: 2
-        maxCallsPerHour: 20
-      ci-actions:
-        enabled: false`}</code>
+            <code>{`tools:
+  costs:
+    github-read: 1
+    web-fetch: 2`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">

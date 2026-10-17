@@ -165,22 +165,7 @@ export default function Page() {
             Mint a scoped agent token <ArrowRight size={16} />
           </Link>
         </div>
-        <pre className="overflow-x-auto rounded-2xl border border-gray-800 bg-gray-950 p-6 text-sm text-green-300"><code>{`agent: research-agent-17
-scope:
-  routes: [/api/research/*]
-  tools: [web_search, document_fetch]
-budget:
-  max_usd: 25
-  max_calls: 300
-delegation:
-  allowed: true
-  child_budget_max_usd: 5
-  child_ttl_minutes: 15
-expiry: 2026-04-26T14:00:00Z
-revocation:
-  check: before_each_request
-audit:
-  fields: [agent, route, tool, budget_remaining, decision]`}</code></pre>
+        <pre className="overflow-x-auto rounded-2xl border border-gray-800 bg-gray-950 p-6 text-sm text-green-300"><code>{`delegation_depth = 1`}</code></pre>
       </section>
 
       <section className="border-t border-gray-900 bg-black">

@@ -100,7 +100,7 @@ const goldenPathSteps: Array<{
     label: '2 · Token issued',
     status: 'token created',
     decision: 'issued',
-    reason: 'tenant=acme-finance; scope=/v1/invoices/*; budget<=3.00 USD',
+    reason: 'tenant_id = acme-finance',
     route: 'agent:invoice-reconciler-worker',
     budget: '3.00 USD budget',
     receipt: 'none: issuing a token is an audit log entry',

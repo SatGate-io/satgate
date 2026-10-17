@@ -210,15 +210,14 @@ Monetization          Subscription tiers      Per-call micropayments (L402)`}</c
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-cyan-300">{`# SatGate budget enforcement - YAML config
-agents:
-  research-bot:
-    budget:
-      daily: 5000    # 5000 credits ($50)
-      per_call:
-        web_search: 5
-        gpt4_analyze: 50
-        dalle_generate: 100`}</code>
+            <code className="text-cyan-300">{`# satgate-mcp.yaml: budget and per-tool costs
+budget:
+  limit: 5000    # 5000 credits ($50)
+tools:
+  costs:
+    web_search: 5
+    gpt4_analyze: 50
+    dalle_generate: 100`}</code>
           </pre>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Capability-Based Authentication (Not API Keys)</h3>

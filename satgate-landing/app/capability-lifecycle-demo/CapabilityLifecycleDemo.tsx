@@ -28,7 +28,7 @@ const lifecycle = [
     label: '3. Narrow',
     title: 'Shrink what the child can do',
     buyer: 'The child receives narrower authority than the parent: fewer tools, less budget, and a shorter time window.',
-    technical: 'Enforce caveats: max_depth=1, child_budget_usd=5, tools=[repo_search], denied_tools=[payment_release], ttl=15m.',
+    technical: 'Enforce caveats: delegation_depth = 1.',
     status: 'Constrained',
     evidence: 'caveats evaluated before the illustrated tool call',
   },
