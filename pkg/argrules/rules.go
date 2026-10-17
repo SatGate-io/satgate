@@ -46,6 +46,19 @@ package argrules
 // Conditions: one_of (+ ascii_case_insensitive), max, min, url, absent.
 // Any other name, a malformed value, or a size over the limits below is an
 // error at mint and at verify.
+//
+// Order cost (opt-in):
+//
+//	{"tool":"place_equity_order","shapes":[
+//	   {"account_number":{"one_of":["5RH12345"]},"order":{"max_cost":"100"}}]}
+//
+// The reserved field name "order" with max_cost caps what one order can cost,
+// counted by OrderMaxCost (see order_cost.go): dollar_amount, or quantity times
+// limit_price for a day limit buy of shares. It is accepted only on
+// place_equity_order and place_crypto_order, mixes with no other condition on
+// its field, and takes a plain decimal above zero with at most 10 digits
+// before and 8 after the point. A release that predates it refuses the
+// document (unknown condition): it fails closed.
 
 import (
 	"bytes"
@@ -109,6 +122,13 @@ type Condition struct {
 	URL *URLCondition
 
 	Absent bool
+
+	// MaxCost, when set, makes this the per-order cap by order cost: the
+	// condition is on the whole call, not on a field the call must carry, and
+	// Field is the reserved name "order". It passes when OrderMaxCost values
+	// the call at no more than MaxCost. It is set by {"order":{"max_cost":"100"}}
+	// and only on place_equity_order and place_crypto_order.
+	MaxCost *Decimal
 }
 
 // URLCondition limits an absolute https URL.
@@ -308,6 +328,13 @@ func parseCondition(tool, field string, raw json.RawMessage) (Condition, error) 
 				return Condition{}, ruleErr("min for %s.%s is not a plain decimal", tool, field)
 			}
 			cond.Min = d
+		case "max_cost":
+			kinds++
+			d, err := parseConditionDecimal(v)
+			if err != nil {
+				return Condition{}, ruleErr("max_cost for %s.%s is not a plain decimal", tool, field)
+			}
+			cond.MaxCost = d
 		case "url":
 			kinds++
 			u, err := parseURLCondition(tool, field, v)
@@ -333,7 +360,7 @@ func parseCondition(tool, field string, raw json.RawMessage) (Condition, error) 
 	// max and min may share a field (a range). Every other pairing is
 	// ambiguous and refused.
 	if kinds > 1 {
-		onlyRange := cond.OneOf == nil && cond.URL == nil && !cond.Absent && cond.Max != nil && cond.Min != nil
+		onlyRange := cond.OneOf == nil && cond.URL == nil && !cond.Absent && cond.MaxCost == nil && cond.Max != nil && cond.Min != nil
 		if !onlyRange {
 			return Condition{}, ruleErr("%s.%s mixes conditions; only max with min may share a field", tool, field)
 		}
@@ -341,7 +368,36 @@ func parseCondition(tool, field string, raw json.RawMessage) (Condition, error) 
 			return Condition{}, ruleErr("min is above max for %s.%s", tool, field)
 		}
 	}
+	if cond.MaxCost != nil {
+		if err := validateMaxCost(tool, field, cond.MaxCost); err != nil {
+			return Condition{}, err
+		}
+	}
 	return cond, nil
+}
+
+// OrderCostField is the reserved field name the max_cost condition is written
+// under. It is not a call argument: a call argument that happens to be named
+// "order" is never read.
+const OrderCostField = "order"
+
+// validateMaxCost checks a max_cost condition: only on the order field, only
+// on an order tool, a plain decimal above zero within the size bounds.
+func validateMaxCost(tool, field string, d *Decimal) error {
+	if field != OrderCostField {
+		return ruleErr("max_cost is only written under the field name %q", OrderCostField)
+	}
+	if !IsOrderTool(tool) {
+		return ruleErr("max_cost is only for place_equity_order and place_crypto_order, not %q", clip(tool))
+	}
+	if d.rat.Sign() <= 0 {
+		return ruleErr("max_cost for %s.%s must be above zero", tool, field)
+	}
+	whole, frac, _ := strings.Cut(d.String(), ".")
+	if len(whole) > MaxOrderCostWholeDigits || len(frac) > MaxOrderCostScale {
+		return ruleErr("max_cost for %s.%s has more than %d digits before or %d after the point", tool, field, MaxOrderCostWholeDigits, MaxOrderCostScale)
+	}
+	return nil
 }
 
 func parseConditionDecimal(raw json.RawMessage) (*Decimal, error) {
@@ -530,6 +586,9 @@ func Marshal(rules []Rule) ([]byte, error) {
 				if f.Min != nil {
 					cond["min"] = f.Min.String()
 				}
+				if f.MaxCost != nil {
+					cond["max_cost"] = f.MaxCost.String()
+				}
 				if f.URL != nil {
 					u := map[string]any{"hosts": f.URL.Hosts}
 					if len(f.URL.Ports) > 0 {
@@ -649,6 +708,8 @@ func describeRules(rules []Rule, clause func(Condition) string) []string {
 
 func describeCondition(f Condition) string {
 	switch {
+	case f.MaxCost != nil:
+		return fmt.Sprintf("order cost is at most %s", f.MaxCost)
 	case f.Absent:
 		return fmt.Sprintf("%s is not sent", f.Field)
 	case f.OneOf != nil:

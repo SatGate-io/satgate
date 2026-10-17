@@ -117,6 +117,8 @@ func plainOneOf(vals []string) bool {
 // value that is not plain.
 func (c Condition) AgentText() string {
 	switch {
+	case c.MaxCost != nil:
+		return "the order's cost (" + OrderCostCountedAs + ") must be at most " + c.MaxCost.String()
 	case c.Absent:
 		return c.Field + " must not be set"
 	case c.OneOf != nil:
@@ -146,6 +148,8 @@ func (c Condition) AgentText() string {
 // like the owner-facing clause ("amt is at most 100") so the two read alike.
 func (c Condition) agentLine() string {
 	switch {
+	case c.MaxCost != nil:
+		return "the order's cost is at most " + c.MaxCost.String() + " (" + OrderCostCountedAs + ")"
 	case c.Absent:
 		return c.Field + " is not sent"
 	case c.OneOf != nil:

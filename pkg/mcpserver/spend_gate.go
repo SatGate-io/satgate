@@ -56,6 +56,16 @@ const counterGrace = time.Hour
 //
 // Known effect, accepted: an order the broker itself rejects (insufficient
 // funds, market closed) still counts toward the day's total.
+//
+// A limit that carries value "order_max_cost" (toolcontrols.SpendLimit.Value)
+// does not read its field. It counts each call at the most it can cost,
+// argrules.OrderMaxCost: dollar_amount, or quantity times limit_price for a
+// day limit buy of shares. The call is valued once and that one number is
+// reserved against every value limit the call meets (the token's day and
+// week limits, a shared budget's total and its symbol caps, a token's symbol
+// cap). A call that cannot be valued is refused for one fixed reason. An
+// order that does not fill still counts until the window resets: the
+// reservation and its give-back rules above are the same.
 type SpendGate struct {
 	store toolcontrols.SpendStore
 
@@ -289,6 +299,24 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 	}
 	var symbol string
 
+	// A call is valued once per order tool it stands for, and every value
+	// limit it meets reserves that one number.
+	type costResult struct {
+		cost argrules.OrderCost
+		why  argrules.OrderCostWhy
+	}
+	costs := map[string]costResult{}
+	valueOf := func(l toolcontrols.SpendLimit) costResult {
+		name := ownName(l)
+		if r, ok := costs[name]; ok {
+			return r
+		}
+		var r costResult
+		r.cost, r.why = argrules.OrderMaxCostOfCall(call.Params, call.Tool, name)
+		costs[name] = r
+		return r
+	}
+
 	for _, l := range limits {
 		sym := ""
 		deny := func(msg string, remaining *int64) *GateAdmission {
@@ -324,15 +352,25 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 			}
 			sym = canon
 		}
-		amount, why := argrules.ReadNumericField(call.Params, call.Tool, l.Field)
-		if why != argrules.NumericFieldOK {
-			return deny(fmt.Sprintf("%s: this token has a limit of %s on %s, and %s, so the limit cannot be checked%s",
-				call.Tool, limitPhrase(l), l.Field, fieldReason(why), sendFieldHint(l, why)), g.remainingAt(ctx, l, key)), nil
-		}
-		units, ok := amountUnits(amount)
-		if !ok {
-			rem := g.remainingAt(ctx, l, key)
-			return deny(overMessage(call.Tool, l, sym, rem), rem), nil
+		var units int64
+		if l.Value != "" {
+			v := valueOf(l)
+			if !v.why.Valued() {
+				return deny(valueRefusal(call.Tool, v.why), g.remainingAt(ctx, l, key)), nil
+			}
+			units = v.cost.Units
+		} else {
+			amount, why := argrules.ReadNumericField(call.Params, call.Tool, l.Field)
+			if why != argrules.NumericFieldOK {
+				return deny(fmt.Sprintf("%s: this token has a limit of %s on %s, and %s, so the limit cannot be checked%s",
+					call.Tool, limitPhrase(l), l.Field, fieldReason(why), sendFieldHint(l, why)), g.remainingAt(ctx, l, key)), nil
+			}
+			var ok bool
+			units, ok = amountUnits(amount)
+			if !ok {
+				rem := g.remainingAt(ctx, l, key)
+				return deny(overMessage(call.Tool, l, sym, rem), rem), nil
+			}
 		}
 		_, _, end := l.WindowBounds(now)
 		res := toolcontrols.Reservation{
@@ -496,7 +534,16 @@ func overMessage(tool string, l toolcontrols.SpendLimit, symbol string, left *in
 	default:
 		who = fmt.Sprintf("this token's limit is %s", limitPhrase(l))
 	}
+	if l.Value != "" {
+		return fmt.Sprintf("%s: %s, counting each order at the most it can cost; this order would go over it", tool, who) + leftPhrase(l, symbol, left)
+	}
 	return fmt.Sprintf("%s: %s on %s; this order would go over it", tool, who, l.Field) + leftPhrase(l, symbol, left)
+}
+
+// valueRefusal is the text for a call a value limit cannot count. The reason
+// is one of argrules' fixed phrases and never holds a value from the call.
+func valueRefusal(tool string, why argrules.OrderCostWhy) string {
+	return fmt.Sprintf("%s: this token counts each order at the most it can cost, and %s, so it was not sent", tool, why)
 }
 
 // leftPhrase is the closing words of a budget or symbol-cap refusal: how much

@@ -149,6 +149,24 @@ func (r Rule) check(args map[string]json.RawMessage) *Denial {
 		var failed string
 		var allowed string
 		for _, cond := range shape.Fields {
+			if cond.MaxCost != nil {
+				// The order-cost cap values the whole call with the one
+				// function every order-cost control shares. Its reason, when
+				// the call cannot be valued, is one of its fixed phrases.
+				ok, why := cond.orderCostHolds(r.Tool, args)
+				if ok {
+					held++
+					continue
+				}
+				if failed == "" {
+					failed = cond.Field
+					allowed = cond.AgentText() // from the rule, never the call
+					if !why.Valued() {
+						allowed += "; this order was not counted because " + string(why)
+					}
+				}
+				continue
+			}
 			if cond.holds(args) {
 				held++
 				continue
@@ -327,6 +345,12 @@ func walkJSONValue(dec *json.Decoder, depth, maxDepth int) error {
 func (r Rule) hasFieldFoldedOnly(key string) bool {
 	for _, shape := range r.Shapes {
 		for _, c := range shape.Fields {
+			if c.MaxCost != nil {
+				// "order" is a name in the rule, not a call argument. The
+				// arguments the cost is read from are checked, with their
+				// own letter-case twins, by OrderMaxCost.
+				continue
+			}
 			if c.Field != key && strings.EqualFold(c.Field, key) {
 				return true
 			}

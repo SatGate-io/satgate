@@ -76,6 +76,13 @@ type ApprovalRule struct {
 	// Above is the threshold, as written (a plain decimal). A call whose
 	// field is greater than this is held; equal is not.
 	Above string
+	// Value, when set, is argrules.OrderCostBasis ("order_max_cost"): the rule
+	// compares the most the call can cost (argrules.OrderMaxCost) with Above
+	// instead of reading Field. Field must then be dollar_amount and every tool
+	// an order tool. A call that cannot be valued is refused, never held (the
+	// owner cannot approve a number SatGate cannot work out). Empty means the
+	// rule reads Field, as before, and an unreadable field is held.
+	Value string
 
 	// ID names the rule (set by ParseScopeValue / CollectApprovals).
 	ID string
@@ -105,7 +112,7 @@ func parseApprovalRule(raw json.RawMessage) (ApprovalRule, error) {
 		return ApprovalRule{}, ctlErr("an approval rule must be an object")
 	}
 	var r ApprovalRule
-	var sawTools, sawField, sawAbove bool
+	var sawTools, sawField, sawAbove, sawValue bool
 	for k, v := range obj {
 		switch k {
 		case "tools":
@@ -124,12 +131,20 @@ func parseApprovalRule(raw json.RawMessage) (ApprovalRule, error) {
 				return ApprovalRule{}, ctlErr("above must be a string holding a plain decimal")
 			}
 			sawAbove = true
+		case "value":
+			if err := json.Unmarshal(v, &r.Value); err != nil {
+				return ApprovalRule{}, ctlErr("value must be a string")
+			}
+			sawValue = true
 		default:
 			return ApprovalRule{}, ctlErr("unknown approval rule key %q", clip(k))
 		}
 	}
 	if !sawTools || !sawField || !sawAbove {
 		return ApprovalRule{}, ctlErr("an approval rule needs tools, field and above")
+	}
+	if sawValue && r.Value == "" {
+		return ApprovalRule{}, ctlErr("value must be %q", argrules.OrderCostBasis)
 	}
 	if err := r.validate(); err != nil {
 		return ApprovalRule{}, err
@@ -167,7 +182,16 @@ func (r *ApprovalRule) validate() error {
 		return ctlErr("above has more than %d digits before or %d after the point", MaxWholeDigits, MaxScale)
 	}
 	r.above = d
-	return nil
+	return validateValueBasis(r.Value, r.Field, r.Tools)
+}
+
+// ThresholdUnits is Above as whole 10^-8 units, exact: Above is written with
+// at most MaxScale fractional digits.
+func (r ApprovalRule) ThresholdUnits() (int64, bool) {
+	if r.above == nil {
+		return 0, false
+	}
+	return argrules.UnitsCeil(r.above.Rat())
 }
 
 // CollectApprovals reads every control caveat on a token, in order, and
@@ -201,6 +225,11 @@ func CollectApprovals(caveats []string) ([]ApprovalRule, error) {
 func DescribeApprovals(rules []ApprovalRule) []string {
 	var out []string
 	for _, r := range rules {
+		if r.Value != "" {
+			out = append(out, fmt.Sprintf("%s: orders that can cost more than %s wait for your approval, counting each order at the most it can cost (%s)",
+				strings.Join(r.Tools, " and "), FormatAmount(r.Field, r.Above), argrules.OrderCostCountedAs))
+			continue
+		}
 		out = append(out, fmt.Sprintf("%s: calls with %s above %s wait for your approval",
 			strings.Join(r.Tools, " and "), r.Field, FormatAmount(r.Field, r.Above)))
 	}
@@ -401,6 +430,20 @@ func OwnerSummary(params json.RawMessage, field string) []SummaryItem {
 	return out
 }
 
+// CountsAsItem is the first line of the owner's summary for a call held by a
+// rule with value order_max_cost: the most the order can cost, which is the
+// number the rule compared with its threshold. units is argrules.OrderCost
+// Units. Like the rest of the summary it holds the call's values and goes to
+// the owner only.
+func CountsAsItem(field string, units int64) SummaryItem {
+	whole, frac := units/argrules.UnitsPerOne, units%argrules.UnitsPerOne
+	amount := fmt.Sprintf("%d", whole)
+	if frac != 0 {
+		amount = fmt.Sprintf("%d.%s", whole, strings.TrimRight(fmt.Sprintf("%08d", frac), "0"))
+	}
+	return SummaryItem{Name: "Counts as at most", Value: FormatAmount(field, amount)}
+}
+
 func displayValue(raw json.RawMessage) string {
 	raw = bytes.TrimSpace(raw)
 	var s string
@@ -455,9 +498,11 @@ type ApprovalRequest struct {
 	Tool     string
 	// CallHash is CallHash(TokenID, Tool, params).
 	CallHash string
-	// Field and Above are the rule that held the call.
+	// Field and Above are the rule that held the call. Value is the rule's
+	// value basis (argrules.OrderCostBasis), empty for a rule that reads Field.
 	Field string
 	Above string
+	Value string
 	// Summary is what the owner is shown. It holds the call's values.
 	Summary []SummaryItem
 	Now     time.Time
