@@ -94,7 +94,7 @@ func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) 
 	if limit, ok := narrowestBudgetLimit(mac); ok {
 		info.BudgetLimit = limit
 	}
-	info.DelegationDepth = narrowestPositiveInt(mac, "delegation_depth")
+	info.DelegationDepth = narrowestDelegationDepth(mac)
 	info.DelegationBudget = narrowestPositiveAmount(mac, "delegation_budget")
 	for _, caveat := range mac.Caveats {
 		if strings.HasPrefix(caveat, "parent = ") {
@@ -195,28 +195,21 @@ func displayScope(mac *macaroon.Macaroon) string {
 	return scopes[0]
 }
 
-// narrowestPositiveInt is the minimum successfully parsed positive integer.
-// A non-numeric value, zero, or a negative value does not set or clear a cap.
-// Zero means unlimited only when no positive cap was parsed.
-func narrowestPositiveInt(mac *macaroon.Macaroon, key string) int {
-	found := false
+// narrowestDelegationDepth is the smallest positive depth the chain's caveats
+// read as, read the way /v1/mint/delegate reads them (readDelegationDepth), so
+// "3abc" is 3 and "2.5" is 2. A value that does not read, or reads as zero or
+// below, sets no cap here and clears none: Delegate refuses such a token
+// before this value is used (readDelegationDepthChain).
+func narrowestDelegationDepth(mac *macaroon.Macaroon) int {
 	min := 0
-	prefix := key + " = "
 	for _, caveat := range mac.Caveats {
-		if !strings.HasPrefix(caveat, prefix) {
+		v, isDepth, ok := readDelegationDepth(caveat)
+		if !isDepth || !ok || v <= 0 {
 			continue
 		}
-		v, err := strconv.Atoi(strings.TrimPrefix(caveat, prefix))
-		if err != nil || v <= 0 {
-			continue
-		}
-		if !found || v < min {
+		if min == 0 || v < min {
 			min = v
-			found = true
 		}
-	}
-	if !found {
-		return 0
 	}
 	return min
 }

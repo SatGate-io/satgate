@@ -133,13 +133,161 @@ func (d *Delegator) SetEventPublisher(ep EventPublisher) {
 
 // ChildPersister is implemented by an EventPublisher that records a delegated
 // child where a revoke can find it. Delegate calls PersistChild, for a
-// zero-credit helper that carries its own revocation id, before it returns the
-// key; a non-nil error means the id was not durably recorded and no key is
-// returned. PersistChild must be safe to call again for the same event (the
+// zero-credit helper, and for every child whose handoff a stored row decided
+// (HandoffLimiter), before it returns the key; a non-nil error means the
+// child was not durably recorded and no key is returned. PersistChild must be safe to call again for the same event (the
 // same parent, label and scope give the same key), and must not put the error's
 // text in the reply.
 type ChildPersister interface {
 	PersistChild(ctx context.Context, event Event) error
+}
+
+// HandoffLimiter is implemented by an EventPublisher that keeps the handoff
+// limit the owner stored for each token (the gateway's delegation tree).
+// Delegate asks it before it mints or carves anything.
+//
+// HandoffRecord is called with the parent the request's authenticator
+// verified. It answers with the row the handoff is judged by:
+//
+//   - rowID "" and no error: no stored limit applies to this parent (a store
+//     with no rows, a token that names no tenant). Delegate goes on as it did
+//     before this interface existed.
+//   - rowID set: depth is the parent's depth below its root, and limited/limit
+//     the stored limit (limited false = unlimited, 0 = may not hand off, N = at
+//     most N levels). The rule is handoffAllowed. When the handoff goes ahead,
+//     rowID, depth and the limit are carried on the delegation event
+//     (EventParentRowID, EventParentDepth, EventParentLimit), so the child's
+//     row is written from the row that was read.
+//   - an error whose HandoffRecordMissing() reports true: the parent should
+//     have a stored row and has none. Refused: "this token can't hand off to
+//     a helper".
+//   - any other error: the limit could not be read. Refused with
+//     ErrChildTokenFailed, because a limit that cannot be read is not one
+//     Delegate can promise to keep. Only the error's class is logged (see
+//     errClass), never its text or the parent's id.
+//
+// The method uses only basic types so a gateway can implement it while it
+// still builds against a version of this package without the interface.
+type HandoffLimiter interface {
+	HandoffRecord(ctx context.Context, parent *TokenInfo) (rowID string, depth int, limit int, limited bool, err error)
+}
+
+// handoffAllowed is the one rule for a stored handoff limit: no limit means
+// unlimited, 0 (or less) refuses, and N refuses a parent already N levels
+// down. parentDepth is the parent's depth in its chain (0 for a root).
+func handoffAllowed(limit int, limited bool, parentDepth int) bool {
+	if !limited {
+		return true
+	}
+	if limit <= 0 {
+		return false
+	}
+	return parentDepth+1 <= limit
+}
+
+// delegationDepthPrefix starts every depth caveat. A caveat that does not start
+// with it (for example "delegation_depth=3") is not a depth caveat here, as on
+// /v1/mint/delegate.
+const delegationDepthPrefix = "delegation_depth = "
+
+// readDelegationDepth reads one depth caveat exactly as /v1/mint/delegate does
+// (mint.go reads it with fmt.Sscanf and macaroon.go's validator judges the
+// result): the leading integer after the prefix, after any spaces, with an
+// optional sign. isDepth is false for a caveat that is not a depth caveat. ok
+// is false when the value does not read (empty, spaces only, letters first, a
+// digit that is not 0-9, out of range): that route refuses such a token. The
+// rest of the value is not looked at, so "3abc" reads 3, "2.5" reads 2, "1e3"
+// reads 1 and "0x10" reads 0.
+func readDelegationDepth(caveat string) (depth int, isDepth, ok bool) {
+	if !strings.HasPrefix(caveat, delegationDepthPrefix) {
+		return 0, false, false
+	}
+	if _, err := fmt.Sscanf(caveat, "delegation_depth = %d", &depth); err != nil {
+		return 0, true, false
+	}
+	return depth, true, true
+}
+
+// readDelegationDepthChain judges every depth caveat in a chain. refused is
+// true when /v1/mint/delegate would refuse the token for its depth: any value
+// that does not read, reads below zero, or reads as zero (the issuer's or a
+// holder's). Otherwise cap is the smallest value read (0 when the chain has no
+// depth caveat), which is the cap that route applies.
+func readDelegationDepthChain(caveats []string) (cap int, refused bool) {
+	for _, caveat := range caveats {
+		depth, isDepth, ok := readDelegationDepth(caveat)
+		if !isDepth {
+			continue
+		}
+		if !ok || depth <= 0 {
+			return 0, true
+		}
+		if cap == 0 || depth < cap {
+			cap = depth
+		}
+	}
+	return cap, false
+}
+
+// parentCaveats are the caveats of the parent's chain: the decoded token when
+// the caller kept it, else the raw token decoded here. nil when neither reads;
+// the checks that follow refuse such a token.
+func parentCaveats(svc *macaroon.Service, parent *TokenInfo) []string {
+	mac := parent.Raw
+	if mac == nil && svc != nil && parent.RawToken != "" {
+		decoded, err := svc.Decode(parent.RawToken)
+		if err != nil {
+			return nil
+		}
+		mac = decoded
+	}
+	if mac == nil {
+		return nil
+	}
+	return mac.Caveats
+}
+
+// storedHandoff is the record a handoff was decided by (see HandoffLimiter).
+type storedHandoff struct {
+	rowID   string
+	depth   int
+	limit   int
+	limited bool
+}
+
+// errNoStoredHandoff is the refusal for a parent with no stored row, and for
+// a stored limit of 0: the parent may not hand off.
+var errNoStoredHandoff = &clientError{msg: "this token can't hand off to a helper"}
+
+// checkStoredHandoffLimit applies handoffAllowed to the record the event
+// consumer keeps for parent. The refusals are clientErrors, so they leave
+// HandleDelegate in the same shape as the depth-limit refusal beside them. A
+// nil record with no error means no stored limit applies.
+func (d *Delegator) checkStoredHandoffLimit(ctx context.Context, parent *TokenInfo) (*storedHandoff, error) {
+	hl, ok := d.events.(HandoffLimiter)
+	if !ok {
+		return nil, nil
+	}
+	rowID, depth, limit, limited, err := hl.HandoffRecord(ctx, parent)
+	if err != nil {
+		var missing interface{ HandoffRecordMissing() bool }
+		if errors.As(err, &missing) && missing.HandoffRecordMissing() {
+			log.Warn().Msg("delegation refused: the parent has no stored row")
+			return nil, errNoStoredHandoff
+		}
+		log.Error().Err(errClass(err)).Msg("delegation refused: the stored handoff limit could not be read")
+		return nil, ErrChildTokenFailed
+	}
+	if rowID == "" {
+		return nil, nil
+	}
+	if handoffAllowed(limit, limited, depth) {
+		return &storedHandoff{rowID: rowID, depth: depth, limit: limit, limited: limited}, nil
+	}
+	if limit <= 0 {
+		return nil, errNoStoredHandoff
+	}
+	return nil, &clientError{msg: fmt.Sprintf("this token has reached its handoff limit (%d levels)", limit)}
 }
 
 // persistChildTimeout bounds PersistChild.
@@ -164,6 +312,18 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		return nil, &clientError{msg: "delegation requires macaroon auth (mode=header)"}
 	}
 
+	// A token whose chain carries a depth /v1/mint/delegate would refuse (zero,
+	// below zero, or a value that does not read) allows no handoff, whether the
+	// issuer wrote it or a holder appended it, and whether or not a stored limit
+	// is wired. This runs before the stored limit is read, before any mint, and
+	// before any carve: it only reads the caveats the token already carries. The
+	// smallest value that does read is the cap, read the same way.
+	depthCap, refused := readDelegationDepthChain(parentCaveats(d.macaroonSvc, parent))
+	if refused {
+		log.Warn().Msg("delegation refused: this token allows no further handoffs")
+		return nil, errNoStoredHandoff
+	}
+
 	// A budget the issuer sealed at mint is the only budget a token can carry.
 	// Delegation never adds one, never seals one the holder chose, and never
 	// drops or swaps the parent's. This runs before any reservation or other
@@ -175,9 +335,20 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		return nil, d.refuseMint(parent, err, "parent token cannot be read")
 	}
 
+	// Enforce the handoff limit the owner stored for this token, when the
+	// event consumer can read one (HandoffLimiter). Nothing has been taken
+	// from the parent yet, so a refusal here changes nothing.
+	decided, err := d.checkStoredHandoffLimit(ctx, parent)
+	if err != nil {
+		return nil, err
+	}
+
 	// Enforce delegation depth limit
-	if parent.DelegationDepth > 0 && parent.Depth >= parent.DelegationDepth {
-		return nil, &clientError{msg: fmt.Sprintf("delegation depth limit reached (%d)", parent.DelegationDepth)}
+	if depthCap == 0 || (parent.DelegationDepth > 0 && parent.DelegationDepth < depthCap) {
+		depthCap = parent.DelegationDepth
+	}
+	if depthCap > 0 && parent.Depth >= depthCap {
+		return nil, &clientError{msg: fmt.Sprintf("delegation depth limit reached (%d)", depthCap)}
 	}
 
 	// Enforce per-delegation budget cap
@@ -354,6 +525,15 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			EventChildScopes:            childScopes,
 		},
 	}
+	if decided != nil {
+		// The row the handoff was decided by: the child's row is written
+		// under it, one level deeper, with the same limit.
+		delegationEvent.Data[EventParentRowID] = decided.rowID
+		delegationEvent.Data[EventParentDepth] = decided.depth
+		if decided.limited {
+			delegationEvent.Data[EventParentLimit] = decided.limit
+		}
+	}
 
 	// A zero-credit helper is recorded by the event consumer before its key
 	// leaves this function, whether or not it carries an hlp- id. What a revoke
@@ -366,7 +546,11 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 	// The signature goes only to PersistChild, on a copy of the event that is
 	// never published: no other subscriber of the delegation event sees it, and
 	// nothing here logs it.
-	if params.Budget == 0 {
+	// When the handoff was decided by a stored row, every child (with credits
+	// too) is recorded before its key is returned, so the row that keeps its
+	// limit exists before the child can hand off in turn. A child with
+	// credits whose row cannot be written gives its carve back.
+	if params.Budget == 0 || decided != nil {
 		if cp, ok := d.events.(ChildPersister); ok {
 			persistEvent := delegationEvent
 			persistEvent.Data = make(map[string]interface{}, len(delegationEvent.Data)+1)
@@ -379,6 +563,7 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			cancel()
 			if perr != nil {
 				log.Error().Msg("delegation refused: the helper could not be recorded where a revoke finds it")
+				d.giveBack(ctx, parent, delegationID, params.Budget)
 				return nil, ErrChildTokenFailed
 			}
 		}

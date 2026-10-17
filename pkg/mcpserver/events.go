@@ -13,6 +13,14 @@ const (
 	EventInheritedRulesKnown    = "inheritedRulesKnown"
 	EventInheritedArgumentRules = "inheritedArgumentRules"
 	EventChildScopes            = "childScopes"
+
+	// The row a handoff was decided by, when the event publisher keeps
+	// stored limits (HandoffLimiter): the parent's row id, its depth, and the
+	// limit read (absent when unlimited). The consumer writes the child's row
+	// from these.
+	EventParentRowID = "parentRowId"
+	EventParentDepth = "parentDepth"
+	EventParentLimit = "parentLimit"
 )
 
 // A delegation event never carries the scope text the holder sent. It carries
