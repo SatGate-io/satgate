@@ -130,13 +130,11 @@ const evidencePack = {
       subject: "dean-agent:finance-automation",
       issuer_kid: "satgate-mint-2026-05",
       caveats: ["tenant_id = acme-finance", "delegation_depth = 1"],
-      receipt_hash: "sha256:7a2ca1b8d5e0a0d7c9545c7f8e6d03d12761b687a7a1f27c0dd7ed2e643a01b5",
     },
     {
       kind: "delegation",
       subject: "worker-agent:invoice-reconciler",
       parent: "dean-agent:finance-automation",
-      receipt_hash: "sha256:95f1c3df9d1f8d7a0e5b60b850f4b6013dd2f0e18496f9e5a8c0319fd51382bf",
     },
   ],
   receipts: [
