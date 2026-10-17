@@ -230,7 +230,7 @@ export default function GovernPage() {
                 <span className="text-red-300 font-medium">The problem:</span> Agents now hold authority that used to require human approval. Security needs proof that scope, delegation, denial, and revocation actually worked.
               </p>
               <p className="text-gray-300 text-sm leading-relaxed mb-4 border-l-2 border-red-800 pl-3">
-                &ldquo;SatGate gives us a kill switch: the next request after a revoke is refused, and on HTTP that refusal gets a signed receipt.&rdquo;
+                &ldquo;SatGate gives us a kill switch. The next request after a revoke is refused.&rdquo;
               </p>
               <div className="pt-3 border-t border-red-900/30">
                 <p className="text-xs text-red-400 font-medium mb-2">Metrics that matter:</p>
@@ -446,7 +446,7 @@ export default function GovernPage() {
                       <Lock size={16} className="text-cyan-400" /> Parent Authority Revoked
                     </h4>
                     <p className="text-gray-500 text-sm">
-                      One click revokes the finance-automation parent. The invoice-reconciler child is refused on its next request, and on HTTP that refusal gets a signed receipt.
+                      One click revokes the finance-automation parent, and with it the invoice-reconciler child. The next request after a revoke is refused.
                     </p>
                   </div>
                 </div>
@@ -700,7 +700,7 @@ export default function GovernPage() {
                 <li>• Every governed agent gets scoped, revocable authority</li>
                 <li>• Delegated workers inherit narrower limits</li>
                 <li>• Policy, budget, and scope denials stop requests before execution</li>
-                <li>• A revoke is followed by a refused request, which gets a signed receipt on HTTP</li>
+                <li>• The next request after a revoke is refused</li>
                 <li className="text-green-400 font-medium">• Receipt exports show what was spent and why a request was refused</li>
               </ul>
             </div>

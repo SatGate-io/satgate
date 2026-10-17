@@ -70,12 +70,12 @@ const evidenceQuestions = [
   {
     question: "What was denied?",
     artifact: "Denial receipt",
-    body: "A policy, budget, scope, tenant, or revocation reason code attached to the blocked invoice call.",
+    body: "A budget, missing-payment or tool-permission reason code attached to the blocked invoice call.",
   },
   {
     question: "Can we prove revocation worked?",
     artifact: "Post-revoke denial",
-    body: "The next request after a revoke is refused, with a signed receipt on HTTP.",
+    body: "The next request after a revoke is refused.",
   },
 ];
 
@@ -102,7 +102,7 @@ const personas = [
   {
     title: "CISO",
     icon: ShieldAlert,
-    quote: "Revocation isn’t a promise. The next request is refused, and on HTTP that refusal gets a signed receipt.",
+    quote: "Revocation isn’t a promise. The next request after a revoke is refused.",
   },
   {
     title: "FinOps lead",
@@ -146,7 +146,6 @@ const evidencePack = {
     { receipt_id: "rcpt_paid_ocr_005", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "spend", ts: "2026-05-09T14:24:44Z", route: "/v1/invoices/ocr", mcp_tool: "document_ai.ocr", amount_usd: "0.18", payment_protocol: "x402", settlement: { chain: "base", tx: "REDACTED_DEMO_SAMPLE", ms: 187 }, decision_reason: "allowed_under_policy", result: "allowed", receipt_hash: "sha256:deb5..." },
     { receipt_id: "rcpt_denial_scope_006", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "denial", ts: "2026-05-09T14:25:08Z", decision_reason: "scope_violation:no_customer_data_export", reason_code: "scope_violation:no_customer_data_export", result: "blocked", receipt_hash: "sha256:9b0f..." },
     { receipt_id: "rcpt_denial_budget_007", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "denial", ts: "2026-05-09T14:25:33Z", decision_reason: "budget_exhausted", reason_code: "budget_exhausted", result: "blocked", receipt_hash: "sha256:c3f6..." },
-    { receipt_id: "rcpt_post_revoke_denial_009", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "post_revoke_denial", ts: "2026-05-09T14:26:16Z", decision_reason: "capability_revoked", reason_code: "capability_revoked", result: "blocked", receipt_hash: "sha256:8b95..." },
   ],
   chain_root: "sha256:f04ed8430b11c8975cc5ef35919ee078fc4cb166cd8d611ed0d94b7da69df09d",
   signature: "ed25519:REDACTED_DEMO_SAMPLE_DO_NOT_VERIFY",
