@@ -323,19 +323,21 @@ budget_id = "budget-xyz-789"
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`# satgate.yaml — L402 route configuration
-routes:
-  - path: /api/v1/translate
-    target: http://localhost:8080
-    policy: l402          # Also accepts "charge" or "monetize"
-    price_sats: 50        # Cost per request in satoshis
-    description: "Translation API — per-request pricing"
+            <code className="text-green-300">{`# satgate.yaml: L402 route configuration
+upstreams:
+  backend:
+    url: http://localhost:8080
 
-  - path: /api/v1/premium
-    target: http://localhost:8080
-    policy: l402
-    price_sats: 200
-    description: "Premium endpoint — higher quality, higher price"
+routes:
+  - name: translate
+    match: { pathPrefix: /api/v1/translate }
+    upstream: backend
+    policy: { kind: l402, priceSats: 50 }  # kind also accepts charge or monetize
+
+  - name: premium
+    match: { pathPrefix: /api/v1/premium }
+    upstream: backend
+    policy: { kind: l402, priceSats: 200 }
 
 # How it works in the gateway:
 # 1. Request arrives at /api/v1/translate

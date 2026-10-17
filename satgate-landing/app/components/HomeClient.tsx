@@ -170,7 +170,7 @@ const LandingPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              Keep your AI agents within budget on the paid services they use. Make external agents pay before they use yours. Get a signed receipt for every decision.
+              Keep your AI agents within budget on the paid services they use. Make external agents pay before they use yours. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
               Each time an agent uses a service, SatGate checks it first. (Developers call these services APIs.) Your own agents stop when their budget runs out. External agents pay on the routes you choose, so abusing your API gets expensive, and paying never gets them past your access rules.
@@ -203,7 +203,7 @@ const LandingPage = () => {
               </div>
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
                 <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> MCP · HTTP APIs · Lightning payments</span>
-                <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> <a href="https://github.com/SatGate-io/satgate" className="text-gray-400 hover:text-white transition underline underline-offset-2">Open source</a></span>
+                <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> <a href="https://github.com/SatGate-io/satgate" className="text-gray-400 hover:text-white transition underline underline-offset-2">Open-source core gateway</a></span>
               </div>
             </div>
           </div>
@@ -250,7 +250,7 @@ const LandingPage = () => {
           <p className="text-xs text-gray-500 mt-3">The agent in the recording is the dashboard&apos;s built-in demo agent.</p>
 
           <h3 className="text-xl font-bold mt-16 mb-2">Your agents&apos; tool calls: only the tools you allow, within budget</h3>
-          <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Add an MCP server, mint a token with a 3-credit budget that can call one tool, and copy its config into Claude Code, Cursor, Hermes, OpenClaw or any other MCP client. A tool outside the list is refused before it runs. Once the budget is spent, the next call is refused too. Each refusal gets a signed receipt, and the open-source verifier checks them.</p>
+          <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Add an MCP server, mint a token with a 3-credit budget that can call one tool, and copy its config into Claude Code, Cursor, Hermes, OpenClaw or any other MCP client. A tool outside the list is refused before it runs. Once the budget is spent, the next call is refused too. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. The open-source verifier checks the receipts.</p>
           <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
             <video
               controls
@@ -289,7 +289,7 @@ const LandingPage = () => {
           <p className="text-xs text-gray-500 mt-3">The agents in the recording are scripted MCP clients. The orders are real: three Bitcoin buys, $7 in total. Account numbers are masked.</p>
 
           <h3 className="text-xl font-bold mt-16 mb-2">External agents: pay before they get in</h3>
-          <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Set a route to Admit and choose how external agents pay: USDC on Base, sats over Lightning, or both, each with its own price. An agent with no wallet gets 402 Payment Required and never reaches your API. In the recording, a second agent sends one cent in USDC, the payment settles on Base, and the call goes through. Sending the same payment again is refused. With USDC, each payment buys one request. On Lightning you choose how many requests one payment buys, and on sat-priced routes the price can rise under load, up to a ceiling you set; unpaid 402s don&apos;t raise it. Paying never gets an agent past your access rules, and payment decisions, refusals included, get a signed receipt.</p>
+          <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Set a route to Admit and choose how external agents pay: USDC on Base, sats over Lightning, or both, each with its own price. An agent with no wallet gets 402 Payment Required and never reaches your API. In the recording, a second agent sends one cent in USDC, the payment settles on Base, and the call goes through. Sending the same payment again is refused. With USDC, each payment buys one request. On Lightning you choose how many requests one payment buys, and on sat-priced routes the price can rise under load, up to a ceiling you set; unpaid 402s don&apos;t raise it. Paying never gets an agent past your access rules. Payment refusals get a signed receipt, and so do most paid requests.</p>
           <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-yellow-500/10">
             <video
               controls
@@ -388,6 +388,12 @@ const LandingPage = () => {
               <span>✓ Revoke works on the next request</span>
               <span>✓ Signed receipts</span>
             </div>
+            <p className="mt-4 rounded-lg border border-purple-500/40 bg-purple-950/40 px-4 py-3 text-sm leading-relaxed text-purple-100">
+              Your rules sit outside the model. Limits, receipts and the off switch live in SatGate, where no prompt or model provider can change them.
+            </p>
+            <Link href="/govern" className="mt-3 inline-flex items-center text-sm font-medium text-purple-300 hover:text-purple-200 transition">
+              Zero trust for AI agents →
+            </Link>
           </div>
 
           {/* Your Agents */}
@@ -411,7 +417,7 @@ const LandingPage = () => {
                 Start here. Nothing is blocked while you see which agents call what, and what it costs.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
-                <li>✓ Nothing is blocked; your agents work as before</li>
+                <li>✓ Never blocks a request for being over budget; requests still need a valid token</li>
                 <li>✓ Usage broken down by team and cost center</li>
                 <li>✓ See which agents, tools and routes cost the most before you change anything</li>
                 <li>✓ Built to add little overhead</li>
@@ -434,7 +440,7 @@ const LandingPage = () => {
                 Then turn on limits. An agent that is out of budget or asks for something it isn&apos;t allowed is stopped before the request runs.
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
-                <li>✓ Budget checked on every request</li>
+                <li>✓ Budget checked on every priced request</li>
                 <li>✓ Your agents spend from a budget you set; nobody pays per call</li>
                 <li>✓ Per-agent spending caps</li>
               </ul>
@@ -482,11 +488,11 @@ const LandingPage = () => {
               </div>
               <div>
                 <h3 className="text-xl font-bold">Receipts anyone can check</h3>
-                <p className="text-gray-500 text-sm">From Observe, Control and Admit</p>
+                <p className="text-gray-500 text-sm">Control and Admit sign receipts. Observe signs them on HTTP when receipts are on for your plan.</p>
               </div>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              When SatGate allows, refuses, charges or revokes, it signs a receipt. Receipts roll up into an Evidence Pack.
+              SatGate signs a receipt when it refuses a request over a budget, a missing payment or a tool permission, and when an agent spends from a budget. Each receipt comes in an Evidence Pack you can export.
               Your auditor can check the signatures with the open-source verifier, without having to trust us.
               A receipt shows what SatGate decided. It is not a compliance certificate.
             </p>
@@ -718,13 +724,13 @@ const LandingPage = () => {
                 step: "1",
                 title: "Pick a policy",
                 description: "Set a policy per route: public for health checks and docs, protected for everything else.",
-                code: `routes:\n  - path: /healthz\n    policy: public\n  - path: /v1/*\n    policy: observe\n  - path: /premium/*\n    policy: charge`
+                code: `routes:\n  - match: { pathExact: /healthz }\n    policy: { kind: public }\n  - match: { pathPrefix: /v1/ }\n    policy: { kind: observe }\n  - match: { pathPrefix: /premium/ }\n    policy: { kind: charge }`
               },
               {
                 step: "2",
                 title: "Apply it",
-                description: "Apply it when you are ready. Every version is kept, with a receipt for who changed what, so you can roll back.",
-                code: `v3 (applied) ← current\nv2 (available)\nv1 (available)\n\nReceipt: who, when, diff`
+                description: "Apply it when you are ready. Every version is kept, with an audit entry for who changed what, so you can roll back.",
+                code: `v3 (applied) ← current\nv2 (available)\nv1 (available)\n\nAudit entry: who, when, diff`
               },
               {
                 step: "3",
@@ -735,8 +741,8 @@ const LandingPage = () => {
               {
                 step: "4",
                 title: "Check what happened",
-                description: "Receipts for allowed, denied, paid, delegated, and revoked decisions, ready to export as an Evidence Pack.",
-                code: `Illustrative sample, not live customer data\nAllowed receipts: 1,203\nDenied receipts: 12,847\nPaid receipts:   $847 settled\nDelegations:     42\nRevocations:     9\n\n→ Export Evidence Pack`
+                description: "Signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, ready to export as Evidence Packs.",
+                code: `Illustrative sample, not live customer data\nAllowed receipts: 1,203\nDenied receipts: 12,847\nPaid receipts:   $847 settled\n\n→ Export Evidence Pack`
               }
             ].map((item, i) => (
               <div key={i} className="relative">
@@ -765,9 +771,9 @@ const LandingPage = () => {
           <h2 className="mb-8 text-3xl font-bold text-white">Questions</h2>
           <div className="space-y-6">
             {[
-              ['What is SatGate?', 'SatGate is a gateway that sits in front of your APIs and MCP tools. It keeps your own agents within the budgets and permissions you set, charges external agents on the routes you choose, and signs a receipt for each decision.'],
+              ['What is SatGate?', 'SatGate is a gateway that sits in front of your APIs and MCP tools. It keeps your own agents within the budgets and permissions you set and charges external agents on the routes you choose. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.'],
               ['How does SatGate control what agents do?', 'Before a request reaches your API or MCP tool, SatGate checks the agent’s permissions, its remaining budget and whether its token was revoked. If a check fails, the request stops at SatGate.'],
-              ['How do I give an agent a budget?', 'You set the budget, the permissions and how many times it can hand work to a sub-agent. The agent gets a token with those limits built in. Every allow, refusal, payment, handoff and revoke gets a receipt.'],
+              ['How do I give an agent a budget?', 'You set the budget, the permissions and how many times it can hand work to a sub-agent. The agent gets a token with those limits built in. SatGate signs a receipt when it refuses a request over a budget, a missing payment or a tool permission, and when an agent spends from a budget.'],
             ].map(([question, answer]) => (
               <div key={question} className="border-t border-gray-800 pt-6 first:border-t-0 first:pt-0">
                 <h3 className="mb-2 text-xl font-bold text-white">{question}</h3>
@@ -803,7 +809,7 @@ const LandingPage = () => {
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="max-w-xs text-sm text-gray-500">Limits for your agents, payment from external agents, and a receipt for every decision.</p>
+              <p className="max-w-xs text-sm text-gray-500">Limits for your agents, payment from external agents, and signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.</p>
               <p className="text-gray-600 text-xs mt-3">You set the rules. SatGate enforces them on every request.</p>
             </div>
             <div>

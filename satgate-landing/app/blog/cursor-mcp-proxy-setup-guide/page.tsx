@@ -161,11 +161,11 @@ export default function CursorMCPProxySetupGuidePage() {
           </p>
 
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
-            <code>{`# example startup
-satgate gateway start
+            <code>{`# open-source HTTP gateway
+satgate --config ./gateway.yaml
 
-# or, depending on your deployment style
-satgate-gateway --config ./satgate.yaml`}</code>
+# open-source MCP proxy
+satgate-mcp --config ./satgate-mcp.yaml`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
@@ -179,22 +179,18 @@ satgate-gateway --config ./satgate.yaml`}</code>
           </p>
 
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
-            <code>{`mcpServers:
+            <code>{`upstreams:
   github-read:
-    url: https://mcp.internal/github-read
-    policy:
-      price: 1
+    transport: stdio
+    command: ["./mcp-servers/github-read"]
 
   web-fetch:
-    url: https://mcp.internal/web-fetch
-    policy:
-      price: 2
+    transport: stdio
+    command: ["./mcp-servers/web-fetch"]
 
   ci-actions:
-    url: https://mcp.internal/ci
-    policy:
-      price: 10
-      requireApproval: true`}</code>
+    transport: stdio
+    command: ["./mcp-servers/ci-actions"]`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
@@ -251,18 +247,10 @@ There is no satgate token create command, and no daily limit.`}</code>
           </p>
 
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
-            <code>{`policies:
-  cursor-dev:
-    totalDailyCredits: 25
-    tools:
-      github-read:
-        cost: 1
-        maxCallsPerHour: 100
-      web-fetch:
-        cost: 2
-        maxCallsPerHour: 20
-      ci-actions:
-        enabled: false`}</code>
+            <code>{`tools:
+  costs:
+    github-read: 1
+    web-fetch: 2`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">

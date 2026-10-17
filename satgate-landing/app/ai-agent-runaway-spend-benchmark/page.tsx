@@ -269,7 +269,7 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-3xl border border-orange-900/60 bg-gradient-to-br from-orange-950/40 to-cyan-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">The fix is not a better bill. It is a pre-request decision.</h2>
-          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate checks permission before the agent acts: observe cost, control spend before the call runs, and prove every allowed, denied, routed, revoked, or paid decision with a signed receipt.</p>
+          <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">SatGate checks permission before the agent acts: observe cost and control spend before the call runs. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Govern agent spend <ArrowRight size={18} /></Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">See how rules and receipts work</Link>

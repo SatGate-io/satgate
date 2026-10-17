@@ -259,20 +259,14 @@ export default function BeyondConnectionPage() {
             </p>
 
             <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 my-6 font-mono text-sm overflow-x-auto">
-              <pre className="text-gray-300">{`# SatGate route config — per-tool cost profiles
-routes:
-  - name: mcp-tools
-    match:
-      pathPrefix: /v1/mcp
-    policy:
-      kind: fiat402
-    mcp:
-      costs:
-        "search_database": 50      # 50 credits per call
-        "create_resource": 500     # 500 credits — expensive!
-        "read_file": 5             # cheap
-        "execute_code": 200        # moderate
-        "cloud_*": 300             # wildcard: any cloud tool`}</pre>
+              <pre className="text-gray-300">{`# satgate-mcp.yaml: per-tool cost profiles
+tools:
+  costs:
+    "search_database": 50      # 50 credits per call
+    "create_resource": 500     # 500 credits, expensive!
+    "read_file": 5             # cheap
+    "execute_code": 200        # moderate
+    "cloud_*": 300             # wildcard: any cloud tool`}</pre>
             </div>
 
             <p>
@@ -508,7 +502,7 @@ X-SatGate-Budget-Limit: 2500
               <div className="bg-gray-900 border border-cyan-500/30 rounded-xl p-4">
                 <p className="font-bold text-cyan-300 mb-1">🎛 Control ($99/mo)</p>
                 <p className="text-gray-400">
-                  Turn on budget enforcement. Hard caps, per-tool cost attribution, cascade delegation. Agents 
+                  Turn on budget enforcement. Hard caps, per-tool cost attribution, cascade delegation. HTTP agents 
                   that exceed their budget get a 402, not a surprise invoice.
                 </p>
               </div>

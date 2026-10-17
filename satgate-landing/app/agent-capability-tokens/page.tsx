@@ -111,7 +111,7 @@ export default function Page() {
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Identity is not permission</h3><p className="leading-relaxed text-gray-400">A verified agent can still be overpowered if the token does not constrain what it can do.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Budgets belong in the credential path</h3><p className="leading-relaxed text-gray-400">Spend limits, call ceilings, and route policy need to be evaluated before forwarding traffic.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Delegation should narrow</h3><p className="leading-relaxed text-gray-400">A parent agent should be able to create a narrower child token, never a broader one.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Audit needs token context</h3><p className="leading-relaxed text-gray-400">Every decision should emit a receipt with identity, capability, caveats, remaining budget, route, outcome, decision_reason, policy_version, and signed receipt (Evidence Pack) id.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Audit needs token context</h3><p className="leading-relaxed text-gray-400">Budget spends, and refusals over a budget, a missing payment or a tool permission, emit a receipt with capability hash, remaining budget, route, outcome, decision_reason, policy_version and Evidence Pack id.</p></div>
           </div>
         </div>
       </section>
@@ -165,22 +165,7 @@ export default function Page() {
             Mint a scoped agent token <ArrowRight size={16} />
           </Link>
         </div>
-        <pre className="overflow-x-auto rounded-2xl border border-gray-800 bg-gray-950 p-6 text-sm text-green-300"><code>{`agent: research-agent-17
-scope:
-  routes: [/api/research/*]
-  tools: [web_search, document_fetch]
-budget:
-  max_usd: 25
-  max_calls: 300
-delegation:
-  allowed: true
-  child_budget_max_usd: 5
-  child_ttl_minutes: 15
-expiry: 2026-04-26T14:00:00Z
-revocation:
-  check: before_each_request
-audit:
-  fields: [agent, route, tool, budget_remaining, decision]`}</code></pre>
+        <pre className="overflow-x-auto rounded-2xl border border-gray-800 bg-gray-950 p-6 text-sm text-green-300"><code>{`delegation_depth = 1`}</code></pre>
       </section>
 
       <section className="border-t border-gray-900 bg-black">

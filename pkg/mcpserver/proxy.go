@@ -72,6 +72,10 @@ type Proxy struct {
 
 	// healthDetail adds a note to /health (SetHealthDetail).
 	healthDetail func() string
+
+	// modeResolver, when set, decides each tools/call under its tenant's
+	// enforcement mode instead of the process-wide one (enforcement_mode.go).
+	modeResolver EnforcementModeResolver
 }
 
 // ResponseGuard wraps the handling of every request the proxy answers: the
@@ -649,8 +653,8 @@ func dropReservedTools(tools []json.RawMessage) []json.RawMessage {
 // they go on with the resolver's default price, as before. A token with no
 // budget is not debited by this function in any mode, so its price decides
 // nothing here.
-func (p *Proxy) priceUnknownRefuses(budgetID string) bool {
-	switch p.config.Enforcement.Mode {
+func (p *Proxy) priceUnknownRefuses(mode, budgetID string) bool {
+	switch mode {
 	case "control", "hard", "soft", "fiat402":
 		return budgetID != ""
 	}
@@ -664,6 +668,12 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	if err != nil {
 		return NewErrorResponse(req.ID, CodeInvalidParams, toolCallParseMessage(err)), nil
 	}
+
+	// The enforcement mode this call is decided under: the process-wide mode,
+	// or, when a host installed a resolver, the mode of this token's tenant.
+	// Every read of the mode below, and the budget enforcer, use this one
+	// answer (see enforcement_mode.go).
+	ctx, mode := p.withResolvedEnforcementMode(ctx, tokenInfo.TenantID)
 
 	// A tool whose name starts with the reserved argument-rules prefix is never
 	// forwarded, whatever the token allows: see macaroon.ArgumentRulesScopePrefix.
@@ -705,9 +715,9 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		price, priceErr := checked.ResolveForTenantChecked(ctx, tokenInfo.TenantID, tc.Name)
 		cost, costResolved = price, true
 		if priceErr != nil {
-			if p.priceUnknownRefuses(tokenInfo.BudgetID) {
+			if p.priceUnknownRefuses(mode, tokenInfo.BudgetID) {
 				log.Error().Err(priceErr).Str("tool", tc.Name).Str("budgetId", tokenInfo.BudgetID).
-					Str("mode", p.config.Enforcement.Mode).
+					Str("mode", mode).
 					Msg("tool price unavailable; refusing the call before any charge")
 				return NewErrorResponseWithData(req.ID, CodeInternalError, ToolPriceUnavailableMessage, map[string]interface{}{
 					"error":     "tool_price_unavailable",
@@ -716,7 +726,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				}), nil
 			}
 			log.Warn().Err(priceErr).Str("tool", tc.Name).Str("budgetId", tokenInfo.BudgetID).
-				Str("mode", p.config.Enforcement.Mode).
+				Str("mode", mode).
 				Int64("cost", price).
 				Msg("tool price unavailable; observe mode never blocks, using the default price")
 		}
@@ -763,7 +773,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	log.Debug().
 		Str("tool", tc.Name).
 		Int64("cost", cost).
-		Str("enforcement", p.config.Enforcement.Mode).
+		Str("enforcement", mode).
 		Str("budgetId", budgetID).
 		Str("tokenId", tokenInfo.TokenID).
 		Msg("tool call intercepted")
@@ -775,7 +785,6 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	// Both observe and control always call Spend(). The only difference is what happens when budget runs out.
 	// Each allow, deny, spend, delegation, or revocation outcome should emit receipt-ready events for Evidence Pack construction.
 	// Legacy aliases (shadow→observe, soft/hard→control) accepted for backward compatibility.
-	mode := p.config.Enforcement.Mode
 	isObserve := mode == "observe" || mode == "shadow" || mode == "chargeback"
 	isControl := mode == "control" || mode == "hard" || mode == "soft" || mode == "fiat402"
 	var allowedEvidence *MCPEvidence
@@ -809,7 +818,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 					Int64("cost", cost).
 					Int64("remaining", remaining).
 					Str("budgetId", budgetID).
-					Str("mode", p.config.Enforcement.Mode).
+					Str("mode", mode).
 					Msg("budget exhausted")
 
 				eventType := EventBudgetExhaust
@@ -881,7 +890,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 
 				if isObserve || p.config.Budget.FailMode == "open" {
 					// Observe always fails open; Control respects failMode config
-					log.Warn().Str("tool", tc.Name).Str("mode", p.config.Enforcement.Mode).
+					log.Warn().Str("tool", tc.Name).Str("mode", mode).
 						Msg("allowing despite budget backend error")
 				} else {
 					return NewErrorResponseWithData(req.ID, CodeInternalError, "Budget service unavailable", map[string]interface{}{
@@ -897,7 +906,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				Int64("cost", cost).
 				Int64("remaining", result.Remaining).
 				Str("budgetId", budgetID).
-				Str("mode", p.config.Enforcement.Mode).
+				Str("mode", mode).
 				Msg("budget spent")
 
 			p.events.Publish(Event{
@@ -941,7 +950,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		Data: map[string]interface{}{
 			"tool":        tc.Name,
 			"cost":        cost,
-			"enforcement": p.config.Enforcement.Mode,
+			"enforcement": normalizeEnforcementMode(mode),
 			"request_id":  eventRequestID,
 		},
 	})
@@ -1051,7 +1060,7 @@ func (p *Proxy) recordMCPDecision(ctx context.Context, req *Request, tokenInfo *
 	decision.RouteOrTool = "mcp:tools/call:" + toolName
 	decision.JSONRPCID = string(req.ID)
 	if decision.PolicyMode == "" {
-		decision.PolicyMode = normalizeEnforcementMode(p.config.Enforcement.Mode)
+		decision.PolicyMode = normalizeEnforcementMode(p.enforcementModeFor(ctx, tokenInfo.TenantID))
 	}
 	if decision.BudgetNotEvaluated {
 		// No balance was read: carry identity only, never a limit or balance.

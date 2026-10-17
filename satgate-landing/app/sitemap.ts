@@ -11,7 +11,7 @@ const baseUrl = 'https://satgate.io';
 
 const staticRoutes: SitemapEntry[] = [
   { path: '', lastModified: '2026-05-05', changeFrequency: 'weekly', priority: 1.0 },
-  { path: '/govern', lastModified: '2026-06-01', changeFrequency: 'weekly', priority: 0.9 },
+  { path: '/govern', lastModified: '2026-10-16', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/economic-firewall', lastModified: '2026-05-09', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/partners/rails', lastModified: '2026-05-14', changeFrequency: 'weekly', priority: 0.85 },
   { path: '/policy-to-proof', lastModified: '2026-05-10', changeFrequency: 'weekly', priority: 0.95 },
@@ -23,7 +23,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/build', lastModified: '2026-05-12', changeFrequency: 'weekly', priority: 0.95 },
   { path: '/accept-satgate-capabilities', lastModified: '2026-05-13', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/capability-auth', lastModified: '2026-05-08', changeFrequency: 'weekly', priority: 0.95 },
-  { path: '/agent-control-plane', lastModified: '2026-05-05', changeFrequency: 'weekly', priority: 0.9 },
+  { path: '/agent-control-plane', lastModified: '2026-10-16', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/evidence-pack-demo', lastModified: '2026-05-10', changeFrequency: 'weekly', priority: 0.95 },
   { path: '/verify-evidence-pack', lastModified: '2026-07-02', changeFrequency: 'weekly', priority: 0.95 },
   { path: '/docs', lastModified: '2026-07-02', changeFrequency: 'weekly', priority: 0.8 },
@@ -32,7 +32,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/trading', lastModified: '2026-10-15', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/pricing', lastModified: '2026-09-27', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/security', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/blog', lastModified: '2026-06-04', changeFrequency: 'weekly', priority: 0.8 },
+  { path: '/blog', lastModified: '2026-10-16', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/compare', lastModified: '2026-05-10', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/compare/aws-agentcore-payments', lastModified: '2026-05-10', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/compare/cloudflare-ai-gateway', lastModified: '2026-05-10', changeFrequency: 'monthly', priority: 0.8 },
@@ -61,6 +61,7 @@ const staticRoutes: SitemapEntry[] = [
 ];
 
 const blogRoutes: SitemapEntry[] = [
+  { path: '/blog/zero-trust-in-the-model', lastModified: '2026-10-16', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/blog/always-on-agents-economic-authority', lastModified: '2026-06-04', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/blog/ai-spend-governance', lastModified: '2026-05-22', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/blog/why-routing-isnt-governance', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.6 },

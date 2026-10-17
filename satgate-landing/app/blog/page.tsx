@@ -32,6 +32,15 @@ export const metadata = {
 // Blog post data - in a real setup this would come from a CMS or markdown files
 const posts = [
   {
+    slug: 'zero-trust-in-the-model',
+    title: "Zero trust in the model: Nadella's insider-risk rules and where SatGate fits",
+    description: 'Satya Nadella says to treat AI models as insider risks and keep the controls outside the model. What that asks of agent builders, and what SatGate does today.',
+    date: '2026-10-16',
+    readTime: '4 min read',
+    author: 'SatGate Team',
+    tags: ['Zero Trust', 'AI Agents', 'Security'],
+  },
+  {
     slug: 'always-on-agents-economic-authority',
     title: 'Always-On Agents Need More Than Identity. They Need Economic Authority.',
     description: 'Microsoft Scout shows where enterprise agents are headed: identity and access matter, but external agent actions also need economic authority, payment ownership, and proof.',
@@ -389,7 +398,7 @@ export default function BlogPage() {
             {[
               ['/roi-calculator', 'AI Agent ROI Calculator', 'Estimate ghost spend, loop waste, payback period, and enforcement ROI.'],
               ['/runaway-agent-cost-calculator', 'Runaway Agent Cost Calculator', 'Model loop, retry, fanout, and paid tool-call exposure.'],
-              ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with one npx command.'],
+              ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with the snippet from MCP Setup.'],
               ['/economic-firewall-readiness-grader', 'Economic Firewall Readiness Grader', 'Score identity, budgets, MCP tools, revocation, routing, and signed receipt proof.'],
               ['/economic-firewall', 'Economic Firewall Definition', 'Learn how spending controls for AI agents work before the request goes through.'],
             ].map(([href, title, body]) => (

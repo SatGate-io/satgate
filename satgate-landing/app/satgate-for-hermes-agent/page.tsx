@@ -31,7 +31,7 @@ export const metadata = {
 const controls = [
   { icon: DollarSign, title: 'Budget before tool calls', body: 'Check session budget, per-tool price, request ceiling, and route policy before Hermes Agent forwards a paid call.' },
   { icon: KeyRound, title: 'Scoped capabilities', body: 'Replace broad static keys with expiring, revocable credentials constrained by route, MCP tool, calls, delegation, and spend.' },
-  { icon: ShieldCheck, title: 'Revocation and kill switches', body: 'Stop a risky skill, workflow, tool, or session immediately without rotating every shared API secret.' },
+  { icon: ShieldCheck, title: 'Revocation and kill switches', body: 'Stop a risky skill, workflow, tool or session on its next request, without rotating every shared API secret.' },
   { icon: Workflow, title: 'MCP and API governance', body: 'Apply one economic policy across MCP servers, internal APIs, model routes, data tools, and paid resources.' },
 ];
 
@@ -120,7 +120,7 @@ export default function SatGateForHermesAgentPage() {
 
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/mcp-proxy-config-generator" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-              Generate MCP proxy config <ArrowRight size={18} />
+              Copy the Hermes config from MCP Setup <ArrowRight size={18} />
             </Link>
             <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               MCP governance

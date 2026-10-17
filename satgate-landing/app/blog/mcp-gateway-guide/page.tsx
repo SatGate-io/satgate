@@ -351,12 +351,12 @@ tools:
           </ul>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`# Mint a budget-aware token for an agent
-satgate mint \\
-  --budget 1000 \\
-  --holder "research-agent" \\
-  --tools "github.search_code,github.get_file,analysis.review_code" \\
-  --expires 24h
+            <code className="text-green-300">{`# Mint a budget-aware token for an agent in MCP Setup
+# (cloud.satgate.io). There is no CLI flag for this.
+#   agent    research-agent
+#   budget   1000 credits
+#   tools    search_code, get_file, review_code
+#   expires  24h
 
 # The resulting macaroon encodes all constraints
 # No server-side session needed — it's self-contained
@@ -404,83 +404,59 @@ satgate mint \\
             Here's a practical setup that combines the standard gateway stack with SatGate's spending controls.
           </p>
 
-          <h3 className="text-xl font-bold text-white mt-8 mb-3">Step 1: Define Your Tool Catalog</h3>
+          <h3 className="text-xl font-bold text-white mt-8 mb-3">Step 1: Define your upstreams and tool costs</h3>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`# catalog.yaml — your MCP server inventory
-servers:
+            <code className="text-green-300">{`# satgate-mcp.yaml: your MCP servers and what each tool costs
+upstreams:
   github:
-    command: "npx @modelcontextprotocol/server-github"
+    transport: stdio
+    command: ["npx", "-y", "@modelcontextprotocol/server-github"]
     env:
-      GITHUB_TOKEN: \${GITHUB_PAT}
-    costs:
-      search_code: 1
-      get_file: 1
-      create_issue: 5
-      create_pull_request: 10
-
-  postgres:
-    url: "https://mcp.internal/postgres"
-    costs:
-      query: 2
-      execute: 10
-
+      GITHUB_TOKEN: "\${GITHUB_PAT}"
   slack:
-    command: "npx @modelcontextprotocol/server-slack"
+    transport: stdio
+    command: ["npx", "-y", "@modelcontextprotocol/server-slack"]
     env:
-      SLACK_BOT_TOKEN: \${SLACK_TOKEN}
-    costs:
-      send_message: 1
-      search_messages: 3`}</code>
+      SLACK_BOT_TOKEN: "\${SLACK_TOKEN}"
+
+budget:
+  limit: 10000          # credits
+
+tools:
+  defaultCost: 1
+  costs:
+    create_issue: 5
+    create_pull_request: 10
+    search_messages: 3
+
+enforcement:
+  mode: hard`}</code>
           </pre>
 
-          <h3 className="text-xl font-bold text-white mt-8 mb-3">Step 2: Configure Governance Policies</h3>
+          <h3 className="text-xl font-bold text-white mt-8 mb-3">Step 2: Give each agent its own token</h3>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`# policies.yaml — who can do what, and how much
-teams:
-  engineering:
-    daily_budget: 10000
-    agents:
-      code-review-agent:
-        budget: 3000
-        tools: [github.*, postgres.query]
-      deploy-agent:
-        budget: 1000
-        tools: [github.create_pull_request, slack.send_message]
-
-  research:
-    daily_budget: 5000
-    agents:
-      research-agent:
-        budget: 5000
-        tools: ["*"]  # all tools
-        
-alerts:
-  - threshold: 80%
-    notify: [slack:#platform-alerts]
-  - threshold: 95%
-    notify: [slack:#platform-alerts, pagerduty]`}</code>
+            <code className="text-green-300">{`# Per-agent budgets and tool lists travel in each
+# agent's token, not in a policy file. On SatGate Cloud,
+# mint one token per agent in MCP Setup:
+#   code-review-agent   3000 credits   github tools
+#   deploy-agent        1000 credits   create_pull_request, send_message
+#   research-agent      5000 credits   all tools`}</code>
           </pre>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Step 3: Start the Gateway</h3>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`# Install SatGate
+            <code className="text-green-300">{`# Install the open-source MCP proxy
 go install github.com/satgate-io/satgate/cmd/satgate-mcp@latest
 
-# Start with your catalog and policies
-satgate-mcp serve \\
-  --catalog catalog.yaml \\
-  --policies policies.yaml \\
-  --port 8080
+# Start it with your config. The binary takes only
+# --config and --version.
+satgate-mcp --config satgate-mcp.yaml
 
-# Mint tokens for your agents
-satgate-mcp mint \\
-  --team engineering \\
-  --agent code-review-agent \\
-  --budget 3000 \\
-  --expires 24h`}</code>
+# Tokens for your agents: mint them in MCP Setup
+# on SatGate Cloud (step 2).`}</code>
           </pre>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Step 4: Point Agents at the Gateway</h3>
@@ -660,7 +636,7 @@ Orchestrator (10,000 credits)
 
           <div className="mt-12 p-6 bg-gray-900/50 border border-gray-800 rounded-lg">
             <p className="text-gray-300 mb-4">
-              SatGate adds spending controls to your MCP gateway. Open source, deploys in minutes:
+              SatGate adds spending controls to your MCP gateway. The MCP proxy is open source:
             </p>
             <pre className="bg-gray-900/70 rounded p-3 text-sm overflow-x-auto">
               <code className="text-green-300">{`go install github.com/satgate-io/satgate/cmd/satgate-mcp@latest`}</code>

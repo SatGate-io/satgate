@@ -2,6 +2,8 @@ package toolcontrols
 
 import (
 	"fmt"
+	"math"
+	"math/big"
 	"unicode/utf8"
 )
 
@@ -24,8 +26,10 @@ import (
 //   - a repeated object key at any depth (keys compared after unescaping);
 //   - a number whose text is not a plain JSON number, is longer than
 //     maxNumberText, has more than maxNumberDigits significant digits, or is
-//     too large or too small for a binary64 (non-finite or underflowing in
-//     any consumer that uses floats);
+//     too large or too small for a binary64: its magnitude is above
+//     math.MaxFloat64 (a consumer that uses floats overflows on it, or rounds
+//     it down to math.MaxFloat64 just above the top), or its leading digit is
+//     below 10^minDecimalExp (underflowing);
 //   - nesting deeper than maxCallNesting, and anything after the value.
 //
 // Numbers are never converted: they are kept as their own text.
@@ -33,13 +37,20 @@ import (
 const (
 	maxNumberText   = 64
 	maxNumberDigits = 40
-	// maxDecimalExp bounds the decimal exponent of a number's leading digit:
-	// 1e308 is the largest finite binary64 magnitude, 2.2e-308 the smallest
-	// normal one. A number outside that range is infinite or subnormal/zero
-	// for a consumer that reads floats, so it is not exact for everyone.
+	// maxDecimalExp and minDecimalExp bound the decimal exponent of a
+	// number's leading digit. The largest finite binary64 is math.MaxFloat64
+	// (about 1.7976931348623157e308) and the smallest normal one is about
+	// 2.2e-308. A number outside that range is infinite or subnormal/zero
+	// for a consumer that reads floats, so it is not exact for everyone. A
+	// leading digit at 10^308 can still be above math.MaxFloat64 (9e308,
+	// 1.8e308); such a number is compared exactly with maxFloat64 and
+	// refused if its magnitude is larger.
 	maxDecimalExp = 308
 	minDecimalExp = -307
 )
+
+// maxFloat64 is math.MaxFloat64 as an exact rational.
+var maxFloat64 = new(big.Rat).SetFloat64(math.MaxFloat64)
 
 // lossless value kinds returned by the reader. number is a numText.
 type numText string
@@ -374,6 +385,16 @@ func (r *strictReader) number() (interface{}, error) {
 		lead10 := (intEnd - intStart) - lead + exp - 1
 		if lead10 > maxDecimalExp || lead10 < minDecimalExp {
 			return nil, unreadable("number is outside the exact range")
+		}
+		// At the top decade the leading digit alone does not decide: 1e308
+		// and 1.7976931348623157e308 are finite, 1.8e308 and 9e308 are above
+		// math.MaxFloat64. Compare the magnitude exactly (the text is at most
+		// maxNumberText bytes, so this is cheap and only runs here).
+		if lead10 == maxDecimalExp {
+			v, ok := new(big.Rat).SetString(string(r.b[intStart:r.i]))
+			if !ok || v.Cmp(maxFloat64) > 0 {
+				return nil, unreadable("number is outside the exact range")
+			}
 		}
 	}
 	return numText(r.b[start:r.i]), nil

@@ -68,14 +68,13 @@ export default function GovernPage() {
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-6">
             <Shield size={12} /> Enterprise agent governance
           </div>
-          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-            Enterprise AI agent governance,
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-              from Policy to Proof.
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
+              Zero trust for AI agents
             </span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            SatGate checks each request before it goes through: Observe agent activity, Control scopes, budgets, delegation, and revocation before the agent acts, then Prove every decision with signed receipts (Evidence Packs) across APIs, MCP tools, and payment methods.
+            Treat every model like a capable insider that can make mistakes or be tricked. The model provider supplies the intelligence. You keep the authority.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/policy-to-proof" className="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center justify-center gap-2">
@@ -87,6 +86,39 @@ export default function GovernPage() {
           </div>
         </div>
       </header>
+
+      <section className="py-16 px-6 border-t border-gray-800 bg-gradient-to-b from-gray-900/20 to-black">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-10">Your limits, your evidence, your off switch.</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="min-w-0 p-6 rounded-xl bg-black border border-gray-800">
+              <h3 className="font-bold text-white mb-2">Limits the model can&apos;t change.</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">Budgets, allowed tools and end dates live in SatGate, not in a prompt or a provider&apos;s settings. SatGate checks each request against them before it reaches the service. In Control, a request outside those limits is refused. Observe records it and does not block on budget.</p>
+            </div>
+            <div className="min-w-0 p-6 rounded-xl bg-black border border-gray-800">
+              <h3 className="font-bold text-white mb-2">Evidence the model didn&apos;t write.</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. The agent never writes or edits its own record. A SatGate Cloud receipt can be checked with the open-source verifier against our published keys.</p>
+            </div>
+            <div className="min-w-0 p-6 rounded-xl bg-black border border-gray-800">
+              <h3 className="font-bold text-white mb-2">An off switch that works mid-task.</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">Revoke an agent and its next request is refused, along with any helpers it handed work to. If a revoke can&apos;t be confirmed, the dashboard says so instead of showing it as done.</p>
+            </div>
+            <div className="min-w-0 p-6 rounded-xl bg-black border border-gray-800">
+              <h3 className="font-bold text-white mb-2">No single model in charge.</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">The same limits and receipts apply whichever model or vendor runs your agents.</p>
+            </div>
+            <div className="min-w-0 p-6 rounded-xl bg-black border border-gray-800">
+              <h3 className="font-bold text-white mb-2">Run it yourself.</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">Self-hosted SatGate runs on your own servers and database and takes no rules from SatGate Cloud.</p>
+            </div>
+          </div>
+          <p className="text-center mt-8">
+            <Link href="/blog/zero-trust-in-the-model" className="text-sm text-purple-400 hover:text-purple-300 transition">
+              Why this matters: zero trust in the model →
+            </Link>
+          </p>
+        </div>
+      </section>
 
       {/* One Token, Two Threats */}
       <section className="py-16 px-6 border-t border-gray-800 bg-gradient-to-b from-gray-900/20 to-black">
@@ -126,7 +158,7 @@ export default function GovernPage() {
                 </div>
               </div>
               <h3 className="text-xl font-bold text-white mb-2">Admit <span className="text-yellow-400">External Agents</span></h3>
-              <p className="text-gray-400 text-sm mb-3">Approved external agents consume your APIs with scoped, expiring access instead of long-lived shared secrets, with per-request policy and pricing above L402, x402 (USDC on Base), API-key billing, or enterprise ledgers.</p>
+              <p className="text-gray-400 text-sm mb-3">Approved external agents consume your APIs with scoped, expiring access instead of long-lived shared secrets, with per-request policy and pricing over L402 or x402 (USDC on Base).</p>
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <Zap size={12} className="text-yellow-400" />
                 <span>Authorized before admission</span>
@@ -191,14 +223,14 @@ export default function GovernPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-lg">CISO</h3>
-                  <span className="text-xs text-red-400 font-medium">Revocation proof</span>
+                  <span className="text-xs text-red-400 font-medium">Revocation</span>
                 </div>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed mb-3">
                 <span className="text-red-300 font-medium">The problem:</span> Agents now hold authority that used to require human approval. Security needs proof that scope, delegation, denial, and revocation actually worked.
               </p>
               <p className="text-gray-300 text-sm leading-relaxed mb-4 border-l-2 border-red-800 pl-3">
-                &ldquo;SatGate gives us a kill switch with evidence: the revocation receipt, the first denied call after revoke, and the authority chain that led there.&rdquo;
+                &ldquo;SatGate gives us a kill switch. The next request after a revoke is refused.&rdquo;
               </p>
               <div className="pt-3 border-t border-red-900/30">
                 <p className="text-xs text-red-400 font-medium mb-2">Metrics that matter:</p>
@@ -224,7 +256,7 @@ export default function GovernPage() {
                 <span className="text-yellow-300 font-medium">The problem:</span> Agents are moving across internal APIs, MCP tools, and paid external rails. Governance cannot depend on which protocol the agent used.
               </p>
               <p className="text-gray-300 text-sm leading-relaxed mb-4 border-l-2 border-yellow-800 pl-3">
-                &ldquo;SatGate sits above MCP, API keys, x402, L402, and enterprise billing rails so every authority decision is recorded — payment or not.&rdquo;
+                &ldquo;SatGate sits in front of HTTP APIs and MCP tools, and takes L402 and x402 payments.&rdquo;
               </p>
               <div className="pt-3 border-t border-yellow-900/30">
                 <p className="text-xs text-yellow-400 font-medium mb-2">Metrics that matter:</p>
@@ -292,12 +324,12 @@ export default function GovernPage() {
                 <h3 className="font-bold text-lg">Prove</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                Export mint receipts, delegation chains, spend ledgers, denial reasons, revocation proof, and payment details in one signed receipt (Evidence Pack).
+                Export your signed receipts, each with its decision, reason, budget and payment details.
               </p>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li className="text-yellow-400">✓ receipt exports</li>
-                <li className="text-yellow-400">✓ Signed denial and revocation trail</li>
-                <li className="text-yellow-400">✓ x402/L402/API-key billing context</li>
+                <li className="text-yellow-400">✓ Signed receipts for refusals over a budget, a missing payment or a tool permission</li>
+                <li className="text-yellow-400">✓ x402 and L402 payment details</li>
                 <li className="text-yellow-400">✓ receipt authority timeline</li>
               </ul>
             </div>
@@ -414,7 +446,7 @@ export default function GovernPage() {
                       <Lock size={16} className="text-cyan-400" /> Parent Authority Revoked
                     </h4>
                     <p className="text-gray-500 text-sm">
-                      One click revokes the finance-automation parent. The invoice-reconciler child loses authority immediately, and the first post-revoke retry is denied with a signed reason.
+                      One click revokes the finance-automation parent, and with it the invoice-reconciler child. The next request after a revoke is refused.
                     </p>
                   </div>
                 </div>
@@ -431,7 +463,7 @@ export default function GovernPage() {
                       <CheckCircle size={16} className="text-green-400" /> Receipt exported
                     </h4>
                     <p className="text-gray-500 text-sm">
-                      Full receipt: who authorized the worker, what it could do, what it spent, what was denied, when authority was revoked, and the first denied call after revoke.
+                      SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
                     </p>
                   </div>
                 </div>
@@ -445,8 +477,8 @@ export default function GovernPage() {
 
           <div className="text-center mt-12">
             <div className="inline-block bg-gradient-to-r from-green-900/20 to-cyan-900/20 border border-green-800/30 rounded-xl px-6 py-4">
-              <p className="text-white font-semibold">Turns a silent authority failure into a blocked action, a revocation receipt, and a signed receipt (Evidence Pack).</p>
-              <p className="text-gray-500 text-sm mt-1">Govern first. Enforce before execution. Prove every decision afterward.</p>
+              <p className="text-white font-semibold">Turns a silent authority failure into a blocked action with a signed receipt.</p>
+              <p className="text-gray-500 text-sm mt-1">Govern first. Enforce before execution. Check the receipts afterward.</p>
             </div>
           </div>
         </div>
@@ -480,7 +512,7 @@ export default function GovernPage() {
               },
               {
                 title: 'Receipt export',
-                description: 'Export mint receipts, delegation chains, spend ledger entries, denial reasons, and revocation proof in one signed receipt (Evidence Pack).',
+                description: 'Export your signed receipts, each with its decision, reason, budget and payment details.',
                 gradient: 'from-cyan-600 to-blue-600',
                 icon: <FileSearch size={24} className="text-cyan-400" />,
               },
@@ -600,15 +632,15 @@ export default function GovernPage() {
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Single Go Binary. No External Dependencies.</h2>
+            <h2 className="text-3xl font-bold mb-4">Single Go binary, with Postgres and Redis for state</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Deploy anywhere in minutes. No JVM, no runtime, no dependency hell. One binary that runs on anything.
+              No JVM and no language runtime. One binary, with Postgres and Redis for budgets and revocation.
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {[
-              { icon: <Container size={24} className="text-cyan-400" />, label: 'Docker', desc: 'ghcr.io/satgate-io/gateway' },
+              { icon: <Container size={24} className="text-cyan-400" />, label: 'Docker', desc: 'ghcr.io/satgate-io/satgate (open source)' },
               { icon: <Layers size={24} className="text-purple-400" />, label: 'Kubernetes', desc: 'Helm chart included' },
               { icon: <FileCode size={24} className="text-green-400" />, label: 'Terraform', desc: 'IaC modules ready' },
               { icon: <Cloud size={24} className="text-yellow-400" />, label: 'SaaS', desc: 'cloud.satgate.io' },
@@ -668,8 +700,8 @@ export default function GovernPage() {
                 <li>• Every governed agent gets scoped, revocable authority</li>
                 <li>• Delegated workers inherit narrower limits</li>
                 <li>• Policy, budget, and scope denials stop requests before execution</li>
-                <li>• Revocation creates proof plus a post-revoke denial</li>
-                <li className="text-green-400 font-medium">• Receipt exports answer who, what, why, spend, denial, and revoke</li>
+                <li>• The next request after a revoke is refused</li>
+                <li className="text-green-400 font-medium">• Receipt exports show what was spent and why a request was refused</li>
               </ul>
             </div>
           </div>
@@ -704,7 +736,7 @@ export default function GovernPage() {
             <div className="p-5 rounded-xl bg-gray-900 border border-gray-800 text-center">
               <div className="text-3xl mb-3">💰</div>
               <h4 className="font-semibold text-white mb-2">Evidence export</h4>
-              <p className="text-gray-500 text-sm">Every mint, delegation, paid call, denial, and revocation produces receipts that can land in an Evidence Pack.</p>
+              <p className="text-gray-500 text-sm">SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.</p>
             </div>
           </div>
 
@@ -731,7 +763,7 @@ export default function GovernPage() {
             </h2>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
               SatGate Mint exchanges workload identity tokens for capability-bearing macaroons.
-              The same Mint flow works for internal calls and governed external paid calls. Every grant becomes part of the signed receipt (Evidence Pack).
+              The same Mint flow works for internal calls and governed external paid calls. Each grant is recorded in the audit log.
             </p>
           </div>
           <div className="text-center">
@@ -774,7 +806,7 @@ export default function GovernPage() {
             <div className="bg-[#12121a] border border-gray-800 rounded-xl p-6">
               <div className="text-2xl font-bold text-green-400 mb-2">3</div>
               <h3 className="text-white font-semibold mb-2">Export the evidence</h3>
-              <p className="text-gray-400 text-sm">Every grant, paid call, denial, delegation, and revocation produces a receipt for the exported receipt bundle (Evidence Pack) when you need to prove what happened.</p>
+              <p className="text-gray-400 text-sm">SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. Use them when you need to prove what happened.</p>
             </div>
           </div>
 
@@ -808,7 +840,7 @@ export SATGATE_TOKEN=$TOKEN
           <div className="grid gap-4 md:grid-cols-2">
             {[
               ['/agent-api-key-risk-assessment', 'Agent API key risk assessment', 'Find static-key blast radius before autonomous agents inherit unlimited API access.'],
-              ['/economic-firewall-readiness-grader', 'Agent governance readiness grader', 'Score identity, budgets, MCP governance, revocation, delegation, signed receipt proof, routing, and rail-aware readiness.'],
+              ['/economic-firewall-readiness-grader', 'Agent governance readiness grader', 'Score identity, budgets, MCP governance, revocation, delegation, signed receipts and payment readiness.'],
               ['/build', 'Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.'],
               ['/mcp', 'MCP cost control', 'Treat MCP tool calls as governed events with per-tool prices, caps, denial reasons, and evidence.'],
             ].map(([href, title, body]) => (
@@ -828,7 +860,7 @@ export SATGATE_TOKEN=$TOKEN
           <div className="space-y-6">
             {[
               ['What is AI agent governance?', 'AI agent governance is the set of controls that determines which agents can call which APIs, tools, and models; how much they can spend; what authority they can delegate; and when access must be revoked. For autonomous agents, governance needs enforcement before the request goes through, not just logs and dashboards.'],
-              ['What are rules and receipts for AI agents?', 'Rules and receipts for AI agents sit before the request goes through. They apply scopes, budgets, delegation rules, and revocation before an agent reaches an upstream API, model, or MCP tool, then preserve signed receipts (Evidence Packs) so the decision can be verified later.'],
+              ['What are rules and receipts for AI agents?', 'Rules and receipts for AI agents sit before the request goes through. They apply scopes, budgets, delegation rules, and revocation before an agent reaches an upstream API, model, or MCP tool, then keep signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, so they can be verified later.'],
               ['How should enterprises govern MCP tool usage?', 'Enterprises should govern MCP tools with per-tool budgets, scoped capability tokens, task and tenant attribution, signed receipts (Evidence Packs), revocation, and hard policy decisions before the request goes through. Rate limits and dashboards are useful, but they do not replace enforcement before tool calls execute.'],
               ['What is the difference between AI governance and AI agent governance?', 'AI governance usually covers model risk, data policy, compliance, and human review. AI agent governance adds controls on each request that goes through SatGate for autonomous actions: scopes, budgets, delegated permissions, revocation, denial reasons, spend attribution, and proof before APIs or MCP tools execute.'],
               ['Is SatGate tied to x402, L402, AgentCore Payments, or Pay.sh?', 'Lightning (L402) and USDC on Base (x402) are live. On each paid route, the owner picks Lightning, USDC, or both. AgentCore Payments and Pay.sh are planned. Payment never overrides permissions.'],

@@ -140,7 +140,7 @@ export default function ROICalculatorPage() {
         name: 'How does SatGate reduce runaway AI agent spend?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate enforces per-agent, per-tool, per-route, and per-request budget policy at the gateway before forwarding to upstream APIs, blocking or routing requests that exceed economic policy.',
+          text: 'SatGate enforces per-agent, per-tool and per-route budgets at the gateway and blocks requests that exceed them.',
         },
       },
       {
@@ -580,7 +580,7 @@ export default function ROICalculatorPage() {
             <div>
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate reduce runaway AI agent spend?</h3>
               <p className="text-gray-400 leading-relaxed">
-                SatGate enforces per-agent, per-tool, per-route, and per-request budget policy at the gateway before forwarding to upstream APIs, blocking or routing requests that exceed economic policy.
+                SatGate enforces per-agent, per-tool and per-route budgets at the gateway and blocks requests that exceed them.
               </p>
             </div>
             <div>

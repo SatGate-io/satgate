@@ -1,15 +1,20 @@
 package mcpserver
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/big"
+	"regexp"
+	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
+	"unicode"
 
 	"github.com/satgate-io/satgate/pkg/macaroon"
 	"github.com/satgate-io/satgate/pkg/toolcontrols"
@@ -205,13 +210,13 @@ func TestSpendRefusalDoesNotEchoTheAmount(t *testing.T) {
 		t.Fatal("not refused")
 	}
 	raw, _ := json.Marshal(r)
-	if strings.Contains(string(raw), "777") {
-		t.Fatalf("refusal echoes the amount: %s", raw)
+	if where := amountEchoes(t, raw, "777.31"); len(where) > 0 {
+		t.Fatalf("refusal echoes the amount at %v: %s", where, raw)
 	}
 	for _, d := range h.rec.decisions {
 		b, _ := json.Marshal(d)
-		if strings.Contains(string(b), "777") {
-			t.Fatalf("receipt input carries the amount: %s", b)
+		if where := amountEchoes(t, b, "777.31"); len(where) > 0 {
+			t.Fatalf("receipt input carries the amount at %v: %s", where, b)
 		}
 	}
 	if len(h.rec.decisions) != 1 {
@@ -221,6 +226,211 @@ func TestSpendRefusalDoesNotEchoTheAmount(t *testing.T) {
 	if d.Decision != "denied" || d.DecisionReason != "policy_denied" || d.DenialCode != "TOOL_SPEND_LIMIT_DENIED" ||
 		d.ArgumentField != "dollar_amount" || d.ControlWindow != "day" || d.ControlLimit != "200" || !d.BudgetNotEvaluated {
 		t.Fatalf("decision = %+v", d)
+	}
+}
+
+// amountEchoes reports where the JSON document doc carries amount as a value.
+// It decodes doc and looks at every object key, string and number on its own,
+// so it never matches inside an unrelated value the way a substring of the
+// serialized bytes does: the old check looked for "777" in the bytes and
+// failed whenever the random 12-hex token id held those digits
+// (token_id 7775a9f2092b in CI run 38937620498). A value echoes the amount
+// when
+//   - it contains the amount's literal text (a literal with a decimal point
+//     cannot occur inside a hex id or any other run of letters and digits), or
+//   - one of its words (a run of letters, digits, '_' and '.') is a plain
+//     decimal number equal to the amount, to its whole part, or to the
+//     amount in counter units, or
+//   - it is a JSON number equal to one of those.
+//
+// A word that mixes letters and digits (a hex id, rcpt_1) is an identifier,
+// not a number, and is not compared.
+func amountEchoes(t *testing.T, doc []byte, amount string) []string {
+	t.Helper()
+	amt, ok := new(big.Rat).SetString(amount)
+	if !ok {
+		t.Fatalf("amount %q is not a decimal", amount)
+	}
+	whole := new(big.Rat).SetInt(new(big.Int).Quo(amt.Num(), amt.Denom()))
+	inUnits := new(big.Rat).Mul(amt, new(big.Rat).SetInt64(units))
+	forms := []*big.Rat{amt, inUnits}
+	if whole.Sign() != 0 { // a whole part of 0 would match every zero count
+		forms = append(forms, whole)
+	}
+	equalsAForm := func(r *big.Rat) bool {
+		for _, f := range forms {
+			if r.Cmp(f) == 0 {
+				return true
+			}
+		}
+		return false
+	}
+
+	dec := json.NewDecoder(bytes.NewReader(doc))
+	dec.UseNumber()
+	var v any
+	if err := dec.Decode(&v); err != nil {
+		t.Fatalf("decode %s: %v", doc, err)
+	}
+	var hits []string
+	checkText := func(path, s string) {
+		if strings.Contains(s, amount) {
+			hits = append(hits, path)
+			return
+		}
+		words := strings.FieldsFunc(s, func(r rune) bool {
+			return !unicode.IsLetter(r) && !unicode.IsDigit(r) && r != '_' && r != '.'
+		})
+		for _, w := range words {
+			w = strings.TrimRight(w, ".")
+			if !plainDecimal.MatchString(w) {
+				continue
+			}
+			if r, ok := new(big.Rat).SetString(w); ok && equalsAForm(r) {
+				hits = append(hits, path)
+				return
+			}
+		}
+	}
+	var walk func(path string, v any)
+	walk = func(path string, v any) {
+		switch x := v.(type) {
+		case map[string]any:
+			for k, e := range x {
+				checkText(path+"{"+k+"}", k)
+				walk(path+"."+k, e)
+			}
+		case []any:
+			for i, e := range x {
+				walk(fmt.Sprintf("%s[%d]", path, i), e)
+			}
+		case string:
+			checkText(path, x)
+		case json.Number:
+			if r, ok := new(big.Rat).SetString(x.String()); ok && equalsAForm(r) {
+				hits = append(hits, path)
+			}
+		}
+	}
+	walk("$", v)
+	sort.Strings(hits)
+	return hits
+}
+
+var plainDecimal = regexp.MustCompile(`^[0-9]+(\.[0-9]+)?$`)
+
+// The refusal does not echo an amount whose digits sit in the token id.
+// TestSpendRefusalDoesNotEchoTheAmount sends 777.31 whatever token id the run
+// mints, so it meets the case CI run 38937620498 failed on (the id holding
+// the amount's digits) only about once in 400 runs. This test meets it on
+// every run, through the real refusal: the amount is made from digits of this
+// run's own token id, so the receipt input always holds the amount's digits
+// inside the id. The check before c76cfac6 (the amount's whole part as a
+// substring of the serialized bytes) fails here every time; amountEchoes,
+// which compares values, must find nothing, and the refusal is still the
+// spend refusal.
+func TestSpendRefusalDoesNotEchoAnAmountWhoseDigitsAreInTheTokenID(t *testing.T) {
+	for attempt := 0; attempt < 50; attempt++ {
+		h := newSpendHarness(t, spendDoc200Day)
+		// An order that reaches the limit exactly: every later amount is refused.
+		if r := h.call(t, 1, "place_crypto_order", order("200")); r.Error != nil {
+			t.Fatalf("order up to the limit refused: %v", r.Error)
+		}
+		if len(h.rec.decisions) != 1 || h.rec.decisions[0].TokenID == "" {
+			t.Fatalf("want one decision with a token id after the first order: %+v", h.rec.decisions)
+		}
+		tokenID := h.rec.decisions[0].TokenID
+		whole := digitsForAmount(tokenID)
+		if whole == "" {
+			continue // this id has no usable run of digits; mint another
+		}
+		amount := whole + ".31"
+		r := h.call(t, 2, "place_crypto_order", order(amount))
+		if r.Error == nil || r.Error.Code != CodePolicyDenied {
+			t.Fatalf("order of %s over the limit was not refused: %+v", amount, r)
+		}
+		if len(h.rec.decisions) != 2 {
+			t.Fatalf("decisions = %d", len(h.rec.decisions))
+		}
+		d := h.rec.decisions[1]
+		if d.TokenID != tokenID || d.Decision != "denied" || d.DenialCode != "TOOL_SPEND_LIMIT_DENIED" {
+			t.Fatalf("decision = %+v", d)
+		}
+		receipt, _ := json.Marshal(d)
+		// The case is there: the receipt input holds the amount's digits, in
+		// the token id.
+		if !strings.Contains(tokenID, whole) || !strings.Contains(string(receipt), whole) {
+			t.Fatalf("the receipt input does not hold %q: %s", whole, receipt)
+		}
+		raw, _ := json.Marshal(r)
+		if where := amountEchoes(t, raw, amount); len(where) > 0 {
+			t.Fatalf("refusal echoes the amount %s at %v: %s", amount, where, raw)
+		}
+		if where := amountEchoes(t, receipt, amount); len(where) > 0 {
+			t.Fatalf("receipt input carries the amount %s at %v: %s", amount, where, receipt)
+		}
+		t.Logf("token id %s, amount %s: the id holds %q; no echo", tokenID, amount, whole)
+		return
+	}
+	t.Fatal("no token id in 50 mints had a usable run of digits")
+}
+
+// digitsForAmount picks, from a token id, a run of decimal digits to be the
+// whole part of an amount: two to six digits (an amount the counter holds),
+// no leading zero, and none of the numbers the refusal and its receipt carry
+// as themselves (the limit 200 and the JSON-RPC ids 1 and 2), so that the id
+// is the only place the digits can come from. It returns "" when the id has
+// none.
+func digitsForAmount(tokenID string) string {
+	for _, run := range regexp.MustCompile(`[0-9]+`).FindAllString(tokenID, -1) {
+		run = strings.TrimLeft(run, "0")
+		if len(run) > 6 {
+			run = run[:6]
+		}
+		if len(run) >= 2 && run != "200" {
+			return run
+		}
+	}
+	return ""
+}
+
+// The receipt input that failed CI run 38937620498: its token id holds the
+// digits 777, and it does not carry the amount 777.31. The check passes it,
+// and catches the amount planted in each form a refusal could echo it.
+func TestAmountEchoesIsExact(t *testing.T) {
+	const ciReceipt = `{"decision":"denied","decision_reason":"policy_denied","policy_mode":"control","tenant_id":"tenant-1","token_id":"7775a9f2092b","budget_id":"budget-spend","budget_subject_id":"budget-spend","scope":"place_crypto_order,place_equity_order","mcp_method":"tools/call","tool_name":"place_crypto_order","route_or_tool":"mcp:tools/call:place_crypto_order","request_id":"","jsonrpc_id":"1","cost_credits":0,"remaining_credits":0,"remaining_before_credits":0,"budget_not_evaluated":true,"denial_code":"TOOL_SPEND_LIMIT_DENIED","argument_field":"dollar_amount","control_window":"day","control_limit":"200"}`
+	if !strings.Contains(ciReceipt, "777") {
+		t.Fatal("the CI receipt no longer holds the digits the old check matched")
+	}
+	if hits := amountEchoes(t, []byte(ciReceipt), "777.31"); len(hits) != 0 {
+		t.Fatalf("CI receipt flagged at %v", hits)
+	}
+	planted := map[string]any{
+		"control_window_total": "777.31",
+		"approval_id":          "amount 777.31",
+		"control_symbol":       "$777",
+		"request_id":           "over by 777.",
+		"remaining_credits":    json.Number("77731000000"),
+		"cost_credits":         json.Number("7.7731e2"),
+		"jsonrpc_id":           "77731000000",
+	}
+	for field, val := range planted {
+		var m map[string]any
+		dec := json.NewDecoder(strings.NewReader(ciReceipt))
+		dec.UseNumber()
+		if err := dec.Decode(&m); err != nil {
+			t.Fatal(err)
+		}
+		m[field] = val
+		b, _ := json.Marshal(m)
+		hits := amountEchoes(t, b, "777.31")
+		if len(hits) != 1 || hits[0] != "$."+field {
+			t.Errorf("%s = %v: hits %v, want [$.%s]", field, val, hits, field)
+		}
+	}
+	// A key can echo too.
+	if hits := amountEchoes(t, []byte(`{"a":{"777.31":true}}`), "777.31"); len(hits) != 1 {
+		t.Errorf("key echo: hits %v", hits)
 	}
 }
 

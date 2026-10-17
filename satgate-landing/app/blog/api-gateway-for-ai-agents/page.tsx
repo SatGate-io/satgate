@@ -38,7 +38,7 @@ export default function ApiGatewayForAiAgentsBlogPage() {
       { '@type': 'Thing', name: 'agent-aware budget enforcement' },
       { '@type': 'Thing', name: 'MCP tool cost control' },
       { '@type': 'Thing', name: 'scoped capability tokens for APIs' },
-      { '@type': 'Thing', name: 'payment rules that work with any payment method' },
+      { '@type': 'Thing', name: 'payment rules for L402 and x402' },
       { '@type': 'Thing', name: 'Observe Control Prove' },
       { '@type': 'Thing', name: 'signed receipts' },
     ],
@@ -210,15 +210,14 @@ Monetization          Subscription tiers      Per-call micropayments (L402)`}</c
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-cyan-300">{`# SatGate budget enforcement - YAML config
-agents:
-  research-bot:
-    budget:
-      daily: 5000    # 5000 credits ($50)
-      per_call:
-        web_search: 5
-        gpt4_analyze: 50
-        dalle_generate: 100`}</code>
+            <code className="text-cyan-300">{`# satgate-mcp.yaml: budget and per-tool costs
+budget:
+  limit: 5000    # 5000 credits ($50)
+tools:
+  costs:
+    web_search: 5
+    gpt4_analyze: 50
+    dalle_generate: 100`}</code>
           </pre>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Capability-Based Authentication (Not API Keys)</h3>
@@ -227,12 +226,11 @@ agents:
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-purple-300">{`# Parent agent mints a delegated token
-satgate mint \\
-  --from parent-token \\
-  --add-caveat "budget <= 500" \\
-  --add-caveat "tools = [web_search, summarize]" \\
-  --add-caveat "expires = 2026-03-12T23:59:59Z"
+            <code className="text-purple-300">{`# Hand the child a narrower token in the dashboard
+# (Delegation & Budgets). There is no CLI for this.
+#   budget   500 credits
+#   tools    web_search, summarize
+#   expires  2026-03-12T23:59:59Z
 
 # Child agent gets a token that:
 # - Can only spend 500 credits (not parent's full 5000)
@@ -320,7 +318,7 @@ satgate mint \\
           <ul className="text-gray-300 space-y-3">
             <li><strong className="text-white">Observe:</strong> Deploy in audit mode. See what agents are calling, spending, and delegating. No enforcement yet, just structured visibility.</li>
             <li><strong className="text-white">Control:</strong> Enable policy checked before the request goes through. Set budget, scope, route, tenant, and MCP-tool limits that block bad calls before they execute.</li>
-            <li><strong className="text-white">Prove:</strong> Preserve signed receipts for allow, deny, spend, delegation, and revocation decisions so security, finance, and auditors can verify what happened later.</li>
+            <li><strong className="text-white">Prove:</strong> Preserve signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, so security, finance, and auditors can verify what happened later.</li>
           </ul>
 
           <p className="text-gray-300 leading-relaxed">
@@ -351,7 +349,7 @@ satgate mint \\
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            You don't need to replace your gateway. You need to add governance that checks before the request goes through and understands authority, budgets, delegation, and variable costs, then proves each decision. That's the difference between an API gateway that routes traffic and one that governs autonomous agent activity.
+            You don't need to replace your gateway. You need to add governance that checks before the request goes through and understands authority, budgets, delegation, and variable costs. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. That's the difference between an API gateway that routes traffic and one that governs autonomous agent activity.
           </p>
 
           <div className="my-8 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
@@ -390,7 +388,7 @@ satgate mint \\
 
           <div className="mt-12 p-6 bg-gray-900/50 border border-gray-800 rounded-lg">
             <p className="text-gray-300 mb-4">
-              SatGate is open source. Try it:
+              The SatGate gateway is open source. Try it:
             </p>
             <pre className="bg-gray-900/70 rounded p-3 text-sm overflow-x-auto">
               <code className="text-green-300">{`go install github.com/satgate-io/satgate/cmd/satgate-mcp@latest`}</code>
@@ -418,7 +416,7 @@ satgate mint \\
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">SatGate path: Observe → Control → Prove</h3>
             <p className="mb-4 text-gray-300">
-              Start by observing agent, API, and MCP usage. Move to checks before the request goes through when budgets, scopes, and revocation need to stop bad calls before they run. Preserve signed receipts so every allow, deny, and budget decision can be verified later.
+              Start by observing agent, API, and MCP usage. Move to checks before the request goes through when budgets, scopes, and revocation need to stop bad calls before they run. Preserve signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, so they can be verified later.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">See how rules and receipts work →</Link>

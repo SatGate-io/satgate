@@ -25,7 +25,7 @@ export default function CompareZuploPage() {
     '@type': 'WebPage',
     name: 'SatGate vs Zuplo',
     url: 'https://satgate.io/compare/zuplo',
-    description: 'Compare SatGate and Zuplo API gateways for AI agent traffic, MCP exposure, budget enforcement, and payment rules that work with any payment method.',
+    description: 'Compare SatGate and Zuplo API gateways for AI agent traffic, MCP exposure, budget enforcement, and payment rules for L402 and x402.',
     datePublished: '2026-04-30',
     dateModified: '2026-05-04',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -126,7 +126,7 @@ export default function CompareZuploPage() {
                   <td className="py-4 text-center"><X className="inline text-red-400" size={18} /></td>
                 </tr>
                 <tr className="border-b border-gray-800">
-                  <td className="py-4 font-medium text-gray-300">Fiat-denominated budget control</td>
+                  <td className="py-4 font-medium text-gray-300">Credit budgets with a configurable unit</td>
                   <td className="py-4 text-center"><Check className="inline text-green-400" size={18} /></td>
                   <td className="py-4 text-center"><X className="inline text-red-400" size={18} /></td>
                 </tr>

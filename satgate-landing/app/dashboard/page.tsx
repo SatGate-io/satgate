@@ -36,7 +36,7 @@ const softwareJsonLd = {
   description: webPageJsonLd.description,
   publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
   dateModified: '2026-05-03',
-  featureList: ['Agent token receipt graph', 'Delegation receipt visibility', 'Macaroon caveat inspection', 'Revocation receipt tracking', 'Denied-call receipt counters'],
+  featureList: ['Agent token receipt graph', 'Delegation visibility', 'Macaroon caveat inspection', 'Revocation tracking', 'Denied-call receipt counters'],
 };
 
 const faqJsonLd = {
@@ -56,7 +56,7 @@ const faqJsonLd = {
       name: 'Why do AI agent teams need receipt-backed governance evidence?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Receipt-backed governance evidence shows which agents hold authority, what scopes and budgets apply, whether tokens are delegated, and which allowed, denied, revoked, or paid decisions feed a signed receipt (Evidence Pack).',
+        text: 'Receipt-backed governance evidence shows which agents hold authority, what scopes and budgets apply, and whether tokens are delegated. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.',
       },
     },
     {
@@ -544,7 +544,7 @@ export default function DashboardPage() {
             <div className="grid gap-4 md:grid-cols-3">
               {[
                 ['What does the SatGate governance dashboard show?', 'The SatGate governance dashboard shows active agent tokens, delegation depth, caveats, blocked requests, banned tokens, revocation hits, and receipt-backed governance evidence for agent activity.'],
-                ['Why do AI agent teams need receipt-backed governance evidence?', 'Receipt-backed governance evidence shows which agents hold authority, what scopes and budgets apply, whether tokens are delegated, and which allowed, denied, revoked, or paid decisions feed a signed receipt (Evidence Pack).'],
+                ['Why do AI agent teams need receipt-backed governance evidence?', 'Receipt-backed governance evidence shows which agents hold authority, what scopes and budgets apply, and whether tokens are delegated. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.'],
                 ['How does dashboard evidence connect to checks before the request goes through?', 'Dashboard evidence surfaces receipts after SatGate checks each request that goes through it. The dashboard surfaces receipt-backed decisions; the signed receipt (Evidence Pack) is the exportable proof artifact; the gateway is where budgets, revocation, scopes, and policy are applied before forwarding.'],
               ].map(([question, answer]) => (
                 <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">

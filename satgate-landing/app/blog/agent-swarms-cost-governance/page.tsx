@@ -231,18 +231,18 @@ export default function AgentSwarmsCostGovernancePage() {
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">What This Looks Like in Practice</h2>
 
           <pre className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-sm font-mono text-gray-300 overflow-x-auto my-6">
-{`# 1. Mint a coordinator token
-satgate mint --agent "project-mgr" --budget 500
+{`# There is no CLI for budgets or handoffs. In the dashboard:
 
-# 2. Coordinator delegates to sub-agents
-satgate delegate --from <pm-token> \\
-  --to "research" --budget 100 --scope "/api/search*"
-satgate delegate --from <pm-token> \\
-  --to "coder" --budget 200 --scope "/api/code*"
+# 1. Tokens: mint a coordinator token for "project-mgr"
+#    with a 500-credit budget.
 
-# 3. Sub-agents delegate further
-satgate delegate --from <coder-token> \\
-  --to "test-runner" --budget 50 --scope "/api/code/test*"
+# 2. Delegation & Budgets: give each sub-agent a narrower
+#    token carved out of that budget:
+#      research   100 credits   /api/search
+#      coder      200 credits   /api/code
+
+# 3. A sub-agent can hand on a narrower token again
+#      test-runner  50 credits  /api/code/test
 
 # 4. Every agent hits the same gateway
 # Budget enforced at each level
@@ -285,7 +285,7 @@ satgate delegate --from <coder-token> \\
 
           <div className="bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-purple-500/20 rounded-xl p-8 mt-12 text-center">
             <h3 className="text-xl font-bold text-white mb-3">Control your agent swarm&apos;s spend</h3>
-            <p className="text-gray-400 mb-6">SatGate is open source. Deploy in 5 minutes. See the delegation demo live.</p>
+            <p className="text-gray-400 mb-6">The SatGate gateway is open source. See the delegation demo live.</p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link href="/protect" className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-6 py-3 rounded-lg font-bold hover:opacity-90 transition flex items-center gap-2">
                 See Demo <ArrowRight size={16} />

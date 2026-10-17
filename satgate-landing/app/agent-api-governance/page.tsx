@@ -92,7 +92,7 @@ export default function AgentApiGovernancePage() {
         name: 'What is agent API governance?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Agent API governance checks identity, delegated permissions, budgets, revocation, routing, and signed receipts before the request goes through.',
+          text: 'Agent API governance checks identity, delegated permissions, budgets, route scope and revocation before the request goes through. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.',
         },
       },
       {
@@ -146,13 +146,13 @@ export default function AgentApiGovernancePage() {
         '@type': 'ListItem',
         position: 2,
         name: 'Budget-aware authority',
-        description: 'Access policy includes spend limits, per-request ceilings, daily caps, tool limits, and remaining budget checks before forwarding traffic.',
+        description: 'Access policy includes spend limits, tool limits and remaining budget checks before forwarding traffic.',
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: 'Revocation before the next request',
-        description: 'When an agent loops, leaks a token, or finishes a task, access can be narrowed, expired, or revoked immediately without rotating global keys.',
+        description: 'When an agent loops, leaks a token, or finishes a task, access can be narrowed, expired or revoked before the next request, without rotating global keys.',
       },
       {
         '@type': 'ListItem',
@@ -191,7 +191,7 @@ export default function AgentApiGovernancePage() {
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-10">
-            AI agents need more than static API keys. They need scoped capabilities, delegation limits, expiry, revocation, and policy checks before every API request — with a receipt proving each decision.
+            AI agents need more than static API keys. They need scoped capabilities, delegation limits, expiry, revocation, and policy checks before every API request. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
@@ -241,7 +241,7 @@ export default function AgentApiGovernancePage() {
         <div className="max-w-6xl mx-auto px-6 py-20">
           <h2 className="text-3xl font-bold text-white mb-4">Agent API governance principles</h2>
           <p className="text-gray-400 max-w-3xl mb-10 text-lg">
-            Governance is not a login screen. It checks permission before the agent acts, on each request that goes through SatGate, and turns every decision into evidence.
+            Governance is not a login screen. It checks permission before the agent acts, on each request that goes through SatGate. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -262,8 +262,8 @@ export default function AgentApiGovernancePage() {
           <div className="grid md:grid-cols-2 gap-5">
             {[
               ['Agent-scoped identity', 'Every request should identify the tenant, agent, task, workflow, parent agent, delegated sub-agent, token, route, and tool behind the call.'],
-              ['Budget-aware authority', 'Access policy should include spend limits, per-request ceilings, daily caps, tool limits, and remaining budget checks before forwarding traffic.'],
-              ['Revocation before the next request', 'When an agent loops, leaks a token, or finishes a task, access should be narrowed, expired, or revoked immediately without rotating global keys.'],
+              ['Budget-aware authority', 'Access policy should include spend limits, tool limits and remaining budget checks before forwarding traffic.'],
+              ['Revocation before the next request', 'When an agent loops, leaks a token, or finishes a task, access can be narrowed, expired or revoked before the next request, without rotating global keys.'],
               ['Delegation with narrowing', 'Sub-agents should never inherit full parent authority. Each delegation should shrink scope, budget, lifetime, and allowed tools.'],
             ].map(([title, body]) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -307,7 +307,7 @@ export default function AgentApiGovernancePage() {
               {[
                 ['Observe', 'Attribute calls by agent, worker, route, tenant, and workflow so real access and spend patterns are visible before policy tightens.'],
                 ['Control', 'Issue scoped capabilities, enforce budgets and route policy, narrow delegation, and revoke authority before the next request.'],
-                ['Prove', 'Issue receipts for policy decisions, paid actions, denials, delegations, revocations, and receipt exports for each governed API action.'],
+                ['Prove', 'Issue signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.'],
               ].map(([title, body]) => (
                 <div key={title} className="rounded-xl border border-gray-800 bg-black p-5">
                   <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
@@ -319,26 +319,7 @@ export default function AgentApiGovernancePage() {
 
           <div className="min-w-0 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h2 className="text-2xl font-bold text-white mb-4">Example capability policy</h2>
-            <pre className="bg-black border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm text-gray-300"><code>{`parent_agent: finance-automation
-worker_agent: invoice-reconciler
-scope:
-  routes: [/invoices/read, /vendors/match, /payments/schedule]
-  denied_routes: [/payments/release]
-authority:
-  tenant: acme-finance
-  workflow: monthly-close
-budget:
-  workflow: 25.00 USD
-  per_request: 0.50 USD
-delegation:
-  allowed: true
-  max_depth: 1
-  child_budget_max: 5.00 USD
-expiry: 2026-12-31T00:00:00Z
-revocation: before_next_request
-evidence:
-  receipt: required
-  include: [parent_agent, worker_agent, route, policy, decision, outcome]`}</code></pre>
+            <pre className="bg-black border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm text-gray-300"><code>{`delegation_depth = 1`}</code></pre>
           </div>
         </div>
       </section>
@@ -351,7 +332,7 @@ evidence:
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is agent API governance?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Agent API governance checks identity, delegated permissions, budgets, revocation, routing, and signed receipts before the request goes through.
+                Agent API governance checks identity, delegated permissions, budgets, route scope and revocation before the request goes through. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -389,7 +370,7 @@ evidence:
               ['/policy-to-proof', 'Rules and Receipts', 'See how agent API decisions become signed receipts.'],
               ['/blog/macaroon-tokens-vs-api-keys', 'Macaroons vs API keys', 'Why narrowed capabilities beat static API keys for agents.'],
               ['/agent-control-plane', 'Agent control plane', 'Govern enterprise agent permissions, delegation lineage, spend, audit, and revocation.'],
-              ['/evidence-pack-demo', 'Receipt demo', 'Show how allow, deny, budget, delegation, and revocation decisions become receipts.'],
+              ['/evidence-pack-demo', 'Receipt demo', 'Show how budget spends, and refusals over a budget, a missing payment or a tool permission, become receipts.'],
               ['/mcp', 'MCP governance', 'Apply authority, budgets, revocation, and signed receipts to agent tool calls.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 transition hover:border-yellow-500/50 hover:bg-yellow-950/10">

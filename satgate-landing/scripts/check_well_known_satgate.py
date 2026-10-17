@@ -46,6 +46,7 @@ REQUIRED_ROUTE_STRINGS = [
     "pay_sh",
     "status: \"supported\"",
     "status: \"planned\"",
+    "status: \"unavailable\"",
     "type: \"payment_rail\"",
     "role: \"external_paid_access\"",
     "key_discovery",
@@ -120,6 +121,10 @@ else:
         planned_pattern = rf'{{ id: "{planned_id}"[^}}]+status: "planned"'
         if not re.search(planned_pattern, route_text):
             errors.append(f"route must mark {planned_id} as planned, not supported")
+    for unavailable_id in ["api_key_billing", "enterprise_ledger"]:
+        unavailable_pattern = rf'{{ id: "{unavailable_id}"[^}}]+status: "unavailable"'
+        if not re.search(unavailable_pattern, route_text):
+            errors.append(f"route must mark {unavailable_id} as unavailable: no adapter ships for it")
 
 
 for path, label in [(SCHEMA_ROUTE, "schema route"), (RECEIPT_SCHEMA_ROUTE, "receipt schema route")]:
@@ -133,7 +138,7 @@ for path, label in [(SCHEMA_ROUTE, "schema route"), (RECEIPT_SCHEMA_ROUTE, "rece
 
 if SCHEMA_ROUTE.exists():
     schema_text = SCHEMA_ROUTE.read_text()
-    for needle in ["SatGate Trust Metadata v1", "description", "schema_version", "roles", "uniqueItems", "required_receipt_fields", "issuer_kid", "allOf", "contains", "rails_adapters", "supported", "id", "type", "role", "status", "planned", "public, max-age=86400"]:
+    for needle in ["SatGate Trust Metadata v1", "description", "schema_version", "roles", "uniqueItems", "required_receipt_fields", "issuer_kid", "allOf", "contains", "rails_adapters", "supported", "id", "type", "role", "status", "planned", "unavailable", "public, max-age=86400"]:
         if needle not in schema_text:
             errors.append(f"schema route missing required schema string: {needle}")
 

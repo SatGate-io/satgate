@@ -61,7 +61,7 @@ const checklist = [
 const criteria = [
   { title: "Capability accepted", body: "A valid scoped capability for the upstream audience and route is accepted before execution." },
   { title: "Capability denied", body: "An expired, wrong-audience, wrong-route, over-budget, or untrusted-issuer capability is rejected with a receipt-grade denial." },
-  { title: "Receipt returned", body: "Every allowed or denied call returns a receipt with `schema_version`, `schema_url`, `receipt_id`, `evidence_pack_id`, `issuer`, `issuer_kid`, `decision`, `decision_reason`, `policy_version`, `timestamp`, `canonicalization`, `hash_algorithm`, `signature_algorithm`, `receipt_hash`, and `signature`." },
+  { title: "Receipt returned", body: "Priced calls, paid calls and refusals return a receipt with `schema_version`, `schema_url`, `receipt_id`, `evidence_pack_id`, `issuer`, `issuer_kid`, `decision`, `decision_reason`, `policy_version`, `timestamp`, `canonicalization`, `hash_algorithm`, `signature_algorithm`, `receipt_hash`, and `signature`." },
   { title: "Trust remains bounded", body: "The upstream makes no marketplace, ranking, reputation, or endorsement claim. Acceptance proves verification behavior, not global trust." },
 ];
 

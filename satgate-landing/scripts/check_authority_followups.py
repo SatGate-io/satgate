@@ -21,9 +21,9 @@ for path in required_files:
 if RAILS.exists():
     rails = RAILS.read_text()
     for needle in [
-        "Agent permissions for every payment method.",
+        "Agent permissions for L402 and x402 payments.",
         "Economic Firewall category stays durable while rails change",
-        "Agent Permissions and Receipts layer",
+        "permissions and receipts work with x402 and L402 today",
         "Rules and Receipts",
         "Evidence Pack",
         "https://github.com/SatGate-io/evidence-pack-verifier",
