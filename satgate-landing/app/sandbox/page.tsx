@@ -93,7 +93,7 @@ const goldenPathSteps: Array<{
     reason: 'DEFAULT_PROTECTION: no capability token presented',
     route: '/v1/invoices/search',
     budget: 'Nothing spent',
-    receipt: 'rcpt_demo_unauth_001',
+    receipt: 'none',
     tone: 'blocked',
   },
   {
