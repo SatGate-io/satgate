@@ -270,7 +270,7 @@ export default function AiSpendGovernanceBlogPage() {
             <li>Route work to the right model or tool based on cost, risk, and policy.</li>
             <li>Block, approve or escalate requests before execution.</li>
             <li>Enforce delegated permissions instead of relying on broad API keys.</li>
-            <li>Create receipts for budget spends, payments and denied actions.</li>
+            <li>Create signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.</li>
             <li>Export evidence for finance, security, compliance, and leadership review.</li>
           </ul>
 

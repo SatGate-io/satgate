@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Sample signed receipt: Who Allowed What?',
     description:
-      'Open a sample SatGate signed receipt: permission checked before each action, a receipt for each spend, payment and refusal.',
+      'Open a sample of SatGate signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.',
   },
 };
 
@@ -235,7 +235,7 @@ export default function EvidencePackDemoPage() {
         <div className="mx-auto max-w-6xl">
           <div className="mb-10 max-w-3xl">
             <p className="mb-3 text-sm font-bold uppercase tracking-[0.24em] text-cyan-300">Receipt timeline</p>
-            <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Spends, payments and refusals get a receipt.</h2>
+            <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.</h2>
             <p className="mt-4 text-sm leading-6 text-gray-400">In this sample the mint, delegation, revocation and export rows are illustrations. SatGate does not sign receipts for those steps; the token&apos;s lineage and the audit log record them.</p>
           </div>
           <div className="space-y-3">

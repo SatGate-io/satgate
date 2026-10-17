@@ -18,7 +18,7 @@ import {
 export const metadata: Metadata = {
   title: "Build Agents That Work Within a Budget",
   description:
-    "Give each agent a task, a budget and a list of tools it may use. Read the public docs and demo, start a 14-day free trial, and check spends and refusals with a signed receipt.",
+    "Give each agent a budget and its allowed tools, with signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.",
   keywords: [
     "SatGate build",
     "AI agent capabilities",
@@ -156,12 +156,12 @@ const buildDocLinks = [
   { title: "Receipt schema", href: `${docsBase}/reference/receipt-schema.md`, body: "The signed record SatGate writes when it allows, refuses or charges a request." },
   { title: "Trust metadata", href: `${docsBase}/reference/satgate-trust-metadata.md`, body: trustMetadataNote },
   { title: "Open verifier", href: "https://github.com/SatGate-io/evidence-pack-verifier", body: "Check a live receipt against the issuer’s published keys (JWKS). Uses RFC 8785 canonical JSON and Ed25519 signatures." },
-  { title: "MCP integration", href: `${docsBase}/guides/mcp-gateway.md`, body: "Put SatGate in front of MCP tools and get a receipt for each priced tool call or refusal." },
+  { title: "MCP integration", href: `${docsBase}/guides/mcp-gateway.md`, body: "Put SatGate in front of MCP tools. When a receipt signer is configured, a priced call and a budget or tool-permission refusal get a signed receipt." },
   { title: "Raw HTTP", href: `${docsBase}/guides/raw-http.md`, body: "Curl commands for issue, pay and verify. The API they call is not available yet." },
   { title: "OpenAI tools", href: `${docsBase}/guides/openai-tools.md`, body: "Run OpenAI tool calls through SatGate and verify the receipts." },
   { title: "Anthropic tools", href: `${docsBase}/guides/anthropic-tools.md`, body: "Enforce limits on Anthropic tool use in your own gateway, not inside the model provider." },
   { title: "LangChain", href: `${docsBase}/guides/langchain-integration.md`, body: "Keep LangChain for orchestration and add SatGate where the tools are called." },
-  { title: "CrewAI", href: `${docsBase}/guides/crewai.md`, body: "Give each CrewAI tool its own token and a receipt for each priced call or refusal." },
+  { title: "CrewAI", href: `${docsBase}/guides/crewai.md`, body: "Give each CrewAI tool its own token, with signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission." },
 
   { title: "API overview", href: `${docsBase}/api/overview.md`, body: "The lower-level gateway APIs and how they map to issue, pay and verify." },
   { title: "Python SDK", href: `${docsBase}/sdks/python.md`, body: "Install and set up the Python SDK." },
@@ -464,7 +464,7 @@ export default function BuildPage() {
             <div className="grid gap-3 text-sm text-gray-300">
               {[
                 "A set budget for the task and for each sub-agent",
-                "Receipts for budget spends, payments and refusals",
+                "Signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission",
                 "The result judged on its own, apart from the receipts",
                 "Check that a retried call isn’t charged twice",
                 "Your rules enforced between the agent and your tools",

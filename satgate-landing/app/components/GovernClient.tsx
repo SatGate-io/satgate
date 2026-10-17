@@ -736,7 +736,7 @@ export default function GovernPage() {
             <div className="p-5 rounded-xl bg-gray-900 border border-gray-800 text-center">
               <div className="text-3xl mb-3">💰</div>
               <h4 className="font-semibold text-white mb-2">Evidence export</h4>
-              <p className="text-gray-500 text-sm">Paid calls, budget spends and refusals produce signed receipts.</p>
+              <p className="text-gray-500 text-sm">SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.</p>
             </div>
           </div>
 
@@ -806,7 +806,7 @@ export default function GovernPage() {
             <div className="bg-[#12121a] border border-gray-800 rounded-xl p-6">
               <div className="text-2xl font-bold text-green-400 mb-2">3</div>
               <h3 className="text-white font-semibold mb-2">Export the evidence</h3>
-              <p className="text-gray-400 text-sm">Paid calls, budget spends and refusals produce signed receipts when you need to prove what happened.</p>
+              <p className="text-gray-400 text-sm">SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. Use them when you need to prove what happened.</p>
             </div>
           </div>
 

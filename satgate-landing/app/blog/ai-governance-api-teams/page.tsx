@@ -363,7 +363,7 @@ GET /api/governance/costs?period=2026-03-01..2026-03-19
             <li><strong className="text-white">Per-endpoint cost modeling</strong> so every API call has an economic weight</li>
             <li><strong className="text-white">Real-time budget enforcement</strong> — pre-call checks, not post-hoc billing</li>
             <li><strong className="text-white">HTTP 402 responses</strong> that give agents structured denial with actionable alternatives</li>
-            <li><strong className="text-white">Signed receipts</strong> for each agent&apos;s spends and refusals</li>
+            <li><strong className="text-white">Signed receipts</strong> for each agent&apos;s budget spends and for its refusals over a budget, a missing payment or a tool permission</li>
             <li><strong className="text-white">MCP-native support</strong> for teams building with the Model Context Protocol</li>
           </ul>
 

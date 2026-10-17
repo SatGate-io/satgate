@@ -1,5 +1,5 @@
 # SatGate: economic firewall for agent workloads
-> Keep your agents within budget. Make external agents pay before they use your API. Get signed receipts for spends, payments and refusals.
+> Keep your agents within budget. Make external agents pay before they use your API. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
 > Three controls: Observe, Control and Admit. All three sign receipts.
 
 ## Purpose

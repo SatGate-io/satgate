@@ -170,7 +170,7 @@ const LandingPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
-              Keep your AI agents within budget on the paid services they use. Make external agents pay before they use yours. Get signed receipts for spends, payments and refusals.
+              Keep your AI agents within budget on the paid services they use. Make external agents pay before they use yours. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-lg leading-relaxed">
               Each time an agent uses a service, SatGate checks it first. (Developers call these services APIs.) Your own agents stop when their budget runs out. External agents pay on the routes you choose, so abusing your API gets expensive, and paying never gets them past your access rules.
@@ -246,7 +246,7 @@ const LandingPage = () => {
           <p className="text-xs text-gray-500 mt-3">The agent in the recording is the dashboard&apos;s built-in demo agent.</p>
 
           <h3 className="text-xl font-bold mt-16 mb-2">Your agents&apos; tool calls: only the tools you allow, within budget</h3>
-          <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Add an MCP server, mint a token with a 3-credit budget that can call one tool, and copy its config into Claude Code, Cursor, Hermes, OpenClaw or any other MCP client. A tool outside the list is refused before it runs. Once the budget is spent, the next call is refused too. Each refusal gets a signed receipt, and the open-source verifier checks them.</p>
+          <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Add an MCP server, mint a token with a 3-credit budget that can call one tool, and copy its config into Claude Code, Cursor, Hermes, OpenClaw or any other MCP client. A tool outside the list is refused before it runs. Once the budget is spent, the next call is refused too. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. The open-source verifier checks the receipts.</p>
           <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
             <video
               controls
@@ -732,7 +732,7 @@ const LandingPage = () => {
               {
                 step: "4",
                 title: "Check what happened",
-                description: "Receipts for allowed and denied decisions, including paid requests, ready to export as Evidence Packs.",
+                description: "Signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, ready to export as Evidence Packs.",
                 code: `Illustrative sample, not live customer data\nAllowed receipts: 1,203\nDenied receipts: 12,847\nPaid receipts:   $847 settled\n\n→ Export Evidence Pack`
               }
             ].map((item, i) => (
@@ -762,7 +762,7 @@ const LandingPage = () => {
           <h2 className="mb-8 text-3xl font-bold text-white">Questions</h2>
           <div className="space-y-6">
             {[
-              ['What is SatGate?', 'SatGate is a gateway that sits in front of your APIs and MCP tools. It keeps your own agents within the budgets and permissions you set, charges external agents on the routes you choose, and signs receipts for spends, payments and refusals.'],
+              ['What is SatGate?', 'SatGate is a gateway that sits in front of your APIs and MCP tools. It keeps your own agents within the budgets and permissions you set and charges external agents on the routes you choose. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.'],
               ['How does SatGate control what agents do?', 'Before a request reaches your API or MCP tool, SatGate checks the agent’s permissions, its remaining budget and whether its token was revoked. If a check fails, the request stops at SatGate.'],
               ['How do I give an agent a budget?', 'You set the budget, the permissions and how many times it can hand work to a sub-agent. The agent gets a token with those limits built in. SatGate signs a receipt when it refuses a request over a budget, a missing payment or a tool permission, and when an agent spends from a budget.'],
             ].map(([question, answer]) => (
@@ -800,7 +800,7 @@ const LandingPage = () => {
                 <Image src="/logo_white_transparent.png" alt="SatGate" width={24} height={24} className="w-6 h-6" />
                 <h4 className="font-bold text-white">SatGate</h4>
               </div>
-              <p className="max-w-xs text-sm text-gray-500">Limits for your agents, payment from external agents, and receipts for spends, payments and refusals.</p>
+              <p className="max-w-xs text-sm text-gray-500">Limits for your agents, payment from external agents, and signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.</p>
               <p className="text-gray-600 text-xs mt-3">You set the rules. SatGate enforces them on every request.</p>
             </div>
             <div>

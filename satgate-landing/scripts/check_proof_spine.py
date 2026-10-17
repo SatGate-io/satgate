@@ -17,11 +17,11 @@ REPO = ROOT.parent
 
 REQUIRED_PHRASES = {
     "app/page.tsx": [
-        "signs receipts for spends, payments and refusals",
-        "signed receipts for spends, payments and refusals",
+        "SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.",
+        "signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission",
     ],
     "app/components/HomeClient.tsx": [
-        "Receipts for allowed and denied decisions, including paid requests",
+        "Signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, ready to export",
         "Allowed receipts",
         "Paid receipts",
         "Export Evidence Pack",
@@ -44,7 +44,7 @@ REQUIRED_PHRASES = {
         "Denied-call receipts",
     ],
     "app/policy-to-proof/page.tsx": [
-        "Paid calls, budget spends and refusals produce signed receipts",
+        "Signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, which your CISO",
         "receipt_id",
         "evidence_pack_id",
         "policy_version",

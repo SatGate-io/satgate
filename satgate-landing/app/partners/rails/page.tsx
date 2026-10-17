@@ -41,7 +41,7 @@ const partnerFit = [
 const flow = [
   ["1", "Permission", "The principal or platform passes down a bounded capability: agent, tenant, route/tool, budget, expiry, policy version, and delegation depth."],
   ["2", "Decision", "SatGate enforces policy before the request goes through to the upstream API, MCP tool, or payment method."],
-  ["3", "Receipt", "Allowed, denied and paid requests emit a signed receipt with the policy and payment details."],
+  ["3", "Receipt", "Budget spends, and refusals over a budget, a missing payment or a tool permission, emit a signed receipt with the policy and payment details."],
   ["4", "Signed receipt", "Each receipt is in a verifiable Evidence Pack, checked against the issuer JWKS by the open verifier."],
 ];
 

@@ -83,7 +83,7 @@ customer_copy_forbidden_phrases = [
 ]
 
 required_phrases = [
-    "Paid calls, budget spends and refusals produce signed receipts",
+    "Signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, which your CISO",
     "without permanent credentials, unlimited spend, or unobservable authority",
     "Who authorized this?",
     "Which agent got access?",
@@ -128,7 +128,7 @@ required_phrases = [
     "Pay.sh",
     "Authority before scale",
     "Sits in front of your APIs",
-    "Spends, payments and refusals are signed on HTTP and MCP alike",
+    "SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. This covers HTTP APIs and MCP tools.",
     "SOC 2 CC1.4 / FinOps attribution",
     "Mint record",
     "Post-revoke denial",
@@ -223,7 +223,7 @@ economic_required_phrases = [
     "Is this action allowed?",
     "Is there budget left, and is the token still valid and not revoked?",
     "Does this route charge, and has the agent paid?",
-    "Allow or refuse, and sign a receipt for spends, payments and refusals.",
+    "Allow or refuse. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.",
     "Payment never widens what an agent can do.",
     "Receipts on HTTP and MCP.",
     "no money moves",
@@ -266,7 +266,7 @@ readiness_required_phrases = [
     "Payment details",
     "apply payment rules when value moves",
     "SatGate checks permission before the agent acts",
-    "keep a signed receipt for spends, payments and refusals",
+    "and keep signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission",
     "Assess whether your agent/API stack is ready for autonomous authority",
     "See SatGate governance",
     "See how rules and receipts work",
@@ -399,9 +399,9 @@ spend_longtail_required_phrases = {
         "/govern",
         "/policy-to-proof",
         "payment details",
-        "Keep signed receipts for spends and refusals",
+        "Keep signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission",
         "03 / PROVE",
-        "Record allowed and denied decisions",
+        "SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.",
     ],
     "ai-api-budget-enforcement": [
         "permission before the agent acts",
@@ -413,7 +413,7 @@ spend_longtail_required_phrases = {
     ],
     "agent-spending-limits": [
         "permission before the agent acts",
-        "receipt for each budget spend and refusal",
+        "SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.",
         "rules and receipts",
         "Govern agent spending limits",
         "/govern",

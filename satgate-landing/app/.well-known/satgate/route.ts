@@ -6,7 +6,7 @@ const metadata = {
   issuer: {
     name: "SatGate",
     issuer_id: "https://api.satgate.io",
-    product: "Economic firewall for AI agents: budgets for your own agents, payment from external agents on the routes you choose, and signed receipts for spends, payments and refusals.",
+    product: "Economic firewall for AI agents: budgets for your own agents, payment from external agents on the routes you choose, and signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.",
     contact: "contact@satgate.io",
     key_discovery: {
       method: "jwks_uri",

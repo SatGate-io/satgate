@@ -27,7 +27,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
     headline: 'The Enterprise Adoption Playbook: Observe, Control, Prove',
-    description: 'A three-stage framework for adopting rules and receipts for AI agents: observe agent activity, control permission before the agent acts, then prove spends and refusals with signed receipts.',
+    description: 'A three-stage framework for adopting rules and receipts for AI agents: observe agent activity, control permission before the agent acts, then keep signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.',
     url: 'https://satgate.io/blog/the-enterprise-adoption-playbook-observe-control-prove',
     datePublished: '2026-03-20',
     dateModified: '2026-06-01',
@@ -216,7 +216,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
               <h2 className="text-2xl font-bold text-white m-0">Stage 3: Prove</h2>
               <span className="px-3 py-1 rounded-full bg-yellow-900/40 border border-yellow-500/30 text-yellow-300 text-sm font-mono">Signed Receipt Mode</span>
             </div>
-            <p className="text-yellow-200 text-lg font-medium mb-0">Budget spends, payments and refusals leave a receipt.</p>
+            <p className="text-yellow-200 text-lg font-medium mb-0">SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.</p>
           </div>
 
           <p className="text-gray-300 leading-relaxed">

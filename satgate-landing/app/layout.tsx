@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     template: "%s | SatGate",
   },
   description:
-    "Budgets and permissions for your AI agents, paid access for external agents where you choose, and signed receipts for spends, payments and refusals.",
+    "Agent budgets, paid access for external agents, and signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.",
   keywords: [
     "rules and receipts",
     "signed receipts",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SatGate: an economic firewall for AI agents",
     description:
-      "Budgets and permissions for your AI agents, paid access for external agents where you choose, and signed receipts for spends, payments and refusals.",
+      "Agent budgets, paid access for external agents, and signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.",
     url: "https://satgate.io",
     siteName: "SatGate",
     images: [
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SatGate: an economic firewall for AI agents",
     description:
-      "Budgets and permissions for your AI agents, paid access for external agents where you choose, and signed receipts for spends, payments and refusals.",
+      "Agent budgets, paid access for external agents, and signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.",
     images: ["/og.png"],
   },
   robots: {
@@ -93,7 +93,7 @@ const jsonLd = {
       url: "https://satgate.io",
       logo: "https://satgate.io/apple-touch-icon.png",
       description:
-        "SatGate is an economic firewall for AI agents. Before a request reaches your API or MCP tool, it checks the agent's budget and permissions, and payment where you charge for access. Spends, payments and refusals get a signed receipt.",
+        "SatGate is an economic firewall for AI agents. Before a request reaches your API or MCP tool, it checks the agent's budget and permissions, and payment where you charge for access. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.",
       sameAs: ["https://github.com/SatGate-io/satgate"],
       contactPoint: {
         "@type": "ContactPoint",

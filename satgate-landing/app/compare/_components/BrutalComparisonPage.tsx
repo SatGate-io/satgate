@@ -173,7 +173,7 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
                 Most gateways, observability tools, and payment rails explain a narrow part of the transaction: where a request went, how much it cost, or whether a token was valid. Enterprise agent governance needs a decision, before the agent acts, that binds identity, tenant, delegated scope, budget, tool, payment context, and revocation state before the upstream system sees the call.
               </p>
               <p>
-                That is the SatGate distinction in these comparisons. SatGate is not trying to replace every model router, tracing stack, API gateway, or payment method. It sits in front of your APIs and MCP tools as Agent Permissions and Receipts: Observe the agent request, Control what it is allowed to do, and sign a receipt for spends, payments and refusals that security, finance and compliance can inspect later.
+                That is the SatGate distinction in these comparisons. SatGate is not trying to replace every model router, tracing stack, API gateway, or payment method. It sits in front of your APIs and MCP tools as Agent Permissions and Receipts: Observe the agent request, Control what it is allowed to do, and keep signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, which security, finance and compliance can inspect later.
               </p>
             </div>
           </div>

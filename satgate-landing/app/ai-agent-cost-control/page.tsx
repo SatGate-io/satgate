@@ -193,7 +193,7 @@ export default function AiAgentCostControlPage() {
         '@type': 'ListItem',
         position: 4,
         name: 'Signed receipt capture',
-        description: 'Allowed, denied and paid requests leave receipts finance and security can review.',
+        description: 'SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. Finance and security can review the receipts.',
       },
     ],
   };
@@ -326,7 +326,7 @@ export default function AiAgentCostControlPage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-6 py-20">
-        <h2 className="text-3xl font-bold text-white mb-8">Start with Observe. Move to Control. Keep signed receipts for spends and refusals.</h2>
+        <h2 className="text-3xl font-bold text-white mb-8">Start with Observe. Move to Control. Keep signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.</h2>
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
             <div className="text-purple-300 font-mono text-sm mb-3">01 / OBSERVE</div>
@@ -341,7 +341,7 @@ export default function AiAgentCostControlPage() {
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
             <div className="text-yellow-300 font-mono text-sm mb-3">03 / PROVE</div>
             <h3 className="text-xl font-bold text-white mb-3">Preserve decision evidence</h3>
-            <p className="text-gray-400 leading-relaxed">Record allowed and denied decisions, including paid requests, in signed receipts. Payment proves value moved; SatGate proves the agent was allowed to move it.</p>
+            <p className="text-gray-400 leading-relaxed">SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. Payment proves value moved; SatGate proves the agent was allowed to move it.</p>
           </div>
         </div>
       </section>
@@ -380,7 +380,7 @@ export default function AiAgentCostControlPage() {
               ['Inline enforcement', 'Budget policy runs before model, API, or MCP tool execution — not after a billing export.'],
               ['Agent-level attribution', 'Every request maps to tenant, workflow, agent, delegated sub-agent, token, route, and tool.'],
               ['Revocable authority', 'Credentials can expire, narrow, delegate safely, or be killed without rotating shared API keys.'],
-              ['Signed receipt capture', 'Allowed, denied and paid requests leave receipts finance and security can review.'],
+              ['Signed receipt capture', 'SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. Finance and security can review the receipts.'],
             ].map(([title, body]) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-5">
                 <h3 className="mb-2 font-bold text-white">{title}</h3>

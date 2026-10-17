@@ -19,7 +19,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'OpenAI API Budget Limits: Stop Runaway Spend Before Calls',
-    description: 'Set per-agent, team, and workflow budgets before GPT calls execute, then prove each spend and refusal.',
+    description: 'Set per-agent budgets before GPT calls run, with signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.',
   },
 };
 
@@ -118,7 +118,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
           <h1 className="text-4xl font-bold mb-4">How to Add OpenAI API Budget Limits Before Calls Run</h1>
           <div className="mb-6 rounded-2xl border border-green-900/60 bg-green-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-green-300">Direct answer</p>
-            <p className="text-gray-300">OpenAI usage limits are account-level. Controls that run before the request goes through enforce per-agent, per-team, and per-workflow budgets before a GPT call reaches OpenAI, then sign a receipt for each spend and refusal.</p>
+            <p className="text-gray-300">OpenAI usage limits are account-level. Controls that run before the request goes through enforce per-agent, per-team, and per-workflow budgets before a GPT call reaches OpenAI. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.</p>
           </div>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row">
             <Link href="/build" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Add a budget with SatGate</Link>
@@ -481,7 +481,7 @@ Do not treat that as HTTP 429.`}</code>
 
           <div className="my-10 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">Put a budget in front of OpenAI calls</h3>
-            <p className="mb-4 text-gray-300">Give each agent a token with a credit budget, route its OpenAI calls through SatGate, and see every budget spend and refusal with a signed receipt.</p>
+            <p className="mb-4 text-gray-300">Give each agent a token with a credit budget, and route its OpenAI calls through SatGate. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/build" className="text-cyan-300 hover:text-cyan-200">Build with SatGate →</Link>
               <Link href="/ai-agent-cost-control" className="text-cyan-300 hover:text-cyan-200">AI agent cost control →</Link>
@@ -498,7 +498,7 @@ Do not treat that as HTTP 429.`}</code>
           <div className="my-10 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h3 className="mb-3 text-xl font-bold text-white">SatGate path: Observe → Control → Prove</h3>
             <p className="mb-4 text-gray-300">
-              Start by observing agent, API, and MCP usage. Move to checks before the request goes through when budgets, scopes, and revocation need to stop bad calls before they run. Preserve signed receipts so budget spends, payments and refusals can be verified later.
+              Start by observing agent, API, and MCP usage. Move to checks before the request goes through when budgets, scopes, and revocation need to stop bad calls before they run. Preserve signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, so they can be verified later.
             </p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">See how rules and receipts work →</Link>

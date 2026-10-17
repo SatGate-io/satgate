@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Enterprise AI Agent Governance: Rules and Receipts",
     description:
-      "Observe agent usage, Control access and budgets before the agent acts, and keep signed receipts for spends, payments and refusals.",
+      "Control access and budgets before the agent acts, with signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.",
   },
 };
 

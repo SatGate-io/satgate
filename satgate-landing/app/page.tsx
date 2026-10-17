@@ -4,14 +4,14 @@ import HomeClient from "./components/HomeClient";
 export const metadata: Metadata = {
   title: { absolute: "SatGate: an economic firewall for AI agents" },
   description:
-    "Keep your AI agents within budget, charge external agents for access to your API, and get signed receipts for spends, payments and refusals.",
+    "Keep agents within budget. Charge external agents. Get signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.",
   alternates: {
     canonical: "https://satgate.io",
   },
   openGraph: {
     title: "SatGate: an economic firewall for AI agents",
     description:
-      "Keep your AI agents within budget on the paid services they use. Make external agents pay before they use yours. Get signed receipts for spends and refusals.",
+      "Keep agents within budget. Charge external agents. Get signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.",
     url: "https://satgate.io",
     type: "website",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SatGate: an economic firewall for AI agents",
     description:
-      "Keep your AI agents within budget on the paid services they use. Make external agents pay before they use yours. Get signed receipts for spends and refusals.",
+      "Keep agents within budget. Charge external agents. Get signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.",
   },
 };
 
@@ -33,7 +33,7 @@ export default function HomePage() {
         name: 'SatGate',
         url: 'https://satgate.io',
         logo: 'https://satgate.io/logo_white_transparent.png',
-        description: 'SatGate is an economic firewall for agent workloads. It checks budgets and permissions on each request and signs receipts for spends, payments and refusals.',
+        description: 'SatGate is an economic firewall for agent workloads. It checks budgets and permissions on each request. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.',
       },
       {
         '@type': 'WebSite',
@@ -45,7 +45,7 @@ export default function HomePage() {
         '@type': 'WebPage',
         name: 'SatGate | Economic Firewall for AI Agents',
         url: 'https://satgate.io',
-        description: 'SatGate checks what each AI agent is allowed to do and spend before its request reaches your API, and signs receipts for spends, payments and refusals.',
+        description: 'SatGate checks what each AI agent is allowed to do and spend before its request reaches your API. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.',
         datePublished: '2026-04-30',
         dateModified: '2026-09-26',
         isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -69,7 +69,7 @@ export default function HomePage() {
         name: 'What is SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate is a gateway that sits in front of your APIs and MCP tools. It keeps your own agents within the budgets and permissions you set, charges external agents on the routes you choose, and signs receipts for spends, payments and refusals.',
+          text: 'SatGate is a gateway that sits in front of your APIs and MCP tools. It keeps your own agents within the budgets and permissions you set and charges external agents on the routes you choose. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.',
         },
       },
       {

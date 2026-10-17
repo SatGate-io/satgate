@@ -222,7 +222,7 @@ export default function LlmCostDashboardPage() {
             {[
               ['/build', 'Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.'],
               ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with the snippet from MCP Setup.'],
-              ['/policy-to-proof', 'Rules and Receipts', 'How spends, payments and refusals become signed receipts.'],
+              ['/policy-to-proof', 'Rules and Receipts', 'How budget spends, and refusals over a budget, a missing payment or a tool permission, become signed receipts.'],
               ['/runaway-agent-cost-calculator', 'Runaway cost calculator', 'Estimate what a looping or retrying agent can spend in an hour.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
