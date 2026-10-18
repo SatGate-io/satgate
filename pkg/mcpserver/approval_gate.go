@@ -2,6 +2,7 @@ package mcpserver
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -22,8 +23,12 @@ type ApprovalNotice struct {
 	Tool       string
 	Field      string
 	Above      string
-	Summary    []toolcontrols.SummaryItem
-	ExpiresAt  time.Time
+	// Value is the rule's value basis (argrules.OrderCostBasis), empty for a
+	// rule that reads Field. With it the rule compared the most the order can
+	// cost, not Field, and Summary starts with a "Counts as at most" line.
+	Value     string
+	Summary   []toolcontrols.SummaryItem
+	ExpiresAt time.Time
 }
 
 // ApprovalNotifier tells the owner a call is waiting. It is called at most
@@ -42,6 +47,14 @@ type ApprovalNotifier interface {
 // again; the gate matches it, uses the approval up in one atomic step and lets
 // the call through. Anything else (a changed argument, another token, a
 // second try) is a different call and is held again.
+//
+// A rule that carries value "order_max_cost" (toolcontrols.ApprovalRule.Value)
+// does not read its field. It compares the most the call can cost
+// (argrules.OrderMaxCost, the number the spending limits and the per-order cap
+// use) with its threshold: above holds, equal does not. A call it cannot value
+// is refused with APPROVAL_CHECK_FAILED, not held, and nobody is emailed: an
+// owner cannot approve a number SatGate cannot work out. A rule without the
+// key keeps its meaning, including holding a call whose field cannot be read.
 //
 // Put it after the SpendGate in ChainGates: a call a limit refuses is refused,
 // never held, and an approved call still reserves against the spending limit
@@ -112,14 +125,44 @@ func (g *ApprovalGate) Admit(ctx context.Context, call GateCall) (*GateAdmission
 	// Which rule holds the call? One whose field is above its threshold, or
 	// whose field cannot be read as a number: a call the gate cannot measure
 	// is not waved through, it is put in front of the owner.
+	//
+	// A rule with a value basis is decided on the order's cost, valued once for
+	// the call. If one of them cannot value the call the call is refused, even
+	// when an earlier rule would have held it.
 	var held *toolcontrols.ApprovalRule
+	var heldUnits int64 // the cost the holding rule compared, when it has a value basis
+	var cost argrules.OrderCost
+	var costWhy argrules.OrderCostWhy
+	costed := false
 	for i := range rules {
+		if rules[i].Value != "" {
+			if !costed {
+				cost, costWhy = argrules.OrderMaxCostOfCall(call.Params, call.Tool, call.Tool)
+				costed = true
+			}
+			if !costWhy.Valued() {
+				return &GateAdmission{Refusal: approvalRefusal(toolcontrols.DenialCodeApprovalUnreadable, rules[i].Field, "",
+					fmt.Sprintf("%s: this token asks the owner before an order that can cost more than %s, counting each order at the most it can cost, and %s, so it was not sent and nobody was asked",
+						call.Tool, toolcontrols.FormatAmount(rules[i].Field, rules[i].Above), costWhy))}, nil
+			}
+			limit, ok := rules[i].ThresholdUnits()
+			if !ok {
+				return &GateAdmission{Refusal: approvalRefusal(toolcontrols.DenialCodeApprovalUnreadable, rules[i].Field, "",
+					fmt.Sprintf("%s: this token's approval rule could not be checked, so the call was not sent", call.Tool))}, nil
+			}
+			if held == nil && cost.Units > limit {
+				held, heldUnits = &rules[i], cost.Units
+			}
+			continue
+		}
+		if held != nil {
+			continue
+		}
 		amount, why := argrules.ReadNumericField(call.Params, call.Tool, rules[i].Field)
 		// A negative amount is not a size to compare: it is held with the
 		// unreadable ones.
 		if why != argrules.NumericFieldOK || strings.HasPrefix(amount.String(), "-") || amount.Cmp(rules[i].Threshold()) > 0 {
 			held = &rules[i]
-			break
 		}
 	}
 	if held == nil {
@@ -132,6 +175,7 @@ func (g *ApprovalGate) Admit(ctx context.Context, call GateCall) (*GateAdmission
 		return nil, errors.New("approvals need a tenant and a token id")
 	}
 
+	summary := ownerSummaryFor(call.Params, held, heldUnits)
 	hash, err := toolcontrols.CallHash(call.Token.TokenID, call.Tool, call.Params)
 	if err != nil {
 		return &GateAdmission{Refusal: approvalRefusal(toolcontrols.DenialCodeApprovalUnreadable, held.Field, "",
@@ -144,7 +188,8 @@ func (g *ApprovalGate) Admit(ctx context.Context, call GateCall) (*GateAdmission
 		CallHash: hash,
 		Field:    held.Field,
 		Above:    held.Above,
-		Summary:  toolcontrols.OwnerSummary(call.Params, held.Field),
+		Value:    held.Value,
+		Summary:  summary,
 		Now:      now,
 		TTL:      g.ttl(),
 	})
@@ -163,11 +208,15 @@ func (g *ApprovalGate) Admit(ctx context.Context, call GateCall) (*GateAdmission
 
 	case toolcontrols.ApprovalHeld:
 		if dec.NeedsNotice {
-			g.tell(ctx, call, dec, held)
+			g.tell(ctx, call, dec, held, summary)
 		}
 		r := approvalRefusal(toolcontrols.DenialCodeApprovalRequired, held.Field, dec.ApprovalID,
 			fmt.Sprintf("%s: calls with %s above %s need the owner's approval; the call is waiting for the owner",
 				call.Tool, held.Field, toolcontrols.FormatAmount(held.Field, held.Above)))
+		if held.Value != "" {
+			r.Message = fmt.Sprintf("%s: orders that can cost more than %s need the owner's approval; the call is waiting for the owner",
+				call.Tool, toolcontrols.FormatAmount(held.Field, held.Above))
+		}
 		r.Data["approval_id"] = dec.ApprovalID
 		r.Data["expires_at"] = dec.ExpiresAt.UTC().Format(time.RFC3339)
 		r.Data["retry"] = "send the same call again after the owner approves"
@@ -194,6 +243,18 @@ func (g *ApprovalGate) Admit(ctx context.Context, call GateCall) (*GateAdmission
 	return nil, fmt.Errorf("approval store returned an unknown outcome")
 }
 
+// ownerSummaryFor is what the owner is shown for a held call: every argument,
+// and for a rule with a value basis a first line saying what the order counts
+// as (units is the cost the rule compared). It holds the call's values, so it
+// goes to the owner only.
+func ownerSummaryFor(params json.RawMessage, r *toolcontrols.ApprovalRule, units int64) []toolcontrols.SummaryItem {
+	items := toolcontrols.OwnerSummary(params, r.Field)
+	if r.Value == "" {
+		return items
+	}
+	return append([]toolcontrols.SummaryItem{toolcontrols.CountsAsItem(r.Field, units)}, items...)
+}
+
 func (g *ApprovalGate) ttl() time.Duration {
 	if g.TTL > 0 {
 		return g.TTL
@@ -203,7 +264,7 @@ func (g *ApprovalGate) ttl() time.Duration {
 
 // tell notifies the owner, once per approval. A failed notice is logged and
 // tried again the next time the agent repeats the held call.
-func (g *ApprovalGate) tell(ctx context.Context, call GateCall, dec toolcontrols.ApprovalDecision, r *toolcontrols.ApprovalRule) {
+func (g *ApprovalGate) tell(ctx context.Context, call GateCall, dec toolcontrols.ApprovalDecision, r *toolcontrols.ApprovalRule, summary []toolcontrols.SummaryItem) {
 	if g.Notifier == nil {
 		log.Error().Str("approval_id", dec.ApprovalID).Msg("a call is waiting for approval but no notifier is configured; the owner can still see it on the approvals page")
 		_ = g.Store.NoticeFailed(ctx, call.Token.TenantID, dec.ApprovalID)
@@ -216,7 +277,8 @@ func (g *ApprovalGate) tell(ctx context.Context, call GateCall, dec toolcontrols
 		Tool:       call.Tool,
 		Field:      r.Field,
 		Above:      r.Above,
-		Summary:    toolcontrols.OwnerSummary(call.Params, r.Field),
+		Value:      r.Value,
+		Summary:    summary,
 		ExpiresAt:  dec.ExpiresAt,
 	}
 	run := func() {

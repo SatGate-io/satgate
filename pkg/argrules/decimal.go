@@ -77,3 +77,32 @@ func (d *Decimal) Cmp(o *Decimal) int { return d.rat.Cmp(o.rat) }
 
 // String is the text the decimal was parsed from.
 func (d *Decimal) String() string { return d.text }
+
+// Times is the exact product d x o. Nothing is rounded.
+func (d *Decimal) Times(o *Decimal) *big.Rat { return new(big.Rat).Mul(d.rat, o.rat) }
+
+// UnitsPerOne is how many amount units make 1: amounts are counted in whole
+// 10^-8 units (the scale a spending limit keeps; see toolcontrols.MaxScale).
+const UnitsPerOne int64 = 100000000
+
+// UnitsCeil converts a non-negative exact value to whole 10^-8 units,
+// rounding UP, so an amount is never undercounted. It reports false for a
+// negative value and for one that does not fit an int64. A value above zero
+// never comes back as 0 units.
+//
+// It is the same rounding spend_gate.go's amountUnits and toolcontrols'
+// unitsOf (with ceil) apply; tests hold the three equal.
+func UnitsCeil(r *big.Rat) (int64, bool) {
+	if r.Sign() < 0 {
+		return 0, false
+	}
+	scaled := new(big.Rat).Mul(r, new(big.Rat).SetInt64(UnitsPerOne))
+	q, rem := new(big.Int).QuoRem(scaled.Num(), scaled.Denom(), new(big.Int))
+	if rem.Sign() != 0 {
+		q.Add(q, big.NewInt(1))
+	}
+	if !q.IsInt64() {
+		return 0, false
+	}
+	return q.Int64(), true
+}
