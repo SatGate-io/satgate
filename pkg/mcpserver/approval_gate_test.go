@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/satgate-io/satgate/pkg/macaroon"
 	"github.com/satgate-io/satgate/pkg/toolcontrols"
 )
 
@@ -340,8 +341,64 @@ func TestApprovalStaysUsedWhenTheUpstreamFails(t *testing.T) {
 	}
 }
 
+// tokenWithIDContaining returns the harness token with one more caveat that
+// does not narrow it (a later expiry), chosen so the token id the proxy
+// derives from it (the first 12 hex characters of a hash) contains want. The
+// id is a hash, so it is searched for rather than set; the search is short
+// (about one try in 400 for a three digit string).
+func tokenWithIDContaining(t *testing.T, svc *macaroon.Service, token, want string) string {
+	t.Helper()
+	base := time.Now().Add(2 * time.Hour)
+	for i := 0; i < 20000; i++ {
+		cand := appendCaveat(t, svc, token, fmt.Sprintf("expires = %d", base.Add(time.Duration(i)*time.Millisecond).UnixMilli()))
+		if strings.Contains(expectedTokenID(t, svc, cand), want) {
+			return cand
+		}
+	}
+	t.Fatalf("no token id containing %q in 20000 tries", want)
+	return ""
+}
+
+// expectedTokenID is the identity the proxy gives a token, worked out from the
+// token itself: a hash of its identifier and signature.
+func expectedTokenID(t *testing.T, svc *macaroon.Service, token string) string {
+	t.Helper()
+	mac, err := svc.Decode(token)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return hashToken(mac.Identifier + mac.Signature)
+}
+
+// The reply, the receipt and the evidence of a held call carry no value of the
+// call's arguments. Two token shapes are covered on purpose: any token, and a
+// token whose id, a hash that is different on every run, happens to contain
+// the planted amount's digits ("777"); the id is checked for being the
+// token's own, and is the one field not searched for argument values.
 func TestApprovalRepliesAndReceiptsCarryNoArgumentValues(t *testing.T) {
+	for _, tc := range []struct{ name, idHas string }{
+		{"any token id", ""},
+		{"token id contains the planted digits", "777"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			checkApprovalRepliesCarryNoArgumentValues(t, tc.idHas)
+		})
+	}
+}
+
+func checkApprovalRepliesCarryNoArgumentValues(t *testing.T, idHas string) {
 	a := newApprovalHarness(t, askAbove50)
+	svc, err := macaroon.NewService(argTestRoot)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if idHas != "" {
+		a.token = tokenWithIDContaining(t, svc, a.token, idHas)
+	}
+	wantTokenID := expectedTokenID(t, svc, a.token)
+	if idHas != "" && !strings.Contains(wantTokenID, idHas) {
+		t.Fatalf("fixture: token id %q does not contain %q", wantTokenID, idHas)
+	}
 	args := `{"side":"buy","type":"market","symbol":"ZZQ-USD","dollar_amount":"777.31"}`
 	a.call(t, 1, "place_crypto_order", args)
 	r := a.call(t, 2, "place_crypto_order", args)
@@ -351,9 +408,10 @@ func TestApprovalRepliesAndReceiptsCarryNoArgumentValues(t *testing.T) {
 
 	// Structured, not a substring search of the whole reply: the reply holds a
 	// random approval id and times whose digits can spell any short number
-	// ("777"). Those fields are checked for their shape; every other string in
-	// the reply, the error message and the receipt input is checked for the
-	// call's values.
+	// ("777"), and the receipt holds the token id, a hash that can too. Those
+	// fields are checked for their shape (the token id for being exactly the
+	// token's own identity); every other string in the reply, the error
+	// message and the receipt input is checked for the call's values.
 	wantID := errData(t, r)["approval_id"].(string)
 	var docs []any
 	for _, v := range []any{r, a.rec.decisions} {
@@ -364,12 +422,14 @@ func TestApprovalRepliesAndReceiptsCarryNoArgumentValues(t *testing.T) {
 		}
 		docs = append(docs, doc)
 	}
+	tokenIDsSeen := 0
 	shaped := map[string]func(string) bool{
 		"approval_id":  toolcontrols.ValidApprovalID,
 		"receipt_id":   func(s string) bool { return s != "" },
 		"evidence_url": func(s string) bool { return strings.HasPrefix(s, "/") || strings.HasPrefix(s, "http") },
 		"expires_at":   func(s string) bool { _, err := time.Parse(time.RFC3339, s); return err == nil },
 		"id":           func(s string) bool { return s != "" },
+		"token_id":     func(s string) bool { tokenIDsSeen++; return s == wantTokenID },
 	}
 	var walk func(path string, v any)
 	walk = func(path string, v any) {
@@ -404,6 +464,9 @@ func TestApprovalRepliesAndReceiptsCarryNoArgumentValues(t *testing.T) {
 	}
 	for i, d := range docs {
 		walk(fmt.Sprintf("doc%d", i), d)
+	}
+	if tokenIDsSeen == 0 {
+		t.Fatal("no token_id in the receipt input: the identity check did not run")
 	}
 	if got := errData(t, r)["approval_id"]; got != wantID {
 		t.Fatalf("approval id changed: %v", got)

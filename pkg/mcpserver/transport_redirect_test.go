@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -130,61 +131,88 @@ func TestStreamableRedirect_SameOriginWithoutStoredHeadersFollowed(t *testing.T)
 	}
 }
 
+// startRedirectFixtureServer starts a test server on an explicit loopback
+// address, so a test can pin the address family instead of leaving it to
+// whichever bind httptest tries first. It skips the test when the host has no
+// such loopback address.
+func startRedirectFixtureServer(t *testing.T, network, addr string, h http.Handler) *httptest.Server {
+	t.Helper()
+	ln, err := net.Listen(network, addr)
+	if err != nil {
+		t.Skipf("no %s loopback on this host: %v", network, err)
+	}
+	s := httptest.NewUnstartedServer(h)
+	s.Listener.Close()
+	s.Listener = ln
+	s.Start()
+	return s
+}
+
+// Both loopback shapes are tested on purpose. A server that binds the IPv6
+// loopback has a host with colons, which must be bracketed in a URL, and
+// httptest binds it whenever the IPv4 bind fails (a busy machine).
 func TestStreamableRedirect_OtherPortIsDifferentOrigin(t *testing.T) {
-	var otherHits atomic.Int32
-	var otherHost string
-	var otherPort string
-	other := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		otherHits.Add(1)
-		http.Error(w, "should not be called", http.StatusBadGateway)
-	}))
-	defer other.Close()
-	otherURL, err := url.Parse(other.URL)
-	if err != nil {
-		t.Fatal(err)
-	}
-	otherHost = otherURL.Hostname()
-	otherPort = otherURL.Port()
+	for _, tc := range []struct{ name, network, addr string }{
+		{"ipv4 loopback", "tcp4", "127.0.0.1:0"},
+		{"ipv6 loopback", "tcp6", "[::1]:0"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var otherHits atomic.Int32
+			var otherHost string
+			var otherPort string
+			other := startRedirectFixtureServer(t, tc.network, tc.addr, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				otherHits.Add(1)
+				http.Error(w, "should not be called", http.StatusBadGateway)
+			}))
+			defer other.Close()
+			otherURL, err := url.Parse(other.URL)
+			if err != nil {
+				t.Fatal(err)
+			}
+			otherHost = otherURL.Hostname()
+			otherPort = otherURL.Port()
 
-	var upstreamHost string
-	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		upstreamHost = r.Host
-		target := "http://" + otherHost + ":" + otherPort + "/elsewhere?q=secret"
-		http.Redirect(w, r, target, http.StatusTemporaryRedirect)
-	}))
-	defer upstream.Close()
-	upURL, err := url.Parse(upstream.URL)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if upURL.Hostname() != otherHost {
-		t.Fatalf("fixture hosts differ: %s vs %s", upURL.Hostname(), otherHost)
-	}
-	if upURL.Port() == otherPort {
-		t.Fatalf("fixture ports must differ")
-	}
+			var upstreamHost string
+			upstream := startRedirectFixtureServer(t, tc.network, tc.addr, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				upstreamHost = r.Host
+				target := "http://" + net.JoinHostPort(otherHost, otherPort) + "/elsewhere?q=secret"
+				http.Redirect(w, r, target, http.StatusTemporaryRedirect)
+			}))
+			defer upstream.Close()
+			upURL, err := url.Parse(upstream.URL)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if upURL.Hostname() != otherHost {
+				t.Fatalf("fixture hosts differ: %s vs %s", upURL.Hostname(), otherHost)
+			}
+			if upURL.Port() == otherPort {
+				t.Fatalf("fixture ports must differ")
+			}
 
-	transport := NewStreamableHTTPTransport(upstream.URL+"/mcp", map[string]string{
-		"Authorization": "Bearer port-secret-token",
-	}, false, true)
-	defer transport.Close()
+			transport := NewStreamableHTTPTransport(upstream.URL+"/mcp", map[string]string{
+				"Authorization": "Bearer port-secret-token",
+			}, false, true)
+			defer transport.Close()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := transport.Connect(ctx); err != nil {
-		t.Fatal(err)
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			if err := transport.Connect(ctx); err != nil {
+				t.Fatal(err)
+			}
+			err = transport.WriteMessage(ctx, redirectBody(map[string]any{
+				"jsonrpc": "2.0", "id": 1, "method": "ping",
+			}))
+			assertRedirectRefused(t, err, http.StatusTemporaryRedirect, other.URL)
+			if strings.Contains(err.Error(), "/elsewhere") || strings.Contains(err.Error(), "q=secret") || strings.Contains(err.Error(), "port-secret-token") {
+				t.Fatalf("error contains target or token: %v", err)
+			}
+			if upstreamHost == "" {
+				t.Fatal("configured origin received no request")
+			}
+			waitNoHits(t, &otherHits)
+		})
 	}
-	err = transport.WriteMessage(ctx, redirectBody(map[string]any{
-		"jsonrpc": "2.0", "id": 1, "method": "ping",
-	}))
-	assertRedirectRefused(t, err, http.StatusTemporaryRedirect, other.URL)
-	if strings.Contains(err.Error(), "/elsewhere") || strings.Contains(err.Error(), "q=secret") || strings.Contains(err.Error(), "port-secret-token") {
-		t.Fatalf("error contains target or token: %v", err)
-	}
-	if upstreamHost == "" {
-		t.Fatal("configured origin received no request")
-	}
-	waitNoHits(t, &otherHits)
 }
 
 func TestStreamableRedirect_SessionIDRefusesLaterRedirect(t *testing.T) {
