@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Check, Gauge, KeyRound, Minus, ShieldCheck, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate vs Portkey - AI Gateway vs Economic Firewall',
+  title: { absolute: 'SatGate vs Portkey - AI Gateway vs Economic Firewall' },
   description: 'Compare SatGate and Portkey. Portkey is a GenAI gateway and observability stack; SatGate controls agent spend, MCP tools, and charging external agents.',
   alternates: { canonical: 'https://satgate.io/compare/portkey' },
   keywords: [

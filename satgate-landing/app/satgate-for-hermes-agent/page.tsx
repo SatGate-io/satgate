@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, Bot, BrainCircuit, DollarSign, KeyRound, ShieldCheck, Terminal, Workflow } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate for Hermes Agent MCP Workflows',
+  title: { absolute: 'SatGate for Hermes Agent MCP Workflows' },
   description: 'Add budgets checked before the request goes through, MCP tool cost policy, scoped capabilities, revocation, and signed receipts to Hermes Agent workflows with SatGate.',
   alternates: { canonical: 'https://satgate.io/satgate-for-hermes-agent' },
   keywords: [

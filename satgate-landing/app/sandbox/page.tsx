@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import ProductionRecordings from '../components/ProductionRecordings';
 import {
   ArrowLeft, Play, Square, Bot, Shield, Clock,
   AlertTriangle, CheckCircle, DollarSign, Activity,
@@ -48,31 +49,24 @@ const BRAVO_RESPONSES = [
 
 const sandboxDemos = [
   {
-    title: 'Mint Demo',
-    href: '/mint-demo',
-    icon: Key,
-    eyebrow: '1 · Create a token',
-    body: 'Give an agent a token with its own permissions and budget before it calls anything.',
-  },
-  {
     title: 'Access Control Demo',
     href: '/protect',
     icon: Shield,
-    eyebrow: '2 · Limit access',
+    eyebrow: '1 · Limit access',
     body: 'Limit what an agent can call, hand a narrower token to a sub-agent, then revoke it.',
   },
   {
     title: 'Spend Control Demo',
     href: '#spend-control-demo',
     icon: DollarSign,
-    eyebrow: '3 · Cap spending',
+    eyebrow: '2 · Cap spending',
     body: 'Run the simulation below and watch SatGate refuse an agent once its budget runs out.',
   },
   {
     title: 'Payments Demo',
     href: '/pay',
     icon: Zap,
-    eyebrow: '4 · Charge external agents',
+    eyebrow: '3 · Charge external agents',
     body: 'Make an external agent pay before its request goes through. Payment refusals get a signed receipt, and so do most paid requests.',
   },
 ];
@@ -90,7 +84,7 @@ const goldenPathSteps: Array<{
     label: '1 · No token',
     status: 'HTTP 401',
     decision: 'denied',
-    reason: 'DEFAULT_PROTECTION: no capability token presented',
+    reason: 'AUTHENTICATION_REQUIRED: no token presented',
     route: '/v1/invoices/search',
     budget: 'Nothing spent',
     receipt: 'none',
@@ -99,10 +93,10 @@ const goldenPathSteps: Array<{
   {
     label: '2 · Token issued',
     status: 'token created',
-    decision: 'issued',
+    decision: 'none',
     reason: 'tenant_id = acme-finance',
     route: 'agent:invoice-reconciler-worker',
-    budget: '3.00 USD budget',
+    budget: '30 credits budget',
     receipt: 'none: issuing a token is an audit log entry',
     tone: 'issued',
   },
@@ -110,17 +104,17 @@ const goldenPathSteps: Array<{
     label: '3 · Allowed',
     status: 'HTTP 200',
     decision: 'allowed',
-    reason: 'allowed_under_policy',
+    reason: 'budget_authorized',
     route: 'mcp:invoices.search',
-    budget: '0.18 USD spent; 2.82 USD remaining',
+    budget: '10 credits spent; 20 credits remaining',
     receipt: 'rcpt_demo_003',
     tone: 'allowed',
   },
   {
     label: '4 · Blocked: not allowed',
     status: 'HTTP 403',
-    decision: 'blocked',
-    reason: 'scope_violation:no_customer_data_export',
+    decision: 'denied',
+    reason: 'policy_denied: the token\'s scope does not cover this route',
     route: '/v1/invoices/export',
     budget: 'Nothing spent',
     receipt: 'rcpt_demo_006',
@@ -129,17 +123,17 @@ const goldenPathSteps: Array<{
   {
     label: '5 · Blocked: out of budget',
     status: 'HTTP 402',
-    decision: 'blocked',
+    decision: 'denied',
     reason: 'budget_exhausted',
     route: '/v1/invoices/reconcile',
-    budget: '0.78 of 3.00 USD spent when refused',
+    budget: '30 of 30 credits spent when refused',
     receipt: 'rcpt_demo_007',
     tone: 'denied',
   },
   {
     label: '6 · Blocked: token revoked',
     status: 'HTTP 401/403',
-    decision: 'blocked',
+    decision: 'denied',
     reason: 'token_revoked',
     route: 'mcp:invoices.search',
     budget: 'Nothing spent after the revoke',
@@ -185,7 +179,7 @@ function GoldenPathSection() {
               One agent, allowed, blocked and revoked.
             </h2>
             <p className="mt-5 text-lg leading-8 text-gray-300">
-              This walkthrough is a simulation with sample data, so it runs the same way every time. The receipts match the sample signed receipt (Evidence Pack) in the viewer. To see SatGate on production, watch the <Link href="/#see-it-live" className="text-cyan-300 underline hover:text-cyan-200">two recordings on the home page</Link>.
+              This walkthrough is a simulation with sample data, so it runs the same way every time. The receipts match the sample signed receipt (Evidence Pack) in the viewer. To see SatGate on production, watch the <Link href="#see-it-live" className="text-cyan-300 underline hover:text-cyan-200">four recordings above</Link>.
             </p>
             <div className="mt-6">
               <ProofCtas />
@@ -512,7 +506,6 @@ export default function SandboxPage() {
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-03',
     featureList: [
-      'Mint Demo',
       'Access Control Demo',
       'Spend Control Demo',
       'Payments Demo',
@@ -578,6 +571,8 @@ export default function SandboxPage() {
           </Link>
         </div>
       </div>
+
+      <ProductionRecordings heading="See SatGate on production" />
 
       <GoldenPathSection />
 
@@ -794,7 +789,7 @@ export default function SandboxPage() {
         {/* CTA */}
         <div className="mt-12 text-center">
           <p className="text-gray-500 text-sm mb-4">
-            This demo is a simulation with sample data. The recordings on the home page show SatGate running on production.
+            This demo is a simulation with sample data. The recordings at the top of this page show SatGate running on production.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

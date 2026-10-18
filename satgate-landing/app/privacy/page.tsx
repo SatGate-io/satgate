@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-  title: 'Privacy Policy - SatGate',
+  title: { absolute: 'Privacy Policy - SatGate' },
   description: 'SatGate privacy policy for SaaS and self-host, including request metadata, telemetry, cookies, retention, and third-party services.',
   alternates: { canonical: 'https://satgate.io/privacy' },
   openGraph: {

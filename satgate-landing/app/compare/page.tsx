@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, BarChart3, Cloud, Eye, KeyRound, Route, Shield, Workflow, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'AI Gateway Comparison: SatGate vs LiteLLM, Portkey, Kong, Apigee',
+  title: { absolute: 'AI Gateway Comparison: SatGate vs LiteLLM, Portkey, Kong, Apigee' },
   description: 'Compare AI gateways, API gateways, and observability tools against SatGate\'s economic firewall for agent spend, MCP tool policy, revocation, and L402.',
   alternates: { canonical: 'https://satgate.io/compare' },
   keywords: [

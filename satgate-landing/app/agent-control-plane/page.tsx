@@ -16,7 +16,7 @@ const pageDescription =
   "Give each AI agent its own limits, let helpers get only part of them, and stop an agent and every helper it started from one place.";
 
 export const metadata: Metadata = {
-  title: pageTitle,
+  title: { absolute: pageTitle },
   description: pageDescription,
   keywords: [
     "agent control plane",

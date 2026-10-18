@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock, Shield, Lock, DollarSign, ArrowRight, CheckCircle, Zap, GitBranch, Eye, Activity, BookOpen } from 'lucide-react';
 
 export const metadata = {
-  title: 'Intelligent AI Delegation: Macaroons, Capability Tokens, and SatGate',
+  title: { absolute: 'Intelligent AI Delegation: Macaroons, Capability Tokens, and SatGate' },
   description: 'DeepMind\'s Intelligent AI Delegation points to macaroon capability tokens for safe AI agent delegation. SatGate implements delegation controls before the request goes through.',
   alternates: { canonical: 'https://satgate.io/blog/deepmind-intelligent-delegation-satgate' },
   keywords: ['AI agent delegation', 'macaroon tokens', 'capability-based security', 'Google DeepMind', 'delegation capability tokens', 'agent economy', 'economic access control', 'SatGate', 'privilege narrowing', 'AI agents on the web'],

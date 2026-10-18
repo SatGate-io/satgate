@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "SatGate Demo | Try AI Agent Budget Enforcement Free",
+  title: { absolute: "SatGate Demo | Try AI Agent Budget Enforcement Free" },
   alternates: { canonical: "https://satgate.io/sandbox" },
   description:
     "Try SatGate without signing up. Watch it give an agent a budget, block calls the agent is not allowed to make, revoke its token and charge external agents.",

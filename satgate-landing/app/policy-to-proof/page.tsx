@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "SatGate Rules and Receipts | Evidence for Enterprise Agent Permissions",
+  title: { absolute: "SatGate Rules and Receipts | Evidence for Enterprise Agent Permissions" },
   description:
     "Define what an agent is allowed to do, enforce it at the gateway, and produce evidence humans and upstreams can trust.",
   keywords: [

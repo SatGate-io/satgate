@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, Bot, DollarSign, Gauge, KeyRound, ShieldCheck, Terminal, Workflow } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate for Claude Desktop MCP',
+  title: { absolute: 'SatGate for Claude Desktop MCP' },
   description: 'Govern Claude Desktop MCP tool calls with SatGate budgets, scoped capabilities, revocation, and signed receipts before the request goes through.',
   alternates: { canonical: 'https://satgate.io/satgate-for-claude-desktop' },
   keywords: [

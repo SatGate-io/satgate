@@ -92,6 +92,7 @@ const answerCards = [
 const resultStyles: Record<string, string> = {
   allowed: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-100',
   blocked: 'border-red-400/30 bg-red-400/10 text-red-100',
+  denied: 'border-red-400/30 bg-red-400/10 text-red-100',
   issued: 'border-cyan-400/30 bg-cyan-400/10 text-cyan-100',
   attenuated: 'border-purple-400/30 bg-purple-400/10 text-purple-100',
   revoked: 'border-amber-400/30 bg-amber-400/10 text-amber-100',
@@ -221,7 +222,7 @@ export default function EvidencePackDemoPage() {
                     </div>
                     <div className="rounded-2xl bg-white/[0.04] p-4">
                       <p className="text-xs text-gray-500">Budget limit</p>
-                      <p className="mt-2 text-sm text-gray-200">{grant.budget_limit} USD</p>
+                      <p className="mt-2 text-sm text-gray-200">{grant.budget_limit} credits</p>
                     </div>
                   </div>
                 </article>

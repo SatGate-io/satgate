@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Check, DollarSign, Gauge, KeyRound, Minus, ShieldCheck, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate vs Langfuse - LLM Observability vs Agent Spending Controls',
+  title: { absolute: 'SatGate vs Langfuse - LLM Observability vs Agent Spending Controls' },
   description: 'Compare SatGate and Langfuse. Langfuse is strong for LLM observability and traces; SatGate enforces budgets and permissions before agents spend.',
   alternates: { canonical: 'https://satgate.io/compare/langfuse' },
   keywords: [
