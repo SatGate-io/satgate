@@ -506,7 +506,6 @@ export default function SandboxPage() {
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     dateModified: '2026-05-03',
     featureList: [
-      'Mint Demo',
       'Access Control Demo',
       'Spend Control Demo',
       'Payments Demo',
