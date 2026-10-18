@@ -3,6 +3,8 @@ package mcpserver
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"io"
@@ -28,6 +30,25 @@ type orderUpstream struct {
 	calls    atomic.Int64
 	mu       sync.Mutex
 	release  chan struct{}
+	token    atomic.Value // string: see requireToken
+}
+
+// fixtureTokenHeader carries the per-instance token requireToken asks for.
+const fixtureTokenHeader = "X-Fixture-Token"
+
+// requireToken makes the fake carry out a tools/call only when the request
+// carries a secret that only this fixture's proxy knows (httpSpendHarness sends
+// it as an upstream header). A localhost port is reused fast, and under load a
+// request meant for a port some other test has just closed can arrive at the
+// fake that now owns it; without the token that stray would be counted as an
+// order this test's proxy placed. Call it before httpSpendHarness.
+func (u *orderUpstream) requireToken(t *testing.T) {
+	t.Helper()
+	b := make([]byte, 16)
+	if _, err := rand.Read(b); err != nil {
+		t.Fatal(err)
+	}
+	u.token.Store(hex.EncodeToString(b))
 }
 
 func newOrderUpstream(t *testing.T) *orderUpstream {
@@ -45,6 +66,10 @@ func newOrderUpstream(t *testing.T) *orderUpstream {
 func (u *orderUpstream) handle(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	if tok, _ := u.token.Load().(string); tok != "" && r.Header.Get(fixtureTokenHeader) != tok {
+		w.WriteHeader(http.StatusForbidden) // not from this fixture's proxy: never executed
 		return
 	}
 	body, _ := io.ReadAll(r.Body)
@@ -147,7 +172,11 @@ func httpSpendHarness(t *testing.T, up *orderUpstream, timeout time.Duration) *s
 	cfg := h.proxy.config
 	cfg.AllowPrivateUpstreams = true
 	cfg.DefaultUpstream = "u"
-	cfg.Upstreams = map[string]UpstreamConfig{"u": {Transport: "streamable", URL: up.srv.URL, Timeout: timeout}}
+	uc := UpstreamConfig{Transport: "streamable", URL: up.srv.URL, Timeout: timeout}
+	if tok, _ := up.token.Load().(string); tok != "" {
+		uc.Headers = map[string]string{fixtureTokenHeader: tok}
+	}
+	cfg.Upstreams = map[string]UpstreamConfig{"u": uc}
 	mgr := NewUpstreamManager(cfg.Upstreams, nil, "u", true)
 	ctx, cancel := context.WithCancel(context.Background())
 	if err := mgr.Start(ctx); err != nil {
@@ -248,19 +277,47 @@ func TestSpendReleasedWhenUpstreamSaysItDidNotRun(t *testing.T) {
 
 // A dial failure before any byte is written: released, and a retry once the
 // upstream is back may use the whole allowance.
+//
+// Two things in the fixture could decide this test's outcome instead of the
+// product, and both are removed:
+//
+//   - The harness's HTTP client has an idle keep-alive connection to the
+//     upstream after it listed the tools. If the upstream is closed and the
+//     call is then written on that connection before the client sees it closed,
+//     a connection was obtained and the call may have left: the outcome is
+//     unknown and the reservation is kept
+//     (TestSpendKeptWhenCallIsWrittenOnDeadPooledConnection). So the test gives
+//     the proxy a client with an empty pool, built the way the product builds
+//     it.
+//   - A dial to a port that was just closed is not guaranteed to be refused:
+//     under load another process's test server can bind the same localhost
+//     port, and the dial then reaches it (a call that "succeeds", or two
+//     processes that connect to each other's closed ports). So that client's
+//     dial fails as a refused connection without opening a socket
+//     (refusedDial): no listener, in any process, can be reached.
+//
+// The probe then checks the call dialed, that every dial failed, and that no
+// connection was ever obtained, so the call can only be a never-sent call.
 func TestSpendReleasedWhenDialFailsBeforeSend(t *testing.T) {
 	up := newOrderUpstream(t)
+	up.requireToken(t)
 	h := httpSpendHarness(t, up, 2*time.Second)
-	up.srv.Close() // connection refused from here on
+	probe := freshUpstreamClient(t, h, refusedDial)
+	up.srv.Close() // the upstream is down
 	r := h.call(t, 1, "place_crypto_order", order("200"))
 	if r.Error == nil {
 		t.Fatalf("call to a dead upstream succeeded: %s", r.Result)
 	}
 	if h.counter(t) != 0 {
-		t.Fatalf("counter after a dial failure = %d, want released", h.counter(t)/units)
+		t.Errorf("counter after a dial failure = %d, want released", h.counter(t)/units)
 	}
 	if up.executed.Load() != 0 {
-		t.Fatalf("executed %d", up.executed.Load())
+		t.Errorf("executed %d", up.executed.Load())
+	}
+	// The fixture must have forced what the test names: a fresh dial, refused.
+	if probe.dialStarts.Load() < 1 || probe.dialFailed.Load() != probe.dialStarts.Load() || probe.gotConn.Load() != 0 {
+		t.Errorf("not a fresh failed dial: %d dials, %d refused, %d connections obtained (%d pooled)",
+			probe.dialStarts.Load(), probe.dialFailed.Load(), probe.gotConn.Load(), probe.reused.Load())
 	}
 }
 
