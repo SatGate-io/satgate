@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRight, BadgeCheck, FileText, GitBranch, Handshake, Layers3, ReceiptText, ShieldCheck } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "SatGate for Payment Methods | Agent Permissions and Receipts",
+  title: { absolute: "SatGate for Payment Methods | Agent Permissions and Receipts" },
   description:
     "SatGate gives payment methods, API platforms, and agent ecosystems a permissions-and-receipts layer that works with L402 and x402 payments today: policy before action, receipts after action, and signed receipts (Evidence Packs) for dispute-ready proof.",
   keywords: [

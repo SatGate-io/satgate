@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Check, DollarSign, Gauge, KeyRound, Minus, ShieldCheck, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate vs Tyk - API Management vs Agent Spending Controls',
+  title: { absolute: 'SatGate vs Tyk - API Management vs Agent Spending Controls' },
   description: 'Compare SatGate and Tyk. Tyk is API management infrastructure; SatGate controls AI agent spend, MCP tools, scoped permissions, revocation, and payments.',
   alternates: { canonical: 'https://satgate.io/compare/tyk' },
   keywords: [

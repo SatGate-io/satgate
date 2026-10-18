@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Check, Gauge, KeyRound, Minus, ShieldCheck, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate vs Helicone - LLM Observability vs Economic Firewall',
+  title: { absolute: 'SatGate vs Helicone - LLM Observability vs Economic Firewall' },
   description: 'Compare SatGate and Helicone. Helicone helps teams debug and analyze AI apps; SatGate adds spending controls for agents, MCP tool budgets, and charging external agents.',
   alternates: { canonical: 'https://satgate.io/compare/helicone' },
   keywords: [

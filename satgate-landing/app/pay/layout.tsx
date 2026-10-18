@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "L402 Payment Rules Demo | SatGate",
+  title: { absolute: "L402 Payment Rules Demo | SatGate" },
   alternates: { canonical: "https://satgate.io/pay" },
   description:
     "See SatGate govern delegated paid API access with payment details, payment proof, scoped permissions, and signed receipts at the gateway before forwarding.",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "L402 Payment Rules Demo | SatGate",
     description:
-      "Per-request paid API access with scoped authority, payment details, and proof.",
+      "Paid API access for external agents, paid with Lightning, USDC on Base, or both.",
   },
 };
 

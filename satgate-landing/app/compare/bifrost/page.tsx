@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, Check, X, Minus, Shield, DollarSign, Zap, Eye, Lock, BarChart3, Code, Server } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate vs Bifrost - Comparison',
+  title: { absolute: 'SatGate vs Bifrost - Comparison' },
   description: 'Compare SatGate and Bifrost AI gateways. See why economic controls matter for the agent economy.',
   alternates: { canonical: 'https://satgate.io/compare/bifrost' },
   openGraph: {

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'SatGate Docs',
+  title: { absolute: 'SatGate Docs' },
   description: 'SatGate public documentation entry point for rules and receipts, signed receipts, MCP gateway, SDKs, and governance concepts.',
   alternates: { canonical: 'https://satgate.io/docs' },
 };

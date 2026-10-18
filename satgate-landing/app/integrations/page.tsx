@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Bot, BrainCircuit, Code2, Monitor, MousePointer2, Workflow } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate Integrations for AI Agent Tools',
+  title: { absolute: 'SatGate Integrations for AI Agent Tools' },
   description: 'Deploy SatGate spending controls with Cursor, Claude Code, Claude Desktop, OpenClaw, Hermes Agent, and MCP-based AI agent workflows.',
   alternates: { canonical: 'https://satgate.io/integrations' },
   keywords: [

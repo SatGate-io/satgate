@@ -137,7 +137,6 @@ export default function DesignPartnersPage() {
           </Link>
 
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
-            <Link href="/mint-demo" className="hover:text-white transition">Mint Demo</Link>
             <Link href="/protect" className="hover:text-white transition">Control Demo</Link>
             <Link href="/policy-to-proof" className="hover:text-white transition">Rules and Receipts</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
@@ -159,7 +158,6 @@ export default function DesignPartnersPage() {
         <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
             {[
-              { href: '/mint-demo', label: 'Mint Demo' },
               { href: '/protect', label: 'Control Demo' },
               { href: '/policy-to-proof', label: 'Rules and Receipts' },
               { href: '/govern', label: 'Enterprise' },

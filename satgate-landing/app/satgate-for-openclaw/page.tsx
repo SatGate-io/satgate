@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, Bot, DollarSign, Gauge, KeyRound, ShieldCheck, Terminal, Workflow } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate for OpenClaw Agents',
+  title: { absolute: 'SatGate for OpenClaw Agents' },
   description: 'Use SatGate as the Agent Permissions and Receipts for governed OpenClaw execution across sub-agents, tools, MCP calls, model routes, and API spend.',
   alternates: { canonical: 'https://satgate.io/satgate-for-openclaw' },
   keywords: [

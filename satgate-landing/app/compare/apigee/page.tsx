@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Check, DollarSign, Gauge, KeyRound, Minus, ShieldCheck, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate vs Apigee: API Management vs Agent Spending Controls',
+  title: { absolute: 'SatGate vs Apigee: API Management vs Agent Spending Controls' },
   description: 'Compare SatGate and Google Apigee. Apigee is enterprise API management; SatGate adds spending controls for AI agents, MCP tool budgets, and charging external agents.',
   alternates: { canonical: 'https://satgate.io/compare/apigee' },
   keywords: [

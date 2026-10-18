@@ -767,12 +767,6 @@ export default function GovernPage() {
             </p>
           </div>
           <div className="text-center">
-            <Link
-              href="/mint-demo"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 rounded-xl text-white font-semibold text-lg transition shadow-lg shadow-purple-500/20"
-            >
-              Launch Interactive Demo <ArrowRight size={20} />
-            </Link>
             <p className="text-gray-600 text-sm mt-4">
               3-step flow: Mock IdP → Mint Exchange → Verified Macaroon
             </p>

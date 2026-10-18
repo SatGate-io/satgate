@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Check, DollarSign, Gauge, KeyRound, Minus, Route, ShieldCheck, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'SatGate vs LiteLLM - AI Gateway vs Economic Firewall',
+  title: { absolute: 'SatGate vs LiteLLM - AI Gateway vs Economic Firewall' },
   description: 'Compare SatGate and LiteLLM. LiteLLM handles model routing, budgets, and spend tracking; SatGate controls agent spend, MCP tools, and charging external agents.',
   alternates: { canonical: 'https://satgate.io/compare/litellm' },
   keywords: [

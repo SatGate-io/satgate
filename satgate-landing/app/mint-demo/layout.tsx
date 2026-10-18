@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Agent Capability Token Minting Demo | SatGate Mint",
+  title: { absolute: "Agent Capability Token Minting Demo | SatGate Mint" },
   alternates: { canonical: "https://satgate.io/mint-demo" },
   description:
     "Mint budget-aware capability tokens and macaroons for AI agents. Set budgets before the request goes through, plus scopes, expiry, delegation limits, and revocation policy.",

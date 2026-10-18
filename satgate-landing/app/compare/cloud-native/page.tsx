@@ -120,7 +120,6 @@ const CloudNativeComparisonPage = () => {
           </Link>
 
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
-            <Link href="/mint-demo" className="hover:text-white transition">Mint Demo</Link>
             <Link href="/protect" className="hover:text-white transition">Control Demo</Link>
             <Link href="/pay" className="hover:text-white transition">Charge Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
@@ -142,7 +141,6 @@ const CloudNativeComparisonPage = () => {
 
         <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
-            <Link href="/mint-demo" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Mint Demo</Link>
             <Link href="/protect" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Control Demo</Link>
             <Link href="/pay" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Charge Demo</Link>
             <Link href="/govern" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Enterprise</Link>

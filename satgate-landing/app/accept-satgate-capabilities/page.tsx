@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, BadgeCheck, CheckCircle2, FileCheck2, ShieldCheck, XCircle } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Accept SatGate Capabilities",
+  title: { absolute: "Accept SatGate Capabilities" },
   description:
     "Define what it means for an upstream API to accept SatGate-scoped capabilities: verify bounded authority, execute the allowed action, and return receipts without implying marketplace reputation.",
   keywords: [

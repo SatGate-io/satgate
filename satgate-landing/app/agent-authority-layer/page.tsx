@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRight, BadgeCheck, FileCheck2, KeyRound, Layers3, ReceiptText, ShieldCheck } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Agent Permissions and Receipts | SatGate",
+  title: { absolute: "Agent Permissions and Receipts | SatGate" },
   description:
     "Give agents scoped authority for useful work. Enforce budget and access policy on governed requests, with signed evidence of the decision.",
   keywords: [

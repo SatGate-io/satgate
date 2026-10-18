@@ -72,7 +72,6 @@ export default function AgentsLandingPage() {
             <span className="text-lg sm:text-xl font-bold text-white whitespace-nowrap">SatGate<sup className="text-xs font-normal">™</sup></span>
           </Link>
           <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
-            <Link href="/mint-demo" className="hover:text-white transition">Mint Demo</Link>
             <Link href="/protect" className="hover:text-white transition">Control Demo</Link>
             <Link href="/pay" className="hover:text-white transition">Payments Demo</Link>
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
