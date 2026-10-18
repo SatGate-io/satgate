@@ -31,6 +31,7 @@ const LandingPage = () => {
           <div className="hidden xl:flex items-center gap-5 text-sm font-medium text-gray-400">
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
             <Link href="/mcp" className="hover:text-white transition">MCP</Link>
+            <Link href="/trading" className="hover:text-white transition">Trading</Link>
             <Link href="/build" className="hover:text-white transition">Build</Link>
             <Link href="/sandbox" className="hover:text-white transition">Demo</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
@@ -70,6 +71,13 @@ const LandingPage = () => {
               className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
             >
               MCP
+            </Link>
+            <Link
+              href="/trading"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg"
+            >
+              Trading
             </Link>
             <Link
               href="/build"
