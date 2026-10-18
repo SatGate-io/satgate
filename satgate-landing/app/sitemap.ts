@@ -50,7 +50,6 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/compare/langfuse', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/compare/cloud-native', lastModified: '2026-05-02', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/protect', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.7 },
-  { path: '/mint-demo', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/sandbox', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/runaway-agent-cost-calculator', lastModified: '2026-05-04', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/economic-firewall-readiness-grader', lastModified: '2026-05-05', changeFrequency: 'monthly', priority: 0.8 },

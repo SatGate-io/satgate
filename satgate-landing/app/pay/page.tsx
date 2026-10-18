@@ -54,7 +54,7 @@ const faqJsonLd = {
       name: 'What happens during a Lightning (L402) payment flow?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment. Payment decisions, refusals included, get a signed receipt.',
+        text: 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment. SatGate signs a receipt when it refuses an agent for a missing payment.',
       },
     },
     {
@@ -446,7 +446,7 @@ export default function PayDemoPage() {
           </h2>
           <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
             On each paid route, the owner picks how external agents pay: Lightning, USDC on Base, or both.
-            Payment decisions, refusals included, get a signed receipt.
+            SatGate signs a receipt when it refuses an agent for a missing payment.
           </p>
           <p className="mt-4 text-gray-400 leading-relaxed max-w-2xl mx-auto">
             <strong className="text-white">Lightning:</strong> the owner chooses how many requests one payment buys. On sat-priced routes the price can rise under load, up to a ceiling the owner sets.
@@ -562,7 +562,7 @@ export default function PayDemoPage() {
         <h2 className="mb-8 text-center text-2xl font-bold text-white">Lightning (L402) payment flow questions</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            ['What happens during a Lightning (L402) payment flow?', 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment. Payment decisions, refusals included, get a signed receipt.'],
+            ['What happens during a Lightning (L402) payment flow?', 'An agent requests a protected API, receives HTTP 402 Payment Required with an L402 challenge, pays the Lightning invoice, then retries with proof of payment. SatGate signs a receipt when it refuses an agent for a missing payment.'],
             ['Why use L402 for agent API access?', 'L402 can carry payment proof at request time, but SatGate keeps its own checks around it: delegated permissions, max budgets, scoped access, and receipts before protected APIs unlock.'],
             ['Can payment details be combined with access policy?', 'Yes. SatGate can combine L402 payment with capability tokens, scoped authorization, budget policy, receipt fields, receipt export, and revocation so payment does not become unrestricted access.'],
           ].map(([question, answer]) => (

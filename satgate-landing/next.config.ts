@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
       { source: '/dashboard', destination: '/sandbox', permanent: true },
       { source: '/crawl', destination: '/sandbox', permanent: true },
       { source: '/monetize', destination: '/pay', permanent: true },
+      { source: '/mint-demo', destination: '/sandbox', permanent: false },
       { source: '/seo-distribution-kit', destination: '/', permanent: true },
       { source: '/openai-budget-policy-generator', destination: '/build', permanent: true },
       { source: '/mcp-tool-cost-policy-generator', destination: '/mcp', permanent: true },

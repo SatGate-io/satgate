@@ -167,7 +167,6 @@ Check the prerequisites and whether you have access before running an example. A
 ## Product and Demo Pages
 - Enterprise AI Agent Governance: https://satgate.io/govern
 - SatGate Demo: https://satgate.io/sandbox
-- SatGate Mint / Capability Token Demo: https://satgate.io/mint-demo
 - SatGate Design Partners: https://satgate.io/design-partners
 - Pricing: https://satgate.io/pricing
 - Security: https://satgate.io/security

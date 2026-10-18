@@ -41,7 +41,7 @@ for required in ["SatGate Demo", "Interactive demo"]:
 for stale in ["SatGate Sandbox", "Demo path", "SatGate sandbox questions", "What does the SatGate sandbox", "Is the sandbox"]:
     if stale in sandbox or stale in layout:
         errors.append(f"demo page still contains stale sandbox label: {stale}")
-ordered = ["Mint Demo", "Access Control Demo", "Spend Control Demo", "Payments Demo"]
+ordered = ["Access Control Demo", "Spend Control Demo", "Payments Demo"]
 positions = []
 for label in ordered:
     pos = sandbox.find(label)
@@ -49,8 +49,8 @@ for label in ordered:
         errors.append(f"sandbox route missing demo card: {label}")
     positions.append(pos)
 if all(pos != -1 for pos in positions) and positions != sorted(positions):
-    errors.append("demo cards are not ordered Mint → Access Control → Spend Control → Payments")
-for href in ["/mint-demo", "/protect", "#spend-control-demo", "/pay"]:
+    errors.append("demo cards are not ordered Access Control → Spend Control → Payments")
+for href in ["/protect", "#spend-control-demo", "/pay"]:
     if href not in sandbox:
         errors.append(f"sandbox route missing demo href: {href}")
 

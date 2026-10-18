@@ -32,7 +32,7 @@ REQUIRED_PHRASES = {
         "Ask about a 90-day design-partner pilot",
     ],
     "app/pay/page.tsx": [
-        "Payment decisions, refusals included, get a signed receipt",
+        "SatGate signs a receipt when it refuses an agent for a missing payment",
         "Receipt Returned",
         "Paid-call receipt queued for export",
         "receipt_id",

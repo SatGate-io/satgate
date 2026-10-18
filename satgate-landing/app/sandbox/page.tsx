@@ -49,13 +49,6 @@ const BRAVO_RESPONSES = [
 
 const sandboxDemos = [
   {
-    title: 'Mint Demo',
-    href: '/mint-demo',
-    icon: Key,
-    eyebrow: '1 · Create a token',
-    body: 'Give an agent a token with its own permissions and budget before it calls anything.',
-  },
-  {
     title: 'Access Control Demo',
     href: '/protect',
     icon: Shield,
