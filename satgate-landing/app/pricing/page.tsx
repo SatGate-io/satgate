@@ -5,6 +5,8 @@ import { Check, ChevronDown, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
+const personalSignupUrl = 'https://cloud.satgate.io/cloud/signup?intent=trading';
+
 const faqs = [
   {
     q: 'How do I start?',
@@ -13,6 +15,10 @@ const faqs = [
   {
     q: 'What is included in Starter?',
     a: 'Starter is free. You get Observe (usage tracking) up to a fair-use cap, 3 routes, default protection and community support.',
+  },
+  {
+    q: 'What is the Personal plan?',
+    a: 'Personal is $9.99 a month after 30 days free, for people who let an AI app trade for them on Robinhood. It sets your limits and keeps receipts. It does not pick trades or give investment advice. Your SatGate bill is a separate subscription and never comes out of your brokerage account.',
   },
   {
     q: 'What is included in Pro?',
@@ -49,7 +55,7 @@ const PricingPage = () => {
     '@type': 'WebPage',
     name: 'SatGate Pricing',
     url: 'https://satgate.io/pricing',
-    description: 'SatGate plans: free Starter, Pro at $99/month, and custom Enterprise self-host. 14-day free trial of Pro features, no credit card.',
+    description: 'SatGate plans: free Starter, Personal at $9.99/month, Pro at $99/month, and custom Enterprise self-host. 14-day free trial of Pro features, no credit card.',
     datePublished: '2026-04-27',
     dateModified: '2026-09-27',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
@@ -86,7 +92,7 @@ const PricingPage = () => {
     '@type': 'OfferCatalog',
     name: 'SatGate Pricing',
     url: 'https://satgate.io/pricing',
-    description: 'SatGate plans: free Starter, Pro at $99/month, and custom Enterprise self-host. 14-day free trial of Pro features, no credit card.',
+    description: 'SatGate plans: free Starter, Personal at $9.99/month, Pro at $99/month, and custom Enterprise self-host. 14-day free trial of Pro features, no credit card.',
     dateModified: '2026-09-27',
     itemListElement: [
       {
@@ -98,6 +104,16 @@ const PricingPage = () => {
         availability: 'https://schema.org/InStock',
         url: 'https://cloud.satgate.io/cloud/signup',
         itemOffered: { '@type': 'Service', name: 'SatGate Starter', serviceType: 'AI agent governance' },
+      },
+      {
+        '@type': 'Offer',
+        name: 'SatGate Personal',
+        price: '9.99',
+        priceCurrency: 'USD',
+        description: 'For people who let an AI app trade for them. 30 days free. No card to start. $9.99/month. Dollar limits per order, per day and per week. Your agent sees only your Robinhood Agentic account. Orders over an amount you pick wait for your yes. One budget your AI apps can share. Signed receipts for orders SatGate refuses for breaking your rules, kept at least 90 days. Stop any agent with one button.',
+        availability: 'https://schema.org/InStock',
+        url: personalSignupUrl,
+        itemOffered: { '@type': 'Service', name: 'SatGate Personal', serviceType: 'AI agent governance' },
       },
       {
         '@type': 'Offer',
@@ -178,7 +194,7 @@ const PricingPage = () => {
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
             Start free.{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">
-              Three plans.
+              Four plans.
             </span>
           </h1>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
@@ -210,7 +226,7 @@ const PricingPage = () => {
 
       {/* Plans */}
       <section className="pb-10 px-6">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch">
           <div className="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-600 transition flex flex-col">
             <div className="mb-6">
               <h3 className="text-lg font-bold text-cyan-400 mb-1">Starter</h3>
@@ -232,6 +248,34 @@ const PricingPage = () => {
               className="block text-center py-3 rounded-lg border border-gray-700 font-bold hover:border-gray-500 hover:bg-gray-800 transition"
             >
               Start free trial
+            </a>
+          </div>
+
+          <div className="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-600 transition flex flex-col">
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-pink-400 mb-1">Personal</h3>
+              <p className="text-gray-500 text-sm">For people who let an AI app trade for them.</p>
+            </div>
+            <div className="mb-6">
+              <span className="text-4xl font-extrabold text-white">$9.99</span>
+              <span className="text-gray-500 text-sm"> / month</span>
+              <p className="text-gray-400 text-sm mt-1">30 days free. No card to start.</p>
+            </div>
+            <ul className="space-y-3 text-sm text-gray-400 mb-8 flex-1">
+              <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />Dollar limits per order, per day and per week</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />Your agent sees only your Robinhood Agentic account</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />Orders over an amount you pick wait for your yes</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />One budget your AI apps can share</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />Signed receipts for orders SatGate refuses for breaking your rules, kept at least 90 days</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />Stop any agent with one button</li>
+            </ul>
+            <a
+              href={personalSignupUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-center py-3 rounded-lg border border-gray-700 font-bold hover:border-gray-500 hover:bg-gray-800 transition"
+            >
+              Start free
             </a>
           </div>
 
@@ -291,6 +335,9 @@ const PricingPage = () => {
             </a>
           </div>
         </div>
+        <p className="max-w-3xl mx-auto mt-8 text-center text-sm text-gray-500">
+          SatGate sets limits and keeps receipts. It does not pick trades or give investment advice. SatGate is not affiliated with or endorsed by Robinhood.
+        </p>
       </section>
 
       <section className="pb-16 px-6">
