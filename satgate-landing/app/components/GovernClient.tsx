@@ -750,25 +750,16 @@ export default function GovernPage() {
         </div>
       </section>
 
-      {/* Live Mint Demo */}
+      {/* How SatGate Mint works */}
       <section className="py-20 px-6 border-t border-gray-800 bg-gradient-to-b from-purple-950/10 to-black">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/10 border border-purple-500/20 rounded-full text-purple-300 text-sm mb-6">
-              <Key size={14} />
-              Live Demo
-            </div>
+          <div className="text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              See authority minted — then prove the lifecycle
+              How SatGate Mint works
             </h2>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
               SatGate Mint exchanges workload identity tokens for capability-bearing macaroons.
               The same Mint flow works for internal calls and governed external paid calls. Each grant is recorded in the audit log.
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-gray-600 text-sm mt-4">
-              3-step flow: Mock IdP → Mint Exchange → Verified Macaroon
             </p>
           </div>
         </div>
@@ -779,10 +770,10 @@ export default function GovernPage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              From Demo to Thousands of Agents
+              From one agent to thousands
             </h2>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              The same exchange you just saw works identically at scale. No secrets management. No credential rotation. Identity is the credential.
+              The same exchange works the same way for one agent or thousands. No secrets management. No credential rotation. Identity is the credential.
             </p>
           </div>
 

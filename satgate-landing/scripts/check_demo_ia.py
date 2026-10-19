@@ -7,6 +7,7 @@ HOME = ROOT / "app" / "components" / "HomeClient.tsx"
 PRICING = ROOT / "app" / "pricing" / "page.tsx"
 SANDBOX = ROOT / "app" / "sandbox" / "page.tsx"
 SANDBOX_LAYOUT = ROOT / "app" / "sandbox" / "layout.tsx"
+GOVERN = ROOT / "app" / "components" / "GovernClient.tsx"
 BACK_LINK_PAGES = [
     ROOT / "app" / "mcp" / "page.tsx",
     ROOT / "app" / "build" / "page.tsx",
@@ -32,6 +33,12 @@ pricing = PRICING.read_text()
 for stale in ["Mint Demo", "Control Demo", "Charge Demo", 'href="/mint-demo"', 'href="/protect"', 'href="/pay"']:
     if stale in pricing:
         errors.append(f"pricing page still contains demo link/copy: {stale}")
+
+# The Mint demo is offline (/mint-demo redirects to /sandbox), so /govern must not promise it.
+govern = GOVERN.read_text()
+for stale in ["Live Demo", "you just saw", "From Demo to", "Mock IdP", 'href="/mint-demo"']:
+    if stale in govern:
+        errors.append(f"/govern still promises the offline Mint demo: {stale}")
 
 sandbox = SANDBOX.read_text()
 layout = SANDBOX_LAYOUT.read_text()
