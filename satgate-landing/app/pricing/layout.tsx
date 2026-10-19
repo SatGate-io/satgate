@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: { absolute: "SatGate Pricing | Economic Firewall for AI Agents" },
   alternates: { canonical: "https://satgate.io/pricing" },
   description:
-    "SatGate plans: free Starter, Pro at $99 a month, and Enterprise. Per-agent budgets, spending caps, MCP tool controls and signed receipts. 14-day free trial, no credit card.",
+    "SatGate plans: free Starter, Personal at $9.99 a month, Pro at $99 a month, and Enterprise. Per-agent budgets, spending caps, MCP tool controls and signed receipts. 14-day free trial, no credit card.",
   keywords: [
     "SatGate pricing",
     "AI agent cost control pricing",
