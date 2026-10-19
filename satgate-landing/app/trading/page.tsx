@@ -131,7 +131,7 @@ export default function TradingPage() {
             >
               Set up my agent&apos;s limits <ArrowRight size={16} />
             </a>
-            <p className="mt-3 text-sm text-gray-400">Free for 30 days, no card needed. Then <span className="whitespace-nowrap">$9.99 a month.</span></p>
+            <p className="mt-3 text-sm text-gray-400">Free for 30 days, no card needed. Continue with Personal for <span className="whitespace-nowrap">$9.99 a month.</span></p>
           </div>
         </div>
       </section>
@@ -181,7 +181,7 @@ export default function TradingPage() {
           >
             Set up my agent&apos;s limits <ArrowRight size={16} />
           </a>
-          <p className="mt-3 text-sm text-gray-400">Free for 30 days, no card needed. Then <span className="whitespace-nowrap">$9.99 a month.</span></p>
+          <p className="mt-3 text-sm text-gray-400">Free for 30 days, no card needed. Continue with Personal for <span className="whitespace-nowrap">$9.99 a month.</span></p>
           <p className="mt-4 text-sm text-gray-500">
             SatGate sets limits and keeps receipts. It does not pick trades or give investment advice.
           </p>
