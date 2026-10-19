@@ -64,7 +64,7 @@ const comparisonRows = [
     topic: 'Orders that were stopped',
     robinhood: 'Orders your agent places show up in the Activity section of its account in the Robinhood app.',
     satgate:
-      'When SatGate refuses an order for being over a limit, outside the Agentic account or not allowed, it signs a receipt for the refusal. If it can\'t sign one, the order still doesn\'t reach Robinhood.',
+      'When SatGate refuses an order for being over a limit, outside the Agentic account or not allowed, it signs a receipt for the refusal. If SatGate can\'t make the receipt, the order is still stopped.',
   },
 ];
 
@@ -74,7 +74,7 @@ const canAndCant = [
   'SatGate stores the access Robinhood gives it, encrypted, and uses it to pass along the calls your agent is allowed to make.',
   'On its own, SatGate only asks Robinhood for its list of tools, plus one read of your account list during setup, when you click, to find your Agentic account. It never reads your balances or places orders by itself.',
   'Robinhood lets a connected agent read all your Robinhood accounts. SatGate locks yours to the Agentic account.',
-  'SatGate signs a receipt when it refuses your agent\'s request for breaking your rules, with the tool name and a refusal code. If it can\'t sign one, the request still doesn\'t reach Robinhood. We don\'t keep Robinhood\'s replies, so we don\'t keep your balances or positions.',
+  'SatGate signs a receipt when it refuses your agent\'s request for breaking your rules, with the tool name and a refusal code. If SatGate can\'t make the receipt, the request is still stopped. We don\'t keep Robinhood\'s replies, so we don\'t keep your balances or positions.',
   'You can stop your agent in SatGate at any time, or disconnect SatGate in the Robinhood app. SatGate\'s bill is a separate subscription and never comes out of your brokerage account.',
 ];
 
