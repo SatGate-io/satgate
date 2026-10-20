@@ -95,6 +95,7 @@ pack, and exit 2 is input that could not be loaded.
 | --- | --- | --- |
 | allowed / budget_authorized | accept | accept |
 | allowed / policy_allowed | accept | accept |
+| allowed / observe_unrecorded | accept with its window and count | accept with its window and count |
 | allowed / sandbox_no_spend | accept | accept |
 | allowed / observe_projected | accept | accept |
 | denied / budget_exhausted | accept | accept |
@@ -124,6 +125,40 @@ paired-profile matrix (for example, the historical tools acceptance and demo
 rejection of paid / budget_authorized are covered). Unknown enums and unsigned
 tampering remain rejected. These differences are legacy behavior, not a claim
 that the two surfaces are fully equivalent outside paid rail.
+
+## Receipts when sign-every-action is on
+
+A gateway with the sign-every-action switch on signs a receipt for each call a verified key makes. Three receipt shapes carry it. Both public copies (`tools/` and `demo/`) hold them to the same cases (`tools/test_every_action_receipts.py`); the copies are patched separately, not copied over each other. A check runs only for a receipt that has the shape, so every older receipt is read as it was, and unknown reasons and unknown pairs still fail.
+
+**Allowed, no balance claim.** `allowed` / `policy_allowed` with `budget.spend_mode` `not_evaluated` (a free tool, a key with no budget). Budget is exactly `{"spend_mode": "not_evaluated", "cost_credits": 0}`. No limit, remaining, attempted, used, spent, projected or payment key at any depth outside `budget`, and none on the Pack wrapper. Demo reads it as the same verified not-evaluated profile as a scope refusal (verified capability authority, redacted raw fields); tools applies the budget and no-claim rules and, as before, does not check provenance. An `allowed` / `policy_allowed` receipt with an evaluated budget is unchanged. This replaces the earlier rule that the not-evaluated budget was legal only on `denied` / `policy_denied`.
+
+**Refusal windows.** A receipt with any `rate_limit_*` field is a window receipt and must be a denial (`denied` with `policy_denied`, `token_revoked` or `capability_expired`) with a non-empty `denial_code`, `rate_limit_phase` `opened` or `closed`, `rate_limit_window_start` a UTC minute written `YYYY-MM-DDTHH:MM:00Z`, `rate_limit_window_seconds` the integer `60`, no `unrecorded_*` field and no balance claim. An opener has no `rate_limit_refused_calls` and is issued at or after its window start. A closer has `rate_limit_refused_calls` as a JSON integer of at least 1 (boolean, string, float, zero and negative are rejected) and is issued at or after the end of its window.
+
+**Observe gap.** `allowed` / `observe_unrecorded`: the signed count of Observe calls that went through in one UTC minute with no receipt. `unrecorded_window_start` (UTC minute), `unrecorded_window_seconds` (the integer `60`), `unrecorded_calls` (integer, at least 1), no `rate_limit_*` field, no balance claim, and issued at or after the end of its window. Without a window or a count it is refused. Demo also refuses the reason on any budget but `not_evaluated`.
+
+## Receipt record
+
+`tools/verify_receipt_record.py` checks a downloaded record: NDJSON, one `satgate.evidence_pack.v1` pack per line in `issued_at` order, then one last line, the manifest. Tests: `tools/test_receipt_record.py`.
+
+The manifest (`schema_version` `satgate.receipt_record_manifest.v1`) is signed like a receipt: JCS (RFC 8785) canonical bytes of the manifest without `manifest_hash` and `signature`, SHA-256 into `manifest_hash` (`sha256:` plus base64url), Ed25519 into `signature` (`ed25519:` plus base64url), with the key `issuer_kid` names in the issuer's JWKS. Without `--require-trusted-issuer` the embedded key in `metadata.public_key_ed25519_b64` is used and the output says the issuer was not anchored. Fields:
+
+| field | meaning |
+| --- | --- |
+| `issuer`, `issuer_kid` | who signed; must equal each receipt's issuer |
+| `key_hash` | the one agent key the record is about; every receipt's authority carries it (`token_id_hash`, `budget_id_hash` or `capability_hash`) |
+| `from`, `to`, `generated_at` | the range (`from` inclusive, `to` exclusive) and when the record was made |
+| `record_starts_at` | optional; when sign-every-action was switched on, so calls before it are known not to be covered |
+| `count` | the number of packs |
+| `first_receipt_hash`, `last_receipt_hash` | the first and last pack's `receipt_hash` (absent for an empty record) |
+| `receipt_hashes_sha256` | `sha256:` plus base64url of SHA-256 over every `receipt_hash`, in order, each followed by a newline |
+| `counts_by_decision_reason` | receipts per `decision_reason` |
+| `windows` | one entry per refusal window: `route_or_tool`, `window_start`, `denial_code`, `opened_receipt_hash`, `closed_receipt_hash` (null if not closed), `refused_calls` (null if not closed) |
+
+Problems (exit 1): a pack that does not verify, a missing or misplaced manifest, a bad manifest hash or signature, a count that differs, receipt hashes that do not match (a receipt dropped, added, changed or moved), a receipt outside the range, out of order or from another issuer, a receipt id, pack id or receipt hash twice, a receipt that does not belong to `key_hash`, a window with two openers or two closers, a closer with no opener, windows the manifest does not list, counts by reason that differ. Warnings (exit 0): an opener never closed once its window has been over for 5 minutes; a window that began before the record's range; a request id on more than one receipt (an agent can legitimately reuse a JSON-RPC id, so each is a separate decision); calls that went through in Observe with no receipt (counted from the gap receipts); a range that starts before `record_starts_at`.
+
+Exit codes: 0 the record checks out, 1 a problem, 2 the input could not be loaded, 3 the `cryptography` package is missing. The JSON output ends with a one-line `summary`, `N receipts, M refusals, K windows, P problems`, also printed on stderr.
+
+What it cannot prove. The manifest is made at download time from what SatGate holds. It shows that nothing was dropped from that list, not that no call ever failed to be stored; the gateway's own counters of calls seen against receipts made cover that.
 
 ## Provenance and verification
 

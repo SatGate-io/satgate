@@ -98,6 +98,7 @@ Gateway receipts use a closed `decision_reason` vocabulary. The public verifier 
 - `capability_invalid`
 - `insufficient_budget`
 - `observe_projected`
+- `observe_unrecorded`
 - `payment_required`
 - `payment_verified`
 - `policy_allowed`
