@@ -886,8 +886,15 @@ def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requi
         if not checks["pack_paid_rail"]:
             add_reason(reasons, reason_codes, "invalid_paid_rail_provenance", "Paid-rail Pack carries budget_state or credit/USD state")
 
+    # The authority, budget and policy mirrors. A paid-rail Pack must carry
+    # them; so must a Pack of a new-profile receipt (allowed / policy_allowed
+    # with no balance, a window opener or closer, a gap record): a mirror
+    # that is left out is refused, exactly as the demo copy has always done
+    # (see tools/VERIFIER-CONTRACT.md). Any other Pack keeps them optional, as
+    # it always was: present, they must match; absent, nothing is checked.
+    mirrors_required = is_new_profile_receipt(primary) or any(r.get("decision_reason") == "payment_verified" for r in receipts)
     for field in ("budget", "policy", "authority"):
-        if field in pack or any(r.get("decision_reason") == "payment_verified" for r in receipts):
+        if field in pack or mirrors_required:
             key = f"pack_{field}_matches_primary_receipt"
             checks[key] = strict_json_equal(pack.get(field), primary.get(field))
             if not checks[key]:

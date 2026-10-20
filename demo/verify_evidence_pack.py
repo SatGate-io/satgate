@@ -1271,6 +1271,12 @@ def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requi
         if not checks[key]:
             add_reason(reasons, reason_codes, "pack_primary_mismatch", f"pack.{field} does not match primary embedded receipt.{field}")
 
+    # The authority, budget and policy mirrors are checked for every Pack,
+    # present or absent: a mirror left out of a Pack whose signed receipt has
+    # it is refused. For a new-profile receipt (allowed / policy_allowed with
+    # no balance, a window opener or closer, a gap record) this is the
+    # contract in tools/VERIFIER-CONTRACT.md, and tools/verify_evidence_pack.py
+    # applies the same rule to those profiles.
     for field in ["authority", "budget", "policy"]:
         key = f"pack_{field}_matches_primary_receipt"
         pack_value = pack.get(field)

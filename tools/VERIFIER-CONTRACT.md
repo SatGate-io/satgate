@@ -39,6 +39,21 @@ existing required `issued_at`/`evidence_url` mirror checks; tools does not newly
 require their presence. Mirror mismatches emit `pack_primary_mismatch` with the
 field name; budget-state mismatches emit `budget_state_mismatch`.
 
+### The Pack wrapper's mirrors for the new profiles
+
+A Pack whose primary receipt is one of the sign-every-action shapes (an
+`allowed` / `policy_allowed` receipt with the no-balance budget, a window opener
+or closer, or an Observe gap record) must repeat the receipt's `authority`,
+`budget` and `policy` in the Pack, each exactly equal (recursive, type-strict)
+to the signed receipt's. A Pack that leaves one out is refused with
+`pack_primary_mismatch` naming the field, by both copies. `tools` used to treat
+these three as optional when absent and `demo` as required; for these shapes
+only, `tools` now requires them, so the two copies agree on every Pack of a new
+shape (a signed Pack with each of the three removed, for each of the shapes, is a
+parity test, `tools/test_every_action_receipts.py`). The rule for any other Pack
+is unchanged: `tools` checks the three when they are present, `demo` always
+compares them. The legacy evaluated and paid profiles are not touched.
+
 The entire input, including unsigned extensions, must be RFC8785-serializable.
 Nonfinite numbers (including overflow from valid JSON `1e309`), unsafe integers,
 invalid Unicode, invalid shapes, and expected parser/canonicalization failures

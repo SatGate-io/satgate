@@ -357,6 +357,66 @@ class EveryActionReceipts(unittest.TestCase):
                 with self.subTest(case=label, surface=surface):
                     self.assertFalse(self.verify(surface, pack)["valid"])
 
+    # ---- the Pack wrapper's authority, budget and policy mirrors ----
+
+    def test_a_new_profile_pack_must_carry_every_mirror_in_both_copies(self):
+        # The contract (tools/VERIFIER-CONTRACT.md, "The Pack wrapper's
+        # mirrors"): a Pack of an allowed / policy_allowed no-balance receipt, a
+        # window opener or closer, or a gap record repeats the receipt's
+        # authority, budget and policy. Leaving one out is refused by both
+        # copies. Each case is signed and the signature is valid: it fails on
+        # the wrapper only. 4 shapes x 3 fields = 12 cases, and the same for the
+        # account-level window receipts of a revoked or expired key.
+        shapes = {"allowed": allowed_free, "opener": opener, "closer": closer, "gap": gap}
+        cases = 0
+        for shape, build in shapes.items():
+            whole = self.pack(build(self.f))
+            for surface in paid.VERIFIERS:
+                with self.subTest(shape=shape, case="whole", surface=surface):
+                    self.assertTrue(self.verify(surface, whole)["valid"], "the pack with every mirror must be valid")
+            for field in ("authority", "budget", "policy"):
+                pack = self.pack(build(self.f))
+                del pack[field]
+                cases += 1
+                for surface in paid.VERIFIERS:
+                    with self.subTest(shape=shape, removed=field, surface=surface):
+                        result = self.verify(surface, pack)
+                        self.assertTrue(result["checks"]["signature_valid"], "the case must fail on the wrapper, not the signature")
+                        self.assertFalse(result["valid"], result)
+                        self.assertIn("pack_primary_mismatch", result["reason_codes"])
+        self.assertEqual(cases, 12)
+        for reason in ("token_revoked", "capability_expired"):
+            for field in ("authority", "budget", "policy"):
+                pack = self.pack(account_level(self.f, reason))
+                del pack[field]
+                for surface in paid.VERIFIERS:
+                    with self.subTest(shape=reason, removed=field, surface=surface):
+                        self.assertFalse(self.verify(surface, pack)["valid"])
+
+    def test_a_mirror_that_differs_from_the_receipt_is_refused_in_both_copies(self):
+        for shape, build in {"allowed": allowed_free, "opener": opener, "closer": closer, "gap": gap}.items():
+            for field, value in (("authority", {"provenance_level": "no_verified_capability"}),
+                                 ("budget", {"spend_mode": "not_evaluated", "cost_credits": 1}),
+                                 ("policy", {"policy_id": "other", "policy_version": "v1"})):
+                pack = self.pack(build(self.f))
+                pack[field] = value
+                for surface in paid.VERIFIERS:
+                    with self.subTest(shape=shape, changed=field, surface=surface):
+                        self.assertFalse(self.verify(surface, pack)["valid"])
+
+    def test_legacy_packs_keep_their_mirror_rules(self):
+        # Not changed by the new-profile rule: a legacy Pack that leaves a
+        # mirror out is accepted by tools (the field is optional there) and
+        # refused by demo, exactly as on main. The new-profile rule does not
+        # reach them.
+        for decision, reason, _ in paid.LEGACY_PROFILES:
+            for field in ("authority", "budget", "policy"):
+                pack = self.f.pack(self.f.receipt(decision, reason))
+                del pack[field]
+                with self.subTest(profile=f"{decision}/{reason}", removed=field):
+                    self.assertTrue(self.verify("tools", pack)["valid"])
+                    self.assertFalse(self.verify("demo", pack)["valid"])
+
     def test_authority_of_a_new_profile_receipt_must_name_a_verified_key(self):
         # A call or refusal by a key that verified: verified_macaroon_caveats, the
         # capability hash bound, raw fields redacted. Missing authority, the
