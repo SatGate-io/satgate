@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -100,6 +101,30 @@ type Delegator struct {
 	// was before the caveat existed, so every gateway machine, old or new,
 	// accepts and stops it the same way. See EnableHelperRevocationID.
 	helperIDs bool
+
+	// recorder, signEveryAction and receiptFailureBlocks sign a delegation
+	// (see SetEvidenceRecorder and SetSignEveryAction). With the switch off
+	// the delegator never touches the recorder.
+	recorder             EvidenceRecorder
+	signEveryAction      bool
+	receiptFailureBlocks func(ctx context.Context, tenantID string) bool
+	reportMiss           func(ctx context.Context, parent *TokenInfo) bool
+	reversalFailed       func()
+	// ea is the switch's shared state (holds, pending store, readiness). The
+	// proxy sets it; a delegator used on its own gets a default one.
+	ea     *everyAction
+	eaOnce sync.Once
+}
+
+// state returns the switch's shared state.
+func (d *Delegator) state() *everyAction {
+	d.eaOnce.Do(func() {
+		if d.ea == nil {
+			d.ea = newEveryAction()
+			d.ea.setRecorder(d.recorder)
+		}
+	})
+	return d.ea
 }
 
 // EnableHelperRevocationID turns the hlp- token_id caveat for zero-credit
@@ -124,6 +149,56 @@ func NewDelegator(macaroonSvc *macaroon.Service, budget BudgetEnforcer) *Delegat
 		budget:      budget,
 		events:      &NoOpPublisher{},
 	}
+}
+
+// SetEvidenceRecorder gives the delegator the recorder that signs a
+// delegation when SetSignEveryAction is on. Proxy.SetEvidenceRecorder calls it.
+func (d *Delegator) SetEvidenceRecorder(rec EvidenceRecorder) { d.recorder = rec }
+
+// SetSignEveryAction turns on signing of every delegation, and of every
+// refusal of one the delegator decides. Off by default.
+func (d *Delegator) SetSignEveryAction(on bool) { d.signEveryAction = on }
+
+// errDelegationProofUnavailable is returned by Delegate when the receipt of a
+// delegation could not be made. Nothing was carved: the carve was given back
+// and no key leaves. HandleDelegate answers it as proof_unavailable.
+var errDelegationProofUnavailable = errors.New("evidence proof unavailable")
+
+type delegateRequestKey struct{}
+
+// delegationRequest is the JSON-RPC request a delegation answers, when the
+// caller kept it on the context (HandleDelegate does).
+func delegationRequest(ctx context.Context) *Request {
+	r, _ := ctx.Value(delegateRequestKey{}).(*Request)
+	return r
+}
+
+// blocksOnReceiptFailure reports whether a delegation whose receipt cannot be
+// made must stop. Observe does not (see Proxy.allowReceiptFailureBlocks);
+// every other mode does.
+func (d *Delegator) blocksOnReceiptFailure(ctx context.Context, tenantID string) bool {
+	if d.receiptFailureBlocks == nil {
+		return true
+	}
+	return d.receiptFailureBlocks(ctx, tenantID)
+}
+
+// signDelegation records the allowed receipt of a delegation. Like every
+// allow receipt it says policy_allowed with no balance claim: it names the
+// call and the key, not the amount carved.
+func (d *Delegator) signDelegation(ctx context.Context, parent *TokenInfo, callID string) error {
+	if d.recorder == nil {
+		return errors.New("sign every action is on but no evidence recorder is installed")
+	}
+	_, err := recordIdentifiedDecision(ctx, d.state(), d.recorder, delegationRequest(ctx), parent, MethodSatGateDelegate, "", MCPDecision{
+		Decision:           "allowed",
+		DecisionReason:     "policy_allowed",
+		BudgetNotEvaluated: true,
+		// The carve's own identity when there is one; otherwise the receipt
+		// is given one by recordIdentifiedDecision.
+		RequestID: callID,
+	}, "")
+	return err
 }
 
 // SetEventPublisher sets the event publisher for delegation events.
@@ -304,6 +379,63 @@ const refundTimeout = 5 * time.Second
 // fail is creating the child's budget, and a failure there gives the carve back.
 // A token minted for a request that fails is never returned, logged or published.
 func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *DelegateParams) (*DelegateResult, error) {
+	// Sign every action: the switch is on but its setup has not succeeded.
+	// Nothing is minted or carved (see Proxy.setupBlocks).
+	if d.signEveryAction && d.ea != nil && !d.ea.ready.Load() {
+		log.Error().Msg("delegation refused: sign every action is on but its setup is not valid")
+		return nil, errDelegationProofUnavailable
+	}
+	// Sign every action: find a dead signer before a key is minted or a budget
+	// is carved.
+	if d.signEveryAction && d.recorder != nil {
+		if err := d.recorder.Preflight(ctx); err != nil {
+			log.Error().Err(err).Msg("delegation evidence preflight failed")
+			if d.blocksOnReceiptFailure(ctx, parent.TenantID) {
+				return nil, errDelegationProofUnavailable
+			}
+			// Observe: the delegation goes on; the miss is reported once, by
+			// the receipt step below if it fails too.
+		}
+	}
+	// Sign every action: in a blocking mode a carve is taken as a hold, not a
+	// debit, so that a delegation whose receipt cannot be made ends with the
+	// parent uncharged even if nothing later succeeds. A store with no hold is
+	// refused before the parent is charged. Room to keep the amount, should the
+	// commit fail after the receipt was signed, is set aside first.
+	var (
+		holder     BudgetHolder
+		settler    CarveSettler
+		holdExpiry time.Time
+		slot       *pendingSlot
+	)
+	if d.signEveryAction && params.Budget > 0 && d.blocksOnReceiptFailure(ctx, parent.TenantID) {
+		if holder = holdOf(d.budget); holder == nil {
+			log.Error().Str("parent", parent.TokenID).Msg("delegation refused before any carve: the budget store offers no hold")
+			return nil, errDelegationProofUnavailable
+		}
+		// The child's budget is created empty and funded only once the parent
+		// has been charged, so the store must be able to do that step (and
+		// repeat it) too. Without it no key could be held back.
+		if settler = settlerOf(d.budget); settler == nil {
+			log.Error().Str("parent", parent.TokenID).Msg("delegation refused before any carve: the budget store cannot fund a child once its parent is charged")
+			return nil, errDelegationProofUnavailable
+		}
+		if slot = d.state().pending.reserve(kindUncharged); slot == nil {
+			log.Error().Str("parent", parent.TokenID).Msg("delegation refused before any carve: the pending store is full")
+			return nil, errDelegationProofUnavailable
+		}
+		defer slot.release()
+	}
+	// undoCarve lets go of what the carve took when the delegation stops
+	// before its key is issued: the hold is released (and lapses by itself if
+	// the release fails), or, with no hold, the carve is refunded.
+	undoCarve := func(delegationID string) {
+		if holder != nil {
+			d.state().release(ctx, holder, parent.BudgetID, delegationID, params.Budget)
+			return
+		}
+		d.giveBack(ctx, parent, delegationID, params.Budget)
+	}
 	if params.Budget < 0 {
 		return nil, &clientError{msg: "budget must be non-negative"}
 	}
@@ -465,7 +597,28 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		nonce := make([]byte, 8)
 		_, _ = rand.Read(nonce)
 		delegationID = fmt.Sprintf("delegate-%s-%s-%d-%s", parent.BudgetID, params.Label, params.Budget, hex.EncodeToString(nonce))
-		res, spendErr := d.budget.Spend(ctx, parent.BudgetID, "_delegation", params.Budget, delegationID)
+		if d.signEveryAction {
+			// Sign every action: the carve's identity is one the server makes
+			// for this carve alone, from nothing the client sent (not the
+			// label, the amount or the JSON-RPC id). It names the hold, the
+			// settlement and the receipt's request_id (see newCallID).
+			id, err := newCallID(carveIDPrefix)
+			if err != nil {
+				log.Error().Err(err).Str("parent", parent.TokenID).Msg("delegation refused before any carve: no identity could be made for it")
+				return nil, errDelegationProofUnavailable
+			}
+			delegationID = id
+		}
+		var (
+			res      *BudgetResult
+			spendErr error
+		)
+		if holder != nil {
+			holdExpiry = time.Now().Add(d.state().cfg().HoldTTL)
+			res, spendErr = holder.Hold(ctx, parent.BudgetID, "_delegation", params.Budget, delegationID, d.state().cfg().HoldTTL)
+		} else {
+			res, spendErr = d.budget.Spend(ctx, parent.BudgetID, "_delegation", params.Budget, delegationID)
+		}
 		if err := d.carveOutcome(parent, res, spendErr); err != nil {
 			// Nothing was carved (see carveOutcome), so nothing is given back.
 			return nil, err
@@ -476,9 +629,19 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 	// Initialize child budget (skip for observe-only 0-budget tokens)
 	if params.Budget > 0 && childBudgetID != "" {
 		// Pass delegation ID via context for atomic TransferBudget in enterprise
+		//
+		// Sign every action (a blocking mode): the child's budget is created
+		// at zero, so whatever happens next the child can spend nothing the
+		// parent was not charged for. The carve is added to it by SettleCarve
+		// once the commit has landed. Nothing is moved at creation, so the
+		// delegation id is not passed.
 		initCtx := context.WithValue(ctx, CtxDelegationID, delegationID)
-		if err := d.budget.Initialize(initCtx, childBudgetID, params.Budget); err != nil {
-			d.giveBack(ctx, parent, delegationID, params.Budget)
+		initCredits := params.Budget
+		if holder != nil {
+			initCtx, initCredits = ctx, 0
+		}
+		if err := d.budget.Initialize(initCtx, childBudgetID, initCredits); err != nil {
+			undoCarve(delegationID)
 			if errors.Is(err, ErrInsufficientBudget) {
 				// The budget said no when the money was to move: a real refusal.
 				// The client gets the fixed sentence, never the error's text.
@@ -563,8 +726,57 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			cancel()
 			if perr != nil {
 				log.Error().Msg("delegation refused: the helper could not be recorded where a revoke finds it")
-				d.giveBack(ctx, parent, delegationID, params.Budget)
+				undoCarve(delegationID)
 				return nil, ErrChildTokenFailed
+			}
+		}
+	}
+	// Sign every action: the receipt of the delegation is made last, once
+	// nothing can refuse it any more and before the key leaves. Order: hold,
+	// sign, commit, then the key. If it cannot be made, the hold is released
+	// (or lapses by itself) and no key is returned. In Observe the call goes on
+	// unsigned and the miss is reported. If the commit fails after a signature
+	// the key is still issued, because the receipt already says it was allowed,
+	// but the child's budget holds nothing (it was created at zero) until the
+	// parent has been charged: the amount is kept, and the pending worker
+	// settles it (SettleCarve), charging the parent exactly once and only then
+	// funding the child. If the parent can no longer cover it, the child stays
+	// empty and the entry is closed, logged and counted.
+	if d.signEveryAction {
+		sctx := ctx
+		if holder != nil {
+			sctx = withHoldExpiry(ctx, holdExpiry)
+		}
+		if err := d.signDelegation(sctx, parent, delegationID); err != nil {
+			log.Error().Err(err).Str("parent", parent.TokenID).Msg("delegation receipt unavailable")
+			if d.blocksOnReceiptFailure(ctx, parent.TenantID) {
+				undoCarve(delegationID)
+				return nil, errDelegationProofUnavailable
+			}
+			log.Warn().Msg("observe mode: delegating with no receipt")
+			if d.reportMiss != nil && !d.reportMiss(ctx, parent) {
+				undoCarve(delegationID)
+				return nil, errDelegationProofUnavailable
+			}
+		} else if holder != nil {
+			// The receipt stands, so the key is issued either way. The child's
+			// budget is empty until the parent has been charged: the commit
+			// lands, then SettleCarve funds the child. If either step fails,
+			// the amount is kept and the retry worker runs SettleCarve until
+			// it lands (charging the parent if the hold has lapsed, once), or
+			// until the parent can no longer cover it (the child stays empty).
+			settle := func(sctx context.Context) error {
+				res, serr := settler.SettleCarve(sctx, parent.BudgetID, childBudgetID, delegationID, params.Budget)
+				return d.carveSettleOutcome(res, serr)
+			}
+			cerr := d.state().commit(ctx, holder, parent.BudgetID, delegationID)
+			if cerr != nil {
+				log.Error().Err(cerr).Str("parent", parent.TokenID).Msg("the carve's hold could not be committed after the delegation was signed; the key is issued and the child can spend nothing until the parent is charged")
+			} else if cerr = retryUndo(ctx, d.state().cfg().CommitTimeout, settle); cerr != nil {
+				log.Error().Err(cerr).Str("parent", parent.TokenID).Msg("the parent was charged but the child's budget could not be funded; the key is issued and the child can spend nothing until it is")
+			}
+			if cerr != nil {
+				d.state().keepUnchargedEntry(slot, parent.TokenID, parent.TenantID, parent.BudgetID, MethodSatGateDelegate, "", delegationID, params.Budget, childBudgetID, settle)
 			}
 		}
 	}
@@ -586,6 +798,27 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		ParentRemaining: parentRemaining,
 		BudgetID:        childBudgetID,
 	}, nil
+}
+
+// carveSettleOutcome reads the answer of SettleCarve. Only a non-nil result
+// with Allowed true and no error means the parent is charged and the child
+// funded. A refusal (an error matching ErrInsufficientBudget, or a result
+// that says no with a code in refusalCodes) matches ErrInsufficientBudget in
+// what it returns; everything else is a failure to try again.
+func (d *Delegator) carveSettleOutcome(res *BudgetResult, err error) error {
+	switch {
+	case err != nil && errors.Is(err, ErrInsufficientBudget):
+		return ErrInsufficientBudget
+	case err != nil:
+		return err
+	case res == nil:
+		return errors.New("the budget store gave no usable answer to the carve")
+	case !res.Allowed && refusalCodes[res.ErrorCode]:
+		return ErrInsufficientBudget
+	case !res.Allowed:
+		return errors.New("the budget store did not settle the carve")
+	}
+	return nil
 }
 
 // refuseMint turns a failure to mint or seal the child into the refusal the
@@ -669,11 +902,26 @@ func (d *Delegator) giveBack(ctx context.Context, parent *TokenInfo, requestID s
 	refunder, ok := d.budget.(BudgetRefunder)
 	if !ok {
 		log.Error().Str("budgetId", parent.BudgetID).Str("requestId", requestID).Int64("amount", amount).Msg("delegation give-back failed: the budget store cannot give back a carve")
+		if d.reversalFailed != nil {
+			d.reversalFailed()
+		}
 		return
 	}
-	rctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), refundTimeout)
-	defer cancel()
-	if err := refunder.Refund(rctx, parent.BudgetID, requestID, amount); err != nil {
+	// Refund is keyed by the request id and does nothing the second time, so
+	// with the switch on a failed give-back is tried again inside the bound.
+	undo := func(rctx context.Context) error { return refunder.Refund(rctx, parent.BudgetID, requestID, amount) }
+	var err error
+	if d.signEveryAction {
+		err = retryUndo(ctx, refundTimeout, undo)
+	} else {
+		rctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), refundTimeout)
+		defer cancel()
+		err = undo(rctx)
+	}
+	if err != nil {
+		if d.reversalFailed != nil {
+			d.reversalFailed()
+		}
 		log.Error().Err(err).Str("budgetId", parent.BudgetID).Str("requestId", requestID).Int64("amount", amount).Msg("delegation give-back failed")
 	}
 }
@@ -684,32 +932,22 @@ func (d *Delegator) HandleDelegate(ctx context.Context, req *Request, tokenInfo 
 		return NewErrorResponse(req.ID, CodeMethodNotFound, "delegation not available (requires auth.mode=header)"), nil
 	}
 
+	if d.signEveryAction && d.ea != nil && !d.ea.ready.Load() {
+		return proofUnavailableResponse(req.ID, MethodSatGateDelegate), nil
+	}
 	var params DelegateParams
 	if err := json.Unmarshal(req.Params, &params); err != nil {
-		return NewErrorResponse(req.ID, CodeInvalidParams, fmt.Sprintf("invalid delegate params: %v", err)), nil
+		unreadable := NewErrorResponse(req.ID, CodeInvalidParams, fmt.Sprintf("invalid delegate params: %v", err))
+		return d.signRefusal(ctx, req, tokenInfo, "INVALID_PARAMS", unreadable), nil
 	}
 
+	ctx = context.WithValue(ctx, delegateRequestKey{}, req)
 	result, err := d.Delegate(ctx, tokenInfo, &params)
 	if err != nil {
-		if refusal := delegationBudgetRefusal(err); refusal != nil {
-			// A policy refusal, not an empty budget. Nothing was reserved or
-			// changed. The log and the reply carry a hash and a word count of
-			// the scope, never the text the holder sent. The reply's text is the
-			// refusal's own fixed sentence.
-			log.Warn().
-				Str("tokenId", tokenInfo.TokenID).
-				Str("method", req.Method).
-				Str("scopeSha256", scopeSHA256(params.Scope)).
-				Int("scopeWords", scopeWordCount(params.Scope)).
-				Str("reason", refusal.Error()).
-				Msg("delegation refused")
-			return NewErrorResponseWithData(req.ID, CodePolicyDenied, refusal.Error(), map[string]interface{}{
-				"error": "delegation_failed",
-			}), nil
+		if errors.Is(err, errDelegationProofUnavailable) {
+			return proofUnavailableResponse(req.ID, MethodSatGateDelegate), nil
 		}
-		return NewErrorResponseWithData(req.ID, CodeBudgetExhausted, delegationClientMessage(err), map[string]interface{}{
-			"error": "delegation_failed",
-		}), nil
+		return d.signRefusal(ctx, req, tokenInfo, delegationDenialCode(err), d.refusalResponse(req, tokenInfo, &params, err)), nil
 	}
 
 	resultJSON, _ := json.Marshal(result)
@@ -718,6 +956,72 @@ func (d *Delegator) HandleDelegate(ctx context.Context, req *Request, tokenInfo 
 		ID:      req.ID,
 		Result:  resultJSON,
 	}, nil
+}
+
+// delegationDenialCode is the signed denial_code of a refused delegation, or
+// "" when the failure was not a decision: a problem on SatGate's side (the
+// child key could not be made, a store gave no usable answer) decides
+// nothing, so it has no receipt.
+func delegationDenialCode(err error) string {
+	var ce *clientError
+	switch {
+	case delegationBudgetRefusal(err) != nil:
+		return "DELEGATION_REFUSED"
+	case errors.As(err, &ce):
+		return "DELEGATION_REFUSED"
+	case errors.Is(err, ErrParentCannotDelegate):
+		return "DELEGATION_REFUSED"
+	}
+	return ""
+}
+
+// signRefusal signs the refusal of a verified key's delegation when the switch
+// is on and the refusal is a decision (code is not empty). On success it
+// returns resp with the receipt's handles added; if the receipt cannot be made
+// it returns proof_unavailable. With the switch off, or with no recorder, it
+// returns resp unchanged.
+func (d *Delegator) signRefusal(ctx context.Context, req *Request, tokenInfo *TokenInfo, code string, resp *Response) *Response {
+	if !d.signEveryAction || code == "" {
+		return resp
+	}
+	if d.recorder == nil {
+		log.Error().Str("code", code).Msg("delegation refusal receipt unavailable: no recorder is installed")
+		return proofUnavailableResponse(req.ID, MethodSatGateDelegate)
+	}
+	ev, err := recordIdentifiedDecision(ctx, d.state(), d.recorder, req, tokenInfo, MethodSatGateDelegate, "", MCPDecision{
+		Decision:           "denied",
+		DecisionReason:     "policy_denied",
+		BudgetNotEvaluated: true,
+		DenialCode:         code,
+	}, "")
+	if err != nil {
+		log.Error().Err(err).Str("code", code).Msg("delegation refusal receipt unavailable")
+		return proofUnavailableResponse(req.ID, MethodSatGateDelegate)
+	}
+	return withEvidenceData(resp, ev)
+}
+
+// refusalResponse is the answer to a delegation Delegate refused.
+func (d *Delegator) refusalResponse(req *Request, tokenInfo *TokenInfo, params *DelegateParams, err error) *Response {
+	if refusal := delegationBudgetRefusal(err); refusal != nil {
+		// A policy refusal, not an empty budget. Nothing was reserved or
+		// changed. The log and the reply carry a hash and a word count of
+		// the scope, never the text the holder sent. The reply's text is the
+		// refusal's own fixed sentence.
+		log.Warn().
+			Str("tokenId", tokenInfo.TokenID).
+			Str("method", req.Method).
+			Str("scopeSha256", scopeSHA256(params.Scope)).
+			Int("scopeWords", scopeWordCount(params.Scope)).
+			Str("reason", refusal.Error()).
+			Msg("delegation refused")
+		return NewErrorResponseWithData(req.ID, CodePolicyDenied, refusal.Error(), map[string]interface{}{
+			"error": "delegation_failed",
+		})
+	}
+	return NewErrorResponseWithData(req.ID, CodeBudgetExhausted, delegationClientMessage(err), map[string]interface{}{
+		"error": "delegation_failed",
+	})
 }
 
 // delegationClientMessage is the text the client sees for a failed delegation.

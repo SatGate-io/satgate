@@ -1,0 +1,938 @@
+E01 initialize (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"capabilities":{"tools":{"listChanged":true}},"protocolVersion":"2024-11-05","serverInfo":{"name":"every-action","version":"test"}}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E01 initialize (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"capabilities":{"tools":{"listChanged":true}},"protocolVersion":"2024-11-05","serverInfo":{"name":"every-action","version":"test"}}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E02 ping (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E02 ping (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E03 notifications/initialized (signer up)
+  responses:
+    <nil>
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E03 notifications/initialized (signer down)
+  responses:
+    <nil>
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E04 notifications/cancelled (signer up)
+  responses:
+    <nil>
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E04 notifications/cancelled (signer down)
+  responses:
+    <nil>
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E05 notifications/progress (signer up)
+  responses:
+    <nil>
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E05 notifications/progress (signer down)
+  responses:
+    <nil>
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E06 tools/list with a key (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"tools":[]}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E06 tools/list with a key (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"tools":[]}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E07 tools/list with no key (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"tools":[]}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E07 tools/list with no key (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"tools":[]}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E08 resources/read with no key (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream: no default upstream configured"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E08 resources/read with no key (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream: no default upstream configured"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E09 tools/call with no key (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"authentication required: no token provided"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E09 tools/call with no key (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"authentication required: no token provided"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E10 tools/call with a key that does not verify (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"authentication failed: invalid macaroon: failed to decode token: invalid JSON: invalid character '\\u009e' looking for beginning of value"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E10 tools/call with a key that does not verify (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"authentication failed: invalid macaroon: failed to decode token: invalid JSON: invalid character '\\u009e' looking for beginning of value"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E11 tools/call with an expired key, no tenant on the request (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"authentication failed: invalid macaroon: caveat check failed: token expired"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E11 tools/call with an expired key, no tenant on the request (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"authentication failed: invalid macaroon: caveat check failed: token expired"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E12 tools/call whose price could not be read (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Tool price temporarily unavailable; the call was not sent and nothing was charged. Retry.","data":{"error":"tool_price_unavailable","retryable":true,"tool":"paid_read"}}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E12 tools/call whose price could not be read (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Tool price temporarily unavailable; the call was not sent and nothing was charged. Retry.","data":{"error":"tool_price_unavailable","retryable":true,"tool":"paid_read"}}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E13 tools/call on a key with a limit and no gate installed (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"A limit on this token could not be checked, so the call was not sent","data":{"error":"tool_controls_unavailable","tool":"place_crypto_order"}}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E13 tools/call on a key with a limit and no gate installed (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"A limit on this token could not be checked, so the call was not sent","data":{"error":"tool_controls_unavailable","tool":"place_crypto_order"}}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E14 tools/call when the budget store does not answer (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Budget service unavailable","data":{"error":"budget_backend_error","failMode":"closed","tool":"paid_read"}}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+E14 tools/call when the budget store does not answer (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Evidence proof unavailable","data":{"error":"proof_unavailable","tool":"paid_read"}}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T01 allowed, priced, Control (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"_meta":{"satgate_evidence":{"evidence_pack_id":"ep_1","evidence_url":"https://issuer.example/v1/evidence/evid_1","receipt_hash":"sha256:1","receipt_id":"rcpt_1"}},"content":[{"text":"ok","type":"text"}],"isError":false}}
+  signed: [allowed/budget_authorized]
+  asked: 1
+  preflights: 1
+  forwarded: 1
+  debit: 1
+  window_total: 0
+T01 allowed, priced, Control (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Evidence proof unavailable","data":{"error":"proof_unavailable","tool":"paid_read"}}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T02 allowed, free tool, Control (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}],"isError":false}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T02 allowed, free tool, Control (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}],"isError":false}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T03 allowed, priced, key with no budget caveat (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"_meta":{"satgate_evidence":{"evidence_pack_id":"ep_1","evidence_url":"https://issuer.example/v1/evidence/evid_1","receipt_hash":"sha256:1","receipt_id":"rcpt_1"}},"content":[{"text":"ok","type":"text"}],"isError":false}}
+  signed: [allowed/budget_authorized]
+  asked: 1
+  preflights: 1
+  forwarded: 1
+  debit: 1
+  window_total: 0
+T03 allowed, priced, key with no budget caveat (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Evidence proof unavailable","data":{"error":"proof_unavailable","tool":"paid_read"}}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T04 allowed, priced, Observe, inside the budget (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"_meta":{"satgate_evidence":{"evidence_pack_id":"ep_1","evidence_url":"https://issuer.example/v1/evidence/evid_1","receipt_hash":"sha256:1","receipt_id":"rcpt_1"}},"content":[{"text":"ok","type":"text"}],"isError":false}}
+  signed: [allowed/budget_authorized]
+  asked: 1
+  preflights: 0
+  forwarded: 1
+  debit: 1
+  window_total: 0
+T04 allowed, priced, Observe, inside the budget (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}],"isError":false}}
+  signed: []
+  asked: 1
+  preflights: 0
+  forwarded: 1
+  debit: 1
+  window_total: 0
+T05 allowed over budget, Observe (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}],"isError":false}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T05 allowed over budget, Observe (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}],"isError":false}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T06 refused: over budget, Control (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32000,"message":"Budget exhausted","data":{"budget_id":"budget-ea","cost_credits":60,"error":"budget_exhausted","evidence_pack_id":"ep_1","evidence_url":"https://issuer.example/v1/evidence/evid_1","receipt_hash":"sha256:1","receipt_id":"rcpt_1","remaining_credits":50,"token_id":"<id>","tool":"big_order"}}}
+  signed: [denied/budget_exhausted]
+  asked: 1
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T06 refused: over budget, Control (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Evidence proof unavailable","data":{"error":"proof_unavailable","tool":"big_order"}}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T07 refused: tool not in the key's scope (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"tool \"paid_read\" not in scope \"free_read\"","data":{"evidence_pack_id":"ep_1","evidence_url":"https://issuer.example/v1/evidence/evid_1","receipt_hash":"sha256:1","receipt_id":"rcpt_1"}}}
+  signed: [denied/policy_denied]
+  asked: 1
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T07 refused: tool not in the key's scope (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Evidence proof unavailable","data":{"error":"proof_unavailable","tool":"paid_read"}}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T08 refused: argument rule (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"tool \"place_equity_order\" argument \"dollar_amount\": arguments are outside what this token allows: dollar_amount must be at most 500","data":{"allowed":"dollar_amount must be at most 500","error":"TOOL_ARGUMENT_DENIED","evidence_pack_id":"ep_1","evidence_url":"https://issuer.example/v1/evidence/evid_1","field":"dollar_amount","receipt_hash":"sha256:1","receipt_id":"rcpt_1","tool":"place_equity_order"}}}
+  signed: [denied/policy_denied/TOOL_ARGUMENT_DENIED]
+  asked: 1
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T08 refused: argument rule (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Evidence proof unavailable","data":{"error":"proof_unavailable","tool":"place_equity_order"}}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T14 refused: call that cannot be read (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32602,"message":"invalid tool call params"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T14 refused: call that cannot be read (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32602,"message":"invalid tool call params"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T15 refused: tool name with the reserved prefix (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"tool name uses a reserved prefix and is not available"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T15 refused: tool name with the reserved prefix (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"tool name uses a reserved prefix and is not available"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T16 allowed, priced, service unreachable (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream error: connection reset"}}
+  signed: [allowed/budget_authorized]
+  asked: 1
+  preflights: 1
+  forwarded: 1
+  debit: 1
+  window_total: 0
+T16 allowed, priced, service unreachable (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Evidence proof unavailable","data":{"error":"proof_unavailable","tool":"paid_read"}}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T17 allowed, free, service unreachable (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream error: connection reset"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T17 allowed, free, service unreachable (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream error: connection reset"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T18 allowed, free, service answers unknown tool (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32601,"message":"upstream said no"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T18 allowed, free, service answers unknown tool (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32601,"message":"upstream said no"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T19 allowed, free, service answers isError (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"rejected"}],"isError":true}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T19 allowed, free, service answers isError (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"rejected"}],"isError":true}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T20 refused: spending limit (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"place_crypto_order: this token's limit is $200 a day on dollar_amount; this order would go over it","data":{"error":"TOOL_SPEND_LIMIT_DENIED","evidence_pack_id":"ep_1","evidence_url":"https://issuer.example/v1/evidence/evid_1","field":"dollar_amount","limit":"200","receipt_hash":"sha256:1","receipt_id":"rcpt_1","tool":"place_crypto_order","window":"day"}}}
+  signed: [denied/policy_denied/TOOL_SPEND_LIMIT_DENIED]
+  asked: 1
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T20 refused: spending limit (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Evidence proof unavailable","data":{"error":"proof_unavailable","tool":"place_crypto_order"}}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T21 allowed inside a spending limit, priced (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"_meta":{"satgate_evidence":{"evidence_pack_id":"ep_1","evidence_url":"https://issuer.example/v1/evidence/evid_1","receipt_hash":"sha256:1","receipt_id":"rcpt_1"}},"content":[{"text":"ok","type":"text"}],"isError":false}}
+  signed: [allowed/budget_authorized]
+  asked: 1
+  preflights: 1
+  forwarded: 1
+  debit: 1
+  window_total: 10000000000
+T21 allowed inside a spending limit, priced (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Evidence proof unavailable","data":{"error":"proof_unavailable","tool":"place_crypto_order"}}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T22 order held for the owner's approval (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"place_crypto_order: calls with dollar_amount above $50 need the owner's approval; the call is waiting for the owner","data":{"above":"50","approval_id":"<id>","error":"APPROVAL_REQUIRED","evidence_pack_id":"ep_1","evidence_url":"https://issuer.example/v1/evidence/evid_1","expires_at":"<time>","field":"dollar_amount","receipt_hash":"sha256:1","receipt_id":"rcpt_1","retry":"send the same call again after the owner approves","tool":"place_crypto_order"}}}
+  signed: [denied/policy_denied/APPROVAL_REQUIRED]
+  asked: 1
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T22 order held for the owner's approval (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Evidence proof unavailable","data":{"error":"proof_unavailable","tool":"place_crypto_order"}}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T23 order below the approval threshold (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"_meta":{"satgate_evidence":{"evidence_pack_id":"ep_1","evidence_url":"https://issuer.example/v1/evidence/evid_1","receipt_hash":"sha256:1","receipt_id":"rcpt_1"}},"content":[{"text":"ok","type":"text"}],"isError":false}}
+  signed: [allowed/budget_authorized]
+  asked: 1
+  preflights: 1
+  forwarded: 1
+  debit: 1
+  window_total: 0
+T23 order below the approval threshold (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Evidence proof unavailable","data":{"error":"proof_unavailable","tool":"place_crypto_order"}}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T24 held order, owner approves, agent sends it again (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"place_crypto_order: calls with dollar_amount above $50 need the owner's approval; the call is waiting for the owner","data":{"above":"50","approval_id":"<id>","error":"APPROVAL_REQUIRED","evidence_pack_id":"ep_1","evidence_url":"https://issuer.example/v1/evidence/evid_1","expires_at":"<time>","field":"dollar_amount","receipt_hash":"sha256:1","receipt_id":"rcpt_1","retry":"send the same call again after the owner approves","tool":"place_crypto_order"}}}
+    {"jsonrpc":"2.0","id":2,"result":{"_meta":{"satgate_evidence":{"evidence_pack_id":"ep_2","evidence_url":"https://issuer.example/v1/evidence/evid_2","receipt_hash":"sha256:2","receipt_id":"rcpt_2"}},"content":[{"text":"ok","type":"text"}],"isError":false}}
+  signed: [allowed/budget_authorized denied/policy_denied/APPROVAL_REQUIRED]
+  asked: 2
+  preflights: 2
+  forwarded: 1
+  debit: 1
+  window_total: 0
+T24 held order, owner approves, agent sends it again (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Evidence proof unavailable","data":{"error":"proof_unavailable","tool":"place_crypto_order"}}}
+    {"jsonrpc":"2.0","id":2,"error":{"code":-32603,"message":"Evidence proof unavailable","data":{"error":"proof_unavailable","tool":"place_crypto_order"}}}
+  signed: []
+  asked: 0
+  preflights: 2
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T25 allowed, Control, budget store down and its fail mode is open (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}],"isError":false}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T25 allowed, Control, budget store down and its fail mode is open (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Evidence proof unavailable","data":{"error":"proof_unavailable","tool":"paid_read"}}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T26 allowed, Observe, price could not be read (default price) (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"_meta":{"satgate_evidence":{"evidence_pack_id":"ep_1","evidence_url":"https://issuer.example/v1/evidence/evid_1","receipt_hash":"sha256:1","receipt_id":"rcpt_1"}},"content":[{"text":"ok","type":"text"}],"isError":false}}
+  signed: [allowed/budget_authorized]
+  asked: 1
+  preflights: 0
+  forwarded: 1
+  debit: 1
+  window_total: 0
+T26 allowed, Observe, price could not be read (default price) (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}],"isError":false}}
+  signed: []
+  asked: 1
+  preflights: 0
+  forwarded: 1
+  debit: 1
+  window_total: 0
+T27 allowed, Observe, budget store down (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}],"isError":false}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T27 allowed, Observe, budget store down (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}],"isError":false}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T28 refused: renamed tool on a key with money rules (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"This tool isn't covered by your spending limits. Ask the owner to add it.","data":{"error":"TOOL_NOT_COVERED_BY_LIMITS","evidence_pack_id":"ep_1","evidence_url":"https://issuer.example/v1/evidence/evid_1","receipt_hash":"sha256:1","receipt_id":"rcpt_1","tool":"paid_read"}}}
+  signed: [denied/policy_denied/TOOL_NOT_COVERED_BY_LIMITS]
+  asked: 1
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T28 refused: renamed tool on a key with money rules (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Evidence proof unavailable","data":{"error":"proof_unavailable","tool":"paid_read"}}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T29 allowed, charge mode (nothing debited here) (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}],"isError":false}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T29 allowed, charge mode (nothing debited here) (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}],"isError":false}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+M08 resources/list, key valid, no default service (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream: no default upstream configured"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M08 resources/list, key valid, no default service (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream: no default upstream configured"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M09 resources/read, key valid, no default service (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream: no default upstream configured"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M09 resources/read, key valid, no default service (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream: no default upstream configured"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M10 prompts/list, key valid, no default service (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream: no default upstream configured"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M10 prompts/list, key valid, no default service (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream: no default upstream configured"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M11 prompts/get, key valid, no default service (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream: no default upstream configured"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M11 prompts/get, key valid, no default service (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream: no default upstream configured"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M13 unknown method, key valid, no default service (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream: no default upstream configured"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M13 unknown method, key valid, no default service (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream: no default upstream configured"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M13b unknown method, key valid, default service connected (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"resources":[]}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+M13b unknown method, key valid, default service connected (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"resources":[]}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+M14 satgate/budget (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"budgetId":"budget-ea","remaining":50,"tokenId":"<id>"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M14 satgate/budget (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"budgetId":"budget-ea","remaining":50,"tokenId":"<id>"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M15 budget/check (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"unreachable"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M15 budget/check (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"unreachable"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M16 satgate/delegate, carved (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"token":"<token>","tokenId":"<id>","budget":5,"parentRemaining":45,"budgetId":"<id>"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 5
+  window_total: 0
+M16 satgate/delegate, carved (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"token":"<token>","tokenId":"<id>","budget":5,"parentRemaining":45,"budgetId":"<id>"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 5
+  window_total: 0
+M16b satgate/delegate, refused: parent cannot afford it (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32000,"message":"insufficient parent budget","data":{"error":"delegation_failed"}}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M16b satgate/delegate, refused: parent cannot afford it (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32000,"message":"insufficient parent budget","data":{"error":"delegation_failed"}}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M16c satgate/delegate, refused: params cannot be read (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32602,"message":"invalid delegate params: json: cannot unmarshal string into Go struct field DelegateParams.budget of type int64"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M16c satgate/delegate, refused: params cannot be read (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32602,"message":"invalid delegate params: json: cannot unmarshal string into Go struct field DelegateParams.budget of type int64"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M17 any authenticated method with a revoked key (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"token revoked"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M17 any authenticated method with a revoked key (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"token revoked"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M18 any authenticated method when the limiter says no (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32004,"message":"rate limit exceeded","data":{"error":"rate_limited","retry_after_seconds":3}}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M18 any authenticated method when the limiter says no (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32004,"message":"rate limit exceeded","data":{"error":"rate_limited","retry_after_seconds":3}}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M19 expired key, signature verifies, tenant on the request (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"authentication failed: invalid macaroon: caveat check failed: token expired"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0
+M19 expired key, signature verifies, tenant on the request (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"authentication failed: invalid macaroon: caveat check failed: token expired"}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 0
+  debit: 0
+  window_total: 0

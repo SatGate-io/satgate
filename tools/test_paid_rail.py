@@ -264,8 +264,12 @@ class PaidRailTests(unittest.TestCase):
                 self.assertTrue(result['checks']['signature_valid'], result)
                 self.assertFalse(result['valid'], result)
                 self.assertIn('invalid_not_evaluated_provenance', result['reason_codes'])
-        # The new budget shape is legal only for a verified policy denial.
-        for decision, reason in (('denied', 'budget_exhausted'), ('allowed', 'policy_allowed')):
+        # The new budget shape is legal for a verified policy denial, and for
+        # the two allowed pairs that read no balance: policy_allowed and the
+        # Observe gap receipt (tools/test_every_action_receipts.py). It stays
+        # illegal on every other pair.
+        for decision, reason in (('denied', 'budget_exhausted'), ('allowed', 'budget_authorized'),
+                                 ('allowed', 'observe_projected')):
             with self.subTest(case=reason, surface='demo'):
                 r = verified_not_evaluated(self.f, decision=decision, decision_reason=reason)
                 result = self.verify('demo', verified_not_evaluated_pack(self.f, r))

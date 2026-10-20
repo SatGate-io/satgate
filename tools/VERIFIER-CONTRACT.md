@@ -36,8 +36,34 @@ claims. When present they must have an exactly matching signed counterpart.
 The same binding applies to optional `issued_at`, `evidence_url`, `timestamp`,
 `policy_version`, `jwks_url`, `schema_url`, and `verify_url`. Demo retains its
 existing required `issued_at`/`evidence_url` mirror checks; tools does not newly
-require their presence. Mirror mismatches emit `pack_primary_mismatch` with the
+require their presence, except for the Observe gap profile (below). Mirror mismatches emit `pack_primary_mismatch` with the
 field name; budget-state mismatches emit `budget_state_mismatch`.
+
+### The Pack wrapper's mirrors for the new profiles
+
+A Pack whose primary receipt is one of the sign-every-action shapes (an
+`allowed` / `policy_allowed` receipt with the no-balance budget, a window opener
+or closer, or an Observe gap record) must repeat the receipt's `authority`,
+`budget` and `policy` in the Pack, each exactly equal (recursive, type-strict)
+to the signed receipt's. A Pack that leaves one out is refused with
+`pack_primary_mismatch` naming the field, by both copies. `tools` used to treat
+these three as optional when absent and `demo` as required; for these shapes
+only, `tools` now requires them, so the two copies agree on every Pack of a new
+shape (a signed Pack with each of the three removed, for each of the shapes, is a
+parity test, `tools/test_every_action_receipts.py`). The rule for any other Pack
+is unchanged: `tools` checks the three when they are present, `demo` always
+compares them. The legacy evaluated and paid profiles are not touched.
+
+An Observe gap record has two more mirrors that must be present. A Pack whose
+primary receipt is `allowed` / `observe_unrecorded` (or carries any of the
+`unrecorded_*` fields) must repeat the receipt's `issued_at` and `evidence_url`
+in the Pack, each exactly equal (type-strict) to the signed receipt's. A gap Pack
+that leaves either out is refused with `pack_primary_mismatch` naming the
+field, by both copies, as `main` refuses it in both. `demo` has always required
+these two for every Pack; `tools` now requires them for the gap profile only.
+For the other new profiles (`allowed` / `policy_allowed`, window openers and
+closers) and for every legacy Pack, `tools` keeps `issued_at` and
+`evidence_url` optional (checked when present), exactly as `main` has it.
 
 The entire input, including unsigned extensions, must be RFC8785-serializable.
 Nonfinite numbers (including overflow from valid JSON `1e309`), unsafe integers,
@@ -95,6 +121,7 @@ pack, and exit 2 is input that could not be loaded.
 | --- | --- | --- |
 | allowed / budget_authorized | accept | accept |
 | allowed / policy_allowed | accept | accept |
+| allowed / observe_unrecorded | accept with its window and count | accept with its window and count |
 | allowed / sandbox_no_spend | accept | accept |
 | allowed / observe_projected | accept | accept |
 | denied / budget_exhausted | accept | accept |
@@ -124,6 +151,44 @@ paired-profile matrix (for example, the historical tools acceptance and demo
 rejection of paid / budget_authorized are covered). Unknown enums and unsigned
 tampering remain rejected. These differences are legacy behavior, not a claim
 that the two surfaces are fully equivalent outside paid rail.
+
+## Receipts when sign-every-action is on
+
+A gateway with the sign-every-action switch on signs a receipt for each call a verified key makes. Three receipt shapes carry it. Both public copies (`tools/` and `demo/`) hold them to the same cases (`tools/test_every_action_receipts.py`); the copies are patched separately, not copied over each other. A check runs only for a receipt that has the shape, so every older receipt is read as it was, and unknown reasons and unknown pairs still fail.
+
+**Allowed, no balance claim.** `allowed` / `policy_allowed` with `budget.spend_mode` `not_evaluated` (a free tool, a key with no budget). Budget is exactly `{"spend_mode": "not_evaluated", "cost_credits": 0}`. No limit, remaining, attempted, used, spent, projected, spend or payment key at any depth outside `budget`, and none on the Pack wrapper (the wrapper's `budget_state` must be the exact budget). The same rule, with the same key list, applies to the other two new shapes below. It covers keys inside `metadata`, `policy`, `authority` and any extension, matched by exact name or by marker whatever the case or punctuation (`payment_hash`, `Payment-Hash`, `rail`, `amount_sats`, `remaining_credits`, `balance`, `spend_mode`, `cost_credits`). Both copies read provenance the same way: the authority names a verified key (`verified_macaroon_caveats`, capability hash bound to the receipt's, raw token, budget and parent fields redacted), and a missing authority, the `no_verified_capability` form or an unredacted field fails. An `allowed` / `policy_allowed` receipt with an evaluated budget is unchanged. This replaces the earlier rule that the not-evaluated budget was legal only on `denied` / `policy_denied`. The old evaluated and paid profiles are not judged by any of this.
+
+**Refusal windows.** A receipt with any `rate_limit_*` field is a window receipt and must be a denial (`denied` with `policy_denied`, `token_revoked` or `capability_expired`) with a non-empty `denial_code`, `rate_limit_phase` `opened` or `closed`, `rate_limit_window_start` a UTC minute written `YYYY-MM-DDTHH:MM:00Z`, `rate_limit_window_seconds` the integer `60`, no `unrecorded_*` field and no balance claim. A window receipt for a `token_revoked` or `capability_expired` refusal names no capability (authority exactly `{"provenance_level": "no_verified_capability"}`, no `capability_hash`); one for `policy_denied` names the verified key, as above. An opener has no `rate_limit_refused_calls` and is issued at or after its window start. A closer has `rate_limit_refused_calls` as a JSON integer of at least 1 (boolean, string, float, zero and negative are rejected) and is issued at or after the end of its window.
+
+**Observe gap.** `allowed` / `observe_unrecorded`: the signed count of Observe calls that went through in one UTC minute with no receipt. `unrecorded_window_start` (UTC minute), `unrecorded_window_seconds` (the integer `60`), `unrecorded_calls` (integer, at least 1), no `rate_limit_*` field, no balance claim, verified-key authority, and issued at or after the end of its window. Without a window or a count it is refused. Demo also refuses the reason on any budget but `not_evaluated`.
+
+## Receipt record
+
+`tools/verify_receipt_record.py` checks a downloaded record: NDJSON, one `satgate.evidence_pack.v1` pack per line in `issued_at` order, then one last line, the manifest.
+
+**The rule: exactly one receipt per record line.** A pack in a record holds one receipt (`receipts` has length 1), and the manifest's hashes cover that receipt. The verifier refuses a line with none, two or more, whether a receipt was added, dropped, duplicated or moved inside a pack. The alternative, hashing and counting every embedded receipt, was not chosen: one receipt per line is what the gateway writes, it keeps `count` equal to the number of receipts, and a pack's signature does not commit to its `receipts` array. Tests: `tools/test_receipt_record.py`.
+
+The manifest (`schema_version` `satgate.receipt_record_manifest.v1`) is signed like a receipt: JCS (RFC 8785) canonical bytes of the manifest without `manifest_hash` and `signature`, SHA-256 into `manifest_hash` (`sha256:` plus base64url), Ed25519 into `signature` (`ed25519:` plus base64url), with the key `issuer_kid` names in the issuer's JWKS. Without `--require-trusted-issuer` the embedded key in `metadata.public_key_ed25519_b64` is used and the output says the issuer was not anchored. Fields:
+
+| field | meaning |
+| --- | --- |
+| `issuer`, `issuer_kid` | who signed; `issuer` must equal each receipt's issuer and `issuer_kid` each receipt's `issuer_kid` (the same signing key) |
+| `key_hash` | the one agent key the record is about; every receipt's authority carries it (`token_id_hash`, `budget_id_hash` or `capability_hash`) |
+| `from`, `to`, `generated_at` | the range (`from` inclusive, `to` exclusive) and when the record was made |
+| `record_starts_at` | optional; when sign-every-action was switched on, so calls before it are known not to be covered |
+| `count` | the number of packs |
+| `first_receipt_hash`, `last_receipt_hash` | the first and last pack's `receipt_hash`; absent or null for an empty record, and nothing else is accepted there (not `false`, not an empty string) |
+| `receipt_hashes_sha256` | `sha256:` plus base64url of SHA-256 over every `receipt_hash`, in order, each followed by a newline |
+| `counts_by_decision_reason` | receipts per `decision_reason`; every value is a whole number (a JSON `true` or `false` is refused, as are floats) |
+| `windows` | one entry per refusal window: `route_or_tool`, `window_start`, `denial_code`, `opened_receipt_hash`, `closed_receipt_hash` (null if not closed), `refused_calls` (null if not closed) |
+
+Problems (exit 1): a pack that does not verify, a pack that does not hold exactly one receipt, a missing or misplaced manifest, a bad manifest hash or signature, a count that differs, receipt hashes that do not match (a receipt dropped, added, changed or moved), a receipt outside the range, out of order, from another issuer or signed under another `issuer_kid` than the manifest's, a receipt id, pack id or receipt hash twice, a receipt that does not belong to `key_hash`, a window with two openers or two closers, a closer with no opener, **a window whose closer is overdue**, windows the manifest does not list, counts by reason that differ or are not whole numbers, first or last hashes on an empty record.
+
+A window's closer is overdue when the window's end plus the 15 second grace the gateway waits is at or before the earlier of the range's end (`to`) and the time the record was made (`generated_at`), the window was opened inside the record, and no closer is in it: a complete record has it. That is a problem, not a warning. A window whose closer is not due yet at that point is reported as `pending` (warning `window_closer_pending`), and one whose window runs past the end of the range as `boundary` (warning `window_runs_past_range`): neither fails the record. The output lists every window with its state (`closed`, `pending`, `boundary` or `overdue`) under `window_states`. Warnings (exit 0): a pending or boundary window; a window that began before the record's range; a request id on more than one receipt (an agent can legitimately reuse a JSON-RPC id, so each is a separate decision); calls that went through in Observe with no receipt (counted from the gap receipts); a range that starts before `record_starts_at`.
+
+Exit codes: 0 the record checks out, 1 a problem, 2 the input could not be loaded, 3 the `cryptography` package is missing. The JSON output ends with a one-line `summary`, `N receipts, M refusals, K windows, P problems`, also printed on stderr.
+
+What it cannot prove. The manifest is made at download time from what SatGate holds. It shows that nothing was dropped from that list, not that no call ever failed to be stored; the gateway's own counters of calls seen against receipts made cover that.
 
 ## Provenance and verification
 
