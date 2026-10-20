@@ -59,6 +59,7 @@ SUPPORTED_CANONICALIZATION = "jcs-rfc8785"
 DECISION_REASON_PROFILES = {
     ("allowed", "budget_authorized"): "evaluated",
     ("allowed", "policy_allowed"): "evaluated",
+    ("allowed", "observe_unrecorded"): "evaluated",
     ("allowed", "sandbox_no_spend"): "sandbox_no_spend",
     ("allowed", "observe_projected"): "projected_only",
     ("allowed", "payment_verified"): "paid_rail",
@@ -80,7 +81,19 @@ ALLOWED_DECISION_REASONS = {reason for _, reason in DECISION_REASON_PROFILES}
 # Only these decision/reason pairs may use it, and only when the signed budget
 # says spend_mode not_evaluated. Every other policy_denied receipt keeps the
 # evaluated profile unchanged.
-VERIFIED_NOT_EVALUATED_PAIRS = {("denied", "policy_denied")}
+#
+# Two more pairs use it. allowed / policy_allowed is a call that was allowed
+# and read no balance (a free tool, a key with no budget): with spend_mode
+# not_evaluated it makes no balance claim, and with an evaluated budget it is
+# judged as it always was. allowed / observe_unrecorded is a gap receipt, the
+# signed count of Observe calls that went through with no receipt; it has no
+# balance to evaluate, so it is legal only with spend_mode not_evaluated.
+VERIFIED_NOT_EVALUATED_PAIRS = {
+    ("denied", "policy_denied"),
+    ("allowed", "policy_allowed"),
+    ("allowed", "observe_unrecorded"),
+}
+NOT_EVALUATED_ONLY_PAIRS = {("allowed", "observe_unrecorded")}
 VERIFIED_NOT_EVALUATED_BUDGET = {"spend_mode": "not_evaluated", "cost_credits": 0}
 VERIFIED_CAPABILITY_AUTHORITY_FIELDS = {
     "budget_id_hash", "budget_subject_hash", "capability_hash", "delegation_budget",
@@ -117,6 +130,8 @@ def decision_profile_for(receipt: Any) -> str | None:
     budget = receipt.get("budget")
     if (decision, reason) in VERIFIED_NOT_EVALUATED_PAIRS and isinstance(budget, dict) and budget.get("spend_mode") == "not_evaluated":
         return "verified_not_evaluated"
+    if (decision, reason) in NOT_EVALUATED_ONLY_PAIRS:
+        return None
     return profile
 DEFAULT_CLOCK_SKEW_SECONDS = 300
 SECRET_PATTERNS = [
@@ -593,6 +608,79 @@ def valid_x402_paid_rail(receipt):
     )
 
 
+
+# Window and gap receipts. A window receipt is the one that opens, or the one
+# that closes, a run of refused calls for one key and tool in one UTC minute
+# (rate_limit_phase "opened" or "closed"); a gap receipt is the signed count of
+# Observe calls that went through in one UTC minute with no receipt. Each check
+# runs only for a receipt that carries the shape, so older receipts are judged
+# as they were. Neither may make a balance claim.
+RATE_WINDOW_FIELDS = (
+    "rate_limit_phase", "rate_limit_window_start", "rate_limit_window_seconds",
+    "rate_limit_refused_calls",
+)
+UNRECORDED_FIELDS = ("unrecorded_calls", "unrecorded_window_start", "unrecorded_window_seconds")
+RATE_WINDOW_PAIRS = {
+    ("denied", "policy_denied"),
+    ("denied", "token_revoked"),
+    ("denied", "capability_expired"),
+}
+WINDOW_SECONDS = 60
+WINDOW_START_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:00Z")
+
+
+def parse_window_start(value: Any) -> datetime | None:
+    """A window starts on a UTC minute, written YYYY-MM-DDTHH:MM:00Z."""
+    if not isinstance(value, str) or WINDOW_START_RE.fullmatch(value) is None:
+        return None
+    return parse_rfc3339(value, [], [], "window_start")
+
+
+def makes_no_balance_claim(receipt: dict[str, Any]) -> bool:
+    return (
+        strict_json_equal(receipt.get("budget"), VERIFIED_NOT_EVALUATED_BUDGET)
+        and not any(field in receipt for field in VERIFIED_NOT_EVALUATED_FORBIDDEN_FIELDS)
+        and not contains_balance_claim({k: v for k, v in receipt.items() if k != "budget"})
+    )
+
+
+def valid_rate_limit_window(receipt: dict[str, Any], issued_at: datetime | None) -> bool:
+    phase = receipt.get("rate_limit_phase")
+    start = parse_window_start(receipt.get("rate_limit_window_start"))
+    seconds = receipt.get("rate_limit_window_seconds")
+    code = receipt.get("denial_code")
+    if not (
+        (receipt.get("decision"), receipt.get("decision_reason")) in RATE_WINDOW_PAIRS
+        and phase in ("opened", "closed")
+        and start is not None
+        and type(seconds) is int and seconds == WINDOW_SECONDS
+        and isinstance(code, str) and bool(code.strip())
+        and not any(field in receipt for field in UNRECORDED_FIELDS)
+        and makes_no_balance_claim(receipt)
+    ):
+        return False
+    if phase == "opened":
+        return "rate_limit_refused_calls" not in receipt and (issued_at is None or issued_at >= start)
+    count = receipt.get("rate_limit_refused_calls")
+    return type(count) is int and count >= 1 and (issued_at is None or issued_at >= start + timedelta(seconds=WINDOW_SECONDS))
+
+
+def valid_unrecorded_gap(receipt: dict[str, Any], issued_at: datetime | None) -> bool:
+    start = parse_window_start(receipt.get("unrecorded_window_start"))
+    seconds = receipt.get("unrecorded_window_seconds")
+    count = receipt.get("unrecorded_calls")
+    return bool(
+        receipt.get("decision") == "allowed"
+        and receipt.get("decision_reason") == "observe_unrecorded"
+        and start is not None
+        and type(seconds) is int and seconds == WINDOW_SECONDS
+        and type(count) is int and count >= 1
+        and not any(field in receipt for field in RATE_WINDOW_FIELDS)
+        and makes_no_balance_claim(receipt)
+        and (issued_at is None or issued_at >= start + timedelta(seconds=WINDOW_SECONDS))
+    )
+
+
 def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reason_codes: list[str], jwks: dict[str, Any] | None = None, require_trusted_issuer: bool = False, now_dt: datetime | None = None, allow_mock: bool = False) -> tuple[dict[str, bool], str, str, bool]:
     prefix = f"receipt_{index}"
     checks: dict[str, bool] = {}
@@ -643,7 +731,7 @@ def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reas
         metadata = metadata_value if isinstance(metadata_value, dict) else {}
         capability_hash = receipt.get("capability_hash")
         checks[f"{prefix}_verified_not_evaluated"] = (
-            decision == "denied"
+            (decision, decision_reason) in VERIFIED_NOT_EVALUATED_PAIRS
             and isinstance(authority_value, dict)
             and authority.get("provenance_level") == "verified_macaroon_caveats"
             and set(authority) <= VERIFIED_CAPABILITY_AUTHORITY_FIELDS
@@ -659,7 +747,7 @@ def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reas
             and not contains_any_key(policy_value, {"limit_credits", "remaining_after_credits", "remaining_before_credits", "remaining_budget_usd", "remaining_credits"})
         )
         if not checks[f"{prefix}_verified_not_evaluated"]:
-            fail("invalid_not_evaluated_provenance", f"receipts[{index}] verified policy denial without budget evaluation carries budget, spend, payment, or unredacted capability claims")
+            fail("invalid_not_evaluated_provenance", f"receipts[{index}] verified decision without budget evaluation carries budget, spend, payment, or unredacted capability claims")
 
     if decision_profile == "not_evaluated":
         authority_value = receipt.get("authority")
@@ -852,6 +940,15 @@ def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reas
         if now_dt > expires_at:
             checks[f"{prefix}_time_valid"] = False
             fail("receipt_expired", f"receipts[{index}].expires_at is in the past")
+
+    if any(field in receipt for field in RATE_WINDOW_FIELDS):
+        checks[f"{prefix}_rate_limit_window"] = valid_rate_limit_window(receipt, issued_at)
+        if not checks[f"{prefix}_rate_limit_window"]:
+            fail("invalid_window_receipt", f"receipts[{index}] is not a valid refusal-window receipt (phase, window, count, or a balance claim)")
+    if receipt.get("decision_reason") == "observe_unrecorded" or any(field in receipt for field in UNRECORDED_FIELDS):
+        checks[f"{prefix}_observe_unrecorded"] = valid_unrecorded_gap(receipt, issued_at)
+        if not checks[f"{prefix}_observe_unrecorded"]:
+            fail("invalid_unrecorded_receipt", f"receipts[{index}] is not a valid gap receipt (it needs its window and a count of at least 1, and makes no balance claim)")
 
     expected_hash = sha256_receipt_hash(receipt)
     checks[f"{prefix}_receipt_hash_match"] = receipt.get("receipt_hash") == expected_hash
