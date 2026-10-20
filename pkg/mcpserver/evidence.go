@@ -164,6 +164,11 @@ type MCPWindowedCall struct {
 	WindowSeconds int64
 	// RetryAfter is what the limiter suggested to the agent; zero otherwise.
 	RetryAfter time.Duration
+	// ReportID is set on a WindowKindUnrecorded call and is the same every time
+	// the proxy reports that one call: the proxy reports a miss again when the
+	// first report failed, so a recorder that can tell it has this id already
+	// must count the call once. Empty on a refused call.
+	ReportID string
 }
 
 // OpenerDecision returns the decision to sign as the window's opener: the
@@ -227,7 +232,11 @@ func UnrecordedDecision(call MCPWindowedCall, calls int64) MCPDecision {
 //     gets proof_unavailable instead of the ordinary refusal.
 //   - WindowKindUnrecorded: when SetSignEveryAction is on and an Observe call
 //     was passed on because its receipt could not be made. The call has gone
-//     on; the method must not fail it. It is called once for that call.
+//     on; the method must not fail it. The proxy calls it on a context of its
+//     own (not the request's, which may be cancelled) with a time limit. If it
+//     returns an error the proxy keeps the miss, by tenant, key, tool and UTC
+//     minute, and calls again, with the same ReportID, until it returns nil. A
+//     call that returns nil has counted the call once.
 //
 // The implementation owns the window. For a refusal it signs one opener
 // (OpenerDecision, through its own RecordMCPDecision) for the first refusal of
@@ -240,9 +249,11 @@ func UnrecordedDecision(call MCPWindowedCall, calls int64) MCPDecision {
 //
 // A recorder that does not implement this interface cannot be used with the
 // switch on: SetSignEveryAction returns ErrSignEveryActionNeedsWindowRecorder,
-// and until a capable recorder is installed every call that needs a window is
-// answered proof_unavailable. The proxy never signs one receipt per refused
-// call behind the wiring's back.
+// and until SetSignEveryAction(true) has succeeded with a capable recorder
+// every call of a key (free or priced, Control or Observe) is answered
+// proof_unavailable before anything is spent or sent. The proxy never signs one
+// receipt per refused call behind the wiring's back, and never lets an
+// Observe call through that it could not count.
 type WindowRecorder interface {
 	RecordWindowedCall(ctx context.Context, call MCPWindowedCall) (*MCPEvidence, error)
 }

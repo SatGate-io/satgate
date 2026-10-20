@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 )
 
 // BudgetResult contains the outcome of a budget check or spend operation.
@@ -69,6 +70,44 @@ type BudgetRefunder interface {
 	Refund(ctx context.Context, budgetID, requestID string, amount int64) error
 }
 
+// BudgetHolder is implemented by budget stores that can set an amount aside for
+// one request and keep it apart until the request is known to be one that may
+// go ahead. With "sign every action" on, a priced Control call and a delegation
+// carve are taken as a hold, never as a debit: the call is signed, and only
+// then is the hold committed. If the signature fails, the hold is released; if
+// even that fails, the hold lapses by itself after its time limit and the
+// balance comes back with no further call. That is what makes "not sent and
+// not charged" hold when no later step succeeds.
+//
+// Contract:
+//   - Hold takes amount from budgetID exactly as Spend does (the same result,
+//     the same refusal and the same error for an exhausted budget; a budget with
+//     no record is unlimited and holds nothing), but the amount is only set
+//     aside. Other requests see the balance without it.
+//   - The hold lapses on its own at ttl after it was taken: the store gives the
+//     amount back to the balance with no call from the proxy. A lapse needs no
+//     clock or process of the proxy's; a store that keeps holds in a database
+//     gives them an expiry the database enforces.
+//   - CommitHold turns the hold into a debit, the same debit Spend records (so
+//     Refund can give it back). It fails if the hold is not there any more
+//     (ErrHoldGone: it lapsed, or was released).
+//   - ReleaseHold gives the hold back now. Releasing a hold that is gone (a
+//     second release, a lapse, a commit) is not an error.
+//   - Holds are named by budgetID and requestID. If two holds of one budget
+//     carry the same requestID at once, each CommitHold or ReleaseHold ends the
+//     earliest of them.
+//   - Every call honours its context, and none depends on the request's: the
+//     proxy runs them on a context of its own with a bound.
+type BudgetHolder interface {
+	Hold(ctx context.Context, budgetID, toolName string, cost int64, requestID string, ttl time.Duration) (*BudgetResult, error)
+	CommitHold(ctx context.Context, budgetID, requestID string) error
+	ReleaseHold(ctx context.Context, budgetID, requestID string) error
+}
+
+// ErrHoldGone is what CommitHold returns when the hold it names is not there:
+// it lapsed, or it was released.
+var ErrHoldGone = errors.New("the budget hold is gone")
+
 // CostResolver determines the credit cost for a tool call.
 type CostResolver interface {
 	// Resolve returns the credit cost for the given tool name.
@@ -119,9 +158,27 @@ type InMemoryBudgetEnforcer struct {
 	// debits is what each admitted Spend took, by budget and request ID, until
 	// Refund gives it back. A spend that took nothing records nothing.
 	debits map[string]int64
+	// holds are the amounts set aside by Hold and not yet committed or
+	// released, by budget and request id, oldest first (see BudgetHolder).
+	holds map[string][]memHold
+	// nextLapse is the earliest expiry among holds; zero when there are none.
+	nextLapse time.Time
+	// now is the clock; nil means time.Now. Tests set it.
+	now func() time.Time
 }
 
-var _ BudgetRefunder = (*InMemoryBudgetEnforcer)(nil)
+type memHold struct {
+	budgetID  string
+	tool      string
+	amount    int64
+	remaining int64
+	expires   time.Time
+}
+
+var (
+	_ BudgetRefunder = (*InMemoryBudgetEnforcer)(nil)
+	_ BudgetHolder   = (*InMemoryBudgetEnforcer)(nil)
+)
 
 func debitKey(budgetID, requestID string) string {
 	return budgetID + "\x00" + requestID
@@ -158,6 +215,7 @@ func (e *InMemoryBudgetEnforcer) Initialize(_ context.Context, tokenID string, c
 func (e *InMemoryBudgetEnforcer) Check(_ context.Context, tokenID string, cost int64) (*BudgetResult, error) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
+	e.lapseLocked()
 
 	remaining, ok := e.budgets[tokenID]
 	if !ok {
@@ -185,6 +243,7 @@ func (e *InMemoryBudgetEnforcer) Check(_ context.Context, tokenID string, cost i
 func (e *InMemoryBudgetEnforcer) Spend(_ context.Context, tokenID string, toolName string, cost int64, requestID string) (*BudgetResult, error) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
+	e.lapseLocked()
 
 	remaining, ok := e.budgets[tokenID]
 	if !ok {
@@ -228,6 +287,7 @@ func (e *InMemoryBudgetEnforcer) Spend(_ context.Context, tokenID string, toolNa
 func (e *InMemoryBudgetEnforcer) Refund(_ context.Context, budgetID, requestID string, amount int64) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
+	e.lapseLocked()
 	if amount <= 0 {
 		return nil
 	}
@@ -244,6 +304,145 @@ func (e *InMemoryBudgetEnforcer) Refund(_ context.Context, budgetID, requestID s
 		recorded = amount
 	}
 	e.budgets[budgetID] += recorded
+	return nil
+}
+
+func (e *InMemoryBudgetEnforcer) clock() time.Time {
+	if e.now != nil {
+		return e.now()
+	}
+	return time.Now()
+}
+
+// lapseLocked gives back every hold whose time has run out. It is called by
+// every operation that reads or changes a balance, under the lock, so a lapsed
+// hold is never seen as spent. With no holds it does nothing.
+func (e *InMemoryBudgetEnforcer) lapseLocked() {
+	if len(e.holds) == 0 {
+		return
+	}
+	now := e.clock()
+	if now.Before(e.nextLapse) {
+		return
+	}
+	e.nextLapse = time.Time{}
+	for key, list := range e.holds {
+		kept := list[:0]
+		for _, h := range list {
+			if !now.Before(h.expires) {
+				if _, ok := e.budgets[h.budgetID]; ok {
+					e.budgets[h.budgetID] += h.amount
+				}
+				continue
+			}
+			if e.nextLapse.IsZero() || h.expires.Before(e.nextLapse) {
+				e.nextLapse = h.expires
+			}
+			kept = append(kept, h)
+		}
+		if len(kept) == 0 {
+			delete(e.holds, key)
+		} else {
+			e.holds[key] = kept
+		}
+	}
+}
+
+// Hold sets cost aside from budgetID for requestID (see BudgetHolder). The
+// answer is Spend's: the same result and the same refusal.
+func (e *InMemoryBudgetEnforcer) Hold(_ context.Context, budgetID string, toolName string, cost int64, requestID string, ttl time.Duration) (*BudgetResult, error) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.lapseLocked()
+
+	remaining, ok := e.budgets[budgetID]
+	if !ok {
+		// No budget = unlimited: nothing to set aside.
+		return &BudgetResult{Allowed: true, Remaining: -1, TokenID: budgetID, Cost: cost}, nil
+	}
+	if remaining < cost {
+		return &BudgetResult{
+			Allowed:   false,
+			Remaining: remaining,
+			TokenID:   budgetID,
+			Cost:      cost,
+			ErrorCode: "budget_exhausted",
+		}, &budgetRefusal{msg: fmt.Sprintf("budget exhausted: %d remaining, %d required", remaining, cost)}
+	}
+	if ttl <= 0 {
+		return nil, errors.New("a budget hold needs a time limit")
+	}
+	remaining -= cost
+	e.budgets[budgetID] = remaining
+	if cost > 0 {
+		if e.holds == nil {
+			e.holds = make(map[string][]memHold)
+		}
+		h := memHold{budgetID: budgetID, tool: toolName, amount: cost, remaining: remaining, expires: e.clock().Add(ttl)}
+		key := debitKey(budgetID, requestID)
+		e.holds[key] = append(e.holds[key], h)
+		if e.nextLapse.IsZero() || h.expires.Before(e.nextLapse) {
+			e.nextLapse = h.expires
+		}
+	}
+	return &BudgetResult{Allowed: true, Remaining: remaining, TokenID: budgetID, Cost: cost}, nil
+}
+
+// takeHoldLocked removes and returns the earliest open hold of a request.
+func (e *InMemoryBudgetEnforcer) takeHoldLocked(budgetID, requestID string) (memHold, bool) {
+	key := debitKey(budgetID, requestID)
+	list := e.holds[key]
+	if len(list) == 0 {
+		return memHold{}, false
+	}
+	h := list[0]
+	if len(list) == 1 {
+		delete(e.holds, key)
+	} else {
+		e.holds[key] = list[1:]
+	}
+	return h, true
+}
+
+// CommitHold turns the request's hold into the debit Spend would have taken.
+func (e *InMemoryBudgetEnforcer) CommitHold(_ context.Context, budgetID, requestID string) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.lapseLocked()
+	h, ok := e.takeHoldLocked(budgetID, requestID)
+	if !ok {
+		if _, exists := e.budgets[budgetID]; !exists {
+			return nil // an unlimited budget holds nothing and commits nothing
+		}
+		return ErrHoldGone
+	}
+	if e.debits == nil {
+		e.debits = make(map[string]int64)
+	}
+	e.debits[debitKey(budgetID, requestID)] += h.amount
+	e.spent = append(e.spent, SpendRecord{
+		TokenID:   budgetID,
+		ToolName:  h.tool,
+		Cost:      h.amount,
+		Remaining: h.remaining,
+		RequestID: requestID,
+	})
+	return nil
+}
+
+// ReleaseHold gives the request's hold back now. A hold that is gone is not an
+// error.
+func (e *InMemoryBudgetEnforcer) ReleaseHold(_ context.Context, budgetID, requestID string) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.lapseLocked()
+	h, ok := e.takeHoldLocked(budgetID, requestID)
+	if !ok {
+		return nil
+	}
+	if _, exists := e.budgets[budgetID]; exists {
+		e.budgets[budgetID] += h.amount
+	}
 	return nil
 }
 
@@ -270,6 +469,7 @@ func (e *InMemoryBudgetEnforcer) SpendWithTask(ctx context.Context, tokenID stri
 func (e *InMemoryBudgetEnforcer) Remaining(_ context.Context, tokenID string) (int64, error) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
+	e.lapseLocked()
 
 	remaining, ok := e.budgets[tokenID]
 	if !ok {

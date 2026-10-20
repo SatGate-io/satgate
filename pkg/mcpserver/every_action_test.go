@@ -95,13 +95,22 @@ func (w *eaWindowRecorder) Close(ctx context.Context, now time.Time) error {
 
 func init() {
 	eaSetSwitch = func(e *eaEnv, on bool) {
-		if on && e.window {
+		// The switch needs a recorder that keeps windows: with anything else
+		// the proxy is not ready and answers proof_unavailable to every call.
+		if on {
 			w := newEAWindowRecorder(e.base)
 			e.rec = w
 			e.proxy.SetEvidenceRecorder(w)
 		}
-		e.proxy.SetSignEveryAction(on)
+		if err := e.proxy.SetSignEveryAction(on); err != nil {
+			e.t.Fatalf("the switch could not be turned on: %v", err)
+		}
 	}
+}
+
+// failingBudget (the budget store that is down) fails Hold as it fails Spend.
+func (failingBudget) Hold(context.Context, string, string, int64, string, time.Duration) (*BudgetResult, error) {
+	return nil, errors.New("redis down")
 }
 
 func eaIsProofUnavailable(r *Response) bool {

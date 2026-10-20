@@ -10,6 +10,7 @@ import (
 	"math"
 	"os"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -83,10 +84,12 @@ type Proxy struct {
 	// before the switch existed.
 	signEveryAction bool
 
-	// uncountedMisses and reversalFailures are the two counters of the switch
-	// (UncountedObserveMisses, ReversalFailures).
-	uncountedMisses  atomic.Int64
+	// reversalFailures counts the give-backs of an Observe carve that failed
+	// (ReversalFailures). ea is the rest of the switch's state (holds, the
+	// pending store, readiness): see every_action_hold.go.
 	reversalFailures atomic.Int64
+	eaOnce           sync.Once
+	ea               *everyAction
 }
 
 // ResponseGuard wraps the handling of every request the proxy answers: the
@@ -285,6 +288,13 @@ func (p *Proxy) SetHelperRevocationID(on bool) {
 // SetEvidenceRecorder wires signed evidence recording for governed MCP decisions.
 func (p *Proxy) SetEvidenceRecorder(rec EvidenceRecorder) {
 	p.evidence = rec
+	p.every().setRecorder(rec)
+	if p.signEveryAction && p.SignEveryActionReady() != nil {
+		// A recorder that cannot keep windows replaced one that could: the
+		// setup is no longer valid, and calls stop until SetSignEveryAction
+		// succeeds again.
+		p.every().ready.Store(false)
+	}
 	p.wireDelegator()
 }
 
@@ -643,6 +653,11 @@ func (p *Proxy) priceUnknownRefuses(mode, budgetID string) bool {
 
 // handleToolsCall is the hot path — intercepts tool calls for budget enforcement.
 func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *TokenInfo) (resp *Response, err error) {
+	// Sign every action: not set up (see setupBlocks). dispatchAuthenticated
+	// stops it first; this keeps a caller that reaches here directly honest.
+	if p.setupBlocks() {
+		return proofUnavailableResponse(req.ID, refusalTool(req)), nil
+	}
 	// Parse tool call
 	tc, err := ParseToolCall(req.Params)
 	if err != nil {
@@ -818,14 +833,37 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				}), nil
 			}
 		}
-		// Sign every action: a debit that is taken before the receipt must be
-		// one the proxy can give back if the receipt fails. A store that
-		// offers no way back is refused before anything is debited.
-		if p.signEveryAction && isControl && !p.canReverseDebit() {
-			log.Error().Str("tool", receiptTool(tc.Name)).Str("budgetId", budgetID).Msg("sign every action: the budget store cannot give back a debit; refusing the call before any charge")
-			return proofUnavailableResponse(req.ID, tc.Name), nil
+		// Sign every action: a priced Control call is held, not debited. The
+		// hold lapses by itself unless the receipt is made and the hold is
+		// committed, so a call whose receipt fails ends uncharged even if
+		// nothing later succeeds. A store with no hold is refused before
+		// anything is taken. Room to keep the amount, should the commit fail
+		// after the call was signed, is set aside first.
+		var (
+			holder     BudgetHolder
+			holdExpiry time.Time
+			slot       *pendingSlot
+		)
+		if p.signEveryAction && isControl {
+			holder = holdOf(p.budget)
+			if holder == nil {
+				log.Error().Str("tool", receiptTool(tc.Name)).Str("budgetId", budgetID).Msg("sign every action: the budget store offers no hold; refusing the call before any charge")
+				return proofUnavailableResponse(req.ID, tc.Name), nil
+			}
+			if slot = p.every().pending.reserve(kindUncharged); slot == nil {
+				log.Error().Str("tool", receiptTool(tc.Name)).Msg("sign every action: the pending store is full; refusing the call before any charge")
+				return proofUnavailableResponse(req.ID, tc.Name), nil
+			}
+			defer slot.release()
 		}
-		result, err := p.budget.Spend(ctx, budgetID, tc.Name, cost, requestID)
+		var result *BudgetResult
+		var err error
+		if holder != nil {
+			holdExpiry = time.Now().Add(p.every().cfg().HoldTTL)
+			result, err = holder.Hold(ctx, budgetID, tc.Name, cost, requestID, p.every().cfg().HoldTTL)
+		} else {
+			result, err = p.budget.Spend(ctx, budgetID, tc.Name, cost, requestID)
+		}
 		eventRequestID = budgetEventRequestID(requestID, result)
 		if err != nil {
 			isBudgetExhausted := result != nil && (result.ErrorCode == "budget_exhausted" || result.ErrorCode == "insufficient_budget")
@@ -931,18 +969,27 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				Str("mode", mode).
 				Msg("budget spent")
 
-			p.events.Publish(Event{
-				Type:      EventBudgetSpend,
-				Timestamp: time.Now(),
-				TokenID:   tokenInfo.TokenID,
-				BudgetID:  budgetID,
-				TenantID:  tenantID,
-				Data:      budgetSpendEventData(tc.Name, cost, result.Remaining, tokenInfo.BudgetLimit, eventRequestID, requestID, mode),
-			})
+			publishSpend := func() {
+				p.events.Publish(Event{
+					Type:      EventBudgetSpend,
+					Timestamp: time.Now(),
+					TokenID:   tokenInfo.TokenID,
+					BudgetID:  budgetID,
+					TenantID:  tenantID,
+					Data:      budgetSpendEventData(tc.Name, cost, result.Remaining, tokenInfo.BudgetLimit, eventRequestID, requestID, mode),
+				})
+			}
+			if holder == nil {
+				publishSpend()
+			}
 
 			var evidenceErr error
 			spendReceiptTried = true
-			allowedEvidence, evidenceErr = p.recordMCPDecision(ctx, req, tokenInfo, tc.Name, MCPDecision{
+			recCtx := ctx
+			if holder != nil {
+				recCtx = withHoldExpiry(ctx, holdExpiry)
+			}
+			allowedEvidence, evidenceErr = p.recordMCPDecision(recCtx, req, tokenInfo, tc.Name, MCPDecision{
 				Decision:         "allowed",
 				DecisionReason:   "budget_authorized",
 				PolicyMode:       normalizeEnforcementMode(mode),
@@ -952,10 +999,22 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			})
 			if evidenceErr != nil {
 				log.Error().Err(evidenceErr).Str("tool", tc.Name).Str("budgetId", budgetID).Msg("MCP allowed evidence recording failed")
+				if holder != nil {
+					// The hold is let go of, on a context of its own. If that
+					// fails too the hold lapses by itself: nothing more has to
+					// succeed for this call to end uncharged. Nothing is sent.
+					p.every().release(ctx, holder, budgetID, requestID, cost)
+					return NewErrorResponseWithData(req.ID, CodeInternalError, "Evidence proof unavailable", map[string]interface{}{
+						"error": "proof_unavailable",
+						"tool":  tc.Name,
+					}), nil
+				}
 				// Observe lets the call through with no receipt (today's
 				// behaviour); with the switch on the miss is reported, once.
 				if !isControl {
-					p.reportObserveMiss(ctx, tokenInfo, MethodToolsCall, tc.Name, mode)
+					if !p.reportObserveMiss(ctx, tokenInfo, MethodToolsCall, tc.Name, mode) {
+						return proofUnavailableResponse(req.ID, tc.Name), nil
+					}
 				}
 				if isControl {
 					p.compensateMCPSpend(ctx, budgetID, eventRequestID, cost)
@@ -963,6 +1022,19 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 						"error": "proof_unavailable",
 						"tool":  tc.Name,
 					}), nil
+				}
+			} else if holder != nil {
+				// Signed. Now the hold becomes the debit, and only then does
+				// the call go out. If the commit fails the call still goes
+				// ahead: it already has a signed allowed receipt, and refusing
+				// it would make that receipt false. The hold lapses, so the
+				// amount is never charged; it is kept, by tenant, key, tool
+				// and minute, for reconciliation, once.
+				if cerr := p.every().commit(ctx, holder, budgetID, requestID); cerr != nil {
+					log.Error().Err(cerr).Str("tool", receiptTool(tc.Name)).Str("budgetId", budgetID).Msg("budget hold could not be committed after the call was signed; the call goes ahead uncharged")
+					p.every().keepUncharged(slot, tokenInfo.TokenID, tenantID, budgetID, MethodToolsCall, tc.Name, requestID, cost)
+				} else {
+					publishSpend()
 				}
 			}
 		}
@@ -1121,7 +1193,14 @@ func (p *Proxy) recordMCPDecision(ctx context.Context, req *Request, tokenInfo *
 			decision.RemainingBeforeCredits = decision.RemainingCredits
 		}
 	}
-	ev, err := p.evidence.RecordMCPDecision(ctx, decision)
+	var ev *MCPEvidence
+	var err error
+	if p.signEveryAction {
+		// Under the signing time limit, which is shorter than a hold's.
+		ev, err = p.every().record(ctx, p.evidence, decision)
+	} else {
+		ev, err = p.evidence.RecordMCPDecision(ctx, decision)
+	}
 	if p.signEveryAction && err == nil && (ev == nil || ev.ReceiptID == "") {
 		// An empty answer is not a receipt (see recordIdentifiedDecision).
 		return nil, errNoReceipt
@@ -1285,32 +1364,19 @@ func budgetEventRequestID(callerRequestID string, result *BudgetResult) string {
 }
 
 // compensateMCPSpend gives back the debit of a call that is stopped because its
-// receipt failed.
+// receipt failed, with the switch off: the budget's Compensate, on the
+// request's context, when the budget has one, as it always was.
 //
-// With the switch off it is what it always was: the budget's Compensate, on the
-// request's context, when the budget has one.
-//
-// With the switch on the reversal is part of the promise ("not sent and not
-// charged"), so it cannot depend on the request: it runs on a context detached
-// from the request's cancellation and bounded by refundTimeout, uses the
-// budget's Compensate or else its Refund, and is retried a few times inside
-// that bound. A reversal that still fails is logged with the budget and request
-// id and counted (ReversalFailures); the call is stopped either way.
+// With the switch on a priced Control call is never debited before its receipt
+// (it is held: see handleToolsCall), so there is nothing here to give back.
 func (p *Proxy) compensateMCPSpend(ctx context.Context, budgetID, requestID string, cost int64) {
-	if budgetID == "" || requestID == "" || cost <= 0 {
+	if budgetID == "" || requestID == "" || cost <= 0 || p.signEveryAction {
 		return
 	}
-	if !p.signEveryAction {
-		if compensator, ok := p.budget.(BudgetCompensator); ok {
-			if err := compensator.Compensate(ctx, budgetID, requestID, cost); err != nil {
-				log.Error().Err(err).Str("budgetId", budgetID).Str("requestId", requestID).Msg("failed to compensate MCP debit after evidence failure")
-			}
+	if compensator, ok := p.budget.(BudgetCompensator); ok {
+		if err := compensator.Compensate(ctx, budgetID, requestID, cost); err != nil {
+			log.Error().Err(err).Str("budgetId", budgetID).Str("requestId", requestID).Msg("failed to compensate MCP debit after evidence failure")
 		}
-		return
-	}
-	if err := reverseDebit(ctx, p.budget, budgetID, requestID, cost); err != nil {
-		p.reversalFailures.Add(1)
-		log.Error().Err(err).Str("budgetId", budgetID).Str("requestId", requestID).Int64("amount", cost).Msg("failed to give back MCP debit after evidence failure")
 	}
 }
 
