@@ -65,7 +65,7 @@ Gateway receipts use a closed `decision_reason` vocabulary. The public verifier 
 
 ## Receipts when sign-every-action is on
 
-A gateway can be run with a switch (`SATGATE_SIGN_EVERY_ACTION` on SatGate's gateways, `Proxy.SetSignEveryAction` in the open-source MCP proxy; off by default) that makes it sign a receipt for each call made with a key SatGate issued, whether the call is let through or refused. While the switch is off, only the calls that had a receipt before get one, and nothing below is promised. While it is on, a call whose receipt cannot be made is not passed on, and nothing is charged for it.
+A gateway can be run with a switch (`Proxy.SetSignEveryAction` in the open-source MCP proxy; the hosted gateways wire their own setting; off by default) that makes it sign a receipt for each call made with a key SatGate issued, whether the call is let through or refused. While the switch is off, only the calls that had a receipt before get one, and nothing below is promised. While it is on, a call whose receipt cannot be made is not passed on, and nothing is charged for it.
 
 What counts as a call: a request that arrives with a key that verifies. What does not: the connection handshake (`initialize`, `ping`, notifications), listing tools, a request with no key or a key SatGate did not issue, and a request SatGate could not decide at all because something it depends on was down (a price it could not read, a limit store that did not answer). Those are stopped or refused, not signed.
 
