@@ -600,22 +600,65 @@ func TestR2_VerifiedKeyKeepsItsIdentity_NeverFromParams(t *testing.T) {
 	}
 }
 
-// With the switch off the answer is what it was: authentication required.
+// With the switch off the answer is what it was: authentication required, and
+// nothing signed. The one change is params null, which used to panic inside the
+// handler (the client saw the connection closed with no answer) and is now the
+// refusal a request with no params gets.
 func TestR2_UnreadableParams_SwitchOff(t *testing.T) {
-	for _, bp := range eaBadParams {
-		if bp.name == "null" {
-			continue // main panics on a null params with a header key; not changed here
+	for _, tr := range eaTransports {
+		for _, bp := range eaBadParams {
+			tr, bp := tr, bp
+			t.Run(tr.name+"/"+bp.name, func(t *testing.T) {
+				e := newEAEnv(t, eaOpts{window: true})
+				defer tr.via(t, e)()
+				r := e.sender(&Request{JSONRPC: "2.0", ID: json.RawMessage(`1`), Method: MethodToolsCall, Params: json.RawMessage(bp.params)})
+				if r.Error == nil || len(e.base.attempts) != 0 || e.rr.forwarded() != 0 {
+					t.Fatalf("answer %s receipts %d forwarded %d", eaShape(r), len(e.base.attempts), e.rr.forwarded())
+				}
+				switch bp.name {
+				case "null", "object with a name that is not text":
+					// Authenticated by the header, refused for its params.
+					if r.Error.Code != CodeInvalidParams {
+						t.Fatalf("answer = %s", eaShape(r))
+					}
+				case "malformed _meta, a string", "malformed _meta, an array", "malformed _meta, a token that is not text":
+					// The unreadable _meta hides the header's key from the proxy, as before.
+					if r.Error.Code != CodePolicyDenied {
+						t.Fatalf("answer = %s", eaShape(r))
+					}
+				}
+			})
 		}
-		bp := bp
-		t.Run("streamable_http/"+bp.name, func(t *testing.T) {
-			e := newEAEnv(t, eaOpts{window: true})
-			done := eaViaStreamable(t, e)
-			defer done()
-			r := e.sender(&Request{JSONRPC: "2.0", ID: json.RawMessage(`1`), Method: MethodToolsCall, Params: json.RawMessage(bp.params)})
-			if r.Error == nil || len(e.base.attempts) != 0 || e.rr.forwarded() != 0 {
-				t.Fatalf("answer %s receipts %d forwarded %d", eaShape(r), len(e.base.attempts), e.rr.forwarded())
-			}
-		})
+	}
+}
+
+// params null never panics, whatever the switch: it is read as no params.
+func TestR2_ParamsNull_IsNoParams(t *testing.T) {
+	if got, want := string(injectMetaToken(json.RawMessage("null"), "tok")), string(func() json.RawMessage {
+		b, _ := json.Marshal(map[string]any{"_meta": map[string]string{"token": "tok"}})
+		return b
+	}()); got != want {
+		t.Fatalf("injectMetaToken(null) = %s, want %s", got, want)
+	}
+	for _, on := range []bool{false, true} {
+		for _, tr := range eaTransports {
+			on, tr := on, tr
+			t.Run(tr.name, func(t *testing.T) {
+				e := newEAEnv(t, eaOpts{window: true})
+				if on {
+					eaSetSwitch(e, true)
+				}
+				defer tr.via(t, e)()
+				absent := e.sender(&Request{JSONRPC: "2.0", ID: json.RawMessage(`1`), Method: MethodToolsCall})
+				null := e.sender(&Request{JSONRPC: "2.0", ID: json.RawMessage(`1`), Method: MethodToolsCall, Params: json.RawMessage("null")})
+				if absent.Error == nil || null.Error == nil || absent.Error.Code != CodeInvalidParams || eaShape(absent) != eaShape(null) {
+					// With the switch on both are signed refusals with their own receipt handles.
+					if !on || null.Error == nil || null.Error.Code != CodeInvalidParams {
+						t.Fatalf("switch %v: no params = %s, params null = %s", on, eaShape(absent), eaShape(null))
+					}
+				}
+			})
+		}
 	}
 }
 

@@ -611,6 +611,11 @@ func injectMetaToken(params json.RawMessage, token string) json.RawMessage {
 	if err := json.Unmarshal(params, &m); err != nil {
 		return params
 	}
+	if m == nil {
+		// "params": null decodes to a nil map. It is no params at all, like
+		// params left out; writing into a nil map would panic.
+		m = map[string]json.RawMessage{}
+	}
 
 	// Check if _meta already has a token
 	if metaRaw, ok := m["_meta"]; ok {
