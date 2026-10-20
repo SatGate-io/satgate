@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { ArrowRight, DollarSign, Lock, Receipt, Users } from 'lucide-react';
 
 const title = 'Financial guardrails for your AI trading agent';
+const tagline = 'Control what agents can do and spend. Prove it.';
 const lead =
   'Your limits sit outside the AI, so it can\'t loosen them or talk its way past them. SatGate checks them before an order reaches Robinhood.';
 const metaTitle = 'Financial guardrails for agentic trading on Robinhood | SatGate';
@@ -122,6 +123,7 @@ export default function TradingPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_0%,rgba(34,211,238,0.18),transparent_34%),radial-gradient(circle_at_80%_10%,rgba(168,85,247,0.14),transparent_32%)]" />
         <div className="relative mx-auto max-w-4xl px-6 py-16 md:py-24">
           <h1 className="mb-4 text-4xl font-extrabold tracking-tight md:text-6xl">{title}</h1>
+          <p className="mb-4 text-2xl font-semibold text-white md:text-3xl">{tagline}</p>
           <p className="mb-8 text-lg text-gray-300 md:text-xl">{lead}</p>
           <ul className="space-y-4">
             {whatItDoes.map(({ icon: Icon, text }) => (
