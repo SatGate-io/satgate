@@ -65,7 +65,7 @@ Gateway receipts use a closed `decision_reason` vocabulary. The public verifier 
 
 ## Receipts when sign-every-action is on
 
-A gateway can be run with a switch (`Proxy.SetSignEveryAction` in the open-source MCP proxy; the hosted gateways wire their own setting; off by default) that makes it sign a receipt for each call made with a key SatGate issued, whether the call is let through or refused. While the switch is off, only the calls that had a receipt before get one, and nothing below is promised. While it is on, a call whose receipt cannot be made is not passed on, and nothing is charged for it.
+A gateway can be run with a switch (`Proxy.SetSignEveryAction` in the open-source MCP proxy; the hosted gateways wire their own setting; off by default) that makes it sign a receipt for each call made with a key SatGate issued, whether the call is let through or refused. While the switch is off, only the calls that had a receipt before get one, and nothing below is promised. While it is on, a call whose receipt cannot be made is not passed on, and nothing is charged for it: the caller gets `proof_unavailable`. A recorder that answers with nothing counts as a receipt that could not be made. A refusal that cannot be recorded is answered `proof_unavailable` as well, in place of the usual refusal. Observe is the one exception: the call goes through and the miss is counted (see the gap receipt below). The switch needs a recorder that keeps refusal windows (`WindowRecorder`); turning it on without one is a setup error.
 
 What counts as a call: a request that arrives with a key that verifies. What does not: the connection handshake (`initialize`, `ping`, notifications), listing tools, a request with no key or a key SatGate did not issue, and a request SatGate could not decide at all because something it depends on was down (a price it could not read, a limit store that did not answer). Those are stopped or refused, not signed.
 
@@ -75,7 +75,7 @@ Three receipt shapes carry this. None changes how an older receipt is read: each
 
 `decision` is `allowed`, `decision_reason` is `policy_allowed`, and `budget` is exactly `{"spend_mode": "not_evaluated", "cost_credits": 0}`. A free tool, or a key with no budget, never reads a balance, so the receipt claims none. It names the tool or method, the key (hashed), the time and the reason, and never the call's arguments.
 
-The verifier refuses such a receipt if a limit, remaining, attempted, used, spent or projected amount, a balance, or any payment field appears anywhere in it (outside that one `budget` object), or if `budget` is anything but the object above. An `allowed` / `policy_allowed` receipt whose budget was evaluated (it states balances, as the HTTP gateway signs today) is still read as before.
+The verifier refuses such a receipt if a limit, remaining, attempted, used, spent or projected amount, a balance, or any payment or spend field appears anywhere in it, at any depth (in `metadata`, `policy`, `authority` or any extension; outside that one `budget` object), or if `budget` is anything but the object above. It also refuses one whose authority does not name a verified key, and a Pack wrapper that carries such a field or a `budget_state` other than the object above. The two refusal windows and the gap receipt below are held to the same rule. An `allowed` / `policy_allowed` receipt whose budget was evaluated (it states balances, as the HTTP gateway signs today) is still read as before.
 
 ### A refusal that repeats: the opener and the closer
 
@@ -109,7 +109,7 @@ The gap receipt makes no balance claim (same budget object as above). The verifi
 
 ### Checking a whole record
 
-`tools/verify_receipt_record.py` checks a downloaded record: one Evidence Pack per line, then a manifest SatGate signed. It runs the per-pack check on every line, then checks the manifest's signature, that the count and the receipt hashes in order match (so nothing was dropped, added, changed or moved), that every receipt is in the manifest's time range, in order, not repeated, and belongs to the one key the manifest names, and that the refusal windows and counts by reason match. See `tools/VERIFIER-CONTRACT.md` for the manifest fields and what the checker cannot prove.
+`tools/verify_receipt_record.py` checks a downloaded record: one Evidence Pack per line, then a manifest SatGate signed. It runs the per-pack check on every line, then checks the manifest's signature, that the count and the receipt hashes in order match (so nothing was dropped, added, changed or moved), that every receipt is in the manifest's time range, in order, not repeated, signed by the manifest's issuer key, and belongs to the one key the manifest names, and that the refusal windows and counts by reason match. A record line holds exactly one receipt. A window that was opened and whose closer is overdue (its minute and the grace period ended before the record did) makes the record invalid; a window whose closer is not due yet, or that runs past the end of the range, is reported as pending or as a boundary window. See `tools/VERIFIER-CONTRACT.md` for the manifest fields and what the checker cannot prove.
 
 ## Verification sequence
 

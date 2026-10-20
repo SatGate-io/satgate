@@ -500,12 +500,99 @@ def contains_balance_claim(value: Any) -> bool:
     return False
 
 
+# The new receipt profiles make no payment, spend or balance claim anywhere. A
+# key that states one is refused at any depth (metadata, policy, authority, any
+# extension), whether it matches a name below exactly or contains a marker, and
+# whatever its case or punctuation. The old evaluated and paid profiles are not
+# judged by this rule.
+NEW_PROFILE_CLAIM_FIELDS = (
+    NOT_EVALUATED_FORBIDDEN_FIELDS | BALANCE_CLAIM_FIELDS
+    | {"transaction", "payer", "pay_to", "credit_unit", "cost_credits", "spend_mode"}
+)
+NEW_PROFILE_CLAIM_MARKERS = BALANCE_CLAIM_MARKERS + (
+    "payment", "invoice", "preimage", "amountsat", "amountusd", "amountatomic",
+)
+NEW_PROFILE_CLAIM_FIELD_FORMS = frozenset(balance_key_form(k) for k in NEW_PROFILE_CLAIM_FIELDS)
+NEW_PROFILE_CLAIM_MARKER_FORMS = tuple(balance_key_form(m) for m in NEW_PROFILE_CLAIM_MARKERS)
+
+
+def contains_forbidden_claim(value: Any) -> bool:
+    """True if any key, at any depth, is a payment, spend or balance claim."""
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if isinstance(key, str):
+                form = balance_key_form(key)
+                if form in NEW_PROFILE_CLAIM_FIELD_FORMS or any(m in form for m in NEW_PROFILE_CLAIM_MARKER_FORMS):
+                    return True
+            if contains_forbidden_claim(child):
+                return True
+        return False
+    if isinstance(value, list):
+        return any(contains_forbidden_claim(child) for child in value)
+    return False
+
+
 def makes_no_balance_claim(receipt: dict[str, Any]) -> bool:
     return (
         strict_json_equal(receipt.get("budget"), NOT_EVALUATED_BUDGET)
-        and not any(field in receipt for field in NOT_EVALUATED_FORBIDDEN_FIELDS)
-        and not contains_balance_claim({k: v for k, v in receipt.items() if k != "budget"})
+        and not contains_forbidden_claim({k: v for k, v in receipt.items() if k != "budget"})
     )
+
+
+# Provenance of the new profiles. A call by a key that verified names that key
+# (verified_macaroon_caveats, capability hash bound, raw fields redacted). A
+# refusal of a key that verified and is revoked or has expired names no
+# capability (no_verified_capability). Both copies read it the same way.
+VERIFIED_CAPABILITY_AUTHORITY_FIELDS = {
+    "budget_id_hash", "budget_subject_hash", "capability_hash", "delegation_budget",
+    "delegation_depth", "parent_token_id_hash", "provenance_level", "raw_budget_id",
+    "raw_capability_token", "raw_parent_token_id", "raw_token_id", "token_id_hash",
+}
+VERIFIED_CAPABILITY_RAW_FIELDS = ("raw_budget_id", "raw_capability_token", "raw_parent_token_id", "raw_token_id")
+NO_CAPABILITY_PAIRS = {("denied", "token_revoked"), ("denied", "capability_expired")}
+
+
+def is_new_profile_receipt(receipt: Any) -> bool:
+    """A receipt of the three shapes added for sign-every-action: allowed
+    without a balance, a window opener or closer, a gap record."""
+    if not isinstance(receipt, dict):
+        return False
+    budget = receipt.get("budget")
+    return bool(
+        (receipt.get("decision") == "allowed" and receipt.get("decision_reason") == "policy_allowed"
+         and isinstance(budget, dict) and budget.get("spend_mode") == "not_evaluated")
+        or receipt.get("decision_reason") == "observe_unrecorded"
+        or any(field in receipt for field in RATE_WINDOW_FIELDS + UNRECORDED_FIELDS)
+    )
+
+
+def valid_new_profile_provenance(receipt: dict[str, Any]) -> bool:
+    authority_value = receipt.get("authority")
+    if not isinstance(authority_value, dict):
+        return False
+    if (receipt.get("decision"), receipt.get("decision_reason")) in NO_CAPABILITY_PAIRS:
+        return authority_value == {"provenance_level": "no_verified_capability"} and "capability_hash" not in receipt
+    capability_hash = receipt.get("capability_hash")
+    policy_value = receipt.get("policy")
+    metadata = receipt.get("metadata")
+    return bool(
+        authority_value.get("provenance_level") == "verified_macaroon_caveats"
+        and set(authority_value) <= VERIFIED_CAPABILITY_AUTHORITY_FIELDS
+        and all(authority_value.get(field) == "redacted" for field in VERIFIED_CAPABILITY_RAW_FIELDS)
+        and isinstance(capability_hash, str) and bool(capability_hash.strip())
+        and authority_value.get("capability_hash") == capability_hash
+        and isinstance(metadata, dict)
+        and not any(field in metadata for field in ("cost_credits", "credit_unit", "limit", "limit_credits", "projected_cost_credits", "remaining_credits", "used"))
+        and not _has_key(policy_value, {"limit_credits", "remaining_after_credits", "remaining_before_credits", "remaining_budget_usd", "remaining_credits"})
+    )
+
+
+def _has_key(value: Any, forbidden: set[str]) -> bool:
+    if isinstance(value, dict):
+        return any(key in forbidden or _has_key(child, forbidden) for key, child in value.items())
+    if isinstance(value, list):
+        return any(_has_key(child, forbidden) for child in value)
+    return False
 
 
 def parse_window_start(value: Any) -> datetime | None:
@@ -646,6 +733,11 @@ def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reas
         checks[f"{prefix}_observe_unrecorded"] = valid_unrecorded_gap(receipt, issued_at)
         if not checks[f"{prefix}_observe_unrecorded"]:
             fail("invalid_unrecorded_receipt", f"receipts[{index}] is not a valid gap receipt (it needs its window and a count of at least 1, and makes no balance claim)")
+
+    if is_new_profile_receipt(receipt):
+        checks[f"{prefix}_new_profile_provenance"] = valid_new_profile_provenance(receipt)
+        if not checks[f"{prefix}_new_profile_provenance"]:
+            fail("invalid_not_evaluated_provenance", f"receipts[{index}] is a no-balance receipt whose authority does not name a verified key (or, for a revoked or expired key, no capability)")
 
     expected_hash = sha256_receipt_hash(receipt)
     checks[f"{prefix}_receipt_hash_match"] = receipt.get("receipt_hash") == expected_hash
@@ -801,6 +893,16 @@ def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requi
             if not checks[key]:
                 add_reason(reasons, reason_codes, "pack_primary_mismatch",
                            f"pack.{field} does not match primary embedded receipt.{field}")
+
+    if is_new_profile_receipt(primary):
+        # The Pack wrapper repeats the receipt's budget and makes no claim of
+        # its own: nothing beside the exact budget mirrors, at any depth.
+        checks["pack_no_forbidden_claims"] = (
+            strict_json_equal(pack.get("budget_state"), NOT_EVALUATED_BUDGET)
+            and not contains_forbidden_claim({k: v for k, v in pack.items() if k not in ("receipts", "budget", "budget_state")})
+        )
+        if not checks["pack_no_forbidden_claims"]:
+            add_reason(reasons, reason_codes, "invalid_not_evaluated_provenance", "pack wrapper of a no-balance receipt carries a budget, spend or payment claim (or a budget_state that is not the exact no-balance budget)")
 
     budget = pack.get("budget_state") if isinstance(pack.get("budget_state"), dict) else {}
     checks["budget_state_matches_primary_receipt"] = bool(primary) and strict_json_equal(budget.get("attempted_amount_usd"), primary.get("attempted_amount_usd")) and strict_json_equal(budget.get("remaining_budget_usd"), primary.get("remaining_budget_usd"))

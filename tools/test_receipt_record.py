@@ -89,13 +89,13 @@ class Builder:
             "issuer": "https://issuer.example", "issuer_kid": "test-key",
             "key_hash": KEY, "from": FROM, "to": TO, "generated_at": GENERATED,
             "count": len(packs),
-            "first_receipt_hash": hashes[0] if hashes else "",
-            "last_receipt_hash": hashes[-1] if hashes else "",
             "receipt_hashes_sha256": REC.receipt_hash_list_digest(hashes),
             "counts_by_decision_reason": reasons,
             "windows": windows if windows is not None else [],
             "metadata": {"public_key_ed25519_b64": self.f.x},
         }
+        if hashes:
+            m["first_receipt_hash"], m["last_receipt_hash"] = hashes[0], hashes[-1]
         m.update(overrides)
         return self.sign(m) if sign else m
 
@@ -295,20 +295,61 @@ class ReceiptRecord(unittest.TestCase):
         self.assertEqual(result["counts"]["windows"], 1)
         self.assertEqual(result["summary"], "3 receipts, 2 refusals, 1 windows, 0 problems")
 
-    def test_receipt_record_window_without_close_warns(self):
+    # An opener with no closer: invalid when the closer is overdue, an explicit
+    # pending or boundary result when it is not.
+
+    def states(self, result):
+        return [w["state"] for w in result["window_states"]]
+
+    def test_receipt_record_window_without_close_fails_when_the_closer_is_overdue(self):
         o = self.b.opener(10)
         packs = [o]
         manifest = self.b.manifest(packs, windows=[window_entry(o)])  # generated hours after the window
         result = self.verify(text(packs, manifest))
-        self.assertTrue(result["valid"], "a window with no closer is a warning, not a failure")
-        self.assertIn("window_not_closed", {w["code"] for w in result["warnings"]})
+        self.assertFalse(result["valid"], "a window whose closer is overdue is a missing receipt")
+        self.assertIn("window_closer_overdue", self.codes(result))
+        self.assertEqual(self.states(result), ["overdue"])
+        self.assertNotEqual(self.run_cli(text(packs, manifest)).returncode, 0)
 
-    def test_a_window_that_is_not_yet_due_does_not_warn(self):
+    def test_the_closer_is_due_when_the_window_end_plus_grace_has_passed(self):
+        o = self.b.opener(10)  # the window is 00:00:00 to 00:01:00; the closer is due at 00:01:15
+        for generated, state in (("2026-01-01T00:01:14Z", "pending"), ("2026-01-01T00:01:15Z", "overdue"), ("2026-01-01T00:03:00Z", "overdue")):
+            with self.subTest(generated_at=generated):
+                manifest = self.b.manifest([o], windows=[window_entry(o)], generated_at=generated)
+                result = self.verify(text([o], manifest))
+                self.assertEqual(self.states(result), [state])
+                self.assertEqual(result["valid"], state == "pending", result["problems"])
+
+    def test_a_window_that_is_not_yet_due_is_pending_and_valid(self):
         o = self.b.opener(10)
-        manifest = self.b.manifest([o], windows=[window_entry(o)], generated_at="2026-01-01T00:03:00Z")
+        manifest = self.b.manifest([o], windows=[window_entry(o)], generated_at="2026-01-01T00:01:10Z")
         result = self.verify(text([o], manifest))
         self.assertTrue(result["valid"], result)
-        self.assertEqual(result["warnings"], [])
+        self.assertEqual(self.states(result), ["pending"])
+        self.assertIn("window_closer_pending", {w["code"] for w in result["warnings"]})
+        self.assertEqual(self.run_cli(text([o], manifest)).returncode, 0)
+
+    def test_the_end_of_the_export_bounds_the_wait_as_well(self):
+        o = self.b.opener(10)
+        # The range ends 10 seconds after the window; the closer is due 5 seconds later.
+        pending = self.b.manifest([o], windows=[window_entry(o)], **{"to": "2026-01-01T00:01:10Z"})
+        self.assertEqual(self.states(self.verify(text([o], pending))), ["pending"])
+        self.assertTrue(self.verify(text([o], pending))["valid"])
+        overdue = self.b.manifest([o], windows=[window_entry(o)], **{"to": "2026-01-01T00:01:20Z"})
+        self.assertEqual(self.states(self.verify(text([o], overdue))), ["overdue"])
+
+    def test_a_window_that_runs_past_the_end_of_the_range_is_a_boundary_not_a_failure(self):
+        o = self.b.opener(10)
+        manifest = self.b.manifest([o], windows=[window_entry(o)], **{"to": "2026-01-01T00:00:50Z"})
+        result = self.verify(text([o], manifest))
+        self.assertTrue(result["valid"], result)
+        self.assertEqual(self.states(result), ["boundary"])
+        self.assertIn("window_runs_past_range", {w["code"] for w in result["warnings"]})
+
+    def test_a_closed_window_is_reported_closed(self):
+        o, c = self.b.opener(10), self.b.closer(80, count=3)
+        manifest = self.b.manifest([o, c], windows=[window_entry(o, c, 3)])
+        self.assertEqual(self.states(self.verify(text([o, c], manifest))), ["closed"])
 
     def test_a_closer_with_no_opener_fails_unless_the_window_began_before_the_record(self):
         c = self.b.closer(80)
@@ -353,12 +394,12 @@ class ReceiptRecord(unittest.TestCase):
 
     # ---- the command line ----
 
-    def run_cli(self, record, *args):
+    def run_cli(self, record, *args, jwks_doc=None):
         with tempfile.TemporaryDirectory() as tmp:
             rec = Path(tmp) / "record.ndjson"
             rec.write_text(record, encoding="utf-8")
             jwks = Path(tmp) / "jwks.json"
-            jwks.write_text(json.dumps(self.f.jwks), encoding="utf-8")
+            jwks.write_text(json.dumps(jwks_doc if jwks_doc is not None else self.f.jwks), encoding="utf-8")
             env = dict(os.environ, PYTHONPATH=str(ROOT / "demo" / "_vendor"), PYTHONDONTWRITEBYTECODE="1")
             proc = subprocess.run(
                 [sys.executable, "-B", str(ROOT / "tools" / "verify_receipt_record.py"), str(rec),
@@ -366,6 +407,85 @@ class ReceiptRecord(unittest.TestCase):
                 capture_output=True, text=True, env=env, timeout=30)
         self.assertNotIn("Traceback", proc.stderr, proc.stderr)
         return proc
+
+    # ---- round 2: one receipt per line, the signing key, exact counts ----
+
+    def with_receipts(self, pack, receipts):
+        edited = copy.deepcopy(pack)
+        edited["receipts"] = receipts
+        return edited
+
+    def cli_fails(self, record, code, label):
+        """The command line, with a trusted JWKS, exits non-zero and names the problem."""
+        proc = self.run_cli(record)
+        self.assertEqual(proc.returncode, 1, f"{label}: {proc.stdout}")
+        result = json.loads(proc.stdout)
+        self.assertFalse(result["valid"], label)
+        self.assertIn(code, {p["code"] for p in result["problems"]}, f"{label}: {result['problems']}")
+
+    def test_cli_a_receipt_added_to_a_pack_fails(self):
+        packs, manifest = self.clean()
+        extra = copy.deepcopy(self.b.allowed(50)["receipts"][0])  # a valid, signed receipt
+        edited = [self.with_receipts(packs[1], packs[1]["receipts"] + [extra])]
+        record = text(packs[:1] + edited + packs[2:], manifest)
+        self.cli_fails(record, "pack_not_one_receipt", "receipt added")
+
+    def test_cli_a_receipt_dropped_from_a_pack_fails(self):
+        packs, manifest = self.clean()
+        edited = self.with_receipts(packs[1], [])
+        self.assertNotEqual(self.run_cli(text(packs[:1] + [edited] + packs[2:], manifest)).returncode, 0)
+        self.cli_fails(text(packs[:1] + [edited] + packs[2:], manifest), "pack_not_one_receipt", "receipt dropped")
+
+    def test_cli_a_receipt_duplicated_inside_a_pack_fails(self):
+        packs, manifest = self.clean()
+        r = packs[1]["receipts"][0]
+        edited = self.with_receipts(packs[1], [r, copy.deepcopy(r)])
+        self.cli_fails(text(packs[:1] + [edited] + packs[2:], manifest), "pack_not_one_receipt", "receipt duplicated")
+
+    def test_cli_receipts_reordered_inside_a_pack_fail(self):
+        packs, manifest = self.clean()
+        r1, r2 = packs[1]["receipts"][0], copy.deepcopy(self.b.allowed(50)["receipts"][0])
+        # Even a record whose manifest was made from the two-receipt packs is refused, in either order.
+        for order in ([r1, r2], [r2, r1]):
+            edited = self.with_receipts(packs[1], order)
+            self.cli_fails(text(packs[:1] + [edited] + packs[2:], manifest), "pack_not_one_receipt", "reordered")
+
+    def test_an_issuer_kid_that_is_not_the_receipts_fails(self):
+        packs, manifest = self.clean()
+        # The same key under a second name: the manifest verifies, but it says a
+        # different key signed than the one that signed the receipts.
+        rotated = self.b.sign(dict(manifest, issuer_kid="rotated-key"))
+        jwks = copy.deepcopy(self.f.jwks)
+        jwks["keys"].append(dict(jwks["keys"][0], kid="rotated-key"))
+        proc = self.run_cli(text(packs, rotated), jwks_doc=jwks)
+        self.assertEqual(proc.returncode, 1, proc.stdout)
+        self.assertIn("issuer_kid_mismatch", {p["code"] for p in json.loads(proc.stdout)["problems"]})
+        # Without a trusted issuer, through the embedded key.
+        result = self.verify(text(packs, rotated), jwks=None, require_trusted_issuer=False)
+        self.assertIn("issuer_kid_mismatch", self.codes(result))
+
+    def test_cli_boolean_counts_by_decision_reason_fail(self):
+        packs, manifest = self.clean()
+        reasons = dict(manifest["counts_by_decision_reason"])
+        one = next(k for k, v in reasons.items() if v == 1)
+        self.assertEqual(reasons[one], 1)
+        for label, value in (("true for 1", True),):
+            edited = self.b.sign(dict(manifest, counts_by_decision_reason=dict(reasons, **{one: value})))
+            self.cli_fails(text(packs, edited), "manifest_count_invalid", label)
+        zero = self.b.sign(dict(manifest, counts_by_decision_reason=dict(reasons, never_seen=False)))
+        self.cli_fails(text(packs, zero), "manifest_count_invalid", "false for a reason that never happened")
+        for bad in (True, 1.0, "4"):
+            edited = self.b.sign(dict(manifest, count=bad))
+            self.assertFalse(self.verify(text(packs, edited))["valid"], bad)
+
+    def test_cli_an_empty_record_with_false_endpoints_fails(self):
+        for field in ("first_receipt_hash", "last_receipt_hash"):
+            for value in (False, "", 0, "sha256:invented"):
+                manifest = self.b.manifest([], **{field: value})
+                self.cli_fails(text([], manifest), "manifest_endpoint_on_empty_record", f"{field}={value!r}")
+        # Absent, or null, is an empty record.
+        self.assertEqual(self.run_cli(text([], self.b.manifest([]))).returncode, 0)
+        self.assertEqual(self.run_cli(text([], self.b.manifest([], first_receipt_hash=None, last_receipt_hash=None))).returncode, 0)
 
     def test_cli_exit_codes_and_summary_line(self):
         packs, manifest = self.clean()

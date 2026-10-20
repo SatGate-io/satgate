@@ -33,4 +33,4 @@ python tools/verify_receipt_record.py record.ndjson \
   --require-trusted-issuer
 ```
 
-It verifies every pack, the manifest's signature, the count and the hash over the receipt hashes in order (so a dropped or moved receipt is caught), the time range, duplicates, the one key, and the refusal windows. The last line of output is a summary such as `4 receipts, 1 refusals, 0 windows, 0 problems`. See `VERIFIER-CONTRACT.md` for the manifest and what the checker cannot prove.
+It verifies every pack, the manifest's signature, the count and the hash over the receipt hashes in order (so a dropped or moved receipt is caught), the time range, duplicates, the one key, one receipt per line, the signing key, and the refusal windows (a window whose closer is overdue makes the record invalid). The last line of output is a summary such as `4 receipts, 1 refusals, 0 windows, 0 problems`. See `VERIFIER-CONTRACT.md` for the manifest and what the checker cannot prove.

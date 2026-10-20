@@ -13,10 +13,13 @@ Usage:
 
 It needs no SatGate login. It checks:
 
-  1. every pack, with the same checks tools/verify_evidence_pack.py makes;
+  1. every pack, with the same checks tools/verify_evidence_pack.py makes, and
+     that each pack carries exactly one receipt: the manifest's hashes cover
+     that one receipt, so a second receipt in a pack would be outside them;
   2. the manifest's signature (against the issuer's JWKS, or the embedded key
      when you do not ask for a trusted issuer), and that the manifest comes
-     from the same issuer as the receipts;
+     from the same issuer, with the same signing key (issuer_kid), as the
+     receipts;
   3. the count: the manifest's count equals the packs in the file;
   4. nothing was dropped between the first and the last: the first and last
      receipt hashes, and a SHA-256 over the receipt hashes in order;
@@ -25,8 +28,11 @@ It needs no SatGate login. It checks:
   6. no receipt twice (same receipt id, pack id or receipt hash);
   7. every receipt belongs to the one key the manifest names (key_hash);
   8. refusal windows: each window has at most one opener and one closer, the
-     manifest lists the same windows, and an opener whose closer is missing
-     once the window has been over for 5 minutes is reported;
+     manifest lists the same windows, and a window whose closer is overdue (the
+     window's end plus the 15 second grace is before the end of the export, or
+     before the record was made, whichever is earlier) makes the record invalid.
+     A window whose closer is not due yet, or that runs past the end of the
+     range, is reported as pending or as a boundary window and does not;
   9. counts by decision reason match the manifest.
 
 What it cannot prove: the manifest is made at download time from what SatGate
@@ -35,7 +41,8 @@ failed to be stored. Calls before record_starts_at are not covered, and the
 output says so. Calls that went through in Observe with no receipt show up as
 signed gap receipts (observe_unrecorded) and are counted in the output.
 
-Exit codes: 0 the record checks out (warnings are allowed), 1 at least one
+Exit codes: 0 the record checks out (warnings, and pending or boundary windows,
+are allowed), 1 at least one
 problem, 2 the input could not be loaded, 3 the Python package 'cryptography'
 is missing. Output is JSON, with a one-line "summary" (also on stderr).
 """
@@ -57,9 +64,10 @@ import verify_evidence_pack as vep  # noqa: E402  (same directory)
 
 MANIFEST_SCHEMA = "satgate.receipt_record_manifest.v1"
 PACK_SCHEMA = vep.EXPECTED_PACK_SCHEMA
-# A window whose closer is still missing this long after the window ended is
-# reported. Before that the closer may simply not be due yet.
-UNCLOSED_WARNING_AFTER = timedelta(minutes=5)
+# The gateway signs a window's closer once the window has been over for this
+# long (RateWindowGraceSeconds in pkg/mcpserver/evidence.go). A closer that is
+# still missing after window end plus this, by the end of the export, is overdue.
+WINDOW_CLOSER_GRACE = timedelta(seconds=15)
 MANIFEST_UNSIGNED_FIELDS = {"manifest_hash", "signature"}
 KEY_HASH_FIELDS = ("token_id_hash", "budget_id_hash", "capability_hash")
 
@@ -71,6 +79,7 @@ class Problems:
         self.problems: list[dict[str, Any]] = []
         self.warnings: list[dict[str, Any]] = []
         self.checks: dict[str, bool] = {}
+        self.window_states: list[dict[str, Any]] = []
 
     def check(self, name: str, ok: bool = True) -> None:
         self.checks[name] = self.checks.get(name, True) and ok
@@ -212,6 +221,10 @@ def verify_record(
         if pack.get("schema_version") != PACK_SCHEMA:
             p.problem("receipts_verified", "not_an_evidence_pack", "the line is neither a satgate.evidence_pack.v1 pack nor the manifest", number)
             continue
+        embedded = pack.get("receipts")
+        if not isinstance(embedded, list) or len(embedded) != 1:
+            p.problem("receipts_verified", "pack_not_one_receipt", "each line must carry exactly one receipt: the manifest's hashes cover one receipt per line", number)
+            continue
         verdict = vep.verify_pack(pack, jwks=jwks, require_trusted_issuer=require_trusted_issuer, allow_mock=allow_mock, now=now)
         if not verdict.get("valid"):
             p.problem("receipts_verified", "receipt_invalid", "the pack does not verify: " + ", ".join(verdict.get("reason_codes", [])), number)
@@ -230,8 +243,17 @@ def verify_record(
             p.problem("manifest_fields", "manifest_field_missing", f"manifest.{field} is missing")
     if not is_count(manifest.get("count")):
         p.problem("manifest_fields", "manifest_field_missing", "manifest.count is missing or not a count")
-    if not isinstance(manifest.get("counts_by_decision_reason"), dict):
+    counts_value = manifest.get("counts_by_decision_reason")
+    if not isinstance(counts_value, dict):
         p.problem("manifest_fields", "manifest_field_missing", "manifest.counts_by_decision_reason is missing")
+    elif not all(isinstance(k, str) and is_count(v) for k, v in counts_value.items()):
+        # A JSON true or false compares equal to 1 and 0 in Python: a count must be an integer.
+        p.problem("manifest_fields", "manifest_count_invalid", "manifest.counts_by_decision_reason must map each reason to a whole number")
+    if not packs:
+        # A record with no receipts has no first or last receipt: absent or null, nothing else.
+        for field in ("first_receipt_hash", "last_receipt_hash"):
+            if manifest.get(field) is not None:
+                p.problem("manifest_fields", "manifest_endpoint_on_empty_record", f"manifest.{field} must be absent or null in a record with no receipts")
     if not isinstance(manifest.get("windows"), list):
         p.problem("manifest_fields", "manifest_field_missing", "manifest.windows is missing")
     start, end = parse_time(manifest.get("from")), parse_time(manifest.get("to"))
@@ -269,6 +291,8 @@ def verify_record(
             p.problem("order_and_range", "outside_range", "issued_at is outside the manifest's from..to", number)
         if isinstance(issuer, str) and receipt.get("issuer") != issuer:
             p.problem("order_and_range", "issuer_mismatch", "the receipt's issuer is not the manifest's issuer", number)
+        if receipt.get("issuer_kid") != manifest.get("issuer_kid"):
+            p.problem("order_and_range", "issuer_kid_mismatch", "the receipt was signed with a different key (issuer_kid) than the manifest", number)
 
     # No receipt twice.
     p.check("no_duplicates")
@@ -320,8 +344,20 @@ def verify_record(
                 p.warn("window_started_before_record", f"the window at {window_start} began before this record; its opener is not here")
             else:
                 p.problem("windows", "window_closer_without_opener", f"the window at {window_start} for {route} has a closer and no opener", closed[0][0])
-        elif not closed and ws is not None and generated_at is not None and ws + timedelta(seconds=vep.WINDOW_SECONDS) + UNCLOSED_WARNING_AFTER <= generated_at:
-            p.warn("window_not_closed", f"the window at {window_start} for {route} was opened and never closed")
+        state = "closed" if closed else "open"
+        if opened and not closed and ws is not None:
+            window_end = ws + timedelta(seconds=vep.WINDOW_SECONDS)
+            horizon = min((t for t in (end, generated_at) if t is not None), default=None)
+            if end is not None and window_end > end:
+                state = "boundary"
+                p.warn("window_runs_past_range", f"the window at {window_start} for {route} runs past the end of the range; its closer is not expected in this record")
+            elif horizon is not None and window_end + WINDOW_CLOSER_GRACE > horizon:
+                state = "pending"
+                p.warn("window_closer_pending", f"the window at {window_start} for {route} is not over, and its grace period not out, at the end of this record; its closer is not due yet")
+            else:
+                state = "overdue"
+                p.problem("windows", "window_closer_overdue", f"the window at {window_start} for {route} was opened and its closer is overdue: the window ended more than {int(WINDOW_CLOSER_GRACE.total_seconds())} seconds before the end of the record and no closer is in it", opened[0][0])
+        p.window_states.append({"route_or_tool": route, "window_start": window_start, "denial_code": code, "state": state})
         computed.append({
             "route_or_tool": route,
             "window_start": window_start,
@@ -339,7 +375,7 @@ def verify_record(
     # Counts by decision reason.
     p.check("counts_by_reason")
     by_reason = dict(Counter(str(r.get("decision_reason")) for _, _, r in receipts))
-    if isinstance(manifest.get("counts_by_decision_reason"), dict) and manifest["counts_by_decision_reason"] != by_reason:
+    if isinstance(counts_value, dict) and json.dumps(counts_value, sort_keys=True) != json.dumps(by_reason, sort_keys=True):
         p.problem("counts_by_reason", "counts_by_reason_mismatch", "counts_by_decision_reason does not match the receipts")
 
     # Where the record starts.
@@ -361,6 +397,7 @@ def finish(p: Problems, pack_count: int, receipts: Receipts, windows: int, unrec
         "warnings": p.warnings,
         "checks": p.checks,
         "summary": f"{pack_count} receipts, {refusals} refusals, {windows} windows, {len(p.problems)} problems",
+        "window_states": p.window_states,
         "counts": {"receipts": pack_count, "refusals": refusals, "windows": windows, "unrecorded_calls": unrecorded_calls},
         "manifest": {k: manifest.get(k) for k in ("key_hash", "from", "to", "generated_at", "record_starts_at", "count")} if manifest else {},
     }

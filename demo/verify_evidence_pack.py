@@ -197,6 +197,38 @@ def contains_any_key(value: Any, forbidden: set[str]) -> bool:
     return False
 
 
+# The new receipt profiles (allowed without a balance, a window opener or
+# closer, a gap record) make no payment, spend or balance claim anywhere. A key
+# that states one is refused at any depth, by exact name or by marker, whatever
+# its case or punctuation. The old evaluated and paid profiles are not judged by
+# this rule. tools/verify_evidence_pack.py holds the same rule.
+NEW_PROFILE_CLAIM_FIELDS = (
+    VERIFIED_NOT_EVALUATED_FORBIDDEN_FIELDS | VERIFIED_NOT_EVALUATED_BALANCE_FIELDS
+    | {"transaction", "payer", "pay_to", "credit_unit", "cost_credits", "spend_mode"}
+)
+NEW_PROFILE_CLAIM_MARKERS = VERIFIED_NOT_EVALUATED_BALANCE_MARKERS + (
+    "payment", "invoice", "preimage", "amountsat", "amountusd", "amountatomic",
+)
+NEW_PROFILE_CLAIM_FIELD_FORMS = frozenset(balance_key_form(k) for k in NEW_PROFILE_CLAIM_FIELDS)
+NEW_PROFILE_CLAIM_MARKER_FORMS = tuple(balance_key_form(m) for m in NEW_PROFILE_CLAIM_MARKERS)
+
+
+def contains_forbidden_claim(value: Any) -> bool:
+    """True if any key, at any depth, is a payment, spend or balance claim."""
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if isinstance(key, str):
+                form = balance_key_form(key)
+                if form in NEW_PROFILE_CLAIM_FIELD_FORMS or any(m in form for m in NEW_PROFILE_CLAIM_MARKER_FORMS):
+                    return True
+            if contains_forbidden_claim(child):
+                return True
+        return False
+    if isinstance(value, list):
+        return any(contains_forbidden_claim(child) for child in value)
+    return False
+
+
 class VerificationError(Exception):
     pass
 
@@ -639,8 +671,21 @@ def parse_window_start(value: Any) -> datetime | None:
 def makes_no_balance_claim(receipt: dict[str, Any]) -> bool:
     return (
         strict_json_equal(receipt.get("budget"), VERIFIED_NOT_EVALUATED_BUDGET)
-        and not any(field in receipt for field in VERIFIED_NOT_EVALUATED_FORBIDDEN_FIELDS)
-        and not contains_balance_claim({k: v for k, v in receipt.items() if k != "budget"})
+        and not contains_forbidden_claim({k: v for k, v in receipt.items() if k != "budget"})
+    )
+
+
+def is_new_profile_receipt(receipt: Any) -> bool:
+    """A receipt of the three shapes added for sign-every-action: allowed
+    without a balance, a window opener or closer, a gap record."""
+    if not isinstance(receipt, dict):
+        return False
+    budget = receipt.get("budget")
+    return bool(
+        (receipt.get("decision") == "allowed" and receipt.get("decision_reason") == "policy_allowed"
+         and isinstance(budget, dict) and budget.get("spend_mode") == "not_evaluated")
+        or receipt.get("decision_reason") == "observe_unrecorded"
+        or any(field in receipt for field in RATE_WINDOW_FIELDS + UNRECORDED_FIELDS)
     )
 
 
@@ -742,6 +787,7 @@ def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reas
             and strict_json_equal(receipt.get("budget"), VERIFIED_NOT_EVALUATED_BUDGET)
             and not any(field in receipt for field in VERIFIED_NOT_EVALUATED_FORBIDDEN_FIELDS)
             and not contains_balance_claim({k: v for k, v in receipt.items() if k != "budget"})
+            and (not is_new_profile_receipt(receipt) or not contains_forbidden_claim({k: v for k, v in receipt.items() if k != "budget"}))
             and isinstance(metadata_value, dict)
             and not any(field in metadata for field in ("cost_credits", "credit_unit", "limit", "limit_credits", "projected_cost_credits", "remaining_credits", "used"))
             and not contains_any_key(policy_value, {"limit_credits", "remaining_after_credits", "remaining_before_credits", "remaining_budget_usd", "remaining_credits"})
@@ -1240,6 +1286,16 @@ def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requi
     primary_decision = str(primary.get("decision", ""))
     primary_reason = str(primary.get("decision_reason", ""))
     decision_profile = decision_profile_for(primary)
+    if is_new_profile_receipt(primary):
+        # The Pack wrapper repeats the receipt's budget and makes no claim of
+        # its own: nothing beside the exact budget mirrors, at any depth.
+        checks["pack_no_forbidden_claims"] = (
+            strict_json_equal(pack.get("budget_state"), VERIFIED_NOT_EVALUATED_BUDGET)
+            and not contains_forbidden_claim({k: v for k, v in pack.items() if k not in ("receipts", "budget", "budget_state")})
+        )
+        if not checks["pack_no_forbidden_claims"]:
+            add_reason(reasons, reason_codes, "invalid_not_evaluated_provenance", "pack wrapper of a no-balance receipt carries a budget, spend or payment claim (or a budget_state that is not the exact no-balance budget)")
+
     if decision_profile == "paid_rail":
         checks["budget_state_matches_primary_receipt"] = (
             bool(primary)

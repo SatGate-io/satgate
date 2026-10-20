@@ -209,19 +209,22 @@ func UnrecordedDecision(call MCPWindowedCall, calls int64) MCPDecision {
 	return d
 }
 
-// WindowRecorder is an optional interface of an EvidenceRecorder. It is how a
-// recorder that keeps windows (the gateway's shared window store) is told about
-// calls that get no receipt of their own. One method serves both kinds (see
-// MCPWindowedCall.Kind).
+// WindowRecorder is an optional interface of an EvidenceRecorder, required when
+// the sign-every-action switch is on. It is how a recorder that keeps windows
+// (the gateway's shared window store) is told about calls that get no receipt of
+// their own. One method serves both kinds (see MCPWindowedCall.Kind).
 //
 // The proxy calls RecordWindowedCall once per call:
 //
 //   - WindowKindRefused: for every call the request limiter refused and, when
 //     SetSignEveryAction is on, every call made with a key that verified and
 //     is revoked or expired. It is called after the refusal is decided and
-//     before it is sent, and the same refusal is sent whatever the method
-//     returns: a refused call is not passed on, so a receipt that cannot be
-//     made costs the agent nothing (the error is logged).
+//     before it is sent. The answer decides what the agent gets:
+//     (nil, nil) means the call was counted in a window that is already open
+//     and signed, and the agent gets the ordinary refusal; a handle with a
+//     receipt id means this call opened the window; an error, or a handle with
+//     no receipt id, means the window could not be recorded, and the agent
+//     gets proof_unavailable instead of the ordinary refusal.
 //   - WindowKindUnrecorded: when SetSignEveryAction is on and an Observe call
 //     was passed on because its receipt could not be made. The call has gone
 //     on; the method must not fail it. It is called once for that call.
@@ -235,9 +238,11 @@ func UnrecordedDecision(call MCPWindowedCall, calls int64) MCPDecision {
 // when signing works again. It returns the receipt's handles on a call that
 // signed one and nil, nil on the others.
 //
-// A recorder that does not implement this interface is given one denied
-// receipt for each refused call through RecordMCPDecision instead (complete,
-// but one signature per refused call), and nothing for an unrecorded call.
+// A recorder that does not implement this interface cannot be used with the
+// switch on: SetSignEveryAction returns ErrSignEveryActionNeedsWindowRecorder,
+// and until a capable recorder is installed every call that needs a window is
+// answered proof_unavailable. The proxy never signs one receipt per refused
+// call behind the wiring's back.
 type WindowRecorder interface {
 	RecordWindowedCall(ctx context.Context, call MCPWindowedCall) (*MCPEvidence, error)
 }

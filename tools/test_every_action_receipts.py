@@ -276,6 +276,148 @@ class EveryActionReceipts(unittest.TestCase):
             with self.subTest(surface=surface):
                 self.assertFalse(self.verify(surface, tampered)["valid"])
 
+    # ---- round 2: nothing nested, and one reading of provenance in both copies ----
+
+    # Claims a new-profile receipt must not make, at any depth, spelled the way a
+    # signer might hide them. Each is signed, so only the profile can refuse it.
+    HIDDEN_CLAIMS = {
+        "payment_hash in metadata": ("metadata", {"public_key_ed25519_b64": "k", "tenant_id": "t", "request_id": "r", "payment_hash": "ab"}),
+        "rail nested in metadata": ("metadata", {"public_key_ed25519_b64": "k", "tenant_id": "t", "request_id": "r", "nested": {"rail": "credits"}}),
+        "amount_sats nested twice": ("metadata", {"public_key_ed25519_b64": "k", "tenant_id": "t", "request_id": "r", "a": {"b": [{"amount_sats": 5}]}}),
+        "camelCase payment key": ("metadata", {"public_key_ed25519_b64": "k", "tenant_id": "t", "request_id": "r", "Payment-Hash": "ab"}),
+        "invoice in policy": ("policy", {"policy_id": "p", "policy_version": "v1", "invoice_hash": "x"}),
+        "spend_mode nested": ("metadata", {"public_key_ed25519_b64": "k", "tenant_id": "t", "request_id": "r", "x": {"spend_mode": "credits"}}),
+        "cost_credits nested": ("policy", {"policy_id": "p", "policy_version": "v1", "x": {"cost_credits": 3}}),
+        "remaining nested": ("metadata", {"public_key_ed25519_b64": "k", "tenant_id": "t", "request_id": "r", "x": {"remaining_credits": 3}}),
+        "balance nested": ("metadata", {"public_key_ed25519_b64": "k", "tenant_id": "t", "request_id": "r", "x": [{"balance": 3}]}),
+    }
+
+    def with_hidden(self, build, field, value):
+        r = build()
+        base = r.get(field)
+        merged = dict(base) if isinstance(base, dict) else {}
+        merged.update(value)
+        r[field] = merged
+        return r
+
+    def test_nested_payment_spend_and_balance_claims_are_invalid_in_every_new_profile(self):
+        builders = {
+            "allowed": lambda: allowed_free(self.f),
+            "opener": lambda: opener(self.f),
+            "closer": lambda: closer(self.f),
+            "gap": lambda: gap(self.f),
+        }
+        for shape, build in builders.items():
+            for label, (field, value) in self.HIDDEN_CLAIMS.items():
+                r = self.with_hidden(build, field, value)
+                if field == "metadata":
+                    r["metadata"].setdefault("public_key_ed25519_b64", self.f.x)
+                self.rejected(r, f"{shape}: {label}")
+
+    def test_nested_claims_are_invalid_on_account_level_window_receipts(self):
+        for reason in ("token_revoked", "capability_expired"):
+            for label, (field, value) in self.HIDDEN_CLAIMS.items():
+                r = account_level(self.f, reason)
+                merged = dict(r.get(field) or {})
+                merged.update(value)
+                r[field] = merged
+                pack = self.f.pack(r)
+                for surface in paid.VERIFIERS:
+                    with self.subTest(reason=reason, case=label, surface=surface):
+                        result = self.verify(surface, pack)
+                        self.assertTrue(result["checks"]["signature_valid"])
+                        self.assertFalse(result["valid"], result)
+
+    def test_unsigned_pack_wrapper_claims_are_invalid(self):
+        wrappers = {
+            "metadata.balance": {"metadata": {"balance": 3}},
+            "nested payment": {"extra": {"nested": {"payment_hash": "ab"}}},
+            "nested rail": {"extra": [{"rail": "l402"}]},
+            "remaining": {"remaining_credits": 4},
+            "spend": {"x": {"spend_mode": "credits"}},
+        }
+        for shape, build in {"allowed": lambda: allowed_free(self.f), "closer": lambda: closer(self.f), "gap": lambda: gap(self.f)}.items():
+            for label, extra in wrappers.items():
+                pack = self.pack(build())
+                pack.update(copy.deepcopy(extra))
+                for surface in paid.VERIFIERS:
+                    with self.subTest(shape=shape, case=label, surface=surface):
+                        result = self.verify(surface, pack)
+                        self.assertFalse(result["valid"], result)
+
+    def test_pack_wrapper_budget_state_must_be_the_exact_no_balance_budget(self):
+        for label, state in {"missing": None, "nonzero cost": {"spend_mode": "not_evaluated", "cost_credits": 2},
+                             "extra key": {"spend_mode": "not_evaluated", "cost_credits": 0, "note": "x"}}.items():
+            pack = self.pack(allowed_free(self.f))
+            if state is None:
+                del pack["budget_state"]
+            else:
+                pack["budget_state"] = state
+            for surface in paid.VERIFIERS:
+                with self.subTest(case=label, surface=surface):
+                    self.assertFalse(self.verify(surface, pack)["valid"])
+
+    def test_authority_of_a_new_profile_receipt_must_name_a_verified_key(self):
+        # A call or refusal by a key that verified: verified_macaroon_caveats, the
+        # capability hash bound, raw fields redacted. Missing authority, the
+        # no-capability form, an unredacted field or a hash that is not the
+        # receipt's fail in both copies the same way.
+        def without_authority(r):
+            r.pop("authority")
+            return r
+
+        def other_authority(**fields):
+            def build(r):
+                r["authority"] = {"provenance_level": "verified_macaroon_caveats", "capability_hash": r["capability_hash"],
+                                  "raw_capability_token": "redacted", "raw_budget_id": "redacted",
+                                  "raw_token_id": "redacted", "raw_parent_token_id": "redacted"}
+                r["authority"].update(fields)
+                return r
+            return build
+
+        bad = {
+            "authority missing": without_authority,
+            "no_verified_capability": lambda r: r.update(authority={"provenance_level": "no_verified_capability"}) or r,
+            "sandbox form": lambda r: r.update(authority={"provenance_level": "sandbox_no_capability"}) or r,
+            "raw token not redacted": other_authority(raw_capability_token="sgcap_x"),
+            "unknown authority field": other_authority(surprise="x"),
+            "hash not the receipt's": other_authority(capability_hash="sha256:another"),
+        }
+        for shape, build in {"allowed": lambda: allowed_free(self.f), "opener": lambda: opener(self.f),
+                             "closer": lambda: closer(self.f), "gap": lambda: gap(self.f)}.items():
+            for label, edit in bad.items():
+                self.rejected(edit(build()), f"{shape}: {label}")
+
+    def test_authority_that_is_not_an_object_is_malformed_input_in_both_copies(self):
+        for build in (lambda: allowed_free(self.f), lambda: closer(self.f), lambda: gap(self.f)):
+            r = build()
+            r["authority"] = "verified_macaroon_caveats"
+            pack = self.pack(r)
+            for surface in paid.VERIFIERS:
+                with self.subTest(surface=surface):
+                    result = self.verify(surface, pack)
+                    self.assertFalse(result["valid"], result)
+                    self.assertEqual(result["reason_codes"], ["invalid_input"])
+
+    def test_revoked_and_expired_window_receipts_name_no_capability(self):
+        for reason in ("token_revoked", "capability_expired"):
+            for label, edit in {
+                "verified authority": lambda r: r.update(authority=paid.verified_not_evaluated(self.f)["authority"], capability_hash="sha256:verified-capability") or r,
+                "authority missing": lambda r: r.pop("authority") and r,
+                "capability hash present": lambda r: r.update(capability_hash="sha256:verified-capability") or r,
+            }.items():
+                r = edit(account_level(self.f, reason))
+                pack = self.f.pack(r)
+                for surface in paid.VERIFIERS:
+                    with self.subTest(reason=reason, case=label, surface=surface):
+                        result = self.verify(surface, pack)
+                        self.assertTrue(result["checks"]["signature_valid"])
+                        self.assertFalse(result["valid"], result)
+
+    def test_old_policy_denied_with_a_verified_key_is_still_valid_without_window_fields(self):
+        # Not a new profile: judged as before, in both copies.
+        self.accepted(paid.verified_not_evaluated(self.f), "verified policy denial")
+
 
 if __name__ == "__main__":
     unittest.main()
