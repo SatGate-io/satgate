@@ -458,8 +458,15 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Inject auth token into params._meta if from header
-	if authToken != "" && req.Params != nil {
+	// Inject auth token into params._meta if from header. With sign-every-action
+	// on, the connection's credential also travels on the context, apart from
+	// params, and params that are not an object are left as they came: the
+	// request still belongs to the key that was verified, and its refusal can
+	// be signed (see authenticate).
+	keepParams := s.proxy.signEveryAction && req.Params != nil && !paramsAreObject(req.Params)
+	if keepParams {
+		// nothing to inject into
+	} else if authToken != "" && req.Params != nil {
 		req.Params = injectMetaToken(req.Params, authToken)
 	} else if authToken != "" && req.Params == nil {
 		metaJSON, _ := json.Marshal(map[string]string{"token": authToken})
@@ -473,6 +480,9 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 		// methods such as tools/list can use the already-resolved tenant and budget
 		// subject without re-verifying or guessing from global session state.
 		reqCtx := session.contextWithIdentity()
+		if s.proxy.signEveryAction {
+			reqCtx = withTransportToken(reqCtx, authToken)
+		}
 		resp, handleErr := s.proxy.handleRequest(reqCtx, req)
 		if handleErr != nil {
 			resp = NewErrorResponse(req.ID, CodeInternalError, handleErr.Error())

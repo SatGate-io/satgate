@@ -111,6 +111,9 @@ type eaEnv struct {
 	budgetID  string
 	credits   int64
 	window    bool
+	// sender, when set, carries a request to the proxy by another road (a real
+	// HTTP transport) and brings the answer back. Nil means a direct call.
+	sender func(*Request) *Response
 }
 
 type eaOpts struct {
@@ -129,6 +132,9 @@ type eaOpts struct {
 	garbage   bool
 	noKey     bool
 	defaultUp bool
+	failOpen  bool // the budget store's fail mode is "open"
+	charge    bool // the proxy decides under charge mode (l402)
+	renamed   bool // paid_read is a renamed tool of the tenant
 	window    bool // set by the runner: sign refusals that repeat through a window recorder
 }
 
@@ -172,6 +178,14 @@ func (u *eaUpstreamTransport) count() int {
 	return u.writes
 }
 
+// eaRenamedRouter is the scripted router for a tenant whose paid_read tool is
+// listed under a name other than its own.
+type eaRenamedRouter struct{ *scriptedRouter }
+
+func (eaRenamedRouter) IsRenamedToolForTenant(_ context.Context, _, tool string) bool {
+	return tool == "paid_read"
+}
+
 func newEAEnv(t *testing.T, o eaOpts) *eaEnv {
 	t.Helper()
 	cfg := &Config{
@@ -185,12 +199,19 @@ func newEAEnv(t *testing.T, o eaOpts) *eaEnv {
 	if o.observe {
 		cfg.Enforcement.Mode = "observe"
 	}
+	if o.failOpen {
+		cfg.Budget.FailMode = "open"
+	}
 	proxy, err := New(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
 	rr := &scriptedRouter{}
-	proxy.SetUpstreamRouter(rr)
+	if o.renamed {
+		proxy.SetUpstreamRouter(eaRenamedRouter{rr})
+	} else {
+		proxy.SetUpstreamRouter(rr)
+	}
 	base := &eaRecorder{}
 	e := &eaEnv{t: t, proxy: proxy, rr: rr, base: base, rec: base, ctx: context.Background(), budgetID: eaBudget, credits: eaCredits, window: o.window}
 	if o.tenantCtx {
@@ -261,6 +282,9 @@ func newEAEnv(t *testing.T, o eaOpts) *eaEnv {
 	if o.brokenBud {
 		proxy.SetBudgetEnforcer(failingBudget{proxy.budget.(*InMemoryBudgetEnforcer)})
 	}
+	if o.charge {
+		proxy.SetEnforcementMode("l402")
+	}
 	if o.defaultUp {
 		tr := &eaUpstreamTransport{}
 		client := &UpstreamClient{name: "default", transport: tr}
@@ -289,6 +313,9 @@ func (e *eaEnv) raw(id int, method, fields string) *Request {
 
 func (e *eaEnv) send(req *Request) *Response {
 	e.t.Helper()
+	if e.sender != nil {
+		return e.sender(req)
+	}
 	resp, err := e.proxy.handleRequest(e.ctx, req)
 	if err != nil {
 		// The transports turn a handler error into an internal error reply.
@@ -335,8 +362,13 @@ type eaRow struct {
 	// window marks the rows signed through the window recorder (a refusal that
 	// repeats): the agent's answer does not change when the signer is down.
 	window bool
-	opts   eaOpts
-	run    func(e *eaEnv) []*Response
+	// transports marks the rows that are also run through a real Streamable
+	// HTTP POST /mcp and an SSE POST /message (every_action_transport_test.go).
+	// A row that needs no key, an expired or a revoked key, or a request context
+	// the transports do not carry cannot be sent that way.
+	transports bool
+	opts       eaOpts
+	run        func(e *eaEnv) []*Response
 	// want is what signing yields with the switch on and the signer up, as
 	// "decision/reason[/code]". For a window row it is the opener.
 	want []string
@@ -383,50 +415,50 @@ func eaTable() []eaRow {
 		{id: "E14", what: "tools/call when the budget store does not answer", why: "SatGate could not decide", opts: eaOpts{brokenBud: true}, run: eaToolCall(1, "paid_read", "")},
 
 		// ---- included: tools/call ----
-		{id: "T01", what: "allowed, priced, Control", included: true, want: spent, run: eaToolCall(1, "paid_read", "")},
-		{id: "T02", what: "allowed, free tool, Control", included: true, want: allowedFree, run: eaToolCall(1, "free_read", "")},
-		{id: "T03", what: "allowed, priced, key with no budget caveat", included: true, want: spent, opts: eaOpts{noBudget: true}, run: eaToolCall(1, "paid_read", "")},
-		{id: "T04", what: "allowed, priced, Observe, inside the budget", included: true, observeOpen: true, want: spent, opts: eaOpts{observe: true}, run: eaToolCall(1, "paid_read", "")},
-		{id: "T05", what: "allowed over budget, Observe", included: true, observeOpen: true, want: allowedFree, opts: eaOpts{observe: true}, run: eaToolCall(1, "big_order", "")},
-		{id: "T06", what: "refused: over budget, Control", included: true, want: []string{"denied/budget_exhausted"}, run: eaToolCall(1, "big_order", "")},
-		{id: "T07", what: "refused: tool not in the key's scope", included: true, want: []string{"denied/policy_denied"}, opts: eaOpts{scope: "free_read"}, run: eaToolCall(1, "paid_read", "")},
-		{id: "T08", what: "refused: argument rule", included: true, want: []string{"denied/policy_denied/TOOL_ARGUMENT_DENIED"},
+		{id: "T01", what: "allowed, priced, Control", included: true, transports: true, want: spent, run: eaToolCall(1, "paid_read", "")},
+		{id: "T02", what: "allowed, free tool, Control", included: true, transports: true, want: allowedFree, run: eaToolCall(1, "free_read", "")},
+		{id: "T03", what: "allowed, priced, key with no budget caveat", included: true, transports: true, want: spent, opts: eaOpts{noBudget: true}, run: eaToolCall(1, "paid_read", "")},
+		{id: "T04", what: "allowed, priced, Observe, inside the budget", included: true, transports: true, observeOpen: true, want: spent, opts: eaOpts{observe: true}, run: eaToolCall(1, "paid_read", "")},
+		{id: "T05", what: "allowed over budget, Observe", included: true, transports: true, observeOpen: true, want: allowedFree, opts: eaOpts{observe: true}, run: eaToolCall(1, "big_order", "")},
+		{id: "T06", what: "refused: over budget, Control", included: true, transports: true, want: []string{"denied/budget_exhausted"}, run: eaToolCall(1, "big_order", "")},
+		{id: "T07", what: "refused: tool not in the key's scope", included: true, transports: true, want: []string{"denied/policy_denied"}, opts: eaOpts{scope: "free_read"}, run: eaToolCall(1, "paid_read", "")},
+		{id: "T08", what: "refused: argument rule", included: true, transports: true, want: []string{"denied/policy_denied/TOOL_ARGUMENT_DENIED"},
 			opts: eaOpts{caveats: []func(*testing.T) string{eaArgRule(robinhoodCapDoc)}},
 			run:  eaToolCall(1, "place_equity_order", `{"type":"limit","quantity":"1","dollar_amount":"5000"}`)},
-		{id: "T14", what: "refused: call that cannot be read", included: true, want: []string{"denied/policy_denied/INVALID_PARAMS"},
+		{id: "T14", what: "refused: call that cannot be read", included: true, transports: true, want: []string{"denied/policy_denied/INVALID_PARAMS"},
 			run: func(e *eaEnv) []*Response {
 				return []*Response{e.send(e.raw(1, MethodToolsCall, `"name":123`))}
 			}},
-		{id: "T15", what: "refused: tool name with the reserved prefix", included: true, want: []string{"denied/policy_denied/RESERVED_TOOL_NAME"}, run: eaToolCall(1, "argrules:v1:abc", "")},
-		{id: "T16", what: "allowed, priced, service unreachable", included: true, want: spent, run: func(e *eaEnv) []*Response {
+		{id: "T15", what: "refused: tool name with the reserved prefix", included: true, transports: true, want: []string{"denied/policy_denied/RESERVED_TOOL_NAME"}, run: eaToolCall(1, "argrules:v1:abc", "")},
+		{id: "T16", what: "allowed, priced, service unreachable", included: true, transports: true, want: spent, run: func(e *eaEnv) []*Response {
 			e.rr.replies = []func() (*Response, error){forwardFails}
 			return []*Response{e.call(1, "paid_read", "")}
 		}},
-		{id: "T17", what: "allowed, free, service unreachable", included: true, want: allowedFree, run: func(e *eaEnv) []*Response {
+		{id: "T17", what: "allowed, free, service unreachable", included: true, transports: true, want: allowedFree, run: func(e *eaEnv) []*Response {
 			e.rr.replies = []func() (*Response, error){forwardFails}
 			return []*Response{e.call(1, "free_read", "")}
 		}},
-		{id: "T18", what: "allowed, free, service answers unknown tool", included: true, want: allowedFree, run: func(e *eaEnv) []*Response {
+		{id: "T18", what: "allowed, free, service answers unknown tool", included: true, transports: true, want: allowedFree, run: func(e *eaEnv) []*Response {
 			e.rr.replies = []func() (*Response, error){rpcErrorCode(-32601)}
 			return []*Response{e.call(1, "free_read", "")}
 		}},
-		{id: "T19", what: "allowed, free, service answers isError", included: true, want: allowedFree, run: func(e *eaEnv) []*Response {
+		{id: "T19", what: "allowed, free, service answers isError", included: true, transports: true, want: allowedFree, run: func(e *eaEnv) []*Response {
 			e.rr.replies = []func() (*Response, error){isErrorReply}
 			return []*Response{e.call(1, "free_read", "")}
 		}},
-		{id: "T20", what: "refused: spending limit", included: true, want: []string{"denied/policy_denied/TOOL_SPEND_LIMIT_DENIED"},
+		{id: "T20", what: "refused: spending limit", included: true, transports: true, want: []string{"denied/policy_denied/TOOL_SPEND_LIMIT_DENIED"},
 			opts: eaOpts{gate: true, caveats: []func(*testing.T) string{eaControl(spendDoc200Day)}},
 			run:  eaToolCall(1, "place_crypto_order", order("300"))},
-		{id: "T21", what: "allowed inside a spending limit, priced", included: true, want: spent,
+		{id: "T21", what: "allowed inside a spending limit, priced", included: true, transports: true, want: spent,
 			opts: eaOpts{gate: true, caveats: []func(*testing.T) string{eaControl(spendDoc200Day)}},
 			run:  eaToolCall(1, "place_crypto_order", order("100"))},
-		{id: "T22", what: "order held for the owner's approval", included: true, want: []string{"denied/policy_denied/APPROVAL_REQUIRED"},
+		{id: "T22", what: "order held for the owner's approval", included: true, transports: true, want: []string{"denied/policy_denied/APPROVAL_REQUIRED"},
 			opts: eaOpts{approvals: true, caveats: []func(*testing.T) string{eaControl(askAbove50)}},
 			run:  eaToolCall(1, "place_crypto_order", order("75"))},
-		{id: "T23", what: "order below the approval threshold", included: true, want: spent,
+		{id: "T23", what: "order below the approval threshold", included: true, transports: true, want: spent,
 			opts: eaOpts{approvals: true, caveats: []func(*testing.T) string{eaControl(askAbove50)}},
 			run:  eaToolCall(1, "place_crypto_order", order("10"))},
-		{id: "T24", what: "held order, owner approves, agent sends it again", included: true,
+		{id: "T24", what: "held order, owner approves, agent sends it again", included: true, transports: true,
 			want: []string{"denied/policy_denied/APPROVAL_REQUIRED", "allowed/budget_authorized"},
 			opts: eaOpts{approvals: true, caveats: []func(*testing.T) string{eaControl(askAbove50)}},
 			run: func(e *eaEnv) []*Response {
@@ -439,20 +471,28 @@ func eaTable() []eaRow {
 				return []*Response{first, e.call(2, "place_crypto_order", order("75"))}
 			}},
 
+		// ---- included: every other outcome that lets a call through, or refuses it ----
+		{id: "T25", what: "allowed, Control, budget store down and its fail mode is open", included: true, transports: true, want: allowedFree, opts: eaOpts{brokenBud: true, failOpen: true}, run: eaToolCall(1, "paid_read", "")},
+		{id: "T26", what: "allowed, Observe, price could not be read (default price)", included: true, transports: true, observeOpen: true, want: spent, opts: eaOpts{observe: true, badPrice: true}, run: eaToolCall(1, "paid_read", "")},
+		{id: "T27", what: "allowed, Observe, budget store down", included: true, transports: true, observeOpen: true, want: allowedFree, opts: eaOpts{observe: true, brokenBud: true}, run: eaToolCall(1, "paid_read", "")},
+		{id: "T28", what: "refused: renamed tool on a key with money rules", included: true, transports: true, want: []string{"denied/policy_denied/TOOL_NOT_COVERED_BY_LIMITS"},
+			opts: eaOpts{renamed: true, gate: true, scope: "*", caveats: []func(*testing.T) string{eaControl(spendDoc200Day)}}, run: eaToolCall(1, "paid_read", "")},
+		{id: "T29", what: "allowed, charge mode (nothing debited here)", included: true, transports: true, want: allowedFree, opts: eaOpts{charge: true}, run: eaToolCall(1, "paid_read", "")},
+
 		// ---- included: the other methods ----
-		{id: "M08", what: "resources/list, key valid, no default service", included: true, want: []string{eaNoUpstream}, run: eaMethod("resources/list", "")},
-		{id: "M09", what: "resources/read, key valid, no default service", included: true, want: []string{eaNoUpstream}, run: eaMethod("resources/read", `"uri":"x"`)},
-		{id: "M10", what: "prompts/list, key valid, no default service", included: true, want: []string{eaNoUpstream}, run: eaMethod("prompts/list", "")},
-		{id: "M11", what: "prompts/get, key valid, no default service", included: true, want: []string{eaNoUpstream}, run: eaMethod("prompts/get", `"name":"x"`)},
-		{id: "M13", what: "unknown method, key valid, no default service", included: true, want: []string{eaNoUpstream}, run: eaMethod("foo/bar", "")},
-		{id: "M13b", what: "unknown method, key valid, default service connected", included: true, want: allowedFree, opts: eaOpts{defaultUp: true}, run: eaMethod("resources/list", "")},
-		{id: "M14", what: "satgate/budget", included: true, want: allowedFree, run: eaMethod(MethodSatGateBudget, "")},
-		{id: "M15", what: "budget/check", included: true, want: allowedFree, run: eaMethod("budget/check", "")},
-		{id: "M16", what: "satgate/delegate, carved", included: true, want: allowedFree, run: eaMethod(MethodSatGateDelegate, `"budget":5,"scope":"free_read","label":"helper"`)},
-		{id: "M16b", what: "satgate/delegate, refused: parent cannot afford it", included: true, want: []string{"denied/policy_denied/DELEGATION_REFUSED"}, run: eaMethod(MethodSatGateDelegate, `"budget":5000,"label":"helper"`)},
-		{id: "M16c", what: "satgate/delegate, refused: params cannot be read", included: true, want: []string{"denied/policy_denied/INVALID_PARAMS"}, run: eaMethod(MethodSatGateDelegate, `"budget":"many"`)},
+		{id: "M08", what: "resources/list, key valid, no default service", included: true, transports: true, want: []string{eaNoUpstream}, run: eaMethod("resources/list", "")},
+		{id: "M09", what: "resources/read, key valid, no default service", included: true, transports: true, want: []string{eaNoUpstream}, run: eaMethod("resources/read", `"uri":"x"`)},
+		{id: "M10", what: "prompts/list, key valid, no default service", included: true, transports: true, want: []string{eaNoUpstream}, run: eaMethod("prompts/list", "")},
+		{id: "M11", what: "prompts/get, key valid, no default service", included: true, transports: true, want: []string{eaNoUpstream}, run: eaMethod("prompts/get", `"name":"x"`)},
+		{id: "M13", what: "unknown method, key valid, no default service", included: true, transports: true, want: []string{eaNoUpstream}, run: eaMethod("foo/bar", "")},
+		{id: "M13b", what: "unknown method, key valid, default service connected", included: true, transports: true, want: allowedFree, opts: eaOpts{defaultUp: true}, run: eaMethod("resources/list", "")},
+		{id: "M14", what: "satgate/budget", included: true, transports: true, want: allowedFree, run: eaMethod(MethodSatGateBudget, "")},
+		{id: "M15", what: "budget/check", included: true, transports: true, want: allowedFree, run: eaMethod("budget/check", "")},
+		{id: "M16", what: "satgate/delegate, carved", included: true, transports: true, want: allowedFree, run: eaMethod(MethodSatGateDelegate, `"budget":5,"scope":"free_read","label":"helper"`)},
+		{id: "M16b", what: "satgate/delegate, refused: parent cannot afford it", included: true, transports: true, want: []string{"denied/policy_denied/DELEGATION_REFUSED"}, run: eaMethod(MethodSatGateDelegate, `"budget":5000,"label":"helper"`)},
+		{id: "M16c", what: "satgate/delegate, refused: params cannot be read", included: true, transports: true, want: []string{"denied/policy_denied/INVALID_PARAMS"}, run: eaMethod(MethodSatGateDelegate, `"budget":"many"`)},
 		{id: "M17", what: "any authenticated method with a revoked key", included: true, window: true, want: []string{"denied/token_revoked/TOKEN_REVOKED"}, opts: eaOpts{revoked: true}, run: eaToolCall(1, "paid_read", "")},
-		{id: "M18", what: "any authenticated method when the limiter says no", included: true, window: true, want: []string{"denied/policy_denied/RATE_LIMITED"}, opts: eaOpts{limited: true}, run: eaToolCall(1, "paid_read", "")},
+		{id: "M18", what: "any authenticated method when the limiter says no", included: true, transports: true, window: true, want: []string{"denied/policy_denied/RATE_LIMITED"}, opts: eaOpts{limited: true}, run: eaToolCall(1, "paid_read", "")},
 		{id: "M19", what: "expired key, signature verifies, tenant on the request", included: true, window: true, want: []string{"denied/capability_expired/CREDENTIAL_EXPIRED"}, opts: eaOpts{expired: true, tenantCtx: true}, run: eaToolCall(1, "paid_read", "")},
 	}
 }
@@ -473,6 +513,14 @@ type eaResult struct {
 // none: the main branch). down makes the signer fail before the row starts.
 func eaRun(t *testing.T, row eaRow, on, down bool) eaResult {
 	t.Helper()
+	return eaRunVia(t, row, on, down, nil)
+}
+
+// eaRunVia is eaRun with the requests carried by another road: via, when not
+// nil, installs a sender on the environment (a real HTTP transport) and returns
+// what to run when the row is done.
+func eaRunVia(t *testing.T, row eaRow, on, down bool, via func(*testing.T, *eaEnv) func()) eaResult {
+	t.Helper()
 	opts := row.opts
 	opts.window = row.window
 	e := newEAEnv(t, opts)
@@ -481,6 +529,9 @@ func eaRun(t *testing.T, row eaRow, on, down bool) eaResult {
 			t.Fatal("this build has no switch")
 		}
 		eaSetSwitch(e, true)
+	}
+	if via != nil {
+		defer via(t, e)()
 	}
 	e.base.setDown(down)
 	before := e.remaining()

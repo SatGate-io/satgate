@@ -143,8 +143,53 @@ func TestEveryAction_Matrix(t *testing.T) {
 		}
 	}
 	t.Logf("master table: %d included rows, %d excluded rows", included, excluded)
-	if included != 33 || excluded != 14 {
+	if included != 38 || excluded != 14 {
 		t.Fatalf("the table has %d included and %d excluded rows; the PR report says 33 and 14. Update both together", included, excluded)
+	}
+}
+
+// The same table through the two real transports. An included row flagged
+// transports yields exactly the receipts it lists, and with the signer down it
+// is stopped with proof_unavailable and nothing debited, however it arrived.
+func TestEveryAction_Matrix_Transports(t *testing.T) {
+	rows := 0
+	for _, row := range eaTable() {
+		if !row.transports {
+			continue
+		}
+		rows++
+		for _, tr := range eaTransports {
+			row, tr := row, tr
+			t.Run(row.id+"_"+tr.name, func(t *testing.T) {
+				up := eaRunVia(t, row, true, false, tr.via)
+				if !reflect.DeepEqual(up.signed, row.want) {
+					t.Fatalf("%s (%s) via %s: receipts = %v, want exactly %v", row.id, row.what, tr.name, up.signed, row.want)
+				}
+				direct := eaRun(t, row, true, false)
+				for i := range up.responses {
+					if eaShape(up.responses[i]) != eaShape(direct.responses[i]) {
+						t.Fatalf("%s via %s answers differently:\n transport %s\n direct    %s", row.id, tr.name, eaShape(up.responses[i]), eaShape(direct.responses[i]))
+					}
+				}
+				if up.forwarded != direct.forwarded || up.debit != direct.debit {
+					t.Fatalf("%s via %s: forwarded %d debit %d, direct: forwarded %d debit %d", row.id, tr.name, up.forwarded, up.debit, direct.forwarded, direct.debit)
+				}
+				down := eaRunVia(t, row, true, true, tr.via)
+				last := down.responses[len(down.responses)-1]
+				if row.observeOpen {
+					if down.forwarded != 1 || last.Error != nil {
+						t.Fatalf("%s via %s: Observe with the signer down: forwarded %d, answer %s", row.id, tr.name, down.forwarded, eaShape(last))
+					}
+					return
+				}
+				if !eaIsProofUnavailable(last) || down.forwarded != 0 || down.debit != 0 || down.counter != 0 {
+					t.Fatalf("%s via %s, signer down: answer %s forwarded %d debit %d window_total %d", row.id, tr.name, eaShape(last), down.forwarded, down.debit, down.counter)
+				}
+			})
+		}
+	}
+	if rows < 30 {
+		t.Fatalf("only %d rows are run through the transports", rows)
 	}
 }
 
@@ -269,16 +314,6 @@ func TestEveryAction_SignerDown_StopsEveryIncludedRow(t *testing.T) {
 				// TestObserveKeepsTodaysBehaviourWhenAReceiptFails.
 				if res.forwarded != 1 {
 					t.Fatalf("Observe row: forwarded = %d, today's behaviour is 1", res.forwarded)
-				}
-			case row.window:
-				// A refusal that repeats keeps its answer: the call is refused
-				// either way. It is not passed on and nothing is debited.
-				up := eaRun(t, row, true, false)
-				if eaShape(last) != eaShape(up.responses[len(up.responses)-1]) {
-					t.Fatalf("window row answer changed when the signer is down:\n up   %s\n down %s", eaShape(up.responses[len(up.responses)-1]), eaShape(last))
-				}
-				if res.forwarded != 0 || res.debit != 0 {
-					t.Fatalf("forwarded=%d debit=%d", res.forwarded, res.debit)
 				}
 			default:
 				if !eaIsProofUnavailable(last) {
@@ -617,9 +652,18 @@ func TestEveryAction_OnWithoutRecorder_FailsClosed(t *testing.T) {
 	if e.rr.forwarded() != 0 || e.remaining() != eaCredits {
 		t.Fatal("something was passed on or debited")
 	}
-	// A refusal has nothing to pass on, so it goes out plain.
-	if r := e.send(e.raw(5, "resources/list", "")); r.Error == nil || r.Error.Code != CodeUpstreamError {
-		t.Fatalf("refusal = %s", eaShape(r))
+	// A refusal of a verified key is signed or it is not given: with no
+	// recorder it is proof_unavailable, never the plain refusal.
+	for i, r := range []*Response{
+		e.send(e.raw(5, "resources/list", "")),
+		e.send(e.raw(6, MethodToolsCall, `"name":123`)),
+		e.send(e.raw(7, MethodSatGateDelegate, `"budget":"many"`)),
+		e.call(8, "argrules:v1:abc", ""),
+		e.call(9, "not_in_scope_tool", ""),
+	} {
+		if !eaIsProofUnavailable(r) {
+			t.Fatalf("refusal %d = %s", i, eaShape(r))
+		}
 	}
 }
 
@@ -712,27 +756,86 @@ func TestEveryAction_RateWindow_OpenerCloserAndCount(t *testing.T) {
 	}
 }
 
-func TestEveryAction_RateWindow_ReplyUnchangedWhenTheSignerIsDown(t *testing.T) {
+// A refusal that cannot be recorded is not given as if it had been: with the
+// signer down the agent gets proof_unavailable, not the rate-limit answer. A
+// call counted inside a window that is already open and signed is a success and
+// gets the ordinary answer.
+func TestEveryAction_RateWindow_ProofUnavailableWhenTheSignerIsDown(t *testing.T) {
 	e := newEAEnv(t, eaOpts{limited: true, window: true})
 	eaSetSwitch(e, true)
 	e.base.setDown(true)
 	r := e.call(1, "paid_read", "")
-	if r.Error == nil || r.Error.Code != CodeRateLimited {
+	if !eaIsProofUnavailable(r) {
 		t.Fatalf("answer = %s", eaShape(r))
 	}
-	if !strings.Contains(string(r.Error.Data), `"retry_after_seconds":3`) || strings.Contains(string(r.Error.Data), "receipt") {
-		t.Fatalf("the rate-limit reply changed: %s", r.Error.Data)
+	if strings.Contains(string(r.Error.Data), "retry_after") {
+		t.Fatalf("the proof_unavailable answer carries the rate-limit data: %s", r.Error.Data)
+	}
+	// The signer comes back: the first refusal opens the window.
+	e.base.setDown(false)
+	if r := e.call(2, "paid_read", ""); r.Error == nil || r.Error.Code != CodeRateLimited {
+		t.Fatalf("answer = %s", eaShape(r))
+	}
+	// The signer goes down again. The window is open and signed, so the next
+	// refusal is only counted: that needs no signature and is not a failure.
+	e.base.setDown(true)
+	r = e.call(3, "paid_read", "")
+	if r.Error == nil || r.Error.Code != CodeRateLimited || !strings.Contains(string(r.Error.Data), `"retry_after_seconds":3`) {
+		t.Fatalf("a call counted in an open window got %s", eaShape(r))
+	}
+	// A different tool is a different window: it must be opened, and cannot be.
+	if r := e.call(4, "free_read", ""); !eaIsProofUnavailable(r) {
+		t.Fatalf("answer = %s", eaShape(r))
 	}
 }
 
-// A recorder with no windows gets one denied receipt per refused call.
+// A recorder with no windows cannot sign a repeated refusal as a window. The
+// switch says so when it is turned on, and every window refusal is then
+// proof_unavailable: nothing is signed one per call behind the wiring's back.
 func TestEveryAction_RateLimit_RecorderWithoutWindows(t *testing.T) {
 	e := newEAEnv(t, eaOpts{limited: true})
-	eaSetSwitch(e, true)
-	_ = e.call(1, "paid_read", "")
-	_ = e.call(2, "paid_read", "")
-	if got := e.base.signed(); !reflect.DeepEqual(got, []string{"denied/policy_denied/RATE_LIMITED", "denied/policy_denied/RATE_LIMITED"}) {
-		t.Fatalf("receipts = %v", got)
+	err := e.proxy.SetSignEveryAction(true)
+	if !errors.Is(err, ErrSignEveryActionNeedsWindowRecorder) {
+		t.Fatalf("SetSignEveryAction with a recorder that keeps no windows returned %v", err)
+	}
+	if !errors.Is(e.proxy.SignEveryActionReady(), ErrSignEveryActionNeedsWindowRecorder) {
+		t.Fatal("SignEveryActionReady does not say the wiring is incomplete")
+	}
+	for i := 1; i <= 2; i++ {
+		if r := e.call(i, "paid_read", ""); !eaIsProofUnavailable(r) {
+			t.Fatalf("answer %d = %s", i, eaShape(r))
+		}
+	}
+	if got := e.base.signed(); len(got) != 0 {
+		t.Fatalf("receipts = %v, want none", got)
+	}
+}
+
+// SetSignEveryAction reports a wiring that cannot keep the promise: no
+// recorder, or one without windows. A recorder with windows is ready, and the
+// switch off is always ready.
+func TestEveryAction_SetupError(t *testing.T) {
+	e := newEAEnv(t, eaOpts{})
+	if err := e.proxy.SetSignEveryAction(false); err != nil {
+		t.Fatalf("switch off: %v", err)
+	}
+	e.proxy.SetEvidenceRecorder(nil)
+	if err := e.proxy.SetSignEveryAction(true); !errors.Is(err, ErrSignEveryActionNeedsWindowRecorder) {
+		t.Fatalf("no recorder: %v", err)
+	}
+	if !e.proxy.SignEveryAction() {
+		t.Fatal("the switch was not set; a wiring error must stop traffic, not leave it unsigned")
+	}
+	e.proxy.SetEvidenceRecorder(e.base)
+	if err := e.proxy.SignEveryActionReady(); !errors.Is(err, ErrSignEveryActionNeedsWindowRecorder) {
+		t.Fatalf("recorder without windows: %v", err)
+	}
+	e.proxy.SetEvidenceRecorder(newEAWindowRecorder(e.base))
+	if err := e.proxy.SetSignEveryAction(true); err != nil {
+		t.Fatalf("recorder with windows: %v", err)
+	}
+	if err := e.proxy.SetSignEveryAction(false); err != nil {
+		t.Fatalf("switch off again: %v", err)
 	}
 }
 
@@ -751,7 +854,7 @@ func TestEveryAction_LimiterReason(t *testing.T) {
 		{"your trial ended, " + "buy now", "RATE_LIMITED"}, // not a code: ignored
 		{"lower_case", "RATE_LIMITED"},
 	} {
-		e := newEAEnv(t, eaOpts{})
+		e := newEAEnv(t, eaOpts{window: true})
 		e.proxy.SetRequestLimiter(&reasonedLimiter{reason: c.reason})
 		eaSetSwitch(e, true)
 		r := e.call(1, "paid_read", "")

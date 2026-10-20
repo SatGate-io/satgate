@@ -22,6 +22,7 @@ package mcpserver
 // record, and the request is not passed on.
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -49,18 +50,59 @@ var everyActionMethods = map[string]bool{
 	"budget/check":        true,
 }
 
+// ErrSignEveryActionNeedsWindowRecorder is what SetSignEveryAction and
+// SignEveryActionReady return when the switch is on and the installed
+// evidence recorder cannot keep windows (it does not implement
+// WindowRecorder), or no recorder is installed. Without windows a repeated
+// refusal could only be signed once per call, and an Observe call that went
+// through unrecorded could not be counted: neither keeps the promise.
+var ErrSignEveryActionNeedsWindowRecorder = errors.New("sign every action needs an evidence recorder that implements WindowRecorder")
+
 // SetSignEveryAction turns "sign every action" on or off. It is off by
-// default. Call it before the proxy serves requests. With it on, a recorder
-// must be installed (SetEvidenceRecorder): a request that would be passed on
-// when no recorder exists is refused as proof_unavailable, never passed on
-// unsigned.
-func (p *Proxy) SetSignEveryAction(on bool) {
+// default. Install the recorder first (SetEvidenceRecorder), then call this.
+//
+// Turning the switch on with no recorder, or with a recorder that does not
+// implement WindowRecorder, returns ErrSignEveryActionNeedsWindowRecorder. The
+// switch is still set: until a capable recorder is installed every request
+// that would be passed on is refused as proof_unavailable and every refusal
+// of a verified key is answered proof_unavailable, so a wiring mistake the
+// caller ignores stops traffic and never leaves it unsigned. A caller that
+// installs the recorder after the switch checks SignEveryActionReady once the
+// wiring is done.
+func (p *Proxy) SetSignEveryAction(on bool) error {
 	p.signEveryAction = on
 	p.wireDelegator()
+	return p.SignEveryActionReady()
+}
+
+// SignEveryActionReady reports whether the switch can keep its promise with
+// what is installed now. It returns nil with the switch off.
+func (p *Proxy) SignEveryActionReady() error {
+	if !p.signEveryAction {
+		return nil
+	}
+	if p.evidence == nil {
+		return fmt.Errorf("%w: no recorder is installed", ErrSignEveryActionNeedsWindowRecorder)
+	}
+	if _, ok := p.evidence.(WindowRecorder); !ok {
+		return fmt.Errorf("%w: %T does not", ErrSignEveryActionNeedsWindowRecorder, p.evidence)
+	}
+	return nil
 }
 
 // SignEveryAction reports whether the switch is on.
 func (p *Proxy) SignEveryAction() bool { return p.signEveryAction }
+
+// UncountedObserveMisses is how many Observe calls went through with no
+// receipt and could not be reported to a window recorder, since the proxy
+// started. It is zero when the recorder keeps windows. It exists so a gap that
+// the recorder could not count is still counted somewhere.
+func (p *Proxy) UncountedObserveMisses() int64 { return p.uncountedMisses.Load() }
+
+// ReversalFailures is how many debits the proxy could not give back after a
+// receipt failed, since it started. Each is logged with its budget and request
+// id. A non-zero value means a store owes a reconciliation.
+func (p *Proxy) ReversalFailures() int64 { return p.reversalFailures.Load() }
 
 // wireDelegator gives the delegator the recorder, the switch and the mode
 // lookup, so a delegation is signed under the same rules as a tool call.
@@ -73,6 +115,7 @@ func (p *Proxy) wireDelegator() {
 	p.delegator.receiptFailureBlocks = func(ctx context.Context, tenantID string) bool {
 		return p.allowReceiptFailureBlocks(p.enforcementModeFor(ctx, tenantID))
 	}
+	p.delegator.reversalFailed = func() { p.reversalFailures.Add(1) }
 	p.delegator.reportMiss = func(ctx context.Context, parent *TokenInfo) {
 		p.reportObserveMiss(ctx, parent, MethodSatGateDelegate, "", p.enforcementModeFor(ctx, tenantOf(parent)))
 	}
@@ -98,16 +141,18 @@ func (p *Proxy) reportObserveMiss(ctx context.Context, tokenInfo *TokenInfo, met
 	if !p.signEveryAction {
 		return
 	}
-	reportUnrecorded(ctx, p.evidence, tokenInfo, method, tool, normalizeEnforcementMode(mode))
+	if !reportUnrecorded(ctx, p.evidence, tokenInfo, method, tool, normalizeEnforcementMode(mode)) {
+		p.uncountedMisses.Add(1)
+	}
 }
 
 // reportUnrecorded is reportObserveMiss for any holder of a recorder (the
-// proxy and the delegator).
-func reportUnrecorded(ctx context.Context, rec EvidenceRecorder, tokenInfo *TokenInfo, method, tool, mode string) {
+// proxy and the delegator). It reports whether the recorder took the count.
+func reportUnrecorded(ctx context.Context, rec EvidenceRecorder, tokenInfo *TokenInfo, method, tool, mode string) bool {
 	wr, ok := rec.(WindowRecorder)
 	if !ok {
-		log.Warn().Str("method", method).Str("tool", tool).Msg("observe call went through with no receipt, and the recorder keeps no windows to count it")
-		return
+		log.Error().Str("method", method).Str("tool", receiptTool(tool)).Msg("observe call went through with no receipt, and the recorder keeps no windows to count it")
+		return false
 	}
 	d := identifyDecision(nil, tokenInfo, method, tool, MCPDecision{
 		Decision:           "allowed",
@@ -120,8 +165,10 @@ func reportUnrecorded(ctx context.Context, rec EvidenceRecorder, tokenInfo *Toke
 		WindowStart:   RateWindowStart(time.Now()),
 		WindowSeconds: RateWindowSeconds,
 	}); err != nil {
-		log.Error().Err(err).Str("method", method).Str("tool", tool).Msg("observe miss could not be counted")
+		log.Error().Err(err).Str("method", method).Str("tool", receiptTool(tool)).Msg("observe miss could not be counted")
+		return false
 	}
+	return true
 }
 
 func isObserveMode(mode string) bool {
@@ -155,7 +202,7 @@ func methodRoute(method, tool string) string {
 // the token proved and nothing the agent sent: never the arguments.
 func (p *Proxy) recordMethodDecision(ctx context.Context, req *Request, tokenInfo *TokenInfo, method, tool string, decision MCPDecision) (*MCPEvidence, error) {
 	if p.evidence == nil {
-		return nil, errors.New("no evidence recorder is installed")
+		return nil, errNoRecorder
 	}
 	return recordIdentifiedDecision(ctx, p.evidence, req, tokenInfo, method, tool, decision, p.enforcementModeFor(ctx, tenantOf(tokenInfo)))
 }
@@ -171,6 +218,7 @@ func tenantOf(t *TokenInfo) string {
 // It adds the method, the tool and, when there is a request, its ids; it never
 // adds anything the agent sent.
 func identifyDecision(req *Request, tokenInfo *TokenInfo, method, tool string, decision MCPDecision, mode string) MCPDecision {
+	tool = receiptTool(tool)
 	if tokenInfo != nil {
 		decision.TenantID = tokenInfo.TenantID
 		decision.TokenID = tokenInfo.TokenID
@@ -211,6 +259,25 @@ func identifyDecision(req *Request, tokenInfo *TokenInfo, method, tool string, d
 	return decision
 }
 
+var (
+	errNoRecorder = errors.New("sign every action is on but no evidence recorder is installed")
+	errNoReceipt  = errors.New("recorder returned no receipt")
+)
+
+// receiptTool is the tool name a receipt or a window record may carry. It is
+// the one place the reserved-name rule runs: a name that starts with the
+// reserved argument-rules prefix can carry the nonce of a rule document, so a
+// receipt names the prefix and never the rest of the word. Every receipt and
+// window envelope is built through identifyDecision, recordMCPDecision or
+// recordWindowedRefusal, and each of them passes the tool through here first.
+// Any other name is returned as it is.
+func receiptTool(tool string) string {
+	if macaroon.IsReservedToolName(tool) {
+		return macaroon.ArgumentRulesScopePrefix + "redacted"
+	}
+	return tool
+}
+
 // recordIdentifiedDecision identifies a decision and records it. It is shared
 // by the proxy and the delegator. A recorder that answers with no receipt has
 // not made one: that is an error.
@@ -220,7 +287,7 @@ func recordIdentifiedDecision(ctx context.Context, rec EvidenceRecorder, req *Re
 		return nil, err
 	}
 	if ev == nil || ev.ReceiptID == "" {
-		return nil, errors.New("recorder returned no receipt")
+		return nil, errNoReceipt
 	}
 	return ev, nil
 }
@@ -263,12 +330,9 @@ func (p *Proxy) signAllowed(ctx context.Context, req *Request, tokenInfo *TokenI
 // check signs: denied / policy_denied, no balance claim, with the stable code
 // in denial_code. On success it returns resp (the refusal the agent would have
 // got anyway) with the receipt's handles added to its error data. If the
-// receipt cannot be made it returns proof_unavailable. With no recorder the
-// plain refusal goes out, as every signed refusal does.
+// receipt cannot be made, or no recorder is installed, it returns
+// proof_unavailable: a refusal of a verified key is signed or it is not given.
 func (p *Proxy) refuseSigned(ctx context.Context, req *Request, tokenInfo *TokenInfo, method, tool, code string, resp *Response) *Response {
-	if p.evidence == nil {
-		return resp
-	}
 	ev, err := p.recordMethodDecision(ctx, req, tokenInfo, method, tool, MCPDecision{
 		Decision:           "denied",
 		DecisionReason:     "policy_denied",
@@ -334,21 +398,29 @@ func refusalTool(req *Request) string {
 		return req.Method
 	}
 	if tc, err := ParseToolCall(req.Params); err == nil {
-		return tc.Name
+		return receiptTool(tc.Name)
 	}
 	return ""
 }
 
-// recordWindowedRefusal tells the recorder that a call was refused and is
-// repeatable: a rate-limit refusal, or a call made with a key that verified
-// and is revoked or expired. The refusal goes out whatever happens here.
+// recordWindowedRefusal tells the window recorder that a call was refused and
+// is repeatable: a rate-limit refusal, or a call made with a key that verified
+// and is revoked or expired.
 //
-// A recorder that keeps windows (WindowRecorder) signs one opener and
-// one closer per key, tool and UTC minute. Any other recorder gets one denied
-// receipt for the call.
-func (p *Proxy) recordWindowedRefusal(ctx context.Context, req *Request, tokenInfo *TokenInfo, base MCPDecision, retryAfter time.Duration) {
+// The recorder (WindowRecorder) signs one opener and one closer per key, tool
+// and UTC minute. It returns nil when the call was counted in a window that is
+// already open and signed, which is a success. It returns an error when the
+// opener or the record could not be made, and when there is no recorder or the
+// recorder keeps no windows. The caller then answers proof_unavailable instead
+// of the ordinary refusal: a refusal that cannot be recorded is not given as if
+// it had been.
+func (p *Proxy) recordWindowedRefusal(ctx context.Context, req *Request, tokenInfo *TokenInfo, base MCPDecision, retryAfter time.Duration) error {
 	if p.evidence == nil {
-		return
+		return errNoRecorder
+	}
+	wr, ok := p.evidence.(WindowRecorder)
+	if !ok {
+		return ErrSignEveryActionNeedsWindowRecorder
 	}
 	tool := refusalTool(req)
 	tenant := ""
@@ -382,22 +454,21 @@ func (p *Proxy) recordWindowedRefusal(ctx context.Context, req *Request, tokenIn
 	if base.PolicyMode == "" {
 		base.PolicyMode = normalizeEnforcementMode(p.enforcementModeFor(ctx, tenant))
 	}
-	if wr, ok := p.evidence.(WindowRecorder); ok {
-		_, err := wr.RecordWindowedCall(ctx, MCPWindowedCall{
-			Kind:          WindowKindRefused,
-			Decision:      base,
-			WindowStart:   RateWindowStart(time.Now()),
-			WindowSeconds: RateWindowSeconds,
-			RetryAfter:    retryAfter,
-		})
-		if err != nil {
-			log.Error().Err(err).Str("method", req.Method).Str("code", base.DenialCode).Msg("MCP refused-call receipt unavailable")
-		}
-		return
+	ev, err := wr.RecordWindowedCall(ctx, MCPWindowedCall{
+		Kind:          WindowKindRefused,
+		Decision:      base,
+		WindowStart:   RateWindowStart(time.Now()),
+		WindowSeconds: RateWindowSeconds,
+		RetryAfter:    retryAfter,
+	})
+	if err != nil {
+		return err
 	}
-	if _, err := p.evidence.RecordMCPDecision(ctx, base); err != nil {
-		log.Error().Err(err).Str("method", req.Method).Str("code", base.DenialCode).Msg("MCP refused-call receipt unavailable")
+	if ev != nil && ev.ReceiptID == "" {
+		// A handle with no receipt in it is not a signed opener.
+		return errNoReceipt
 	}
+	return nil
 }
 
 // expiredCredentialError marks an authentication error for a key whose
@@ -437,21 +508,27 @@ func markExpired(err error) error {
 // recordAuthRefusal signs the refusal of a request whose key did not verify,
 // but only when the failure says the key verified and expired (see
 // ExpiredCredential) and the context names the tenant. It signs nothing for a
-// missing key or a key that does not verify: nothing says whose they are.
-func (p *Proxy) recordAuthRefusal(ctx context.Context, req *Request, authErr error) {
+// missing key or a key that does not verify: nothing says whose they are. It
+// returns proof_unavailable when the window record cannot be made, and nil
+// when the ordinary refusal should go out.
+func (p *Proxy) recordAuthRefusal(ctx context.Context, req *Request, authErr error) *Response {
 	var exp ExpiredCredential
 	if !errors.As(authErr, &exp) || !exp.CredentialExpired() {
-		return
+		return nil
 	}
 	if TenantFromContext(ctx) == "" {
 		log.Warn().Str("method", req.Method).Msg("expired key refused; no tenant on the request, so no receipt")
-		return
+		return nil
 	}
-	p.recordWindowedRefusal(ctx, req, nil, MCPDecision{
+	if err := p.recordWindowedRefusal(ctx, req, nil, MCPDecision{
 		DecisionReason:       "capability_expired",
 		DenialCode:           DenialCodeCredentialExpired,
 		NoVerifiedCapability: true,
-	}, 0)
+	}, 0); err != nil {
+		log.Error().Err(err).Str("method", req.Method).Str("code", DenialCodeCredentialExpired).Msg("MCP refused-call receipt unavailable")
+		return proofUnavailableResponse(req.ID, refusalTool(req))
+	}
+	return nil
 }
 
 // dispatchAuthenticated runs the authenticated methods: tools/call,
@@ -471,7 +548,9 @@ func (p *Proxy) dispatchAuthenticated(ctx context.Context, req *Request) (*Respo
 			},
 		})
 		if p.signEveryAction {
-			p.recordAuthRefusal(ctx, req, authErr)
+			if unavailable := p.recordAuthRefusal(ctx, req, authErr); unavailable != nil {
+				return unavailable, nil
+			}
 		}
 		return NewErrorResponse(req.ID, CodePolicyDenied, authErr.Error()), nil
 	}
@@ -484,11 +563,14 @@ func (p *Proxy) dispatchAuthenticated(ctx context.Context, req *Request) (*Respo
 	if p.revocation != nil && tokenInfo.BudgetID != "" {
 		if p.revocation.IsRevoked(ctx, tokenInfo.BudgetID) {
 			if p.signEveryAction {
-				p.recordWindowedRefusal(ctx, req, tokenInfo, MCPDecision{
+				if err := p.recordWindowedRefusal(ctx, req, tokenInfo, MCPDecision{
 					DecisionReason:       "token_revoked",
 					DenialCode:           DenialCodeTokenRevoked,
 					NoVerifiedCapability: true,
-				}, 0)
+				}, 0); err != nil {
+					log.Error().Err(err).Str("method", req.Method).Str("code", DenialCodeTokenRevoked).Msg("MCP refused-call receipt unavailable")
+					return proofUnavailableResponse(req.ID, refusalTool(req)), nil
+				}
 			}
 			return NewErrorResponse(req.ID, CodePolicyDenied, "token revoked"), nil
 		}
@@ -504,9 +586,13 @@ func (p *Proxy) dispatchAuthenticated(ctx context.Context, req *Request) (*Respo
 		if ok, retryAfter := p.limiter.Allow(ctx, tokenInfo, req.Method, toolName); !ok {
 			log.Debug().Str("method", req.Method).Str("tool", toolName).Str("tokenId", tokenInfo.TokenID).Msg("request rate limited")
 			if p.signEveryAction {
-				p.recordWindowedRefusal(ctx, req, tokenInfo, MCPDecision{
-					DenialCode: limiterDenialCode(ctx, p.limiter),
-				}, retryAfter)
+				code := limiterDenialCode(ctx, p.limiter)
+				if err := p.recordWindowedRefusal(ctx, req, tokenInfo, MCPDecision{
+					DenialCode: code,
+				}, retryAfter); err != nil {
+					log.Error().Err(err).Str("method", req.Method).Str("code", code).Msg("MCP refused-call receipt unavailable")
+					return proofUnavailableResponse(req.ID, refusalTool(req)), nil
+				}
 			}
 			return rateLimitedResponse(req.ID, retryAfter), nil
 		}
@@ -573,4 +659,87 @@ func (p *Proxy) forwardGoverned(ctx context.Context, req *Request, tokenInfo *To
 		attachMCPEvidenceToResponse(resp, ev)
 	}
 	return resp, err
+}
+
+// ---- giving a debit back ----
+
+// canReverseDebit reports whether the budget store can give a request's debit
+// back (Compensate or Refund). With the switch on a priced call in a blocking
+// mode is refused before it is debited when it cannot.
+func (p *Proxy) canReverseDebit() bool { return canReverse(p.budget) }
+
+func canReverse(b BudgetEnforcer) bool {
+	switch b.(type) {
+	case BudgetCompensator, BudgetRefunder:
+		return true
+	}
+	return false
+}
+
+// reversalAttempts is how many times a reversal is tried inside refundTimeout.
+const reversalAttempts = 3
+
+var errNoReversal = errors.New("the budget store offers neither Compensate nor Refund")
+
+// reverseDebit gives one request's debit back. It runs on a context detached
+// from the request's cancellation (a request that was cancelled while its
+// receipt was being made must still be given back) and bounded by
+// refundTimeout. It uses Compensate when the store has it and Refund otherwise,
+// never both, and tries again a few times: both are keyed by the request id and
+// do nothing the second time (see BudgetRefunder).
+func reverseDebit(ctx context.Context, b BudgetEnforcer, budgetID, requestID string, amount int64) error {
+	switch s := b.(type) {
+	case BudgetCompensator:
+		return retryUndo(ctx, func(c context.Context) error { return s.Compensate(c, budgetID, requestID, amount) })
+	case BudgetRefunder:
+		return retryUndo(ctx, func(c context.Context) error { return s.Refund(c, budgetID, requestID, amount) })
+	}
+	return errNoReversal
+}
+
+// retryUndo runs undo on a context detached from ctx's cancellation and bounded
+// by refundTimeout, up to reversalAttempts times with a short pause between.
+func retryUndo(ctx context.Context, undo func(context.Context) error) error {
+	rctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), refundTimeout)
+	defer cancel()
+	var err error
+	for attempt := 0; attempt < reversalAttempts; attempt++ {
+		if err = undo(rctx); err == nil {
+			return nil
+		}
+		select {
+		case <-rctx.Done():
+			return err
+		case <-time.After(time.Duration(attempt+1) * 20 * time.Millisecond):
+		}
+	}
+	return err
+}
+
+// ---- the connection's own credential ----
+
+type transportTokenKey struct{}
+
+// withTransportToken keeps the bearer credential of a connection on the
+// request's context, apart from the request's params. The transports set it
+// with the switch on; authenticate reads it when params carry no token. It is
+// the credential the connection presented, verified like any other: nothing a
+// caller wrote into params can name a different identity through it.
+func withTransportToken(ctx context.Context, token string) context.Context {
+	if token == "" {
+		return ctx
+	}
+	return context.WithValue(ctx, transportTokenKey{}, token)
+}
+
+func transportTokenFrom(ctx context.Context) string {
+	t, _ := ctx.Value(transportTokenKey{}).(string)
+	return t
+}
+
+// paramsAreObject reports whether params is a JSON object. The transports add
+// the connection's credential to params._meta only then.
+func paramsAreObject(params json.RawMessage) bool {
+	t := bytes.TrimSpace(params)
+	return len(t) > 0 && t[0] == '{'
 }

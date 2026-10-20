@@ -594,6 +594,96 @@ T24 held order, owner approves, agent sends it again (signer down)
   forwarded: 0
   debit: 0
   window_total: 0
+T25 allowed, Control, budget store down and its fail mode is open (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}],"isError":false}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T25 allowed, Control, budget store down and its fail mode is open (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Evidence proof unavailable","data":{"error":"proof_unavailable","tool":"paid_read"}}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T26 allowed, Observe, price could not be read (default price) (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"_meta":{"satgate_evidence":{"evidence_pack_id":"ep_1","evidence_url":"https://issuer.example/v1/evidence/evid_1","receipt_hash":"sha256:1","receipt_id":"rcpt_1"}},"content":[{"text":"ok","type":"text"}],"isError":false}}
+  signed: [allowed/budget_authorized]
+  asked: 1
+  preflights: 0
+  forwarded: 1
+  debit: 1
+  window_total: 0
+T26 allowed, Observe, price could not be read (default price) (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}],"isError":false}}
+  signed: []
+  asked: 1
+  preflights: 0
+  forwarded: 1
+  debit: 1
+  window_total: 0
+T27 allowed, Observe, budget store down (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}],"isError":false}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T27 allowed, Observe, budget store down (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}],"isError":false}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T28 refused: renamed tool on a key with money rules (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"This tool isn't covered by your spending limits. Ask the owner to add it.","data":{"error":"TOOL_NOT_COVERED_BY_LIMITS","evidence_pack_id":"ep_1","evidence_url":"https://issuer.example/v1/evidence/evid_1","receipt_hash":"sha256:1","receipt_id":"rcpt_1","tool":"paid_read"}}}
+  signed: [denied/policy_denied/TOOL_NOT_COVERED_BY_LIMITS]
+  asked: 1
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T28 refused: renamed tool on a key with money rules (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32603,"message":"Evidence proof unavailable","data":{"error":"proof_unavailable","tool":"paid_read"}}}
+  signed: []
+  asked: 0
+  preflights: 1
+  forwarded: 0
+  debit: 0
+  window_total: 0
+T29 allowed, charge mode (nothing debited here) (signer up)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}],"isError":false}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
+T29 allowed, charge mode (nothing debited here) (signer down)
+  responses:
+    {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}],"isError":false}}
+  signed: []
+  asked: 0
+  preflights: 0
+  forwarded: 1
+  debit: 0
+  window_total: 0
 M08 resources/list, key valid, no default service (signer up)
   responses:
     {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream: no default upstream configured"}}

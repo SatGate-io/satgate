@@ -385,7 +385,13 @@ func (s *SSEServer) handleStreamablePost(w http.ResponseWriter, r *http.Request)
 	}
 
 	authToken := extractAuthToken(r)
-	if authToken != "" && len(req.Params) > 0 {
+	// With sign-every-action on, the connection's credential also travels on
+	// the context, apart from params, and params that are not an object are
+	// left as they came (see authenticate).
+	keepParams := s.proxy.signEveryAction && len(req.Params) > 0 && !paramsAreObject(req.Params)
+	if keepParams {
+		// nothing to inject into
+	} else if authToken != "" && len(req.Params) > 0 {
 		req.Params = injectMetaToken(req.Params, authToken)
 	} else if authToken != "" {
 		metaJSON, _ := json.Marshal(map[string]string{"token": authToken})
@@ -395,6 +401,9 @@ func (s *SSEServer) handleStreamablePost(w http.ResponseWriter, r *http.Request)
 
 	// r.Context() carries the enterprise spend session. Do not replace it.
 	reqCtx := sess.contextOnto(r.Context())
+	if s.proxy.signEveryAction {
+		reqCtx = withTransportToken(reqCtx, authToken)
+	}
 	rpcResp, handleErr := s.proxy.handleRequest(reqCtx, req)
 	if handleErr != nil {
 		rpcResp = NewErrorResponse(req.ID, CodeInternalError, handleErr.Error())

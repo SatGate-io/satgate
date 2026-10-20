@@ -21,7 +21,7 @@ func (p *Proxy) gateRefusalResponse(ctx context.Context, req *Request, tokenInfo
 	}
 	data["error"] = r.Code
 	data["tool"] = toolName
-	if p.evidence == nil {
+	if p.evidence == nil && !p.signEveryAction {
 		return NewErrorResponseWithData(req.ID, CodePolicyDenied, r.Message, data)
 	}
 	proofUnavailable := func(err error, stage string) *Response {
@@ -30,6 +30,9 @@ func (p *Proxy) gateRefusalResponse(ctx context.Context, req *Request, tokenInfo
 			"error": "proof_unavailable",
 			"tool":  toolName,
 		})
+	}
+	if p.evidence == nil {
+		return proofUnavailable(errNoRecorder, "no_recorder")
 	}
 	if err := p.evidence.Preflight(ctx); err != nil {
 		return proofUnavailable(err, "preflight")

@@ -10,6 +10,7 @@ import (
 	"math"
 	"os"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -81,6 +82,11 @@ type Proxy struct {
 	// every_action.go). Off by default: every answer is then what it was
 	// before the switch existed.
 	signEveryAction bool
+
+	// uncountedMisses and reversalFailures are the two counters of the switch
+	// (UncountedObserveMisses, ReversalFailures).
+	uncountedMisses  atomic.Int64
+	reversalFailures atomic.Int64
 }
 
 // ResponseGuard wraps the handling of every request the proxy answers: the
@@ -486,6 +492,13 @@ func (p *Proxy) dispatchRequest(ctx context.Context, req *Request) (*Response, e
 func (p *Proxy) authenticate(ctx context.Context, req *Request) (*TokenInfo, error) {
 	// Try to extract token from params._meta.token (MCP convention for metadata)
 	token := extractMetaToken(req.Params)
+	if token == "" && p.signEveryAction {
+		// The transports keep the bearer credential of the connection apart
+		// from params (transportTokenFrom), so a request whose params are not
+		// an object, or whose _meta cannot be read, still belongs to the key
+		// that was verified. It is verified below like any other.
+		token = transportTokenFrom(ctx)
+	}
 
 	if token != "" {
 		info, err := p.auth.Verify(ctx, token)
@@ -805,6 +818,13 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				}), nil
 			}
 		}
+		// Sign every action: a debit that is taken before the receipt must be
+		// one the proxy can give back if the receipt fails. A store that
+		// offers no way back is refused before anything is debited.
+		if p.signEveryAction && isControl && !p.canReverseDebit() {
+			log.Error().Str("tool", receiptTool(tc.Name)).Str("budgetId", budgetID).Msg("sign every action: the budget store cannot give back a debit; refusing the call before any charge")
+			return proofUnavailableResponse(req.ID, tc.Name), nil
+		}
 		result, err := p.budget.Spend(ctx, budgetID, tc.Name, cost, requestID)
 		eventRequestID = budgetEventRequestID(requestID, result)
 		if err != nil {
@@ -1058,8 +1078,12 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 
 func (p *Proxy) recordMCPDecision(ctx context.Context, req *Request, tokenInfo *TokenInfo, toolName string, decision MCPDecision) (*MCPEvidence, error) {
 	if p.evidence == nil {
+		if p.signEveryAction {
+			return nil, errNoRecorder
+		}
 		return nil, nil
 	}
+	toolName = receiptTool(toolName)
 	decision.TenantID = tokenInfo.TenantID
 	decision.TokenID = tokenInfo.TokenID
 	decision.BudgetID = tokenInfo.BudgetID
@@ -1089,15 +1113,20 @@ func (p *Proxy) recordMCPDecision(ctx context.Context, req *Request, tokenInfo *
 		decision.CostCredits = 0
 		decision.RemainingCredits = 0
 		decision.RemainingBeforeCredits = 0
-		return p.evidence.RecordMCPDecision(ctx, decision)
+	} else {
+		if decision.RemainingBeforeCredits == 0 && decision.Decision == "allowed" {
+			decision.RemainingBeforeCredits = decision.RemainingCredits + decision.CostCredits
+		}
+		if decision.RemainingBeforeCredits == 0 && decision.Decision != "allowed" {
+			decision.RemainingBeforeCredits = decision.RemainingCredits
+		}
 	}
-	if decision.RemainingBeforeCredits == 0 && decision.Decision == "allowed" {
-		decision.RemainingBeforeCredits = decision.RemainingCredits + decision.CostCredits
+	ev, err := p.evidence.RecordMCPDecision(ctx, decision)
+	if p.signEveryAction && err == nil && (ev == nil || ev.ReceiptID == "") {
+		// An empty answer is not a receipt (see recordIdentifiedDecision).
+		return nil, errNoReceipt
 	}
-	if decision.RemainingBeforeCredits == 0 && decision.Decision != "allowed" {
-		decision.RemainingBeforeCredits = decision.RemainingCredits
-	}
-	return p.evidence.RecordMCPDecision(ctx, decision)
+	return ev, err
 }
 
 // scopeDeniedResponse refuses a verified token whose scope does not cover the
@@ -1160,7 +1189,7 @@ type argumentDenialDetail struct {
 // data next to any evidence handles; nil extra and no recorder gives a reply
 // with no data. detail is non-nil only for an argument-rule refusal.
 func (p *Proxy) policyDeniedResponse(ctx context.Context, req *Request, tokenInfo *TokenInfo, toolName, message string, extra map[string]interface{}, detail *argumentDenialDetail) *Response {
-	if p.evidence == nil {
+	if p.evidence == nil && !p.signEveryAction {
 		if len(extra) == 0 {
 			return NewErrorResponse(req.ID, CodePolicyDenied, message)
 		}
@@ -1172,6 +1201,9 @@ func (p *Proxy) policyDeniedResponse(ctx context.Context, req *Request, tokenInf
 			"error": "proof_unavailable",
 			"tool":  toolName,
 		})
+	}
+	if p.evidence == nil {
+		return proofUnavailable(errNoRecorder, "no_recorder")
 	}
 	if err := p.evidence.Preflight(ctx); err != nil {
 		return proofUnavailable(err, "preflight")
@@ -1252,24 +1284,33 @@ func budgetEventRequestID(callerRequestID string, result *BudgetResult) string {
 	return callerRequestID
 }
 
+// compensateMCPSpend gives back the debit of a call that is stopped because its
+// receipt failed.
+//
+// With the switch off it is what it always was: the budget's Compensate, on the
+// request's context, when the budget has one.
+//
+// With the switch on the reversal is part of the promise ("not sent and not
+// charged"), so it cannot depend on the request: it runs on a context detached
+// from the request's cancellation and bounded by refundTimeout, uses the
+// budget's Compensate or else its Refund, and is retried a few times inside
+// that bound. A reversal that still fails is logged with the budget and request
+// id and counted (ReversalFailures); the call is stopped either way.
 func (p *Proxy) compensateMCPSpend(ctx context.Context, budgetID, requestID string, cost int64) {
-	compensator, ok := p.budget.(BudgetCompensator)
-	if !ok && p.signEveryAction && budgetID != "" && requestID != "" && cost > 0 {
-		// Sign every action promises that a call stopped for want of a receipt
-		// debits nothing. A budget that cannot compensate but can give a
-		// request's debit back (the in-memory one) does that.
-		if refunder, canRefund := p.budget.(BudgetRefunder); canRefund {
-			if err := refunder.Refund(ctx, budgetID, requestID, cost); err != nil {
-				log.Error().Err(err).Str("budgetId", budgetID).Str("requestId", requestID).Msg("failed to give back MCP debit after evidence failure")
-			}
-			return
-		}
-	}
-	if !ok || budgetID == "" || requestID == "" || cost <= 0 {
+	if budgetID == "" || requestID == "" || cost <= 0 {
 		return
 	}
-	if err := compensator.Compensate(ctx, budgetID, requestID, cost); err != nil {
-		log.Error().Err(err).Str("budgetId", budgetID).Str("requestId", requestID).Msg("failed to compensate MCP debit after evidence failure")
+	if !p.signEveryAction {
+		if compensator, ok := p.budget.(BudgetCompensator); ok {
+			if err := compensator.Compensate(ctx, budgetID, requestID, cost); err != nil {
+				log.Error().Err(err).Str("budgetId", budgetID).Str("requestId", requestID).Msg("failed to compensate MCP debit after evidence failure")
+			}
+		}
+		return
+	}
+	if err := reverseDebit(ctx, p.budget, budgetID, requestID, cost); err != nil {
+		p.reversalFailures.Add(1)
+		log.Error().Err(err).Str("budgetId", budgetID).Str("requestId", requestID).Int64("amount", cost).Msg("failed to give back MCP debit after evidence failure")
 	}
 }
 

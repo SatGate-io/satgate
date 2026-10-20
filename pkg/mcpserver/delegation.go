@@ -108,6 +108,7 @@ type Delegator struct {
 	signEveryAction      bool
 	receiptFailureBlocks func(ctx context.Context, tenantID string) bool
 	reportMiss           func(ctx context.Context, parent *TokenInfo)
+	reversalFailed       func()
 }
 
 // EnableHelperRevocationID turns the hlp- token_id caveat for zero-credit
@@ -369,6 +370,15 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			}
 			// Observe: the delegation goes on; the miss is reported once, by
 			// the receipt step below if it fails too.
+		}
+	}
+	// Sign every action: a carve is a debit taken before the receipt, so it
+	// must be one that can be given back. A store that cannot give back is
+	// refused before the parent is charged.
+	if d.signEveryAction && params.Budget > 0 && d.blocksOnReceiptFailure(ctx, parent.TenantID) {
+		if _, ok := d.budget.(BudgetRefunder); !ok {
+			log.Error().Str("parent", parent.TokenID).Msg("delegation refused before any carve: the budget store cannot give a carve back")
+			return nil, errDelegationProofUnavailable
 		}
 	}
 	if params.Budget < 0 {
@@ -753,11 +763,26 @@ func (d *Delegator) giveBack(ctx context.Context, parent *TokenInfo, requestID s
 	refunder, ok := d.budget.(BudgetRefunder)
 	if !ok {
 		log.Error().Str("budgetId", parent.BudgetID).Str("requestId", requestID).Int64("amount", amount).Msg("delegation give-back failed: the budget store cannot give back a carve")
+		if d.reversalFailed != nil {
+			d.reversalFailed()
+		}
 		return
 	}
-	rctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), refundTimeout)
-	defer cancel()
-	if err := refunder.Refund(rctx, parent.BudgetID, requestID, amount); err != nil {
+	// Refund is keyed by the request id and does nothing the second time, so
+	// with the switch on a failed give-back is tried again inside the bound.
+	undo := func(rctx context.Context) error { return refunder.Refund(rctx, parent.BudgetID, requestID, amount) }
+	var err error
+	if d.signEveryAction {
+		err = retryUndo(ctx, undo)
+	} else {
+		rctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), refundTimeout)
+		defer cancel()
+		err = undo(rctx)
+	}
+	if err != nil {
+		if d.reversalFailed != nil {
+			d.reversalFailed()
+		}
 		log.Error().Err(err).Str("budgetId", parent.BudgetID).Str("requestId", requestID).Int64("amount", amount).Msg("delegation give-back failed")
 	}
 }
@@ -814,8 +839,12 @@ func delegationDenialCode(err error) string {
 // it returns proof_unavailable. With the switch off, or with no recorder, it
 // returns resp unchanged.
 func (d *Delegator) signRefusal(ctx context.Context, req *Request, tokenInfo *TokenInfo, code string, resp *Response) *Response {
-	if !d.signEveryAction || d.recorder == nil || code == "" {
+	if !d.signEveryAction || code == "" {
 		return resp
+	}
+	if d.recorder == nil {
+		log.Error().Str("code", code).Msg("delegation refusal receipt unavailable: no recorder is installed")
+		return proofUnavailableResponse(req.ID, MethodSatGateDelegate)
 	}
 	ev, err := recordIdentifiedDecision(ctx, d.recorder, req, tokenInfo, MethodSatGateDelegate, "", MCPDecision{
 		Decision:           "denied",
