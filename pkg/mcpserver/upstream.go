@@ -915,6 +915,14 @@ func (m *UpstreamManager) ForwardToolCall(ctx context.Context, toolName string, 
 	return m.sendRequest(ctx, e.client, MethodToolsCall, params, timeout)
 }
 
+// hasDefaultUpstream reports whether ForwardRequest has a service to send to.
+func (m *UpstreamManager) hasDefaultUpstream() bool {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	_, ok := m.clients[m.defaultUp]
+	return ok
+}
+
 // ForwardRequest sends an arbitrary request to the default upstream.
 func (m *UpstreamManager) ForwardRequest(ctx context.Context, method string, params json.RawMessage, timeout time.Duration) (*Response, error) {
 	m.mu.Lock()

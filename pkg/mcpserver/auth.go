@@ -144,7 +144,8 @@ func (a *MacaroonAuthenticator) Verify(_ context.Context, token string) (*TokenI
 		if strings.Contains(err.Error(), "invalid signature") {
 			return nil, fmt.Errorf("invalid macaroon (possible root key mismatch — check that the gateway and the token issuer use the same capability root key): %w", err)
 		}
-		return nil, fmt.Errorf("invalid macaroon: %w", err)
+		// markExpired changes the error's type, never its text.
+		return nil, fmt.Errorf("invalid macaroon: %w", markExpired(err))
 	}
 
 	return FillTokenInfo(a.Service, mac, token)

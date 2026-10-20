@@ -1,6 +1,9 @@
 package mcpserver
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // MCPDecision is the receipt-ready decision envelope emitted for governed MCP
 // tools/call budget decisions. Enterprise implementations can turn this into a
@@ -70,6 +73,173 @@ type MCPDecision struct {
 	// in the refusal's error data.
 	ControlShared bool   `json:"control_shared,omitempty"`
 	ControlSymbol string `json:"control_symbol,omitempty"`
+
+	// RateLimitPhase, RateLimitWindowStart, RateLimitWindowSeconds and
+	// RateLimitRefusedCalls are set only on a window receipt (see
+	// WindowRecorder): the one receipt that opens, or the one that
+	// closes, a run of refused calls for one key and tool in one UTC minute.
+	// Recorders sign them into the receipt as top-level plain strings and
+	// integers next to DenialCode. None of them is a balance claim and none
+	// holds a value the agent sent.
+	//
+	// RateLimitPhase is RateWindowOpened or RateWindowClosed.
+	// RateLimitWindowStart is the window's first second, RFC 3339 in UTC.
+	// RateLimitWindowSeconds is RateWindowSeconds. RateLimitRefusedCalls is
+	// set on the closer only and counts every refused call in the window,
+	// the one that opened it included (so it is at least 1).
+	RateLimitPhase         string `json:"rate_limit_phase,omitempty"`
+	RateLimitWindowStart   string `json:"rate_limit_window_start,omitempty"`
+	RateLimitWindowSeconds int64  `json:"rate_limit_window_seconds,omitempty"`
+	RateLimitRefusedCalls  int64  `json:"rate_limit_refused_calls,omitempty"`
+
+	// UnrecordedCalls, UnrecordedWindowStart and UnrecordedWindowSeconds are set
+	// only on a gap receipt (see UnrecordedDecision): how many Observe calls
+	// went through with no receipt in one UTC minute. Plain integer and
+	// strings, no balance claim, no value the agent sent.
+	UnrecordedCalls         int64  `json:"unrecorded_calls,omitempty"`
+	UnrecordedWindowStart   string `json:"unrecorded_window_start,omitempty"`
+	UnrecordedWindowSeconds int64  `json:"unrecorded_window_seconds,omitempty"`
+}
+
+// Window receipts. A refused call that repeats (a rate limit that keeps
+// saying no, a key that stays revoked) does not get a receipt each time: the
+// first refusal of a key and tool in a UTC minute is signed as the window's
+// opener, and one closer, signed after the minute is over, carries how many
+// calls were refused in it. A flood of any size costs two signatures a minute.
+const (
+	// RateWindowSeconds is the length of a window. Windows are aligned to the
+	// UTC minute.
+	RateWindowSeconds = 60
+	// RateWindowGraceSeconds is how long after a window ends a recorder waits
+	// before it signs the closer, so late counts are not missed.
+	RateWindowGraceSeconds = 15
+
+	RateWindowOpened = "opened"
+	RateWindowClosed = "closed"
+
+	// DenialCodeRateLimited is the signed denial code of a call the request
+	// limiter refused when the limiter gives no other reason.
+	DenialCodeRateLimited = "RATE_LIMITED"
+	// DenialCodeTokenRevoked and DenialCodeCredentialExpired are the signed
+	// denial codes of a call made with a key that verified and is revoked, or
+	// whose time has run out.
+	DenialCodeTokenRevoked      = "TOKEN_REVOKED"
+	DenialCodeCredentialExpired = "CREDENTIAL_EXPIRED"
+)
+
+// RateWindowStart returns the start of the UTC-minute window t falls in.
+func RateWindowStart(t time.Time) time.Time {
+	return t.UTC().Truncate(RateWindowSeconds * time.Second)
+}
+
+// The two kinds of call a WindowRecorder is told about.
+const (
+	// WindowKindRefused is a call that was refused and will be refused again:
+	// a rate-limit refusal, or a call made with a key that verified and is
+	// revoked or expired. The recorder signs an opener and a closer.
+	WindowKindRefused = "refused"
+	// WindowKindUnrecorded is a call that was passed on in Observe because its
+	// receipt could not be made. The recorder counts it and, once signing
+	// works again, signs one gap receipt for the window (UnrecordedDecision).
+	WindowKindUnrecorded = "unrecorded"
+)
+
+// DecisionReasonObserveUnrecorded is the decision_reason of a gap receipt: a
+// signed count of the calls that went through in Observe with no receipt.
+const DecisionReasonObserveUnrecorded = "observe_unrecorded"
+
+// MCPWindowedCall tells a WindowRecorder about one call that gets no receipt
+// of its own: a refused call that repeats, or an Observe call that went
+// through unrecorded. It never holds call arguments.
+type MCPWindowedCall struct {
+	// Kind is WindowKindRefused or WindowKindUnrecorded.
+	Kind string
+	// Decision is the call as a decision envelope: the key (TokenID, BudgetID,
+	// TenantID), the method, the tool and, for a refusal, the signed reason and
+	// DenialCode.
+	Decision MCPDecision
+	// WindowStart is the start of the UTC-minute window of this call.
+	WindowStart time.Time
+	// WindowSeconds is RateWindowSeconds.
+	WindowSeconds int64
+	// RetryAfter is what the limiter suggested to the agent; zero otherwise.
+	RetryAfter time.Duration
+}
+
+// OpenerDecision returns the decision to sign as the window's opener: the
+// refusal with its window fields set and no count.
+func (c MCPWindowedCall) OpenerDecision() MCPDecision {
+	d := c.Decision
+	d.RateLimitPhase = RateWindowOpened
+	d.RateLimitWindowStart = c.WindowStart.UTC().Format(time.RFC3339)
+	d.RateLimitWindowSeconds = c.WindowSeconds
+	d.RateLimitRefusedCalls = 0
+	return d
+}
+
+// CloserDecision returns the decision to sign as the closer of the window an
+// opener decision opened: the same key, tool and window, phase closed, and the
+// number of refused calls (the opener's included). refused below 1 is raised
+// to 1, because a closed window had at least its opener.
+func CloserDecision(opener MCPDecision, refused int64) MCPDecision {
+	if refused < 1 {
+		refused = 1
+	}
+	d := opener
+	d.RateLimitPhase = RateWindowClosed
+	d.RateLimitRefusedCalls = refused
+	return d
+}
+
+// UnrecordedDecision returns the decision to sign as the gap receipt of a
+// window: allowed / observe_unrecorded for the key and tool of an unrecorded
+// call, with the window and how many calls went through with no receipt. calls
+// below 1 is raised to 1.
+func UnrecordedDecision(call MCPWindowedCall, calls int64) MCPDecision {
+	if calls < 1 {
+		calls = 1
+	}
+	d := call.Decision
+	d.Decision = "allowed"
+	d.DecisionReason = DecisionReasonObserveUnrecorded
+	d.BudgetNotEvaluated = true
+	d.UnrecordedWindowStart = call.WindowStart.UTC().Format(time.RFC3339)
+	d.UnrecordedWindowSeconds = call.WindowSeconds
+	d.UnrecordedCalls = calls
+	return d
+}
+
+// WindowRecorder is an optional interface of an EvidenceRecorder. It is how a
+// recorder that keeps windows (the gateway's shared window store) is told about
+// calls that get no receipt of their own. One method serves both kinds (see
+// MCPWindowedCall.Kind).
+//
+// The proxy calls RecordWindowedCall once per call:
+//
+//   - WindowKindRefused: for every call the request limiter refused and, when
+//     SetSignEveryAction is on, every call made with a key that verified and
+//     is revoked or expired. It is called after the refusal is decided and
+//     before it is sent, and the same refusal is sent whatever the method
+//     returns: a refused call is not passed on, so a receipt that cannot be
+//     made costs the agent nothing (the error is logged).
+//   - WindowKindUnrecorded: when SetSignEveryAction is on and an Observe call
+//     was passed on because its receipt could not be made. The call has gone
+//     on; the method must not fail it. It is called once for that call.
+//
+// The implementation owns the window. For a refusal it signs one opener
+// (OpenerDecision, through its own RecordMCPDecision) for the first refusal of
+// a key and tool in a window, counts the rest, and signs one closer
+// (CloserDecision) with the count once the window has been over for
+// RateWindowGraceSeconds. For an unrecorded call it counts, per tenant, tool,
+// key and UTC minute, and signs one gap receipt (UnrecordedDecision) per window
+// when signing works again. It returns the receipt's handles on a call that
+// signed one and nil, nil on the others.
+//
+// A recorder that does not implement this interface is given one denied
+// receipt for each refused call through RecordMCPDecision instead (complete,
+// but one signature per refused call), and nothing for an unrecorded call.
+type WindowRecorder interface {
+	RecordWindowedCall(ctx context.Context, call MCPWindowedCall) (*MCPEvidence, error)
 }
 
 // MCPEvidence is the verifier-facing handle returned after recording an MCP

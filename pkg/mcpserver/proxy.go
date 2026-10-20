@@ -76,6 +76,11 @@ type Proxy struct {
 	// modeResolver, when set, decides each tools/call under its tenant's
 	// enforcement mode instead of the process-wide one (enforcement_mode.go).
 	modeResolver EnforcementModeResolver
+
+	// signEveryAction is the "sign every action" switch (SetSignEveryAction,
+	// every_action.go). Off by default: every answer is then what it was
+	// before the switch existed.
+	signEveryAction bool
 }
 
 // ResponseGuard wraps the handling of every request the proxy answers: the
@@ -274,6 +279,7 @@ func (p *Proxy) SetHelperRevocationID(on bool) {
 // SetEvidenceRecorder wires signed evidence recording for governed MCP decisions.
 func (p *Proxy) SetEvidenceRecorder(rec EvidenceRecorder) {
 	p.evidence = rec
+	p.wireDelegator()
 }
 
 // SetRevocationChecker sets the revocation checker for token validation.
@@ -454,53 +460,8 @@ func (p *Proxy) dispatchRequest(ctx context.Context, req *Request) (*Response, e
 		return p.handleToolsListWithCtx(ctx, req)
 
 	case MethodToolsCall, MethodSatGateDelegate, MethodSatGateBudget, "budget/check":
-		// These methods require authentication.
-		tokenInfo, authErr := p.authenticate(ctx, req)
-		if authErr != nil {
-			log.Warn().Err(authErr).Str("method", req.Method).Msg("authentication failed")
-			p.events.Publish(Event{
-				Type:      EventAuthFailure,
-				Timestamp: time.Now(),
-				Data: map[string]interface{}{
-					"method": req.Method,
-					"error":  authErr.Error(),
-				},
-			})
-			return NewErrorResponse(req.ID, CodePolicyDenied, authErr.Error()), nil
-		}
-		// Inject tenant ID into context for downstream use (multi-tenant budget routing)
-		if tokenInfo.TenantID != "" {
-			ctx = context.WithValue(ctx, CtxTenantID, tokenInfo.TenantID)
-		}
-		ctx = context.WithValue(ctx, CtxTokenInfo, tokenInfo)
-		// Check revocation (after tenant is in context)
-		if p.revocation != nil && tokenInfo.BudgetID != "" {
-			if p.revocation.IsRevoked(ctx, tokenInfo.BudgetID) {
-				return NewErrorResponse(req.ID, CodePolicyDenied, "token revoked"), nil
-			}
-		}
-		// Per-token rate limit, before any cost, spend, event or upstream call.
-		if p.limiter != nil {
-			toolName := ""
-			if req.Method == MethodToolsCall {
-				if tc, err := ParseToolCall(req.Params); err == nil {
-					toolName = tc.Name
-				}
-			}
-			if ok, retryAfter := p.limiter.Allow(ctx, tokenInfo, req.Method, toolName); !ok {
-				log.Debug().Str("method", req.Method).Str("tool", toolName).Str("tokenId", tokenInfo.TokenID).Msg("request rate limited")
-				return rateLimitedResponse(req.ID, retryAfter), nil
-			}
-		}
-		switch req.Method {
-		case MethodToolsCall:
-			return p.handleToolsCall(ctx, req, tokenInfo)
-		case MethodSatGateDelegate:
-			return p.handleDelegate(ctx, req, tokenInfo)
-		case MethodSatGateBudget:
-			return HandleBudget(ctx, req, p.budget, tokenInfo)
-		}
-		return nil, fmt.Errorf("unreachable")
+		// These methods require authentication (dispatchAuthenticated).
+		return p.dispatchAuthenticated(ctx, req)
 
 	case MethodCancelled:
 		log.Debug().RawJSON("params", req.Params).Msg("cancellation received")
@@ -509,6 +470,12 @@ func (p *Proxy) dispatchRequest(ctx context.Context, req *Request) (*Response, e
 	default:
 		if IsNotification(req.Method) {
 			return nil, nil
+		}
+		if p.signEveryAction {
+			// With the switch on, a method the proxy does not know is an
+			// action of a key like any other: it is authenticated, limited
+			// and signed before it is passed on.
+			return p.dispatchAuthenticated(ctx, req)
 		}
 		return p.forwardToDefault(ctx, req)
 	}
@@ -666,7 +633,11 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	// Parse tool call
 	tc, err := ParseToolCall(req.Params)
 	if err != nil {
-		return NewErrorResponse(req.ID, CodeInvalidParams, toolCallParseMessage(err)), nil
+		unreadable := NewErrorResponse(req.ID, CodeInvalidParams, toolCallParseMessage(err))
+		if p.signEveryAction {
+			unreadable = p.refuseSigned(ctx, req, tokenInfo, MethodToolsCall, "", "INVALID_PARAMS", unreadable)
+		}
+		return unreadable, nil
 	}
 
 	// The enforcement mode this call is decided under: the process-wide mode,
@@ -678,7 +649,13 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	// A tool whose name starts with the reserved argument-rules prefix is never
 	// forwarded, whatever the token allows: see macaroon.ArgumentRulesScopePrefix.
 	if macaroon.IsReservedToolName(tc.Name) {
-		return NewErrorResponse(req.ID, CodePolicyDenied, "tool name uses a reserved prefix and is not available"), nil
+		reserved := NewErrorResponse(req.ID, CodePolicyDenied, "tool name uses a reserved prefix and is not available")
+		if p.signEveryAction {
+			// The receipt names the prefix, never the rest of the word: it can
+			// carry the nonce of a rule document.
+			reserved = p.refuseSigned(ctx, req, tokenInfo, MethodToolsCall, macaroon.ArgumentRulesScopePrefix+"redacted", "RESERVED_TOOL_NAME", reserved)
+		}
+		return reserved, nil
 	}
 
 	// Every scope caveat must allow the tool. A later caveat can only narrow.
@@ -729,6 +706,27 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				Str("mode", mode).
 				Int64("cost", price).
 				Msg("tool price unavailable; observe mode never blocks, using the default price")
+		}
+	}
+
+	// Sign every action: find a dead signer before anything is taken. Asked
+	// once, here, before a spending-limit slot is reserved and before a
+	// single-use approval is used up, so a signer that is down costs the owner
+	// neither. The receipts themselves are made below. In Observe a dead signer
+	// does not stop the call (allowReceiptFailureBlocks); the miss is reported
+	// where the receipt fails, not here, because the receipt may still be made.
+	if p.signEveryAction {
+		if p.evidence == nil {
+			if p.allowReceiptFailureBlocks(mode) {
+				log.Error().Str("tool", tc.Name).Msg("sign every action is on but no evidence recorder is installed; refusing the call")
+				return proofUnavailableResponse(req.ID, tc.Name), nil
+			}
+		} else if err := p.evidence.Preflight(ctx); err != nil {
+			log.Error().Err(err).Str("tool", tc.Name).Msg("MCP evidence preflight failed")
+			if p.allowReceiptFailureBlocks(mode) {
+				return proofUnavailableResponse(req.ID, tc.Name), nil
+			}
+			log.Warn().Str("tool", tc.Name).Str("mode", mode).Msg("observe mode: passing the call on with no receipt")
 		}
 	}
 
@@ -788,6 +786,10 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	isObserve := mode == "observe" || mode == "shadow" || mode == "chargeback"
 	isControl := mode == "control" || mode == "hard" || mode == "soft" || mode == "fiat402"
 	var allowedEvidence *MCPEvidence
+	// spendReceiptTried is set once the spend path has asked for its own
+	// receipt (budget_authorized). Whatever came of it, no second allow
+	// receipt is asked for below: a call has one.
+	spendReceiptTried := false
 
 	if (isObserve || isControl) && budgetID != "" && cost > 0 {
 		// Auto-initialize budget from macaroon caveat if not yet initialized
@@ -919,6 +921,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			})
 
 			var evidenceErr error
+			spendReceiptTried = true
 			allowedEvidence, evidenceErr = p.recordMCPDecision(ctx, req, tokenInfo, tc.Name, MCPDecision{
 				Decision:         "allowed",
 				DecisionReason:   "budget_authorized",
@@ -929,6 +932,11 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			})
 			if evidenceErr != nil {
 				log.Error().Err(evidenceErr).Str("tool", tc.Name).Str("budgetId", budgetID).Msg("MCP allowed evidence recording failed")
+				// Observe lets the call through with no receipt (today's
+				// behaviour); with the switch on the miss is reported, once.
+				if !isControl {
+					p.reportObserveMiss(ctx, tokenInfo, MethodToolsCall, tc.Name, mode)
+				}
 				if isControl {
 					p.compensateMCPSpend(ctx, budgetID, eventRequestID, cost)
 					return NewErrorResponseWithData(req.ID, CodeInternalError, "Evidence proof unavailable", map[string]interface{}{
@@ -938,6 +946,19 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				}
 			}
 		}
+	}
+
+	// Sign every action: a call that every check passed and that no earlier
+	// step signed (a free tool, a key with no budget, an Observe call over
+	// budget) gets its one receipt now, before it is passed on. A call the
+	// spend path signed already has its receipt (budget_authorized, with the
+	// cost and the balance) and gets no second one.
+	if p.signEveryAction && allowedEvidence == nil && !spendReceiptTried {
+		ev, stopped := p.signAllowed(ctx, req, tokenInfo, MethodToolsCall, tc.Name, eventRequestID, mode)
+		if stopped != nil {
+			return stopped, nil
+		}
+		allowedEvidence = ev
 	}
 
 	// Publish tool call event
@@ -1233,6 +1254,17 @@ func budgetEventRequestID(callerRequestID string, result *BudgetResult) string {
 
 func (p *Proxy) compensateMCPSpend(ctx context.Context, budgetID, requestID string, cost int64) {
 	compensator, ok := p.budget.(BudgetCompensator)
+	if !ok && p.signEveryAction && budgetID != "" && requestID != "" && cost > 0 {
+		// Sign every action promises that a call stopped for want of a receipt
+		// debits nothing. A budget that cannot compensate but can give a
+		// request's debit back (the in-memory one) does that.
+		if refunder, canRefund := p.budget.(BudgetRefunder); canRefund {
+			if err := refunder.Refund(ctx, budgetID, requestID, cost); err != nil {
+				log.Error().Err(err).Str("budgetId", budgetID).Str("requestId", requestID).Msg("failed to give back MCP debit after evidence failure")
+			}
+			return
+		}
+	}
 	if !ok || budgetID == "" || requestID == "" || cost <= 0 {
 		return
 	}
