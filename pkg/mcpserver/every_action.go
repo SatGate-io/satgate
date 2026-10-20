@@ -75,6 +75,7 @@ var ErrSignEveryActionNeedsWindowRecorder = errors.New("sign every action needs 
 // the proxy not ready again.
 func (p *Proxy) SetSignEveryAction(on bool) error {
 	p.signEveryAction = on
+	p.every().on.Store(on)
 	p.wireDelegator()
 	err := p.SignEveryActionReady()
 	p.every().ready.Store(on && err == nil)
@@ -286,6 +287,16 @@ func receiptTool(tool string) string {
 // not made one: that is an error. The recorder is asked under the signing time
 // limit (everyAction.record).
 func recordIdentifiedDecision(ctx context.Context, ea *everyAction, rec EvidenceRecorder, req *Request, tokenInfo *TokenInfo, method, tool string, decision MCPDecision, mode string) (*MCPEvidence, error) {
+	if ea != nil && req != nil && decision.RequestID == "" && ea.on.Load() {
+		// The request_id of the receipt is the server's, one for each call:
+		// two sessions that number their requests alike get receipts that
+		// can be told apart (see newCallID).
+		id, err := newCallID(callIDPrefix)
+		if err != nil {
+			return nil, err
+		}
+		decision.RequestID = id
+	}
 	d := identifyDecision(req, tokenInfo, method, tool, decision, mode)
 	var ev *MCPEvidence
 	var err error
@@ -707,9 +718,16 @@ func (p *Proxy) forwardGoverned(ctx context.Context, req *Request, tokenInfo *To
 const reversalAttempts = 3
 
 // retryUndo runs undo on a context detached from ctx's cancellation and bounded
-// by bound, up to reversalAttempts times with a short pause between. The
-// store's calls it is used for (CommitHold, ReleaseHold, Refund) are keyed by
-// the request id and do nothing the second time.
+// by bound, up to reversalAttempts times with a short pause between.
+//
+// A repeat is safe because of what the store's calls promise (BudgetHolder,
+// BudgetRefunder, CarveSettler): each acts on the one hold, or the one
+// request's debit, that it names, and a second time it finds that hold in the
+// state the first try left it and changes nothing. A try whose answer was
+// lost therefore costs nothing when it is repeated, and a repeat can never
+// reach another call's hold, because no two calls share a hold's identity
+// (newCallID). An answer that says what became of the hold (ErrHoldGone,
+// ErrHoldCommitted, ErrHoldIDInUse) is final and is not repeated.
 func retryUndo(ctx context.Context, bound time.Duration, undo func(context.Context) error) error {
 	rctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), bound)
 	defer cancel()
@@ -717,6 +735,9 @@ func retryUndo(ctx context.Context, bound time.Duration, undo func(context.Conte
 	for attempt := 0; attempt < reversalAttempts; attempt++ {
 		if err = undo(rctx); err == nil {
 			return nil
+		}
+		if errors.Is(err, ErrHoldGone) || errors.Is(err, ErrHoldCommitted) || errors.Is(err, ErrHoldIDInUse) {
+			return err
 		}
 		select {
 		case <-rctx.Done():

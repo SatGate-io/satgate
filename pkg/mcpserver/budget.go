@@ -71,42 +71,63 @@ type BudgetRefunder interface {
 }
 
 // BudgetHolder is implemented by budget stores that can set an amount aside for
-// one request and keep it apart until the request is known to be one that may
-// go ahead. With "sign every action" on, a priced Control call and a delegation
+// one call and keep it apart until the call is known to be one that may go
+// ahead. With "sign every action" on, a priced Control call and a delegation
 // carve are taken as a hold, never as a debit: the call is signed, and only
 // then is the hold committed. If the signature fails, the hold is released; if
 // even that fails, the hold lapses by itself after its time limit and the
 // balance comes back with no further call. That is what makes "not sent and
 // not charged" hold when no later step succeeds.
 //
+// A hold is named by budgetID and holdID. The proxy makes holdID itself, once
+// for each admitted call, from random bits (newCallID); it is never derived
+// from anything a client sends (not the JSON-RPC id, the session or a request
+// id), so two calls can never share one, however their clients number them.
+//
 // Contract:
 //   - Hold takes amount from budgetID exactly as Spend does (the same result,
 //     the same refusal and the same error for an exhausted budget; a budget with
 //     no record is unlimited and holds nothing), but the amount is only set
-//     aside. Other requests see the balance without it.
+//     aside. Other calls see the balance without it.
+//   - One hold per identity. A Hold under a holdID that is already in use on
+//     that budget (open, or settled and still remembered) is a programming
+//     error: the store refuses it with ErrHoldIDInUse and changes nothing. The
+//     proxy never repeats a Hold; one whose answer was lost lapses by itself.
 //   - The hold lapses on its own at ttl after it was taken: the store gives the
 //     amount back to the balance with no call from the proxy. A lapse needs no
 //     clock or process of the proxy's; a store that keeps holds in a database
 //     gives them an expiry the database enforces.
-//   - CommitHold turns the hold into a debit, the same debit Spend records (so
-//     Refund can give it back). It fails if the hold is not there any more
-//     (ErrHoldGone: it lapsed, or was released).
-//   - ReleaseHold gives the hold back now. Releasing a hold that is gone (a
-//     second release, a lapse, a commit) is not an error.
-//   - Holds are named by budgetID and requestID. If two holds of one budget
-//     carry the same requestID at once, each CommitHold or ReleaseHold ends the
-//     earliest of them.
+//   - CommitHold and ReleaseHold act on that one hold and on no other, and
+//     each can be repeated after a lost answer: the repeat finds the same
+//     hold and reports what already happened, and changes nothing.
+//     CommitHold turns an open hold into a debit, the same debit Spend
+//     records (so Refund can give it back); a hold already committed answers
+//     nil (the debit is not taken twice); a hold that lapsed or was released
+//     answers ErrHoldGone. ReleaseHold gives an open hold back now; a hold
+//     already released or lapsed answers nil; a hold already committed answers
+//     ErrHoldCommitted and the debit stands. An identity the store has no
+//     record of answers as a hold that is gone (CommitHold: ErrHoldGone,
+//     ReleaseHold: nil); on a budget with no record both answer nil.
 //   - Every call honours its context, and none depends on the request's: the
 //     proxy runs them on a context of its own with a bound.
 type BudgetHolder interface {
-	Hold(ctx context.Context, budgetID, toolName string, cost int64, requestID string, ttl time.Duration) (*BudgetResult, error)
-	CommitHold(ctx context.Context, budgetID, requestID string) error
-	ReleaseHold(ctx context.Context, budgetID, requestID string) error
+	Hold(ctx context.Context, budgetID, toolName string, cost int64, holdID string, ttl time.Duration) (*BudgetResult, error)
+	CommitHold(ctx context.Context, budgetID, holdID string) error
+	ReleaseHold(ctx context.Context, budgetID, holdID string) error
 }
 
 // ErrHoldGone is what CommitHold returns when the hold it names is not there:
 // it lapsed, or it was released.
 var ErrHoldGone = errors.New("the budget hold is gone")
+
+// ErrHoldCommitted is what ReleaseHold returns when the hold it names was
+// already committed: it is a debit now and a release does not undo it.
+var ErrHoldCommitted = errors.New("the budget hold was already committed")
+
+// ErrHoldIDInUse is what Hold returns when a hold with that identity exists on
+// the budget already. The proxy gives every call an identity of its own, so
+// this is a programming error, never a condition to retry.
+var ErrHoldIDInUse = errors.New("a budget hold with that identity already exists")
 
 // CarveSettler is implemented by budget stores that can finish a delegation's
 // carve after the fact: charge the parent for it and make the child's budget
@@ -188,10 +209,17 @@ type InMemoryBudgetEnforcer struct {
 	// debits is what each admitted Spend took, by budget and request ID, until
 	// Refund gives it back. A spend that took nothing records nothing.
 	debits map[string]int64
-	// holds are the amounts set aside by Hold and not yet committed or
-	// released, by budget and request id, oldest first (see BudgetHolder).
-	holds map[string][]memHold
-	// nextLapse is the earliest expiry among holds; zero when there are none.
+	// holds are the open holds: amounts set aside by Hold and not yet
+	// committed, released or lapsed, by budget and hold id (see BudgetHolder).
+	holds map[string]*memHold
+	// settled remembers how each hold that is no longer open ended, for
+	// settledHoldMemory, so that a repeat of its commit or release (after a
+	// lost answer) finds it and reports what happened. settledOrder is the
+	// same keys oldest first, with the time each was settled.
+	settled      map[string]holdEnd
+	settledOrder []settledRef
+	settledHead  int
+	// nextLapse is the earliest expiry among open holds; zero when there are none.
 	nextLapse time.Time
 	// funded is the carves SettleCarve has already added to a child budget,
 	// by child budget and request id.
@@ -207,6 +235,25 @@ type memHold struct {
 	remaining int64
 	expires   time.Time
 }
+
+// holdEnd is how a hold that is no longer open ended.
+type holdEnd int
+
+const (
+	holdCommitted holdEnd = iota + 1
+	holdReleased
+	holdLapsed
+)
+
+type settledRef struct {
+	key string
+	at  time.Time
+}
+
+// settledHoldMemory is how long the in-memory store remembers a settled hold.
+// It is far longer than any retry the proxy makes of a commit or a release
+// (bounded by the commit limit, which is shorter than the hold's own).
+const settledHoldMemory = 10 * time.Minute
 
 var (
 	_ BudgetRefunder = (*InMemoryBudgetEnforcer)(nil)
@@ -348,43 +395,63 @@ func (e *InMemoryBudgetEnforcer) clock() time.Time {
 	return time.Now()
 }
 
-// lapseLocked gives back every hold whose time has run out. It is called by
-// every operation that reads or changes a balance, under the lock, so a lapsed
-// hold is never seen as spent. With no holds it does nothing.
+// lapseLocked gives back every open hold whose time has run out and forgets
+// settled holds that are past settledHoldMemory. It is called by every
+// operation that reads or changes a balance, under the lock, so a lapsed hold
+// is never seen as spent. With no holds it does nothing.
 func (e *InMemoryBudgetEnforcer) lapseLocked() {
-	if len(e.holds) == 0 {
+	if len(e.holds) == 0 && len(e.settled) == 0 {
 		return
 	}
 	now := e.clock()
-	if now.Before(e.nextLapse) {
+	for e.settledHead < len(e.settledOrder) {
+		r := e.settledOrder[e.settledHead]
+		if now.Before(r.at.Add(settledHoldMemory)) {
+			break
+		}
+		delete(e.settled, r.key)
+		e.settledHead++
+	}
+	if e.settledHead > 1024 && e.settledHead*2 > len(e.settledOrder) {
+		e.settledOrder = append([]settledRef(nil), e.settledOrder[e.settledHead:]...)
+		e.settledHead = 0
+	}
+	if len(e.holds) == 0 || now.Before(e.nextLapse) {
 		return
 	}
 	e.nextLapse = time.Time{}
-	for key, list := range e.holds {
-		kept := list[:0]
-		for _, h := range list {
-			if !now.Before(h.expires) {
-				if _, ok := e.budgets[h.budgetID]; ok {
-					e.budgets[h.budgetID] += h.amount
-				}
-				continue
+	for key, h := range e.holds {
+		if !now.Before(h.expires) {
+			if _, ok := e.budgets[h.budgetID]; ok {
+				e.budgets[h.budgetID] += h.amount
 			}
-			if e.nextLapse.IsZero() || h.expires.Before(e.nextLapse) {
-				e.nextLapse = h.expires
-			}
-			kept = append(kept, h)
-		}
-		if len(kept) == 0 {
 			delete(e.holds, key)
-		} else {
-			e.holds[key] = kept
+			e.settleLocked(key, holdLapsed, now)
+			continue
+		}
+		if e.nextLapse.IsZero() || h.expires.Before(e.nextLapse) {
+			e.nextLapse = h.expires
 		}
 	}
 }
 
-// Hold sets cost aside from budgetID for requestID (see BudgetHolder). The
-// answer is Spend's: the same result and the same refusal.
-func (e *InMemoryBudgetEnforcer) Hold(_ context.Context, budgetID string, toolName string, cost int64, requestID string, ttl time.Duration) (*BudgetResult, error) {
+// settleLocked records how the hold ended. A hold already remembered keeps its
+// place in the forgetting order and takes the new end.
+func (e *InMemoryBudgetEnforcer) settleLocked(key string, end holdEnd, now time.Time) {
+	if e.settled == nil {
+		e.settled = make(map[string]holdEnd)
+	}
+	if _, known := e.settled[key]; !known {
+		e.settledOrder = append(e.settledOrder, settledRef{key: key, at: now})
+	}
+	e.settled[key] = end
+}
+
+// Hold sets cost aside from budgetID for the hold holdID (see BudgetHolder).
+// The answer is Spend's: the same result and the same refusal. A holdID
+// already in use on the budget is refused with ErrHoldIDInUse and nothing
+// changes.
+func (e *InMemoryBudgetEnforcer) Hold(_ context.Context, budgetID string, toolName string, cost int64, holdID string, ttl time.Duration) (*BudgetResult, error) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	e.lapseLocked()
@@ -393,6 +460,16 @@ func (e *InMemoryBudgetEnforcer) Hold(_ context.Context, budgetID string, toolNa
 	if !ok {
 		// No budget = unlimited: nothing to set aside.
 		return &BudgetResult{Allowed: true, Remaining: -1, TokenID: budgetID, Cost: cost}, nil
+	}
+	key := debitKey(budgetID, holdID)
+	if holdID == "" {
+		return nil, errors.New("a budget hold needs an identity")
+	}
+	if _, open := e.holds[key]; open {
+		return nil, ErrHoldIDInUse
+	}
+	if _, done := e.settled[key]; done {
+		return nil, ErrHoldIDInUse
 	}
 	if remaining < cost {
 		return &BudgetResult{
@@ -408,74 +485,86 @@ func (e *InMemoryBudgetEnforcer) Hold(_ context.Context, budgetID string, toolNa
 	}
 	remaining -= cost
 	e.budgets[budgetID] = remaining
-	if cost > 0 {
-		if e.holds == nil {
-			e.holds = make(map[string][]memHold)
-		}
-		h := memHold{budgetID: budgetID, tool: toolName, amount: cost, remaining: remaining, expires: e.clock().Add(ttl)}
-		key := debitKey(budgetID, requestID)
-		e.holds[key] = append(e.holds[key], h)
-		if e.nextLapse.IsZero() || h.expires.Before(e.nextLapse) {
-			e.nextLapse = h.expires
-		}
+	if e.holds == nil {
+		e.holds = make(map[string]*memHold)
+	}
+	h := &memHold{budgetID: budgetID, tool: toolName, amount: cost, remaining: remaining, expires: e.clock().Add(ttl)}
+	e.holds[key] = h
+	if e.nextLapse.IsZero() || h.expires.Before(e.nextLapse) {
+		e.nextLapse = h.expires
 	}
 	return &BudgetResult{Allowed: true, Remaining: remaining, TokenID: budgetID, Cost: cost}, nil
 }
 
-// takeHoldLocked removes and returns the earliest open hold of a request.
-func (e *InMemoryBudgetEnforcer) takeHoldLocked(budgetID, requestID string) (memHold, bool) {
-	key := debitKey(budgetID, requestID)
-	list := e.holds[key]
-	if len(list) == 0 {
-		return memHold{}, false
+// takeOpenLocked removes and returns the open hold with this key.
+func (e *InMemoryBudgetEnforcer) takeOpenLocked(key string) (*memHold, bool) {
+	h, ok := e.holds[key]
+	if !ok {
+		return nil, false
 	}
-	h := list[0]
-	if len(list) == 1 {
-		delete(e.holds, key)
-	} else {
-		e.holds[key] = list[1:]
-	}
+	delete(e.holds, key)
 	return h, true
 }
 
-// CommitHold turns the request's hold into the debit Spend would have taken.
-func (e *InMemoryBudgetEnforcer) CommitHold(_ context.Context, budgetID, requestID string) error {
-	e.mu.Lock()
-	defer e.mu.Unlock()
-	e.lapseLocked()
-	h, ok := e.takeHoldLocked(budgetID, requestID)
-	if !ok {
-		if _, exists := e.budgets[budgetID]; !exists {
-			return nil // an unlimited budget holds nothing and commits nothing
+// commitLocked turns an open hold into the debit Spend would have taken.
+func (e *InMemoryBudgetEnforcer) commitLocked(key, budgetID, holdID string, h *memHold) {
+	if h.amount > 0 {
+		if e.debits == nil {
+			e.debits = make(map[string]int64)
 		}
-		return ErrHoldGone
+		e.debits[key] += h.amount
 	}
-	if e.debits == nil {
-		e.debits = make(map[string]int64)
-	}
-	e.debits[debitKey(budgetID, requestID)] += h.amount
 	e.spent = append(e.spent, SpendRecord{
 		TokenID:   budgetID,
 		ToolName:  h.tool,
 		Cost:      h.amount,
 		Remaining: h.remaining,
-		RequestID: requestID,
+		RequestID: holdID,
 	})
-	return nil
+	e.settleLocked(key, holdCommitted, e.clock())
 }
 
-// ReleaseHold gives the request's hold back now. A hold that is gone is not an
-// error.
-func (e *InMemoryBudgetEnforcer) ReleaseHold(_ context.Context, budgetID, requestID string) error {
+// CommitHold turns the hold into the debit Spend would have taken. It acts on
+// that hold only. A repeat finds the hold committed and answers nil without
+// taking the debit again.
+func (e *InMemoryBudgetEnforcer) CommitHold(_ context.Context, budgetID, holdID string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	e.lapseLocked()
-	h, ok := e.takeHoldLocked(budgetID, requestID)
-	if !ok {
+	key := debitKey(budgetID, holdID)
+	if h, ok := e.takeOpenLocked(key); ok {
+		e.commitLocked(key, budgetID, holdID, h)
 		return nil
 	}
-	if _, exists := e.budgets[budgetID]; exists {
-		e.budgets[budgetID] += h.amount
+	switch e.settled[key] {
+	case holdCommitted:
+		return nil
+	case holdReleased, holdLapsed:
+		return ErrHoldGone
+	}
+	if _, exists := e.budgets[budgetID]; !exists {
+		return nil // an unlimited budget holds nothing and commits nothing
+	}
+	return ErrHoldGone
+}
+
+// ReleaseHold gives the hold back now. It acts on that hold only. A repeat, or
+// a hold that lapsed, answers nil; a hold already committed answers
+// ErrHoldCommitted and the debit stands.
+func (e *InMemoryBudgetEnforcer) ReleaseHold(_ context.Context, budgetID, holdID string) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.lapseLocked()
+	key := debitKey(budgetID, holdID)
+	if h, ok := e.takeOpenLocked(key); ok {
+		if _, exists := e.budgets[budgetID]; exists {
+			e.budgets[budgetID] += h.amount
+		}
+		e.settleLocked(key, holdReleased, e.clock())
+		return nil
+	}
+	if e.settled[key] == holdCommitted {
+		return ErrHoldCommitted
 	}
 	return nil
 }
@@ -492,12 +581,8 @@ func (e *InMemoryBudgetEnforcer) SettleCarve(_ context.Context, parentBudgetID, 
 	pkey := debitKey(parentBudgetID, requestID)
 	remaining, parentLimited := e.budgets[parentBudgetID]
 	if parentLimited && amount > 0 && e.debits[pkey] == 0 {
-		if h, ok := e.takeHoldLocked(parentBudgetID, requestID); ok {
-			if e.debits == nil {
-				e.debits = make(map[string]int64)
-			}
-			e.debits[pkey] += h.amount
-			e.spent = append(e.spent, SpendRecord{TokenID: parentBudgetID, ToolName: h.tool, Cost: h.amount, Remaining: h.remaining, RequestID: requestID})
+		if h, ok := e.takeOpenLocked(pkey); ok {
+			e.commitLocked(pkey, parentBudgetID, requestID, h)
 		} else {
 			if remaining < amount {
 				return &BudgetResult{
@@ -515,6 +600,9 @@ func (e *InMemoryBudgetEnforcer) SettleCarve(_ context.Context, parentBudgetID, 
 			}
 			e.debits[pkey] += amount
 			e.spent = append(e.spent, SpendRecord{TokenID: parentBudgetID, ToolName: "_delegation", Cost: amount, Remaining: remaining, RequestID: requestID})
+			// The hold (lapsed or released) is now a debit: a late repeat of
+			// its commit reports that, and its release changes nothing.
+			e.settleLocked(pkey, holdCommitted, e.clock())
 		}
 	}
 	// The parent is charged. Fund the child once.

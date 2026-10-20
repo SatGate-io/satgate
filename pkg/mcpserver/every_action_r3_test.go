@@ -761,8 +761,13 @@ func TestR3_R1_InMemoryHold(t *testing.T) {
 	if err := b.CommitHold(ctx, "b", "r1"); err != nil {
 		t.Fatal(err)
 	}
-	if err := b.CommitHold(ctx, "b", "r1"); !errors.Is(err, ErrHoldGone) {
+	// Round 4: a repeat of a commit finds the hold committed and answers nil;
+	// it does not take the debit twice (see TestR4_InMemoryHold).
+	if err := b.CommitHold(ctx, "b", "r1"); err != nil {
 		t.Fatalf("second commit = %v", err)
+	}
+	if rem, _ := b.Remaining(ctx, "b"); rem != 6 {
+		t.Fatalf("remaining after the repeated commit = %d, want 6", rem)
 	}
 	if err := b.Refund(ctx, "b", "r1", 4); err != nil {
 		t.Fatal(err)
@@ -799,17 +804,6 @@ func TestR3_R1_InMemoryHold(t *testing.T) {
 	}
 	if err := b.CommitHold(ctx, "none", "r5"); err != nil {
 		t.Fatalf("unlimited commit: %v", err)
-	}
-	// Two holds under one request id: each end takes the earliest.
-	_, _ = b.Hold(ctx, "b", "t", 1, "same", time.Minute)
-	_, _ = b.Hold(ctx, "b", "t", 2, "same", time.Minute)
-	_ = b.ReleaseHold(ctx, "b", "same")
-	if rem, _ := b.Remaining(ctx, "b"); rem != 9-0 && rem != 10-2 {
-		t.Fatalf("after one of two releases = %d", rem)
-	}
-	_ = b.ReleaseHold(ctx, "b", "same")
-	if rem, _ := b.Remaining(ctx, "b"); rem != 10 {
-		t.Fatalf("after both = %d", rem)
 	}
 }
 

@@ -186,7 +186,7 @@ func (d *Delegator) blocksOnReceiptFailure(ctx context.Context, tenantID string)
 // signDelegation records the allowed receipt of a delegation. Like every
 // allow receipt it says policy_allowed with no balance claim: it names the
 // call and the key, not the amount carved.
-func (d *Delegator) signDelegation(ctx context.Context, parent *TokenInfo) error {
+func (d *Delegator) signDelegation(ctx context.Context, parent *TokenInfo, callID string) error {
 	if d.recorder == nil {
 		return errors.New("sign every action is on but no evidence recorder is installed")
 	}
@@ -194,6 +194,9 @@ func (d *Delegator) signDelegation(ctx context.Context, parent *TokenInfo) error
 		Decision:           "allowed",
 		DecisionReason:     "policy_allowed",
 		BudgetNotEvaluated: true,
+		// The carve's own identity when there is one; otherwise the receipt
+		// is given one by recordIdentifiedDecision.
+		RequestID: callID,
 	}, "")
 	return err
 }
@@ -594,6 +597,18 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		nonce := make([]byte, 8)
 		_, _ = rand.Read(nonce)
 		delegationID = fmt.Sprintf("delegate-%s-%s-%d-%s", parent.BudgetID, params.Label, params.Budget, hex.EncodeToString(nonce))
+		if d.signEveryAction {
+			// Sign every action: the carve's identity is one the server makes
+			// for this carve alone, from nothing the client sent (not the
+			// label, the amount or the JSON-RPC id). It names the hold, the
+			// settlement and the receipt's request_id (see newCallID).
+			id, err := newCallID(carveIDPrefix)
+			if err != nil {
+				log.Error().Err(err).Str("parent", parent.TokenID).Msg("delegation refused before any carve: no identity could be made for it")
+				return nil, errDelegationProofUnavailable
+			}
+			delegationID = id
+		}
 		var (
 			res      *BudgetResult
 			spendErr error
@@ -732,7 +747,7 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		if holder != nil {
 			sctx = withHoldExpiry(ctx, holdExpiry)
 		}
-		if err := d.signDelegation(sctx, parent); err != nil {
+		if err := d.signDelegation(sctx, parent, delegationID); err != nil {
 			log.Error().Err(err).Str("parent", parent.TokenID).Msg("delegation receipt unavailable")
 			if d.blocksOnReceiptFailure(ctx, parent.TenantID) {
 				undoCarve(delegationID)

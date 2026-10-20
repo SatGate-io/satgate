@@ -24,6 +24,8 @@ package mcpserver
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"sort"
@@ -127,7 +129,11 @@ func (p *Proxy) EveryActionSettings() EveryActionSettings { return *p.every().se
 // readiness flag, the settings, the pending store and its retry worker. The
 // proxy and its delegator share one.
 type everyAction struct {
-	ready    atomic.Bool
+	ready atomic.Bool
+	// on mirrors the switch (SetSignEveryAction): with it on, a receipt that
+	// is not given a request id is given one the server makes (newCallID),
+	// never one derived from the client's JSON-RPC id.
+	on       atomic.Bool
 	settings atomic.Pointer[EveryActionSettings]
 	pending  *pendingStore
 
@@ -267,25 +273,51 @@ func settlerOf(b BudgetEnforcer) CarveSettler {
 	return s
 }
 
-// commit turns a hold into a debit on a context of its own, bounded by
-// CommitTimeout, trying a few times (CommitHold names the hold by request id
-// and the store ends it once). It is the step after a signature.
-func (ea *everyAction) commit(ctx context.Context, h BudgetHolder, budgetID, requestID string) error {
+// ---- the identity of a call ----
+
+// newCallID makes the identity of one admitted call, or of one delegation
+// carve: the prefix and 128 random bits from the system's source. It is the
+// name of the call's hold, of the amount kept for it if its commit fails, of
+// its carve settlement, and the request_id its receipt carries. Nothing a
+// client sends goes into it (not the JSON-RPC id, the session, a request id,
+// a label), so two calls can never share one, whatever numbering their
+// clients use. If the source fails the call is refused before anything is
+// taken.
+func newCallID(prefix string) (string, error) {
+	var b [16]byte
+	if _, err := rand.Read(b[:]); err != nil {
+		return "", err
+	}
+	return prefix + hex.EncodeToString(b[:]), nil
+}
+
+// Prefixes of the identities newCallID makes.
+const (
+	callIDPrefix  = "call-"
+	carveIDPrefix = "carve-"
+)
+
+// commit turns the hold holdID into a debit on a context of its own, bounded
+// by CommitTimeout, trying a few times. It is the step after a signature. The
+// store's CommitHold acts on that hold only and is the same the second time
+// (BudgetHolder), so a try whose answer was lost and its repeat commit the one
+// hold once and touch no other call's.
+func (ea *everyAction) commit(ctx context.Context, h BudgetHolder, budgetID, holdID string) error {
 	return retryUndo(ctx, ea.cfg().CommitTimeout, func(c context.Context) error {
-		return h.CommitHold(c, budgetID, requestID)
+		return h.CommitHold(c, budgetID, holdID)
 	})
 }
 
-// release gives a hold back on a context of its own, bounded by CommitTimeout.
-// If it still fails the hold lapses by itself; the failure is logged and
-// counted (ReversalFailures), and nothing more has to succeed.
-func (ea *everyAction) release(ctx context.Context, h BudgetHolder, budgetID, requestID string, amount int64) {
+// release gives the hold holdID back on a context of its own, bounded by
+// CommitTimeout. If it still fails the hold lapses by itself; the failure is
+// logged and counted (ReversalFailures), and nothing more has to succeed.
+func (ea *everyAction) release(ctx context.Context, h BudgetHolder, budgetID, holdID string, amount int64) {
 	err := retryUndo(ctx, ea.cfg().CommitTimeout, func(c context.Context) error {
-		return h.ReleaseHold(c, budgetID, requestID)
+		return h.ReleaseHold(c, budgetID, holdID)
 	})
 	if err != nil {
 		ea.releaseFailures.Add(1)
-		log.Error().Err(err).Str("budgetId", budgetID).Str("requestId", requestID).Int64("amount", amount).
+		log.Error().Err(err).Str("budgetId", budgetID).Str("requestId", holdID).Int64("amount", amount).
 			Dur("lapsesWithin", ea.cfg().HoldTTL).Msg("could not release a budget hold; it lapses by itself and the balance comes back")
 	}
 }
@@ -326,7 +358,9 @@ type PendingRecord struct {
 	// Minute is the start of the UTC minute of the call.
 	Minute time.Time
 	// Amount and RequestID are set on PendingUncharged: the credits that were
-	// held and never committed, and the request id the hold was taken under.
+	// held and never committed, and the identity of the call's hold (made by
+	// the server for that one call, see newCallID; also the request_id of its
+	// receipt). Two entries never share one.
 	Amount    int64
 	RequestID string
 	// ChildBudgetID is set when the entry is a delegation's carve: the budget
@@ -372,8 +406,18 @@ type pendingStore struct {
 	nonce    string
 }
 
+// newPendingStore makes a store. Its entries' ids (which are also the ReportID
+// of a gap report, the key the window recorder counts it once by) carry a
+// nonce of random bits, so that two gateway processes, or one process before
+// and after a restart, never make the same id. If the source of random bits
+// fails the nonce falls back to the clock, as before.
 func newPendingStore() *pendingStore {
-	return &pendingStore{entries: map[string]*pendingEntry{}, nonce: fmt.Sprintf("%x", time.Now().UnixNano()&0xffffff)}
+	nonce := fmt.Sprintf("%x", time.Now().UnixNano())
+	var b [8]byte
+	if _, err := rand.Read(b[:]); err == nil {
+		nonce = hex.EncodeToString(b[:])
+	}
+	return &pendingStore{entries: map[string]*pendingEntry{}, nonce: nonce}
 }
 
 func kindName(kind int) string {

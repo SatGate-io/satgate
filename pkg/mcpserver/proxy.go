@@ -794,6 +794,19 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 
 	// Generate request ID for idempotency
 	requestID := generateRequestID(budgetID, tc.Name, req.ID)
+	if p.signEveryAction {
+		// Sign every action: the call's identity is one the server makes for
+		// this call alone. It names the hold, the amount kept if the commit
+		// fails, the spend, the events and the receipt's request_id. The
+		// JSON-RPC id is the client's and a different session may send the
+		// same one, so it is never part of it (see newCallID).
+		id, err := newCallID(callIDPrefix)
+		if err != nil {
+			log.Error().Err(err).Str("tool", receiptTool(tc.Name)).Msg("sign every action: no identity could be made for the call; refusing it before any charge")
+			return proofUnavailableResponse(req.ID, tc.Name), nil
+		}
+		requestID = id
+	}
 	eventRequestID := requestID
 
 	log.Debug().
@@ -1167,6 +1180,15 @@ func (p *Proxy) recordMCPDecision(ctx context.Context, req *Request, tokenInfo *
 	decision.Scope = tokenInfo.Scope
 	decision.MCPMethod = MethodToolsCall
 	decision.ToolName = toolName
+	if p.signEveryAction && decision.RequestID == "" {
+		// A refusal made before the call had an identity: its receipt gets one
+		// of the server's own, never one built from the client's JSON-RPC id.
+		id, err := newCallID(callIDPrefix)
+		if err != nil {
+			return nil, err
+		}
+		decision.RequestID = id
+	}
 	if d, ok := gateDetailFrom(ctx); ok && decision.Decision == "allowed" {
 		// What a call gate recorded about an admitted call (a window total,
 		// an approval id). Refusals carry their own detail.
