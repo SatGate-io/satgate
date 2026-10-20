@@ -721,9 +721,12 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 	// sign, commit, then the key. If it cannot be made, the hold is released
 	// (or lapses by itself) and no key is returned. In Observe the call goes on
 	// unsigned and the miss is reported. If the commit fails after a signature
-	// the key is still issued, because the receipt already says it was allowed;
-	// the hold lapses, so the carve is never charged, and the amount is kept
-	// for reconciliation.
+	// the key is still issued, because the receipt already says it was allowed,
+	// but the child's budget holds nothing (it was created at zero) until the
+	// parent has been charged: the amount is kept, and the pending worker
+	// settles it (SettleCarve), charging the parent exactly once and only then
+	// funding the child. If the parent can no longer cover it, the child stays
+	// empty and the entry is closed, logged and counted.
 	if d.signEveryAction {
 		sctx := ctx
 		if holder != nil {

@@ -299,7 +299,8 @@ const (
 	PendingGap = "observe_gap"
 	// PendingUncharged is a call that was signed and sent while the commit of
 	// its hold failed: the hold lapses, the amount was never charged, and the
-	// signed receipt says it was.
+	// signed receipt says it was. A delegation's carve is such an entry too
+	// (ChildBudgetID is set); the worker settles it itself.
 	PendingUncharged = "uncharged_commit"
 )
 

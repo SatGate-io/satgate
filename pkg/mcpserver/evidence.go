@@ -273,6 +273,15 @@ type MCPEvidence struct {
 // verifiable artifact. Enterprise implementations should fail closed from
 // Preflight/RecordMCPDecision when required signing/archive infrastructure is
 // unavailable.
+//
+// With "sign every action" on, RecordMCPDecision runs under a time limit (the
+// signing limit) and the proxy stops waiting for it when the limit passes: the
+// call is then refused, its hold released, and nothing is forwarded or issued.
+// A receipt cannot be unsigned, so a recorder must itself never make one for a
+// call that has been given up on: it checks ctx right before it signs (after
+// any work that does not watch ctx), and returns ctx.Err() without signing
+// once ctx is done. A recorder that does not may sign an allowed receipt for a
+// call that was refused.
 type EvidenceRecorder interface {
 	Preflight(ctx context.Context) error
 	RecordMCPDecision(ctx context.Context, decision MCPDecision) (*MCPEvidence, error)
