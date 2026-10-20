@@ -51,7 +51,7 @@ const comparisonRows = [
     topic: 'How much your agent can trade',
     robinhood: 'You choose how much money to put in the agent\'s account, and the agent can trade with what is in it.',
     satgate:
-      'You set the most it can trade, in dollars, per order, per day and per week, and an order over a limit is refused before it reaches Robinhood. Orders are dollar amounts in stocks or crypto. Options and limit orders are off.',
+      'You set the most it can trade, in dollars, per order, per day and per week, and an order over a limit is refused before it reaches Robinhood. Your agent can trade stocks and crypto, in dollar amounts.',
   },
   {
     topic: 'Approving orders',
