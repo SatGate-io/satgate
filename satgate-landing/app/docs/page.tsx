@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 const docs = [
-  ['Verify a signed receipt', '/verify-evidence-pack', 'Independently verify signed receipts, JWKS, pack mirrors, and tamper evidence.'],
+  ['Check a receipt', '/verify-evidence-pack', 'Independently verify signed receipts, JWKS, pack mirrors, and tamper evidence.'],
   ['Rules and Receipts', '/policy-to-proof', 'How SatGate turns authority decisions into portable evidence.'],
   ['Signed receipt demo', '/evidence-pack-demo', 'Explore a buyer-readable sample artifact and schema.'],
   ['MCP Gateway', '/mcp', 'Govern MCP tool calls with scoped authority and budget evidence.'],

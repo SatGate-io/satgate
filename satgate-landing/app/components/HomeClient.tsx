@@ -751,6 +751,7 @@ const LandingPage = () => {
               <h4 className="mb-4 font-bold text-white">Resources</h4>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li><Link href="/tools" className="hover:text-white transition">Tools</Link></li>
+                <li><Link href="/verify-evidence-pack" className="hover:text-white transition">Check a receipt</Link></li>
                 <li><Link href="/compare" className="hover:text-white transition">Compare</Link></li>
                 <li><Link href="/blog" className="hover:text-white transition">Blog</Link></li>
                 <li><Link href="/ai-agent-cost-control" className="hover:text-white transition">Cost Control</Link></li>

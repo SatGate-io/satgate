@@ -51,12 +51,12 @@ REQUIRED_PHRASES = {
         "decision_reason",
     ],
     "app/verify-evidence-pack/page.tsx": [
-        "Don&apos;t trust us. Check it yourself.",
+        "Check a SatGate receipt",
         "valid=true",
         "trusted_issuer_valid=true",
         "--jwks-file jwks.json",
         "--require-trusted-issuer",
-        "Current limits",
+        "<h3 className=\"mb-4 mt-8 text-xl font-bold text-white\">Limits</h3>",
         "/evidence/mcp-budget-refusal-20261005.json",
     ],
     "app/openai-budget-policy-generator/page.tsx": [
