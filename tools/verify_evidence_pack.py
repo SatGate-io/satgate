@@ -566,6 +566,15 @@ def is_new_profile_receipt(receipt: Any) -> bool:
     )
 
 
+def is_gap_receipt(receipt: Any) -> bool:
+    """A receipt of the gap profile: allowed / observe_unrecorded, or one that
+    carries any of the unrecorded-count fields."""
+    return isinstance(receipt, dict) and (
+        receipt.get("decision_reason") == "observe_unrecorded"
+        or any(field in receipt for field in UNRECORDED_FIELDS)
+    )
+
+
 def valid_new_profile_provenance(receipt: dict[str, Any]) -> bool:
     authority_value = receipt.get("authority")
     if not isinstance(authority_value, dict):
@@ -860,16 +869,30 @@ def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requi
     primary = receipts[0] if receipts else {}
     # Optional display mirrors are not new authority. If present, they must
     # have a signed counterpart and match it recursively in both type and value.
+    # A gap receipt's Pack must carry the issued_at and evidence_url mirrors,
+    # equal to the signed receipt's: main refuses a gap Pack without them in
+    # both copies, and the demo copy still does. They are checked below as
+    # required; every other profile keeps them optional, as main has them.
+    gap_mirrors = ("issued_at", "evidence_url") if is_gap_receipt(primary) else ()
     for field in ("rail", "amount_sats", "payment_hash", "invoice_hash", "macaroon_hash",
                   "transaction", "network", "asset", "payer", "pay_to", "amount_atomic",
                   "paid_rail_context", "issued_at", "evidence_url", "timestamp",
                   "policy_version", "jwks_url", "schema_url", "verify_url"):
+        if field in gap_mirrors:
+            continue
         if field in pack:
             key = f"pack_optional_{field}_matches_primary_receipt"
             checks[key] = field in primary and strict_json_equal(pack[field], primary[field])
             if not checks[key]:
                 add_reason(reasons, reason_codes, "pack_primary_mismatch",
                            f"pack.{field} does not match primary embedded receipt.{field}")
+
+    for field in gap_mirrors:
+        key = f"pack_{field}_matches_primary_receipt"
+        checks[key] = bool(primary) and strict_json_equal(pack.get(field), primary.get(field))
+        if not checks[key]:
+            add_reason(reasons, reason_codes, "pack_primary_mismatch",
+                       f"pack.{field} does not match primary embedded receipt.{field}")
 
     checks["pack_hash_matches_primary_receipt"] = bool(primary) and pack.get("receipt_hash") == primary.get("receipt_hash")
     if not checks["pack_hash_matches_primary_receipt"]:

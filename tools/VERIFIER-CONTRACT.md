@@ -36,7 +36,7 @@ claims. When present they must have an exactly matching signed counterpart.
 The same binding applies to optional `issued_at`, `evidence_url`, `timestamp`,
 `policy_version`, `jwks_url`, `schema_url`, and `verify_url`. Demo retains its
 existing required `issued_at`/`evidence_url` mirror checks; tools does not newly
-require their presence. Mirror mismatches emit `pack_primary_mismatch` with the
+require their presence, except for the Observe gap profile (below). Mirror mismatches emit `pack_primary_mismatch` with the
 field name; budget-state mismatches emit `budget_state_mismatch`.
 
 ### The Pack wrapper's mirrors for the new profiles
@@ -53,6 +53,17 @@ shape (a signed Pack with each of the three removed, for each of the shapes, is 
 parity test, `tools/test_every_action_receipts.py`). The rule for any other Pack
 is unchanged: `tools` checks the three when they are present, `demo` always
 compares them. The legacy evaluated and paid profiles are not touched.
+
+An Observe gap record has two more mirrors that must be present. A Pack whose
+primary receipt is `allowed` / `observe_unrecorded` (or carries any of the
+`unrecorded_*` fields) must repeat the receipt's `issued_at` and `evidence_url`
+in the Pack, each exactly equal (type-strict) to the signed receipt's. A gap Pack
+that leaves either out is refused with `pack_primary_mismatch` naming the
+field, by both copies, as `main` refuses it in both. `demo` has always required
+these two for every Pack; `tools` now requires them for the gap profile only.
+For the other new profiles (`allowed` / `policy_allowed`, window openers and
+closers) and for every legacy Pack, `tools` keeps `issued_at` and
+`evidence_url` optional (checked when present), exactly as `main` has it.
 
 The entire input, including unsigned extensions, must be RFC8785-serializable.
 Nonfinite numbers (including overflow from valid JSON `1e309`), unsafe integers,

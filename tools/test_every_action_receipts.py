@@ -14,7 +14,11 @@ the same synthetic keys. Run:
   python -B -m unittest discover -s tools -p 'test_every_action_receipts.py' -v
 """
 import copy
+import json
+import os
+import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -414,6 +418,75 @@ class EveryActionReceipts(unittest.TestCase):
                 pack = self.f.pack(self.f.receipt(decision, reason))
                 del pack[field]
                 with self.subTest(profile=f"{decision}/{reason}", removed=field):
+                    self.assertTrue(self.verify("tools", pack)["valid"])
+                    self.assertFalse(self.verify("demo", pack)["valid"])
+
+    # ---- the Observe gap Pack's issued_at and evidence_url mirrors ----
+
+    def cli(self, surface, pack, jwks_path):
+        env = dict(os.environ, PYTHONPATH=str(ROOT / "demo" / "_vendor"), PYTHONDONTWRITEBYTECODE="1")
+        proc = subprocess.run(
+            [sys.executable, "-B", str(ROOT / surface / "verify_evidence_pack.py"), "-", "--now", NOW,
+             "--jwks-file", str(jwks_path), "--require-trusted-issuer"],
+            input=json.dumps(pack), text=True, capture_output=True, env=env, timeout=30)
+        self.assertNotIn("Traceback", proc.stderr, proc.stderr)
+        result = json.loads(proc.stdout)
+        self.assertEqual(proc.returncode == 0, result["valid"], proc.stderr)
+        return proc, result
+
+    def test_a_gap_pack_must_carry_issued_at_and_evidence_url_in_both_copies(self):
+        # Signed, signature valid, the unsigned issued_at or evidence_url mirror
+        # left out of the Pack. main refuses both omissions in both copies; so
+        # must the gap profile here, through both Python APIs and both
+        # trusted-JWKS command lines. The whole Pack is valid in all four.
+        whole = self.pack(gap(self.f))
+        for field in ("issued_at", "evidence_url"):
+            self.assertIn(field, whole, "the fixture's Pack must carry the mirror")
+        with tempfile.TemporaryDirectory() as td:
+            jwks = Path(td) / "synthetic-jwks.json"
+            jwks.write_text(json.dumps(self.f.jwks))
+            for surface in paid.VERIFIERS:
+                with self.subTest(case="whole", surface=surface, via="api"):
+                    self.assertTrue(self.verify(surface, whole)["valid"])
+                with self.subTest(case="whole", surface=surface, via="cli"):
+                    proc, result = self.cli(surface, whole, jwks)
+                    self.assertEqual(proc.returncode, 0, result)
+            for field in ("issued_at", "evidence_url"):
+                pack = copy.deepcopy(whole)
+                del pack[field]
+                for surface in paid.VERIFIERS:
+                    with self.subTest(removed=field, surface=surface, via="api"):
+                        result = self.verify(surface, pack)
+                        self.assertTrue(result["checks"]["signature_valid"], "the case must fail on the wrapper, not the signature")
+                        self.assertFalse(result["valid"], result)
+                        self.assertIn("pack_primary_mismatch", result["reason_codes"])
+                    with self.subTest(removed=field, surface=surface, via="cli"):
+                        proc, result = self.cli(surface, pack, jwks)
+                        self.assertNotEqual(proc.returncode, 0, result)
+                        self.assertTrue(result["checks"]["signature_valid"], result)
+                        self.assertIn("pack_primary_mismatch", result["reason_codes"])
+
+    def test_a_gap_pack_mirror_that_differs_from_the_receipt_is_refused_in_both_copies(self):
+        for field, value in (("issued_at", "2026-01-01T00:09:00Z"), ("evidence_url", "https://issuer.example/other"),
+                             ("issued_at", None), ("evidence_url", 5)):
+            pack = self.pack(gap(self.f))
+            pack[field] = value
+            for surface in paid.VERIFIERS:
+                with self.subTest(changed=field, to=value, surface=surface):
+                    result = self.verify(surface, pack)
+                    self.assertTrue(result["checks"]["signature_valid"])
+                    self.assertFalse(result["valid"], result)
+                    self.assertIn("pack_primary_mismatch", result["reason_codes"])
+
+    def test_the_other_new_profiles_keep_issued_at_and_evidence_url_as_main_has_them(self):
+        # Not widened: an allowed / policy_allowed, opener or closer Pack that
+        # leaves issued_at or evidence_url out is accepted by tools (optional
+        # there) and refused by demo (always compared), exactly as on main.
+        for shape, build in {"allowed": allowed_free, "opener": opener, "closer": closer}.items():
+            for field in ("issued_at", "evidence_url"):
+                pack = self.pack(build(self.f))
+                del pack[field]
+                with self.subTest(shape=shape, removed=field):
                     self.assertTrue(self.verify("tools", pack)["valid"])
                     self.assertFalse(self.verify("demo", pack)["valid"])
 

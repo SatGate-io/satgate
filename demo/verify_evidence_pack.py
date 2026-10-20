@@ -1265,6 +1265,11 @@ def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requi
     if not checks["pack_hash_matches_primary_receipt"]:
         add_reason(reasons, reason_codes, "pack_receipt_hash_not_primary", "pack.receipt_hash does not match primary embedded receipt.receipt_hash")
 
+    # evidence_url and issued_at are compared for every Pack, present or absent:
+    # a mirror left out of a Pack whose signed receipt has it is refused. For a
+    # gap record (allowed / observe_unrecorded) this is the contract in
+    # tools/VERIFIER-CONTRACT.md, and tools/verify_evidence_pack.py applies the
+    # same rule to gap Packs.
     for field in ["evidence_pack_id", "evidence_url", "receipt_id", "issuer", "issued_at", "decision", "decision_reason", "route_or_tool", "capability_hash"]:
         key = f"pack_{field}_matches_primary_receipt"
         checks[key] = bool(primary) and strict_json_equal(pack.get(field), primary.get(field))
