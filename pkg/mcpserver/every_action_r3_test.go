@@ -51,6 +51,13 @@ type eaHoldStore struct {
 	holdDelay                       time.Duration
 	holdTTLs                        []time.Duration
 	lastHoldBudget, lastHoldRequest string
+	// Round 3 follow-up: SettleCarve (every_action_r3f_test.go). A store that
+	// cannot commit cannot settle either; failSettle fails the settle alone;
+	// loseSettleAnswers makes the next n settles take effect and answer with
+	// an error.
+	settles           int
+	failSettle        bool
+	loseSettleAnswers int
 }
 
 func (b *eaHoldStore) Spend(ctx context.Context, id, tool string, cost int64, rid string) (*BudgetResult, error) {

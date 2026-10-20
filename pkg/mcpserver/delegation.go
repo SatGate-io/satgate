@@ -401,12 +401,20 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 	// commit fail after the receipt was signed, is set aside first.
 	var (
 		holder     BudgetHolder
+		settler    CarveSettler
 		holdExpiry time.Time
 		slot       *pendingSlot
 	)
 	if d.signEveryAction && params.Budget > 0 && d.blocksOnReceiptFailure(ctx, parent.TenantID) {
 		if holder = holdOf(d.budget); holder == nil {
 			log.Error().Str("parent", parent.TokenID).Msg("delegation refused before any carve: the budget store offers no hold")
+			return nil, errDelegationProofUnavailable
+		}
+		// The child's budget is created empty and funded only once the parent
+		// has been charged, so the store must be able to do that step (and
+		// repeat it) too. Without it no key could be held back.
+		if settler = settlerOf(d.budget); settler == nil {
+			log.Error().Str("parent", parent.TokenID).Msg("delegation refused before any carve: the budget store cannot fund a child once its parent is charged")
 			return nil, errDelegationProofUnavailable
 		}
 		if slot = d.state().pending.reserve(kindUncharged); slot == nil {
@@ -606,8 +614,18 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 	// Initialize child budget (skip for observe-only 0-budget tokens)
 	if params.Budget > 0 && childBudgetID != "" {
 		// Pass delegation ID via context for atomic TransferBudget in enterprise
+		//
+		// Sign every action (a blocking mode): the child's budget is created
+		// at zero, so whatever happens next the child can spend nothing the
+		// parent was not charged for. The carve is added to it by SettleCarve
+		// once the commit has landed. Nothing is moved at creation, so the
+		// delegation id is not passed.
 		initCtx := context.WithValue(ctx, CtxDelegationID, delegationID)
-		if err := d.budget.Initialize(initCtx, childBudgetID, params.Budget); err != nil {
+		initCredits := params.Budget
+		if holder != nil {
+			initCtx, initCredits = ctx, 0
+		}
+		if err := d.budget.Initialize(initCtx, childBudgetID, initCredits); err != nil {
 			undoCarve(delegationID)
 			if errors.Is(err, ErrInsufficientBudget) {
 				// The budget said no when the money was to move: a real refusal.
@@ -723,9 +741,24 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 				return nil, errDelegationProofUnavailable
 			}
 		} else if holder != nil {
-			if cerr := d.state().commit(ctx, holder, parent.BudgetID, delegationID); cerr != nil {
-				log.Error().Err(cerr).Str("parent", parent.TokenID).Msg("the carve's hold could not be committed after the delegation was signed; the key is issued, the carve was never charged")
-				d.state().keepUncharged(slot, parent.TokenID, parent.TenantID, parent.BudgetID, MethodSatGateDelegate, "", delegationID, params.Budget)
+			// The receipt stands, so the key is issued either way. The child's
+			// budget is empty until the parent has been charged: the commit
+			// lands, then SettleCarve funds the child. If either step fails,
+			// the amount is kept and the retry worker runs SettleCarve until
+			// it lands (charging the parent if the hold has lapsed, once), or
+			// until the parent can no longer cover it (the child stays empty).
+			settle := func(sctx context.Context) error {
+				res, serr := settler.SettleCarve(sctx, parent.BudgetID, childBudgetID, delegationID, params.Budget)
+				return d.carveSettleOutcome(res, serr)
+			}
+			cerr := d.state().commit(ctx, holder, parent.BudgetID, delegationID)
+			if cerr != nil {
+				log.Error().Err(cerr).Str("parent", parent.TokenID).Msg("the carve's hold could not be committed after the delegation was signed; the key is issued and the child can spend nothing until the parent is charged")
+			} else if cerr = retryUndo(ctx, d.state().cfg().CommitTimeout, settle); cerr != nil {
+				log.Error().Err(cerr).Str("parent", parent.TokenID).Msg("the parent was charged but the child's budget could not be funded; the key is issued and the child can spend nothing until it is")
+			}
+			if cerr != nil {
+				d.state().keepUnchargedEntry(slot, parent.TokenID, parent.TenantID, parent.BudgetID, MethodSatGateDelegate, "", delegationID, params.Budget, childBudgetID, settle)
 			}
 		}
 	}
@@ -747,6 +780,27 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		ParentRemaining: parentRemaining,
 		BudgetID:        childBudgetID,
 	}, nil
+}
+
+// carveSettleOutcome reads the answer of SettleCarve. Only a non-nil result
+// with Allowed true and no error means the parent is charged and the child
+// funded. A refusal (an error matching ErrInsufficientBudget, or a result
+// that says no with a code in refusalCodes) matches ErrInsufficientBudget in
+// what it returns; everything else is a failure to try again.
+func (d *Delegator) carveSettleOutcome(res *BudgetResult, err error) error {
+	switch {
+	case err != nil && errors.Is(err, ErrInsufficientBudget):
+		return ErrInsufficientBudget
+	case err != nil:
+		return err
+	case res == nil:
+		return errors.New("the budget store gave no usable answer to the carve")
+	case !res.Allowed && refusalCodes[res.ErrorCode]:
+		return ErrInsufficientBudget
+	case !res.Allowed:
+		return errors.New("the budget store did not settle the carve")
+	}
+	return nil
 }
 
 // refuseMint turns a failure to mint or seal the child into the refusal the

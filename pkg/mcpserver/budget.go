@@ -108,6 +108,36 @@ type BudgetHolder interface {
 // it lapsed, or it was released.
 var ErrHoldGone = errors.New("the budget hold is gone")
 
+// CarveSettler is implemented by budget stores that can finish a delegation's
+// carve after the fact: charge the parent for it and make the child's budget
+// spendable, as one step that can be repeated. With "sign every action" on, a
+// delegation in Control (or any blocking mode) creates the child's budget at
+// zero, so the child can spend nothing, and the carve reaches the child only
+// when the parent has been charged for it. The charge is normally the commit of
+// the carve's hold; if that commit fails after the receipt was signed, the
+// proxy keeps the amount and calls SettleCarve from its retry worker until it
+// lands. A store without it cannot take part: such a delegation is refused
+// before anything is taken (proof_unavailable).
+//
+// Contract:
+//   - SettleCarve is keyed by parentBudgetID and requestID (the id the carve's
+//     hold was taken under). It is idempotent and safe to repeat after an
+//     answer was lost: the parent is charged at most once, and the child is
+//     funded at most once, whatever mix of the two already happened.
+//   - Parent: if a debit for requestID is already recorded (a commit that
+//     landed, or an earlier settle), it charges nothing more. Otherwise a hold
+//     for requestID that is still open is committed; if there is none (it
+//     lapsed), the amount is debited now exactly as Spend would, and if the
+//     parent can no longer cover it the answer is a refusal that matches
+//     ErrInsufficientBudget, with nothing charged and the child not funded.
+//   - Child: only after the parent is charged, amount is added to childBudgetID
+//     (created at zero by Initialize), once per requestID.
+//   - It honours its context. The proxy runs it on a context of its own with a
+//     bound.
+type CarveSettler interface {
+	SettleCarve(ctx context.Context, parentBudgetID, childBudgetID, requestID string, amount int64) (*BudgetResult, error)
+}
+
 // CostResolver determines the credit cost for a tool call.
 type CostResolver interface {
 	// Resolve returns the credit cost for the given tool name.
@@ -163,6 +193,9 @@ type InMemoryBudgetEnforcer struct {
 	holds map[string][]memHold
 	// nextLapse is the earliest expiry among holds; zero when there are none.
 	nextLapse time.Time
+	// funded is the carves SettleCarve has already added to a child budget,
+	// by child budget and request id.
+	funded map[string]bool
 	// now is the clock; nil means time.Now. Tests set it.
 	now func() time.Time
 }
@@ -178,6 +211,7 @@ type memHold struct {
 var (
 	_ BudgetRefunder = (*InMemoryBudgetEnforcer)(nil)
 	_ BudgetHolder   = (*InMemoryBudgetEnforcer)(nil)
+	_ CarveSettler   = (*InMemoryBudgetEnforcer)(nil)
 )
 
 func debitKey(budgetID, requestID string) string {
@@ -444,6 +478,55 @@ func (e *InMemoryBudgetEnforcer) ReleaseHold(_ context.Context, budgetID, reques
 		e.budgets[budgetID] += h.amount
 	}
 	return nil
+}
+
+// SettleCarve charges the parent for a carve and funds the child, once each,
+// under the store's lock (see CarveSettler). A debit already recorded for the
+// request is not charged again; an open hold is committed; with neither, the
+// amount is debited now and a parent that cannot cover it is refused.
+func (e *InMemoryBudgetEnforcer) SettleCarve(_ context.Context, parentBudgetID, childBudgetID, requestID string, amount int64) (*BudgetResult, error) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.lapseLocked()
+
+	pkey := debitKey(parentBudgetID, requestID)
+	remaining, parentLimited := e.budgets[parentBudgetID]
+	if parentLimited && amount > 0 && e.debits[pkey] == 0 {
+		if h, ok := e.takeHoldLocked(parentBudgetID, requestID); ok {
+			if e.debits == nil {
+				e.debits = make(map[string]int64)
+			}
+			e.debits[pkey] += h.amount
+			e.spent = append(e.spent, SpendRecord{TokenID: parentBudgetID, ToolName: h.tool, Cost: h.amount, Remaining: h.remaining, RequestID: requestID})
+		} else {
+			if remaining < amount {
+				return &BudgetResult{
+					Allowed:   false,
+					Remaining: remaining,
+					TokenID:   parentBudgetID,
+					Cost:      amount,
+					ErrorCode: "budget_exhausted",
+				}, &budgetRefusal{msg: fmt.Sprintf("budget exhausted: %d remaining, %d required", remaining, amount)}
+			}
+			remaining -= amount
+			e.budgets[parentBudgetID] = remaining
+			if e.debits == nil {
+				e.debits = make(map[string]int64)
+			}
+			e.debits[pkey] += amount
+			e.spent = append(e.spent, SpendRecord{TokenID: parentBudgetID, ToolName: "_delegation", Cost: amount, Remaining: remaining, RequestID: requestID})
+		}
+	}
+	// The parent is charged. Fund the child once.
+	ckey := debitKey(childBudgetID, requestID)
+	if !e.funded[ckey] {
+		if e.funded == nil {
+			e.funded = make(map[string]bool)
+		}
+		e.funded[ckey] = true
+		e.budgets[childBudgetID] += amount
+	}
+	return &BudgetResult{Allowed: true, Remaining: e.budgets[parentBudgetID], TokenID: parentBudgetID, Cost: amount}, nil
 }
 
 // SpendWithTask is like Spend but also records the MCP task ID for correlation.

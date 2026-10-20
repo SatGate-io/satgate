@@ -137,6 +137,13 @@ type everyAction struct {
 	worker           atomic.Bool
 	releaseFailures  atomic.Int64
 	uncommittedLapse atomic.Int64
+
+	// carveCharged and carveClosed count the delegations whose carve was
+	// settled by the retry worker after the key was issued: charged to the
+	// parent and the child funded, or closed because the parent could no
+	// longer cover it (the child stays unable to spend).
+	carveCharged atomic.Int64
+	carveClosed  atomic.Int64
 }
 
 func newEveryAction() *everyAction {
@@ -254,6 +261,12 @@ func holdOf(b BudgetEnforcer) BudgetHolder {
 	return h
 }
 
+// settlerOf returns the budget as a CarveSettler, or nil when it is not one.
+func settlerOf(b BudgetEnforcer) CarveSettler {
+	s, _ := b.(CarveSettler)
+	return s
+}
+
 // commit turns a hold into a debit on a context of its own, bounded by
 // CommitTimeout, trying a few times (CommitHold names the hold by request id
 // and the store ends it once). It is the step after a signature.
@@ -315,6 +328,12 @@ type PendingRecord struct {
 	// held and never committed, and the request id the hold was taken under.
 	Amount    int64
 	RequestID string
+	// ChildBudgetID is set when the entry is a delegation's carve: the budget
+	// of the key that was issued. That budget holds nothing, and the child can
+	// spend nothing, until the carve has been charged to the parent. The retry
+	// worker settles the entry itself (see CarveSettler); the host need only
+	// watch it.
+	ChildBudgetID string
 	// Attempts is how many times the entry has been tried since it was kept.
 	Attempts int
 	// Since is when the entry was kept.
@@ -333,7 +352,12 @@ type UnchargedRecorder interface {
 
 type pendingEntry struct {
 	PendingRecord
-	call     MCPWindowedCall // PendingGap
+	call MCPWindowedCall // PendingGap
+	// settle is set on the uncharged entry of a delegation's carve: it charges
+	// the parent and funds the child, exactly once however often it is called
+	// (CarveSettler). The retry worker runs it whether or not an
+	// UnchargedRecorder is installed.
+	settle   func(ctx context.Context) error
 	inflight bool
 }
 
@@ -492,7 +516,7 @@ func (s *pendingStore) claim(withUncharged bool) []*pendingEntry {
 		if e.inflight {
 			continue
 		}
-		if e.Kind == PendingUncharged && !withUncharged {
+		if e.Kind == PendingUncharged && !withUncharged && e.settle == nil {
 			continue
 		}
 		e.inflight = true
@@ -516,7 +540,15 @@ func (s *pendingStore) retryable(withUncharged bool) bool {
 	if s.count[kindGap] > 0 {
 		return true
 	}
-	return withUncharged && s.count[kindUncharged] > 0
+	if withUncharged && s.count[kindUncharged] > 0 {
+		return true
+	}
+	for _, e := range s.entries {
+		if e.settle != nil {
+			return true
+		}
+	}
+	return false
 }
 
 // ---- reporting a miss ----
@@ -584,25 +616,37 @@ func (ea *everyAction) reportMiss(ctx context.Context, rec EvidenceRecorder, slo
 // keepUncharged keeps the amount of a hold whose commit failed after the call
 // was signed, in the slot set aside before the hold was taken.
 func (ea *everyAction) keepUncharged(slot *pendingSlot, tokenID, tenantID, budgetID, method, tool, requestID string, amount int64) {
+	ea.keepUnchargedEntry(slot, tokenID, tenantID, budgetID, method, tool, requestID, amount, "", nil)
+}
+
+// keepUnchargedEntry is keepUncharged for any entry. A delegation's carve
+// passes the child's budget and the settle step the retry worker runs.
+func (ea *everyAction) keepUnchargedEntry(slot *pendingSlot, tokenID, tenantID, budgetID, method, tool, requestID string, amount int64, childBudgetID string, settle func(context.Context) error) {
 	e := &pendingEntry{PendingRecord: PendingRecord{
-		ID:        ea.pending.nextID(kindUncharged),
-		TenantID:  tenantID,
-		TokenID:   tokenID,
-		BudgetID:  budgetID,
-		Method:    method,
-		Tool:      receiptTool(tool),
-		Minute:    RateWindowStart(time.Now()),
-		Amount:    amount,
-		RequestID: requestID,
-	}}
+		ID:            ea.pending.nextID(kindUncharged),
+		TenantID:      tenantID,
+		TokenID:       tokenID,
+		BudgetID:      budgetID,
+		Method:        method,
+		Tool:          receiptTool(tool),
+		Minute:        RateWindowStart(time.Now()),
+		Amount:        amount,
+		RequestID:     requestID,
+		ChildBudgetID: childBudgetID,
+	}, settle: settle}
 	kept := slot.put(e) || ea.pending.add(kindUncharged, e)
 	if !kept {
 		// The slot was set aside before the hold, so this is a bug.
 		log.Error().Str("budgetId", budgetID).Str("requestId", requestID).Int64("amount", amount).Msg("an uncharged amount could not be kept: the pending store is full")
 		return
 	}
-	log.Error().Str("budgetId", budgetID).Str("requestId", requestID).Int64("amount", amount).
-		Msg("the call was signed and sent but its hold could not be committed; the amount was never charged and is kept for reconciliation")
+	if settle != nil {
+		log.Error().Str("budgetId", budgetID).Str("childBudgetId", childBudgetID).Str("requestId", requestID).Int64("amount", amount).
+			Msg("the delegation was signed and its key issued but the carve could not be settled; the child can spend nothing until the parent is charged, which the retry worker keeps trying")
+	} else {
+		log.Error().Str("budgetId", budgetID).Str("requestId", requestID).Int64("amount", amount).
+			Msg("the call was signed and sent but its hold could not be committed; the amount was never charged and is kept for reconciliation")
+	}
 	ea.kick()
 }
 
@@ -655,7 +699,10 @@ func (ea *everyAction) flush(ctx context.Context) bool {
 				ok = err == nil
 			}
 		case PendingUncharged:
-			if sink != nil {
+			switch {
+			case e.settle != nil:
+				ok = ea.settleCarveEntry(rctx, e)
+			case sink != nil:
 				ok = sink.RecordUncharged(rctx, e.PendingRecord) == nil
 			}
 		}
@@ -668,6 +715,41 @@ func (ea *everyAction) flush(ctx context.Context) bool {
 		}
 	}
 	return progressed
+}
+
+// settleCarveEntry runs the settle step of a delegation's carve and reports
+// whether the entry is done with. It is done when the carve was charged to the
+// parent and the child funded (counted), and also when the parent could no
+// longer cover it: the child's budget stays empty for good, which is logged at
+// error level and counted, and the entry closes with that result. Any other
+// failure keeps the entry for the next pass.
+func (ea *everyAction) settleCarveEntry(ctx context.Context, e *pendingEntry) bool {
+	err := e.settle(ctx)
+	switch {
+	case err == nil:
+		ea.carveCharged.Add(1)
+		log.Info().Str("budgetId", e.BudgetID).Str("childBudgetId", e.ChildBudgetID).Str("requestId", e.RequestID).Int64("amount", e.Amount).
+			Msg("the carve of a delegation was charged to the parent after the fact; the child's budget is now spendable")
+		return true
+	case errors.Is(err, ErrInsufficientBudget):
+		ea.carveClosed.Add(1)
+		log.Error().Str("budgetId", e.BudgetID).Str("childBudgetId", e.ChildBudgetID).Str("requestId", e.RequestID).Int64("amount", e.Amount).
+			Msg("the parent can no longer cover the carve of a delegation whose key was issued; the child's budget stays empty and the entry is closed")
+		return true
+	}
+	log.Warn().Err(err).Str("budgetId", e.BudgetID).Str("childBudgetId", e.ChildBudgetID).Str("requestId", e.RequestID).
+		Msg("the carve of a delegation could not be settled yet; it will be tried again")
+	return false
+}
+
+// CarveSettlements reports what the retry worker has done with delegations
+// whose commit failed after the key was issued: how many carves were charged to
+// the parent and funded to the child after the fact, and how many were closed
+// because the parent could no longer cover them (the child never became able
+// to spend; each is also logged at error level).
+func (p *Proxy) CarveSettlements() (charged, closedUnfunded int64) {
+	ea := p.every()
+	return ea.carveCharged.Load(), ea.carveClosed.Load()
 }
 
 // PendingRecords lists what the pending store holds: who and what each entry
