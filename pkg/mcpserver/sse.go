@@ -50,6 +50,7 @@ type SSEServer struct {
 	// transport paths into an RFC 9728 / MCP authorization challenge.
 	// Empty (the default) keeps the historical bare 401 byte for byte.
 	oauthMetadataURL string
+	operationTracker OperationTracker
 }
 
 // sseSession represents one connected MCP client over SSE.
@@ -385,6 +386,22 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var end func()
+	handedOff := false
+	if s.operationTracker != nil {
+		var ok bool
+		end, ok = s.operationTracker.BeginOperation()
+		if !ok {
+			http.Error(w, "mcp server shutting down", http.StatusServiceUnavailable)
+			return
+		}
+		defer func() {
+			if !handedOff {
+				end()
+			}
+		}()
+	}
+
 	sessionID := r.URL.Query().Get("sessionId")
 	if sessionID == "" {
 		http.Error(w, "sessionId required", http.StatusBadRequest)
@@ -475,7 +492,13 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Handle request asynchronously — don't block the HTTP response
+	// Transfer the lease before launching, so even a panic writing 202 cannot
+	// release work that the worker still owns.
+	handedOff = true
 	go func() {
+		if end != nil {
+			defer end()
+		}
 		// Inject session identity into context so unauthenticated-but-session-scoped
 		// methods such as tools/list can use the already-resolved tenant and budget
 		// subject without re-verifying or guessing from global session state.

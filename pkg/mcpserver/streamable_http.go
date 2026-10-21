@@ -220,6 +220,15 @@ func (s *SSEServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *SSEServer) handleStreamable(w http.ResponseWriter, r *http.Request) {
+	if s.operationTracker != nil {
+		end, ok := s.operationTracker.BeginOperation()
+		if !ok {
+			http.Error(w, "mcp server shutting down", http.StatusServiceUnavailable)
+			return
+		}
+		defer end()
+	}
+
 	if !originAllowed(r.Header.Get("Origin"), s.allowedOrigins) {
 		http.Error(w, "origin not allowed", http.StatusForbidden)
 		return
