@@ -56,6 +56,30 @@ changed_record = '\n'.join(json.dumps(o) for o in record_objects)+'\n'
 add('record-tampered',changed_record,expected='Not valid',sentence="The receipt hash doesn't match the receipt's contents.")
 add('record-other-key',record,other.jwks,expected='Not valid')
 add('record-embedded-only',record,{'keys':[dict(other.jwks['keys'][0],kid='other-key')]},expected='Not valid')
+# Malformed/ambiguous publications are availability failures in the worker,
+# before either unchanged CLI is called. Cover both artifact entry points.
+for prefix, artifact in [('pack', p), ('record', record)]:
+    key = f.jwks['keys'][0]
+    malformed = {
+        'bad-x': {'keys': [dict(key, x='bad')]},
+        'bad-base64': {'keys': [dict(key, x='!' * 43)]},
+        'null-entry': {'keys': [None]},
+        'null-extra': {'keys': [key, None]},
+        'duplicate-kid': {'keys': [key, dict(key)]},
+        'empty-set': {'keys': []},
+        'bad-type': {'keys': [dict(key, kty='RSA')]},
+        'bad-alg': {'keys': [dict(key, alg='RS256')]},
+        'bad-use': {'keys': [dict(key, use='enc')]},
+        'bad-unmatched-key': {'keys': [key, dict(key, kid='unused', x='bad')]},
+    }
+    for label, keys in malformed.items():
+        add(prefix+'-keys-'+label, artifact, keys,
+            expected="SatGate couldn't read the issuer's published signing keys")
+# Whole-file integrity is not claimed: optional pack hash may be absent.
+unsigned = copy.deepcopy(p)
+unsigned.pop('evidence_pack_hash', None)
+unsigned['unsigned_review_marker'] = 'not part of the signed receipt'
+add('pack-unsigned-extra', unsigned)
 add('not-json','not JSON',expected='This file is not a receipt in JSON or a receipt record.')
 add('empty','',expected='Choose a receipt file that is not empty.')
 add('large','x'*(10*1024*1024+1),expected='Choose a receipt file smaller than 10 MiB.')

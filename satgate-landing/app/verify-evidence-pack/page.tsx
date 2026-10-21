@@ -40,7 +40,7 @@ export default function VerifyEvidencePackPage() {
         <ol className="list-decimal space-y-3 pl-6">
           <li>{HELD_RECEIPT_COPY.stepOne}</li>
           <li>Drop the file on the box below.</li>
-          <li>Read the result. Valid means SatGate signed this receipt and nothing in it has changed since. Not valid means don&apos;t rely on it.</li>
+          <li>Read the result. Valid means SatGate signed this receipt and what it signed hasn&apos;t changed since. Not valid means don&apos;t rely on it.</li>
         </ol>
         <ReceiptChecker />
         <p className="mt-3 text-sm text-gray-400">One-time checker download: {(build.bytes / 1000000).toFixed(2)} MB ({build.bytes.toLocaleString('en-US')} bytes, before transfer compression).</p>
@@ -57,11 +57,11 @@ export default function VerifyEvidencePackPage() {
         <h2 className="mb-4 text-2xl font-bold text-white">For engineers: check it on your own computer</h2>
         <p>The checker on this page runs the open-source verifier, tools/verify_evidence_pack.py from github.com/SatGate-io/satgate, inside your browser. The file it runs has the SHA-256 shown here, the same as that file on GitHub: <code className="break-all text-cyan-200">{build.verifiers['verify_evidence_pack.py'].sha256}</code>.</p>
         <p className="mt-4 break-all">tools/verify_receipt_record.py SHA-256: <code className="text-cyan-200">{build.verifiers['verify_receipt_record.py'].sha256}</code></p>
-        <p className="mt-6">To check without using anything from this site, run the verifier yourself:</p>
+        <p className="mt-6">To run the verifier on your own computer:</p>
         <pre className="mt-4 max-w-full overflow-x-auto rounded-xl border border-white/10 bg-white/5 p-5 text-sm leading-6"><code>{commands}</code></pre>
         <p className="mt-4 break-words">Cloud gateway keys: <a href="https://api.satgate.io/.well-known/jwks.json" className="break-all text-cyan-200 underline">https://api.satgate.io/.well-known/jwks.json</a></p>
         <p className="mt-2 break-words">Cloud MCP keys: <a href="https://satgate-mcp-saas.fly.dev/.well-known/jwks.json" className="break-all text-cyan-200 underline">https://satgate-mcp-saas.fly.dev/.well-known/jwks.json</a></p>
-        <p className="mt-6">Two results matter. valid=true means the receipt matches the key embedded in it, which alone doesn&apos;t say who signed it. trusted_issuer_valid=true means it matches SatGate&apos;s published key, fetched separately. The second one is the check that counts, and it&apos;s the only one this page calls Valid.</p>
+        <p className="mt-6">Two results matter. valid=true means the receipt passed the checks you asked for; a check against only the key embedded in a receipt doesn&apos;t say who signed it. trusted_issuer_valid=true means it matched SatGate&apos;s published key, fetched separately. That&apos;s the check that counts, and it&apos;s the only one this page calls Valid.</p>
         <p className="mt-4">A self-hosted SatGate gateway signs with its own key. Check its receipts against that gateway&apos;s published keys.</p>
         <h3 className="mb-4 mt-8 text-xl font-bold text-white">Limits</h3>
         <ul className="list-disc space-y-3 pl-6">

@@ -1,0 +1,26 @@
+Receipt checker runtime notices
+
+Pyodide 314.0.7 is redistributed here without modifications to its runtime
+files. It is covered by the Mozilla Public License 2.0 in LICENSE.
+The corresponding source, including build instructions and CPython patches,
+is available at the exact upstream tag:
+https://github.com/pyodide/pyodide/tree/314.0.7
+
+python_stdlib.zip and pyodide.asm.wasm include CPython 3.14.2. Its Python
+Software Foundation license and historical notices are in CPYTHON-LICENSE.
+CPython source: https://github.com/python/cpython/tree/v3.14.2
+Pyodide's changes and build configuration are at the Pyodide tag above.
+CPYTHON-THIRD-PARTY-NOTICES preserves CPython's upstream incorporated-software
+license inventory, including notices for its standard-library components.
+
+The runtime is built with Emscripten 5.0.3. Its license and bundled-component
+notices are in EMSCRIPTEN-LICENSE; its musl libc notices are in MUSL-COPYRIGHT.
+Source: https://github.com/emscripten-core/emscripten/tree/5.0.3
+
+The five separately served wheels retain their license files inside their
+.dist-info directories: cffi 2.0.0 (MIT), cryptography 47.0.0 (Apache-2.0 OR
+BSD-3-Clause), pycparser 3.0 (BSD-3-Clause), six 1.17.0 (MIT), and rfc8785
+0.1.4 (Apache-2.0).
+
+These notices concern redistributed third-party code, not the uploaded file.
+The checker does not upload the selected receipt.

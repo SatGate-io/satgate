@@ -13,11 +13,39 @@ const cases=JSON.parse(read('corpus/ui-cases.json'));
 cases.push({name:'invalid-utf8',bytes:[255],expected:'This file is not a receipt in JSON or a receipt record.'});
 const keyURLs=['https://api.satgate.io/.well-known/jwks.json','https://satgate-mcp-saas.fly.dev/.well-known/jwks.json'];
 const results=[];
+// Exact site-owned icons only: no wildcard images, query strings or file names.
+const siteIcons=['/icon-32.png','/icon-192.png','/apple-touch-icon.png','/favicon.ico'];
+function allowedProductRequest(r) {
+  assert.equal(r.bytes,0,'upload');
+  assert.equal(r.method,'GET');
+  const url=new URL(r.url);
+  return keyURLs.includes(r.url) || (url.origin===origin && !url.search &&
+    (url.pathname==='/verify-evidence-pack' || url.pathname.startsWith('/_next/static/') ||
+     url.pathname.startsWith('/receipt-checker/') || url.pathname==='/receipt-checker-worker.mjs' || siteIcons.includes(url.pathname)));
+}
 let browser;
 (async()=>{
   browser=await chromium.launch(process.env.CHROMIUM_EXECUTABLE ? {executablePath:process.env.CHROMIUM_EXECUTABLE} : {});
   const ctx=await browser.newContext({viewport:{width:1440,height:1000}});
   const page=await ctx.newPage();
+  // Positive and negative harness controls: the icon exception cannot permit
+  // uploads, off-origin icons, arbitrary paths, or file-derived queries.
+  for (const icon of siteIcons) assert.ok(allowedProductRequest({url:origin+icon,method:'GET',bytes:0}));
+  for (const url of [origin+'/icon-32.png?receipt=private',origin+'/private-receipt.png','https://attacker.example/icon-32.png']) {
+    assert.equal(allowedProductRequest({url,method:'GET',bytes:0}),false,url);
+  }
+  assert.throws(()=>allowedProductRequest({url:origin+'/icon-32.png',method:'POST',bytes:0}));
+  assert.throws(()=>allowedProductRequest({url:origin+'/icon-32.png',method:'GET',bytes:1}));
+  results.push({name:'static-icon-allowlist-controls',exit:0});
+  const manifest=JSON.parse(fs.readFileSync(path.join(__dirname,'receipt-checker-manifest.json'),'utf8'));
+  for (const file of manifest.files.filter(f=>f.notice)) {
+    const response=await page.request.get(origin+'/receipt-checker/'+file.file);
+    assert.equal(response.status(),200,file.file);
+    const data=await response.body();
+    assert.equal(data.length,file.bytes,file.file);
+    assert.equal(crypto.createHash('sha256').update(data).digest('hex'),file.sha256,file.file);
+    results.push({name:'notice-'+file.file,exit:0,status:response.status(),bytes:data.length,sha256:file.sha256});
+  }
   const errors=[];page.on('pageerror',e=>errors.push(String(e)));
   let requests=[];
   page.on('request',r=>requests.push({url:r.url(),method:r.method(),bytes:r.postDataBuffer()?.length || 0}));
@@ -40,11 +68,12 @@ let browser;
     if (item.expected==='Valid') assert.equal(text,'Valid',item.name);
     else { assert.ok(text.includes(item.expected),item.name+': '+text);assert.ok(!/^Valid$/m.test(text),item.name); }
     if (item.sentence) assert.ok(text.includes(item.sentence),item.name+': '+text);
-    for (const r of requests) {
-      assert.equal(r.bytes,0,item.name+' upload');assert.equal(r.method,'GET');
-      const local = r.url.startsWith(origin+'/') && new URL(r.url).search === '' && (r.url === origin+'/verify-evidence-pack' || r.url.startsWith(origin+'/_next/static/') || r.url.startsWith(origin+'/receipt-checker/') || r.url === origin+'/receipt-checker-worker.mjs');
-      assert.ok(local || keyURLs.includes(r.url),r.url);
+    if (item.expected.startsWith("SatGate couldn't")) {
+      assert.ok(!text.includes('Not valid'),item.name+': '+text);
+      // No Python runtime or verifier is even requested on publication failure.
+      assert.ok(!requests.some(r=>r.url.startsWith(origin+'/receipt-checker/')),item.name+' loaded runtime');
     }
+    for (const r of requests) assert.ok(allowedProductRequest(r),item.name+': '+r.url);
     assert.deepEqual(errors,[]);
     assert.equal(await page.evaluate(()=>Object.keys(localStorage).length+Object.keys(sessionStorage).length),0);
     fs.mkdirSync(path.join(lane,'requests'),{recursive:true});
@@ -76,6 +105,11 @@ let browser;
         await page.goto(origin+route);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),390,route);
       }
       await page.setViewportSize({width:1440,height:1000});
+      // Home/docs navigation can finish Next Link prefetches asynchronously.
+      // Drain that separate layout audit before the next receipt trace begins;
+      // do not broaden the receipt allowlist to RSC queries or arbitrary routes.
+      await page.goto(origin+'/verify-evidence-pack');
+      await page.waitForLoadState('networkidle');
     }
   }
   await scenario({name:'real-cloud',text:read('real-pack.json').toString(),keyBytes:read('mcp-jwks.json'),expected:'Valid'},true);
@@ -90,7 +124,7 @@ let browser;
   await page.locator('label[for=receipt-file]').dispatchEvent('drop',{dataTransfer:transfer});
   await page.waitForFunction(()=>document.querySelector('[data-testid=verdict]').innerText==='Valid',null,{timeout:120000});
   results.push({name:'drop-box',exit:0});
-  assert.ok(requests.every(r=>r.bytes===0 && r.method==='GET' && (r.url.startsWith(origin+'/') || keyURLs.includes(r.url))));
+  for (const r of requests) assert.ok(allowedProductRequest(r),r.url);
   fs.writeFileSync(path.join(lane,'requests/drop-box.json'),JSON.stringify(requests,null,2));
   requests=[];
   // Browser API parity uses test-side code served by Playwright only. The exact

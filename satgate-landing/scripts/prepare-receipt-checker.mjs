@@ -11,8 +11,13 @@ const hash = data => createHash('sha256').update(data).digest('hex');
 for (const file of manifest.files) {
   const target = path.join(dest, file.file);
   let data;
-  try { data = await readFile(target); } catch { /* cold build */ }
-  if (!data || hash(data) !== file.sha256) {
+  if (file.source) {
+    if (file.url !== `/receipt-checker/${file.file}`) throw new Error(`Invalid local notice URL: ${file.file}`);
+    data = await readFile(path.join(root, file.source));
+  } else {
+    try { data = await readFile(target); } catch { /* cold build */ }
+  }
+  if (!file.source && (!data || hash(data) !== file.sha256)) {
     const response = await fetch(file.url, { signal: AbortSignal.timeout(120000) });
     if (!response.ok) throw new Error(`Runtime download failed: ${file.file}: ${response.status}`);
     data = Buffer.from(await response.arrayBuffer());

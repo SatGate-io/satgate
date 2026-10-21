@@ -21,6 +21,21 @@ Package hashes also agree with the pinned Pyodide lock file. Runtime URLs are
 same-origin; the CDN and Python package index are build-time inputs only.
 The build computes the displayed verifier hashes and raw checker size.
 
+Runtime redistribution includes the pinned Pyodide MPL-2.0 LICENSE, an exact
+314.0.7 source-tag notice, the CPython 3.14.2 license and incorporated-software
+notices, and the Emscripten 5.0.3 and musl notices. Each is served beside the
+runtime and pinned by URL, SHA-256 and length. NOTICE.txt is a committed local
+source with its served URL in the manifest; downloaded notices use upstream tag
+URLs. Local and downloaded sources go through the same integrity gate. Wheels
+retain their upstream license files inside the archives.
+
+Before loading Python, the worker validates the entire published key set:
+nonempty objects, unique nonempty key IDs, supported OKP/Ed25519 metadata and
+canonical 32-byte base64url public keys importable by Web Crypto. Any malformed
+or ambiguous publication gives could-not-check. A well-formed publication with
+no matching key or a key that rejects the signature still goes to the unchanged
+verifiers and gives Not valid.
+
 The two allowed issuer strings are exactly `https://api.satgate.io` and
 `https://satgate-mcp-saas.fly.dev`. Every pack, embedded receipt and manifest
 must name the same allowed issuer. No dropped-file URL is fetched. Key requests

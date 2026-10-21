@@ -8,6 +8,49 @@
   },
   "files": [
     {
+      "url": "https://raw.githubusercontent.com/python/cpython/v3.14.2/Doc/license.rst",
+      "file": "CPYTHON-THIRD-PARTY-NOTICES",
+      "sha256": "c695d550b135e53e38807e76496d1db17d22c40e461d1f3f354c86188d3305dd",
+      "bytes": 57595,
+      "notice": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/5.0.3/system/lib/libc/musl/COPYRIGHT",
+      "file": "MUSL-COPYRIGHT",
+      "sha256": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af",
+      "bytes": 6204,
+      "notice": true
+    },
+    {
+      "url": "/receipt-checker/NOTICE.txt",
+      "source": "scripts/receipt-checker-NOTICE.txt",
+      "file": "NOTICE.txt",
+      "sha256": "df85e3aa88fae76b3a2f7bb9737c1611af810090c4897e9ee66ec43a79821603",
+      "bytes": 1376,
+      "notice": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/pyodide/pyodide/314.0.7/LICENSE",
+      "file": "LICENSE",
+      "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5",
+      "bytes": 16725,
+      "notice": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/python/cpython/v3.14.2/LICENSE",
+      "file": "CPYTHON-LICENSE",
+      "sha256": "b0e25a78cffb43f4d92de8b61ccfa1f1f98ecbc22330b54b5251e7b6ba010231",
+      "bytes": 13804,
+      "notice": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/5.0.3/LICENSE",
+      "file": "EMSCRIPTEN-LICENSE",
+      "sha256": "620a78084fc7ca97c0b5dea9abf891f3ffcadfdbf305276f099c9c4e12fc1d86",
+      "bytes": 5093,
+      "notice": true
+    },
+    {
       "url": "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/pyodide.mjs",
       "file": "pyodide.mjs",
       "sha256": "6f1d60f7bf529beb300f0f47983c921d3982363640ba20af0e38efdddbc66109",

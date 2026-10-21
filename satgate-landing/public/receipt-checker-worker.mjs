@@ -6,6 +6,28 @@ const KEY_URLS = Object.freeze({
 });
 const MAX_BYTES = 10 * 1024 * 1024;
 const base = '/receipt-checker/';
+// This is a key-publication preflight, not receipt verification. A broken or
+// ambiguous publication means could-not-check, not a rejected signature.
+async function usableKeys(jwks) {
+  if (!jwks || !Array.isArray(jwks.keys) || !jwks.keys.length) return false;
+  const ids = new Set();
+  for (const key of jwks.keys) {
+    if (!key || typeof key !== 'object' || Array.isArray(key) ||
+        typeof key.kid !== 'string' || !key.kid || ids.has(key.kid) ||
+        key.kty !== 'OKP' || key.crv !== 'Ed25519' ||
+        (key.alg != null && key.alg !== 'EdDSA') ||
+        (key.use != null && key.use !== 'sig') ||
+        typeof key.x !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(key.x)) return false;
+    ids.add(key.kid);
+    try {
+      const raw = Uint8Array.from(atob(key.x.replace(/-/g,'+').replace(/_/g,'/')+'='), c=>c.charCodeAt(0));
+      // Reject noncanonical base64url (including nonzero unused bits).
+      if (raw.length !== 32 || btoa(String.fromCharCode(...raw)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'') !== key.x) return false;
+      await crypto.subtle.importKey('raw', raw, {name:'Ed25519'}, false, ['verify']);
+    } catch { return false; }
+  }
+  return true;
+}
 self.onmessage = async ({data: file}) => {
   let py;
   try {
@@ -41,7 +63,7 @@ self.onmessage = async ({data: file}) => {
       let parsed;
       try { parsed = JSON.parse(keys); }
       catch { return postMessage({kind:'keys-read'}); }
-      if (!parsed || !Array.isArray(parsed.keys) || !parsed.keys.length) return postMessage({kind:'keys-read'});
+      if (!await usableKeys(parsed)) return postMessage({kind:'keys-read'});
     } catch { return postMessage({kind:'keys-network'}); }
     const {loadPyodide} = await import('/receipt-checker/pyodide.mjs');
     py = await loadPyodide({indexURL: base, stdout:()=>{}, stderr:()=>{}});
