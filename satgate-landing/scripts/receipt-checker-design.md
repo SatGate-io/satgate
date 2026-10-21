@@ -30,7 +30,9 @@ unreadable keys and other issuers never become Valid. Before key CORS is live,
 the checker reports that it could not check, not Not valid.
 
 File objects go directly to a module Web Worker, not a server action or a form.
-The file is read in memory. There is no upload, local/session storage, IndexedDB
+The file is read in memory, UTF-8 decoding is fatal rather than lossy, and the
+original file bytes (not re-encoded text) are written to MEMFS. There is no upload,
+local/session storage, IndexedDB
 mount, service worker or persistent receipt cache. The worker is destroyed after
 each result, a new file or component unmount. A two-minute watchdog also destroys
 it. Only static checker files can be browser-cached between checks.

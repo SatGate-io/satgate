@@ -11,7 +11,10 @@ self.onmessage = async ({data: file}) => {
   try {
     if (!file.size) return postMessage({kind:'empty'});
     if (file.size > MAX_BYTES) return postMessage({kind:'large'});
-    const text = await file.text();
+    const inputBytes = new Uint8Array(await file.arrayBuffer());
+    let text;
+    try { text = new TextDecoder('utf-8', {fatal:true}).decode(inputBytes); }
+    catch { return postMessage({kind:'json'}); }
     let objects, record = false;
     try { objects = [JSON.parse(text)]; }
     catch {
@@ -49,7 +52,7 @@ self.onmessage = async ({data: file}) => {
       if (!response.ok) throw new Error('Verifier unavailable');
       py.FS.writeFile('/'+name, new Uint8Array(await response.arrayBuffer()));
     }
-    py.FS.writeFile('/input', text);
+    py.FS.writeFile('/input', inputBytes);
     py.FS.writeFile('/keys', keys);
     py.globals.set('entry', record ? 'verify_receipt_record' : 'verify_evidence_pack');
     const output = JSON.parse(await py.runPythonAsync(`

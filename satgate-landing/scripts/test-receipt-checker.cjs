@@ -10,6 +10,7 @@ const lane=process.argv[2], origin=process.argv[3] || 'http://127.0.0.1:3928';
 const root=path.resolve(__dirname,'..');
 const read=name=>fs.readFileSync(path.join(lane,name));
 const cases=JSON.parse(read('corpus/ui-cases.json'));
+cases.push({name:'invalid-utf8',bytes:[255],expected:'This file is not a receipt in JSON or a receipt record.'});
 const keyURLs=['https://api.satgate.io/.well-known/jwks.json','https://satgate-mcp-saas.fly.dev/.well-known/jwks.json'];
 const results=[];
 let browser;
@@ -27,7 +28,7 @@ let browser;
     await page.goto(origin+'/verify-evidence-pack');
     if (screenshots) await page.screenshot({path:path.join(lane,'desktop-before.png'),fullPage:true});
     const start=performance.now();
-    const upload={name:item.name+'.json',mimeType:'application/json',buffer:Buffer.from(item.text)};
+    const upload={name:item.name+'.json',mimeType:'application/json',buffer:Buffer.from(item.bytes || item.text)};
     if (item.name==='pack-valid') {
       const chooser=page.waitForEvent('filechooser');
       await page.locator('label[for=receipt-file]').click();
