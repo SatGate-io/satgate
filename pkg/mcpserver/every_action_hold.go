@@ -241,7 +241,13 @@ func (ea *everyAction) record(ctx context.Context, rec EvidenceRecorder, d MCPDe
 		err error
 	}
 	done := make(chan answer, 1)
+	// Keep tracked ownership until the recorder actually returns, even when
+	// the select below answers at its deadline before recorder cleanup ends.
+	lease := retainOperation(ctx)
 	go func() {
+		if lease != nil {
+			defer lease.release()
+		}
 		defer func() {
 			if recover() != nil {
 				done <- answer{nil, errRecorderPanic}

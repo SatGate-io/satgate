@@ -117,7 +117,12 @@ func TestOperationDrainWaitsForDispatchSettlementAndRecords(t *testing.T) {
 				}}, nil
 			}))
 			var sawEnd atomic.Bool
+			var dispatchStarted atomic.Bool
 			tracker.onEnd = func() {
+				// The finite GET connect lease precedes the dispatch under test.
+				if !dispatchStarted.Load() {
+					return
+				}
 				if !settlementDone.Load() {
 					t.Error("end ran before settlement finished")
 				}
@@ -137,14 +142,17 @@ func TestOperationDrainWaitsForDispatchSettlementAndRecords(t *testing.T) {
 			defer upstreamOnce.Do(func() { close(router.release) })
 			defer settleOnce.Do(func() { close(releaseSettle) })
 			postDone := make(chan struct{})
+			connectLeases := 0
 			if transport == "sse" {
 				conn := eaOpenSSE(t, srv.URL, e.token)
 				defer conn.body.Close()
+				connectLeases = 1
+				dispatchStarted.Store(true)
 				if conn.post(mustJSON(t, toolCallBody(17, "paid_read"))) != http.StatusAccepted {
 					t.Fatal("POST not accepted")
 				}
 				// Registration must already be visible when the POST returns 202.
-				if active, begins, ends := tracker.counts(); active != 1 || begins != 1 || ends != 0 {
+				if active, begins, ends := tracker.counts(); active != 1 || begins != 1+connectLeases || ends != connectLeases {
 					t.Errorf("at acceptance: %d %d %d", active, begins, ends)
 				}
 				lifecycleWait(t, router.entered)
@@ -158,6 +166,7 @@ func TestOperationDrainWaitsForDispatchSettlementAndRecords(t *testing.T) {
 				if !ok {
 					t.Fatal("session not created")
 				}
+				dispatchStarted.Store(true)
 				go func() {
 					defer close(postDone)
 					status, _, _ := streamablePost(t, srv.URL+"/mcp", sess.id, e.token, toolCallBody(17, "paid_read"))
@@ -175,7 +184,7 @@ func TestOperationDrainWaitsForDispatchSettlementAndRecords(t *testing.T) {
 			settleOnce.Do(func() { close(releaseSettle) })
 			lifecycleWait(t, drained)
 			lifecycleWait(t, postDone)
-			if active, begins, ends := tracker.counts(); active != 0 || begins != 1 || ends != 1 || !sawEnd.Load() {
+			if active, begins, ends := tracker.counts(); active != 0 || begins != 1+connectLeases || ends != 1+connectLeases || !sawEnd.Load() {
 				t.Fatalf("after drain: %d %d %d", active, begins, ends)
 			}
 		})

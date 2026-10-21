@@ -220,6 +220,22 @@ func (s *SSEServer) ListenAndServe(ctx context.Context) error {
 // Response: text/event-stream with JSON-RPC messages as "message" events.
 // The endpoint URL for posting messages is sent as the first event.
 func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
+	// Only the finite connect-time phase can record. Release before opening
+	// a healthy stream, but cover every denial, return and panic before that.
+	var endConnect func()
+	if s.operationTracker != nil {
+		lease, ok := s.beginOperation()
+		if !ok {
+			http.Error(w, "mcp server shutting down", http.StatusServiceUnavailable)
+			return
+		}
+		endConnect = lease.release
+		defer func() {
+			if endConnect != nil {
+				endConnect()
+			}
+		}()
+	}
 	flusher, ok := w.(http.Flusher)
 	if !ok {
 		http.Error(w, "streaming not supported", http.StatusInternalServerError)
@@ -275,6 +291,11 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
+	}
+
+	if endConnect != nil {
+		endConnect()
+		endConnect = nil
 	}
 
 	s.mu.Lock()
@@ -387,14 +408,16 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var end func()
+	var lease *operationLease
 	handedOff := false
 	if s.operationTracker != nil {
 		var ok bool
-		end, ok = s.operationTracker.BeginOperation()
+		lease, ok = s.beginOperation()
 		if !ok {
 			http.Error(w, "mcp server shutting down", http.StatusServiceUnavailable)
 			return
 		}
+		end = lease.release
 		defer func() {
 			if !handedOff {
 				end()
@@ -502,7 +525,7 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 		// Inject session identity into context so unauthenticated-but-session-scoped
 		// methods such as tools/list can use the already-resolved tenant and budget
 		// subject without re-verifying or guessing from global session state.
-		reqCtx := session.contextWithIdentity()
+		reqCtx := withOperationLease(session.contextWithIdentity(), lease)
 		if s.proxy.signEveryAction {
 			reqCtx = withTransportToken(reqCtx, authToken)
 		}
