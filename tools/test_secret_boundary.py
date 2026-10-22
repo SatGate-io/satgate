@@ -59,6 +59,11 @@ class SecretBoundary(unittest.TestCase):
         actual = [[(p.pattern, p.flags) for p in checker.SECRET_PATTERNS]
                   for checker in self.checkers]
         self.assertEqual(actual, [EXPECTED] * len(self.checkers))
+        blocks = []
+        for checker in self.checkers:
+            source = Path(checker.__file__).read_text()
+            blocks.append(source.split("# A marker cannot start", 1)[1].split("\n]", 1)[0])
+        self.assertEqual(blocks, [blocks[0]] * len(blocks))
 
     def test_stk_inside_an_access_id_passes(self):
         access_id = "evid_" + "A" * 12 + "stk_" + "B" * 16
