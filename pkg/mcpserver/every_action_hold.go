@@ -632,11 +632,9 @@ func missSlotFrom(ctx context.Context) *pendingSlot {
 // through with no receipt. It runs on a context of its own (a cancelled
 // request must still be counted) bounded by MissReportTimeout. If that fails,
 // the miss is kept with its tenant, key, tool and minute and retried in the
-// background until the recorder takes it, exactly once. It returns true when
-// the miss is accounted for (recorded or kept) and false only when the store is
-// full and no room was set aside for it: the caller then answers
-// proof_unavailable and does not pass the call on.
-func (ea *everyAction) reportMiss(ctx context.Context, rec EvidenceRecorder, slot *pendingSlot, call MCPWindowedCall) bool {
+// background until the recorder takes it, exactly once. A non-nil error stops
+// forwarding; a durable unknown must be answered as unknown, never refused.
+func (ea *everyAction) reportMiss(ctx context.Context, rec EvidenceRecorder, slot *pendingSlot, call MCPWindowedCall) error {
 	if call.ReportID == "" {
 		call.ReportID = ea.pending.nextID(kindGap)
 	}
@@ -649,7 +647,7 @@ func (ea *everyAction) reportMiss(ctx context.Context, rec EvidenceRecorder, slo
 		cancel()
 		if err == nil {
 			slot.release()
-			return true
+			return nil
 		}
 		log.Error().Err(err).Str("method", call.Decision.MCPMethod).Str("tool", receiptTool(call.Decision.ToolName)).Msg("observe miss could not be recorded; kept for retry")
 	}
@@ -674,10 +672,10 @@ func (ea *everyAction) reportMiss(ctx context.Context, rec EvidenceRecorder, slo
 	}
 	if !kept {
 		log.Error().Str("method", call.Decision.MCPMethod).Str("tool", receiptTool(call.Decision.ToolName)).Msg("the pending store is full; the call is refused, not passed on")
-		return false
+		return ErrPendingNotStored
 	}
 	ea.kick()
-	return true
+	return nil
 }
 
 // keepUncharged keeps the amount of a hold whose commit failed after the call

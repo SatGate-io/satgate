@@ -17,6 +17,7 @@ type p2Backend struct {
 	rows                      map[string][]byte
 	locks                     map[string]*sync.Mutex
 	completed                 map[string]PendingDisposition
+	cancelled                 map[string]bool
 	receipts                  map[string]bool
 	gaps                      map[string]bool
 	debit, funded, reconciled map[string]bool
@@ -27,7 +28,7 @@ type p2Backend struct {
 }
 
 func newP2Backend() *p2Backend {
-	return &p2Backend{rows: map[string][]byte{}, locks: map[string]*sync.Mutex{}, completed: map[string]PendingDisposition{}, receipts: map[string]bool{}, gaps: map[string]bool{}, debit: map[string]bool{}, funded: map[string]bool{}, reconciled: map[string]bool{}, parent: 100}
+	return &p2Backend{rows: map[string][]byte{}, locks: map[string]*sync.Mutex{}, completed: map[string]PendingDisposition{}, cancelled: map[string]bool{}, receipts: map[string]bool{}, gaps: map[string]bool{}, debit: map[string]bool{}, funded: map[string]bool{}, reconciled: map[string]bool{}, parent: 100}
 }
 
 type p2Store struct{ b *p2Backend }
@@ -41,7 +42,10 @@ func (s p2Store) Save(_ context.Context, w PendingWork) error {
 	defer s.b.mu.Unlock()
 	s.b.calls++
 	if s.b.failSave {
-		return errors.New("fixture storage unavailable")
+		return ErrPendingNotStored
+	}
+	if s.b.cancelled[w.Record.ID] {
+		return ErrPendingNotStored
 	}
 	if old, ok := s.b.rows[w.Record.ID]; ok && string(old) != string(raw) {
 		return errors.New("immutable identity collision")
@@ -51,6 +55,23 @@ func (s p2Store) Save(_ context.Context, w PendingWork) error {
 		s.b.locks[w.Record.ID] = &sync.Mutex{}
 	}
 	return nil
+}
+func (s p2Store) ResolveSave(_ context.Context, w PendingWork) (bool, error) {
+	s.b.mu.Lock()
+	defer s.b.mu.Unlock()
+	s.b.calls++
+	if s.b.cancelled[w.Record.ID] {
+		return false, nil
+	}
+	if raw, ok := s.b.rows[w.Record.ID]; ok {
+		want, _ := json.Marshal(w)
+		if string(raw) != string(want) {
+			return false, errors.New("immutable identity collision")
+		}
+		return true, nil
+	}
+	s.b.cancelled[w.Record.ID] = true
+	return false, nil
 }
 func (s p2Store) List(context.Context) ([]PendingWork, error) {
 	s.b.mu.Lock()

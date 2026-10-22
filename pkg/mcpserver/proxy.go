@@ -857,7 +857,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			holdExpiry time.Time
 			slot       *pendingSlot
 		)
-		if p.signEveryAction && isControl {
+		if p.signEveryAction && (isControl || p.every().durable != nil) {
 			holder = holdOf(p.budget)
 			if holder == nil {
 				log.Error().Str("tool", receiptTool(tc.Name)).Str("budgetId", budgetID).Msg("sign every action: the budget store offers no hold; refusing the call before any charge")
@@ -1019,7 +1019,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			})
 			if evidenceErr != nil {
 				log.Error().Err(evidenceErr).Str("tool", tc.Name).Str("budgetId", budgetID).Msg("MCP allowed evidence recording failed")
-				if holder != nil {
+				if holder != nil && isControl {
 					// The hold is let go of, on a context of its own. If that
 					// fails too the hold lapses by itself: nothing more has to
 					// succeed for this call to end uncharged. Nothing is sent.
@@ -1032,8 +1032,11 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				// Observe lets the call through with no receipt (today's
 				// behaviour); with the switch on the miss is reported, once.
 				if !isControl {
-					if !p.reportObserveMiss(ctx, tokenInfo, MethodToolsCall, tc.Name, mode) {
-						return proofUnavailableResponse(req.ID, tc.Name), nil
+					if err := p.reportObserveMiss(recCtx, tokenInfo, MethodToolsCall, tc.Name, mode); err != nil {
+						if holder != nil && !errors.Is(err, ErrPendingOutcomeUnknown) {
+							p.every().release(ctx, holder, budgetID, requestID, cost)
+						}
+						return pendingFailureResponse(req.ID, tc.Name, err), nil
 					}
 				}
 				if isControl {
@@ -1046,6 +1049,9 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			} else if holder != nil && prep != nil {
 				stored, perr := p.every().keepPrepared(ctx, prep)
 				if !stored {
+					if errors.Is(perr, ErrPendingOutcomeUnknown) {
+						return pendingFailureResponse(req.ID, tc.Name, perr), nil
+					}
 					p.every().release(ctx, holder, budgetID, requestID, cost)
 					return proofUnavailableResponse(req.ID, tc.Name), nil
 				}

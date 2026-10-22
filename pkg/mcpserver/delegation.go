@@ -108,7 +108,7 @@ type Delegator struct {
 	recorder             EvidenceRecorder
 	signEveryAction      bool
 	receiptFailureBlocks func(ctx context.Context, tenantID string) bool
-	reportMiss           func(ctx context.Context, parent *TokenInfo) bool
+	reportMiss           func(ctx context.Context, parent *TokenInfo) error
 	reversalFailed       func()
 	// ea is the switch's shared state (holds, pending store, readiness). The
 	// proxy sets it; a delegator used on its own gets a default one.
@@ -408,7 +408,7 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		holdExpiry time.Time
 		slot       *pendingSlot
 	)
-	if d.signEveryAction && params.Budget > 0 && d.blocksOnReceiptFailure(ctx, parent.TenantID) {
+	if d.signEveryAction && params.Budget > 0 && (d.blocksOnReceiptFailure(ctx, parent.TenantID) || d.state().durable != nil) {
 		if holder = holdOf(d.budget); holder == nil {
 			log.Error().Str("parent", parent.TokenID).Msg("delegation refused before any carve: the budget store offers no hold")
 			return nil, errDelegationProofUnavailable
@@ -761,13 +761,21 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 				return nil, errDelegationProofUnavailable
 			}
 			log.Warn().Msg("observe mode: delegating with no receipt")
-			if d.reportMiss != nil && !d.reportMiss(ctx, parent) {
-				undoCarve(delegationID)
-				return nil, errDelegationProofUnavailable
+			if d.reportMiss != nil {
+				if err := d.reportMiss(sctx, parent); err != nil {
+					if errors.Is(err, ErrPendingOutcomeUnknown) {
+						return nil, err
+					}
+					undoCarve(delegationID)
+					return nil, errDelegationProofUnavailable
+				}
 			}
 		} else if holder != nil && prep != nil {
 			stored, perr := d.state().keepPrepared(ctx, prep)
 			if !stored {
+				if errors.Is(perr, ErrPendingOutcomeUnknown) {
+					return nil, perr
+				}
 				undoCarve(delegationID)
 				return nil, errDelegationProofUnavailable
 			}
@@ -960,6 +968,9 @@ func (d *Delegator) HandleDelegate(ctx context.Context, req *Request, tokenInfo 
 	ctx = context.WithValue(ctx, delegateRequestKey{}, req)
 	result, err := d.Delegate(ctx, tokenInfo, &params)
 	if err != nil {
+		if errors.Is(err, ErrPendingOutcomeUnknown) {
+			return pendingFailureResponse(req.ID, MethodSatGateDelegate, err), nil
+		}
 		if errors.Is(err, errDelegationProofUnavailable) {
 			return proofUnavailableResponse(req.ID, MethodSatGateDelegate), nil
 		}
