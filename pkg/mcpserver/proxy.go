@@ -857,7 +857,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			holdExpiry time.Time
 			slot       *pendingSlot
 		)
-		if p.signEveryAction && (isControl || p.every().durable != nil) {
+		if p.signEveryAction && (isControl || p.every().holdObserve(ctx, p.budget)) {
 			holder = holdOf(p.budget)
 			if holder == nil {
 				log.Error().Str("tool", receiptTool(tc.Name)).Str("budgetId", budgetID).Msg("sign every action: the budget store offers no hold; refusing the call before any charge")

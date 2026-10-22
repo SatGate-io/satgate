@@ -96,6 +96,22 @@ type PendingBudget interface {
 	SettlePendingBudget(context.Context, PendingWork) error
 }
 
+// PendingObserveBudget may exempt ordinary Observe tools/call from holds ONLY
+// when its Spend is guaranteed to create no debit, ledger or idempotency effect
+// in this resolved request mode. This never exempts delegation transfers.
+// Without this explicit host guarantee durable Observe must hold before acting.
+type PendingObserveBudget interface {
+	ObserveSpendIsReadOnly(context.Context) bool
+}
+
+func (ea *everyAction) holdObserve(ctx context.Context, budget BudgetEnforcer) bool {
+	if ea.durable == nil {
+		return false
+	}
+	readOnly, ok := budget.(PendingObserveBudget)
+	return !ok || !readOnly.ObserveSpendIsReadOnly(ctx)
+}
+
 // SetPendingStore installs a host journal before serving. Nil preserves the RAM
 // path. Installation does not enable the switch, access storage or start workers.
 // Hosts FlushPending at startup and on a timer only while the switch is on.
