@@ -24,7 +24,23 @@ func (s p2LostReply) ResolveSave(c context.Context, w PendingWork) (bool, error)
 	if s.unreachable {
 		return false, errors.New("fixture: resolve unreachable")
 	}
-	return s.p2Store.ResolveSave(c, w)
+	if resolver, ok := any(s.p2Store).(interface {
+		ResolveSave(context.Context, PendingWork) (bool, error)
+	}); ok {
+		return resolver.ResolveSave(c, w)
+	}
+	// Step A's contract double predates resolution. Keep this probe runnable
+	// there unchanged; step A never invokes this fallback.
+	ws, err := s.p2Store.List(c)
+	if err != nil {
+		return false, err
+	}
+	for _, v := range ws {
+		if v.Record.ID == w.Record.ID {
+			return true, nil
+		}
+	}
+	return false, errors.New("fixture: committed work missing")
 }
 func TestP2LostSaveReply(t *testing.T) {
 	for _, kind := range []string{"gap", "uncharged", "carve"} {
@@ -39,11 +55,22 @@ func TestP2LostSaveReply(t *testing.T) {
 				p.SetPendingStore(p2LostReply{p2Store{b}, unreachable})
 				w := p2Work(kind)
 				if kind == "gap" {
-					err := p.every().durableGap(context.Background(), nil, *w.Window)
+					// Step A returned bool; the corrected helper returns error. The
+					// same behavioral probe must compile and fail on that old head.
+					answer := any(p.every().durableGap(context.Background(), nil, *w.Window))
+					var err error
+					switch v := answer.(type) {
+					case bool:
+						if !v {
+							err = errors.New("fixture: step-A gap refused")
+						}
+					case error:
+						err = v
+					}
 					if err != nil && !unreachable {
 						t.Error("committed gap was treated as refused")
 					}
-					if unreachable && !errors.Is(err, ErrPendingOutcomeUnknown) {
+					if unreachable && (err == nil || !strings.Contains(err.Error(), "unknown")) {
 						t.Error("gap must be unknown, not refused")
 					}
 				} else {
