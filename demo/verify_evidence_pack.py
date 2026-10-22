@@ -134,10 +134,13 @@ def decision_profile_for(receipt: Any) -> str | None:
         return None
     return profile
 DEFAULT_CLOCK_SKEW_SECONDS = 300
+# A marker cannot start inside a token/id. Keep '/' and '=' as delimiters so
+# credentials in URL path segments, query values and assignments still match.
+# Keep this block identical in all distributed verifier copies.
 SECRET_PATTERNS = [
-    re.compile(r"Bearer\s+[A-Za-z0-9._~+/=-]+", re.IGNORECASE),
-    re.compile(r"sgcap_[A-Za-z0-9._~+/=-]+"),
-    re.compile(r"stk_[A-Za-z0-9._~+/=-]+"),
+    re.compile(r"(?<![A-Za-z0-9._~+-])Bearer\s+[A-Za-z0-9._~+/=-]+", re.IGNORECASE),
+    re.compile(r"(?<![A-Za-z0-9._~+-])sgcap_[A-Za-z0-9._~+/=-]+"),
+    re.compile(r"(?<![A-Za-z0-9._~+-])stk_[A-Za-z0-9._~+/=-]+"),
 ]
 PAID_RAIL_FIELDS = {"rail", "payment_hash", "invoice_hash", "macaroon_hash", "amount_sats"}
 CREDIT_USD_FIELDS = {
