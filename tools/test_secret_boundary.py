@@ -12,7 +12,11 @@ import string
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-BOUNDARY = r"(?<![A-Za-z0-9._~+-])"
+BOUNDARY = r"(?:(?<![A-Za-z0-9._~-])|(?<=%[0-9A-Fa-f]{2}))"
+MARKERS = ("stk_fixture_not_a_credential", "sgcap_fixture_not_a_credential",
+           "Bearer fixture_not_a_credential", "bEaReR fixture_not_a_credential")
+ENCODED_STARTS = ("Bearer%20", "token%3D", "user%3A", "path%2F", "Bearer+",
+                  "bEaReR+", "+", "token+", "token%3d", "user%3a", "path%2f")
 EXPECTED = [
     (BOUNDARY + r"Bearer\s+[A-Za-z0-9._~+/=-]+", re.IGNORECASE | re.UNICODE),
     (BOUNDARY + r"sgcap_[A-Za-z0-9._~+/=-]+", re.UNICODE),
@@ -73,10 +77,77 @@ class SecretBoundary(unittest.TestCase):
         self.assert_markers({"note": "evid_AAAABearer fixture_not_a_credential"}, False)
 
     def test_token_alphabet_continuations_are_not_starts(self):
-        continuations = string.ascii_letters + string.digits + "._~+-"
+        # '+' is not in generated pack values; it is a form-encoded space.
+        continuations = string.ascii_letters + string.digits + "._~-"
         for char in continuations:
             for marker in ("stk_fixture", "sgcap_fixture", "Bearer fixture"):
                 self.assert_markers({"note": char + marker}, False)
+
+    def test_encoded_token_starts_still_fail(self):
+        for before in ENCODED_STARTS:
+            for marker in MARKERS:
+                self.assert_markers(before + marker, True)
+                self.assert_markers({"nested": [{"note": before + marker}]}, True)
+                for checker in self.checkers:
+                    result = checker.verify_pack({"note": before + marker})
+                    self.assertFalse(result["checks"]["no_secret_leakage"])
+                    self.assertFalse(result["valid"])
+
+    def test_every_percent_escape_is_a_start(self):
+        for byte in range(256):
+            for escape in ("%%%02X" % byte, "%%%02x" % byte):
+                for marker in MARKERS:
+                    self.assert_markers({"note": "value" + escape + marker}, True)
+
+    def test_incomplete_or_nonhex_escapes_do_not_override_continuations(self):
+        for before in ("%2", "%GG", "%2G", "%G2", "%123", "%2FA"):
+            for marker in MARKERS:
+                self.assert_markers({"note": before + marker}, False)
+
+    def test_generated_pack_alphabets_exclude_encoded_delimiters(self):
+        # Exercise the shipped Python encoder over every byte, not a random sample.
+        alphabet = set(string.ascii_letters + string.digits + "-_")
+        for checker in self.checkers:
+            encoded = checker.b64url_encode(bytes(range(256)))
+            self.assertEqual(set(encoded), alphabet)
+            self.assertFalse(set(encoded) & set("%+"))
+            for length in (16, 24, 32, 64):
+                value = checker.b64url_encode(bytes(range(length)))
+                self.assertLessEqual(set(value), alphabet)
+        # Go generators cannot be imported by Python. Pin their actual encoder
+        # calls as source contracts without building the gateway's heavy packages.
+        roots = {ROOT}
+        peer = os.environ.get("VERIFY_SECRET_BOUNDARY_PEER_ROOT")
+        if peer:
+            roots.add(Path(peer).resolve())
+        for root in roots:
+            gateway = root / "gateway" / "internal"
+            if not gateway.is_dir():
+                continue  # Public CI has no enterprise checkout.
+            for surface in ("evidence", "proxy"):
+                source = (gateway / surface / "receipt.go").read_text()
+                for expression in (
+                    '"evid_" + base64.RawURLEncoding.EncodeToString(b[:])',
+                    '"rcpt_" + base64.RawURLEncoding.EncodeToString(receiptIDHash[:])[:22]',
+                    '"ep_" + base64.RawURLEncoding.EncodeToString(evidencePackHash[:])[:22]',
+                    '"sha256:" + base64.RawURLEncoding.EncodeToString(hash[:])',
+                    '"ed25519:" + base64.RawURLEncoding.EncodeToString(signature)',
+                    'base64.RawURLEncoding.EncodeToString(signer.PublicKey)',
+                ):
+                    self.assertIn(expression, source)
+                self.assertNotRegex(source, r'base64\.(?:Raw)?StdEncoding\.EncodeToString')
+            cursor = (gateway / "cloud" / "evidence_packs_api.go").read_text()
+            self.assertIn('base64.RawURLEncoding.EncodeToString(append(nonce, sealed...))', cursor)
+            nonce = (gateway / "mcpapproval" / "link.go").read_text()
+            self.assertIn('return hex.EncodeToString(b[:]), nil', nonce)
+        self.assertFalse(set(string.hexdigits + "-:") & set("%+"))
+
+    def test_generated_value_marker_embeddings_still_pass(self):
+        # Include all base64url predecessors and the fixed generated ID prefixes.
+        for before in string.ascii_letters + string.digits + "_-":
+            for marker in ("stk_fixture", "sgcap_fixture", "Bearerfixture"):
+                for prefix in ("evid_", "rcpt_", "ep_", "sha256:", "ed25519:", ""):
+                    self.assert_markers({"generated": prefix + before + marker}, False)
 
     def test_real_token_starts_still_fail(self):
         for marker in ("stk_fixture_not_a_credential", "sgcap_fixture_not_a_credential",
