@@ -5,6 +5,7 @@ its own two copies to the same constant shared-block SHA-256. Keep this file
 byte-identical in public tools/ and enterprise tests/.
 """
 import copy
+import base64
 import hashlib
 import importlib.util
 import os
@@ -17,19 +18,19 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 
 ROOT = Path(__file__).resolve().parents[1]
-SHARED_BLOCK_SHA256 = "47739e6611ea893fe390ec1ee6e263de098f6cb196b999617ea2817358308d60"
+SHARED_BLOCK_SHA256 = "20e0e799b68d5a8b897966a094d903ad4f61da1b926a32e7a73c40a4ff499099"
 MARKERS = ("stk_fixture", "sgcap_fixture", "Bearer fixture", "bEaReR fixture")
 ENCODED_STARTS = ("Bearer%20", "token%3D", "user%3A", "path%2F", "Bearer+",
                   "bEaReR+", "+", "token+", "token%3d", "user%3a", "path%2f")
 ALPHABET = string.ascii_letters + string.digits + "_-"
-SHAPES = (("evid_", 32), ("rcpt_", 22), ("ep_", 22), ("receipt-", 22),
+SHAPES = (("evid_", 32), ("rcpt_", 22), ("ep_", 22),
           ("sha256:", 43), ("ed25519:", 86))
 # Sealed policy budget ids are 64 characters TOTAL (mint- plus 59 hex).
 # No-budget mint-/dlg- row ids are not HTTP spend subjects.
 NEW_SHAPES = (
     ("quote", "quote_", 32, "access_id"),
     *((subject, subject + "-", 22, "request_id")
-      for subject in ("observe", "req", "budget", "policy", "degradation")),
+      for subject in ("receipt", "observe", "req", "budget", "policy", "degradation")),
     ("mint_budget", "mint-" + "a" * 59 + "-", 22, "request_id"),
     ("delegation_budget", "a" * 32 + "-", 22, "request_id"),
     ("child_budget", "del-" + "a" * 24 + "-", 22, "request_id"),
@@ -279,6 +280,23 @@ class SecretBoundary(unittest.TestCase):
                 self.assert_pack(value, True, field)
             self.assert_pack("redacted", False, field)
 
+    def test_request_id_caller_header_and_route_collisions(self):
+        # Canonical 16-byte suffixes, not an encoding-artifact counterexample.
+        subjects = [p[:-1] for _, p, _, loc in NEW_SHAPES if loc == "request_id"]
+        subjects += ["route-name", "caller", "", "route-stk_fixture", "route-sgcap_fixture"]
+        for subject_index, subject in enumerate(subjects):
+            for marker in ("stk_Q", "sgcap_Q"):
+                body = generated("", 21, marker, 2) + "A"
+                self.assertEqual(base64.urlsafe_b64encode(base64.urlsafe_b64decode(body + "==")).decode().rstrip("="), body)
+                for location in ("request_id", "policy", "path", "nested", "X-Request-ID", "Idempotency-Key"):
+                    with self.subTest(subject=subject_index, marker_size=len(marker), location=location):
+                        self.assert_pack(subject + "-" + body, True, location)
+
+    def test_request_id_marker_in_subject_is_not_filtered(self):
+        for marker in MARKERS:
+            for location in ("request_id", "path", "policy", "nested"):
+                self.assert_pack("route-" + marker + "-" + "A" * 22, True, location)
+
     def test_generator_alphabets_and_lengths(self):
         for checker in self.checkers:
             self.assertEqual(set(checker.b64url_encode(bytes(range(256)))), set(ALPHABET))
@@ -303,7 +321,7 @@ class SecretBoundary(unittest.TestCase):
             evidence = (gateway / "evidence" / "receipt.go").read_text()
             self.assertIn('generateEvidenceRequestID("receipt")', evidence)
             self.assertIn('var b [16]byte', evidence)
-            self.assertIn('fmt.Sprintf("%s-%s", subject, base64.RawURLEncoding.EncodeToString(b[:]))', evidence)
+            self.assertIn('base64.RawURLEncoding.EncodeToString(b[:])', evidence)
             proxy = (gateway / "proxy" / "proxy.go").read_text()
             for expression in ('var b [16]byte', 'subject = "req"',
                                'bindDecisionRequestID(r, "budget")',
@@ -336,8 +354,9 @@ def new_shape_contract(prefix, length, location):
                 body = generated("", length, marker, offset)
                 value = prefix + body
                 with self.subTest(marker_size=len(marker), offset=offset):
-                    self.assert_pack(value, False, location)
-                    self.assert_pack("https://issuer.example/" + value + "?v=1", False, location)
+                    # Request IDs have no exemption, regardless of provenance.
+                    self.assert_pack(value, location == "request_id", location)
+                    self.assert_pack("https://issuer.example/" + value + "?v=1", location == "request_id", location)
                     # Same random body, but no audited subject.
                     self.assert_pack("caller-" + body, True, location)
             # Shorten padding, not the marker itself. All 64 continuations on
