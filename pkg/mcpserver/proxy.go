@@ -857,7 +857,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			holdExpiry time.Time
 			slot       *pendingSlot
 		)
-		if p.signEveryAction && isControl {
+		if p.signEveryAction && (isControl || p.every().holdObserve(ctx, p.budget)) {
 			holder = holdOf(p.budget)
 			if holder == nil {
 				log.Error().Str("tool", receiptTool(tc.Name)).Str("budgetId", budgetID).Msg("sign every action: the budget store offers no hold; refusing the call before any charge")
@@ -999,8 +999,15 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			var evidenceErr error
 			spendReceiptTried = true
 			recCtx := ctx
+			var prep *pendingPreparation
 			if holder != nil {
 				recCtx = withHoldExpiry(ctx, holdExpiry)
+				var perr error
+				recCtx, prep, perr = p.every().preparePending(recCtx, PendingRecord{TokenID: tokenInfo.TokenID, TenantID: tenantID, BudgetID: budgetID, Method: MethodToolsCall, Tool: receiptTool(tc.Name), RequestID: requestID, Amount: cost})
+				if perr != nil {
+					p.every().release(ctx, holder, budgetID, requestID, cost)
+					return proofUnavailableResponse(req.ID, tc.Name), nil
+				}
 			}
 			allowedEvidence, evidenceErr = p.recordMCPDecision(recCtx, req, tokenInfo, tc.Name, MCPDecision{
 				Decision:         "allowed",
@@ -1012,7 +1019,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			})
 			if evidenceErr != nil {
 				log.Error().Err(evidenceErr).Str("tool", tc.Name).Str("budgetId", budgetID).Msg("MCP allowed evidence recording failed")
-				if holder != nil {
+				if holder != nil && isControl {
 					// The hold is let go of, on a context of its own. If that
 					// fails too the hold lapses by itself: nothing more has to
 					// succeed for this call to end uncharged. Nothing is sent.
@@ -1025,8 +1032,11 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				// Observe lets the call through with no receipt (today's
 				// behaviour); with the switch on the miss is reported, once.
 				if !isControl {
-					if !p.reportObserveMiss(ctx, tokenInfo, MethodToolsCall, tc.Name, mode) {
-						return proofUnavailableResponse(req.ID, tc.Name), nil
+					if err := p.reportObserveMiss(recCtx, tokenInfo, MethodToolsCall, tc.Name, mode); err != nil {
+						if holder != nil && !errors.Is(err, ErrPendingOutcomeUnknown) {
+							p.every().release(ctx, holder, budgetID, requestID, cost)
+						}
+						return pendingFailureResponse(req.ID, tc.Name, err), nil
 					}
 				}
 				if isControl {
@@ -1035,6 +1045,20 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 						"error": "proof_unavailable",
 						"tool":  tc.Name,
 					}), nil
+				}
+			} else if holder != nil && prep != nil {
+				stored, perr := p.every().keepPrepared(ctx, prep)
+				if !stored {
+					if errors.Is(perr, ErrPendingOutcomeUnknown) {
+						return pendingFailureResponse(req.ID, tc.Name, perr), nil
+					}
+					p.every().release(ctx, holder, budgetID, requestID, cost)
+					return proofUnavailableResponse(req.ID, tc.Name), nil
+				}
+				if perr != nil {
+					log.Warn().Msg("signed call is durably pending settlement")
+				} else {
+					publishSpend()
 				}
 			} else if holder != nil {
 				// Signed. Now the hold becomes the debit, and only then does
