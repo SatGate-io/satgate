@@ -11,7 +11,7 @@
       "source_path": "demo/README.md",
       "source_blob": "997ecb5ba5887f498da9ce12702c35dcf6539cbb",
       "mode": "adapted",
-      "sha256": "57a9bb05dc8a845cd796b41e1a5ab915f757d64daaea40bd8b1f7fd33037eea0"
+      "sha256": "02d15dc1abbe7d1c560de0db52a7cba1785f3df97e3645fdaa9de7347401850d"
     },
     {
       "public_path": "demo/_vendor/rfc8785/__init__.py",
@@ -88,7 +88,7 @@
       "source_path": "demo/verify_evidence_pack.py",
       "source_blob": "76fe89a681d7f15f06a8d941ebef33daabbb7ade",
       "mode": "adapted",
-      "sha256": "2ef3f4c50db9304f2026fab943f693020e616c4a7b60799344c2b47583a33a35"
+      "sha256": "29e5ce74b594c925076a57e89303fb8629be6b4fd21fb17345a4963955d3c5b2"
     }
   ]
 }

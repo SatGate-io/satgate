@@ -134,11 +134,58 @@ def decision_profile_for(receipt: Any) -> str | None:
         return None
     return profile
 DEFAULT_CLOCK_SKEW_SECONDS = 300
+# BEGIN SHARED SECRET SCAN
+# Keep main's credential patterns unchanged in every distributed verifier.
 SECRET_PATTERNS = [
     re.compile(r"Bearer\s+[A-Za-z0-9._~+/=-]+", re.IGNORECASE),
     re.compile(r"sgcap_[A-Za-z0-9._~+/=-]+"),
     re.compile(r"stk_[A-Za-z0-9._~+/=-]+"),
 ]
+# Only complete generated encodings are masked, including in evidence URLs.
+# Both ends must be outside the raw base64url alphabet; never mask a substring
+# of a longer identifier/credential. Do not decode or change caller text.
+GENERATED_VALUE_PATTERN = re.compile(
+    r"(?<![A-Za-z0-9_-])(?:(?:evid_|quote_)[A-Za-z0-9_-]{32}"
+    r"|(?:rcpt_|ep_)[A-Za-z0-9_-]{22}"
+    r"|sha256:[A-Za-z0-9_-]{43}|ed25519:[A-Za-z0-9_-]{86})"
+    r"(?![A-Za-z0-9_-])"
+)
+GENERATED_PUBLIC_KEY_PATTERN = re.compile(r"[A-Za-z0-9_-]{43}")
+# Stay inside main's Bearer token class so a match starting before a masked
+# value (Bearer + space + the whole value) is preserved, not erased.
+GENERATED_VALUE_PLACEHOLDER = "satgate-generated"
+# Request IDs are never exempt: their subjects or headers can be caller text.
+# New generators redraw marker-bearing random suffixes. Pre-change request IDs
+# can rarely (about one in a million) contain a marker and fail this checker.
+
+
+def mask_receipt_public_key(receipt: Any) -> Any:
+    # The only raw key in a signed pack is
+    # receipts[*].metadata.public_key_ed25519_b64 (or metadata on a standalone
+    # satgate.receipt.v1). Do not grant the exception to same-named caller fields.
+    if not isinstance(receipt, dict) or receipt.get("schema_version") != "satgate.receipt.v1":
+        return receipt
+    metadata = receipt.get("metadata")
+    if not isinstance(metadata, dict):
+        return receipt
+    key = metadata.get("public_key_ed25519_b64")
+    if not isinstance(key, str) or not GENERATED_PUBLIC_KEY_PATTERN.fullmatch(key):
+        return receipt
+    return dict(receipt, metadata=dict(metadata, public_key_ed25519_b64=GENERATED_VALUE_PLACEHOLDER))
+
+
+def secret_scan_text(value: Any) -> str:
+    # Copy only the permitted raw-key fields; never mutate the signed input.
+    # Serialize exactly as before, then replace whole prefixed values in that
+    # same scanned text. Sensitive-field checks still receive the original input.
+    scan_value = mask_receipt_public_key(value)
+    if isinstance(value, dict) and value.get("schema_version") == "satgate.evidence_pack.v1":
+        receipts = value.get("receipts")
+        if isinstance(receipts, list):
+            scan_value = dict(value, receipts=[mask_receipt_public_key(r) for r in receipts])
+    raw = json.dumps(scan_value, sort_keys=True, separators=(",", ":"), default=str)
+    return GENERATED_VALUE_PATTERN.sub(GENERATED_VALUE_PLACEHOLDER, raw)
+# END SHARED SECRET SCAN
 PAID_RAIL_FIELDS = {"rail", "payment_hash", "invoice_hash", "macaroon_hash", "amount_sats"}
 CREDIT_USD_FIELDS = {
     "amount_usd", "attempted_amount_usd", "remaining_budget_usd", "currency",
@@ -538,7 +585,7 @@ def verify_receipt_signature(receipt: dict[str, Any], reasons: list[str], reason
 
 
 def contains_secret_marker(value: Any) -> bool:
-    raw = json.dumps(value, sort_keys=True, separators=(",", ":"), default=str)
+    raw = secret_scan_text(value)
     # Redaction labels are expected. Actual bearer/capability prefixes are not.
     raw = raw.replace('"raw_capability_token":"redacted"', "")
     raw = raw.replace('"authorization_header":"redacted"', "")
