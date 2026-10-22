@@ -147,6 +147,21 @@ class ReceiptRecord(unittest.TestCase):
         self.assertEqual(result["summary"], "4 receipts, 1 refusals, 0 windows, 0 problems")
         self.assertTrue(result["checks"]["manifest_trusted_issuer"])
 
+    def test_record_with_stk_inside_access_id_passes_end_to_end(self):
+        # Exactly 32 base64url characters after evid_, with the unlucky prefix
+        # in the middle. Sign after setting the ID and all URL copies.
+        access_id = "evid_" + "A" * 12 + "stk_" + "B" * 16
+        url = "https://issuer.example/v1/evidence/" + access_id
+        pack = self.b.allowed(10, evidence_access_id=access_id, evidence_url=url,
+                              event_history_ref=url)
+        record = text([pack], self.b.manifest([pack]))
+        proc = self.run_cli(record)
+        result = json.loads(proc.stdout)
+        self.assertEqual(proc.returncode, 0, "record CLI must accept an embedded prefix")
+        self.assertTrue(result["valid"])
+        self.assertEqual(result["problems"], [])
+        self.assertTrue(result["checks"]["manifest_trusted_issuer"])
+
     def test_clean_record_passes_without_a_trusted_issuer_by_the_embedded_key(self):
         packs, manifest = self.clean()
         result = self.verify(text(packs, manifest), jwks=None, require_trusted_issuer=False)
