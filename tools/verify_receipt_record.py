@@ -3,8 +3,8 @@
 
 A record is what an owner downloads to see everything one agent key did in a
 stretch of time: newline-delimited JSON (NDJSON), one signed Evidence Pack per
-line in the order they were issued, then one last line, a manifest SatGate
-signed with the same key that signs receipts.
+line in the order they were issued, then one last signed line: a complete
+manifest or a cut-off terminal object. Each object uses its own issuer_kid.
 
 Usage:
   python tools/verify_receipt_record.py record.ndjson --jwks-url https://api.satgate.io/.well-known/jwks.json --require-trusted-issuer
@@ -18,8 +18,8 @@ It needs no SatGate login. It checks:
      that one receipt, so a second receipt in a pack would be outside them;
   2. the manifest's signature (against the issuer's JWKS, or the embedded key
      when you do not ask for a trusted issuer), and that the manifest comes
-     from the same issuer, with the same signing key (issuer_kid), as the
-     receipts;
+     from the same issuer as the receipts. Signing keys may differ, but in
+     trusted mode every issuer_kid must be in the supplied issuer JWKS;
   3. the count: the manifest's count equals the packs in the file;
   4. nothing was dropped between the first and the last: the first and last
      receipt hashes, and a SHA-256 over the receipt hashes in order;
@@ -33,7 +33,15 @@ It needs no SatGate login. It checks:
      before the record was made, whichever is earlier) makes the record invalid.
      A window whose closer is not due yet, or that runs past the end of the
      range, is reported as pending or as a boundary window and does not;
-  9. counts by decision reason match the manifest.
+  9. counts by decision reason match the manifest;
+ 10. the terminal schema's fixed field set, and explicit truncation status.
+
+A signed satgate.receipt_record_truncated.v1 terminal authenticates only the
+prefix before it: its counts, hashes and receipts are checked, but no complete
+range or missing-closer claim is made. Its status is "truncated", valid and
+complete are false, and verified_prefix and truncation_reason describe it.
+Without a trusted issuer, each embedded key proves self-consistency only, not
+issuer identity; trust_mode and a warning say so, including for mixed-key files.
 
 What it cannot prove: the manifest is made at download time from what SatGate
 holds. It shows nothing was dropped from that list, not that no call ever
@@ -44,7 +52,9 @@ signed gap receipts (observe_unrecorded) and are counted in the output.
 Exit codes: 0 the record checks out (warnings, and pending or boundary windows,
 are allowed), 1 at least one
 problem, 2 the input could not be loaded, 3 the Python package 'cryptography'
-is missing. Output is JSON, with a one-line "summary" (also on stderr).
+is missing, 4 a signed cut-off terminal and its prefix verify (not complete).
+Malformed NDJSON is a verification problem (1); file/JWKS loading and CLI usage
+errors are 2. Output is JSON, with a one-line "summary" (also on stderr).
 """
 
 from __future__ import annotations
@@ -63,12 +73,25 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import verify_evidence_pack as vep  # noqa: E402  (same directory)
 
 MANIFEST_SCHEMA = "satgate.receipt_record_manifest.v1"
+TRUNCATED_SCHEMA = "satgate.receipt_record_truncated.v1"
+TRUNCATED_EXIT = 4
 PACK_SCHEMA = vep.EXPECTED_PACK_SCHEMA
 # The gateway signs a window's closer once the window has been over for this
 # long (RateWindowGraceSeconds in pkg/mcpserver/evidence.go). A closer that is
 # still missing after window end plus this, by the end of the export, is overdue.
 WINDOW_CLOSER_GRACE = timedelta(seconds=15)
 MANIFEST_UNSIGNED_FIELDS = {"manifest_hash", "signature"}
+# v1 is closed at the top level. Optional E3 coverage fields are signed, not
+# evidence of completeness; truncated must be absent or exactly false here.
+MANIFEST_FIELDS = {
+    "schema_version", "canonicalization", "hash_algorithm", "signature_algorithm",
+    "issuer", "issuer_kid", "metadata", "manifest_hash", "signature",
+    "key_hash", "from", "to", "generated_at", "record_starts_at", "count",
+    "first_receipt_hash", "last_receipt_hash", "receipt_hashes_sha256",
+    "counts_by_decision_reason", "windows", "filter", "coverage",
+    "legacy_identity_policy", "truncated",
+}
+TRUNCATED_FIELDS = MANIFEST_FIELDS | {"truncation_reason"}
 KEY_HASH_FIELDS = ("token_id_hash", "budget_id_hash", "capability_hash")
 
 Receipts = list  # of (line number, pack, primary receipt)
@@ -113,7 +136,8 @@ def manifest_hash(manifest: dict[str, Any]) -> str:
 
 def verify_manifest_signature(manifest: dict[str, Any], jwks: dict[str, Any] | None, require_trusted_issuer: bool, p: Problems) -> None:
     """The manifest is signed over its canonical form without manifest_hash and
-    signature, with the key that signs receipts (found by issuer_kid)."""
+    signature, with its own key (found by issuer_kid). Also used for truncation
+    terminals, whose signing payload and hash field are identical to E3's."""
     p.check("manifest_signature")
     if manifest.get("canonicalization") != vep.SUPPORTED_CANONICALIZATION or manifest.get("hash_algorithm") != "sha256" or manifest.get("signature_algorithm") != "ed25519":
         p.problem("manifest_signature", "manifest_unsupported_algorithm", "the manifest must be jcs-rfc8785, sha256 and ed25519")
@@ -180,6 +204,10 @@ def authority_hashes(receipt: dict[str, Any]) -> set[str]:
 def unreadable(message: str) -> dict[str, Any]:
     return {
         "valid": False,
+        "complete": False,
+        "status": "invalid",
+        "trusted_issuer_valid": False,
+        "trust_mode": "unverified",
         "problems": [{"code": "invalid_input", "message": message}],
         "warnings": [],
         "checks": {"input_valid": False},
@@ -205,17 +233,20 @@ def verify_record(
     if not lines or not all(isinstance(obj, dict) for _, obj in lines):
         return unreadable("the record is empty or a line is not an object")
 
-    # The manifest is the last line, and the only one.
-    manifests = [(n, o) for n, o in lines if o.get("schema_version") == MANIFEST_SCHEMA]
-    packs = [(n, o) for n, o in lines if o.get("schema_version") != MANIFEST_SCHEMA]
+    # Exactly one terminal, complete OR truncated, and only at the end.
+    terminal_schemas = (MANIFEST_SCHEMA, TRUNCATED_SCHEMA)
+    manifests = [(n, o) for n, o in lines if o.get("schema_version") in terminal_schemas]
+    packs = [(n, o) for n, o in lines if o.get("schema_version") not in terminal_schemas]
     p.check("manifest_present")
-    if len(manifests) != 1 or lines[-1][1].get("schema_version") != MANIFEST_SCHEMA:
-        p.problem("manifest_present", "manifest_missing_or_misplaced", "the record must end with exactly one manifest line")
+    if len(manifests) != 1 or lines[-1][1].get("schema_version") not in terminal_schemas:
+        p.problem("manifest_present", "manifest_missing_or_misplaced", "the record must end with exactly one complete manifest or truncation terminal")
         return finish(p, len(packs), [], 0, 0)
     manifest = manifests[0][1]
+    truncated = manifest.get("schema_version") == TRUNCATED_SCHEMA
 
     # Every pack, with the per-pack verifier.
     p.check("receipts_verified")
+    p.check("receipts_trusted_issuer")
     receipts: Receipts = []
     for number, pack in packs:
         if pack.get("schema_version") != PACK_SCHEMA:
@@ -226,6 +257,7 @@ def verify_record(
             p.problem("receipts_verified", "pack_not_one_receipt", "each line must carry exactly one receipt: the manifest's hashes cover one receipt per line", number)
             continue
         verdict = vep.verify_pack(pack, jwks=jwks, require_trusted_issuer=require_trusted_issuer, allow_mock=allow_mock, now=now)
+        p.check("receipts_trusted_issuer", verdict.get("trusted_issuer_valid", False))
         if not verdict.get("valid"):
             p.problem("receipts_verified", "receipt_invalid", "the pack does not verify: " + ", ".join(verdict.get("reason_codes", [])), number)
             continue
@@ -234,6 +266,15 @@ def verify_record(
     # The manifest itself.
     verify_manifest_signature(manifest, jwks, require_trusted_issuer, p)
     p.check("manifest_fields")
+    allowed_fields = TRUNCATED_FIELDS if truncated else MANIFEST_FIELDS
+    if manifest.keys() - allowed_fields:
+        p.problem("manifest_fields", "manifest_unknown_field", "the terminal has unknown top-level fields for its schema version")
+    if truncated:
+        reason = manifest.get("truncation_reason")
+        if manifest.get("truncated") is not True or not isinstance(reason, str) or not reason.strip():
+            p.problem("manifest_fields", "truncation_fields_invalid", "a truncation terminal requires truncated=true and a nonempty truncation_reason")
+    elif "truncated" in manifest and manifest["truncated"] is not False:
+        p.problem("manifest_fields", "manifest_truncated_invalid", "a complete manifest's truncated field must be absent or false; cut-off records need the truncated schema")
     # A record with no receipts has no first or last receipt.
     required = ["issuer", "issuer_kid", "key_hash", "receipt_hashes_sha256"]
     if packs:
@@ -291,8 +332,6 @@ def verify_record(
             p.problem("order_and_range", "outside_range", "issued_at is outside the manifest's from..to", number)
         if isinstance(issuer, str) and receipt.get("issuer") != issuer:
             p.problem("order_and_range", "issuer_mismatch", "the receipt's issuer is not the manifest's issuer", number)
-        if receipt.get("issuer_kid") != manifest.get("issuer_kid"):
-            p.problem("order_and_range", "issuer_kid_mismatch", "the receipt was signed with a different key (issuer_kid) than the manifest", number)
 
     # No receipt twice.
     p.check("no_duplicates")
@@ -345,7 +384,11 @@ def verify_record(
             else:
                 p.problem("windows", "window_closer_without_opener", f"the window at {window_start} for {route} has a closer and no opener", closed[0][0])
         state = "closed" if closed else "open"
-        if opened and not closed and ws is not None:
+        if opened and not closed and truncated:
+            # A closer may be in the part not downloaded. Do not apply the
+            # complete-range absence claim to an authenticated prefix.
+            state = "prefix_open"
+        elif opened and not closed and ws is not None:
             window_end = ws + timedelta(seconds=vep.WINDOW_SECONDS)
             horizon = min((t for t in (end, generated_at) if t is not None), default=None)
             if end is not None and window_end > end:
@@ -391,12 +434,29 @@ def verify_record(
 
 def finish(p: Problems, pack_count: int, receipts: Receipts, windows: int, unrecorded_calls: int, manifest: dict[str, Any] | None = None) -> dict[str, Any]:
     refusals = sum(1 for _, _, r in receipts if r.get("decision") == "denied")
+    verified = not p.problems
+    truncated = verified and manifest is not None and manifest.get("schema_version") == TRUNCATED_SCHEMA
+    trusted = verified and p.checks.get("manifest_trusted_issuer", False) and p.checks.get("receipts_trusted_issuer", False)
+    if verified and not trusted:
+        p.warn("issuer_not_authenticated", "embedded-key verification proves self-consistency only, not issuer identity")
+    summary = f"{pack_count} receipts, {refusals} refusals, {windows} windows, {len(p.problems)} problems"
+    if truncated:
+        summary = f"truncated ({manifest['truncation_reason']}): verified prefix, " + summary
     return {
-        "valid": not p.problems,
+        "valid": verified and not truncated,
+        "complete": verified and not truncated,
+        "status": "truncated" if truncated else ("complete" if verified else "invalid"),
+        "trusted_issuer_valid": trusted,
+        "trust_mode": ("trusted_issuer" if trusted else "embedded_key_self_consistency") if verified else "unverified",
+        "truncation_reason": manifest["truncation_reason"] if truncated else None,
+        "verified_prefix": {k: manifest.get(k) for k in (
+            "count", "first_receipt_hash", "last_receipt_hash", "receipt_hashes_sha256",
+            "counts_by_decision_reason", "windows",
+        )} if truncated else None,
         "problems": p.problems,
         "warnings": p.warnings,
         "checks": p.checks,
-        "summary": f"{pack_count} receipts, {refusals} refusals, {windows} windows, {len(p.problems)} problems",
+        "summary": summary,
         "window_states": p.window_states,
         "counts": {"receipts": pack_count, "refusals": refusals, "windows": windows, "unrecorded_calls": unrecorded_calls},
         "manifest": {k: manifest.get(k) for k in ("key_hash", "from", "to", "generated_at", "record_starts_at", "count")} if manifest else {},
@@ -404,11 +464,14 @@ def finish(p: Problems, pack_count: int, receipts: Receipts, windows: int, unrec
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Verify a downloaded SatGate receipt record (NDJSON plus a signed manifest).")
+    parser = argparse.ArgumentParser(
+        description="Verify a SatGate receipt record with a signed complete manifest or cut-off terminal; each issuer_kid verifies independently.",
+        epilog="Exit codes: 0 complete, 1 invalid record (including malformed NDJSON), 2 input/JWKS loading or usage error, 3 missing cryptography, 4 verified truncated prefix. Embedded keys prove self-consistency, not issuer identity.",
+    )
     parser.add_argument("source", help="record file (NDJSON), or '-' for stdin")
     parser.add_argument("--jwks-url", help="HTTPS issuer JWKS URL to trust")
     parser.add_argument("--jwks-file", help="local JWKS JSON file to trust")
-    parser.add_argument("--require-trusted-issuer", action="store_true", help="fail unless every receipt and the manifest verify against the trusted JWKS")
+    parser.add_argument("--require-trusted-issuer", action="store_true", help="fail unless every receipt and the complete/truncated terminal verify against the trusted JWKS")
     parser.add_argument("--allow-mock", action="store_true", help="allow receipts marked mock/demo/test")
     parser.add_argument("--now", help="RFC3339 time to use for temporal checks (tests/reproducibility)")
     args = parser.parse_args(argv)
@@ -426,6 +489,8 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     print(json.dumps(result, indent=2, sort_keys=True))
     print(result["summary"], file=sys.stderr)
+    if result.get("status") == "truncated":
+        return TRUNCATED_EXIT
     return 0 if result["valid"] else 1
 
 
