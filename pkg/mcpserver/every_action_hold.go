@@ -26,6 +26,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"sort"
@@ -133,9 +134,11 @@ type everyAction struct {
 	// on mirrors the switch (SetSignEveryAction): with it on, a receipt that
 	// is not given a request id is given one the server makes (newCallID),
 	// never one derived from the client's JSON-RPC id.
-	on       atomic.Bool
-	settings atomic.Pointer[EveryActionSettings]
-	pending  *pendingStore
+	on            atomic.Bool
+	settings      atomic.Pointer[EveryActionSettings]
+	pending       *pendingStore
+	durable       PendingStore
+	pendingBudget PendingBudget
 
 	recMu sync.RWMutex
 	rec   EvidenceRecorder
@@ -253,7 +256,17 @@ func (ea *everyAction) record(ctx context.Context, rec EvidenceRecorder, d MCPDe
 				done <- answer{nil, errRecorderPanic}
 			}
 		}()
-		ev, err := rec.RecordMCPDecision(sctx, d)
+		var ev *MCPEvidence
+		var err error
+		if prep, _ := ctx.Value(pendingPreparationKey{}).(*pendingPreparation); prep != nil {
+			var raw json.RawMessage
+			ev, raw, err = rec.(PendingEvidenceRecorder).PreparePendingDecision(sctx, d)
+			if err == nil {
+				prep.work.Receipt = raw
+			}
+		} else {
+			ev, err = rec.RecordMCPDecision(sctx, d)
+		}
 		done <- answer{ev, err}
 	}()
 	select {
@@ -627,6 +640,9 @@ func (ea *everyAction) reportMiss(ctx context.Context, rec EvidenceRecorder, slo
 	if call.ReportID == "" {
 		call.ReportID = ea.pending.nextID(kindGap)
 	}
+	if ea.durable != nil && ea.on.Load() {
+		return ea.durableGap(ctx, slot, call)
+	}
 	if wr, ok := rec.(WindowRecorder); ok {
 		rctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), ea.cfg().MissReportTimeout)
 		_, err := wr.RecordWindowedCall(rctx, call)
@@ -807,11 +823,36 @@ func (p *Proxy) CarveSettlements() (charged, closedUnfunded int64) {
 // was for, and its minute. An entry leaves when it has been recorded (a gap, by
 // the window recorder; an uncharged amount, by an UnchargedRecorder) or when
 // the host takes it with AckPending.
-func (p *Proxy) PendingRecords() []PendingRecord { return p.every().pending.records() }
+func (p *Proxy) PendingRecords() []PendingRecord {
+	ea := p.every()
+	out := ea.pending.records()
+	if ea.durable != nil && ea.on.Load() {
+		ctx, cancel := context.WithTimeout(context.Background(), ea.cfg().MissReportTimeout)
+		defer cancel()
+		ws, err := ea.durable.List(ctx)
+		if err != nil {
+			log.Error().Msg("durable pending journal could not be listed")
+			return out
+		}
+		for _, w := range ws {
+			out = append(out, w.Record)
+		}
+	}
+	return out
+}
 
 // AckPending removes the entry the host has dealt with, and reports whether it
 // was there.
-func (p *Proxy) AckPending(id string) bool { return p.every().pending.remove(id) }
+func (p *Proxy) AckPending(id string) bool {
+	ea := p.every()
+	if ea.durable != nil && ea.on.Load() {
+		ctx, cancel := context.WithTimeout(context.Background(), ea.cfg().CommitTimeout)
+		defer cancel()
+		done, err := ea.durable.Process(ctx, id, func(context.Context, PendingWork) (PendingDisposition, error) { return PendingCompleted, nil })
+		return done && err == nil
+	}
+	return ea.pending.remove(id)
+}
 
 // FlushPending tries every retryable entry once, now, and returns how many
 // entries the store still holds. The retry worker does the same on its own; a
@@ -819,5 +860,13 @@ func (p *Proxy) AckPending(id string) bool { return p.every().pending.remove(id)
 func (p *Proxy) FlushPending(ctx context.Context) int {
 	ea := p.every()
 	ea.flush(ctx)
-	return len(ea.pending.records())
+	if ea.durable != nil && ea.on.Load() {
+		ea.flushDurable(ctx)
+		ws, err := ea.durable.List(ctx)
+		if err != nil {
+			return -1
+		}
+		return len(ws) + len(ea.pending.records())
+	}
+	return len(p.PendingRecords())
 }

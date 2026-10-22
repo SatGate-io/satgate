@@ -999,8 +999,15 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			var evidenceErr error
 			spendReceiptTried = true
 			recCtx := ctx
+			var prep *pendingPreparation
 			if holder != nil {
 				recCtx = withHoldExpiry(ctx, holdExpiry)
+				var perr error
+				recCtx, prep, perr = p.every().preparePending(recCtx, PendingRecord{TokenID: tokenInfo.TokenID, TenantID: tenantID, BudgetID: budgetID, Method: MethodToolsCall, Tool: receiptTool(tc.Name), RequestID: requestID, Amount: cost})
+				if perr != nil {
+					p.every().release(ctx, holder, budgetID, requestID, cost)
+					return proofUnavailableResponse(req.ID, tc.Name), nil
+				}
 			}
 			allowedEvidence, evidenceErr = p.recordMCPDecision(recCtx, req, tokenInfo, tc.Name, MCPDecision{
 				Decision:         "allowed",
@@ -1035,6 +1042,17 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 						"error": "proof_unavailable",
 						"tool":  tc.Name,
 					}), nil
+				}
+			} else if holder != nil && prep != nil {
+				stored, perr := p.every().keepPrepared(ctx, prep)
+				if !stored {
+					p.every().release(ctx, holder, budgetID, requestID, cost)
+					return proofUnavailableResponse(req.ID, tc.Name), nil
+				}
+				if perr != nil {
+					log.Warn().Msg("signed call is durably pending settlement")
+				} else {
+					publishSpend()
 				}
 			} else if holder != nil {
 				// Signed. Now the hold becomes the debit, and only then does

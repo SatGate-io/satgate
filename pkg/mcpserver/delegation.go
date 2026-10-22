@@ -744,8 +744,15 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 	// empty and the entry is closed, logged and counted.
 	if d.signEveryAction {
 		sctx := ctx
+		var prep *pendingPreparation
 		if holder != nil {
 			sctx = withHoldExpiry(ctx, holdExpiry)
+			var perr error
+			sctx, prep, perr = d.state().preparePending(sctx, PendingRecord{TokenID: parent.TokenID, TenantID: parent.TenantID, BudgetID: parent.BudgetID, ChildBudgetID: childBudgetID, Method: MethodSatGateDelegate, RequestID: delegationID, Amount: params.Budget})
+			if perr != nil {
+				undoCarve(delegationID)
+				return nil, errDelegationProofUnavailable
+			}
 		}
 		if err := d.signDelegation(sctx, parent, delegationID); err != nil {
 			log.Error().Err(err).Str("parent", parent.TokenID).Msg("delegation receipt unavailable")
@@ -757,6 +764,15 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			if d.reportMiss != nil && !d.reportMiss(ctx, parent) {
 				undoCarve(delegationID)
 				return nil, errDelegationProofUnavailable
+			}
+		} else if holder != nil && prep != nil {
+			stored, perr := d.state().keepPrepared(ctx, prep)
+			if !stored {
+				undoCarve(delegationID)
+				return nil, errDelegationProofUnavailable
+			}
+			if perr != nil {
+				log.Warn().Msg("signed delegation is durably pending settlement")
 			}
 		} else if holder != nil {
 			// The receipt stands, so the key is issued either way. The child's
