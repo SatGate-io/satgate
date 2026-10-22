@@ -145,13 +145,19 @@ SECRET_PATTERNS = [
 # Both ends must be outside the raw base64url alphabet; never mask a substring
 # of a longer identifier/credential. Do not decode or change caller text.
 GENERATED_VALUE_PATTERN = re.compile(
-    r"(?<![A-Za-z0-9_-])(?:evid_[A-Za-z0-9_-]{32}"
-    r"|(?:rcpt_|ep_|receipt-)[A-Za-z0-9_-]{22}"
+    r"(?<![A-Za-z0-9_-])(?:(?:evid_|quote_)[A-Za-z0-9_-]{32}"
+    r"|(?:rcpt_|ep_|(?:receipt|observe|req|budget|policy|degradation)-)[A-Za-z0-9_-]{22}"
+    # Sealed budget subjects only: policy mint (64 chars TOTAL), delegation,
+    # own-credit child, or cloud UUID-v4. Never accept an arbitrary subject.
+    r"|(?:mint-[0-9a-f]{59}|[0-9a-f]{32}|del-[0-9a-f]{24}"
+    r"|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})-[A-Za-z0-9_-]{22}"
     r"|sha256:[A-Za-z0-9_-]{43}|ed25519:[A-Za-z0-9_-]{86})"
     r"(?![A-Za-z0-9_-])"
 )
 GENERATED_PUBLIC_KEY_PATTERN = re.compile(r"[A-Za-z0-9_-]{43}")
-GENERATED_VALUE_PLACEHOLDER = "[satgate-generated]"
+# Stay inside main's Bearer token class so a match starting before a masked
+# value (Bearer + space + the whole value) is preserved, not erased.
+GENERATED_VALUE_PLACEHOLDER = "satgate-generated"
 
 
 def mask_receipt_public_key(receipt: Any) -> Any:

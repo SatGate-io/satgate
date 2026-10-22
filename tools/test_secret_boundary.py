@@ -17,13 +17,24 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 
 ROOT = Path(__file__).resolve().parents[1]
-SHARED_BLOCK_SHA256 = "1ec5defaf2d31cd45ecbbbbd6eb3f0855f6ee3270f31ac21356c19e0489c7d61"
+SHARED_BLOCK_SHA256 = "47739e6611ea893fe390ec1ee6e263de098f6cb196b999617ea2817358308d60"
 MARKERS = ("stk_fixture", "sgcap_fixture", "Bearer fixture", "bEaReR fixture")
 ENCODED_STARTS = ("Bearer%20", "token%3D", "user%3A", "path%2F", "Bearer+",
                   "bEaReR+", "+", "token+", "token%3d", "user%3a", "path%2f")
 ALPHABET = string.ascii_letters + string.digits + "_-"
 SHAPES = (("evid_", 32), ("rcpt_", 22), ("ep_", 22), ("receipt-", 22),
           ("sha256:", 43), ("ed25519:", 86))
+# Sealed policy budget ids are 64 characters TOTAL (mint- plus 59 hex).
+# No-budget mint-/dlg- row ids are not HTTP spend subjects.
+NEW_SHAPES = (
+    ("quote", "quote_", 32, "access_id"),
+    *((subject, subject + "-", 22, "request_id")
+      for subject in ("observe", "req", "budget", "policy", "degradation")),
+    ("mint_budget", "mint-" + "a" * 59 + "-", 22, "request_id"),
+    ("delegation_budget", "a" * 32 + "-", 22, "request_id"),
+    ("child_budget", "del-" + "a" * 24 + "-", 22, "request_id"),
+    ("uuid_budget", "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa-", 22, "request_id"),
+)
 EXPECTED = [(r"Bearer\s+[A-Za-z0-9._~+/=-]+", re.IGNORECASE | re.UNICODE),
             (r"sgcap_[A-Za-z0-9._~+/=-]+", re.UNICODE),
             (r"stk_[A-Za-z0-9._~+/=-]+", re.UNICODE)]
@@ -230,6 +241,38 @@ class SecretBoundary(unittest.TestCase):
     def test_access_id_signed_pack(self):
         self.assert_pack("evid_" + "A" * 12 + "stk_" + "B" * 16, False, "access_id")
 
+    def test_bearer_whole_generated_values_matches_main(self):
+        # This match starts OUTSIDE the generated value. The placeholder must
+        # preserve it even if the body itself has no credential marker.
+        shapes = SHAPES + tuple((p, n) for _, p, n, _ in NEW_SHAPES)
+        for index, (prefix, length) in enumerate(shapes):
+            for scheme in ("Bearer", "bEaReR"):
+                for spaces in (" ", "  "):
+                    with self.subTest(shape=index, mixed=scheme != "Bearer", spaces=len(spaces)):
+                        self.assert_pack(scheme + spaces + prefix + "A" * length, True)
+            # JSON escaping means main does not see these as whitespace.
+            for whitespace in ("\t", "\n", "\r"):
+                with self.subTest(shape=index, whitespace=ord(whitespace)):
+                    self.assert_pack("Bearer" + whitespace + prefix + "A" * length, False)
+
+    def test_unaudited_request_subjects_stay_scanned(self):
+        # These are NOT sealed HTTP budget subjects, despite resembling row ids.
+        prefixes = ("caller-", "route-name-", "mint-" + "a" * 24 + "-",
+                    "mint-" + "a" * 58 + "-", "mint-" + "a" * 60 + "-",
+                    "mint-" + "a" * 64 + "-", "dlg-" + "a" * 24 + "-",
+                    "del-" + "a" * 23 + "-", "del-" + "a" * 25 + "-",
+                    "a" * 31 + "-", "a" * 33 + "-", "A" * 32 + "-",
+                    "mint-" + "A" * 59 + "-", "del-" + "A" * 24 + "-",
+                    "aaaaaaaa-aaaa-3aaa-8aaa-aaaaaaaaaaaa-",
+                    "aaaaaaaa-aaaa-4aaa-7aaa-aaaaaaaaaaaa-")
+        for index, prefix in enumerate(prefixes):
+            for marker in ("stk_Q", "sgcap_Q"):
+                with self.subTest(prefix=index, marker_size=len(marker)):
+                    self.assert_pack(generated(prefix, 22, marker, 1), True, "request_id")
+        # A secret in the prefix must not be hidden by a generated suffix.
+        for marker in MARKERS:
+            self.assert_pack(marker + "-" + "A" * 22, True, "request_id")
+
     def test_sensitive_fields_are_unchanged(self):
         for field in ("raw_capability_token", "authorization_header", "payment_secret"):
             for value in ("fixture_without_a_prefix", "evid_" + "A" * 32):
@@ -261,8 +304,59 @@ class SecretBoundary(unittest.TestCase):
             self.assertIn('generateEvidenceRequestID("receipt")', evidence)
             self.assertIn('var b [16]byte', evidence)
             self.assertIn('fmt.Sprintf("%s-%s", subject, base64.RawURLEncoding.EncodeToString(b[:]))', evidence)
+            proxy = (gateway / "proxy" / "proxy.go").read_text()
+            for expression in ('var b [16]byte', 'subject = "req"',
+                               'bindDecisionRequestID(r, "budget")',
+                               'generateBudgetRequestID("degradation")',
+                               'bindAndStampDecisionRequestID(w, r, "observe")',
+                               'subject := "policy"',
+                               'bindDecisionRequestID(r, principal.BudgetSubjectID)'):
+                self.assertIn(expression, proxy)
+            receipt = (gateway / "proxy" / "receipt.go").read_text()
+            self.assertIn('"quote_" + strings.TrimPrefix(evidenceAccessID, "evid_")', receipt)
+            mint = (gateway / "mint" / "mint.go").read_text()
+            self.assertIn('budgetID := fmt.Sprintf("mint-%s", sha256Sum(', mint)
+            self.assertIn('budgetID = budgetID[:64]', mint)
+            delegation = (gateway / "cloud" / "delegation" / "delegation_v2.go").read_text()
+            self.assertIn('b := make([]byte, 16)', delegation)
+            self.assertIn('return hex.EncodeToString(b)', delegation)
+            cloud = (gateway / "cloud" / "cloud.go").read_text()
+            for expression in ('b[6] = (b[6] & 0x0f) | 0x40',
+                               'b[8] = (b[8] & 0x3f) | 0x80',
+                               '"budget_id = "+tokenID'):
+                self.assertIn(expression, cloud)
             cursor = (gateway / "cloud" / "evidence_packs_api.go").read_text()
             self.assertIn('base64.RawURLEncoding.EncodeToString(append(nonce, sealed...))', cursor)
+
+
+def new_shape_contract(prefix, length, location):
+    def test(self):
+        for marker in ("stk_Q", "sgcap_Q"):
+            for offset in (0, length // 2, length - len(marker)):
+                body = generated("", length, marker, offset)
+                value = prefix + body
+                with self.subTest(marker_size=len(marker), offset=offset):
+                    self.assert_pack(value, False, location)
+                    self.assert_pack("https://issuer.example/" + value + "?v=1", False, location)
+                    # Same random body, but no audited subject.
+                    self.assert_pack("caller-" + body, True, location)
+            # Shorten padding, not the marker itself. All 64 continuations on
+            # BOTH sides, and short/long bodies, must still be scanned.
+            value = generated(prefix, length, marker, 1)
+            variants = (value[:-1], value + "B") + tuple(c + value for c in ALPHABET) + tuple(value + c for c in ALPHABET)
+            for index, variant in enumerate(variants):
+                with self.subTest(marker_size=len(marker), variant=index):
+                    self.assert_pack(variant, True, location)
+            # A credential adjacent to a generated value is never erased.
+            for separator in ("", "/", ".", "~", " ", "\n", "\t", "\r"):
+                self.assert_pack(value + separator + marker, True, location)
+                self.assert_pack(marker + separator + value, True, location)
+    return test
+
+
+for _name, _prefix, _length, _location in NEW_SHAPES:
+    setattr(SecretBoundary, "test_round3_shape_" + _name,
+            new_shape_contract(_prefix, _length, _location))
 
 
 if __name__ == "__main__":
