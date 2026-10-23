@@ -1,108 +1,76 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import {readFileSync} from 'node:fs';
+import path from 'node:path';
+import ReceiptChecker from './ReceiptChecker';
+import {HELD_RECEIPT_COPY} from './held-receipt-copy';
 
+const title = 'Check a SatGate receipt';
+const description = HELD_RECEIPT_COPY.lead;
 export const metadata: Metadata = {
-  title: { absolute: 'Verify a SatGate receipt' },
-  description: 'Check a SatGate receipt yourself, with no SatGate account: download a real signed receipt (Evidence Pack) and verify its Ed25519 signature against the published keys.',
-  alternates: { canonical: 'https://satgate.io/verify-evidence-pack' },
+  title: {absolute:title}, description,
+  alternates: {canonical:'https://satgate.io/verify-evidence-pack'},
+  openGraph: {title, description, url:'https://satgate.io/verify-evidence-pack', images:[{url:'/og.png',width:1200,height:630}]},
+  twitter: {card:'summary_large_image',title,description,images:['/og.png']},
 };
-
-const livePackUrl = 'https://satgate-mcp-saas.fly.dev/v1/evidence/evid_65RDOGL30IHpIRyugWFOLFKgew_wK-QK';
 const samplePackFile = '/evidence/mcp-budget-refusal-20261005.json';
-const samplePackJwks = 'https://satgate-mcp-saas.fly.dev/.well-known/jwks.json';
-
-export default function VerifyEvidencePackPage() {
-  return (
-    <main className="min-h-screen bg-black text-white">
-      <section className="border-b border-white/10 px-6 py-20">
-        <div className="mx-auto max-w-4xl">
-          <Link href="/" className="text-sm text-gray-400 hover:text-white">← Back to Home</Link>
-          <p className="mt-10 text-sm font-bold uppercase tracking-[0.24em] text-cyan-300">Check it yourself</p>
-          <h1 className="mt-4 text-5xl font-black tracking-tight sm:text-6xl">Don&apos;t trust us. Check it yourself.</h1>
-          <p className="mt-6 text-xl leading-8 text-gray-300">
-            You don&apos;t need a SatGate account to check a signed receipt (Evidence Pack). Download the pack and SatGate&apos;s published public keys, then run the open-source verifier. It confirms SatGate signed the receipt and that nothing in it was changed afterward.
-          </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a href="https://github.com/SatGate-io/satgate/tree/main/tools" className="rounded-lg bg-white px-5 py-3 text-center font-bold text-black hover:bg-gray-200">Get verifier tool</a>
-            <a href={samplePackFile} className="rounded-lg border border-cyan-300/40 px-5 py-3 text-center font-bold text-cyan-100 hover:border-cyan-200">Download a real receipt</a>
-          </div>
-          <p className="mt-4 text-sm leading-6 text-gray-400">
-            This is the budget refusal from the MCP demo video on the home page: a tool call refused with <code>budget_exhausted</code> after the agent&apos;s 3-credit budget ran out. It&apos;s signed with the hosted MCP service&apos;s key. The <a href={livePackUrl} className="text-cyan-200 underline underline-offset-4">live copy</a> stays up until the plan&apos;s retention period ends; the downloaded file verifies the same way.
-          </p>
-        </div>
-      </section>
-
-      <section className="border-b border-white/10 px-6 py-16">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="text-3xl font-black">What the result means.</h2>
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-5 text-amber-50">
-              <h3 className="font-bold"><code>valid=true</code></h3>
-              <p className="mt-2 text-sm leading-6">Checked with the key stored inside the pack, this only shows the pack is consistent with itself. It doesn&apos;t show who signed it.</p>
-            </div>
-            <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-5 text-emerald-50">
-              <h3 className="font-bold"><code>trusted_issuer_valid=true</code></h3>
-              <p className="mt-2 text-sm leading-6">This is the one that matters: the signature checks out against SatGate&apos;s public keys, downloaded separately from the pack.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="px-6 py-16">
-        <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
-          <article className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-            <h2 className="text-2xl font-black">Run the verifier</h2>
-            <pre className="mt-5 overflow-x-auto rounded-xl bg-black p-4 text-sm text-gray-300"><code>{`python3 -m venv .venv-verify
+const commands = `git clone https://github.com/SatGate-io/satgate.git
+cd satgate
+python3 -m venv .venv-verify
 . .venv-verify/bin/activate
 pip install cryptography rfc8785
 curl -fsS https://satgate.io${samplePackFile} -o pack.json
-curl -fsS ${samplePackJwks} -o jwks.json
-python tools/verify_evidence_pack.py pack.json \
-  --jwks-file jwks.json \
-  --require-trusted-issuer`}</code></pre>
-          </article>
-
-          <article className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-            <h2 className="text-2xl font-black">What the verifier checks</h2>
-            <ul className="mt-5 space-y-3 text-gray-300">
-              <li>• The receipt format version, and whether it&apos;s marked as real or a test.</li>
-              <li>• It rebuilds the signed content in a standard form (RFC 8785), leaving out <code>receipt_hash</code> and <code>signature</code>.</li>
-              <li>• The SHA-256 <code>receipt_hash</code> and the Ed25519 signature.</li>
-              <li>• The signature against SatGate&apos;s public keys at <code>/.well-known/jwks.json</code>. A key stored in the pack is only a fallback and doesn&apos;t prove who signed.</li>
-              <li>• The copies of the result and budget at the top of the pack match the signed receipt.</li>
-              <li>• The optional <code>evidence_pack_hash</code>, and that tokens and secrets are blanked out.</li>
-            </ul>
-          </article>
-        </div>
+curl -fsS https://satgate-mcp-saas.fly.dev/.well-known/jwks.json -o jwks.json
+python tools/verify_evidence_pack.py pack.json \\
+  --jwks-file jwks.json \\
+  --require-trusted-issuer`;
+export default function VerifyEvidencePackPage() {
+  const build = JSON.parse(readFileSync(path.join(process.cwd(),'public/receipt-checker/build.json'),'utf8'));
+  return <main className="min-h-screen bg-black px-6 py-16 text-white sm:py-24">
+    <div className="mx-auto max-w-3xl space-y-12 text-lg leading-8 text-gray-300">
+      <header>
+        <h1 className="text-4xl font-black leading-tight tracking-tight text-white sm:text-6xl">Check a SatGate receipt</h1>
+        <p className="mt-6 text-xl">{HELD_RECEIPT_COPY.lead}</p>
+      </header>
+      <section>
+        <h2 className="mb-4 text-2xl font-bold text-white">Why it matters</h2>
+        <p>A receipt records what your agent asked for and what SatGate decided. Your agent never writes or edits its own record. Because anyone can check a receipt, you can hand one to an accountant, an auditor or a customer, and they can confirm it for themselves.</p>
       </section>
-
-      <section className="border-t border-white/10 px-6 py-16">
-        <div className="mx-auto max-w-4xl">
-          <h2 className="text-3xl font-black">Current limits</h2>
-          <ul className="mt-6 space-y-3 text-gray-300">
-            <li>• Signing keys are stored as platform secrets. We don&apos;t claim they sit in a hardware security module, and no outside firm has audited them.</li>
-            <li>• Receipts are kept in durable storage. They aren&apos;t anchored anywhere outside SatGate, and the storage isn&apos;t write-once.</li>
-            <li>• Anyone with a receipt link can open it, until the retention period ends or the pack is deleted. Share links with care.</li>
-            <li>• A pass means the receipt is intact and SatGate signed it. It says nothing about what your API did next, whether a payment settled, or regulatory compliance.</li>
-          </ul>
-        </div>
+      <section>
+        <h2 className="mb-4 text-2xl font-bold text-white">Check one in three steps</h2>
+        <ol className="list-decimal space-y-3 pl-6">
+          <li>{HELD_RECEIPT_COPY.stepOne}</li>
+          <li>Drop the file on the box below.</li>
+          <li>Read the result. Valid means SatGate signed this receipt and what it signed hasn&apos;t changed since. Not valid means don&apos;t rely on it.</li>
+        </ol>
+        <ReceiptChecker />
+        <p className="mt-3 text-sm text-gray-400">One-time checker download: {(build.bytes / 1000000).toFixed(2)} MB ({build.bytes.toLocaleString('en-US')} bytes, before transfer compression).</p>
       </section>
-
-      <section className="border-t border-white/10 px-6 py-16">
-        <div className="mx-auto max-w-4xl">
-          <h2 className="text-3xl font-black">What a pass proves, and what it doesn&apos;t.</h2>
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-5 text-emerald-50">
-              <h3 className="font-bold">Proves</h3>
-              <p className="mt-2 text-sm leading-6">The key named in <code>issuer_kid</code> signed the receipt. Any change to a signed field makes the check fail. The rest of the pack agrees with the signed receipt, and tokens and secrets are blanked out.</p>
-            </div>
-            <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-5 text-amber-50">
-              <h3 className="font-bold">Does not prove by itself</h3>
-              <p className="mt-2 text-sm leading-6">That a payment settled, that your API&apos;s own logs agree, that a revoke took effect everywhere instantly, or anything else beyond this one receipt.</p>
-            </div>
-          </div>
-        </div>
+      <section>
+        <h2 className="mb-4 text-2xl font-bold text-white">{HELD_RECEIPT_COPY.coverageHeading}</h2>
+        {HELD_RECEIPT_COPY.coverage.map((text,index)=><p key={text} className={index ? 'mt-4' : ''}>{text}</p>)}
       </section>
-    </main>
-  );
+      <section>
+        <h2 className="mb-4 text-2xl font-bold text-white">What a valid receipt doesn&apos;t show</h2>
+        <p>It shows what SatGate decided. It doesn&apos;t show what happened after SatGate let a request through, for example whether a broker filled an order or whether a payment settled.</p>
+      </section>
+      <section id="engineers" className="min-w-0 border-t border-white/10 pt-12 text-base leading-7">
+        <h2 className="mb-4 text-2xl font-bold text-white">For engineers: check it on your own computer</h2>
+        <p>The checker on this page runs the open-source verifier, tools/verify_evidence_pack.py from github.com/SatGate-io/satgate, inside your browser. The file it runs has the SHA-256 shown here, the same as that file on GitHub: <code className="break-all text-cyan-200">{build.verifiers['verify_evidence_pack.py'].sha256}</code>.</p>
+        <p className="mt-4 break-all">tools/verify_receipt_record.py SHA-256: <code className="text-cyan-200">{build.verifiers['verify_receipt_record.py'].sha256}</code></p>
+        <p className="mt-6">To run the verifier on your own computer:</p>
+        <pre className="mt-4 max-w-full overflow-x-auto rounded-xl border border-white/10 bg-white/5 p-5 text-sm leading-6"><code>{commands}</code></pre>
+        <p className="mt-4 break-words">Cloud gateway keys: <a href="https://api.satgate.io/.well-known/jwks.json" className="break-all text-cyan-200 underline">https://api.satgate.io/.well-known/jwks.json</a></p>
+        <p className="mt-2 break-words">Cloud MCP keys: <a href="https://satgate-mcp-saas.fly.dev/.well-known/jwks.json" className="break-all text-cyan-200 underline">https://satgate-mcp-saas.fly.dev/.well-known/jwks.json</a></p>
+        <p className="mt-6">Two results matter. valid=true means the receipt passed the checks you asked for; a check against only the key embedded in a receipt doesn&apos;t say who signed it. trusted_issuer_valid=true means it matched SatGate&apos;s published key, fetched separately. That&apos;s the check that counts, and it&apos;s the only one this page calls Valid.</p>
+        <p className="mt-4">A self-hosted SatGate gateway signs with its own key. Check its receipts against that gateway&apos;s published keys.</p>
+        <h3 className="mb-4 mt-8 text-xl font-bold text-white">Limits</h3>
+        <ul className="list-disc space-y-3 pl-6">
+          <li>Anyone with a pack&apos;s link can open that pack until it&apos;s deleted, so share links with care.</li>
+          <li>Our signing keys are kept in our hosting provider&apos;s secret storage, not in a hardware security module, and they haven&apos;t had an outside security assessment.</li>
+          <li>Receipts are stored in SatGate&apos;s own storage. Nothing outside SatGate anchors them, so keep your own copy of any receipt you rely on.</li>
+          <li>A valid check shows the receipt is intact and was signed with SatGate&apos;s key. It doesn&apos;t show what an outside service did, whether money settled, or that you meet any regulation.</li>
+        </ul>
+      </section>
+    </div>
+  </main>;
 }

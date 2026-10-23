@@ -17,6 +17,8 @@ sdk/nodejs/dist/
 
 # Next.js build output
 .next/
+# Pinned browser runtime and byte-identical tools copies, generated before build
+satgate-landing/public/receipt-checker/
 
 # Environment secrets
 .env.local
