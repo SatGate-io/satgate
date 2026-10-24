@@ -162,6 +162,58 @@ A gateway with the sign-every-action switch on signs a receipt for each call a v
 
 **Observe gap.** `allowed` / `observe_unrecorded`: the signed count of Observe calls that went through in one UTC minute with no receipt. `unrecorded_window_start` (UTC minute), `unrecorded_window_seconds` (the integer `60`), `unrecorded_calls` (integer, at least 1), no `rate_limit_*` field, no balance claim, verified-key authority, and issued at or after the end of its window. Without a window or a count it is refused. Demo also refuses the reason on any budget but `not_evaluated`.
 
+## Unavailable-check refusal — reader-only support
+
+Bundle `unavailable-check-v1` adds exactly `tool_price_unavailable`,
+`tool_controls_unavailable`, `budget_backend_error`, and
+`pending_capacity_exhausted`. Each is an explicit `denied` pair in both public
+copies, never an allowed/paid, rate-window or Observe gap pair. These reasons
+are no-budget-only, not optional evaluated profiles. SatGate does not yet sign
+these outage blocks; this release changes readers only. Signer/identity/archive
+failure remains unsigned. The reason meanings are specified in
+`docs/reference/receipt-schema.md`.
+
+The fourth strict no-balance shape uses exactly
+`{"spend_mode":"not_evaluated","cost_credits":0}` for receipt `budget` and Pack
+`budget_state`, with integer zero and no extra keys. Receipt `policy` and
+`metadata` are objects. Authority must name a verified key:
+`verified_macaroon_caveats`, nonempty capability hash equal to the receipt's,
+only `VERIFIED_CAPABILITY_AUTHORITY_FIELDS`, and all four raw fields present as
+`redacted`. Required Pack `authority`, `budget` and `policy` mirrors must match
+the signed objects recursively in concrete JSON type and value. The same
+recursive forbidden-claim scan as the other strict no-balance shapes applies
+outside the exact budget objects, to receipt and wrapper alike, including
+extensions. No balance, attempted, remaining, limit, projected, spend or payment
+claims, invented prices or approval outcomes. Any window/gap field is refused.
+Malformed new profiles cannot fall back to legacy enum-only checking.
+
+These rules do not broaden `policy_denied`, paid rail, or any existing profile.
+Both copies retain their prior optional `issued_at`/`evidence_url` mirror behavior
+outside the gap profile. Existing signature, trust, time, hash and redaction
+checks remain mandatory. Signed positive and negative cases exercise both APIs
+and actual CLIs in `tools/test_unavailable_check_receipts.py`.
+
+### Minimum reader and immutable distribution
+
+Checkers older than this release reject all four reasons, even with valid
+signatures. Frozen public module `v0.5.3-0.20261022091107-d599b7e3b9af` readers,
+including the byte-identical tools pair at dashboard pin
+`3395b48f8a2d87001708160a09de6dc551141549`, are tested to keep that boundary
+explicit. New readers continue checking old receipts; they cannot repair saved
+old readers. Unknown reasons/schemas/record lines remain invalid, not silently
+skipped. Additive context, an input profile or an invented critical extension
+is not reason-version negotiation.
+
+`tools/checker-bundles/unavailable-check-v1/` freezes one matching record script,
+sibling pack script, requirements and this contract with `SHA256SUMS`. Do not
+edit this version after release; ship a new version for later changes. Download
+from a reviewed immutable commit/ref and verify hashes from that trusted source
+before execution (instructions in `tools/README.md`). Never trust a file's own
+version string or auto-execute a checker linked by an untrusted record. Archive
+the matching bundle/ref with record-download guidance. The separate linked
+`SatGate-io/evidence-pack-verifier` is a first-receipt signature checker, not an
+interchangeable full semantic pack or whole-record checker.
+
 ## Receipt record
 
 `tools/verify_receipt_record.py` checks a downloaded record: NDJSON, one `satgate.evidence_pack.v1` pack per line in `issued_at` order, then exactly one last signed line: a complete manifest or a truncation terminal. Missing, repeated or misplaced terminals fail closed.

@@ -1,0 +1,1527 @@
+#!/usr/bin/env python3
+"""Verify a public SatGate Evidence Pack.
+
+Usage:
+  python demo/verify_evidence_pack.py https://api.satgate.io/v1/evidence/evid_...
+  python demo/verify_evidence_pack.py ./evidence-pack.json
+  curl -fsS ... | python demo/verify_evidence_pack.py -
+
+The verifier needs no SatGate auth. It validates the proof artifact itself:
+- Evidence Pack schema version
+- embedded receipt hash
+- Ed25519 receipt signature against either a caller-supplied issuer JWKS or the embedded public key
+- top-level pack fields matching the embedded receipt
+- obvious bearer-token leakage markers
+
+By default the verifier requires issuer-anchored verification and auto-discovers the
+issuer JWKS from the receipt issuer origin. Pass --allow-embedded-key to downgrade to
+embedded-key self-verification for demo/self-signed packs; that mode only proves the
+artifact is internally self-consistent, NOT that a trusted issuer signed it.
+"""
+
+from __future__ import annotations
+
+import argparse
+import base64
+import hashlib
+import ipaddress
+from datetime import datetime, timezone, timedelta
+from decimal import Decimal, InvalidOperation
+import json
+import re
+import sys
+import urllib.error
+import urllib.parse
+import urllib.request
+import unicodedata
+from pathlib import Path
+from typing import Any
+
+VENDOR_DIR = Path(__file__).resolve().parent / "_vendor"
+if VENDOR_DIR.exists():
+    sys.path.insert(0, str(VENDOR_DIR))
+
+try:
+    import rfc8785
+except Exception:  # pragma: no cover - vendored package should be present
+    rfc8785 = None
+
+try:
+    from cryptography.exceptions import InvalidSignature
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+except Exception:  # pragma: no cover - exercised only in minimal Python envs
+    InvalidSignature = Exception
+    Ed25519PublicKey = None
+
+EXPECTED_PACK_SCHEMA = "satgate.evidence_pack.v1"
+EXPECTED_RECEIPT_SCHEMA = "satgate.receipt.v1"
+SUPPORTED_CANONICALIZATION = "jcs-rfc8785"
+DECISION_REASON_PROFILES = {
+    ("allowed", "budget_authorized"): "evaluated",
+    ("allowed", "policy_allowed"): "evaluated",
+    ("allowed", "observe_unrecorded"): "evaluated",
+    ("allowed", "sandbox_no_spend"): "sandbox_no_spend",
+    ("allowed", "observe_projected"): "projected_only",
+    ("allowed", "payment_verified"): "paid_rail",
+    ("paid", "payment_verified"): "paid_rail",
+    ("denied", "budget_exhausted"): "evaluated",
+    ("denied", "insufficient_budget"): "evaluated",
+    ("denied", "policy_denied"): "evaluated",
+    ("denied", "capability_invalid"): "not_evaluated",
+    ("denied", "capability_expired"): "not_evaluated",
+    ("denied", "auth_missing"): "not_evaluated",
+    ("denied", "token_revoked"): "not_evaluated",
+    ("denied", "payment_required"): "not_evaluated",
+}
+ALLOWED_DECISIONS = {decision for decision, _ in DECISION_REASON_PROFILES}
+ALLOWED_DECISION_REASONS = {reason for _, reason in DECISION_REASON_PROFILES}
+# A verified capability refused by policy before any budget lookup (for example
+# a scope miss). The capability is real, so authority stays the verified form;
+# no balance was read, so the receipt makes no limit, remaining, or spend claim.
+# Only these decision/reason pairs may use it, and only when the signed budget
+# says spend_mode not_evaluated. Every other policy_denied receipt keeps the
+# evaluated profile unchanged.
+#
+# Two more pairs use it. allowed / policy_allowed is a call that was allowed
+# and read no balance (a free tool, a key with no budget): with spend_mode
+# not_evaluated it makes no balance claim, and with an evaluated budget it is
+# judged as it always was. allowed / observe_unrecorded is a gap receipt, the
+# signed count of Observe calls that went through with no receipt; it has no
+# balance to evaluate, so it is legal only with spend_mode not_evaluated.
+VERIFIED_NOT_EVALUATED_PAIRS = {
+    ("denied", "policy_denied"),
+    ("allowed", "policy_allowed"),
+    ("allowed", "observe_unrecorded"),
+}
+NOT_EVALUATED_ONLY_PAIRS = {("allowed", "observe_unrecorded")}
+VERIFIED_NOT_EVALUATED_BUDGET = {"spend_mode": "not_evaluated", "cost_credits": 0}
+VERIFIED_CAPABILITY_AUTHORITY_FIELDS = {
+    "budget_id_hash", "budget_subject_hash", "capability_hash", "delegation_budget",
+    "delegation_depth", "parent_token_id_hash", "provenance_level", "raw_budget_id",
+    "raw_capability_token", "raw_parent_token_id", "raw_token_id", "token_id_hash",
+}
+VERIFIED_CAPABILITY_RAW_FIELDS = ("raw_budget_id", "raw_capability_token", "raw_parent_token_id", "raw_token_id")
+VERIFIED_NOT_EVALUATED_FORBIDDEN_FIELDS = {
+    "amount_atomic", "amount_sats", "amount_usd", "attempted_amount_usd", "currency",
+    "invoice_hash", "macaroon_hash", "paid_rail_context", "payment_hash",
+    "projected_cost_credits", "rail", "remaining_budget_usd",
+}
+# A scope refusal reads no balance, so no key that states a limit, remaining,
+# used, spent, attempted or projected amount may appear anywhere in the receipt
+# outside the strict budget object, or anywhere on the Pack wrapper. Matching is
+# by exact name and by marker so a renamed or nested balance field still fails.
+VERIFIED_NOT_EVALUATED_BALANCE_FIELDS = {
+    "attempted_amount_usd", "limit", "limit_credits", "projected_cost_credits",
+    "remaining_after_credits", "remaining_before_credits", "remaining_budget_usd",
+    "remaining_credits", "spent_credits", "used", "used_credits",
+}
+VERIFIED_NOT_EVALUATED_BALANCE_MARKERS = (
+    "attempted_amount", "balance", "limit_credits", "projected_cost", "remaining",
+    "spent", "used_credits",
+)
+
+
+def decision_profile_for(receipt: Any) -> str | None:
+    if not isinstance(receipt, dict):
+        return None
+    decision = str(receipt.get("decision", ""))
+    reason = str(receipt.get("decision_reason", ""))
+    profile = DECISION_REASON_PROFILES.get((decision, reason))
+    budget = receipt.get("budget")
+    if (decision, reason) in VERIFIED_NOT_EVALUATED_PAIRS and isinstance(budget, dict) and budget.get("spend_mode") == "not_evaluated":
+        return "verified_not_evaluated"
+    if (decision, reason) in NOT_EVALUATED_ONLY_PAIRS:
+        return None
+    return profile
+DEFAULT_CLOCK_SKEW_SECONDS = 300
+SECRET_PATTERNS = [
+    re.compile(r"Bearer\s+[A-Za-z0-9._~+/=-]+", re.IGNORECASE),
+    re.compile(r"sgcap_[A-Za-z0-9._~+/=-]+"),
+    re.compile(r"stk_[A-Za-z0-9._~+/=-]+"),
+]
+PAID_RAIL_FIELDS = {"rail", "payment_hash", "invoice_hash", "macaroon_hash", "amount_sats"}
+CREDIT_USD_FIELDS = {
+    "amount_usd", "attempted_amount_usd", "remaining_budget_usd", "currency",
+    "credit_unit", "cost_credits", "limit_credits", "remaining_before_credits",
+    "remaining_after_credits", "remaining_credits", "projected_cost_credits",
+}
+
+
+def is_zero_amount(value):
+    if value is None:
+        return True
+    try:
+        return Decimal(str(value)) == 0
+    except (InvalidOperation, ValueError):
+        return False
+
+
+def balance_key_form(key: str) -> str:
+    """Fold a key to lower-case letters and digits only, so camelCase, kebab-case,
+    upper-case and full-width spellings of a balance key ("limitCredits",
+    "Remaining-Budget", "USED_CREDITS") compare like their snake_case names."""
+    folded = unicodedata.normalize("NFKC", key).casefold()
+    return "".join(ch for ch in folded if ch.isalnum())
+
+
+VERIFIED_NOT_EVALUATED_BALANCE_FIELD_FORMS = frozenset(
+    balance_key_form(key) for key in VERIFIED_NOT_EVALUATED_BALANCE_FIELDS
+)
+VERIFIED_NOT_EVALUATED_BALANCE_MARKER_FORMS = tuple(
+    balance_key_form(marker) for marker in VERIFIED_NOT_EVALUATED_BALANCE_MARKERS
+)
+
+
+def contains_balance_claim(value: Any) -> bool:
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if isinstance(key, str):
+                form = balance_key_form(key)
+                if form in VERIFIED_NOT_EVALUATED_BALANCE_FIELD_FORMS or any(
+                    marker in form for marker in VERIFIED_NOT_EVALUATED_BALANCE_MARKER_FORMS
+                ):
+                    return True
+            if contains_balance_claim(child):
+                return True
+        return False
+    if isinstance(value, list):
+        return any(contains_balance_claim(child) for child in value)
+    return False
+
+
+def contains_any_key(value: Any, forbidden: set[str]) -> bool:
+    if isinstance(value, dict):
+        return any(key in forbidden or contains_any_key(child, forbidden) for key, child in value.items())
+    if isinstance(value, list):
+        return any(contains_any_key(child, forbidden) for child in value)
+    return False
+
+
+# The new receipt profiles (allowed without a balance, a window opener or
+# closer, a gap record) make no payment, spend or balance claim anywhere. A key
+# that states one is refused at any depth, by exact name or by marker, whatever
+# its case or punctuation. The old evaluated and paid profiles are not judged by
+# this rule. tools/verify_evidence_pack.py holds the same rule.
+NEW_PROFILE_CLAIM_FIELDS = (
+    VERIFIED_NOT_EVALUATED_FORBIDDEN_FIELDS | VERIFIED_NOT_EVALUATED_BALANCE_FIELDS
+    | {"transaction", "payer", "pay_to", "credit_unit", "cost_credits", "spend_mode"}
+)
+NEW_PROFILE_CLAIM_MARKERS = VERIFIED_NOT_EVALUATED_BALANCE_MARKERS + (
+    "payment", "invoice", "preimage", "amountsat", "amountusd", "amountatomic",
+)
+NEW_PROFILE_CLAIM_FIELD_FORMS = frozenset(balance_key_form(k) for k in NEW_PROFILE_CLAIM_FIELDS)
+NEW_PROFILE_CLAIM_MARKER_FORMS = tuple(balance_key_form(m) for m in NEW_PROFILE_CLAIM_MARKERS)
+
+
+def contains_forbidden_claim(value: Any) -> bool:
+    """True if any key, at any depth, is a payment, spend or balance claim."""
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if isinstance(key, str):
+                form = balance_key_form(key)
+                if form in NEW_PROFILE_CLAIM_FIELD_FORMS or any(m in form for m in NEW_PROFILE_CLAIM_MARKER_FORMS):
+                    return True
+            if contains_forbidden_claim(child):
+                return True
+        return False
+    if isinstance(value, list):
+        return any(contains_forbidden_claim(child) for child in value)
+    return False
+
+
+class VerificationError(Exception):
+    pass
+
+
+def add_reason(reasons: list[str], reason_codes: list[str] | None, code: str, message: str) -> None:
+    reasons.append(message)
+    if reason_codes is not None and code not in reason_codes:
+        reason_codes.append(code)
+
+
+def parse_rfc3339(value: Any, reasons: list[str], reason_codes: list[str], field: str) -> datetime | None:
+    """Parse an RFC 3339 section 5.6 date-time into an aware UTC datetime.
+
+    Supported range: years 0001 to 9999 (Python's datetime range), as ruled on
+    #226 and #485. Year 0000 is malformed, and so is a value whose UTC instant
+    falls outside that range once its offset is applied
+    (0001-01-01T00:00:00+01:00, 9999-12-31T23:59:59-01:00). A value outside
+    the grammar or the range adds malformed_<field>; a missing one adds
+    missing_<field>. Returns None in both cases.
+    """
+    if not isinstance(value, str) or not value:
+        add_reason(reasons, reason_codes, f"missing_{field}", f"receipt.{field} missing")
+        return None
+    try:
+        # Strict RFC 3339 section 5.6 grammar, checked BEFORE any normalisation
+        # or datetime.fromisoformat (which also accepts non-RFC3339 shapes such
+        # as a missing seconds field, a space separator, and offsets with
+        # seconds). ASCII digits only; re.fullmatch so a trailing newline fails.
+        #   date-time = YYYY-MM-DD ("T"/"t") hh:mm:ss [.digits] ("Z"/"z" | +-hh:mm)
+        m = re.fullmatch(
+            r"([0-9]{4})-([0-9]{2})-([0-9]{2})[Tt]([0-9]{2}):([0-9]{2}):([0-9]{2})"
+            r"(?:\.([0-9]+))?(?:[Zz]|([+-])([0-9]{2}):([0-9]{2}))",
+            value,
+        )
+        if m is None:
+            raise ValueError("not an RFC 3339 date-time")
+        year, month, day, hour, minute, second = (int(m.group(i)) for i in range(1, 7))
+        offset_hour = int(m.group(9)) if m.group(8) else 0
+        offset_minute = int(m.group(10)) if m.group(8) else 0
+        leap = year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+        days_in_month = (31, 29 if leap else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+        if not (
+            1 <= month <= 12
+            and 1 <= day <= days_in_month[month - 1]
+            and hour <= 23
+            and minute <= 59
+            and second <= 60
+            and offset_hour <= 23
+            and offset_minute <= 59
+        ):
+            raise ValueError("RFC 3339 field out of range")
+        # second == 60 (leap second) passes the range check above but is then
+        # rejected by datetime, which has no leap seconds. This fails closed and
+        # matches Go's time.Parse, so gateway receipts never carry it.
+        # Normalise for datetime only: Z/z -> +00:00, fraction truncated to 6
+        # digits or right-padded with zeros (Python < 3.11 fromisoformat takes
+        # exactly 3 or 6). The original string still participates in receipt
+        # hash/signature verification unchanged.
+        fraction = (m.group(7) or "")[:6].ljust(6, "0")
+        offset = f"{m.group(8)}{m.group(9)}:{m.group(10)}" if m.group(8) else "+00:00"
+        parsed = datetime.fromisoformat(
+            f"{m.group(1)}-{m.group(2)}-{m.group(3)}T{m.group(4)}:{m.group(5)}:{m.group(6)}.{fraction}{offset}"
+        )
+        return parsed.astimezone(timezone.utc)
+    except (ValueError, OverflowError):
+        add_reason(reasons, reason_codes, f"malformed_{field}", f"receipt.{field} is not RFC3339")
+        return None
+
+
+def issuer_jwks_url(issuer: str, reasons: list[str], reason_codes: list[str]) -> str | None:
+    parsed = urllib.parse.urlparse(issuer)
+    if parsed.scheme != "https" or parsed.username or parsed.password or parsed.fragment or not parsed.hostname or parsed.port not in {None, 443}:
+        add_reason(reasons, reason_codes, "invalid_issuer", "receipt.issuer must be an https origin without userinfo, fragment, or non-default port")
+        return None
+    try:
+        host_ip = ipaddress.ip_address(parsed.hostname)
+    except ValueError:
+        host_ip = None
+    if host_ip and (host_ip.is_private or host_ip.is_loopback or host_ip.is_link_local or host_ip.is_multicast or host_ip.is_reserved):
+        add_reason(reasons, reason_codes, "invalid_issuer", "receipt.issuer must not target private, loopback, link-local, multicast, or reserved IP space")
+        return None
+    origin = f"https://{parsed.hostname}"
+    return origin + "/.well-known/jwks.json"
+
+
+def jwks_source_matches_issuer(jwks_source: str | None, issuer: str) -> bool:
+    if not jwks_source or not jwks_source.startswith("https://"):
+        return True
+    source = urllib.parse.urlparse(jwks_source)
+    issuer_parsed = urllib.parse.urlparse(issuer)
+    return source.scheme == "https" and issuer_parsed.scheme == "https" and source.hostname == issuer_parsed.hostname and source.port in {None, 443}
+
+
+def b64url_decode(value: str) -> bytes:
+    return base64.urlsafe_b64decode(value + "=" * ((4 - len(value) % 4) % 4))
+
+
+def b64url_encode(value: bytes) -> str:
+    return base64.urlsafe_b64encode(value).decode("ascii").rstrip("=")
+
+
+def canonical_receipt_payload(receipt: dict[str, Any]) -> bytes:
+    """Return the RFC8785/JCS canonical receipt payload.
+
+    `receipt_hash` and `signature` are excluded from the signed payload.
+    """
+    if rfc8785 is None:
+        raise VerificationError("rfc8785 canonicalization module unavailable")
+    payload = {k: v for k, v in receipt.items() if k not in {"receipt_hash", "signature"}}
+    return rfc8785.dumps(payload)
+
+
+def sha256_receipt_hash(receipt: dict[str, Any]) -> str:
+    return "sha256:" + b64url_encode(hashlib.sha256(canonical_receipt_payload(receipt)).digest())
+
+
+def sha256_evidence_pack_hash(pack: dict[str, Any]) -> str:
+    """Hash the RFC8785/JCS archived pack with only evidence_pack_hash omitted.
+
+    previous_evidence_pack_hash remains in the payload so the archive chain pointer is bound.
+    """
+    if rfc8785 is None:
+        raise VerificationError("rfc8785 canonicalization module unavailable")
+    payload = {k: v for k, v in pack.items() if k != "evidence_pack_hash"}
+    return "sha256:" + b64url_encode(hashlib.sha256(rfc8785.dumps(payload)).digest())
+
+
+ARCHIVE_FIELDS = (
+    "archive_profile", "archive_storage", "archive_retention", "archived_at",
+    "evidence_pack_hash", "previous_evidence_pack_hash",
+)
+
+
+def validate_archive(pack: dict[str, Any], reasons: list[str], reason_codes: list[str]) -> bool:
+    """Validate archive metadata for every pack profile, not only sandbox packs."""
+    if not any(field in pack and pack.get(field) is not None for field in ARCHIVE_FIELDS):
+        return True
+    archive_profile = pack.get("archive_profile")
+    archive_storage = pack.get("archive_storage")
+    archive_retention = pack.get("archive_retention")
+    archived_at = pack.get("archived_at")
+    evidence_pack_hash = pack.get("evidence_pack_hash")
+    previous_hash = pack.get("previous_evidence_pack_hash")
+    valid = (
+        archive_profile == "satgate.archive.v1"
+        and isinstance(archive_storage, str) and bool(archive_storage)
+        and isinstance(archive_retention, str) and bool(archive_retention)
+        and isinstance(archived_at, str)
+        and parse_rfc3339(archived_at, reasons, reason_codes, "archived_at") is not None
+        and isinstance(evidence_pack_hash, str)
+        and re.fullmatch(r"sha256:[A-Za-z0-9_-]{43}", evidence_pack_hash) is not None
+        and evidence_pack_hash == sha256_evidence_pack_hash(pack)
+        and (previous_hash is None or (
+            isinstance(previous_hash, str)
+            and re.fullmatch(r"sha256:[A-Za-z0-9_-]{43}", previous_hash) is not None
+        ))
+    )
+    if not valid:
+        add_reason(reasons, reason_codes, "invalid_archive_provenance", "archive metadata or canonical evidence_pack_hash is invalid")
+    return valid
+
+
+def sha256_string_hash(value: str) -> str:
+    return "sha256:" + b64url_encode(hashlib.sha256(value.encode("utf-8")).digest())
+
+
+# Fields the gateway folds into the effective-policy object before hashing.
+# The order is irrelevant because RFC8785/JCS canonicalization sorts keys.
+POLICY_EFFECTIVE_FIELDS = [
+    "policy_id",
+    "policy_version",
+    "policy_decision_mode",
+    "policy_source",
+    "route_or_tool",
+    "cost_credits",
+    "projected_cost_credits",
+    "credit_unit",
+]
+
+
+def canonical_effective_policy_hash(policy: dict[str, Any]) -> str | None:
+    """Recompute policy.policy_effective_hash from the fields the gateway signed."""
+    if rfc8785 is None:
+        return None
+    effective = {field: policy[field] for field in POLICY_EFFECTIVE_FIELDS if field in policy}
+    return "sha256:" + b64url_encode(hashlib.sha256(rfc8785.dumps(effective)).digest())
+
+
+def strict_json_equal(left: Any, right: Any) -> bool:
+    """Return True only when JSON values match in value and concrete type.
+
+    Python considers ``1 == 1.0 == True`` for some comparisons because ``bool``
+    subclasses ``int`` and numeric types coerce. Evidence Pack top-level mirrors
+    are human-readable views of signed receipt subtrees; accept only byte-faithful
+    JSON type/value equality so mirror tampering cannot change ``1`` to ``true``
+    or ``20`` to ``20.0`` while still passing verification.
+    """
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, dict):
+        if left.keys() != right.keys():
+            return False
+        return all(strict_json_equal(left[key], right[key]) for key in left)
+    if isinstance(left, list):
+        if len(left) != len(right):
+            return False
+        return all(strict_json_equal(a, b) for a, b in zip(left, right))
+    return left == right
+
+
+def verify_ed25519_signature_with_public_key(receipt: dict[str, Any], public_key_value: str, reasons: list[str], reason_codes: list[str] | None, label: str) -> bool:
+    if Ed25519PublicKey is None:
+        add_reason(reasons, reason_codes, "crypto_unavailable", "Signatures could not be checked because the Python package 'cryptography' is not installed. Install it with: pip install 'cryptography>=42'")
+        return False
+
+    signature_value = receipt.get("signature")
+    if not isinstance(signature_value, str) or not signature_value.startswith("ed25519:"):
+        add_reason(reasons, reason_codes, "missing_signature", "receipt.signature missing ed25519: prefix")
+        return False
+
+    try:
+        key_bytes = b64url_decode(public_key_value)
+        if len(key_bytes) != 32:
+            raise ValueError(f"Ed25519 public key must be 32 bytes, got {len(key_bytes)}")
+        public_key = Ed25519PublicKey.from_public_bytes(key_bytes)
+        signature = b64url_decode(signature_value.removeprefix("ed25519:"))
+        public_key.verify(signature, canonical_receipt_payload(receipt))
+        return True
+    except (ValueError, InvalidSignature) as exc:
+        add_reason(reasons, reason_codes, "invalid_signature", f"receipt signature invalid with {label}: {exc.__class__.__name__}")
+        return False
+
+
+def verify_embedded_ed25519_signature(receipt: dict[str, Any], reasons: list[str], reason_codes: list[str] | None = None) -> bool:
+    metadata = receipt.get("metadata")
+    if not isinstance(metadata, dict):
+        add_reason(reasons, reason_codes, "missing_metadata", "receipt.metadata missing")
+        return False
+
+    public_key_value = metadata.get("public_key_ed25519_b64")
+    if not isinstance(public_key_value, str) or not public_key_value:
+        add_reason(reasons, reason_codes, "missing_embedded_public_key", "receipt.metadata.public_key_ed25519_b64 missing")
+        return False
+
+    return verify_ed25519_signature_with_public_key(receipt, public_key_value, reasons, reason_codes, "embedded public key")
+
+
+def jwks_key_for_receipt(receipt: dict[str, Any], jwks: dict[str, Any] | None, reasons: list[str], reason_codes: list[str] | None = None) -> str | None:
+    if not jwks:
+        return None
+    kid = receipt.get("issuer_kid")
+    if not isinstance(kid, str) or not kid:
+        add_reason(reasons, reason_codes, "missing_issuer_kid", "receipt.issuer_kid missing; cannot verify against issuer JWKS")
+        return None
+    keys = jwks.get("keys")
+    if not isinstance(keys, list):
+        add_reason(reasons, reason_codes, "malformed_jwks", "trusted JWKS must contain a keys array")
+        return None
+
+    matches = [key for key in keys if isinstance(key, dict) and key.get("kid") == kid]
+    if not matches:
+        add_reason(reasons, reason_codes, "jwks_kid_not_found", f"issuer JWKS has no key matching kid {kid!r}")
+        return None
+    if len(matches) > 1:
+        add_reason(reasons, reason_codes, "jwks_duplicate_kid", f"issuer JWKS has multiple keys matching kid {kid!r}")
+        return None
+
+    key = matches[0]
+    if key.get("kty") != "OKP" or key.get("crv") != "Ed25519":
+        add_reason(reasons, reason_codes, "malformed_jwks_key", f"issuer JWKS key {kid!r} must be OKP/Ed25519")
+        return None
+    if key.get("alg") not in (None, "EdDSA"):
+        add_reason(reasons, reason_codes, "malformed_jwks_key", f"issuer JWKS key {kid!r} has unsupported alg {key.get('alg')!r}")
+        return None
+    if key.get("use") not in (None, "sig"):
+        add_reason(reasons, reason_codes, "malformed_jwks_key", f"issuer JWKS key {kid!r} has unsupported use {key.get('use')!r}")
+        return None
+    x = key.get("x")
+    if not isinstance(x, str) or not x:
+        add_reason(reasons, reason_codes, "malformed_jwks_key", f"issuer JWKS key {kid!r} missing x coordinate")
+        return None
+    try:
+        if len(b64url_decode(x)) != 32:
+            add_reason(reasons, reason_codes, "malformed_jwks_key", f"issuer JWKS key {kid!r} x coordinate is not a 32-byte Ed25519 key")
+            return None
+    except Exception:
+        add_reason(reasons, reason_codes, "malformed_jwks_key", f"issuer JWKS key {kid!r} x coordinate is not valid base64url")
+        return None
+    return x
+
+
+def verify_receipt_signature(receipt: dict[str, Any], reasons: list[str], reason_codes: list[str], jwks: dict[str, Any] | None = None, require_trusted_issuer: bool = False) -> tuple[bool, bool, str]:
+    issuer_key = jwks_key_for_receipt(receipt, jwks, reasons, reason_codes)
+    if issuer_key:
+        issuer_valid = verify_ed25519_signature_with_public_key(receipt, issuer_key, reasons, reason_codes, "issuer JWKS")
+        if issuer_valid:
+            return True, True, "issuer_jwks_anchored"
+        if require_trusted_issuer:
+            return False, False, "issuer_jwks_failed"
+
+    if require_trusted_issuer:
+        add_reason(reasons, reason_codes, "trusted_issuer_required", "issuer JWKS verification required; embedded public key fallback is not trusted")
+        return False, False, "untrusted"
+
+    embedded_valid = verify_embedded_ed25519_signature(receipt, reasons, reason_codes)
+    return embedded_valid, False, "embedded_public_key_self_verifying" if embedded_valid else "unverified"
+
+
+def contains_secret_marker(value: Any) -> bool:
+    raw = json.dumps(value, sort_keys=True, separators=(",", ":"), default=str)
+    # Redaction labels are expected. Actual bearer/capability prefixes are not.
+    raw = raw.replace('"raw_capability_token":"redacted"', "")
+    raw = raw.replace('"authorization_header":"redacted"', "")
+    for pattern in SECRET_PATTERNS:
+        if pattern.search(raw):
+            return True
+    return contains_unredacted_secret_field(value)
+
+
+def contains_unredacted_secret_field(value: Any) -> bool:
+    if isinstance(value, dict):
+        for key, child in value.items():
+            key_lower = str(key).lower()
+            if any(marker in key_lower for marker in ["token", "secret", "authorization", "budget_id", "payment_secret"]):
+                if isinstance(child, str) and child and child.lower() not in {"redacted", "[redacted]"}:
+                    if not key_lower.endswith("hash") and "fingerprint" not in key_lower and "public_key" not in key_lower:
+                        return True
+            if contains_unredacted_secret_field(child):
+                return True
+    elif isinstance(value, list):
+        return any(contains_unredacted_secret_field(child) for child in value)
+    return False
+
+
+def contains_credit_state(value):
+    return contains_any_key(value, CREDIT_USD_FIELDS)
+
+
+def valid_paid_rail(receipt):
+    """L402 amounts are positive integer sats within the JCS safe domain.
+
+    Keep this narrow contract aligned with the other distributed verifier;
+    tools/test_paid_rail.py runs the same signed corpus against both copies.
+    """
+    amount = receipt.get("amount_sats")
+    fields = {"rail", "payment_hash", "invoice_hash", "macaroon_hash", "amount_sats"}
+    return (
+        receipt.get("decision") in ("allowed", "paid")
+        and receipt.get("rail") == "l402"
+        and type(amount) is int and 0 < amount <= 2**53 - 1
+        and all(isinstance(receipt.get(k), str) and receipt[k].strip()
+                for k in ("payment_hash", "invoice_hash", "macaroon_hash"))
+        and strict_json_equal(receipt.get("paid_rail_context"),
+                              {k: receipt.get(k) for k in fields})
+        and strict_json_equal(receipt.get("budget"),
+                              {"spend_mode": "paid_rail", "rail": "l402", "amount_sats": amount})
+        and not contains_credit_state(receipt)
+        # The settled-authorization label belongs to x402 only.
+        and not (isinstance(receipt.get("authority"), dict)
+                 and receipt["authority"].get("provenance_level") == "settled_x402_authorization")
+    )
+
+
+X402_RAIL_FIELDS = {"rail", "transaction", "network", "asset", "payer", "pay_to", "amount_atomic"}
+# The USDC contract per network. An x402 receipt naming any other asset is
+# invalid even when signed.
+X402_USDC = {
+    "eip155:8453": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+    "eip155:84532": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+}
+
+
+def _is_lower_hex(value, length):
+    return (
+        isinstance(value, str) and len(value) == length and value.startswith("0x")
+        and all(c in "0123456789abcdef" for c in value[2:])
+    )
+
+
+def valid_x402_paid_rail(receipt):
+    """x402 (USDC on Base) paid receipts: a settled transaction, the USDC
+    contract for the network, lowercase addresses, a positive integer atomic
+    amount, an authority that claims a settled authorization (never a
+    macaroon), and no L402 or credit/USD fields.
+
+    Keep aligned with the other distributed verifier;
+    tools/test_paid_rail.py runs the same signed corpus against both copies.
+    """
+    amount = receipt.get("amount_atomic")
+    network = receipt.get("network")
+    context_value = receipt.get("paid_rail_context")
+    return (
+        receipt.get("decision") in ("allowed", "paid")
+        and receipt.get("rail") == "x402"
+        and type(amount) is int and 0 < amount <= 2**53 - 1
+        and _is_lower_hex(receipt.get("transaction"), 66)
+        and network in X402_USDC
+        and receipt.get("asset") == X402_USDC.get(network)
+        and all(_is_lower_hex(receipt.get(k), 42) for k in ("asset", "payer", "pay_to"))
+        and strict_json_equal(receipt.get("authority"), {"provenance_level": "settled_x402_authorization"})
+        and "capability_hash" not in receipt
+        and isinstance(context_value, dict)
+        and set(context_value) == X402_RAIL_FIELDS
+        and strict_json_equal(context_value, {k: receipt.get(k) for k in X402_RAIL_FIELDS})
+        and strict_json_equal(receipt.get("budget"),
+                              {"spend_mode": "paid_rail", "rail": "x402", "amount_atomic": amount})
+        and not any(k in receipt for k in ("payment_hash", "invoice_hash", "macaroon_hash", "amount_sats"))
+        and not contains_credit_state(receipt)
+    )
+
+
+
+# Window and gap receipts. A window receipt is the one that opens, or the one
+# that closes, a run of refused calls for one key and tool in one UTC minute
+# (rate_limit_phase "opened" or "closed"); a gap receipt is the signed count of
+# Observe calls that went through in one UTC minute with no receipt. Each check
+# runs only for a receipt that carries the shape, so older receipts are judged
+# as they were. Neither may make a balance claim.
+RATE_WINDOW_FIELDS = (
+    "rate_limit_phase", "rate_limit_window_start", "rate_limit_window_seconds",
+    "rate_limit_refused_calls",
+)
+UNRECORDED_FIELDS = ("unrecorded_calls", "unrecorded_window_start", "unrecorded_window_seconds")
+RATE_WINDOW_PAIRS = {
+    ("denied", "policy_denied"),
+    ("denied", "token_revoked"),
+    ("denied", "capability_expired"),
+}
+WINDOW_SECONDS = 60
+WINDOW_START_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:00Z")
+
+
+def parse_window_start(value: Any) -> datetime | None:
+    """A window starts on a UTC minute, written YYYY-MM-DDTHH:MM:00Z."""
+    if not isinstance(value, str) or WINDOW_START_RE.fullmatch(value) is None:
+        return None
+    return parse_rfc3339(value, [], [], "window_start")
+
+
+def makes_no_balance_claim(receipt: dict[str, Any]) -> bool:
+    return (
+        strict_json_equal(receipt.get("budget"), VERIFIED_NOT_EVALUATED_BUDGET)
+        and not contains_forbidden_claim({k: v for k, v in receipt.items() if k != "budget"})
+    )
+
+
+def is_new_profile_receipt(receipt: Any) -> bool:
+    """A receipt of the three shapes added for sign-every-action: allowed
+    without a balance, a window opener or closer, a gap record."""
+    if not isinstance(receipt, dict):
+        return False
+    budget = receipt.get("budget")
+    return bool(
+        (receipt.get("decision") == "allowed" and receipt.get("decision_reason") == "policy_allowed"
+         and isinstance(budget, dict) and budget.get("spend_mode") == "not_evaluated")
+        or receipt.get("decision_reason") == "observe_unrecorded"
+        or any(field in receipt for field in RATE_WINDOW_FIELDS + UNRECORDED_FIELDS)
+    )
+
+
+def valid_rate_limit_window(receipt: dict[str, Any], issued_at: datetime | None) -> bool:
+    phase = receipt.get("rate_limit_phase")
+    start = parse_window_start(receipt.get("rate_limit_window_start"))
+    seconds = receipt.get("rate_limit_window_seconds")
+    code = receipt.get("denial_code")
+    if not (
+        (receipt.get("decision"), receipt.get("decision_reason")) in RATE_WINDOW_PAIRS
+        and phase in ("opened", "closed")
+        and start is not None
+        and type(seconds) is int and seconds == WINDOW_SECONDS
+        and isinstance(code, str) and bool(code.strip())
+        and not any(field in receipt for field in UNRECORDED_FIELDS)
+        and makes_no_balance_claim(receipt)
+    ):
+        return False
+    if phase == "opened":
+        return "rate_limit_refused_calls" not in receipt and (issued_at is None or issued_at >= start)
+    count = receipt.get("rate_limit_refused_calls")
+    return type(count) is int and count >= 1 and (issued_at is None or issued_at >= start + timedelta(seconds=WINDOW_SECONDS))
+
+
+def valid_unrecorded_gap(receipt: dict[str, Any], issued_at: datetime | None) -> bool:
+    start = parse_window_start(receipt.get("unrecorded_window_start"))
+    seconds = receipt.get("unrecorded_window_seconds")
+    count = receipt.get("unrecorded_calls")
+    return bool(
+        receipt.get("decision") == "allowed"
+        and receipt.get("decision_reason") == "observe_unrecorded"
+        and start is not None
+        and type(seconds) is int and seconds == WINDOW_SECONDS
+        and type(count) is int and count >= 1
+        and not any(field in receipt for field in RATE_WINDOW_FIELDS)
+        and makes_no_balance_claim(receipt)
+        and (issued_at is None or issued_at >= start + timedelta(seconds=WINDOW_SECONDS))
+    )
+
+
+def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reason_codes: list[str], jwks: dict[str, Any] | None = None, require_trusted_issuer: bool = False, now_dt: datetime | None = None, allow_mock: bool = False) -> tuple[dict[str, bool], str, str, bool]:
+    prefix = f"receipt_{index}"
+    checks: dict[str, bool] = {}
+
+    def fail(code: str, message: str) -> None:
+        add_reason(reasons, reason_codes, code, message)
+
+    checks[f"{prefix}_schema_version"] = receipt.get("schema_version") == EXPECTED_RECEIPT_SCHEMA
+    if not checks[f"{prefix}_schema_version"]:
+        fail("invalid_receipt_schema", f"receipts[{index}].schema_version is {receipt.get('schema_version')!r}, expected {EXPECTED_RECEIPT_SCHEMA!r}")
+
+    checks[f"{prefix}_canonicalization"] = receipt.get("canonicalization") == SUPPORTED_CANONICALIZATION
+    if not checks[f"{prefix}_canonicalization"]:
+        fail("unsupported_canonicalization", f"receipts[{index}].canonicalization must be {SUPPORTED_CANONICALIZATION!r}")
+
+    checks[f"{prefix}_hash_algorithm"] = receipt.get("hash_algorithm") == "sha256"
+    if receipt.get("hash_algorithm") is None:
+        fail("missing_hash_algorithm", f"receipts[{index}].hash_algorithm missing")
+    elif not checks[f"{prefix}_hash_algorithm"]:
+        fail("unsupported_hash_algorithm", f"receipts[{index}].hash_algorithm is not sha256")
+
+    checks[f"{prefix}_signature_algorithm"] = receipt.get("signature_algorithm") == "ed25519"
+    if receipt.get("signature_algorithm") is None:
+        fail("missing_signature_algorithm", f"receipts[{index}].signature_algorithm missing")
+    elif not checks[f"{prefix}_signature_algorithm"]:
+        fail("unsupported_signature_algorithm", f"receipts[{index}].signature_algorithm is not ed25519")
+
+    checks[f"{prefix}_decision"] = receipt.get("decision") in ALLOWED_DECISIONS
+    if not checks[f"{prefix}_decision"]:
+        fail("unknown_decision", f"receipts[{index}].decision is not a supported protocol decision")
+
+    checks[f"{prefix}_decision_reason"] = receipt.get("decision_reason") in ALLOWED_DECISION_REASONS
+    if not checks[f"{prefix}_decision_reason"]:
+        fail("unknown_decision_reason", f"receipts[{index}].decision_reason is not a supported protocol reason")
+
+    decision = str(receipt.get("decision", ""))
+    decision_reason = str(receipt.get("decision_reason", ""))
+    decision_profile = decision_profile_for(receipt)
+    checks[f"{prefix}_decision_reason_combination"] = decision_profile is not None
+    if not checks[f"{prefix}_decision_reason_combination"]:
+        fail("invalid_decision_reason_combination", f"receipts[{index}] decision/reason combination is not legal")
+
+    if decision_profile == "verified_not_evaluated":
+        authority_value = receipt.get("authority")
+        metadata_value = receipt.get("metadata")
+        policy_value = receipt.get("policy")
+        authority = authority_value if isinstance(authority_value, dict) else {}
+        metadata = metadata_value if isinstance(metadata_value, dict) else {}
+        capability_hash = receipt.get("capability_hash")
+        checks[f"{prefix}_verified_not_evaluated"] = (
+            (decision, decision_reason) in VERIFIED_NOT_EVALUATED_PAIRS
+            and isinstance(authority_value, dict)
+            and authority.get("provenance_level") == "verified_macaroon_caveats"
+            and set(authority) <= VERIFIED_CAPABILITY_AUTHORITY_FIELDS
+            and all(authority.get(field) == "redacted" for field in VERIFIED_CAPABILITY_RAW_FIELDS)
+            and isinstance(capability_hash, str)
+            and bool(capability_hash.strip())
+            and authority.get("capability_hash") == capability_hash
+            and strict_json_equal(receipt.get("budget"), VERIFIED_NOT_EVALUATED_BUDGET)
+            and not any(field in receipt for field in VERIFIED_NOT_EVALUATED_FORBIDDEN_FIELDS)
+            and not contains_balance_claim({k: v for k, v in receipt.items() if k != "budget"})
+            and (not is_new_profile_receipt(receipt) or not contains_forbidden_claim({k: v for k, v in receipt.items() if k != "budget"}))
+            and isinstance(metadata_value, dict)
+            and not any(field in metadata for field in ("cost_credits", "credit_unit", "limit", "limit_credits", "projected_cost_credits", "remaining_credits", "used"))
+            and not contains_any_key(policy_value, {"limit_credits", "remaining_after_credits", "remaining_before_credits", "remaining_budget_usd", "remaining_credits"})
+        )
+        if not checks[f"{prefix}_verified_not_evaluated"]:
+            fail("invalid_not_evaluated_provenance", f"receipts[{index}] verified decision without budget evaluation carries budget, spend, payment, or unredacted capability claims")
+
+    if decision_profile == "not_evaluated":
+        authority_value = receipt.get("authority")
+        budget_value = receipt.get("budget")
+        authority = authority_value if isinstance(authority_value, dict) else {}
+        budget = budget_value if isinstance(budget_value, dict) else {}
+        forbidden_receipt_fields = {
+            "amount_usd", "attempted_amount_usd", "capability_hash", "currency",
+            "rail", "remaining_budget_usd",
+        }
+        checks[f"{prefix}_not_evaluated"] = (
+            receipt.get("decision") == "denied"
+            and authority == {"provenance_level": "no_verified_capability"}
+            and budget == {"spend_mode": "not_evaluated", "cost_credits": 0}
+            and not any(field in receipt for field in forbidden_receipt_fields)
+        )
+        if not checks[f"{prefix}_not_evaluated"]:
+            fail("invalid_not_evaluated_provenance", f"receipts[{index}] no-capability denial carries authority or evaluated budget claims")
+
+    if decision_profile == "paid_rail":
+        checks[f"{prefix}_paid_rail"] = bool(valid_paid_rail(receipt) or valid_x402_paid_rail(receipt))
+        if not checks[f"{prefix}_paid_rail"]:
+            fail("invalid_paid_rail_provenance", f"receipts[{index}] payment_verified L402 or x402 context is missing, mismatched, or carries contradictory credit/USD state")
+
+    if receipt.get("decision_reason") == "sandbox_no_spend":
+        authority_value = receipt.get("authority")
+        budget_value = receipt.get("budget")
+        metadata_value = receipt.get("metadata")
+        policy_value = receipt.get("policy")
+        authority = authority_value if isinstance(authority_value, dict) else {}
+        budget = budget_value if isinstance(budget_value, dict) else {}
+        metadata = metadata_value if isinstance(metadata_value, dict) else {}
+        policy = policy_value if isinstance(policy_value, dict) else {}
+        allowed_authority = {"provenance_level"}
+        allowed_budget = {"spend_mode", "cost_credits", "credit_unit"}
+        allowed_metadata = {
+            "cost_credits", "credit_unit", "method", "path", "public_key_ed25519_b64",
+            "remaining_credits", "request_id", "tenant_id",
+        }
+        allowed_policy = {
+            "cost_credits", "credit_unit", "hash", "id", "name", "policy_decision_mode",
+            "policy_effective_hash", "policy_id", "policy_id_hash", "policy_source",
+            "policy_version", "policy_version_hash", "route_or_tool", "version",
+        }
+        allowed_receipt = {
+            "attempted_amount_usd", "authority", "budget", "canonicalization", "decision",
+            "decision_reason", "event_history_ref", "evidence_access_id", "evidence_pack_id",
+            "evidence_url", "expires_at", "hash_algorithm", "issued_at", "issuer", "issuer_kid",
+            "issuer_trusted", "jwks_url", "metadata", "policy", "policy_version", "receipt_hash",
+            "receipt_id", "remaining_budget_usd", "route_or_tool", "schema_url", "schema_version",
+            "signature", "signature_algorithm", "timestamp", "trust_anchor", "verify_url",
+        }
+        checks[f"{prefix}_sandbox_no_spend"] = (
+            receipt.get("decision") == "allowed"
+            and authority.get("provenance_level") == "sandbox_no_capability"
+            and all(key in allowed_authority for key in authority)
+            and all(key in allowed_budget for key in budget)
+            and isinstance(metadata_value, dict)
+            and isinstance(metadata.get("tenant_id"), str) and bool(metadata.get("tenant_id"))
+            and isinstance(metadata.get("request_id"), str) and bool(metadata.get("request_id"))
+            and all(key in allowed_metadata for key in metadata)
+            and is_zero_amount(metadata.get("cost_credits"))
+            and is_zero_amount(metadata.get("remaining_credits"))
+            and isinstance(policy_value, dict)
+            and all(key in allowed_policy for key in policy)
+            and policy.get("policy_decision_mode") == "sandbox"
+            and is_zero_amount(policy.get("cost_credits"))
+            and all(key in allowed_receipt for key in receipt)
+            and budget.get("spend_mode") == "sandbox_no_spend"
+            and budget.get("cost_credits") == 0
+            and "attempted_amount_usd" in receipt
+            and is_zero_amount(receipt["attempted_amount_usd"])
+            and "remaining_budget_usd" in receipt
+            and is_zero_amount(receipt["remaining_budget_usd"])
+        )
+        if not checks[f"{prefix}_sandbox_no_spend"]:
+            fail("invalid_sandbox_provenance", f"receipts[{index}] sandbox_no_spend authority or spend claims are inconsistent")
+
+    if receipt.get("decision_reason") == "observe_projected":
+        authority_value = receipt.get("authority")
+        budget_value = receipt.get("budget")
+        metadata_value = receipt.get("metadata")
+        policy_value = receipt.get("policy")
+        authority = authority_value if isinstance(authority_value, dict) else {}
+        budget = budget_value if isinstance(budget_value, dict) else {}
+        metadata = metadata_value if isinstance(metadata_value, dict) else {}
+        policy = policy_value if isinstance(policy_value, dict) else {}
+        projected = receipt.get("projected_cost_credits")
+        projected_valid = isinstance(projected, (int, float)) and not isinstance(projected, bool) and projected >= 0
+        allowed_authority = {
+            "budget_id_hash", "budget_subject_hash", "capability_hash", "delegation_budget",
+            "delegation_depth", "parent_token_id_hash", "provenance_level", "raw_budget_id",
+            "raw_capability_token", "raw_parent_token_id", "raw_token_id", "token_id_hash",
+        }
+        allowed_budget = {"credit_unit", "projected_cost_credits", "spend_mode"}
+        allowed_metadata = {
+            "credit_unit", "method", "path", "projected_cost_credits",
+            "public_key_ed25519_b64", "request_id", "tenant_id",
+        }
+        allowed_policy = {
+            "credit_unit", "hash", "id", "name", "policy_decision_mode",
+            "policy_effective_hash", "policy_id", "policy_id_hash", "policy_source",
+            "policy_version", "policy_version_hash", "projected_cost_credits",
+            "route_or_tool", "version",
+        }
+        allowed_receipt = {
+            "authority", "budget", "canonicalization", "capability_hash", "decision",
+            "decision_reason", "event_history_ref", "evidence_access_id", "evidence_pack_id",
+            "evidence_url", "expires_at", "hash_algorithm", "issued_at", "issuer", "issuer_kid",
+            "issuer_trusted", "jwks_url", "metadata", "policy", "policy_version",
+            "projected_cost_credits", "receipt_hash", "receipt_id", "route_or_tool", "schema_url",
+            "schema_version", "signature", "signature_algorithm", "timestamp", "trust_anchor", "verify_url",
+        }
+        raw_authority_fields = ("raw_budget_id", "raw_capability_token", "raw_parent_token_id", "raw_token_id")
+        checks[f"{prefix}_observe_projected"] = (
+            receipt.get("decision") == "allowed"
+            and projected_valid
+            and isinstance(authority_value, dict)
+            and authority.get("provenance_level") == "verified_macaroon_caveats"
+            and all(key in allowed_authority for key in authority)
+            and all(authority.get(key) in (None, "redacted") for key in raw_authority_fields)
+            and isinstance(budget_value, dict)
+            and set(budget) == allowed_budget
+            and budget.get("spend_mode") == "projected_only"
+            and budget.get("projected_cost_credits") == projected
+            and isinstance(metadata_value, dict)
+            and all(key in allowed_metadata for key in metadata)
+            and isinstance(metadata.get("tenant_id"), str) and bool(metadata.get("tenant_id"))
+            and isinstance(metadata.get("request_id"), str) and bool(metadata.get("request_id"))
+            and metadata.get("projected_cost_credits") == projected
+            and isinstance(policy_value, dict)
+            and all(key in allowed_policy for key in policy)
+            and policy.get("policy_decision_mode") == "observe"
+            and policy.get("projected_cost_credits") == projected
+            and all(key in allowed_receipt for key in receipt)
+        )
+        if not checks[f"{prefix}_observe_projected"]:
+            fail("invalid_observe_projection", f"receipts[{index}] observe_projected authority or spend claims are inconsistent")
+
+    mock_markers = [receipt.get("mock_only"), receipt.get("demo"), receipt.get("environment") in {"mock", "test", "demo"}]
+    metadata = receipt.get("metadata") if isinstance(receipt.get("metadata"), dict) else {}
+    mock_markers.extend([metadata.get("mock_only"), metadata.get("demo"), metadata.get("environment") in {"mock", "test", "demo"}])
+    checks[f"{prefix}_production_artifact"] = allow_mock or not any(marker is True for marker in mock_markers)
+    if not checks[f"{prefix}_production_artifact"]:
+        fail("mock_artifact_not_allowed", f"receipts[{index}] is marked mock/demo/test but --allow-mock was not supplied")
+
+    policy = receipt.get("policy")
+    checks[f"{prefix}_policy_provenance_present"] = isinstance(policy, dict) and bool(policy)
+    if not checks[f"{prefix}_policy_provenance_present"]:
+        fail("missing_policy_provenance", f"receipts[{index}].policy missing named policy provenance")
+    else:
+        policy_version = policy.get("policy_version", policy.get("version"))
+        checks[f"{prefix}_policy_version_consistent"] = policy_version == receipt.get("policy_version")
+        if not checks[f"{prefix}_policy_version_consistent"]:
+            fail("policy_version_mismatch", f"receipts[{index}].policy.policy_version does not match receipt.policy_version")
+        policy_id = policy.get("policy_id", policy.get("id"))
+        policy_id_hash = policy.get("policy_id_hash")
+        checks[f"{prefix}_policy_id_hash_match"] = True
+        if policy_id_hash is not None:
+            checks[f"{prefix}_policy_id_hash_match"] = isinstance(policy_id, str) and policy_id_hash == sha256_string_hash(policy_id)
+            if not checks[f"{prefix}_policy_id_hash_match"]:
+                fail("policy_hash_mismatch", f"receipts[{index}].policy.policy_id_hash does not match policy_id")
+        policy_version_hash = policy.get("policy_version_hash")
+        checks[f"{prefix}_policy_version_hash_match"] = True
+        if policy_version_hash is not None:
+            checks[f"{prefix}_policy_version_hash_match"] = isinstance(policy_version, str) and policy_version_hash == sha256_string_hash(policy_version)
+            if not checks[f"{prefix}_policy_version_hash_match"]:
+                fail("policy_hash_mismatch", f"receipts[{index}].policy.policy_version_hash does not match policy_version")
+        policy_effective_hash = policy.get("policy_effective_hash")
+        checks[f"{prefix}_policy_effective_hash_match"] = True
+        if policy_effective_hash is not None:
+            recomputed_effective = canonical_effective_policy_hash(policy)
+            if recomputed_effective is not None:
+                checks[f"{prefix}_policy_effective_hash_match"] = policy_effective_hash == recomputed_effective
+                if not checks[f"{prefix}_policy_effective_hash_match"]:
+                    fail("policy_hash_mismatch", f"receipts[{index}].policy.policy_effective_hash does not match the canonical effective policy object")
+
+    issued_at = parse_rfc3339(receipt.get("issued_at"), reasons, reason_codes, "issued_at")
+    timestamp = parse_rfc3339(receipt.get("timestamp"), reasons, reason_codes, "timestamp") if receipt.get("timestamp") is not None else issued_at
+    expires_at = parse_rfc3339(receipt.get("expires_at"), reasons, reason_codes, "expires_at") if receipt.get("expires_at") is not None else None
+    checks[f"{prefix}_time_valid"] = (
+        issued_at is not None and timestamp is not None
+        and (receipt.get("expires_at") is None or expires_at is not None)
+    )
+    if now_dt and issued_at:
+        if issued_at > now_dt + timedelta(seconds=DEFAULT_CLOCK_SKEW_SECONDS):
+            checks[f"{prefix}_time_valid"] = False
+            fail("receipt_issued_in_future", f"receipts[{index}].issued_at is beyond allowed clock skew")
+    if now_dt and expires_at:
+        if now_dt > expires_at:
+            checks[f"{prefix}_time_valid"] = False
+            fail("receipt_expired", f"receipts[{index}].expires_at is in the past")
+
+    if any(field in receipt for field in RATE_WINDOW_FIELDS):
+        checks[f"{prefix}_rate_limit_window"] = valid_rate_limit_window(receipt, issued_at)
+        if not checks[f"{prefix}_rate_limit_window"]:
+            fail("invalid_window_receipt", f"receipts[{index}] is not a valid refusal-window receipt (phase, window, count, or a balance claim)")
+    if receipt.get("decision_reason") == "observe_unrecorded" or any(field in receipt for field in UNRECORDED_FIELDS):
+        checks[f"{prefix}_observe_unrecorded"] = valid_unrecorded_gap(receipt, issued_at)
+        if not checks[f"{prefix}_observe_unrecorded"]:
+            fail("invalid_unrecorded_receipt", f"receipts[{index}] is not a valid gap receipt (it needs its window and a count of at least 1, and makes no balance claim)")
+
+    expected_hash = sha256_receipt_hash(receipt)
+    checks[f"{prefix}_receipt_hash_match"] = receipt.get("receipt_hash") == expected_hash
+    if not checks[f"{prefix}_receipt_hash_match"]:
+        fail("receipt_hash_mismatch", f"receipts[{index}].receipt_hash does not match canonical receipt")
+
+    signature_valid, trusted_issuer_valid, trust_anchor = verify_receipt_signature(receipt, reasons, reason_codes, jwks, require_trusted_issuer)
+    checks[f"{prefix}_signature_valid"] = signature_valid
+    checks[f"{prefix}_trusted_issuer_valid"] = trusted_issuer_valid
+    return checks, expected_hash, trust_anchor, trusted_issuer_valid
+
+def validate_input_shapes(pack: Any, jwks: Any) -> None:
+    """Reject malformed shapes and non-JCS data before semantic operations.
+
+    Canonicalize the entire input, including unsigned extensions: otherwise a
+    nonfinite value outside the signed subtree can leak into JSON output.
+    """
+    if not isinstance(pack, dict):
+        raise VerificationError("Evidence Pack must be an object")
+    if jwks is not None and not isinstance(jwks, dict):
+        raise VerificationError("JWKS must be an object")
+    if rfc8785 is None:
+        raise VerificationError("rfc8785 canonicalization module unavailable")
+    rfc8785.dumps(pack)
+    if jwks is not None:
+        rfc8785.dumps(jwks)
+    receipts = pack.get("receipts")
+    records = [pack] + (receipts if isinstance(receipts, list) else [])
+    for record in records:
+        if not isinstance(record, dict):
+            continue  # The normal receipt-presence check reports this shape.
+        for field in ("decision", "decision_reason", "environment", "issuer"):
+            if field in record and not isinstance(record[field], str):
+                raise VerificationError(f"{field} must be a string")
+        for field in ("authority", "budget", "policy", "metadata"):
+            if record is not pack and field in record and not isinstance(record[field], dict):
+                raise VerificationError(f"{field} must be an object")
+        metadata = record.get("metadata") if isinstance(record.get("metadata"), dict) else {}
+        if "environment" in metadata and not isinstance(metadata["environment"], str):
+            raise VerificationError("metadata.environment must be a string")
+
+
+def verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, require_trusted_issuer: bool = False, allow_mock: bool = False, now: str | None = None, discover_jwks: bool = False, jwks_source: str | None = None) -> dict[str, Any]:
+    """Public API: untrusted input failures are verdicts, never tracebacks."""
+    try:
+        validate_input_shapes(pack, jwks)
+        return _verify_pack(pack, jwks, require_trusted_issuer, allow_mock, now, discover_jwks, jwks_source)
+    except (VerificationError, ValueError, OverflowError, RecursionError) as exc:
+        # Do not echo untrusted values (or bearer locators) in the error verdict.
+        return {
+            "valid": False, "trusted_issuer_valid": False,
+            "protocol_profile": "issuer_jwks" if require_trusted_issuer else "artifact_integrity",
+            "reason_codes": ["invalid_input"], "checks": {"input_valid": False},
+            "summary": {}, "reasons": [f"Malformed or non-canonicalizable input ({type(exc).__name__})"],
+        }
+
+
+def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, require_trusted_issuer: bool = False, allow_mock: bool = False, now: str | None = None, discover_jwks: bool = False, jwks_source: str | None = None) -> dict[str, Any]:
+    reasons: list[str] = []
+    reason_codes: list[str] = []
+    checks: dict[str, bool] = {}
+    now_dt = parse_rfc3339(now, reasons, reason_codes, "now") if now is not None else datetime.now(timezone.utc)
+    if now_dt is None:
+        return {
+            "valid": False, "trusted_issuer_valid": False,
+            "protocol_profile": "issuer_jwks" if require_trusted_issuer else "artifact_integrity",
+            "reason_codes": reason_codes, "checks": {"time_valid": False},
+            "summary": {}, "reasons": reasons,
+        }
+
+    checks["schema_version"] = pack.get("schema_version") == EXPECTED_PACK_SCHEMA
+    if not checks["schema_version"]:
+        add_reason(reasons, reason_codes, "invalid_pack_schema", f"schema_version is {pack.get('schema_version')!r}, expected {EXPECTED_PACK_SCHEMA!r}")
+
+    checks["production_artifact"] = allow_mock or not (pack.get("mock_only") is True or pack.get("demo") is True or pack.get("environment") in {"mock", "test", "demo"})
+    if not checks["production_artifact"]:
+        add_reason(reasons, reason_codes, "mock_artifact_not_allowed", "pack is marked mock/demo/test but --allow-mock was not supplied")
+
+    receipts_value = pack.get("receipts")
+    receipts = receipts_value if isinstance(receipts_value, list) else []
+    checks["embedded_receipts_present"] = bool(receipts) and all(isinstance(r, dict) for r in receipts)
+    if not checks["embedded_receipts_present"]:
+        add_reason(reasons, reason_codes, "missing_receipts", "pack.receipts must contain one or more receipt objects")
+        receipts = []
+
+    if require_trusted_issuer and discover_jwks and jwks is None and receipts and isinstance(receipts[0], dict):
+        issuer_value = receipts[0].get("issuer")
+        if isinstance(issuer_value, str):
+            discovered = issuer_jwks_url(issuer_value, reasons, reason_codes)
+            if discovered:
+                jwks_source = discovered
+                jwks = load_jwks(discovered)
+
+    if require_trusted_issuer and jwks_source and receipts and isinstance(receipts[0], dict):
+        issuer_value = receipts[0].get("issuer")
+        if isinstance(issuer_value, str) and not jwks_source_matches_issuer(jwks_source, issuer_value):
+            checks["jwks_issuer_match"] = False
+            add_reason(reasons, reason_codes, "jwks_issuer_mismatch", "trusted JWKS source does not match receipt issuer origin")
+        else:
+            checks["jwks_issuer_match"] = True
+
+    receipt_checks: dict[str, bool] = {}
+    receipt_hashes: list[str] = []
+    receipt_trust_anchors: list[str] = []
+    receipt_trusted_issuer: list[bool] = []
+    for index, receipt in enumerate(receipts):
+        per_receipt, expected_hash, trust_anchor, trusted_issuer_valid = verify_receipt(receipt, index, reasons, reason_codes, jwks, require_trusted_issuer, now_dt, allow_mock)
+        receipt_checks.update(per_receipt)
+        receipt_hashes.append(expected_hash)
+        receipt_trust_anchors.append(trust_anchor)
+        receipt_trusted_issuer.append(trusted_issuer_valid)
+    checks.update(receipt_checks)
+    checks["receipt_hash_match"] = bool(receipts) and all(checks.get(f"receipt_{i}_receipt_hash_match", False) for i in range(len(receipts)))
+    checks["time_valid"] = bool(receipts) and all(checks.get(f"receipt_{i}_time_valid", False) for i in range(len(receipts)))
+    checks["signature_valid"] = bool(receipts) and all(checks.get(f"receipt_{i}_signature_valid", False) for i in range(len(receipts)))
+    checks["trusted_issuer_valid"] = bool(receipts) and all(receipt_trusted_issuer) and checks.get("jwks_issuer_match", True)
+    if require_trusted_issuer and not checks["trusted_issuer_valid"]:
+        add_reason(reasons, reason_codes, "trusted_issuer_required", "trusted issuer verification was required but at least one receipt was not issuer-JWKS anchored")
+
+    checks["archive_valid"] = validate_archive(pack, reasons, reason_codes)
+
+    primary = receipts[0] if receipts else {}
+    # Optional display mirrors are not new authority. If present, they must
+    # have a signed counterpart and match it recursively in both type and value.
+    for field in ("rail", "amount_sats", "payment_hash", "invoice_hash", "macaroon_hash",
+                  "transaction", "network", "asset", "payer", "pay_to", "amount_atomic",
+                  "paid_rail_context", "issued_at", "evidence_url", "timestamp",
+                  "policy_version", "jwks_url", "schema_url", "verify_url"):
+        if field in pack:
+            key = f"pack_optional_{field}_matches_primary_receipt"
+            checks[key] = field in primary and strict_json_equal(pack[field], primary[field])
+            if not checks[key]:
+                add_reason(reasons, reason_codes, "pack_primary_mismatch",
+                           f"pack.{field} does not match primary embedded receipt.{field}")
+
+    if primary.get("decision_reason") == "sandbox_no_spend":
+        allowed_pack = {
+            "archive_profile", "archive_retention", "archive_storage", "archived_at", "authority",
+            "budget", "budget_state", "capability_hash", "caveat", "correlation", "decision",
+            "decision_reason", "evidence_pack_hash", "evidence_pack_id", "evidence_url", "issued_at",
+            "issuer", "jwks_url", "policy", "previous_evidence_pack_hash", "receipt_hash", "receipt_id",
+            "receipts", "redaction", "request_context", "request_id", "route_or_tool", "schema_url",
+            "schema_version", "tenant_id", "verify_url",
+        }
+        budget_state_value = pack.get("budget_state")
+        budget_state = budget_state_value if isinstance(budget_state_value, dict) else {}
+        correlation_value = pack.get("correlation")
+        request_context_value = pack.get("request_context")
+        redaction_value = pack.get("redaction")
+        correlation = correlation_value if isinstance(correlation_value, dict) else {}
+        request_context = request_context_value if isinstance(request_context_value, dict) else {}
+        redaction = redaction_value if isinstance(redaction_value, dict) else {}
+        allowed_budget_state = {"attempted_amount_usd", "remaining_budget_usd", "credit_unit"}
+        allowed_correlation = {
+            "decision", "decision_reason", "evidence_pack_id", "receipt_hash", "receipt_id",
+            "request_id", "route_or_tool", "tenant_id",
+        }
+        allowed_request_context = {"method", "path", "request_id", "route_or_tool", "tenant_id"}
+        allowed_redaction = {"authorization_header", "raw_budget_id", "raw_capability_token"}
+        primary_metadata_value = primary.get("metadata")
+        primary_metadata = primary_metadata_value if isinstance(primary_metadata_value, dict) else {}
+        expected_correlation = {
+            "decision": primary.get("decision"),
+            "decision_reason": primary.get("decision_reason"),
+            "evidence_pack_id": primary.get("evidence_pack_id"),
+            "receipt_hash": primary.get("receipt_hash"),
+            "receipt_id": primary.get("receipt_id"),
+            "request_id": primary_metadata.get("request_id"),
+            "route_or_tool": primary.get("route_or_tool"),
+            "tenant_id": primary_metadata.get("tenant_id"),
+        }
+        expected_request_context = {
+            "method": primary_metadata.get("method"),
+            "path": primary_metadata.get("path"),
+            "request_id": primary_metadata.get("request_id"),
+            "route_or_tool": primary.get("route_or_tool"),
+            "tenant_id": primary_metadata.get("tenant_id"),
+        }
+        archive_profile = pack.get("archive_profile")
+        archive_fields = ("archive_storage", "archive_retention", "archived_at", "evidence_pack_hash", "previous_evidence_pack_hash")
+        if archive_profile is None:
+            archive_valid = all(pack.get(field) is None for field in archive_fields)
+        else:
+            archive_storage = pack.get("archive_storage")
+            archive_retention = pack.get("archive_retention")
+            archived_at = pack.get("archived_at")
+            evidence_pack_hash = pack.get("evidence_pack_hash")
+            previous_hash = pack.get("previous_evidence_pack_hash")
+            archive_valid = (
+                archive_profile == "satgate.archive.v1"
+                and isinstance(archive_storage, str) and bool(archive_storage)
+                and isinstance(archive_retention, str) and bool(archive_retention)
+                and isinstance(archived_at, str) and parse_rfc3339(archived_at, reasons, reason_codes, "archived_at") is not None
+                and isinstance(evidence_pack_hash, str)
+                and re.fullmatch(r"sha256:[A-Za-z0-9_-]{43}", evidence_pack_hash) is not None
+                and evidence_pack_hash == sha256_evidence_pack_hash(pack)
+                and (previous_hash is None or (isinstance(previous_hash, str) and re.fullmatch(r"sha256:[A-Za-z0-9_-]{43}", previous_hash) is not None))
+            )
+        primary_budget_value = primary.get("budget")
+        primary_budget = primary_budget_value if isinstance(primary_budget_value, dict) else {}
+        checks["pack_sandbox_no_spend"] = (
+            archive_valid
+            and isinstance(budget_state_value, dict)
+            and all(key in allowed_pack for key in pack)
+            and isinstance(pack.get("tenant_id"), str)
+            and bool(pack.get("tenant_id"))
+            and pack.get("tenant_id") == primary_metadata.get("tenant_id")
+            and isinstance(pack.get("request_id"), str)
+            and bool(pack.get("request_id"))
+            and pack.get("request_id") == primary_metadata.get("request_id")
+            and ("caveat" not in pack or isinstance(pack.get("caveat"), str))
+            and all(
+                field not in pack or strict_json_equal(pack.get(field), primary.get(field))
+                for field in ("issued_at", "jwks_url", "schema_url", "verify_url")
+            )
+            and all(key in allowed_budget_state for key in budget_state)
+            and (correlation_value is None or isinstance(correlation_value, dict))
+            and all(key in allowed_correlation for key in correlation)
+            and all(strict_json_equal(value, expected_correlation[key]) for key, value in correlation.items())
+            and (request_context_value is None or isinstance(request_context_value, dict))
+            and all(key in allowed_request_context for key in request_context)
+            and all(strict_json_equal(value, expected_request_context[key]) for key, value in request_context.items())
+            and isinstance(redaction_value, dict)
+            and all(key in allowed_redaction for key in redaction)
+            and all(value == "redacted" for value in redaction.values())
+            and ("capability_hash" not in pack or pack.get("capability_hash") is None)
+            and "attempted_amount_usd" in budget_state
+            and is_zero_amount(budget_state["attempted_amount_usd"])
+            and "remaining_budget_usd" in budget_state
+            and is_zero_amount(budget_state["remaining_budget_usd"])
+            and strict_json_equal(budget_state.get("credit_unit"), primary_budget.get("credit_unit"))
+        )
+        if not checks["pack_sandbox_no_spend"]:
+            add_reason(reasons, reason_codes, "invalid_sandbox_provenance", "sandbox_no_spend pack claims capability, budget, delegation, or payment authority")
+
+    if primary.get("decision_reason") == "observe_projected":
+        allowed_pack = {
+            "archive_profile", "archive_retention", "archive_storage", "archived_at", "authority",
+            "budget", "budget_state", "capability_hash", "caveat", "correlation", "decision",
+            "decision_reason", "evidence_pack_hash", "evidence_pack_id", "evidence_url", "issued_at",
+            "issuer", "jwks_url", "policy", "previous_evidence_pack_hash", "receipt_hash", "receipt_id",
+            "receipts", "redaction", "request_context", "request_id", "route_or_tool", "schema_url",
+            "schema_version", "tenant_id", "verify_url",
+        }
+        projected = primary.get("projected_cost_credits")
+        budget_state_value = pack.get("budget_state")
+        budget_state = budget_state_value if isinstance(budget_state_value, dict) else {}
+        checks["pack_observe_projected"] = (
+            all(key in allowed_pack for key in pack)
+            and isinstance(budget_state_value, dict)
+            and set(budget_state) == {"credit_unit", "projected_cost_credits", "spend_mode"}
+            and budget_state.get("spend_mode") == "projected_only"
+            and strict_json_equal(budget_state.get("projected_cost_credits"), projected)
+            and strict_json_equal(budget_state.get("credit_unit"), primary.get("budget", {}).get("credit_unit"))
+        )
+        if not checks["pack_observe_projected"]:
+            add_reason(reasons, reason_codes, "invalid_observe_projection", "observe_projected pack carries inconsistent or billable budget state")
+
+    primary_decision = str(primary.get("decision", ""))
+    primary_reason = str(primary.get("decision_reason", ""))
+    decision_profile = decision_profile_for(primary)
+    if any(r.get("decision_reason") == "payment_verified" for r in receipts):
+        checks["pack_paid_rail"] = "budget_state" not in pack and not contains_any_key(pack, CREDIT_USD_FIELDS)
+        if not checks["pack_paid_rail"]:
+            add_reason(reasons, reason_codes, "invalid_paid_rail_provenance", "payment_verified L402 Pack carries budget_state or contradictory credit/USD fields")
+
+    checks["pack_hash_matches_primary_receipt"] = bool(primary) and pack.get("receipt_hash") == primary.get("receipt_hash")
+    if not checks["pack_hash_matches_primary_receipt"]:
+        add_reason(reasons, reason_codes, "pack_receipt_hash_not_primary", "pack.receipt_hash does not match primary embedded receipt.receipt_hash")
+
+    # evidence_url and issued_at are compared for every Pack, present or absent:
+    # a mirror left out of a Pack whose signed receipt has it is refused. For a
+    # gap record (allowed / observe_unrecorded) this is the contract in
+    # tools/VERIFIER-CONTRACT.md, and tools/verify_evidence_pack.py applies the
+    # same rule to gap Packs.
+    for field in ["evidence_pack_id", "evidence_url", "receipt_id", "issuer", "issued_at", "decision", "decision_reason", "route_or_tool", "capability_hash"]:
+        key = f"pack_{field}_matches_primary_receipt"
+        checks[key] = bool(primary) and strict_json_equal(pack.get(field), primary.get(field))
+        if not checks[key]:
+            add_reason(reasons, reason_codes, "pack_primary_mismatch", f"pack.{field} does not match primary embedded receipt.{field}")
+
+    # The authority, budget and policy mirrors are checked for every Pack,
+    # present or absent: a mirror left out of a Pack whose signed receipt has
+    # it is refused. For a new-profile receipt (allowed / policy_allowed with
+    # no balance, a window opener or closer, a gap record) this is the
+    # contract in tools/VERIFIER-CONTRACT.md, and tools/verify_evidence_pack.py
+    # applies the same rule to those profiles.
+    for field in ["authority", "budget", "policy"]:
+        key = f"pack_{field}_matches_primary_receipt"
+        pack_value = pack.get(field)
+        receipt_value = primary.get(field) if isinstance(primary, dict) else None
+        checks[key] = bool(primary) and strict_json_equal(pack_value, receipt_value)
+        if not checks[key]:
+            add_reason(reasons, reason_codes, "pack_primary_mismatch", f"pack.{field} mirror does not match primary embedded receipt.{field}")
+
+    budget_value = pack.get("budget_state")
+    budget: dict[str, Any] = budget_value if isinstance(budget_value, dict) else {}
+    primary_budget_value = primary.get("budget")
+    primary_budget: dict[str, Any] = primary_budget_value if isinstance(primary_budget_value, dict) else {}
+    primary_decision = str(primary.get("decision", ""))
+    primary_reason = str(primary.get("decision_reason", ""))
+    decision_profile = decision_profile_for(primary)
+    if is_new_profile_receipt(primary):
+        # The Pack wrapper repeats the receipt's budget and makes no claim of
+        # its own: nothing beside the exact budget mirrors, at any depth.
+        checks["pack_no_forbidden_claims"] = (
+            strict_json_equal(pack.get("budget_state"), VERIFIED_NOT_EVALUATED_BUDGET)
+            and not contains_forbidden_claim({k: v for k, v in pack.items() if k not in ("receipts", "budget", "budget_state")})
+        )
+        if not checks["pack_no_forbidden_claims"]:
+            add_reason(reasons, reason_codes, "invalid_not_evaluated_provenance", "pack wrapper of a no-balance receipt carries a budget, spend or payment claim (or a budget_state that is not the exact no-balance budget)")
+
+    if decision_profile == "paid_rail":
+        checks["budget_state_matches_primary_receipt"] = (
+            bool(primary)
+            and "budget_state" not in pack
+            and (
+                primary_budget == {
+                    "spend_mode": "paid_rail",
+                    "rail": "l402",
+                    "amount_sats": primary.get("amount_sats"),
+                }
+                or primary_budget == {
+                    "spend_mode": "paid_rail",
+                    "rail": "x402",
+                    "amount_atomic": primary.get("amount_atomic"),
+                }
+            )
+        )
+    elif decision_profile == "projected_only":
+        checks["budget_state_matches_primary_receipt"] = (
+            bool(primary)
+            and budget.get("spend_mode") == "projected_only"
+            and primary_budget.get("spend_mode") == "projected_only"
+            and "projected_cost_credits" in budget
+            and strict_json_equal(budget["projected_cost_credits"], primary.get("projected_cost_credits"))
+            and strict_json_equal(budget["projected_cost_credits"], primary_budget.get("projected_cost_credits"))
+            and strict_json_equal(budget.get("credit_unit"), primary_budget.get("credit_unit"))
+        )
+    elif decision_profile == "not_evaluated":
+        checks["budget_state_matches_primary_receipt"] = (
+            bool(primary)
+            and budget == {"spend_mode": "not_evaluated", "cost_credits": 0}
+            and strict_json_equal(primary_budget, budget)
+            and primary.get("authority") == {"provenance_level": "no_verified_capability"}
+            and pack.get("capability_hash") is None
+        )
+    elif decision_profile == "verified_not_evaluated":
+        checks["budget_state_matches_primary_receipt"] = (
+            bool(primary)
+            and strict_json_equal(budget_value, VERIFIED_NOT_EVALUATED_BUDGET)
+            and strict_json_equal(primary_budget_value, VERIFIED_NOT_EVALUATED_BUDGET)
+            and isinstance(primary.get("capability_hash"), str)
+            and pack.get("capability_hash") == primary.get("capability_hash")
+            and not contains_any_key({k: v for k, v in pack.items() if k != "receipts"}, VERIFIED_NOT_EVALUATED_FORBIDDEN_FIELDS)
+            and not contains_balance_claim({k: v for k, v in pack.items() if k != "receipts"})
+        )
+    else:
+        checks["budget_state_matches_primary_receipt"] = (
+            bool(primary)
+            and "attempted_amount_usd" in budget
+            and "attempted_amount_usd" in primary
+            and strict_json_equal(budget["attempted_amount_usd"], primary["attempted_amount_usd"])
+            and "remaining_budget_usd" in budget
+            and "remaining_budget_usd" in primary
+            and strict_json_equal(budget["remaining_budget_usd"], primary["remaining_budget_usd"])
+            and strict_json_equal(budget.get("credit_unit"), primary_budget.get("credit_unit"))
+        )
+    if not checks["budget_state_matches_primary_receipt"]:
+        add_reason(reasons, reason_codes, "budget_state_mismatch", "pack.budget_state does not match primary embedded receipt budget fields")
+
+    checks["no_secret_leakage"] = not contains_secret_marker(pack)
+    if not checks["no_secret_leakage"]:
+        add_reason(reasons, reason_codes, "secret_leakage", "pack contains a bearer/capability secret marker or unredacted secret-like field")
+
+    summary = {
+        "evidence_pack_id": pack.get("evidence_pack_id"),
+        "receipt_id": pack.get("receipt_id"),
+        "receipt_hash": pack.get("receipt_hash"),
+        "issuer": pack.get("issuer"),
+        "decision": pack.get("decision"),
+        "decision_reason": pack.get("decision_reason"),
+        "route_or_tool": pack.get("route_or_tool"),
+        "budget_state": pack.get("budget_state"),
+        "receipt_count": len(receipts),
+        "trust_anchor": "issuer_jwks_anchored" if checks.get("trusted_issuer_valid") else (receipt_trust_anchors[0] if receipt_trust_anchors else "unverified"),
+        "receipt_trust_anchors": receipt_trust_anchors,
+        "policy": pack.get("policy"),
+    }
+
+    return {
+        "valid": all(value for key, value in checks.items() if not key.endswith("trusted_issuer_valid")) and (checks.get("trusted_issuer_valid", False) if require_trusted_issuer else True),
+        "trusted_issuer_valid": checks.get("trusted_issuer_valid", False),
+        "protocol_profile": "issuer_jwks" if require_trusted_issuer else "artifact_integrity",
+        "reason_codes": reason_codes,
+        "checks": checks,
+        "summary": summary,
+        "reasons": reasons,
+        "caveat": None if checks.get("trusted_issuer_valid") else "Receipt verified against embedded public key only. This proves artifact integrity/self-consistency; pass --jwks-url/--jwks-file and --require-trusted-issuer for issuer-anchored verification.",
+    }
+
+
+
+def validate_explicit_jwks_url(url: str) -> None:
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme != "https":
+        raise VerificationError("JWKS URL must use https")
+    if parsed.username or parsed.password or parsed.fragment:
+        raise VerificationError("JWKS URL must not contain userinfo or fragments")
+    if not parsed.hostname:
+        raise VerificationError("JWKS URL must include a hostname")
+    if parsed.port not in {None, 443}:
+        raise VerificationError("JWKS URL must use the default HTTPS port")
+    try:
+        host_ip = ipaddress.ip_address(parsed.hostname)
+    except ValueError:
+        host_ip = None
+    if host_ip and (host_ip.is_private or host_ip.is_loopback or host_ip.is_link_local or host_ip.is_multicast or host_ip.is_reserved):
+        raise VerificationError("JWKS URL must not target private, loopback, link-local, multicast, or reserved IP space")
+
+
+def load_jwks(source: str) -> dict[str, Any]:
+    if source.startswith("https://"):
+        validate_explicit_jwks_url(source)
+        req = urllib.request.Request(source, headers={"Accept": "application/json", "User-Agent": "satgate-evidence-pack-verifier/1"})
+        try:
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                if resp.status != 200:
+                    raise VerificationError(f"JWKS fetch returned HTTP {resp.status}")
+                text = resp.read().decode("utf-8")
+        except urllib.error.HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace")[:500]
+            raise VerificationError(f"HTTP {exc.code} fetching JWKS: {body}") from exc
+        except urllib.error.URLError as exc:
+            raise VerificationError(f"failed to fetch JWKS: {exc.reason}") from exc
+    else:
+        text = Path(source).read_text(encoding="utf-8")
+    try:
+        jwks = json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise VerificationError(f"JWKS source is not JSON: {exc}") from exc
+    if not isinstance(jwks, dict):
+        raise VerificationError("JWKS source JSON must be an object")
+    return jwks
+
+def load_source(source: str) -> tuple[dict[str, Any], dict[str, Any]]:
+    metadata: dict[str, Any] = {"source": source}
+    if source == "-":
+        text = sys.stdin.read()
+        metadata["http_status"] = None
+    elif source.startswith("http://") or source.startswith("https://"):
+        req = urllib.request.Request(source, headers={"Accept": "application/json", "User-Agent": "satgate-evidence-pack-verifier/1"})
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                metadata["http_status"] = resp.status
+                metadata["content_type"] = resp.headers.get("Content-Type")
+                text = resp.read().decode("utf-8")
+        except urllib.error.HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace")[:500]
+            raise VerificationError(f"HTTP {exc.code} fetching Evidence Pack: {body}") from exc
+        except urllib.error.URLError as exc:
+            raise VerificationError(f"failed to fetch Evidence Pack: {exc.reason}") from exc
+    else:
+        path = Path(source)
+        text = path.read_text(encoding="utf-8")
+        metadata["http_status"] = None
+
+    try:
+        pack = json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise VerificationError(f"source is not JSON: {exc}") from exc
+    if not isinstance(pack, dict):
+        raise VerificationError("source JSON must be an object")
+    return pack, metadata
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Verify a public SatGate Evidence Pack URL or JSON file.")
+    parser.add_argument("source", help="Evidence Pack URL, JSON file path, or '-' for stdin")
+    parser.add_argument("--pretty", action="store_true", help="pretty-print JSON output (default)")
+    parser.add_argument("--jwks-url", help="HTTPS issuer JWKS URL to trust for receipt issuer_kid lookup")
+    parser.add_argument("--jwks-file", help="local JWKS JSON file to trust for receipt issuer_kid lookup")
+    parser.add_argument("--require-trusted-issuer", action="store_true", help="require issuer-JWKS-anchored verification (now the default; kept for explicitness/back-compat)")
+    parser.add_argument("--allow-embedded-key", action="store_true", help="downgrade to embedded-key self-verification (demo/self-signed packs); proves artifact self-consistency only, NOT issuer trust")
+    parser.add_argument("--discover-jwks", action="store_true", help="discover issuer JWKS from receipt.issuer at /.well-known/jwks.json (on by default in trusted mode when no --jwks-url/--jwks-file is given)")
+    parser.add_argument("--allow-mock", action="store_true", help="allow packs or receipts marked mock/demo/test")
+    parser.add_argument("--now", help="RFC3339 timestamp to use for temporal verification (tests/reproducibility)")
+    args = parser.parse_args(argv)
+    if Ed25519PublicKey is None:
+        print(
+            "Signatures could not be checked because the Python package 'cryptography' is not installed. "
+            "Install it with: pip install 'cryptography>=42'"
+        )
+        return 3
+
+    try:
+        if args.jwks_url and args.jwks_file:
+            raise VerificationError("use either --jwks-url or --jwks-file, not both")
+        # Safe by default: require issuer-anchored verification unless the caller
+        # explicitly opts into embedded-key self-verification.
+        require_trusted = not args.allow_embedded_key
+        has_explicit_jwks = bool(args.jwks_url or args.jwks_file)
+        # In trusted mode, auto-discover the issuer JWKS when no explicit source
+        # was supplied so a bare `verify_evidence_pack.py <url>` is issuer-anchored.
+        discover = require_trusted and (args.discover_jwks or not has_explicit_jwks)
+        jwks = load_jwks(args.jwks_url or args.jwks_file) if has_explicit_jwks else None
+        pack, source_meta = load_source(args.source)
+        result = verify_pack(pack, jwks=jwks, require_trusted_issuer=require_trusted, allow_mock=args.allow_mock, now=args.now, discover_jwks=discover, jwks_source=args.jwks_url)
+        result.update(source_meta)
+        print(json.dumps(result, indent=2, sort_keys=True))
+        if not result["valid"]:
+            return 1
+        if args.allow_embedded_key and not result.get("trusted_issuer_valid"):
+            print(
+                "WARNING: verified against the embedded public key only (--allow-embedded-key). "
+                "This proves the artifact is internally self-consistent, NOT that a trusted SatGate "
+                "issuer signed it. A forged self-signed pack would also pass this mode. Re-run without "
+                "--allow-embedded-key (optionally with --jwks-url/--jwks-file) for issuer-anchored proof.",
+                file=sys.stderr,
+            )
+        return 0
+    except (VerificationError, ValueError, OSError, OverflowError, RecursionError) as exc:
+        print(json.dumps({"valid": False, "reason_codes": ["invalid_input"],
+                          "error": f"Input could not be loaded or verified ({type(exc).__name__})"},
+                         indent=2, sort_keys=True))
+        return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

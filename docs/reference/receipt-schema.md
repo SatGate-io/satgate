@@ -51,17 +51,51 @@ Gateway receipts use a closed `decision_reason` vocabulary. The public verifier 
 - `auth_missing`
 - `budget_authorized`
 - `budget_exhausted`
+- `budget_backend_error`
 - `capability_expired`
 - `capability_invalid`
 - `insufficient_budget`
 - `observe_projected`
 - `observe_unrecorded`
+- `pending_capacity_exhausted`
 - `payment_required`
 - `payment_verified`
 - `policy_allowed`
 - `policy_denied`
 - `sandbox_no_spend`
 - `token_revoked`
+- `tool_price_unavailable`
+- `tool_controls_unavailable`
+
+The four unavailable-check reasons are reader support introduced in checker bundle
+`unavailable-check-v1`. Checkers older than this release reject these receipts,
+even when their signatures are valid. This checker-only release does not change
+what SatGate signs; the dependency-outage exclusions below still apply.
+
+### Unavailable-check refusal (reader support only)
+
+Each reason requires `decision: denied`, a verified key, and no evaluated budget:
+
+| reason | meaning |
+| --- | --- |
+| `tool_price_unavailable` | A required checked price lookup failed; the call was not sent. No fallback price is claimed. |
+| `tool_controls_unavailable` | Required spending/approval controls could not be checked, were absent, or returned an invalid admission; not a limit or approval denial. |
+| `budget_backend_error` | A required fail-closed budget/hold backend operation failed; not budget exhaustion or a known failed-store return value. |
+| `pending_capacity_exhausted` | The local Control pending reservation could not be made before a hold; not evidence the customer's funds were exhausted. |
+
+`budget` and the Pack's `budget_state` are exactly
+`{"spend_mode":"not_evaluated","cost_credits":0}` (integer zero, no extra keys).
+Authority is `verified_macaroon_caveats`, with a nonempty `capability_hash` bound
+to the receipt's, only the verified-capability authority fields, and all four raw
+capability/token/budget/parent fields present as `redacted`. Metadata and policy
+are objects. The Pack must carry matching `authority`, `budget` and `policy`
+mirrors, recursively equal in concrete JSON type and value. The receipt and
+wrapper cannot make balance, attempted, remaining, limit, projected, spend or
+payment claims at any depth outside the exact budget mirrors. Secret scanning,
+signature, time, hash and issuer trust checks still apply. These are per-call
+refusals, never rate-window or Observe gap pairs; window/gap fields are rejected.
+Existing profiles retain their existing behavior. Signer, identity or archive
+failure cannot be proven by signing a new receipt and remains unsigned.
 
 ## Receipts when sign-every-action is on
 
@@ -109,6 +143,13 @@ The gap receipt makes no balance claim (same budget object as above). The verifi
 
 ### Checking a whole record
 
+Download the record checker together with its exact sibling pack checker,
+requirements, contract and hashes as bundle `unavailable-check-v1`; see
+[`tools/README.md`](../../tools/README.md#versioned-checker-bundle).
+Updating only the record script does not teach it new reasons. A saved older
+checker still rejects these reasons; a bundle/version field in an untrusted
+record cannot negotiate support or authorize downloading/executing a checker.
+
 `tools/verify_receipt_record.py` checks a downloaded record: one Evidence Pack per line, then a signed complete manifest or cut-off terminal. It runs the per-pack check on every line, checks the terminal's signature and closed field set (unknown fields fail), that the count and the receipt hashes in order match (so nothing was dropped, added, changed or moved), that every receipt is in the terminal's time range, in order, not repeated, from the same issuer, and belongs to the one agent key the terminal names, and that the refusal windows and counts by reason match. Each receipt and the terminal select their own signing key by `issuer_kid`; with `--require-trusted-issuer`, all keys must be in the issuer JWKS supplied by `--jwks-file` or `--jwks-url`. Embedded-key mode, including mixed keys, proves self-consistency only and says so in output. A record line holds exactly one receipt. In a complete record, an overdue window closer makes the record invalid; a closer not yet due, or a window running past the range, is pending or boundary. A signed `satgate.receipt_record_truncated.v1` terminal is checked against its prefix, reports `status: truncated`, its reason and `verified_prefix`, and exits 4 with `valid` and `complete` false; an unclosed prefix window is `prefix_open`. Exit codes are 0 complete, 1 invalid record, 2 input/JWKS loading or usage error, 3 missing cryptography, 4 verified truncation. See `tools/VERIFIER-CONTRACT.md` for the field sets and limits of these claims.
 
 ## Verification sequence
@@ -153,6 +194,7 @@ The gap receipt makes no balance claim (same budget object as above). The verifi
 ## Schema design notes
 
 - The schema keeps `additionalProperties: true` so rails, billing systems, and Evidence Pack implementations can add contextual fields without breaking v1 consumers.
+- Additive context is not negotiation of new reasons or critical semantics. Gateway reasons remain closed; unknown reasons, schemas and record lines fail, not silently skip or become unsupported warnings. The no-budget profile's recursive claim restrictions override contextual optionality.
 - The dangerous parts are closed: `schema_version`, `decision`, origin-style `issuer`, canonicalization/hash/signature algorithms, signature/hash prefixes, and required proof fields.
 - `issuer` must be an HTTPS origin: no path, query, or fragment. Verifiers must reject non-origin issuers before JWKS lookup.
 - `paid` receipts require `amount_usd`, `currency: "USD"`, and `rail` so paid-call evidence does not lose payment context.

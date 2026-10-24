@@ -54,9 +54,13 @@ except Exception:  # pragma: no cover - exercised only in minimal Python envs
 EXPECTED_PACK_SCHEMA = "satgate.evidence_pack.v1"
 EXPECTED_RECEIPT_SCHEMA = "satgate.receipt.v1"
 SUPPORTED_CANONICALIZATION = "jcs-rfc8785"
+UNAVAILABLE_CHECK_REASONS = frozenset({
+    "tool_price_unavailable", "tool_controls_unavailable",
+    "budget_backend_error", "pending_capacity_exhausted",
+})
 ALLOWED_DECISIONS = {"allowed", "paid", "denied"}
-# Reasons the gateway writes into receipt.decision_reason. payment_verified is
-# checked by the paid-rail validator, not this set. Unknown reasons still fail.
+# Supported gateway reasons, including reader-only unavailable-check support.
+# payment_verified is checked by the paid-rail validator. Unknown reasons fail.
 ALLOWED_DECISION_REASONS = {
     "auth_missing",
     "budget_authorized",
@@ -71,7 +75,7 @@ ALLOWED_DECISION_REASONS = {
     "policy_denied",
     "sandbox_no_spend",
     "token_revoked",
-}
+} | UNAVAILABLE_CHECK_REASONS
 CRYPTO_MISSING_EXIT = 3
 CRYPTO_MISSING_MESSAGE = (
     "Signatures could not be checked because the Python package 'cryptography' is not installed. "
@@ -490,6 +494,8 @@ def valid_x402_paid_rail(receipt):
 #    "opened" or "closed"). It is a denied receipt with a denial_code.
 # 3. A gap receipt: allowed / observe_unrecorded, a signed count of the
 #    Observe calls that went through in one UTC minute with no receipt.
+# 4. Reader-only unavailable-check refusals: explicit denied reasons, always
+#    verified-key and no-budget, never rate windows or Observe gaps.
 NOT_EVALUATED_BUDGET = {"spend_mode": "not_evaluated", "cost_credits": 0}
 NOT_EVALUATED_FORBIDDEN_FIELDS = {
     "amount_atomic", "amount_sats", "amount_usd", "attempted_amount_usd", "currency",
@@ -600,8 +606,11 @@ NO_CAPABILITY_PAIRS = {("denied", "token_revoked"), ("denied", "capability_expir
 
 
 def is_new_profile_receipt(receipt: Any) -> bool:
-    """A receipt of the three shapes added for sign-every-action: allowed
-    without a balance, a window opener or closer, a gap record."""
+    """A strict no-balance profile, including an unavailable-check refusal.
+
+    Select by reason even with a bad decision or budget: those must fail, not
+    fall back to legacy enum-only validation.
+    """
     if not isinstance(receipt, dict):
         return False
     budget = receipt.get("budget")
@@ -609,6 +618,7 @@ def is_new_profile_receipt(receipt: Any) -> bool:
         (receipt.get("decision") == "allowed" and receipt.get("decision_reason") == "policy_allowed"
          and isinstance(budget, dict) and budget.get("spend_mode") == "not_evaluated")
         or receipt.get("decision_reason") == "observe_unrecorded"
+        or receipt.get("decision_reason") in UNAVAILABLE_CHECK_REASONS
         or any(field in receipt for field in RATE_WINDOW_FIELDS + UNRECORDED_FIELDS)
     )
 
@@ -772,6 +782,15 @@ def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reas
     # check exists only for a receipt that carries its shape, so a receipt made
     # before them is judged exactly as it was.
     budget_value = receipt.get("budget")
+    if receipt.get("decision_reason") in UNAVAILABLE_CHECK_REASONS:
+        checks[f"{prefix}_unavailable_check_refusal"] = (
+            receipt.get("decision") == "denied"
+            and makes_no_balance_claim(receipt)
+            and isinstance(receipt.get("policy"), dict)
+            and not any(field in receipt for field in RATE_WINDOW_FIELDS + UNRECORDED_FIELDS)
+        )
+        if not checks[f"{prefix}_unavailable_check_refusal"]:
+            fail("invalid_unavailable_check_refusal", "Unavailable-check refusal must be denied, with the exact no-budget shape and no window, gap, spend or payment claims")
     if (
         receipt.get("decision") == "allowed"
         and receipt.get("decision_reason") == "policy_allowed"
@@ -958,7 +977,8 @@ def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requi
 
     # The authority, budget and policy mirrors. A paid-rail Pack must carry
     # them; so must a Pack of a new-profile receipt (allowed / policy_allowed
-    # with no balance, a window opener or closer, a gap record): a mirror
+    # with no balance, a window opener or closer, a gap record, or an
+    # unavailable-check refusal): a mirror
     # that is left out is refused, exactly as the demo copy has always done
     # (see tools/VERIFIER-CONTRACT.md). Any other Pack keeps them optional, as
     # it always was: present, they must match; absent, nothing is checked.

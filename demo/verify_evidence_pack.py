@@ -56,6 +56,11 @@ except Exception:  # pragma: no cover - exercised only in minimal Python envs
 EXPECTED_PACK_SCHEMA = "satgate.evidence_pack.v1"
 EXPECTED_RECEIPT_SCHEMA = "satgate.receipt.v1"
 SUPPORTED_CANONICALIZATION = "jcs-rfc8785"
+UNAVAILABLE_CHECK_REASONS = frozenset({
+    "tool_price_unavailable", "tool_controls_unavailable",
+    "budget_backend_error", "pending_capacity_exhausted",
+})
+UNAVAILABLE_CHECK_PAIRS = {("denied", reason) for reason in UNAVAILABLE_CHECK_REASONS}
 DECISION_REASON_PROFILES = {
     ("allowed", "budget_authorized"): "evaluated",
     ("allowed", "policy_allowed"): "evaluated",
@@ -73,6 +78,7 @@ DECISION_REASON_PROFILES = {
     ("denied", "token_revoked"): "not_evaluated",
     ("denied", "payment_required"): "not_evaluated",
 }
+DECISION_REASON_PROFILES.update({pair: "verified_not_evaluated" for pair in UNAVAILABLE_CHECK_PAIRS})
 ALLOWED_DECISIONS = {decision for decision, _ in DECISION_REASON_PROFILES}
 ALLOWED_DECISION_REASONS = {reason for _, reason in DECISION_REASON_PROFILES}
 # A verified capability refused by policy before any budget lookup (for example
@@ -88,12 +94,14 @@ ALLOWED_DECISION_REASONS = {reason for _, reason in DECISION_REASON_PROFILES}
 # judged as it always was. allowed / observe_unrecorded is a gap receipt, the
 # signed count of Observe calls that went through with no receipt; it has no
 # balance to evaluate, so it is legal only with spend_mode not_evaluated.
+# Unavailable-check refusal pairs also require this verified-key shape, always:
+# unlike policy_denied/policy_allowed, they have no evaluated-budget variant.
 VERIFIED_NOT_EVALUATED_PAIRS = {
     ("denied", "policy_denied"),
     ("allowed", "policy_allowed"),
     ("allowed", "observe_unrecorded"),
-}
-NOT_EVALUATED_ONLY_PAIRS = {("allowed", "observe_unrecorded")}
+} | UNAVAILABLE_CHECK_PAIRS
+NOT_EVALUATED_ONLY_PAIRS = {("allowed", "observe_unrecorded")} | UNAVAILABLE_CHECK_PAIRS
 VERIFIED_NOT_EVALUATED_BUDGET = {"spend_mode": "not_evaluated", "cost_credits": 0}
 VERIFIED_CAPABILITY_AUTHORITY_FIELDS = {
     "budget_id_hash", "budget_subject_hash", "capability_hash", "delegation_budget",
@@ -723,8 +731,11 @@ def makes_no_balance_claim(receipt: dict[str, Any]) -> bool:
 
 
 def is_new_profile_receipt(receipt: Any) -> bool:
-    """A receipt of the three shapes added for sign-every-action: allowed
-    without a balance, a window opener or closer, a gap record."""
+    """A strict no-balance profile, including an unavailable-check refusal.
+
+    Select by reason even with a bad decision or budget: those must fail, not
+    fall back to a legacy profile.
+    """
     if not isinstance(receipt, dict):
         return False
     budget = receipt.get("budget")
@@ -732,6 +743,7 @@ def is_new_profile_receipt(receipt: Any) -> bool:
         (receipt.get("decision") == "allowed" and receipt.get("decision_reason") == "policy_allowed"
          and isinstance(budget, dict) and budget.get("spend_mode") == "not_evaluated")
         or receipt.get("decision_reason") == "observe_unrecorded"
+        or receipt.get("decision_reason") in UNAVAILABLE_CHECK_REASONS
         or any(field in receipt for field in RATE_WINDOW_FIELDS + UNRECORDED_FIELDS)
     )
 
@@ -811,6 +823,15 @@ def verify_receipt(receipt: dict[str, Any], index: int, reasons: list[str], reas
     decision = str(receipt.get("decision", ""))
     decision_reason = str(receipt.get("decision_reason", ""))
     decision_profile = decision_profile_for(receipt)
+    if decision_reason in UNAVAILABLE_CHECK_REASONS:
+        checks[f"{prefix}_unavailable_check_refusal"] = (
+            decision == "denied"
+            and makes_no_balance_claim(receipt)
+            and isinstance(receipt.get("policy"), dict)
+            and not any(field in receipt for field in RATE_WINDOW_FIELDS + UNRECORDED_FIELDS)
+        )
+        if not checks[f"{prefix}_unavailable_check_refusal"]:
+            fail("invalid_unavailable_check_refusal", "Unavailable-check refusal must be denied, with the exact no-budget shape and no window, gap, spend or payment claims")
     checks[f"{prefix}_decision_reason_combination"] = decision_profile is not None
     if not checks[f"{prefix}_decision_reason_combination"]:
         fail("invalid_decision_reason_combination", f"receipts[{index}] decision/reason combination is not legal")
@@ -1326,7 +1347,8 @@ def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requi
     # The authority, budget and policy mirrors are checked for every Pack,
     # present or absent: a mirror left out of a Pack whose signed receipt has
     # it is refused. For a new-profile receipt (allowed / policy_allowed with
-    # no balance, a window opener or closer, a gap record) this is the
+    # no balance, a window opener or closer, a gap record, or an
+    # unavailable-check refusal) this is the
     # contract in tools/VERIFIER-CONTRACT.md, and tools/verify_evidence_pack.py
     # applies the same rule to those profiles.
     for field in ["authority", "budget", "policy"]:
