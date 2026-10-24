@@ -67,12 +67,16 @@ Gateway receipts use a closed `decision_reason` vocabulary. The public verifier 
 - `tool_price_unavailable`
 - `tool_controls_unavailable`
 
-The four unavailable-check reasons are reader support introduced in checker bundle
-`unavailable-check-v1`. Checkers older than this release reject these receipts,
-even when their signatures are valid. This checker-only release does not change
-what SatGate signs; the dependency-outage exclusions below still apply.
+The four unavailable-check reasons require checker bundle `unavailable-check-v1`
+(released at `40b22c58e6c62d4c4def1aa487035fcd52da73e5`) or a matching newer
+reader. Older checkers reject them even when their signatures are valid.
+The public MCP proxy produces them only when both `SetSignEveryAction(true)`
+and the separate `SetSignUnavailableCheckRefusals(true)` are set before serving.
+The latter defaults to false, including after a module upgrade: existing
+sign-every-action deployments do not implicitly opt in to new reason vocabulary.
+Cloud enablement is a separate rollout step, not enabled by this code release.
 
-### Unavailable-check refusal (reader support only)
+### Unavailable-check refusal (explicit producer opt-in)
 
 Each reason requires `decision: denied`, a verified key, and no evaluated budget:
 
@@ -97,13 +101,27 @@ refusals, never rate-window or Observe gap pairs; window/gap fields are rejected
 Existing profiles retain their existing behavior. Signer, identity or archive
 failure cannot be proven by signing a new receipt and remains unsigned.
 
+Price refusals precede controls, reservation and spend. Invalid control admissions
+are settled before signing; real spending-limit and approval denials keep their
+policy meaning. Budget backend receipts are produced only for the fail-closed
+blocking branch, never Observe or configured fail-open Control. Pending-capacity
+receipts are Control-only, after proof preflight and before a hold, without
+reserving an additional pending slot. Missing hold support and preparation failure
+after a hold remain unsigned. A possibly persisted allowed receipt or
+`outcome_unknown` is never reinterpreted as a refusal. With both switches on, a
+transport failure after admission returns the existing admission evidence handles
+on its existing error, not a second or outage receipt. With the new switch off,
+all these responses and receipts retain their previous bytes and meaning.
+Disabling the setting stops future emission; it never deletes or rewrites archived
+receipts. Keep the matching checker bundle available after rollback.
+
 ## Receipts when sign-every-action is on
 
 A gateway can be run with a switch (`Proxy.SetSignEveryAction` in the open-source MCP proxy; the hosted gateways wire their own setting; off by default) that makes it sign a receipt for each call made with a key SatGate issued, whether the call is let through or refused. While the switch is off, only the calls that had a receipt before get one, and nothing below is promised. While it is on, a call whose receipt cannot be made is not passed on, and nothing is charged for it: the caller gets `proof_unavailable`. A recorder that answers with nothing counts as a receipt that could not be made. A refusal that cannot be recorded is answered `proof_unavailable` as well, in place of the usual refusal. Observe is the one exception: the call goes through and the miss is counted (see the gap receipt below). The switch needs a recorder that keeps refusal windows (`WindowRecorder`); turning it on without one is a setup error. With the switch on, the `request_id` of a receipt is made by the server for that one call (random, never built from the caller's JSON-RPC id, session or request id), so two callers that number their requests alike get receipts that can be told apart.
 
-What counts as a call: a request that arrives with a key that verifies. What does not: the connection handshake (`initialize`, `ping`, notifications), listing tools, a request with no key or a key SatGate did not issue, and a request SatGate could not decide at all because something it depends on was down (a price it could not read, a limit store that did not answer). Those are stopped or refused, not signed.
+What counts as a call: a request that arrives with a key that verifies. What does not: the connection handshake (`initialize`, `ping`, notifications), listing tools, a request with no key or a key SatGate did not issue. A request stopped because a required check was unavailable stays unsigned unless the separate unavailable-check setting above is also on. Signer, identity and archive failures remain unsigned in either case.
 
-Three receipt shapes carry this. None changes how an older receipt is read: each check below applies only to a receipt that has the shape.
+Three sign-every-action shapes carry this, plus the separately opted-in unavailable-check refusal above. None changes how an older receipt is read: each check below applies only to a receipt that has the shape.
 
 ### A call that was allowed and read no balance
 

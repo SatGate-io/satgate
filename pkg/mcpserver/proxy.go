@@ -83,6 +83,8 @@ type Proxy struct {
 	// every_action.go). Off by default: every answer is then what it was
 	// before the switch existed.
 	signEveryAction bool
+	// Separate vocabulary opt-in: module upgrades must not enable outage receipts.
+	signUnavailableCheckRefusals bool
 
 	// reversalFailures counts the give-backs of an Observe carve that failed
 	// (ReversalFailures). ea is the rest of the switch's state (holds, the
@@ -724,11 +726,11 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				log.Error().Err(priceErr).Str("tool", tc.Name).Str("budgetId", tokenInfo.BudgetID).
 					Str("mode", mode).
 					Msg("tool price unavailable; refusing the call before any charge")
-				return NewErrorResponseWithData(req.ID, CodeInternalError, ToolPriceUnavailableMessage, map[string]interface{}{
+				return p.refuseUnavailableCheck(ctx, tokenInfo, tc.Name, unavailablePrice, NewErrorResponseWithData(req.ID, CodeInternalError, ToolPriceUnavailableMessage, map[string]interface{}{
 					"error":     "tool_price_unavailable",
 					"tool":      tc.Name,
 					"retryable": true,
-				}), nil
+				})), nil
 			}
 			log.Warn().Err(priceErr).Str("tool", tc.Name).Str("budgetId", tokenInfo.BudgetID).
 				Str("mode", mode).
@@ -865,6 +867,9 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			}
 			if slot = p.every().pending.reserve(kindUncharged); slot == nil {
 				log.Error().Str("tool", receiptTool(tc.Name)).Msg("sign every action: the pending store is full; refusing the call before any charge")
+				if isControl {
+					return p.refuseUnavailableCheck(ctx, tokenInfo, tc.Name, unavailablePendingCapacity, proofUnavailableResponse(req.ID, tc.Name)), nil
+				}
 				return proofUnavailableResponse(req.ID, tc.Name), nil
 			}
 			defer slot.release()
@@ -966,11 +971,11 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 					log.Warn().Str("tool", tc.Name).Str("mode", mode).
 						Msg("allowing despite budget backend error")
 				} else {
-					return NewErrorResponseWithData(req.ID, CodeInternalError, "Budget service unavailable", map[string]interface{}{
+					return p.refuseUnavailableCheck(ctx, tokenInfo, tc.Name, unavailableBudgetBackend, NewErrorResponseWithData(req.ID, CodeInternalError, "Budget service unavailable", map[string]interface{}{
 						"error":    "budget_backend_error",
 						"tool":     tc.Name,
 						"failMode": "closed",
-					}), nil
+					})), nil
 				}
 			}
 		} else if result != nil {
@@ -1117,7 +1122,12 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	// otherwise look like an answer from the upstream.
 	dispatchFrom(ctx).recordForward(resp, err)
 	if err != nil {
-		return NewErrorResponse(req.ID, CodeUpstreamError, fmt.Sprintf("upstream error: %v", err)), nil
+		transportError := NewErrorResponse(req.ID, CodeUpstreamError, fmt.Sprintf("upstream error: %v", err))
+		if p.unavailableCheckRefusalsEnabled() {
+			// Admission already happened: deliver its handles, never a new denial.
+			transportError = withEvidenceData(transportError, allowedEvidence)
+		}
+		return transportError, nil
 	}
 
 	// Track every tool call as a task

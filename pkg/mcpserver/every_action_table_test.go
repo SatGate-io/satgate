@@ -354,6 +354,9 @@ type eaRow struct {
 	what     string
 	included bool
 	why      string // excluded rows: the reason a customer would accept
+	// unavailableReason reclassifies only these stops when the separate
+	// unavailable-check emission gate is also on. Default-mode rows stay as-is.
+	unavailableReason string
 	// observeOpen marks the Observe rows. Today an Observe call goes on when
 	// its receipt cannot be made, and this PR keeps that (the owner has not
 	// chosen yet), so with the signer down they are the only included rows
@@ -410,9 +413,9 @@ func eaTable() []eaRow {
 		{id: "E09", what: "tools/call with no key", why: "no key", opts: eaOpts{noKey: true}, run: eaToolCall(1, "paid_read", "")},
 		{id: "E10", what: "tools/call with a key that does not verify", why: "a key SatGate did not issue: nothing says whose it is", opts: eaOpts{garbage: true}, run: eaToolCall(1, "paid_read", "")},
 		{id: "E11", what: "tools/call with an expired key, no tenant on the request", why: "the account is not proven: no trusted tenant on the request", opts: eaOpts{expired: true}, run: eaToolCall(1, "paid_read", "")},
-		{id: "E12", what: "tools/call whose price could not be read", why: "SatGate could not decide", opts: eaOpts{badPrice: true}, run: eaToolCall(1, "paid_read", "")},
-		{id: "E13", what: "tools/call on a key with a limit and no gate installed", why: "SatGate could not decide", opts: eaOpts{caveats: []func(*testing.T) string{eaControl(spendDoc200Day)}}, run: eaToolCall(1, "place_crypto_order", order("10"))},
-		{id: "E14", what: "tools/call when the budget store does not answer", why: "SatGate could not decide", opts: eaOpts{brokenBud: true}, run: eaToolCall(1, "paid_read", "")},
+		{id: "E12", what: "tools/call whose price could not be read", why: "SatGate could not decide", unavailableReason: "tool_price_unavailable", opts: eaOpts{badPrice: true}, run: eaToolCall(1, "paid_read", "")},
+		{id: "E13", what: "tools/call on a key with a limit and no gate installed", why: "SatGate could not decide", unavailableReason: "tool_controls_unavailable", opts: eaOpts{caveats: []func(*testing.T) string{eaControl(spendDoc200Day)}}, run: eaToolCall(1, "place_crypto_order", order("10"))},
+		{id: "E14", what: "tools/call when the budget store does not answer", why: "SatGate could not decide", unavailableReason: "budget_backend_error", opts: eaOpts{brokenBud: true}, run: eaToolCall(1, "paid_read", "")},
 
 		// ---- included: tools/call ----
 		{id: "T01", what: "allowed, priced, Control", included: true, transports: true, want: spent, run: eaToolCall(1, "paid_read", "")},

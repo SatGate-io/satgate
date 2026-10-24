@@ -18,10 +18,10 @@ package mcpserver
 // a request that reaches the authenticated methods with a key that verified is
 // an action, whether the proxy passes it on or refuses it. The handshake
 // (initialize, ping, notifications), tools/list, and requests with no key or a
-// key that does not verify are not. A failure where the proxy could not decide
-// (a price it could not read, a spending-limit store that was down, a budget
-// store that did not answer) is not an action either: there is no decision to
-// record, and the request is not passed on.
+// key that does not verify are not. Unavailable-check stops stay unsigned unless
+// SetSignUnavailableCheckRefusals is also on. That separate, default-off opt-in
+// records only the four explicit no-budget refusal reasons below; signer,
+// identity, archive and ambiguous allowed-receipt failures stay unsigned.
 
 import (
 	"bytes"
@@ -101,6 +101,19 @@ func (p *Proxy) SignEveryActionReady() error {
 
 // SignEveryAction reports whether the switch is on.
 func (p *Proxy) SignEveryAction() bool { return p.signEveryAction }
+
+// SetSignUnavailableCheckRefusals opts into the unavailable-check-v1 reason
+// vocabulary. Off by default, independently of SetSignEveryAction, including on
+// module upgrade. Both switches must be on to emit these refusals or deliver
+// existing admission handles on a transport error. Call before serving requests.
+// Disabling it stops future emission; it does not rewrite archived receipts.
+func (p *Proxy) SetSignUnavailableCheckRefusals(on bool) {
+	p.signUnavailableCheckRefusals = on
+}
+
+func (p *Proxy) unavailableCheckRefusalsEnabled() bool {
+	return p.signEveryAction && p.signUnavailableCheckRefusals
+}
 
 // ReversalFailures is how many times the proxy could not give back what it had
 // taken for a call whose receipt failed, since it started: a hold that could
@@ -365,6 +378,69 @@ func (p *Proxy) refuseSigned(ctx context.Context, req *Request, tokenInfo *Token
 	if err != nil {
 		log.Error().Err(err).Str("method", method).Str("tool", tool).Str("code", code).Msg("MCP refusal receipt unavailable")
 		return proofUnavailableResponse(req.ID, tool)
+	}
+	return withEvidenceData(resp, ev)
+}
+
+// unavailableCheckReason is deliberately not a string or an MCPDecision: this
+// seam accepts no backend text, fallback price, gate detail or raw arguments.
+type unavailableCheckReason uint8
+
+const (
+	unavailablePrice unavailableCheckReason = iota + 1
+	unavailableControls
+	unavailableBudgetBackend
+	unavailablePendingCapacity
+)
+
+func (r unavailableCheckReason) reason() string {
+	switch r {
+	case unavailablePrice:
+		return "tool_price_unavailable"
+	case unavailableControls:
+		return "tool_controls_unavailable"
+	case unavailableBudgetBackend:
+		return "budget_backend_error"
+	case unavailablePendingCapacity:
+		return "pending_capacity_exhausted"
+	default:
+		return ""
+	}
+}
+
+// refuseUnavailableCheck signs one stopped call directly, never reserving a
+// pending slot. The original response is only an output envelope, never signed.
+// It allocates a server identity and recordMethodDecision uses the existing
+// signing timeout and recorder archive contract. No failure is retried as a
+// refusal: in particular, a possibly persisted allow is never passed here.
+func (p *Proxy) refuseUnavailableCheck(ctx context.Context, tokenInfo *TokenInfo, tool string, reason unavailableCheckReason, resp *Response) *Response {
+	if !p.unavailableCheckRefusalsEnabled() {
+		return resp
+	}
+	if reason.reason() == "" || tokenInfo == nil || p.setupBlocks() || p.evidence == nil {
+		return proofUnavailableResponse(resp.ID, tool)
+	}
+	requestID, err := p.every().callID(callIDPrefix)
+	if err != nil {
+		return proofUnavailableResponse(resp.ID, tool)
+	}
+	// Price failure precedes the ordinary tools/call preflight. Recheck here
+	// for all four stops so a failed signer is never itself signed as an outage.
+	preCtx, cancel := context.WithTimeout(ctx, p.every().cfg().SignTimeout)
+	defer cancel()
+	if err := p.evidence.Preflight(preCtx); err != nil {
+		return proofUnavailableResponse(resp.ID, tool)
+	}
+	// No Request is passed: not even the caller's JSON-RPC id is a signed
+	// field here. The response correlation id remains only in the envelope.
+	ev, err := p.recordMethodDecision(ctx, nil, tokenInfo, MethodToolsCall, tool, MCPDecision{
+		Decision:           "denied",
+		DecisionReason:     reason.reason(),
+		BudgetNotEvaluated: true,
+		RequestID:          requestID,
+	})
+	if err != nil {
+		return proofUnavailableResponse(resp.ID, tool)
 	}
 	return withEvidenceData(resp, ev)
 }

@@ -33,10 +33,11 @@ type MCPDecision struct {
 	// verification succeeds. Recorders must not project token, capability, or
 	// evaluated-budget authority for this profile.
 	NoVerifiedCapability bool `json:"no_verified_capability,omitempty"`
-	// BudgetNotEvaluated marks a verified capability refused by policy before
-	// any budget lookup (for example a scope miss). Recorders must sign
-	// spend_mode not_evaluated and must not project a limit, remaining, or
-	// attempted balance, because none was read.
+	// BudgetNotEvaluated marks a decision with no evaluated-budget claim,
+	// including policy refusals, free admissions and the four unavailable-check
+	// refusals (produced only with both proxy signing switches on). Recorders
+	// must sign exactly {"spend_mode":"not_evaluated","cost_credits":0}, never
+	// a limit, remaining, attempted balance or a failed backend's return values.
 	BudgetNotEvaluated bool `json:"budget_not_evaluated,omitempty"`
 
 	// DenialCode, ArgumentField and ArgumentRulesSHA256 are set only when the

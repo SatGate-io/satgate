@@ -149,10 +149,7 @@ func (p *Proxy) admitCall(ctx context.Context, req *Request, tokenInfo *TokenInf
 	if p.gate == nil {
 		// The token carries a control and nothing here can enforce it.
 		log.Error().Str("tool", toolName).Msg("token carries a control but no call gate is installed; refusing the call")
-		return nil, NewErrorResponseWithData(req.ID, CodeInternalError, "A limit on this token could not be checked, so the call was not sent", map[string]interface{}{
-			"error": "tool_controls_unavailable",
-			"tool":  toolName,
-		})
+		return nil, p.controlsUnavailableResponse(ctx, req, tokenInfo, toolName)
 	}
 	adm, err := p.gate.Admit(ctx, GateCall{
 		Token:     tokenInfo,
@@ -164,10 +161,7 @@ func (p *Proxy) admitCall(ctx context.Context, req *Request, tokenInfo *TokenInf
 	})
 	if err != nil {
 		log.Error().Err(err).Str("tool", toolName).Msg("call gate could not decide; refusing the call")
-		return nil, NewErrorResponseWithData(req.ID, CodeInternalError, "A limit on this token could not be checked, so the call was not sent", map[string]interface{}{
-			"error": "tool_controls_unavailable",
-			"tool":  toolName,
-		})
+		return nil, p.controlsUnavailableResponse(ctx, req, tokenInfo, toolName)
 	}
 	if adm == nil {
 		return nil, nil
@@ -177,10 +171,7 @@ func (p *Proxy) admitCall(ctx context.Context, req *Request, tokenInfo *TokenInf
 		if adm.Settle != nil {
 			adm.Settle(ctx, GateOutcome{})
 		}
-		return nil, NewErrorResponseWithData(req.ID, CodeInternalError, "A limit on this token could not be checked, so the call was not sent", map[string]interface{}{
-			"error": "tool_controls_unavailable",
-			"tool":  toolName,
-		})
+		return nil, p.controlsUnavailableResponse(ctx, req, tokenInfo, toolName)
 	}
 	if adm.Refusal != nil {
 		resp := p.gateRefusalResponse(ctx, req, tokenInfo, toolName, adm.Refusal)
@@ -190,6 +181,14 @@ func (p *Proxy) admitCall(ctx context.Context, req *Request, tokenInfo *TokenInf
 		return nil, resp
 	}
 	return adm, nil
+}
+
+func (p *Proxy) controlsUnavailableResponse(ctx context.Context, req *Request, tokenInfo *TokenInfo, tool string) *Response {
+	return p.refuseUnavailableCheck(ctx, tokenInfo, tool, unavailableControls,
+		NewErrorResponseWithData(req.ID, CodeInternalError, "A limit on this token could not be checked, so the call was not sent", map[string]interface{}{
+			"error": "tool_controls_unavailable",
+			"tool":  tool,
+		}))
 }
 
 // settle reports how the call ended. Only two endings are known not to have
