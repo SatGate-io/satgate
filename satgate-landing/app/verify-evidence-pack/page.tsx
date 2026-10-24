@@ -79,9 +79,6 @@ python tools/verify_evidence_pack.py pack.json \
       <section className="border-t border-white/10 px-6 py-16">
         <div className="mx-auto max-w-4xl">
           <h2 className="text-3xl font-black">Current limits</h2>
-          <p className="mt-6 text-sm leading-6 text-gray-300">
-            For full pack or downloaded-record checking, use the matching <a href="https://github.com/SatGate-io/satgate/blob/main/tools/README.md#versioned-checker-bundle" className="text-cyan-200 underline">versioned checker bundle</a> from a reviewed immutable commit. Bundle <code>unavailable-check-v1</code> adds reader support for unavailable-check refusals; older checkers reject those reasons even with valid signatures. SatGate does not yet sign these outage blocks. The separate evidence-pack-verifier project checks the first receipt&apos;s signature, not the full pack or record contract.
-          </p>
           <ul className="mt-6 space-y-3 text-gray-300">
             <li>• Signing keys are stored as platform secrets. We don&apos;t claim they sit in a hardware security module, and no outside firm has audited them.</li>
             <li>• Receipts are kept in durable storage. They aren&apos;t anchored anywhere outside SatGate, and the storage isn&apos;t write-once.</li>
