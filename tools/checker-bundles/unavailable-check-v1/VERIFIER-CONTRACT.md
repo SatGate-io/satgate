@@ -162,7 +162,7 @@ A gateway with the sign-every-action switch on signs a receipt for each call a v
 
 **Observe gap.** `allowed` / `observe_unrecorded`: the signed count of Observe calls that went through in one UTC minute with no receipt. `unrecorded_window_start` (UTC minute), `unrecorded_window_seconds` (the integer `60`), `unrecorded_calls` (integer, at least 1), no `rate_limit_*` field, no balance claim, verified-key authority, and issued at or after the end of its window. Without a window or a count it is refused. Demo also refuses the reason on any budget but `not_evaluated`.
 
-## Unavailable-check refusal — reader-only support
+## Unavailable-check refusal: reader-only support
 
 Bundle `unavailable-check-v1` adds exactly `tool_price_unavailable`,
 `tool_controls_unavailable`, `budget_backend_error`, and
