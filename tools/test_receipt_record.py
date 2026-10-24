@@ -147,6 +147,21 @@ class ReceiptRecord(unittest.TestCase):
         self.assertEqual(result["summary"], "4 receipts, 1 refusals, 0 windows, 0 problems")
         self.assertTrue(result["checks"]["manifest_trusted_issuer"])
 
+    def test_record_with_stk_inside_access_id_passes_end_to_end(self):
+        # Exactly 32 base64url characters after evid_, with the unlucky prefix
+        # in the middle. Sign after setting the ID and all URL copies.
+        access_id = "evid_" + "A" * 12 + "stk_" + "B" * 16
+        url = "https://issuer.example/v1/evidence/" + access_id
+        pack = self.b.allowed(10, evidence_access_id=access_id, evidence_url=url,
+                              event_history_ref=url)
+        record = text([pack], self.b.manifest([pack]))
+        proc = self.run_cli(record)
+        result = json.loads(proc.stdout)
+        self.assertEqual(proc.returncode, 0, "record CLI must accept an embedded prefix")
+        self.assertTrue(result["valid"])
+        self.assertEqual(result["problems"], [])
+        self.assertTrue(result["checks"]["manifest_trusted_issuer"])
+
     def test_clean_record_passes_without_a_trusted_issuer_by_the_embedded_key(self):
         packs, manifest = self.clean()
         result = self.verify(text(packs, manifest), jwks=None, require_trusted_issuer=False)
@@ -394,19 +409,203 @@ class ReceiptRecord(unittest.TestCase):
 
     # ---- the command line ----
 
-    def run_cli(self, record, *args, jwks_doc=None):
+    def run_cli(self, record, *args, jwks_doc=None, trusted=True):
         with tempfile.TemporaryDirectory() as tmp:
             rec = Path(tmp) / "record.ndjson"
             rec.write_text(record, encoding="utf-8")
             jwks = Path(tmp) / "jwks.json"
             jwks.write_text(json.dumps(jwks_doc if jwks_doc is not None else self.f.jwks), encoding="utf-8")
             env = dict(os.environ, PYTHONPATH=str(ROOT / "demo" / "_vendor"), PYTHONDONTWRITEBYTECODE="1")
+            trust_args = ["--jwks-file", str(jwks), "--require-trusted-issuer"] if trusted else []
             proc = subprocess.run(
                 [sys.executable, "-B", str(ROOT / "tools" / "verify_receipt_record.py"), str(rec),
-                 "--jwks-file", str(jwks), "--require-trusted-issuer", "--allow-mock", "--now", NOW, *args],
+                 *trust_args, "--allow-mock", "--now", NOW, *args],
                 capture_output=True, text=True, env=env, timeout=30)
         self.assertNotIn("Traceback", proc.stderr, proc.stderr)
         return proc
+
+    # ---- P3: authenticated cut-off prefixes and issuer key rotation ----
+
+    def e3_fields(self):
+        # Exact extension fields emitted by enterprise E3; no production values.
+        return {
+            "filter": {"token_id_hash": KEY, "surfaces": ["http", "mcp"]},
+            "coverage": "stored_receipts_only",
+            "legacy_identity_policy": "scan_verified_archives; receipts_without_signed_token_id_hash_cannot_be_attributed",
+        }
+
+    def terminal(self, packs, **overrides):
+        fields = dict(self.e3_fields(), schema_version="satgate.receipt_record_truncated.v1",
+                      truncated=True, truncation_reason="time_limit")
+        fields.update(overrides)
+        return self.b.manifest(packs, **fields)
+
+    def mixed(self, issuer="https://issuer.example"):
+        other = paid.Fixture()
+        other.jwks["keys"][0]["kid"] = "rotated-key"
+        r = self.b.base(ea.allowed_free(other), 20)
+        r.update(issuer=issuer, issuer_kid="rotated-key")
+        packs = [self.b.allowed(10), paid.verified_not_evaluated_pack(other, r)]
+        jwks = {"keys": self.f.jwks["keys"] + other.jwks["keys"]}
+        # Manifest signed by the second key, not the first receipt's key.
+        manifest = Builder(other).manifest(packs, issuer_kid="rotated-key")
+        return packs, manifest, jwks
+
+    def test_p3_complete_e3_record_passes(self):
+        packs, _ = self.clean()
+        result = self.verify(text(packs, self.b.manifest(packs, truncated=False, **self.e3_fields())))
+        self.assertTrue(result["valid"], result)
+        self.assertEqual(self.run_cli(text(packs, self.b.manifest(packs))).returncode, 0)
+
+    def test_p3_truncated_record_has_verified_prefix_and_exit_4(self):
+        packs, _ = self.clean()
+        proc = self.run_cli(text(packs, self.terminal(packs)))
+        self.assertEqual(proc.returncode, 4, proc.stdout)
+        result = json.loads(proc.stdout)
+        self.assertEqual(result["status"], "truncated")
+        self.assertFalse(result["valid"])
+        self.assertFalse(result["complete"])
+        self.assertEqual(result["truncation_reason"], "time_limit")
+        self.assertEqual(result["verified_prefix"]["count"], len(packs))
+        self.assertEqual(result["verified_prefix"]["receipt_hashes_sha256"],
+                         REC.receipt_hash_list_digest([p["receipt_hash"] for p in packs]))
+        self.assertEqual(result["problems"], [])
+        self.assertIn("truncated", proc.stderr)
+
+    def test_p3_empty_truncated_prefix(self):
+        result = self.verify(text([], self.terminal([])))
+        self.assertEqual(result.get("status"), "truncated", result)
+        self.assertEqual(result["verified_prefix"]["count"], 0)
+        self.assertFalse(result["valid"])
+
+    def test_p3_terminal_prefix_hash_mismatch_fails(self):
+        packs, _ = self.clean()
+        self.cli_fails(text(packs, self.terminal(packs, receipt_hashes_sha256="sha256:invented")),
+                       "receipt_hashes_mismatch", "terminal prefix hash")
+
+    def test_p3_terminal_prefix_count_mismatch_fails(self):
+        packs, _ = self.clean()
+        self.cli_fails(text(packs, self.terminal(packs, count=len(packs) + 1)),
+                       "count_mismatch", "terminal prefix count")
+
+    def test_p3_terminal_prefix_endpoint_and_reason_counts_must_match(self):
+        packs, _ = self.clean()
+        for fields, code in (({"first_receipt_hash": "sha256:invented"}, "first_or_last_mismatch"),
+                             ({"counts_by_decision_reason": {}}, "counts_by_reason_mismatch")):
+            with self.subTest(fields=tuple(fields)):
+                self.cli_fails(text(packs, self.terminal(packs, **fields)), code, "terminal prefix")
+
+    def test_p3_terminal_signature_must_verify(self):
+        packs, _ = self.clean()
+        terminal = self.terminal(packs)
+        terminal["signature"] = "ed25519:" + paid.V.b64url_encode(bytes(64))
+        self.cli_fails(text(packs, terminal), "manifest_signature_invalid", "terminal signature")
+        result = self.verify(text(packs, terminal))
+        self.assertIsNone(result.get("verified_prefix"))
+
+    def test_p3_terminal_trusted_key_required(self):
+        packs, _ = self.clean()
+        terminal = self.terminal(packs, issuer_kid="absent-key")
+        self.cli_fails(text(packs, terminal), "trusted_issuer_required", "terminal unknown kid")
+
+    def test_p3_terminal_unknown_field_fails(self):
+        packs, _ = self.clean()
+        self.cli_fails(text(packs, self.terminal(packs, future_flag=True)),
+                       "manifest_unknown_field", "terminal field")
+
+    def test_p3_truncation_marker_requires_true_and_nonempty_reason(self):
+        packs, _ = self.clean()
+        for fields in ({"truncated": False}, {"truncated": 1}, {"truncation_reason": ""},
+                       {"truncation_reason": None}):
+            with self.subTest(fields=fields):
+                self.cli_fails(text(packs, self.terminal(packs, **fields)),
+                               "truncation_fields_invalid", "invalid terminal")
+
+    def test_p3_terminal_is_unique_and_last(self):
+        packs, manifest = self.clean()
+        terminal = self.terminal(packs)
+        for objects in ([*packs, terminal, manifest], [terminal, *packs], [*packs, terminal, terminal]):
+            with self.subTest(schemas=[o["schema_version"] for o in objects]):
+                record = "\n".join(json.dumps(o) for o in objects)
+                self.cli_fails(record, "manifest_missing_or_misplaced", "misplaced terminal")
+
+    def test_p3_cut_off_prefix_does_not_claim_overdue_closer_is_missing(self):
+        opener = self.b.opener(10)
+        terminal = self.terminal([opener], windows=[window_entry(opener)])
+        result = self.verify(text([opener], terminal))
+        self.assertEqual(result.get("status"), "truncated", result)
+        self.assertEqual(self.states(result), ["prefix_open"])
+        self.assertNotIn("window_closer_overdue", self.codes(result))
+
+    def test_p3_terminal_still_checks_receipts_order_duplicates_and_agent(self):
+        packs, _ = self.clean()
+        for prefix, code in (([packs[1], packs[0]], "out_of_order"),
+                             ([packs[0], packs[0]], "duplicate_receipt"),
+                             ([self.pack_for(OTHER_KEY, 10)], "key_hash_mismatch")):
+            with self.subTest(code=code):
+                self.cli_fails(text(prefix, self.terminal(prefix)), code, "invalid prefix")
+        packs[0]["receipts"][0]["decision_reason"] = "budget_exhausted"
+        self.cli_fails(text(packs, self.terminal(packs)), "receipt_invalid", "tampered prefix")
+
+    def test_p3_manifest_unknown_field_fails_even_if_signed(self):
+        packs, _ = self.clean()
+        self.cli_fails(text(packs, self.b.manifest(packs, future_flag=True)),
+                       "manifest_unknown_field", "unknown field")
+
+    def test_p3_complete_manifest_cannot_claim_truncated(self):
+        packs, _ = self.clean()
+        for value in (True, 0, None, "false"):
+            with self.subTest(value=value):
+                self.cli_fails(text(packs, self.b.manifest(packs, truncated=value)),
+                               "manifest_truncated_invalid", "false completeness")
+        self.cli_fails(text(packs, self.b.manifest(packs, truncation_reason="time_limit")),
+                       "manifest_unknown_field", "truncation reason on complete manifest")
+
+    def test_p3_two_trusted_key_ids_pass(self):
+        packs, manifest, jwks = self.mixed()
+        result = self.verify(text(packs, manifest), jwks=jwks)
+        self.assertTrue(result["valid"], result)
+        proc = self.run_cli(text(packs, manifest), jwks_doc=jwks)
+        self.assertEqual(proc.returncode, 0, proc.stdout)
+        self.assertEqual(json.loads(proc.stdout)["trust_mode"], "trusted_issuer")
+
+    def test_p3_missing_receipt_key_in_trusted_set_fails(self):
+        packs, manifest, jwks = self.mixed()
+        # Keep the manifest's key; remove only the first receipt's key.
+        jwks["keys"] = jwks["keys"][1:]
+        proc = self.run_cli(text(packs, manifest), jwks_doc=jwks)
+        self.assertEqual(proc.returncode, 1, proc.stdout)
+        self.assertIn("receipt_invalid", self.codes(json.loads(proc.stdout)))
+        self.assertIn("jwks_kid_not_found", proc.stdout)
+
+    def test_p3_missing_manifest_key_in_trusted_set_fails(self):
+        packs, manifest, _ = self.mixed()
+        proc = self.run_cli(text(packs, manifest), jwks_doc=self.f.jwks)
+        self.assertEqual(proc.returncode, 1, proc.stdout)
+        self.assertIn("trusted_issuer_required", self.codes(json.loads(proc.stdout)))
+
+    def test_p3_different_issuer_fails_even_with_trusted_keys(self):
+        packs, manifest, jwks = self.mixed(issuer="https://other-issuer.example")
+        proc = self.run_cli(text(packs, manifest), jwks_doc=jwks)
+        self.assertEqual(proc.returncode, 1, proc.stdout)
+        self.assertIn("issuer_mismatch", self.codes(json.loads(proc.stdout)))
+
+    def test_p3_mixed_keys_embedded_mode_is_explicitly_self_consistency(self):
+        packs, manifest, _ = self.mixed()
+        result = self.verify(text(packs, manifest), jwks=None, require_trusted_issuer=False)
+        self.assertTrue(result["valid"], result)
+        self.assertEqual(result["trust_mode"], "embedded_key_self_consistency")
+        self.assertFalse(result["trusted_issuer_valid"])
+        self.assertIn("issuer_not_authenticated", {w["code"] for w in result["warnings"]})
+        proc = self.run_cli(text(packs, manifest), trusted=False)
+        self.assertEqual(proc.returncode, 0, proc.stdout)
+        self.assertEqual(json.loads(proc.stdout)["trust_mode"], "embedded_key_self_consistency")
+
+    def test_p3_mixed_key_truncated_prefix(self):
+        packs, _, jwks = self.mixed()
+        result = self.verify(text(packs, self.terminal(packs)), jwks=jwks)
+        self.assertEqual(result.get("status"), "truncated", result)
+        self.assertTrue(result["trusted_issuer_valid"])
 
     # ---- round 2: one receipt per line, the signing key, exact counts ----
 
@@ -450,19 +649,17 @@ class ReceiptRecord(unittest.TestCase):
             edited = self.with_receipts(packs[1], order)
             self.cli_fails(text(packs[:1] + [edited] + packs[2:], manifest), "pack_not_one_receipt", "reordered")
 
-    def test_an_issuer_kid_that_is_not_the_receipts_fails(self):
+    def test_two_issuer_kids_for_the_same_trusted_key_are_accepted(self):
         packs, manifest = self.clean()
-        # The same key under a second name: the manifest verifies, but it says a
-        # different key signed than the one that signed the receipts.
+        # P3 replaces the old same-kid restriction: trusted aliases are valid,
+        # just as two different keys in the issuer's trusted set are valid.
         rotated = self.b.sign(dict(manifest, issuer_kid="rotated-key"))
         jwks = copy.deepcopy(self.f.jwks)
         jwks["keys"].append(dict(jwks["keys"][0], kid="rotated-key"))
         proc = self.run_cli(text(packs, rotated), jwks_doc=jwks)
-        self.assertEqual(proc.returncode, 1, proc.stdout)
-        self.assertIn("issuer_kid_mismatch", {p["code"] for p in json.loads(proc.stdout)["problems"]})
-        # Without a trusted issuer, through the embedded key.
+        self.assertEqual(proc.returncode, 0, proc.stdout)
         result = self.verify(text(packs, rotated), jwks=None, require_trusted_issuer=False)
-        self.assertIn("issuer_kid_mismatch", self.codes(result))
+        self.assertTrue(result["valid"], result)
 
     def test_cli_boolean_counts_by_decision_reason_fail(self):
         packs, manifest = self.clean()

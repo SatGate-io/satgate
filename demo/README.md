@@ -58,6 +58,21 @@ python verify_evidence_pack.py 'http://localhost:8080/v1/evidence/evid_...' --al
 
 Expected result: `valid=true`, `trusted_issuer_valid=false`, and the explicit embedded-key caveat. That proves artifact integrity and internal self-consistency only. The local HTTPS issuer identity does not serve a trusted JWKS, so default trusted-issuer verification is expected to fail. Do not present this local result as buyer trust in a canonical SatGate issuer.
 
+### Request IDs and secret scanning
+
+Request IDs are scanned exactly as caller text, even when they look generated;
+neither a caller header nor a route/subject name is proof of generated origin.
+Request IDs issued before the generator change can rarely (about one in a
+million) contain a credential marker in their random suffix and fail the
+checker. New request-ID generators redraw those suffixes, so new random parts
+cannot contain a marker. Caller headers and subjects can still contain markers
+and are still flagged. Old signed artifacts are not rewritten or exempted.
+
+Whole `evid_`, `quote_`, `rcpt_`, `ep_`, `sha256:` and `ed25519:` encodings retain
+their exact-length, raw-base64url boundary exceptions. Raw public keys are
+excluded only in the receipt's own `metadata.public_key_ed25519_b64` field.
+Credential patterns, Bearer detection and sensitive-field checks are unchanged.
+
 ## Image identities
 
 - Gateway: `ghcr.io/satgate-io/satgate-gateway-demo@sha256:b10848b4847be4b62c80a004f18af50e450937d92b9238a6c697a319880ab8c9`

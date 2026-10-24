@@ -50,6 +50,7 @@ type SSEServer struct {
 	// transport paths into an RFC 9728 / MCP authorization challenge.
 	// Empty (the default) keeps the historical bare 401 byte for byte.
 	oauthMetadataURL string
+	operationTracker OperationTracker
 }
 
 // sseSession represents one connected MCP client over SSE.
@@ -219,6 +220,22 @@ func (s *SSEServer) ListenAndServe(ctx context.Context) error {
 // Response: text/event-stream with JSON-RPC messages as "message" events.
 // The endpoint URL for posting messages is sent as the first event.
 func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
+	// Only the finite connect-time phase can record. Release before opening
+	// a healthy stream, but cover every denial, return and panic before that.
+	var endConnect func()
+	if s.operationTracker != nil {
+		lease, ok := s.beginOperation()
+		if !ok {
+			http.Error(w, "mcp server shutting down", http.StatusServiceUnavailable)
+			return
+		}
+		endConnect = lease.release
+		defer func() {
+			if endConnect != nil {
+				endConnect()
+			}
+		}()
+	}
 	flusher, ok := w.(http.Flusher)
 	if !ok {
 		http.Error(w, "streaming not supported", http.StatusInternalServerError)
@@ -274,6 +291,11 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
+	}
+
+	if endConnect != nil {
+		endConnect()
+		endConnect = nil
 	}
 
 	s.mu.Lock()
@@ -385,6 +407,24 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var end func()
+	var lease *operationLease
+	handedOff := false
+	if s.operationTracker != nil {
+		var ok bool
+		lease, ok = s.beginOperation()
+		if !ok {
+			http.Error(w, "mcp server shutting down", http.StatusServiceUnavailable)
+			return
+		}
+		end = lease.release
+		defer func() {
+			if !handedOff {
+				end()
+			}
+		}()
+	}
+
 	sessionID := r.URL.Query().Get("sessionId")
 	if sessionID == "" {
 		http.Error(w, "sessionId required", http.StatusBadRequest)
@@ -475,11 +515,17 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Handle request asynchronously — don't block the HTTP response
+	// Transfer the lease before launching, so even a panic writing 202 cannot
+	// release work that the worker still owns.
+	handedOff = true
 	go func() {
+		if end != nil {
+			defer end()
+		}
 		// Inject session identity into context so unauthenticated-but-session-scoped
 		// methods such as tools/list can use the already-resolved tenant and budget
 		// subject without re-verifying or guessing from global session state.
-		reqCtx := session.contextWithIdentity()
+		reqCtx := withOperationLease(session.contextWithIdentity(), lease)
 		if s.proxy.signEveryAction {
 			reqCtx = withTransportToken(reqCtx, authToken)
 		}

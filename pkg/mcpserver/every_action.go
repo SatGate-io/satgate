@@ -126,7 +126,7 @@ func (p *Proxy) wireDelegator() {
 		return p.allowReceiptFailureBlocks(p.enforcementModeFor(ctx, tenantID))
 	}
 	p.delegator.reversalFailed = func() { p.reversalFailures.Add(1) }
-	p.delegator.reportMiss = func(ctx context.Context, parent *TokenInfo) bool {
+	p.delegator.reportMiss = func(ctx context.Context, parent *TokenInfo) error {
 		return p.reportObserveMiss(ctx, parent, MethodSatGateDelegate, "", p.enforcementModeFor(ctx, tenantOf(parent)))
 	}
 }
@@ -151,11 +151,10 @@ func (p *Proxy) allowReceiptFailureBlocks(mode string) bool {
 // kept with its tenant, key, tool and minute and retried until it is recorded
 // exactly once (see everyAction.reportMiss).
 //
-// It returns false only when the miss could be neither recorded nor kept (the
-// pending store is full): the caller then does not pass the call on.
-func (p *Proxy) reportObserveMiss(ctx context.Context, tokenInfo *TokenInfo, method, tool, mode string) bool {
+// An error stops forwarding. Unknown durable outcomes must not be called refused.
+func (p *Proxy) reportObserveMiss(ctx context.Context, tokenInfo *TokenInfo, method, tool, mode string) error {
 	if !p.signEveryAction {
-		return true
+		return nil
 	}
 	return p.every().reportMiss(ctx, p.evidence, missSlotFrom(ctx), unrecordedCall(tokenInfo, method, tool, mode))
 }
@@ -327,8 +326,8 @@ func (p *Proxy) signAllowed(ctx context.Context, req *Request, tokenInfo *TokenI
 		log.Error().Err(err).Str("method", method).Str("tool", tool).Str("stage", stage).Msg("MCP allow receipt unavailable")
 		if !p.allowReceiptFailureBlocks(mode) {
 			log.Warn().Str("method", method).Str("tool", tool).Str("mode", mode).Msg("observe mode: passing the call on with no receipt")
-			if !p.reportObserveMiss(ctx, tokenInfo, method, tool, mode) {
-				return nil, proofUnavailableResponse(req.ID, tool)
+			if err := p.reportObserveMiss(ctx, tokenInfo, method, tool, mode); err != nil {
+				return nil, pendingFailureResponse(req.ID, tool, err)
 			}
 			return nil, nil
 		}
