@@ -27,7 +27,11 @@ class CheckerBundle(unittest.TestCase):
         for name, digest in entries.items():
             data = (BUNDLE / name).read_bytes()
             self.assertEqual(hashlib.sha256(data).hexdigest(), digest)
-            self.assertEqual(data, (ROOT / "tools" / name).read_bytes())
+            # The released contract is immutable. Producer documentation may
+            # advance after the reader-only release; executable/requirements
+            # bytes must still match the released checker pair exactly.
+            if name != "VERIFIER-CONTRACT.md":
+                self.assertEqual(data, (ROOT / "tools" / name).read_bytes())
 
     def test_isolated_bundle_pack_and_record_cli_old_and_new_receipts(self):
         f = paid.Fixture()

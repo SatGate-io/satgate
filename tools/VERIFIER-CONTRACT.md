@@ -162,15 +162,17 @@ A gateway with the sign-every-action switch on signs a receipt for each call a v
 
 **Observe gap.** `allowed` / `observe_unrecorded`: the signed count of Observe calls that went through in one UTC minute with no receipt. `unrecorded_window_start` (UTC minute), `unrecorded_window_seconds` (the integer `60`), `unrecorded_calls` (integer, at least 1), no `rate_limit_*` field, no balance claim, verified-key authority, and issued at or after the end of its window. Without a window or a count it is refused. Demo also refuses the reason on any budget but `not_evaluated`.
 
-## Unavailable-check refusal: reader-only support
+## Unavailable-check refusal: separately gated producer
 
 Bundle `unavailable-check-v1` adds exactly `tool_price_unavailable`,
 `tool_controls_unavailable`, `budget_backend_error`, and
 `pending_capacity_exhausted`. Each is an explicit `denied` pair in both public
 copies, never an allowed/paid, rate-window or Observe gap pair. These reasons
-are no-budget-only, not optional evaluated profiles. SatGate does not yet sign
-these outage blocks; this release changes readers only. Signer/identity/archive
-failure remains unsigned. The reason meanings are specified in
+are no-budget-only, not optional evaluated profiles. The public MCP proxy produces
+them only with both `SetSignEveryAction(true)` and the separate, default-off
+`SetSignUnavailableCheckRefusals(true)`. Existing deployments do not opt in on
+module upgrade. Cloud enablement is a separate step. Signer/identity/archive
+failure remains unsigned. The reason meanings and producer exclusions are specified in
 `docs/reference/receipt-schema.md`.
 
 The fourth strict no-balance shape uses exactly

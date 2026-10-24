@@ -139,6 +139,10 @@ type everyAction struct {
 	pending       *pendingStore
 	durable       PendingStore
 	pendingBudget PendingBudget
+	// Per-instance identity source, installed at construction, before serving.
+	// Keeping it here lets fault tests exercise allocation failure without
+	// replacing crypto/rand globally (which also affects unrelated requests).
+	callID func(string) (string, error)
 
 	recMu sync.RWMutex
 	rec   EvidenceRecorder
@@ -156,7 +160,7 @@ type everyAction struct {
 }
 
 func newEveryAction() *everyAction {
-	ea := &everyAction{pending: newPendingStore()}
+	ea := &everyAction{pending: newPendingStore(), callID: newCallID}
 	s := EveryActionSettings{}.withDefaults()
 	ea.settings.Store(&s)
 	ea.pending.bound.Store(int64(s.PendingBound))

@@ -1,0 +1,23 @@
+[
+  "price/direct {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Tool price temporarily unavailable; the call was not sent and nothing was charged. Retry.\",\"data\":{\"error\":\"tool_price_unavailable\",\"retryable\":true,\"tool\":\"paid_read\"}}}",
+  "price/streamable_http {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Tool price temporarily unavailable; the call was not sent and nothing was charged. Retry.\",\"data\":{\"error\":\"tool_price_unavailable\",\"retryable\":true,\"tool\":\"paid_read\"}}}",
+  "price/sse {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Tool price temporarily unavailable; the call was not sent and nothing was charged. Retry.\",\"data\":{\"error\":\"tool_price_unavailable\",\"retryable\":true,\"tool\":\"paid_read\"}}}",
+  "controls-missing/direct {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"A limit on this token could not be checked, so the call was not sent\",\"data\":{\"error\":\"tool_controls_unavailable\",\"tool\":\"place_crypto_order\"}}}",
+  "controls-missing/streamable_http {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"A limit on this token could not be checked, so the call was not sent\",\"data\":{\"error\":\"tool_controls_unavailable\",\"tool\":\"place_crypto_order\"}}}",
+  "controls-missing/sse {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"A limit on this token could not be checked, so the call was not sent\",\"data\":{\"error\":\"tool_controls_unavailable\",\"tool\":\"place_crypto_order\"}}}",
+  "controls-error/direct {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"A limit on this token could not be checked, so the call was not sent\",\"data\":{\"error\":\"tool_controls_unavailable\",\"tool\":\"paid_read\"}}}",
+  "controls-error/streamable_http {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"A limit on this token could not be checked, so the call was not sent\",\"data\":{\"error\":\"tool_controls_unavailable\",\"tool\":\"paid_read\"}}}",
+  "controls-error/sse {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"A limit on this token could not be checked, so the call was not sent\",\"data\":{\"error\":\"tool_controls_unavailable\",\"tool\":\"paid_read\"}}}",
+  "controls-invalid/direct {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"A limit on this token could not be checked, so the call was not sent\",\"data\":{\"error\":\"tool_controls_unavailable\",\"tool\":\"paid_read\"}}}",
+  "controls-invalid/streamable_http {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"A limit on this token could not be checked, so the call was not sent\",\"data\":{\"error\":\"tool_controls_unavailable\",\"tool\":\"paid_read\"}}}",
+  "controls-invalid/sse {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"A limit on this token could not be checked, so the call was not sent\",\"data\":{\"error\":\"tool_controls_unavailable\",\"tool\":\"paid_read\"}}}",
+  "budget/direct {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Budget service unavailable\",\"data\":{\"error\":\"budget_backend_error\",\"failMode\":\"closed\",\"tool\":\"paid_read\"}}}",
+  "budget/streamable_http {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Budget service unavailable\",\"data\":{\"error\":\"budget_backend_error\",\"failMode\":\"closed\",\"tool\":\"paid_read\"}}}",
+  "budget/sse {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Budget service unavailable\",\"data\":{\"error\":\"budget_backend_error\",\"failMode\":\"closed\",\"tool\":\"paid_read\"}}}",
+  "capacity/direct {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"paid_read\"}}}",
+  "capacity/streamable_http {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"paid_read\"}}}",
+  "capacity/sse {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"paid_read\"}}}",
+  "transport/direct {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32002,\"message\":\"upstream error: connection reset\"}}",
+  "transport/streamable_http {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32002,\"message\":\"upstream error: connection reset\"}}",
+  "transport/sse {\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32002,\"message\":\"upstream error: connection reset\"}}"
+]
