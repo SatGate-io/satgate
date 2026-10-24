@@ -1,0 +1,27 @@
+{
+  "repository": "SatGate-io/satgate",
+  "module_version": "v0.5.3-0.20261022091107-d599b7e3b9af",
+  "module_commit": "d599b7e3b9af92af1dbc3d90bfac6755c820a44b",
+  "dashboard_commit": "3395b48f8a2d87001708160a09de6dc551141549",
+  "purpose": "Frozen public readers: new reasons must remain rejected; do not update these bytes with current readers.",
+  "files": [
+    {
+      "frozen_path": "tools/verify_evidence_pack.py",
+      "source_path": "tools/verify_evidence_pack.py",
+      "sha256": "1ddc777dd77415ee229df3b1c6cbe9c71c168c3e94575c6e167e48d14f70af11",
+      "dashboard_identical": true
+    },
+    {
+      "frozen_path": "tools/verify_receipt_record.py",
+      "source_path": "tools/verify_receipt_record.py",
+      "sha256": "883687f530de0b7216577b037d507410271ea32170c7a5a6b215724e06bbadfa",
+      "dashboard_identical": true
+    },
+    {
+      "frozen_path": "demo/verify_evidence_pack.py",
+      "source_path": "demo/verify_evidence_pack.py",
+      "sha256": "2ef3f4c50db9304f2026fab943f693020e616c4a7b60799344c2b47583a33a35",
+      "dashboard_identical": false
+    }
+  ]
+}

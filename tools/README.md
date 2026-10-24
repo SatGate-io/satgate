@@ -25,6 +25,50 @@ The verifier checks RFC 8785/JCS receipt canonicalization, `receipt_hash`, Ed255
 
 ## Verify a downloaded receipt record
 
+### Versioned checker bundle
+
+Minimum bundle for unavailable-check refusal receipts: `unavailable-check-v1`.
+It supports `denied` / `tool_price_unavailable`, `tool_controls_unavailable`,
+`budget_backend_error`, and `pending_capacity_exhausted`, with the exact verified-key,
+no-evaluated-budget profile in `VERIFIER-CONTRACT.md`. SatGate does not yet sign
+these blocks: this is a reader-only release. Checkers older than this release
+reject them even with valid signatures. New readers still check old receipts.
+
+The record script imports its sibling `verify_evidence_pack.py`: download both,
+requirements and contract as one version, not an isolated record script. The
+versioned directory is `tools/checker-bundles/unavailable-check-v1/`; obtain its
+reviewed full commit SHA independently from the repository/release coordinator.
+No tag or GitHub release is created by this change. Once reviewed, the coordinator
+may tag that exact commit `checker-unavailable-check-v1`. Do not use mutable
+`main` as an audit pin or trust a version/link supplied by the record itself.
+
+Download from that immutable commit, then verify the hash list obtained from the
+same trusted source before installing dependencies or executing code:
+
+```bash
+REF=<reviewed-full-commit-sha>
+mkdir -p unavailable-check-v1
+cd unavailable-check-v1
+BASE="https://raw.githubusercontent.com/SatGate-io/satgate/$REF/tools/checker-bundles/unavailable-check-v1"
+for FILE in verify_receipt_record.py verify_evidence_pack.py requirements-verify-evidence-pack.txt VERIFIER-CONTRACT.md SHA256SUMS; do
+  curl -fsS "$BASE/$FILE" -o "$FILE" || exit 1
+done
+shasum -a 256 -c SHA256SUMS || exit 1
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r requirements-verify-evidence-pack.txt
+python verify_receipt_record.py /path/to/record.ndjson \
+  --jwks-file /path/to/issuer-jwks.json --require-trusted-issuer
+```
+
+Keep these files and the reviewed ref with the exported record. Hashes show
+matching bytes, not who authorized them; the repository/ref must be trusted
+separately. Never auto-download/execute code from an untrusted record. The
+separate linked `SatGate-io/evidence-pack-verifier` checks the first receipt's
+signature, not this full semantic/record contract; it is not a substitute.
+
+### Whole-record checks
+
 A record is one agent key's receipts for a stretch of time: one Evidence Pack per line, then a signed complete manifest or cut-off terminal. Check all of it at once:
 
 ```bash

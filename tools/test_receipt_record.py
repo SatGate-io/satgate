@@ -18,6 +18,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 
 import test_paid_rail as paid  # noqa: E402
 import test_every_action_receipts as ea  # noqa: E402
+import test_unavailable_check_receipts as unavailable  # noqa: E402
 
 spec = importlib.util.spec_from_file_location("verify_receipt_record", ROOT / "tools" / "verify_receipt_record.py")
 REC = importlib.util.module_from_spec(spec)
@@ -136,6 +137,67 @@ class ReceiptRecord(unittest.TestCase):
 
     def codes(self, result):
         return {p["code"] for p in result["problems"]}
+
+    def mixed_unavailable(self):
+        packs = [self.b.allowed(10), self.b.refused(20)]
+        for index, reason in enumerate(unavailable.REASONS):
+            packs.append(self.b.pack(self.b.base(unavailable.refusal(self.f, reason), 30 + index)))
+        return packs, self.b.manifest(packs)
+
+    def test_complete_record_mixes_old_and_all_four_unavailable_reasons(self):
+        packs, manifest = self.mixed_unavailable()
+        result = self.verify(text(packs, manifest))
+        self.assertTrue(result["valid"], result["problems"])
+        self.assertTrue(result["complete"])
+        self.assertEqual(result["summary"], "6 receipts, 5 refusals, 0 windows, 0 problems")
+        self.assertEqual(set(manifest["counts_by_decision_reason"]),
+                         {"policy_allowed", "policy_denied", *unavailable.REASONS})
+        proc = self.run_cli(text(packs, manifest))
+        self.assertEqual(proc.returncode, 0)
+        self.assertTrue(json.loads(proc.stdout)["complete"])
+
+    def test_mixed_record_preserves_signed_count_hash_range_identity_and_no_skip(self):
+        packs, manifest = self.mixed_unavailable()
+        mutations = [
+            (packs[:-1], manifest, "count_mismatch"),
+            (packs[:-1], self.b.sign(dict(manifest, count=5)), "receipt_hashes_mismatch"),
+            (packs, self.b.sign(dict(manifest, counts_by_decision_reason={"policy_denied": 6})),
+             "counts_by_reason_mismatch"),
+            (packs, self.b.manifest(packs, to="2026-01-01T00:00:32Z"), "outside_range"),
+            (packs, self.b.manifest(packs, key_hash=OTHER_KEY), "key_hash_mismatch"),
+        ]
+        for changed, terminal, code in mutations:
+            result = self.verify(text(changed, terminal))
+            self.assertFalse(result["valid"])
+            self.assertIn(code, self.codes(result))
+        r = unavailable.refusal(self.f, unavailable.REASONS[0])
+        r["decision"] = "allowed"
+        bad = packs + [self.b.pack(self.b.base(r, 40))]
+        # Even a signed manifest counting an invalid new receipt cannot skip it.
+        result = self.verify(text(bad, self.b.manifest(bad)))
+        self.assertFalse(result["valid"])
+        self.assertIn("receipt_invalid", self.codes(result))
+        extra = text(packs, manifest).splitlines()
+        extra.insert(-1, json.dumps({"schema_version": "satgate.unknown.v1"}))
+        self.assertIn("not_an_evidence_pack", self.codes(self.verify("\n".join(extra))))
+
+    def test_frozen_dashboard_record_pair_rejects_new_profile(self):
+        packs, manifest = self.mixed_unavailable()
+        with tempfile.TemporaryDirectory() as td:
+            jwks = Path(td) / "public-jwks.json"
+            jwks.write_text(json.dumps(self.f.jwks))
+            script = unavailable.FROZEN / "tools" / "verify_receipt_record.py"
+            for selected, expected in ((packs[:2], 0), (packs, 1)):
+                terminal = self.b.manifest(selected)
+                proc = subprocess.run(
+                    [sys.executable, "-B", str(script), "-", "--now", NOW,
+                     "--jwks-file", str(jwks), "--require-trusted-issuer"],
+                    input=text(selected, terminal), text=True, capture_output=True, timeout=30)
+                result = json.loads(proc.stdout)
+                self.assertEqual(proc.returncode, expected)
+                self.assertEqual(result["valid"], expected == 0)
+                if expected:
+                    self.assertIn("receipt_invalid", self.codes(result))
 
     # ---- a clean record ----
 
