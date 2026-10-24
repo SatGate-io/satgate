@@ -3,8 +3,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, DollarSign, Lock, Receipt, Users } from 'lucide-react';
 
-const title = 'Financial guardrails for your AI trading agent';
-const tagline = 'Control what agents can do and spend. Prove it.';
+const title = 'Financial guardrail for your AI agents';
+const tagline = 'Control what agents can do and spend. Prove every action.';
 const lead =
   'Your limits sit outside the AI, so it can\'t loosen them or talk its way past them. SatGate checks them before an order reaches Robinhood.';
 const metaTitle = 'Financial guardrails for agentic trading on Robinhood | SatGate';
