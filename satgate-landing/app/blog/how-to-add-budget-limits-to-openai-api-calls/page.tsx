@@ -3,23 +3,23 @@ import RoiCta from '../../components/RoiCta';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "OpenAI API Budget Limits: Stop Runaway Spend Before Calls",
-  description: "Set OpenAI API budget limits by agent, team, or workflow. Stop runaway GPT spend before the call runs and keep signed receipt proof.",
+  title: "How to Set OpenAI API Budget Limits Per Team",
+  description: "Set per-team OpenAI API budget limits before GPT calls run. Block the call when that team is over budget, and keep signed receipt proof.",
   alternates: { canonical: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls' },
   keywords: ['OpenAI API budget limits', 'OpenAI cost control', 'API gateway OpenAI', 'GPT-4 spending limits', 'OpenAI API costs', 'prevent OpenAI overspending', 'hard cap OpenAI spend', 'per-agent OpenAI budget'],
   openGraph: {
-    title: 'OpenAI API Budget Limits: Stop Runaway Spend Before Calls',
-    description: 'Set OpenAI API budget limits by agent, team, or workflow. Stop runaway GPT spend before the call runs and keep signed receipt proof.',
+    title: 'How to Set OpenAI API Budget Limits Per Team',
+    description: 'Set per-team OpenAI API budget limits before GPT calls run. Block the call when that team is over budget, and keep signed receipt proof.',
     url: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls',
     type: 'article',
     publishedTime: '2026-04-07T00:00:00Z',
-    modifiedTime: '2026-08-12T00:00:00Z',
+    modifiedTime: '2026-10-19T00:00:00Z',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OpenAI API Budget Limits: Stop Runaway Spend Before Calls',
-    description: 'Set per-agent budgets before GPT calls run, with signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.',
+    title: 'How to Set OpenAI API Budget Limits Per Team',
+    description: 'Set per-team OpenAI API budget limits before GPT calls run. Block the call when that team is over budget, and keep signed receipt proof.',
   },
 };
 
@@ -27,12 +27,12 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'OpenAI API Budget Limits: Stop Runaway Spend Before Calls',
+    headline: 'How to Set OpenAI API Budget Limits Per Team',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-07',
-    dateModified: '2026-08-12',
+    dateModified: '2026-10-19',
     mainEntityOfPage: 'https://satgate.io/blog/how-to-add-budget-limits-to-openai-api-calls',
     about: [
       { '@type': 'Thing', name: 'OpenAI API budget limits' },
@@ -115,7 +115,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
             <span className="px-2 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono">API Gateway</span>
           </div>
           
-          <h1 className="text-4xl font-bold mb-4">How to Add OpenAI API Budget Limits Before Calls Run</h1>
+          <h1 className="text-4xl font-bold mb-4">How to Set OpenAI API Budget Limits Per Team</h1>
           <div className="mb-6 rounded-2xl border border-green-900/60 bg-green-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-green-300">Direct answer</p>
             <p className="text-gray-300">OpenAI usage limits are account-level. Controls that run before the request goes through enforce per-agent, per-team, and per-workflow budgets before a GPT call reaches OpenAI. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.</p>
