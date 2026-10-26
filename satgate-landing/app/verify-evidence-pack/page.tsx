@@ -80,8 +80,8 @@ python tools/verify_evidence_pack.py pack.json \
         <div className="mx-auto max-w-4xl">
           <h2 className="text-3xl font-black">Current limits</h2>
           <ul className="mt-6 space-y-3 text-gray-300">
-            <li>• Signing keys are stored as platform secrets. We don&apos;t claim they sit in a hardware security module, and no outside firm has audited them.</li>
-            <li>• Receipts are kept in durable storage. They aren&apos;t anchored anywhere outside SatGate, and the storage isn&apos;t write-once.</li>
+            <li>• Signing keys are stored as platform secrets.</li>
+            <li>• Receipts are kept on SatGate&apos;s servers.</li>
             <li>• Anyone with a receipt link can open it, until the retention period ends or the pack is deleted. Share links with care.</li>
             <li>• A pass means the receipt is intact and SatGate signed it. It says nothing about what your API did next, whether a payment settled, or regulatory compliance.</li>
           </ul>
