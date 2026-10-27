@@ -223,7 +223,7 @@ economic_required_phrases = [
     "Is this action allowed?",
     "Is there budget left, and is the token still valid and not revoked?",
     "Does this route charge, and has the agent paid?",
-    "Allow or refuse. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.",
+    "'Allow or refuse.',",
     "Payment never widens what an agent can do.",
     "Receipts on HTTP and MCP.",
     "no money moves",
