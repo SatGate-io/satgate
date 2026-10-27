@@ -116,7 +116,7 @@ export default function WhyProcessWontScaleBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            When one agent can make hundreds of calls for a single task, and you have 200 agents running 24/7 across a dozen business units, organizational processes can&apos;t keep pace. Spreadsheet reviews, quarterly audits, and manual quota-setting weren&apos;t designed for systems that make economic decisions at machine speed. InformationWeek&apos;s recommendations describe the <em>what</em>. What&apos;s missing is the <em>how</em> — specifically, how to enforce these controls without humans in the loop.
+            When one agent can make hundreds of calls for a single task, and you have 200 agents running 24/7 across a dozen business units, organizational processes can&apos;t keep pace. Spreadsheet reviews, quarterly audits, and manual quota-setting weren&apos;t designed for systems that make economic decisions at machine speed. InformationWeek&apos;s recommendations describe the <em>what</em>. What&apos;s missing is the <em>how</em>: specifically, how to enforce these controls without humans in the loop.
           </p>
 
           {/* The Scale Problem */}
