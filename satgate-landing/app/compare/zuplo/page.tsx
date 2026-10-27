@@ -7,7 +7,7 @@ export const metadata = {
   alternates: { canonical: 'https://satgate.io/compare/zuplo' },
   openGraph: {
     title: 'SatGate vs Zuplo: API Gateway vs Agent Spending Controls',
-    description: 'Compare Zuplo API gateway controls with SatGate spending controls for AI agent budgets, MCP tool costs, and L402 monetization.',
+    description: 'Compare Zuplo API gateway controls with SatGate spending controls for AI agent budgets, MCP tool costs, and charging external agents in Lightning or USDC.',
     url: 'https://satgate.io/compare/zuplo',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -46,7 +46,7 @@ export default function CompareZuploPage() {
         name: 'What is the main difference between SatGate and Zuplo?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Zuplo is a traditional API gateway with MCP support for exposing APIs to agents. SatGate adds spending controls: per-tool cost attribution, hard budget enforcement, scoped delegation, and L402 monetization.',
+          text: 'Zuplo is a traditional API gateway with MCP support for exposing APIs to agents. SatGate adds spending controls: per-tool cost attribution, hard budget enforcement, scoped delegation, and charging external agents in Lightning or USDC.',
         },
       },
       {
@@ -121,11 +121,6 @@ export default function CompareZuploPage() {
                   <td className="py-4 text-center"><X className="inline text-red-400" size={18} /></td>
                 </tr>
                 <tr className="border-b border-gray-800">
-                  <td className="py-4 font-medium text-gray-300">API monetization (L402)</td>
-                  <td className="py-4 text-center"><Check className="inline text-green-400" size={18} /></td>
-                  <td className="py-4 text-center"><X className="inline text-red-400" size={18} /></td>
-                </tr>
-                <tr className="border-b border-gray-800">
                   <td className="py-4 font-medium text-gray-300">Credit budgets with a configurable unit</td>
                   <td className="py-4 text-center"><Check className="inline text-green-400" size={18} /></td>
                   <td className="py-4 text-center"><X className="inline text-red-400" size={18} /></td>
@@ -187,14 +182,14 @@ export default function CompareZuploPage() {
                   <p className="text-cyan-400 font-medium text-sm mb-2">SatGate</p>
                   <p className="text-gray-400 text-sm">
                     <strong className="text-white">Purpose-built for agent economics.</strong> Hard budget caps, 
-                    per-tool cost profiles, spend governance, fiat-denominated budget governance, and API monetization with L402.
+                    per-tool cost profiles, spend governance, fiat-denominated budget governance, and charging external agents in Lightning or USDC.
                   </p>
                 </div>
                 <div className="bg-gray-800/50 rounded-lg p-4">
                   <p className="text-gray-500 font-medium text-sm mb-2">Zuplo</p>
                   <p className="text-gray-400 text-sm">
                     <strong className="text-gray-300">Traditional API management.</strong> Rate limiting, authentication, 
-                    request validation. No native economic controls or API monetization.
+                    request validation.
                   </p>
                 </div>
               </div>
@@ -236,8 +231,7 @@ export default function CompareZuploPage() {
                 <div className="bg-gray-800/50 rounded-lg p-4">
                   <p className="text-cyan-400 font-medium text-sm mb-2">SatGate</p>
                   <p className="text-gray-400 text-sm">
-                    <strong className="text-white">Open-core, self-hostable.</strong> Run in your VPC, 
-                    your Kubernetes cluster, or use SatGate Cloud. Full control over your data.
+                    <strong className="text-white">Open-core.</strong> Use SatGate Cloud, or run it on your own servers with Enterprise.
                   </p>
                 </div>
                 <div className="bg-gray-800/50 rounded-lg p-4">
@@ -330,7 +324,7 @@ export default function CompareZuploPage() {
           <h2 className="text-xl font-bold mb-6">SatGate vs Zuplo questions</h2>
           <div className="space-y-5">
             {[
-              ['What is the main difference between SatGate and Zuplo?', 'Zuplo is a traditional API gateway with MCP support for exposing APIs to agents. SatGate adds spending controls: per-tool cost attribution, hard budget enforcement, scoped delegation, and L402 monetization.'],
+              ['What is the main difference between SatGate and Zuplo?', 'Zuplo is a traditional API gateway with MCP support for exposing APIs to agents. SatGate adds spending controls: per-tool cost attribution, hard budget enforcement, scoped delegation, and charging external agents in Lightning or USDC.'],
               ['Does rate limiting replace economic controls for AI agents?', 'No. Rate limits control request volume, not business cost. AI agents need dollar-denominated, per-agent, and per-tool controls so expensive calls can be capped before spend occurs.'],
               ['Can SatGate work with an existing API gateway like Zuplo?', 'Yes. SatGate can be deployed as the economic policy layer in front of, behind, or alongside an existing API gateway so teams can keep API management while adding agent spend governance.'],
             ].map(([question, answer]) => (

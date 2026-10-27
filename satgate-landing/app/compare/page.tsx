@@ -121,14 +121,14 @@ const comparisons = [
   {
     href: '/compare/bifrost',
     title: 'SatGate vs Bifrost',
-    description: 'LLM routing vs spending controls. Both have MCP — only one enforces per-tool budgets on agent tool calls.',
+    description: 'LLM routing vs spending controls. SatGate enforces per-tool budgets on agent tool calls.',
     icon: Zap,
     color: 'purple',
   },
   {
     href: '/compare/zuplo',
     title: 'SatGate vs Zuplo',
-    description: 'API gateway vs economic firewall. Zuplo exposes APIs — SatGate governs spend.',
+    description: 'API gateway vs economic firewall. SatGate controls what agents spend.',
     icon: Shield,
     color: 'cyan',
   },

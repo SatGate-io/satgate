@@ -28,20 +28,20 @@ const comparisonRows = [
   {
     feature: 'Cost Attribution',
     icon: <Eye size={16} className="text-gray-400" />,
-    cloud: 'Aggregate — impossible to see which tool caused a spike',
+    cloud: 'Usually billed by service, not by agent tool',
     satgate: 'Surgical — real-time per-tool visibility',
   },
   {
     feature: 'Authentication',
     icon: <Lock size={16} className="text-gray-400" />,
     cloud: 'Centralized — dependent on EntraID/IAM',
-    satgate: 'Decentralized — macaroons for delegation, L402 for proof-of-budget',
+    satgate: 'Tokens that can only be narrowed when handed to a sub-agent, with budgets checked before each call in Control',
   },
   {
     feature: 'Visibility',
     icon: <Zap size={16} className="text-gray-400" />,
     cloud: 'Delayed — logs take minutes/hours to reach billing',
-    satgate: 'Instant — millisecond-level economic telemetry',
+    satgate: 'Usage per agent and tool in the dashboard',
   },
   {
     feature: 'Multi-Cloud',
@@ -53,7 +53,7 @@ const comparisonRows = [
     feature: 'Agent-to-Agent Commerce',
     icon: <Bot size={16} className="text-gray-400" />,
     cloud: 'Not supported',
-    satgate: 'L402 micropayments built-in',
+    satgate: 'Lightning (L402) or USDC (x402) payments built in',
   },
 ];
 
@@ -235,7 +235,7 @@ const CloudNativeComparisonPage = () => {
               <h3 className="text-xl font-bold">The Multi-Cloud Blindspot</h3>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              Enterprises are never single-cloud. Claude on AWS Bedrock, GPT on Azure OpenAI, custom models on-prem. Your governance can&apos;t be siloed to one provider.
+              Most enterprises use more than one cloud. Claude on AWS Bedrock, GPT on Azure OpenAI, custom models on-prem. Your governance can&apos;t be siloed to one provider.
             </p>
             <blockquote className="border-l-2 border-purple-500 pl-4 text-purple-300 italic">
               &ldquo;If you rely on AWS for security, what happens when your agent calls a tool on Azure?&rdquo;
@@ -260,7 +260,7 @@ const CloudNativeComparisonPage = () => {
           <div className="p-6 sm:p-8 rounded-xl bg-gray-900/50 border border-gray-800 hover:border-yellow-800/50 transition">
             <div className="flex items-center gap-3 mb-4">
               <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-yellow-900/50 text-yellow-400 font-bold text-sm">3</span>
-              <h3 className="text-xl font-bold">L402: The Future of Agent-to-Agent Commerce</h3>
+              <h3 className="text-xl font-bold">Paid access for external agents: Lightning or USDC</h3>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
               Cloud providers think in terms of &ldquo;users.&rdquo; SatGate thinks in terms of &ldquo;economies.&rdquo; As agents become autonomous economic actors, they need native payment building blocks.

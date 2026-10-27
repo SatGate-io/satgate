@@ -36,7 +36,7 @@ const rows: Array<[string, string, string]> = [
   ['MCP tool budget enforcement', 'Yes', 'No native MCP economic firewall focus'],
   ['Per-tool cost attribution beyond LLM calls', 'Yes', 'Primarily LLM/model spend tracking'],
   ['Scoped revocable agent capabilities', 'Yes', 'Virtual keys for LLM gateway access'],
-  ['L402 paid-agent API payments', 'Yes', 'No'],
+  ['Paid access for external agents (Lightning or USDC)', 'Yes', 'No'],
   ['100+ LLM provider abstraction', 'No', 'Yes'],
   ['LLM fallbacks/load balancing', 'Partial', 'Yes'],
   ['Open-source/self-hostable', 'Yes', 'Yes'],
@@ -215,7 +215,7 @@ export default function CompareLiteLLMPage() {
             {([
               ['Hard agent budget enforcement', true, 'Budget decisions before expensive agent/API activity executes.'],
               ['MCP tool cost policy', true, 'Prices, limits, risk tiers, and audit evidence per tool call.'],
-              ['L402 payment rules', true, 'Payment details recorded at request time for external agent or API access.'],
+              ['Paid access for external agents (Lightning or USDC)', true, 'Payment details recorded at request time for external agent or API access.'],
               ['100+ model provider gateway', false, 'This is LiteLLM territory; SatGate can govern traffic before it reaches that layer.'],
             ] as Array<[string, boolean, string]>).map(([label, yes, body]) => (
               <div key={String(label)} className="rounded-xl border border-gray-800 bg-black p-5">

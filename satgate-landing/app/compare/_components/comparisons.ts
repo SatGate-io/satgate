@@ -2,12 +2,12 @@ import type { BrutalComparison } from './BrutalComparisonPage';
 
 const standardAxes = {
   crossProvider: 'OpenAI, Anthropic, local models, SaaS APIs, MCP servers, and internal services can share one enforcement story.',
-  crossRail: 'Model tokens, API credits, paid MCP tools, L402/x402-style access, prepaid budgets, and internal chargeback are policy inputs, not separate silos.',
+  crossRail: 'Credits, paid MCP tools and Lightning or USDC payments all go through the same rules.',
   preExecution: 'Deny, scope, meter, or require proof before the expensive call, tool invocation, or paid resource executes.',
   delegation: 'Issue scoped, budgeted, revocable capability for an agent, task, session, tenant, or sub-agent instead of handing out broad static keys.',
-  evidence: 'Signed receipts (Evidence Packs) connect identity, delegated permissions, policy, budget, route/tool, decision, and receipt into an audit-ready artifact.',
+  evidence: 'Signed receipts record the route or tool, SatGate’s decision and the budget, and anyone can check them.',
   selfHost: 'Self-host the same SatGate binary in your own environment, or use SatGate Cloud. Run enforcement close to private APIs, regulated data, and customer-controlled gateways.',
-  mcp: 'Proxy MCP sessions and tool calls at the protocol boundary, with per-tool budget, risk tier, identity, and decision evidence.',
+  mcp: 'Checks each MCP tool call against its budget and allowed tools, and signs receipts.',
 };
 
 export const brutalComparisons: Record<string, BrutalComparison> = {
@@ -42,7 +42,7 @@ export const brutalComparisons: Record<string, BrutalComparison> = {
     bullets: [
       { title: 'AWS is strongest inside AWS-native architectures', body: 'That is valuable. It is also the limitation. Most enterprises will not put every agent, model, API, MCP server, and payment method inside one AWS-native box.' },
       { title: 'Payments are not permission', body: 'A payment session does not answer whether this agent, task, tenant, budget, route, or delegated child should be allowed to act right now.' },
-      { title: 'Receipts need policy context', body: 'Finance and security need more than “a payment happened.” They need who delegated the permissions, what policy applied, why it was allowed, and what evidence remains.' },
+      { title: 'Receipts need policy context', body: 'Finance and security need more than “a payment happened.” They need to know what was refused, what was spent, and that the record wasn’t changed.' },
       { title: 'Deployment flexibility matters', body: 'Regulated APIs, private MCP tools, and customer-controlled gateways need enforcement near the trust boundary, not only in a managed cloud console.' },
     ],
     faqs: [

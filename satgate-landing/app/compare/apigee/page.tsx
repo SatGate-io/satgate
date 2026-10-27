@@ -37,7 +37,7 @@ const rows: Array<[string, string, string]> = [
   ['MCP tool budget enforcement', 'Yes: per-tool budgets, cost attribution, and deny decisions', 'Not the primary category focus'],
   ['Scoped revocable agent capabilities', 'Yes: route, tool, call, budget, expiry, delegation, and revocation caveats', 'Typically API keys, policies, tokens, or platform auth building blocks'],
   ['Runaway agent spend benchmark/data', 'Yes: benchmark page plus JSON/CSV dataset', 'No direct equivalent'],
-  ['L402 paid-agent API payments', 'Yes: checks payment details before access and preserves a signed receipt (Evidence Pack)', 'No native SatGate-style payment rules focus'],
+  ['Paid access for external agents (Lightning or USDC)', 'Yes: checks payment before access, and signs a receipt when it refuses an agent for a missing payment', 'No native SatGate-style payment rules focus'],
   ['Broad API/AI platform management', 'Focused on spending controls', 'Yes / stronger fit'],
 ];
 

@@ -33,7 +33,7 @@ const rows: Array<[string, string, string]> = [
   ['MCP tool budget enforcement', 'Yes', 'Not the primary economic-control focus'],
   ['Per-tool cost attribution beyond LLM calls', 'Yes', 'Primarily LLM/app traffic or gateway telemetry'],
   ['Scoped revocable agent capabilities', 'Yes', 'Adjacent access controls, not SatGate-style narrowed capabilities'],
-  ['L402 paid-agent API payments', 'Yes', 'No native payment rules equivalent'],
+  ['Paid access for external agents (Lightning or USDC)', 'Yes', 'No native payment rules equivalent'],
   ['AI gateway / model traffic management', 'Partial', 'Yes'],
   ['Observability and analytics', 'Yes, economic audit oriented', 'Yes'],
   ['Open-source/self-hostable posture', 'Yes', 'Varies by product and deployment tier'],
@@ -157,7 +157,7 @@ export default function ComparePortkeyPage() {
             {([
               ['Hard agent budget enforcement', true, 'Policy decisions before expensive agent/API activity executes.'],
               ['MCP tool cost policy', true, 'Prices, limits, risk tiers, and audit evidence per tool call.'],
-              ['L402 payment rules', true, 'Payment details recorded at request time for external agent or API access.'],
+              ['Paid access for external agents (Lightning or USDC)', true, 'Payment details recorded at request time for external agent or API access.'],
               ['Broad AI gateway/observability suite', false, 'This is where Portkey may be the better fit; SatGate governs the economics around that layer.'],
             ] as Array<[string, boolean, string]>).map(([label, yes, body]) => (
               <div key={label} className="rounded-xl border border-gray-800 bg-black p-5">

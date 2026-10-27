@@ -126,7 +126,7 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
         <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="mb-4 text-3xl font-bold text-white">What to compare for agent governance</h2>
           <p className="mb-10 max-w-4xl text-lg leading-relaxed text-gray-400">
-            Routing, dashboards, billing caps, and rate limits are useful. They are not the same as permission before the agent acts across providers and rails. SatGate makes the operational loop explicit: Observe the request, Control the budget for a sub-agent before execution, and Prove the outcome with a signed receipt.
+            Routing, dashboards, billing caps, and rate limits are useful. They are not the same as permission before the agent acts across providers and rails. Observe shows what agents do, Control enforces their budgets before a call runs, and SatGate signs receipts you can check.
           </p>
           <div className="overflow-hidden rounded-2xl border border-gray-800">
             <div className="grid gap-4 bg-gray-900/80 px-5 py-4 text-sm font-bold uppercase tracking-wide text-gray-400 md:grid-cols-[1.1fr_1.4fr_1.4fr_.7fr]">
@@ -164,7 +164,7 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
       </section>
 
       <section className="border-y border-gray-900 bg-black">
-        <div className="mx-auto grid max-w-6xl gap-8 px-6 py-16 lg:grid-cols-[1.1fr_.9fr]">
+        <div className="mx-auto max-w-6xl px-6 py-16">
           <div>
             <p className="mb-3 text-sm font-mono uppercase tracking-wide text-cyan-300">The rules-and-receipts layer</p>
             <h2 className="mb-5 text-3xl font-bold text-white">The hard question is not routing. It is who had permission before the agent acts.</h2>
@@ -176,15 +176,6 @@ export function BrutalComparisonPage({ config }: { config: BrutalComparison }) {
                 That is the SatGate distinction in these comparisons. SatGate is not trying to replace every model router, tracing stack, API gateway, or payment method. It sits in front of your APIs and MCP tools as Agent Permissions and Receipts: Observe the agent request, Control what it is allowed to do, and keep signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, which security, finance and compliance can inspect later.
               </p>
             </div>
-          </div>
-          <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
-            <h3 className="mb-4 text-xl font-bold text-white">What a receipt should preserve</h3>
-            <ul className="space-y-3 text-gray-300">
-              <li><strong className="text-white">Authority:</strong> the agent, user, tenant, token caveats, and delegated depth behind the request.</li>
-              <li><strong className="text-white">Policy:</strong> the budget, tool, payment method, allowlist, and revocation checks evaluated before execution.</li>
-              <li><strong className="text-white">Decision:</strong> whether SatGate allowed or denied the request, or held it for approval.</li>
-              <li><strong className="text-white">Proof:</strong> signed receipt metadata that can survive dashboards, vendor logs, and postmortem guesswork.</li>
-            </ul>
           </div>
         </div>
       </section>
